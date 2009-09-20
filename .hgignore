@@ -11,3 +11,5 @@ eggs
 parts
 src/*.egg-info
 .DS_Store
+.project
+.pydevproject
