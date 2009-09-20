@@ -1,0 +1,13 @@
+# use glob syntax.
+syntax: glob
+*.pyc
+*.pyo
+.installed.cfg
+bin
+develop-eggs
+dist
+downloads
+eggs
+parts
+src/*.egg-info
+.DS_Store
