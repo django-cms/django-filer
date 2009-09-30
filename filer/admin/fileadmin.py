@@ -13,7 +13,14 @@ from filer.admin.tools import *
 from filer.models import tools
 
 from django.conf import settings
+# forms
+class FileAdminChangeFrom(forms.ModelForm):
+    #subject_location = forms.CharField(max_length=64, required=False)
+    
+    class Meta:
+        model = File
 
+#ModelAdmins
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('label',)
     list_per_page = 10
@@ -26,26 +33,11 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     # and in render_change_form() override add and change to False.
     save_as=True
     
+    form = FileAdminChangeFrom
     fieldsets = (
         (None, {
             'fields': ('name', 'owner',)#'contact',
         }),
-        #(None, {
-        #    'fields': ('subject_location',),
-        #    'classes': ('hide',),
-        #}),
-        ('Copyright and Author', {
-            #'classes': ('collapse',),
-            'fields': ('author', 'must_always_publish_author_credit', 'must_always_publish_copyright')
-        }),
-        ('Restrictions', {
-            #'classes': ('collapse',),
-            #'fields': ('can_use_for_web', 'can_use_for_print','can_use_for_teaching','can_use_for_research','can_use_for_private_use')
-        }),
-        #('Manipulation (only works with cloned images)', {
-            #'classes': ('collapse',),
-        #    'fields': ('manipulation_profile', )
-        #}),
     )
     class Media:
         css = {

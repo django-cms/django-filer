@@ -1,4 +1,5 @@
 import os
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
@@ -42,7 +43,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/paste_clipboard_to_folder/$', self.admin_site.admin_view(views.paste_clipboard_to_folder), name='filer-paste_clipboard_to_folder'),
             url(r'^operations/discard_clipboard/$', self.admin_site.admin_view(views.discard_clipboard), name='filer-discard_clipboard'),
             url(r'^operations/delete_clipboard/$', self.admin_site.admin_view(views.delete_clipboard), name='filer-delete_clipboard'),
-            url(r'^operations/move_file_to_clipboard/$', self.admin_site.admin_view(views.move_file_to_clipboard), name='filer-move_file_to_clipboard'),
+            url(r'^operations/move_file_to_clipboard/$', self.admin_site.admin_view(self.move_file_to_clipboard), name='filer-move_file_to_clipboard'),
             # upload does it's own permission stuff (because of the stupid flash missing cookie stuff)
             url(r'^operations/upload/$', self.ajax_upload, name='filer-ajax_upload'),
         )
@@ -122,3 +123,16 @@ class ClipboardAdmin(admin.ModelAdmin):
             print e
         print file_items
         return render_to_response('admin/filer/tools/clipboard/clipboard_item_rows.html', {'items': file_items }, context_instance=RequestContext(request))
+    def move_file_to_clipboard(self, request):
+        print "move file"
+        if request.method=='POST':
+            file_id = request.POST.get("file_id", None)
+            clipboard = tools.get_user_clipboard(request.user)
+            if file_id:
+                file = File.objects.get(id=file_id)
+                if file.has_edit_permission(request):
+                    tools.move_file_to_clipboard([file], clipboard)
+                else:
+                    raise PermissionDenied
+        return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
+

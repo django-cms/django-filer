@@ -26,7 +26,7 @@ class Image(File):
     subject_location = models.CharField(max_length=64, null=True, blank=True, default=None)
     
     def _check_validity(self):
-        if not self.name or not self.contact:
+        if not self.name:# or not self.contact:
             return False
         return True
     def sidebar_image_ratio(self):
@@ -48,8 +48,8 @@ class Image(File):
                 pass
         if self.date_taken is None:
             self.date_taken = datetime.now()
-        if not self.contact:
-            self.contact = self.owner
+        #if not self.contact:
+        #    self.contact = self.owner
         self.has_all_mandatory_data = self._check_validity()
         try:
             if self.subject_location:
@@ -73,7 +73,7 @@ class Image(File):
         except:
             # probably the image is missing. nevermind.
             pass
-        super(ImageFile, self).save(*args, **kwargs)
+        super(Image, self).save(*args, **kwargs)
         
     def _get_exif(self):
         if hasattr(self, '_exif_cache'):

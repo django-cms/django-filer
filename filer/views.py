@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 
-from models import Folder, Image, Clipboard, ClipboardItem
+from models import Folder, Image, Clipboard, ClipboardItem, File
 from models import tools
 from models import FolderRoot, UnfiledImages, ImagesWithMissingData
 from django.contrib.auth.models import User
@@ -136,20 +136,6 @@ def delete_clipboard(request):
         tools.delete_clipboard(clipboard)
     return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
 
-
-@login_required
-def move_file_to_clipboard(request):
-    print "move file"
-    if request.method=='POST':
-        file_id = request.POST.get("file_id", None)
-        clipboard = tools.get_user_clipboard(request.user)
-        if file_id:
-            file = Image.objects.get(id=file_id)
-            if file.has_edit_permission(request):
-                tools.move_file_to_clipboard([file], clipboard)
-            else:
-                raise PermissionDenied
-    return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
 
 @login_required
 def clone_files_from_clipboard_to_folder(request):
