@@ -1,0 +1,13 @@
+{% extends "admin/image_filer/image/change_form.html" %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">Home</a> › <a href="/admin/image_filer/">Image Portfolio</a>{% if original.folder %} › <a href="{% url admin:image_filer-directory_listing-root %}">Root</a>{% for ancestor_folder in original.folder.get_ancestors %} › <a href="{% url admin:image_filer-directory_listing ancestor_folder.id %}">{{ ancestor_folder.name }}</a>{% endfor %} › <a href="{% url admin:image_filer-directory_listing original.folder.id %}">{{ original.folder.name }}</a>{% endif %} › <a href="/admin/image_filer/image/{{ image.id }}/">{{ image.label }}</a> › export</div>{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block content %}
+<form action="{% url admin:image_filer-export_image image.id %}" method="post">
+	<table>
+	{{ form }}
+	</table>
+	<input type="submit" value="download image" />
+</form>
+{% endblock %}

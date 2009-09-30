@@ -1,0 +1,131 @@
+{% extends "admin/filer/folder/base.html" %}
+{% load i18n %}
+{% load adminmedia %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/popup_handling.js"></script>
+
+<style type="text/css">
+	table thead th.thumbHeader {
+		width: 52px;
+	}
+	#fileUploadFakeLink {
+		position: relative;
+		
+	}
+	#fileInputUploaderContainer {
+		position: absolute;
+		top:0;
+		left: -8px;
+	}
+	#fileInputUploader {
+	}
+	.fileUploadQueueItem .fileUploadProgress .fileUploadProgressBar {
+		background-color: black;
+	}
+	.loadingThumb {
+		width: 32px;
+		height: 32px;
+		background-image: url({{ FILER_MEDIA_URL }}img/loading_animation.gif);
+		background-repeat:no-repeat;
+		
+	}
+	.clipboard tr td.thumbnail {
+		width: 40px;
+	}
+	a.insertlinkButton {
+		padding: 4px;
+		padding-left: 28px;
+		background-image: url({{ FILER_MEDIA_URL }}img/select_item.gif);
+		background-repeat: no-repeat;
+	}
+	a.insertlinkButton:hover {
+		background-image: url({{ FILER_MEDIA_URL }}img/select_item-hover.gif);
+	}
+	
+	h1.folder_header {
+		background-image: url({{ FILER_MEDIA_URL }}img/nav-bg.gif);
+		background-repeat: repeat-x;
+		background-position: bottom;
+	}
+	a.small_folder_link {
+		display: block;
+		height: 36px;
+		background-repeat: no-repeat;
+		padding-left: 36px;
+		padding-right: 4px;
+		background-image: url({{ FILER_MEDIA_URL }}icons/plainfolder_32x32.png);
+		line-height: 36px;
+		float: right;
+	}
+	
+	
+</style>
+{# upload stuff #}
+<script type="text/javascript" src="http://jqueryui.com/latest/jquery-1.3.2.js"></script>
+<script src="http://dev.jquery.com/view/tags/ui/latest/ui/effects.core.js"></script>
+<script src="http://dev.jquery.com/view/tags/ui/latest/ui/effects.highlight.js"></script>
+<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/jquery.cookie.js"></script>
+<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/swfupload.js"></script>
+<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/swfupload.queue.js"></script>
+
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+
+{% block extrastyle %}{{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+	<a href="/admin/">Home</a> › <a href="/admin/filer/">Image Portfolio</a> › 
+	<a href="{% url admin:filer-directory_listing-root %}">Root</a>
+	{% for ancestor_folder in folder.get_ancestors %}
+	 › <a href="{% url admin:filer-directory_listing ancestor_folder.id %}">{{ ancestor_folder.name }}</a>
+	 {% endfor %} › 
+	 {{ folder.name }}
+</div>
+{% endblock %}
+
+
+{% block sidebar %}
+<div id="content-related">
+	{% include "admin/filer/tools/clipboard/clipboard.html" %}
+</div>
+{% endblock %}
+
+
+{% block content_title %}<h1>&nbsp;</h1>
+{% endblock %}
+{% block content %}
+<div id="content-main">
+	<ul class="object-tools">
+		{% if folder.can_have_subfolders %}<li><a id="id_new_folder" href="{% url admin:filer-directory_listing-make_root_folder %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);">{% trans "New Folder" %}</a>{% endif %}</li>
+		<li>{% include "admin/filer/tools/upload_button.html" %}</li>
+		{% comment %}
+		<li><a id="id_directory_root" href="{% url admin:filer-directory_listing-root %}{% if is_popup %}?_popup=1{% endif %}" class="link">Root</a></li>
+		<li><a id="id_missing_data_images" href="{% url admin:filer-directory_listing-images_with_missing_data %}{% if is_popup %}?_popup=1{% endif %}" class="link">Incomplete Images</a></li>
+		<li><a id="id_unfiled_images" href="{% url admin:filer-directory_listing-unfiled_images %}{% if is_popup %}?_popup=1{% endif %}" class="link">Unfiled Images</a></li>
+		{% endcomment %}
+    </ul>
+	
+    <div class="module" id="changelist">
+    	{% include "admin/filer/tools/search_form.html" %}
+		{% if not folder.is_root %}
+		<h1 class="folder_header">{% if folder.parent %}<a href="{% url admin:filer-directory_listing folder.parent.id %}{% if is_popup %}?_popup=1{% endif %}">&uarr;</a>{% else %}<a href="{% url admin:filer-directory_listing-root %}{% if is_popup %}?_popup=1{% endif %}">&uarr;</a>{% endif %} 
+			<img src="{{ FILER_MEDIA_URL }}icons/plainfolder_64x64.png" alt="Folder Icon" /> {{ folder.name }}
+			<span class="small quiet">({% blocktrans count folder.children_count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.file_count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>
+		</h1>
+		{% else %}{% if folder.is_smart_folder %}
+		<h1 class="folder_header"><a href="{% url admin:filer-directory_listing-root %}{% if is_popup %}?_popup=1{% endif %}">&uarr;</a>
+			<img src="{{ folder.icons.64 }}" alt="Folder Icon" /> {{ folder.name }}
+		</h1>
+		{% endif %}
+		{% endif %}
+        {% include "admin/filer/folder/directory_table.html" %}
+    </div>
+</div>
+
+{% endblock %}

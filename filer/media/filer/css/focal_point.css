@@ -1,0 +1,2 @@
+#image_container { position: relative; } 
+#image_container img, #image_container svg { margin: 0px; position: absolute; top: 0; left: 0;}

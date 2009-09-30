@@ -1,0 +1,127 @@
+from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
+from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
+from django.http import HttpResponseRedirect
+from django.template import RequestContext
+from django.shortcuts import render_to_response
+from django.contrib import admin
+from django import forms
+from django.db.models import Q
+from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
+from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
+from filer.admin.tools import *
+from filer.models import tools
+
+from django.conf import settings
+
+class FileAdmin(PrimitivePermissionAwareModelAdmin):
+    list_display = ('label',)
+    list_per_page = 10
+    search_fields = ['name', 'original_filename',]
+    raw_id_fields = ('owner',) #'contact', 
+    
+    # save_as hack, because without save_as it is impossible to hide the 
+    # save_and_add_another if save_as is False.
+    # To show only save_and_continue and save in the submit row we need save_as=True
+    # and in render_change_form() override add and change to False.
+    save_as=True
+    
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'owner',)#'contact',
+        }),
+        #(None, {
+        #    'fields': ('subject_location',),
+        #    'classes': ('hide',),
+        #}),
+        ('Copyright and Author', {
+            #'classes': ('collapse',),
+            'fields': ('author', 'must_always_publish_author_credit', 'must_always_publish_copyright')
+        }),
+        ('Restrictions', {
+            #'classes': ('collapse',),
+            #'fields': ('can_use_for_web', 'can_use_for_print','can_use_for_teaching','can_use_for_research','can_use_for_private_use')
+        }),
+        #('Manipulation (only works with cloned images)', {
+            #'classes': ('collapse',),
+        #    'fields': ('manipulation_profile', )
+        #}),
+    )
+    class Media:
+        css = {
+            'all': (settings.MEDIA_URL + 'image_filer/css/focal_point.css',)
+        }
+        js = (
+            settings.MEDIA_URL + 'image_filer/js/jquery-1.3.2.min.js',
+            settings.MEDIA_URL + 'image_filer/js/raphael.js',
+            settings.MEDIA_URL + 'image_filer/js/focal_point.js',
+        )
+    def admin_thumbnail(self,xs):
+        return mark_safe('<img src="{{ FILER_MEDIA_URL }}icons/plainfolder_32x32.png" alt="Folder Icon" />')
+    admin_thumbnail.allow_tags = True
+    def response_change(self, request, obj):
+        '''
+        Overrides the default to be able to forward to the directory listing
+        instead of the default change_list_view
+        '''
+        r = super(FileAdmin, self).response_change(request, obj)
+        #print r['Location']
+        if r['Location']:
+            # it was a successful save
+            if r['Location'] in ['../']:
+                # this means it was a save: redirect to the directory view
+                if obj.folder:
+                    url = reverse('admin:filer-directory_listing', 
+                                  kwargs={'folder_id': obj.folder.id})
+                else:
+                    url = reverse('admin:filer-directory_listing-unfiled_images')
+                return HttpResponseRedirect(url)
+            else:
+                # this means it probably was a save_and_continue_editing
+                pass
+        return r
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        extra_context = {'show_delete': True}
+        context.update(extra_context)
+        return super(FileAdmin, self).render_change_form(request=request, context=context, add=False, change=False, form_url=form_url, obj=obj)
+    
+    def delete_view(self, request, object_id, extra_context=None):
+        '''
+        Overrides the default to enable redirecting to the directory view after
+        deletion of a image.
+        
+        we need to fetch the object and find out who the parent is
+        before super, because super will delete the object and make it impossible
+        to find out the parent folder to redirect to.
+        '''
+        parent_folder = None
+        try:
+            obj = self.queryset(request).get(pk=unquote(object_id))
+            parent_folder = obj.folder
+        except self.model.DoesNotExist:
+            obj = None
+        
+        r = super(FileAdmin, self).delete_view(request=request, object_id=object_id, extra_context=extra_context)
+        
+        url = r.get("Location", None)
+        if url in ["../../../../","../../"]:
+            if parent_folder:
+                url = reverse('admin:filer-directory_listing', 
+                                  kwargs={'folder_id': parent_folder.id})
+            else:
+                url = reverse('admin:filer-directory_listing-unfiled_images')
+            return HttpResponseRedirect(url)
+        return r
+    def get_urls(self):
+        from django.conf.urls.defaults import patterns, url
+        urls = super(FileAdmin, self).get_urls()
+        #from filer import views
+        url_patterns = patterns('',
+            #url(r'^(?P<image_id>\d+)/export/$', self.admin_site.admin_view(views.export_image), name='image_filer-export_image'),
+        )
+        url_patterns.extend(urls)
+        return url_patterns
+    def add_view(self, request):
+        return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))
+    def changelist_view(self, request, extra_context=None):
+        return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))

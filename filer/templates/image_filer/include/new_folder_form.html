@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% block content %}
+<h1>Add folder</h1>
+<div id="content-main">
+	<form id="folder_form" method="post" action="" enctype="multipart/form-data">
+		<div>
+			<input type="hidden" value="1" name="_popup"/>
+		  <fieldset class="module aligned">
+			<div class="form-row name">
+				<div>
+					<label class="required" for="id_name">Name:</label><input type="text" maxlength="255" name="name" class="vTextField" id="id_name"/>
+				</div>
+			</div>
+		  </fieldset>
+		<div style="overflow: auto;" class="submit-row">
+			<input type="submit" name="_save" class="default" value="Save"/>
+		</div>
+		<script type="text/javascript">document.getElementById("id_name").focus();</script>
+		<script type="text/javascript">
+		
+		</script>
+		</div>
+	</form>
+</div>
+
+        
+ <br class="clear"/>
+{% endblock %}

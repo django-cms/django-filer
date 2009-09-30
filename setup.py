@@ -13,8 +13,8 @@ setup(
     long_description = read('README'),
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
-    packages = find_packages('src'),
-    package_dir = {'': 'src'},
+    packages = ('filer',),
+    #package_dir = {'': 'src'},
     install_requires = ['setuptools','django'],
     classifiers = [
         'Development Status :: 4 - Beta',

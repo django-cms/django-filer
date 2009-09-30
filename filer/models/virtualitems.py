@@ -1,0 +1,58 @@
+from django.utils.translation import ugettext_lazy as _
+from filer.models.filemodels import File, DEFAULT_ICON_SIZES
+from filer.models.foldermodels import Folder
+from filer import context_processors
+
+class DummyFolder(object):
+    name = "Dummy Folder"
+    is_root = True
+    is_smart_folder = True
+    can_have_subfolders = False
+    parent = None
+    _icon = "plainfolder"
+    @property
+    def children(self):
+        return Folder.objects.filter(id__in=[0]) # empty queryset
+    @property
+    def files(self):
+        return File.objects.filter(id__in=[0]) # empty queryset
+    parent_url = None
+    @property
+    def image_files(self):
+        return self.files
+    @property
+    def icons(self):
+        r = {}
+        if getattr(self, '_icon', False):
+            for size in DEFAULT_ICON_SIZES:
+                r[size] = "%sfiler/icons/%s_%sx%s.png" % \
+                    (context_processors.media(None)['FILER_MEDIA_URL'],
+                     self._icon, size, size)
+        return r
+
+
+class UnfiledImages(DummyFolder):
+    name = _("unfiled files")
+    is_root = True
+    _icon = "unfiled_folder"
+    def _files(self):
+        return File.objects.filter(folder__isnull=True)
+    files = property(_files)
+
+class ImagesWithMissingData(DummyFolder):
+    name = _("files with missing metadata")
+    is_root = True
+    _icon = "incomplete_metadata_folder"
+    @property
+    def files(self):
+        return File.objects.filter(has_all_mandatory_data=False)
+
+class FolderRoot(DummyFolder):
+    name = 'Root'
+    is_root = True
+    is_smart_folder = False
+    can_have_subfolders = True
+    @property
+    def children(self):
+        return Folder.objects.filter(parent__isnull=True)
+    parent_url = None

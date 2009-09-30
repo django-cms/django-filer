@@ -1,0 +1,23 @@
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{{ IMAGE_FILER_MEDIA_URL }}slideshow2/js/mootools.js"></script>
+<script type="text/javascript" src="{{ IMAGE_FILER_MEDIA_URL }}slideshow2/js/slideshow.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ IMAGE_FILER_MEDIA_URL }}slideshow2/css/slideshow.css" />
+{% endblock %}
+<div id="slideshow" class="slideshow">
+</div>
+<script type="text/javascript">
+    var data = {
+            {% for file in image_folder_publication.folder.files %}
+            '{{file.file.url}}': {'thumbnail': '{{file.thumbnails.admin_directory_listing_icon}}' },
+            {% endfor %}
+    };
+    {# For details see http://code.google.com/p/slideshow/wiki/Slideshow #}
+    var options = {
+            'controller': true,
+            'fast': true,
+            'thumbnails': { 'animate': ['../css/loader-#.png', 12] },
+            'preload': true,
+            'resize': 'length',
+    };
+    var myShow = new Slideshow("slideshow", data, options);
+</script>

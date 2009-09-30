@@ -1,0 +1,6 @@
+<span class="image">
+	<img alt="{% if image_publication.alt_text %}{{ image_publication.alt_text }}{% endif %}" 
+		 src="{{ image_publication.url }}" />
+	{% if image_publication.caption %}<span class="image_caption">{{ image_publication.caption }}</span>{% endif %}
+	{% if image_publication.show_author %}<span class="image_author">(Author: {{ image_publication.image.author }})</span>{% endif %}
+</span>   

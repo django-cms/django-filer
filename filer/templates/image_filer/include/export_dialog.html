@@ -1,0 +1,39 @@
+<script type="text/javascript">
+function initNewFolderDialog() {
+	var handleCancel = function() {
+		this.cancel();
+	}
+	var handleSubmit = function() {
+		this.submit();
+	}
+	var onSuccess = function() {
+		window.location=".";
+	}
+	var onFailure = function() {
+		alert("Folder name already taken.");
+	}
+	var myButtons = [	{ text: "Submit", handler: handleSubmit, isDefault: true },
+						{ text: "Cancel", handler: handleCancel} ];
+	YAHOO.log("starting dialog load");
+	var newFolderDialog = new YAHOO.widget.Dialog("newFolderDialog", {hideaftersubmit: false});
+	newFolderDialog.cfg.queueProperty("buttons", myButtons);
+	newFolderDialog.callback.success = onSuccess;
+	function showNewFolderDialog() {
+		newFolderDialog.render();
+		newFolderDialog.show();
+	}
+	
+	YAHOO.log("dialog loaded");
+	
+	YAHOO.util.Event.addListener("newFolderButton", "click", showNewFolderDialog);
+};
+YAHOO.util.Event.onDOMReady(initNewFolderDialog);
+</script>
+
+<div id="newFolderDialog" style="visibility: hidden;">
+	<div class="hd">New Folder</div>
+	<div class="bd">
+		{% include "image_filer/include/new_folder_form.html" %}
+	</div>
+	<div class="ft">foot</div>
+</div>

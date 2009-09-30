@@ -1,0 +1,9 @@
+<span class="folder">
+    Folder '{{ image_folder_publication.folder.name }}' files:
+    <ul>
+    {% for file in image_folder_publication.folder.files %}
+    <li>File name: {{file.original_filename}}</li>
+    {% endfor %}
+    </ul>
+    
+</span>   
