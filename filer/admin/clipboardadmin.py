@@ -12,15 +12,18 @@ from django.db.models import Q
 from django.contrib.admin.models import User
 from django.conf import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import Clipboard, ClipboardItem, File
+from filer.models import Clipboard, ClipboardItem, File, Image
 from filer.utils.files import generic_handle_file
 from filer.admin.tools import *
 from filer.models import tools
 
-# forms
+# forms... sucks, types should be automatic
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model=File
+class UploadImageFileForm(forms.ModelForm):
+    class Meta:
+        model=Image
 
 
 # ModelAdmins
@@ -102,22 +105,24 @@ class ClipboardAdmin(admin.ModelAdmin):
                 print "inaem: %s iext: %s" % (iname, iext)
                 #print "extension: ", iext
                 if iext in ['.jpg','.jpeg','.png','.gif']:
+                    uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'file_field':ifile})
+                else:
                     uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'file_field':ifile})
-                    if uploadform.is_valid():
-                        print 'uploadform is valid'
-                        try:
-                            file = uploadform.save(commit=False)
-                            file.save()
-                            file_items.append(file)
-                        except Exception, e:
-                            print "some exception"
-                            print e
-                        #print "save %s" % image
-                        bi = ClipboardItem(clipboard=clipboard, file=file)
-                        bi.save()
-                        #sprint image
-                    else:
-                        pass#print uploadform.errors
+                if uploadform.is_valid():
+                    print 'uploadform is valid'
+                    try:
+                        file = uploadform.save(commit=False)
+                        file.save()
+                        file_items.append(file)
+                    except Exception, e:
+                        print "some exception"
+                        print e
+                    #print "save %s" % image
+                    bi = ClipboardItem(clipboard=clipboard, file=file)
+                    bi.save()
+                    #sprint image
+                else:
+                    pass#print uploadform.errors
                 print "what up?"
         except Exception, e:
             print e

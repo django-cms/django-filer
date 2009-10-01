@@ -4,7 +4,6 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth import models as auth_models
 from django.utils.translation import ugettext_lazy as _
-
 from django.conf import settings
 from filer import context_processors
 
@@ -103,17 +102,6 @@ class Folder(models.Model):
     
     objects = FolderManager()
     
-    
-    def _get_file_relationships(self):
-        # TODO: make this a "multi iterator" that can iterate over multiple
-        #         querysets without having to load all objects
-        rel = []
-        for attr in dir(self):
-            if not attr.startswith('_') and attr.endswith('_files'):
-                # TODO: also check for fieldtype
-                rel.append(getattr(self, attr))
-        return rel
-    
     @property
     def file_count(self):
         if not hasattr(self, '_file_count_cache'):
@@ -129,12 +117,7 @@ class Folder(models.Model):
         return self.file_count + self.children_count
     @property
     def files(self):
-        rel = self._get_file_relationships()
-        result = []
-        for files in rel:
-            for file in files.all():
-                result.append(file)
-        return result
+        return self.all_files.all()
     
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')

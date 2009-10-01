@@ -27,7 +27,7 @@
 					<td></td>
 				</tr>
             {% endfor %}
-			{% for file in folder_files %}
+			{% for generic_file in folder_files %}{% with generic_file.get_subtype as file %}
                 <tr class="{% cycle rowcolors %}">
                 	<td></td>
 				    <!-- FileIcon -->
@@ -49,7 +49,7 @@
 						</form>
 					</td>
 				</tr>
-            {% endfor %}
+            {% endwith %}{% endfor %}
 			{% if not folder.is_root %}{% ifequal folder.item_count 0 %}
 			<tr class="{% cycle rowcolors %}">
 				    <!-- FileIcon -->

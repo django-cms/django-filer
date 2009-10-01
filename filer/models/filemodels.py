@@ -17,9 +17,9 @@ DEFAULT_ICON_SIZES = (
 
 class File(models.Model):
     _icon = "file"
-    folder = models.ForeignKey(Folder, related_name='files', null=True, blank=True)
+    folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
     file_field = models.FileField(upload_to=IMAGE_FILER_UPLOAD_ROOT, storage=fs, null=True, blank=True,max_length=255)
-    _file_type_plugin_name = models.CharField(_("file_type_plugin_name"), max_length=128, db_index=True, editable=False, default='GenericFile')
+    _file_type_plugin_name = models.CharField(_("file_type_plugin_name"), max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
     has_all_mandatory_data = models.BooleanField(default=False, editable=False)
@@ -53,14 +53,10 @@ class File(models.Model):
     
     @property
     def icons(self):
-        print "icons"
         r = {}
         if getattr(self, '_icon', False):
             for size in DEFAULT_ICON_SIZES:
-                print "   %s" % (size,)
-                print "   %s" % context_processors.media(None)['FILER_MEDIA_URL']
                 r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
-        print r
         return r
     
     def has_edit_permission(self, request):
@@ -92,15 +88,6 @@ class File(models.Model):
         else:
             text = u"%s" % (self.name,)
         return text
-    def __init__(self, *args, **kwargs):
-        #if self.__class__.__name__ == 'GenericFile' and \
-        #        not self._file_type_plugin_name == 'GenericFile':
-        #    detail_instance =
-        print self.__class__.__name__ 
-        import pprint
-        pprint.pprint(args)
-        pprint.pprint(kwargs)
-        return super(File, self).__init__(*args, **kwargs)
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
         # _file_type_plugin_name
@@ -113,5 +100,18 @@ class File(models.Model):
         elif issubclass(self.__class__, File):
             self._file_type_plugin_name = self.__class__.__name__
         return super(File, self).save(*args,**kwargs)
+    
+    def get_subtype(self):
+        print "get subtype"
+        if not self._file_type_plugin_name:
+            r = self
+        else:
+            try:
+                r = getattr(self, self._file_type_plugin_name.lower())
+            except Exception, e:
+                print e
+                r = self
+        print u"get_subtype: %s %s" % (r, self._file_type_plugin_name)
+        return r
     class Meta:
         app_label = 'filer'

@@ -9,6 +9,7 @@ from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
     file_type = 'image'
+    _icon = "image"
     
     _height = models.IntegerField(null=True, blank=True) 
     _width = models.IntegerField(null=True, blank=True)
