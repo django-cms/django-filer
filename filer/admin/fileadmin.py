@@ -39,18 +39,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             'fields': ('name', 'owner',)#'contact',
         }),
     )
-    class Media:
-        css = {
-            'all': (settings.MEDIA_URL + 'image_filer/css/focal_point.css',)
-        }
-        js = (
-            settings.MEDIA_URL + 'image_filer/js/jquery-1.3.2.min.js',
-            settings.MEDIA_URL + 'image_filer/js/raphael.js',
-            settings.MEDIA_URL + 'image_filer/js/focal_point.js',
-        )
-    def admin_thumbnail(self,xs):
-        return mark_safe('<img src="{{ FILER_MEDIA_URL }}icons/plainfolder_32x32.png" alt="Folder Icon" />')
-    admin_thumbnail.allow_tags = True
     def response_change(self, request, obj):
         '''
         Overrides the default to be able to forward to the directory listing

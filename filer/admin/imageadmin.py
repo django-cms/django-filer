@@ -23,7 +23,7 @@ class ImageAdminFrom(forms.ModelForm):
         if self.instance:
             return self.instance.sidebar_image_ratio()
         else:
-            return 0.0
+            return ''
     
     class Meta:
         model = Image
@@ -41,20 +41,26 @@ class ImageAdminFrom(forms.ModelForm):
 class ImageAdmin(FileAdmin):
     
     form = ImageAdminFrom
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'owner', )
+        }),
+        (None, {
+            'fields': ('subject_location',),
+            'classes': ('hide',),
+        }),
+    )
     #fieldsets = (
     #    (None, {
     #        'fields': ('name', 'owner',)#'contact',
     #    }),
     #)
-    class Media:
-        css = {
-            'all': (settings.MEDIA_URL + 'image_filer/css/focal_point.css',)
-        }
-        js = (
-            settings.MEDIA_URL + 'image_filer/js/jquery-1.3.2.min.js',
-            settings.MEDIA_URL + 'image_filer/js/raphael.js',
-            settings.MEDIA_URL + 'image_filer/js/focal_point.js',
-        )
-    def admin_thumbnail(self,xs):
-        return mark_safe('<img src="{{ FILER_MEDIA_URL }}icons/plainfolder_32x32.png" alt="Folder Icon" />')
-    admin_thumbnail.allow_tags = True
+    #class Media:
+    #    css = {
+    #        'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
+    #    }
+    #    js = (
+    #        settings.MEDIA_URL + 'filer/js/jquery-1.3.2.min.js',
+    #        settings.MEDIA_URL + 'filer/js/raphael.js',
+    #        settings.MEDIA_URL + 'filer/js/focal_point.js',
+    #    )

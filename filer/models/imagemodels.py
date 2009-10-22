@@ -120,19 +120,18 @@ class Image(File):
             return self.folder.has_generic_permission(request, type)
         else:
             return False
-                
+    @property
     def label(self):
         if self.name in ['',None]:
             return self.original_filename or 'unnamed file'
         else:
             return self.name
-    label = property(label)
     @property
     def width(self):
-        return self._width_field or 0
+        return self._width or 0
     @property
     def height(self):
-        return self._height_field or 0
+        return self._height or 0
     @property
     def size(self):
         try:
