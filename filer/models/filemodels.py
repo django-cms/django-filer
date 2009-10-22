@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.core import urlresolvers
 from django.db import models
 from django.contrib.auth import models as auth_models
 
@@ -6,13 +7,9 @@ from django.conf import settings
 from filer.models.safe_file_storage import SafeFilenameFileSystemStorage
 from filer.models.foldermodels import Folder
 from filer import context_processors
+from filer.models.defaults import *
 
 fs = SafeFilenameFileSystemStorage()
-
-IMAGE_FILER_UPLOAD_ROOT = getattr(settings,'IMAGE_FILER_UPLOAD_ROOT', 'catalogue')
-DEFAULT_ICON_SIZES = (
-        '32','48','64',
-)
     
 
 class File(models.Model):
@@ -101,7 +98,7 @@ class File(models.Model):
             self._file_type_plugin_name = self.__class__.__name__
         return super(File, self).save(*args,**kwargs)
     
-    def get_subtype(self):
+    def subtype(self):
         print "get subtype"
         if not self._file_type_plugin_name:
             r = self
@@ -111,7 +108,10 @@ class File(models.Model):
             except Exception, e:
                 print e
                 r = self
-        print u"get_subtype: %s %s" % (r, self._file_type_plugin_name)
+        print u"get subtype: %s %s" % (r, self._file_type_plugin_name)
         return r
+    def get_absolute_admin_change_url(self):
+        return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
     class Meta:
         app_label = 'filer'
+

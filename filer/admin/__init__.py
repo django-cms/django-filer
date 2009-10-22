@@ -4,12 +4,6 @@ from filer.models import *
 
 admin.site.register([FolderPermission,])
 
-
-admin.site.register([Image,])
-
-
-
-
 from filer.admin.folderadmin import FolderAdmin
 #admin.site.register([Folder,])
 admin.site.register(Folder,FolderAdmin)
@@ -20,3 +14,6 @@ admin.site.register(File,FileAdmin)
 
 from filer.admin.clipboardadmin import ClipboardAdmin
 admin.site.register(Clipboard, ClipboardAdmin)
+
+from filer.admin.imageadmin import ImageAdmin
+admin.site.register(Image, ImageAdmin)

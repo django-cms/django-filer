@@ -1,12 +1,13 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
+from filer import __version__
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name = "django-filer",
-    version = "0.1",
+    version = __version__,
     url = 'http://github.com/stefanfoulis/django-filer',
     license = 'BSD',
     description = "A file management application for django that makes handling of files and images a breeze.",

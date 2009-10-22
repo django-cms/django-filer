@@ -1,13 +1,25 @@
 import StringIO
 from datetime import datetime, date
 from django.utils.translation import ugettext_lazy as _
+from django.core import urlresolvers
 from django.db import models
 from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
+from filer.models.defaults import *
+from filer import context_processors
+
+from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
+from sorl.thumbnail.fields import ALL_ARGS
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
+    DEFAULT_THUMBNAILS = {
+        'admin_clipboard_icon': {'size': (32,32), 'options': ['crop','upscale']},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,SIDEBAR_IMAGE_WIDTH), 'options': []},
+        'admin_directory_listing_icon': {'size': (48,48), 'options': ['crop','upscale']},
+        'admin_tiny_icon': {'size': (32,32), 'options': ['crop','upscale']},
+    }
     file_type = 'image'
     _icon = "image"
     
@@ -60,17 +72,17 @@ class Image(File):
                                                   
                 sl = (int(pos_x), int(pos_y) )
                 exif_sl = self.exif.get('SubjectLocation', None)
-                if self.file and not sl == exif_sl:
-                    self.file.open()
-                    fd_source = StringIO.StringIO(self.file.read())
-                    self.file.close()
-                    set_exif_subject_location(sl, fd_source, self.file.path)
+                if self.file_field and not sl == exif_sl:
+                    self.file_field.open()
+                    fd_source = StringIO.StringIO(self.file_field.read())
+                    self.file_field.close()
+                    set_exif_subject_location(sl, fd_source, self.file_field.path)
         except:
             # probably the image is missing. nevermind
             pass
         try:
-            self._width = self.file.width
-            self._height = self.file.height
+            self._width = self.file_field.width
+            self._height = self.file_field.height
         except:
             # probably the image is missing. nevermind.
             pass
@@ -80,8 +92,8 @@ class Image(File):
         if hasattr(self, '_exif_cache'):
             return self._exif_cache
         else:
-            if self.file:
-                self._exif_cache = get_exif_for_file(self.file.path)
+            if self.file_field:
+                self._exif_cache = get_exif_for_file(self.file_field.path)
             else:
                 self._exif_cache = {}
         return self._exif_cache
@@ -124,27 +136,77 @@ class Image(File):
     @property
     def size(self):
         try:
-            return self.file.size
+            return self.file_field.size
         except:
             return 0
+    @property
+    def icons(self):
+        if not getattr(self, '_icon_thumbnails_cache', False):
+            r = {}
+            print "creating image icon"
+            for size in DEFAULT_ICON_SIZES:
+                print "    creating image icon %s" % size
+                try:
+                    args = {'size': (int(size),int(size)), 'options': ['crop','upscale']}
+                    # Build the DjangoThumbnail kwargs.
+                    kwargs = {}
+                    for k, v in args.items():
+                        kwargs[ALL_ARGS[k]] = v
+                    print "kwargs"
+                    print kwargs
+                    # Build the destination filename and return the thumbnail.
+                    name_kwargs = {}
+                    for key in ['size', 'options', 'quality', 'basedir', 'subdir',
+                                'prefix', 'extension']:
+                        name_kwargs[key] = args.get(key)
+                    print "name_kwargs"
+                    print name_kwargs
+                    source = self.file_field
+                    print "the source"
+                    print source.name
+                    dest = build_thumbnail_name(source.name, **name_kwargs)
+                    print "    %s" % dest
+                    print "    creating image iconB %s" % size
+                    r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
+                except Exception, e:
+                    print e
+                #r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
+            setattr(self, '_icon_thumbnails_cache', r)
+        return getattr(self, '_icon_thumbnails_cache')
+    def _build_thumbnail(self, args):
+        # Build the DjangoThumbnail kwargs.
+        kwargs = {}
+        for k, v in args.items():
+            kwargs[ALL_ARGS[k]] = v
+        # Build the destination filename and return the thumbnail.
+        name_kwargs = {}
+        for key in ['size', 'options', 'quality', 'basedir', 'subdir',
+                    'prefix', 'extension']:
+            name_kwargs[key] = args.get(key)
+        source = self.file_field
+        dest = build_thumbnail_name(source.name, **name_kwargs)
+        return DjangoThumbnail(source, relative_dest=dest, **kwargs)
     @property
     def thumbnails(self):
         # we build an extra dict here mainly
         # to prevent the default errors to 
         # get thrown and to add a default missing
         # image (not yet)
+        print "getting thumbnails for %s" % self.id
         if not hasattr(self, '_thumbnails'):
             tns = {}
-            for name, tn in self.file.extra_thumbnails.items():
-                tns[name] = tn
+            for name, opts in Image.DEFAULT_THUMBNAILS.items():
+                tns[name] = unicode(self._build_thumbnail(opts))
             self._thumbnails = tns
+            #print tns
         return self._thumbnails
+    
     @property
     def url(self):
         '''
         needed to make this behave like a ImageField
         '''
-        return self.file.url
+        return self.file_field.url
     @property
     def absolute_image_url(self):
         return self.url
@@ -152,12 +214,14 @@ class Image(File):
     def rel_image_url(self):
         'return the image url relative to MEDIA_URL'
         try:
-            rel_url = u"%s" % self.file.url
+            rel_url = u"%s" % self.file_field.url
             if rel_url.startswith('/media/'):
                 before, match, rel_url = rel_url.partition('/media/')
             return rel_url
         except Exception, e:
             return ''
+    def get_absolute_admin_change_url(self):
+        return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     def __unicode__(self):
         # this simulates the way a file field works and
         # allows the sorl thumbnail tag to use the Image model
