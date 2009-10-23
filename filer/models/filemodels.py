@@ -118,6 +118,9 @@ class File(models.Model):
         except:
             r = ''
         return r
+    @property
+    def file(self):
+        return self.file_field.file
     class Meta:
         app_label = 'filer'
 

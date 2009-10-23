@@ -12,6 +12,8 @@ from filer import context_processors
 from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
 from sorl.thumbnail.fields import ALL_ARGS
 
+from PIL import Image as PILImage
+
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
     DEFAULT_THUMBNAILS = {
@@ -81,10 +83,12 @@ class Image(File):
             # probably the image is missing. nevermind
             pass
         try:
-            self._width = self.file_field.width
-            self._height = self.file_field.height
-        except:
+            # do this more efficient somehow?
+            self._width, self._height = PILImage.open(self.file_field).size
+            #self._height = self.file_field.height
+        except Exception, e:
             # probably the image is missing. nevermind.
+            print e
             pass
         super(Image, self).save(*args, **kwargs)
         
@@ -191,7 +195,7 @@ class Image(File):
         # to prevent the default errors to 
         # get thrown and to add a default missing
         # image (not yet)
-        print "getting thumbnails for %s" % self.id
+        #print "getting thumbnails for %s" % self.id
         if not hasattr(self, '_thumbnails'):
             tns = {}
             for name, opts in Image.DEFAULT_THUMBNAILS.items():
