@@ -118,8 +118,26 @@ class File(models.Model, mixins.IconsMixin):
     def file(self):
         return self.file_field.file
     @property
+    def path(self):
+        try:
+            return self.file_field.path
+        except:
+            return ""
+    @property
     def size(self):
         return self._file_size or 0
+    
+    @property
+    def logical_folder(self):
+        """
+        if this file is not in a specific folder return the Special "unfiled"
+        Folder object
+        """
+        if not self.folder:
+            from filer.models.virtualitems import UnfiledImages
+            return UnfiledImages()
+        else:
+            return self.folder
     class Meta:
         app_label = 'filer'
 

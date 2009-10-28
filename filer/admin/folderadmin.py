@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import admin
@@ -138,7 +138,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         elif folder_id == None:
             folder = FolderRoot()
         else:
-            folder = Folder.objects.get(id=folder_id)
+            try:
+                folder = Folder.objects.get(id=folder_id)
+            except Folder.DoesNotExist:
+                raise Http404
             
         # search
         def filter_folder(qs, terms=[]):
