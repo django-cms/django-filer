@@ -1,8 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
-from filer.models.filemodels import File, DEFAULT_ICON_SIZES
+from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
 from filer.models import mixins
-from filer import context_processors
 from django.core import urlresolvers
 
 class DummyFolder(mixins.IconsMixin):

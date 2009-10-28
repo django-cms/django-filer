@@ -6,8 +6,7 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
-from filer.models.defaults import *
-from filer import context_processors
+from filer.settings import FILER_ADMIN_ICON_SIZES
 
 from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
 from sorl.thumbnail.fields import ALL_ARGS
@@ -75,9 +74,9 @@ class Image(File):
                 sl = (int(pos_x), int(pos_y) )
                 exif_sl = self.exif.get('SubjectLocation', None)
                 if self.file_field and not sl == exif_sl:
-                    self.file_field.open()
+                    #self.file_field.open()
                     fd_source = StringIO.StringIO(self.file_field.read())
-                    self.file_field.close()
+                    #self.file_field.close()
                     set_exif_subject_location(sl, fd_source, self.file_field.path)
         except:
             # probably the image is missing. nevermind
@@ -88,7 +87,7 @@ class Image(File):
             #self._height = self.file_field.height
         except Exception, e:
             # probably the image is missing. nevermind.
-            print e
+            #print e
             pass
         super(Image, self).save(*args, **kwargs)
         
@@ -137,16 +136,10 @@ class Image(File):
     def height(self):
         return self._height or 0
     @property
-    def size(self):
-        try:
-            return self.file_field.size
-        except:
-            return 0
-    @property
     def icons(self):
         if not getattr(self, '_icon_thumbnails_cache', False):
             r = {}
-            for size in DEFAULT_ICON_SIZES:
+            for size in FILER_ADMIN_ICON_SIZES:
                 try:
                     args = {'size': (int(size),int(size)), 'options': ['crop','upscale']}
                     # Build the DjangoThumbnail kwargs.
@@ -163,7 +156,6 @@ class Image(File):
                     r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
                 except Exception, e:
                     pass#print e
-                #r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
             setattr(self, '_icon_thumbnails_cache', r)
         return getattr(self, '_icon_thumbnails_cache')
     def _build_thumbnail(self, args):

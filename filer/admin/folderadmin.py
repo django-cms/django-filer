@@ -11,6 +11,7 @@ from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
 from filer.admin.tools import *
 from filer.models import tools
+from filer.settings import FILER_MEDIA_PREFIX
 
 
 # Forms
@@ -105,7 +106,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return HttpResponseRedirect(url)
         return r
     def icon_img(self,xs):
-        return mark_safe('<img src="{{ FILER_MEDIA_URL }}img/icons/plainfolder_32x32.png" alt="Folder Icon" />')
+        return mark_safe('<img src="%simg/icons/plainfolder_32x32.png" alt="Folder Icon" />' % FILER_MEDIA_PREFIX)
     icon_img.allow_tags = True
     
     def get_urls(self):

@@ -1,17 +1,17 @@
 {% extends "admin/filer/base_site.html" %}
 {% load i18n %}
-{% load adminmedia %}
+{% load adminmedia filermedia %}
 
 {% block extrahead %}{{ block.super }}
-<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
-<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/popup_handling.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="{% filer_media_prefix %}js/popup_handling.js"></script>
 
 {# upload stuff #}
-<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/jquery-ui-1.7.2.custom.min.js"></script>
-<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/jquery.cookie.js"></script>
-<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/swfupload.js"></script>
-<script type="text/javascript" src="{{ FILER_MEDIA_URL }}js/swfupload.queue.js"></script>
+<script type="text/javascript" src="{% filer_media_prefix %}js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="{% filer_media_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="{% filer_media_prefix %}js/jquery.cookie.js"></script>
+<script type="text/javascript" src="{% filer_media_prefix %}js/swfupload.js"></script>
+<script type="text/javascript" src="{% filer_media_prefix %}js/swfupload.queue.js"></script>
 
 {% endblock %}
 
@@ -65,7 +65,7 @@
     	{% include "admin/filer/tools/search_form.html" %}
 		{% if not folder.is_root %}
 		<h1 class="folder_header">{% if folder.parent %}<a href="{% url admin:filer-directory_listing folder.parent.id %}{% if is_popup %}?_popup=1{% endif %}">&uarr;</a>{% else %}<a href="{% url admin:filer-directory_listing-root %}{% if is_popup %}?_popup=1{% endif %}">&uarr;</a>{% endif %} 
-			<img src="{{ FILER_MEDIA_URL }}icons/plainfolder_64x64.png" alt="Folder Icon" /> {{ folder.name }}
+			<img src="{{ folder.icons.64 }}" alt="Folder Icon" /> {{ folder.name }}
 			<span class="small quiet">({% blocktrans count folder.children_count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.file_count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>
 			<span>{% if is_popup %}{% else %}<a style="display: block; float: right;" class="changelink" href="/admin/filer/folder/{{ folder.id }}/">Change</a>{% endif %}</span>
 		</h1>

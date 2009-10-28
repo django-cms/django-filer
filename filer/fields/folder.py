@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.conf import settings
 from sorl.thumbnail.base import ThumbnailException
-from filer import context_processors
+from filer.settings import FILER_MEDIA_PREFIX
 
 class ImageFilerFolderWidget(ForeignKeyRawIdWidget):
     choices = None
@@ -55,7 +55,7 @@ class ImageFilerFolderWidget(ForeignKeyRawIdWidget):
         return obj
     
     class Media:
-        js = (context_processors.media(None)['IMAGE_FILER_MEDIA_URL']+'js/popup_handling.js',)
+        js = (FILER_MEDIA_PREFIX+'js/popup_handling.js',)
 
 class ImageFilerFolderFormField(forms.ModelChoiceField):
     widget = ImageFilerFolderWidget 

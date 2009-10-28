@@ -60,8 +60,8 @@ class AdminImageWidget(ForeignKeyRawIdWidget):
         return obj
     
     class Media:
-        js = (settings.FILER_MEDIA_URL+'js/image_widget_thumbnail.js',
-              settings.FILER_MEDIA_URL+'js/popup_handling.js',)
+        js = (settings.FILER_MEDIA_PREFIX+'js/image_widget_thumbnail.js',
+              settings.FILER_MEDIA_PREFIX+'js/popup_handling.js',)
 
 class AdminImageFormField(forms.ModelChoiceField):
     widget = AdminImageWidget

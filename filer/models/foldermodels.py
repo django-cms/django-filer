@@ -5,13 +5,8 @@ from django.db.models import Q
 from django.contrib.auth import models as auth_models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from filer import context_processors
 from django.core import urlresolvers
 from filer.models import mixins
-
-DEFAULT_ICON_SIZES = (
-        '32','48','64',
-)
 
 '''
 Managers
@@ -153,15 +148,6 @@ class Folder(models.Model, mixins.IconsMixin):
                 else:
                     setattr(self, att_name, False)
             return getattr(self, att_name)
-    
-    @property
-    def icons(self):
-        r = {}
-        if getattr(self, '_icon', False):
-            for size in DEFAULT_ICON_SIZES:
-                r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
-        print r
-        return r
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change', args=(self.id,))
     def get_admin_directory_listing_url_path(self):
@@ -190,11 +176,6 @@ class FolderPermission(models.Model):
         (THIS, _('this item only') ),
         (CHILDREN, _('this item and all children') ),
     )
-    '''
-    content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    '''
     folder = models.ForeignKey(Folder, null=True, blank=True)
     
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=0)

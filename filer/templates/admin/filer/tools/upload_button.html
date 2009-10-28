@@ -1,9 +1,15 @@
-{% load i18n admin_modify adminmedia %}
+{% load i18n admin_modify adminmedia filermedia %}
 
 <div style="margin-left: -9px;"><span id="spanButtonPlaceHolder"></span></div>
 
-<script type="text/javascript"><!--
+<script type="text/javascript">
+//<![CDATA[
+var swfu;
 $(document).ready(function() {
+	// Check to see if SWFUpload is available
+	if (typeof(SWFUpload) === "undefined") {
+		return;
+	}
 	var QUEUE_CONTAINER_ID = "fileInputQueue";
 	var handlers = {
 		file_dialog_complete: function(numFilesSelected, numFilesQueued) {
@@ -11,10 +17,10 @@ $(document).ready(function() {
 		},
 		fileQueued: function(file) {
 			// handle file info stuff
-			var byteSize = Math.round(file.size / 1024 * 100) * .01;
+			var byteSize = Math.round(file.size / 1024 * 100) * 0.01;
 			var suffix = 'KB';
 			if (byteSize > 1000) {
-				byteSize = Math.round(byteSize *.001 * 100) * .01;
+				byteSize = Math.round(byteSize *0.001 * 100) * 0.01;
 				suffix = 'MB';
 			}
 			var sizeParts = byteSize.toString().split('.');
@@ -124,11 +130,10 @@ $(document).ready(function() {
 			} catch (ex) {
 				this.debug(ex);
 			}
-		},
-
+		}
 	};
     var settings = {
-        flash_url : "{{ FILER_MEDIA_URL }}flash/swfupload.swf",
+        flash_url : "{% filer_media_prefix %}flash/swfupload.swf",
         upload_url: "{% url admin:filer-ajax_upload %}",
         post_params: {'jsessionid':$.cookie('sessionid')},
         file_size_limit : "100 MB",
@@ -143,7 +148,7 @@ $(document).ready(function() {
         debug: false,
 
         // Button settings
-        button_image_url: "{{ FILER_MEDIA_URL }}img/upload_button.png",
+        button_image_url: "{% filer_media_prefix %}img/upload_button.png",
         button_width: "79",
         button_height: "16",
         button_placeholder_id: "spanButtonPlaceHolder",
@@ -161,11 +166,12 @@ $(document).ready(function() {
 		//upload_start_handler : FeaturesDemoHandlers.uploadStart,
 		upload_progress_handler : handlers.uploadProgress,
 		upload_error_handler : handlers.uploadError,
-		upload_success_handler : handlers.uploadSuccess,
+		upload_success_handler : handlers.uploadSuccess
 		//upload_complete_handler : handlers.uploadComplete,
 		//debug_handler : FeaturesDemoHandlers.debug,
     };
 
     swfu = new SWFUpload(settings);
  });
---></script>
+//]]>
+</script>

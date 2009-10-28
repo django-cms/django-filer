@@ -6,8 +6,7 @@ from django.contrib.auth import models as auth_models
 from django.conf import settings
 from filer.models.safe_file_storage import SafeFilenameFileSystemStorage
 from filer.models.foldermodels import Folder
-from filer import context_processors
-from filer.models.defaults import DEFAULT_ICON_SIZES, IMAGE_FILER_UPLOAD_ROOT
+from filer.settings import FILER_UPLOAD_ROOT
 from filer.models import mixins
 
 fs = SafeFilenameFileSystemStorage()
@@ -16,7 +15,7 @@ fs = SafeFilenameFileSystemStorage()
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file_field = models.FileField(upload_to=IMAGE_FILER_UPLOAD_ROOT, storage=fs, null=True, blank=True,max_length=255)
+    file_field = models.FileField(upload_to=FILER_UPLOAD_ROOT, storage=fs, null=True, blank=True,max_length=255)
     _file_type_plugin_name = models.CharField(_("file_type_plugin_name"), max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -85,11 +84,15 @@ class File(models.Model, mixins.IconsMixin):
             # what should we do now?
             # maybe this has a subclass, but is being saved as a File instance
             # anyway. do we need to go check all possible subclasses?
-            #self._file_type_plugin_name = 'GenericFile'
             pass
         elif issubclass(self.__class__, File):
             self._file_type_plugin_name = self.__class__.__name__
-        return super(File, self).save(*args,**kwargs)
+        
+        try:
+            self._file_size = self.file_field.size
+        except:
+            pass
+        super(File, self).save(*args,**kwargs)
     
     def subtype(self):
         #print "get subtype"
@@ -114,6 +117,9 @@ class File(models.Model, mixins.IconsMixin):
     @property
     def file(self):
         return self.file_field.file
+    @property
+    def size(self):
+        return self._file_size or 0
     class Meta:
         app_label = 'filer'
 
