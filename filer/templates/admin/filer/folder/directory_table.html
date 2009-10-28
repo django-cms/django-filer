@@ -17,11 +17,11 @@
                 <tr class="{% cycle rowcolors %}">
                 	<td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;">{% trans "insert" %}</a>{% endif %}</td>
 				    <!-- FileIcon -->
-				    <td><a href="{% url admin:filer-directory_listing subfolder.id %}{% if is_popup %}?_popup=1{% endif %}"><img src="{{ FILER_MEDIA_URL }}icons/plainfolder_48x48.png" alt="Folder Icon" /></a></td>
+				    <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}"><img src="{{ subfolder.icons.48 }}" alt="Folder Icon" /></a></td>
 				    <!-- Filename/Dimensions -->
 				    <td>
-				    	{% if is_popup %}{% else %}<a style="display: block; float: right;" class="changelink" href="/admin/filer/folder/{{ subfolder.id }}/">Change</a>{% endif %}
-				    	<div><b><a href="{% url admin:filer-directory_listing subfolder.id %}{% if is_popup %}?_popup=1{% endif %}">{{ subfolder.name }}</a></b></div>
+				    	<a style="display: block; float: right;" class="changelink" href="/admin/filer/folder/{{ subfolder.id }}/{% if is_popup %}?_popup=1{% endif %}">Change</a>
+				    	<div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}">{{ subfolder.name }}</a></b></div>
 						<div>owner: {{ subfolder.owner }} Folders: {{ subfolder.children_count }} Images: {{ subfolder.file_count }}</div>
 					</td>
 					<td></td>
@@ -31,11 +31,11 @@
                 <tr class="{% cycle rowcolors %}">
                 	<td></td>
 				    <!-- FileIcon -->
-					<td>{% if is_popup and not select_folder %}<a class="insertlink" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;">{% else %}<a href="{{ file.get_absolute_admin_change_url }}">{% endif %}<img src="{{ file.icons.48 }}" alt="{{ file.default_alt_text }}" /></a></td>
+					<td>{% if is_popup and not select_folder %}<a class="insertlink" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;">{% else %}<a href="{{ file.get_admin_url_path }}">{% endif %}<img src="{{ file.icons.48 }}" alt="{{ file.default_alt_text }}" /></a></td>
 				    <!-- Filename/Dimensions -->
 				    <td>
-				    	{% if not is_popup %}<a style="display: block; float: right;" class="changelink" href="{{ file.get_absolute_admin_change_url }}">Change</a>{% endif %}
-				    	<div><b>{% if is_popup %}<a class="insertlink" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.thumbnails.admin_tiny_icon|escapejs }}', '{{ file.label|escapejs }}'); return false;">{% else %}<a href="{{ file.get_absolute_admin_change_url }}">{% endif %}{{ file.label }}</a></b></div>
+				    	{% if not is_popup %}<a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}">Change</a>{% endif %}
+				    	<div><b>{% if is_popup %}<a class="insertlink" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.thumbnails.admin_tiny_icon|escapejs }}', '{{ file.label|escapejs }}'); return false;">{% else %}<a href="{{ file.get_admin_url_path }}">{% endif %}{{ file.label }}</a></b></div>
 						<div><span class="tiny">{{ file.width }} x {{ file.height }} px ({{ file.size|filesize:"auto1000long" }})</span></div>
 						<div>owner: {{ file.owner }}</div>
 						{% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> has all mandatory metadata</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> missing metadata!</div>{% endif %}

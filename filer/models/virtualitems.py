@@ -1,15 +1,20 @@
 from django.utils.translation import ugettext_lazy as _
 from filer.models.filemodels import File, DEFAULT_ICON_SIZES
 from filer.models.foldermodels import Folder
+from filer.models import mixins
 from filer import context_processors
+from django.core import urlresolvers
 
-class DummyFolder(object):
+class DummyFolder(mixins.IconsMixin):
     name = "Dummy Folder"
     is_root = True
     is_smart_folder = True
     can_have_subfolders = False
     parent = None
     _icon = "plainfolder"
+    @property
+    def virtual_folders(self):
+        return []
     @property
     def children(self):
         return Folder.objects.filter(id__in=[0]) # empty queryset
@@ -20,15 +25,6 @@ class DummyFolder(object):
     @property
     def image_files(self):
         return self.files
-    @property
-    def icons(self):
-        r = {}
-        if getattr(self, '_icon', False):
-            for size in DEFAULT_ICON_SIZES:
-                r[size] = "%sfiler/icons/%s_%sx%s.png" % \
-                    (context_processors.media(None)['FILER_MEDIA_URL'],
-                     self._icon, size, size)
-        return r
 
 
 class UnfiledImages(DummyFolder):
@@ -38,7 +34,9 @@ class UnfiledImages(DummyFolder):
     def _files(self):
         return File.objects.filter(folder__isnull=True)
     files = property(_files)
-
+    def get_admin_directory_listing_url_path(self):
+        return urlresolvers.reverse('admin:filer-directory_listing-unfiled_images')
+    
 class ImagesWithMissingData(DummyFolder):
     name = _("files with missing metadata")
     is_root = True
@@ -46,6 +44,8 @@ class ImagesWithMissingData(DummyFolder):
     @property
     def files(self):
         return File.objects.filter(has_all_mandatory_data=False)
+    def get_admin_directory_listing_url_path(self):
+        return urlresolvers.reverse('admin:filer-directory_listing-images_with_missing_data')
 
 class FolderRoot(DummyFolder):
     name = 'Root'
@@ -53,6 +53,11 @@ class FolderRoot(DummyFolder):
     is_smart_folder = False
     can_have_subfolders = True
     @property
+    def virtual_folders(self):
+        return [UnfiledImages(), ]# ImagesWithMissingData()]
+    @property
     def children(self):
-        return Folder.objects.filter(parent__isnull=True)
+        return Folder.objects.filter(parent__isnull=True) 
     parent_url = None
+    def get_admin_directory_listing_url_path(self):
+        return urlresolvers.reverse('admin:filer-directory_listing-root')

@@ -15,6 +15,7 @@ from filer.admin.tools import *
 from filer.models import tools
 
 from django.conf import settings
+
 # forms
 class ImageAdminFrom(forms.ModelForm):
     subject_location = forms.CharField(max_length=64, required=False)
@@ -29,7 +30,7 @@ class ImageAdminFrom(forms.ModelForm):
         model = Image
     class Media:
         css = {
-            'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
+            #'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
         js = (
             settings.MEDIA_URL + 'filer/js/jquery-1.3.2.min.js',

@@ -146,33 +146,23 @@ class Image(File):
     def icons(self):
         if not getattr(self, '_icon_thumbnails_cache', False):
             r = {}
-            print "creating image icon"
             for size in DEFAULT_ICON_SIZES:
-                print "    creating image icon %s" % size
                 try:
                     args = {'size': (int(size),int(size)), 'options': ['crop','upscale']}
                     # Build the DjangoThumbnail kwargs.
                     kwargs = {}
                     for k, v in args.items():
                         kwargs[ALL_ARGS[k]] = v
-                    print "kwargs"
-                    print kwargs
                     # Build the destination filename and return the thumbnail.
                     name_kwargs = {}
                     for key in ['size', 'options', 'quality', 'basedir', 'subdir',
                                 'prefix', 'extension']:
                         name_kwargs[key] = args.get(key)
-                    print "name_kwargs"
-                    print name_kwargs
                     source = self.file_field
-                    print "the source"
-                    print source.name
                     dest = build_thumbnail_name(source.name, **name_kwargs)
-                    print "    %s" % dest
-                    print "    creating image iconB %s" % size
                     r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
                 except Exception, e:
-                    print e
+                    pass#print e
                 #r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
             setattr(self, '_icon_thumbnails_cache', r)
         return getattr(self, '_icon_thumbnails_cache')
@@ -223,7 +213,7 @@ class Image(File):
             return rel_url
         except Exception, e:
             return ''
-    def get_absolute_admin_change_url(self):
+    def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     def __unicode__(self):
         # this simulates the way a file field works and

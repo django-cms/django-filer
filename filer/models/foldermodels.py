@@ -6,6 +6,8 @@ from django.contrib.auth import models as auth_models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from filer import context_processors
+from django.core import urlresolvers
+from filer.models import mixins
 
 DEFAULT_ICON_SIZES = (
         '32','48','64',
@@ -75,7 +77,7 @@ class FolderPermissionManager(models.Manager):
 '''
 Models
 '''
-class Folder(models.Model):
+class Folder(models.Model, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -158,8 +160,12 @@ class Folder(models.Model):
         if getattr(self, '_icon', False):
             for size in DEFAULT_ICON_SIZES:
                 r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
+        print r
         return r
-    
+    def get_admin_url_path(self):
+        return urlresolvers.reverse('admin:filer_folder_change', args=(self.id,))
+    def get_admin_directory_listing_url_path(self):
+        return urlresolvers.reverse('admin:filer-directory_listing', args=(self.id,))
     def __unicode__(self):
         return u"%s" % (self.name,)
     class Meta:

@@ -7,12 +7,13 @@ from django.conf import settings
 from filer.models.safe_file_storage import SafeFilenameFileSystemStorage
 from filer.models.foldermodels import Folder
 from filer import context_processors
-from filer.models.defaults import *
+from filer.models.defaults import DEFAULT_ICON_SIZES, IMAGE_FILER_UPLOAD_ROOT
+from filer.models import mixins
 
 fs = SafeFilenameFileSystemStorage()
     
 
-class File(models.Model):
+class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
     file_field = models.FileField(upload_to=IMAGE_FILER_UPLOAD_ROOT, storage=fs, null=True, blank=True,max_length=255)
@@ -47,14 +48,6 @@ class File(models.Model):
             text = self.name
         text = u"%s [%s]" % (text, self.__class__.__name__)
         return text
-    
-    @property
-    def icons(self):
-        r = {}
-        if getattr(self, '_icon', False):
-            for size in DEFAULT_ICON_SIZES:
-                r[size] = "%sicons/%s_%sx%s.png" % (context_processors.media(None)['FILER_MEDIA_URL'], self._icon, size, size)
-        return r
     
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
@@ -110,7 +103,7 @@ class File(models.Model):
                 r = self
         #print u"get subtype: %s %s" % (r, self._file_type_plugin_name)
         return r
-    def get_absolute_admin_change_url(self):
+    def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
     def  url(self):
         try:

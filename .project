@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>django-1.1</project>
-		<project>django-cms-2.0</project>
 		<project>django-sorl-thumbnail</project>
 		<project>django-south</project>
 	</projects>

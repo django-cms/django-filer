@@ -176,6 +176,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         
         folder_children = []
         folder_files = []
+        if folder.is_root:
+            folder_children += folder.virtual_folders
+        
         for f in folder_qs:
             f.perms = userperms_for_request(f, request)
             if hasattr(f, 'has_read_permission'):

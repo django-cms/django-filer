@@ -16,7 +16,6 @@ from django.conf import settings
 # forms
 class FileAdminChangeFrom(forms.ModelForm):
     #subject_location = forms.CharField(max_length=64, required=False)
-    
     class Meta:
         model = File
 
@@ -101,7 +100,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         )
         url_patterns.extend(urls)
         return url_patterns
-    def add_view(self, request):
-        return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))
-    def changelist_view(self, request, extra_context=None):
-        return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))
+    #def add_view(self, request):
+    #    return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))
+    #def changelist_view(self, request, extra_context=None):
+    #    return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))
