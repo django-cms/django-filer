@@ -9,6 +9,7 @@ dist
 downloads
 eggs
 parts
+build
 *.egg-info
 .DS_Store
 .project

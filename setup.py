@@ -1,22 +1,47 @@
+# make sure setuptools is available 
+from ez_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup, find_packages
 import os
-from setuptools import setup
-from filer import __version__
+
+version = __import__('filer').__version__
+
+media_files = []
+for dir in ['filer/media','filer/templates']:
+    for dirpath, dirnames, filenames in os.walk(dir):
+        media_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames]])
 
 def read(fname):
+    # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+install_requires = [
+    'sorl-thumbnail>=3.2.5',
+    'django-mptt>=0.2.1',
+    'django>=1.1',
+]
 
 setup(
     name = "django-filer",
-    version = __version__,
+    version = version,
     url = 'http://github.com/stefanfoulis/django-filer',
     license = 'BSD',
+    platforms=['OS Independent'],
     description = "A file management application for django that makes handling of files and images a breeze.",
     long_description = read('README'),
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
-    packages = ('filer',),
-    #package_dir = {'': 'src'},
-    install_requires = ['setuptools','django'],
+    packages=find_packages(exclude=['ez_setup']),
+    package_dir={
+        'filer':'filer',
+    },
+    install_requires = install_requires,
+    package_data={
+        '': ['*.txt', '*.rst',],
+    },
+    data_files = media_files,
+    zip_safe=False,
     classifiers = [
         'Development Status :: 4 - Beta',
         'Framework :: Django',
