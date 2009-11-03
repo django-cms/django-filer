@@ -1,6 +1,10 @@
 from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_MEDIA_PREFIX
 
 class IconsMixin(object):
+    '''
+    Can be used on any model that has a _icon attribute. will return a dict
+    containing urls for icons of different sizes with that name.
+    '''
     @property
     def icons(self):
         r = {}

@@ -20,7 +20,7 @@
 				    <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}"><img src="{{ subfolder.icons.48 }}" alt="Folder Icon" /></a></td>
 				    <!-- Filename/Dimensions -->
 				    <td>
-				    	<a style="display: block; float: right;" class="changelink" href="/admin/filer/folder/{{ subfolder.id }}/{% if is_popup %}?_popup=1{% endif %}">Change</a>
+				    	<a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}">Change</a>
 				    	<div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}">{{ subfolder.name }}</a></b></div>
 						<div>owner: {{ subfolder.owner }} Folders: {{ subfolder.children_count }} Images: {{ subfolder.file_count }}</div>
 					</td>
@@ -34,8 +34,8 @@
 					<td><a href="{{ file.get_admin_url_path }}"><img src="{{ file.icons.48 }}" alt="{{ file.default_alt_text }}" /></a></td>
 				    <!-- Filename/Dimensions -->
 				    <td>
-				    	<a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}">Change</a>
-				    	<div><b><a href="{{ file.get_admin_url_path }}">{{ file.label }}</a></b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }})</span></div>
+				    	<a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}">Change</a>
+				    	<div><b><a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}">{{ file.label }}</a></b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }})</span></div>
 						{% ifequal file.file_type "image" %}<div>{{ file.width }} x {{ file.height }} px </span></div>{% endifequal %}
 						{% if file.owner %}<div>owner: {{ file.owner }}</div>{% endif %}
 						{# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> has all mandatory metadata</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> missing metadata!</div>{% endif %} #}
