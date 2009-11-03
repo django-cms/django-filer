@@ -17,6 +17,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 install_requires = [
+    'setuptools',
     'sorl-thumbnail>=3.2.5',
     'django-mptt>=0.2.1',
     'django>=1.1',
@@ -33,12 +34,12 @@ setup(
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(exclude=['ez_setup']),
-    package_dir={
-        'filer':'filer',
-    },
     install_requires = install_requires,
     package_data={
         '': ['*.txt', '*.rst',],
+    },
+    package_dir = {
+        'filer':'filer',
     },
     data_files = media_files,
     zip_safe=False,

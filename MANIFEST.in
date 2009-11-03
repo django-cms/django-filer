@@ -1,0 +1,6 @@
+include AUTHORS
+include LICENSE
+include README
+recursive-include filer/templates *.html *.css *.js
+recursive-include filer/media *
+
