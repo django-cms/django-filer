@@ -1,7 +1,7 @@
 Changelog for django-filer
 =============================
 
-0.1 (2009-09-20)
-----------------
+0.0.2a (2009-11-04)
+-------------------
 
-- Initial project setup.
+- First test release as a pypi package.
