@@ -1,7 +1,3 @@
-# make sure setuptools is available 
-from ez_setup import use_setuptools
-use_setuptools()
-
 from setuptools import setup, find_packages
 import os
 
@@ -33,7 +29,7 @@ setup(
     long_description = read('README'),
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
-    packages=find_packages(exclude=['ez_setup']),
+    packages=find_packages(),
     install_requires = install_requires,
     package_data={
         '': ['*.txt', '*.rst',],
