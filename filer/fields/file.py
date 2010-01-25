@@ -7,7 +7,7 @@ from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from sorl.thumbnail.base import ThumbnailException
-from filer.settings import FILER_MEDIA_PREFIX
+from filer.settings import FILER_STATICMEDIA_PREFIX
 from django.conf import settings as globalsettings
 from filer.models import File
 
@@ -72,8 +72,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return obj
     
     class Media:
-        js = (FILER_MEDIA_PREFIX+'js/admin_file_widget.js',
-              FILER_MEDIA_PREFIX+'js/popup_handling.js',)
+        js = (FILER_STATICMEDIA_PREFIX+'js/admin_file_widget.js',
+              FILER_STATICMEDIA_PREFIX+'js/popup_handling.js',)
 
 class AdminFileFormField(forms.ModelChoiceField):
     widget = AdminFileWidget

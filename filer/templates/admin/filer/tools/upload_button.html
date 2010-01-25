@@ -133,7 +133,7 @@ $(document).ready(function() {
 		}
 	};
     var settings = {
-        flash_url : "{% filer_media_prefix %}flash/swfupload.swf",
+        flash_url : "{% filer_staticmedia_prefix %}flash/swfupload.swf",
         upload_url: "{% url admin:filer-ajax_upload %}",
         post_params: {'jsessionid':$.cookie('sessionid')},
         file_size_limit : "100 MB",
@@ -148,7 +148,7 @@ $(document).ready(function() {
         debug: false,
 
         // Button settings
-        button_image_url: "{% filer_media_prefix %}img/upload_button.png",
+        button_image_url: "{% filer_staticmedia_prefix %}img/upload_button.png",
         button_width: "79",
         button_height: "16",
         button_placeholder_id: "spanButtonPlaceHolder",
