@@ -1,5 +1,5 @@
 {% load i18n thumbnail %}
-{% load adminmedia %}
+{% load adminmedia filermedia %}
 <div id="toolbartable">
         <table cellspacing="0">
             <thead>
@@ -31,7 +31,7 @@
                 <tr class="{% cycle rowcolors %}">
                 	<td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"></a>{% endif %}</td>
 				    <!-- FileIcon -->
-					<td><a href="{{ file.get_admin_url_path }}"><img src="{{ file.icons.48 }}" alt="{{ file.default_alt_text }}" /></a></td>
+					<td><a href="{{ file.get_admin_url_path }}"><img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" /></a></td>
 				    <!-- Filename/Dimensions -->
 				    <td>
 				    	<a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}">Change</a>

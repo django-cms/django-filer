@@ -1,3 +1,4 @@
+import os
 from django.utils.translation import ugettext as _
 from django.utils.text import truncate_words
 from django.utils import simplejson
@@ -44,12 +45,11 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 output.append(u'<img id="%s" src="%s" alt="%s" /> ' % (css_id_thumbnail_img, obj.icons['32'], obj.label) )
                 output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, obj) )
             except Exception, e:#ThumbnailException, KeyError: # KeyError does not seem to catch the error if obj.icons['32'] is missing
-                print u"error rendering Filer widget. Probably missing file: %s (%s)" % (e, type(e))
-                output.append(u'<img id="%s" src="" class="quiet" alt="file is missing">' % css_id_thumbnail_img)
+                #print u"error rendering Filer widget. Probably missing file: %s (%s)" % (e, type(e))
+                output.append(u'<img id="%s" src="%s" class="quiet" alt="file is missing">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
                 output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, 'file missing!') )
-                pass
         else:
-            output.append(u'<img id="%s" src="" class="quiet" alt="no file selected">' % css_id_thumbnail_img)
+            output.append(u'<img id="%s" src="%s" class="quiet" alt="no file selected">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/nofile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
             output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, '') )
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
