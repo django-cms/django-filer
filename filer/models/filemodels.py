@@ -4,18 +4,16 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 
 from django.conf import settings
-from filer.models.safe_file_storage import SafeFilenameFileSystemStorage
+from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
-from filer.settings import FILER_UPLOAD_ROOT
 from filer.models import mixins
 
-fs = SafeFilenameFileSystemStorage()
     
 
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file_field = models.FileField(upload_to=FILER_UPLOAD_ROOT, storage=fs, null=True, blank=True,max_length=255)
+    file_field = models.FileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField(_("file_type_plugin_name"), max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -28,6 +26,8 @@ class File(models.Model, mixins.IconsMixin):
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+    
+    #is_public = models.BooleanField(default=True)
     
     # TODO: Factor out customer specific fields... maybe a m2m?
     #can_use_for_web = models.BooleanField(default=True)
@@ -87,11 +87,12 @@ class File(models.Model, mixins.IconsMixin):
             pass
         elif issubclass(self.__class__, File):
             self._file_type_plugin_name = self.__class__.__name__
-        
+        # cache the file size
         try:
             self._file_size = self.file_field.size
         except:
             pass
+        
         super(File, self).save(*args,**kwargs)
     
     def subtype(self):
