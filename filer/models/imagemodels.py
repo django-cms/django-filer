@@ -73,18 +73,18 @@ class Image(File):
                                                   
                 sl = (int(pos_x), int(pos_y) )
                 exif_sl = self.exif.get('SubjectLocation', None)
-                if self.file_field and not sl == exif_sl:
-                    #self.file_field.open()
-                    fd_source = StringIO.StringIO(self.file_field.read())
-                    #self.file_field.close()
-                    set_exif_subject_location(sl, fd_source, self.file_field.path)
+                if self._file and not sl == exif_sl:
+                    #self._file.open()
+                    fd_source = StringIO.StringIO(self._file.read())
+                    #self._file.close()
+                    set_exif_subject_location(sl, fd_source, self._file.path)
         except:
             # probably the image is missing. nevermind
             pass
         try:
             # do this more efficient somehow?
-            self._width, self._height = PILImage.open(self.file_field).size
-            #self._height = self.file_field.height
+            self._width, self._height = PILImage.open(self._file).size
+            #self._height = self._file.height
         except Exception, e:
             # probably the image is missing. nevermind.
             #print e
@@ -95,8 +95,8 @@ class Image(File):
         if hasattr(self, '_exif_cache'):
             return self._exif_cache
         else:
-            if self.file_field:
-                self._exif_cache = get_exif_for_file(self.file_field.path)
+            if self._file:
+                self._exif_cache = get_exif_for_file(self._file.path)
             else:
                 self._exif_cache = {}
         return self._exif_cache
@@ -151,7 +151,7 @@ class Image(File):
                     for key in ['size', 'options', 'quality', 'basedir', 'subdir',
                                 'prefix', 'extension']:
                         name_kwargs[key] = args.get(key)
-                    source = self.file_field
+                    source = self._file
                     dest = build_thumbnail_name(source.name, **name_kwargs)
                     r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
                 except Exception, e:
@@ -168,7 +168,7 @@ class Image(File):
         for key in ['size', 'options', 'quality', 'basedir', 'subdir',
                     'prefix', 'extension']:
             name_kwargs[key] = args.get(key)
-        source = self.file_field
+        source = self._file
         dest = build_thumbnail_name(source.name, **name_kwargs)
         return DjangoThumbnail(source, relative_dest=dest, **kwargs)
     @property
@@ -191,7 +191,7 @@ class Image(File):
         '''
         needed to make this behave like a ImageField
         '''
-        return self.file_field.url
+        return self._file.url
     @property
     def absolute_image_url(self):
         return self.url
@@ -199,7 +199,7 @@ class Image(File):
     def rel_image_url(self):
         'return the image url relative to MEDIA_URL'
         try:
-            rel_url = u"%s" % self.file_field.url
+            rel_url = u"%s" % self._file.url
             if rel_url.startswith('/media/'):
                 before, match, rel_url = rel_url.partition('/media/')
             return rel_url

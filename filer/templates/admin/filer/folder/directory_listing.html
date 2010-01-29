@@ -30,7 +30,7 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-	<a href="/admin/">Home</a> › <a href="/admin/filer/">Image Portfolio</a> › 
+	<a href="/admin/">Home</a> › <a href="/admin/filer/">Filer</a> › 
 	<a href="{% url admin:filer-directory_listing-root %}">Root</a>
 	{% for ancestor_folder in folder.get_ancestors %}
 	 › <a href="{% url admin:filer-directory_listing ancestor_folder.id %}">{{ ancestor_folder.name }}</a>

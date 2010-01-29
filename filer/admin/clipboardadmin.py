@@ -105,9 +105,9 @@ class ClipboardAdmin(admin.ModelAdmin):
                 print "inaem: %s iext: %s" % (iname, iext)
                 #print "extension: ", iext
                 if iext in ['.jpg','.jpeg','.png','.gif']:
-                    uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'file_field':ifile})
+                    uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'_file':ifile})
                 else:
-                    uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'file_field':ifile})
+                    uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'_file':ifile})
                 if uploadform.is_valid():
                     print 'uploadform is valid'
                     try:

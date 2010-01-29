@@ -90,7 +90,7 @@ class Folder(models.Model, mixins.IconsMixin):
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
     name = models.CharField(max_length=255)
     
-    owner = models.ForeignKey(auth_models.User, related_name='owned_folders', null=True, blank=True)
+    owner = models.ForeignKey(auth_models.User, related_name='filer_owned_folders', null=True, blank=True)
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
@@ -179,8 +179,8 @@ class FolderPermission(models.Model):
     folder = models.ForeignKey(Folder, null=True, blank=True)
     
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=0)
-    user = models.ForeignKey(auth_models.User, verbose_name=_("user"), blank=True, null=True)
-    group = models.ForeignKey(auth_models.Group, verbose_name=_("group"), blank=True, null=True)
+    user = models.ForeignKey(auth_models.User, related_name="filer_folder_permissions", verbose_name=_("user"), blank=True, null=True)
+    group = models.ForeignKey(auth_models.Group, related_name="filer_folder_permissions", verbose_name=_("group"), blank=True, null=True)
     everybody = models.BooleanField(_("everybody"), default=False)
     
     can_edit = models.BooleanField(_("can edit"), default=True)

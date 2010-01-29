@@ -3,8 +3,8 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 
 class Clipboard(models.Model):
-    user = models.ForeignKey(auth_models.User, related_name="clipboards")
-    files = models.ManyToManyField('File', related_name="clipboards", through='ClipboardItem')
+    user = models.ForeignKey(auth_models.User, related_name="filer_clipboards")
+    files = models.ManyToManyField('File', related_name="in_clipboards", through='ClipboardItem')
     
     def append_file(self, file):
         newitem = ClipboardItem(file=file, clipboard=self)

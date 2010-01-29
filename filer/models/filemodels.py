@@ -13,7 +13,7 @@ from filer.models import mixins
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file_field = models.FileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    _file = models.FileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField(_("file_type_plugin_name"), max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -45,7 +45,7 @@ class File(models.Model, mixins.IconsMixin):
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
-        text = u"%s [%s]" % (text, self.__class__.__name__)
+        text = u"%s" % (text,)
         return text
     
     def has_edit_permission(self, request):
@@ -89,7 +89,7 @@ class File(models.Model, mixins.IconsMixin):
             self._file_type_plugin_name = self.__class__.__name__
         # cache the file size
         try:
-            self._file_size = self.file_field.size
+            self._file_size = self._file.size
         except:
             pass
         
@@ -111,17 +111,17 @@ class File(models.Model, mixins.IconsMixin):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
     def  url(self):
         try:
-            r = self.file_field.url
+            r = self._file.url
         except:
             r = ''
         return r
     @property
     def file(self):
-        return self.file_field.file
+        return self._file.file
     @property
     def path(self):
         try:
-            return self.file_field.path
+            return self._file.path
         except:
             return ""
     @property
