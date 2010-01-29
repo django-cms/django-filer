@@ -140,4 +140,13 @@ class ClipboardAdmin(admin.ModelAdmin):
                 else:
                     raise PermissionDenied
         return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
+    def get_model_perms(self, request):
+        """
+        It seems this is only used for the list view. NICE :-)
+        """
+        return {
+            'add': False,
+            'change': False,
+            'delete': False,
+        }
 

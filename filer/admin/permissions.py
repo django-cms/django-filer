@@ -5,7 +5,7 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
         # we don't have a "add" permission... but all adding is handled
         # by special methods that go around these permissions anyway
         # TODO: reactivate return False
-        return True
+        return False
     def has_change_permission(self, request, obj=None):
         if hasattr(obj, 'has_edit_permission'):
             if obj.has_edit_permission(request):

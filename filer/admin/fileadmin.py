@@ -100,6 +100,17 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         )
         url_patterns.extend(urls)
         return url_patterns
+    def get_model_perms(self, request):
+        """
+        It seems this is only used for the list view. NICE :-)
+        """
+        return {
+            'add': False,
+            'change': False,
+            'delete': False,
+        }
+    #def has_change_permission(self, request, obj=None):
+    #    return False
     #def add_view(self, request):
     #    return HttpResponseRedirect(reverse('admin:filer-directory_listing-root'))
     #def changelist_view(self, request, extra_context=None):
