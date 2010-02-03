@@ -69,16 +69,16 @@ class ClipboardAdmin(admin.ModelAdmin):
             #print request.POST
             # flashcookie-hack (flash does not submit the cookie, so we send the
             # django sessionid over regular post
-            print "ajax upload view"
+            #print "ajax upload view"
             engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
-            print "imported session store"
+            #print "imported session store"
             #session_key = request.POST.get('jsessionid')
             session_key = request.POST.get('jsessionid')
-            print "session_key: %s" % session_key
+            #print "session_key: %s" % session_key
             request.session = engine.SessionStore(session_key)
-            print "got session object"
+            #print "got session object"
             request.user = User.objects.get(id=request.session['_auth_user_id'])
-            print "got user"
+            #print "got user"
             #print request.session['_auth_user_id']
             #print session_key
             #print engine
@@ -91,45 +91,47 @@ class ClipboardAdmin(admin.ModelAdmin):
             file = request.FILES.get('Filedata')
             #print request.FILES
             #print original_filename, file
-            print "get clipboad"
+            #print "get clipboad"
             clipboard, was_clipboard_created = Clipboard.objects.get_or_create(user=request.user)
-            print "handle files"
+            #print "handle files"
             files = generic_handle_file(file, original_filename)
             file_items = []
-            print "loop files"
+            #print "loop files"
             for ifile, iname in files:
                 try:
                     iext = os.path.splitext(iname)[1].lower()
                 except:
                     iext = ''
-                print "inaem: %s iext: %s" % (iname, iext)
+                #print "inaem: %s iext: %s" % (iname, iext)
                 #print "extension: ", iext
                 if iext in ['.jpg','.jpeg','.png','.gif']:
                     uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'_file':ifile})
                 else:
                     uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'_file':ifile})
                 if uploadform.is_valid():
-                    print 'uploadform is valid'
+                    #print 'uploadform is valid'
                     try:
                         file = uploadform.save(commit=False)
                         file.save()
                         file_items.append(file)
+                        bi = ClipboardItem(clipboard=clipboard, file=file)
+                        bi.save()
                     except Exception, e:
-                        print "some exception"
-                        print e
+                        #print "some exception"
+                        #print e
+                        pass
                     #print "save %s" % image
-                    bi = ClipboardItem(clipboard=clipboard, file=file)
-                    bi.save()
                     #sprint image
                 else:
                     pass#print uploadform.errors
-                print "what up?"
+                #print "what up?"
         except Exception, e:
-            print e
-        print file_items
+            #print e
+            pass
+        #print file_items
         return render_to_response('admin/filer/tools/clipboard/clipboard_item_rows.html', {'items': file_items }, context_instance=RequestContext(request))
     def move_file_to_clipboard(self, request):
-        print "move file"
+        #print "move file"
         if request.method=='POST':
             file_id = request.POST.get("file_id", None)
             clipboard = tools.get_user_clipboard(request.user)

@@ -32,5 +32,5 @@ def get_directory_name(instance, filename):
         private_or_public = FILER_PUBLICMEDIA_PREFIX
     else:
         private_or_public = FILER_PRIVATEMEDIA_PREFIX
-    print os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )
+    #print os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )
     return os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )

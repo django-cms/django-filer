@@ -60,8 +60,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         '''
         r = super(FolderAdmin, self).response_change(request, obj)
         if r['Location']:
-            print r['Location']
-            print obj
+            #print r['Location']
+            #print obj
             # it was a successful save
             if r['Location'] in ['../']:
                 if obj.parent:
