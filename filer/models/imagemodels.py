@@ -1,3 +1,4 @@
+import os
 import StringIO
 from datetime import datetime, date
 from django.utils.translation import ugettext_lazy as _
@@ -6,7 +7,7 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
-from filer.settings import FILER_ADMIN_ICON_SIZES
+from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
 
 from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
 from sorl.thumbnail.fields import ALL_ARGS
@@ -159,18 +160,21 @@ class Image(File):
             setattr(self, '_icon_thumbnails_cache', r)
         return getattr(self, '_icon_thumbnails_cache')
     def _build_thumbnail(self, args):
-        # Build the DjangoThumbnail kwargs.
-        kwargs = {}
-        for k, v in args.items():
-            kwargs[ALL_ARGS[k]] = v
-        # Build the destination filename and return the thumbnail.
-        name_kwargs = {}
-        for key in ['size', 'options', 'quality', 'basedir', 'subdir',
-                    'prefix', 'extension']:
-            name_kwargs[key] = args.get(key)
-        source = self._file
-        dest = build_thumbnail_name(source.name, **name_kwargs)
-        return DjangoThumbnail(source, relative_dest=dest, **kwargs)
+        try:
+            # Build the DjangoThumbnail kwargs.
+            kwargs = {}
+            for k, v in args.items():
+                kwargs[ALL_ARGS[k]] = v
+            # Build the destination filename and return the thumbnail.
+            name_kwargs = {}
+            for key in ['size', 'options', 'quality', 'basedir', 'subdir',
+                        'prefix', 'extension']:
+                name_kwargs[key] = args.get(key)
+            source = self._file
+            dest = build_thumbnail_name(source.name, **name_kwargs)
+            return DjangoThumbnail(source, relative_dest=dest, **kwargs)
+        except:
+            return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
     @property
     def thumbnails(self):
         # we build an extra dict here mainly
