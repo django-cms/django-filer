@@ -35,7 +35,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     form = FileAdminChangeFrom
     fieldsets = (
         (None, {
-            'fields': ('name', 'owner',)#'contact',
+            'fields': ('name', 'owner','description')#'contact',
         }),
     )
     def response_change(self, request, obj):

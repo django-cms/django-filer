@@ -64,11 +64,13 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         obj = self.obj_for_value(value)
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
     def obj_for_value(self, value):
+        print "obj for value: %s" % value
         try:
             key = self.rel.get_related_field().name
             obj = self.rel.to._default_manager.get(**{key: value})
         except:
             obj = None
+        print u"     %s" % obj
         return obj
     
     class Media:
