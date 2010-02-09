@@ -17,7 +17,7 @@ except ImportError:
         from PIL import ExifTags
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
-from image_filer.utils.pil_exif import get_exif, get_subject_location
+from filer.utils.pil_exif import get_exif, get_subject_location
         
 def scale_and_crop(im, requested_size, opts, subject_location=None):
     x, y   = [float(v) for v in im.size]
