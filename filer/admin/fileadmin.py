@@ -15,7 +15,6 @@ from filer.models import tools
 from django.conf import settings
 # forms
 class FileAdminChangeFrom(forms.ModelForm):
-    #subject_location = forms.CharField(max_length=64, required=False)
     class Meta:
         model = File
 
