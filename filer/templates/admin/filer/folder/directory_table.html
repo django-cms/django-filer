@@ -15,7 +15,7 @@
             <tbody>
             {% for subfolder in folder_children %}
                 <tr class="{% cycle rowcolors %}">
-                	<td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;"></a>{% endif %}</td>
+                	<td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;">&nbsp;</a>{% endif %}</td>
 				    <!-- FileIcon -->
 				    <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}"><img src="{{ subfolder.icons.48 }}" alt="Folder Icon" /></a></td>
 				    <!-- Filename/Dimensions -->
@@ -29,7 +29,7 @@
             {% endfor %}
 			{% for generic_file in folder_files %}{% with generic_file.subtype as file %}
                 <tr class="{% cycle rowcolors %}">
-                	<td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"></a>{% endif %}</td>
+                	<td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;">&nbsp;</a>{% endif %}</td>
 				    <!-- FileIcon -->
 					<td><a href="{{ file.get_admin_url_path }}"><img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" /></a></td>
 				    <!-- Filename/Dimensions -->
