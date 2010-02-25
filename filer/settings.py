@@ -35,11 +35,3 @@ FILER_PRIVATEMEDIA_PATH = getattr(settings,'FILER_PRIVATEMEDIA_PATH', '')
 FILER_ADMIN_ICON_SIZES = (
         '32','48','64',
 )
-
-
-from pprint import pprint
-vars = {}
-for key, value in locals().items():
-    if key.startswith('FILER'):
-        vars[key] = value
-pprint(vars)
