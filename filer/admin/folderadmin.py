@@ -182,7 +182,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder_files = []
         if folder.is_root:
             folder_children += folder.virtual_folders
-        
         for f in folder_qs:
             f.perms = userperms_for_request(f, request)
             if hasattr(f, 'has_read_permission'):
@@ -211,7 +210,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:
             permissions = {}
-        #print admin.site.root_path
+        #folder_children = folder_children.sort(cmp=lambda x,y: cmp(x.name.lower(), y.name.lower()))
+        folder_files.sort(cmp=lambda x,y: cmp(x.label.lower(), y.label.lower()))
         return render_to_response('admin/filer/folder/directory_listing.html', {
                 'folder':folder,
                 'folder_children':folder_children,
