@@ -191,12 +191,6 @@ class Image(File):
         return self._thumbnails
     
     @property
-    def url(self):
-        '''
-        needed to make this behave like a ImageField
-        '''
-        return self._file.url
-    @property
     def absolute_image_url(self):
         return self.url
     @property

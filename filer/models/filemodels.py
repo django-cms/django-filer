@@ -110,7 +110,11 @@ class File(models.Model, mixins.IconsMixin):
         return r
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
-    def  url(self):
+    @property
+    def url(self):
+        '''
+        to make the model behave like a file field
+        '''
         try:
             r = self._file.url
         except:
