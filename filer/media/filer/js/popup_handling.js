@@ -4,10 +4,7 @@
 	    win.close();
 	};
 	dismissRelatedImageLookupPopup = function(win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt) {
-	    console.log("win.name: " + win.name);
-		console.log("WTF!!!");
 		var name = windowname_to_id(win.name);
-		console.log("name:" + name);
 	    var img_name = name + '_thumbnail_img';
 	    var txt_name = name + '_description_txt';
 	    var elem = document.getElementById(name);
