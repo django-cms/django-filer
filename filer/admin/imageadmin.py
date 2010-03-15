@@ -33,7 +33,6 @@ class ImageAdminFrom(forms.ModelForm):
             #'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
         js = (
-            settings.MEDIA_URL + 'filer/js/jquery-1.3.2.min.js',
             settings.MEDIA_URL + 'filer/js/raphael.js',
             settings.MEDIA_URL + 'filer/js/focal_point.js',
         )
