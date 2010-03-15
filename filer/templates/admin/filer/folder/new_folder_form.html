@@ -2,7 +2,7 @@
 {% block content %}
 <h1>Add folder</h1>
 <div id="content-main">
-	<form id="folder_form" method="post" action="" enctype="multipart/form-data">
+	<form id="folder_form" method="post" action="" enctype="multipart/form-data">{% csrf_token %}
 		<div>
 			<input type="hidden" value="1" name="_popup"/>
 		  <fieldset class="module aligned">
