@@ -36,6 +36,10 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         (None, {
             'fields': ('name', 'owner','description')#'contact',
         }),
+        ('advanced', {
+            'fields': ('_file',),
+            'classes': ('hide',),
+        }),
     )
     def response_change(self, request, obj):
         '''
