@@ -16,7 +16,6 @@ install_requires = [
     'setuptools',
     'sorl-thumbnail>=3.2.5',
     'django-mptt>=0.2.1',
-    'django>=1.1',
 ]
 
 setup(
