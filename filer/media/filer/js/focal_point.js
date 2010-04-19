@@ -1,3 +1,4 @@
+(function($) {
 $(function(){
 	var PAPER_WIDTH, PAPER_HEIGTH;
 	var paper, ratio;
@@ -76,6 +77,7 @@ $(function(){
 		add(x, y);
 	});
 });
+})(django.jQuery);
 
 
 	
