@@ -1,0 +1,133 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-04-28 11:13+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: fields/file.py:58
+msgid "Lookup"
+msgstr ""
+
+#: models/filemodels.py:17
+msgid "file_type_plugin_name"
+msgstr ""
+
+#: models/foldermodels.py:175
+msgid "all items"
+msgstr ""
+
+#: models/foldermodels.py:176
+msgid "this item only"
+msgstr ""
+
+#: models/foldermodels.py:177
+msgid "this item and all children"
+msgstr ""
+
+#: models/foldermodels.py:181
+msgid "type"
+msgstr ""
+
+#: models/foldermodels.py:182
+msgid "user"
+msgstr ""
+
+#: models/foldermodels.py:183
+msgid "group"
+msgstr ""
+
+#: models/foldermodels.py:184
+msgid "everybody"
+msgstr ""
+
+#: models/foldermodels.py:186
+msgid "can edit"
+msgstr ""
+
+#: models/foldermodels.py:187
+msgid "can read"
+msgstr ""
+
+#: models/foldermodels.py:188
+msgid "can add children"
+msgstr ""
+
+#: models/foldermodels.py:214
+msgid "Folder Permission"
+msgstr ""
+
+#: models/foldermodels.py:215
+msgid "Folder Permissions"
+msgstr ""
+
+#: models/imagemodels.py:31
+msgid "date taken"
+msgstr ""
+
+#: models/virtualitems.py:30
+msgid "unfiled files"
+msgstr ""
+
+#: models/virtualitems.py:40
+msgid "files with missing metadata"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:18
+#: templates/admin/filer/image/change_form.html:11
+msgid "History"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:19
+#: templates/admin/filer/image/change_form.html:12
+msgid "View on site"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:55
+msgid "New Folder"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:69
+#: templates/admin/filer/tools/search_form.html:13
+#, python-format
+msgid "1 folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/filer/folder/directory_listing.html:69
+#, python-format
+msgid "1 file"
+msgid_plural "%(counter)s files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/filer/folder/directory_table.html:11
+msgid "Name"
+msgstr ""
+
+#: templates/admin/filer/image/change_form.html:24
+msgid "Set focal point"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:10
+msgid "Go"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:14
+#, python-format
+msgid "1 image"
+msgid_plural "%(counter)s images"
+msgstr[0] ""
+msgstr[1] ""
