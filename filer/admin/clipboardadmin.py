@@ -16,6 +16,7 @@ from filer.models import Clipboard, ClipboardItem, File, Image
 from filer.utils.files import generic_handle_file
 from filer.admin.tools import *
 from filer.models import tools
+from django.views.decorators.csrf import csrf_exempt
 
 # forms... sucks, types should be automatic
 class UploadFileForm(forms.ModelForm):
@@ -58,7 +59,7 @@ class ClipboardAdmin(admin.ModelAdmin):
     #    return False
     #def has_delete_permission(self, request, obj=None):
     #    return False
-    
+    @csrf_exempt
     def ajax_upload(self, request, folder_id=None):
         """
         receives an upload from the flash uploader and fixes the session
