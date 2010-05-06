@@ -14,8 +14,6 @@ from filer.models import File
 
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
-    input_type = 'hidden'
-    is_hidden = True
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
@@ -59,6 +57,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         output.append('</br>')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
+        output.append( '''<script type="text/javascript">django.jQuery("#%s").hide()</script> ''' % css_id)
         return mark_safe(u''.join(output))
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
