@@ -22,7 +22,12 @@ class ImageAdminFrom(forms.ModelForm):
     
     def sidebar_image_ratio(self):
         if self.instance:
-            return self.instance.sidebar_image_ratio()
+            # this is very important. It forces the value to be returned as a
+            # string and always with a "." as seperator. If the conversion
+            # from float to string is done in the template, the locale will
+            # be used and in some cases there would be a "," instead of ".".
+            # javascript would parse that to an integer.
+            return  "%.6F" % self.instance.sidebar_image_ratio()
         else:
             return ''
     

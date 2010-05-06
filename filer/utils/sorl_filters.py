@@ -20,6 +20,7 @@ except ImportError:
 from filer.utils.pil_exif import get_exif, get_subject_location
         
 def scale_and_crop(im, requested_size, opts, subject_location=None):
+    # x, y: original image size
     x, y   = [float(v) for v in im.size]
     xr, yr = [float(v) for v in requested_size]
     
@@ -39,15 +40,21 @@ def scale_and_crop(im, requested_size, opts, subject_location=None):
             subject_location = get_subject_location(exif_data)
         if not subject_location:
             # default crop implementation
+            # x, y: re-read here, because 'crop'/'upscale' may have changed them
             x, y   = [float(v) for v in im.size]
             ex, ey = (x-min(x, xr))/2, (y-min(y, yr))/2
             if ex or ey:
                 im = im.crop((int(ex), int(ey), int(x-ex), int(y-ey)))
         else:
             # subject location aware cropping
+            # res_x, res_y: the resolution of the possibly already resized image
             res_x, res_y   = [float(v) for v in im.size]
-            subj_x = res_x/(x/float(subject_location[0]))
-            subj_y = res_y/(y/float(subject_location[1]))
+            # subj_x, subj_y: the position of the subject
+            # better than this because of rounding issues: 
+            # subj_x = res_x/(x/float(subject_location[0]))
+            # subj_y = res_y/(y/float(subject_location[1]))
+            subj_x = res_x*float(subject_location[0])/x
+            subj_y = res_y*float(subject_location[1])/y   
             ex, ey = (res_x-min(res_x, xr))/2, (res_y-min(res_y, yr))/2
             fx, fy = res_x-ex, res_y-ey
             # get the dimensions of the resulting box
@@ -77,7 +84,7 @@ def scale_and_crop(im, requested_size, opts, subject_location=None):
                 crop_box = ((int(tex), int(tey), int(tfx), int(tfy)))
                 # draw elipse on focal point for Debugging
                 #draw = ImageDraw.Draw(im)
-                #esize = 20
+                #esize = 10
                 #draw.ellipse( ( (subj_x-esize, subj_y-esize), (subj_x+esize, subj_y+esize)), outline="#FF0000" )
                 im = im.crop(crop_box)
     return im

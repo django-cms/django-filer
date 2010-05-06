@@ -18,7 +18,7 @@ class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
     DEFAULT_THUMBNAILS = {
         'admin_clipboard_icon': {'size': (32,32), 'options': ['crop','upscale']},
-        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,SIDEBAR_IMAGE_WIDTH), 'options': []},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,10000), 'options': []},
         'admin_directory_listing_icon': {'size': (48,48), 'options': ['crop','upscale']},
         'admin_tiny_icon': {'size': (32,32), 'options': ['crop','upscale']},
     }
