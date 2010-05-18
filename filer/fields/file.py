@@ -19,6 +19,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
+        required = self.attrs
         if attrs is None:
             attrs = {}
         related_url = None
@@ -54,14 +55,29 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
             (related_url, url, name))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (globalsettings.ADMIN_MEDIA_PREFIX, _('Lookup')))
+        clearid = '%s_clear' % css_id
+        if value and not self.required:
+            output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" />' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear')))
         output.append('</br>')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
-        output.append( '''<script type="text/javascript">django.jQuery("#%s").hide()</script> ''' % css_id)
+        noimgurl = '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX
+        js = '<script type="text/javascript">django.jQuery("#%(id)s").hide();'
+        if value and not self.required:
+            js += ('django.jQuery("#%(id)s_clear").click(function(){'
+                'django.jQuery("#%(id)s").removeAttr("value");'
+                'django.jQuery("#%(imgid)s").attr("src", "%(noimg)s");'
+                'django.jQuery("#%(descid)s").html("");'
+                'django.jQuery(this).remove();});')
+        js += '</script>'
+        output.append(js % {'id': css_id, 'imgid': css_id_thumbnail_img,
+                            'noimg': noimgurl, 'descid': css_id_description_txt})
         return mark_safe(u''.join(output))
+    
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
+    
     def obj_for_value(self, value):
         try:
             key = self.rel.get_related_field().name
@@ -83,6 +99,10 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.min_value = None
         other_widget = kwargs.pop('widget', None)
         forms.Field.__init__(self, widget=self.widget(rel), *args, **kwargs)
+        
+    def widget_attrs(self, widget):
+        widget.required = self.required
+        return {}
 
 
 from filer.models import File
