@@ -56,20 +56,24 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             (related_url, url, name))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (globalsettings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         clearid = '%s_clear' % css_id
-        if value and not self.required:
-            output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" />' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear')))
+        output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" />' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear')))
         output.append('</br>')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
         noimgurl = '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX
-        js = '<script type="text/javascript">django.jQuery("#%(id)s").hide();'
-        if value and not self.required:
-            js += ('django.jQuery("#%(id)s_clear").click(function(){'
-                'django.jQuery("#%(id)s").removeAttr("value");'
-                'django.jQuery("#%(imgid)s").attr("src", "%(noimg)s");'
-                'django.jQuery("#%(descid)s").html("");'
-                'django.jQuery(this).remove();});')
-        js += '</script>'
+        js = '''<script type="text/javascript">django.jQuery("#%(id)s").hide();
+django.jQuery("#%(id)s_clear").click(function(){
+    django.jQuery("#%(id)s").removeAttr("value");
+    django.jQuery("#%(imgid)s").attr("src", "%(noimg)s");
+    django.jQuery("#%(descid)s").html("");
+});
+django.jQuery(document).ready(function(){
+    var plus = django.jQuery("#add_%(id)s");
+    if (plus.length){
+        plus.remove();
+    }
+});
+</script>'''
         output.append(js % {'id': css_id, 'imgid': css_id_thumbnail_img,
                             'noimg': noimgurl, 'descid': css_id_description_txt})
         return mark_safe(u''.join(output))
