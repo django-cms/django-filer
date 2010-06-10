@@ -1,13 +1,28 @@
 {% extends "admin/image_filer/image/change_form.html" %}
+{% trans i18n %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">Home</a> › <a href="/admin/image_filer/">Image Portfolio</a>{% if original.folder %} › <a href="{% url admin:image_filer-directory_listing-root %}">Root</a>{% for ancestor_folder in original.folder.get_ancestors %} › <a href="{% url admin:image_filer-directory_listing ancestor_folder.id %}">{{ ancestor_folder.name }}</a>{% endfor %} › <a href="{% url admin:image_filer-directory_listing original.folder.id %}">{{ original.folder.name }}</a>{% endif %} › <a href="/admin/image_filer/image/{{ image.id }}/">{{ image.label }}</a> › export</div>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/admin/" title="{% trans "Go back to" %} {% trans "admin home page" %}">{% trans "Home" %}</a>
+    &rsaquo; <a href="/admin/filer/" title="{% trans "Go back to" %} {% trans "Filer" %}">{% trans "Filer" %}</a>
+    {% if original.folder %} 
+    &rsaquo; <a href="{% url admin:filer-directory_listing-root %}" title="{% trans "Go back to" %} '{% trans "root"|title %}' {% trans "folder" %}">{% trans "root"|title %}</a>
+    {% for ancestor_folder in original.folder.get_ancestors %}
+    &rsaquo; <a href="{% url admin:filer-directory_listing ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a>
+    {% endfor %}
+    &rsaquo; <a href="{% url admin:filer-directory_listing original.folder.id %}" title="{% blocktrans with original.folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ original.folder.name }}</a>
+    {% endif %}
+    &rsaquo; <a href="/admin/image_filer/image/{{ image.id }}" title="{% trans "Go back to" %} {{ image.label }}" >{{ image.label }}</a>
+    &rsaquo; {% trans 'export' %}
+</div>
+{% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 {% block content %}
 <form action="{% url admin:image_filer-export_image image.id %}" method="post">
-	<table>
-	{{ form }}
-	</table>
-	<input type="submit" value="download image" />
+    <table>
+    {{ form }}
+    </table>
+    <input type="submit" value="{% trans "download image" %}" />
 </form>
 {% endblock %}

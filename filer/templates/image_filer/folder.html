@@ -1,8 +1,9 @@
+{% load i18n %}
 <span class="folder">
-    Folder '{{ image_folder_publication.folder.name }}' files:
+    {% blocktrans with image_folder_publication.folder.name as folder_label %}Folder '{{ folder_label }}' files{% endblocktrans %}:
     <ul>
     {% for file in image_folder_publication.folder.files %}
-    <li>File name: {{file.original_filename}}</li>
+    <li>{% trans "File name" %}: {{file.original_filename}}</li>
     {% endfor %}
     </ul>
     

@@ -20,9 +20,13 @@ class Clipboard(models.Model):
         return u"Clipboard %s of %s" % (self.id, self.user)
     class Meta:
         app_label = 'filer'
+        verbose_name = _('Clipboard')
+        verbose_name_plural = _('Clipboards')
 
 class ClipboardItem(models.Model):
     file = models.ForeignKey('File')
     clipboard = models.ForeignKey(Clipboard)
     class Meta:
         app_label = 'filer'
+        verbose_name = _('Clipboard item')
+        verbose_name_plural = _('Clipboard items')

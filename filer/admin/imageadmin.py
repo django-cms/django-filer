@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
+from django.utils.translation import ugettext  as _
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -18,7 +19,7 @@ from django.conf import settings
 
 # forms
 class ImageAdminFrom(forms.ModelForm):
-    subject_location = forms.CharField(max_length=64, required=False)
+    subject_location = forms.CharField(max_length=64, required=False, label=_('Subject location'))
     
     def sidebar_image_ratio(self):
         if self.instance:

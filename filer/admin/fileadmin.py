@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
+from django.utils.translation import ugettext  as _
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -36,7 +37,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         (None, {
             'fields': ('name', 'owner','description')#'contact',
         }),
-        ('advanced', {
+        (_('Advanced'), {
             'fields': ('_file',),
             'classes': ('collapse',),
         }),

@@ -46,17 +46,17 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             except Exception, e:#ThumbnailException, KeyError: # KeyError does not seem to catch the error if obj.icons['32'] is missing
                 #print u"error rendering Filer widget. Probably missing file: %s (%s)" % (e, type(e))
                 output.append(u'<img id="%s" src="%s" class="quiet" alt="file is missing">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
-                output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, 'file missing!') )
+                output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, _('file missing!')) )
         else:
             output.append(u'<img id="%s" src="%s" class="quiet" alt="no file selected">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/nofile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
             output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, '') )
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
-        output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
-            (related_url, url, name))
+        output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
+            (related_url, url, name, _('Browse for file')))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (globalsettings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         clearid = '%s_clear' % css_id
-        output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" />' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear')))
+        output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" title="%s"/>' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear'),  _('Clear')))
         output.append('</br>')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )

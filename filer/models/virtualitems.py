@@ -47,7 +47,7 @@ class ImagesWithMissingData(DummyFolder):
         return urlresolvers.reverse('admin:filer-directory_listing-images_with_missing_data')
 
 class FolderRoot(DummyFolder):
-    name = 'Root'
+    name = _('Root')
     is_root = True
     is_smart_folder = False
     can_have_subfolders = True
