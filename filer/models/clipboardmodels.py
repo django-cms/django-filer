@@ -21,7 +21,6 @@ class Clipboard(models.Model):
     class Meta:
         app_label = 'filer'
         verbose_name = _('Clipboard')
-        verbose_name_plural = _('Clipboards')
 
 class ClipboardItem(models.Model):
     file = models.ForeignKey('File')

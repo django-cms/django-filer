@@ -53,7 +53,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
-            (related_url, url, name, _('Browse for file')))
+            (related_url, url, name, _('Lookup')))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (globalsettings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         clearid = '%s_clear' % css_id
         output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" title="%s"/>' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear'),  _('Clear')))

@@ -8,8 +8,8 @@
                 <label for="searchbar"><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="{% trans "Search" %}" /></label>
                 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
                 <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" />
-                <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click to" %} {% trans "search for entered phrase" %}"  />
-                <input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans "Check to" %} {% trans "limit the search to current folder" %}"/>
+                <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}"  />
+                <input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans "Check it to" %} {% trans "limit the search to current folder" %}"/>
                 <label for="limit_search_to_folder">{% trans "limit the search to current folder" %}</label>
                 {% if show_result_count %}
                 <span class="small quiet">({% trans "found" %} {% blocktrans count folder_children|length as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}

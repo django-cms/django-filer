@@ -8,22 +8,76 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-28 11:33+0200\n"
+"POT-Creation-Date: 2010-06-12 22:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: fields/file.py:58
+#: admin/fileadmin.py:40
+msgid "Advanced"
+msgstr ""
+
+#: admin/imageadmin.py:22
+msgid "Subject location"
+msgstr ""
+
+#: admin/imageadmin.py:22
+msgid "Location of the main subject of the scene."
+msgstr ""
+
+#: fields/file.py:49
+msgid "file missing!"
+msgstr ""
+
+#: fields/file.py:56 fields/file.py:57
 msgid "Lookup"
 msgstr ""
 
-#: models/filemodels.py:17
-msgid "file_type_plugin_name"
+#: fields/file.py:59
+msgid "Clear"
+msgstr ""
+
+#: models/clipboardmodels.py:23
+#: templates/admin/filer/tools/clipboard/clipboard.html:5
+msgid "Clipboard"
+msgstr ""
+
+#: models/clipboardmodels.py:30
+msgid "Clipboard item"
+msgstr ""
+
+#: models/clipboardmodels.py:31
+msgid "Clipboard items"
+msgstr ""
+
+#: models/filemodels.py:23
+#: templates/admin/filer/folder/directory_table.html:11
+#: templates/admin/filer/folder/new_folder_form.html:13
+msgid "Name"
+msgstr ""
+
+#: models/filemodels.py:24
+msgid "Description"
+msgstr ""
+
+#: models/filemodels.py:26
+#: templates/admin/filer/folder/directory_table.html:25
+#: templates/admin/filer/folder/directory_table.html:40
+msgid "Owner"
+msgstr ""
+
+#: models/filemodels.py:149
+msgid "File"
+msgstr ""
+
+#: models/filemodels.py:150
+msgid "Files"
 msgstr ""
 
 #: models/foldermodels.py:175
@@ -78,7 +132,17 @@ msgstr ""
 msgid "date taken"
 msgstr ""
 
+#: models/imagemodels.py:215
+msgid "Image"
+msgstr ""
+
+#: models/imagemodels.py:216
+#: templates/admin/filer/folder/directory_table.html:25
+msgid "Images"
+msgstr ""
+
 #: models/virtualitems.py:30
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
 msgid "unfiled files"
 msgstr ""
 
@@ -86,22 +150,123 @@ msgstr ""
 msgid "files with missing metadata"
 msgstr ""
 
-#: templates/admin/filer/folder/change_form.html:18
+#: models/virtualitems.py:50 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:35
+#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/image/change_form.html:9
+#: templates/image_filer/image_export_form.html:9
+msgid "root"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:33
+#: templates/admin/filer/folder/directory_listing.html:34
+#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/image/change_form.html:6
+#: templates/admin/filer/image/change_form.html:7
+#: templates/image_filer/image_export_form.html:6
+#: templates/image_filer/image_export_form.html:7
+#: templates/image_filer/image_export_form.html:15
+msgid "Go back to"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/directory_listing.html:33
+#: templates/admin/filer/image/change_form.html:6
+#: templates/image_filer/image_export_form.html:6
+msgid "admin homepage"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/directory_listing.html:33
+#: templates/admin/filer/image/change_form.html:6
+#: templates/image_filer/image_export_form.html:6
+msgid "Home"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/directory_listing.html:34
+#: templates/admin/filer/image/change_form.html:7
+#: templates/image_filer/image_export_form.html:7
+msgid "Filer"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "folder"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:37
 #: templates/admin/filer/image/change_form.html:11
+#: templates/admin/filer/image/change_form.html:13
+#: templates/image_filer/image_export_form.html:11
+#: templates/image_filer/image_export_form.html:13
+#, python-format
+msgid "Go back to '%(folder_name)s' folder"
+msgstr ""
+
+#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/image/change_form.html:24
 msgid "History"
 msgstr ""
 
-#: templates/admin/filer/folder/change_form.html:19
-#: templates/admin/filer/image/change_form.html:12
+#: templates/admin/filer/folder/change_form.html:22
+#: templates/admin/filer/image/change_form.html:25
 msgid "View on site"
 msgstr ""
 
+#: templates/admin/filer/folder/change_form.html:30
+#: templates/admin/filer/folder/directory_listing.html:68
+#: templates/admin/filer/folder/directory_listing.html:74
+#: templates/admin/filer/folder/directory_table.html:20
+msgid "Folder Icon"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:35
+#: templates/admin/filer/image/change_form.html:9
+#: templates/image_filer/image_export_form.html:9
+msgid "Go back to root folder"
+msgstr ""
+
 #: templates/admin/filer/folder/directory_listing.html:55
+msgid "Adds a new Folder"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:55
+#: templates/image_filer/include/export_dialog.html:34
 msgid "New Folder"
 msgstr ""
 
+#: templates/admin/filer/folder/directory_listing.html:59
+msgid "Show images with missing metadata"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:59
+msgid "Incomplete Images"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:60
+msgid "Show unfiled images"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:60
+msgid "unfiled images"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:67
+msgid "Go back to the parent folder"
+msgstr ""
+
 #: templates/admin/filer/folder/directory_listing.html:69
-#: templates/admin/filer/tools/search_form.html:13
+#: templates/admin/filer/tools/search_form.html:15
 #, python-format
 msgid "1 folder"
 msgid_plural "%(counter)s folders"
@@ -109,27 +274,160 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/admin/filer/folder/directory_listing.html:69
+#: templates/admin/filer/tools/search_form.html:16
 #, python-format
 msgid "1 file"
 msgid_plural "%(counter)s files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_table.html:11
-msgid "Name"
+#: templates/admin/filer/folder/directory_listing.html:70
+msgid "Change current folder details"
 msgstr ""
 
-#: templates/admin/filer/image/change_form.html:24
+#: templates/admin/filer/folder/directory_listing.html:70
+#: templates/admin/filer/folder/directory_table.html:23
+#: templates/admin/filer/folder/directory_table.html:37
+msgid "Change"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:20
+#: templates/admin/filer/folder/directory_table.html:23
+#: templates/admin/filer/folder/directory_table.html:24
+#, python-format
+msgid "Change '%(item_label)s' folder details"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:25
+msgid "Folders"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:32
+msgid "Select this file"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:34
+#: templates/admin/filer/folder/directory_table.html:37
+#: templates/admin/filer/folder/directory_table.html:38
+#, python-format
+msgid "Change '%(item_label)s' details"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:49
+msgid "Move to clipboard"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:57
+msgid "there are no files or subfolders"
+msgstr ""
+
+#: templates/admin/filer/folder/new_folder_form.html:4
+msgid "Add new"
+msgstr ""
+
+#: templates/admin/filer/folder/new_folder_form.html:18
+msgid "Save"
+msgstr ""
+
+#: templates/admin/filer/image/change_form.html:37
 msgid "Set focal point"
 msgstr ""
 
-#: templates/admin/filer/tools/search_form.html:10
-msgid "Go"
+#: templates/admin/filer/image/change_form.html:39
+msgid "Full size preview"
 msgstr ""
 
-#: templates/admin/filer/tools/search_form.html:14
+#: templates/admin/filer/tools/search_form.html:8
+#: templates/admin/filer/tools/search_form.html:11
+msgid "Search"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:10
+msgid "Enter your search phrase here"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:11
+msgid "Click here to"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:11
+msgid "run search for entered phrase"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:12
+msgid "Check it to"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:12
+#: templates/admin/filer/tools/search_form.html:13
+msgid "limit the search to current folder"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:15
+msgid "found"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:15
+msgid "and"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:16
+msgid "cancel search"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:16
+msgid "Paste all items here"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "discard"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "Move all clipboard files to"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:28
+msgid "delete files"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:28
+msgid "Delete all files in the clipboard"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:38
+msgid "the clipboard is empty"
+msgstr ""
+
+#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
+msgid "upload failed"
+msgstr ""
+
+#: templates/image_filer/folder.html:3
 #, python-format
-msgid "1 image"
-msgid_plural "%(counter)s images"
-msgstr[0] ""
-msgstr[1] ""
+msgid "Folder '%(folder_label)s' files"
+msgstr ""
+
+#: templates/image_filer/folder.html:6
+msgid "File name"
+msgstr ""
+
+#: templates/image_filer/image.html:6
+msgid "author"
+msgstr ""
+
+#: templates/image_filer/image_export_form.html:16
+msgid "export"
+msgstr ""
+
+#: templates/image_filer/image_export_form.html:26
+msgid "download image"
+msgstr ""
+
+#: templates/image_filer/include/export_dialog.html:13
+msgid "Folder name already taken."
+msgstr ""
+
+#: templates/image_filer/include/export_dialog.html:15
+msgid "Submit"
+msgstr ""

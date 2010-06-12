@@ -16,12 +16,12 @@
             {% for subfolder in folder_children %}
                 <tr class="{% cycle rowcolors %}">
                     <td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;" >&nbsp;</a>{% endif %}</td>
-                    <!-- FileIcon -->
-                    <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' details{% endblocktrans %}"><img src="{{ subfolder.icons.48 }}" alt="{% trans "Folder Icon" %}" /></a></td>
-                    <!-- Filename/Dimensions -->
+                    <!-- DirIcon -->
+                    <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.48 }}" alt="{% trans "Folder Icon" %}" /></a></td>
+                    <!-- Directory details -->
                     <td>
-                        <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
-                        <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ subfolder.name }}</a></b></div>
+                        <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
+                        <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b></div>
                         <div>{% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }} {% trans "Folders" %}: {{ subfolder.children_count|default:"0" }} {% trans "Images" %}: {{ subfolder.file_count|default:"0" }}</div>
                     </td>
                     <td></td>

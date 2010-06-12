@@ -19,7 +19,7 @@ from django.conf import settings
 
 # forms
 class ImageAdminFrom(forms.ModelForm):
-    subject_location = forms.CharField(max_length=64, required=False, label=_('Subject location'))
+    subject_location = forms.CharField(max_length=64, required=False, label=_('Subject location'), help_text=_('Location of the main subject of the scene.'))
     
     def sidebar_image_ratio(self):
         if self.instance:
