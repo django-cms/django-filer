@@ -4,6 +4,12 @@
 {% block extrahead %}{{ block.super }}
 {% endblock %}
 
+{% block breadcrumbs %}
+{% with original as instance %}
+{% include "admin/filer/breadcrumbs.html" %}
+{% endwith %}
+{% endblock %}
+
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
 {% endblock %}

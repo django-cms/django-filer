@@ -144,8 +144,19 @@ class File(models.Model, mixins.IconsMixin):
             return UnfiledImages()
         else:
             return self.folder
+    @property
+    def logical_path(self):
+        """
+        Gets logical path of the folder in the tree structure.
+        Used to generate breadcrumbs
+        """
+        folder_path = []
+        if self.folder:
+            folder_path.extend(self.folder.get_ancestors())
+        folder_path.append(self.logical_folder)
+        return folder_path     
+        
     class Meta:
         app_label = 'filer'
         verbose_name = _('File')
         verbose_name_plural = _('Files')
-

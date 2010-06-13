@@ -24,7 +24,13 @@ class DummyFolder(mixins.IconsMixin):
     @property
     def image_files(self):
         return self.files
-
+    @property
+    def logical_path(self):
+        """
+        Gets logical path of the folder in the tree structure.
+        Used to generate breadcrumbs
+        """
+        return []
 
 class UnfiledImages(DummyFolder):
     name = _("unfiled files")

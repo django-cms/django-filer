@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-12 22:10+0000\n"
+"POT-Creation-Date: 2010-06-13 23:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,59 +71,59 @@ msgstr ""
 msgid "Owner"
 msgstr ""
 
-#: models/filemodels.py:149
+#: models/filemodels.py:161
 msgid "File"
 msgstr ""
 
-#: models/filemodels.py:150
+#: models/filemodels.py:162
 msgid "Files"
 msgstr ""
 
-#: models/foldermodels.py:175
+#: models/foldermodels.py:187
 msgid "all items"
 msgstr ""
 
-#: models/foldermodels.py:176
+#: models/foldermodels.py:188
 msgid "this item only"
 msgstr ""
 
-#: models/foldermodels.py:177
+#: models/foldermodels.py:189
 msgid "this item and all children"
 msgstr ""
 
-#: models/foldermodels.py:181
+#: models/foldermodels.py:193
 msgid "type"
 msgstr ""
 
-#: models/foldermodels.py:182
+#: models/foldermodels.py:194
 msgid "user"
 msgstr ""
 
-#: models/foldermodels.py:183
+#: models/foldermodels.py:195
 msgid "group"
 msgstr ""
 
-#: models/foldermodels.py:184
+#: models/foldermodels.py:196
 msgid "everybody"
 msgstr ""
 
-#: models/foldermodels.py:186
+#: models/foldermodels.py:198
 msgid "can edit"
 msgstr ""
 
-#: models/foldermodels.py:187
+#: models/foldermodels.py:199
 msgid "can read"
 msgstr ""
 
-#: models/foldermodels.py:188
+#: models/foldermodels.py:200
 msgid "can add children"
 msgstr ""
 
-#: models/foldermodels.py:214
+#: models/foldermodels.py:226
 msgid "Folder Permission"
 msgstr ""
 
-#: models/foldermodels.py:215
+#: models/foldermodels.py:227
 msgid "Folder Permissions"
 msgstr ""
 
@@ -140,33 +140,61 @@ msgstr ""
 msgid "Images"
 msgstr ""
 
-#: models/virtualitems.py:30
+#: models/virtualitems.py:36
 #: templates/admin/filer/tools/clipboard/clipboard.html:22
 msgid "unfiled files"
 msgstr ""
 
-#: models/virtualitems.py:40
+#: models/virtualitems.py:46
 msgid "files with missing metadata"
 msgstr ""
 
-#: models/virtualitems.py:50 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:35
-#: templates/admin/filer/folder/directory_listing.html:58
-#: templates/admin/filer/folder/directory_listing.html:67
-#: templates/admin/filer/image/change_form.html:9
+#: models/virtualitems.py:56 templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/directory_listing.html:61
 #: templates/image_filer/image_export_form.html:9
 msgid "root"
+msgstr ""
+
+#: templates/admin/filer/breadcrumbs.html:3
+msgid "Go back to admin homepage"
+msgstr ""
+
+#: templates/admin/filer/breadcrumbs.html:3
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/image_filer/image_export_form.html:6
+msgid "Home"
+msgstr ""
+
+#: templates/admin/filer/breadcrumbs.html:4
+msgid "Go back to Filer app"
+msgstr ""
+
+#: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/image_filer/image_export_form.html:7
+msgid "Filer"
+msgstr ""
+
+#: templates/admin/filer/breadcrumbs.html:5
+#: templates/image_filer/image_export_form.html:9
+msgid "Go back to root folder"
+msgstr ""
+
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/image_filer/image_export_form.html:11
+#: templates/image_filer/image_export_form.html:13
+#, python-format
+msgid "Go back to '%(folder_name)s' folder"
 msgstr ""
 
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:33
-#: templates/admin/filer/folder/directory_listing.html:34
-#: templates/admin/filer/folder/directory_listing.html:58
-#: templates/admin/filer/folder/directory_listing.html:67
-#: templates/admin/filer/image/change_form.html:6
-#: templates/admin/filer/image/change_form.html:7
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/directory_listing.html:61
 #: templates/image_filer/image_export_form.html:6
 #: templates/image_filer/image_export_form.html:7
 #: templates/image_filer/image_export_form.html:15
@@ -174,97 +202,65 @@ msgid "Go back to"
 msgstr ""
 
 #: templates/admin/filer/folder/change_form.html:6
-#: templates/admin/filer/folder/directory_listing.html:33
-#: templates/admin/filer/image/change_form.html:6
 #: templates/image_filer/image_export_form.html:6
 msgid "admin homepage"
 msgstr ""
 
-#: templates/admin/filer/folder/change_form.html:6
-#: templates/admin/filer/folder/directory_listing.html:33
-#: templates/admin/filer/image/change_form.html:6
-#: templates/image_filer/image_export_form.html:6
-msgid "Home"
-msgstr ""
-
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/admin/filer/folder/directory_listing.html:34
-#: templates/admin/filer/image/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
-msgid "Filer"
-msgstr ""
-
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:58
-#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/directory_listing.html:61
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:22
 msgid "folder"
 msgstr ""
 
-#: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:37
-#: templates/admin/filer/image/change_form.html:11
-#: templates/admin/filer/image/change_form.html:13
-#: templates/image_filer/image_export_form.html:11
-#: templates/image_filer/image_export_form.html:13
-#, python-format
-msgid "Go back to '%(folder_name)s' folder"
-msgstr ""
-
 #: templates/admin/filer/folder/change_form.html:21
-#: templates/admin/filer/image/change_form.html:24
+#: templates/admin/filer/image/change_form.html:10
 msgid "History"
 msgstr ""
 
 #: templates/admin/filer/folder/change_form.html:22
-#: templates/admin/filer/image/change_form.html:25
+#: templates/admin/filer/image/change_form.html:11
 msgid "View on site"
 msgstr ""
 
 #: templates/admin/filer/folder/change_form.html:30
+#: templates/admin/filer/folder/directory_listing.html:62
 #: templates/admin/filer/folder/directory_listing.html:68
-#: templates/admin/filer/folder/directory_listing.html:74
 #: templates/admin/filer/folder/directory_table.html:20
 msgid "Folder Icon"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:35
-#: templates/admin/filer/image/change_form.html:9
-#: templates/image_filer/image_export_form.html:9
-msgid "Go back to root folder"
-msgstr ""
-
-#: templates/admin/filer/folder/directory_listing.html:55
+#: templates/admin/filer/folder/directory_listing.html:49
 msgid "Adds a new Folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:55
+#: templates/admin/filer/folder/directory_listing.html:49
 #: templates/image_filer/include/export_dialog.html:34
 msgid "New Folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:59
+#: templates/admin/filer/folder/directory_listing.html:53
 msgid "Show images with missing metadata"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:59
+#: templates/admin/filer/folder/directory_listing.html:53
 msgid "Incomplete Images"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:60
+#: templates/admin/filer/folder/directory_listing.html:54
 msgid "Show unfiled images"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:60
+#: templates/admin/filer/folder/directory_listing.html:54
 msgid "unfiled images"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:61
 msgid "Go back to the parent folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:69
+#: templates/admin/filer/folder/directory_listing.html:63
 #: templates/admin/filer/tools/search_form.html:15
 #, python-format
 msgid "1 folder"
@@ -272,7 +268,7 @@ msgid_plural "%(counter)s folders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_listing.html:69
+#: templates/admin/filer/folder/directory_listing.html:63
 #: templates/admin/filer/tools/search_form.html:16
 #, python-format
 msgid "1 file"
@@ -280,11 +276,11 @@ msgid_plural "%(counter)s files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_listing.html:70
+#: templates/admin/filer/folder/directory_listing.html:64
 msgid "Change current folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:70
+#: templates/admin/filer/folder/directory_listing.html:64
 #: templates/admin/filer/folder/directory_table.html:23
 #: templates/admin/filer/folder/directory_table.html:37
 msgid "Change"
@@ -328,11 +324,11 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: templates/admin/filer/image/change_form.html:37
+#: templates/admin/filer/image/change_form.html:23
 msgid "Set focal point"
 msgstr ""
 
-#: templates/admin/filer/image/change_form.html:39
+#: templates/admin/filer/image/change_form.html:25
 msgid "Full size preview"
 msgstr ""
 
