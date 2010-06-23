@@ -57,7 +57,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (globalsettings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         clearid = '%s_clear' % css_id
         output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" title="%s"/>' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear'),  _('Clear')))
-        output.append('</br>')
+        output.append('<br />')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
         noimgurl = '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX
