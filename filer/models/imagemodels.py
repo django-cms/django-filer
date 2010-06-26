@@ -8,6 +8,7 @@ from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
 from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
+from django.conf import settings
 
 from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
 from sorl.thumbnail.fields import ALL_ARGS
@@ -138,6 +139,7 @@ class Image(File):
         return self._height or 0
     @property
     def icons(self):
+        print "ICONS! START"
         if not getattr(self, '_icon_thumbnails_cache', False):
             r = {}
             for size in FILER_ADMIN_ICON_SIZES:
@@ -158,6 +160,7 @@ class Image(File):
                 except Exception, e:
                     pass#print e
             setattr(self, '_icon_thumbnails_cache', r)
+        print "ICONS! END"
         return getattr(self, '_icon_thumbnails_cache')
     def _build_thumbnail(self, args):
         try:
@@ -177,6 +180,7 @@ class Image(File):
             return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
     @property
     def thumbnails(self):
+        print "THUMBNAILS START"
         # we build an extra dict here mainly
         # to prevent the default errors to 
         # get thrown and to add a default missing
@@ -188,6 +192,7 @@ class Image(File):
                 tns[name] = unicode(self._build_thumbnail(opts))
             self._thumbnails = tns
             #print tns
+        print "THUMBNAILS END"
         return self._thumbnails
     
     @property
@@ -198,8 +203,8 @@ class Image(File):
         'return the image url relative to MEDIA_URL'
         try:
             rel_url = u"%s" % self._file.url
-            if rel_url.startswith('/media/'):
-                before, match, rel_url = rel_url.partition('/media/')
+            if rel_url.startswith(settings.MEDIA_URL):
+                before, match, rel_url = rel_url.partition(settings.MEDIA_URL)
             return rel_url
         except Exception, e:
             return ''
