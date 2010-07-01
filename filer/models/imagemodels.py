@@ -86,10 +86,8 @@ class Image(File):
         try:
             # do this more efficient somehow?
             self._width, self._height = PILImage.open(self._file).size
-            #self._height = self._file.height
         except Exception, e:
             # probably the image is missing. nevermind.
-            #print e
             pass
         super(Image, self).save(*args, **kwargs)
         
@@ -139,7 +137,6 @@ class Image(File):
         return self._height or 0
     @property
     def icons(self):
-        print "ICONS! START"
         if not getattr(self, '_icon_thumbnails_cache', False):
             r = {}
             for size in FILER_ADMIN_ICON_SIZES:
@@ -158,9 +155,8 @@ class Image(File):
                     dest = build_thumbnail_name(source.name, **name_kwargs)
                     r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
                 except Exception, e:
-                    pass#print e
+                    pass
             setattr(self, '_icon_thumbnails_cache', r)
-        print "ICONS! END"
         return getattr(self, '_icon_thumbnails_cache')
     def _build_thumbnail(self, args):
         try:
@@ -180,19 +176,15 @@ class Image(File):
             return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
     @property
     def thumbnails(self):
-        print "THUMBNAILS START"
         # we build an extra dict here mainly
         # to prevent the default errors to 
         # get thrown and to add a default missing
         # image (not yet)
-        #print "getting thumbnails for %s" % self.id
         if not hasattr(self, '_thumbnails'):
             tns = {}
             for name, opts in Image.DEFAULT_THUMBNAILS.items():
                 tns[name] = unicode(self._build_thumbnail(opts))
             self._thumbnails = tns
-            #print tns
-        print "THUMBNAILS END"
         return self._thumbnails
     
     @property
