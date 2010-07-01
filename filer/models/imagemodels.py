@@ -217,3 +217,5 @@ class Image(File):
         return self.rel_image_url
     class Meta:
         app_label = 'filer'
+        verbose_name = _('Image')
+        verbose_name_plural = _('Images')

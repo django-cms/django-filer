@@ -115,6 +115,17 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def files(self):
         return self.all_files.all()
+    @property
+    def logical_path(self):
+        """
+        Gets logical path of the folder in the tree structure.
+        Used to generate breadcrumbs
+        """
+        folder_path = []
+        if self.parent:
+            folder_path.extend(self.parent.get_ancestors())
+            folder_path.append(self.parent)
+        return folder_path
     
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
@@ -152,6 +163,7 @@ class Folder(models.Model, mixins.IconsMixin):
         return urlresolvers.reverse('admin:filer_folder_change', args=(self.id,))
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse('admin:filer-directory_listing', args=(self.id,))
+        
     def __unicode__(self):
         return u"%s" % (self.name,)
     class Meta:

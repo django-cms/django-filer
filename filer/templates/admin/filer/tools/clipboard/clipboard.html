@@ -1,43 +1,44 @@
-{% load thumbnail %}
+{% load thumbnail i18n %}
 {% for clipboard in user.filer_clipboards.all %}
 <table style="width: 100%; border: 1px solid #DDDDDD;" class="clipboard">
-	<thead>
-		<tr><th colspan="3">Clipboard</th></tr>
-	</thead>
-	<tfoot>
-		<tr>
-			<td colspan="3">
-				<form action="{% url admin:filer-paste_clipboard_to_folder %}" method="post" style="display: inline;">{% csrf_token %}
-					<input type="hidden" name="folder_id" value="{{ folder.id }}" />
-					<input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
-					<input type="hidden" name="redirect_to" value="{{ current_url }}" />
-					{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-					<input type="submit" value="&lArr;"{% if folder.is_root %} disabled="disabled" style="color: gray;"{% endif %} />
-				</form>
-				<form action="{% url admin:filer-discard_clipboard %}" method="post"  style="display: inline;">{% csrf_token %}
-					<input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
-					<input type="hidden" name="redirect_to" value="{{ current_url }}" />
-					{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-					<input type="submit" value="discard" />
-				</form>{% comment %}
-				<form action="{% url admin:filer-delete_clipboard %}" method="post"  style="display: inline;">{% csrf_token %}
-					<input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
-					<input type="hidden" name="redirect_to" value="{{ current_url }}" />
-					{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-					<input type="submit" value="delete files" />
-				</form>{% endcomment %}
-			</td>
-		</tr>
-	</tfoot>
-	<tbody id="fileInputQueue" class="fileUploadQueue">{% if clipboard.files.count %}{% with clipboard.files.all as items %}
-		{% include "admin/filer/tools/clipboard/clipboard_item_rows.html" %}
-		{% endwith %}
-	{% else %}
-		<tr class="noItemsRow">
-			<td colspan="3" style="color: gray;text-align: center; height: 48px; vertical-align: middle;">the clipboard is empty</td>
-		</tr>
-	{% endif %}
-	</tbody>
+    <thead>
+        <tr><th colspan="3">{% trans "Clipboard" %}</th></tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td colspan="3">
+                <form action="{% url admin:filer-paste_clipboard_to_folder %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="folder_id" value="{{ folder.id }}" />
+                    <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
+                    <input type="hidden" name="redirect_to" value="{{ current_url }}" />
+                    {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                    <input type="submit" value="&lArr;"{% if folder.is_root %} disabled="disabled" style="color: gray;"{% endif %} title="{% trans "Paste all items here" %}"/>
+                </form>
+                <form action="{% url admin:filer-discard_clipboard %}" method="post"  style="display: inline;">{% csrf_token %}
+                    <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
+                    <input type="hidden" name="redirect_to" value="{{ current_url }}" />
+                    {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                    <input type="submit" value="{% trans "discard" %}" title="{% trans "Move all clipboard files to" %} '{% trans "unfiled files" %}' {% trans "folder" %}"/>
+                </form>{% comment %}
+                <form action="{% url admin:filer-delete_clipboard %}" method="post"  style="display: inline;">{% csrf_token %}
+                    <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
+                    <input type="hidden" name="redirect_to" value="{{ current_url }}" />
+                    {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                    <input type="submit" value="{% trans "delete files" %}" title="{% trans "Delete all files in the clipboard" %}" />
+                </form>{% endcomment %}
+            </td>
+        </tr>
+    </tfoot>
+    <tbody id="fileInputQueue" class="fileUploadQueue">{% if clipboard.files.count %}{% with clipboard.files.all as items %}
+        {% include "admin/filer/tools/clipboard/clipboard_item_rows.html" %}
+        {% endwith %}
+    {% else %}
+        <tr class="noItemsRow">
+            <td colspan="3" style="color: gray;text-align: center; height: 48px; vertical-align: middle;">{% trans "the clipboard is empty" %}</td>
+        </tr>
+    {% endif %}
+    </tbody>
 </table>
 {% endfor %}
-	
+    

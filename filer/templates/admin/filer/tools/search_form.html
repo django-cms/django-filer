@@ -1,22 +1,24 @@
 {% load adminmedia filermedia %}
 {% load i18n %}
 <div id="toolbar">
-	<div style="float: left;">
-		<form id="changelist-search" action="" method="get">{% csrf_token %}
-			<div><!-- DIV needed for valid HTML -->
-			<label for="searchbar"><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="Search" /></label>
-			{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-			<input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" />
-			<input type="submit" value="{% trans 'Go' %}" />
-			<input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder"{% if limit_search_to_folder %} checked{% endif %} /> <label for="limit_search_to_folder">limit search to current folder</label>
-			{% if show_result_count %}
-			<span class="small quiet">(found {% blocktrans count folder_children|length as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} and
-			{% blocktrans count folder_files|length as counter %}1 image{% plural %}{{ counter }} images{% endblocktrans %}) <a href="?">forget search</a></span>
-			
-			{% endif %}
-			</div>
-		</form>
-	</div>
-	<div style="clear: both;"></div>
+    <div style="float: left;">
+        <form id="changelist-search" action="" method="get">
+            {% csrf_token %}
+            <div>
+                <label for="searchbar"><img src="{% admin_media_prefix %}img/admin/icon_searchbox.png" alt="{% trans "Search" %}" /></label>
+                {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" />
+                <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}"  />
+                <input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans "Check it to" %} {% trans "limit the search to current folder" %}"/>
+                <label for="limit_search_to_folder">{% trans "limit the search to current folder" %}</label>
+                {% if show_result_count %}
+                <span class="small quiet">({% trans "found" %} {% blocktrans count folder_children|length as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
+                {% blocktrans count folder_files|length as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?">{% trans "cancel search" %}</a></span>
+                
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div style="clear: both;"></div>
 </div>
 <script type="text/javascript">document.getElementById("searchbar").focus();</script>

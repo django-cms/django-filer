@@ -1,14 +1,13 @@
 {% extends "admin/filer/change_form.html" %}
 {% load i18n admin_modify adminmedia %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">Home</a> › <a href="/admin/filer/">Image Portfolio</a>{% if original.folder %} › <a href="{% url admin:filer-directory_listing-root %}">Root</a>{% for ancestor_folder in original.folder.get_ancestors %} › <a href="{% url admin:filer-directory_listing ancestor_folder.id %}">{{ ancestor_folder.name }}</a>{% endfor %} › <a href="{% url admin:filer-directory_listing original.folder.id %}">{{ original.folder.name }}</a>{% endif %} › {{ original }}</div>{% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
-  	{#<li><a href="export/">Export</a></li>#}
-  	<li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    {#<li><a href="export/">{% trans "Export" %}</a></li>#}
+    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
@@ -17,13 +16,13 @@
 {% block sidebar %}
 <div id="content-related">
     <div id="navcontainer">
-		<div id="image_container">
-			<img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
-			<div id="paper">&nbsp;</div>
-		</div>
-		<h4>{% trans 'Set focal point'%}</h4>
+        <div id="image_container">
+            <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
+            <div id="paper">&nbsp;</div>
+        </div>
+        <h4>{% trans "Set focal point" %}</h4>
 
-		<a href="{{ original.url }}">full size</a>
+        <a href="{{ original.url }}">{% trans "Full size preview" %}</a>
     </div>
 </div>
 {% endblock %}

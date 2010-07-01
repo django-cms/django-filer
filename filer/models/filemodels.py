@@ -14,16 +14,16 @@ class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
     _file = models.FileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
-    _file_type_plugin_name = models.CharField(_("file_type_plugin_name"), max_length=128, null=True, blank=True, editable=False)
+    _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
     has_all_mandatory_data = models.BooleanField(default=False, editable=False)
     
     original_filename = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Name'))
+    description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
     
-    owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True)
+    owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True, verbose_name=_('Owner'))
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -144,6 +144,19 @@ class File(models.Model, mixins.IconsMixin):
             return UnfiledImages()
         else:
             return self.folder
+    @property
+    def logical_path(self):
+        """
+        Gets logical path of the folder in the tree structure.
+        Used to generate breadcrumbs
+        """
+        folder_path = []
+        if self.folder:
+            folder_path.extend(self.folder.get_ancestors())
+        folder_path.append(self.logical_folder)
+        return folder_path     
+        
     class Meta:
         app_label = 'filer'
-
+        verbose_name = _('File')
+        verbose_name_plural = _('Files')
