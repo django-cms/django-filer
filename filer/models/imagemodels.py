@@ -7,7 +7,7 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
-from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
+from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_STATICMEDIA_PREFIX, FILER_UPLOAD_MEDIA_URL
 from django.conf import settings
 
 from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
@@ -192,11 +192,11 @@ class Image(File):
         return self.url
     @property
     def rel_image_url(self):
-        'return the image url relative to MEDIA_URL'
+        'return the image url relative to FILER_UPLOAD_MEDIA_URL'
         try:
             rel_url = u"%s" % self._file.url
-            if rel_url.startswith(settings.MEDIA_URL):
-                before, match, rel_url = rel_url.partition(settings.MEDIA_URL)
+            if rel_url.startswith(FILER_UPLOAD_MEDIA_URL):
+                before, match, rel_url = rel_url.partition(FILER_UPLOAD_MEDIA_URL)
             return rel_url
         except Exception, e:
             return ''
