@@ -14,7 +14,7 @@ def read(fname):
 
 install_requires = [
     'setuptools',
-    'sorl-thumbnail>=3.2.5',
+    'easy-thumbnails',
     'django-mptt>=0.2.1',
 ]
 

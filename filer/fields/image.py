@@ -6,7 +6,6 @@ from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from sorl.thumbnail.base import ThumbnailException
 from filer.settings import FILER_STATICMEDIA_PREFIX
 from django.conf import settings as globalsettings
 from filer.fields.file import AdminFileWidget, AdminFileFormField, FilerFileField

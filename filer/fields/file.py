@@ -7,7 +7,6 @@ from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from sorl.thumbnail.base import ThumbnailException
 from filer.settings import FILER_STATICMEDIA_PREFIX
 from django.conf import settings as globalsettings
 from filer.models import File
@@ -43,7 +42,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             try:
                 output.append(u'<img id="%s" src="%s" alt="%s" /> ' % (css_id_thumbnail_img, obj.icons['32'], obj.label) )
                 output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, obj) )
-            except Exception, e:#ThumbnailException, KeyError: # KeyError does not seem to catch the error if obj.icons['32'] is missing
+            except Exception, e:# KeyError: # KeyError does not seem to catch the error if obj.icons['32'] is missing
                 #print u"error rendering Filer widget. Probably missing file: %s (%s)" % (e, type(e))
                 output.append(u'<img id="%s" src="%s" class="quiet" alt="file is missing">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
                 output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, _('file missing!')) )
