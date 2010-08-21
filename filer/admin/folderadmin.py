@@ -115,14 +115,27 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         from filer import views
         url_patterns = patterns('',
             # we override the default list view with our own directory listing of the root directories
-            url(r'^$', self.admin_site.admin_view(self.directory_listing), name='filer-directory_listing-root'),
-            url(r'^(?P<folder_id>\d+)/list/$', self.admin_site.admin_view(self.directory_listing), name='filer-directory_listing'),
+            url(r'^$', self.admin_site.admin_view(self.directory_listing),
+                name='filer-directory_listing-root'),
+            url(r'^(?P<folder_id>\d+)/list/$',
+                self.admin_site.admin_view(self.directory_listing),
+                name='filer-directory_listing'),
             
-            url(r'^(?P<folder_id>\d+)/make_folder/$', self.admin_site.admin_view(views.make_folder), name='filer-directory_listing-make_folder'),
-            url(r'^make_folder/$', self.admin_site.admin_view(views.make_folder), name='filer-directory_listing-make_root_folder'),
+            url(r'^(?P<folder_id>\d+)/make_folder/$',
+                self.admin_site.admin_view(views.make_folder),
+                name='filer-directory_listing-make_folder'),
+            url(r'^make_folder/$',
+                self.admin_site.admin_view(views.make_folder),
+                name='filer-directory_listing-make_root_folder'),
             
-            url(r'^images_with_missing_data/$', self.admin_site.admin_view(self.directory_listing), {'viewtype': 'images_with_missing_data'}, name='filer-directory_listing-images_with_missing_data'),
-            url(r'^unfiled_images/$', self.admin_site.admin_view(self.directory_listing), {'viewtype': 'unfiled_images'}, name='filer-directory_listing-unfiled_images'),
+            url(r'^images_with_missing_data/$',
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'images_with_missing_data'},
+                name='filer-directory_listing-images_with_missing_data'),
+            url(r'^unfiled_images/$',
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'unfiled_images'},
+                name='filer-directory_listing-unfiled_images'),
         )
         url_patterns.extend(urls)
         return url_patterns

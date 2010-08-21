@@ -44,12 +44,22 @@ class ClipboardAdmin(admin.ModelAdmin):
         from filer import views
         url_patterns = patterns('',
             #url(r'^([0-9]+)/move-page/$', self.admin_site.admin_view(self.move_entity), name='%s_%s' % (info, 'move_page') ),
-            url(r'^operations/paste_clipboard_to_folder/$', self.admin_site.admin_view(views.paste_clipboard_to_folder), name='filer-paste_clipboard_to_folder'),
-            url(r'^operations/discard_clipboard/$', self.admin_site.admin_view(views.discard_clipboard), name='filer-discard_clipboard'),
-            url(r'^operations/delete_clipboard/$', self.admin_site.admin_view(views.delete_clipboard), name='filer-delete_clipboard'),
-            url(r'^operations/move_file_to_clipboard/$', self.admin_site.admin_view(self.move_file_to_clipboard), name='filer-move_file_to_clipboard'),
+            url(r'^operations/paste_clipboard_to_folder/$',
+                self.admin_site.admin_view(views.paste_clipboard_to_folder),
+                name='filer-paste_clipboard_to_folder'),
+            url(r'^operations/discard_clipboard/$',
+                self.admin_site.admin_view(views.discard_clipboard),
+                name='filer-discard_clipboard'),
+            url(r'^operations/delete_clipboard/$',
+                self.admin_site.admin_view(views.delete_clipboard),
+                name='filer-delete_clipboard'),
+            url(r'^operations/move_file_to_clipboard/$',
+                self.admin_site.admin_view(self.move_file_to_clipboard),
+                name='filer-move_file_to_clipboard'),
             # upload does it's own permission stuff (because of the stupid flash missing cookie stuff)
-            url(r'^operations/upload/$', self.ajax_upload, name='filer-ajax_upload'),
+            url(r'^operations/upload/$',
+                self.ajax_upload,
+                name='filer-ajax_upload'),
         )
         url_patterns.extend(urls)
         return url_patterns
