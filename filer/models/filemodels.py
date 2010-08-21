@@ -8,12 +8,14 @@ from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
 
+from easy_thumbnails.fields import ThumbnailerField
+
     
 
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    _file = models.FileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    _file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     

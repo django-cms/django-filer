@@ -10,18 +10,17 @@ from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
 from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
 from django.conf import settings
 
-from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
-from sorl.thumbnail.fields import ALL_ARGS
+from filer.models.filer_file_storage import get_directory_name
 
 from PIL import Image as PILImage
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
     DEFAULT_THUMBNAILS = {
-        'admin_clipboard_icon': {'size': (32,32), 'options': ['crop','upscale']},
-        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,10000), 'options': []},
-        'admin_directory_listing_icon': {'size': (48,48), 'options': ['crop','upscale']},
-        'admin_tiny_icon': {'size': (32,32), 'options': ['crop','upscale']},
+        'admin_clipboard_icon': {'size': (32,32), 'crop':True, 'upscale':True},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,10000),},
+        'admin_directory_listing_icon': {'size': (48,48), 'crop':True, 'upscale':True},
+        'admin_tiny_icon': {'size': (32,32), 'crop':True, 'upscale':True},
     }
     file_type = 'image'
     _icon = "image"
@@ -141,39 +140,19 @@ class Image(File):
             r = {}
             for size in FILER_ADMIN_ICON_SIZES:
                 try:
-                    args = {'size': (int(size),int(size)), 'options': ['crop','upscale']}
-                    # Build the DjangoThumbnail kwargs.
-                    kwargs = {}
-                    for k, v in args.items():
-                        kwargs[ALL_ARGS[k]] = v
-                    # Build the destination filename and return the thumbnail.
-                    name_kwargs = {}
-                    for key in ['size', 'options', 'quality', 'basedir', 'subdir',
-                                'prefix', 'extension']:
-                        name_kwargs[key] = args.get(key)
-                    source = self._file
-                    dest = build_thumbnail_name(source.name, **name_kwargs)
-                    r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
+                    thumbnail_options = {
+                        'size':(int(size),int(size)),
+                        'crop': True,
+                        'upscale':True,
+                        }
+                    thumb = self._file.get_thumbnail(thumbnail_options)
+                    r[size] = thumb.url
+                    
                 except Exception, e:
                     pass
             setattr(self, '_icon_thumbnails_cache', r)
         return getattr(self, '_icon_thumbnails_cache')
-    def _build_thumbnail(self, args):
-        try:
-            # Build the DjangoThumbnail kwargs.
-            kwargs = {}
-            for k, v in args.items():
-                kwargs[ALL_ARGS[k]] = v
-            # Build the destination filename and return the thumbnail.
-            name_kwargs = {}
-            for key in ['size', 'options', 'quality', 'basedir', 'subdir',
-                        'prefix', 'extension']:
-                name_kwargs[key] = args.get(key)
-            source = self._file
-            dest = build_thumbnail_name(source.name, **name_kwargs)
-            return DjangoThumbnail(source, relative_dest=dest, **kwargs)
-        except:
-            return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
+        
     @property
     def thumbnails(self):
         # we build an extra dict here mainly
@@ -181,10 +160,13 @@ class Image(File):
         # get thrown and to add a default missing
         # image (not yet)
         if not hasattr(self, '_thumbnails'):
-            tns = {}
+            thumbnails = {}
             for name, opts in Image.DEFAULT_THUMBNAILS.items():
-                tns[name] = unicode(self._build_thumbnail(opts))
-            self._thumbnails = tns
+                try:
+                    thumbnails[name] = self._file.get_thumbnail(opts).url
+                except:
+                    return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
+            self._thumbnails = thumbnails
         return self._thumbnails
     
     @property
