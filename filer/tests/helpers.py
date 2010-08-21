@@ -1,3 +1,5 @@
+from PIL import Image, ImageChops, ImageDraw
+
 from django.contrib.auth.models import User
 from filer.models.foldermodels import Folder
 

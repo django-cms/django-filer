@@ -1,8 +1,12 @@
+import os
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.core.files import File
 
 from filer.models.foldermodels import Folder
-from filer.tests.helpers import create_superuser, create_folder_structure
+from filer.models.imagemodels import Image
+from filer.tests.helpers import (create_superuser, create_folder_structure,
+                                 create_image)
 
 class FilerTests(TestCase):
     def test_environment(self):
@@ -70,12 +74,32 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+        self.img = create_image()
+        self.image_name = 'test_file.jpg'
+        self.filename = os.path.join(os.path.dirname(__file__),
+                                 self.image_name)
+        self.img.save(self.filename, 'JPEG')
         
     def tearDown(self):
         self.client.logout()
+        os.remove(self.filename)
+        for img in Image.objects.all():
+            img.delete()
         
-    def test_filer_upload_image(self):
-        self.assertTrue(False)
+    def test_filer_upload_file(self):
+        self.assertEqual(Image.objects.count(),0)
+        f=open(self.filename)
+        file = File(f) 
+        response = self.client.post(reverse('admin:filer-ajax_upload'),
+                                    {
+                                       'Filename':self.image_name, 
+                                        'Filedata': file,
+                                       'jsessionid':self.client.session.session_key,
+                                    })
+        self.assertEqual(Image.objects.count(),1)
+        self.assertEqual(Image.objects.all()[0].original_filename,
+                         self.image_name)
+        
         
     def test_filer_paste_clipboard_to_folder(self):
         self.assertTrue(False)
