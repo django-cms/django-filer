@@ -186,8 +186,9 @@ class Image(File):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     def __unicode__(self):
         # this simulates the way a file field works and
-        # allows the sorl thumbnail tag to use the Image model
+        # allows the sorl tag to use the Image model
         # as if it was a image field
+        #TODO: check if this is still required
         return self.rel_image_url
     class Meta:
         app_label = 'filer'
