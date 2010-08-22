@@ -13,6 +13,7 @@ FILER_UPLOAD_MEDIA_ROOT = getattr(settings, 'FILER_UPLOAD_MEDIA_ROOT', settings.
 FILER_UPLOAD_MEDIA_URL = getattr(settings, 'FILER_UPLOAD_MEDIA_URL', settings.MEDIA_URL)
 FILER_FILE_STORAGE = getattr(settings, 'FILER_FILE_STORAGE', 'filer.models.filer_file_storage.FilerFileSystemStorage')
 
+FILER_UNZIP_FILES = getattr(settings, 'FILER_UNZIP_FILES', True)
 '''
 # either relative to MEDIA_ROOT or a full path, for sorl to work it must be inside MEDIA_ROOT
 if getattr(settings,'FILER_PUBLICMEDIA_ROOT', '').startswith('/'):

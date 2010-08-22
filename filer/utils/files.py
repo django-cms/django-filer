@@ -2,6 +2,8 @@ import os
 
 from filer.utils.zip import unzip
 
+from filer import settings
+
 def generic_handle_file(file, original_filename):
     """
     Handels a file, regardless if a package or a single file and returns 
@@ -11,7 +13,7 @@ def generic_handle_file(file, original_filename):
     files = []
     filetype = os.path.splitext(original_filename)[1].lower()
     #print filetype
-    if filetype=='.zip':
+    if filetype=='.zip' and settings.FILER_UNZIP_FILES:
         unpacked_files = unzip(file)
         for ufile, ufilename in unpacked_files:
             files += generic_handle_file(ufile, ufilename)
