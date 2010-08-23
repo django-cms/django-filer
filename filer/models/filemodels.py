@@ -1,3 +1,5 @@
+from os.path import splitext
+
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
@@ -132,6 +134,12 @@ class File(models.Model, mixins.IconsMixin):
     @property
     def size(self):
         return self._file_size or 0
+    @property
+    def extension(self):
+        filetype = splitext(self.file.name)[1].lower()
+        if len(filetype)>0:
+            filetype = filetype[1:]
+        return filetype
     
     @property
     def logical_folder(self):
