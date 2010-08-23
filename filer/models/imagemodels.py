@@ -192,11 +192,11 @@ class Image(File):
         return self.url
     @property
     def rel_image_url(self):
-        'return the image url relative to FILER_UPLOAD_MEDIA_URL'
+        'return the image url relative to the used storage base url'
         try:
             rel_url = u"%s" % self._file.url
-            if rel_url.startswith(FILER_UPLOAD_MEDIA_URL):
-                before, match, rel_url = rel_url.partition(FILER_UPLOAD_MEDIA_URL)
+            if rel_url.startswith(self._file.storage.base_url):
+                before, match, rel_url = rel_url.partition(self._file.storage.base_url)
             return rel_url
         except Exception, e:
             return ''
