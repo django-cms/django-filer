@@ -2,6 +2,7 @@ from PIL import Image, ImageChops, ImageDraw
 
 from django.contrib.auth.models import User
 from filer.models.foldermodels import Folder
+from filer.models.clipboardmodels import Clipboard, ClipboardItem
 
 def create_superuser():
     superuser = User.objects.create_superuser('admin',
@@ -27,6 +28,10 @@ def create_folder_structure(depth=2, sibling=2, parent=None):
                 folder.save()
                 create_folder_structure(depth=d-1, sibling=sibling, parent=folder)
                 
+def create_clipboard_item(user, file):
+    clipboard, was_clipboard_created = Clipboard.objects.get_or_create(user=user)
+    clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
+    return clipboard_item
                 
 def create_image(mode='RGB', size=(800, 600)):
     image = Image.new(mode, size)
