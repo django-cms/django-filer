@@ -4,7 +4,7 @@ from django.template.defaultfilters import slugify
 from django.utils.encoding import force_unicode, smart_str
 import os
 import datetime
-from filer import settings as filer_settings
+from filer.settings import FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX
 from django.core.exceptions import ImproperlyConfigured
 
 def get_valid_filename(s):
@@ -20,43 +20,16 @@ def get_valid_filename(s):
         return u"%s.%s" % (filename, ext)
     else:
         return u"%s" % (filename,)
-        
-class PublicFileSystemStorage(FileSystemStorage):
-    """
-    Public filesystem storage
-    """
 
-    def __init__(self, location=None, base_url=None):
-        if location is None:
-            location = filer_settings.FILER_PUBLICMEDIA_ROOT
-        if base_url is None:
-            base_url = filer_settings.FILER_PUBLICMEDIA_URL
-        self.location = os.path.abspath(location)
-        self.base_url = base_url
-        
-        
-class PrivateFileSystemStorage(FileSystemStorage):
-    """
-    Public filesystem storage
-    """
-
-    def __init__(self, location=None, base_url=None):
-        if location is None:
-            location = filer_settings.FILER_PRIVATEMEDIA_ROOT
-        if base_url is None:
-            base_url = filer_settings.FILER_PRIVATEMEDIA_URL
-        self.location = os.path.abspath(location)
-        self.base_url = base_url
-
-
+# TODO: public/private media is going to change with a custom FileField and Storate
+#       class that supports files that are not in MEDIA_ROOT
 def get_directory_name(instance, filename):
     '''
     returns the path relative to the base path (media root
     '''
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
-    return os.path.normpath( os.path.join(instance._file.storage.location,
-                                          datepart,
-                                          get_valid_filename(filename)) )
-    
-def move_file():
-    pass
+    if instance.is_public:
+        private_or_public = FILER_PUBLICMEDIA_PREFIX
+    else:
+        private_or_public = FILER_PRIVATEMEDIA_PREFIX
+    return os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )

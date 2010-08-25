@@ -1,11 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
-from django.db.models.signals import post_init, pre_save
 from django.contrib.auth import models as auth_models
 
 from django.conf import settings
-from filer.signals import set_file_field_storage
 from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
@@ -34,24 +32,6 @@ class File(models.Model, mixins.IconsMixin):
     
     is_public = models.BooleanField(default=False)
     
-   
-        
-    def save(self, *args, **kwargs):
-        # check if this is a subclass of "File" or not and set
-        # _file_type_plugin_name
-        if self.__class__ == File:
-            # what should we do now?
-            # maybe this has a subclass, but is being saved as a File instance
-            # anyway. do we need to go check all possible subclasses?
-            pass
-        elif issubclass(self.__class__, File):
-            self._file_type_plugin_name = self.__class__.__name__
-        # cache the file size
-        try:
-            self._file_size = self._file.size
-        except:
-            pass
-        super(File, self).save(*args,**kwargs)
     
     @property
     def label(self):
@@ -91,9 +71,26 @@ class File(models.Model, mixins.IconsMixin):
         else:
             text = u"%s" % (self.name,)
         return text
-
+    def save(self, *args, **kwargs):
+        # check if this is a subclass of "File" or not and set
+        # _file_type_plugin_name
+        if self.__class__ == File:
+            # what should we do now?
+            # maybe this has a subclass, but is being saved as a File instance
+            # anyway. do we need to go check all possible subclasses?
+            pass
+        elif issubclass(self.__class__, File):
+            self._file_type_plugin_name = self.__class__.__name__
+        # cache the file size
+        try:
+            self._file_size = self._file.size
+        except:
+            pass
+        
+        super(File, self).save(*args,**kwargs)
     
     def subtype(self):
+        #print "get subtype"
         if not self._file_type_plugin_name:
             r = self
         else:
@@ -102,6 +99,7 @@ class File(models.Model, mixins.IconsMixin):
             except Exception, e:
                 #print e
                 r = self
+        #print u"get subtype: %s %s" % (r, self._file_type_plugin_name)
         return r
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
@@ -111,10 +109,10 @@ class File(models.Model, mixins.IconsMixin):
         to make the model behave like a file field
         '''
         try:
-            _url = self._file.url
+            r = self._file.url
         except:
-            _url = ''
-        return _url
+            r = ''
+        return r
     @property
     def file(self):
         return self._file.file
@@ -155,7 +153,3 @@ class File(models.Model, mixins.IconsMixin):
         app_label = 'filer'
         verbose_name = _('File')
         verbose_name_plural = _('Files')
-        
-        
-pre_save.connect(set_file_field_storage, sender=File)        
-post_init.connect(set_file_field_storage, sender=File)
