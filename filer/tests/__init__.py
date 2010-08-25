@@ -74,19 +74,20 @@ class FilerApiTests(TestCase):
         
     def test_create_icons(self):
         file = DjangoFile(open(self.filename), name=self.image_name)
-        
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
                                      _file=file)
+        
         image.save()
         icons = image.icons
+        file_basename = os.path.basename(image._file.path)
         self.assertEqual(len(icons),3)
         self.assertEqual(os.path.basename(icons['32']),
-                         u'test_file.jpg.32x32_q85_crop_upscale.jpg')
+                         file_basename + u'.32x32_q85_crop_upscale.jpg')
         self.assertEqual(os.path.basename(icons['48']),
-                         u'test_file.jpg.48x48_q85_crop_upscale.jpg')
+                         file_basename + u'.48x48_q85_crop_upscale.jpg')
         self.assertEqual(os.path.basename(icons['64']),
-                         u'test_file.jpg.64x64_q85_crop_upscale.jpg')
+                         file_basename + u'.64x64_q85_crop_upscale.jpg')
         
     def test_file_upload_public_destination(self):
         """

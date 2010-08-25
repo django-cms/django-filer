@@ -3,11 +3,13 @@ import StringIO
 from datetime import datetime, date
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
+from django.db.models.signals import post_init, pre_save
 from django.db import models
 from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
-from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
+from filer.settings import FILER_ADMIN_ICON_SIZES
+from filer.signals import set_file_field_storage
 from django.conf import settings
 
 from filer.models.filer_file_storage import get_directory_name
@@ -64,25 +66,7 @@ class Image(File):
                 pass
         if self.date_taken is None:
             self.date_taken = datetime.now()
-        #if not self.contact:
-        #    self.contact = self.owner
         self.has_all_mandatory_data = self._check_validity()
-        try:
-            if self.subject_location:
-                parts = self.subject_location.split(',')
-                pos_x = int(parts[0])
-                pos_y = int(parts[1])
-                                                  
-                sl = (int(pos_x), int(pos_y) )
-                exif_sl = self.exif.get('SubjectLocation', None)
-                if self._file and not sl == exif_sl:
-                    #self._file.open()
-                    fd_source = StringIO.StringIO(self._file.read())
-                    #self._file.close()
-                    set_exif_subject_location(sl, fd_source, self._file.path)
-        except:
-            # probably the image is missing. nevermind
-            pass
         try:
             # do this more efficient somehow?
             self._width, self._height = PILImage.open(self._file).size
@@ -190,3 +174,7 @@ class Image(File):
         app_label = 'filer'
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
+        
+        
+pre_save.connect(set_file_field_storage, sender=Image)        
+post_init.connect(set_file_field_storage, sender=Image)
