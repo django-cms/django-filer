@@ -9,7 +9,6 @@ from filer.models.clipboardmodels import Clipboard
 from filer.admin.clipboardadmin import UploadImageFileForm
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
-from filer import settings as filer_settings
 
 class FilerTests(TestCase):
     def test_environment(self):
@@ -100,7 +99,6 @@ class FilerApiTests(TestCase):
                                      original_filename=self.image_name,
                                      _file=file)
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
         
     def test_file_upload_private_destination(self):
         """
@@ -113,26 +111,11 @@ class FilerApiTests(TestCase):
                                      original_filename=self.image_name,
                                      _file=file)
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
         
-    def test_file_change_upload_to_destination(self):
-        """
-        Test that the file is actualy move from the private to the public
-        directory when the is_public is checked on an existing private file.
-        """
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        
-        image = Image.objects.create(owner=self.superuser,
-                                     is_public=False,
-                                     original_filename=self.image_name,
-                                     _file=file)
-        image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
-        image.is_public = True
-        image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT)) 
-        
-        
+    
+                
+                 
+
         
 class FilerFolderAdminUrlsTests(TestCase):
     def setUp(self):
