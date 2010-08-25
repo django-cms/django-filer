@@ -38,7 +38,6 @@ class Image(File):
     must_always_publish_author_credit = models.BooleanField(default=False)
     must_always_publish_copyright = models.BooleanField(default=False)
     
-    subject_location = models.CharField(max_length=64, null=True, blank=True, default=None)
     
     def _check_validity(self):
         if not self.name:# or not self.contact:
@@ -64,25 +63,7 @@ class Image(File):
                 pass
         if self.date_taken is None:
             self.date_taken = datetime.now()
-        #if not self.contact:
-        #    self.contact = self.owner
         self.has_all_mandatory_data = self._check_validity()
-        try:
-            if self.subject_location:
-                parts = self.subject_location.split(',')
-                pos_x = int(parts[0])
-                pos_y = int(parts[1])
-                                                  
-                sl = (int(pos_x), int(pos_y) )
-                exif_sl = self.exif.get('SubjectLocation', None)
-                if self._file and not sl == exif_sl:
-                    #self._file.open()
-                    fd_source = StringIO.StringIO(self._file.read())
-                    #self._file.close()
-                    set_exif_subject_location(sl, fd_source, self._file.path)
-        except:
-            # probably the image is missing. nevermind
-            pass
         try:
             # do this more efficient somehow?
             self._width, self._height = PILImage.open(self._file).size

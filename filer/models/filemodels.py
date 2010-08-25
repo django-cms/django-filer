@@ -31,7 +31,29 @@ class File(models.Model, mixins.IconsMixin):
     modified_at = models.DateTimeField(auto_now=True)
     
     is_public = models.BooleanField(default=False)
-    
+
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args,**kwargs)
+        self._old_is_public = self.is_public
+        self.old_file = self._file
+        
+    def save(self, *args, **kwargs):
+        # check if this is a subclass of "File" or not and set
+        # _file_type_plugin_name
+        if self.__class__ == File:
+            # what should we do now?
+            # maybe this has a subclass, but is being saved as a File instance
+            # anyway. do we need to go check all possible subclasses?
+            pass
+        elif issubclass(self.__class__, File):
+            self._file_type_plugin_name = self.__class__.__name__
+        # cache the file size
+        try:
+            self._file_size = self._file.size
+        except:
+            pass
+        
+        super(File, self).save(*args,**kwargs)
     
     @property
     def label(self):
@@ -71,23 +93,7 @@ class File(models.Model, mixins.IconsMixin):
         else:
             text = u"%s" % (self.name,)
         return text
-    def save(self, *args, **kwargs):
-        # check if this is a subclass of "File" or not and set
-        # _file_type_plugin_name
-        if self.__class__ == File:
-            # what should we do now?
-            # maybe this has a subclass, but is being saved as a File instance
-            # anyway. do we need to go check all possible subclasses?
-            pass
-        elif issubclass(self.__class__, File):
-            self._file_type_plugin_name = self.__class__.__name__
-        # cache the file size
-        try:
-            self._file_size = self._file.size
-        except:
-            pass
-        
-        super(File, self).save(*args,**kwargs)
+
     
     def subtype(self):
         #print "get subtype"

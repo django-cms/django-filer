@@ -33,3 +33,8 @@ def get_directory_name(instance, filename):
     else:
         private_or_public = FILER_PRIVATEMEDIA_PREFIX
     return os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )
+    
+def move_files(file, src, dst):
+    """
+    Move all the related files from a src directory to a dst directory.
+    """
