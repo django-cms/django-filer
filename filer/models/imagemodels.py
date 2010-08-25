@@ -136,22 +136,16 @@ class Image(File):
         return self._height or 0
     @property
     def icons(self):
-        if not getattr(self, '_icon_thumbnails_cache', False):
-            r = {}
-            for size in FILER_ADMIN_ICON_SIZES:
-                try:
-                    thumbnail_options = {
-                        'size':(int(size),int(size)),
-                        'crop': True,
-                        'upscale':True,
-                        }
-                    thumb = self._file.get_thumbnail(thumbnail_options)
-                    r[size] = thumb.url
-                    
-                except Exception, e:
-                    pass
-            setattr(self, '_icon_thumbnails_cache', r)
-        return getattr(self, '_icon_thumbnails_cache')
+        _icons = {}
+        for size in FILER_ADMIN_ICON_SIZES:
+            thumbnail_options = {
+                'size':(int(size),int(size)),
+                'crop': True,
+                'upscale':True,
+                }
+            thumb = self._file.get_thumbnail(thumbnail_options)
+            _icons[size] = thumb.url
+        return _icons
         
     @property
     def thumbnails(self):

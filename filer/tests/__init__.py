@@ -46,15 +46,20 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertEqual(Image.objects.count(), 1)
         image = Image.objects.all()[0]
-        import ipdb; ipdb.set_trace()
         image.delete()
         self.assertEqual(Image.objects.count(), 0)
         
-    
+    def test_upload_image_form(self):
+        self.assertEqual(Image.objects.count(), 0)
+        file = DjangoFile(open(self.filename), name=self.image_name)
+        upoad_image_form = UploadImageFileForm({'original_filename':self.image_name,
+                                                'owner': self.superuser.pk},
+                                                {'_file':file})
+        if upoad_image_form.is_valid():
+            image = upoad_image_form.save()
+            self.assertEqual(Image.objects.count(), 1)              
         
     def test_create_clipboard_item(self):
-        """
-        """
         file = DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
@@ -65,6 +70,18 @@ class FilerApiTests(TestCase):
                               file=image)
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
+        
+    def test_create_icons(self):
+        file = DjangoFile(open(self.filename), name=self.image_name)
+        image = Image.objects.create(owner=self.superuser,
+                                     original_filename=self.image_name,
+                                     _file=file)
+        image.save()
+        self.assertEqual(image.icons,
+                         {'32': u'/media/filer_public/2010/08/24/test_file.jpg.32x32_q85_crop_upscale.jpg',
+                          '64': u'/media/filer_public/2010/08/24/test_file.jpg.64x64_q85_crop_upscale.jpg',
+                          '48': u'/media/filer_public/2010/08/24/test_file.jpg.48x48_q85_crop_upscale.jpg'})
+                         
 
         
 class FilerFolderAdminUrlsTests(TestCase):
@@ -144,7 +161,6 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(),1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
-        import ipdb; ipdb.set_trace()
         
         
     #def test_filer_paste_clipboard_to_folder(self):
