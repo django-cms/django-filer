@@ -35,7 +35,10 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     form = FileAdminChangeFrom
     fieldsets = (
         (None, {
-            'fields': ('name', 'owner','description')#'contact',
+            'fields': ('name', 'owner','description')
+        }),
+        (None, {
+            'fields': ('is_public',)
         }),
         (_('Advanced'), {
             'fields': ('_file',),

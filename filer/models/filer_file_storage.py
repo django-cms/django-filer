@@ -28,9 +28,8 @@ def get_directory_name(instance, filename):
     returns the path relative to the base path (media root
     '''
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
-    if True:#instance.is_public:
+    if instance.is_public:
         private_or_public = FILER_PUBLICMEDIA_PREFIX
     else:
         private_or_public = FILER_PRIVATEMEDIA_PREFIX
-    #print os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )
     return os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )

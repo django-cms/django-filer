@@ -85,8 +85,35 @@ class FilerApiTests(TestCase):
         self.assertEqual(os.path.basename(icons['48']),
                          u'test_file.jpg.48x48_q85_crop_upscale.jpg')
         self.assertEqual(os.path.basename(icons['64']),
-                         u'test_file.jpg.64x64_q85_crop_upscale.jpg') 
-                         
+                         u'test_file.jpg.64x64_q85_crop_upscale.jpg')
+        
+    def test_file_upload_public_destination(self):
+        """
+        Test where an image `is_public` == True is uploaded.
+        """
+        file = DjangoFile(open(self.filename), name=self.image_name)
+        
+        image = Image.objects.create(owner=self.superuser,
+                                     is_public=True,
+                                     original_filename=self.image_name,
+                                     _file=file)
+        image.save()
+        
+    def test_file_upload_private_destination(self):
+        """
+        Test where an image `is_public` == False is uploaded.
+        """
+        file = DjangoFile(open(self.filename), name=self.image_name)
+        
+        image = Image.objects.create(owner=self.superuser,
+                                     is_public=False,
+                                     original_filename=self.image_name,
+                                     _file=file)
+        image.save()
+        
+    
+                
+                 
 
         
 class FilerFolderAdminUrlsTests(TestCase):

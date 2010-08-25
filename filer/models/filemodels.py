@@ -30,17 +30,8 @@ class File(models.Model, mixins.IconsMixin):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     
-    #is_public = models.BooleanField(default=True)
+    is_public = models.BooleanField(default=False)
     
-    # TODO: Factor out customer specific fields... maybe a m2m?
-    #can_use_for_web = models.BooleanField(default=True)
-    #can_use_for_print = models.BooleanField(default=True)
-    #can_use_for_teaching = models.BooleanField(default=True)
-    #can_use_for_research = models.BooleanField(default=True)
-    #can_use_for_private_use = models.BooleanField(default=True)
-    #usage_restriction_notes = models.TextField(null=True, blank=True)
-    #notes = models.TextField(null=True, blank=True)
-    #contact = models.ForeignKey(auth_models.User, related_name='contact_of_files', null=True, blank=True)
     
     @property
     def label(self):
