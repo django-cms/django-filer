@@ -78,6 +78,9 @@ class FilerApiTests(TestCase):
                                      _file=file)
         image.save()
         import ipdb; ipdb.set_trace()
+        image.icons
+        image._file.delete()
+        
         self.assertEqual(image.icons,
                          {'32': u'/media/filer_public/2010/08/24/test_file.jpg.32x32_q85_crop_upscale.jpg',
                           '64': u'/media/filer_public/2010/08/24/test_file.jpg.64x64_q85_crop_upscale.jpg',

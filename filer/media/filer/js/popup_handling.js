@@ -1,5 +1,5 @@
 (function($) {
-	function dismissPopupAndReload(win) {
+	dismissPopupAndReload = function(win) {
 	    document.location.reload();
 	    win.close();
 	};
