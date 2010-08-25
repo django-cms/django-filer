@@ -44,6 +44,7 @@ class Image(File):
         if not self.name:# or not self.contact:
             return False
         return True
+    
     def sidebar_image_ratio(self):
         if self.width:
             return float(self.width)/float(self.SIDEBAR_IMAGE_WIDTH)
@@ -138,27 +139,30 @@ class Image(File):
     def icons(self):
         _icons = {}
         for size in FILER_ADMIN_ICON_SIZES:
-            thumbnail_options = {
-                'size':(int(size),int(size)),
-                'crop': True,
-                'upscale':True,
-                }
-            thumb = self._file.get_thumbnail(thumbnail_options)
-            _icons[size] = thumb.url
+            try:
+                thumbnail_options = {
+                    'size':(int(size),int(size)),
+                    'crop': True,
+                    'upscale':True,
+                    }
+                thumb = self._file.get_thumbnail(thumbnail_options)
+                _icons[size] = thumb.url
+            except Exception, e:
+                # swallow the the exception to avoid to bubble it up
+                # in the template {{ image.icons.48 }}
+                pass
         return _icons
         
     @property
     def thumbnails(self):
-        # we build an extra dict here mainly
-        # to prevent the default errors to 
-        # get thrown and to add a default missing
-        # image (not yet)
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
                 _thumbnails[name] = self._file.get_thumbnail(opts).url
             except:
-                return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
+                # swallow the the exception to avoid to bubble it up
+                # in the template {{ image.icons.48 }}
+                pass
         return _thumbnails
     
     @property
