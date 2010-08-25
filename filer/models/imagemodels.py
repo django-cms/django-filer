@@ -153,15 +153,13 @@ class Image(File):
         # to prevent the default errors to 
         # get thrown and to add a default missing
         # image (not yet)
-        if not hasattr(self, '_thumbnails'):
-            thumbnails = {}
-            for name, opts in Image.DEFAULT_THUMBNAILS.items():
-                try:
-                    thumbnails[name] = self._file.get_thumbnail(opts).url
-                except:
-                    return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
-            self._thumbnails = thumbnails
-        return self._thumbnails
+        _thumbnails = {}
+        for name, opts in Image.DEFAULT_THUMBNAILS.items():
+            try:
+                _thumbnails[name] = self._file.get_thumbnail(opts).url
+            except:
+                return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
+        return _thumbnails
     
     @property
     def absolute_image_url(self):
