@@ -1,5 +1,4 @@
 from django.core.files.storage import FileSystemStorage
-from django.core.files.move import file_move_safe
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_unicode, smart_str
@@ -35,25 +34,6 @@ def get_directory_name(instance, filename):
         private_or_public = FILER_PRIVATEMEDIA_PREFIX
     return os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )
     
-def move_file(file, src, dst):
-    """
-    Move all the related files from a src directory to a dst directory.
-    """
-    import ipdb; ipdb.set_trace()
-    filename_src = file.name
-    filename_dst = filename.replace(src, dst)
-    
-    files=[]
-    source = file.get_source_cache()
-    files.append(source.name)
-    for thumb in source.thumbnails.all():
-        files.append(thumb.name)
-        
-    src_files = [os.path.join(file.storage.location, f) for f in files]
-    # remove the first dir
-    dst_files = [os.path.join(file.storage.location, dst, '/'.join(f.split('/')[1:])) for f in files]
-    for src_file, dst_file in zip(src_files, dst_files):
-        file_move_safe(src_file, dst_file)
     
     
  

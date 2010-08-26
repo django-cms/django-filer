@@ -1,13 +1,11 @@
 import os
-import tempfile
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
-from django.core.files import File as DjangoFile
 from django.db import models
 from django.contrib.auth import models as auth_models
 
 from django.conf import settings
-from filer.models.filer_file_storage import get_directory_name, move_file
+from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
 from filer import settings as filer_settings
@@ -57,17 +55,22 @@ class File(models.Model, mixins.IconsMixin):
             pass
         if self._old_is_public != self.is_public and \
                                   self.pk:
+            filer_settings.FILER_PRIVATEMEDIA_PREFIX
             if self.is_public:
                 path = self._file.path
-                new_path = path.replace('filer_private', 'filer_public')
+                new_path = path.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                                        filer_settings.FILER_PUBLICMEDIA_PREFIX)
                 os.rename(path, new_path)
-                new_name = self._file.name.replace('filer_private', 'filer_public')
+                new_name = self._file.name.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                                                   filer_settings.FILER_PUBLICMEDIA_PREFIX)
                 self._file = new_name
             else:
                 path = self._file.path
-                new_path = path.replace('filer_public', 'filer_private')
+                new_path = path.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
+                                        filer_settings.FILER_PRIVATEMEDIA_PREFIX)
                 os.rename(path, new_path)
-                new_name = self._file.name.replace('filer_public', 'filer_private')
+                new_name = self._file.name.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
+                                                   filer_settings.FILER_PRIVATEMEDIA_PREFIX)
                 self._file = new_name
             self._old_is_public = self.is_public
             
