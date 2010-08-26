@@ -7,7 +7,7 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
-from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
+from filer import settings as filer_settings
 from django.conf import settings
 
 from filer.models.filer_file_storage import get_directory_name
@@ -119,7 +119,7 @@ class Image(File):
     @property
     def icons(self):
         _icons = {}
-        for size in FILER_ADMIN_ICON_SIZES:
+        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             try:
                 thumbnail_options = {
                     'size':(int(size),int(size)),

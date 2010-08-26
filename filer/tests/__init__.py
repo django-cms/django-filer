@@ -131,8 +131,12 @@ class FilerApiTests(TestCase):
         self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
         image.is_public = True
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT)) 
-        
+        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
+        self.assertEqual(len(image.icons), 3)
+        image.is_public = False
+        image.save()
+        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertEqual(len(image.icons), 3)
         
         
 class FilerFolderAdminUrlsTests(TestCase):

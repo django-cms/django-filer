@@ -1,12 +1,16 @@
+import os
+import tempfile
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
+from django.core.files import File as DjangoFile
 from django.db import models
 from django.contrib.auth import models as auth_models
 
 from django.conf import settings
-from filer.models.filer_file_storage import get_directory_name
+from filer.models.filer_file_storage import get_directory_name, move_file
 from filer.models.foldermodels import Folder
 from filer.models import mixins
+from filer import settings as filer_settings
 
 from easy_thumbnails.fields import ThumbnailerField
 
@@ -35,7 +39,7 @@ class File(models.Model, mixins.IconsMixin):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args,**kwargs)
         self._old_is_public = self.is_public
-        self.old_file = self._file
+        self._old_file = self._file
         
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
@@ -52,9 +56,24 @@ class File(models.Model, mixins.IconsMixin):
             self._file_size = self._file.size
         except:
             pass
+        if self._old_is_public != self.is_public and \
+                                  self.pk:
+            if self.is_public:
+                path = self._file.path
+                new_path = path.replace('filer_private', 'filer_public')
+                os.rename(path, new_path)
+                new_name = self._file.name.replace('filer_private', 'filer_public')
+                self._file = new_name
+            else:
+                path = self._file.path
+                new_path = path.replace('filer_public', 'filer_private')
+                os.rename(path, new_path)
+                new_name = self._file.name.replace('filer_public', 'filer_private')
+                self._file = new_name
+            
         
         super(File, self).save(*args,**kwargs)
-    
+
     @property
     def label(self):
         if self.name in ['',None]:
