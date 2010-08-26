@@ -49,9 +49,5 @@ class ImageAdmin(FileAdmin):
     form = ImageAdminFrom
     fieldsets = (
         FileAdmin.fieldsets[0],
-        (None, {
-            'fields': ('subject_location',),
-            'classes': ('hide',),
-        }),
         FileAdmin.fieldsets[1],
     )
