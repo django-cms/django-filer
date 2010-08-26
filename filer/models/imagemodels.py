@@ -38,17 +38,6 @@ class Image(File):
     must_always_publish_author_credit = models.BooleanField(default=False)
     must_always_publish_copyright = models.BooleanField(default=False)
     
-    
-    def _check_validity(self):
-        if not self.name:# or not self.contact:
-            return False
-        return True
-    
-    def sidebar_image_ratio(self):
-        if self.width:
-            return float(self.width)/float(self.SIDEBAR_IMAGE_WIDTH)
-        else:
-            return 1.0
     def save(self, *args, **kwargs):
         if self.date_taken is None:
             try:
@@ -70,7 +59,21 @@ class Image(File):
         except Exception, e:
             # probably the image is missing. nevermind.
             pass
-        super(Image, self).save(*args, **kwargs)
+        
+        super(Image, self).save(*args, **kwargs)    
+    
+    def _check_validity(self):
+        if not self.name:# or not self.contact:
+            return False
+        return True
+    
+    def sidebar_image_ratio(self):
+        if self.width:
+            return float(self.width)/float(self.SIDEBAR_IMAGE_WIDTH)
+        else:
+            return 1.0
+        
+
         
     def _get_exif(self):
         if hasattr(self, '_exif_cache'):

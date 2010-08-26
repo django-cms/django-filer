@@ -39,7 +39,6 @@ class File(models.Model, mixins.IconsMixin):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args,**kwargs)
         self._old_is_public = self.is_public
-        self._old_file = self._file
         
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
@@ -70,6 +69,7 @@ class File(models.Model, mixins.IconsMixin):
                 os.rename(path, new_path)
                 new_name = self._file.name.replace('filer_public', 'filer_private')
                 self._file = new_name
+            self._old_is_public = self.is_public
             
         
         super(File, self).save(*args,**kwargs)
