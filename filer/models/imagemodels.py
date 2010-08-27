@@ -156,7 +156,7 @@ class Image(File):
     def rel_image_url(self):
         'return the image url relative to MEDIA_URL'
         try:
-            rel_url = u"%s" % self._file.url
+            rel_url = u"%s" % self.file.url
             if rel_url.startswith(settings.MEDIA_URL):
                 before, match, rel_url = rel_url.partition(settings.MEDIA_URL)
             return rel_url

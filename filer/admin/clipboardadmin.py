@@ -98,9 +98,9 @@ class ClipboardAdmin(admin.ModelAdmin):
                 except:
                     iext = ''
                 if iext in ['.jpg','.jpeg','.png','.gif']:
-                    uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'_file':ifile})
+                    uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'file':ifile})
                 else:
-                    uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'_file':ifile})
+                    uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'file':ifile})
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)
