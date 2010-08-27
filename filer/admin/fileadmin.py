@@ -41,7 +41,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             'fields': ('is_public',)
         }),
         (_('Advanced'), {
-            'fields': ('_file',),
+            'fields': ('file',),
             'classes': ('collapse',),
         }),
     )
