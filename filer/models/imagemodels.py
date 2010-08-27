@@ -55,7 +55,7 @@ class Image(File):
         self.has_all_mandatory_data = self._check_validity()
         try:
             # do this more efficient somehow?
-            self._width, self._height = PILImage.open(self._file).size
+            self._width, self._height = PILImage.open(self.file).size
         except Exception, e:
             # probably the image is missing. nevermind.
             pass
@@ -79,8 +79,8 @@ class Image(File):
         if hasattr(self, '_exif_cache'):
             return self._exif_cache
         else:
-            if self._file:
-                self._exif_cache = get_exif_for_file(self._file.path)
+            if self.file:
+                self._exif_cache = get_exif_for_file(self.file.path)
             else:
                 self._exif_cache = {}
         return self._exif_cache
@@ -129,7 +129,7 @@ class Image(File):
                     'crop': True,
                     'upscale':True,
                     }
-                thumb = self._file.get_thumbnail(thumbnail_options)
+                thumb = self.file.get_thumbnail(thumbnail_options)
                 _icons[size] = thumb.url
             except Exception, e:
                 # swallow the the exception to avoid to bubble it up
@@ -142,7 +142,7 @@ class Image(File):
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
-                _thumbnails[name] = self._file.get_thumbnail(opts).url
+                _thumbnails[name] = self.file.get_thumbnail(opts).url
             except:
                 # swallow the the exception to avoid to bubble it up
                 # in the template {{ image.icons.48 }}

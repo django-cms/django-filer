@@ -17,7 +17,7 @@ from easy_thumbnails.fields import ThumbnailerField
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    _file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -50,28 +50,28 @@ class File(models.Model, mixins.IconsMixin):
             self._file_type_plugin_name = self.__class__.__name__
         # cache the file size
         try:
-            self._file_size = self._file.size
+            self._file_size = self.file.size
         except:
             pass
         if self._old_is_public != self.is_public and \
                                   self.pk:
             filer_settings.FILER_PRIVATEMEDIA_PREFIX
             if self.is_public:
-                path = self._file.path
+                path = self.file.path
                 new_path = path.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                                         filer_settings.FILER_PUBLICMEDIA_PREFIX)
                 os.rename(path, new_path)
-                new_name = self._file.name.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                new_name = self.file.name.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                                                    filer_settings.FILER_PUBLICMEDIA_PREFIX)
-                self._file = new_name
+                self.file = new_name
             else:
-                path = self._file.path
+                path = self.file.path
                 new_path = path.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                         filer_settings.FILER_PRIVATEMEDIA_PREFIX)
                 os.rename(path, new_path)
-                new_name = self._file.name.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
+                new_name = self.file.name.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                                    filer_settings.FILER_PRIVATEMEDIA_PREFIX)
-                self._file = new_name
+                self.file = new_name
             self._old_is_public = self.is_public
             
         
@@ -137,17 +137,14 @@ class File(models.Model, mixins.IconsMixin):
         to make the model behave like a file field
         '''
         try:
-            r = self._file.url
+            r = self.file.url
         except:
             r = ''
         return r
     @property
-    def file(self):
-        return self._file.file
-    @property
     def path(self):
         try:
-            return self._file.path
+            return self.file.path
         except:
             return ""
     @property

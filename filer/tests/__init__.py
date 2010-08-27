@@ -43,7 +43,7 @@ class FilerApiTests(TestCase):
         file = DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
-                                     _file=file)
+                                     file=file)
         image.save()
         self.assertEqual(Image.objects.count(), 1)
         image = Image.objects.all()[0]
@@ -55,7 +55,7 @@ class FilerApiTests(TestCase):
         file = DjangoFile(open(self.filename), name=self.image_name)
         upoad_image_form = UploadImageFileForm({'original_filename':self.image_name,
                                                 'owner': self.superuser.pk},
-                                                {'_file':file})
+                                                {'file':file})
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
             self.assertEqual(Image.objects.count(), 1)              
@@ -64,7 +64,7 @@ class FilerApiTests(TestCase):
         file = DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
-                                     _file=file)
+                                     file=file)
         image.save()
         # Get the clipboard of the current user
         clipboard_item = create_clipboard_item(user=self.superuser,
@@ -77,10 +77,10 @@ class FilerApiTests(TestCase):
         
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
-                                     _file=file)
+                                     file=file)
         image.save()
         icons = image.icons
-        file_basename = os.path.basename(image._file.path)
+        file_basename = os.path.basename(image.file.path)
         self.assertEqual(len(icons),3)
         self.assertEqual(os.path.basename(icons['32']),
                          file_basename + u'.32x32_q85_crop_upscale.jpg')
@@ -99,9 +99,9 @@ class FilerApiTests(TestCase):
         image = Image.objects.create(owner=self.superuser,
                                      is_public=True,
                                      original_filename=self.image_name,
-                                     _file=file)
+                                     file=file)
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
         
     def test_file_upload_private_destination(self):
         """
@@ -112,9 +112,9 @@ class FilerApiTests(TestCase):
         image = Image.objects.create(owner=self.superuser,
                                      is_public=False,
                                      original_filename=self.image_name,
-                                     _file=file)
+                                     file=file)
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
         
     def test_file_change_upload_to_destination(self):
         """
@@ -126,16 +126,16 @@ class FilerApiTests(TestCase):
         image = Image.objects.create(owner=self.superuser,
                                      is_public=False,
                                      original_filename=self.image_name,
-                                     _file=file)
+                                     file=file)
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
         image.is_public = True
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
         self.assertEqual(len(image.icons), 3)
         image.is_public = False
         image.save()
-        self.assertTrue(image._file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
         self.assertEqual(len(image.icons), 3)
         
         
