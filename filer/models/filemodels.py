@@ -44,7 +44,22 @@ class File(models.Model, mixins.IconsMixin):
         """
         for thumb in self.file.get_source_cache().thumbnails.all():
             os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
-            thumb.delete()      
+            thumb.delete()
+            
+    def move_file(self, src_filer_prefix, dst_filer_prefix):
+        """
+        Move the file from src to dst. If `os.dirname(dst)` does not exist it
+        creates all the required directory.
+        """
+        src = self.file.path
+        dst = src.replace(src_filer_prefix,
+                           dst_filer_prefix)
+        if not os.path.exists(os.path.dirname(dst)):
+            os.makedirs(os.path.dirname(dst))
+        os.rename(src, dst)
+        new_name = self.file.name.replace(src_filer_prefix,
+                                          dst_filer_prefix)
+        self.file = new_name
         
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
@@ -63,35 +78,14 @@ class File(models.Model, mixins.IconsMixin):
             pass
         if self._old_is_public != self.is_public and \
                                   self.pk:
-            filer_settings.FILER_PRIVATEMEDIA_PREFIX
+            self.delete_thumbnails()
             if self.is_public:
-                path = self.file.path
-                new_path = path.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
-                                        filer_settings.FILER_PUBLICMEDIA_PREFIX)
-                # check if the directory exists
-                self.delete_thumbnails()
-                if not os.path.exists(os.path.dirname(new_path)):
-                    os.makedirs(os.path.dirname(new_path))
-                os.rename(path, new_path)
-                new_name = self.file.name.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
-                                                   filer_settings.FILER_PUBLICMEDIA_PREFIX)
-                self.file = new_name
+                self.move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                               filer_settings.FILER_PUBLICMEDIA_PREFIX)
             else:
-                path = self.file.path
-                new_path = path.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
-                                        filer_settings.FILER_PRIVATEMEDIA_PREFIX)
-                # check if the directory exists
-                self.delete_thumbnails()
-                if not os.path.exists(os.path.dirname(new_path)):
-                    os.makedirs(os.path.dirname(new_path))
-                # This raise an expection if new_path does not exist
-                os.rename(path, new_path)
-                new_name = self.file.name.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
-                                                   filer_settings.FILER_PRIVATEMEDIA_PREFIX)
-                self.file = new_name
+                self.move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
+                               filer_settings.FILER_PRIVATEMEDIA_PREFIX)
             self._old_is_public = self.is_public
-            
-        
         super(File, self).save(*args,**kwargs)
 
     @property
