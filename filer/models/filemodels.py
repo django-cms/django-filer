@@ -38,6 +38,14 @@ class File(models.Model, mixins.IconsMixin):
         super(File, self).__init__(*args,**kwargs)
         self._old_is_public = self.is_public
         
+    def delete_thumbnails(self):
+        """
+        Delete all the thumbnails related to `instance.file`
+        """
+        for thumb in self.file.get_source_cache().thumbnails.all():
+            os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
+            thumb.delete()      
+        
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
         # _file_type_plugin_name
@@ -60,6 +68,10 @@ class File(models.Model, mixins.IconsMixin):
                 path = self.file.path
                 new_path = path.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                                         filer_settings.FILER_PUBLICMEDIA_PREFIX)
+                # check if the directory exists
+                self.delete_thumbnails()
+                if not os.path.exists(os.path.dirname(new_path)):
+                    os.makedirs(os.path.dirname(new_path))
                 os.rename(path, new_path)
                 new_name = self.file.name.replace(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                                                    filer_settings.FILER_PUBLICMEDIA_PREFIX)
@@ -68,6 +80,11 @@ class File(models.Model, mixins.IconsMixin):
                 path = self.file.path
                 new_path = path.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                         filer_settings.FILER_PRIVATEMEDIA_PREFIX)
+                # check if the directory exists
+                self.delete_thumbnails()
+                if not os.path.exists(os.path.dirname(new_path)):
+                    os.makedirs(os.path.dirname(new_path))
+                # This raise an expection if new_path does not exist
                 os.rename(path, new_path)
                 new_name = self.file.name.replace(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                                    filer_settings.FILER_PRIVATEMEDIA_PREFIX)
