@@ -119,7 +119,7 @@ class FilerFileField(models.ForeignKey):
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
-        #defaults = {'form_class': ImageFilerImageWidget}
+        #defaults = {'form_class': FilerImageWidget}
         defaults = {
             'form_class': self.default_form_class,
             'rel': self.rel,

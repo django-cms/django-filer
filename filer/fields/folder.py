@@ -7,7 +7,8 @@ from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from filer.settings import FILER_MEDIA_PREFIX
+from filer.settings import FILER_STATICMEDIA_PREFIX
+
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):
     choices = None
@@ -19,7 +20,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         css_id_name = "%s_name" % css_id
         if attrs is None:
             attrs = {}
-        related_url = reverse('admin:image_filer-directory_listing-root')
+        related_url = reverse('admin:filer-directory_listing-root')
         params = self.url_parameters()
         params['select_folder'] = 1
         if params:
@@ -54,7 +55,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return obj
     
     class Media:
-        js = (FILER_MEDIA_PREFIX+'js/popup_handling.js',)
+        js = (FILER_STATICMEDIA_PREFIX+'js/popup_handling.js',)
 
 
 
@@ -78,17 +79,17 @@ class FilerFolderField(models.ForeignKey):
     default_form_class = AdminFolderFormField
     default_model_class = Folder
     def __init__(self, **kwargs):
-        return super(ImageFilerModelFolderField,self).__init__(Folder, **kwargs)
+        return super(FilerFolderField,self).__init__(Folder, **kwargs)
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
-        #defaults = {'form_class': ImageFilerImageWidget}
+        #defaults = {'form_class': FilerFolderWidget}
         defaults = {
-            'form_class': ImageFilerFolderFormField,
+            'form_class': self.default_form_class,
             'rel': self.rel,
         }
         defaults.update(kwargs)
-        return super(ImageFilerModelFolderField, self).formfield(**defaults)
+        return super(FilerFolderField, self).formfield(**defaults)
         
     def south_field_triple(self):
         "Returns a suitable description of this field for South."
