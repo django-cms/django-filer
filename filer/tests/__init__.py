@@ -34,16 +34,20 @@ class FilerApiTests(TestCase):
         for img in Image.objects.all():
             img.delete()
             
+    def create_filer_image(self):
+        file = DjangoFile(open(self.filename), name=self.image_name)
+        image = Image.objects.create(owner=self.superuser,
+                                     original_filename=self.image_name,
+                                     file=file)
+        return image
+            
     def test_create_folder_structure(self):
         create_folder_structure(depth=3, sibling=2, parent=None)
         self.assertEqual(Folder.objects.count(), 26)
         
     def test_create_and_delete_image(self):
         self.assertEqual(Image.objects.count(), 0)
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        image = Image.objects.create(owner=self.superuser,
-                                     original_filename=self.image_name,
-                                     file=file)
+        image = self.create_filer_image()
         image.save()
         self.assertEqual(Image.objects.count(), 1)
         image = Image.objects.all()[0]
@@ -61,10 +65,7 @@ class FilerApiTests(TestCase):
             self.assertEqual(Image.objects.count(), 1)              
         
     def test_create_clipboard_item(self):
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        image = Image.objects.create(owner=self.superuser,
-                                     original_filename=self.image_name,
-                                     file=file)
+        image = self.create_filer_image()
         image.save()
         # Get the clipboard of the current user
         clipboard_item = create_clipboard_item(user=self.superuser,
@@ -73,11 +74,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(Clipboard.objects.count(), 1)
         
     def test_create_icons(self):
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        
-        image = Image.objects.create(owner=self.superuser,
-                                     original_filename=self.image_name,
-                                     file=file)
+        image = self.create_filer_image()
         image.save()
         icons = image.icons
         file_basename = os.path.basename(image.file.path)
@@ -94,12 +91,8 @@ class FilerApiTests(TestCase):
         """
         Test where an image `is_public` == True is uploaded.
         """
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        
-        image = Image.objects.create(owner=self.superuser,
-                                     is_public=True,
-                                     original_filename=self.image_name,
-                                     file=file)
+        image = self.create_filer_image()
+        image.is_public = True
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
         
@@ -107,14 +100,27 @@ class FilerApiTests(TestCase):
         """
         Test where an image `is_public` == False is uploaded.
         """
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        
-        image = Image.objects.create(owner=self.superuser,
-                                     is_public=False,
-                                     original_filename=self.image_name,
-                                     file=file)
+        image = self.create_filer_image()
+        image.is_public = False
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        
+    def test_file_move_location(self):
+        """
+        Test the method that move a file between filer_public, filer_private
+        and vice et versa
+        """
+        image = self.create_filer_image()
+        image.is_public = False
+        image.save()
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        image.move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                        filer_settings.FILER_PUBLICMEDIA_PREFIX)
+        image.save()
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
+        
+        
+        
         
     def test_file_change_upload_to_destination(self):
         """
