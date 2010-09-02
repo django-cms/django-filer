@@ -16,6 +16,7 @@ from filer.models import Clipboard, ClipboardItem, File, Image
 from filer.utils.files import generic_handle_file
 from filer.admin.tools import *
 from filer.models import tools
+from filer import settings as filer_settings
 from django.views.decorators.csrf import csrf_exempt
 
 # forms... sucks, types should be automatic
@@ -104,6 +105,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)
+                        # Enforce the FILER_IS_PUBLIC_DEFAULT
+                        file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
                         file.save()
                         file_items.append(file)
                         clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
