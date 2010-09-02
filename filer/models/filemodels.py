@@ -46,7 +46,7 @@ class File(models.Model, mixins.IconsMixin):
             os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
             thumb.delete()
             
-    def move_file(self, src_filer_prefix, dst_filer_prefix):
+    def _move_file(self, src_filer_prefix, dst_filer_prefix):
         """
         Move the file from src to dst. If `os.dirname(dst)` does not exist it
         creates all the required directory.
@@ -80,10 +80,10 @@ class File(models.Model, mixins.IconsMixin):
                                   self.pk:
             self.delete_thumbnails()
             if self.is_public:
-                self.move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                self._move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                                filer_settings.FILER_PUBLICMEDIA_PREFIX)
             else:
-                self.move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
+                self._move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                filer_settings.FILER_PRIVATEMEDIA_PREFIX)
             self._old_is_public = self.is_public
         super(File, self).save(*args,**kwargs)

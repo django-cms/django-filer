@@ -114,7 +114,7 @@ class FilerApiTests(TestCase):
         image.is_public = False
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
-        image.move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+        image._move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                         filer_settings.FILER_PUBLICMEDIA_PREFIX)
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
