@@ -41,14 +41,14 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         if obj:
             try:
                 output.append(u'<img id="%s" src="%s" alt="%s" /> ' % (css_id_thumbnail_img, obj.icons['32'], obj.label) )
-                output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, obj) )
+                output.append(u'&nbsp;<span id="%s">%s</span>' % (css_id_description_txt, obj) )
             except Exception, e:# KeyError: # KeyError does not seem to catch the error if obj.icons['32'] is missing
                 #print u"error rendering Filer widget. Probably missing file: %s (%s)" % (e, type(e))
                 output.append(u'<img id="%s" src="%s" class="quiet" alt="file is missing">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
-                output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, _('file missing!')) )
+                output.append(u'&nbsp;<span id="%s">%s</span>' % (css_id_description_txt, _('file missing!')) )
         else:
             output.append(u'<img id="%s" src="%s" class="quiet" alt="no file selected">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/nofile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
-            output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, '') )
+            output.append(u'&nbsp;<span id="%s">%s</span>' % (css_id_description_txt, '') )
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \

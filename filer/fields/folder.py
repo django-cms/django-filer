@@ -17,7 +17,9 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id')
-        css_id_name = "%s_name" % css_id
+        css_id_folder = "%s_folder" % css_id
+        css_id_description_txt = "%s_description_txt" % css_id
+        required = self.attrs
         if attrs is None:
             attrs = {}
         related_url = reverse('admin:filer-directory_listing-root')
@@ -31,17 +33,38 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = []
         if obj:
-            output.append(u'Folder: <span id="%s">%s</span>' % (css_id_name,obj.name))
+            output.append(u'Folder: <span id="%s">%s</span>' % (css_id_description_txt,obj.name))
         else:
-            output.append(u'Folder: <span id="%s">none selected</span>' % css_id_name)
+            output.append(u'Folder: <span id="%s">none selected</span>' % css_id_description_txt)
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
             (related_url, url, name))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         output.append('</br>')
+        #super_attrs = attrs.copy()
+        #output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
+        clearid = '%s_clear' % css_id
+        output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" title="%s"/>' % (clearid, settings.ADMIN_MEDIA_PREFIX, _('Clear'),  _('Clear')))
+        output.append('<br />')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
+        noimgurl = '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX
+        js = '''<script type="text/javascript">django.jQuery("#%(id)s").hide();
+django.jQuery("#%(id)s_clear").click(function(){
+    django.jQuery("#%(id)s").removeAttr("value");
+    django.jQuery("#%(foldid)s").attr("src", "%(noimg)s");
+    django.jQuery("#%(descid)s").html("");
+});
+django.jQuery(document).ready(function(){
+    var plus = django.jQuery("#add_%(id)s");
+    if (plus.length){
+        plus.remove();
+    }
+});
+</script>'''
+        output.append(js % {'id': css_id, 'foldid': css_id_folder,
+                            'noimg': noimgurl, 'descid': css_id_description_txt})
         return mark_safe(u''.join(output))
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
