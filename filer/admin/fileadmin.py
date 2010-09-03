@@ -1,19 +1,11 @@
 from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
+from django.contrib.admin.util import unquote
 from django.utils.translation import ugettext  as _
 from django.http import HttpResponseRedirect
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.contrib import admin
 from django import forms
-from django.db.models import Q
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
-from filer.admin.tools import *
-from filer.models import tools
+from filer.models import File
 
-from django.conf import settings
 # forms
 class FileAdminChangeFrom(forms.ModelForm):
     class Meta:
@@ -30,7 +22,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     # save_and_add_another if save_as is False.
     # To show only save_and_continue and save in the submit row we need save_as=True
     # and in render_change_form() override add and change to False.
-    save_as=True
+    save_as = True
     
     form = FileAdminChangeFrom
     fieldsets = (

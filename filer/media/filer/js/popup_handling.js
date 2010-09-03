@@ -15,7 +15,7 @@
 	};
 	dismissRelatedFolderLookupPopup = function(win, chosenId, chosenName) {
 	    var id = windowname_to_id(win.name);
-	    var id_name = id + '_name';
+	    var id_name = id + '_description_txt';
 	    document.getElementById(id).value = chosenId;
 	    document.getElementById(id_name).innerHTML = chosenName;
 	    win.close();
