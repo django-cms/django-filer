@@ -11,6 +11,7 @@ from filer.models import Clipboard, ClipboardItem, File, Image
 from filer.utils.files import generic_handle_file
 from filer.models import tools
 from filer import settings as filer_settings
+from filer.admin.tools import popup_param
 from django.views.decorators.csrf import csrf_exempt
 
 # forms... sucks, types should be automatic
