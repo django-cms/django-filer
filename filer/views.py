@@ -1,21 +1,14 @@
-import os
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-from django.contrib.sessions.models import Session
-from django.conf import settings
-from django.db.models import Q
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.exceptions import PermissionDenied
 
-from models import Folder, Image, Clipboard, ClipboardItem, File
+from models import Folder, Image, Clipboard
 from models import tools
-from models import FolderRoot, UnfiledImages, ImagesWithMissingData
-from django.contrib.auth.models import User
 
 from django import forms
 
-from django.contrib import admin
 
 class NewFolderForm(forms.ModelForm):
     class Meta:
@@ -45,7 +38,7 @@ def _userperms(item, request):
 @login_required
 def edit_folder(request, folder_id):
     # TODO: implement edit_folder view
-    folder=None
+    folder = None
     return render_to_response('admin/filer/folder/folder_edit.html', {
             'folder':folder,
             'is_popup': request.REQUEST.has_key('_popup') or request.REQUEST.has_key('pop'),
@@ -54,7 +47,7 @@ def edit_folder(request, folder_id):
 @login_required
 def edit_image(request, folder_id):
     # TODO: implement edit_image view
-    folder=None
+    folder = None
     return render_to_response('filer/image_edit.html', {
             'folder':folder,
             'is_popup': request.REQUEST.has_key('_popup') or request.REQUEST.has_key('pop'),
@@ -97,10 +90,9 @@ def make_folder(request, folder_id=None):
 
 class UploadFileForm(forms.ModelForm):
     class Meta:
-        model=Image
+        model = Image
         #fields = ('file',)
         
-from filer.utils.files import generic_handle_file
 
 @login_required
 def upload(request):
@@ -112,7 +104,7 @@ def upload(request):
 
 @login_required
 def paste_clipboard_to_folder(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         folder = Folder.objects.get( id=request.POST.get('folder_id') )
         clipboard = Clipboard.objects.get( id=request.POST.get('clipboard_id') )
         if folder.has_add_children_permission(request):
@@ -124,14 +116,14 @@ def paste_clipboard_to_folder(request):
 
 @login_required
 def discard_clipboard(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         clipboard = Clipboard.objects.get( id=request.POST.get('clipboard_id') )
         tools.discard_clipboard(clipboard)
     return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
 
 @login_required
 def delete_clipboard(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         clipboard = Clipboard.objects.get( id=request.POST.get('clipboard_id') )
         tools.delete_clipboard(clipboard)
     return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
@@ -139,7 +131,7 @@ def delete_clipboard(request):
 
 @login_required
 def clone_files_from_clipboard_to_folder(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         clipboard = Clipboard.objects.get( id=request.POST.get('clipboard_id') )
         folder = Folder.objects.get( id=request.POST.get('folder_id') )
         tools.clone_files_from_clipboard_to_folder(clipboard, folder)
