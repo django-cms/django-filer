@@ -1,7 +1,6 @@
 import os
 from django.utils.translation import ugettext as _
 from django.utils.text import truncate_words
-from django.utils import simplejson
 from django.db import models
 from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
@@ -115,7 +114,7 @@ class FilerFileField(models.ForeignKey):
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Image model as parameter...
         # a FilerImageFiled can only be a ForeignKey to a Image
-        return super(FilerFileField,self).__init__(self.default_model_class, **kwargs)
+        return super(FilerFileField, self).__init__(self.default_model_class, **kwargs)
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
