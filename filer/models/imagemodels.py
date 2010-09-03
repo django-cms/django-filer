@@ -1,18 +1,15 @@
-import os
-import StringIO
-from datetime import datetime, date
+from datetime import datetime
+from PIL import Image as PILImage
+
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
-from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
-from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
+from filer.utils.pil_exif import get_exif_for_file
 from filer import settings as filer_settings
 from django.conf import settings
 
-from filer.models.filer_file_storage import get_directory_name
 
-from PIL import Image as PILImage
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
@@ -41,7 +38,7 @@ class Image(File):
     def save(self, *args, **kwargs):
         if self.date_taken is None:
             try:
-                exif_date = self.exif.get('DateTimeOriginal',None)
+                exif_date = self.exif.get('DateTimeOriginal', None)
                 if exif_date is not None:
                     d, t = str.split(exif_date.values)
                     year, month, day = d.split(':')
@@ -109,7 +106,7 @@ class Image(File):
             return False
     @property
     def label(self):
-        if self.name in ['',None]:
+        if self.name in ['', None]:
             return self.original_filename or 'unnamed file'
         else:
             return self.name
