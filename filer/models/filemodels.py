@@ -35,7 +35,7 @@ class File(models.Model, mixins.IconsMixin):
     is_public = models.BooleanField(default=filer_settings.FILER_IS_PUBLIC_DEFAULT)
 
     def __init__(self, *args, **kwargs):
-        super(File, self).__init__(*args,**kwargs)
+        super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         
     def delete_thumbnails(self):
@@ -86,11 +86,11 @@ class File(models.Model, mixins.IconsMixin):
                 self._move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                filer_settings.FILER_PRIVATEMEDIA_PREFIX)
             self._old_is_public = self.is_public
-        super(File, self).save(*args,**kwargs)
+        super(File, self).save(*args, **kwargs)
 
     @property
     def label(self):
-        if self.name in ['',None]:
+        if self.name in ['', None]:
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
