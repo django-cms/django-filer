@@ -1,20 +1,14 @@
 import os
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import admin
 from django import forms
-from django.db.models import Q
 from django.contrib.admin.models import User
 from django.conf import settings
-from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import Clipboard, ClipboardItem, File, Image
 from filer.utils.files import generic_handle_file
-from filer.admin.tools import *
 from filer.models import tools
 from filer import settings as filer_settings
 from django.views.decorators.csrf import csrf_exempt
@@ -22,10 +16,10 @@ from django.views.decorators.csrf import csrf_exempt
 # forms... sucks, types should be automatic
 class UploadFileForm(forms.ModelForm):
     class Meta:
-        model=File
+        model = File
 class UploadImageFileForm(forms.ModelForm):
     class Meta:
-        model=Image
+        model = Image
 
 
 # ModelAdmins
@@ -98,10 +92,14 @@ class ClipboardAdmin(admin.ModelAdmin):
                     iext = os.path.splitext(iname)[1].lower()
                 except:
                     iext = ''
-                if iext in ['.jpg','.jpeg','.png','.gif']:
-                    uploadform = UploadImageFileForm({'original_filename':iname,'owner': request.user.pk}, {'file':ifile})
+                if iext in ['.jpg', '.jpeg', '.png', '.gif']:
+                    uploadform = UploadImageFileForm({'original_filename':iname,
+                                                      'owner': request.user.pk},
+                                                    {'file':ifile})
                 else:
-                    uploadform = UploadFileForm({'original_filename':iname,'owner': request.user.pk}, {'file':ifile})
+                    uploadform = UploadFileForm({'original_filename':iname,
+                                                 'owner': request.user.pk},
+                                                {'file':ifile})
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)
@@ -124,7 +122,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                                   context_instance=RequestContext(request))
     def move_file_to_clipboard(self, request):
         #print "move file"
-        if request.method=='POST':
+        if request.method == 'POST':
             file_id = request.POST.get("file_id", None)
             clipboard = tools.get_user_clipboard(request.user)
             if file_id:
