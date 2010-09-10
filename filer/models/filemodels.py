@@ -51,14 +51,11 @@ class File(models.Model, mixins.IconsMixin):
         Move the file from src to dst. If `os.dirname(dst)` does not exist it
         creates all the required directory.
         """
-        src = self.file.path
+        src = self.file.name
         dst = src.replace(src_filer_prefix,
                            dst_filer_prefix)
-        if not os.path.exists(os.path.dirname(dst)):
-            os.makedirs(os.path.dirname(dst))
-        os.rename(src, dst)
-        new_name = self.file.name.replace(src_filer_prefix,
-                                          dst_filer_prefix)
+        new_name = self.file.storage.save(dst, self.file)
+        self.file.delete(save=False)
         self.file = new_name
         
     def save(self, *args, **kwargs):
@@ -78,7 +75,6 @@ class File(models.Model, mixins.IconsMixin):
             pass
         if self._old_is_public != self.is_public and \
                                   self.pk:
-            self.delete_thumbnails()
             if self.is_public:
                 self._move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
                                filer_settings.FILER_PUBLICMEDIA_PREFIX)
