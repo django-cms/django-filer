@@ -18,8 +18,11 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from filer.utils.pil_exif import get_exif, get_subject_location
-        
-def scale_and_crop(im, requested_size, opts, subject_location=None):
+
+#new signature: im, size, crop=False, upscale=False, **kwargs
+def scale_and_crop(im, size, **opts):
+    requested_size = size
+    subject_location = opts.get('subject_location', None)
     # x, y: original image size
     x, y   = [float(v) for v in im.size]
     xr, yr = [float(v) for v in requested_size]

@@ -30,7 +30,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name' ]
     raw_id_fields = ('owner',)
     save_as = True # see ImageAdmin
-    #hide_in_app_index = True # custom var handled in app_index.html of image_filer
     
     def get_form(self, request, obj=None, **kwargs):
         """

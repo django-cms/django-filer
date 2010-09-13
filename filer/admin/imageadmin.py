@@ -38,5 +38,9 @@ class ImageAdmin(FileAdmin):
     fieldsets = (
         FileAdmin.fieldsets[0],
         FileAdmin.fieldsets[1],
-        FileAdmin.fieldsets[2], 
+        FileAdmin.fieldsets[2],
+        ('Subject Location', {
+            'fields': ('subject_location',),
+            'classes': ('collapse',),
+        }),
     )

@@ -35,6 +35,8 @@ class Image(File):
     must_always_publish_author_credit = models.BooleanField(default=False)
     must_always_publish_copyright = models.BooleanField(default=False)
     
+    subject_location = models.CharField(max_length=64, null=True, blank=True, default=None)
+    
     def save(self, *args, **kwargs):
         if self.date_taken is None:
             try:
