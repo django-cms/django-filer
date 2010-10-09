@@ -17,5 +17,5 @@ FILER_PRIVATEMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FIL
 
 
 FILER_ADMIN_ICON_SIZES = (
-        '32','48','64',
+        '16', '32', '48', '64', 
 )
