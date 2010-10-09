@@ -163,6 +163,11 @@ class Image(File):
             return ''
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
+    @property
+    def easy_thumbnails_relative_name(self):
+        print "calling easy_thumbnails_relative_name: %s" % self.rel_image_url
+        return self.rel_image_url
+    
     def __unicode__(self):
         # this simulates the way a file field works and
         # allows the sorl tag to use the Image model
