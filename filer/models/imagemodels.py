@@ -165,7 +165,6 @@ class Image(File):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     @property
     def easy_thumbnails_relative_name(self):
-        print "calling easy_thumbnails_relative_name: %s" % self.rel_image_url
         return self.rel_image_url
     
     def __unicode__(self):
