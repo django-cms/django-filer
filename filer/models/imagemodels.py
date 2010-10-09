@@ -166,13 +166,7 @@ class Image(File):
     @property
     def easy_thumbnails_relative_name(self):
         return self.rel_image_url
-    
-    def __unicode__(self):
-        # this simulates the way a file field works and
-        # allows the sorl tag to use the Image model
-        # as if it was a image field
-        #TODO: check if this is still required
-        return self.rel_image_url
+
     class Meta:
         app_label = 'filer'
         verbose_name = _('Image')
