@@ -19,7 +19,7 @@ install_requires = [
 ]
 
 setup(
-    name = "django-filer",
+    name = "django-filer-easy-thumbnails",
     version = version,
     url = 'http://github.com/stefanfoulis/django-filer',
     license = 'BSD',
