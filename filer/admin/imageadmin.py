@@ -1,19 +1,7 @@
-from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
 from django.utils.translation import ugettext  as _
-from django.http import HttpResponseRedirect
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.contrib import admin
 from django import forms
-from django.db.models import Q
-from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.fileadmin import FileAdmin
-from filer.models import Folder, FolderRoot, UnfiledImages, \
-                            ImagesWithMissingData, File, Image
-from filer.admin.tools import *
-from filer.models import tools
+from filer.models import Image
 
 from django.conf import settings
 
@@ -49,9 +37,10 @@ class ImageAdmin(FileAdmin):
     form = ImageAdminFrom
     fieldsets = (
         FileAdmin.fieldsets[0],
-        (None, {
-            'fields': ('subject_location',),
-            'classes': ('hide',),
-        }),
         FileAdmin.fieldsets[1],
+        FileAdmin.fieldsets[2],
+        ('Subject Location', {
+            'fields': ('subject_location',),
+            'classes': ('collapse',),
+        }),
     )
