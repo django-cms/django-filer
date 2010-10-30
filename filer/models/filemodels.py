@@ -32,7 +32,7 @@ class File(models.Model, mixins.IconsMixin):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     
-    is_public = models.BooleanField(default=filer_settings.FILER_IS_PUBLIC_DEFAULT)
+    is_public = models.BooleanField(default=False)
 
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
