@@ -14,18 +14,18 @@ def read(fname):
 
 install_requires = [
     'setuptools',
-    'sorl-thumbnail>=3.2.5',
+    'easy-thumbnails',
     'django-mptt>=0.2.1',
 ]
 
 setup(
-    name = "django-filer",
+    name = "django-filer-easy-thumbnails",
     version = version,
     url = 'http://github.com/stefanfoulis/django-filer',
     license = 'BSD',
     platforms=['OS Independent'],
     description = "A file management application for django that makes handling of files and images a breeze.",
-    long_description = read('README'),
+    long_description = read('README.rst'),
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),

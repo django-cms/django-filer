@@ -1,27 +1,23 @@
-import os
-import StringIO
-from datetime import datetime, date
+from datetime import datetime
+from PIL import Image as PILImage
+
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
-from django.contrib.auth import models as auth_models
 from filer.models.filemodels import File
-from filer.utils.pil_exif import get_exif_for_file, set_exif_subject_location
-from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_PUBLICMEDIA_PREFIX, FILER_PRIVATEMEDIA_PREFIX, FILER_STATICMEDIA_PREFIX
+from filer.utils.pil_exif import get_exif_for_file
+from filer import settings as filer_settings
 from django.conf import settings
 
-from sorl.thumbnail.main import DjangoThumbnail, build_thumbnail_name
-from sorl.thumbnail.fields import ALL_ARGS
 
-from PIL import Image as PILImage
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
     DEFAULT_THUMBNAILS = {
-        'admin_clipboard_icon': {'size': (32,32), 'options': ['crop','upscale']},
-        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,10000), 'options': []},
-        'admin_directory_listing_icon': {'size': (48,48), 'options': ['crop','upscale']},
-        'admin_tiny_icon': {'size': (32,32), 'options': ['crop','upscale']},
+        'admin_clipboard_icon': {'size': (32,32), 'crop':True, 'upscale':True},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH,10000),},
+        'admin_directory_listing_icon': {'size': (48,48), 'crop':True, 'upscale':True},
+        'admin_tiny_icon': {'size': (32,32), 'crop':True, 'upscale':True},
     }
     file_type = 'image'
     _icon = "image"
@@ -41,19 +37,10 @@ class Image(File):
     
     subject_location = models.CharField(max_length=64, null=True, blank=True, default=None)
     
-    def _check_validity(self):
-        if not self.name:# or not self.contact:
-            return False
-        return True
-    def sidebar_image_ratio(self):
-        if self.width:
-            return float(self.width)/float(self.SIDEBAR_IMAGE_WIDTH)
-        else:
-            return 1.0
     def save(self, *args, **kwargs):
         if self.date_taken is None:
             try:
-                exif_date = self.exif.get('DateTimeOriginal',None)
+                exif_date = self.exif.get('DateTimeOriginal', None)
                 if exif_date is not None:
                     d, t = str.split(exif_date.values)
                     year, month, day = d.split(':')
@@ -64,39 +51,35 @@ class Image(File):
                 pass
         if self.date_taken is None:
             self.date_taken = datetime.now()
-        #if not self.contact:
-        #    self.contact = self.owner
         self.has_all_mandatory_data = self._check_validity()
         try:
-            if self.subject_location:
-                parts = self.subject_location.split(',')
-                pos_x = int(parts[0])
-                pos_y = int(parts[1])
-                                                  
-                sl = (int(pos_x), int(pos_y) )
-                exif_sl = self.exif.get('SubjectLocation', None)
-                if self._file and not sl == exif_sl:
-                    #self._file.open()
-                    fd_source = StringIO.StringIO(self._file.read())
-                    #self._file.close()
-                    set_exif_subject_location(sl, fd_source, self._file.path)
-        except:
-            # probably the image is missing. nevermind
-            pass
-        try:
             # do this more efficient somehow?
-            self._width, self._height = PILImage.open(self._file).size
+            self._width, self._height = PILImage.open(self.file).size
         except Exception, e:
             # probably the image is missing. nevermind.
             pass
-        super(Image, self).save(*args, **kwargs)
+        
+        super(Image, self).save(*args, **kwargs)    
+    
+    def _check_validity(self):
+        if not self.name:# or not self.contact:
+            return False
+        return True
+    
+    def sidebar_image_ratio(self):
+        if self.width:
+            return float(self.width)/float(self.SIDEBAR_IMAGE_WIDTH)
+        else:
+            return 1.0
+        
+
         
     def _get_exif(self):
         if hasattr(self, '_exif_cache'):
             return self._exif_cache
         else:
-            if self._file:
-                self._exif_cache = get_exif_for_file(self._file.path)
+            if self.file:
+                self._exif_cache = get_exif_for_file(self.file.path)
             else:
                 self._exif_cache = {}
         return self._exif_cache
@@ -125,7 +108,7 @@ class Image(File):
             return False
     @property
     def label(self):
-        if self.name in ['',None]:
+        if self.name in ['', None]:
             return self.original_filename or 'unnamed file'
         else:
             return self.name
@@ -137,55 +120,33 @@ class Image(File):
         return self._height or 0
     @property
     def icons(self):
-        if not getattr(self, '_icon_thumbnails_cache', False):
-            r = {}
-            for size in FILER_ADMIN_ICON_SIZES:
-                try:
-                    args = {'size': (int(size),int(size)), 'options': ['crop','upscale']}
-                    # Build the DjangoThumbnail kwargs.
-                    kwargs = {}
-                    for k, v in args.items():
-                        kwargs[ALL_ARGS[k]] = v
-                    # Build the destination filename and return the thumbnail.
-                    name_kwargs = {}
-                    for key in ['size', 'options', 'quality', 'basedir', 'subdir',
-                                'prefix', 'extension']:
-                        name_kwargs[key] = args.get(key)
-                    source = self._file
-                    dest = build_thumbnail_name(source.name, **name_kwargs)
-                    r[size] = unicode(DjangoThumbnail(source, relative_dest=dest, **kwargs))
-                except Exception, e:
-                    pass
-            setattr(self, '_icon_thumbnails_cache', r)
-        return getattr(self, '_icon_thumbnails_cache')
-    def _build_thumbnail(self, args):
-        try:
-            # Build the DjangoThumbnail kwargs.
-            kwargs = {}
-            for k, v in args.items():
-                kwargs[ALL_ARGS[k]] = v
-            # Build the destination filename and return the thumbnail.
-            name_kwargs = {}
-            for key in ['size', 'options', 'quality', 'basedir', 'subdir',
-                        'prefix', 'extension']:
-                name_kwargs[key] = args.get(key)
-            source = self._file
-            dest = build_thumbnail_name(source.name, **name_kwargs)
-            return DjangoThumbnail(source, relative_dest=dest, **kwargs)
-        except:
-            return os.path.normpath(u"%s/icons/missingfile_%sx%s.png" % (FILER_STATICMEDIA_PREFIX, 32, 32,))
+        _icons = {}
+        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
+            try:
+                thumbnail_options = {
+                    'size':(int(size),int(size)),
+                    'crop': True,
+                    'upscale':True,
+                    }
+                thumb = self.file.get_thumbnail(thumbnail_options)
+                _icons[size] = thumb.url
+            except Exception, e:
+                # swallow the the exception to avoid to bubble it up
+                # in the template {{ image.icons.48 }}
+                pass
+        return _icons
+        
     @property
     def thumbnails(self):
-        # we build an extra dict here mainly
-        # to prevent the default errors to 
-        # get thrown and to add a default missing
-        # image (not yet)
-        if not hasattr(self, '_thumbnails'):
-            tns = {}
-            for name, opts in Image.DEFAULT_THUMBNAILS.items():
-                tns[name] = unicode(self._build_thumbnail(opts))
-            self._thumbnails = tns
-        return self._thumbnails
+        _thumbnails = {}
+        for name, opts in Image.DEFAULT_THUMBNAILS.items():
+            try:
+                _thumbnails[name] = self.file.get_thumbnail(opts).url
+            except:
+                # swallow the the exception to avoid to bubble it up
+                # in the template {{ image.icons.48 }}
+                pass
+        return _thumbnails
     
     @property
     def absolute_image_url(self):
@@ -194,7 +155,7 @@ class Image(File):
     def rel_image_url(self):
         'return the image url relative to MEDIA_URL'
         try:
-            rel_url = u"%s" % self._file.url
+            rel_url = u"%s" % self.file.url
             if rel_url.startswith(settings.MEDIA_URL):
                 before, match, rel_url = rel_url.partition(settings.MEDIA_URL)
             return rel_url
@@ -202,11 +163,10 @@ class Image(File):
             return ''
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
-    def __unicode__(self):
-        # this simulates the way a file field works and
-        # allows the sorl thumbnail tag to use the Image model
-        # as if it was a image field
+    @property
+    def easy_thumbnails_relative_name(self):
         return self.rel_image_url
+
     class Meta:
         app_label = 'filer'
         verbose_name = _('Image')
