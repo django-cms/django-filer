@@ -25,7 +25,7 @@ setup(
     license = 'BSD',
     platforms=['OS Independent'],
     description = "A file management application for django that makes handling of files and images a breeze.",
-    long_description = read('README'),
+    long_description = read('README.rst'),
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),

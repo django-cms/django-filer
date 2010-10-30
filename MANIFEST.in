@@ -1,6 +1,6 @@
 include AUTHORS
 include LICENSE
-include README
+include README.rst
 include HISTORY
 recursive-include filer/templates *
 recursive-include filer/media *
