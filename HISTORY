@@ -2,7 +2,7 @@ Changelog for django-filer
 =============================
 
 
-0.8.0
+0.8.1
 -----
 moved to easy-thumbnail for thumbnailing. added tests and lots of cleanup.
 Backward incompatible changes:
