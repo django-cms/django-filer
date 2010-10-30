@@ -14,12 +14,12 @@ Installation
 
 add the `django-filer` to `INSTALLED_APPS`:
 
-```
-INSTALLED_APPS = (
-    ...
-    'filer',
-    ...
-)
+```python
+    INSTALLED_APPS = (
+        ...
+        'filer',
+        ...
+    )
 ```
 
 and then run `syncdb` or `migrate` if you're using South.
@@ -29,12 +29,12 @@ For automatic subject location aware cropping of images replace
 `filer.thumbnail_processors.scale_and_crop_with_subject_location` in the
 `THUMBNAIL_PROCESSORS` setting:
 
-```
-THUMBNAIL_PROCESSORS = (
-    'easy_thumbnails.processors.colorspace',
-    'easy_thumbnails.processors.autocrop',
-    #'easy_thumbnails.processors.scale_and_crop',
-    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
-    'easy_thumbnails.processors.filters',
-)
+```python
+    THUMBNAIL_PROCESSORS = (
+        'easy_thumbnails.processors.colorspace',
+        'easy_thumbnails.processors.autocrop',
+        #'easy_thumbnails.processors.scale_and_crop',
+        'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+        'easy_thumbnails.processors.filters',
+    )
 ```
