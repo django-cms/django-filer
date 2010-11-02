@@ -13,3 +13,20 @@
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
 {% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+	{% block file_sidebar %}
+		{% with original.duplicates as duplicates %}
+			{% if duplicates %}
+				<h3>{% trans 'duplicates' %}</h3>
+				<ul>
+					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	{% endblock %}
+</div>
+{% endblock %}
