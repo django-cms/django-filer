@@ -4,7 +4,7 @@
 	    win.close();
 	};
 	dismissRelatedImageLookupPopup = function(win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt) {
-		var name = windowname_to_id(win.name);
+	    var name = windowname_to_id(win.name);
 	    var img_name = name + '_thumbnail_img';
 	    var txt_name = name + '_description_txt';
 	    var elem = document.getElementById(name);
@@ -15,9 +15,9 @@
 	};
 	dismissRelatedFolderLookupPopup = function(win, chosenId, chosenName) {
 	    var id = windowname_to_id(win.name);
-	    var id_name = id + '_name';
-		document.getElementById(id).value = chosenId;
+	    var id_name = id + '_description_txt';
+	    document.getElementById(id).value = chosenId;
 	    document.getElementById(id_name).innerHTML = chosenName;
-		win.close();
+	    win.close();
 	};
 })(jQuery);

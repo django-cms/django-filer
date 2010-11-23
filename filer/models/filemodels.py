@@ -1,5 +1,4 @@
-from os.path import splitext
-
+import os
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
@@ -9,13 +8,16 @@ from django.conf import settings
 from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
+from filer import settings as filer_settings
+
+from easy_thumbnails.fields import ThumbnailerField
 
     
 
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    _file = models.FileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -30,21 +32,61 @@ class File(models.Model, mixins.IconsMixin):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     
-    #is_public = models.BooleanField(default=True)
-    
-    # TODO: Factor out customer specific fields... maybe a m2m?
-    #can_use_for_web = models.BooleanField(default=True)
-    #can_use_for_print = models.BooleanField(default=True)
-    #can_use_for_teaching = models.BooleanField(default=True)
-    #can_use_for_research = models.BooleanField(default=True)
-    #can_use_for_private_use = models.BooleanField(default=True)
-    #usage_restriction_notes = models.TextField(null=True, blank=True)
-    #notes = models.TextField(null=True, blank=True)
-    #contact = models.ForeignKey(auth_models.User, related_name='contact_of_files', null=True, blank=True)
-    
+    is_public = models.BooleanField(default=False)
+
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        self._old_is_public = self.is_public
+        
+    def delete_thumbnails(self):
+        """
+        Delete all the thumbnails related to `instance.file`
+        """
+        for thumb in self.file.get_source_cache().thumbnails.all():
+            os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
+            thumb.delete()
+            
+    def _move_file(self, src_filer_prefix, dst_filer_prefix):
+        """
+        Move the file from src to dst. If `os.dirname(dst)` does not exist it
+        creates all the required directory.
+        """
+        src = self.file.name
+        dst = src.replace(src_filer_prefix,
+                           dst_filer_prefix)
+        new_name = self.file.storage.save(dst, self.file)
+        self.file.delete(save=False)
+        self.file = new_name
+        
+    def save(self, *args, **kwargs):
+        # check if this is a subclass of "File" or not and set
+        # _file_type_plugin_name
+        if self.__class__ == File:
+            # what should we do now?
+            # maybe this has a subclass, but is being saved as a File instance
+            # anyway. do we need to go check all possible subclasses?
+            pass
+        elif issubclass(self.__class__, File):
+            self._file_type_plugin_name = self.__class__.__name__
+        # cache the file size
+        try:
+            self._file_size = self.file.size
+        except:
+            pass
+        if self._old_is_public != self.is_public and \
+                                  self.pk:
+            if self.is_public:
+                self._move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
+                               filer_settings.FILER_PUBLICMEDIA_PREFIX)
+            else:
+                self._move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
+                               filer_settings.FILER_PRIVATEMEDIA_PREFIX)
+            self._old_is_public = self.is_public
+        super(File, self).save(*args, **kwargs)
+
     @property
     def label(self):
-        if self.name in ['',None]:
+        if self.name in ['', None]:
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
@@ -80,23 +122,7 @@ class File(models.Model, mixins.IconsMixin):
         else:
             text = u"%s" % (self.name,)
         return text
-    def save(self, *args, **kwargs):
-        # check if this is a subclass of "File" or not and set
-        # _file_type_plugin_name
-        if self.__class__ == File:
-            # what should we do now?
-            # maybe this has a subclass, but is being saved as a File instance
-            # anyway. do we need to go check all possible subclasses?
-            pass
-        elif issubclass(self.__class__, File):
-            self._file_type_plugin_name = self.__class__.__name__
-        # cache the file size
-        try:
-            self._file_size = self._file.size
-        except:
-            pass
-        
-        super(File, self).save(*args,**kwargs)
+
     
     def subtype(self):
         #print "get subtype"
@@ -118,17 +144,14 @@ class File(models.Model, mixins.IconsMixin):
         to make the model behave like a file field
         '''
         try:
-            r = self._file.url
+            r = self.file.url
         except:
             r = ''
         return r
     @property
-    def file(self):
-        return self._file.file
-    @property
     def path(self):
         try:
-            return self._file.path
+            return self.file.path
         except:
             return ""
     @property
@@ -136,7 +159,7 @@ class File(models.Model, mixins.IconsMixin):
         return self._file_size or 0
     @property
     def extension(self):
-        filetype = splitext(self.file.name)[1].lower()
+        filetype = os.path.splitext(self.file.name)[1].lower()
         if len(filetype)>0:
             filetype = filetype[1:]
         return filetype

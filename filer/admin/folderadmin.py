@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_ngettext, model_format_dict
+from django.contrib.admin.util import unquote
 from django.http import HttpResponseRedirect, Http404
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -9,7 +9,7 @@ from django import forms
 from django.db.models import Q
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
-from filer.admin.tools import *
+from filer.admin.tools import popup_status, selectfolder_status, userperms_for_request
 from filer.models import tools
 from filer.settings import FILER_STATICMEDIA_PREFIX
 
@@ -18,7 +18,7 @@ from filer.settings import FILER_STATICMEDIA_PREFIX
 class AddFolderPopupForm(forms.ModelForm):
     folder = forms.HiddenInput()
     class Meta:
-        model=Folder
+        model = Folder
         fields = ('name',)
 
 # ModelAdmins
@@ -29,8 +29,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_filter = ('owner',)
     search_fields = ['name', 'files__name' ]
     raw_id_fields = ('owner',)
-    save_as=True # see ImageAdmin
-    #hide_in_app_index = True # custom var handled in app_index.html of image_filer
+    save_as = True # see ImageAdmin
     
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -105,7 +104,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 url = reverse('admin:filer-directory_listing-root')
             return HttpResponseRedirect(url)
         return r
-    def icon_img(self,xs):
+    def icon_img(self, xs):
         return mark_safe('<img src="%simg/icons/plainfolder_32x32.png" alt="Folder Icon" />' % FILER_STATICMEDIA_PREFIX)
     icon_img.allow_tags = True
     
@@ -115,14 +114,27 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         from filer import views
         url_patterns = patterns('',
             # we override the default list view with our own directory listing of the root directories
-            url(r'^$', self.admin_site.admin_view(self.directory_listing), name='filer-directory_listing-root'),
-            url(r'^(?P<folder_id>\d+)/list/$', self.admin_site.admin_view(self.directory_listing), name='filer-directory_listing'),
+            url(r'^$', self.admin_site.admin_view(self.directory_listing),
+                name='filer-directory_listing-root'),
+            url(r'^(?P<folder_id>\d+)/list/$',
+                self.admin_site.admin_view(self.directory_listing),
+                name='filer-directory_listing'),
             
-            url(r'^(?P<folder_id>\d+)/make_folder/$', self.admin_site.admin_view(views.make_folder), name='filer-directory_listing-make_folder'),
-            url(r'^make_folder/$', self.admin_site.admin_view(views.make_folder), name='filer-directory_listing-make_root_folder'),
+            url(r'^(?P<folder_id>\d+)/make_folder/$',
+                self.admin_site.admin_view(views.make_folder),
+                name='filer-directory_listing-make_folder'),
+            url(r'^make_folder/$',
+                self.admin_site.admin_view(views.make_folder),
+                name='filer-directory_listing-make_root_folder'),
             
-            url(r'^images_with_missing_data/$', self.admin_site.admin_view(self.directory_listing), {'viewtype': 'images_with_missing_data'}, name='filer-directory_listing-images_with_missing_data'),
-            url(r'^unfiled_images/$', self.admin_site.admin_view(self.directory_listing), {'viewtype': 'unfiled_images'}, name='filer-directory_listing-unfiled_images'),
+            url(r'^images_with_missing_data/$',
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'images_with_missing_data'},
+                name='filer-directory_listing-images_with_missing_data'),
+            url(r'^unfiled_images/$',
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'unfiled_images'},
+                name='filer-directory_listing-unfiled_images'),
         )
         url_patterns.extend(urls)
         return url_patterns
@@ -131,9 +143,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
         clipboard = tools.get_user_clipboard(request.user)
-        if viewtype=='images_with_missing_data':
+        if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
-        elif viewtype=='unfiled_images':
+        elif viewtype == 'unfiled_images':
             folder = UnfiledImages()
         elif folder_id == None:
             folder = FolderRoot()
@@ -211,7 +223,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except:
             permissions = {}
         #folder_children = folder_children.sort(cmp=lambda x,y: cmp(x.name.lower(), y.name.lower()))
-        folder_files.sort(cmp=lambda x,y: cmp(x.label.lower(), y.label.lower()))
+        folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(), y.label.lower()))
         return render_to_response('admin/filer/folder/directory_listing.html', {
                 'folder':folder,
                 'folder_children':folder_children,

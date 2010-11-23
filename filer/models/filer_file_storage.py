@@ -28,9 +28,12 @@ def get_valid_filename(s):
         return u"%s" % (filename,)
 
 def default_callback(instance, filename):
-    url_prefix = FILER_PUBLICMEDIA_PREFIX
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
-    return os.path.normpath( os.path.join(url_prefix, datepart, get_valid_filename(filename)) )
+    if instance.is_public:
+        private_or_public = FILER_PUBLICMEDIA_PREFIX
+    else:
+        private_or_public = FILER_PRIVATEMEDIA_PREFIX
+    return os.path.normpath( os.path.join(private_or_public, datepart, get_valid_filename(filename)) )
 
 def get_dir_name_callback():
     import_path = FILER_GET_DIRECTORY_CALLBACK

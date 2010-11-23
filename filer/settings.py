@@ -1,9 +1,13 @@
 import os
 from django.conf import settings
 
-FILER_STATICMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_STATICMEDIA_PREFIX', os.path.join(settings.MEDIA_URL,'filer/') ) ) + '/'
+FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
+
+FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', False)
 
 # TODO: could be removed in the future
+FILER_STATICMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_STATICMEDIA_PREFIX', os.path.join(settings.MEDIA_URL,'filer/') ) ) + '/'
+
 FILER_PUBLICMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public') )
 FILER_PRIVATEMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private') )
 
@@ -31,7 +35,6 @@ else:
 FILER_PRIVATEMEDIA_PATH = getattr(settings,'FILER_PRIVATEMEDIA_PATH', '')
 # there is no definable FILER_PRIVATEMEDIA_URL, because this is defined by urls.py
 '''
-
 FILER_ADMIN_ICON_SIZES = (
-        '32','48','64',
+        '16', '32', '48', '64', 
 )

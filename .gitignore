@@ -12,4 +12,5 @@ build
 .DS_Store
 .project
 .pydevproject
+.settings
 *~

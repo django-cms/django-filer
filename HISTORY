@@ -1,6 +1,18 @@
 Changelog for django-filer
 =============================
 
+
+0.8.1
+-----
+moved to easy-thumbnail for thumbnailing. added tests and lots of cleanup.
+Backward incompatible changes:
+* use easy-thumbnails instead of sorl.thumbnail
+** don't forget to change the THUMBNAIL_PROCESSORS setting accordingly
+
+0.7.0
+-----
+bugfixes
+
 0.5.4a1
 -------
 adds description field
