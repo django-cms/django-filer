@@ -1,9 +1,10 @@
-============
-django-filer
-============
+Getting Started
+===============
 
+To get started using ``django-filer`` simply install it with
+``pip``::
 
-A file management application for django that makes handling of files and images a breeze.
+    $ pip install django-filer
 
 Dependencies
 ------------
@@ -11,14 +12,8 @@ Dependencies
 * django-cms >= 2.1
 * easy-thumbnails >= 1.0-alpha-13
 
-Getting Started
----------------
-
-To get started using ``django-filer`` simply install it with
-``pip``::
-
-    $ pip install django-filer
-
+Configuration
+-------------
 
 Add ``"filer"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
 (or ``migrate`` if you're using South).
