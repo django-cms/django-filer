@@ -11,7 +11,7 @@ from django.utils.text import get_valid_filename as get_valid_filename_django
 from filer.settings import \
     FILER_UPLOAD_MEDIA_ROOT, FILER_UPLOAD_MEDIA_URL, \
     FILER_FILE_STORAGE, FILER_PUBLICMEDIA_PREFIX, \
-    FILER_GET_DIRECTORY_CALLBACK
+    FILER_PRIVATEMEDIA_PREFIX, FILER_GET_DIRECTORY_CALLBACK
 
 def get_valid_filename(s):
     '''
