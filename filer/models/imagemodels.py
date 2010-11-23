@@ -155,9 +155,9 @@ class Image(File):
     def rel_image_url(self):
         'return the image url relative to the used storage base url'
         try:
-            rel_url = u"%s" % self._file.url
-            if rel_url.startswith(self._file.storage.base_url):
-                before, match, rel_url = rel_url.partition(self._file.storage.base_url)
+            rel_url = u"%s" % self.file.url
+            if rel_url.startswith(self.file.storage.base_url):
+                before, match, rel_url = rel_url.partition(self.file.storage.base_url)
             return rel_url
         except Exception, e:
             return ''

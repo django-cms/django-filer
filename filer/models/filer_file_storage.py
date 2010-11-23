@@ -55,10 +55,10 @@ def get_directory_name(instance, filename):
     '''
     returns the path relative to the base path (media root
     '''
-    if instance and instance._file:
+    if instance and instance.file:
         # assigning our storage_class
         storage_class = get_storage_class()
-        instance._file.storage = storage_class() # is this too hacky?
+        instance.file.storage = storage_class() # is this too hacky?
     callback = get_dir_name_callback()
     return callback(instance, filename)
 
