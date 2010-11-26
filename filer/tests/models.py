@@ -73,13 +73,10 @@ class FilerApiTests(TestCase):
         image.save()
         icons = image.icons
         file_basename = os.path.basename(image.file.path)
-        self.assertEqual(len(icons), 3)
-        self.assertEqual(os.path.basename(icons['32']),
-                         file_basename + u'.32x32_q85_crop_upscale.jpg')
-        self.assertEqual(os.path.basename(icons['48']),
-                         file_basename + u'.48x48_q85_crop_upscale.jpg')
-        self.assertEqual(os.path.basename(icons['64']),
-                         file_basename + u'.64x64_q85_crop_upscale.jpg')
+        self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
+        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
+            self.assertEqual(os.path.basename(icons[size]),
+                             file_basename + u'.%sx%s_q85_crop_upscale.jpg' %(size,size))
          
         
     def test_file_upload_public_destination(self):
@@ -133,9 +130,9 @@ class FilerApiTests(TestCase):
         image.is_public = True
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
-        self.assertEqual(len(image.icons), 3)
+        self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         image.is_public = False
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
-        self.assertEqual(len(image.icons), 3)
+        self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         
