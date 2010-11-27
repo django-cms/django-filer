@@ -8,14 +8,12 @@ from filer.models.foldermodels import Folder
 from filer.models.filemodels import File
 from filer.models.imagemodels import Image
 
+from filer.settings import FILER_IS_PUBLIC_DEFAULT
+
 class FileImporter(object):
     def __init__(self, * args, **kwargs):
         self.path = kwargs.get('path')
-        if kwargs.get('verbosity'):
-            self.verbosity = int(kwargs.get('verbosity'))
-        else:
-            self.verbosity = int(kwargs.get('verbosity'))
-            
+        self.verbosity = int(kwargs.get('verbosity', 1))
         self.file_created = 0
         self.image_created = 0
         self.folder_created = 0
@@ -33,14 +31,16 @@ class FileImporter(object):
             obj, created = Image.objects.get_or_create(
                                 original_filename=file.name,
                                 file=file,
-                                folder=folder)
+                                folder=folder,
+                                is_public=FILER_IS_PUBLIC_DEFAULT)
             if created:
                 self.image_created += 1
         else:
             obj, created = File.objects.get_or_create(
                                 original_filename=file.name,
                                 file=file,
-                                folder=folder)
+                                folder=folder,
+                                is_public=FILER_IS_PUBLIC_DEFAULT)
             if created:
                 self.file_created += 1
         if self.verbosity >= 2:
