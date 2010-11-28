@@ -29,6 +29,7 @@ Getting help
 ------------
 
 * google group: http://groups.google.com/group/django-filer
+* IRC: #django-filer on freenode.net
 
 Contributing
 ------------
@@ -45,3 +46,4 @@ Contents
    :maxdepth: 2
 
    getting_started
+   running_tests
