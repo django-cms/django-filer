@@ -49,33 +49,28 @@ class FileImporter(object):
                                                         obj, created)  
         return obj
     
-    def root_folder(self, root):
+    def get_or_create_folder(self, folder_names):
         """
-        Retrieve or create the root folder.
-        """
-        name = os.path.basename(root)
-        if root != self.path:
-            parent_name = os.path.basename(os.path.dirname(root))
-        else:
-            parent_name = None
-        obj, created = Folder.objects.get_or_create(parent__name=parent_name,
-                                                    name=name)
-        if self.verbosity >= 2:
-            print u"root : %s -- created : %s" % (obj, created) 
-        return obj
-    
-    def create_folder(self, parent, name):
-        """
-        Retrieve or create a folder.
-        """
-        obj, created = Folder.objects.get_or_create(name=name, parent=parent)
-        self.folder_created += 1
+        Gets or creates a Folder based the list of folder names in hierarchical 
+        order (like breadcrumbs).
         
-        if self.verbosity >= 2:
-            print u"folder_created #%s folder : %s -- created : %s" % (self.folder_created,
-                                                                       obj, created) 
-        return obj
-            
+        get_or_create_folder(['root', 'subfolder', 'subsub folder'])
+        
+        creates the folders with correct parent relations and returns the 
+        'subsub folder' instance.
+        """
+        if not len(folder_names):
+            return None
+        current_parent = None
+        for folder_name in folder_names:
+            current_parent, created = Folder.objects.get_or_create(name=folder_name, parent=current_parent)
+            if created:
+                self.folder_created += 1
+                if self.verbosity >= 2:
+                    print u"folder_created #%s folder : %s -- created : %s" % (self.folder_created,
+                                                                               folder, created) 
+        return current_parent
+    
     def walker(self, path=None):
         """
         This method walk a directory structure and create the
@@ -88,15 +83,17 @@ class FileImporter(object):
         path = unicode(os.path.normpath(path))
         if self.verbosity >= 1:
             print u"Import the folders and files in %s" % path
+        root_folder_name = os.path.basename(path)
         for root, dirs, files in os.walk(path):
-            root_folder = self.root_folder(root)
-            #print  files , "files"
+            rel_folders = root.partition(path)[2].strip(os.path.sep).split(os.path.sep)
+            while '' in rel_folders:
+                rel_folders.remove('')
+            folder_names = [root_folder_name] + rel_folders
+            folder = self.get_or_create_folder(folder_names)
             for file in files:
                 dj_file = DjangoFile(open(os.path.join(root, file)),
                                      name=file)
-                self.import_file(file=dj_file, folder=root_folder)
-            for dir in dirs:
-                self.create_folder(parent=root_folder, name=dir)
+                self.import_file(file=dj_file, folder=folder)
         if self.verbosity >= 1:
             print u"folder_created #%s / file_created #%s / image_created #%s "% (self.folder_created,
                                                                                  self.file_created,
