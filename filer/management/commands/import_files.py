@@ -44,7 +44,7 @@ class FileImporter(object):
             if created:
                 self.file_created += 1
         if self.verbosity >= 2:
-            print "file_created #%s / image_created #%s -- file : %s -- created : %s" %(self.file_created,
+            print u"file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
                                                         self.image_created,
                                                         obj, created)  
         return obj
@@ -61,7 +61,7 @@ class FileImporter(object):
         obj, created = Folder.objects.get_or_create(parent__name=parent_name,
                                                     name=name)
         if self.verbosity >= 2:
-            print "root : %s -- created : %s" %(obj, created) 
+            print u"root : %s -- created : %s" % (obj, created) 
         return obj
     
     def create_folder(self, parent, name):
@@ -72,8 +72,8 @@ class FileImporter(object):
         self.folder_created += 1
         
         if self.verbosity >= 2:
-            print "folder_created #%s folder : %s -- created : %s" %(self.folder_created,
-                                                                     obj, created) 
+            print u"folder_created #%s folder : %s -- created : %s" % (self.folder_created,
+                                                                       obj, created) 
         return obj
             
     def walker(self, path=None):
@@ -82,8 +82,12 @@ class FileImporter(object):
         Folders and Files as they appear.
         """
         path = path or self.path
+        # prevent trailing slashes and other inconsistencies on path.
+        # cast to unicode so that os.walk returns path names in unicode
+        # (prevents encoding/decoding errors)
+        path = unicode(os.path.normpath(path))
         if self.verbosity >= 1:
-            print "Import the folders and files in %s" %path
+            print u"Import the folders and files in %s" % path
         for root, dirs, files in os.walk(path):
             root_folder = self.root_folder(root)
             #print  files , "files"
@@ -94,7 +98,7 @@ class FileImporter(object):
             for dir in dirs:
                 self.create_folder(parent=root_folder, name=dir)
         if self.verbosity >= 1:
-            print "folder_created #%s / file_created #%s / image_created #%s "% (self.folder_created,
+            print u"folder_created #%s / file_created #%s / image_created #%s "% (self.folder_created,
                                                                                  self.file_created,
                                                                                  self.image_created)
 
