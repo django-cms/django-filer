@@ -9,9 +9,9 @@ In the source checkout run::
   ./bin/buildout
 
 This will setup buildout and install all the needed dependencies in a isolated
-invironment.
+environment.
 
-Then you can run the testsuite with::
+Run the tests::
 
   ./bin/django test filer
 
