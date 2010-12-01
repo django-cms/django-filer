@@ -68,7 +68,7 @@ class FileImporter(object):
                 self.folder_created += 1
                 if self.verbosity >= 2:
                     print u"folder_created #%s folder : %s -- created : %s" % (self.folder_created,
-                                                                               folder, created) 
+                                                                               current_parent, created) 
         return current_parent
     
     def walker(self, path=None):
