@@ -115,7 +115,7 @@ class WrapThumbnailNode(ObjectWrapper):
         ObjectWrapper.__init__(self, oInstance)
 
     def render(self, context):
-        print "WrapThumbnailNode.render"
+        #print "WrapThumbnailNode.render"
         # use a fake variable to always get a Thumbnail object in context
         fakevar = False
         if self.context_name == None:

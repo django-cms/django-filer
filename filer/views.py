@@ -151,7 +151,10 @@ def serve_protected_file(request, file_id):
     if not thefile.has_read_permission(request):
         raise PermissionDenied
     if static_server != None:
-        return static_server.serve(request, thefile.url, thefile.file.name, thefile.file.path, thefile.file.size)
+        #print "thefile.url", thefile.url
+        #print "thefile.file.url", thefile.file.url
+        direct_url = thefile.file.url
+        return static_server.serve(request, direct_url, thefile.file.name, thefile.file.path, thefile.file.size)
     return HttpResponseServerError('Misconfigured. Can not serve protected files.')
 
 def serve_protected_thumbnail(request, file_id, file_name):
@@ -184,12 +187,9 @@ def serve_protected_thumbnail_auth(request, file_id, file_name):
             name = thefile.file.get_thumbnail_name(thumbnail_options = { 'size': (1,1)})
             media_path = posixpath.join(posixpath.dirname(name), file_name)
             full_path = posixpath.join(django_settings.MEDIA_ROOT, media_path)
-            url = posixpath.join(django_settings.MEDIA_URL, media_path)
-            #print "url", url
-            #print "media_path", media_path
-            #print "full_path", full_path
+            direct_url = posixpath.join(django_settings.MEDIA_URL, media_path)
             size = os.path.getsize(full_path) # XXX: Should convert full_path from posix to os.path format
-            return static_server.serve(request, url, media_path, full_path, size)
+            return static_server.serve(request, direct_url, media_path, full_path, size)
         except Exception as e:
             print " *** ", e
             raise Http404('File not found')

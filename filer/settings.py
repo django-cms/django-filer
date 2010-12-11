@@ -36,6 +36,7 @@ if static_server == None:
                 module = '.'.join(module)
                 exec "import %s" % module
                 exec "static_server = %s()" % klass
+                print static_server
             except:
                 print "Failed to create an instance of '%s'" % klass
                 pass
