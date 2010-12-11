@@ -22,11 +22,11 @@ FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64', 
 )
 
-FILER_SERVE_PRIVATE = getattr(settings, 'FILER_SERVE_PRIVATE', "filer.server.UnprotectedServer")
+FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.UnprotectedServer")
 
 static_server = None
 if static_server == None:
-    klass = FILER_SERVE_PRIVATE
+    klass = FILER_PRIVATEMEDIA_SERVER
     if klass == None: print "NO STATIC SERVER CONFIGURED"
     else:
         if type(klass) == type(""):
