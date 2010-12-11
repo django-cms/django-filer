@@ -1,13 +1,16 @@
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseServerError
 from django.core.exceptions import PermissionDenied
 
-from models import Folder, Image, Clipboard
+from models import Folder, Image, Clipboard, File
 from models import tools
 
 from django import forms
+from django.conf import settings as django_settings
+from settings import static_server, FILER_STATICMEDIA_PREFIX
+import os, posixpath
 
 
 class NewFolderForm(forms.ModelForm):
@@ -137,3 +140,62 @@ def clone_files_from_clipboard_to_folder(request):
         tools.clone_files_from_clipboard_to_folder(clipboard, folder)
     return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
 
+@login_required
+def serve_protected_file(request, file_id):
+    """
+    Serve protected files to authenticated users with read permissions.
+    """
+    thefile = File.objects.get(id = file_id)
+    if thefile == None:
+        raise Http404('File not found')
+    if not thefile.has_read_permission(request):
+        raise PermissionDenied
+    if static_server != None:
+        return static_server.serve(request, thefile.url, thefile.file.name, thefile.file.path, thefile.file.size)
+    return HttpResponseServerError('Misconfigured. Can not serve protected files.')
+
+def serve_protected_thumbnail(request, file_id, file_name):
+    """
+    Serve protected thumbnails.
+    If the user isn't authenticated or doesn't have read permissions,
+    redirect to a static image.
+    """
+    if not request.user.is_authenticated():
+        newurl = posixpath.join(FILER_STATICMEDIA_PREFIX, "icons/image_32x32.png")
+        return HttpResponseRedirect(newurl)
+    return serve_protected_thumbnail_auth(request, file_id, file_name)
+
+@login_required
+def serve_protected_thumbnail_auth(request, file_id, file_name):
+    """
+    Serve protected thumbnails to authenticated users.
+    If the user doesn't have read permissions, redirect to a static image.
+    """
+    thefile = File.objects.get(id = file_id)
+    if thefile == None:
+        raise Http404('File not found')
+    if not thefile.has_read_permission(request):
+        newurl = posixpath.join(FILER_STATICMEDIA_PREFIX, "icons/image_32x32.png")
+        return HttpResponseRedirect(newurl)
+    if static_server != None:
+        try:
+            # we don't care about the options because they're in file_name
+            # so we just pass the required size option
+            name = thefile.file.get_thumbnail_name(thumbnail_options = { 'size': (1,1)})
+            media_path = posixpath.join(posixpath.dirname(name), file_name)
+            full_path = posixpath.join(django_settings.MEDIA_ROOT, media_path)
+            url = posixpath.join(django_settings.MEDIA_URL, media_path)
+            #print "url", url
+            #print "media_path", media_path
+            #print "full_path", full_path
+            size = os.path.getsize(full_path) # XXX: Should convert full_path from posix to os.path format
+            return static_server.serve(request, url, media_path, full_path, size)
+        except Exception as e:
+            print " *** ", e
+            raise Http404('File not found')
+    return HttpResponseServerError('Misconfigured. Can not serve protected files.')
+
+def direct_file_access(request, path):
+    if static_server != None:
+        return static_server.direct_access(request, path)
+    return HttpResponseServerError('Misconfigured. Can not serve protected files.')

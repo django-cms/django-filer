@@ -138,16 +138,24 @@ class File(models.Model, mixins.IconsMixin):
         return r
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
+
     @property
     def url(self):
         '''
-        to make the model behave like a file field
+        1. to make the model behave like a file field
+        2. protect private files if the static_server is configured
         '''
         try:
-            r = self.file.url
+            if self.is_public or filer_settings.static_server == None:
+                r = self.file.url
+            else:
+                urlbase = filer_settings.FILER_PRIVATEMEDIA_URL
+                fname = os.path.basename(self.file.name)
+                r = os.path.normpath(os.path.join(urlbase, "file", ("%04d" % self.id), fname))
         except:
             r = ''
         return r
+
     @property
     def path(self):
         try:

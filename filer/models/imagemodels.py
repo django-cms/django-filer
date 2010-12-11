@@ -129,6 +129,9 @@ class Image(File):
                     'upscale':True,
                     }
                 thumb = self.file.get_thumbnail(thumbnail_options)
+                if not self.is_public:
+                    from filer.templatetags.filer_image_tags import WrapPrivateThumbnailFile
+                    thumb = WrapPrivateThumbnailFile(thumb, self.id)
                 _icons[size] = thumb.url
             except Exception, e:
                 # swallow the the exception to avoid to bubble it up
@@ -141,7 +144,11 @@ class Image(File):
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
-                _thumbnails[name] = self.file.get_thumbnail(opts).url
+                thumb = self.file.get_thumbnail(opts)
+                if not self.is_public:
+                    from filer.templatetags.filer_image_tags import WrapPrivateThumbnailFile
+                    thumb = WrapPrivateThumbnailFile(thumb, self.id)
+                _thumbnails[name] = thumb.url
             except:
                 # swallow the the exception to avoid to bubble it up
                 # in the template {{ image.icons.48 }}

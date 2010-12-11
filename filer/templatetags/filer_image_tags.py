@@ -2,6 +2,13 @@ from django.template import Library
 import math
 import re
 
+import posixpath
+from easy_thumbnails.templatetags.thumbnail import thumbnail, ThumbnailNode
+from easy_thumbnails.files import ThumbnailFile
+from filer import settings as filer_settings
+from filer.utils.wrapper import ObjectWrapper
+from django.utils import html
+
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')
 
 register = Library()
@@ -90,3 +97,57 @@ def divide_xy_by(original_size, divisor):
     size = divide_y_by(size, divisor=divisor)
     return size
 divide_xy_by = register.filter(divide_xy_by)
+
+
+class WrapPrivateThumbnailFile(ObjectWrapper):
+    def __init__(self, oInstance, filerFileId):
+        ObjectWrapper.__init__(self, oInstance)
+        thumbfile = posixpath.basename(oInstance.url)
+        urlbase = filer_settings.FILER_PRIVATEMEDIA_URL
+        self.newUrl = posixpath.normpath(posixpath.join(urlbase, "thumb", ("%04d" % filerFileId), thumbfile))
+
+    @property
+    def url(self):
+        return self.newUrl
+
+class WrapThumbnailNode(ObjectWrapper):
+    def __init__(self, oInstance):
+        ObjectWrapper.__init__(self, oInstance)
+
+    def render(self, context):
+        print "WrapThumbnailNode.render"
+        # use a fake variable to always get a Thumbnail object in context
+        fakevar = False
+        if self.context_name == None:
+            self.context_name = '__tmp__context__var__'
+            fakevar = True
+        thumb_url = ThumbnailNode.render(self, context)
+        thumbnailer = context[self.context_name]
+        if fakevar:
+            if thumbnailer != '': # Assume thumbnailer is a File
+                thumb_url = html.escape(thumbnailer.url)
+            context[self.context_name] = ''
+            self.context_name = None
+
+        if thumbnailer == '': return thumb_url
+        try:
+            source = self.source_var.resolve(context)
+        except VariableDoesNotExist:
+            return thumb_url
+
+        if not hasattr(source, "is_public"): return thumb_url
+        if source.is_public: return thumb_url
+
+        wfile = WrapPrivateThumbnailFile(thumbnailer, source.id)
+        if fakevar:
+            thumb_url = html.escape(wfile.url)
+        else:
+            context[self.context_name] = wfile
+
+        return thumb_url
+
+def filerthumbnail(parser, token):
+    node = thumbnail(parser, token)
+    return WrapThumbnailNode(node)
+
+register.tag(filerthumbnail)

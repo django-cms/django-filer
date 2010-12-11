@@ -21,3 +21,22 @@ FILER_PRIVATEMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FIL
 FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64', 
 )
+
+FILER_SERVE_PRIVATE = getattr(settings, 'FILER_SERVE_PRIVATE', "filer.server.UnprotectedServer")
+
+static_server = None
+if static_server == None:
+    klass = FILER_SERVE_PRIVATE
+    if klass == None: print "NO STATIC SERVER CONFIGURED"
+    else:
+        if type(klass) == type(""):
+            try:
+                module = klass.split('.')
+                if len(module) > 1: module = module[:-1]
+                module = '.'.join(module)
+                exec "import %s" % module
+                exec "static_server = %s()" % klass
+            except:
+                print "Failed to create an instance of '%s'" % klass
+                pass
+        else: static_server = klass
