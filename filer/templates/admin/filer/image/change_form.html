@@ -2,7 +2,6 @@
 {% load i18n admin_modify adminmedia %}
 
 
-{% block coltype %}colMS{% endblock %}
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
@@ -13,16 +12,13 @@
 {% endif %}{% endif %}
 {% endblock %}
 
-{% block sidebar %}
-<div id="content-related">
-    <div id="navcontainer">
-        <div id="image_container">
-            <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
-            <div id="paper">&nbsp;</div>
-        </div>
-        <h4>{% trans "Set focal point" %}</h4>
-
-        <a href="{{ original.url }}">{% trans "Full size preview" %}</a>
+{% block file_sidebar %}
+<div id="navcontainer">
+    <div id="image_container">
+        <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
+        <div id="paper">&nbsp;</div>
     </div>
+    <a href="{{ original.url }}">{% trans "Full size preview" %}</a>
 </div>
+{{ block.super }}
 {% endblock %}

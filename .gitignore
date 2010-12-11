@@ -14,3 +14,4 @@ build
 .pydevproject
 .settings
 *~
+docs/_build
