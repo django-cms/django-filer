@@ -9,7 +9,8 @@ from models import tools
 
 from django import forms
 from django.conf import settings as django_settings
-from settings import static_server, FILER_STATICMEDIA_PREFIX
+from settings import FILER_STATICMEDIA_PREFIX
+from settings import static_server
 import os, posixpath
 
 
@@ -150,12 +151,11 @@ def serve_protected_file(request, file_id):
         raise Http404('File not found')
     if not thefile.has_read_permission(request):
         raise PermissionDenied
-    if static_server != None:
-        #print "thefile.url", thefile.url
-        #print "thefile.file.url", thefile.file.url
-        direct_url = thefile.file.url
-        return static_server.serve(request, direct_url, thefile.file.name, thefile.file.path, thefile.file.size)
-    return HttpResponseServerError('Misconfigured. Can not serve protected files.')
+    if static_server == None:
+        raise Http404('File not found')
+
+    direct_url = thefile.file.url
+    return static_server.serve(request, direct_url, thefile.file.name, thefile.file.path, thefile.file.size)
 
 def serve_protected_thumbnail(request, file_id, file_name):
     """
@@ -180,22 +180,23 @@ def serve_protected_thumbnail_auth(request, file_id, file_name):
     if not thefile.has_read_permission(request):
         newurl = posixpath.join(FILER_STATICMEDIA_PREFIX, "icons/image_32x32.png")
         return HttpResponseRedirect(newurl)
-    if static_server != None:
-        try:
-            # we don't care about the options because they're in file_name
-            # so we just pass the required size option
-            name = thefile.file.get_thumbnail_name(thumbnail_options = { 'size': (1,1)})
-            media_path = posixpath.join(posixpath.dirname(name), file_name)
-            full_path = posixpath.join(django_settings.MEDIA_ROOT, media_path)
-            direct_url = posixpath.join(django_settings.MEDIA_URL, media_path)
-            size = os.path.getsize(full_path) # XXX: Should convert full_path from posix to os.path format
-            return static_server.serve(request, direct_url, media_path, full_path, size)
-        except Exception as e:
-            print " *** ", e
-            raise Http404('File not found')
-    return HttpResponseServerError('Misconfigured. Can not serve protected files.')
+    if static_server == None:
+        raise Http404('File not found')
+    try:
+        # we don't care about the options because they're in file_name
+        # so we just pass the required size option
+        name = thefile.file.get_thumbnail_name(thumbnail_options = { 'size': (1,1)})
+        media_path = posixpath.join(posixpath.dirname(name), file_name)
+        full_path = posixpath.join(django_settings.MEDIA_ROOT, media_path)
+        direct_url = posixpath.join(django_settings.MEDIA_URL, media_path)
+        size = os.path.getsize(full_path) # XXX: Should convert full_path from posix to os.path format
+        return static_server.serve(request, direct_url, media_path, full_path, size)
+    except Exception as e:
+        print " *** ", e
+        raise Http404('File not found')
 
 def direct_file_access(request, path):
-    if static_server != None:
-        return static_server.direct_access(request, path)
-    return HttpResponseServerError('Misconfigured. Can not serve protected files.')
+    if static_server == None:
+        raise Http404('File not found')
+    return static_server.direct_access(request, path)
+

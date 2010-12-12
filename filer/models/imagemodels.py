@@ -8,6 +8,7 @@ from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file
 from filer import settings as filer_settings
 from django.conf import settings
+from filer.settings import static_server
 
 
 
@@ -129,7 +130,7 @@ class Image(File):
                     'upscale':True,
                     }
                 thumb = self.file.get_thumbnail(thumbnail_options)
-                if not self.is_public:
+                if not self.is_public and static_server != None:
                     from filer.templatetags.filer_image_tags import WrapPrivateThumbnailFile
                     thumb = WrapPrivateThumbnailFile(thumb, self.id)
                 _icons[size] = thumb.url
@@ -145,7 +146,7 @@ class Image(File):
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
                 thumb = self.file.get_thumbnail(opts)
-                if not self.is_public:
+                if not self.is_public and static_server != None:
                     from filer.templatetags.filer_image_tags import WrapPrivateThumbnailFile
                     thumb = WrapPrivateThumbnailFile(thumb, self.id)
                 _thumbnails[name] = thumb.url

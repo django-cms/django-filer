@@ -10,6 +10,7 @@ from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
 from filer import settings as filer_settings
+from filer.settings import static_server
 
 from easy_thumbnails.fields import ThumbnailerField
 
@@ -171,7 +172,7 @@ class File(models.Model, mixins.IconsMixin):
         2. protect private files if the static_server is configured
         '''
         try:
-            if self.is_public or filer_settings.static_server == None:
+            if self.is_public or static_server == None:
                 r = self.file.url
             else:
                 urlbase = filer_settings.FILER_PRIVATEMEDIA_URL

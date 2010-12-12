@@ -8,6 +8,7 @@ from easy_thumbnails.files import ThumbnailFile
 from filer import settings as filer_settings
 from filer.utils.wrapper import ObjectWrapper
 from django.utils import html
+from filer.settings import static_server
 
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')
 
@@ -148,6 +149,7 @@ class WrapThumbnailNode(ObjectWrapper):
 
 def filerthumbnail(parser, token):
     node = thumbnail(parser, token)
+    if static_server == None: return node
     return WrapThumbnailNode(node)
 
 register.tag(filerthumbnail)
