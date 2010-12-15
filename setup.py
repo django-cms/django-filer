@@ -31,12 +31,12 @@ setup(
     packages=find_packages(),
     install_requires = install_requires,
     package_data={
-        '': ['*.txt', '*.rst',],
+        '': ['*.txt', '*.rst'],
+        'filer': media_files
     },
     package_dir = {
         'filer':'filer',
     },
-    data_files = media_files,
     zip_safe=False,
     classifiers = [
         'Development Status :: 4 - Beta',
