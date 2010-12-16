@@ -15,8 +15,9 @@ class FileAdminChangeFrom(forms.ModelForm):
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('label',)
     list_per_page = 10
-    search_fields = ['name', 'original_filename',]
-    raw_id_fields = ('owner',) #'contact', 
+    search_fields = ['name', 'original_filename','sha1',]
+    raw_id_fields = ('owner',)
+    readonly_fields = ('sha1',)
     
     # save_as hack, because without save_as it is impossible to hide the 
     # save_and_add_another if save_as is False.
@@ -33,7 +34,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             'fields': ('is_public',)
         }),
         (_('Advanced'), {
-            'fields': ('file',),
+            'fields': ('file','sha1',),
             'classes': ('collapse',),
         }),
     )

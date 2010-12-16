@@ -1,4 +1,5 @@
 import os
+import hashlib
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
@@ -12,7 +13,17 @@ from filer import settings as filer_settings
 
 from easy_thumbnails.fields import ThumbnailerField
 
-    
+class FileManager(models.Manager):
+    def find_all_duplicates(self):
+        r = {}
+        for file in self.all():
+            if file.sha1:
+                q = self.filter(sha1=file.sha1)
+                if len(q) > 1:
+                    r[file.sha1] = [i.subtype() for i in q]
+        return r
+    def find_duplicates(self, file):
+        return [i.subtype() for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
@@ -20,6 +31,8 @@ class File(models.Model, mixins.IconsMixin):
     file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
+    
+    sha1 = models.CharField(max_length=40, blank=True, default='')
     
     has_all_mandatory_data = models.BooleanField(default=False, editable=False)
     
@@ -33,7 +46,9 @@ class File(models.Model, mixins.IconsMixin):
     modified_at = models.DateTimeField(auto_now=True)
     
     is_public = models.BooleanField(default=False)
-
+    
+    objects = FileManager()
+    
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
@@ -57,7 +72,13 @@ class File(models.Model, mixins.IconsMixin):
         new_name = self.file.storage.save(dst, self.file)
         self.file.delete(save=False)
         self.file = new_name
-        
+    
+    def generate_sha1(self):
+        sha = hashlib.sha1()
+        self.file.seek(0)
+        sha.update(self.file.read())
+        self.sha1 = sha.hexdigest()
+    
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
         # _file_type_plugin_name
@@ -82,6 +103,10 @@ class File(models.Model, mixins.IconsMixin):
                 self._move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
                                filer_settings.FILER_PRIVATEMEDIA_PREFIX)
             self._old_is_public = self.is_public
+        try:
+            self.generate_sha1()
+        except Exception,e:
+            print e, type(3)
         super(File, self).save(*args, **kwargs)
 
     @property
@@ -179,8 +204,11 @@ class File(models.Model, mixins.IconsMixin):
         if self.folder:
             folder_path.extend(self.folder.get_ancestors())
         folder_path.append(self.logical_folder)
-        return folder_path     
-        
+        return folder_path
+    @property
+    def duplicates(self):
+        return File.objects.find_duplicates(self)
+    
     class Meta:
         app_label = 'filer'
         verbose_name = _('File')

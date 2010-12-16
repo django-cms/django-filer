@@ -3,11 +3,6 @@ import os
 
 version = __import__('filer').__version__
 
-media_files = []
-for dir in ['filer/media','filer/templates']:
-    for dirpath, dirnames, filenames in os.walk(dir):
-        media_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames]])
-
 def read(fname):
     # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -30,13 +25,7 @@ setup(
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),
     install_requires = install_requires,
-    package_data={
-        '': ['*.txt', '*.rst',],
-    },
-    package_dir = {
-        'filer':'filer',
-    },
-    data_files = media_files,
+    include_package_data=True,
     zip_safe=False,
     classifiers = [
         'Development Status :: 4 - Beta',
