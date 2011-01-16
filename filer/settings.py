@@ -35,12 +35,13 @@ if static_server == None:
                module = '.'.join(module)
                exec "import %s" % module
                exec "static_server = %s()" % klass
-               print static_server
+               #print static_server
            except:
-               print "Failed to create an instance of '%s'" % klass
+               #print "Failed to create an instance of '%s'" % klass
                static_server = None
                pass
        else: static_server = klass
 
    if static_server == None:
-      print "FILER: NO STATIC SERVER FOR PRIVATE FILES CONFIGURED. FILES ARE NOT PROTECTED."
+      #print "FILER: NO STATIC SERVER FOR PRIVATE FILES CONFIGURED. FILES ARE NOT PROTECTED."
+      pass
