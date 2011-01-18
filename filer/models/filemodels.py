@@ -11,7 +11,7 @@ from filer.models.foldermodels import Folder
 from filer.models import mixins
 from filer import settings as filer_settings
 
-from easy_thumbnails.fields import ThumbnailerField
+from filer.fields.multistorage_file import MultiStorageFileField
 
 class FileManager(models.Manager):
     def find_all_duplicates(self):
@@ -28,7 +28,7 @@ class FileManager(models.Manager):
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    file = MultiStorageFileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     

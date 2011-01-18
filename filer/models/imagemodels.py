@@ -156,8 +156,8 @@ class Image(File):
         'return the image url relative to MEDIA_URL'
         try:
             rel_url = u"%s" % self.file.url
-            if rel_url.startswith(settings.MEDIA_URL):
-                before, match, rel_url = rel_url.partition(settings.MEDIA_URL)
+            if rel_url.startswith(self.file.storage.base_url):
+                before, match, rel_url = rel_url.partition(self.file.storage.base_url)
             return rel_url
         except Exception, e:
             return ''
@@ -166,6 +166,9 @@ class Image(File):
     @property
     def easy_thumbnails_relative_name(self):
         return self.rel_image_url
+    @property
+    def easy_thumbnails_source(self):
+        return self.file.storage
 
     class Meta:
         app_label = 'filer'
