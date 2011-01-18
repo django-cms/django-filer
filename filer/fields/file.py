@@ -1,14 +1,15 @@
-import os
-from django.utils.translation import ugettext as _
-from django.utils.text import truncate_words
-from django.db import models
 from django import forms
+from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
+from django.db import models
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.text import truncate_words
+from django.utils.translation import ugettext as _
+from filer.models import File, File
 from filer.settings import FILER_STATICMEDIA_PREFIX
-from django.conf import settings as globalsettings
-from filer.models import File
+import os
 
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
@@ -17,9 +18,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
-        required = self.attrs
-        if attrs is None:
-            attrs = {}
+        super_attrs = attrs.copy()
         related_url = None
         if value:
             try:
@@ -31,50 +30,26 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             related_url = reverse('admin:filer-directory_listing-root')
         params = self.url_parameters()
         if params:
-            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+            lookup_url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
         else:
-            url = ''
-        if not attrs.has_key('class'):
-            attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
-        output = []
-        if obj:
-            try:
-                output.append(u'<img id="%s" src="%s" alt="%s" /> ' % (css_id_thumbnail_img, obj.icons['32'], obj.label) )
-                output.append(u'&nbsp;<span id="%s">%s</span>' % (css_id_description_txt, obj) )
-            except Exception, e:# KeyError: # KeyError does not seem to catch the error if obj.icons['32'] is missing
-                #print u"error rendering Filer widget. Probably missing file: %s (%s)" % (e, type(e))
-                output.append(u'<img id="%s" src="%s" class="quiet" alt="file is missing">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
-                output.append(u'&nbsp;<span id="%s">%s</span>' % (css_id_description_txt, _('file missing!')) )
-        else:
-            output.append(u'<img id="%s" src="%s" class="quiet" alt="no file selected">' % (css_id_thumbnail_img,os.path.normpath(u"%s/icons/nofile_32x32.png" % FILER_STATICMEDIA_PREFIX) ) )
-            output.append(u'&nbsp;<span id="%s">%s</span>' % (css_id_description_txt, '') )
-        # TODO: "id_" is hard-coded here. This should instead use the correct
-        # API to determine the ID dynamically.
-        output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
-            (related_url, url, name, _('Lookup')))
-        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (globalsettings.ADMIN_MEDIA_PREFIX, _('Lookup')))
-        clearid = '%s_clear' % css_id
-        output.append('<img id="%s" src="%simg/admin/icon_deletelink.gif" width="10" height="10" alt="%s" title="%s"/>' % (clearid, globalsettings.ADMIN_MEDIA_PREFIX, _('Clear'),  _('Clear')))
-        output.append('<br />')
-        super_attrs = attrs.copy()
-        output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
-        noimgurl = '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX
-        js = '''<script type="text/javascript">django.jQuery("#%(id)s").hide();
-django.jQuery("#%(id)s_clear").click(function(){
-    django.jQuery("#%(id)s").removeAttr("value");
-    django.jQuery("#%(imgid)s").attr("src", "%(noimg)s");
-    django.jQuery("#%(descid)s").html("");
-});
-django.jQuery(document).ready(function(){
-    var plus = django.jQuery("#add_%(id)s");
-    if (plus.length){
-        plus.remove();
-    }
-});
-</script>'''
-        output.append(js % {'id': css_id, 'imgid': css_id_thumbnail_img,
-                            'noimg': noimgurl, 'descid': css_id_description_txt})
-        return mark_safe(u''.join(output))
+            lookup_url = ''
+        missingfile = os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX)
+        nofile = os.path.normpath(u"%s/icons/nofile_32x32.png" % FILER_STATICMEDIA_PREFIX)
+        context = {
+            'super': super(AdminFileWidget, self).render(name, value, super_attrs),
+            'lookup_url': '%s%s' % (related_url, lookup_url),
+            'thumb_id': css_id_thumbnail_img,
+            'span_id': css_id_description_txt,
+            'object': obj,
+            'missingfile': missingfile,
+            'nofile': nofile,
+            'lookup_name': name,
+            'admin_media_prefix': globalsettings.ADMIN_MEDIA_PREFIX,
+            'clear_id': '%s_clear' % css_id,
+            'id': css_id,
+        }
+        html = render_to_string('admin/filer/widgets/admin_file.html', context)
+        return mark_safe(html)
     
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
@@ -107,7 +82,6 @@ class AdminFileFormField(forms.ModelChoiceField):
         return {}
 
 
-from filer.models import File
 class FilerFileField(models.ForeignKey):
     default_form_class = AdminFileFormField
     default_model_class = File
