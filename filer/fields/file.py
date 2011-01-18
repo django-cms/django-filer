@@ -33,18 +33,18 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             lookup_url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
         else:
             lookup_url = ''
-        missingfile = os.path.normpath(u"%s/icons/missingfile_32x32.png" % FILER_STATICMEDIA_PREFIX)
-        nofile = os.path.normpath(u"%s/icons/nofile_32x32.png" % FILER_STATICMEDIA_PREFIX)
+        filer_static_prefix = FILER_STATICMEDIA_PREFIX
+        if not filer_static_prefix[-1] == '/':
+            filer_static_prefix += '/'
         context = {
             'super': super(AdminFileWidget, self).render(name, value, super_attrs),
             'lookup_url': '%s%s' % (related_url, lookup_url),
             'thumb_id': css_id_thumbnail_img,
             'span_id': css_id_description_txt,
             'object': obj,
-            'missingfile': missingfile,
-            'nofile': nofile,
             'lookup_name': name,
             'admin_media_prefix': globalsettings.ADMIN_MEDIA_PREFIX,
+            'filer_static_prefix': filer_static_prefix,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
         }

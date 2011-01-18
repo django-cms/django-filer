@@ -1,14 +1,14 @@
 {% load i18n %}
 {% if object %}
 	{% if object.icons.32 %}
-		<img id="{{ thumb_id }}" src="{{ object.icons.32 }}" alt="{{ object.label }}" />
+		<img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}" />
 		&nbsp;<span id="{{ span_id }}">{{ object }}</span>
 	{% else %}
-	    <img id="{{ thumb_id }}" src="{{ missingfile }}" alt="{% trans 'file missing' %}" />
+	    <img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
 	    &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
 	{% endif %}
 {% else %}
-    <img id="{{ thumb_id }}" src="{{ nofile }}" class="quiet" alt="{% trans 'no file selected' %}" />
+    <img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
     &nbsp;<span id="{{ span_id }}"></span>
 {% endif %}
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
