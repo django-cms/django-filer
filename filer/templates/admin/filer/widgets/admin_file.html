@@ -16,12 +16,12 @@
 </a>
 <img id="{{ clear_id }}" src="{{ admin_media_prefix }}img/admin/icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" />
 <br />
-{{ super }}
+{{ hidden_input }}
 <script type="text/javascript">
 	django.jQuery("#{{ id }}").hide();
 	django.jQuery("#{{ clear_id }}").click(function(){
 	    django.jQuery("#{{ id }}").removeAttr("value");
-	    django.jQuery("#{{ thumb_id }}").attr("src", "{{ nofile }}");
+	    django.jQuery("#{{ thumb_id }}").attr("src", "{{ filer_static_prefix }}icons/nofile_48x48.png");
 	    django.jQuery("#{{ span_id }}").html("");
 	});
 	django.jQuery(document).ready(function(){

@@ -33,11 +33,17 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             lookup_url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
         else:
             lookup_url = ''
+        if not attrs.has_key('class'):
+            attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
+        # rendering the super for ForeignKeyRawIdWidget on purpose here beacuase
+        # we only need the input and none of the other stuff that
+        # ForeignKeyRawIdWidget adds
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)
         filer_static_prefix = FILER_STATICMEDIA_PREFIX
         if not filer_static_prefix[-1] == '/':
             filer_static_prefix += '/'
         context = {
-            'super': super(AdminFileWidget, self).render(name, value, super_attrs),
+            'hidden_input': hidden_input,
             'lookup_url': '%s%s' % (related_url, lookup_url),
             'thumb_id': css_id_thumbnail_img,
             'span_id': css_id_description_txt,
