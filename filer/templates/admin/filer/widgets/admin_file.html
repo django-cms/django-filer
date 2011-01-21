@@ -2,7 +2,7 @@
 {% if object %}
 	{% if object.icons.32 %}
 		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}" /></a>
-		&nbsp;<span id="{{ span_id }}">{{ object }}</span>
+		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
 	{% else %}
 		<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
 		&nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
