@@ -61,17 +61,14 @@ class File(models.Model, mixins.IconsMixin):
             os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
             thumb.delete()
             
-    def _move_file(self, src_filer_prefix, dst_filer_prefix):
+    def _move_file(self, src_storage, dst_storage):
         """
-        Move the file from src to dst. If `os.dirname(dst)` does not exist it
-        creates all the required directory.
+        Move the file from src to dst. 
         """
-        src = self.file.name
-        dst = src.replace(src_filer_prefix,
-                           dst_filer_prefix)
-        new_name = self.file.storage.save(dst, self.file)
-        self.file.delete(save=False)
-        self.file = new_name
+        file_name = self.file.name
+        self.file = dst_storage.save(self.file.name,
+                                     src_storage.open(file_name))
+        src_storage.delete(file_name)
     
     def generate_sha1(self):
         sha = hashlib.sha1()
@@ -97,11 +94,11 @@ class File(models.Model, mixins.IconsMixin):
         if self._old_is_public != self.is_public and \
                                   self.pk:
             if self.is_public:
-                self._move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
-                               filer_settings.FILER_PUBLICMEDIA_PREFIX)
+                self._move_file(self.file.storages['private'],
+                                self.file.storages['public'])
             else:
-                self._move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
-                               filer_settings.FILER_PRIVATEMEDIA_PREFIX)
+                self._move_file(self.file.storages['public'],
+                                self.file.storages['private'])
             self._old_is_public = self.is_public
         try:
             self.generate_sha1()
