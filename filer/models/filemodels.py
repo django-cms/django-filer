@@ -5,6 +5,8 @@ from django.core import urlresolvers
 from django.db import models
 from django.contrib.auth import models as auth_models
 
+from easy_thumbnails.models import Thumbnail
+
 from django.conf import settings
 from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
@@ -65,12 +67,16 @@ class File(models.Model, mixins.IconsMixin):
         """
         Move the file from src to dst. 
         """
-        #TODO: We need to delete the thumbnail that has been generated in the
-        # previous storage.
         file_name = self.file.name
-        self.file = dst_storage.save(self.file.name,
+        self.file = dst_storage.save(self.original_filename,
                                      src_storage.open(file_name))
         src_storage.delete(file_name)
+        self._delete_thumbnails(file_name)
+        
+    def _delete_thumbnails(self, file_name):
+        for thumb in Thumbnail.objects.filter(source__name=file_name):
+            thumb.delete()
+
     
     def generate_sha1(self):
         sha = hashlib.sha1()
