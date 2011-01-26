@@ -12,12 +12,16 @@ FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', setting
 FILER_PUBLICMEDIA_PREFIX = getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public/')
 FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL,FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
 FILER_PUBLICMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PUBLICMEDIA_PREFIX ) )
-FILER_PUBLICMEDIA_STORAGE = 'filer.storage.PublicFileSystemStorage'
+FILER_PUBLICMEDIA_STORAGE = getattr(settings,
+                                    'FILER_PUBLICMEDIA_STORAGE',
+                                    'filer.storage.PublicFileSystemStorage')
 
 FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private/')
 FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
 FILER_PRIVATEMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) )
-FILER_PRIVATEMEDIA_STORAGE = 'filer.storage.PrivateFileSystemStorage'
+FILER_PRIVATEMEDIA_STORAGE =getattr(settings,
+                                    'FILER_PRIVATEMEDIA_STORAGE',
+                                    'filer.storage.PrivateFileSystemStorage')
 
 if not FILER_PUBLICMEDIA_PREFIX.endswith('/'):
     raise ImproperlyConfigured('FILER_PUBLICMEDIA_PREFIX (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_PREFIX)
