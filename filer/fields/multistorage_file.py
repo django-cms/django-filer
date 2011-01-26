@@ -1,6 +1,6 @@
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
-from django.core.files.storage import get_storage_class, default_storage
+from django.core.files.storage import get_storage_class, default_storage, Storage
 from django.core.files.base import File
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.db.models.fields.files import FileField, ImageField
@@ -52,7 +52,10 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):#FileField)
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(verbose_name=verbose_name, name=name, upload_to=upload_to, storage=None, **kwargs)
         #super(MultiStorageFileField, self).__init__(verbose_name=verbose_name, name=name, upload_to=upload_to, storage=None, **kwargs)
         for key, value in self.storages.items():
-            self.storages[key] = get_storage_class(value)()
+            if issubclass(value.__class__, Storage):
+                self.storages[key] = value
+            else:
+                self.storages[key] = get_storage_class(value)()
     
     def get_directory_name(self):
         return super(MultiStorageFileField, self).get_directory_name()

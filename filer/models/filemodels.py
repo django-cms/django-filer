@@ -65,6 +65,8 @@ class File(models.Model, mixins.IconsMixin):
         """
         Move the file from src to dst. 
         """
+        #TODO: We need to delete the thumbnail that has been generated in the
+        # previous storage.
         file_name = self.file.name
         self.file = dst_storage.save(self.file.name,
                                      src_storage.open(file_name))
