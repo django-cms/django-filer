@@ -56,7 +56,7 @@ class File(models.Model, mixins.IconsMixin):
         Move the file from src to dst. 
         """
         src_file_name = self.file.name
-        dst_file_name = self._meta.get_field('file').generate_filename(self, self.file.name)
+        dst_file_name = self._meta.get_field('file').generate_filename(self, self.original_filename)
         
         if self.is_public:
             src_storage = self.file.storages['private']
