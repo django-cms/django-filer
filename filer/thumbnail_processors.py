@@ -15,7 +15,6 @@ from filer.settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG
 RE_SUBJECT_LOCATION = re.compile(r'(\d+),(\d+)$')
 
 def normalize_subject_location(subject_location):
-    print "normalize_subject_location", subject_location
     if subject_location:
         if isinstance(subject_location, basestring):
             m = RE_SUBJECT_LOCATION.match(subject_location)
@@ -41,10 +40,8 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False, crop=
     parameters will be ignored.
     """
     subject_location = normalize_subject_location(subject_location)
-    print "normalized subject_location", subject_location
     if not (subject_location and crop):
         # use the normal scale_and_crop
-        print "using default CROP"
         return processors.scale_and_crop(im, size, crop=crop, upscale=upscale, **kwargs)
     
     # for here on we have a subject_location and cropping is on
