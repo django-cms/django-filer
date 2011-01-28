@@ -5,13 +5,9 @@ from django.core import urlresolvers
 from django.db import models
 from django.contrib.auth import models as auth_models
 
-from easy_thumbnails.models import Thumbnail
-
 from django.conf import settings
-from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
-from filer import settings as filer_settings
 
 from filer.fields.multistorage_file import MultiStorageFileField
 
@@ -30,7 +26,7 @@ class FileManager(models.Manager):
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file = MultiStorageFileField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    file = MultiStorageFileField(null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -55,28 +51,31 @@ class File(models.Model, mixins.IconsMixin):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         
-    def delete_thumbnails(self):
-        """
-        Delete all the thumbnails related to `instance.file`
-        """
-        for thumb in self.file.get_source_cache().thumbnails.all():
-            os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
-            thumb.delete()
-            
-    def _move_file(self, src_storage, dst_storage):
+    def _move_file(self):
         """
         Move the file from src to dst. 
         """
-        file_name = self.file.name
-        self.file = dst_storage.save(self.original_filename,
-                                     src_storage.open(file_name))
-        src_storage.delete(file_name)
-        self._delete_thumbnails(file_name)
+        src_file_name = self.file.name
+        dst_file_name = self._meta.get_field('file').generate_filename(self, self.file.name)
         
-    def _delete_thumbnails(self, file_name):
-        for thumb in Thumbnail.objects.filter(source__name=file_name):
-            thumb.delete()
+        if self.is_public:
+            src_storage = self.file.storages['private']
+            dst_storage = self.file.storages['public']
+        else:
+            src_storage = self.file.storages['public']
+            dst_storage = self.file.storages['private']
 
+        # delete the thumbnail
+        # We are toggling the is_public to make sure that easy_thumbnails can
+        # delete the thumbnails
+        self.is_public = not self.is_public
+        self.file.delete_thumbnails()
+        self.is_public = not self.is_public
+        
+        self.file = dst_storage.save(dst_file_name,
+                                     src_storage.open(src_file_name))
+        src_storage.delete(src_file_name)
+        
     
     def generate_sha1(self):
         sha = hashlib.sha1()
@@ -99,18 +98,12 @@ class File(models.Model, mixins.IconsMixin):
             self._file_size = self.file.size
         except:
             pass
-        if self._old_is_public != self.is_public and \
-                                  self.pk:
-            if self.is_public:
-                self._move_file(self.file.storages['private'],
-                                self.file.storages['public'])
-            else:
-                self._move_file(self.file.storages['public'],
-                                self.file.storages['private'])
+        if self._old_is_public != self.is_public and self.pk:
+            self._move_file()
             self._old_is_public = self.is_public
         try:
             self.generate_sha1()
-        except Exception,e:
+        except Exception, e:
             print e, type(3)
         super(File, self).save(*args, **kwargs)
 

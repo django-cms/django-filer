@@ -1,7 +1,16 @@
+import datetime
 import os
 import urlparse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.encoding import force_unicode, smart_str
+
+
+def generate_filename(instance, filename):
+    datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
+    return os.path.join(datepart, filename)
+
+
 
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 
@@ -10,18 +19,22 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', False)
 FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', settings.MEDIA_URL + 'filer/' )
 
 FILER_PUBLICMEDIA_PREFIX = getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public/')
-FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL,FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
+FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL, FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
 FILER_PUBLICMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PUBLICMEDIA_PREFIX ) )
 FILER_PUBLICMEDIA_STORAGE = getattr(settings,
                                     'FILER_PUBLICMEDIA_STORAGE',
                                     'filer.storage.PublicFileSystemStorage')
 
+FILER_PUBLICMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', generate_filename)
+
+
 FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private/')
 FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
 FILER_PRIVATEMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) )
-FILER_PRIVATEMEDIA_STORAGE =getattr(settings,
+FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
                                     'FILER_PRIVATEMEDIA_STORAGE',
                                     'filer.storage.PrivateFileSystemStorage')
+FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO', generate_filename)
 
 if not FILER_PUBLICMEDIA_PREFIX.endswith('/'):
     raise ImproperlyConfigured('FILER_PUBLICMEDIA_PREFIX (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_PREFIX)

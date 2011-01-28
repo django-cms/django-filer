@@ -18,8 +18,3 @@ def get_valid_filename(s):
     else:
         return u"%s" % (filename,)
 
-def get_directory_name(instance, filename):
-    datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
-    return datepart
-    
- 

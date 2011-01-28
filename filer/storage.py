@@ -1,7 +1,5 @@
-import urlparse
 from django.core.files.storage import FileSystemStorage
 from filer import settings as filer_settings
-from django.conf import settings
 
 
 
