@@ -1,6 +1,12 @@
 Changelog for django-filer
 =============================
 
+next
+----
+
+* seperate, customizable file storage backends for public and private files
+
+
 0.8.2
 -----
 
