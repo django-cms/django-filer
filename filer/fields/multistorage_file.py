@@ -23,24 +23,11 @@ def generate_filename_multistorage(instance, filename):
 
 class MultiStorageFieldFile(easy_thumbnails_files.ThumbnailerFieldFile):
     def __init__(self, instance, field, name):
-        # from FieldFile.__init__
-        #super(FieldFile, self).__init__(None, name)
         File.__init__(self, None, name)
         self.instance = instance
         self.field = field
-        #self.storage = field.storage
         self._committed = True
-        
-        # our special stuff
         self.storages = self.field.storages
-        
-        # from ThumbnailerFieldFiel.__init__
-        #self.source_storage = self.field.storage
-#        thumbnail_storage = getattr(self.field, 'thumbnail_storage', None)
-#        if thumbnail_storage:
-#            self.thumbnail_storage = thumbnail_storage
-
-        # upload to should be a callable
     
  
     @property
@@ -57,23 +44,12 @@ class MultiStorageFieldFile(easy_thumbnails_files.ThumbnailerFieldFile):
         else:
             return self.storages['private']
             
-    #@property
-    #def upload_to(self):
-    #    if self.instance.is_public:
-    #        return self.upload_to_dict['public']
-    #    else:
-    #        return self.upload_to_dict['private']
-            
     @property
     def thumbnail_storage(self):
         if self.instance.is_public:
             return self.storages['public']
         else:
             return self.storages['private']
-            
-    
-    
-    
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
