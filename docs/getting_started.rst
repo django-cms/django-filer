@@ -10,7 +10,7 @@ Dependencies
 ------------
 
 * django-mptt >= 0.2.1'
-* easy-thumbnails >= 1.0-alpha-13
+* easy-thumbnails >= 1.0-alpha-16
 
 Configuration
 -------------
