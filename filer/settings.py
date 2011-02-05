@@ -53,22 +53,22 @@ FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "file
 
 static_server = None
 if static_server == None:
-   klass = FILER_PRIVATEMEDIA_SERVER
-   if klass != None:
-       if type(klass) == type(""):
-           try:
-               module = klass.split('.')
-               if len(module) > 1: module = module[:-1]
-               module = '.'.join(module)
-               exec "import %s" % module
-               exec "static_server = %s()" % klass
-               #print static_server
-           except:
-               #print "Failed to create an instance of '%s'" % klass
-               static_server = None
-               pass
-       else: static_server = klass
-
-   if static_server == None:
-      #print "FILER: NO STATIC SERVER FOR PRIVATE FILES CONFIGURED. FILES ARE NOT PROTECTED."
-      pass
+    klass = FILER_PRIVATEMEDIA_SERVER
+    if klass != None:
+        if type(klass) == type(""):
+            try:
+                module = klass.split('.')
+                if len(module) > 1: module = module[:-1]
+                module = '.'.join(module)
+                exec "import %s" % module
+                exec "static_server = %s()" % klass
+                #print static_server
+            except:
+                #print "Failed to create an instance of '%s'" % klass
+                static_server = None
+                pass
+        else: static_server = klass
+    
+    if static_server == None:
+        #print "FILER: NO STATIC SERVER FOR PRIVATE FILES CONFIGURED. FILES ARE NOT PROTECTED."
+        pass

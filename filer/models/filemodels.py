@@ -8,8 +8,6 @@ from django.contrib.auth import models as auth_models
 from django.conf import settings
 from filer.models.foldermodels import Folder
 from filer.models import mixins
-from filer import settings as filer_settings
-from filer.settings import static_server
 
 from filer.fields.multistorage_file import MultiStorageFileField
 
@@ -167,16 +165,10 @@ class File(models.Model, mixins.IconsMixin):
     @property
     def url(self):
         '''
-        1. to make the model behave like a file field
-        2. protect private files if the static_server is configured
+        to make the model behave like a file field
         '''
         try:
-            if self.is_public or static_server == None:
-                r = self.file.url
-            else:
-                urlbase = filer_settings.FILER_PRIVATEMEDIA_URL
-                fname = os.path.basename(self.file.name)
-                r = os.path.normpath(os.path.join(urlbase, "file", ("%04d" % self.id), fname))
+            r = self.file.url
         except:
             r = ''
         return r
