@@ -1,0 +1,14 @@
+{% extends "admin/filer/base_site.html" %}
+{% load i18n %}
+{% load adminmedia filermedia %}
+
+{% block title %}Do something{% endblock %}
+{% block content %}
+<a href="{{ next_page }}">Continue</a>
+
+<form enctype="multipart/form-data" action="{% url admin:filer-simple_upload %}" method="post">
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

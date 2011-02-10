@@ -13,6 +13,7 @@ from filer.models import tools
 from filer import settings as filer_settings
 from filer.admin.tools import popup_param
 from django.views.decorators.csrf import csrf_exempt
+from django.core import urlresolvers
 
 # forms... sucks, types should be automatic
 class UploadFileForm(forms.ModelForm):
@@ -56,6 +57,9 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/$',
                 self.ajax_upload,
                 name='filer-ajax_upload'),
+            url(r'^operations/myupload/$',
+                self.admin_site.admin_view(self.simple_upload),
+                name='filer-simple_upload'),
         )
         url_patterns.extend(urls)
         return url_patterns
@@ -121,6 +125,72 @@ class ClipboardAdmin(admin.ModelAdmin):
         return render_to_response('admin/filer/tools/clipboard/clipboard_item_rows.html',
                                   {'items': file_items },
                                   context_instance=RequestContext(request))
+
+    def handle_uploaded_file(self, request, afile):
+        #print type(afile), dir(afile)
+        original_filename = afile.name
+        files = generic_handle_file(afile, original_filename)
+        file_items = []
+        for ifile, iname in files:
+            try:
+                iext = os.path.splitext(iname)[1].lower()
+            except:
+                iext = ''
+            if iext in ['.jpg', '.jpeg', '.png', '.gif']:
+                uploadform = UploadImageFileForm({'original_filename':iname,
+                                                  'owner': request.user.pk},
+                                                {'file':ifile})
+            else:
+                uploadform = UploadFileForm({'original_filename':iname,
+                                             'owner': request.user.pk},
+                                            {'file':ifile})
+            if uploadform.is_valid():
+                try:
+                    file = uploadform.save(commit=False)
+                    # Enforce the FILER_IS_PUBLIC_DEFAULT
+                    file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+                    file.save()
+                    file_items.append(file)
+                    clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
+                    clipboard_item.save()
+                except Exception, e:
+                    #print e
+                    pass
+            else:
+                pass#print uploadform.errors
+
+        pass
+
+    def simple_upload(self, request, folder_id=None):
+        class TmpUploadFileForm(forms.Form):
+           #title = forms.CharField(max_length=50)
+           folder_id = forms.CharField(max_length=20, required=False)
+           file  = forms.FileField()
+
+        if not folder_id:
+            folder_id = request.REQUEST.get('folder_id', None)
+
+        next_page = urlresolvers.reverse("admin:filer-directory_listing-unfiled_images")
+
+        if request.method == 'POST':
+            form = TmpUploadFileForm(request.POST, request.FILES)
+            #print request.FILES['file']
+            if form.is_valid():
+                #print "Form is valid"
+                self.handle_uploaded_file(request, request.FILES['file'])
+                return HttpResponseRedirect(next_page)
+        else:
+            form = TmpUploadFileForm()
+            if folder_id == None: folder_id = ""
+            form.fields["folder_id"].initial = folder_id
+            form.fields["folder_id"].widget = forms.HiddenInput()
+
+        return render_to_response(
+            'admin/filer/tools/simple_upload.html',
+            {'form': form, 'next_page': next_page },
+            context_instance=RequestContext(request))
+
+
     def move_file_to_clipboard(self, request):
         #print "move file"
         if request.method == 'POST':
