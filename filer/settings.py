@@ -22,6 +22,8 @@ FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64', 
 )
 
+FILER_USE_SIMPLE_UPLOAD = getattr(settings, 'FILER_USE_SIMPLE_UPLOAD', False)
+
 FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.UnprotectedServer")
 
 static_server = None

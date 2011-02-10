@@ -7,10 +7,10 @@
 <script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
-{% comment %}
+{% if not simple_upload %}
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/swfupload.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/swfupload.queue.js"></script>
-{% endcomment %}
+{% endif %}
 
 <script type="text/javascript" src="{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
@@ -49,9 +49,12 @@
 <div id="content-main">
     <ul class="object-tools">
         {% if folder.can_have_subfolders %}<li><a id="id_new_folder" href="{% url admin:filer-directory_listing-make_root_folder %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a>{% endif %}</li>
-        <li><a id="id_my_upload" class="addlink" href="{% url admin:filer-simple_upload %}?parent_id={{ folder.id }}">My Upload</a></li>
-        {% comment %}
+        {% if simple_upload %}
+        <li><a id="id_simple_upload" class="addlink" href="{% url admin:filer-simple_upload %}?folder_id={{ folder.id }}">Upload</a></li>
+        {% else %}
         <li>{% include "admin/filer/tools/upload_button.html" %}</li>
+        {% endif %}
+        {% comment %}
         <li><a id="id_directory_root" href="{% url admin:filer-directory_listing-root %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" class="link" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}">{% trans "root"|title %}</a></li>
         <li><a id="id_missing_data_images" href="{% url admin:filer-directory_listing-images_with_missing_data %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" class="link" title="{% trans "Show images with missing metadata" noop %}">{% trans "Incomplete Images" noop %}</a></li>
         <li><a id="id_unfiled_images" href="{% url admin:filer-directory_listing-unfiled_images %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" class="link" title="{% trans "Show unfiled images" noop %}">{% trans "unfiled images"|title noop %}</a></li>

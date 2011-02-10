@@ -2,13 +2,13 @@
 {% load i18n %}
 {% load adminmedia filermedia %}
 
-{% block title %}Do something{% endblock %}
+{% block title %}Upload some files{% endblock %}
 {% block content %}
-<a href="{{ next_page }}">Continue</a>
+{# <a href="{{ next_page }}">Continue</a> #}
 
 <form enctype="multipart/form-data" action="{% url admin:filer-simple_upload %}" method="post">
 {{ form.as_p }}
-<input type="submit" value="Submit" />
+<input type="submit" value="{% trans "Start uploading" %}"/>
 </form>
 
 {% endblock %}

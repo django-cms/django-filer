@@ -11,7 +11,7 @@ from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
 from filer.admin.tools import popup_status, selectfolder_status, userperms_for_request
 from filer.models import tools
-from filer.settings import FILER_STATICMEDIA_PREFIX
+from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_USE_SIMPLE_UPLOAD
 
 
 # Forms
@@ -238,4 +238,5 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
                 'root_path': "/%s" % admin.site.root_path, # needed in the admin/base.html template for logout links and stuff 
+                'simple_upload': True if FILER_USE_SIMPLE_UPLOAD else False,
             }, context_instance=RequestContext(request))

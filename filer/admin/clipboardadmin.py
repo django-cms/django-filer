@@ -165,7 +165,11 @@ class ClipboardAdmin(admin.ModelAdmin):
         class TmpUploadFileForm(forms.Form):
            #title = forms.CharField(max_length=50)
            folder_id = forms.CharField(max_length=20, required=False)
-           file  = forms.FileField()
+           file_1  = forms.FileField(required=False)
+           file_2  = forms.FileField(required=False)
+           file_3  = forms.FileField(required=False)
+           file_4  = forms.FileField(required=False)
+           file_5  = forms.FileField(required=False)
 
         if not folder_id:
             folder_id = request.REQUEST.get('folder_id', None)
@@ -177,7 +181,9 @@ class ClipboardAdmin(admin.ModelAdmin):
             #print request.FILES['file']
             if form.is_valid():
                 #print "Form is valid"
-                self.handle_uploaded_file(request, request.FILES['file'])
+                for k,afile in request.FILES.items():
+                    if afile == None: continue
+                    self.handle_uploaded_file(request, afile)
                 return HttpResponseRedirect(next_page)
         else:
             form = TmpUploadFileForm()
