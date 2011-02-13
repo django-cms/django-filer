@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 
 from models import Folder, Image, Clipboard, File
 from models import tools
+from admin.tools import register_recent_folder
 
 from django import forms
 from django.conf import settings as django_settings
@@ -117,12 +118,7 @@ def paste_clipboard_to_folder(request):
 
             if FILER_USE_SIMPLE_UPLOAD:
                 folder_id = "%s" % folder.id
-                hist = request.session.get('filer_recent_uploads', '')
-                hist = [ fid for fid in hist.split(',') if hist != '' ]
-                if folder_id in hist: hist.remove(folder_id)
-                hist.insert(0, folder_id)
-                hist= ','.join(hist[:5])
-                request.session['filer_recent_uploads'] = hist
+                register_recent_folder(folder_id, request)
 
         else:
             raise PermissionDenied

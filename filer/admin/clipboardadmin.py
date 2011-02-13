@@ -11,7 +11,7 @@ from filer.models import Clipboard, ClipboardItem, File, Image
 from filer.utils.files import generic_handle_file
 from filer.models import tools
 from filer import settings as filer_settings
-from filer.admin.tools import popup_param
+from filer.admin.tools import popup_param, register_recent_folder
 from django.views.decorators.csrf import csrf_exempt
 from django.core import urlresolvers
 
@@ -174,14 +174,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             folder_id = request.REQUEST.get('folder_id', None)
 
         if folder_id:
-            # Keep the last 5 folders from which Upload was started so that
-            # we can easily return to them from "unfiled_images" folder
-            hist = request.session.get('filer_recent_uploads', '')
-            hist = [ fid for fid in hist.split(',') if hist != '' ]
-            if folder_id in hist: hist.remove(folder_id)
-            hist.insert(0, folder_id)
-            hist= ','.join(hist[:5])
-            request.session['filer_recent_uploads'] = hist
+            register_recent_folder(folder_id, request)
 
         if request.method == 'POST':
             form = TmpUploadFileForm(request.POST, request.FILES)
@@ -207,10 +200,16 @@ class ClipboardAdmin(admin.ModelAdmin):
             clipboard = tools.get_user_clipboard(request.user)
             if file_id:
                 file = File.objects.get(id=file_id)
+                try: folder_id = "%s" % file.folder.id
+                except: folder_id = None
                 if file.has_edit_permission(request):
                     tools.move_file_to_clipboard([file], clipboard)
                 else:
                     raise PermissionDenied
+
+                if filer_settings.FILER_USE_SIMPLE_UPLOAD and folder_id:
+                    register_recent_folder(folder_id, request)
+
         return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
     def get_model_perms(self, request):
         """
