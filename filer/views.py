@@ -9,7 +9,7 @@ from models import tools
 
 from django import forms
 from django.conf import settings as django_settings
-from settings import FILER_STATICMEDIA_PREFIX
+from settings import FILER_STATICMEDIA_PREFIX, FILER_USE_SIMPLE_UPLOAD
 from settings import static_server
 import os, posixpath
 
@@ -114,8 +114,19 @@ def paste_clipboard_to_folder(request):
         if folder.has_add_children_permission(request):
             tools.move_files_from_clipboard_to_folder(clipboard, folder)
             tools.discard_clipboard(clipboard)
+
+            if FILER_USE_SIMPLE_UPLOAD:
+                folder_id = "%s" % folder.id
+                hist = request.session.get('filer_recent_uploads', '')
+                hist = [ fid for fid in hist.split(',') if hist != '' ]
+                if folder_id in hist: hist.remove(folder_id)
+                hist.insert(0, folder_id)
+                hist= ','.join(hist[:5])
+                request.session['filer_recent_uploads'] = hist
+
         else:
             raise PermissionDenied
+
     return HttpResponseRedirect( '%s%s' % (request.REQUEST.get('redirect_to', ''), popup_param(request) ) )
 
 @login_required
