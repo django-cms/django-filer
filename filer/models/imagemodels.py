@@ -4,11 +4,10 @@ from PIL import Image as PILImage
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from django.db import models
+from easy_thumbnails.files import Thumbnailer
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file
 from filer import settings as filer_settings
-from django.conf import settings
-from filer.settings import static_server
 
 
 
@@ -166,14 +165,11 @@ class Image(File):
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     @property
-    def easy_thumbnails_relative_name(self):
-        return self.rel_image_url
-    @property
-    def easy_thumbnails_source(self):
-        return self.file.storage
-    @property
-    def easy_thumbnails_thumbnail_storage(self):
-        return self.file.thumbnail_storage
+    def easy_thumbnails_thumbnailer(self):
+        tn = Thumbnailer(file=self.file.file, name=self.file.name,
+                         source_storage=self.file.source_storage, 
+                         thumbnail_storage=self.file.thumbnail_storage)
+        return tn
     class Meta:
         app_label = 'filer'
         verbose_name = _('Image')
