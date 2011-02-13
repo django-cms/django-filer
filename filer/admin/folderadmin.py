@@ -225,16 +225,20 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         simple_upload = True if FILER_USE_SIMPLE_UPLOAD else False
         recent_uploads = []
-        if simple_upload and viewtype == 'unfiled_images':
-            hist = request.session.get('filer_recent_uploads', '')
-            hist = [ fid for fid in hist.split(',') if hist != '' ]
-            for fid in hist:
-                #url = reverse('admin:filer-directory_listing', kwargs={'folder_id': fid})
-                try:
-                    fldr = Folder.objects.get(id=fid)
-                    recent_uploads.append(fldr)
-                except Folder.DoesNotExist:
-                    pass
+        show_unfiled = False
+        if simple_upload:
+            if viewtype != 'unfiled_images':
+                show_unfiled = True
+            else:
+                hist = request.session.get('filer_recent_uploads', '')
+                hist = [ fid for fid in hist.split(',') if hist != '' ]
+                for fid in hist:
+                    #url = reverse('admin:filer-directory_listing', kwargs={'folder_id': fid})
+                    try:
+                        fldr = Folder.objects.get(id=fid)
+                        recent_uploads.append(fldr)
+                    except Folder.DoesNotExist:
+                        pass
 
 
         #folder_children = folder_children.sort(cmp=lambda x,y: cmp(x.name.lower(), y.name.lower()))
@@ -255,4 +259,5 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'root_path': "/%s" % admin.site.root_path, # needed in the admin/base.html template for logout links and stuff 
                 'simple_upload': simple_upload,
                 'recent_uploads': recent_uploads, # folders where simple_upload was recently started
+                'show_unfiled': show_unfiled,
             }, context_instance=RequestContext(request))

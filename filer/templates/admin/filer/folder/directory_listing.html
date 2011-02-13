@@ -39,15 +39,20 @@
 
 {% block sidebar %}
 <div id="content-related">
-    {% include "admin/filer/tools/clipboard/clipboard.html" %}
-    {% if simple_upload and recent_uploads %}
-    <div id="recent-uploads">
-        {% trans "Recent upload folders:" %}<br>
-        {% for fldr in recent_uploads %}
-        <a href="{{ fldr.get_admin_directory_listing_url_path }}">{{ fldr.name }}</a><br>
-        {% endfor %}
-    </div>
-    {% endif %}
+ {% include "admin/filer/tools/clipboard/clipboard.html" %}
+ {% if simple_upload %}
+ <div id="recent-uploads">
+  {% if show_unfiled %}
+  <a href="{% url admin:filer-directory_listing-unfiled_images %}">{% trans "unfiled files"|title noop %}</a><br>
+  {% endif %}
+  {% if recent_uploads %}
+  {% trans "Recent upload folders:" %}<br>
+  {% for fldr in recent_uploads %}
+  <a href="{{ fldr.get_admin_directory_listing_url_path }}">{{ fldr.name }}</a><br>
+  {% endfor %}
+ </div>
+ {% endif %}
+ {% endif %}
 </div>
 {% endblock %}
 
