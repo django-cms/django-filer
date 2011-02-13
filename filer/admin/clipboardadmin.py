@@ -126,8 +126,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                                   {'items': file_items },
                                   context_instance=RequestContext(request))
 
+
     def handle_uploaded_file(self, request, afile):
-        #print type(afile), dir(afile)
         original_filename = afile.name
         files = generic_handle_file(afile, original_filename)
         file_items = []
@@ -161,10 +161,9 @@ class ClipboardAdmin(admin.ModelAdmin):
 
         pass
 
+
     def simple_upload(self, request, folder_id=None):
         class TmpUploadFileForm(forms.Form):
-           #title = forms.CharField(max_length=50)
-           folder_id = forms.CharField(max_length=20, required=False)
            file_1  = forms.FileField(required=False)
            file_2  = forms.FileField(required=False)
            file_3  = forms.FileField(required=False)
@@ -174,26 +173,30 @@ class ClipboardAdmin(admin.ModelAdmin):
         if not folder_id:
             folder_id = request.REQUEST.get('folder_id', None)
 
-        next_page = urlresolvers.reverse("admin:filer-directory_listing-unfiled_images")
+        if folder_id:
+            # Keep the last 5 folders from which Upload was started so that
+            # we can easily return to them from "unfiled_images" folder
+            hist = request.session.get('filer_recent_uploads', '')
+            hist = [ fid for fid in hist.split(',') if hist != '' ]
+            if folder_id in hist: hist.remove(folder_id)
+            hist.insert(0, folder_id)
+            hist= ','.join(hist[:5])
+            request.session['filer_recent_uploads'] = hist
 
         if request.method == 'POST':
             form = TmpUploadFileForm(request.POST, request.FILES)
-            #print request.FILES['file']
             if form.is_valid():
-                #print "Form is valid"
                 for k,afile in request.FILES.items():
                     if afile == None: continue
                     self.handle_uploaded_file(request, afile)
+                next_page = urlresolvers.reverse("admin:filer-directory_listing-unfiled_images")
                 return HttpResponseRedirect(next_page)
         else:
             form = TmpUploadFileForm()
-            if folder_id == None: folder_id = ""
-            form.fields["folder_id"].initial = folder_id
-            form.fields["folder_id"].widget = forms.HiddenInput()
 
         return render_to_response(
             'admin/filer/tools/simple_upload.html',
-            {'form': form, 'next_page': next_page },
+            {'form': form },
             context_instance=RequestContext(request))
 
 

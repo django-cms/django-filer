@@ -222,6 +222,21 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:
             permissions = {}
+
+        simple_upload = True if FILER_USE_SIMPLE_UPLOAD else False
+        recent_uploads = []
+        if simple_upload and viewtype == 'unfiled_images':
+            hist = request.session.get('filer_recent_uploads', '')
+            hist = [ fid for fid in hist.split(',') if hist != '' ]
+            for fid in hist:
+                #url = reverse('admin:filer-directory_listing', kwargs={'folder_id': fid})
+                try:
+                    fldr = Folder.objects.get(id=fid)
+                    recent_uploads.append(fldr)
+                except Folder.DoesNotExist:
+                    pass
+
+
         #folder_children = folder_children.sort(cmp=lambda x,y: cmp(x.name.lower(), y.name.lower()))
         folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(), y.label.lower()))
         return render_to_response('admin/filer/folder/directory_listing.html', {
@@ -238,5 +253,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
                 'root_path': "/%s" % admin.site.root_path, # needed in the admin/base.html template for logout links and stuff 
-                'simple_upload': True if FILER_USE_SIMPLE_UPLOAD else False,
+                'simple_upload': simple_upload,
+                'recent_uploads': recent_uploads, # folders where simple_upload was recently started
             }, context_instance=RequestContext(request))
