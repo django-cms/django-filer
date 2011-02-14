@@ -1,9 +1,11 @@
 import os
 import hashlib
-from django.utils.translation import ugettext_lazy as _
+
+from django.contrib.auth import models as auth_models
+from django.core.files.base import ContentFile
 from django.core import urlresolvers
 from django.db import models
-from django.contrib.auth import models as auth_models
+from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
 from filer.models.foldermodels import Folder
@@ -71,9 +73,11 @@ class File(models.Model, mixins.IconsMixin):
         self.is_public = not self.is_public
         self.file.delete_thumbnails()
         self.is_public = not self.is_public
-        
-        self.file = dst_storage.save(dst_file_name,
-                                     src_storage.open(src_file_name))
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
+        src_file = src_storage.open(src_file_name)
+        src_file.open()
+        self.file = dst_storage.save(dst_file_name, ContentFile(src_file.read()))
         src_storage.delete(src_file_name)
         
     
