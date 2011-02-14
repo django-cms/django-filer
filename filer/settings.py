@@ -11,7 +11,6 @@ def generate_filename(instance, filename):
     return os.path.join(datepart, get_valid_filename(filename))
 
 
-
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 
 FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', False)
@@ -36,10 +35,6 @@ FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
                                     'filer.storage.PrivateFileSystemStorage')
 FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO', generate_filename)
 
-if not FILER_PUBLICMEDIA_PREFIX.endswith('/'):
-    raise ImproperlyConfigured('FILER_PUBLICMEDIA_PREFIX (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_PREFIX)
-if not FILER_PRIVATEMEDIA_PREFIX.endswith('/'):
-    raise ImproperlyConfigured('FILER_PRIVATEMEDIA_PREFIX (currently "%s") must end with a "/"' % FILER_PRIVATEMEDIA_PREFIX)
 if not FILER_PUBLICMEDIA_URL.endswith('/'):
     raise ImproperlyConfigured('FILER_PUBLICMEDIA_URL (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_URL)
 if not FILER_PRIVATEMEDIA_URL.endswith('/'):
@@ -49,26 +44,4 @@ FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64', 
 )
 
-FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.UnprotectedServer")
-
-static_server = None
-if static_server == None:
-    klass = FILER_PRIVATEMEDIA_SERVER
-    if klass != None:
-        if type(klass) == type(""):
-            try:
-                module = klass.split('.')
-                if len(module) > 1: module = module[:-1]
-                module = '.'.join(module)
-                exec "import %s" % module
-                exec "static_server = %s()" % klass
-                #print static_server
-            except:
-                #print "Failed to create an instance of '%s'" % klass
-                static_server = None
-                pass
-        else: static_server = klass
-    
-    if static_server == None:
-        #print "FILER: NO STATIC SERVER FOR PRIVATE FILES CONFIGURED. FILES ARE NOT PROTECTED."
-        pass
+FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.backends.default.DefaultServer")

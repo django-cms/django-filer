@@ -8,10 +8,6 @@ from models import Folder, Image, Clipboard, File
 from models import tools
 
 from django import forms
-from django.conf import settings as django_settings
-from settings import FILER_STATICMEDIA_PREFIX
-from settings import static_server
-import os, posixpath
 
 
 class NewFolderForm(forms.ModelForm):
@@ -140,63 +136,3 @@ def clone_files_from_clipboard_to_folder(request):
         folder = Folder.objects.get( id=request.POST.get('folder_id') )
         tools.clone_files_from_clipboard_to_folder(clipboard, folder)
     return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
-
-@login_required
-def serve_protected_file(request, file_id):
-    """
-    Serve protected files to authenticated users with read permissions.
-    """
-    thefile = File.objects.get(id = file_id)
-    if thefile == None:
-        raise Http404('File not found')
-    if not thefile.has_read_permission(request):
-        raise PermissionDenied
-    if static_server == None:
-        raise Http404('File not found')
-
-    direct_url = thefile.file.url
-    return static_server.serve(request, direct_url, thefile.file.name, thefile.file.path, thefile.file.size)
-
-def serve_protected_thumbnail(request, file_id, file_name):
-    """
-    Serve protected thumbnails.
-    If the user isn't authenticated or doesn't have read permissions,
-    redirect to a static image.
-    """
-    if not request.user.is_authenticated():
-        newurl = posixpath.join(FILER_STATICMEDIA_PREFIX, "icons/image_32x32.png")
-        return HttpResponseRedirect(newurl)
-    return serve_protected_thumbnail_auth(request, file_id, file_name)
-
-@login_required
-def serve_protected_thumbnail_auth(request, file_id, file_name):
-    """
-    Serve protected thumbnails to authenticated users.
-    If the user doesn't have read permissions, redirect to a static image.
-    """
-    thefile = File.objects.get(id = file_id)
-    if thefile == None:
-        raise Http404('File not found')
-    if not thefile.has_read_permission(request):
-        newurl = posixpath.join(FILER_STATICMEDIA_PREFIX, "icons/image_32x32.png")
-        return HttpResponseRedirect(newurl)
-    if static_server == None:
-        raise Http404('File not found')
-    try:
-        # we don't care about the options because they're in file_name
-        # so we just pass the required size option
-        name = thefile.file.get_thumbnail_name(thumbnail_options = { 'size': (1,1)})
-        media_path = posixpath.join(posixpath.dirname(name), file_name)
-        full_path = posixpath.join(django_settings.MEDIA_ROOT, media_path)
-        direct_url = posixpath.join(django_settings.MEDIA_URL, media_path)
-        size = os.path.getsize(full_path) # XXX: Should convert full_path from posix to os.path format
-        return static_server.serve(request, direct_url, media_path, full_path, size)
-    except Exception as e:
-        print " *** ", e
-        raise Http404('File not found')
-
-def direct_file_access(request, path):
-    if static_server == None:
-        raise Http404('File not found')
-    return static_server.direct_access(request, path)
-

@@ -1,12 +1,13 @@
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
-from django.core.files.storage import get_storage_class, Storage
 from django.core.files.base import File
+from django.core.files.storage import Storage
 from filer import settings as filer_settings
+from filer.utils.loader import load
 
 DEFAULT_STORAGES = {
-    'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,
-    'private': filer_settings.FILER_PRIVATEMEDIA_STORAGE,
+    'public': load(filer_settings.FILER_PUBLICMEDIA_STORAGE, Storage),
+    'private': load(filer_settings.FILER_PRIVATEMEDIA_STORAGE, Storage),
 }
 
 def generate_filename_multistorage(instance, filename):
@@ -58,10 +59,3 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(verbose_name=verbose_name, name=name,
                                                                       upload_to=generate_filename_multistorage,
                                                                       storage=None, **kwargs)
-
-        for key, value in self.storages.items():
-            if issubclass(value.__class__, Storage):
-                self.storages[key] = value
-            else:
-                self.storages[key] = get_storage_class(value)()
-                
