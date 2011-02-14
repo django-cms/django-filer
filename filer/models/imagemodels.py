@@ -169,7 +169,9 @@ class Image(File):
     @property
     def easy_thumbnails_source(self):
         return self.file.storage
-
+    @property
+    def easy_thumbnails_thumbnail_storage(self):
+        return self.file.thumbnail_storage
     class Meta:
         app_label = 'filer'
         verbose_name = _('Image')

@@ -4,11 +4,11 @@ import urlparse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import force_unicode, smart_str
-
+from filer.utils.files import get_valid_filename
 
 def generate_filename(instance, filename):
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
-    return os.path.join(datepart, filename)
+    return os.path.join(datepart, get_valid_filename(filename))
 
 
 
