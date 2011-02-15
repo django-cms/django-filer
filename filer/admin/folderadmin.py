@@ -1,3 +1,5 @@
+import urllib
+
 from django.contrib.admin.util import unquote
 from django.contrib import admin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -168,7 +170,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return qs
         q = request.GET.get('q', None)
         if q:
-            search_terms = q.split(" ")
+            search_terms = urllib.unquote_plus(q).split(" ")
         else:
             search_terms = []
         limit_search_to_folder = request.GET.get('limit_search_to_folder', False) in (True, 'on')
@@ -250,6 +252,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'current_url': request.path,
                 'title': u'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
+                'q':urllib.quote_plus(q),
                 'show_result_count': show_result_count,
                 'limit_search_to_folder': limit_search_to_folder,
                 'is_popup': popup_status(request),

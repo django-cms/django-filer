@@ -14,7 +14,7 @@
             </thead>
             <tbody>
             {% for item in paginated_items.object_list %}
-                {% if item.file_type == 'Folder'%}{% with item as subfolder%}
+                {% if item.file_type == 'Folder' or item.file_type == 'DummyFolder' %}{% with item as subfolder%}
                 <tr class="{% cycle rowcolors %}">
                     <td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;" >&nbsp;</a>{% endif %}</td>
                     <!-- DirIcon -->
@@ -63,7 +63,7 @@
         </table>
         <p class="paginator">
             {% if paginated_items.has_previous %}
-                <a href="?page={{ paginated_items.previous_page_number }}">previous</a>
+                <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">previous</a>
             {% endif %}
     
             <span class="this-page">
@@ -71,7 +71,7 @@
             </span>
     
             {% if paginated_items.has_next %}
-                <a href="?page={{ paginated_items.next_page_number }}">next</a>
+                <a href="?page={{ paginated_items.next_page_number }}{% if q %}&q={{ q }}{% endif %}">next</a>
             {% endif %}
         </p>
         </div>
