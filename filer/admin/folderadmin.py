@@ -173,6 +173,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             search_terms = urllib.unquote_plus(q).split(" ")
         else:
             search_terms = []
+            q = ''
         limit_search_to_folder = request.GET.get('limit_search_to_folder', False) in (True, 'on')
     
         if len(search_terms)>0:
