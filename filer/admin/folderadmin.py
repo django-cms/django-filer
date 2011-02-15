@@ -1,6 +1,6 @@
 from django.contrib.admin.util import unquote
 from django.contrib import admin
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404
