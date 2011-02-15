@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load adminmedia filermedia filer_tags %}
+{% load adminmedia admin_list filermedia filer_tags %}
 <div id="toolbartable">
         <table cellspacing="0">
             <thead>
@@ -13,7 +13,8 @@
                 </tr>
             </thead>
             <tbody>
-            {% for subfolder in folder_children %}
+            {% for item in paginated_items.object_list %}
+                {% if item.file_type == 'Folder'%}{% with item as subfolder%}
                 <tr class="{% cycle rowcolors %}">
                     <td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;" >&nbsp;</a>{% endif %}</td>
                     <!-- DirIcon -->
@@ -26,8 +27,8 @@
                     </td>
                     <td></td>
                 </tr>
-            {% endfor %}
-            {% for generic_file in folder_files %}{% with generic_file.subtype as file %}
+                {% endwith %}{% endif %}
+                {% if item.file_type == 'File' or item.file_type == 'Image' %}{% with item.subtype as file %}
                 <tr class="{% cycle rowcolors %}">
                     <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% endif %}</td>
                     <!-- FileIcon -->
@@ -50,7 +51,8 @@
                         </form>
                     </td>
                 </tr>
-            {% endwith %}{% endfor %}
+                {% endwith %}{% endif %}
+            {% endfor %}
             {% if not folder.is_root %}{% ifequal folder.item_count 0 %}
             <tr class="{% cycle rowcolors %}">
                     <!-- FileIcon -->
@@ -59,4 +61,17 @@
             {% endifequal %}{% endif %}
             </tbody>
         </table>
+        <p class="paginator">
+            {% if paginated_items.has_previous %}
+                <a href="?page={{ paginated_items.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="this-page">
+                Page {{ paginated_items.number }} of {{ paginated_items.paginator.num_pages }}.
+            </span>
+    
+            {% if paginated_items.has_next %}
+                <a href="?page={{ paginated_items.next_page_number }}">next</a>
+            {% endif %}
+        </p>
         </div>

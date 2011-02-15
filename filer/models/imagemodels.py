@@ -19,7 +19,7 @@ class Image(File):
         'admin_directory_listing_icon': {'size': (48,48), 'crop':True, 'upscale':True},
         'admin_tiny_icon': {'size': (32,32), 'crop':True, 'upscale':True},
     }
-    file_type = 'image'
+    file_type = 'Image'
     _icon = "image"
     
     _height = models.IntegerField(null=True, blank=True) 

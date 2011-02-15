@@ -26,6 +26,7 @@ class FileManager(models.Manager):
         return [i.subtype() for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
 class File(models.Model, mixins.IconsMixin):
+    file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
     file = MultiStorageFileField(null=True, blank=True, max_length=255)

@@ -1,17 +1,19 @@
-from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
 from django.contrib.admin.util import unquote
-from django.http import HttpResponseRedirect, Http404
-from django.template import RequestContext
-from django.shortcuts import render_to_response
 from django.contrib import admin
-from django import forms
+from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.http import HttpResponseRedirect, Http404
+from django import forms
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.utils.safestring import mark_safe
+
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
 from filer.admin.tools import popup_status, selectfolder_status, userperms_for_request
+from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
 from filer.models import tools
-from filer.settings import FILER_STATICMEDIA_PREFIX
+from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 
 
 # Forms
@@ -224,10 +226,25 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             permissions = {}
         #folder_children = folder_children.sort(cmp=lambda x,y: cmp(x.name.lower(), y.name.lower()))
         folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(), y.label.lower()))
+        #import ipdb; ipdb.set_trace()
+        items = folder_children + folder_files
+        paginator = Paginator(items, FILER_PAGINATE_BY)
+        
+        # Make sure page request is an int. If not, deliver first page.
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+    
+        # If page request (9999) is out of range, deliver last page of results.
+        try:
+            paginated_items = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            paginated_items = paginator.page(paginator.num_pages)
         return render_to_response('admin/filer/folder/directory_listing.html', {
                 'folder':folder,
-                'folder_children':folder_children,
-                'folder_files':folder_files,
+                'paginator':paginator,
+                'paginated_items':paginated_items,
                 'permissions': permissions,
                 'permstest': userperms_for_request(folder, request),
                 'current_url': request.path,

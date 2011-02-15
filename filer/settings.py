@@ -10,7 +10,7 @@ def generate_filename(instance, filename):
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
     return os.path.join(datepart, get_valid_filename(filename))
 
-
+FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 5)
 
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 
