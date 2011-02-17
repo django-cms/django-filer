@@ -63,7 +63,7 @@
     </table>
     <p class="paginator">
         {% if paginated_items.has_previous %}
-            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">previous</a>
+            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if is_popup %}&_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">previous</a>
         {% endif %}
 
         <span class="this-page">
@@ -71,7 +71,7 @@
         </span>
 
         {% if paginated_items.has_next %}
-            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&q={{ q }}{% endif %}">next</a>
+            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if is_popup %}&_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">next</a>
         {% endif %}
     </p>
 </div>
