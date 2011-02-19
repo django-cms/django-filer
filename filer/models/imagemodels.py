@@ -1,13 +1,14 @@
-from datetime import datetime
 from PIL import Image as PILImage
-
-from django.utils.translation import ugettext_lazy as _
+from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.files import Thumbnailer
+from filer import settings as filer_settings
+from filer.fields.multistorage_file import ThumbnailNameMixin
 from filer.models.filemodels import File
 from filer.utils.pil_exif import get_exif_for_file
-from filer import settings as filer_settings
+
 
 
 
@@ -166,7 +167,7 @@ class Image(File):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     @property
     def easy_thumbnails_thumbnailer(self):
-        tn = Thumbnailer(file=self.file.file, name=self.file.name,
+        tn = MyThumbnailer(file=self.file.file, name=self.file.name,
                          source_storage=self.file.source_storage, 
                          thumbnail_storage=self.file.thumbnail_storage)
         return tn
@@ -174,3 +175,7 @@ class Image(File):
         app_label = 'filer'
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
+
+
+class MyThumbnailer(ThumbnailNameMixin, Thumbnailer):
+    pass

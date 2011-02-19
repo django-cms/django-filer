@@ -34,6 +34,7 @@ FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
                                     'FILER_PRIVATEMEDIA_STORAGE',
                                     'filer.storage.PrivateFileSystemStorage')
 FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO', generate_filename)
+FILER_PRIVATEMEDIA_THUMBNAIL_BASEDIR = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_BASEDIR', '_')
 
 if not FILER_PUBLICMEDIA_URL.endswith('/'):
     raise ImproperlyConfigured('FILER_PUBLICMEDIA_URL (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_URL)

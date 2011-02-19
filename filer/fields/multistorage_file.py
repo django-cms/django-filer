@@ -1,9 +1,11 @@
-from easy_thumbnails import fields as easy_thumbnails_fields
-from easy_thumbnails import files as easy_thumbnails_files
 from django.core.files.base import File
 from django.core.files.storage import Storage
+from easy_thumbnails import fields as easy_thumbnails_fields, \
+    files as easy_thumbnails_files
 from filer import settings as filer_settings
 from filer.utils.loader import load
+import hashlib
+import os
 
 DEFAULT_STORAGES = {
     'public': load(filer_settings.FILER_PUBLICMEDIA_STORAGE, Storage),
@@ -21,16 +23,25 @@ def generate_filename_multistorage(instance, filename):
     else:
         return upload_to
 
+class ThumbnailNameMixin(easy_thumbnails_files.Thumbnailer):
+    def get_thumbnail_name(self, thumbnail_options, transparent=False):
+        path, source_filename = os.path.split(self.name)
+        source_extension = os.path.splitext(source_filename)[1][1:]
+        dst = super(ThumbnailNameMixin, self).get_thumbnail_name(thumbnail_options, transparent=transparent)
+        dst_path, dst_filename = os.path.split(dst)
+        dst_extension = os.path.splitext(dst_filename)[1][1:]
+        m = hashlib.md5()
+        m.update(dst)
+        thumb_options_hash = m.hexdigest()
+        return u"_/%s-%s.%s" % (self.name, thumb_options_hash, dst_extension)
 
-class MultiStorageFieldFile(easy_thumbnails_files.ThumbnailerFieldFile):
+class MultiStorageFieldFile(ThumbnailNameMixin, easy_thumbnails_files.ThumbnailerFieldFile):
     def __init__(self, instance, field, name):
         File.__init__(self, None, name)
         self.instance = instance
         self.field = field
         self._committed = True
         self.storages = self.field.storages
-    
- 
     @property
     def storage(self):
         if self.instance.is_public:

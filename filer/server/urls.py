@@ -2,11 +2,11 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('filer.server.views',
     # This url is generated in filer.models.filemodels.url
-    url(r'^file/(?P<file_id>[0-9]+)/(?P<file_name>.*)$',
+    url(r'^file/(?P<path>.*)$',
         'serve_protected_file',),
 
 #    # This url is generated in filer.templatetags.filer_image_tags.WrapPrivateThumbnailFile
-    url(r'^thumbnails/(?P<file_id>[0-9]+)/(?P<file_name>.*)$',
+    url(r'^_/(?P<path>.*)$',
         'serve_protected_thumbnail',),
 )
 
