@@ -1,10 +1,10 @@
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseServerError
 from django.core.exceptions import PermissionDenied
 
-from models import Folder, Image, Clipboard
+from models import Folder, Image, Clipboard, File
 from models import tools
 
 from django import forms
@@ -136,4 +136,3 @@ def clone_files_from_clipboard_to_folder(request):
         folder = Folder.objects.get( id=request.POST.get('folder_id') )
         tools.clone_files_from_clipboard_to_folder(clipboard, folder)
     return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
-

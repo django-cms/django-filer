@@ -1,13 +1,14 @@
-from datetime import datetime
 from PIL import Image as PILImage
-
-from django.utils.translation import ugettext_lazy as _
+from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
-from filer.models.filemodels import File
-from filer.utils.pil_exif import get_exif_for_file
+from django.utils.translation import ugettext_lazy as _
+from easy_thumbnails.files import Thumbnailer
 from filer import settings as filer_settings
-from django.conf import settings
+from filer.models.filemodels import File
+from filer.utils.filer_easy_thumbnails import FilerThumbnailer
+from filer.utils.pil_exif import get_exif_for_file
+
 
 
 
@@ -141,32 +142,22 @@ class Image(File):
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
-                _thumbnails[name] = self.file.get_thumbnail(opts).url
+                thumb = self.file.get_thumbnail(opts)
+                _thumbnails[name] = thumb.url
             except:
-                # swallow the the exception to avoid to bubble it up
-                # in the template {{ image.icons.48 }}
+                # swallow the exception to avoid it bubbling up
+                # to the template {{ image.icons.48 }}
                 pass
         return _thumbnails
     
-    @property
-    def absolute_image_url(self):
-        return self.url
-    @property
-    def rel_image_url(self):
-        'return the image url relative to MEDIA_URL'
-        try:
-            rel_url = u"%s" % self.file.url
-            if rel_url.startswith(settings.MEDIA_URL):
-                before, match, rel_url = rel_url.partition(settings.MEDIA_URL)
-            return rel_url
-        except Exception, e:
-            return ''
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     @property
-    def easy_thumbnails_relative_name(self):
-        return self.rel_image_url
-
+    def easy_thumbnails_thumbnailer(self):
+        tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
+                         source_storage=self.file.source_storage, 
+                         thumbnail_storage=self.file.thumbnail_storage)
+        return tn
     class Meta:
         app_label = 'filer'
         verbose_name = _('Image')

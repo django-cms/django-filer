@@ -1,6 +1,12 @@
 Changelog for django-filer
 =============================
 
+next
+----
+
+* seperate, customizable file storage backends for public and private files
+
+
 0.8.2
 -----
 
@@ -10,7 +16,7 @@ Changelog for django-filer
 0.8.1
 -----
 
-* moved to easy-thumbnail for thumbnailing. added tests and lots of cleanup.
+* moved to easy-thumbnails for thumbnailing. added tests and lots of cleanup.
 * Backwards incompatible changes:
  * use easy-thumbnails instead of sorl.thumbnail
 

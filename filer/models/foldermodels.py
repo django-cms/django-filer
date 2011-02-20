@@ -139,7 +139,7 @@ class Folder(models.Model, mixins.IconsMixin):
         folder. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated() or not user.is_staff:
+        if not user.is_authenticated():# or not user.is_staff:
             return False
         elif user.is_superuser:
             return True
