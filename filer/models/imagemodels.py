@@ -5,8 +5,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.files import Thumbnailer
 from filer import settings as filer_settings
-from filer.fields.multistorage_file import ThumbnailNameMixin
 from filer.models.filemodels import File
+from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
 
 
@@ -150,24 +150,11 @@ class Image(File):
                 pass
         return _thumbnails
     
-    @property
-    def absolute_image_url(self):
-        return self.url
-    @property
-    def rel_image_url(self):
-        'return the image url relative to MEDIA_URL'
-        try:
-            rel_url = u"%s" % self.file.url
-            if rel_url.startswith(self.file.storage.base_url):
-                before, match, rel_url = rel_url.partition(self.file.storage.base_url)
-            return rel_url
-        except Exception, e:
-            return ''
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     @property
     def easy_thumbnails_thumbnailer(self):
-        tn = MyThumbnailer(file=self.file.file, name=self.file.name,
+        tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
                          source_storage=self.file.source_storage, 
                          thumbnail_storage=self.file.thumbnail_storage)
         return tn
@@ -175,7 +162,3 @@ class Image(File):
         app_label = 'filer'
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
-
-
-class MyThumbnailer(ThumbnailNameMixin, Thumbnailer):
-    pass

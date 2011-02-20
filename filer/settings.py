@@ -27,14 +27,23 @@ FILER_PUBLICMEDIA_STORAGE = getattr(settings,
 FILER_PUBLICMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', generate_filename)
 
 
-FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private/')
-FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
-FILER_PRIVATEMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) )
+FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 
+                                    'filer_private/')
+FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL', 
+                                 urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
+FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT', 
+                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) ) )
 FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
                                     'FILER_PRIVATEMEDIA_STORAGE',
                                     'filer.storage.PrivateFileSystemStorage')
-FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO', generate_filename)
-FILER_PRIVATEMEDIA_THUMBNAIL_BASEDIR = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_BASEDIR', '_')
+FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO', 
+                                       generate_filename)
+FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'thumbs')
+FILER_PRIVATEMEDIA_FILE_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'files')
+
+FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.backends.default.DefaultServer")
+
+FILER_NGINX_PROTECTED_LOCATION = getattr(settings, 'FILER_NGINX_PROTECTED_LOCATION', "protected_media")
 
 if not FILER_PUBLICMEDIA_URL.endswith('/'):
     raise ImproperlyConfigured('FILER_PUBLICMEDIA_URL (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_URL)
@@ -44,5 +53,3 @@ if not FILER_PRIVATEMEDIA_URL.endswith('/'):
 FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64', 
 )
-
-FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.backends.default.DefaultServer")
