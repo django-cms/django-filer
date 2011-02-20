@@ -5,6 +5,7 @@ from filer.models import mixins
 from django.core import urlresolvers
 
 class DummyFolder(mixins.IconsMixin):
+    file_type = 'DummyFolder'
     name = "Dummy Folder"
     is_root = True
     is_smart_folder = True
