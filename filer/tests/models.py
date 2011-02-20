@@ -76,7 +76,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + u'.%sx%s_q85_crop_upscale.jpg' %(size,size))
+                             file_basename + u'__%sx%s_q85_crop_upscale.jpg' %(size,size))
          
         
     def test_file_upload_public_destination(self):
