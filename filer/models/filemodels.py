@@ -38,10 +38,10 @@ class File(models.Model, mixins.IconsMixin):
     has_all_mandatory_data = models.BooleanField(default=False, editable=False)
     
     original_filename = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Name'))
-    description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
+    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('name'))
+    description = models.TextField(null=True, blank=True, verbose_name=_('description'))
     
-    owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True, verbose_name=_('Owner'))
+    owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True, verbose_name=_('owner'))
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -216,5 +216,5 @@ class File(models.Model, mixins.IconsMixin):
     
     class Meta:
         app_label = 'filer'
-        verbose_name = _('File')
-        verbose_name_plural = _('Files')
+        verbose_name = _('file')
+        verbose_name_plural = _('files')

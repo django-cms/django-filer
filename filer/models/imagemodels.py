@@ -160,5 +160,5 @@ class Image(File):
         return tn
     class Meta:
         app_label = 'filer'
-        verbose_name = _('Image')
-        verbose_name_plural = _('Images')
+        verbose_name = _('image')
+        verbose_name_plural = _('images')
