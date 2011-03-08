@@ -93,9 +93,9 @@ class Image(File):
         return self.has_generic_permission(request, 'add_children')
     def has_generic_permission(self, request, type):
         """
-Return true if the current user has permission on this
-image. Return the string 'ALL' if the user has all rights.
-"""
+        Return true if the current user has permission on this
+        image. Return the string 'ALL' if the user has all rights.
+        """
         user = request.user
         if not user.is_authenticated() or not user.is_staff:
             return False
@@ -162,4 +162,3 @@ image. Return the string 'ALL' if the user has all rights.
         app_label = 'filer'
         verbose_name = _('image')
         verbose_name_plural = _('images')
-

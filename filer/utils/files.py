@@ -5,9 +5,9 @@ from filer.utils.zip import unzip
 
 def generic_handle_file(file, original_filename):
     """
-Handels a file, regardless if a package or a single file and returns
-a list of files. can recursively unpack packages.
-"""
+    Handels a file, regardless if a package or a single file and returns
+    a list of files. can recursively unpack packages.
+    """
     #print "entering generic_handle_file(file=%s, original_filename=%s)" % (file, original_filename)
     files = []
     filetype = os.path.splitext(original_filename)[1].lower()
@@ -24,9 +24,9 @@ a list of files. can recursively unpack packages.
 
 def get_valid_filename(s):
     '''
-like the regular get_valid_filename, but also slugifies away
-umlauts and stuff.
-'''
+    like the regular get_valid_filename, but also slugifies away
+    umlauts and stuff.
+    '''
     s = get_valid_filename_django(s)
     filename, ext = os.path.splitext(s)
     filename = slugify(filename)
