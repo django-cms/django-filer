@@ -20,7 +20,8 @@ FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', setting
 
 FILER_PUBLICMEDIA_PREFIX = getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public/')
 FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL, FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
-FILER_PUBLICMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PUBLICMEDIA_PREFIX ) )
+FILER_PUBLICMEDIA_ROOT = getattr(settings, 'FILER_PUBLICMEDIA_ROOT',
+                                 os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PUBLICMEDIA_PREFIX ) ) )
 FILER_PUBLICMEDIA_STORAGE = getattr(settings,
                                     'FILER_PUBLICMEDIA_STORAGE',
                                     'filer.storage.PublicFileSystemStorage')
@@ -28,16 +29,16 @@ FILER_PUBLICMEDIA_STORAGE = getattr(settings,
 FILER_PUBLICMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', generate_filename)
 
 
-FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 
+FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX',
                                     'filer_private/')
-FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL', 
+FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL',
                                  urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
-FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT', 
+FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT',
                                   os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) ) )
 FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
                                     'FILER_PRIVATEMEDIA_STORAGE',
                                     'filer.storage.PrivateFileSystemStorage')
-FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO', 
+FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
                                        generate_filename)
 FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'thumbs')
 FILER_PRIVATEMEDIA_FILE_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'files')
@@ -52,5 +53,5 @@ if not FILER_PRIVATEMEDIA_URL.endswith('/'):
     raise ImproperlyConfigured('FILER_PRIVATEMEDIA_URL (currently "%s") must end with a "/"' % FILER_PRIVATEMEDIA_URL)
 
 FILER_ADMIN_ICON_SIZES = (
-        '16', '32', '48', '64', 
+        '16', '32', '48', '64',
 )

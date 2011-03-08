@@ -23,7 +23,7 @@ class Image(File):
     file_type = 'Image'
     _icon = "image"
     
-    _height = models.IntegerField(null=True, blank=True) 
+    _height = models.IntegerField(null=True, blank=True)
     _width = models.IntegerField(null=True, blank=True)
     
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True, editable=False)
@@ -60,7 +60,7 @@ class Image(File):
             # probably the image is missing. nevermind.
             pass
         
-        super(Image, self).save(*args, **kwargs)    
+        super(Image, self).save(*args, **kwargs)
     
     def _check_validity(self):
         if not self.name:# or not self.contact:
@@ -155,7 +155,7 @@ class Image(File):
     @property
     def easy_thumbnails_thumbnailer(self):
         tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
-                         source_storage=self.file.source_storage, 
+                         source_storage=self.file.source_storage,
                          thumbnail_storage=self.file.thumbnail_storage)
         return tn
     class Meta:
