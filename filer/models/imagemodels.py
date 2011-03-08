@@ -1,13 +1,14 @@
-from datetime import datetime
 from PIL import Image as PILImage
-
-from django.utils.translation import ugettext_lazy as _
+from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
-from filer.models.filemodels import File
-from filer.utils.pil_exif import get_exif_for_file
+from django.utils.translation import ugettext_lazy as _
+from easy_thumbnails.files import Thumbnailer
 from filer import settings as filer_settings
-from django.conf import settings
+from filer.models.filemodels import File
+from filer.utils.filer_easy_thumbnails import FilerThumbnailer
+from filer.utils.pil_exif import get_exif_for_file
+
 
 
 
@@ -19,10 +20,10 @@ class Image(File):
         'admin_directory_listing_icon': {'size': (48,48), 'crop':True, 'upscale':True},
         'admin_tiny_icon': {'size': (32,32), 'crop':True, 'upscale':True},
     }
-    file_type = 'image'
+    file_type = 'Image'
     _icon = "image"
     
-    _height = models.IntegerField(null=True, blank=True) 
+    _height = models.IntegerField(null=True, blank=True)
     _width = models.IntegerField(null=True, blank=True)
     
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True, editable=False)
@@ -59,7 +60,7 @@ class Image(File):
             # probably the image is missing. nevermind.
             pass
         
-        super(Image, self).save(*args, **kwargs)    
+        super(Image, self).save(*args, **kwargs)
     
     def _check_validity(self):
         if not self.name:# or not self.contact:
@@ -92,9 +93,9 @@ class Image(File):
         return self.has_generic_permission(request, 'add_children')
     def has_generic_permission(self, request, type):
         """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
-        """
+Return true if the current user has permission on this
+image. Return the string 'ALL' if the user has all rights.
+"""
         user = request.user
         if not user.is_authenticated() or not user.is_staff:
             return False
@@ -141,33 +142,24 @@ class Image(File):
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
-                _thumbnails[name] = self.file.get_thumbnail(opts).url
+                thumb = self.file.get_thumbnail(opts)
+                _thumbnails[name] = thumb.url
             except:
-                # swallow the the exception to avoid to bubble it up
-                # in the template {{ image.icons.48 }}
+                # swallow the exception to avoid it bubbling up
+                # to the template {{ image.icons.48 }}
                 pass
         return _thumbnails
     
-    @property
-    def absolute_image_url(self):
-        return self.url
-    @property
-    def rel_image_url(self):
-        'return the image url relative to the used storage base url'
-        try:
-            rel_url = u"%s" % self.file.url
-            if rel_url.startswith(self.file.storage.base_url):
-                before, match, rel_url = rel_url.partition(self.file.storage.base_url)
-            return rel_url
-        except Exception, e:
-            return ''
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_image_change', args=(self.id,))
     @property
-    def easy_thumbnails_relative_name(self):
-        return self.rel_image_url
-
+    def easy_thumbnails_thumbnailer(self):
+        tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
+                         source_storage=self.file.source_storage,
+                         thumbnail_storage=self.file.thumbnail_storage)
+        return tn
     class Meta:
         app_label = 'filer'
-        verbose_name = _('Image')
-        verbose_name_plural = _('Images')
+        verbose_name = _('image')
+        verbose_name_plural = _('images')
+

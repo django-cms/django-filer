@@ -9,8 +9,8 @@ To get started using ``django-filer`` simply install it with
 Dependencies
 ------------
 
-* django-cms >= 2.1
-* easy-thumbnails >= 1.0-alpha-13
+* django-mptt >= 0.2.1'
+* easy-thumbnails >= 1.0-alpha-16
 
 Configuration
 -------------

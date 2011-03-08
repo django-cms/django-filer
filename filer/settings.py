@@ -1,40 +1,56 @@
+import datetime
 import os
+import urlparse
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.encoding import force_unicode, smart_str
+from filer.utils.files import get_valid_filename
+
+def generate_filename(instance, filename):
+    datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
+    return os.path.join(datepart, get_valid_filename(filename))
+
+FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 
 FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', False)
 
-# TODO: could be removed in the future
-FILER_STATICMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_STATICMEDIA_PREFIX', os.path.join(settings.MEDIA_URL,'filer/') ) ) + '/'
+FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', settings.MEDIA_URL + 'filer/' )
 
-FILER_PUBLICMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public') )
-FILER_PRIVATEMEDIA_PREFIX = os.path.normpath( getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private') )
+FILER_PUBLICMEDIA_PREFIX = getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public/')
+FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL, FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
+FILER_PUBLICMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PUBLICMEDIA_PREFIX ) )
+FILER_PUBLICMEDIA_STORAGE = getattr(settings,
+                                    'FILER_PUBLICMEDIA_STORAGE',
+                                    'filer.storage.PublicFileSystemStorage')
 
-FILER_GET_DIRECTORY_CALLBACK = getattr(settings, 'FILER_GET_DIRECTORY_CALLBACK', 'filer.models.filer_file_storage.default_callback')
+FILER_PUBLICMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', generate_filename)
 
-FILER_UPLOAD_MEDIA_ROOT = getattr(settings, 'FILER_UPLOAD_MEDIA_ROOT', settings.MEDIA_ROOT)
-FILER_UPLOAD_MEDIA_URL = getattr(settings, 'FILER_UPLOAD_MEDIA_URL', settings.MEDIA_URL)
-FILER_FILE_STORAGE = getattr(settings, 'FILER_FILE_STORAGE', 'filer.models.filer_file_storage.FilerFileSystemStorage')
 
-FILER_UNZIP_FILES = getattr(settings, 'FILER_UNZIP_FILES', True)
-'''
-# either relative to MEDIA_ROOT or a full path, for sorl to work it must be inside MEDIA_ROOT
-if getattr(settings,'FILER_PUBLICMEDIA_ROOT', '').startswith('/'):
-    FILER_PUBLICMEDIA_ROOT = os.path.abspath( getattr(settings,'FILER_PUBLICMEDIA_ROOT') )
-else:
-    FILER_PUBLICMEDIA_ROOT = os.path.abspath( os.path.join(settings.MEDIA_ROOT, getattr(settings,'FILER_PUBLICMEDIA_ROOT', 'filer_public') ) )
+FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX',
+                                    'filer_private/')
+FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL',
+                                 urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
+FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT',
+                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) ) )
+FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
+                                    'FILER_PRIVATEMEDIA_STORAGE',
+                                    'filer.storage.PrivateFileSystemStorage')
+FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
+                                       generate_filename)
+FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'thumbs')
+FILER_PRIVATEMEDIA_FILE_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'files')
 
-# either relative to MEDIA_URL or a full path
-if  getattr(settings,'FILER_PUBLICMEDIA_URL', '').startswith('/'):
-    FILER_PUBLICMEDIA_URL  = os.path.normpath( getattr(settings,'FILER_PUBLICMEDIA_URL') )
-else:
-    FILER_PUBLICMEDIA_URL = os.path.normpath( os.path.join(settings.MEDIA_URL, getattr(settings,'FILER_PUBLICMEDIA_URL', 'filer_public') ) )
+FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.backends.default.DefaultServer")
 
-# absolute path to private media directory
-FILER_PRIVATEMEDIA_PATH = getattr(settings,'FILER_PRIVATEMEDIA_PATH', '')
-# there is no definable FILER_PRIVATEMEDIA_URL, because this is defined by urls.py
-'''
+FILER_NGINX_PROTECTED_LOCATION = getattr(settings, 'FILER_NGINX_PROTECTED_LOCATION', "protected_media")
+
+if not FILER_PUBLICMEDIA_URL.endswith('/'):
+    raise ImproperlyConfigured('FILER_PUBLICMEDIA_URL (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_URL)
+if not FILER_PRIVATEMEDIA_URL.endswith('/'):
+    raise ImproperlyConfigured('FILER_PRIVATEMEDIA_URL (currently "%s") must end with a "/"' % FILER_PRIVATEMEDIA_URL)
+
 FILER_ADMIN_ICON_SIZES = (
-        '16', '32', '48', '64', 
+        '16', '32', '48', '64',
 )

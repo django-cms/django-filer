@@ -3,8 +3,8 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="/admin/" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
-    &rsaquo; <a href="/admin/filer/" title="{% trans "Go back to" %} {% trans "Filer" %}">{% trans "Filer" %}</a>
+    <a href="{% url admin:index %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
+    &rsaquo; <a href="{% url admin:index %}filer/" title="{% trans "Go back to" %} {% trans "Filer" %}">{% trans "Filer" %}</a>
     {% if original.folder %} 
     &rsaquo; <a href="{% url admin:filer-directory_listing-root %}" title="{% trans "Go back to root folder" %}">{% trans "root" %}</a>
     {% for ancestor_folder in original.folder.get_ancestors %}
@@ -12,7 +12,7 @@
     {% endfor %}
     &rsaquo; <a href="{% url admin:filer-directory_listing original.folder.id %}" title="{% blocktrans with original.folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ original.folder.name }}</a>
     {% endif %}
-    &rsaquo; <a href="/admin/image_filer/image/{{ image.id }}" title="{% trans "Go back to" %} '{{ image.label }}'" >{{ image.label }}</a>
+    &rsaquo; <a href="{% url admin:index %}image_filer/image/{{ image.id }}" title="{% trans "Go back to" %} '{{ image.label }}'" >{{ image.label }}</a>
     &rsaquo; {% trans 'export' %}
 </div>
 {% endblock %}

@@ -139,7 +139,7 @@ class Folder(models.Model, mixins.IconsMixin):
         folder. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated() or not user.is_staff:
+        if not user.is_authenticated():# or not user.is_staff:
             return False
         elif user.is_superuser:
             return True
@@ -223,6 +223,6 @@ class FolderPermission(models.Model):
         perms = ', '.join(perms)
         return u"Folder: '%s'->%s [%s] [%s]" % (name, unicode(self.TYPES[self.type][1]), perms, usergroup)
     class Meta:
-        verbose_name = _('Folder Permission')
-        verbose_name_plural = _('Folder Permissions')
+        verbose_name = _('folder permission')
+        verbose_name_plural = _('folder permissions')
         app_label = 'filer'

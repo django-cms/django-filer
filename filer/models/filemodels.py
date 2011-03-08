@@ -1,17 +1,17 @@
 import os
 import hashlib
-from django.utils.translation import ugettext_lazy as _
+
+from django.contrib.auth import models as auth_models
+from django.core.files.base import ContentFile
 from django.core import urlresolvers
 from django.db import models
-from django.contrib.auth import models as auth_models
+from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
-from filer.models.filer_file_storage import get_directory_name
 from filer.models.foldermodels import Folder
 from filer.models import mixins
-from filer import settings as filer_settings
 
-from easy_thumbnails.fields import ThumbnailerField
+from filer.fields.multistorage_file import MultiStorageFileField
 
 class FileManager(models.Manager):
     def find_all_duplicates(self):
@@ -26,9 +26,10 @@ class FileManager(models.Manager):
         return [i.subtype() for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
 class File(models.Model, mixins.IconsMixin):
+    file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    file = MultiStorageFileField(null=True, blank=True, max_length=255)
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -37,10 +38,10 @@ class File(models.Model, mixins.IconsMixin):
     has_all_mandatory_data = models.BooleanField(default=False, editable=False)
     
     original_filename = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Name'))
-    description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
+    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('name'))
+    description = models.TextField(null=True, blank=True, verbose_name=_('description'))
     
-    owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True, verbose_name=_('Owner'))
+    owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True, verbose_name=_('owner'))
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -53,25 +54,33 @@ class File(models.Model, mixins.IconsMixin):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         
-    def delete_thumbnails(self):
+    def _move_file(self):
         """
-        Delete all the thumbnails related to `instance.file`
+        Move the file from src to dst. 
         """
-        for thumb in self.file.get_source_cache().thumbnails.all():
-            os.remove(os.path.join(settings.MEDIA_ROOT, thumb.name))
-            thumb.delete()
-            
-    def _move_file(self, src_filer_prefix, dst_filer_prefix):
-        """
-        Move the file from src to dst. If `os.dirname(dst)` does not exist it
-        creates all the required directory.
-        """
-        src = self.file.name
-        dst = src.replace(src_filer_prefix,
-                           dst_filer_prefix)
-        new_name = self.file.storage.save(dst, self.file)
-        self.file.delete(save=False)
-        self.file = new_name
+        src_file_name = self.file.name
+        dst_file_name = self._meta.get_field('file').generate_filename(self, self.original_filename)
+        
+        if self.is_public:
+            src_storage = self.file.storages['private']
+            dst_storage = self.file.storages['public']
+        else:
+            src_storage = self.file.storages['public']
+            dst_storage = self.file.storages['private']
+
+        # delete the thumbnail
+        # We are toggling the is_public to make sure that easy_thumbnails can
+        # delete the thumbnails
+        self.is_public = not self.is_public
+        self.file.delete_thumbnails()
+        self.is_public = not self.is_public
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
+        src_file = src_storage.open(src_file_name)
+        src_file.open()
+        self.file = dst_storage.save(dst_file_name, ContentFile(src_file.read()))
+        src_storage.delete(src_file_name)
+        
     
     def generate_sha1(self):
         sha = hashlib.sha1()
@@ -94,18 +103,12 @@ class File(models.Model, mixins.IconsMixin):
             self._file_size = self.file.size
         except:
             pass
-        if self._old_is_public != self.is_public and \
-                                  self.pk:
-            if self.is_public:
-                self._move_file(filer_settings.FILER_PRIVATEMEDIA_PREFIX,
-                               filer_settings.FILER_PUBLICMEDIA_PREFIX)
-            else:
-                self._move_file(filer_settings.FILER_PUBLICMEDIA_PREFIX,
-                               filer_settings.FILER_PRIVATEMEDIA_PREFIX)
+        if self._old_is_public != self.is_public and self.pk:
+            self._move_file()
             self._old_is_public = self.is_public
         try:
             self.generate_sha1()
-        except Exception,e:
+        except Exception, e:
             print e, type(3)
         super(File, self).save(*args, **kwargs)
 
@@ -130,7 +133,7 @@ class File(models.Model, mixins.IconsMixin):
         image. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated() or not user.is_staff:
+        if not user.is_authenticated():# or not user.is_staff:
             return False
         elif user.is_superuser:
             return True
@@ -163,6 +166,7 @@ class File(models.Model, mixins.IconsMixin):
         return r
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
+
     @property
     def url(self):
         '''
@@ -173,6 +177,7 @@ class File(models.Model, mixins.IconsMixin):
         except:
             r = ''
         return r
+
     @property
     def path(self):
         try:
@@ -217,5 +222,5 @@ class File(models.Model, mixins.IconsMixin):
     
     class Meta:
         app_label = 'filer'
-        verbose_name = _('File')
-        verbose_name_plural = _('Files')
+        verbose_name = _('file')
+        verbose_name_plural = _('files')
