@@ -13,6 +13,7 @@ from filer.settings import FILER_IS_PUBLIC_DEFAULT
 class FileImporter(object):
     def __init__(self, * args, **kwargs):
         self.path = kwargs.get('path')
+        self.base_folder = kwargs.get('base_folder')
         self.verbosity = int(kwargs.get('verbosity', 1))
         self.file_created = 0
         self.image_created = 0
@@ -71,24 +72,31 @@ class FileImporter(object):
                                                                                current_parent, created) 
         return current_parent
     
-    def walker(self, path=None):
+    def walker(self, path=None, base_folder=None):
         """
         This method walk a directory structure and create the
         Folders and Files as they appear.
         """
         path = path or self.path
+        base_folder = base_folder or self.base_folder
         # prevent trailing slashes and other inconsistencies on path.
         # cast to unicode so that os.walk returns path names in unicode
         # (prevents encoding/decoding errors)
         path = unicode(os.path.normpath(path))
+        if base_folder:
+            base_folder = unicode(os.path.normpath(base_folder))
+            print u"The directory structure will be imported in %s" % (base_folder,)
         if self.verbosity >= 1:
-            print u"Import the folders and files in %s" % path
+            print u"Import the folders and files in %s" % (path,)
         root_folder_name = os.path.basename(path)
         for root, dirs, files in os.walk(path):
             rel_folders = root.partition(path)[2].strip(os.path.sep).split(os.path.sep)
             while '' in rel_folders:
                 rel_folders.remove('')
-            folder_names = [root_folder_name] + rel_folders
+            if base_folder:
+                folder_names = base_folder.split('/') + [root_folder_name] + rel_folders
+            else:
+                folder_names = [root_folder_name] + rel_folders
             folder = self.get_or_create_folder(folder_names)
             for file in files:
                 dj_file = DjangoFile(open(os.path.join(root, file)),
@@ -100,12 +108,25 @@ class FileImporter(object):
                                                                                  self.image_created)
 
 class Command(NoArgsCommand):
+    """
+    Import directory structure into the filer ::
+    
+        manage.py --path=/tmp/assets/images
+        manage.py --path=/tmp/assets/news --folder=images
+        
+    """
+    
     option_list = BaseCommand.option_list + (
         make_option('--path',
             action='store',
             dest='path',
             default=False,
             help='Import files located in the path into django-filer'),
+        make_option('--folder',
+            action='store',
+            dest='base_folder',
+            default=False,
+            help='Specify the destination folder in which the directory structure should be imported'),
         )
 
     def handle_noargs(self, **options):
