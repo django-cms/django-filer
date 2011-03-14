@@ -16,7 +16,9 @@ FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_I
 
 FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', False)
 
-FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', settings.MEDIA_URL + 'filer/' )
+FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
+if not FILER_STATICMEDIA_PREFIX:
+    FILER_STATICMEDIA_PREFIX = (getattr(settings,'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
 
 FILER_PUBLICMEDIA_PREFIX = getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public/')
 FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL, FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
