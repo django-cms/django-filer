@@ -21,3 +21,5 @@ tests/develop-eggs
 tests/downloads
 tests/eggs
 tests/parts
+tests/personal*.cfg
+tests/project/personal*.py
