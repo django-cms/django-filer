@@ -15,3 +15,9 @@ build
 .settings
 *~
 docs/_build
+tests/.installed.cfg
+tests/bin
+tests/develop-eggs
+tests/downloads
+tests/eggs
+tests/parts
