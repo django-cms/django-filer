@@ -7,7 +7,6 @@ class PublicFileSystemStorage(FileSystemStorage):
 
     See ``filer.settings`` for the defaults for ``location`` and ``base_url``.
     """
-    name = "World Readable"
     def __init__(self, location=None, base_url=None, *args, **kwargs):
         from filer import settings as filer_settings
         location = location or getattr(filer_settings, 'FILER_PUBLICMEDIA_ROOT', None)
@@ -22,8 +21,6 @@ class PrivateFileSystemStorage(FileSystemStorage):
 
     See ``filer.settings`` for the defaults for ``location`` and ``base_url``.
     """
-    is_secure = True
-    name = "Secure Filesystem Storage"
     def __init__(self, location=None, base_url=None, *args, **kwargs):
         from filer import settings as filer_settings
         location = location or getattr(filer_settings, 'FILER_PRIVATEMEDIA_ROOT', None)
