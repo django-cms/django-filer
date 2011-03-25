@@ -30,6 +30,11 @@
 		if (plus.length){
 			plus.remove();
 		}
+		{% if object and object.file_type == 'Image' %}
+		$('#{{ thumb_id}}').click(function{
+			window.open('{{ object.url }}', '{{ object.name|slugify }}', 'menubar=no,width={{ obj.width }},height={{ obj.height }},toolbar=no,scrollbars=no,location=no');
+		});
+		{% endif %}
 	});
 </script>
 {% endspaceless %}
