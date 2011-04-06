@@ -1,9 +1,8 @@
+#-*- coding: utf-8 -*-
 import os
-import mimetypes
 import stat
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
+from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.utils.http import http_date
-from django.utils.encoding import smart_str
 from django.views.static import was_modified_since
 from filer.server.backends.base import ServerBase
 

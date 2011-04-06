@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import urllib
 
 from django.contrib.admin.util import unquote

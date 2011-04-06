@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from PIL import Image, ImageChops, ImageDraw
 
 from django.contrib.auth.models import User

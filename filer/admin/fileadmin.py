@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
 from django.contrib.admin.util import unquote
 from django.utils.translation import ugettext  as _

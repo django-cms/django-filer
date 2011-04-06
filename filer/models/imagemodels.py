@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from PIL import Image as PILImage
 from datetime import datetime
 from django.core import urlresolvers

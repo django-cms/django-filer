@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from easy_thumbnails.files import Thumbnailer
 import os
 import re

@@ -1,10 +1,8 @@
+#-*- coding: utf-8 -*-
 import mptt
-from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth import models as auth_models
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.core import urlresolvers
 from filer.models import mixins
 

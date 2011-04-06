@@ -1,4 +1,5 @@
-from django.conf.urls.defaults import *
+#-*- coding: utf-8 -*-
+from django.conf.urls.defaults import patterns, url
 from filer import settings as filer_settings
 
 urlpatterns = patterns('filer.server.views',

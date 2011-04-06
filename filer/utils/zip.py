@@ -1,4 +1,4 @@
-import os
+#-*- coding: utf-8 -*-
 #import zipfile
 # zipfile.open() is only available in Python 2.6, so we use the future version
 from django.core.files.uploadedfile import SimpleUploadedFile

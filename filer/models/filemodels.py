@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import os
 import hashlib
 
@@ -7,7 +8,6 @@ from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from django.conf import settings
 from filer.models.foldermodels import Folder
 from filer.models import mixins
 
