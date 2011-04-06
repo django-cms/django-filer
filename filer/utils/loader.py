@@ -14,19 +14,22 @@ from django.utils.importlib import import_module
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join
 
-def load(klass, superklass):
+def load(klass, superklass=None):
     """
     will return an instance of klass, no matter if klass is:
     * already an instance of klass
     * is a subclass of superklass
     * is a string containing the path to a class. e.g 'my.app.MyClass'
     """
-    if isinstance(klass, superklass):
-        return klass
-    elif inspect.isclass(klass) and issubclass(klass, superklass):
-        return klass()
-    elif issubclass(klass.__class__, superklass):
-        return klass
+    if superklass: # We have a superclass
+        if isinstance(klass, superklass):
+            return klass
+        elif inspect.isclass(klass) and issubclass(klass, superklass):
+            return klass()
+        elif issubclass(klass.__class__, superklass):
+            return klass
+    
+    # If we don't have a superclass, the class argument should be a string
     if isinstance(klass, str) or isinstance(klass, unicode):
         import_path = str(klass)
         try:
