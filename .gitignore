@@ -21,3 +21,7 @@ tests/develop-eggs
 tests/downloads
 tests/eggs
 tests/parts
+distribute*
+lib/
+include/
+tests/tmp/
