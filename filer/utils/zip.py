@@ -1,8 +1,5 @@
-import os
-#import zipfile
-# zipfile.open() is only available in Python 2.6, so we use the future version
 from django.core.files.uploadedfile import SimpleUploadedFile
-from filer.utils import zipfile
+from zipfile import ZipFile
 
 def unzip(file):
     """
@@ -11,12 +8,12 @@ def unzip(file):
     """
     files = []
     # TODO: implement try-except here
-    zip = zipfile.ZipFile(file)
+    zip = ZipFile(file)
     bad_file = zip.testzip()
     if bad_file:
         raise Exception('"%s" in the .zip archive is corrupt.' % bad_file)
     infolist = zip.infolist()
-    print infolist
+#    print infolist
     for zipinfo in infolist:
         print "handling %s" % zipinfo.filename
         if zipinfo.filename.startswith('__'): # do not process meta files
