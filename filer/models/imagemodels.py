@@ -129,6 +129,7 @@ class Image(File):
                     'size':(int(size),int(size)),
                     'crop': True,
                     'upscale':True,
+                    'subject_location': self.subject_location,
                     }
                 thumb = self.file.get_thumbnail(thumbnail_options)
                 _icons[size] = thumb.url
@@ -143,6 +144,7 @@ class Image(File):
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
+                opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
                 _thumbnails[name] = thumb.url
             except:
