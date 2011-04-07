@@ -1,6 +1,6 @@
+#-*- coding: utf-8 -*-
 from django.template import Library
 import math
-import re
 
 register = Library()
 

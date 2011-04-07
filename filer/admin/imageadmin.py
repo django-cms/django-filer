@@ -1,9 +1,9 @@
+#-*- coding: utf-8 -*-
 from django.utils.translation import ugettext  as _
 from django import forms
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
 
-from django.conf import settings
 from filer import settings as filer_settings
 
 # forms

@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django import forms
 from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
@@ -7,10 +8,8 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.text import truncate_words
-from django.utils.translation import ugettext as _
-from filer.models import File, File
+from filer.models import File
 from filer.settings import FILER_STATICMEDIA_PREFIX
-import os
 
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None

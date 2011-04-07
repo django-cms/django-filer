@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from easy_thumbnails import fields as easy_thumbnails_fields, \
@@ -5,8 +6,6 @@ from easy_thumbnails import fields as easy_thumbnails_fields, \
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
 from filer.utils.loader import load
-import hashlib
-import os
 
 DEFAULT_STORAGES = {
     'public': load(filer_settings.FILER_PUBLICMEDIA_STORAGE, Storage),

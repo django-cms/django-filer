@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import os
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify

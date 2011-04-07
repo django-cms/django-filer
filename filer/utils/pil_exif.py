@@ -1,5 +1,4 @@
-import StringIO
-
+#-*- coding: utf-8 -*-
 try:
     import Image
     import ExifTags

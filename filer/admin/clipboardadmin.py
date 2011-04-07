@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import os
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponse

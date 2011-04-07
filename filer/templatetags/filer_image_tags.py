@@ -1,5 +1,5 @@
+#-*- coding: utf-8 -*-
 from django.template import Library
-import math
 import re
 
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')

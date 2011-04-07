@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from filer.models import Clipboard
 
 def discard_clipboard(clipboard):

@@ -1,10 +1,11 @@
+#-*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseServerError
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.exceptions import PermissionDenied
 
-from models import Folder, Image, Clipboard, File
+from models import Folder, Image, Clipboard
 from models import tools
 
 from django import forms

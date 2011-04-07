@@ -1,18 +1,8 @@
-import os
-import errno
-import urlparse
-import itertools
+#-*- coding: utf-8 -*-
 import inspect
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.core.files import locks, File
-from django.core.files.move import file_move_safe
-from django.utils.encoding import force_unicode
-from django.utils.functional import LazyObject
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
-from django.utils.text import get_valid_filename
-from django.utils._os import safe_join
 
 def load(klass, superklass=None):
     """
