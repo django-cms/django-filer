@@ -27,3 +27,4 @@ include/
 tests/tmp/
 *.coverage
 htmlcov/
+share/

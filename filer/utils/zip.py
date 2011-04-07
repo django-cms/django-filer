@@ -15,7 +15,7 @@ def unzip(file):
     infolist = zip.infolist()
 #    print infolist
     for zipinfo in infolist:
-        print "handling %s" % zipinfo.filename
+#        print "handling %s" % zipinfo.filename
         if zipinfo.filename.startswith('__'): # do not process meta files
             continue
         thefile = SimpleUploadedFile(name=zipinfo.filename, content=zip.read(zipinfo))
