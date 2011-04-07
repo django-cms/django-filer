@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from filer.models import mixins
+from django.utils.translation import ugettext_lazy as _
 
 '''
 Managers
