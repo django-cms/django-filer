@@ -4,7 +4,6 @@ from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from easy_thumbnails.files import Thumbnailer
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
