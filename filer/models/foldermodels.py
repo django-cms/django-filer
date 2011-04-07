@@ -16,16 +16,23 @@ class FolderManager(models.Manager):
         return self.get_query_set().filter(has_all_mandatory_data=False)
 
 class FolderPermissionManager(models.Manager):
+    '''
+    Theses methods are called by introspection from "has_generic_permisison" on
+    the folder model.
+    '''
     def get_read_id_list(self, user):
         """
         Give a list of a Folders where the user has read rights or the string
         "All" if the user has all rights.
         """
         return self.__get_id_list(user, "can_read")
+    
     def get_edit_id_list(self, user):
         return self.__get_id_list(user, "can_edit")
+    
     def get_add_children_id_list(self, user):
         return self.__get_id_list(user, "can_add_children")
+    
     def __get_id_list(self, user, attr):
         if user.is_superuser:
             return 'All'
@@ -129,10 +136,13 @@ class Folder(models.Model, mixins.IconsMixin):
     
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
+    
     def has_read_permission(self, request):
         return self.has_generic_permission(request, 'read')
+    
     def has_add_children_permission(self, request):
         return self.has_generic_permission(request, 'add_children')
+    
     def has_generic_permission(self, request, type):
         """
         Return true if the current user has permission on this
@@ -150,6 +160,8 @@ class Folder(models.Model, mixins.IconsMixin):
             if not hasattr(self, "permission_user_cache") or \
                not hasattr(self, att_name) or \
                request.user.pk != self.permission_user_cache.pk:
+                
+                # This calls methods on the manager i.e. get_read_id_list()
                 func = getattr(FolderPermission.objects, "get_%s_id_list" % type)
                 permission = func(user)
                 self.permission_user_cache = request.user
@@ -159,8 +171,10 @@ class Folder(models.Model, mixins.IconsMixin):
                 else:
                     setattr(self, att_name, False)
             return getattr(self, att_name)
+        
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change', args=(self.id,))
+    
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse('admin:filer-directory_listing', args=(self.id,))
         
