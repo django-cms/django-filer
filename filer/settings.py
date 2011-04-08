@@ -17,6 +17,12 @@ FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
 if not FILER_STATICMEDIA_PREFIX:
     FILER_STATICMEDIA_PREFIX = (getattr(settings,'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
 
+FILER_ADMIN_ICON_SIZES = (
+        '16', '32', '48', '64',
+)
+
+# Public Media
+
 FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL, 'filer_public/').replace('\\', '/') )
 FILER_PUBLICMEDIA_ROOT = getattr(settings, 'FILER_PUBLICMEDIA_ROOT',
                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, 'filer_public/' ) ) )
@@ -31,6 +37,7 @@ FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(settings,
                                     'FILER_PUBLICMEDIA_STORAGE',
                                     'filer.storage.PublicFileSystemStorage')
 
+# Private Media
 
 FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL',
                                  '/smedia/files/' )
@@ -52,6 +59,3 @@ FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "file
 
 FILER_NGINX_PROTECTED_LOCATION = getattr(settings, 'FILER_NGINX_PROTECTED_LOCATION', "protected_media")
 
-FILER_ADMIN_ICON_SIZES = (
-        '16', '32', '48', '64',
-)
