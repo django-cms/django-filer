@@ -9,8 +9,10 @@ To get started using ``django-filer`` simply install it with
 Dependencies
 ------------
 
-* django-mptt >= 0.2.1'
-* easy-thumbnails >= 1.0-alpha-16
+* `Django`_ 1.2 with django-staticfiles or `Django`_ 1.3
+* django-mptt >= 0.2.1
+* `easy_thumbnails`_ requires the `easy_thumbnails simpler-get_thumbnail branch <https://github.com/SmileyChris/easy-thumbnails/tree/simpler-get_thumbnail>`_ until the next release of `easy_thumbnails`_
+* `PIL`_ 1.1.7 (probably also works with older versions)
 
 Configuration
 -------------

@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 """
 django-filer - file and image management for django projects
 """

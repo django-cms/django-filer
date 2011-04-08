@@ -1,0 +1,10 @@
+[run]
+branch = True
+source =
+    filer
+omit =
+    ../*migrations*
+    ../*tests*
+[report]
+precision = 2
+

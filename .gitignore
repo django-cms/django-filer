@@ -23,3 +23,10 @@ tests/eggs
 tests/parts
 tests/personal*.cfg
 tests/project/personal*.py
+distribute*
+lib/
+include/
+tests/tmp/
+*.coverage
+htmlcov/
+share/

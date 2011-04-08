@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_STATICMEDIA_PREFIX
 
 class IconsMixin(object):

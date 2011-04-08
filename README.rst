@@ -5,11 +5,17 @@ django-filer
 
 A file management application for django that makes handling of files and images a breeze.
 
+Documentation: http://django-filer.readthedocs.org/en/latest/index.html
+
+Wiki: https://github.com/stefanfoulis/django-filer/wiki
+
 Dependencies
 ------------
 
-* django-cms >= 2.1
-* easy-thumbnails >= 1.0-alpha-13
+* `Django`_ 1.2 with django-staticfiles or `Django`_ 1.3
+* django-mptt >= 0.2.1
+* `easy_thumbnails`_ requires the git version until the next release
+* `PIL`_ 1.1.7 (probably also works with older versions)
 
 Getting Started
 ---------------
@@ -36,3 +42,7 @@ For automatic subject location aware cropping of images replace
         'easy_thumbnails.processors.filters',
     )
 
+.. _Django: http://djangoproject.com
+.. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
+.. _sorl.thumbnail: http://thumbnail.sorl.net/
+.. _PIL: http://www.pythonware.com/products/pil/

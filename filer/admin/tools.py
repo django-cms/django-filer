@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 def popup_status(request):
     return request.REQUEST.has_key('_popup') or request.REQUEST.has_key('pop')
 def selectfolder_status(request):

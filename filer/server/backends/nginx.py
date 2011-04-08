@@ -1,8 +1,13 @@
+#-*- coding: utf-8 -*-
 from django.http import HttpResponse
 from filer.server.backends.base import ServerBase
 from filer import settings as filer_settings
 
 class NginxXAccelRedirectServer(ServerBase):
+    '''
+    This returns a response with only headers set, so that nginx actually does
+    the serving
+    '''
     def __init__(self, *args, **kwargs):
         self.nginx_protected_location = kwargs.get('nginx_location', filer_settings.FILER_NGINX_PROTECTED_LOCATION)
         self.nginx_protected_root = filer_settings.FILER_PRIVATEMEDIA_ROOT

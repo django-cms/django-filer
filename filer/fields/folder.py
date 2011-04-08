@@ -1,6 +1,6 @@
+#-*- coding: utf-8 -*-
 from django.utils.translation import ugettext as _
 from django.utils.text import truncate_words
-from django.utils import simplejson
 from django.db import models
 from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget

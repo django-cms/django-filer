@@ -1,5 +1,5 @@
+#-*- coding: utf-8 -*-
 from django.template import Library
-import math
 
 register = Library()
 
