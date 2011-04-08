@@ -8,8 +8,10 @@ A file management application for django that makes handling of files and images
 Dependencies
 ------------
 
-* django-cms >= 2.1
-* easy-thumbnails >= 1.0-alpha-13
+* `Django`_ 1.2 with django-staticfiles or `Django`_ 1.3
+* django-mptt >= 0.2.1
+* `easy_thumbnails`_ requires the `easy_thumbnails simpler-get_thumbnail branch <https://github.com/SmileyChris/easy-thumbnails/tree/simpler-get_thumbnail>`_ until the next release of `easy_thumbnails`_
+* `PIL`_ 1.1.7 (probably also works with older versions)
 
 Getting Started
 ---------------
@@ -36,3 +38,7 @@ For automatic subject location aware cropping of images replace
         'easy_thumbnails.processors.filters',
     )
 
+.. _Django: http://djangoproject.com
+.. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
+.. _sorl.thumbnail: http://thumbnail.sorl.net/
+.. _PIL: http://www.pythonware.com/products/pil/
