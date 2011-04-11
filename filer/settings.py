@@ -44,7 +44,7 @@ FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
 FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
                                        generate_filename)
 FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'thumbs')
-FILER_PRIVATEMEDIA_FILE_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'files')
+FILER_PRIVATEMEDIA_FILE_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_FILE_URL_PREFIX', 'files')
 
 FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.backends.default.DefaultServer")
 
