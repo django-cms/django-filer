@@ -26,7 +26,6 @@ def move_files_from_clipboard_to_folder(clipboard, folder):
 
 def move_files_to_folder(files, folder):
     for file in files:
-        #print "moving %s (%s) to %s" % (file, type(file), folder)
         file.folder = folder
         file.save()
     return True

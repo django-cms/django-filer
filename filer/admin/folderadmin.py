@@ -64,8 +64,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         '''
         r = super(FolderAdmin, self).response_change(request, obj)
         if r['Location']:
-            #print r['Location']
-            #print obj
             # it was a successful save
             if r['Location'] in ['../']:
                 if obj.parent:
@@ -204,20 +202,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             f.perms = userperms_for_request(f, request)
             if hasattr(f, 'has_read_permission'):
                 if f.has_read_permission(request):
-                    #print "%s has read permission for %s" % (request.user, f)
                     folder_children.append(f)
                 else:
-                    pass#print "%s has NO read permission for %s" % (request.user, f)
+                    pass
             else:
                 folder_children.append(f) 
         for f in file_qs:
             f.perms = userperms_for_request(f, request)
             if hasattr(f, 'has_read_permission'):
                 if f.has_read_permission(request):
-                    #print "%s has read permission for %s" % (request.user, f)
                     folder_files.append(f)
                 else:
-                    pass#print "%s has NO read permission for %s" % (request.user, f)
+                    pass
             else:
                 folder_files.append(f)
         try:
@@ -228,9 +224,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:
             permissions = {}
-        #folder_children = folder_children.sort(cmp=lambda x,y: cmp(x.name.lower(), y.name.lower()))
         folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(), y.label.lower()))
-        #import ipdb; ipdb.set_trace()
         items = folder_children + folder_files
         paginator = Paginator(items, FILER_PAGINATE_BY)
         

@@ -112,18 +112,15 @@ class ClipboardAdmin(admin.ModelAdmin):
                         clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
                         clipboard_item.save()
                     except Exception, e:
-                        #print e
                         pass
                 else:
-                    pass#print uploadform.errors
+                    pass
         except Exception, e:
-            #print e
             pass
         return render_to_response('admin/filer/tools/clipboard/clipboard_item_rows.html',
                                   {'items': file_items },
                                   context_instance=RequestContext(request))
     def move_file_to_clipboard(self, request):
-        #print "move file"
         if request.method == 'POST':
             file_id = request.POST.get("file_id", None)
             clipboard = tools.get_user_clipboard(request.user)

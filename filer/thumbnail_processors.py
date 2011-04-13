@@ -25,7 +25,6 @@ def normalize_subject_location(subject_location):
             try:
                 return ( int(subject_location[0]), int(subject_location[1]) )
             except (TypeError, ValueError), e:
-                print e, type(e)
                 pass
     return False
 #new signature: im, size, crop=False, upscale=False, **kwargs
