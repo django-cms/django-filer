@@ -37,7 +37,7 @@
                 <td>
                     <a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
                     <div><b><a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a></b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }})</span></div>
-                    {% ifequal file.file_type "image" %}<div>{{ file.width }} x {{ file.height }} px </span></div>{% endifequal %}
+                    {% ifequal file.file_type "image" %}<div>{{ file.width }} x {{ file.height }} px </div>{% endifequal %}
                     {% if file.owner %}<div>{% trans "Owner" %}: {{ file.owner }}</div>{% endif %}
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
