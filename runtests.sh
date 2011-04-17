@@ -26,7 +26,7 @@ done
 
 if [ $coverage == true ]; then
         pushd .
-	cd tests/
+        cd tests/
         coverage run bin/django test $suite
         coverage html
         popd
@@ -35,7 +35,7 @@ else
 
         # the default case...
         pushd .
-	cd tests/
+        cd tests/
         bin/django test $suite
         popd
 
