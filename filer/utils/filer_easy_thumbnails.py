@@ -18,7 +18,7 @@ def thumbnail_to_original_filename(thumbnail_name):
 
 
 class ThumbnailerNameMixin(object):
-    thumbnail_basedir = filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX
+    thumbnail_basedir = ''
     thumbnail_subdir = ''
     thumbnail_prefix = ''
     thumbnail_quality = Thumbnailer.thumbnail_quality
@@ -28,7 +28,7 @@ class ThumbnailerNameMixin(object):
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
-        reproducable thumnail name that can be converted back to the original
+        reproducable thumbnail name that can be converted back to the original
         filename.
         """
         path, source_filename = os.path.split(self.name)
@@ -58,16 +58,6 @@ class ThumbnailerNameMixin(object):
         filename = u'%s__%s.%s' % (source_filename, all_opts, extension)
 
         return os.path.join(basedir, path, subdir, filename)
-#    def get_thumbnail_name(self, thumbnail_options, transparent=False):
-#        path, source_filename = os.path.split(self.name)
-#        source_extension = os.path.splitext(source_filename)[1][1:]
-#        dst = super(ThumbnailNameMixin, self).get_thumbnail_name(thumbnail_options, transparent=transparent)
-#        dst_path, dst_filename = os.path.split(dst)
-#        dst_extension = os.path.splitext(dst_filename)[1][1:]
-#        m = hashlib.md5()
-#        m.update(dst)
-#        thumb_options_hash = m.hexdigest()
-#        return u"thumbs/%s-%s.%s" % (self.name, thumb_options_hash, dst_extension)
 
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
     pass

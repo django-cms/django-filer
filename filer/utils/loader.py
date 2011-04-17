@@ -1,37 +1,38 @@
 #-*- coding: utf-8 -*-
-import inspect
+"""
+This function is snatched from 
+https://github.com/ojii/django-load/blob/3058ab9d9d4875589638cc45e84b59e7e1d7c9c3/django_load/core.py#L49
 
-from django.core.exceptions import ImproperlyConfigured
+local changes: 
+
+* added check for basestring to allow values that are already an object
+  or method.
+
+"""
 from django.utils.importlib import import_module
 
-def load(klass, superklass=None):
+def load_object(import_path):
     """
-    will return an instance of klass, no matter if klass is:
-    * already an instance of klass
-    * is a subclass of superklass
-    * is a string containing the path to a class. e.g 'my.app.MyClass'
-    """
-    if superklass: # We have a superclass
-        if isinstance(klass, superklass):
-            return klass
-        elif inspect.isclass(klass) and issubclass(klass, superklass):
-            return klass()
-        elif issubclass(klass.__class__, superklass):
-            return klass
+    Loads an object from an 'import_path', like in MIDDLEWARE_CLASSES and the
+    likes.
     
-    # If we don't have a superclass, the class argument should be a string
-    if isinstance(klass, str) or isinstance(klass, unicode):
-        import_path = str(klass)
-        try:
-            dot = import_path.rindex('.')
-        except ValueError:
-            raise ImproperlyConfigured("%s isn't a %s module." % (import_path, superklass))
-        module, classname = import_path[:dot], import_path[dot+1:]
-        try:
-            mod = import_module(module)
-        except ImportError, e:
-            raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
-        try:
-            return getattr(mod, classname)()
-        except AttributeError:
-            raise ImproperlyConfigured('%s module "%s" does not define a "%s" class.' % (superklass, module, classname))
+    Import paths should be: "mypackage.mymodule.MyObject". It then imports the
+    module up until the last dot and tries to get the attribute after that dot
+    from the imported module.
+    
+    If the import path does not contain any dots, a TypeError is raised.
+    
+    If the module cannot be imported, an ImportError is raised.
+    
+    If the attribute does not exist in the module, a AttributeError is raised.
+    """
+    if not isinstance(import_path, basestring):
+        return import_path
+    if '.' not in import_path:
+        raise TypeError(
+            "'import_path' argument to 'django_load.core.load_object' must "
+            "contain at least one dot."
+        )
+    module_name, object_name = import_path.rsplit('.', 1)
+    module = import_module(module_name)
+    return getattr(module, object_name)

@@ -5,11 +5,15 @@ from easy_thumbnails import fields as easy_thumbnails_fields, \
     files as easy_thumbnails_files
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
-from filer.utils.loader import load
 
-DEFAULT_STORAGES = {
-    'public': load(filer_settings.FILER_PUBLICMEDIA_STORAGE, Storage),
-    'private': load(filer_settings.FILER_PRIVATEMEDIA_STORAGE, Storage),
+
+STORAGES = {
+    'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,
+    'private': filer_settings.FILER_PRIVATEMEDIA_STORAGE,
+}
+THUMBNAIL_STORAGES = {
+    'public': filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_STORAGE,
+    'private': filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE,
 }
 
 def generate_filename_multistorage(instance, filename):
@@ -30,6 +34,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin, easy_thumbnails_files.Thumbnai
         self.field = field
         self._committed = True
         self.storages = self.field.storages
+        self.thumbnail_storages = self.field.thumbnail_storages
     @property
     def storage(self):
         if self.instance.is_public:
@@ -47,14 +52,15 @@ class MultiStorageFieldFile(ThumbnailerNameMixin, easy_thumbnails_files.Thumbnai
     @property
     def thumbnail_storage(self):
         if self.instance.is_public:
-            return self.storages['public']
+            return self.thumbnail_storages['public']
         else:
-            return self.storages['private']
+            return self.thumbnail_storages['private']
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
-    def __init__(self, verbose_name=None, name=None, upload_to_dict=None, storages=None, **kwargs):
-        self.storages = storages or DEFAULT_STORAGES
+    def __init__(self, verbose_name=None, name=None, upload_to_dict=None, storages=None, thumbnail_storages=None, **kwargs):
+        self.storages = storages or STORAGES
+        self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(verbose_name=verbose_name, name=name,
                                                                       upload_to=generate_filename_multistorage,
                                                                       storage=None, **kwargs)
