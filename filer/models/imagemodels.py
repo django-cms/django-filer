@@ -4,7 +4,6 @@ from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from easy_thumbnails.files import Thumbnailer
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
@@ -129,6 +128,7 @@ class Image(File):
                     'size':(int(size),int(size)),
                     'crop': True,
                     'upscale':True,
+                    'subject_location': self.subject_location,
                     }
                 thumb = self.file.get_thumbnail(thumbnail_options)
                 _icons[size] = thumb.url
@@ -143,6 +143,7 @@ class Image(File):
         _thumbnails = {}
         for name, opts in Image.DEFAULT_THUMBNAILS.items():
             try:
+                opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
                 _thumbnails[name] = thumb.url
             except:
