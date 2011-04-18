@@ -16,9 +16,7 @@ def unzip(file):
     if bad_file:
         raise Exception('"%s" in the .zip archive is corrupt.' % bad_file)
     infolist = zip.infolist()
-#    print infolist
     for zipinfo in infolist:
-#        print "handling %s" % zipinfo.filename
         if zipinfo.filename.startswith('__'): # do not process meta files
             continue
         thefile = SimpleUploadedFile(name=zipinfo.filename, content=zip.read(zipinfo))

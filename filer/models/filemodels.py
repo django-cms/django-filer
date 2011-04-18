@@ -109,7 +109,7 @@ class File(models.Model, mixins.IconsMixin):
         try:
             self.generate_sha1()
         except Exception, e:
-            print e, type(3)
+            pass
         super(File, self).save(*args, **kwargs)
 
     @property
@@ -153,16 +153,13 @@ class File(models.Model, mixins.IconsMixin):
 
     
     def subtype(self):
-        #print "get subtype"
         if not self._file_type_plugin_name:
             r = self
         else:
             try:
                 r = getattr(self, self._file_type_plugin_name.lower())
             except Exception, e:
-                #print e
                 r = self
-        #print u"get subtype: %s %s" % (r, self._file_type_plugin_name)
         return r
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))

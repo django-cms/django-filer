@@ -10,10 +10,8 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         if hasattr(obj, 'has_edit_permission'):
             if obj.has_edit_permission(request):
-                #print "%s has edit permission for %s" % (request.user, obj)
                 return True
             else:
-                #print "%s has NO edit permission for %s" % (request.user, obj)
                 return False
         else:
             return True

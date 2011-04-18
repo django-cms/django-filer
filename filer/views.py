@@ -79,10 +79,8 @@ def make_folder(request, folder_id=None):
             new_folder.parent = folder
             new_folder.owner = request.user
             new_folder.save()
-            #print u"Saving folder %s as child of %s" % (new_folder, folder)
             return HttpResponse('<script type="text/javascript">opener.dismissPopupAndReload(window);</script>')
     else:
-        #print u"New Folder GET, parent %s" % folder
         new_folder_form = NewFolderForm()
     return render_to_response('admin/filer/folder/new_folder_form.html', {
             'new_folder_form': new_folder_form,
@@ -92,7 +90,6 @@ def make_folder(request, folder_id=None):
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = Image
-        #fields = ('file',)
         
 
 @login_required

@@ -45,7 +45,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         '''
         r = super(FileAdmin, self).response_change(request, obj)
-        #print r['Location']
         if r['Location']:
             # it was a successful save
             if r['Location'] in ['../']:
