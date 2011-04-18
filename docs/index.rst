@@ -44,4 +44,5 @@ Contents
 
    getting_started
    running_tests
+   server
    settings

@@ -72,5 +72,3 @@ FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(settings,
                                     ))
 FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', DefaultServer())
 
-FILER_NGINX_PROTECTED_LOCATION = getattr(settings, 'FILER_NGINX_PROTECTED_LOCATION', "protected_media")
-
