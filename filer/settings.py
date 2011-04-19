@@ -1,15 +1,11 @@
 #-*- coding: utf-8 -*-
-import datetime
-import os
-import urlparse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.encoding import force_unicode, smart_str
-from filer.utils.files import get_valid_filename
-
-def generate_filename(instance, filename):
-    datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
-    return os.path.join(datepart, get_valid_filename(filename))
+from filer.server.backends.default import DefaultServer
+from filer.storage import PublicFileSystemStorage, PrivateFileSystemStorage
+from filer.utils.loader import load_object
+import os
+import urlparse
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
@@ -21,40 +17,58 @@ FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
 if not FILER_STATICMEDIA_PREFIX:
     FILER_STATICMEDIA_PREFIX = (getattr(settings,'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
 
-FILER_PUBLICMEDIA_PREFIX = getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public/')
-FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', urlparse.urljoin(settings.MEDIA_URL, FILER_PUBLICMEDIA_PREFIX).replace('\\', '/') )
-FILER_PUBLICMEDIA_ROOT = getattr(settings, 'FILER_PUBLICMEDIA_ROOT',
-                                 os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PUBLICMEDIA_PREFIX ) ) )
-FILER_PUBLICMEDIA_STORAGE = getattr(settings,
-                                    'FILER_PUBLICMEDIA_STORAGE',
-                                    'filer.storage.PublicFileSystemStorage')
-
-FILER_PUBLICMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', generate_filename)
-
-
-FILER_PRIVATEMEDIA_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX',
-                                    'filer_private/')
-FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL',
-                                 urlparse.urljoin(settings.MEDIA_URL,FILER_PRIVATEMEDIA_PREFIX).replace('\\', '/') )
-FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT',
-                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, FILER_PRIVATEMEDIA_PREFIX ) ) )
-FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
-                                    'FILER_PRIVATEMEDIA_STORAGE',
-                                    'filer.storage.PrivateFileSystemStorage')
-FILER_PRIVATEMEDIA_UPLOAD_TO = getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
-                                       generate_filename)
-FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'thumbs')
-FILER_PRIVATEMEDIA_FILE_URL_PREFIX = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL_PREFIX', 'files')
-
-FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', "filer.server.backends.default.DefaultServer")
-
-FILER_NGINX_PROTECTED_LOCATION = getattr(settings, 'FILER_NGINX_PROTECTED_LOCATION', "protected_media")
-
-if not FILER_PUBLICMEDIA_URL.endswith('/'):
-    raise ImproperlyConfigured('FILER_PUBLICMEDIA_URL (currently "%s") must end with a "/"' % FILER_PUBLICMEDIA_URL)
-if not FILER_PRIVATEMEDIA_URL.endswith('/'):
-    raise ImproperlyConfigured('FILER_PRIVATEMEDIA_URL (currently "%s") must end with a "/"' % FILER_PRIVATEMEDIA_URL)
-
 FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64',
 )
+
+# Public Media
+
+FILER_PUBLICMEDIA_ROOT = getattr(settings, 'FILER_PUBLICMEDIA_ROOT',
+                                 os.path.abspath( os.path.join(settings.MEDIA_ROOT, 'filer' ) ) )
+FILER_PUBLICMEDIA_URL = getattr(settings, 'FILER_PUBLICMEDIA_URL', 
+                                urlparse.urljoin(settings.MEDIA_URL, 'filer/') )
+FILER_PUBLICMEDIA_STORAGE = getattr(settings,
+                                    'FILER_PUBLICMEDIA_STORAGE',
+                                    PublicFileSystemStorage(
+                                        location=FILER_PUBLICMEDIA_ROOT,
+                                        base_url=FILER_PUBLICMEDIA_URL
+                                    ))
+FILER_PUBLICMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', 'filer.utils.generate_filename.by_date'))
+
+FILER_PUBLICMEDIA_THUMBNAIL_ROOT = getattr(settings, 'FILER_PUBLICMEDIA_THUMBNAIL_ROOT',
+                                 os.path.abspath( os.path.join(settings.MEDIA_ROOT, 'filer_thumbnails' ) ) )
+FILER_PUBLICMEDIA_THUMBNAIL_URL = getattr(settings, 'FILER_PUBLICMEDIA_THUMBNAIL_URL', urlparse.urljoin(settings.MEDIA_URL, 'filer_thumbnails/') )
+FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(settings,
+                                    'FILER_PUBLICMEDIA_THUMBNAIL_STORAGE',
+                                    PublicFileSystemStorage(
+                                        location=FILER_PUBLICMEDIA_THUMBNAIL_ROOT,
+                                        base_url=FILER_PUBLICMEDIA_THUMBNAIL_URL
+                                    ))
+
+# Private Media
+
+FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT',
+                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, '../smedia/filer/' ) ) )
+FILER_PRIVATEMEDIA_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL',
+                                 '/smedia/filer/' )
+FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
+                                    'FILER_PRIVATEMEDIA_STORAGE',
+                                    PrivateFileSystemStorage(
+                                        location=FILER_PRIVATEMEDIA_ROOT,
+                                        base_url=FILER_PRIVATEMEDIA_URL
+                                    ))
+FILER_PRIVATEMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
+                                       'filer.utils.generate_filename.by_date'))
+FILER_PRIVATEMEDIA_THUMBNAIL_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_ROOT',
+                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, 
+                                                                '../smedia/filer_thumbnails/' ) ) )
+FILER_PRIVATEMEDIA_THUMBNAIL_URL = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL',
+                                 '/smedia/filer_thumbnails/')
+FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(settings,
+                                    'FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE',
+                                    PrivateFileSystemStorage(
+                                        location=FILER_PRIVATEMEDIA_THUMBNAIL_ROOT,
+                                        base_url=FILER_PRIVATEMEDIA_THUMBNAIL_URL
+                                    ))
+FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', DefaultServer())
+

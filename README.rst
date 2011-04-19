@@ -17,17 +17,36 @@ Dependencies
 * `easy_thumbnails`_ requires the git version until the next release
 * `PIL`_ 1.1.7 (probably also works with older versions)
 
-Getting Started
----------------
+Installation
+------------
 
 To get started using ``django-filer`` simply install it with
 ``pip``::
 
     $ pip install django-filer
 
-
 Add ``"filer"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
 (or ``migrate`` if you're using South).
+
+Configuration
+-------------
+
+django-filer can handle public and private files. Public files are your regular
+world readable files in ``MEDIA_ROOT``. Private files are a other case however.
+To be able to check permissions on the file downloads a special view is used and
+they are saved in a separate location (in a directory called `smedia` next to 
+``MEDIA_ROOT`` by default).
+
+``filer.server.urls`` needs to be included in the root ``urls.py``::
+
+    urlpatterns += patterns('',
+        url(r'^', include('filer.server.urls')),
+    )
+
+By default private files are served directly by django. That is acceptable in
+a development environment, but very bad for performance in production. See
+the docs on how to serve files more efficiently.
+
 
 For automatic subject location aware cropping of images replace 
 ``easy_thumbnails.processors.scale_and_crop`` with
