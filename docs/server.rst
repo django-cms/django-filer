@@ -27,21 +27,24 @@ serving to an upstream webserver.
 ``filer.server.backends.nginx.NginxXAccelRedirectServer``
 ---------------------------------------------------------
 
-in settings.py::
+nginx docs about this stuff: http://wiki.nginx.org/XSendfile
+
+in ``settings.py``::
 
     from filer.server.backends.nginx import NginxXAccelRedirectServer
+    from filer.storage import PrivateFileSystemStorage
     
     FILER_PRIVATEMEDIA_ROOT = '/path/to/smedia/filer'
     FILER_PRIVATEMEDIA_URL = '/smedia/filer/'
     FILER_PRIVATEMEDIA_SERVER = NginxXAccelRedirectServer(
                                    location=FILER_PRIVATEMEDIA_ROOT,
-                                   nginx_location='nginx_filer_private')
+                                   nginx_location='/nginx_filer_private')
     
     FILER_PRIVATEMEDIA_THUMBNAIL_ROOT = '/path/to/smedia/filer_thumbnails'
-    FILER_PRIVATEMEDIA_THUMBNAIL_URL = '/smedia/filer_thumbnails'
+    FILER_PRIVATEMEDIA_THUMBNAIL_URL = '/smedia/filer_thumbnails/'
     FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = NginxXAccelRedirectServer(
-                                   location=FILER_PRIVATEMEDIA_ROOT,
-                                   nginx_location='nginx_filer_private_thumbnails')
+                                   location=FILER_PRIVATEMEDIA_THUMBNAIL_ROOT,
+                                   nginx_location='/nginx_filer_private_thumbnails')
 
 ``nginx_location`` is the location directive where nginx "hides" private files
 from general access. A fitting nginx configuration might look something like
@@ -49,12 +52,16 @@ this::
     
     location /nginx_filer_private/ {
       internal;
-      root   /path/to/smedia/filer;
+      alias /path/to/smedia/filer/;
     }
     location /nginx_filer_private_thumbnails/ {
       internal;
-      root   /path/to/smedia/filer_thumbnails;
+      alias /path/to/smedia/filer_thumbnails/;
     }
+
+.. Note::
+   make sure you follow the example exactly. Missing trailing slashes and ``alias`` vs.
+   ``root`` have subtle differences that can make your config fail.
 
 ``NginxXAccelRedirectServer`` will add the a ``X-Accel-Redirect`` header to 
 the response instead of actually loading and delivering the file itself. The 
@@ -66,4 +73,4 @@ again.
 ``filer.server.backends.xsendfile.ApacheXSendfileServer``
 ---------------------------------------------------------
 
-.. TODO: add docs
+.. Note:: add docs
