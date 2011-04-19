@@ -59,13 +59,13 @@ FILER_PRIVATEMEDIA_STORAGE = getattr(settings,
                                     ))
 FILER_PRIVATEMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
                                        'filer.utils.generate_filename.by_date'))
-FILER_PRIVATEMEDIA_THUMBNAIL_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT',
+FILER_PRIVATEMEDIA_THUMBNAIL_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_ROOT',
                                   os.path.abspath( os.path.join(settings.MEDIA_ROOT, 
                                                                 '../smedia/filer_thumbnails/' ) ) )
-FILER_PRIVATEMEDIA_THUMBNAIL_URL = getattr(settings, 'FILER_PRIVATEMEDIA_URL',
+FILER_PRIVATEMEDIA_THUMBNAIL_URL = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_URL',
                                  '/smedia/filer_thumbnails/')
 FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(settings,
-                                    'FILER_PRIVATEMEDIA_STORAGE',
+                                    'FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE',
                                     PrivateFileSystemStorage(
                                         location=FILER_PRIVATEMEDIA_THUMBNAIL_ROOT,
                                         base_url=FILER_PRIVATEMEDIA_THUMBNAIL_URL
