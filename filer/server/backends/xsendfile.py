@@ -8,5 +8,4 @@ class ApacheXSendfileServer(ServerBase):
         response = HttpResponse()
         response['X-Sendfile'] = file.path
         self.default_headers(request, response, file=file, **kwargs)
-        del response['Content-Type'] # let Apache decide
         return response

@@ -24,15 +24,16 @@ for development and serves the file directly from django.
 More suitiable for production are server backends that delegate the actual file
 serving to an upstream webserver.
 
-``filer.server.backends.nginx.NginxXAccelRedirectServer``
----------------------------------------------------------
+``NginxXAccelRedirectServer``
+-----------------------------
+
+location: ``filer.server.backends.nginx.NginxXAccelRedirectServer``
 
 nginx docs about this stuff: http://wiki.nginx.org/XSendfile
 
 in ``settings.py``::
 
     from filer.server.backends.nginx import NginxXAccelRedirectServer
-    from filer.storage import PrivateFileSystemStorage
     
     FILER_PRIVATEMEDIA_ROOT = '/path/to/smedia/filer'
     FILER_PRIVATEMEDIA_URL = '/smedia/filer/'
@@ -70,7 +71,28 @@ value in the header will be something like
 the actual file delivery while the django backend is free to do other stuff
 again.
 
-``filer.server.backends.xsendfile.ApacheXSendfileServer``
----------------------------------------------------------
+``ApacheXSendfileServer``
+-------------------------
 
-.. Note:: add docs
+location: ``filer.server.backends.xsendfile.ApacheXSendfileServer``
+
+.. Warning::
+   I have not tested this myself. Any feedback and example configurations are
+   very welcome :-)
+
+Once you have ``mod_xsendfile`` installed on your apache server you can
+configure the settings.
+
+in ``settings.py``::
+    
+    from filer.server.backends.xsendfile import ApacheXSendfileServer
+    
+    FILER_PRIVATEMEDIA_SERVER = ApacheXSendfileServer()
+    FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = ApacheXSendfileServer()
+
+in your apache configuration::
+    
+    XSendFilePath /path/to/smedia/
+
+``XSendFilePath`` is a whitelist for directories where apache will serve files
+from.
