@@ -6,8 +6,8 @@ Dependencies
 
 * `Django`_ 1.2 with django-staticfiles or `Django`_ 1.3
 * `django-mptt`_ >= 0.2.1
-* `easy_thumbnails`_ requires the git version until the next release
-* `PIL`_ 1.1.7 (probably also works with older versions)
+* `easy_thumbnails`_ >= 1.0-alpha-17
+* `PIL`_ 1.1.7 (with JPEG and ZLIB support) I recommend using `Pillow`_ instead.
 
 Installation
 ------------
@@ -58,3 +58,4 @@ For automatic subject location aware cropping of images replace
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _PIL: http://www.pythonware.com/products/pil/
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
+.. _Pillow: http://pypi.python.org/pypi/Pillow/

@@ -14,8 +14,8 @@ Dependencies
 
 * `Django`_ 1.2 with django-staticfiles or `Django`_ 1.3
 * django-mptt >= 0.2.1
-* `easy_thumbnails`_ requires the git version until the next release
-* `PIL`_ 1.1.7 (probably also works with older versions)
+* `easy_thumbnails`_ >= 1.0-alpha-17
+* `PIL`_ 1.1.7 (with JPEG and ZLIB support)
 
 Installation
 ------------
