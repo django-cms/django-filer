@@ -26,7 +26,7 @@ Configuration
 django-filer can handle public and private files. Public files are your regular
 world readable files in ``MEDIA_ROOT``. Private files are a other case however.
 To be able to check permissions on the file downloads a special view is used and
-they are saved in a separate location (in a directory called `smedia` next to 
+they are saved in a separate location (in a directory called ``smedia`` next to 
 ``MEDIA_ROOT`` by default).
 
 ``filer.server.urls`` needs to be included in the root ``urls.py``::
@@ -37,8 +37,7 @@ they are saved in a separate location (in a directory called `smedia` next to
 
 By default private files are served directly by django. That is acceptable in
 a development environment, but very bad for performance in production. See
-the docs on how to serve files more efficiently.
-
+the docs on :ref:`how to serve files more efficiently <server>`.
 
 For automatic subject location aware cropping of images replace 
 ``easy_thumbnails.processors.scale_and_crop`` with
