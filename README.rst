@@ -65,3 +65,4 @@ For automatic subject location aware cropping of images replace
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _PIL: http://www.pythonware.com/products/pil/
+.. _Pillow: http://pypi.python.org/pypi/Pillow/

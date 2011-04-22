@@ -43,6 +43,7 @@ Contents
    :maxdepth: 1
 
    getting_started
+   usage
    server
    settings
    running_tests
