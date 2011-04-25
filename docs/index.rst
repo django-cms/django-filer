@@ -28,6 +28,8 @@ Getting help
 * google group: http://groups.google.com/group/django-filer
 * IRC: #django-filer on freenode.net
 
+.. _contributing:
+
 Contributing
 ------------
 

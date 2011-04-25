@@ -11,6 +11,8 @@ Should newly uploaded files be private or public by default.
 
 Defaults to `False` (new files are private)
 
+.. _FILER_STATICMEDIA_PREFIX:
+
 ``FILER_STATICMEDIA_PREFIX``
 ----------------------------
 
