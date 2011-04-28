@@ -45,6 +45,7 @@ Contents
    :maxdepth: 1
 
    getting_started
+   installation
    usage
    server
    settings

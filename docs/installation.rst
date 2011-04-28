@@ -11,8 +11,7 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
     $ pip install django-filer
 
 If you are feeling adventurous you can get 
-`the latest version from github <django-filer>`_. See the section on 
-:ref:`contributing` for more details on using the source version.
+`the latest sourcecode from github <https://github.com/stefanfoulis/django-filer/>`_
 
 Dependencies
 ------------
