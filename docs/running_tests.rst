@@ -5,7 +5,7 @@ Running tests
 
 There is a minimal project and buildout configuration to get the tests up and 
 running.
-In the source checkout run::
+In the source checkout switch to the ``tests`` directory and run::
 
   python bootstrap.py
   ./bin/buildout
