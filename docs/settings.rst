@@ -127,16 +127,16 @@ directory should be served.
     Defaults to ``filer.server.backends.default.DefaultServer``
     
 
-`FILER_PAGINATE_BY`
--------------------
+``FILER_PAGINATE_BY``
+---------------------
 
 The number of items (Folders, Files) that should be displayed per page in
 admin.
 
 Defaults to `20`
 
-`FILER_SUBJECT_LOCATION_IMAGE_DEBUG`
-------------------------------------
+``FILER_SUBJECT_LOCATION_IMAGE_DEBUG``
+--------------------------------------
 
 Draws a red circle around to point in the image that was used to do the 
 subject location aware image cropping.
