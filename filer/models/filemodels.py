@@ -7,13 +7,14 @@ from django.core.files.base import ContentFile
 from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from polymorphic import PolymorphicModel, PolymorphicManager
 
 from filer.models.foldermodels import Folder
 from filer.models import mixins
 
 from filer.fields.multistorage_file import MultiStorageFileField
 
-class FileManager(models.Manager):
+class FileManager(PolymorphicManager):
     def find_all_duplicates(self):
         r = {}
         for file in self.all():
@@ -25,7 +26,7 @@ class FileManager(models.Manager):
     def find_duplicates(self, file):
         return [i.subtype() for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
-class File(models.Model, mixins.IconsMixin):
+class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
