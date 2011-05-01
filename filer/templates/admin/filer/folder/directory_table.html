@@ -22,8 +22,8 @@
                 <!-- Directory details -->
                 <td>
                     <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
-                    <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b></div>
-                    <div>{% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }} {% trans "Folders" %}: {{ subfolder.children_count|default:"0" }} {% trans "Files" %}: {{ subfolder.file_count|default:"0" }}</div>
+                    <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b>{% if not subfolder.is_root %}<span class="tiny"> ({% blocktrans count subfolder.children_count|default:"0" as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.file_count|default:"0" as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>{% endif %}</div>
+                    <div>{% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }}</div>
                 </td>
                 <td></td>
             </tr>
@@ -36,9 +36,9 @@
                 <!-- Filename/Dimensions -->
                 <td>
                     <a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
-                    <div><b><a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a></b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }})</span></div>
-                    {% ifequal file.file_type "Image" %}<div>{{ file.width }} x {{ file.height }} px </div>{% endifequal %}
-                    {% if file.owner %}<div>{% trans "Owner" %}: {{ file.owner }}</div>{% endif %}
+                    <div><b><a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a></b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span></div>
+                    <div>{% trans "Owner" %}: {{ file.owner|default:"n/a" }}</div>
+                    <div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
                 <td style="text-align: right;">

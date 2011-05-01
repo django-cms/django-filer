@@ -3,12 +3,12 @@
 Server
 ======
 
-django-filer can handle public and private files. Public files are your regular
-world readable files in ``MEDIA_ROOT``. Private files are a other case however.
-To be able to check permissions on the file downloads a special view is used and
-they are saved in a separate location. The default is a directory called 
-``smedia`` next to ``MEDIA_ROOT`` that must *NOT* be served by the webserver
-directly.
+django-filer supports permissions on files. They can be enabled or disabled.
+Files with disabled permissions are your regular world readable files in
+``MEDIA_ROOT``. Files with permissions are a other case however. To be able to
+check permissions on the file downloads a special view is used and they are
+saved in a separate location. The default is a directory called ``smedia`` next
+to ``MEDIA_ROOT`` that must *NOT* be served by the webserver directly.
 
 ``filer.server.urls`` needs to be included in the root ``urls.py``::
 
@@ -16,9 +16,9 @@ directly.
         url(r'^', include('filer.server.urls')),
     )
 
-The view will serve the private media files by delegating to one of its server
-backends. The ones bundled with django-filer live in ``filer.server.backends``
-and it is easy to create new ones.
+The view will serve the permission-checked media files by delegating to one of
+its server backends. The ones bundled with django-filer live in
+``filer.server.backends`` and it is easy to create new ones.
 
 The default is ``filer.server.backends.default.DefaultServer``. It is suitable
 for development and serves the file directly from django.
@@ -49,9 +49,9 @@ in ``settings.py``::
                                    location=FILER_PRIVATEMEDIA_THUMBNAIL_ROOT,
                                    nginx_location='/nginx_filer_private_thumbnails')
 
-``nginx_location`` is the location directive where nginx "hides" private files
-from general access. A fitting nginx configuration might look something like
-this::
+``nginx_location`` is the location directive where nginx "hides"
+permission-checked files from general access. A fitting nginx configuration
+might look something like this::
     
     location /nginx_filer_private/ {
       internal;
