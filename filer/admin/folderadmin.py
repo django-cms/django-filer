@@ -241,6 +241,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(paginator.num_pages)
         return render_to_response('admin/filer/folder/directory_listing.html', {
                 'folder':folder,
+                'clipboard_files': [f.subtype() for f in File.objects.filter(in_clipboards__clipboarditem__clipboard__user=request.user).distinct()],
                 'paginator':paginator,
                 'paginated_items':paginated_items,
                 'permissions': permissions,
