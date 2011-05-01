@@ -48,11 +48,6 @@
     <ul class="object-tools">
         {% if folder.can_have_subfolders %}<li><a id="id_new_folder" href="{% url admin:filer-directory_listing-make_root_folder %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a>{% endif %}</li>
         <li>{% include "admin/filer/tools/upload_button.html" %}</li>
-        {% comment %}
-        <li><a id="id_directory_root" href="{% url admin:filer-directory_listing-root %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" class="link" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}">{% trans "root"|title %}</a></li>
-        <li><a id="id_missing_data_images" href="{% url admin:filer-directory_listing-images_with_missing_data %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" class="link" title="{% trans "Show images with missing metadata" noop %}">{% trans "Incomplete Images" noop %}</a></li>
-        <li><a id="id_unfiled_images" href="{% url admin:filer-directory_listing-unfiled_images %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" class="link" title="{% trans "Show unfiled images" noop %}">{% trans "unfiled images"|title noop %}</a></li>
-        {% endcomment %}
     </ul>
     
     <div class="module" id="changelist">
