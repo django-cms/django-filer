@@ -46,7 +46,7 @@ class File(models.Model, mixins.IconsMixin):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False, verbose_name=_('Permissions disabled'), help_text=_('Disable any permission checking for this file. File will be publicly accessible to anyone.'))
     
     objects = FileManager()
     
