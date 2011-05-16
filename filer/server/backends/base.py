@@ -1,24 +1,26 @@
 #-*- coding: utf-8 -*-
-import os
-import mimetypes
 from django.utils.encoding import smart_str
+import mimetypes
+import os
+
 
 class ServerBase(object):
     def __init__(self, *args, **kwargs):
         pass
-    
+
     def get_mimetype(self, path):
         return mimetypes.guess_type(path)[0] or 'application/octet-stream'
-    
+
     def default_headers(self, **kwargs):
         self.save_as_header(**kwargs)
         self.size_header(**kwargs)
+
     def save_as_header(self, response, **kwargs):
-        '''
+        """
         * if save_as is False the header will not be added
         * if save_as is a filename, it will be used in the header
         * if save_as is None the filename will be determined from the file path
-        '''
+        """
         save_as = kwargs.get('save_as', None)
         if save_as == False:
             return
@@ -29,6 +31,7 @@ class ServerBase(object):
         else:
             filename = os.path.basename(file.path)
         response['Content-Disposition'] = smart_str(u'attachment; filename=%s' % filename)
+
     def size_header(self, response, **kwargs):
         size = kwargs.get('size', None)
         file = kwargs.get('file', None)
