@@ -21,7 +21,7 @@ FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64',
 )
 
-# Public Media
+# Public media (media accessible without any permission checks)
 
 FILER_PUBLICMEDIA_ROOT = getattr(settings, 'FILER_PUBLICMEDIA_ROOT',
                                  os.path.abspath( os.path.join(settings.MEDIA_ROOT, 'filer' ) ) )
@@ -45,7 +45,7 @@ FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(settings,
                                         base_url=FILER_PUBLICMEDIA_THUMBNAIL_URL
                                     ))
 
-# Private Media
+# Private media (media accessible through permissions checks)
 
 FILER_PRIVATEMEDIA_ROOT = getattr(settings, 'FILER_PRIVATEMEDIA_ROOT',
                                   os.path.abspath( os.path.join(settings.MEDIA_ROOT, '../smedia/filer/' ) ) )

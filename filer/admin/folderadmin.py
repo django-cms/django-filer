@@ -1,41 +1,40 @@
 #-*- coding: utf-8 -*-
-import urllib
-
-from django.contrib.admin.util import unquote
+from django import forms
 from django.contrib import admin
+from django.contrib.admin.util import unquote
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404
-from django import forms
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
-
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.admin.tools import popup_status, selectfolder_status, userperms_for_request
-from filer.models import Folder, FolderRoot, UnfiledImages, ImagesWithMissingData, File
-from filer.models import tools
+from filer.admin.tools import popup_status, selectfolder_status, \
+    userperms_for_request
+from filer.models import Folder, FolderRoot, UnfiledImages, \
+    ImagesWithMissingData, File, tools
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
+import urllib
 
 
-# Forms
 class AddFolderPopupForm(forms.ModelForm):
     folder = forms.HiddenInput()
+
     class Meta:
         model = Folder
         fields = ('name',)
 
-# ModelAdmins
+
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
     list_per_page = 20
     list_filter = ('owner',)
-    search_fields = ['name', 'files__name' ]
+    search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
-    save_as = True # see ImageAdmin
-    
+    save_as = True  # see ImageAdmin
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by
@@ -45,7 +44,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if parent_id:
             return AddFolderPopupForm
         else:
-            return super(FolderAdmin, self).get_form(request, obj=None, **kwargs)
+            return super(FolderAdmin, self).get_form(
+                                                request, obj=None, **kwargs)
+
     def save_form(self, request, form, change):
         """
         Given a ModelForm return an unsaved instance. ``change`` is True if
@@ -57,17 +58,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             parent = Folder.objects.get(id=parent_id)
             r.parent = parent
         return r
+
     def response_change(self, request, obj):
-        '''
+        """
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
-        '''
+        """
         r = super(FolderAdmin, self).response_change(request, obj)
         if r['Location']:
             # it was a successful save
             if r['Location'] in ['../']:
                 if obj.parent:
-                    url = reverse('admin:filer-directory_listing', 
+                    url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': obj.parent.id})
                 else:
                     url = reverse('admin:filer-directory_listing-root')
@@ -76,60 +78,69 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # this means it probably was a save_and_continue_editing
                 pass
         return r
-    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+
+    def render_change_form(self, request, context, add=False, change=False,
+                           form_url='', obj=None):
         extra_context = {'show_delete': True}
         context.update(extra_context)
-        return super(FolderAdmin, self).render_change_form(request=request, context=context, add=False, change=False, form_url=form_url, obj=obj)
-    
+        return super(FolderAdmin, self).render_change_form(
+                        request=request, context=context, add=False,
+                        change=False, form_url=form_url, obj=obj)
+
     def delete_view(self, request, object_id, extra_context=None):
-        '''
+        """
         Overrides the default to enable redirecting to the directory view after
         deletion of a folder.
-        
+
         we need to fetch the object and find out who the parent is
-        before super, because super will delete the object and make it impossible
-        to find out the parent folder to redirect to.
-        '''
+        before super, because super will delete the object and make it
+        impossible to find out the parent folder to redirect to.
+        """
         parent_folder = None
         try:
             obj = self.queryset(request).get(pk=unquote(object_id))
             parent_folder = obj.parent
         except self.model.DoesNotExist:
             obj = None
-        
-        r = super(FolderAdmin, self).delete_view(request=request, object_id=object_id, extra_context=extra_context)
+
+        r = super(FolderAdmin, self).delete_view(
+                    request=request, object_id=object_id,
+                    extra_context=extra_context)
         url = r.get("Location", None)
-        if url in ["../../../../","../../"]:
+        if url in ["../../../../", "../../"]:
             if parent_folder:
-                url = reverse('admin:filer-directory_listing', 
+                url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
             return HttpResponseRedirect(url)
         return r
+
     def icon_img(self, xs):
-        return mark_safe('<img src="%simg/icons/plainfolder_32x32.png" alt="Folder Icon" />' % FILER_STATICMEDIA_PREFIX)
+        return mark_safe('<img src="%simg/icons/plainfolder_32x32.png" ' + \
+                         'alt="Folder Icon" />' % FILER_STATICMEDIA_PREFIX)
     icon_img.allow_tags = True
-    
+
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url
         urls = super(FolderAdmin, self).get_urls()
         from filer import views
         url_patterns = patterns('',
-            # we override the default list view with our own directory listing of the root directories
+            # we override the default list view with our own directory listing
+            # of the root directories
             url(r'^$', self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing-root'),
             url(r'^(?P<folder_id>\d+)/list/$',
                 self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing'),
-            
+
             url(r'^(?P<folder_id>\d+)/make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_folder'),
             url(r'^make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_root_folder'),
-            
+
             url(r'^images_with_missing_data/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'images_with_missing_data'},
@@ -141,8 +152,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         )
         url_patterns.extend(urls)
         return url_patterns
-    
-    
+
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
         clipboard = tools.get_user_clipboard(request.user)
@@ -157,15 +167,23 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 folder = Folder.objects.get(id=folder_id)
             except Folder.DoesNotExist:
                 raise Http404
-            
+
         # search
         def filter_folder(qs, terms=[]):
             for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | Q(owner__username__icontains=term) | Q(owner__first_name__icontains=term) | Q(owner__last_name__icontains=term)  )  
+                qs = qs.filter(Q(name__icontains=term) | \
+                               Q(owner__username__icontains=term) | \
+                               Q(owner__first_name__icontains=term) | \
+                               Q(owner__last_name__icontains=term))
             return qs
+
         def filter_file(qs, terms=[]):
             for term in terms:
-                qs = qs.filter( Q(name__icontains=term) | Q(original_filename__icontains=term ) | Q(owner__username__icontains=term) | Q(owner__first_name__icontains=term) | Q(owner__last_name__icontains=term) )
+                qs = qs.filter(Q(name__icontains=term) | \
+                               Q(original_filename__icontains=term) | \
+                               Q(owner__username__icontains=term) | \
+                               Q(owner__first_name__icontains=term) | \
+                               Q(owner__last_name__icontains=term))
             return qs
         q = request.GET.get('q', None)
         if q:
@@ -173,27 +191,29 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             search_terms = []
             q = ''
-        limit_search_to_folder = request.GET.get('limit_search_to_folder', False) in (True, 'on')
-    
-        if len(search_terms)>0:
+        limit_search_to_folder = request.GET.get('limit_search_to_folder',
+                                                 False) in (True, 'on')
+
+        if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
                 folder_qs = folder.get_descendants()
-                file_qs = File.objects.filter(folder__in=folder.get_descendants())
+                file_qs = File.objects.filter(
+                                        folder__in=folder.get_descendants())
             else:
                 folder_qs = Folder.objects.all()
                 file_qs = File.objects.all()
             folder_qs = filter_folder(folder_qs, search_terms)
             file_qs = filter_file(file_qs, search_terms)
-                
+
             show_result_count = True
         else:
             folder_qs = folder.children.all()
             file_qs = folder.files.all()
             show_result_count = False
-        
+
         folder_qs = folder_qs.order_by('name')
         file_qs = file_qs.order_by('name')
-        
+
         folder_children = []
         folder_files = []
         if folder.is_root:
@@ -206,7 +226,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 else:
                     pass
             else:
-                folder_children.append(f) 
+                folder_children.append(f)
         for f in file_qs:
             f.perms = userperms_for_request(f, request)
             if hasattr(f, 'has_read_permission'):
@@ -220,38 +240,47 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             permissions = {
                 'has_edit_permission': folder.has_edit_permission(request),
                 'has_read_permission': folder.has_read_permission(request),
-                'has_add_children_permission': folder.has_add_children_permission(request),
+                'has_add_children_permission': \
+                                folder.has_add_children_permission(request),
             }
         except:
             permissions = {}
-        folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(), y.label.lower()))
+        folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(),
+                                               y.label.lower()))
         items = folder_children + folder_files
         paginator = Paginator(items, FILER_PAGINATE_BY)
-        
+
         # Make sure page request is an int. If not, deliver first page.
         try:
             page = int(request.GET.get('page', '1'))
         except ValueError:
             page = 1
-    
+
         # If page request (9999) is out of range, deliver last page of results.
         try:
             paginated_items = paginator.page(page)
         except (EmptyPage, InvalidPage):
             paginated_items = paginator.page(paginator.num_pages)
-        return render_to_response('admin/filer/folder/directory_listing.html', {
-                'folder':folder,
-                'paginator':paginator,
-                'paginated_items':paginated_items,
+        return render_to_response(
+            'admin/filer/folder/directory_listing.html',
+            {
+                'folder': folder,
+                'clipboard_files': [f.subtype() for f in \
+                  File.objects.filter(
+                    in_clipboards__clipboarditem__clipboard__user=request.user
+                    ).distinct()],
+                'paginator': paginator,
+                'paginated_items': paginated_items,
                 'permissions': permissions,
                 'permstest': userperms_for_request(folder, request),
                 'current_url': request.path,
                 'title': u'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
-                'q':urllib.quote_plus(q),
+                'q': urllib.quote_plus(q),
                 'show_result_count': show_result_count,
                 'limit_search_to_folder': limit_search_to_folder,
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
-                'root_path': "/%s" % admin.site.root_path, # needed in the admin/base.html template for logout links and stuff 
-            }, context_instance=RequestContext(request))
+                # needed in the admin/base.html template for logout links
+                'root_path': "/%s" % admin.site.root_path,
+        }, context_instance=RequestContext(request))

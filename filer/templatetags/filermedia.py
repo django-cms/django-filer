@@ -3,6 +3,7 @@ from django.template import Library
 
 register = Library()
 
+
 def filer_staticmedia_prefix():
     """
     Returns the string contained in the setting FILER_STATICMEDIA_PREFIX.

@@ -51,13 +51,14 @@ Make sure that they are accessible at one of those locations.
 See the :ref:`FILER_STATICMEDIA_PREFIX` setting if you want to serve them from
 somewhere else.
 
-private files
-.............
+permissions on files
+....................
 
-django-filer can handle public and private files. Public files are your regular
-world readable files in ``MEDIA_ROOT``. Private files are a other case however.
-To be able to check permissions on the file downloads, a special view is used and
-they are saved in a separate location (in a directory called ``smedia`` next to 
+django-filer supports permissions on files. They can be enabled or disabled. 
+Files with disabled permissions are your regular world readable files in
+``MEDIA_ROOT``. Files with permissions are a other case however. To be able to 
+check permissions on the file downloads a special view is used and they are 
+saved in a separate location (in a directory called `smedia` next to
 ``MEDIA_ROOT`` by default).
 
 ``filer.server.urls`` needs to be included in the root ``urls.py``::
@@ -66,9 +67,10 @@ they are saved in a separate location (in a directory called ``smedia`` next to
         url(r'^', include('filer.server.urls')),
     )
 
-By default private files are served directly by `django`_. That is acceptable in
-a development environment, but very bad for performance in production. See
-the docs on :ref:`how to serve files more efficiently <server>`.
+By default files with permissions are served directly by `django`_. That is
+acceptable in a development environment, but very bad for performance in
+production. See the docs on :ref:`how to serve files more efficiently
+<server>`.
 
 subject location aware cropping
 ...............................
