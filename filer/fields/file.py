@@ -111,8 +111,8 @@ class FilerFileField(models.ForeignKey):
             return
         if name and hasattr(self.default_model_class, name):
             raise ImproperlyConfigured(
-                "%s fields cannot have related name %r, this property already "
-                "exists on %s" % (self.__class__.__name__,
+                ("%s fields cannot have related name %r, this property " + \
+                 "already exists on %s") % (self.__class__.__name__,
                                   name,
                                   self.default_form_class.__name__)
             )

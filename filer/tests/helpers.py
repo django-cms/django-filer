@@ -41,5 +41,3 @@ def create_image(mode='RGB', size=(800, 600)):
     draw.rectangle((x_bit, y_bit * 2, x_bit * 7, y_bit * 3), 'red')
     draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), 'red')
     return image
-            
-        

@@ -21,10 +21,10 @@ def generic_handle_file(file, original_filename):
 
 
 def get_valid_filename(s):
-    '''
+    """
     like the regular get_valid_filename, but also slugifies away
     umlauts and stuff.
-    '''
+    """
     s = get_valid_filename_django(s)
     filename, ext = os.path.splitext(s)
     filename = slugify(filename)

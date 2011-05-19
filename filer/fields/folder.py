@@ -40,22 +40,22 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             output.append(u'Folder: <span id="%s">%s</span>' % (
                                             css_id_description_txt, obj.name))
         else:
-            output.append(u'Folder: <span id="%s">'
-                          u'none selected</span>' % css_id_description_txt)
+            output.append((u'Folder: <span id="%s">' + \
+                           u'none selected</span>') % css_id_description_txt)
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         output.append(
-            u'<a href="%s%s" class="related-lookup" id="lookup_id_%s"'
-            u'onclick="return showRelatedObjectLookupPopup(this);"> ' % \
+            (u'<a href="%s%s" class="related-lookup" id="lookup_id_%s"' + \
+             u'onclick="return showRelatedObjectLookupPopup(this);"> ') % \
                 (related_url, url, name))
-        output.append('<img src="%simg/admin/selector-search.gif" '
-                      'width="16" height="16" alt="%s" /></a>' % (
+        output.append(('<img src="%simg/admin/selector-search.gif" ' +\
+                       'width="16" height="16" alt="%s" /></a>') % (
                                     settings.ADMIN_MEDIA_PREFIX, _('Lookup')))
         output.append('</br>')
         clearid = '%s_clear' % css_id
         output.append(
-            '<img id="%s" src="%simg/admin/icon_deletelink.gif" '
-            'width="10" height="10" alt="%s" title="%s"/>' % (
+            (u'<img id="%s" src="%simg/admin/icon_deletelink.gif" ' +\
+             u'width="10" height="10" alt="%s" title="%s"/>') % (
                             clearid, settings.ADMIN_MEDIA_PREFIX,
                             _('Clear'), _('Clear')))
         output.append('<br />')

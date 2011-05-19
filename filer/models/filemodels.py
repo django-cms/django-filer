@@ -57,8 +57,8 @@ class File(models.Model, mixins.IconsMixin):
     is_public = models.BooleanField(
                     default=False,
                     verbose_name=_('Permissions disabled'),
-                    help_text=_('Disable any permission checking for this '
-                                'file. File will be publicly accessible '
+                    help_text=_('Disable any permission checking for this ' +\
+                                'file. File will be publicly accessible ' +\
                                 'to anyone.'))
 
     objects = FileManager()
@@ -183,9 +183,9 @@ class File(models.Model, mixins.IconsMixin):
 
     @property
     def url(self):
-        '''
+        """
         to make the model behave like a file field
-        '''
+        """
         try:
             r = self.file.url
         except:

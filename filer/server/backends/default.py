@@ -7,12 +7,12 @@ from django.views.static import was_modified_since
 from filer.server.backends.base import ServerBase
 
 class DefaultServer(ServerBase):
-    '''
+    """
     Serve static files from the local filesystem through django.
     This is a bad idea for most situations other than testing.
-    
+
     This will only work for files that can be accessed in the local filesystem.
-    '''
+    """
     def serve(self, request, file, **kwargs):
         fullpath = file.path
         # the following code is largely borrowed from `django.views.static.serve`

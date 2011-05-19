@@ -30,9 +30,8 @@ def load_object(import_path):
         return import_path
     if '.' not in import_path:
         raise TypeError(
-            "'import_path' argument to 'django_load.core.load_object' must "
-            "contain at least one dot."
-        )
+            "'import_path' argument to 'django_load.core.load_object' " +\
+            "must contain at least one dot.")
     module_name, object_name = import_path.rsplit('.', 1)
     module = import_module(module_name)
     return getattr(module, object_name)
