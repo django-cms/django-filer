@@ -3,6 +3,14 @@
 Settings
 ========
 
+``FILER_PERMISSION``
+--------------------
+
+Activate the or not the Permission check on the files and folders before 
+displaying them in the admin. When set to false it give all the authorization
+to staff members.
+
+Defaults to `True`
 
 ``FILER_IS_PUBLIC_DEFAULT``
 ---------------------------

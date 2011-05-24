@@ -7,6 +7,8 @@ from filer.utils.loader import load_object
 import os
 import urlparse
 
+FILER_PERMISSION = getattr(settings, 'FILER_PERMISSION', True)
+
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
