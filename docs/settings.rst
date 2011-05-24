@@ -3,21 +3,21 @@
 Settings
 ========
 
-``FILER_PERMISSION``
---------------------
+``FILER_ENABLE_PERMISSIONS``
+----------------------------
 
 Activate the or not the Permission check on the files and folders before 
 displaying them in the admin. When set to false it give all the authorization
 to staff members.
 
-Defaults to `True`
+Defaults to ``True``
 
 ``FILER_IS_PUBLIC_DEFAULT``
 ---------------------------
 
 Should newly uploaded files have permission checking disabled (be public) by default.
 
-Defaults to `False` (new files have permission checking enabled, are private)
+Defaults to ``False`` (new files have permission checking enabled, are private)
 
 .. _FILER_STATICMEDIA_PREFIX:
 

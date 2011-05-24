@@ -6,13 +6,13 @@ from filer.utils.loader import load_object, storage_factory
 import os
 import urlparse
 
-FILER_PERMISSION = getattr(settings, 'FILER_PERMISSION', True)
+FILER_ENABLE_PERMISSIONS = getattr(settings, 'FILER_ENABLE_PERMISSIONS', False)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 
-FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', False)
+FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
 if not FILER_STATICMEDIA_PREFIX:

@@ -34,7 +34,7 @@ class FolderPermissionManager(models.Manager):
         return self.__get_id_list(user, "can_add_children")
 
     def __get_id_list(self, user, attr):
-        if user.is_superuser or not filer_settings.FILER_PERMISSION:
+        if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
         allow_list = []
         deny_list = []
