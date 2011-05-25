@@ -47,6 +47,7 @@ Contents
    getting_started
    installation
    usage
+   permissions
    server
    settings
    running_tests

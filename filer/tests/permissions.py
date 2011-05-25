@@ -2,6 +2,7 @@
 from django.contrib.auth.models import User
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
+from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
@@ -44,13 +45,24 @@ class FolderPermissionsTestCase(TestCase):
         self.assertEqual(result, True)
         
     def test_unlogged_user_has_no_rights(self):
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        filer_settings.FILER_ENABLE_PERMISSIONS = True
         self.create_fixtures()
         request = Mock()
         setattr(request, 'user', self.unauth_user)
         
         result = self.folder.has_read_permission(request)
+        filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
         self.assertEqual(result, False)
+    
+    def test_unlogged_user_has_rights_when_permissions_disabled(self):
+        self.create_fixtures()
+        request = Mock()
+        setattr(request, 'user', self.unauth_user)
         
+        result = self.folder.has_read_permission(request)
+        self.assertEqual(result, True)
+    
     def test_owner_user_has_rights(self):
         self.create_fixtures()
         # Set owner as the owner of the folder.

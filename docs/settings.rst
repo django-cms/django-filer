@@ -3,13 +3,21 @@
 Settings
 ========
 
+``FILER_ENABLE_PERMISSIONS``
+----------------------------
+
+Activate the or not the Permission check on the files and folders before 
+displaying them in the admin. When set to false it give all the authorization
+to staff members.
+
+Defaults to ``True``
 
 ``FILER_IS_PUBLIC_DEFAULT``
 ---------------------------
 
 Should newly uploaded files have permission checking disabled (be public) by default.
 
-Defaults to `False` (new files have permission checking enabled, are private)
+Defaults to ``False`` (new files have permission checking enabled, are private)
 
 .. _FILER_STATICMEDIA_PREFIX:
 
@@ -26,24 +34,10 @@ directory should be served.
 ``FILER_PUBLICMEDIA_*``
 -----------------------
 
-``FILER_PUBLICMEDIA_ROOT``
-    The base directory for public (without permission checks) media.
-    
-    Defaults to ``<MEDIA_ROOT>/filer/``
-    
-``FILER_PUBLICMEDIA_URL``
-    The url prefix for public (without permission checks) media.
-    
-    Defaults to ``<MEDIA_URL>/filer/``
-    
 ``FILER_PUBLICMEDIA_STORAGE``
     The storage backend for public (without permission checks) files. Must be
     an instance of a storage class.
-    
-    Defaults to ``filer.storage.PublicFileSystemStorage`` using 
-    ``FILER_PUBLICMEDIA_ROOT`` and ``FILER_PUBLICMEDIA_URL`` as ``location`` and
-    ``base_url``.
-    
+
 ``FILER_PUBLICMEDIA_UPLOAD_TO``
     The function to generate the path relative to the storage root. The 
     default generates a date based path like ``2011/05/03/filename.jpg``. This
@@ -53,62 +47,22 @@ directory should be served.
     
     Defaults to ``'filer.utils.generate_filename.by_date'``
     
-``FILER_PUBLICMEDIA_THUMBNAIL_ROOT``
-    Same as ``FILER_PUBLICMEDIA_ROOT`` but for thumbnails.
-    
-    Defaults to ``<MEDIA_ROOT>/filer_thumbnails/``
-    
-``FILER_PUBLICMEDIA_THUMBNAIL_URL``
-    Same as ``FILER_PUBLICMEDIA_URL`` but for thumbnails.
-    
-    Defaults to ``<MEDIA_URL>/filer_thumbnails/``
-    
 ``FILER_PUBLICMEDIA_THUMBNAIL_STORAGE``
     Same as ``FILER_PUBLICMEDIA_STORAGE`` but for thumbnails
-    
-    Defaults to ``filer.storage.PublicFileSystemStorage`` using 
-    ``FILER_PUBLICMEDIA_THUMBNAIL_ROOT`` and ``FILER_PUBLICMEDIA_THUMBNAIL_URL`` as
-    ``location`` and ``base_url``.
     
 ``FILER_PRIVATEMEDIA_*``
 ------------------------
 
-``FILER_PRIVATEMEDIA_ROOT``
-    The base directory for private (with permission checks) media.
-    
-    Defaults to ``<MEDIA_ROOT>/../smedia/filer/``
-    
-``FILER_PRIVATEMEDIA_URL``
-    The url prefix for private (with permission checks) media.
-    
-    Defaults to ``/smedia/filer/``
-    
 ``FILER_PRIVATEMEDIA_STORAGE``
     The storage backend for private (with permission checks) files. Must be
     an instance of a storage class.
     
-    Defaults to ``filer.storage.PublicFileSystemStorage`` using 
-    ``FILER_PRIVATEMEDIA_ROOT`` and ``FILER_PRIVATEMEDIA_URL`` as ``location`` and
-    ``base_url``.
-    
-``FILER_PRIVATEMEDIA_UPLOAD_TO``
-    The function to generate the path relative to the storage root. The 
     default generates a date based path like ``2011/05/03/filename.jpg``. This
     will be applied with the current date whenever a file is uploaded or moved
     between public (without permission checks) and private (with permission
     checks) storages.
     
     Defaults to ``'filer.utils.generate_filename.by_date'``
-    
-``FILER_PRIVATEMEDIA_THUMBNAIL_ROOT``
-    Base path for thumbnails
-    
-    Defaults to ``<MEDIA_ROOT>/../smedia/filer_thumbnails/``
-    
-``FILER_PRIVATEMEDIA_THUMBNAIL_URL``
-    Base url for thumbnails.
-    
-    Defaults to ``/smedia/filer_thumbnails/``
     
 ``FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE``
     Same as ``FILER_PRIVATEMEDIA_STORAGE`` but for thumbnails.

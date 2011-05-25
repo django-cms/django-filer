@@ -5,6 +5,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
+from filer import settings as filer_settings
+
 import mptt
 
 
@@ -32,7 +34,7 @@ class FolderPermissionManager(models.Manager):
         return self.__get_id_list(user, "can_add_children")
 
     def __get_id_list(self, user, attr):
-        if user.is_superuser:
+        if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
         allow_list = []
         deny_list = []
