@@ -197,6 +197,8 @@ class Folder(models.Model, mixins.IconsMixin):
         permissions = (("can_use_directory_listing",
                         "Can use directory listing"),)
         app_label = 'filer'
+        verbose_name = _("Folder")
+        verbose_name_plural = _("Folders")
 
 # MPTT registration
 try:
