@@ -54,11 +54,8 @@ class FilerImageAdminUrlsTests(TestCase):
         
     def tearDown(self):
         self.client.logout()
-        
-    #def test_filer_image_move_to_folder(self):
-    #    self.assertTrue(False)
-        
-        
+
+
 class FilerClipboardAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
@@ -68,13 +65,13 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.filename = os.path.join(os.path.dirname(__file__),
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
-        
+
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():
             img.delete()
-        
+
     def test_filer_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         file = DjangoFile(open(self.filename))
@@ -87,11 +84,3 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
-        
-        
-    #def test_filer_paste_clipboard_to_folder(self):
-    #    self.assertTrue(False)
-    #    
-    #def test_filer_discard_clipboard(self):
-    #    self.assertTrue(False)
-        

@@ -14,7 +14,7 @@ from filer import settings as filer_settings
 
 
 class FilerApiTests(TestCase):
-    
+
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -23,24 +23,24 @@ class FilerApiTests(TestCase):
         self.filename = os.path.join(os.path.dirname(__file__),
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
-        
+
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():
             img.delete()
-            
+
     def create_filer_image(self):
         file = DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
                                      file=file)
         return image
-            
+
     def test_create_folder_structure(self):
         create_folder_structure(depth=3, sibling=2, parent=None)
         self.assertEqual(Folder.objects.count(), 26)
-        
+
     def test_create_and_delete_image(self):
         self.assertEqual(Image.objects.count(), 0)
         image = self.create_filer_image()
@@ -49,7 +49,7 @@ class FilerApiTests(TestCase):
         image = Image.objects.all()[0]
         image.delete()
         self.assertEqual(Image.objects.count(), 0)
-        
+
     def test_upload_image_form(self):
         self.assertEqual(Image.objects.count(), 0)
         file = DjangoFile(open(self.filename), name=self.image_name)
@@ -59,7 +59,7 @@ class FilerApiTests(TestCase):
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
             self.assertEqual(Image.objects.count(), 1)              
-        
+
     def test_create_clipboard_item(self):
         image = self.create_filer_image()
         image.save()
@@ -68,7 +68,7 @@ class FilerApiTests(TestCase):
                               file=image)
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
-        
+
     def test_create_icons(self):
         image = self.create_filer_image()
         image.save()
@@ -78,8 +78,7 @@ class FilerApiTests(TestCase):
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
                              file_basename + u'__%sx%s_q85_crop_upscale.jpg' %(size,size))
-         
-        
+
     def test_file_upload_public_destination(self):
         """
         Test where an image `is_public` == True is uploaded.
@@ -87,8 +86,8 @@ class FilerApiTests(TestCase):
         image = self.create_filer_image()
         image.is_public = True
         image.save()
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
-        
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
+
     def test_file_upload_private_destination(self):
         """
         Test where an image `is_public` == False is uploaded.
@@ -96,8 +95,8 @@ class FilerApiTests(TestCase):
         image = self.create_filer_image()
         image.is_public = False
         image.save()
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
-        
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
+
     def test_file_move_location(self):
         """
         Test the method that move a file between filer_public, filer_private
@@ -106,34 +105,30 @@ class FilerApiTests(TestCase):
         image = self.create_filer_image()
         image.is_public = False
         image.save()
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         image.is_public = True
         image.save()
-        
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
-        
-        
-        
-        
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
+
     def test_file_change_upload_to_destination(self):
         """
         Test that the file is actualy move from the private to the public
         directory when the is_public is checked on an existing private file.
         """
         file = DjangoFile(open(self.filename), name=self.image_name)
-        
+
         image = Image.objects.create(owner=self.superuser,
                                      is_public=False,
                                      original_filename=self.image_name,
                                      file=file)
         image.save()
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         image.is_public = True
         image.save()
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         image.is_public = False
         image.save()
-        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_ROOT))
+        self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
-        
+

@@ -1,15 +1,13 @@
 #-*- coding: utf-8 -*-
-import os
-from optparse import make_option
-
-from django.core.management.base import BaseCommand, NoArgsCommand
 from django.core.files import File as DjangoFile
-
-from filer.models.foldermodels import Folder
+from django.core.management.base import BaseCommand, NoArgsCommand
 from filer.models.filemodels import File
+from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
-
 from filer.settings import FILER_IS_PUBLIC_DEFAULT
+from optparse import make_option
+import os
+
 
 class FileImporter(object):
     def __init__(self, * args, **kwargs):
@@ -19,11 +17,10 @@ class FileImporter(object):
         self.file_created = 0
         self.image_created = 0
         self.folder_created = 0
-    
+
     def import_file(self, file, folder):
         """
         Create a File or an Image into the given folder
-        
         """
         try:
             iext = os.path.splitext(file.name)[1].lower()
@@ -48,16 +45,16 @@ class FileImporter(object):
         if self.verbosity >= 2:
             print u"file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
                                                         self.image_created,
-                                                        obj, created)  
+                                                        obj, created)
         return obj
-    
+
     def get_or_create_folder(self, folder_names):
         """
         Gets or creates a Folder based the list of folder names in hierarchical 
         order (like breadcrumbs).
-        
+
         get_or_create_folder(['root', 'subfolder', 'subsub folder'])
-        
+
         creates the folders with correct parent relations and returns the 
         'subsub folder' instance.
         """
@@ -70,9 +67,9 @@ class FileImporter(object):
                 self.folder_created += 1
                 if self.verbosity >= 2:
                     print u"folder_created #%s folder : %s -- created : %s" % (self.folder_created,
-                                                                               current_parent, created) 
+                                                                               current_parent, created)
         return current_parent
-    
+
     def walker(self, path=None, base_folder=None):
         """
         This method walk a directory structure and create the
@@ -104,19 +101,20 @@ class FileImporter(object):
                                      name=file)
                 self.import_file(file=dj_file, folder=folder)
         if self.verbosity >= 1:
-            print u"folder_created #%s / file_created #%s / image_created #%s "% (self.folder_created,
-                                                                                 self.file_created,
-                                                                                 self.image_created)
+            print ('folder_created #%s / file_created #%s / ' + \
+                   'image_created #%s') % (
+                                self.folder_created, self.file_created,
+                                self.image_created)
+
 
 class Command(NoArgsCommand):
     """
     Import directory structure into the filer ::
-    
+
         manage.py --path=/tmp/assets/images
         manage.py --path=/tmp/assets/news --folder=images
-        
     """
-    
+
     option_list = BaseCommand.option_list + (
         make_option('--path',
             action='store',
