@@ -7,34 +7,30 @@ from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
 from filer.models.foldermodels import Folder
+from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
 import os
 
 
-class FileManager(models.Manager):
+class FileManager(PolymorphicManager):
     def find_all_duplicates(self):
         r = {}
         for file in self.all():
             if file.sha1:
                 q = self.filter(sha1=file.sha1)
                 if len(q) > 1:
-                    r[file.sha1] = [i.subtype() for i in q]
+                    r[file.sha1] = q
         return r
 
     def find_duplicates(self, file):
-        return [i.subtype() for i in self.exclude(pk=file.pk).filter(
-                                                            sha1=file.sha1)]
+        return [i for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
-
-class File(models.Model, mixins.IconsMixin):
+class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, related_name='all_files',
                                null=True, blank=True)
     file = MultiStorageFileField(null=True, blank=True, max_length=255)
-    _file_type_plugin_name = models.CharField("file_type_plugin_name",
-                                              max_length=128, null=True,
-                                              blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
 
     sha1 = models.CharField(max_length=40, blank=True, default='')
@@ -167,16 +163,6 @@ class File(models.Model, mixins.IconsMixin):
         else:
             text = u"%s" % (self.name,)
         return text
-
-    def subtype(self):
-        if not self._file_type_plugin_name:
-            r = self
-        else:
-            try:
-                r = getattr(self, self._file_type_plugin_name.lower())
-            except Exception, e:
-                r = self
-        return r
 
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))

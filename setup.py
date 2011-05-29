@@ -11,6 +11,7 @@ install_requires = [
     'setuptools',
     'easy-thumbnails',
     'django-mptt>=0.2.1',
+    'django_polymorphic',
 ]
 
 setup(

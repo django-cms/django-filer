@@ -265,10 +265,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'admin/filer/folder/directory_listing.html',
             {
                 'folder': folder,
-                'clipboard_files': [f.subtype() for f in \
-                  File.objects.filter(
+                'clipboard_files': File.objects.filter(
                     in_clipboards__clipboarditem__clipboard__user=request.user
-                    ).distinct()],
+                    ).distinct(),
                 'paginator': paginator,
                 'paginated_items': paginated_items,
                 'permissions': permissions,
