@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django-Filer 0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-07 21:23+0100\n"
+"POT-Creation-Date: 2011-05-27 19:38-0300\n"
 "PO-Revision-Date: 2010-06-05 21:18-0000\n"
 "Last-Translator: Crunchorn <crunchorn@prokonto.pl>\n"
 "Language: pl\n"
@@ -18,118 +18,135 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
 
-#: admin/fileadmin.py:36
+#: admin/fileadmin.py:37
 msgid "Advanced"
 msgstr "Zaawansowane"
 
-#: admin/imageadmin.py:10
+#: admin/imageadmin.py:12
 msgid "Subject location"
 msgstr "Współrzędne obiektu"
 
-#: admin/imageadmin.py:10
+#: admin/imageadmin.py:13
 msgid "Location of the main subject of the scene."
 msgstr "Współrzędne głownego obiektu prezentowanej sceny"
 
-#: fields/folder.py:43 templates/admin/filer/widgets/admin_file.html:14
+#: fields/folder.py:53 templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
 msgid "Lookup"
 msgstr "Wyszukaj"
 
-#: fields/folder.py:48 templates/admin/filer/widgets/admin_file.html:17
+#: fields/folder.py:60 templates/admin/filer/widgets/admin_file.html:17
 msgid "Clear"
 msgstr "Usuń"
 
-#: models/clipboardmodels.py:23
+#: models/clipboardmodels.py:27
 #, fuzzy
 msgid "clipboard"
 msgstr "Schowek"
 
-#: models/clipboardmodels.py:24
+#: models/clipboardmodels.py:28
 #, fuzzy
 msgid "clipboards"
 msgstr "Schowek"
 
-#: models/clipboardmodels.py:31
+#: models/clipboardmodels.py:37
 #, fuzzy
 msgid "clipboard item"
 msgstr "el. schowka"
 
-#: models/clipboardmodels.py:32
+#: models/clipboardmodels.py:38
 #, fuzzy
 msgid "clipboard items"
 msgstr "el. schowka"
 
-#: models/filemodels.py:41
+#: models/filemodels.py:46
 #, fuzzy
 msgid "name"
 msgstr "Nazwa pliku"
 
-#: models/filemodels.py:42
+#: models/filemodels.py:48
 #, fuzzy
 msgid "description"
 msgstr "Opis"
 
-#: models/filemodels.py:44
+#: models/filemodels.py:52
 #, fuzzy
 msgid "owner"
 msgstr "Właściciel"
 
-#: models/filemodels.py:219
+#: models/filemodels.py:59
+msgid "Permissions disabled"
+msgstr ""
+
+#: models/filemodels.py:60
+msgid "Disable any permission checking for this "
+msgstr ""
+
+#: models/filemodels.py:243
 #, fuzzy
 msgid "file"
 msgstr "%(counter)s plik"
 
-#: models/filemodels.py:220
+#: models/filemodels.py:244
 #, fuzzy
 msgid "files"
 msgstr "Pliki"
 
-#: models/foldermodels.py:187
+#: models/foldermodels.py:200
+#, fuzzy
+msgid "Folder"
+msgstr "Katalogi"
+
+#: models/foldermodels.py:201
+msgid "Folders"
+msgstr "Katalogi"
+
+#: models/foldermodels.py:216
 msgid "all items"
 msgstr "wszystkie elementy"
 
-#: models/foldermodels.py:188
+#: models/foldermodels.py:217
 msgid "this item only"
 msgstr "tylko ten katalog"
 
-#: models/foldermodels.py:189
+#: models/foldermodels.py:218
 msgid "this item and all children"
 msgstr "ten katalog i wszystkie podrzędne"
 
-#: models/foldermodels.py:193
+#: models/foldermodels.py:222
 msgid "type"
 msgstr "typ"
 
-#: models/foldermodels.py:194
+#: models/foldermodels.py:225
 msgid "user"
 msgstr "użytkownik"
 
-#: models/foldermodels.py:195
+#: models/foldermodels.py:228
 msgid "group"
 msgstr "grupa"
 
-#: models/foldermodels.py:196
+#: models/foldermodels.py:229
 msgid "everybody"
 msgstr "wszyscy"
 
-#: models/foldermodels.py:198
+#: models/foldermodels.py:231
 msgid "can edit"
 msgstr "może edytować"
 
-#: models/foldermodels.py:199
+#: models/foldermodels.py:232
 msgid "can read"
 msgstr "może wyświetlić"
 
-#: models/foldermodels.py:200
+#: models/foldermodels.py:233
 msgid "can add children"
 msgstr "może dodawać el. podrzędne"
 
-#: models/foldermodels.py:226
+#: models/foldermodels.py:262
 #, fuzzy
 msgid "folder permission"
 msgstr "Uprawnienia dla katalogu"
 
-#: models/foldermodels.py:227
+#: models/foldermodels.py:263
 #, fuzzy
 msgid "folder permissions"
 msgstr "Uprawnienia dla katalogów"
@@ -138,29 +155,28 @@ msgstr "Uprawnienia dla katalogów"
 msgid "date taken"
 msgstr "Data wykonania"
 
-#: models/imagemodels.py:163
+#: models/imagemodels.py:175
 #, fuzzy
 msgid "image"
 msgstr "Obrazek"
 
-#: models/imagemodels.py:164
+#: models/imagemodels.py:176
 #, fuzzy
 msgid "images"
 msgstr "Obrazki"
 
-#: models/virtualitems.py:37
+#: models/virtualitems.py:45
 #: templates/admin/filer/tools/clipboard/clipboard.html:22
 msgid "unfiled files"
 msgstr "Luźne pliki"
 
-#: models/virtualitems.py:47
+#: models/virtualitems.py:59
 msgid "files with missing metadata"
 msgstr "pliki z wybrakowanymi metadanymi"
 
-#: models/virtualitems.py:57 templates/admin/filer/breadcrumbs.html:5
+#: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:52
-#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/admin/filer/folder/directory_listing.html:56
 #: templates/image_filer/image_export_form.html:9
 msgid "root"
 msgstr "Katalog główny"
@@ -206,8 +222,7 @@ msgstr ""
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:52
-#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/admin/filer/folder/directory_listing.html:56
 #: templates/image_filer/image_export_form.html:6
 #: templates/image_filer/image_export_form.html:7
 #: templates/image_filer/image_export_form.html:15
@@ -220,8 +235,7 @@ msgid "admin homepage"
 msgstr "panelu administracyjnego"
 
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:52
-#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/admin/filer/folder/directory_listing.html:56
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:22
 msgid "folder"
@@ -238,8 +252,8 @@ msgid "View on site"
 msgstr "Zobacz na stronie"
 
 #: templates/admin/filer/folder/change_form.html:30
-#: templates/admin/filer/folder/directory_listing.html:62
-#: templates/admin/filer/folder/directory_listing.html:68
+#: templates/admin/filer/folder/directory_listing.html:57
+#: templates/admin/filer/folder/directory_listing.html:63
 #: templates/admin/filer/folder/directory_table.html:21
 msgid "Folder Icon"
 msgstr "Ikona katalogu"
@@ -253,27 +267,12 @@ msgstr "Dodaje nowy katalog"
 msgid "New Folder"
 msgstr "Nowy katalog"
 
-#: templates/admin/filer/folder/directory_listing.html:53
-msgid "Show images with missing metadata"
-msgstr "Wyświetl pliki z wybrakowanymi metadanymi"
-
-#: templates/admin/filer/folder/directory_listing.html:53
-msgid "Incomplete Images"
-msgstr "Niekompletne obrazki"
-
-#: templates/admin/filer/folder/directory_listing.html:54
-msgid "Show unfiled images"
-msgstr "Wyświetl luźne obrazki"
-
-#: templates/admin/filer/folder/directory_listing.html:54
-msgid "unfiled images"
-msgstr "Luźne obrazki"
-
-#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/admin/filer/folder/directory_listing.html:56
 msgid "Go back to the parent folder"
 msgstr "Wróć do katalogu nadrzędnego"
 
-#: templates/admin/filer/folder/directory_listing.html:63
+#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_table.html:25
 #: templates/admin/filer/tools/search_form.html:18
 #, python-format
 msgid "1 folder"
@@ -282,7 +281,8 @@ msgstr[0] "%(counter)s katalog"
 msgstr[1] "%(counter)s katalogi"
 msgstr[2] "%(counter)s katalogów"
 
-#: templates/admin/filer/folder/directory_listing.html:63
+#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_table.html:25
 #: templates/admin/filer/tools/search_form.html:19
 #, python-format
 msgid "1 file"
@@ -291,11 +291,11 @@ msgstr[0] "%(counter)s plik"
 msgstr[1] "%(counter)s pliki"
 msgstr[2] "%(counter)s plików"
 
-#: templates/admin/filer/folder/directory_listing.html:64
+#: templates/admin/filer/folder/directory_listing.html:59
 msgid "Change current folder details"
 msgstr "Zmodyfikuj dane aktualnie wyświetlanego katalogu"
 
-#: templates/admin/filer/folder/directory_listing.html:64
+#: templates/admin/filer/folder/directory_listing.html:59
 #: templates/admin/filer/folder/directory_table.html:24
 #: templates/admin/filer/folder/directory_table.html:38
 msgid "Change"
@@ -314,18 +314,9 @@ msgid "Change '%(item_label)s' folder details"
 msgstr "Zmodyfikuj dane katalogu '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:26
-#: templates/admin/filer/folder/directory_table.html:41
+#: templates/admin/filer/folder/directory_table.html:40
 msgid "Owner"
 msgstr "Właściciel"
-
-#: templates/admin/filer/folder/directory_table.html:26
-msgid "Folders"
-msgstr "Katalogi"
-
-#: templates/admin/filer/folder/directory_table.html:26
-#, fuzzy
-msgid "Files"
-msgstr "Plik"
 
 #: templates/admin/filer/folder/directory_table.html:33
 msgid "Select this file"
@@ -337,6 +328,19 @@ msgstr "Wybierz ten plik"
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Zmodyfikuj dane '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table.html:41
+#, fuzzy
+msgid "Permissions"
+msgstr "Uprawnienia dla katalogów"
+
+#: templates/admin/filer/folder/directory_table.html:41
+msgid "disabled"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:41
+msgid "enabled"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:50
 msgid "Move to clipboard"
@@ -412,15 +416,7 @@ msgstr "odrzuć"
 msgid "Move all clipboard files to"
 msgstr "Przenieś wszystkie el. schowka do"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:28
-msgid "delete files"
-msgstr "usuń pliki"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:28
-msgid "Delete all files in the clipboard"
-msgstr "Usuń wszystkie pliki ze schowka"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:38
+#: templates/admin/filer/tools/clipboard/clipboard.html:39
 msgid "the clipboard is empty"
 msgstr "schowek jest pusty"
 
@@ -466,6 +462,28 @@ msgstr "Katalog o podanej nazwie juz istnieje"
 #: templates/image_filer/include/export_dialog.html:15
 msgid "Submit"
 msgstr "Wyślij"
+
+#~ msgid "Show images with missing metadata"
+#~ msgstr "Wyświetl pliki z wybrakowanymi metadanymi"
+
+#~ msgid "Incomplete Images"
+#~ msgstr "Niekompletne obrazki"
+
+#~ msgid "Show unfiled images"
+#~ msgstr "Wyświetl luźne obrazki"
+
+#~ msgid "unfiled images"
+#~ msgstr "Luźne obrazki"
+
+#, fuzzy
+#~ msgid "Files"
+#~ msgstr "Plik"
+
+#~ msgid "delete files"
+#~ msgstr "usuń pliki"
+
+#~ msgid "Delete all files in the clipboard"
+#~ msgstr "Usuń wszystkie pliki ze schowka"
 
 #~ msgid "Images"
 #~ msgstr "Obrazki"
