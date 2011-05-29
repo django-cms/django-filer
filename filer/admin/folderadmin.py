@@ -117,8 +117,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return r
 
     def icon_img(self, xs):
-        return mark_safe('<img src="%simg/icons/plainfolder_32x32.png" ' + \
-                         'alt="Folder Icon" />' % FILER_STATICMEDIA_PREFIX)
+        return mark_safe(('<img src="%simg/icons/plainfolder_32x32.png" ' + \
+                          'alt="Folder Icon" />') % FILER_STATICMEDIA_PREFIX)
     icon_img.allow_tags = True
 
     def get_urls(self):

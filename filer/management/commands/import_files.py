@@ -101,8 +101,8 @@ class FileImporter(object):
                                      name=file)
                 self.import_file(file=dj_file, folder=folder)
         if self.verbosity >= 1:
-            print 'folder_created #%s / file_created #%s / ' + \
-                  'image_created #%s' % (
+            print ('folder_created #%s / file_created #%s / ' + \
+                   'image_created #%s') % (
                                 self.folder_created, self.file_created,
                                 self.image_created)
 
