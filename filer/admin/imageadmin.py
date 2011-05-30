@@ -38,10 +38,7 @@ class ImageAdminFrom(forms.ModelForm):
 
 class ImageAdmin(FileAdmin):
     form = ImageAdminFrom
-    fieldsets = (
-        FileAdmin.fieldsets[0],
-        FileAdmin.fieldsets[1],
-        FileAdmin.fieldsets[2],
+    fieldsets = FileAdmin.fieldsets + (
         ('Subject Location', {
             'fields': ('subject_location',),
             'classes': ('collapse',),

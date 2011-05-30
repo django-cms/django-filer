@@ -4,6 +4,7 @@ from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext  as _
+from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File
 
@@ -27,18 +28,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     save_as = True
 
     form = FileAdminChangeFrom
-    fieldsets = (
-        (None, {
-            'fields': ('name', 'owner', 'description')
-        }),
-        (None, {
-            'fields': ('is_public',)
-        }),
-        (_('Advanced'), {
-            'fields': ('file', 'sha1',),
-            'classes': ('collapse',),
-        }),
-    )
 
     def response_change(self, request, obj):
         """
@@ -109,3 +98,27 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             'change': False,
             'delete': False,
         }
+
+if settings.FILER_ENABLE_PERMISSIONS:
+    FileAdmin.fieldsets = (
+        (None, {
+            'fields': ('name', 'owner', 'description')
+        }),
+        (None, {
+            'fields': ('is_public',)
+        }),
+        (_('Advanced'), {
+            'fields': ('file', 'sha1',),
+            'classes': ('collapse',),
+        }),
+    )
+else:
+    FileAdmin.fieldsets = (
+        (None, {
+            'fields': ('name', 'owner', 'description')
+        }),
+        (_('Advanced'), {
+            'fields': ('file', 'sha1',),
+            'classes': ('collapse',),
+        }),
+    )

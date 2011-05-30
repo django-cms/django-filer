@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
+from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
     userperms_for_request
@@ -282,4 +283,5 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'select_folder': selectfolder_status(request),
                 # needed in the admin/base.html template for logout links
                 'root_path': "/%s" % admin.site.root_path,
+                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
         }, context_instance=RequestContext(request))
