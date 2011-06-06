@@ -1,18 +1,25 @@
 {% extends "admin/filer/base_site.html" %}
-{% load i18n %}
-{% load adminmedia filermedia %}
+{% load adminmedia filer_admin_tags filermedia i18n %}
 
 {% block extrahead %}{{ block.super }}
 {# upload stuff #}
+{{ media.js }}
 <script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/swfupload.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/swfupload.queue.js"></script>
-
 <script type="text/javascript" src="{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
-
+{% if action_form %}{% if actions_on_top or actions_on_bottom %}
+<script type="text/javascript">
+(function($) {
+    $(document).ready(function($) {
+        $("tr input.action-select").actions();
+    });
+})(django.jQuery);
+</script>
+{% endif %}{% endif %}
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}
@@ -21,9 +28,19 @@
 
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
+{{ media.css }}
+{% if action_form %}
+  {% url admin:jsi18n as jsi18nurl %}
+  <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
+{% endif %}
 {% if query.pop %}
 <style type="text/css">
     #header { display: none; }
+</style>
+{% endif %}
+{% if not actions_on_top and not actions_on_bottom %}
+<style>
+    #changelist table thead th:first-child {width: inherit}
 </style>
 {% endif %}
 {% endblock %}
@@ -64,7 +81,11 @@
         </h1>
         {% endif %}
         {% endif %}
+        <form id="changelist-form" action="" method="post">{% csrf_token %}
+        {% if action_form and actions_on_top and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}
         {% include "admin/filer/folder/directory_table.html" %}
+        {% if action_form and actions_on_bottom and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}
+        </form>
     </div>
 </div>
 

@@ -1,14 +1,20 @@
 #-*- coding: utf-8 -*-
 from django import forms
+from django import template
 from django.contrib import admin
-from django.contrib.admin.util import unquote
+from django.contrib.admin import helpers
+from django.contrib.admin.util import unquote, get_deleted_objects
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
@@ -35,6 +41,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
+    actions = ['delete_files_or_folders']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -169,6 +176,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             except Folder.DoesNotExist:
                 raise Http404
 
+        # Check actions to see if any are available on this changelist
+        actions = self.get_actions(request)
+        
+        # Remove action checkboxes if there aren't any actions available.
+        list_display = list(self.list_display)
+        if not actions:
+            try:
+                list_display.remove('action_checkbox')
+            except ValueError:
+                pass
+
         # search
         def filter_folder(qs, terms=[]):
             for term in terms:
@@ -257,6 +275,39 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except ValueError:
             page = 1
 
+        selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+
+        # Actions with no confirmation
+        if (actions and request.method == 'POST' and
+                'index' in request.POST and '_save' not in request.POST):
+            if selected:
+                response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
+                if response:
+                    return response
+            else:
+                msg = _("Items must be selected in order to perform "
+                        "actions on them. No items have been changed.")
+                self.message_user(request, msg)
+
+        # Actions with confirmation
+        if (actions and request.method == 'POST' and
+                helpers.ACTION_CHECKBOX_NAME in request.POST and
+                'index' not in request.POST and '_save' not in request.POST):
+            if selected:
+                response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
+                if response:
+                    return response
+
+        # Build the action form and populate it with available actions.
+        if actions:
+            action_form = self.action_form(auto_id=None)
+            action_form.fields['action'].choices = self.get_action_choices(request)
+        else:
+            action_form = None
+
+        selection_note_all = ungettext('%(total_count)s selected',
+            'All %(total_count)s selected', paginator.count)
+
         # If page request (9999) is out of range, deliver last page of results.
         try:
             paginated_items = paginator.page(page)
@@ -283,5 +334,159 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'select_folder': selectfolder_status(request),
                 # needed in the admin/base.html template for logout links
                 'root_path': "/%s" % admin.site.root_path,
+                'action_form': action_form,
+                'actions_on_top': self.actions_on_top,
+                'actions_on_bottom': self.actions_on_bottom,
+                'actions_selection_counter': self.actions_selection_counter,
+                'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
+                'selection_note_all': selection_note_all % {'total_count': paginator.count},
+                'media': self.media,
                 'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
         }, context_instance=RequestContext(request))
+
+    def response_action(self, request, files_queryset, folders_queryset):
+        """
+        Handle an admin action. This is called if a request is POSTed to the
+        changelist; it returns an HttpResponse if the action was handled, and
+        None otherwise.
+        """
+
+        # There can be multiple action forms on the page (at the top
+        # and bottom of the change list, for example). Get the action
+        # whose button was pushed.
+        try:
+            action_index = int(request.POST.get('index', 0))
+        except ValueError:
+            action_index = 0
+
+        # Construct the action form.
+        data = request.POST.copy()
+        data.pop(helpers.ACTION_CHECKBOX_NAME, None)
+        data.pop("index", None)
+
+        # Use the action whose button was pushed
+        try:
+            data.update({'action': data.getlist('action')[action_index]})
+        except IndexError:
+            # If we didn't get an action from the chosen form that's invalid
+            # POST data, so by deleting action it'll fail the validation check
+            # below. So no need to do anything here
+            pass
+
+        action_form = self.action_form(data, auto_id=None)
+        action_form.fields['action'].choices = self.get_action_choices(request)
+
+        # If the form's valid we can handle the action.
+        if action_form.is_valid():
+            action = action_form.cleaned_data['action']
+            select_across = action_form.cleaned_data['select_across']
+            func, name, description = self.get_actions(request)[action]
+
+            # Get the list of selected PKs. If nothing's selected, we can't
+            # perform an action on it, so bail. Except we want to perform
+            # the action explicitly on all objects.
+            selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+            if not selected and not select_across:
+                # Reminder that something needs to be selected or nothing will happen
+                msg = _("Items must be selected in order to perform "
+                        "actions on them. No items have been changed.")
+                self.message_user(request, msg)
+                return None
+
+            if not select_across:
+                selected_files = []
+                selected_folders = []
+
+                for pk in selected:
+                    if pk[:5] == "file-":
+                        selected_files.append(pk[5:])
+                    else:
+                        selected_folders.append(pk[7:])
+
+                # Perform the action only on the selected objects
+                files_queryset = files_queryset.filter(pk__in=selected_files)
+                folders_queryset = folders_queryset.filter(pk__in=selected_folders)
+
+            response = func(self, request, files_queryset, folders_queryset)
+
+            # Actions may return an HttpResponse, which will be used as the
+            # response from the POST. If not, we'll be a good little HTTP
+            # citizen and redirect back to the changelist page.
+            if isinstance(response, HttpResponse):
+                return response
+            else:
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            msg = _("No action selected.")
+            self.message_user(request, msg)
+            return None
+
+    def get_actions(self, request):
+        actions = super(FolderAdmin, self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+
+    def delete_files_or_folders(self, request, files_queryset, folders_queryset):
+        """
+        Action which deletes the selected files and/or folders.
+    
+        This action first displays a confirmation page whichs shows all the
+        deleteable files and/or folders, or, if the user has no permission on one of the related
+        childs (foreignkeys), a "permission denied" message.
+    
+        Next, it delets all selected files and/or folders and redirects back to the folder.
+        """
+        opts = self.model._meta
+        app_label = opts.app_label
+    
+        # Check that the user has delete permission for the actual model
+        if not self.has_delete_permission(request):
+            raise PermissionDenied
+    
+        # Populate deletable_objects, a data structure of all related objects that
+        # will also be deleted.
+        # Hopefully this also checks for necessary permissions.
+        # TODO: Check if permissions are really verified
+        deletable_files, perms_needed_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
+        deletable_folders, perms_needed_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
+
+        all_deletable_objects = [deletable_files, deletable_folders]
+        all_perms_needed = perms_needed_files.union(perms_needed_folders)
+
+        # The user has already confirmed the deletion.
+        # Do the deletion and return a None to display the change list view again.
+        if request.POST.get('post'):
+            if all_perms_needed:
+                raise PermissionDenied
+            n = files_queryset.count() + folders_queryset.count()
+            if n:
+                for f in files_queryset:
+                    self.log_deletion(request, f, force_unicode(f))
+                    f.delete()
+                for f in folders_queryset:
+                    self.log_deletion(request, f, force_unicode(f))
+                    f.delete()
+                self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {
+                    "count": n,
+                })
+            # Return None to display the change list page again.
+            return None
+    
+        context = {
+            "title": _("Are you sure?"),
+            "deletable_objects": all_deletable_objects,
+            'files_queryset': files_queryset,
+            'folders_queryset': folders_queryset,
+            "perms_lacking": all_perms_needed,
+            "opts": opts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }
+    
+        # Display the confirmation page
+        return render_to_response([
+            "admin/filer/delete_selected_confirmation.html"
+        ], context, context_instance=template.RequestContext(request))
+    
+    delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
