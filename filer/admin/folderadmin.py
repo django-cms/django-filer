@@ -41,7 +41,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['delete_files_or_folders']
+    actions = ['move_to_clipboard', 'delete_files_or_folders']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -425,6 +425,56 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         actions = super(FolderAdmin, self).get_actions(request)
         del actions['delete_selected']
         return actions
+
+    def move_to_clipboard(self, request, files_queryset, folders_queryset):
+        """
+        Action which moves the selected files and files in selected folders to clipboard.
+        """
+
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        if request.method != 'POST':
+            return
+        
+        clipboard = tools.get_user_clipboard(request.user)
+
+        def check_permissions(files):
+            for f in files:
+                if not f.has_edit_permission(request):
+                    raise PermissionDenied
+
+        def check_folder_permissions(folders):
+            for f in folders:
+                if not f.has_edit_permission(request):
+                    raise PermissionDenied
+                check_permissions(f.files)
+                check_folder_permissions(f.children.all())
+
+        check_permissions(files_queryset)
+        check_folder_permissions(folders_queryset)
+
+        files_count = [0] # We define it like that so that we can modify it inside the move_files function
+
+        def move_files(files):
+            tools.move_file_to_clipboard(files, clipboard)
+            files_count[0] += len(files)
+
+        def move_folders(folders):
+            for f in folders:
+                move_files(f.files)
+                move_folders(f.children.all())
+        
+        move_files(files_queryset)
+        move_folders(folders_queryset)
+
+        self.message_user(request, _("Successfully moved %(count)d files to clipboard.") % {
+            "count": files_count[0],
+        })
+
+        return None
+
+    move_to_clipboard.short_description = ugettext_lazy("Move selected files to clipboard")
 
     def delete_files_or_folders(self, request, files_queryset, folders_queryset):
         """
