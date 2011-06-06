@@ -18,7 +18,7 @@ from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
-    userperms_for_request
+    userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions
 from filer.models import Folder, FolderRoot, UnfiledImages, \
     ImagesWithMissingData, File, tools
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
@@ -41,7 +41,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'delete_files_or_folders']
+    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -435,24 +435,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             raise PermissionDenied
 
         if request.method != 'POST':
-            return
+            return None
         
         clipboard = tools.get_user_clipboard(request.user)
 
-        def check_permissions(files):
-            for f in files:
-                if not f.has_edit_permission(request):
-                    raise PermissionDenied
-
-        def check_folder_permissions(folders):
-            for f in folders:
-                if not f.has_edit_permission(request):
-                    raise PermissionDenied
-                check_permissions(f.files)
-                check_folder_permissions(f.children.all())
-
-        check_permissions(files_queryset)
-        check_folder_permissions(folders_queryset)
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
 
         files_count = [0] # We define it like that so that we can modify it inside the move_files function
 
@@ -475,6 +463,58 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return None
 
     move_to_clipboard.short_description = ugettext_lazy("Move selected files to clipboard")
+
+    def files_set_public_or_private(self, request, set_public, files_queryset, folders_queryset):
+        """
+        Action which enables or disables permissions for selected files and files in selected folders to clipboard (set them private or public).
+        """
+
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        if request.method != 'POST':
+            return None
+        
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
+
+        files_count = [0] # We define it like that so that we can modify it inside the set_files function
+
+        def set_files(files):
+            for f in files:
+                if f.is_public != set_public:
+                    f.is_public = set_public
+                    f.save()
+                    files_count[0] += 1
+
+        def set_folders(folders):
+            for f in folders:
+                set_files(f.files)
+                set_folders(f.children.all())
+        
+        set_files(files_queryset)
+        set_folders(folders_queryset)
+
+        if set_public:
+            self.message_user(request, _("Successfully disabled permissions for %(count)d files.") % {
+                "count": files_count[0],
+            })
+        else:
+            self.message_user(request, _("Successfully enabled permissions for %(count)d files.") % {
+                "count": files_count[0],
+            })
+
+        return None
+
+    def files_set_private(self, request, files_queryset, folders_queryset):
+        return self.files_set_public_or_private(request, False, files_queryset, folders_queryset)
+
+    files_set_private.short_description = ugettext_lazy("Enable permissions for selected files")
+
+    def files_set_public(self, request, files_queryset, folders_queryset):
+        return self.files_set_public_or_private(request, True, files_queryset, folders_queryset)
+
+    files_set_public.short_description = ugettext_lazy("Disable permissions for selected files")
 
     def delete_files_or_folders(self, request, files_queryset, folders_queryset):
         """
