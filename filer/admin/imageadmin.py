@@ -41,7 +41,11 @@ class ImageAdmin(FileAdmin):
     fieldsets = (
         FileAdmin.fieldsets[0],
         FileAdmin.fieldsets[1],
-        FileAdmin.fieldsets[2],
+        (_('Advanced'), {
+            'fields': ('default_alt_text', 'default_caption',
+                       'author', 'file', 'sha1',),
+            'classes': ('collapse',),
+        }),
         ('Subject Location', {
             'fields': ('subject_location',),
             'classes': ('collapse',),

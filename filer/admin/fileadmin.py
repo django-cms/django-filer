@@ -16,7 +16,7 @@ class FileAdminChangeFrom(forms.ModelForm):
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('label',)
     list_per_page = 10
-    search_fields = ['name', 'original_filename', 'sha1', ]
+    search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
     readonly_fields = ('sha1',)
 
