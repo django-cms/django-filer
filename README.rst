@@ -15,6 +15,7 @@ Dependencies
 * `Django`_ 1.2 with django-staticfiles or `Django`_ 1.3
 * django-mptt >= 0.2.1
 * `easy_thumbnails`_ >= 1.0-alpha-17
+* `django-polymorphic`_ >= 0.2
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support)
 
 Installation
@@ -63,6 +64,7 @@ For automatic subject location aware cropping of images replace
     )
 
 .. _Django: http://djangoproject.com
+.. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _PIL: http://www.pythonware.com/products/pil/

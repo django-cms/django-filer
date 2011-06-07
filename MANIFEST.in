@@ -3,5 +3,4 @@ include LICENSE
 include README.rst
 include HISTORY
 recursive-include filer/templates *
-recursive-include filer/media *
-
+recursive-include filer/static *

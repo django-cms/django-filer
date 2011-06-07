@@ -9,8 +9,9 @@ def read(fname):
 
 install_requires = [
     'setuptools',
-    'easy-thumbnails',
+    'easy-thumbnails>=1.0-alpha-17',
     'django-mptt>=0.2.1',
+    'django_polymorphic',
 ]
 
 setup(

@@ -40,7 +40,6 @@ class ImageAdmin(FileAdmin):
     form = ImageAdminFrom
     fieldsets = (
         FileAdmin.fieldsets[0],
-        FileAdmin.fieldsets[1],
         (_('Advanced'), {
             'fields': ('default_alt_text', 'default_caption',
                        'author', 'file', 'sha1',),

@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
+from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
     userperms_for_request
@@ -180,6 +181,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def filter_file(qs, terms=[]):
             for term in terms:
                 qs = qs.filter(Q(name__icontains=term) | \
+                               Q(description__icontains=term)| \
                                Q(original_filename__icontains=term) | \
                                Q(owner__username__icontains=term) | \
                                Q(owner__first_name__icontains=term) | \
@@ -265,10 +267,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'admin/filer/folder/directory_listing.html',
             {
                 'folder': folder,
-                'clipboard_files': [f.subtype() for f in \
-                  File.objects.filter(
+                'clipboard_files': File.objects.filter(
                     in_clipboards__clipboarditem__clipboard__user=request.user
-                    ).distinct()],
+                    ).distinct(),
                 'paginator': paginator,
                 'paginated_items': paginated_items,
                 'permissions': permissions,
@@ -283,4 +284,5 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'select_folder': selectfolder_status(request),
                 # needed in the admin/base.html template for logout links
                 'root_path': "/%s" % admin.site.root_path,
+                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
         }, context_instance=RequestContext(request))

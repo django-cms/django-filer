@@ -74,4 +74,4 @@ FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(
                                                   '/smedia/filer_thumbnails/')
                     ))
 FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', DefaultServer())
-
+FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_SERVER', DefaultServer())

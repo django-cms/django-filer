@@ -28,7 +28,7 @@
                 <td></td>
             </tr>
             {% endwith %}{% endif %}
-            {% if item.file_type == 'File' or item.file_type == 'Image' %}{% with item.subtype as file %}
+            {% if item.file_type == 'File' or item.file_type == 'Image' %}{% with item as file %}
             <tr class="{% cycle rowcolors %}">
                 <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% endif %}</td>
                 <!-- FileIcon -->
@@ -38,7 +38,7 @@
                     <a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
                     <div><b><a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a></b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span></div>
                     <div>{% trans "Owner" %}: {{ file.owner|default:"n/a" }}</div>
-                    <div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>
+                    {% if enable_permissions %}<div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>{% endif %}
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
                 <td style="text-align: right;">

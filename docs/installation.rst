@@ -19,6 +19,7 @@ Dependencies
 * `Django`_ 1.2
 * `django-mptt`_ >= 0.2.1
 * `easy_thumbnails`_ >= 1.0-alpha-17
+* `django-polymorphic`_ >= 0.2
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support) I recommend using `Pillow`_ instead.
 * `django-staticfiles`_ or ``django.contrib.staticfiles`` with `Django`_ 1.3 is 
   recommended
@@ -105,6 +106,7 @@ To crop an image and respect the subject location::
 .. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/
 .. _django.contrib.staticfiles: http://docs.djangoproject.com/en/1.3/howto/static-files/
 .. _Django: http://djangoproject.com
+.. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _PIL: http://www.pythonware.com/products/pil/
