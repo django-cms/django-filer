@@ -457,8 +457,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         files_count = [0] # We define it like that so that we can modify it inside the move_files function
 
         def move_files(files):
-            tools.move_file_to_clipboard(files, clipboard)
-            files_count[0] += len(files)
+            files_count[0] += tools.move_file_to_clipboard(files, clipboard)
 
         def move_folders(folders):
             for f in folders:
