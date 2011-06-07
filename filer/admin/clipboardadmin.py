@@ -52,9 +52,6 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/delete_clipboard/$',
                 self.admin_site.admin_view(views.delete_clipboard),
                 name='filer-delete_clipboard'),
-            url(r'^operations/move_file_to_clipboard/$',
-                self.admin_site.admin_view(self.move_file_to_clipboard),
-                name='filer-move_file_to_clipboard'),
             # upload does it's own permission stuff (because of the stupid
             # flash missing cookie stuff)
             url(r'^operations/upload/$',
@@ -123,20 +120,6 @@ class ClipboardAdmin(admin.ModelAdmin):
                     'admin/filer/tools/clipboard/clipboard_item_rows.html',
                     {'items': file_items},
                     context_instance=RequestContext(request))
-
-    def move_file_to_clipboard(self, request):
-        if request.method == 'POST':
-            file_id = request.POST.get("file_id", None)
-            clipboard = tools.get_user_clipboard(request.user)
-            if file_id:
-                file = File.objects.get(id=file_id)
-                if file.has_edit_permission(request):
-                    tools.move_file_to_clipboard([file], clipboard)
-                else:
-                    raise PermissionDenied
-        return HttpResponseRedirect('%s%s' % (
-                            request.POST.get('redirect_to', ''),
-                            popup_param(request)))
 
     def get_model_perms(self, request):
         """

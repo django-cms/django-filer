@@ -42,13 +42,7 @@
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
                 <td style="text-align: right;">
-                    <form action="{% url admin:filer-move_file_to_clipboard %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="file_id" value="{{ file.id }}" />
-                        <input type="hidden" name="redirect_to" value="{{ current_url }}" />
-                        {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-                        <input type="submit" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files %} style="color: gray;" disabled="disabled"{% endif %} />
-                    </form>
+                    <input type="submit" name="move-to-clipboard-{{ file.id }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files %} style="color: gray;" disabled="disabled"{% endif %} />
                 </td>
             </tr>
             {% endwith %}{% endif %}

@@ -274,6 +274,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             page = int(request.GET.get('page', '1'))
         except ValueError:
             page = 1
+       
+        # Are we moving to clipboard?
+        if request.method == 'POST' and '_save' not in request.POST:
+            for f in folder_files:
+                print f
+                if "move-to-clipboard-%d" % (f.id,) in request.POST:
+                    clipboard = tools.get_user_clipboard(request.user)
+                    if f.has_edit_permission(request):
+                        tools.move_file_to_clipboard([f], clipboard)
+                        return HttpResponseRedirect(request.get_full_path())
+                    else:
+                        raise PermissionDenied
 
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
 

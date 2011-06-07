@@ -82,6 +82,7 @@
         {% endif %}
         {% endif %}
         <form id="changelist-form" action="" method="post">{% csrf_token %}
+        {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
         {% if action_form and actions_on_top and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}
         {% include "admin/filer/folder/directory_table.html" %}
         {% if action_form and actions_on_bottom and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}
