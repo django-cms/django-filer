@@ -38,7 +38,13 @@ class ImageAdminFrom(forms.ModelForm):
 
 class ImageAdmin(FileAdmin):
     form = ImageAdminFrom
-    fieldsets = FileAdmin.fieldsets + (
+    fieldsets = (
+        FileAdmin.fieldsets[0],
+        (_('Advanced'), {
+            'fields': ('default_alt_text', 'default_caption',
+                       'author', 'file', 'sha1',),
+            'classes': ('collapse',),
+        }),
         ('Subject Location', {
             'fields': ('subject_location',),
             'classes': ('collapse',),
