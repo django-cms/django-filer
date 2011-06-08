@@ -278,7 +278,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
             for f in folder_files:
-                print f
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
                     clipboard = tools.get_user_clipboard(request.user)
                     if f.has_edit_permission(request):
