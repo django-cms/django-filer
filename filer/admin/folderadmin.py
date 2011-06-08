@@ -3,7 +3,7 @@ from django import forms
 from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import unquote, get_deleted_objects
+from django.contrib.admin.util import unquote, get_deleted_objects, _format_callback
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
@@ -18,7 +18,8 @@ from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
-    userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions
+    userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions, \
+    check_files_read_permissions, check_folder_read_permissions
 from filer.models import Folder, FolderRoot, UnfiledImages, \
     ImagesWithMissingData, File, tools
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
@@ -41,7 +42,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders']
+    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -453,6 +454,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         check_files_edit_permissions(request, files_queryset)
         check_folder_edit_permissions(request, folders_queryset)
 
+        # TODO: Display a confirmation page if moving more then X files to clipboard?
+
         files_count = [0] # We define it like that so that we can modify it inside the move_files function
 
         def move_files(files):
@@ -590,3 +593,89 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         ], context, context_instance=template.RequestContext(request))
     
     delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
+
+    def move_files_and_folders(self, request, files_queryset, folders_queryset):
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        if files_queryset:
+            current_folder = files_queryset[0].folder
+        else:
+            current_folder = folders_queryset[0].parent
+        
+        perms_needed = False
+        try:
+            check_files_read_permissions(request, files_queryset)
+            check_folder_read_permissions(request, folders_queryset)
+        except PermissionDenied:
+            perms_needed = True
+
+        def list_all_to_move(folders):
+            for fo in folders:
+                yield _format_callback(fo, request.user, self.admin_site, 2, set())
+                children = list(list_all_to_move(fo.children.all()))
+                children.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files])
+                if children:
+                    yield children
+
+        to_move = list(list_all_to_move(folders_queryset))
+        to_move.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset])
+
+        def list_all_folders(folders, level):
+            for fo in folders:
+                if fo in folders_queryset:
+                    # We do not allow moving to selected folders or their descendants
+                    continue
+
+                if not fo.has_read_permission(request):
+                    continue
+
+                # We do not allow moving back to the folder itself
+                enabled = fo != current_folder and fo.has_add_children_permission(request)
+                yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_unicode(fo)), enabled))
+                for c in list_all_folders(fo.children.all(), level + 1):
+                    yield c
+
+        folders = list(list_all_folders(FolderRoot().children, 0))
+
+        if request.method == 'POST' and request.POST.get('post'):
+            try:
+                destination = Folder.objects.get(pk=request.POST.get('destination'))
+            except Folder.DoesNotExist:
+                raise PermissionDenied
+            folders_dict = dict(folders)
+            if destination not in folders_dict or not folders_dict[destination][1]:
+                raise PermissionDenied
+            n = files_queryset.count() + folders_queryset.count()
+            if n:
+                for f in files_queryset:
+                    f.folder = destination
+                    f.save()
+                for f in folders_queryset:
+                    f.move_to(destination, 'last-child')
+                    f.save()
+                self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
+                    "count": n,
+                    "destination": destination,
+                })
+            return None
+
+        context = {
+            "title": _("Move files and/or folders"),
+            "to_move": [to_move],
+            "destination_folders": folders,
+            'files_queryset': files_queryset,
+            'folders_queryset': folders_queryset,
+            "perms_lacking": perms_needed,
+            "opts": opts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }
+    
+        # Display the confirmation page
+        return render_to_response([
+            "admin/filer/folder/choose_move_destination.html"
+        ], context, context_instance=template.RequestContext(request))
+   
+    move_files_and_folders.short_description = ugettext_lazy("Move selected files and/or folders")
