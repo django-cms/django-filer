@@ -454,7 +454,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         check_files_edit_permissions(request, files_queryset)
         check_folder_edit_permissions(request, folders_queryset)
 
-        # TODO: Display a confirmation page if moving more then X files to clipboard?
+        # TODO: Display a confirmation page if moving more than X files to clipboard?
 
         files_count = [0] # We define it like that so that we can modify it inside the move_files function
 
@@ -587,7 +587,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }
     
-        # Display the confirmation page
+        # Display the destination folder selection page
         return render_to_response([
             "admin/filer/delete_selected_confirmation.html"
         ], context, context_instance=template.RequestContext(request))
