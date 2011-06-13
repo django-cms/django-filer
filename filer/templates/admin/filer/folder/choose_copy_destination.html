@@ -6,20 +6,20 @@
      <a href="../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../">{{ app_label|capfirst }}</a> &rsaquo;
      <a href="./">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
-     {% trans 'Move files and/or folders' %}
+     {% trans 'Copy files and/or folders' %}
 </div>
 {% endblock %}
 
 {% block content %}
 {% if perms_lacking %}
-    <p>{% blocktrans %}Your account doesn't have permissions to move all of the selected files and/or folders.{% endblocktrans %}</p>
+    <p>{% blocktrans %}Your account doesn't have permissions to copy all of the selected files and/or folders.{% endblocktrans %}</p>
 {% else %}
 {% if not destination_folders %}
     <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
 {% else %}
-    <p>{% blocktrans %}The following files and/or folders will be moved to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
-    {% for move in to_move %}
-        <ul>{{ move|unordered_list }}</ul>
+    <p>{% blocktrans %}The following files and/or folders will be copied to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
+    {% for copy in to_copy %}
+        <ul>{{ copy|unordered_list }}</ul>
     {% endfor %}
     <form action="" method="post">{% csrf_token %}
     <div>
@@ -29,15 +29,16 @@
     {% for f in folders_queryset %}
     <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />
     {% endfor %}
-    <input type="hidden" name="action" value="move_files_and_folders" />
+    <input type="hidden" name="action" value="copy_files_and_folders" />
     <input type="hidden" name="post" value="yes" />
     <p><label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
     <select name="destination" id="destination">
     {% for folder, name_and_enabled in destination_folders %}
-        <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}>{{ name_and_enabled.0 }}</option>
+        <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}{% if selected_destination_folder and folder.pk == selected_destination_folder %} selected="selected"{% endif %}>{{ name_and_enabled.0 }}</option>
     {% endfor %}
     </select></p>
-    <p><input type="submit" value="{% trans "Move" %}" /></p>
+    {{ copy_form.as_p_with_help }}
+    <p><input type="submit" value="{% trans "Copy" %}" /></p>
     </div>
     </form>
 {% endif %}

@@ -92,6 +92,25 @@ class File(PolymorphicModel, mixins.IconsMixin):
                                      ContentFile(src_file.read()))
         src_storage.delete(src_file_name)
 
+    def _copy_file(self, destination, overwrite=False):
+        """
+        Copies the file to a destination files and returns it.
+        """
+
+        if overwrite:
+            # If the destination file already exists default storage backend does not overwrite it but generates another filename.
+            # TODO: Find a way to override this behavior.
+            raise NotImplementedError
+
+        src_file_name = self.file.name
+        storage = self.file.storages['public' if self.is_public else 'private']
+
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
+        src_file = storage.open(src_file_name)
+        src_file.open()
+        return storage.save(destination, ContentFile(src_file.read()))
+
     def generate_sha1(self):
         sha = hashlib.sha1()
         self.file.seek(0)
