@@ -200,6 +200,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def filter_file(qs, terms=[]):
             for term in terms:
                 qs = qs.filter(Q(name__icontains=term) | \
+                               Q(description__icontains=term)| \
                                Q(original_filename__icontains=term) | \
                                Q(owner__username__icontains=term) | \
                                Q(owner__first_name__icontains=term) | \
