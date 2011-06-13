@@ -593,7 +593,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     
         # Display the destination folder selection page
         return render_to_response([
-            "admin/filer/delete_selected_confirmation.html"
+            "admin/filer/delete_selected_files_confirmation.html"
         ], context, context_instance=template.RequestContext(request))
     
     delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
