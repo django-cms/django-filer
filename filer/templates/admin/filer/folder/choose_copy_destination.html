@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n %}
+{% load i18n adminmedia %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -9,6 +9,8 @@
      {% trans 'Copy files and/or folders' %}
 </div>
 {% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
 
 {% block content %}
 {% if perms_lacking %}

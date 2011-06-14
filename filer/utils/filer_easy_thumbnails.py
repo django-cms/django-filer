@@ -59,5 +59,31 @@ class ThumbnailerNameMixin(object):
 
         return os.path.join(basedir, path, subdir, filename)
 
+class ActionThumbnailerMixin(object):
+    thumbnail_basedir = ''
+    thumbnail_subdir = ''
+    thumbnail_prefix = ''
+    thumbnail_quality = Thumbnailer.thumbnail_quality
+    thumbnail_extension = Thumbnailer.thumbnail_extension
+    thumbnail_transparency_extension = Thumbnailer.thumbnail_transparency_extension
+    
+    def get_thumbnail_name(self, thumbnail_options, transparent=False):
+        """
+        A version of ``Thumbnailer.get_thumbnail_name`` that returns the original
+        filename to resize.
+        """
+        path, filename = os.path.split(self.name)
+
+        basedir = self.thumbnail_basedir
+        subdir = self.thumbnail_subdir
+
+        return os.path.join(basedir, path, subdir, filename)
+
+    def thumbnail_exists(self, thumbnail_name):
+        return False
+
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
+    pass
+
+class FilerActionThumbnailer(ActionThumbnailerMixin, Thumbnailer):
     pass

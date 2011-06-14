@@ -16,14 +16,17 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
-from filer.admin.forms import CopyFilesAndFoldersForm
+from filer.admin.forms import CopyFilesAndFoldersForm, ResizeImagesForm
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
     userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions, \
     check_files_read_permissions, check_folder_read_permissions
 from filer.models import Folder, FolderRoot, UnfiledImages, \
-    ImagesWithMissingData, File, tools, FolderPermission
+    ImagesWithMissingData, File, tools, FolderPermission, Image
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
+from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
+from filer.thumbnail_processors import normalize_subject_location
+from django.conf import settings as django_settings
 import urllib
 import os
 import itertools
@@ -45,7 +48,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders', 'copy_files_and_folders']
+    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders', 'copy_files_and_folders', 'resize_images']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -671,6 +674,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
+            if perms_needed:
+                raise PermissionDenied
             try:
                 destination = Folder.objects.get(pk=request.POST.get('destination'))
             except Folder.DoesNotExist:
@@ -701,7 +706,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
     
-        # Display the confirmation page
+        # Display the destination folder selection page
         return render_to_response([
             "admin/filer/folder/choose_move_destination.html"
         ], context, context_instance=template.RequestContext(request))
@@ -786,6 +791,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folders = self._list_all_destination_folders(request, folders_queryset, current_folder, True)
 
         if request.method == 'POST' and request.POST.get('post'):
+            if perms_needed:
+                raise PermissionDenied
             form = CopyFilesAndFoldersForm(request.POST)
             if form.is_valid():
                 try:
@@ -826,9 +833,129 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
     
-        # Display the confirmation page
+        # Display the destination folder selection page
         return render_to_response([
             "admin/filer/folder/choose_copy_destination.html"
         ], context, context_instance=template.RequestContext(request))
    
     copy_files_and_folders.short_description = ugettext_lazy("Copy selected files and/or folders")
+
+    def _check_resize_perms(self, request, files_queryset, folders_queryset):
+        try:
+            check_files_read_permissions(request, files_queryset)
+            check_folder_read_permissions(request, folders_queryset)
+            check_files_edit_permissions(request, files_queryset)
+        except PermissionDenied:
+            return True
+        return False
+
+    def _list_folders_to_resize(self, request, folders):
+        for fo in folders:
+            children = list(self._list_folders_to_resize(request, fo.children.all()))
+            children.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files if isinstance(f, Image)])
+            if children:
+                yield _format_callback(fo, request.user, self.admin_site, 2, set())
+                yield children
+
+    def _list_all_to_resize(self, request, files_queryset, folders_queryset):
+        to_resize = list(self._list_folders_to_resize(request, folders_queryset))
+        to_resize.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset if isinstance(f, Image)])
+        return to_resize
+
+    def _new_subject_location(self, original_width, original_height, new_width, new_height, x, y, crop):
+        # TODO: We could probably do better
+        return (round(new_width / 2), round(new_height / 2))
+
+    def _resize_image(self, image, form_data):
+        original_width = float(image.width)
+        original_height = float(image.height)
+        thumbnailer = FilerActionThumbnailer(file=image.file.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
+        # This should overwrite the original image
+        new_image = thumbnailer.get_thumbnail({
+            'size': (form_data['width'], form_data['height']),
+            'crop': form_data['crop'],
+            'upscale': form_data['upscale'],
+            'subject_location': image.subject_location,
+        })
+        from django.db.models.fields.files import ImageFieldFile
+        image.file.file = new_image.file
+        image.generate_sha1()
+        image.save() # Also gets new width and height
+
+        subject_location = normalize_subject_location(image.subject_location)
+        if subject_location:
+            (x, y) = subject_location
+            x = float(x)
+            y = float(y)
+            new_width = float(image.width)
+            new_height = float(image.height)
+            (new_x, new_y) = self._new_subject_location(original_width, original_height, new_width, new_height, x, y, form_data['crop'])
+            image.subject_location = "%d,%d" % (new_x, new_y)
+            image.save()
+
+    def _resize_images(self, files, form_data):
+        n = 0
+        for f in files:
+            if isinstance(f, Image):
+                self._resize_image(f, form_data)
+                n += 1
+        return n
+
+    def _resize_folder(self, folder, form_data):
+        return self._resize_images_impl(folder.files.all(), folder.children.all(), form_data)
+
+    def _resize_images_impl(self, files_queryset, folders_queryset, form_data):
+        n = self._resize_images(files_queryset, form_data)
+
+        for f in folders_queryset:
+            n += self._resize_folder(f, form_data)
+        
+        return n
+
+    def resize_images(self, request, files_queryset, folders_queryset):
+        opts = self.model._meta
+        app_label = opts.app_label
+        
+        perms_needed = self._check_resize_perms(request, files_queryset, folders_queryset)
+        to_resize = self._list_all_to_resize(request, files_queryset, folders_queryset)
+
+        if request.method == 'POST' and request.POST.get('post'):
+            if perms_needed:
+                raise PermissionDenied
+            form = ResizeImagesForm(request.POST)
+            if form.is_valid():
+                if form.cleaned_data.get('thumbnail_option'):
+                    form.cleaned_data['width'] = form.cleaned_data['thumbnail_option'].width
+                    form.cleaned_data['height'] = form.cleaned_data['thumbnail_option'].height
+                    form.cleaned_data['crop'] = form.cleaned_data['thumbnail_option'].crop
+                    form.cleaned_data['upscale'] = form.cleaned_data['thumbnail_option'].upscale
+                if files_queryset.count() + folders_queryset.count():
+                    # We count all files here (recursivelly)
+                    n = self._resize_images_impl(files_queryset, folders_queryset, form.cleaned_data)
+                    self.message_user(request, _("Successfully resized %(count)d images.") % {
+                         "count": n,
+                    })
+                return None
+        else:
+            form = ResizeImagesForm()
+
+        context = {
+            "title": _("Resize images"),
+            "to_resize": [to_resize],
+            "resize_form": form,
+            "cmsplugin_enabled": 'cmsplugin_filer_image' in django_settings.INSTALLED_APPS,
+            "files_queryset": files_queryset,
+            "folders_queryset": folders_queryset,
+            "perms_lacking": perms_needed,
+            "opts": opts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+        }
+    
+        # Display the resize options page
+        return render_to_response([
+            "admin/filer/folder/choose_images_resize_options.html"
+        ], context, context_instance=template.RequestContext(request))
+   
+    resize_images.short_description = ugettext_lazy("Resize selected images")
