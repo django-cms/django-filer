@@ -553,6 +553,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not self.has_delete_permission(request):
             raise PermissionDenied
     
+        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
+
         # Populate deletable_objects, a data structure of all related objects that
         # will also be deleted.
         # Hopefully this also checks for necessary permissions.
@@ -584,6 +586,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     
         context = {
             "title": _("Are you sure?"),
+            "instance": current_folder,
+            "breadcrumbs_action": _("Delete files and/or folders"),
             "deletable_objects": all_deletable_objects,
             "files_queryset": files_queryset,
             "folders_queryset": folders_queryset,
@@ -695,6 +699,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         context = {
             "title": _("Move files and/or folders"),
+            "instance": current_folder,
+            "breadcrumbs_action": _("Move files and/or folders"),
             "to_move": [to_move],
             "destination_folders": folders,
             "files_queryset": files_queryset,
@@ -820,6 +826,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         context = {
             "title": _("Copy files and/or folders"),
+            "instance": current_folder,
+            "breadcrumbs_action": _("Copy files and/or folders"),
             "to_copy": [to_copy],
             "destination_folders": folders,
             "selected_destination_folder": selected_destination_folder or current_folder.pk,
@@ -915,7 +923,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def resize_images(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
-        
+       
+        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         perms_needed = self._check_resize_perms(request, files_queryset, folders_queryset)
         to_resize = self._list_all_to_resize(request, files_queryset, folders_queryset)
 
@@ -941,6 +950,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         context = {
             "title": _("Resize images"),
+            "instance": current_folder,
+            "breadcrumbs_action": _("Resize images"),
             "to_resize": [to_resize],
             "resize_form": form,
             "cmsplugin_enabled": 'cmsplugin_filer_image' in django_settings.INSTALLED_APPS,

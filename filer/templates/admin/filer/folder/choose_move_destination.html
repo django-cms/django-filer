@@ -2,12 +2,7 @@
 {% load i18n adminmedia %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-     <a href="../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../">{{ app_label|capfirst }}</a> &rsaquo;
-     <a href="./">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
-     {% trans 'Move files and/or folders' %}
-</div>
+{% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
