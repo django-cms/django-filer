@@ -7,5 +7,5 @@ class ApacheXSendfileServer(ServerBase):
     def serve(self, request, file, **kwargs):
         response = HttpResponse()
         response['X-Sendfile'] = file.path
-        self.default_headers(request, response, file=file, **kwargs)
+        self.default_headers(request=request, response=response, file=file, **kwargs)
         return response
