@@ -815,7 +815,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "title": _("Copy files and/or folders"),
             "to_copy": [to_copy],
             "destination_folders": folders,
-            "selected_destination_folder": selected_destination_folder,
+            "selected_destination_folder": selected_destination_folder or current_folder.pk,
             "copy_form": form,
             "files_queryset": files_queryset,
             "folders_queryset": folders_queryset,
