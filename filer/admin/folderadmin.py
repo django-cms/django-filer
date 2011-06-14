@@ -635,9 +635,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         to_copy_or_move.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset])
         return to_copy_or_move
 
-    def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, level):
+    def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, allow_self, level):
         for fo in folders:
-            if fo in folders_queryset:
+            if not allow_self and fo in folders_queryset:
                 # We do not allow moving to selected folders or their descendants
                 continue
 
@@ -645,13 +645,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 continue
 
             # We do not allow copying/moving back to the folder itself
-            enabled = fo != current_folder and fo.has_add_children_permission(request)
+            enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_unicode(fo)), enabled))
-            for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), level + 1):
+            for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
                 yield c
 
-    def _list_all_destination_folders(self, request, folders_queryset, current_folder):
-        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, FolderRoot().children, 0))
+    def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
+        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, FolderRoot().children, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         for f in files_queryset:
@@ -668,7 +668,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         perms_needed = self._check_move_perms(request, files_queryset, folders_queryset)
         to_move = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder)
+        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
             try:
@@ -747,6 +747,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # Not yet implemented as we have to find a portable (for different storage backends) way to overwrite files
             raise NotImplementedError
 
+        # TODO: Should we also allow not to overwrite the folder if it exists, but just copy into it?
+
         # TODO: Is this a race-condition? Would this be a problem?
         foldername = self._get_available_name(destination, folder.name)
 
@@ -781,7 +783,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         perms_needed = self._check_copy_perms(request, files_queryset, folders_queryset)
         to_copy = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder)
+        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, True)
 
         if request.method == 'POST' and request.POST.get('post'):
             form = CopyFilesAndFoldersForm(request.POST)
