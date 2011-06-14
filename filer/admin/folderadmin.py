@@ -626,8 +626,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _get_current_action_folder(self, request, files_queryset, folders_queryset):
         if files_queryset:
             return files_queryset[0].folder
-        else:
+        elif folders_queryset:
             return folders_queryset[0].parent
+        else:
+            return None
 
     def _list_folders_to_copy_or_move(self, request, folders):
         for fo in folders:
@@ -701,7 +703,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "title": _("Move files and/or folders"),
             "instance": current_folder,
             "breadcrumbs_action": _("Move files and/or folders"),
-            "to_move": [to_move],
+            "to_move": to_move,
             "destination_folders": folders,
             "files_queryset": files_queryset,
             "folders_queryset": folders_queryset,
@@ -828,7 +830,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "title": _("Copy files and/or folders"),
             "instance": current_folder,
             "breadcrumbs_action": _("Copy files and/or folders"),
-            "to_copy": [to_copy],
+            "to_copy": to_copy,
             "destination_folders": folders,
             "selected_destination_folder": selected_destination_folder or current_folder.pk,
             "copy_form": form,
@@ -952,7 +954,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "title": _("Resize images"),
             "instance": current_folder,
             "breadcrumbs_action": _("Resize images"),
-            "to_resize": [to_resize],
+            "to_resize": to_resize,
             "resize_form": form,
             "cmsplugin_enabled": 'cmsplugin_filer_image' in django_settings.INSTALLED_APPS,
             "files_queryset": files_queryset,

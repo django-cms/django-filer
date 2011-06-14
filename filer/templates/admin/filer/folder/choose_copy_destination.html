@@ -14,10 +14,11 @@
 {% if not destination_folders %}
     <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
 {% else %}
+{% if not to_copy %}
+    <p>{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}</p>
+{% else %}
     <p>{% blocktrans %}The following files and/or folders will be copied to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
-    {% for copy in to_copy %}
-        <ul>{{ copy|unordered_list }}</ul>
-    {% endfor %}
+    <ul>{{ to_copy|unordered_list }}</ul>
     <form action="" method="post">{% csrf_token %}
     <div>
     {% for f in files_queryset %}
@@ -38,6 +39,7 @@
     <p><input type="submit" value="{% trans "Copy" %}" /></p>
     </div>
     </form>
+{% endif %}
 {% endif %}
 {% endif %}
 {% endblock %}

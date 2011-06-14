@@ -11,10 +11,11 @@
 {% if perms_lacking %}
     <p>{% blocktrans %}Your account doesn't have permissions to resize all of the selected images.{% endblocktrans %}</p>
 {% else %}
+{% if not to_resize %}
+    <p>{% blocktrans %}There are no images available to resize.{% endblocktrans %}</p>
+{% else %}
     <p>{% blocktrans %}The following images will be resized:{% endblocktrans %}</p>
-    {% for resize in to_resize %}
-        <ul>{{ resize|unordered_list }}</ul>
-    {% endfor %}
+    <ul>{{ to_resize|unordered_list }}</ul>
     <form action="" method="post">{% csrf_token %}
     <div>
     {% for f in files_queryset %}
@@ -35,5 +36,6 @@
     <p><input type="submit" value="{% trans "Resize" %}" /></p>
     </div>
     </form>
+{% endif %}
 {% endif %}
 {% endblock %}
