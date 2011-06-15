@@ -3,7 +3,7 @@ from django import forms
 from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import unquote, get_deleted_objects, _format_callback
+from django.contrib.admin.util import unquote, get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
@@ -605,6 +605,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     
     delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
 
+    # Copied from django.contrib.admin.util
+    def _format_callback(self, obj, user, admin_site, perms_needed):
+        has_admin = obj.__class__ in admin_site._registry
+        opts = obj._meta
+        if has_admin:
+            admin_url = reverse('%s:%s_%s_change'
+                                % (admin_site.name,
+                                   opts.app_label,
+                                   opts.object_name.lower()),
+                                None, (quote(obj._get_pk_val()),))
+            p = '%s.%s' % (opts.app_label,
+                           opts.get_delete_permission())
+            if not user.has_perm(p):
+                perms_needed.add(opts.verbose_name)
+            # Display a link to the admin page.
+            return mark_safe(u'%s: <a href="%s">%s</a>' %
+                             (escape(capfirst(opts.verbose_name)),
+                              admin_url,
+                              escape(obj)))
+        else:
+            # Don't display link to edit, because it either has no
+            # admin or is edited inline.
+            return u'%s: %s' % (capfirst(opts.verbose_name),
+                                force_unicode(obj))
+    
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
             check_files_read_permissions(request, files_queryset)
@@ -633,15 +658,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def _list_folders_to_copy_or_move(self, request, folders):
         for fo in folders:
-            yield _format_callback(fo, request.user, self.admin_site, 2, set())
+            yield self._format_callback(fo, request.user, self.admin_site, 2, set())
             children = list(self._list_folders_to_copy_or_move(request, fo.children.all()))
-            children.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files])
+            children.extend([self._format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files])
             if children:
                 yield children
 
     def _list_all_to_copy_or_move(self, request, files_queryset, folders_queryset):
         to_copy_or_move = list(self._list_folders_to_copy_or_move(request, folders_queryset))
-        to_copy_or_move.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset])
+        to_copy_or_move.extend([self._format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset])
         return to_copy_or_move
 
     def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, allow_self, level):
@@ -862,14 +887,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _list_folders_to_resize(self, request, folders):
         for fo in folders:
             children = list(self._list_folders_to_resize(request, fo.children.all()))
-            children.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files if isinstance(f, Image)])
+            children.extend([self._format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files if isinstance(f, Image)])
             if children:
-                yield _format_callback(fo, request.user, self.admin_site, 2, set())
+                yield self._format_callback(fo, request.user, self.admin_site, 2, set())
                 yield children
 
     def _list_all_to_resize(self, request, files_queryset, folders_queryset):
         to_resize = list(self._list_folders_to_resize(request, folders_queryset))
-        to_resize.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset if isinstance(f, Image)])
+        to_resize.extend([self._format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset if isinstance(f, Image)])
         return to_resize
 
     def _new_subject_location(self, original_width, original_height, new_width, new_height, x, y, crop):
