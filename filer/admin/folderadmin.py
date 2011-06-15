@@ -3,7 +3,7 @@ from django import forms
 from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import unquote, get_deleted_objects, _format_callback
+from django.contrib.admin.util import unquote, get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
@@ -595,6 +595,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     
     delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
 
+    # Copied from django.contrib.admin.util
+    def _format_callback(self, obj, user, admin_site, perms_needed):
+        has_admin = obj.__class__ in admin_site._registry
+        opts = obj._meta
+        if has_admin:
+            admin_url = reverse('%s:%s_%s_change'
+                                % (admin_site.name,
+                                   opts.app_label,
+                                   opts.object_name.lower()),
+                                None, (quote(obj._get_pk_val()),))
+            p = '%s.%s' % (opts.app_label,
+                           opts.get_delete_permission())
+            if not user.has_perm(p):
+                perms_needed.add(opts.verbose_name)
+            # Display a link to the admin page.
+            return mark_safe(u'%s: <a href="%s">%s</a>' %
+                             (escape(capfirst(opts.verbose_name)),
+                              admin_url,
+                              escape(obj)))
+        else:
+            # Don't display link to edit, because it either has no
+            # admin or is edited inline.
+            return u'%s: %s' % (capfirst(opts.verbose_name),
+                                force_unicode(obj))
+    
     def move_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
@@ -613,14 +638,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         def list_all_to_move(folders):
             for fo in folders:
-                yield _format_callback(fo, request.user, self.admin_site, 2, set())
+                yield self._format_callback(fo, request.user, self.admin_site, 2, set())
                 children = list(list_all_to_move(fo.children.all()))
-                children.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files])
+                children.extend([self._format_callback(f, request.user, self.admin_site, 2, set()) for f in fo.files])
                 if children:
                     yield children
 
         to_move = list(list_all_to_move(folders_queryset))
-        to_move.extend([_format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset])
+        to_move.extend([self._format_callback(f, request.user, self.admin_site, 2, set()) for f in files_queryset])
 
         def list_all_folders(folders, level):
             for fo in folders:
