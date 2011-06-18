@@ -1,22 +1,32 @@
 #-*- coding: utf-8 -*-
 from django import forms
+from django import template
 from django.contrib import admin
-from django.contrib.admin.util import unquote
+from django.contrib.admin import helpers
+from django.contrib.admin.util import quote, unquote, get_deleted_objects, capfirst
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+from django.db import router
 from django.db.models import Q
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils.encoding import force_unicode
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
-    userperms_for_request
+    userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions, \
+    check_files_read_permissions, check_folder_read_permissions
 from filer.models import Folder, FolderRoot, UnfiledImages, \
     ImagesWithMissingData, File, tools
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 import urllib
+import inspect
 
 
 class AddFolderPopupForm(forms.ModelForm):
@@ -35,6 +45,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
+    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -169,6 +180,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             except Folder.DoesNotExist:
                 raise Http404
 
+        # Check actions to see if any are available on this changelist
+        actions = self.get_actions(request)
+        
+        # Remove action checkboxes if there aren't any actions available.
+        list_display = list(self.list_display)
+        if not actions:
+            try:
+                list_display.remove('action_checkbox')
+            except ValueError:
+                pass
+
         # search
         def filter_folder(qs, terms=[]):
             for term in terms:
@@ -257,6 +279,50 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             page = int(request.GET.get('page', '1'))
         except ValueError:
             page = 1
+       
+        # Are we moving to clipboard?
+        if request.method == 'POST' and '_save' not in request.POST:
+            for f in folder_files:
+                if "move-to-clipboard-%d" % (f.id,) in request.POST:
+                    clipboard = tools.get_user_clipboard(request.user)
+                    if f.has_edit_permission(request):
+                        tools.move_file_to_clipboard([f], clipboard)
+                        return HttpResponseRedirect(request.get_full_path())
+                    else:
+                        raise PermissionDenied
+
+        selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+
+        # Actions with no confirmation
+        if (actions and request.method == 'POST' and
+                'index' in request.POST and '_save' not in request.POST):
+            if selected:
+                response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
+                if response:
+                    return response
+            else:
+                msg = _("Items must be selected in order to perform "
+                        "actions on them. No items have been changed.")
+                self.message_user(request, msg)
+
+        # Actions with confirmation
+        if (actions and request.method == 'POST' and
+                helpers.ACTION_CHECKBOX_NAME in request.POST and
+                'index' not in request.POST and '_save' not in request.POST):
+            if selected:
+                response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
+                if response:
+                    return response
+
+        # Build the action form and populate it with available actions.
+        if actions:
+            action_form = self.action_form(auto_id=None)
+            action_form.fields['action'].choices = self.get_action_choices(request)
+        else:
+            action_form = None
+
+        selection_note_all = ungettext('%(total_count)s selected',
+            'All %(total_count)s selected', paginator.count)
 
         # If page request (9999) is out of range, deliver last page of results.
         try:
@@ -284,5 +350,379 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'select_folder': selectfolder_status(request),
                 # needed in the admin/base.html template for logout links
                 'root_path': "/%s" % admin.site.root_path,
+                'action_form': action_form,
+                'actions_on_top': self.actions_on_top,
+                'actions_on_bottom': self.actions_on_bottom,
+                'actions_selection_counter': self.actions_selection_counter,
+                'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
+                'selection_note_all': selection_note_all % {'total_count': paginator.count},
+                'media': self.media,
                 'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
         }, context_instance=RequestContext(request))
+
+    def response_action(self, request, files_queryset, folders_queryset):
+        """
+        Handle an admin action. This is called if a request is POSTed to the
+        changelist; it returns an HttpResponse if the action was handled, and
+        None otherwise.
+        """
+
+        # There can be multiple action forms on the page (at the top
+        # and bottom of the change list, for example). Get the action
+        # whose button was pushed.
+        try:
+            action_index = int(request.POST.get('index', 0))
+        except ValueError:
+            action_index = 0
+
+        # Construct the action form.
+        data = request.POST.copy()
+        data.pop(helpers.ACTION_CHECKBOX_NAME, None)
+        data.pop("index", None)
+
+        # Use the action whose button was pushed
+        try:
+            data.update({'action': data.getlist('action')[action_index]})
+        except IndexError:
+            # If we didn't get an action from the chosen form that's invalid
+            # POST data, so by deleting action it'll fail the validation check
+            # below. So no need to do anything here
+            pass
+
+        action_form = self.action_form(data, auto_id=None)
+        action_form.fields['action'].choices = self.get_action_choices(request)
+
+        # If the form's valid we can handle the action.
+        if action_form.is_valid():
+            action = action_form.cleaned_data['action']
+            select_across = action_form.cleaned_data['select_across']
+            func, name, description = self.get_actions(request)[action]
+
+            # Get the list of selected PKs. If nothing's selected, we can't
+            # perform an action on it, so bail. Except we want to perform
+            # the action explicitly on all objects.
+            selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
+            if not selected and not select_across:
+                # Reminder that something needs to be selected or nothing will happen
+                msg = _("Items must be selected in order to perform "
+                        "actions on them. No items have been changed.")
+                self.message_user(request, msg)
+                return None
+
+            if not select_across:
+                selected_files = []
+                selected_folders = []
+
+                for pk in selected:
+                    if pk[:5] == "file-":
+                        selected_files.append(pk[5:])
+                    else:
+                        selected_folders.append(pk[7:])
+
+                # Perform the action only on the selected objects
+                files_queryset = files_queryset.filter(pk__in=selected_files)
+                folders_queryset = folders_queryset.filter(pk__in=selected_folders)
+
+            response = func(self, request, files_queryset, folders_queryset)
+
+            # Actions may return an HttpResponse, which will be used as the
+            # response from the POST. If not, we'll be a good little HTTP
+            # citizen and redirect back to the changelist page.
+            if isinstance(response, HttpResponse):
+                return response
+            else:
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            msg = _("No action selected.")
+            self.message_user(request, msg)
+            return None
+
+    def get_actions(self, request):
+        actions = super(FolderAdmin, self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+
+    def move_to_clipboard(self, request, files_queryset, folders_queryset):
+        """
+        Action which moves the selected files and files in selected folders to clipboard.
+        """
+
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        if request.method != 'POST':
+            return None
+        
+        clipboard = tools.get_user_clipboard(request.user)
+
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
+
+        # TODO: Display a confirmation page if moving more than X files to clipboard?
+
+        files_count = [0] # We define it like that so that we can modify it inside the move_files function
+
+        def move_files(files):
+            files_count[0] += tools.move_file_to_clipboard(files, clipboard)
+
+        def move_folders(folders):
+            for f in folders:
+                move_files(f.files)
+                move_folders(f.children.all())
+        
+        move_files(files_queryset)
+        move_folders(folders_queryset)
+
+        self.message_user(request, _("Successfully moved %(count)d files to clipboard.") % {
+            "count": files_count[0],
+        })
+
+        return None
+
+    move_to_clipboard.short_description = ugettext_lazy("Move selected files to clipboard")
+
+    def files_set_public_or_private(self, request, set_public, files_queryset, folders_queryset):
+        """
+        Action which enables or disables permissions for selected files and files in selected folders to clipboard (set them private or public).
+        """
+
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        if request.method != 'POST':
+            return None
+        
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
+
+        files_count = [0] # We define it like that so that we can modify it inside the set_files function
+
+        def set_files(files):
+            for f in files:
+                if f.is_public != set_public:
+                    f.is_public = set_public
+                    f.save()
+                    files_count[0] += 1
+
+        def set_folders(folders):
+            for f in folders:
+                set_files(f.files)
+                set_folders(f.children.all())
+        
+        set_files(files_queryset)
+        set_folders(folders_queryset)
+
+        if set_public:
+            self.message_user(request, _("Successfully disabled permissions for %(count)d files.") % {
+                "count": files_count[0],
+            })
+        else:
+            self.message_user(request, _("Successfully enabled permissions for %(count)d files.") % {
+                "count": files_count[0],
+            })
+
+        return None
+
+    def files_set_private(self, request, files_queryset, folders_queryset):
+        return self.files_set_public_or_private(request, False, files_queryset, folders_queryset)
+
+    files_set_private.short_description = ugettext_lazy("Enable permissions for selected files")
+
+    def files_set_public(self, request, files_queryset, folders_queryset):
+        return self.files_set_public_or_private(request, True, files_queryset, folders_queryset)
+
+    files_set_public.short_description = ugettext_lazy("Disable permissions for selected files")
+
+    def delete_files_or_folders(self, request, files_queryset, folders_queryset):
+        """
+        Action which deletes the selected files and/or folders.
+    
+        This action first displays a confirmation page whichs shows all the
+        deleteable files and/or folders, or, if the user has no permission on one of the related
+        childs (foreignkeys), a "permission denied" message.
+    
+        Next, it delets all selected files and/or folders and redirects back to the folder.
+        """
+        opts = self.model._meta
+        app_label = opts.app_label
+    
+        # Check that the user has delete permission for the actual model
+        if not self.has_delete_permission(request):
+            raise PermissionDenied
+
+        all_protected = []
+
+        # Populate deletable_objects, a data structure of all related objects that
+        # will also be deleted.
+        # Hopefully this also checks for necessary permissions.
+        # TODO: Check if permissions are really verified
+        (args, varargs, keywords, defaults) = inspect.getargspec(get_deleted_objects)
+        if 'levels_to_root' in args:
+            # Django 1.2
+            deletable_files, perms_needed_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
+            deletable_folders, perms_needed_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
+        else:
+            # Django 1.3
+            using = router.db_for_write(modeladmin.model)
+            deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, modeladmin.admin_site, using)
+            deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, modeladmin.admin_site, using)
+            all_protected.extend(protected_files)
+            all_protected.extend(protected_folders)
+
+        all_deletable_objects = [deletable_files, deletable_folders]
+        all_perms_needed = perms_needed_files.union(perms_needed_folders)
+
+        # The user has already confirmed the deletion.
+        # Do the deletion and return a None to display the change list view again.
+        if request.POST.get('post'):
+            if all_perms_needed:
+                raise PermissionDenied
+            n = files_queryset.count() + folders_queryset.count()
+            if n:
+                for f in files_queryset:
+                    self.log_deletion(request, f, force_unicode(f))
+                    f.delete()
+                for f in folders_queryset:
+                    self.log_deletion(request, f, force_unicode(f))
+                    f.delete()
+                self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {
+                    "count": n,
+                })
+            # Return None to display the change list page again.
+            return None
+
+        if all_perms_needed or all_protected:
+            title = _("Cannot delete files and/or folders")
+        else:
+            title = _("Are you sure?")
+
+        context = {
+            "title": title,
+            "deletable_objects": all_deletable_objects,
+            'files_queryset': files_queryset,
+            'folders_queryset': folders_queryset,
+            "perms_lacking": all_perms_needed,
+            "protected": all_protected,
+            "opts": opts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }
+    
+        # Display the destination folder selection page
+        return render_to_response([
+            "admin/filer/delete_selected_confirmation.html"
+        ], context, context_instance=template.RequestContext(request))
+    
+    delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
+
+    # Copied from django.contrib.admin.util
+    def _format_callback(self, obj, user, admin_site, perms_needed):
+        has_admin = obj.__class__ in admin_site._registry
+        opts = obj._meta
+        if has_admin:
+            admin_url = reverse('%s:%s_%s_change'
+                                % (admin_site.name,
+                                   opts.app_label,
+                                   opts.object_name.lower()),
+                                None, (quote(obj._get_pk_val()),))
+            p = '%s.%s' % (opts.app_label,
+                           opts.get_delete_permission())
+            if not user.has_perm(p):
+                perms_needed.add(opts.verbose_name)
+            # Display a link to the admin page.
+            return mark_safe(u'%s: <a href="%s">%s</a>' %
+                             (escape(capfirst(opts.verbose_name)),
+                              admin_url,
+                              escape(obj)))
+        else:
+            # Don't display link to edit, because it either has no
+            # admin or is edited inline.
+            return u'%s: %s' % (capfirst(opts.verbose_name),
+                                force_unicode(obj))
+    
+    def move_files_and_folders(self, request, files_queryset, folders_queryset):
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        if files_queryset:
+            current_folder = files_queryset[0].folder
+        else:
+            current_folder = folders_queryset[0].parent
+        
+        perms_needed = False
+        try:
+            check_files_read_permissions(request, files_queryset)
+            check_folder_read_permissions(request, folders_queryset)
+        except PermissionDenied:
+            perms_needed = True
+
+        def list_all_to_move(folders):
+            for fo in folders:
+                yield self._format_callback(fo, request.user, self.admin_site, set())
+                children = list(list_all_to_move(fo.children.all()))
+                children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in fo.files])
+                if children:
+                    yield children
+
+        to_move = list(list_all_to_move(folders_queryset))
+        to_move.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in files_queryset])
+
+        def list_all_folders(folders, level):
+            for fo in folders:
+                if fo in folders_queryset:
+                    # We do not allow moving to selected folders or their descendants
+                    continue
+
+                if not fo.has_read_permission(request):
+                    continue
+
+                # We do not allow moving back to the folder itself
+                enabled = fo != current_folder and fo.has_add_children_permission(request)
+                yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_unicode(fo)), enabled))
+                for c in list_all_folders(fo.children.all(), level + 1):
+                    yield c
+
+        folders = list(list_all_folders(FolderRoot().children, 0))
+
+        if request.method == 'POST' and request.POST.get('post'):
+            try:
+                destination = Folder.objects.get(pk=request.POST.get('destination'))
+            except Folder.DoesNotExist:
+                raise PermissionDenied
+            folders_dict = dict(folders)
+            if destination not in folders_dict or not folders_dict[destination][1]:
+                raise PermissionDenied
+            n = files_queryset.count() + folders_queryset.count()
+            if n:
+                for f in files_queryset:
+                    f.folder = destination
+                    f.save()
+                for f in folders_queryset:
+                    f.move_to(destination, 'last-child')
+                    f.save()
+                self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
+                    "count": n,
+                    "destination": destination,
+                })
+            return None
+
+        context = {
+            "title": _("Move files and/or folders"),
+            "to_move": [to_move],
+            "destination_folders": folders,
+            'files_queryset': files_queryset,
+            'folders_queryset': folders_queryset,
+            "perms_lacking": perms_needed,
+            "opts": opts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }
+    
+        # Display the confirmation page
+        return render_to_response([
+            "admin/filer/folder/choose_move_destination.html"
+        ], context, context_instance=template.RequestContext(request))
+   
+    move_files_and_folders.short_description = ugettext_lazy("Move selected files and/or folders")

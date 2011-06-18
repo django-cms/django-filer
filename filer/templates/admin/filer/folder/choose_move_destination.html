@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+     <a href="../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../">{{ app_label|capfirst }}</a> &rsaquo;
+     <a href="./">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
+     {% trans 'Move files and/or folders' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if perms_lacking %}
+    <p>{% blocktrans %}Your account doesn't have permissions to move all of the selected files and/or folders.{% endblocktrans %}</p>
+{% else %}
+{% if not destination_folders %}
+    <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
+{% else %}
+    <p>{% blocktrans %}The following files and/or folders will be moved to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
+    {% for move in to_move %}
+        <ul>{{ move|unordered_list }}</ul>
+    {% endfor %}
+    <form action="" method="post">{% csrf_token %}
+    <div>
+    {% for f in files_queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}" />
+    {% endfor %}
+    {% for f in folders_queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />
+    {% endfor %}
+    <input type="hidden" name="action" value="move_files_and_folders" />
+    <input type="hidden" name="post" value="yes" />
+    <label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
+    <select name="destination" id="destination">
+    {% for folder, name_and_enabled in destination_folders %}
+        <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}>{{ name_and_enabled.0 }}</option>
+    {% endfor %}
+    </select><br />
+    <input type="submit" value="{% trans "Move" %}" />
+    </div>
+    </form>
+{% endif %}
+{% endif %}
+{% endblock %}
