@@ -571,9 +571,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             deletable_folders, perms_needed_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
         else:
             # Django 1.3
-            using = router.db_for_write(modeladmin.model)
-            deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, modeladmin.admin_site, using)
-            deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, modeladmin.admin_site, using)
+            using = router.db_for_write(self.model)
+            deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
+            deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
             all_protected.extend(protected_files)
             all_protected.extend(protected_folders)
 

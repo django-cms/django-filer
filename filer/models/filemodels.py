@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
+from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
 from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
@@ -51,7 +52,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     modified_at = models.DateTimeField(auto_now=True)
 
     is_public = models.BooleanField(
-                    default=False,
+                    default=filer_settings.FILER_IS_PUBLIC_DEFAULT,
                     verbose_name=_('Permissions disabled'),
                     help_text=_('Disable any permission checking for this ' +\
                                 'file. File will be publicly accessible ' +\
