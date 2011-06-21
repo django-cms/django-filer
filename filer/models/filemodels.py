@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
+from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
 from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
@@ -51,7 +52,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     modified_at = models.DateTimeField(auto_now=True)
 
     is_public = models.BooleanField(
-                    default=False,
+                    default=filer_settings.FILER_IS_PUBLIC_DEFAULT,
                     verbose_name=_('Permissions disabled'),
                     help_text=_('Disable any permission checking for this ' +\
                                 'file. File will be publicly accessible ' +\
@@ -91,6 +92,25 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self.file = dst_storage.save(dst_file_name,
                                      ContentFile(src_file.read()))
         src_storage.delete(src_file_name)
+
+    def _copy_file(self, destination, overwrite=False):
+        """
+        Copies the file to a destination files and returns it.
+        """
+
+        if overwrite:
+            # If the destination file already exists default storage backend does not overwrite it but generates another filename.
+            # TODO: Find a way to override this behavior.
+            raise NotImplementedError
+
+        src_file_name = self.file.name
+        storage = self.file.storages['public' if self.is_public else 'private']
+
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
+        src_file = storage.open(src_file_name)
+        src_file.open()
+        return storage.save(destination, ContentFile(src_file.read()))
 
     def generate_sha1(self):
         sha = hashlib.sha1()

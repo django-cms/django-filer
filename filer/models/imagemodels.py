@@ -58,6 +58,7 @@ class Image(File):
         self.has_all_mandatory_data = self._check_validity()
         try:
             # do this more efficient somehow?
+            self.file.seek(0)
             self._width, self._height = PILImage.open(self.file).size
         except Exception:
             # probably the image is missing. nevermind.
