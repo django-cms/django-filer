@@ -20,7 +20,7 @@ class AsPWithHelpMixin(object):
             errors_on_separate_row = True)
 
 class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
-    suffix = forms.CharField(required=True, help_text=_("Suffix which will be appended to filenames of copied files."))
+    suffix = forms.CharField(required=False, help_text=_("Suffix which will be appended to filenames of copied files."))
     # TODO: We have to find a way to overwrite files with different storage backends first.
     #overwrite_files = forms.BooleanField(required=False, help_text=_("Overwrite a file if there already exists a file with the same filename?"))
 
