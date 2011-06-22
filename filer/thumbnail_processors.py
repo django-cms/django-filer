@@ -12,7 +12,7 @@ except ImportError:
 from easy_thumbnails import processors
 from filer.settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG
 
-RE_SUBJECT_LOCATION = re.compile(r'(\d+),(\d+)$')
+RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 
 
 def normalize_subject_location(subject_location):

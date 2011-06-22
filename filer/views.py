@@ -1,18 +1,22 @@
 #-*- coding: utf-8 -*-
 from django import forms
+from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from models import Folder, Image, Clipboard, tools
+from django.utils.translation import ugettext_lazy as _
+from models import Folder, Image, Clipboard, tools, FolderRoot
 
 
 class NewFolderForm(forms.ModelForm):
     class Meta:
         model = Folder
         fields = ('name',)
-
+        widgets = {
+            'name': widgets.AdminTextInputWidget,
+        }
 
 def popup_status(request):
     return '_popup' in request.REQUEST or 'pop' in request.REQUEST
@@ -85,12 +89,15 @@ def make_folder(request, folder_id=None):
         new_folder_form = NewFolderForm(request.POST)
         if new_folder_form.is_valid():
             new_folder = new_folder_form.save(commit=False)
-            new_folder.parent = folder
-            new_folder.owner = request.user
-            new_folder.save()
-            return HttpResponse('<script type="text/javascript">' + \
-                                'opener.dismissPopupAndReload(window);' + \
-                                '</script>')
+            if (folder or FolderRoot()).contains_folder(new_folder.name):
+                new_folder_form._errors['name'] = new_folder_form.error_class([_('Folder with this name already exists.')])
+            else:
+                new_folder.parent = folder
+                new_folder.owner = request.user
+                new_folder.save()
+                return HttpResponse('<script type="text/javascript">' + \
+                                    'opener.dismissPopupAndReload(window);' + \
+                                    '</script>')
     else:
         new_folder_form = NewFolderForm()
     return render_to_response('admin/filer/folder/new_folder_form.html', {

@@ -3,9 +3,14 @@ import os
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.files import File as DjangoFile
+from django.contrib.admin import helpers
 
+from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
+from filer.models.clipboardmodels import Clipboard
+from filer.models.virtualitems import FolderRoot
+from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image)
 
@@ -84,3 +89,176 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
+
+class  BulkOperationsMixin(object):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.img = create_image()
+        self.image_name = 'test_file.jpg'
+        self.filename = os.path.join(os.path.dirname(__file__),
+                                 self.image_name)
+        self.img.save(self.filename, 'JPEG')
+        self.create_src_and_dst_folders()
+        self.create_image(self.src_folder)
+
+    def tearDown(self):
+        self.client.logout()
+        os.remove(self.filename)
+        for img in Image.objects.all():
+            img.delete()
+        for folder in Folder.objects.all():
+            folder.delete()
+
+    def create_src_and_dst_folders(self):
+        self.src_folder = Folder(name="Src", parent=None)
+        self.src_folder.save()
+        self.dst_folder = Folder(name="Dst", parent=None)
+        self.dst_folder.save()
+
+    def create_image(self, folder):
+        file = DjangoFile(open(self.filename), name=self.image_name)
+        self.image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file, folder=folder)
+        self.image_obj.save()
+
+class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
+    def test_move_files_and_folders_action(self):
+        # TODO: Test recursive (files and folders tree) move
+
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.src_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'move_files_and_folders',
+            'post': 'yes',
+            'destination': self.dst_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.assertEqual(self.src_folder.files.count(), 0)
+        self.assertEqual(self.dst_folder.files.count(), 1)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.dst_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'move_files_and_folders',
+            'post': 'yes',
+            'destination': self.src_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+
+    def test_move_to_clipboard_action(self):
+        # TODO: Test recursive (files and folders tree) move
+
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.src_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'move_to_clipboard',
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.assertEqual(self.src_folder.files.count(), 0)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+        clipboard = Clipboard.objects.get(user=self.superuser)
+        self.assertEqual(clipboard.files.count(), 1)
+        tools.move_files_from_clipboard_to_folder(clipboard, self.src_folder)
+        tools.discard_clipboard(clipboard)
+        self.assertEqual(clipboard.files.count(), 0)
+        self.assertEqual(self.src_folder.files.count(), 1)
+
+    def test_files_set_public_action(self):
+        self.image_obj.is_public = False
+        self.image_obj.save()
+        self.assertEqual(self.image_obj.is_public, False)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.src_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'files_set_public',
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.image_obj = Image.objects.get(id=self.image_obj.id)
+        self.assertEqual(self.image_obj.is_public, True)
+
+    def test_files_set_private_action(self):
+        self.image_obj.is_public = True
+        self.image_obj.save()
+        self.assertEqual(self.image_obj.is_public, True)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.src_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'files_set_private',
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.image_obj = Image.objects.get(id=self.image_obj.id)
+        self.assertEqual(self.image_obj.is_public, False)
+        self.image_obj.is_public = True
+        self.image_obj.save()
+
+    def test_copy_files_and_folders_action(self):
+        # TODO: Test recursive (files and folders tree) copy
+
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+        self.assertEqual(self.image_obj.original_filename, 'test_file.jpg')
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.src_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': 'test',
+            'destination': self.dst_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 1)
+        self.assertEqual(self.src_folder.files[0].id, self.image_obj.id)
+        dst_image_obj = self.dst_folder.files[0]
+        self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
+
+class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
+    def test_delete_files_or_folders_action(self):
+        self.assertNotEqual(File.objects.count(), 0)
+        self.assertNotEqual(Image.objects.count(), 0)
+        self.assertNotEqual(Folder.objects.count(), 0)
+        url = reverse('admin:filer-directory_listing-root')
+        folders = []
+        for folder in FolderRoot().children.all():
+            folders.append('folder-%d' % (folder.id,))
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: folders,
+        })
+        self.assertEqual(File.objects.count(), 0)
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(Folder.objects.count(), 0)
+
+class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
+    def test_resize_images_action(self):
+        # TODO: Test recursive (files and folders tree) processing
+
+        self.assertEqual(self.image_obj.width, 800)
+        self.assertEqual(self.image_obj.height, 600)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.src_folder.id,
+        })
+        response = self.client.post(url, {
+            'action': 'resize_images',
+            'post': 'yes',
+            'width': 42,
+            'height': 42,
+            'crop': True,
+            'upscale': False,
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.image_obj = Image.objects.get(id=self.image_obj.id)
+        self.assertEqual(self.image_obj.width, 42)
+        self.assertEqual(self.image_obj.height, 42)

@@ -191,6 +191,13 @@ class Folder(models.Model, mixins.IconsMixin):
     def __unicode__(self):
         return u"%s" % (self.name,)
 
+    def contains_folder(self, folder_name):
+        try:
+            self.children.get(name=folder_name)
+            return True
+        except Folder.DoesNotExist:
+            return False
+
     class Meta:
         unique_together = (('parent', 'name'),)
         ordering = ('name',)

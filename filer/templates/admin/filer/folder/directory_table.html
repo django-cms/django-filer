@@ -4,7 +4,7 @@
     <table cellspacing="0">
         <thead>
             <tr class="{% cycle 'row1' 'row2' as rowcolors %}">
-                <th{% if is_popup %} style="width: 7em;"{% endif %}></th>
+                <th{% if is_popup %} style="width: 3em;"{% else %} class="action-checkbox-column"{% endif %}>{% if paginator.count and not select_folder and not is_popup %}<input type="checkbox" id="action-toggle" />{% endif %}</th>
                 <!-- THUMB -->
                 <th class="thumbHeader">&nbsp;</th>
                 <!-- FILENAME / FOLDERNAME / DIMENSIONS / OWNER -->
@@ -16,7 +16,7 @@
         {% for item in paginated_items.object_list %}
             {% if item.file_type == 'Folder' or item.file_type == 'DummyFolder' %}{% with item as subfolder%}
             <tr class="{% cycle rowcolors %}">
-                <td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;" >&nbsp;</a>{% endif %}</td>
+                <td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;" >&nbsp;</a>{% else %}{% if action_form and item.pk and not is_popup %}<input type="checkbox" class="action-select" value="folder-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
                 <!-- DirIcon -->
                 <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.48 }}" alt="{% trans "Folder Icon" %}" /></a></td>
                 <!-- Directory details -->
@@ -30,7 +30,7 @@
             {% endwith %}{% endif %}
             {% if item.file_type == 'File' or item.file_type == 'Image' %}{% with item as file %}
             <tr class="{% cycle rowcolors %}">
-                <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% endif %}</td>
+                <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% else %}{% if action_form and not is_popup %}<input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
                 <!-- FileIcon -->
                 <td><a href="{{ file.get_admin_url_path }}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}"><img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" /></a></td>
                 <!-- Filename/Dimensions -->
@@ -42,13 +42,7 @@
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{{ ADMIN_MEDIA_PREFIX }}admin/img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{{ ADMIN_MEDIA_PREFIX }}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
                 <td style="text-align: right;">
-                    <form action="{% url admin:filer-move_file_to_clipboard %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="file_id" value="{{ file.id }}" />
-                        <input type="hidden" name="redirect_to" value="{{ current_url }}" />
-                        {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-                        <input type="submit" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files %} style="color: gray;" disabled="disabled"{% endif %} />
-                    </form>
+                    <input type="submit" name="move-to-clipboard-{{ file.id }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files %} style="color: gray;" disabled="disabled"{% endif %} />
                 </td>
             </tr>
             {% endwith %}{% endif %}

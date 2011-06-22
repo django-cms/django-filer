@@ -18,11 +18,13 @@ def get_user_clipboard(user):
 
 
 def move_file_to_clipboard(files, clipboard):
+    count = 0
     for file in files:
-        clipboard.append_file(file)
-        file.folder = None
-        file.save()
-    return True
+        if clipboard.append_file(file):
+            file.folder = None
+            file.save()
+            count += 1
+    return count
 
 
 def move_files_from_clipboard_to_folder(clipboard, folder):
