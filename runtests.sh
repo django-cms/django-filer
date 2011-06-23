@@ -52,7 +52,7 @@ do
             echo "    -f, --failfast - abort at first failing test"
             echo "    -c, --with-coverage - enables coverage"
             echo "    -r, --rebuild-env - run buildout before the tests"
-            echo "    -d, --django <version> - run tests against a django version, options: 12, 13 or trunk"
+            echo "    -d, --django <version> - run tests against a django version, options: 124, 125, 13 or trunk"
             echo "    -p, --python /path/to/python - python version to use to run the tests"
             echo "    -h, --help - display this help"
             exit 1
@@ -66,8 +66,7 @@ done
 
 echo "using python at: $python"
 
-#sig="py:$python;dj:$django$"
-sig="py:$python$"
+sig="py:$python;dj:$django$"
 
 oldsig="nosig"
 
@@ -88,7 +87,8 @@ if [ $reuse_env == false ]; then
         echo "bootstrap.py failed"
         exit 1
     fi
-    ./bin/buildout -c "buildout.cfg"
+    ./bin/buildout -c "django-$django.cfg"
+    ./bin/buildout -c "django-$django.cfg"
     if [ $? != 0 ]; then
         echo "bin/buildout failed"
         exit 1
@@ -116,7 +116,7 @@ if [ $disable_coverage == false ]; then
     ./bin/coverage xml
     ./bin/coverage html
 else
-    ./bin/django$django jenkins
+    ./bin/django jenkins
     retcode=$?
 fi
 cd ..
