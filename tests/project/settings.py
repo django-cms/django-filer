@@ -14,9 +14,18 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.sessions',
-    'django.contrib.staticfiles']
+    'django_jenkins',
+]
 ROOT_URLCONF = 'project.urls'
 
 MEDIA_ROOT = os.path.abspath( os.path.join(TMP_ROOT, 'media') )
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
+
+# django-jenkins settings
+PROJECT_APPS = ['filer'] # list of apps to run tests for
+JENKINS_TASKS = (
+        #'django_jenkins.tasks.run_pylint', # pylint not working for some weird reason (UTF-8 ValueError)
+        'django_jenkins.tasks.with_coverage',
+        'django_jenkins.tasks.django_tests',
+)
