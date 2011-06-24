@@ -16,6 +16,7 @@ build
 *~
 docs/_build
 tests/.installed.cfg
+tests/.buildoutsig
 tests/bin
 tests/develop-eggs
 tests/downloads
@@ -23,6 +24,7 @@ tests/eggs
 tests/parts
 tests/personal*.cfg
 tests/project/personal*.py
+tests/reports/
 distribute*
 lib/
 include/
