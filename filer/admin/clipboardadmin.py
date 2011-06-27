@@ -12,17 +12,8 @@ from filer import settings as filer_settings
 from filer.admin.tools import popup_param
 from filer.models import Clipboard, ClipboardItem, File, Image, tools
 from filer.utils.files import generic_handle_file
+from filer.utils.loader import load_object
 import os
-
-
-class UploadFileForm(forms.ModelForm):
-    class Meta:
-        model = File
-
-
-class UploadImageFileForm(forms.ModelForm):
-    class Meta:
-        model = Image
 
 
 # ModelAdmins
@@ -90,16 +81,19 @@ class ClipboardAdmin(admin.ModelAdmin):
                     iext = os.path.splitext(iname)[1].lower()
                 except:
                     iext = ''
-                if iext in ['.jpg', '.jpeg', '.png', '.gif']:
-                    uploadform = UploadImageFileForm({
-                                            'original_filename': iname,
-                                            'owner': request.user.pk
-                                        }, {'file': ifile})
-                else:
-                    uploadform = UploadFileForm({
-                                            'original_filename': iname,
-                                            'owner': request.user.pk
-                                            }, {'file': ifile})
+                    
+		for filer_class in settings.FILER_CLASSES:
+		  FileSubClass = load_object(filer_class)
+		  #TODO: What if there are more than one that qualify?
+		  if FileSubClass.matches_file_type(iname, ifile):
+		    class ProxyFileForm(forms.ModelForm):
+			class Meta:
+			    model = FileSubClass
+		    break
+		uploadform = ProxyFileForm({
+					'original_filename': iname,
+					'owner': request.user.pk
+					}, {'file': ifile})
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)

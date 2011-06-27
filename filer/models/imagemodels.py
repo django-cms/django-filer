@@ -39,6 +39,13 @@ class Image(File):
 
     subject_location = models.CharField(max_length=64, null=True, blank=True,
                                         default=None)
+    @classmethod
+    def matches_file_type(cls, iname, ifile):
+      try:
+	  iext = os.path.splitext(iname)[1].lower()
+      except:
+	  iext = ''
+      return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
