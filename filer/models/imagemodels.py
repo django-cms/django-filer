@@ -8,7 +8,7 @@ from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
-
+import os
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
@@ -41,10 +41,12 @@ class Image(File):
                                         default=None)
     @classmethod
     def matches_file_type(cls, iname, ifile):
-      try:
-	  iext = os.path.splitext(iname)[1].lower()
-      except:
-	  iext = ''
+      # This was originally in admin/clipboardmodels.py  it was inside of a try
+      # except, I have moved it here outside of a try except because I can't
+      # figure out just what kind of exception this could generate... all it was
+      # doing for me was obscuring errors...
+      # --Dave Butler <croepha@gmail.com>
+      iext = os.path.splitext(iname)[1].lower()
       return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
     def save(self, *args, **kwargs):
