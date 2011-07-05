@@ -89,6 +89,14 @@ class ClipboardAdmin(admin.ModelAdmin):
 		    class ProxyFileForm(forms.ModelForm):
 			class Meta:
 			    model = FileSubClass
+			    # This is needed if there are more fields defined in 
+			    # filer models that we don't know about...
+			    fields = (
+			      'original_filename',
+			      'owner',
+			      'file'
+			    ) 
+			    
 		    break
 		uploadform = ProxyFileForm({
 					'original_filename': iname,
