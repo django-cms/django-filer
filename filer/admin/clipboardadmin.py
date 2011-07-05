@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django import forms
+from django.forms.models import modelform_factory
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.models import User
@@ -86,19 +86,17 @@ class ClipboardAdmin(admin.ModelAdmin):
 		  FileSubClass = load_object(filer_class)
 		  #TODO: What if there are more than one that qualify?
 		  if FileSubClass.matches_file_type(iname, ifile):
-		    class ProxyFileForm(forms.ModelForm):
-			class Meta:
-			    model = FileSubClass
-			    # This is needed if there are more fields defined in 
-			    # filer models that we don't know about...
-			    fields = (
-			      'original_filename',
-			      'owner',
-			      'file'
-			    ) 
-			    
+		    FileForm = modelform_factory(
+		      model = FileSubClass,
+		      fields = (
+			'original_filename',
+			'owner',
+			'file'
+		      )
+		      
+		    )
 		    break
-		uploadform = ProxyFileForm({
+		uploadform = FileForm({
 					'original_filename': iname,
 					'owner': request.user.pk
 					}, {'file': ifile})
