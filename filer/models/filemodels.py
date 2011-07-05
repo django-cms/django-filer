@@ -189,7 +189,13 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_url_path(self):
-        return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
+      return django.core.urlresolvers.reverse(
+	'admin:%s_%s_change' % (
+	  self._meta.app_label,
+	  self._meta.module_name,
+	),
+	args=(self.pk,)
+      )
 
     @property
     def url(self):
