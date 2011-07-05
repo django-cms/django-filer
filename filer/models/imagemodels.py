@@ -167,10 +167,6 @@ class Image(File):
                 pass
         return _thumbnails
 
-    def get_admin_url_path(self):
-        return urlresolvers.reverse('admin:filer_image_change',
-                                    args=(self.id,))
-
     @property
     def easy_thumbnails_thumbnailer(self):
         tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
