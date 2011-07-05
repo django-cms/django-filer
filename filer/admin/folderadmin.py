@@ -24,7 +24,7 @@ from filer.admin.tools import popup_status, selectfolder_status, \
     userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions, \
     check_files_read_permissions, check_folder_read_permissions
 from filer.models import Folder, FolderRoot, UnfiledImages, \
-    ImagesWithMissingData, File, tools, FolderPermission, Image
+    ImagesWithMissingData, File, tools, Image
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location

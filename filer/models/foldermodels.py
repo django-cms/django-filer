@@ -214,7 +214,7 @@ except mptt.AlreadyRegistered:
     pass
 
 
-class FolderPermission(models.Model):
+class OldFolderPermission(models.Model):
     ALL = 0
     THIS = 1
     CHILDREN = 2
