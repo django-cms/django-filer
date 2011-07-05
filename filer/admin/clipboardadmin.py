@@ -77,11 +77,6 @@ class ClipboardAdmin(admin.ModelAdmin):
             files = generic_handle_file(file, original_filename)
             file_items = []
             for ifile, iname in files:
-                try:
-                    iext = os.path.splitext(iname)[1].lower()
-                except:
-                    iext = ''
-                    
 		for filer_class in settings.FILER_CLASSES:
 		  FileSubClass = load_object(filer_class)
 		  #TODO: What if there are more than one that qualify?
