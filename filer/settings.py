@@ -24,7 +24,7 @@ FILER_ADMIN_ICON_SIZES = (
 
 # This is an ordered iterable that describes a list of 
 # classes that I should check for when adding files
-FILER_CLASSES = getattr(settings, 'FILER_CLASSES',
+FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
   (
     'filer.models.filemodels.File',
     'filer.models.imagemodels.Image',    

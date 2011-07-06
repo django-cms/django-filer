@@ -40,7 +40,7 @@ class Image(File):
     subject_location = models.CharField(max_length=64, null=True, blank=True,
                                         default=None)
     @classmethod
-    def matches_file_type(cls, iname, ifile):
+    def matches_file_type(cls, iname, ifile, request):
       # This was originally in admin/clipboardadmin.py  it was inside of a try
       # except, I have moved it here outside of a try except because I can't
       # figure out just what kind of exception this could generate... all it was
