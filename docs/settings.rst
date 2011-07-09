@@ -98,3 +98,11 @@ Draws a red circle around to point in the image that was used to do the
 subject location aware image cropping.
 
 Defaults to `False`
+
+``FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS``
+-------------------------------------------------
+
+Regular users are not allowed to create new folders at the root level, only
+subfolders of already existing folders, unless this setting is set to ``True``.
+
+Defaults to ``False``
