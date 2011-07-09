@@ -445,7 +445,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def get_actions(self, request):
         actions = super(FolderAdmin, self).get_actions(request)
-        del actions['delete_selected']
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
         return actions
 
     def move_to_clipboard(self, request, files_queryset, folders_queryset):
