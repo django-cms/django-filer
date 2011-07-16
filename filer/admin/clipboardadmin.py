@@ -77,24 +77,18 @@ class ClipboardAdmin(admin.ModelAdmin):
             files = generic_handle_file(file, original_filename)
             file_items = []
             for ifile, iname in files:
-		for filer_class in settings.FILER_FILE_MODELS:
-		  FileSubClass = load_object(filer_class)
-		  #TODO: What if there are more than one that qualify?
-		  if FileSubClass.matches_file_type(iname, ifile, request):
-		    FileForm = modelform_factory(
-		      model = FileSubClass,
-		      fields = (
-			'original_filename',
-			'owner',
-			'file'
-		      )
-		      
-		    )
-		    break
-		uploadform = FileForm({
-					'original_filename': iname,
-					'owner': request.user.pk
-					}, {'file': ifile})
+                for filer_class in settings.FILER_FILE_MODELS:
+                    FileSubClass = load_object(filer_class)
+                    #TODO: What if there are more than one that qualify?
+                    if FileSubClass.matches_file_type(iname, ifile, request):
+                        FileForm = modelform_factory(
+                            model = FileSubClass,
+                            fields = ('original_filename', 'owner', 'file')
+                        )
+                        break
+                uploadform = FileForm({'original_filename': iname,
+                                       'owner': request.user.pk},
+                                      {'file': ifile})
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)

@@ -39,6 +39,7 @@ class Image(File):
 
     subject_location = models.CharField(max_length=64, null=True, blank=True,
                                         default=None)
+
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
       # This was originally in admin/clipboardadmin.py  it was inside of a try

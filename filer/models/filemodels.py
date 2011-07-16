@@ -26,6 +26,7 @@ class FileManager(PolymorphicManager):
     def find_duplicates(self, file):
         return [i for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
+
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
@@ -59,10 +60,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
                                 'to anyone.'))
 
     objects = FileManager()
-    
+
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
-      return True # I match all files...
+        return True  # I match all files...
 
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
@@ -103,7 +104,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         """
 
         if overwrite:
-            # If the destination file already exists default storage backend does not overwrite it but generates another filename.
+            # If the destination file already exists default storage backend
+            # does not overwrite it but generates another filename.
             # TODO: Find a way to override this behavior.
             raise NotImplementedError
 
@@ -189,13 +191,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_url_path(self):
-      return urlresolvers.reverse(
-	'admin:%s_%s_change' % (
-	  self._meta.app_label,
-	  self._meta.module_name,
-	),
-	args=(self.pk,)
-      )
+        return urlresolvers.reverse(
+            'admin:%s_%s_change' % (self._meta.app_label,
+                                    self._meta.module_name,),
+            args=(self.pk,)
+        )
 
     @property
     def url(self):
