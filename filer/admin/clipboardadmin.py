@@ -77,7 +77,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             files = generic_handle_file(file, original_filename)
             file_items = []
             for ifile, iname in files:
-                for filer_class in settings.FILER_FILE_MODELS:
+                for filer_class in filer_settings.FILER_FILE_MODELS:
                     FileSubClass = load_object(filer_class)
                     #TODO: What if there are more than one that qualify?
                     if FileSubClass.matches_file_type(iname, ifile, request):
