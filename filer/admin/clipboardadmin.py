@@ -88,7 +88,6 @@ class ClipboardAdmin(admin.ModelAdmin):
 			'owner',
 			'file'
 		      )
-		      
 		    )
 		    break
 		uploadform = FileForm({
