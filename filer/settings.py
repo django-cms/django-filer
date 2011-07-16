@@ -26,8 +26,8 @@ FILER_ADMIN_ICON_SIZES = (
 # classes that I should check for when adding files
 FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     (
-        'filer.models.filemodels.File',
         'filer.models.imagemodels.Image',
+        'filer.models.filemodels.File',
     )
 )
 
