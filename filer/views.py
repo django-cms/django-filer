@@ -8,6 +8,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from models import Folder, Image, Clipboard, tools, FolderRoot
+from filer import settings as filer_settings
 
 
 class NewFolderForm(forms.ModelForm):
@@ -17,6 +18,7 @@ class NewFolderForm(forms.ModelForm):
         widgets = {
             'name': widgets.AdminTextInputWidget,
         }
+
 
 def popup_status(request):
     return '_popup' in request.REQUEST or 'pop' in request.REQUEST
@@ -79,8 +81,9 @@ def make_folder(request, folder_id=None):
     if request.user.is_superuser:
         pass
     elif folder == None:
-        # regular users may not add root folders
-        raise PermissionDenied
+        # regular users may not add root folders unless configured otherwise
+        if not filer_settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS:
+            raise PermissionDenied
     elif not folder.has_add_children_permission(request):
         # the user does not have the permission to add subfolders
         raise PermissionDenied

@@ -2,6 +2,7 @@
 from django.http import HttpResponse
 from filer.server.backends.base import ServerBase
 
+
 class NginxXAccelRedirectServer(ServerBase):
     """
     This returns a response with only headers set, so that nginx actually does

@@ -58,7 +58,7 @@ class FilerApiTests(TestCase):
                                                 {'file':file})
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
-            self.assertEqual(Image.objects.count(), 1)              
+            self.assertEqual(Image.objects.count(), 1)
 
     def test_create_clipboard_item(self):
         image = self.create_filer_image()
@@ -131,4 +131,3 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
-

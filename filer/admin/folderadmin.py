@@ -188,7 +188,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
-        
+
         # Remove action checkboxes if there aren't any actions available.
         list_display = list(self.list_display)
         if not actions:
@@ -209,7 +209,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def filter_file(qs, terms=[]):
             for term in terms:
                 qs = qs.filter(Q(name__icontains=term) | \
-                               Q(description__icontains=term)| \
+                               Q(description__icontains=term) | \
                                Q(original_filename__icontains=term) | \
                                Q(owner__username__icontains=term) | \
                                Q(owner__first_name__icontains=term) | \
@@ -285,7 +285,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             page = int(request.GET.get('page', '1'))
         except ValueError:
             page = 1
-       
+
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
             for f in folder_files:
@@ -445,7 +445,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def get_actions(self, request):
         actions = super(FolderAdmin, self).get_actions(request)
-        del actions['delete_selected']
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
         return actions
 
     def move_to_clipboard(self, request, files_queryset, folders_queryset):
@@ -458,7 +459,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if request.method != 'POST':
             return None
-        
+
         clipboard = tools.get_user_clipboard(request.user)
 
         check_files_edit_permissions(request, files_queryset)
@@ -466,7 +467,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # TODO: Display a confirmation page if moving more than X files to clipboard?
 
-        files_count = [0] # We define it like that so that we can modify it inside the move_files function
+        files_count = [0]  # We define it like that so that we can modify it inside the move_files function
 
         def move_files(files):
             files_count[0] += tools.move_file_to_clipboard(files, clipboard)
@@ -475,7 +476,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             for f in folders:
                 move_files(f.files)
                 move_folders(f.children.all())
-        
+
         move_files(files_queryset)
         move_folders(folders_queryset)
 
@@ -497,11 +498,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if request.method != 'POST':
             return None
-        
+
         check_files_edit_permissions(request, files_queryset)
         check_folder_edit_permissions(request, folders_queryset)
 
-        files_count = [0] # We define it like that so that we can modify it inside the set_files function
+        files_count = [0]  # We define it like that so that we can modify it inside the set_files function
 
         def set_files(files):
             for f in files:
@@ -514,7 +515,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             for f in folders:
                 set_files(f.files)
                 set_folders(f.children.all())
-        
+
         set_files(files_queryset)
         set_folders(folders_queryset)
 
@@ -542,20 +543,20 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def delete_files_or_folders(self, request, files_queryset, folders_queryset):
         """
         Action which deletes the selected files and/or folders.
-    
+
         This action first displays a confirmation page whichs shows all the
         deleteable files and/or folders, or, if the user has no permission on one of the related
         childs (foreignkeys), a "permission denied" message.
-    
+
         Next, it delets all selected files and/or folders and redirects back to the folder.
         """
         opts = self.model._meta
         app_label = opts.app_label
-    
+
         # Check that the user has delete permission for the actual model
         if not self.has_delete_permission(request):
             raise PermissionDenied
-    
+
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
 
         all_protected = []
@@ -618,12 +619,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-    
+
         # Display the destination folder selection page
         return render_to_response([
             "admin/filer/delete_selected_files_confirmation.html"
         ], context, context_instance=template.RequestContext(request))
-    
+
     delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
 
     # Copied from django.contrib.admin.util
@@ -650,7 +651,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # admin or is edited inline.
             return u'%s: %s' % (capfirst(opts.verbose_name),
                                 force_unicode(obj))
-    
+
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
             check_files_read_permissions(request, files_queryset)
@@ -759,12 +760,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-    
+
         # Display the destination folder selection page
         return render_to_response([
             "admin/filer/folder/choose_move_destination.html"
         ], context, context_instance=template.RequestContext(request))
-   
+
     move_files_and_folders.short_description = ugettext_lazy("Move selected files and/or folders")
 
     def _generate_new_filename(self, filename, suffix):
@@ -777,7 +778,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             raise NotImplementedError
 
         # We are assuming here that we are operating on an already saved database objects with current database state available
-        
+
         filename = self._generate_new_filename(file.file.name, suffix)
 
         # Due to how inheritance works, we have to set both pk and id to None
@@ -812,12 +813,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         foldername = self._get_available_name(destination, folder.name)
 
         old_folder = Folder.objects.get(pk=folder.pk)
-        
+
         # Due to how inheritance works, we have to set both pk and id to None
         folder.pk = None
         folder.id = None
         folder.name = foldername
-        folder.insert_at(destination, 'last-child', True) # We save folder here
+        folder.insert_at(destination, 'last-child', True)  # We save folder here
 
         for perm in FolderPermission.objects.filter(folder=old_folder):
             perm.pk = None
@@ -832,13 +833,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         for f in folders_queryset:
             n += self._copy_folder(f, destination, suffix, overwrite)
-        
+
         return n
 
     def copy_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
-        
+
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         perms_needed = self._check_copy_perms(request, files_queryset, folders_queryset)
         to_copy = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
@@ -888,12 +889,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-    
+
         # Display the destination folder selection page
         return render_to_response([
             "admin/filer/folder/choose_copy_destination.html"
         ], context, context_instance=template.RequestContext(request))
-   
+
     copy_files_and_folders.short_description = ugettext_lazy("Copy selected files and/or folders")
 
     def _check_resize_perms(self, request, files_queryset, folders_queryset):
@@ -936,7 +937,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         from django.db.models.fields.files import ImageFieldFile
         image.file.file = new_image.file
         image.generate_sha1()
-        image.save() # Also gets new width and height
+        image.save()  # Also gets new width and height
 
         subject_location = normalize_subject_location(image.subject_location)
         if subject_location:
@@ -965,13 +966,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         for f in folders_queryset:
             n += self._resize_folder(f, form_data)
-        
+
         return n
 
     def resize_images(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
-       
+
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         perms_needed = self._check_resize_perms(request, files_queryset, folders_queryset)
         to_resize = self._list_all_to_resize(request, files_queryset, folders_queryset)
@@ -1011,10 +1012,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-    
+
         # Display the resize options page
         return render_to_response([
             "admin/filer/folder/choose_images_resize_options.html"
         ], context, context_instance=template.RequestContext(request))
-   
+
     resize_images.short_description = ugettext_lazy("Resize selected images")

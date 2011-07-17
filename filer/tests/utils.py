@@ -21,47 +21,47 @@ class TestTargetClass(TestTargetSuperClass):
 #===============================================================================
 class ClassLoaderTestCase(TestCase):
     ''' Tests filer.utils.loader.load() '''
-    
+
     def test_loader_loads_strings_properly(self):
         target = 'filer.tests.utils.TestTargetClass'
         result = load(target, None) # Should return an instance
         self.assertEqual(result.__class__, TestTargetClass)
-        
+
     def test_loader_loads_class(self):
         result = load(TestTargetClass(), TestTargetSuperClass)
         self.assertEqual(result.__class__, TestTargetClass)
-        
+
     def test_loader_loads_subclass(self):
         result = load(TestTargetClass, TestTargetSuperClass)
         self.assertEqual(result.__class__, TestTargetClass)
-        
+
 #===============================================================================
 # Testing the zipping/unzipping of files
 #===============================================================================
 
 class ZippingTestCase(TestCase):
-    
+
     def create_fixtures(self):
-        
+
         self.img = create_image()
         self.image_name = 'test_file.jpg'
         self.filename = os.path.join(os.path.dirname(__file__),
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
-        
+
         self.file = DjangoFile(open(self.filename), name=self.image_name)
-        
+
         self.zipfilename = 'test_zip.zip'
-        
+
         self.zip = ZipFile(self.zipfilename, 'a')
         self.zip.write(self.filename)
         self.zip.close()
-        
+
     def tearDown(self):
         # Clean up the created zip file
         os.remove(self.zipfilename)
         os.remove(self.filename)
-        
+
     def test_unzipping_works(self):
         self.create_fixtures()
         result = unzip(self.zipfilename)
