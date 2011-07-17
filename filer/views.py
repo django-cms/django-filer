@@ -18,7 +18,6 @@ class NewFolderForm(forms.ModelForm):
             'name': widgets.AdminTextInputWidget,
         }
 
-
 def popup_status(request):
     return '_popup' in request.REQUEST or 'pop' in request.REQUEST
 
