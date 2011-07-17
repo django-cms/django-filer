@@ -39,9 +39,9 @@ class PermissionAdmin(admin.ModelAdmin):
 
     def subject_combined(self, obj):
         if obj.subject == 'file':
-            return u'<strong>%s</strong> (File)' % obj.file
+            return u'<img src="%s" /> <strong>%s</strong> (File)' % (obj.file.icons['16'], obj.file,)
         elif obj.subject == 'folder':
-            return u'<strong>%s</strong> (Folder)' % obj.folder
+            return u'<img src="%s" /> <strong>%s</strong> (Folder)' % (obj.folder.icons['16'], obj.folder,)
         return u'<strong>%s</strong>' % obj.get_subject_display()
     subject_combined.allow_tags = True
     subject_combined.short_description = 'subject'
