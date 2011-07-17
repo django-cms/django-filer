@@ -28,7 +28,7 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_make_root_folder_get(self):
         response = self.client.get(reverse('admin:filer-directory_listing-make_root_folder'))
         self.assertEqual(response.status_code, 200)
-        
+
     def test_filer_make_root_folder_post(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
@@ -40,23 +40,23 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
         #TODO: not sure why the status code is 200
         self.assertEqual(response.status_code, 200)
-        
+
     def test_filer_directory_listing_root_empty_get(self):
         response = self.client.post(reverse('admin:filer-directory_listing-root'))
         self.assertEqual(response.status_code, 200)
-        
+
     def test_filer_directory_listing_root_get(self):
         create_folder_structure(depth=3, sibling=2, parent=None)
         response = self.client.post(reverse('admin:filer-directory_listing-root'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
-        
-    
+
+
 class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
-        
+
     def tearDown(self):
         self.client.logout()
 
@@ -82,7 +82,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         file = DjangoFile(open(self.filename))
         response = self.client.post(reverse('admin:filer-ajax_upload'),
                                     {
-                                       'Filename':self.image_name, 
+                                       'Filename':self.image_name,
                                         'Filedata': file,
                                        'jsessionid':self.client.session.session_key,
                                     })

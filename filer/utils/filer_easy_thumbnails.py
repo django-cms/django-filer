@@ -24,7 +24,7 @@ class ThumbnailerNameMixin(object):
     thumbnail_quality = Thumbnailer.thumbnail_quality
     thumbnail_extension = Thumbnailer.thumbnail_extension
     thumbnail_transparency_extension = Thumbnailer.thumbnail_transparency_extension
-    
+
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
@@ -66,7 +66,7 @@ class ActionThumbnailerMixin(object):
     thumbnail_quality = Thumbnailer.thumbnail_quality
     thumbnail_extension = Thumbnailer.thumbnail_extension
     thumbnail_transparency_extension = Thumbnailer.thumbnail_transparency_extension
-    
+
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that returns the original

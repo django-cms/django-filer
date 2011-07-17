@@ -15,9 +15,9 @@ def popup_param(request):
         return ""
 
 def check_files_edit_permissions(request, files):
-   for f in files:
-       if not f.has_edit_permission(request):
-           raise PermissionDenied
+    for f in files:
+        if not f.has_edit_permission(request):
+            raise PermissionDenied
 
 def check_folder_edit_permissions(request, folders):
     for f in folders:
@@ -27,9 +27,9 @@ def check_folder_edit_permissions(request, folders):
         check_folder_edit_permissions(request, f.children.all())
 
 def check_files_read_permissions(request, files):
-   for f in files:
-       if not f.has_read_permission(request):
-           raise PermissionDenied
+    for f in files:
+        if not f.has_read_permission(request):
+            raise PermissionDenied
 
 def check_folder_read_permissions(request, folders):
     for f in folders:

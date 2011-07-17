@@ -50,12 +50,12 @@ class FileImporter(object):
 
     def get_or_create_folder(self, folder_names):
         """
-        Gets or creates a Folder based the list of folder names in hierarchical 
+        Gets or creates a Folder based the list of folder names in hierarchical
         order (like breadcrumbs).
 
         get_or_create_folder(['root', 'subfolder', 'subsub folder'])
 
-        creates the folders with correct parent relations and returns the 
+        creates the folders with correct parent relations and returns the
         'subsub folder' instance.
         """
         if not len(folder_names):

@@ -47,4 +47,3 @@ def serve_protected_thumbnail(request, path):
         return thumbnail_server.serve(request, thumbnail, save_as=False)
     except Exception:
         raise Http404('File not found')
-
