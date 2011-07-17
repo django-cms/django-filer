@@ -2,6 +2,8 @@
 from django.contrib.auth import models as auth_models
 from django.db import models
 from django.db.models import Q
+from django.utils.translation import ugettext  as _
+from filer.fields.file import FilerFileField
 
 
 WHO_CHOICES = (
@@ -55,7 +57,7 @@ class Permission(models.Model):
 
     subject = models.CharField(choices=SUBJECT_CHOICES, max_length=32, default='root')
     folder = models.ForeignKey('filer.Folder', null=True, blank=True, related_name='permissions')
-    file = models.ForeignKey('filer.File', null=True, blank=True, related_name='permissions')
+    file = FilerFileField(null=True, blank=True, related_name='permissions')
     is_inheritable = models.BooleanField(default=True)
 
     can = models.CharField(choices=PERMISSION_CHOICES, max_length=32, default='read')
@@ -66,3 +68,22 @@ class Permission(models.Model):
         verbose_name = 'permission'
         verbose_name_plural = 'permissions'
         app_label = 'filer'
+
+    def clean(self):
+        from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+        if self.who == 'user' and not self.user:
+            raise ValidationError(_('Please select the user this permission should applied to.'))
+        if self.who == 'group' and not self.group:
+            raise ValidationError(_('Please select the user this permission should applied to.'))
+        if not self.who == 'user':
+            self.user = None
+        if not self.who == 'group':
+            self.group = None
+        if self.subject == 'file' and not self.file:
+            raise ValidationError(_('Please select the file this permission should applied to.'))
+        if self.subject == 'folder' and not self.folder:
+            raise ValidationError(_('Please select the folder this permission should applied to.'))
+        if not self.subject == 'folder':
+            self.folder = None
+        if not self.subject == 'file':
+            self.file = None
