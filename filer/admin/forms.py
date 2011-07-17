@@ -6,18 +6,21 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
+
 if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
     from cmsplugin_filer_image.models import ThumbnailOption
+
 
 class AsPWithHelpMixin(object):
     def as_p_with_help(self):
         "Returns this form rendered as HTML <p>s with help text formated for admin."
         return self._html_output(
-            normal_row = u'<p%(html_class_attr)s>%(label)s %(field)s</p>%(help_text)s',
-            error_row = u'%s',
-            row_ender = '</p>',
-            help_text_html = u'<p class="help">%s</p>',
-            errors_on_separate_row = True)
+            normal_row=u'<p%(html_class_attr)s>%(label)s %(field)s</p>%(help_text)s',
+            error_row=u'%s',
+            row_ender='</p>',
+            help_text_html=u'<p class="help">%s</p>',
+            errors_on_separate_row=True)
+
 
 class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
     suffix = forms.CharField(required=False, help_text=_("Suffix which will be appended to filenames of copied files."))
@@ -29,6 +32,7 @@ class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
         if valid != self.cleaned_data['suffix']:
             raise forms.ValidationError(_('Suffix should be a valid, simple and lowercase filename part, like "%(valid)s".') % {'valid': valid})
         return self.cleaned_data['suffix']
+
 
 class ResizeImagesForm(forms.Form, AsPWithHelpMixin):
     if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
