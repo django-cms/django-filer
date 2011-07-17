@@ -2,8 +2,8 @@
 from django.contrib.auth import models as auth_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from filer.models import filemodels
+
 
 class Clipboard(models.Model):
     user = models.ForeignKey(auth_models.User, related_name="filer_clipboards")

@@ -209,7 +209,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def filter_file(qs, terms=[]):
             for term in terms:
                 qs = qs.filter(Q(name__icontains=term) | \
-                               Q(description__icontains=term)| \
+                               Q(description__icontains=term) | \
                                Q(original_filename__icontains=term) | \
                                Q(owner__username__icontains=term) | \
                                Q(owner__first_name__icontains=term) | \
@@ -467,7 +467,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # TODO: Display a confirmation page if moving more than X files to clipboard?
 
-        files_count = [0] # We define it like that so that we can modify it inside the move_files function
+        files_count = [0]  # We define it like that so that we can modify it inside the move_files function
 
         def move_files(files):
             files_count[0] += tools.move_file_to_clipboard(files, clipboard)
@@ -502,7 +502,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         check_files_edit_permissions(request, files_queryset)
         check_folder_edit_permissions(request, folders_queryset)
 
-        files_count = [0] # We define it like that so that we can modify it inside the set_files function
+        files_count = [0]  # We define it like that so that we can modify it inside the set_files function
 
         def set_files(files):
             for f in files:
@@ -818,7 +818,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder.pk = None
         folder.id = None
         folder.name = foldername
-        folder.insert_at(destination, 'last-child', True) # We save folder here
+        folder.insert_at(destination, 'last-child', True)  # We save folder here
 
         for perm in FolderPermission.objects.filter(folder=old_folder):
             perm.pk = None
@@ -937,7 +937,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         from django.db.models.fields.files import ImageFieldFile
         image.file.file = new_image.file
         image.generate_sha1()
-        image.save() # Also gets new width and height
+        image.save()  # Also gets new width and height
 
         subject_location = normalize_subject_location(image.subject_location)
         if subject_location:

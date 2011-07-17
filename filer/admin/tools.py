@@ -1,12 +1,14 @@
 #-*- coding: utf-8 -*-
-
 from django.core.exceptions import PermissionDenied
+
 
 def popup_status(request):
     return '_popup' in request.REQUEST or 'pop' in request.REQUEST
 
+
 def selectfolder_status(request):
     return 'select_folder' in request.REQUEST
+
 
 def popup_param(request):
     if popup_status(request):
@@ -14,10 +16,12 @@ def popup_param(request):
     else:
         return ""
 
+
 def check_files_edit_permissions(request, files):
     for f in files:
         if not f.has_edit_permission(request):
             raise PermissionDenied
+
 
 def check_folder_edit_permissions(request, folders):
     for f in folders:
@@ -26,10 +30,12 @@ def check_folder_edit_permissions(request, folders):
         check_files_edit_permissions(request, f.files)
         check_folder_edit_permissions(request, f.children.all())
 
+
 def check_files_read_permissions(request, files):
     for f in files:
         if not f.has_read_permission(request):
             raise PermissionDenied
+
 
 def check_folder_read_permissions(request, folders):
     for f in folders:
@@ -37,6 +43,7 @@ def check_folder_read_permissions(request, folders):
             raise PermissionDenied
         check_files_read_permissions(request, f.files)
         check_folder_read_permissions(request, f.children.all())
+
 
 def userperms_for_request(item, request):
     r = []

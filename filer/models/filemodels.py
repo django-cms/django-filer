@@ -26,6 +26,7 @@ class FileManager(PolymorphicManager):
     def find_duplicates(self, file):
         return [i for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
 
+
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"

@@ -10,6 +10,7 @@ from filer import settings as filer_settings
 # in the opts part.
 RE_ORIGINAL_FILENAME = re.compile(r"^(?P<source_filename>.*)__(?P<opts_and_ext>.*?)$")
 
+
 def thumbnail_to_original_filename(thumbnail_name):
     m = RE_ORIGINAL_FILENAME.match(thumbnail_name)
     if m:
@@ -59,6 +60,7 @@ class ThumbnailerNameMixin(object):
 
         return os.path.join(basedir, path, subdir, filename)
 
+
 class ActionThumbnailerMixin(object):
     thumbnail_basedir = ''
     thumbnail_subdir = ''
@@ -82,8 +84,10 @@ class ActionThumbnailerMixin(object):
     def thumbnail_exists(self, thumbnail_name):
         return False
 
+
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
     pass
+
 
 class FilerActionThumbnailer(ActionThumbnailerMixin, Thumbnailer):
     pass

@@ -4,6 +4,7 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from zipfile import ZipFile
 
+
 def unzip(file):
     """
     Take a path to a zipfile and checks if it is a valid zip file
@@ -17,9 +18,9 @@ def unzip(file):
         raise Exception('"%s" in the .zip archive is corrupt.' % bad_file)
     infolist = zip.infolist()
     for zipinfo in infolist:
-        if zipinfo.filename.startswith('__'): # do not process meta files
+        if zipinfo.filename.startswith('__'):  # do not process meta files
             continue
         thefile = SimpleUploadedFile(name=zipinfo.filename, content=zip.read(zipinfo))
-        files.append( (thefile, zipinfo.filename) )
+        files.append((thefile, zipinfo.filename))
     zip.close()
     return files

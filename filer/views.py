@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from models import Folder, Image, Clipboard, tools, FolderRoot
 from filer import settings as filer_settings
 
+
 class NewFolderForm(forms.ModelForm):
     class Meta:
         model = Folder
@@ -17,6 +18,7 @@ class NewFolderForm(forms.ModelForm):
         widgets = {
             'name': widgets.AdminTextInputWidget,
         }
+
 
 def popup_status(request):
     return '_popup' in request.REQUEST or 'pop' in request.REQUEST
