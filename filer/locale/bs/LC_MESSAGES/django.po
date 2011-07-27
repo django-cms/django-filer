@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 09:08+0200\n"
+"POT-Creation-Date: 2011-07-27 12:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -194,12 +194,25 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: models/clipboardmodels.py:34
+#: models/clipboardmodels.py:9 models/foldermodels.py:232
+msgid "user"
+msgstr ""
+
+#: models/clipboardmodels.py:11 models/filemodels.py:251
+msgid "files"
+msgstr ""
+
+#: models/clipboardmodels.py:34 models/clipboardmodels.py:40
 msgid "clipboard"
 msgstr ""
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
+msgstr ""
+
+#: models/clipboardmodels.py:39 models/filemodels.py:35
+#: models/filemodels.py:250
+msgid "file"
 msgstr ""
 
 #: models/clipboardmodels.py:44
@@ -210,7 +223,30 @@ msgstr ""
 msgid "clipboard items"
 msgstr ""
 
-#: models/filemodels.py:44
+#: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:73
+#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "folder"
+msgstr ""
+
+#: models/filemodels.py:36
+msgid "file size"
+msgstr ""
+
+#: models/filemodels.py:38
+msgid "sha1"
+msgstr ""
+
+#: models/filemodels.py:40
+msgid "has all mandatory data"
+msgstr ""
+
+#: models/filemodels.py:42
+msgid "original filename"
+msgstr ""
+
+#: models/filemodels.py:44 models/foldermodels.py:99
 msgid "name"
 msgstr ""
 
@@ -222,6 +258,14 @@ msgstr ""
 msgid "owner"
 msgstr ""
 
+#: models/filemodels.py:52 models/foldermodels.py:105
+msgid "uploaded at"
+msgstr ""
+
+#: models/filemodels.py:53 models/foldermodels.py:108
+msgid "modified at"
+msgstr ""
+
 #: models/filemodels.py:57
 msgid "Permissions disabled"
 msgstr ""
@@ -230,12 +274,8 @@ msgstr ""
 msgid "Disable any permission checking for this "
 msgstr ""
 
-#: models/filemodels.py:250
-msgid "file"
-msgstr ""
-
-#: models/filemodels.py:251
-msgid "files"
+#: models/foldermodels.py:107
+msgid "created at"
 msgstr ""
 
 #: models/foldermodels.py:207
@@ -260,10 +300,6 @@ msgstr ""
 
 #: models/foldermodels.py:229
 msgid "type"
-msgstr ""
-
-#: models/foldermodels.py:232
-msgid "user"
 msgstr ""
 
 #: models/foldermodels.py:235
@@ -296,6 +332,30 @@ msgstr ""
 
 #: models/imagemodels.py:29
 msgid "date taken"
+msgstr ""
+
+#: models/imagemodels.py:32
+msgid "default alt text"
+msgstr ""
+
+#: models/imagemodels.py:33
+msgid "default caption"
+msgstr ""
+
+#: models/imagemodels.py:35 templates/image_filer/image.html:6
+msgid "author"
+msgstr ""
+
+#: models/imagemodels.py:37
+msgid "must always publish author credit"
+msgstr ""
+
+#: models/imagemodels.py:38
+msgid "must always publish copyright"
+msgstr ""
+
+#: models/imagemodels.py:40
+msgid "subject location"
 msgstr ""
 
 #: models/imagemodels.py:176
@@ -417,13 +477,6 @@ msgstr ""
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/image_filer/image_export_form.html:6
 msgid "admin homepage"
-msgstr ""
-
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:73
-#: templates/admin/filer/folder/new_folder_form.html:4
-#: templates/admin/filer/tools/clipboard/clipboard.html:22
-msgid "folder"
 msgstr ""
 
 #: templates/admin/filer/folder/change_form.html:21
@@ -612,6 +665,22 @@ msgstr ""
 msgid "there are no files or subfolders"
 msgstr ""
 
+#: templates/admin/filer/folder/directory_table.html:60
+msgid "previous"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:64
+#, python-format
+msgid ""
+"\n"
+"            Page %(number)s of %(num_pages)s.\n"
+"            "
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:70
+msgid "next"
+msgstr ""
+
 #: templates/admin/filer/folder/new_folder_form.html:4
 msgid "Add new"
 msgstr ""
@@ -708,10 +777,6 @@ msgstr ""
 
 #: templates/image_filer/folder.html:6
 msgid "File name"
-msgstr ""
-
-#: templates/image_filer/image.html:6
-msgid "author"
 msgstr ""
 
 #: templates/image_filer/image_export_form.html:16
