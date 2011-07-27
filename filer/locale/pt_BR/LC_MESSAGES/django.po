@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 09:09+0200\n"
+"POT-Creation-Date: 2011-07-27 12:15+0200\n"
 "PO-Revision-Date: 2011-05-27 19:42\n"
 "Last-Translator:   <will@aas.com.br>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -208,13 +208,26 @@ msgstr "Pesquisa"
 msgid "Clear"
 msgstr "Limpar"
 
-#: models/clipboardmodels.py:34
+#: models/clipboardmodels.py:9 models/foldermodels.py:232
+msgid "user"
+msgstr "usuário"
+
+#: models/clipboardmodels.py:11 models/filemodels.py:251
+msgid "files"
+msgstr "arquivos"
+
+#: models/clipboardmodels.py:34 models/clipboardmodels.py:40
 msgid "clipboard"
 msgstr "Área de transferência"
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
 msgstr "Área de transferência"
+
+#: models/clipboardmodels.py:39 models/filemodels.py:35
+#: models/filemodels.py:250
+msgid "file"
+msgstr "arquivo"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard item"
@@ -224,7 +237,31 @@ msgstr "item da área de transferência"
 msgid "clipboard items"
 msgstr "itens da área de transferência"
 
-#: models/filemodels.py:44
+#: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:73
+#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "folder"
+msgstr "pasta"
+
+#: models/filemodels.py:36
+#, fuzzy
+msgid "file size"
+msgstr "arquivos"
+
+#: models/filemodels.py:38
+msgid "sha1"
+msgstr ""
+
+#: models/filemodels.py:40
+msgid "has all mandatory data"
+msgstr ""
+
+#: models/filemodels.py:42
+msgid "original filename"
+msgstr ""
+
+#: models/filemodels.py:44 models/foldermodels.py:99
 msgid "name"
 msgstr "nome"
 
@@ -236,6 +273,15 @@ msgstr "descrição"
 msgid "owner"
 msgstr "Proprietário"
 
+#: models/filemodels.py:52 models/foldermodels.py:105
+#, fuzzy
+msgid "uploaded at"
+msgstr "Falha no upload"
+
+#: models/filemodels.py:53 models/foldermodels.py:108
+msgid "modified at"
+msgstr ""
+
 #: models/filemodels.py:57
 msgid "Permissions disabled"
 msgstr "Permissões desabilitadas"
@@ -244,13 +290,9 @@ msgstr "Permissões desabilitadas"
 msgid "Disable any permission checking for this "
 msgstr "Desative qualquer verificação de permissão para este"
 
-#: models/filemodels.py:250
-msgid "file"
-msgstr "arquivo"
-
-#: models/filemodels.py:251
-msgid "files"
-msgstr "arquivos"
+#: models/foldermodels.py:107
+msgid "created at"
+msgstr ""
 
 #: models/foldermodels.py:207
 msgid "Folder"
@@ -275,10 +317,6 @@ msgstr "este item e todas subjacentes"
 #: models/foldermodels.py:229
 msgid "type"
 msgstr "tipo"
-
-#: models/foldermodels.py:232
-msgid "user"
-msgstr "usuário"
 
 #: models/foldermodels.py:235
 msgid "group"
@@ -311,6 +349,32 @@ msgstr "permissões de pasta"
 #: models/imagemodels.py:29
 msgid "date taken"
 msgstr "data de tomada"
+
+#: models/imagemodels.py:32
+msgid "default alt text"
+msgstr ""
+
+#: models/imagemodels.py:33
+#, fuzzy
+msgid "default caption"
+msgstr "descrição"
+
+#: models/imagemodels.py:35 templates/image_filer/image.html:6
+msgid "author"
+msgstr "autor"
+
+#: models/imagemodels.py:37
+msgid "must always publish author credit"
+msgstr ""
+
+#: models/imagemodels.py:38
+msgid "must always publish copyright"
+msgstr ""
+
+#: models/imagemodels.py:40
+#, fuzzy
+msgid "subject location"
+msgstr "Local de Assunto"
 
 #: models/imagemodels.py:176
 msgid "image"
@@ -433,13 +497,6 @@ msgstr "Volte para"
 #: templates/image_filer/image_export_form.html:6
 msgid "admin homepage"
 msgstr "homepage admin"
-
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:73
-#: templates/admin/filer/folder/new_folder_form.html:4
-#: templates/admin/filer/tools/clipboard/clipboard.html:22
-msgid "folder"
-msgstr "pasta"
 
 #: templates/admin/filer/folder/change_form.html:21
 #: templates/admin/filer/image/change_form.html:9
@@ -630,6 +687,22 @@ msgstr "Mover para a área de transferência"
 msgid "there are no files or subfolders"
 msgstr "não existem arquivos ou subpastas"
 
+#: templates/admin/filer/folder/directory_table.html:60
+msgid "previous"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:64
+#, python-format
+msgid ""
+"\n"
+"            Page %(number)s of %(num_pages)s.\n"
+"            "
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:70
+msgid "next"
+msgstr ""
+
 #: templates/admin/filer/folder/new_folder_form.html:4
 msgid "Add new"
 msgstr "Adicionar novo"
@@ -727,10 +800,6 @@ msgstr "Arquivos da pasta '%(folder_label)s'"
 #: templates/image_filer/folder.html:6
 msgid "File name"
 msgstr "Nome do arquivo"
-
-#: templates/image_filer/image.html:6
-msgid "author"
-msgstr "autor"
 
 #: templates/image_filer/image_export_form.html:16
 msgid "export"

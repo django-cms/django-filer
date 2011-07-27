@@ -29,15 +29,15 @@ class Image(File):
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
                                       editable=False)
 
-    default_alt_text = models.CharField(max_length=255, blank=True, null=True)
-    default_caption = models.CharField(max_length=255, blank=True, null=True)
+    default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
+    default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
 
-    author = models.CharField(max_length=255, null=True, blank=True)
+    author = models.CharField(_('author'), max_length=255, null=True, blank=True)
 
-    must_always_publish_author_credit = models.BooleanField(default=False)
-    must_always_publish_copyright = models.BooleanField(default=False)
+    must_always_publish_author_credit = models.BooleanField(_('must always publish author credit'), default=False)
+    must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
 
-    subject_location = models.CharField(max_length=64, null=True, blank=True,
+    subject_location = models.CharField(_('subject location'), max_length=64, null=True, blank=True,
                                         default=None)
 
     def save(self, *args, **kwargs):
