@@ -1,19 +1,19 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
-"Report-Msgid-Bugs-To: https://github.com/stefanfoulis/django-filer/issues\n"
-"POT-Creation-Date: 2011-05-27 19:39-0300\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-07-27 09:09+0200\n"
 "PO-Revision-Date: 2011-07-26 14:55\n"
 "Last-Translator:  Marco Badan <marco.badan@gmail.com>\n"
 "Language-Team: https://github.com/stefanfoulis/django-filer/\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Translated-Using: django-rosetta 0.6.2\n"
 
@@ -27,11 +27,11 @@ msgstr "Avanzato"
 
 #: admin/folderadmin.py:310 admin/folderadmin.py:413
 msgid ""
-"Items must be selected in order to perform actions on them. No items "
-"have been changed."
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
 msgstr ""
-"Gli elementi devono essere selezionati in modo da eseguire azioni su "
-"di essi. Nessun elemento è stato modificato."
+"Gli elementi devono essere selezionati in modo da eseguire azioni su di "
+"essi. Nessun elemento è stato modificato."
 
 #: admin/folderadmin.py:330
 #, python-format
@@ -154,8 +154,8 @@ msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
 msgstr ""
-"Il suffisso dovrebbe essere valido, semplice e minuscolo per quanto "
-"riguarda la parte del nome del file, come \"%(valid)s\"."
+"Il suffisso dovrebbe essere valido, semplice e minuscolo per quanto riguarda "
+"la parte del nome del file, come \"%(valid)s\"."
 
 #: admin/forms.py:39
 msgid "thumbnail option"
@@ -393,13 +393,13 @@ msgstr "duplicati"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
-"Deleting the selected files and/or folders would result in deleting "
-"related objects, but your account doesn't have permission to delete the"
-" following types of objects:"
+"Deleting the selected files and/or folders would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 msgstr ""
-"Cancellare i file selezionati e/o cartelle comporta l'eliminazione "
-"degli oggetti correlati, ma il tuo account non dispone "
-"dell'autorizzazione per eliminare i seguenti tipi di oggetti:"
+"Cancellare i file selezionati e/o cartelle comporta l'eliminazione degli "
+"oggetti correlati, ma il tuo account non dispone dell'autorizzazione per "
+"eliminare i seguenti tipi di oggetti:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
@@ -411,11 +411,11 @@ msgstr ""
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
-"Are you sure you want to delete the selected files and/or folders? All "
-"of the following objects and their related items will be deleted:"
+"Are you sure you want to delete the selected files and/or folders? All of "
+"the following objects and their related items will be deleted:"
 msgstr ""
-"Sei sicuro di voler cancellare i file selezionati e/o le cartelle? "
-"Tutti gli oggetti seguenti e quelli correlati verranno cancellati:"
+"Sei sicuro di voler cancellare i file selezionati e/o le cartelle? Tutti gli "
+"oggetti seguenti e quelli correlati verranno cancellati:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:41
 msgid "Yes, I'm sure"
@@ -462,11 +462,11 @@ msgstr "Icona cartella"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files"
-" and/or folders."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
 msgstr ""
-"Il tuo account non dispone delle autorizzazioni per copiare tutti i "
-"file e/o cartelle selezionati."
+"Il tuo account non dispone delle autorizzazioni per copiare tutti i file e/o "
+"cartelle selezionati."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
 #: templates/admin/filer/folder/choose_move_destination.html:15
@@ -479,8 +479,8 @@ msgstr "Non ci sono file e/o le cartelle disponibili per la copia."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:20
 msgid ""
-"The following files and/or folders will be copied to a destination "
-"folder (retaining their tree structure):"
+"The following files and/or folders will be copied to a destination folder "
+"(retaining their tree structure):"
 msgstr ""
 "I seguenti file e/o cartelle verranno copiati in una cartella di "
 "destinazione (mantenendo la loro struttura ad albero):"
@@ -496,11 +496,10 @@ msgstr "Copia"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:12
 msgid ""
-"Your account doesn't have permissions to resize all of the selected "
-"images."
+"Your account doesn't have permissions to resize all of the selected images."
 msgstr ""
-"Il tuo account non dispone delle autorizzazioni per ridimensionare "
-"tutte le immagini selezionate."
+"Il tuo account non dispone delle autorizzazioni per ridimensionare tutte le "
+"immagini selezionate."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid "There are no images available to resize."
@@ -522,12 +521,11 @@ msgstr "Scegli i parametri di ridimensionamento:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid ""
-"Warning: Images will be resized in-place and originals will be lost. "
-"Maybe first make a copy of them to retain the originals."
+"Warning: Images will be resized in-place and originals will be lost. Maybe "
+"first make a copy of them to retain the originals."
 msgstr ""
-"Attenzione: Le immagini verranno ridimensionate ora e le immagini "
-"originali andranno perse. Forse è meglio fare una copia per mantenere "
-"i file originali."
+"Attenzione: Le immagini verranno ridimensionate ora e le immagini originali "
+"andranno perse. Forse è meglio fare una copia per mantenere i file originali."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
@@ -535,11 +533,11 @@ msgstr "Ridimensiona"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
-"Your account doesn't have permissions to move all of the selected files"
-" and/or folders."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
 msgstr ""
-"Il tuo account non dispone delle autorizzazioni per spostare tutti i "
-"file e/o cartelle selezionati."
+"Il tuo account non dispone delle autorizzazioni per spostare tutti i file e/"
+"o cartelle selezionati."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
@@ -547,8 +545,8 @@ msgstr "Non ci sono file e/o cartelle a disponibili per lo spostamento."
 
 #: templates/admin/filer/folder/choose_move_destination.html:20
 msgid ""
-"The following files and/or folders will be moved to a destination "
-"folder (retaining their tree structure):"
+"The following files and/or folders will be moved to a destination folder "
+"(retaining their tree structure):"
 msgstr ""
 "I seguenti file e/o cartelle verranno spostati in una cartella di "
 "destinazione (mantenendo la loro struttura ad albero):"

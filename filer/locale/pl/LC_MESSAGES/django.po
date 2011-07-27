@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django-Filer 0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-27 19:38-0300\n"
+"POT-Creation-Date: 2011-07-27 09:09+0200\n"
 "PO-Revision-Date: 2010-06-05 21:18-0000\n"
 "Last-Translator: Crunchorn <crunchorn@prokonto.pl>\n"
 "Language: pl\n"
@@ -18,9 +18,177 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
 
-#: admin/fileadmin.py:37
+#: views.py:96
+#, fuzzy
+msgid "Folder with this name already exists."
+msgstr "Katalog o podanej nazwie juz istnieje"
+
+#: admin/fileadmin.py:110 admin/fileadmin.py:120 admin/imageadmin.py:43
 msgid "Advanced"
 msgstr "Zaawansowane"
+
+#: admin/folderadmin.py:310 admin/folderadmin.py:413
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+
+#: admin/folderadmin.py:330
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: admin/folderadmin.py:363
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr ""
+
+#: admin/folderadmin.py:442
+msgid "No action selected."
+msgstr ""
+
+#: admin/folderadmin.py:483
+#, python-format
+msgid "Successfully moved %(count)d files to clipboard."
+msgstr ""
+
+#: admin/folderadmin.py:489
+#, fuzzy
+msgid "Move selected files to clipboard"
+msgstr "Usuń wszystkie pliki ze schowka"
+
+#: admin/folderadmin.py:523
+#, python-format
+msgid "Successfully disabled permissions for %(count)d files."
+msgstr ""
+
+#: admin/folderadmin.py:527
+#, python-format
+msgid "Successfully enabled permissions for %(count)d files."
+msgstr ""
+
+#: admin/folderadmin.py:536
+msgid "Enable permissions for selected files"
+msgstr ""
+
+#: admin/folderadmin.py:541
+msgid "Disable permissions for selected files"
+msgstr ""
+
+#: admin/folderadmin.py:597
+#, python-format
+msgid "Successfully deleted %(count)d files and/or folders."
+msgstr ""
+
+#: admin/folderadmin.py:604
+#, fuzzy
+msgid "Cannot delete files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:606
+msgid "Are you sure?"
+msgstr ""
+
+#: admin/folderadmin.py:611
+#, fuzzy
+msgid "Delete files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:628
+#, fuzzy
+msgid "Delete selected files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:743
+#, python-format
+msgid ""
+"Successfully moved %(count)d files and/or folders to folder "
+"'%(destination)s'."
+msgstr ""
+
+#: admin/folderadmin.py:750 admin/folderadmin.py:752
+#, fuzzy
+msgid "Move files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:769
+#, fuzzy
+msgid "Move selected files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:863
+#, python-format
+msgid ""
+"Successfully copied %(count)d files and/or folders to folder "
+"'%(destination)s'."
+msgstr ""
+
+#: admin/folderadmin.py:877 admin/folderadmin.py:879
+#, fuzzy
+msgid "Copy files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:898
+#, fuzzy
+msgid "Copy selected files and/or folders"
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: admin/folderadmin.py:993
+#, python-format
+msgid "Successfully resized %(count)d images."
+msgstr ""
+
+#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
+#, fuzzy
+msgid "Resize images"
+msgstr "Luźne obrazki"
+
+#: admin/folderadmin.py:1021
+#, fuzzy
+msgid "Resize selected images"
+msgstr "Luźne obrazki"
+
+#: admin/forms.py:26
+msgid "Suffix which will be appended to filenames of copied files."
+msgstr ""
+
+#: admin/forms.py:33
+#, python-format
+msgid ""
+"Suffix should be a valid, simple and lowercase filename part, like "
+"\"%(valid)s\"."
+msgstr ""
+
+#: admin/forms.py:39
+msgid "thumbnail option"
+msgstr ""
+
+#: admin/forms.py:40
+msgid "width"
+msgstr ""
+
+#: admin/forms.py:41
+msgid "height"
+msgstr ""
+
+#: admin/forms.py:42
+msgid "crop"
+msgstr ""
+
+#: admin/forms.py:43
+msgid "upscale"
+msgstr ""
+
+#: admin/forms.py:48
+msgid "Thumbnail option or resize parameters must be choosen."
+msgstr ""
+
+#: admin/forms.py:50
+msgid "Resize parameters must be choosen."
+msgstr ""
 
 #: admin/imageadmin.py:12
 msgid "Subject location"
@@ -39,114 +207,114 @@ msgstr "Wyszukaj"
 msgid "Clear"
 msgstr "Usuń"
 
-#: models/clipboardmodels.py:27
+#: models/clipboardmodels.py:34
 #, fuzzy
 msgid "clipboard"
 msgstr "Schowek"
 
-#: models/clipboardmodels.py:28
+#: models/clipboardmodels.py:35
 #, fuzzy
 msgid "clipboards"
 msgstr "Schowek"
 
-#: models/clipboardmodels.py:37
+#: models/clipboardmodels.py:44
 #, fuzzy
 msgid "clipboard item"
 msgstr "el. schowka"
 
-#: models/clipboardmodels.py:38
+#: models/clipboardmodels.py:45
 #, fuzzy
 msgid "clipboard items"
 msgstr "el. schowka"
 
-#: models/filemodels.py:46
+#: models/filemodels.py:44
 #, fuzzy
 msgid "name"
 msgstr "Nazwa pliku"
 
-#: models/filemodels.py:48
+#: models/filemodels.py:46
 #, fuzzy
 msgid "description"
 msgstr "Opis"
 
-#: models/filemodels.py:52
+#: models/filemodels.py:50
 #, fuzzy
 msgid "owner"
 msgstr "Właściciel"
 
-#: models/filemodels.py:59
+#: models/filemodels.py:57
 msgid "Permissions disabled"
 msgstr ""
 
-#: models/filemodels.py:60
+#: models/filemodels.py:58
 msgid "Disable any permission checking for this "
 msgstr ""
 
-#: models/filemodels.py:243
+#: models/filemodels.py:250
 #, fuzzy
 msgid "file"
 msgstr "%(counter)s plik"
 
-#: models/filemodels.py:244
+#: models/filemodels.py:251
 #, fuzzy
 msgid "files"
 msgstr "Pliki"
 
-#: models/foldermodels.py:200
+#: models/foldermodels.py:207
 #, fuzzy
 msgid "Folder"
 msgstr "Katalogi"
 
-#: models/foldermodels.py:201
+#: models/foldermodels.py:208
 msgid "Folders"
 msgstr "Katalogi"
 
-#: models/foldermodels.py:216
+#: models/foldermodels.py:223
 msgid "all items"
 msgstr "wszystkie elementy"
 
-#: models/foldermodels.py:217
+#: models/foldermodels.py:224
 msgid "this item only"
 msgstr "tylko ten katalog"
 
-#: models/foldermodels.py:218
+#: models/foldermodels.py:225
 msgid "this item and all children"
 msgstr "ten katalog i wszystkie podrzędne"
 
-#: models/foldermodels.py:222
+#: models/foldermodels.py:229
 msgid "type"
 msgstr "typ"
 
-#: models/foldermodels.py:225
+#: models/foldermodels.py:232
 msgid "user"
 msgstr "użytkownik"
 
-#: models/foldermodels.py:228
+#: models/foldermodels.py:235
 msgid "group"
 msgstr "grupa"
 
-#: models/foldermodels.py:229
+#: models/foldermodels.py:236
 msgid "everybody"
 msgstr "wszyscy"
 
-#: models/foldermodels.py:231
+#: models/foldermodels.py:238
 msgid "can edit"
 msgstr "może edytować"
 
-#: models/foldermodels.py:232
+#: models/foldermodels.py:239
 msgid "can read"
 msgstr "może wyświetlić"
 
-#: models/foldermodels.py:233
+#: models/foldermodels.py:240
 msgid "can add children"
 msgstr "może dodawać el. podrzędne"
 
-#: models/foldermodels.py:262
+#: models/foldermodels.py:269
 #, fuzzy
 msgid "folder permission"
 msgstr "Uprawnienia dla katalogu"
 
-#: models/foldermodels.py:263
+#: models/foldermodels.py:270
 #, fuzzy
 msgid "folder permissions"
 msgstr "Uprawnienia dla katalogów"
@@ -155,12 +323,12 @@ msgstr "Uprawnienia dla katalogów"
 msgid "date taken"
 msgstr "Data wykonania"
 
-#: models/imagemodels.py:175
+#: models/imagemodels.py:176
 #, fuzzy
 msgid "image"
 msgstr "Obrazek"
 
-#: models/imagemodels.py:176
+#: models/imagemodels.py:177
 #, fuzzy
 msgid "images"
 msgstr "Obrazki"
@@ -176,10 +344,31 @@ msgstr "pliki z wybrakowanymi metadanymi"
 
 #: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:73
 #: templates/image_filer/image_export_form.html:9
 msgid "root"
 msgstr "Katalog główny"
+
+#: templates/admin/filer/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: templates/admin/filer/actions.html:4
+msgid "Go"
+msgstr ""
+
+#: templates/admin/filer/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: templates/admin/filer/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s files and/or folders"
+msgstr ""
+
+#: templates/admin/filer/actions.html:13
+msgid "Clear selection"
+msgstr ""
 
 #: templates/admin/filer/breadcrumbs.html:3
 msgid "Go back to admin homepage"
@@ -208,6 +397,7 @@ msgid "Go back to root folder"
 msgstr "Wróć do katalogu głównego"
 
 #: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/breadcrumbs.html:10
 #: templates/admin/filer/folder/change_form.html:10
 #: templates/image_filer/image_export_form.html:11
 #: templates/image_filer/image_export_form.html:13
@@ -219,10 +409,33 @@ msgstr "Przejdź do katalogu '%(folder_name)s'"
 msgid "duplicates"
 msgstr ""
 
+#: templates/admin/filer/delete_selected_files_confirmation.html:11
+msgid ""
+"Deleting the selected files and/or folders would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: templates/admin/filer/delete_selected_files_confirmation.html:19
+msgid ""
+"Deleting the selected files and/or folders would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: templates/admin/filer/delete_selected_files_confirmation.html:27
+msgid ""
+"Are you sure you want to delete the selected files and/or folders? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+
+#: templates/admin/filer/delete_selected_files_confirmation.html:41
+msgid "Yes, I'm sure"
+msgstr ""
+
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:73
 #: templates/image_filer/image_export_form.html:6
 #: templates/image_filer/image_export_form.html:7
 #: templates/image_filer/image_export_form.html:15
@@ -235,7 +448,7 @@ msgid "admin homepage"
 msgstr "panelu administracyjnego"
 
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:73
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:22
 msgid "folder"
@@ -252,26 +465,110 @@ msgid "View on site"
 msgstr "Zobacz na stronie"
 
 #: templates/admin/filer/folder/change_form.html:30
-#: templates/admin/filer/folder/directory_listing.html:57
-#: templates/admin/filer/folder/directory_listing.html:63
+#: templates/admin/filer/folder/directory_listing.html:74
+#: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:21
 msgid "Folder Icon"
 msgstr "Ikona katalogu"
 
-#: templates/admin/filer/folder/directory_listing.html:49
+#: templates/admin/filer/folder/choose_copy_destination.html:12
+msgid ""
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+
+#: templates/admin/filer/folder/choose_copy_destination.html:15
+#: templates/admin/filer/folder/choose_move_destination.html:15
+#, fuzzy
+msgid "There are no destination folders available."
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: templates/admin/filer/folder/choose_copy_destination.html:18
+#, fuzzy
+msgid "There are no files and/or folders available to copy."
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: templates/admin/filer/folder/choose_copy_destination.html:20
+msgid ""
+"The following files and/or folders will be copied to a destination folder "
+"(retaining their tree structure):"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_copy_destination.html:32
+#: templates/admin/filer/folder/choose_move_destination.html:32
+msgid "Destination folder:"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_copy_destination.html:39
+msgid "Copy"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:12
+msgid ""
+"Your account doesn't have permissions to resize all of the selected images."
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:15
+msgid "There are no images available to resize."
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:17
+msgid "The following images will be resized:"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:30
+msgid "Choose an existing thumbnail option or enter resize parameters:"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:32
+msgid "Choose resize parameters:"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:35
+msgid ""
+"Warning: Images will be resized in-place and originals will be lost. Maybe "
+"first make a copy of them to retain the originals."
+msgstr ""
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:36
+msgid "Resize"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_move_destination.html:12
+msgid ""
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+
+#: templates/admin/filer/folder/choose_move_destination.html:18
+#, fuzzy
+msgid "There are no files and/or folders available to move."
+msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
+
+#: templates/admin/filer/folder/choose_move_destination.html:20
+msgid ""
+"The following files and/or folders will be moved to a destination folder "
+"(retaining their tree structure):"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_move_destination.html:38
+msgid "Move"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:66
 msgid "Adds a new Folder"
 msgstr "Dodaje nowy katalog"
 
-#: templates/admin/filer/folder/directory_listing.html:49
+#: templates/admin/filer/folder/directory_listing.html:66
 #: templates/image_filer/include/export_dialog.html:34
 msgid "New Folder"
 msgstr "Nowy katalog"
 
-#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:73
 msgid "Go back to the parent folder"
 msgstr "Wróć do katalogu nadrzędnego"
 
-#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_listing.html:75
 #: templates/admin/filer/folder/directory_table.html:25
 #: templates/admin/filer/tools/search_form.html:18
 #, python-format
@@ -281,7 +578,7 @@ msgstr[0] "%(counter)s katalog"
 msgstr[1] "%(counter)s katalogi"
 msgstr[2] "%(counter)s katalogów"
 
-#: templates/admin/filer/folder/directory_listing.html:58
+#: templates/admin/filer/folder/directory_listing.html:75
 #: templates/admin/filer/folder/directory_table.html:25
 #: templates/admin/filer/tools/search_form.html:19
 #, python-format
@@ -291,18 +588,17 @@ msgstr[0] "%(counter)s plik"
 msgstr[1] "%(counter)s pliki"
 msgstr[2] "%(counter)s plików"
 
-#: templates/admin/filer/folder/directory_listing.html:59
+#: templates/admin/filer/folder/directory_listing.html:76
 msgid "Change current folder details"
 msgstr "Zmodyfikuj dane aktualnie wyświetlanego katalogu"
 
-#: templates/admin/filer/folder/directory_listing.html:59
+#: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:24
 #: templates/admin/filer/folder/directory_table.html:38
 msgid "Change"
 msgstr "Zmień"
 
 #: templates/admin/filer/folder/directory_table.html:11
-#: templates/admin/filer/folder/new_folder_form.html:13
 msgid "Name"
 msgstr "Nazwa"
 
@@ -342,11 +638,11 @@ msgstr ""
 msgid "enabled"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:50
+#: templates/admin/filer/folder/directory_table.html:45
 msgid "Move to clipboard"
 msgstr "Przenieś do schowka"
 
-#: templates/admin/filer/folder/directory_table.html:59
+#: templates/admin/filer/folder/directory_table.html:53
 msgid "there are no files or subfolders"
 msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
 
@@ -354,7 +650,14 @@ msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
 msgid "Add new"
 msgstr "Dodaj nowy"
 
-#: templates/admin/filer/folder/new_folder_form.html:18
+#: templates/admin/filer/folder/new_folder_form.html:12
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: templates/admin/filer/folder/new_folder_form.html:27
 msgid "Save"
 msgstr "Zapisz"
 
@@ -472,18 +775,12 @@ msgstr "Wyślij"
 #~ msgid "Show unfiled images"
 #~ msgstr "Wyświetl luźne obrazki"
 
-#~ msgid "unfiled images"
-#~ msgstr "Luźne obrazki"
-
 #, fuzzy
 #~ msgid "Files"
 #~ msgstr "Plik"
 
 #~ msgid "delete files"
 #~ msgstr "usuń pliki"
-
-#~ msgid "Delete all files in the clipboard"
-#~ msgstr "Usuń wszystkie pliki ze schowka"
 
 #~ msgid "Images"
 #~ msgstr "Obrazki"
