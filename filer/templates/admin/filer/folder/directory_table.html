@@ -61,7 +61,7 @@
         {% endif %}
 
         <span class="this-page">
-        	{% blocktrans  with number=paginated_items.number num_pages=paginated_items.paginator.num_pages %}
+        	{% blocktrans with paginated_items.number as number and paginated_items.paginator.num_pages as num_pages %}
             Page {{ number }} of {{ num_pages }}.
             {% endblocktrans %}
         </span>
