@@ -51,7 +51,7 @@ def filter_by_permission(qs, user, permission):
         Q(owner=user) | \
         (
             Q(permissions__user=user, permissions__can__gte=permission) | \
-#            Q(permissions__group__in=groups, permissions__can__gte=permission) | \
+            Q(permissions__group__in=groups, permissions__can__gte=permission) | \
             Q(permissions__who='everyone', permissions__can__gte=permission) | \
             staff_q
         )
@@ -70,8 +70,8 @@ class PermissionManager(models.Manager):
             folder_qs = Folder.objects.filter(parent=folder)
             file_qs = File.objects.filter(folder=folder)
         else:
-            folder_qs = Folder.objects.filter(parent_id=folder)
-            file_qs = File.objects.filter(folder_id=folder)
+            folder_qs = Folder.objects.filter(parent__id=folder)
+            file_qs = File.objects.filter(folder__id=folder)
 
         # find out if the permission is given by any parent
         groups = user.groups.all()
@@ -130,10 +130,14 @@ class Permission(models.Model):
             who = u'user "%s"' % self.user
         elif self.who == 'group':
             who = u'group "%s"' % self.group
+        else:
+            who = self.who
         if self.subject == 'file':
             subject = u'file "%s"' % self.file
         elif self.subject == 'folder':
             subject = u'folder "%s"' % self.folder
+        else:
+            subject = u'"%s"' % self.subject
         return u'%s can %s %s' % (who, self.get_can_display(), subject)
 
     def clean(self):
