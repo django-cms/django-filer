@@ -94,18 +94,18 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
-    parent = models.ForeignKey('self', null=True, blank=True,
+    parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
                                related_name='children')
-    name = models.CharField(max_length=255)
+    name = models.CharField(_('name'), max_length=255)
 
-    owner = models.ForeignKey(auth_models.User,
+    owner = models.ForeignKey(auth_models.User, verbose_name=('owner'),
                               related_name='filer_owned_folders',
                               null=True, blank=True)
 
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    modified_at = models.DateTimeField(_('modified at'),auto_now=True)
 
     objects = FolderManager()
 
@@ -224,7 +224,7 @@ class FolderPermission(models.Model):
         (THIS, _('this item only')),
         (CHILDREN, _('this item and all children')),
     )
-    folder = models.ForeignKey(Folder, null=True, blank=True)
+    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=0)
     user = models.ForeignKey(auth_models.User,

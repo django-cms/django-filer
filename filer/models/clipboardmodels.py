@@ -2,13 +2,13 @@
 from django.contrib.auth import models as auth_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from filer.models import filemodels
 
+
 class Clipboard(models.Model):
-    user = models.ForeignKey(auth_models.User, related_name="filer_clipboards")
+    user = models.ForeignKey(auth_models.User, verbose_name=_('user'), related_name="filer_clipboards")
     files = models.ManyToManyField(
-                        'File', related_name="in_clipboards",
+                        'File', verbose_name=_('files'), related_name="in_clipboards",
                         through='ClipboardItem')
 
     def append_file(self, file):
@@ -36,8 +36,8 @@ class Clipboard(models.Model):
 
 
 class ClipboardItem(models.Model):
-    file = models.ForeignKey('File')
-    clipboard = models.ForeignKey(Clipboard)
+    file = models.ForeignKey('File', verbose_name=_('file'))
+    clipboard = models.ForeignKey(Clipboard, verbose_name=_('clipboard'))
 
     class Meta:
         app_label = 'filer'

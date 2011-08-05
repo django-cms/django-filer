@@ -9,13 +9,13 @@ from filer.tests.helpers import create_superuser, create_image
 import os
 
 class ToolsTestCase(TestCase):
-    
+
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():
             img.delete()
-    
+
     def create_fixtures(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -24,7 +24,7 @@ class ToolsTestCase(TestCase):
         self.filename = os.path.join(os.path.dirname(__file__),
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
-        
+
         self.file = DjangoFile(open(self.filename), name=self.image_name)
         # This is actually a "file" for filer considerations
         self.image = Image.objects.create(owner=self.superuser,
@@ -32,19 +32,19 @@ class ToolsTestCase(TestCase):
                                      file=self.file)
         self.clipboard = Clipboard.objects.create(user=self.superuser)
         self.clipboard.append_file(self.image)
-        
+
         self.folder = Folder.objects.create(name='test_folder')
-        
+
     def test_clear_clipboard_works(self):
         self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
         tools.discard_clipboard(self.clipboard)
         self.assertEqual(len(self.clipboard.files.all()), 0)
-    
+
     def test_move_to_clipboard_works(self):
         self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
-        
+
         file2 = Image.objects.create(owner=self.superuser,
                                      original_filename='file2',
                                      file=self.file)
@@ -52,22 +52,22 @@ class ToolsTestCase(TestCase):
                                      original_filename='file3',
                                      file=self.file)
         files = [file2, file3]
-        
+
         tools.move_file_to_clipboard(files, self.clipboard)
         self.assertEqual(len(self.clipboard.files.all()), 3)
-        
+
     def test_move_from_clipboard_to_folder_works(self):
         self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
-        
+
         tools.move_files_from_clipboard_to_folder(self.clipboard, self.folder)
         for file in self.clipboard.files.all():
             self.assertEqual(file.folder, self.folder)
-            
+
     def test_delete_clipboard_works(self):
         self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
-        
+
         tools.delete_clipboard(self.clipboard)
         # Assert there is no file with self.image_name = 'test_file.jpg'
         result = Image.objects.filter(file=self.file)

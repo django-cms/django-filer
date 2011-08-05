@@ -18,7 +18,7 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
 if not FILER_STATICMEDIA_PREFIX:
-    FILER_STATICMEDIA_PREFIX = (getattr(settings,'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
+    FILER_STATICMEDIA_PREFIX = (getattr(settings, 'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
 
 FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64',
@@ -39,7 +39,7 @@ FILER_PUBLICMEDIA_STORAGE = getattr(
                     'FILER_PUBLICMEDIA_STORAGE',
                     storage_factory(
                         klass=PublicFileSystemStorage,
-                        location= os.path.abspath(
+                        location=os.path.abspath(
                             os.path.join(settings.MEDIA_ROOT,
                                          'filer')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
@@ -51,7 +51,7 @@ FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(
                     'FILER_PUBLICMEDIA_THUMBNAIL_STORAGE',
                     storage_factory(
                         klass=PublicFileSystemStorage,
-                        location= os.path.abspath(
+                        location=os.path.abspath(
                             os.path.join(settings.MEDIA_ROOT,
                                          'filer_thumbnails')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
@@ -65,7 +65,7 @@ FILER_PRIVATEMEDIA_STORAGE = getattr(
                     'FILER_PRIVATEMEDIA_STORAGE',
                     storage_factory(
                         klass=PrivateFileSystemStorage,
-                        location= os.path.abspath(
+                        location=os.path.abspath(
                             os.path.join(settings.MEDIA_ROOT,
                                          '../smedia/filer/')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
@@ -78,7 +78,7 @@ FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(
                    'FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE',
                     storage_factory(
                         klass=PrivateFileSystemStorage,
-                        location= os.path.abspath(
+                        location=os.path.abspath(
                             os.path.join(settings.MEDIA_ROOT,
                                          '../smedia/filer_thumbnails/')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,

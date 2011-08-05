@@ -6,6 +6,7 @@ from django.utils.http import http_date
 from django.views.static import was_modified_since
 from filer.server.backends.base import ServerBase
 
+
 class DefaultServer(ServerBase):
     """
     Serve static files from the local filesystem through django.
