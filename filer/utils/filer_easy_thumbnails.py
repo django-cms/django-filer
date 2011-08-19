@@ -10,6 +10,7 @@ from filer import settings as filer_settings
 # in the opts part.
 RE_ORIGINAL_FILENAME = re.compile(r"^(?P<source_filename>.*)__(?P<opts_and_ext>.*?)$")
 
+
 def thumbnail_to_original_filename(thumbnail_name):
     m = RE_ORIGINAL_FILENAME.match(thumbnail_name)
     if m:
@@ -24,7 +25,7 @@ class ThumbnailerNameMixin(object):
     thumbnail_quality = Thumbnailer.thumbnail_quality
     thumbnail_extension = Thumbnailer.thumbnail_extension
     thumbnail_transparency_extension = Thumbnailer.thumbnail_transparency_extension
-    
+
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
@@ -59,5 +60,34 @@ class ThumbnailerNameMixin(object):
 
         return os.path.join(basedir, path, subdir, filename)
 
+
+class ActionThumbnailerMixin(object):
+    thumbnail_basedir = ''
+    thumbnail_subdir = ''
+    thumbnail_prefix = ''
+    thumbnail_quality = Thumbnailer.thumbnail_quality
+    thumbnail_extension = Thumbnailer.thumbnail_extension
+    thumbnail_transparency_extension = Thumbnailer.thumbnail_transparency_extension
+
+    def get_thumbnail_name(self, thumbnail_options, transparent=False):
+        """
+        A version of ``Thumbnailer.get_thumbnail_name`` that returns the original
+        filename to resize.
+        """
+        path, filename = os.path.split(self.name)
+
+        basedir = self.thumbnail_basedir
+        subdir = self.thumbnail_subdir
+
+        return os.path.join(basedir, path, subdir, filename)
+
+    def thumbnail_exists(self, thumbnail_name):
+        return False
+
+
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
+    pass
+
+
+class FilerActionThumbnailer(ActionThumbnailerMixin, Thumbnailer):
     pass

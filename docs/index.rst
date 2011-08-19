@@ -28,6 +28,8 @@ Getting help
 * google group: http://groups.google.com/group/django-filer
 * IRC: #django-filer on freenode.net
 
+.. _contributing:
+
 Contributing
 ------------
 
@@ -43,6 +45,9 @@ Contents
    :maxdepth: 1
 
    getting_started
+   installation
+   usage
+   permissions
    server
    settings
    running_tests

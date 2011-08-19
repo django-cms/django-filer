@@ -46,6 +46,7 @@ h1.folder_header {
 	background-image: url(../img/nav-bg.gif);
 	background-repeat: repeat-x;
 	background-position: bottom;
+	margin-bottom: 0;
 }
 a.small_folder_link {
 	display: block;

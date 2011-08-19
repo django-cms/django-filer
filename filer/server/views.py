@@ -8,6 +8,8 @@ from filer.models import File
 from filer.utils.filer_easy_thumbnails import thumbnail_to_original_filename
 
 server = filer_settings.FILER_PRIVATEMEDIA_SERVER
+thumbnail_server = filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_SERVER
+
 
 def serve_protected_file(request, path):
     """
@@ -23,6 +25,7 @@ def serve_protected_file(request, path):
         else:
             raise Http404('File not found')
     return server.serve(request, file=thefile.file, save_as=False)
+
 
 def serve_protected_thumbnail(request, path):
     """
@@ -43,7 +46,6 @@ def serve_protected_thumbnail(request, path):
             raise Http404('File not found')
     try:
         thumbnail = ThumbnailFile(name=path, storage=thefile.file.thumbnail_storage)
-        return server.serve(request, thumbnail, save_as=False)
+        return thumbnail_server.serve(request, thumbnail, save_as=False)
     except Exception:
         raise Http404('File not found')
-

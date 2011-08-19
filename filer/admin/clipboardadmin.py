@@ -1,24 +1,25 @@
 #-*- coding: utf-8 -*-
-import os
+from django import forms
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.admin.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponse
-from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.contrib import admin
-from django import forms
-from django.contrib.admin.models import User
-from django.conf import settings
-from filer.models import Clipboard, ClipboardItem, File, Image
-from filer.utils.files import generic_handle_file
-from filer.models import tools
+from django.template import RequestContext
+from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.admin.tools import popup_param
-from django.views.decorators.csrf import csrf_exempt
+from filer.models import Clipboard, ClipboardItem, File, Image, tools
+from filer.utils.files import generic_handle_file
+import os
 
-# forms... sucks, types should be automatic
+
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = File
+
+
 class UploadImageFileForm(forms.ModelForm):
     class Meta:
         model = Image
@@ -27,20 +28,21 @@ class UploadImageFileForm(forms.ModelForm):
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
     model = ClipboardItem
+
+
 class ClipboardAdmin(admin.ModelAdmin):
     model = Clipboard
-    inlines = [ ClipboardItemInline, ]
+    inlines = [ClipboardItemInline]
     filter_horizontal = ('files',)
     raw_id_fields = ('user',)
     verbose_name = "DEBUG Clipboard"
     verbose_name_plural = "DEBUG Clipboards"
-    
+
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url
         urls = super(ClipboardAdmin, self).get_urls()
         from filer import views
         url_patterns = patterns('',
-            #url(r'^([0-9]+)/move-page/$', self.admin_site.admin_view(self.move_entity), name='%s_%s' % (info, 'move_page') ),
             url(r'^operations/paste_clipboard_to_folder/$',
                 self.admin_site.admin_view(views.paste_clipboard_to_folder),
                 name='filer-paste_clipboard_to_folder'),
@@ -50,43 +52,37 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/delete_clipboard/$',
                 self.admin_site.admin_view(views.delete_clipboard),
                 name='filer-delete_clipboard'),
-            url(r'^operations/move_file_to_clipboard/$',
-                self.admin_site.admin_view(self.move_file_to_clipboard),
-                name='filer-move_file_to_clipboard'),
-            # upload does it's own permission stuff (because of the stupid flash missing cookie stuff)
+            # upload does it's own permission stuff (because of the stupid
+            # flash missing cookie stuff)
             url(r'^operations/upload/$',
                 self.ajax_upload,
                 name='filer-ajax_upload'),
         )
         url_patterns.extend(urls)
         return url_patterns
-    #def has_add_permission(self, request):
-    #    return False
-    #def has_change_permission(self, request, obj=None):
-    #    return False
-    #def has_delete_permission(self, request, obj=None):
-    #    return False
+
     @csrf_exempt
     def ajax_upload(self, request, folder_id=None):
         """
         receives an upload from the flash uploader and fixes the session
-        because of the missing cookie. Receives only one file at the time, 
+        because of the missing cookie. Receives only one file at the time,
         althow it may be a zip file, that will be unpacked.
         """
         try:
-            # flashcookie-hack (flash does not submit the cookie, so we send the
-            # django sessionid over regular post
+            # flashcookie-hack (flash does not submit the cookie, so we send
+            # the django sessionid over regular post
             engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
             session_key = request.POST.get('jsessionid')
             request.session = engine.SessionStore(session_key)
-            request.user = User.objects.get(id=request.session['_auth_user_id'])
+            request.user = User.objects.get(
+                                    id=request.session['_auth_user_id'])
             # upload and save the file
             if not request.method == 'POST':
                 return HttpResponse("must be POST")
             original_filename = request.POST.get('Filename')
             file = request.FILES.get('Filedata')
             # Get clipboad
-            clipboard, was_clipboard_created = Clipboard.objects.get_or_create(user=request.user)
+            clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
             files = generic_handle_file(file, original_filename)
             file_items = []
             for ifile, iname in files:
@@ -95,13 +91,15 @@ class ClipboardAdmin(admin.ModelAdmin):
                 except:
                     iext = ''
                 if iext in ['.jpg', '.jpeg', '.png', '.gif']:
-                    uploadform = UploadImageFileForm({'original_filename':iname,
-                                                      'owner': request.user.pk},
-                                                    {'file':ifile})
+                    uploadform = UploadImageFileForm({
+                                            'original_filename': iname,
+                                            'owner': request.user.pk
+                                        }, {'file': ifile})
                 else:
-                    uploadform = UploadFileForm({'original_filename':iname,
-                                                 'owner': request.user.pk},
-                                                {'file':ifile})
+                    uploadform = UploadFileForm({
+                                            'original_filename': iname,
+                                            'owner': request.user.pk
+                                            }, {'file': ifile})
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)
@@ -109,7 +107,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                         file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
                         file.save()
                         file_items.append(file)
-                        clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
+                        clipboard_item = ClipboardItem(
+                                            clipboard=clipboard, file=file)
                         clipboard_item.save()
                     except Exception, e:
                         pass
@@ -117,20 +116,11 @@ class ClipboardAdmin(admin.ModelAdmin):
                     pass
         except Exception, e:
             pass
-        return render_to_response('admin/filer/tools/clipboard/clipboard_item_rows.html',
-                                  {'items': file_items },
-                                  context_instance=RequestContext(request))
-    def move_file_to_clipboard(self, request):
-        if request.method == 'POST':
-            file_id = request.POST.get("file_id", None)
-            clipboard = tools.get_user_clipboard(request.user)
-            if file_id:
-                file = File.objects.get(id=file_id)
-                if file.has_edit_permission(request):
-                    tools.move_file_to_clipboard([file], clipboard)
-                else:
-                    raise PermissionDenied
-        return HttpResponseRedirect( '%s%s' % (request.POST.get('redirect_to', ''), popup_param(request) ) )
+        return render_to_response(
+                    'admin/filer/tools/clipboard/clipboard_item_rows.html',
+                    {'items': file_items},
+                    context_instance=RequestContext(request))
+
     def get_model_perms(self, request):
         """
         It seems this is only used for the list view. NICE :-)
@@ -140,4 +130,3 @@ class ClipboardAdmin(admin.ModelAdmin):
             'change': False,
             'delete': False,
         }
-

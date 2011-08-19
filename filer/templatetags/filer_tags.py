@@ -13,7 +13,6 @@ filesize_long_formats = {
 }
 
 
-
 def filesize(bytes, format='auto1024'):
     """
     Returns the number of bytes in either the nearest unit or a specific unit

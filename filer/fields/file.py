@@ -11,34 +11,39 @@ from django.utils.text import truncate_words
 from filer.models import File
 from filer.settings import FILER_STATICMEDIA_PREFIX
 
+
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
+
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
-        super_attrs = attrs.copy()
         related_url = None
         if value:
             try:
                 file = File.objects.get(pk=value)
-                related_url = file.logical_folder.get_admin_directory_listing_url_path()
-            except Exception,e:
+                related_url = file.logical_folder.\
+                                get_admin_directory_listing_url_path()
+            except Exception:
                 pass
         if not related_url:
             related_url = reverse('admin:filer-directory_listing-root')
         params = self.url_parameters()
         if params:
-            lookup_url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+            lookup_url = '?' + '&amp;'.join(
+                                ['%s=%s' % (k, v) for k, v in params.items()])
         else:
             lookup_url = ''
-        if not attrs.has_key('class'):
-            attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
-        # rendering the super for ForeignKeyRawIdWidget on purpose here beacuase
+        if not 'class' in attrs:
+            # The JavaScript looks for this hook.
+            attrs['class'] = 'vForeignKeyRawIdAdminField'
+        # rendering the super for ForeignKeyRawIdWidget on purpose here because
         # we only need the input and none of the other stuff that
         # ForeignKeyRawIdWidget adds
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(
+                                                            name, value, attrs)
         filer_static_prefix = FILER_STATICMEDIA_PREFIX
         if not filer_static_prefix[-1] == '/':
             filer_static_prefix += '/'
@@ -56,11 +61,11 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
-    
+
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
-    
+
     def obj_for_value(self, value):
         try:
             key = self.rel.get_related_field().name
@@ -68,12 +73,14 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         except:
             obj = None
         return obj
-    
+
     class Media:
-        js = (FILER_STATICMEDIA_PREFIX+'js/popup_handling.js',)
+        js = (FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
+
 
 class AdminFileFormField(forms.ModelChoiceField):
     widget = AdminFileWidget
+
     def __init__(self, rel, queryset, to_field_name, *args, **kwargs):
         self.rel = rel
         self.queryset = queryset
@@ -82,7 +89,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.min_value = None
         other_widget = kwargs.pop('widget', None)
         forms.Field.__init__(self, widget=self.widget(rel), *args, **kwargs)
-        
+
     def widget_attrs(self, widget):
         widget.required = self.required
         return {}
@@ -91,31 +98,35 @@ class AdminFileFormField(forms.ModelChoiceField):
 class FilerFileField(models.ForeignKey):
     default_form_class = AdminFileFormField
     default_model_class = File
+
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Image model as parameter...
         # a FilerImageFiled can only be a ForeignKey to a Image
         self.validate_related_name(kwargs.get('related_name', None))
-        return super(FilerFileField, self).__init__(self.default_model_class, **kwargs)
-    
+        return super(FilerFileField, self).__init__(
+                                        self.default_model_class, **kwargs)
+
     def validate_related_name(self, name):
         if not name:
             return
         if name and hasattr(self.default_model_class, name):
             raise ImproperlyConfigured(
-                "%s fields cannot have related name %r, this property already "
-                "exists on %s" % (self.__class__.__name__, name, self.default_form_class.__name__) 
+                ("%s fields cannot have related name %r, this property " + \
+                 "already exists on %s") % (self.__class__.__name__,
+                                  name,
+                                  self.default_form_class.__name__)
             )
-    
+
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
-        #defaults = {'form_class': FilerImageWidget}
         defaults = {
             'form_class': self.default_form_class,
             'rel': self.rel,
         }
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)
+
     def south_field_triple(self):
         "Returns a suitable description of this field for South."
         # We'll just introspect ourselves, since we inherit.

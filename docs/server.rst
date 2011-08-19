@@ -1,22 +1,13 @@
-Server
-======
+.. _server:
 
-django-filer can handle public and private files. Public files are your regular
-world readable files in ``MEDIA_ROOT``. Private files are a other case however.
-To be able to check permissions on the file downloads a special view is used and
-they are saved in a separate location. The default is a directory called 
-``smedia`` next to ``MEDIA_ROOT`` that must *NOT* be served by the webserver
-directly.
+File Server Backends
+====================
 
-``filer.server.urls`` needs to be included in the root ``urls.py``::
+.. NOTE:: Please follow the instructions for setting up :ref:`permissions` first.
 
-    urlpatterns += patterns('',
-        url(r'^', include('filer.server.urls')),
-    )
-
-The view will serve the private media files by delegating to one of its server
-backends. The ones bundled with django-filer live in ``filer.server.backends``
-and it is easy to create new ones.
+The private file view will serve the permission-checked media files by
+delegating to one of its server backends. The ones bundled with django-filer
+live in ``filer.server.backends`` and it is easy to create new ones.
 
 The default is ``filer.server.backends.default.DefaultServer``. It is suitable
 for development and serves the file directly from django.
@@ -34,22 +25,25 @@ nginx docs about this stuff: http://wiki.nginx.org/XSendfile
 in ``settings.py``::
 
     from filer.server.backends.nginx import NginxXAccelRedirectServer
+    from filer.storage import PrivateFileSystemStorage
     
-    FILER_PRIVATEMEDIA_ROOT = '/path/to/smedia/filer'
-    FILER_PRIVATEMEDIA_URL = '/smedia/filer/'
+    FILER_PRIVATEMEDIA_STORAGE = PrivateFileSystemStorage(
+                           path='/path/to/smedia/filer',
+                           base_url='/smedia/filer/')
     FILER_PRIVATEMEDIA_SERVER = NginxXAccelRedirectServer(
-                                   location=FILER_PRIVATEMEDIA_ROOT,
-                                   nginx_location='/nginx_filer_private')
+                           location='/path/to/smedia/filer',
+                           nginx_location='/nginx_filer_private')
     
-    FILER_PRIVATEMEDIA_THUMBNAIL_ROOT = '/path/to/smedia/filer_thumbnails'
-    FILER_PRIVATEMEDIA_THUMBNAIL_URL = '/smedia/filer_thumbnails/'
+    FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = PrivateFileSystemStorage(
+                           location='/path/to/smedia/filer_thumbnails',
+                           base_url='/smedia/filer_thumbnails/')
     FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = NginxXAccelRedirectServer(
-                                   location=FILER_PRIVATEMEDIA_THUMBNAIL_ROOT,
-                                   nginx_location='/nginx_filer_private_thumbnails')
+                           location='/path/to/smedia/filer_thumbnails',
+                           nginx_location='/nginx_filer_private_thumbnails')
 
-``nginx_location`` is the location directive where nginx "hides" private files
-from general access. A fitting nginx configuration might look something like
-this::
+``nginx_location`` is the location directive where nginx "hides"
+permission-checked files from general access. A fitting nginx configuration
+might look something like this::
     
     location /nginx_filer_private/ {
       internal;
@@ -61,8 +55,9 @@ this::
     }
 
 .. Note::
-   make sure you follow the example exactly. Missing trailing slashes and ``alias`` vs.
-   ``root`` have subtle differences that can make your config fail.
+   make sure you follow the example exactly. Missing trailing slashes and
+   ``alias`` vs. ``root`` have subtle differences that can make your config
+   fail.
 
 ``NginxXAccelRedirectServer`` will add the a ``X-Accel-Redirect`` header to 
 the response instead of actually loading and delivering the file itself. The 

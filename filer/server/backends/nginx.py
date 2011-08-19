@@ -2,6 +2,7 @@
 from django.http import HttpResponse
 from filer.server.backends.base import ServerBase
 
+
 class NginxXAccelRedirectServer(ServerBase):
     """
     This returns a response with only headers set, so that nginx actually does
@@ -13,8 +14,10 @@ class NginxXAccelRedirectServer(ServerBase):
         """
         self.location = location
         self.nginx_location = nginx_location
+
     def get_nginx_location(self, path):
         return path.replace(self.location, self.nginx_location)
+
     def serve(self, request, file, **kwargs):
         response = HttpResponse(mimetype=self.get_mimetype(file.path))
         nginx_path = self.get_nginx_location(file.path)
