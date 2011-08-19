@@ -68,6 +68,7 @@ class ClipboardAdmin(admin.ModelAdmin):
         because of the missing cookie. Receives only one file at the time,
         althow it may be a zip file, that will be unpacked.
         """
+        file_items = []
         try:
             # flashcookie-hack (flash does not submit the cookie, so we send
             # the django sessionid over regular post
@@ -80,11 +81,10 @@ class ClipboardAdmin(admin.ModelAdmin):
             if not request.method == 'POST':
                 return HttpResponse("must be POST")
             original_filename = request.POST.get('Filename')
-            file = request.FILES.get('Filedata')
+            the_file = request.FILES.get('Filedata')
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
-            files = generic_handle_file(file, original_filename)
-            file_items = []
+            files = generic_handle_file(the_file, original_filename)
             for ifile, iname in files:
                 try:
                     iext = os.path.splitext(iname)[1].lower()
@@ -102,20 +102,25 @@ class ClipboardAdmin(admin.ModelAdmin):
                                             }, {'file': ifile})
                 if uploadform.is_valid():
                     try:
-                        file = uploadform.save(commit=False)
+                        upload_file = uploadform.save(commit=False)
                         # Enforce the FILER_IS_PUBLIC_DEFAULT
-                        file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
-                        file.save()
-                        file_items.append(file)
+                        upload_file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+                        upload_file.save()
+                        file_items.append(upload_file)
                         clipboard_item = ClipboardItem(
-                                            clipboard=clipboard, file=file)
+                                            clipboard=clipboard, file=upload_file)
                         clipboard_item.save()
                     except Exception, e:
+                        # TODO: This should go. It's horrible. If it's really
+                        # ok, there should be a comment explaining why.
                         pass
                 else:
                     pass
         except Exception, e:
+            #TODO: This should go. It's horrible! I can't immagine why you
+            # would do this...
             pass
+
         return render_to_response(
                     'admin/filer/tools/clipboard/clipboard_item_rows.html',
                     {'items': file_items},
