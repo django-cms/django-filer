@@ -61,6 +61,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     objects = FileManager()
 
+    @classmethod
+    def matches_file_type(cls, iname, ifile, request):
+        return True  # I match all files...
+
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
@@ -100,7 +104,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         """
 
         if overwrite:
-            # If the destination file already exists default storage backend does not overwrite it but generates another filename.
+            # If the destination file already exists default storage backend
+            # does not overwrite it but generates another filename.
             # TODO: Find a way to override this behavior.
             raise NotImplementedError
 
@@ -186,7 +191,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_url_path(self):
-        return urlresolvers.reverse('admin:filer_file_change', args=(self.id,))
+        return urlresolvers.reverse(
+            'admin:%s_%s_change' % (self._meta.app_label,
+                                    self._meta.module_name,),
+            args=(self.pk,)
+        )
 
     @property
     def url(self):
