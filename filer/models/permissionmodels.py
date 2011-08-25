@@ -126,19 +126,26 @@ class Permission(models.Model):
         app_label = 'filer'
 
     def __unicode__(self):
+        return u'%s can %s %s' % (
+            self.get_who_combined_display(), self.get_can_display(), self.get_subject_combined_display())
+
+    def get_who_combined_display(self):
         if self.who == 'user':
             who = u'user "%s"' % self.user
         elif self.who == 'group':
             who = u'group "%s"' % self.group
         else:
             who = self.who
+        return who
+
+    def get_subject_combined_display(self):
         if self.subject == 'file':
             subject = u'file "%s"' % self.file
         elif self.subject == 'folder':
             subject = u'folder "%s"' % self.folder
         else:
             subject = u'"%s"' % self.subject
-        return u'%s can %s %s' % (who, self.get_can_display(), subject)
+        return subject
 
     def clean(self):
         from django.core.exceptions import ValidationError, NON_FIELD_ERRORS

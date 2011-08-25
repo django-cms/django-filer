@@ -250,11 +250,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder_children += folder.virtual_folders
         for f in folder_qs:
             f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
+            if hasattr(f, 'can_view'):
+                if f.can_view(request):
                     folder_children.append(f)
-                else:
-                    pass
             else:
                 folder_children.append(f)
         for f in file_qs:

@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
             ('folder', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='permissions', null=True, to=orm['filer.Folder'])),
             ('file', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='permissions', null=True, to=orm['filer.File'])),
             ('is_inheritable', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('can', self.gf('django.db.models.fields.CharField')(default='read', max_length=32)),
+            ('can', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
         ))
         db.send_create_signal('filer', ['Permission'])
 
@@ -136,7 +136,7 @@ class Migration(SchemaMigration):
         },
         'filer.permission': {
             'Meta': {'object_name': 'Permission'},
-            'can': ('django.db.models.fields.CharField', [], {'default': "'read'", 'max_length': '32'}),
+            'can': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
             'file': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'permissions'", 'null': 'True', 'to': "orm['filer.File']"}),
             'folder': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'permissions'", 'null': 'True', 'to': "orm['filer.Folder']"}),
             'group': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'filer_permissions'", 'null': 'True', 'to': "orm['auth.Group']"}),
