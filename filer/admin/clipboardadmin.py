@@ -1,6 +1,6 @@
 import os
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import admin
@@ -12,6 +12,7 @@ from filer.utils.files import generic_handle_file
 from filer.models import tools
 from filer import settings as filer_settings
 from filer.admin.tools import popup_param
+from filer.admin.upload import handle_upload, UploadException
 from django.views.decorators.csrf import csrf_exempt
 
 # forms... sucks, types should be automatic
@@ -73,20 +74,11 @@ class ClipboardAdmin(admin.ModelAdmin):
         althow it may be a zip file, that will be unpacked.
         """
         try:
-            # flashcookie-hack (flash does not submit the cookie, so we send the
-            # django sessionid over regular post
-            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
-            session_key = request.POST.get('jsessionid')
-            request.session = engine.SessionStore(session_key)
-            request.user = User.objects.get(id=request.session['_auth_user_id'])
-            # upload and save the file
-            if not request.method == 'POST':
-                return HttpResponse("must be POST")
-            original_filename = request.POST.get('Filename')
-            file = request.FILES.get('Filedata')
+            upload, filename, is_raw = handle_upload(request)
+
             # Get clipboad
             clipboard, was_clipboard_created = Clipboard.objects.get_or_create(user=request.user)
-            files = generic_handle_file(file, original_filename)
+            files = generic_handle_file(upload, filename)
             file_items = []
             for ifile, iname in files:
                 try:
@@ -118,7 +110,7 @@ class ClipboardAdmin(admin.ModelAdmin):
         except Exception, e:
             #print e
             pass
-        return render_to_response('admin/filer/tools/clipboard/clipboard_item_rows.html',
+        return render_to_response('admin/filer/tools/clipboard/upload_response.json',
                                   {'items': file_items },
                                   context_instance=RequestContext(request))
     def move_file_to_clipboard(self, request):

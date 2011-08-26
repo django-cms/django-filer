@@ -1,0 +1,13 @@
+{% load thumbnail i18n %}{{% if items %}
+    'files': [
+{% for generic_item in items %}{% with generic_item.subtype as item %}
+    {
+        'thumbnail': '{{ item.icons.32 }}',
+        'alt_text': '{{ item.default_alt_text }}',
+        'label': '{{ item.label }}'
+    }{% if not forloop.last %},{% endif %}
+{% endwith %}{% endfor %}]
+{% else %}
+    'error': 'upload failed'
+{% endif %}
+}
