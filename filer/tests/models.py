@@ -1,12 +1,12 @@
 #-*- coding: utf-8 -*-
 import os
+from django.forms.models import modelform_factory
 from django.test import TestCase
 from django.core.files import File as DjangoFile
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
-from filer.admin.clipboardadmin import UploadImageFileForm
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
 from filer import settings as filer_settings
@@ -53,12 +53,13 @@ class FilerApiTests(TestCase):
     def test_upload_image_form(self):
         self.assertEqual(Image.objects.count(), 0)
         file = DjangoFile(open(self.filename), name=self.image_name)
-        upoad_image_form = UploadImageFileForm({'original_filename':self.image_name,
+        ImageUploadForm = modelform_factory(Image, fields=('original_filename', 'owner', 'file'))
+        upoad_image_form = ImageUploadForm({'original_filename':self.image_name,
                                                 'owner': self.superuser.pk},
                                                 {'file':file})
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
-            self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(Image.objects.count(), 1)
 
     def test_create_clipboard_item(self):
         image = self.create_filer_image()
