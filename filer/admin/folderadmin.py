@@ -18,7 +18,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
-from filer.admin.forms import CopyFilesAndFoldersForm, ResizeImagesForm
+from filer.admin.forms import CopyFilesAndFoldersForm, ResizeImagesForm, RenameFilesForm
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.admin.tools import popup_status, selectfolder_status, \
     userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions, \
@@ -51,7 +51,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders', 'copy_files_and_folders', 'resize_images']
+    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders', 'copy_files_and_folders', 'resize_images', 'rename_files']
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -275,8 +275,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:
             permissions = {}
-        folder_files.sort(cmp=lambda x, y: cmp(x.label.lower(),
-                                               y.label.lower()))
+        folder_files.sort()
         items = folder_children + folder_files
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
@@ -682,13 +681,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         for fo in folders:
             yield self._format_callback(fo, request.user, self.admin_site, set())
             children = list(self._list_folders_to_copy_or_move(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in fo.files])
+            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files)])
             if children:
                 yield children
 
     def _list_all_to_copy_or_move(self, request, files_queryset, folders_queryset):
         to_copy_or_move = list(self._list_folders_to_copy_or_move(request, folders_queryset))
-        to_copy_or_move.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in files_queryset])
+        to_copy_or_move.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset)])
         return to_copy_or_move
 
     def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, allow_self, level):
@@ -767,6 +766,86 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         ], context, context_instance=template.RequestContext(request))
 
     move_files_and_folders.short_description = ugettext_lazy("Move selected files and/or folders")
+
+    def _rename_file(self, file, form_data, counter, global_counter):
+        original_basename, original_extension = os.path.splitext(file.original_filename)
+        current_basename, current_extension = os.path.splitext(file.name)
+        file.name = form_data['rename_format'] % {
+                'original_filename': file.original_filename,
+                'original_basename': original_basename,
+                'original_extension': original_extension,
+                'current_filename': file.name,
+                'current_basename': current_basename,
+                'current_extension': current_extension,
+                'current_folder': file.folder.name,
+                'counter': counter + 1, # 1-based
+                'global_counter': global_counter + 1, # 1-based
+            }
+        file.save()
+
+    def _rename_files(self, files, form_data, global_counter):
+        n = 0
+        for f in sorted(files):
+            self._rename_file(f, form_data, n, global_counter + n)
+            n += 1
+        return n
+
+    def _rename_folder(self, folder, form_data, global_counter):
+        return self._rename_images_impl(folder.files.all(), folder.children.all(), form_data, global_counter)
+
+    def _rename_files_impl(self, files_queryset, folders_queryset, form_data, global_counter):
+        n = 0
+
+        for f in folders_queryset:
+            n += self._rename_folder(f, form_data, global_counter + n)
+
+        n += self._rename_files(files_queryset, form_data, global_counter + n)
+
+        return n
+
+    def rename_files(self, request, files_queryset, folders_queryset):
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
+        perms_needed = self._check_move_perms(request, files_queryset, folders_queryset)
+        to_rename = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
+
+        if request.method == 'POST' and request.POST.get('post'):
+            if perms_needed:
+                raise PermissionDenied
+            form = RenameFilesForm(request.POST)
+            if form.is_valid():
+                if files_queryset.count() + folders_queryset.count():
+                    n = self._rename_files_impl(files_queryset, folders_queryset, form.cleaned_data, 0)
+                    self.message_user(request, _("Successfully renamed %(count)d files.") % {
+                        "count": n,
+                    })
+                return None
+        else:
+            form = RenameFilesForm()
+
+        context = {
+            "title": _("Rename files"),
+            "instance": current_folder,
+            "breadcrumbs_action": _("Rename files"),
+            "to_rename": to_rename,
+            "rename_form": form,
+            "files_queryset": files_queryset,
+            "folders_queryset": folders_queryset,
+            "perms_lacking": perms_needed,
+            "opts": opts,
+            "root_path": self.admin_site.root_path,
+            "app_label": app_label,
+            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+        }
+
+        # Display the rename format selection page
+        return render_to_response([
+            "admin/filer/folder/choose_rename_format.html"
+        ], context, context_instance=template.RequestContext(request))
+
+    rename_files.short_description = ugettext_lazy("Rename files")
 
     def _generate_new_filename(self, filename, suffix):
         basename, extension = os.path.splitext(filename)
@@ -909,14 +988,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _list_folders_to_resize(self, request, folders):
         for fo in folders:
             children = list(self._list_folders_to_resize(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in fo.files if isinstance(f, Image)])
+            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files) if isinstance(f, Image)])
             if children:
                 yield self._format_callback(fo, request.user, self.admin_site, set())
                 yield children
 
     def _list_all_to_resize(self, request, files_queryset, folders_queryset):
         to_resize = list(self._list_folders_to_resize(request, folders_queryset))
-        to_resize.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in files_queryset if isinstance(f, Image)])
+        to_resize.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset) if isinstance(f, Image)])
         return to_resize
 
     def _new_subject_location(self, original_width, original_height, new_width, new_height, x, y, crop):
