@@ -157,6 +157,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
         text = u"%s" % (text,)
         return text
 
+    def __lt__(self, other):
+        return cmp(self.label.lower(), other.label.lower()) < 0
+
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
 

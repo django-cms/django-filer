@@ -34,6 +34,29 @@ class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
         return self.cleaned_data['suffix']
 
 
+class RenameFilesForm(forms.Form, AsPWithHelpMixin):
+    rename_format = forms.CharField(required=True)
+
+    def clean_rename_format(self):
+        try:
+            self.cleaned_data['rename_format'] % {
+                'original_filename': 'filename',
+                'original_basename': 'basename',
+                'original_extension': 'ext',
+                'current_filename': 'filename',
+                'current_basename': 'basename',
+                'current_extension': 'ext',
+                'current_folder': 'folder',
+                'counter': 42,
+                'global_counter': 42,
+            }
+        except KeyError, e:
+            raise forms.ValidationError(_('Unknown rename format value key "%(key)s".') % {'key': e.args[0]})
+        except Exception, e:
+            raise forms.ValidationError(_('Invalid rename format: %(error)s.') % {'error': e})
+        return self.cleaned_data['rename_format']
+
+
 class ResizeImagesForm(forms.Form, AsPWithHelpMixin):
     if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
         thumbnail_option = models.ForeignKey(ThumbnailOption, null=True, blank=True, verbose_name=_("thumbnail option")).formfield()
