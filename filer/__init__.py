@@ -4,9 +4,9 @@ django-filer - file and image management for django projects
 """
 __version_info__ = {
     'major': 0,
-    'minor': 8,
-    'micro': 2,
-    'releaselevel': 'final',
+    'minor': 9,
+    'micro': 0,
+    'releaselevel': 'alpha',
     'serial': 1
 }
 
