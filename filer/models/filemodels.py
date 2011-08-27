@@ -30,16 +30,16 @@ class FileManager(PolymorphicManager):
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
-    folder = models.ForeignKey(Folder, related_name='all_files',
+    folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
                                null=True, blank=True)
-    file = MultiStorageFileField(null=True, blank=True, max_length=255)
-    _file_size = models.IntegerField(null=True, blank=True)
+    file = MultiStorageFileField(_('file'), null=True, blank=True, max_length=255)
+    _file_size = models.IntegerField(_('file size'), null=True, blank=True)
 
-    sha1 = models.CharField(max_length=40, blank=True, default='')
+    sha1 = models.CharField(_('sha1'), max_length=40, blank=True, default='')
 
-    has_all_mandatory_data = models.BooleanField(default=False, editable=False)
+    has_all_mandatory_data = models.BooleanField(_('has all mandatory data'), default=False, editable=False)
 
-    original_filename = models.CharField(max_length=255, blank=True, null=True)
+    original_filename = models.CharField(_('original filename'), max_length=255, blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True,
                             verbose_name=_('name'))
     description = models.TextField(null=True, blank=True,
@@ -49,8 +49,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
                               related_name='owned_%(class)ss',
                               null=True, blank=True, verbose_name=_('owner'))
 
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
+    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
 
     is_public = models.BooleanField(
                     default=filer_settings.FILER_IS_PUBLIC_DEFAULT,

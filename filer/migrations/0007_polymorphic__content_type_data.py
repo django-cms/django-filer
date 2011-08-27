@@ -1,5 +1,6 @@
 # encoding: utf-8
 import datetime
+from django.core.exceptions import ObjectDoesNotExist
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
@@ -8,14 +9,17 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        image_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='image').id
-        file_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='file').id
-        for file in orm['filer.file'].objects.all():
-            if file._file_type_plugin_name == 'Image':
-                file.polymorphic_ctype_id = image_ct
-            else:
-                file.polymorphic_ctype_id = file_ct
-            file.save()
+        try:
+            image_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='image').id
+            file_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='file').id
+            for file in orm['filer.file'].objects.all():
+                if file._file_type_plugin_name == 'Image':
+                    file.polymorphic_ctype_id = image_ct
+                else:
+                    file.polymorphic_ctype_id = file_ct
+                file.save()
+        except ObjectDoesNotExist:
+            print "No filer contentypes to migrate. This is probably because migrate is running on a new database."
 
 
     def backwards(self, orm):
