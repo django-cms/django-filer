@@ -1,19 +1,16 @@
 #-*- coding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
-from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.models import User
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils import simplejson
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
-from filer.admin.tools import popup_param
-from filer.models import Clipboard, ClipboardItem, File, Image, tools
-from filer.utils.files import generic_handle_file
+from filer.models import Clipboard, ClipboardItem
+from filer.utils.files import handle_upload, UploadException
 from filer.utils.loader import load_object
-import os
 
 
 # ModelAdmins
@@ -55,60 +52,50 @@ class ClipboardAdmin(admin.ModelAdmin):
     @csrf_exempt
     def ajax_upload(self, request, folder_id=None):
         """
-        receives an upload from the flash uploader and fixes the session
-        because of the missing cookie. Receives only one file at the time,
-        althow it may be a zip file, that will be unpacked.
+        receives an upload from the uploader. Receives only one file at the time.
         """
         try:
-            # flashcookie-hack (flash does not submit the cookie, so we send
-            # the django sessionid over regular post
-            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
-            session_key = request.POST.get('jsessionid')
-            request.session = engine.SessionStore(session_key)
-            request.user = User.objects.get(
-                                    id=request.session['_auth_user_id'])
-            # upload and save the file
-            if not request.method == 'POST':
-                return HttpResponse("must be POST")
-            original_filename = request.POST.get('Filename')
-            file = request.FILES.get('Filedata')
+            upload, filename, is_raw = handle_upload(request)
+
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
-            files = generic_handle_file(file, original_filename)
-            file_items = []
-            for ifile, iname in files:
-                for filer_class in filer_settings.FILER_FILE_MODELS:
-                    FileSubClass = load_object(filer_class)
-                    #TODO: What if there are more than one that qualify?
-                    if FileSubClass.matches_file_type(iname, ifile, request):
-                        FileForm = modelform_factory(
-                            model = FileSubClass,
-                            fields = ('original_filename', 'owner', 'file')
-                        )
-                        break
-                uploadform = FileForm({'original_filename': iname,
-                                       'owner': request.user.pk},
-                                      {'file': ifile})
-                if uploadform.is_valid():
-                    try:
-                        file = uploadform.save(commit=False)
-                        # Enforce the FILER_IS_PUBLIC_DEFAULT
-                        file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
-                        file.save()
-                        file_items.append(file)
-                        clipboard_item = ClipboardItem(
-                                            clipboard=clipboard, file=file)
-                        clipboard_item.save()
-                    except Exception, e:
-                        pass
-                else:
-                    pass
-        except Exception, e:
-            pass
-        return render_to_response(
-                    'admin/filer/tools/clipboard/clipboard_item_rows.html',
-                    {'items': file_items},
-                    context_instance=RequestContext(request))
+
+            # find the file type
+            for filer_class in filer_settings.FILER_FILE_MODELS:
+                FileSubClass = load_object(filer_class)
+                #TODO: What if there are more than one that qualify?
+                if FileSubClass.matches_file_type(filename, upload, request):
+                    FileForm = modelform_factory(
+                        model = FileSubClass,
+                        fields = ('original_filename', 'owner', 'file')
+                    )
+                    break
+            uploadform = FileForm({'original_filename': filename,
+                                   'owner': request.user.pk},
+                                  {'file': upload})
+            if uploadform.is_valid():
+                file_obj = uploadform.save(commit=False)
+                # Enforce the FILER_IS_PUBLIC_DEFAULT
+                file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+                file_obj.save()
+                clipboard_item = ClipboardItem(
+                                    clipboard=clipboard, file=file_obj)
+                clipboard_item.save()
+                json_response = {
+                    'thumbnail': file_obj.icons['32'],
+                    'alt_text': '',
+                    'label': unicode(file_obj),
+                }
+                return HttpResponse(simplejson.dumps(json_response), mimetype='application/json')
+            else:
+                form_errors = '; '.join(['%s: %s' % (
+                    field,
+                    ', '.join(errors)) for field, errors in uploadform.errors.items()
+                ])
+                raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
+        except UploadException, e:
+            return HttpResponse(simplejson.dumps({'error': unicode(e)}), mimetype='application/json')
+
 
     def get_model_perms(self, request):
         """

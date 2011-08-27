@@ -2,23 +2,34 @@
 import os
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify
-from filer.utils.zip import unzip
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
-def generic_handle_file(file, original_filename):
-    """
-    Handels a file, regardless if a package or a single file and returns
-    a list of files. can recursively unpack packages.
-    """
-    files = []
-    filetype = os.path.splitext(original_filename)[1].lower()
-    if filetype == '.zip':
-        unpacked_files = unzip(file)
-        for ufile, ufilename in unpacked_files:
-            files += generic_handle_file(ufile, ufilename)
+class UploadException(Exception):
+    pass
+
+
+def handle_upload(request):
+    if not request.method == "POST":
+        raise UploadException("AJAX request not valid: must be POST")
+    if request.is_ajax():
+        # the file is stored raw in the request
+        is_raw = True
+        filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
+        upload = SimpleUploadedFile(name=filename, content=request.read())
     else:
-        files.append((file, original_filename))
-    return files
+        if len(request.FILES) == 1:
+            # FILES is a dictionary in Django but Ajax Upload gives the uploaded file an
+            # ID based on a random number, so it cannot be guessed here in the code.
+            # Rather than editing Ajax Upload to pass the ID in the querystring, note that
+            # each upload is a separate request so FILES should only have one entry.
+            # Thus, we can just grab the first (and only) value in the dict.
+            is_raw = False
+            upload = request.FILES.values()[0]
+            filename = upload.name
+        else:
+            raise UploadException("AJAX request not valid: Bad Upload")
+    return upload, filename, is_raw
 
 
 def get_valid_filename(s):

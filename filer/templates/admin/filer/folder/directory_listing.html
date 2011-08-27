@@ -7,8 +7,7 @@
 <script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/swfupload.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/swfupload.queue.js"></script>
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
 <script type="text/javascript" src="{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}
@@ -64,7 +63,8 @@
 <div id="content-main">
     <ul class="object-tools">
         {% if folder.can_have_subfolders %}<li><a id="id_new_folder" href="{% url admin:filer-directory_listing-make_root_folder %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a>{% endif %}</li>
-        <li>{% include "admin/filer/tools/upload_button.html" %}</li>
+        <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
+        {% include 'admin/filer/tools/upload_button_js.html' %}
     </ul>
     
     <div class="module" id="changelist">
