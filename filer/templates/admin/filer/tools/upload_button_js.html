@@ -7,7 +7,7 @@ $(function() {
         button: document.getElementById('id_upload_button'),
         onSubmit: function(id, fileName){
             $("#fileInputQueue .noItemsRow").hide();
-            $('#fileInputQueue').append('<tr id="fileUpload-' + id + '" class="clipboardItem"><td class="thumbnail"><div class="loadingThumb" /></td><td class="label"><div><span class="fileName">' + fileName + ' (<span class="size">?</span>)</span><span class="percentage">&nbsp;</span></div><div class="fileUploadProgress" style="width: 100%;"><div id="fileUpload-' + id + '-ProgressBar" class="fileUploadProgressBar" style="width: 1px; height: 3px;"></div></div></td></tr>');
+            $('#fileInputQueue').append('<tr id="fileUpload-' + id + '" class="clipboardItem fileUploadQueueItem"><td class="thumbnail"><div class="loadingThumb" /></td><td class="label"><div><span class="fileName">' + fileName + ' (<span class="size">?</span>)</span> [<span class="percentage">&nbsp;</span>]</div><div class="fileUploadProgress" style="width: 100%;"><div id="fileUpload-' + id + '-ProgressBar" class="fileUploadProgressBar" style="width: 1px; height: 3px;"></div></div></td></tr>');
         },
         onProgress: function(id, fileName, loaded, total){
             var percent = Math.round(loaded / total * 100);
