@@ -8,7 +8,7 @@ from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
-
+import os
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
@@ -39,6 +39,16 @@ class Image(File):
 
     subject_location = models.CharField(_('subject location'), max_length=64, null=True, blank=True,
                                         default=None)
+
+    @classmethod
+    def matches_file_type(cls, iname, ifile, request):
+      # This was originally in admin/clipboardadmin.py  it was inside of a try
+      # except, I have moved it here outside of a try except because I can't
+      # figure out just what kind of exception this could generate... all it was
+      # doing for me was obscuring errors...
+      # --Dave Butler <croepha@gmail.com>
+      iext = os.path.splitext(iname)[1].lower()
+      return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
@@ -159,10 +169,6 @@ class Image(File):
                 # to the template {{ image.icons.48 }}
                 pass
         return _thumbnails
-
-    def get_admin_url_path(self):
-        return urlresolvers.reverse('admin:filer_image_change',
-                                    args=(self.id,))
 
     @property
     def easy_thumbnails_thumbnailer(self):

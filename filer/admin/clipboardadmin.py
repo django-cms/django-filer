@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django import forms
+from django.forms.models import modelform_factory
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.models import User
@@ -12,17 +12,8 @@ from filer import settings as filer_settings
 from filer.admin.tools import popup_param
 from filer.models import Clipboard, ClipboardItem, File, Image, tools
 from filer.utils.files import generic_handle_file
+from filer.utils.loader import load_object
 import os
-
-
-class UploadFileForm(forms.ModelForm):
-    class Meta:
-        model = File
-
-
-class UploadImageFileForm(forms.ModelForm):
-    class Meta:
-        model = Image
 
 
 # ModelAdmins
@@ -86,20 +77,18 @@ class ClipboardAdmin(admin.ModelAdmin):
             files = generic_handle_file(file, original_filename)
             file_items = []
             for ifile, iname in files:
-                try:
-                    iext = os.path.splitext(iname)[1].lower()
-                except:
-                    iext = ''
-                if iext in ['.jpg', '.jpeg', '.png', '.gif']:
-                    uploadform = UploadImageFileForm({
-                                            'original_filename': iname,
-                                            'owner': request.user.pk
-                                        }, {'file': ifile})
-                else:
-                    uploadform = UploadFileForm({
-                                            'original_filename': iname,
-                                            'owner': request.user.pk
-                                            }, {'file': ifile})
+                for filer_class in filer_settings.FILER_FILE_MODELS:
+                    FileSubClass = load_object(filer_class)
+                    #TODO: What if there are more than one that qualify?
+                    if FileSubClass.matches_file_type(iname, ifile, request):
+                        FileForm = modelform_factory(
+                            model = FileSubClass,
+                            fields = ('original_filename', 'owner', 'file')
+                        )
+                        break
+                uploadform = FileForm({'original_filename': iname,
+                                       'owner': request.user.pk},
+                                      {'file': ifile})
                 if uploadform.is_valid():
                     try:
                         file = uploadform.save(commit=False)

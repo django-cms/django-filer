@@ -24,6 +24,15 @@ FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64',
 )
 
+# This is an ordered iterable that describes a list of 
+# classes that I should check for when adding files
+FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
+    (
+        'filer.models.imagemodels.Image',
+        'filer.models.filemodels.File',
+    )
+)
+
 # Public media (media accessible without any permission checks)
 FILER_PUBLICMEDIA_STORAGE = getattr(
                     settings,
