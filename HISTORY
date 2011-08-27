@@ -1,6 +1,11 @@
 Changelog for django-filer
 =============================
 
+0.8.3
+-----
+
+* replaced flash uploader with pure javascript (Burn in hell, flash uplaoder!)
+
 0.8.2
 -----
 
