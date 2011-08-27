@@ -1,12 +1,12 @@
 #!/bin/bash
 
-rm -rf eggs/
-rm -rf downloads/
-rm -rf develop-eggs/
-rm -rf bin/
-rm -rf parts/
-rm -rf .installed.cfg
-rm -rf .buildoutsig
+rm -rvf eggs/
+rm -rvf downloads/
+rm -rvf develop-eggs/
+rm -rvf bin/
+rm -rvf parts/
+rm -rvf .installed.cfg
+rm -rvf .buildoutsig
 
 
 find . -name '*.pyc' -delete
