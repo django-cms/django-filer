@@ -34,8 +34,9 @@ class ServerBase(object):
 
     def size_header(self, response, **kwargs):
         size = kwargs.get('size', None)
-        file = kwargs.get('file', None)
+        #file = kwargs.get('file', None)
         if size:
             response['Content-Length'] = size
-        elif file and file.size is not None:
-            response['Content-Length'] = file.size
+        # we should not do this, because it accesses the file. and that might be an expensive operation.
+        # elif file and file.size is not None:
+        #     response['Content-Length'] = file.size

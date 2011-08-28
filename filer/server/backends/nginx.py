@@ -19,7 +19,9 @@ class NginxXAccelRedirectServer(ServerBase):
         return path.replace(self.location, self.nginx_location)
 
     def serve(self, request, file, **kwargs):
-        response = HttpResponse(mimetype=self.get_mimetype(file.path))
+        # we should not use get_mimetype() here, because it tries to access the file in the filesystem.
+        #response = HttpResponse(mimetype=self.get_mimetype(file.path))
+        response = HttpResponse()
         nginx_path = self.get_nginx_location(file.path)
         response['X-Accel-Redirect'] = nginx_path
         self.default_headers(request=request, response=response, file=file, **kwargs)
