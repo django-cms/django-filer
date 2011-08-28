@@ -10,6 +10,7 @@ from filer import settings as filer_settings
 from filer.models import File
 from filer.server.backends.default import DefaultServer
 from filer.server.backends.nginx import NginxXAccelRedirectServer
+from filer.server.backends.xsendfile import ApacheXSendfileServer
 from filer.tests.helpers import create_image
 from filer.tests.utils import Mock
 
@@ -85,4 +86,40 @@ class NginxServerTestCase(BaseServerBackendTestCase):
         request.META = {}
         os.remove(self.filer_file.file.path)
         response = self.server.serve(request, self.filer_file.file)
+        headers = dict(response.items())
         self.assertTrue(response.has_header('X-Accel-Redirect'))
+        self.assertTrue(headers['X-Accel-Redirect'].startswith(self.server.nginx_location))
+        self.assertTrue(self.filer_file.file.closed)
+
+
+class XSendfileServerTestCase(BaseServerBackendTestCase):
+    def setUp(self):
+        super(XSendfileServerTestCase, self).setUp()
+        self.server = ApacheXSendfileServer()
+
+    def test_normal(self):
+        request = Mock()
+        request.META = {}
+        response = self.server.serve(request, self.filer_file.file)
+        headers = dict(response.items())
+        self.assertTrue(response.has_header('X-Sendfile'))
+        self.assertEqual(headers['X-Sendfile'], self.filer_file.file.path)
+        # make sure the file object was never opened (otherwise the whole delegating to nginx would kinda
+        # be useless)
+        self.assertTrue(self.filer_file.file.closed)
+
+
+    def test_missing_file(self):
+        """
+        this backend should not even notice if the file is missing.
+        """
+        request = Mock()
+        request.META = {}
+        os.remove(self.filer_file.file.path)
+        response = self.server.serve(request, self.filer_file.file)
+        headers = dict(response.items())
+        self.assertTrue(response.has_header('X-Sendfile'))
+        self.assertEqual(headers['X-Sendfile'], self.filer_file.file.path)
+        # make sure the file object was never opened (otherwise the whole delegating to nginx would kinda
+        # be useless)
+        self.assertTrue(self.filer_file.file.closed)
