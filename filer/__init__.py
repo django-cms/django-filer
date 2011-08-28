@@ -1,8 +1,5 @@
 #-*- coding: utf-8 -*-
-"""
-django-filer - file and image management for django projects
-"""
-__version_info__ = {
+__version_info__ = {  # pragma: nocover
     'major': 0,
     'minor': 9,
     'micro': 0,
@@ -10,7 +7,7 @@ __version_info__ = {
     'serial': 1
 }
 
-def get_version(short=False):
+def get_version(short=False):  # pragma: nocover
     assert __version_info__['releaselevel'] in ('alpha', 'beta', 'final')
     vers = ["%(major)i.%(minor)i" % __version_info__, ]
     if __version_info__['micro']:
@@ -19,4 +16,4 @@ def get_version(short=False):
         vers.append('%s%i' % (__version_info__['releaselevel'][0], __version_info__['serial']))
     return ''.join(vers)
 
-__version__ = get_version()
+__version__ = get_version()  # pragma: nocover
