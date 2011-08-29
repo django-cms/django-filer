@@ -769,12 +769,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def _rename_file(self, file, form_data, counter, global_counter):
         original_basename, original_extension = os.path.splitext(file.original_filename)
-        current_basename, current_extension = os.path.splitext(file.name)
+        if file.name:
+            current_basename, current_extension = os.path.splitext(file.name)
+        else:
+            current_basename = ""
+            current_extension = ""
         file.name = form_data['rename_format'] % {
                 'original_filename': file.original_filename,
                 'original_basename': original_basename,
                 'original_extension': original_extension,
-                'current_filename': file.name,
+                'current_filename': file.name or "",
                 'current_basename': current_basename,
                 'current_extension': current_extension,
                 'current_folder': file.folder.name,
