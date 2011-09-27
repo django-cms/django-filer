@@ -17,7 +17,7 @@ def handle_upload(request):
         # the file is stored raw in the request
         is_raw = True
         filename = request.GET.get('qqfile', '')
-        upload = SimpleUploadedFile(name=filename, content=request.read())
+        upload = SimpleUploadedFile(name=filename, content=request.raw_post_data)
     else:
         if len(request.FILES) == 1:
             # FILES is a dictionary in Django but Ajax Upload gives the uploaded file an
