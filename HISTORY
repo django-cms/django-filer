@@ -1,6 +1,12 @@
 Changelog for django-filer
 =============================
 
+
+0.8.4
+-----
+
+* fix ajax file upload for django < 1.3
+
 0.8.3
 -----
 
