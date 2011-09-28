@@ -2,6 +2,11 @@ Changelog for django-filer
 =============================
 
 
+0.8.5
+-----
+
+* fix thumbnail templatetag support for easy-thumbnails>=1.0-alpha-17
+
 0.8.4
 -----
 
