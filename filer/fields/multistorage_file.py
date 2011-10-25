@@ -15,7 +15,7 @@ THUMBNAIL_STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_STORAGE,
     'private': filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE,
 }
-FORMATS_STORAGES = {
+FORMAT_STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_FORMATS_STORAGE,
     'private': filer_settings.FILER_PRIVATEMEDIA_FORMATS_STORAGE,
 }
@@ -32,8 +32,27 @@ def generate_filename_multistorage(instance, filename):
         return upload_to
 
 
+class FormatNameMixin(object):
+    def get_format_name(self, ext):
+        path, source_filename = os.path.split(self.name)
+        filename, extension = os.path.splitext(source_filename)
+        if format_ext.starts_with('.'):
+            newfilename = '%s%s' % (filename, format_ext)
+        else:
+            newfilename = '%s.%s' % (filename, format_ext)
+        return os.path.join(path, newfilename)
+
+    def get_format_url(self, ext):
+        base_name = self.get_format_name(format_ext)
+        if self.format_storage.exists(base_name):
+            return os.path.join(self.format_storage.base_url, base_name)
+        else:
+            raise NameError
+
+
 class MultiStorageFieldFile(ThumbnailerNameMixin,
-                            easy_thumbnails_files.ThumbnailerFieldFile):
+                            easy_thumbnails_files.ThumbnailerFieldFile,
+                            FormatNameMixin):
     def __init__(self, instance, field, name):
         File.__init__(self, None, name)
         self.instance = instance
@@ -41,7 +60,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         self._committed = True
         self.storages = self.field.storages
         self.thumbnail_storages = self.field.thumbnail_storages
-        self.formats_storages = self.field.formats_storages
+        self.formats_storage = self.field.format_storages
 
     @property
     def storage(self):
@@ -66,7 +85,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
 
 
     @property
-    def formats_storage(self):
+    def format_storage(self):
         if self.instance.is_public:
             return self.formats_storages['public']
         else:
@@ -81,11 +100,11 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
 
     def __init__(self, verbose_name=None, name=None, upload_to_dict=None,
-                 storages=None, thumbnail_storages=None, formats_storages=None,
+                 storages=None, thumbnail_storages=None, format_storages=None,
                  **kwargs):
         self.storages = storages or STORAGES
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
-        self.formats_storages = formats_storages or FORMATS_STORAGES
+        self.format_storages = format_storages or FORMAT_STORAGES
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(
                                       verbose_name=verbose_name, name=name,
                                       upload_to=generate_filename_multistorage,

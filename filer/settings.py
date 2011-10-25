@@ -111,3 +111,6 @@ FILER_PRIVATEMEDIA_FORMATS_STORAGE = getattr(
                                                   '/smedia/filer_formats/')
                     ))
 FILER_PRIVATEMEDIA_FORMATS_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_FORMATS_SERVER', DefaultServer())
+
+# formats recognized as video file formats
+FILER_SOURCE_VIDEO_FORMATS = ('.mp4', '.avi', '.wmv', '.mov', '.mpg')

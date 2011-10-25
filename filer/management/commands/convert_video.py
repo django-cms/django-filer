@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from filer.models.videomodels import Video
+from filer.models import Video
 
 class Command(BaseCommand):
     args = ''
