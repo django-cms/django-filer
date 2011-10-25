@@ -15,7 +15,10 @@ THUMBNAIL_STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_STORAGE,
     'private': filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE,
 }
-
+FORMATS_STORAGES = {
+    'public': filer_settings.FILER_PUBLICMEDIA_FORMATS_STORAGE,
+    'private': filer_settings.FILER_PRIVATEMEDIA_FORMATS_STORAGE,
+}
 
 def generate_filename_multistorage(instance, filename):
     if instance.is_public:
@@ -38,6 +41,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         self._committed = True
         self.storages = self.field.storages
         self.thumbnail_storages = self.field.thumbnail_storages
+        self.formats_storages = self.field.formats_storages
 
     @property
     def storage(self):
@@ -61,14 +65,30 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
             return self.thumbnail_storages['private']
 
 
+    @property
+    def formats_storage(self):
+        if self.instance.is_public:
+            return self.formats_storages['public']
+        else:
+            return self.formats_storages['private']
+
+    def get_format(self, options, save=True):
+        #wtf is opaque vs transparent???
+        pass
+        
+
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
 
     def __init__(self, verbose_name=None, name=None, upload_to_dict=None,
-                 storages=None, thumbnail_storages=None, **kwargs):
+                 storages=None, thumbnail_storages=None, formats_storages=None,
+                 **kwargs):
         self.storages = storages or STORAGES
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
+        self.formats_storages = formats_storages or FORMATS_STORAGES
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(
                                       verbose_name=verbose_name, name=name,
                                       upload_to=generate_filename_multistorage,
                                       storage=None, **kwargs)
+
+    # make versions devia estar aki!!!!

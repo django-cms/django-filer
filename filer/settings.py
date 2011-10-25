@@ -29,6 +29,7 @@ FILER_ADMIN_ICON_SIZES = (
 FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     (
         'filer.models.imagemodels.Image',
+        'filer.models.imagemodels.Video',
         'filer.models.filemodels.File',
     )
 )
@@ -86,3 +87,27 @@ FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(
                     ))
 FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', DefaultServer())
 FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_SERVER', DefaultServer())
+
+FILER_PUBLICMEDIA_FORMATS_STORAGE = getattr(
+                    settings,
+                    'FILER_PUBLICMEDIA_FORMATS_STORAGE',
+                    storage_factory(
+                        klass=PublicFileSystemStorage,
+                        location=os.path.abspath(
+                            os.path.join(settings.MEDIA_ROOT,
+                                         'filer_formats')),
+                        base_url=urlparse.urljoin(settings.MEDIA_URL,
+                                                  'filer_formats/')
+                    ))
+FILER_PRIVATEMEDIA_FORMATS_STORAGE = getattr(
+                    settings,
+                    'FILER_PRIVATEMEDIA_FORMATS_STORAGE',
+                    storage_factory(
+                        klass=PrivateFileSystemStorage,
+                        location=os.path.abspath(
+                            os.path.join(settings.MEDIA_ROOT,
+                                         '../smedia/filer_formats/')),
+                        base_url=urlparse.urljoin(settings.MEDIA_URL,
+                                                  '/smedia/filer_formats/')
+                    ))
+FILER_PRIVATEMEDIA_FORMATS_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_FORMATS_SERVER', DefaultServer())

@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.utils.filer_easy_thumbnails import FilerThumbnailer
+from filer.utils.filer_easy_thumbnails import FilerThumbnailer, VideoThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
 import os
 
@@ -172,6 +172,7 @@ class Image(File):
 
     @property
     def easy_thumbnails_thumbnailer(self):
+        import pdb; pdb.set_trace()
         tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
                          source_storage=self.file.source_storage,
                          thumbnail_storage=self.file.thumbnail_storage)
@@ -181,3 +182,271 @@ class Image(File):
         app_label = 'filer'
         verbose_name = _('image')
         verbose_name_plural = _('images')
+
+
+VIDEO_STATUS_TYPE = (
+    ('new','New'),
+    ('process','Being precessed'),
+    ('ok', 'Converted successfully'),
+    ('error', 'Conversion failed'),
+)
+ 
+class Video(File):
+    SIDEBAR_IMAGE_WIDTH = 210
+    DEFAULT_THUMBNAILS = {
+        'admin_clipboard_icon': {'size': (32, 32), 'crop': True,
+                                 'upscale': True},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH, 10000)},
+        'admin_directory_listing_icon': {'size': (48, 48),
+                                         'crop': True, 'upscale': True},
+        'admin_tiny_icon': {'size': (32, 32), 'crop': True, 'upscale': True},
+    }
+    file_type = 'Video'
+    _icon = "video"
+
+    _height = models.IntegerField(null=True, blank=True)
+    _width = models.IntegerField(null=True, blank=True)
+
+    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
+                                      editable=False)
+
+    #default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
+    #default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
+
+    #author = models.CharField(_('author'), max_length=255, null=True, blank=True)
+
+    #must_always_publish_author_credit = models.BooleanField(_('must always publish author credit'), default=False)
+    #must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
+
+    subject_location = models.CharField(_('subject location'), max_length=64, null=True, blank=True,
+                                        default=None)
+    status = models.CharField(max_length=50, choices=VIDEO_STATUS_TYPE, default='new')
+    output = models.TextField(blank=True)
+
+    @classmethod
+    def matches_file_type(cls, iname, ifile, request):
+      # This was originally in admin/clipboardadmin.py  it was inside of a try
+      # except, I have moved it here outside of a try except because I can't
+      # figure out just what kind of exception this could generate... all it was
+      # doing for me was obscuring errors...
+      # --Dave Butler <croepha@gmail.com>
+      iext = os.path.splitext(iname)[1].lower()
+      # Fscking extension
+      return iext in ['.avi', '.mp4']
+
+    def save(self, *args, **kwargs):
+        if self.date_taken is None:
+            try:
+                exif_date = self.exif.get('DateTimeOriginal', None)
+                if exif_date is not None:
+                    d, t = str.split(exif_date.values)
+                    year, month, day = d.split(':')
+                    hour, minute, second = t.split(':')
+                    self.date_taken = datetime(
+                                       int(year), int(month), int(day),
+                                       int(hour), int(minute), int(second))
+            except:
+                pass
+        if self.date_taken is None:
+            self.date_taken = datetime.now()
+        self.has_all_mandatory_data = self._check_validity()
+        try:
+            # do this more efficient somehow?
+            self.file.seek(0)
+            self._width, self._height = PILImage.open(self.file).size
+        except Exception:
+            # probably the image is missing. nevermind.
+            pass
+        super(Video, self).save(*args, **kwargs)
+
+    def _check_validity(self):
+        if not self.name:
+            return False
+        return True
+
+    def sidebar_image_ratio(self):
+        if self.width:
+            return float(self.width) / float(self.SIDEBAR_IMAGE_WIDTH)
+        else:
+            return 1.0
+
+    def _get_exif(self):
+        if hasattr(self, '_exif_cache'):
+            return self._exif_cache
+        else:
+            if self.file:
+                self._exif_cache = get_exif_for_file(self.file.path)
+            else:
+                self._exif_cache = {}
+        return self._exif_cache
+    exif = property(_get_exif)
+
+    def has_edit_permission(self, request):
+        return self.has_generic_permission(request, 'edit')
+
+    def has_read_permission(self, request):
+        return self.has_generic_permission(request, 'read')
+
+    def has_add_children_permission(self, request):
+        return self.has_generic_permission(request, 'add_children')
+
+    def has_generic_permission(self, request, type):
+        """
+        Return true if the current user has permission on this
+        image. Return the string 'ALL' if the user has all rights.
+        """
+        user = request.user
+        if not user.is_authenticated() or not user.is_staff:
+            return False
+        elif user.is_superuser:
+            return True
+        elif user == self.owner:
+            return True
+        elif self.folder:
+            return self.folder.has_generic_permission(request, type)
+        else:
+            return False
+
+    @property
+    def label(self):
+        if self.name in ['', None]:
+            return self.original_filename or 'unnamed file'
+        else:
+            return self.name
+
+    @property
+    def width(self):
+        return self._width or 0
+
+    @property
+    def height(self):
+        return self._height or 0
+
+    @property
+    def icons(self):
+        import pdb; pdb.set_trace()
+        _icons = {}
+        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
+            try:
+                thumbnail_options = {
+                    'size': (int(size), int(size)),
+                    'crop': True,
+                    'upscale': True,
+                    'subject_location': self.subject_location}
+                thumb = self.file.get_thumbnail(thumbnail_options)
+                _icons[size] = thumb.url
+            except Exception, e:
+                # swallow the the exception to avoid to bubble it up
+                # in the template {{ image.icons.48 }}
+                pass
+        return _icons
+
+    @property
+    def thumbnails(self):
+        _thumbnails = {}
+        for name, opts in Image.DEFAULT_THUMBNAILS.items():
+            try:
+                opts.update({'subject_location': self.subject_location})
+                thumb = self.file.get_thumbnail(opts)
+                _thumbnails[name] = thumb.url
+            except:
+                # swallow the exception to avoid it bubbling up
+                # to the template {{ image.icons.48 }}
+                pass
+        return _thumbnails
+
+    @property
+    def easy_thumbnails_thumbnailer(self):
+        import pdb; pdb.set_trace()
+        tn = VideoThumbnailer(file=self.file.file, name=self.file.name,
+                         source_storage=self.file.formats_storage,
+                         thumbnail_storage=self.file.thumbnail_storage
+                         )
+        return tn
+
+
+    @property
+    def formats(self):
+        _icons = {}
+        for ext in ('.flv',):
+            try:
+                #thumbnail_options = {
+                    #'size': (int(size), int(size)),
+                    #'crop': True,
+                    #'upscale': True,
+                    #'subject_location': self.subject_location}
+                thumb = self.file.get_format({'format': ext})
+                _icons[ext] = thumb.url
+            except Exception, e:
+                # swallow the the exception to avoid to bubble it up
+                # in the template {{ image.icons.48 }}
+                pass
+        return _icons
+
+    def convert(self):
+        original_path = self.file.storage.path(self.file.name)
+        original_path, filename = os.path.split(original_path) #os.path.dirname(kwargs['file'].path_full)
+        extension = os.path.splitext(filename)[1]
+        from video import convert_video
+        path = os.path.split(self.file.formats_storage.path(self.file.name))[0]
+        return convert_video(original_path, path, filename, extension)
+
+    class Meta:
+        app_label = 'filer'
+        verbose_name = _('video')
+        verbose_name_plural = _('videos')
+
+    def __unicode__(self):
+        return "Video"
+        if self.name in ('', None):
+            text = u"%s" % (self.original_filename,)
+        else:
+            text = u"%s" % (self.name,)
+        return text
+
+    def get_video_flv_url(self):
+        return self.file.formats_storage.url(self.flv())
+        
+    def flv(self):
+        path = self.file.name
+        path, filename = os.path.split(path) #os.path.dirname(kwargs['file'].path_full)
+        basename = os.path.splitext(filename)[0]
+        return os.path.join(path, basename + '.flv')
+
+    def __init__(self, *args, **kwargs):
+        super(Video, self).__init__(*args, **kwargs)
+        self.file.source_generators=(sg,)
+        self.file.thumbnail_path = thumbnail_path
+        
+        
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
+try:
+    from PIL import Image as PILImage
+except ImportError:
+    import Image as PILImage
+
+
+def sg(source, **options):
+    """
+    Try to open the source file directly using PIL, ignoring any errors.
+    """
+    # Use a StringIO wrapper because if the source is an incomplete file like
+    # object, PIL may have problems with it. For example, some image types
+    # require tell and seek methods that are not present on all storage
+    # File objects.
+    #source = StringIO(.read())
+    try:
+        image = PILImage.open(source.thumbnail_path(source))
+    except Exception:
+        return
+    return image
+
+def thumbnail_path(self):
+    original_path = self.formats_storage.path(self.name)
+    original_path, filename = os.path.split(original_path) #os.path.dirname(kwargs['file'].path_full)
+    basename = os.path.splitext(filename)[0]
+    return os.path.join(original_path, basename + '.png')
