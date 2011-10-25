@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+import os
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from easy_thumbnails import fields as easy_thumbnails_fields, \
@@ -36,14 +37,14 @@ class FormatNameMixin(object):
     def get_format_name(self, ext):
         path, source_filename = os.path.split(self.name)
         filename, extension = os.path.splitext(source_filename)
-        if format_ext.starts_with('.'):
-            newfilename = '%s%s' % (filename, format_ext)
+        if ext.startswith('.'):
+            newfilename = '%s%s' % (filename, ext)
         else:
-            newfilename = '%s.%s' % (filename, format_ext)
+            newfilename = '%s.%s' % (filename, ext)
         return os.path.join(path, newfilename)
 
     def get_format_url(self, ext):
-        base_name = self.get_format_name(format_ext)
+        base_name = self.get_format_name(ext)
         if self.format_storage.exists(base_name):
             return os.path.join(self.format_storage.base_url, base_name)
         else:
