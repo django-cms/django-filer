@@ -112,7 +112,7 @@ FILER_PRIVATEMEDIA_FORMATS_STORAGE = getattr(
                     ))
 FILER_PRIVATEMEDIA_FORMATS_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_FORMATS_SERVER', DefaultServer())
 
-# formats recognized as video file formats
-FILER_SOURCE_VIDEO_FORMATS = ('.mp4', '.avi', '.wmv', '.mov', '.mpg')
-# formats to convert into
-FILER_VIDEO_FORMATS = ('.flv', '.mp4')
+# formats recognized as video file formats (no leading dot)
+FILER_SOURCE_VIDEO_FORMATS = ('mp4', 'avi', 'wmv', 'mov', 'mpg')
+# formats to convert into (no leading dot)
+FILER_VIDEO_FORMATS = ('flv', 'mp4')

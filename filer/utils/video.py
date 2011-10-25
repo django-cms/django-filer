@@ -10,9 +10,7 @@ def convert_video(sourcefile, path, extension):
     if sourcefile is None:
         return True, "Sourcefile does not exist"
     filebase, original_ext = os.path.splitext(filename)
-    if original_ext == extension:
-        return False, "No need to convert, already a %s", extension
-    convfilename = "%s%s" % (filebase, extension)
+    convfilename = "%s.%s" % (filebase, extension)
     targetfile = os.path.join(path, convfilename)
     if not os.path.exists(path):
         os.makedirs(path)

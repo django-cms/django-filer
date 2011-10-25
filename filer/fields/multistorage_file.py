@@ -37,10 +37,7 @@ class FormatNameMixin(object):
     def get_format_name(self, ext):
         path, source_filename = os.path.split(self.name)
         filename, extension = os.path.splitext(source_filename)
-        if ext.startswith('.'):
-            newfilename = '%s%s' % (filename, ext)
-        else:
-            newfilename = '%s.%s' % (filename, ext)
+        newfilename = '%s.%s' % (filename, ext)
         return os.path.join(path, newfilename)
 
     def get_format_url(self, ext):
@@ -49,6 +46,12 @@ class FormatNameMixin(object):
             return os.path.join(self.format_storage.base_url, base_name)
         else:
             raise NameError
+
+    def get_poster_url(self):
+        original_path = self.formats_storage.path(self.name)
+        original_path, filename = os.path.split(original_path)
+        basename = os.path.splitext(filename)[0]
+        return os.path.join(original_path, basename + '.png')
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,
