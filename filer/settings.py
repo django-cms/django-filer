@@ -29,7 +29,7 @@ FILER_ADMIN_ICON_SIZES = (
 FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     (
         'filer.models.imagemodels.Image',
-        'filer.models.imagemodels.Video',
+        'filer.models.videomodels.Video',
         'filer.models.filemodels.File',
     )
 )
@@ -114,3 +114,5 @@ FILER_PRIVATEMEDIA_FORMATS_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_FORMAT
 
 # formats recognized as video file formats
 FILER_SOURCE_VIDEO_FORMATS = ('.mp4', '.avi', '.wmv', '.mov', '.mpg')
+# formats to convert into
+FILER_VIDEO_FORMATS = ('.flv', '.mp4')

@@ -60,7 +60,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         self._committed = True
         self.storages = self.field.storages
         self.thumbnail_storages = self.field.thumbnail_storages
-        self.formats_storage = self.field.format_storages
+        self.format_storages = self.field.format_storages
 
     @property
     def storage(self):
@@ -87,9 +87,9 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
     @property
     def format_storage(self):
         if self.instance.is_public:
-            return self.formats_storages['public']
+            return self.format_storages['public']
         else:
-            return self.formats_storages['private']
+            return self.format_storages['private']
 
     def get_format(self, options, save=True):
         #wtf is opaque vs transparent???

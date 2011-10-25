@@ -4,12 +4,13 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer import settings as filer_settings
 from filer.models.filemodels import File
+from filer.utils.video import convert_video, grab_poster
 
 VIDEO_STATUS_TYPE = (
-    ('new','New'),
-    ('process','Being precessed'),
-    ('ok', 'Converted successfully'),
-    ('error', 'Conversion failed'),
+    ('new',_('New')),
+    ('process',_('Being precessed')),
+    ('ok', _('Converted successfully')),
+    ('error', _('Conversion failed')),
 )
 
 class Video(File):
@@ -49,7 +50,12 @@ class Video(File):
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
         # TODO try to get metadata like width/height 
-        super(Image, self).save(*args, **kwargs)
+        super(Video, self).save(*args, **kwargs)
+
+    def _check_validity(self):
+        if not self.name:
+            return False
+        return True
 
     @property
     def formats(self):
@@ -63,11 +69,18 @@ class Video(File):
 
     def convert(self):
         original_path = self.file.storage.path(self.file.name)
-        original_path, filename = os.path.split(original_path) #os.path.dirname(kwargs['file'].path_full)
-        extension = os.path.splitext(filename)[1]
-        from video import convert_video
-        path = os.path.split(self.file.formats_storage.path(self.file.name))[0]
-        return convert_video(original_path, path, filename, extension)
+        path = os.path.split(self.file.format_storage.path(self.file.name))[0]
+        # loop in all 
+        full_res = True
+        full_out = ''
+        for extension in filer_settings.FILER_VIDEO_FORMATS:
+            res, out = convert_video(original_path, path, extension)
+            res = res or full_res
+            full_out += out
+        res, out = grab_poster(original_path, path)
+        res = res or full_res
+        full_out += out
+        return full_res, full_out
 
     class Meta:
         app_label = 'filer'
