@@ -60,7 +60,6 @@ class Video(File):
     @property
     def formats(self):
         _formats = {}
-        import pdb; pdb.set_trace()
         for ext in filer_settings.FILER_VIDEO_FORMATS:
             if ext.startswith('.'):
                 ext = ext[1:]
