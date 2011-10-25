@@ -6,6 +6,7 @@ from django.core.files import File as DjangoFile
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
+from filer.models.videomodels import Video
 from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
@@ -132,3 +133,47 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
+
+
+
+class FilerVideoApiTest(TestCase):
+    
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.video_name = 'video_test.mp4'
+        self.video_path = os.path.join(os.path.dirname(__file__), 'mediafiles', self.video_name)
+    
+    def tearDown(self):
+        self.client.logout()
+        for video in Video.objects.all():
+            video.delete()
+
+    def create_filer_video(self):
+        djfile = DjangoFile(open(self.video_path), name=self.video_name)
+        video = Video.objects.create(owner=self.superuser,
+                                     original_filename=self.video_name,
+                                     file=djfile)
+        return video
+        
+    def test_create_and_delete_video(self):
+        self.assertEqual(Video.objects.count(), 0)
+        video = self.create_filer_video()
+        video.save()
+        self.assertEqual(video.conversion_status, 'new')
+        self.assertEqual(Video.objects.count(), 1)
+        video = Video.objects.all()[0]
+        video.delete()
+        self.assertEqual(Video.objects.count(), 0)
+    
+    def test_upload_video_form(self):
+        self.assertEqual(Video.objects.count(), 0)
+        djfile = DjangoFile(open(self.video_path), name=self.video_name)
+        VideoUploadForm = modelform_factory(Video, fields=('original_filename', 'owner', 'file'))
+        upoad_video_form = VideoUploadForm({'original_filename':self.video_name,
+                                                'owner': self.superuser.pk},
+                                                {'file':djfile})
+        if upoad_video_form.is_valid():
+            video = upoad_video_form.save()
+        self.assertEqual(Video.objects.count(), 1)
+        self.assertEqual(video.conversion_status, 'new')
