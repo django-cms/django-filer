@@ -26,7 +26,7 @@ To get started using ``django-filer`` simply install it with
 
     $ pip install django-filer
 
-Add ``"filer"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
+Add ``"filer"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
 (or ``migrate`` if you're using South).
 
 Configuration
