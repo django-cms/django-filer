@@ -6,12 +6,14 @@ from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.video import convert_video, grab_poster, get_dimensions
 
+
 VIDEO_STATUS_TYPE = (
-    ('new',_('New')),
-    ('process',_('Being precessed')),
+    ('new', _('New')),
+    ('process', _('Being precessed')),
     ('ok', _('Converted successfully')),
     ('error', _('Conversion failed')),
 )
+
 
 class Video(File):
     file_type = 'Video'
@@ -41,15 +43,15 @@ class Video(File):
         app_label = 'filer'
         verbose_name = _('video')
         verbose_name_plural = _('videos')
-        
+
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
-      iext = os.path.splitext(iname)[1].lower().lstrip('.')
-      return iext in filer_settings.FILER_SOURCE_VIDEO_FORMATS
+        iext = os.path.splitext(iname)[1].lower().lstrip('.')
+        return iext in filer_settings.FILER_SOURCE_VIDEO_FORMATS
 
     def set_initial_dimensions(self):
         sourcefile = self.file.storage.path(self.file.name)
-        x,y = get_dimensions(sourcefile)
+        x, y = get_dimensions(sourcefile)
         self.original_width = x
         self.original_height = y
         self.width = x
@@ -77,7 +79,7 @@ class Video(File):
         return _formats
 
     def formats_html5(self):
-        #video formats supported by HTML5 browsers
+        """ Video formats supported by HTML5 browsers """
         HTML5_FORMATS = ('mp4','ogv','webm')
         _formats = []
         for format, url in self.formats.items():
@@ -86,7 +88,7 @@ class Video(File):
         return _formats
 
     def format_flash(self):
-        #returns flash video file if available
+        """ Returns flash video file if available """
         return self.formats.get('flv', None)
 
     @property
@@ -96,49 +98,23 @@ class Video(File):
         except Exception, e:
             return ""
 
-    # def has_format_mp4(self):
-    #     return True if 'mp4' in self.formats else False
-    # 
-    # def has_format_webm(self):
-    #     return True if 'webm' in self.formats else False
-    # 
-    # def has_format_ogv(self):
-    #     return True if 'ogv' in self.formats else False
-    # 
-    # def get_format_url(self, format):
-    #     basefile, ext = os.path.splitext(self.file.name)
-    #     newfile = os.path.join(basefile, format)
-    # 
-    #     filepath, ext = os.path.splitext(basefile)
-    #     formatfile = 
-    #     
-    # 
-    # def get_format_mp4(self):
-    #     pass
-
     def convert(self):
         original_path = self.file.storage.path(self.file.name)
         path = os.path.split(self.file.format_storage.path(self.file.name))[0]
-        # loop in all 
-        full_res = True
-        full_out = ''         
+        # loop in all
+        output = []
+        error = False
+        #only set new dimensions if diferent from the original and not zero
+        if self.width and self.height and (
+                (self.width, self.height) != (self.original_width, self.original_height)):
+            new_dimensions = "%sx%s" % (self.width, self.height)
+        else:
+            new_dimensions = None
         for extension in filer_settings.FILER_VIDEO_FORMATS:
-            #only set new dimensions if diferent from the original and not zero
-            if self.width and self.height and (
-                    self.width != self.original_width or self.height != self.original_height):
-                new_dimensions = "%sx%s" % (self.width, self.height)
-            else:
-                new_dimensions = ""
             res, out = convert_video(original_path, path, extension, new_dimensions)
-            res = res or full_res
-            full_out += out
-        res, out = grab_poster(original_path, path)
-        res = res or full_res
-        full_out += out
-        return full_res, full_out
-
-
-
-    #def get_video_flv_url(self):
-        #return self.file.formats_storage.url(self.flv())
-
+            error = error or res
+            output.append(out)
+        res, out = grab_poster(original_path, path, new_dimensions)
+        error = error or res
+        output.append(out)
+        return error, "\n".join(output)

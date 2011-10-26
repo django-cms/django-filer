@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from filer.models import Video
 
+
 class Command(BaseCommand):
     args = ''
-    help = 'process next video conversion task'
+    help = 'Processes next video conversion task'
 
     def handle(self, *args, **options):
         try:
@@ -20,7 +21,7 @@ class Command(BaseCommand):
             import traceback
             vid.conversion_output = traceback.format_exc()
         else:
-            vid.conversion_status = 'ok' if result else 'error'
+            vid.conversion_status = 'ok' if not result else 'error'
             vid.conversion_output = output
         vid.save()
         if vid.conversion_status == 'ok':
