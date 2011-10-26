@@ -21,9 +21,14 @@ class VideoAdmin(FileAdmin):
             'classes': ('collapse',),
         }),
         (_('Conversion'), {
-            'fields': ('conversion_status', 'original_height','original_width','height','width',
+            'fields': ('conversion_status', 'height','width',
                        'conversion_output',),
             'classes': ('collapse',),
         })
     )
-    readonly_fields = ('original_height','original_width')
+    
+    def render_change_form(self, request, context, *args, **kwargs):
+        video = Video.objects.get(pk=context['object_id'])
+        context['adminform'].form.fields['width'].help_text = _('Uploaded video width %s px') % video.original_width
+        context['adminform'].form.fields['height'].help_text = _('Uploaded video height %s px') % video.original_height
+        return super(VideoAdmin, self).render_change_form(request, context, args, kwargs)
