@@ -6,12 +6,14 @@ from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.video import convert_video, grab_poster, get_dimensions
 
+
 VIDEO_STATUS_TYPE = (
-    ('new',_('New')),
-    ('process',_('Being precessed')),
+    ('new', _('New')),
+    ('process', _('Being precessed')),
     ('ok', _('Converted successfully')),
     ('error', _('Conversion failed')),
 )
+
 
 class Video(File):
     file_type = 'Video'
@@ -41,15 +43,15 @@ class Video(File):
         app_label = 'filer'
         verbose_name = _('video')
         verbose_name_plural = _('videos')
-        
+
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
-      iext = os.path.splitext(iname)[1].lower().lstrip('.')
-      return iext in filer_settings.FILER_SOURCE_VIDEO_FORMATS
+        iext = os.path.splitext(iname)[1].lower().lstrip('.')
+        return iext in filer_settings.FILER_SOURCE_VIDEO_FORMATS
 
     def set_initial_dimensions(self):
         sourcefile = self.file.storage.path(self.file.name)
-        x,y = get_dimensions(sourcefile)
+        x, y = get_dimensions(sourcefile)
         self.original_width = x
         self.original_height = y
         self.width = x
@@ -86,16 +88,16 @@ class Video(File):
     def convert(self):
         original_path = self.file.storage.path(self.file.name)
         path = os.path.split(self.file.format_storage.path(self.file.name))[0]
-        # loop in all 
+        # loop in all
         full_res = True
-        full_out = ''         
+        full_out = ''
+        #only set new dimensions if diferent from the original and not zero
+        if self.width and self.height and (
+                self.width != self.original_width or self.height != self.original_height):
+            new_dimensions = "%sx%s" % (self.width, self.height)
+        else:
+            new_dimensions = ""
         for extension in filer_settings.FILER_VIDEO_FORMATS:
-            #only set new dimensions if diferent from the original and not zero
-            if self.width and self.height and (
-                    self.width != self.original_width or self.height != self.original_height):
-                new_dimensions = "%sx%s" % (self.width, self.height)
-            else:
-                new_dimensions = ""
             res, out = convert_video(original_path, path, extension, new_dimensions)
             res = res or full_res
             full_out += out
@@ -108,4 +110,3 @@ class Video(File):
 
     #def get_video_flv_url(self):
         #return self.file.formats_storage.url(self.flv())
-

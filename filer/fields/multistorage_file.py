@@ -21,6 +21,7 @@ FORMAT_STORAGES = {
     'private': filer_settings.FILER_PRIVATEMEDIA_FORMATS_STORAGE,
 }
 
+
 def generate_filename_multistorage(instance, filename):
     if instance.is_public:
         upload_to = filer_settings.FILER_PUBLICMEDIA_UPLOAD_TO
@@ -48,10 +49,9 @@ class FormatNameMixin(object):
             raise NameError
 
     def get_poster_url(self):
-        original_path = self.formats_storage.path(self.name)
-        original_path, filename = os.path.split(original_path)
+        original_path, filename = os.path.split(self.name)
         basename = os.path.splitext(filename)[0]
-        return os.path.join(original_path, basename + '.png')
+        return self.format_storage.url(os.path.join(original_path, basename + '.png'))
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,
@@ -87,7 +87,6 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         else:
             return self.thumbnail_storages['private']
 
-
     @property
     def format_storage(self):
         if self.instance.is_public:
@@ -98,7 +97,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
     def get_format(self, options, save=True):
         #wtf is opaque vs transparent???
         pass
-        
+
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
