@@ -109,7 +109,9 @@ class Video(File):
                 (self.width, self.height) != (self.original_width, self.original_height)):
             new_dimensions = "%sx%s" % (self.width, self.height)
         else:
-            new_dimensions = None
+            new_dimensions = filer_settings.FFMPEG_TARGET_DIMENSIONS
+            if new_dimensions:
+                self.width, self.height = new_dimensions.split('x')
         for extension in filer_settings.FILER_VIDEO_FORMATS:
             res, out = convert_video(original_path, path, extension, new_dimensions)
             error = error or res

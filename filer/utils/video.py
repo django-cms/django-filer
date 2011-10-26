@@ -50,8 +50,7 @@ def execute_ffmpeg_command(com, targetfile):
                 os.remove(targetfile)
                 return True, "\n".join([com, ffmpegresult])
         except:
-            return True, traceback.format_exc()
-            #return True, "\n".join([com, ffmpegresult])
+            return True, "\n".join([com, ffmpegresult])
     except:
         return True, traceback.format_exc()
     return False, ffmpegresult
