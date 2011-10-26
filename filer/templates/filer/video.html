@@ -1,11 +1,12 @@
 {% load filermedia %}
 <!-- from: http://camendesign.com/code/video_for_everybody -->
 <!-- first try HTML5 playback: if serving as XML, expand `controls` to `controls="controls"` and autoplay likewise -->
-<!-- warning: playback does not work on iOS3 if you include the poster attribute! fixed in iOS4.0 -->
-<video width="{{ dimensions.0 }}" height="{{ dimensions.1 }}" controls>
+<video {% if poster %} poster="{{ video.poster }}"{% endif %} width="{{ dimensions.0 }}" height="{{ dimensions.1 }}" controls>
 	<!-- MP4 must be first for iPad! -->
     {% for fileformat in video.formats_html5 %}
     <source src="{{ fileformat.url }}" type='video/{{ fileformat.format }}' />
+    {% empty %}
+    <source src="{{ video.original_format.url }}" type='video/{{ video.original_format.format }}' />
     {% endfor %}
 
 	{% if video.format_flash %}
@@ -14,10 +15,10 @@
 		<!-- Firefox uses the `data` attribute above, IE/Safari uses the param below -->
 		<param name="movie" value="{% filer_staticmedia_prefix %}flash/flowplayer-3.2.7.swf" />
 		<param name="wmode" value="transparent" />
-		<param name="flashVars" value="config={'playlist':['/media/app24.png',{'url':'{{ video.format_flash }}','autoPlay':false}]}" />
+		<param name="flashVars" value="config={'playlist':['{{ video.poster }}',{'url':'{{ video.format_flash }}','autoPlay':false}]}" />
 		<!-- fallback image. note the title field below, put the title of the video there -->
-		<img src="/media/app24.png" width="640" height="360" alt="__TITLE__"
-		     title="No video playback capabilities, please download the video below" />
+		<img src="{{ video.poster }}" alt="{{ video.default_alt_text }}"
+		     title="No video playback capabilities" />
 	</object>
   {% endif %}	
 </video>

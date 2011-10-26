@@ -59,7 +59,8 @@ class Video(File):
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        if not self.original_width and not self.original_height:
+        if not ( self.original_width or self.original_height or \
+                 self.width or self.height ):
             self.set_initial_dimensions()
         super(Video, self).save(*args, **kwargs)
 
@@ -77,6 +78,12 @@ class Video(File):
             except Exception, e:
                 pass
         return _formats
+
+    def original_format(self):
+        url = self.file.storage.url(self.file.name)
+        name, ext = os.path.splitext(self.file.name)
+        format = ext.replace('.','')
+        return {'url':url, 'format':format}
 
     def formats_html5(self):
         """ Video formats supported by HTML5 browsers """
