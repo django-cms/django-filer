@@ -24,7 +24,7 @@ FILER_ADMIN_ICON_SIZES = (
         '16', '32', '48', '64',
 )
 
-# This is an ordered iterable that describes a list of 
+# This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
 FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     (
@@ -119,6 +119,8 @@ FILER_VIDEO_FORMATS = ('flv', 'mp4')
 # command line for video checking of dimensions
 FFMPEG_CHECK_CMD = "ffmpeg -i %(input_file)s"
 # command line for video conversion
-FFMPEG_CMD = "ffmpeg -i %(input_file)s -y -b 2326k -ar 44100 -ab 224k -ac 2 -f %(format)s -s  %(target_file)s"
+FFMPEG_CMD = "ffmpeg -i %(input_file)s -y -b 2326k -ar 44100 -ab 224k -ac 2 -f %(format)s %(dimensions)s %(target_file)s"
+# argument for setting the size in ffmpeg
+FFMPEG_SIZE_ARGUMENT = "-s %(dimensions)s"
 # command line for grabbing preview image from video
-GRABIMG_CMD = "ffmpeg -y -i %(input_file)s -vframes 1 -ss 00:00:05 -an -vcodec png -f rawvideo -s %(dimensions)s %(target_file)s"
+GRABIMG_CMD = "ffmpeg -y -i %(input_file)s -vframes 1 -ss 00:00:05 -an -vcodec png -f rawvideo %(dimensions)s %(target_file)s"

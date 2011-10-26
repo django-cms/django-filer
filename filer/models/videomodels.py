@@ -89,24 +89,19 @@ class Video(File):
         original_path = self.file.storage.path(self.file.name)
         path = os.path.split(self.file.format_storage.path(self.file.name))[0]
         # loop in all
-        full_res = True
-        full_out = ''
+        output = []
+        error = False
         #only set new dimensions if diferent from the original and not zero
         if self.width and self.height and (
-                self.width != self.original_width or self.height != self.original_height):
+                (self.width, self.height) != (self.original_width, self.original_height)):
             new_dimensions = "%sx%s" % (self.width, self.height)
         else:
             new_dimensions = ""
         for extension in filer_settings.FILER_VIDEO_FORMATS:
             res, out = convert_video(original_path, path, extension, new_dimensions)
-            res = res or full_res
-            full_out += out
-        res, out = grab_poster(original_path, path)
-        res = res or full_res
-        full_out += out
-        return full_res, full_out
-
-
-
-    #def get_video_flv_url(self):
-        #return self.file.formats_storage.url(self.flv())
+            error = error or res
+            output.append(out)
+        res, out = grab_poster(original_path, path, new_dimensions)
+        error = error or res
+        output.append(out)
+        return error, "\n".join(output)
