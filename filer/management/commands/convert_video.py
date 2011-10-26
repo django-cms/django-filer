@@ -3,7 +3,7 @@ from filer.models import Video
 
 class Command(BaseCommand):
     args = ''
-    help = 'process next video conversion task'
+    help = 'Processes next video conversion task'
 
     def handle(self, *args, **options):
         try:
