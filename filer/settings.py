@@ -120,6 +120,8 @@ FILER_VIDEO_FORMATS = ('flv', 'mp4')
 FFMPEG_CHECK_CMD = "ffmpeg -i %(input_file)s"
 # command line for video conversion
 FFMPEG_CMD = "ffmpeg -i %(input_file)s -y -b 2326k -ar 44100 -ab 224k -ac 2 -f %(format)s %(dimensions)s %(target_file)s"
+# dimensions of the converted videos - leave blank to keep the original video size
+FFMPEG_TARGET_DIMENSIONS = "640x480"
 # argument for setting the size in ffmpeg
 FFMPEG_SIZE_ARGUMENT = "-s %(dimensions)s"
 # command line for grabbing preview image from video
