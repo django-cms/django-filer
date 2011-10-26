@@ -76,12 +76,45 @@ class Video(File):
                 pass
         return _formats
 
+    def formats_html5(self):
+        #video formats supported by HTML5 browsers
+        HTML5_FORMATS = ('mp4','ogv','webm')
+        _formats = []
+        for format, url in self.formats.items():
+            if format in HTML5_FORMATS:
+                _formats.append({'format':format, 'url':url})
+        return _formats
+
+    def format_flash(self):
+        #returns flash video file if available
+        return self.formats.get('flv', None)
+
     @property
     def poster(self):
         try:
             return self.file.get_poster_url()
         except Exception, e:
             return ""
+
+    # def has_format_mp4(self):
+    #     return True if 'mp4' in self.formats else False
+    # 
+    # def has_format_webm(self):
+    #     return True if 'webm' in self.formats else False
+    # 
+    # def has_format_ogv(self):
+    #     return True if 'ogv' in self.formats else False
+    # 
+    # def get_format_url(self, format):
+    #     basefile, ext = os.path.splitext(self.file.name)
+    #     newfile = os.path.join(basefile, format)
+    # 
+    #     filepath, ext = os.path.splitext(basefile)
+    #     formatfile = 
+    #     
+    # 
+    # def get_format_mp4(self):
+    #     pass
 
     def convert(self):
         original_path = self.file.storage.path(self.file.name)

@@ -40,9 +40,13 @@ def convert_video(sourcefile, path, extension, dimensions):
     targetfile = os.path.join(path, convfilename)
     if not os.path.exists(path):
         os.makedirs(path) 
+    if dimensions:
+        dimensions_cmd = "-s %s" % dimensions
+    else:
+        dimensions_cmd = ""
     cmd_options = {'input_file': commands.mkarg(sourcefile),
                    'format': commands.mkarg(extension),
-                   'dimensions': commands.mkarg(dimensions),
+                   'dimensions': dimensions_cmd,
                    'target_file': commands.mkarg(targetfile) }
     ffmpeg = filer_settings.FFMPEG_CMD % cmd_options
     #flvtool = "flvtool2 -U %s" % targetfile
