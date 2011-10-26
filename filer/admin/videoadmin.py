@@ -6,22 +6,13 @@ from filer.admin.fileadmin import FileAdmin
 from filer.models import Video
 
 
-class VideoAdminFrom(forms.ModelForm):
+class VideoAdminForm(forms.ModelForm):
     class Meta:
         model = Video
 
-    #class Media:
-        #css = {
-            ##'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
-        #}
-        #js = (
-            #filer_settings.FILER_STATICMEDIA_PREFIX + 'js/raphael.js',
-            #filer_settings.FILER_STATICMEDIA_PREFIX + 'js/focal_point.js',
-        #)
-
 
 class VideoAdmin(FileAdmin):
-    form = VideoAdminFrom
+    form = VideoAdminForm
     fieldsets = (
         FileAdmin.fieldsets[0],
         (_('Advanced'), {
@@ -30,7 +21,9 @@ class VideoAdmin(FileAdmin):
             'classes': ('collapse',),
         }),
         (_('Conversion'), {
-            'fields': ('conversion_status', 'conversion_output',),
+            'fields': ('conversion_status', 'original_height','original_width','height','width',
+                       'conversion_output',),
             'classes': ('collapse',),
         })
     )
+    readonly_fields = ('original_height','original_width')

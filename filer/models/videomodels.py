@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.utils.video import convert_video, grab_poster
+from filer.utils.video import convert_video, grab_poster, get_dimensions
 
 VIDEO_STATUS_TYPE = (
     ('new',_('New')),
@@ -17,8 +17,11 @@ class Video(File):
     file_type = 'Video'
     _icon = "video"
 
-    _height = models.IntegerField(null=True, blank=True)
-    _width = models.IntegerField(null=True, blank=True)
+    original_height = models.IntegerField(null=True, blank=True, default=0)
+    original_width = models.IntegerField(null=True, blank=True, default=0)
+
+    height = models.IntegerField(null=True, blank=True, default=0)
+    width = models.IntegerField(null=True, blank=True, default=0)
 
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
                                       editable=False)
@@ -34,22 +37,28 @@ class Video(File):
     conversion_status = models.CharField(max_length=50, choices=VIDEO_STATUS_TYPE, default='new')
     conversion_output = models.TextField(blank=True)
 
+    class Meta:
+        app_label = 'filer'
+        verbose_name = _('video')
+        verbose_name_plural = _('videos')
+        
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
       iext = os.path.splitext(iname)[1].lower().lstrip('.')
       return iext in filer_settings.FILER_SOURCE_VIDEO_FORMATS
 
-    @property
-    def width(self):
-        return self._width or 0
-
-    @property
-    def height(self):
-        return self._height or 0
+    def set_initial_dimensions(self):
+        sourcefile = self.file.storage.path(self.file.name)
+        x,y = get_dimensions(sourcefile)
+        self.original_width = x
+        self.original_height = y
+        self.width = x
+        self.height = y
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        # TODO try to get metadata like width/height 
+        if not self.original_width and not self.original_height:
+            self.set_initial_dimensions()
         super(Video, self).save(*args, **kwargs)
 
     def _check_validity(self):
@@ -74,15 +83,20 @@ class Video(File):
         except Exception, e:
             return ""
 
-
     def convert(self):
         original_path = self.file.storage.path(self.file.name)
         path = os.path.split(self.file.format_storage.path(self.file.name))[0]
         # loop in all 
         full_res = True
-        full_out = ''
+        full_out = ''         
         for extension in filer_settings.FILER_VIDEO_FORMATS:
-            res, out = convert_video(original_path, path, extension)
+            #only set new dimensions if diferent from the original and not zero
+            if self.width and self.height and (
+                    self.width != self.original_width or self.height != self.original_height):
+                new_dimensions = "%sx%s" % (self.width, self.height)
+            else:
+                new_dimensions = ""
+            res, out = convert_video(original_path, path, extension, new_dimensions)
             res = res or full_res
             full_out += out
         res, out = grab_poster(original_path, path)
@@ -90,10 +104,7 @@ class Video(File):
         full_out += out
         return full_res, full_out
 
-    class Meta:
-        app_label = 'filer'
-        verbose_name = _('video')
-        verbose_name_plural = _('videos')
+
 
     #def get_video_flv_url(self):
         #return self.file.formats_storage.url(self.flv())

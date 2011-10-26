@@ -11,8 +11,10 @@ class Migration(SchemaMigration):
         # Adding model 'Video'
         db.create_table('filer_video', (
             ('file_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['filer.File'], unique=True, primary_key=True)),
-            ('_height', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('_width', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('original_height', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('original_width', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('height', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('width', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
             ('date_taken', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('default_alt_text', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('default_caption', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -138,8 +140,6 @@ class Migration(SchemaMigration):
         },
         'filer.video': {
             'Meta': {'object_name': 'Video', '_ormbases': ['filer.File']},
-            '_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            '_width': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'author': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'conversion_output': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'conversion_status': ('django.db.models.fields.CharField', [], {'default': "'new'", 'max_length': '50'}),
@@ -147,8 +147,12 @@ class Migration(SchemaMigration):
             'default_alt_text': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'default_caption': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'file_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['filer.File']", 'unique': 'True', 'primary_key': 'True'}),
+            'height': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'must_always_publish_author_credit': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'original_height': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'original_width': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'width': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'})
         }
     }
 
