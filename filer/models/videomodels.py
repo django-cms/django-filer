@@ -80,11 +80,11 @@ class Video(File):
 
     def formats_html5(self):
         """ Video formats supported by HTML5 browsers """
-        HTML5_FORMATS = ('mp4','ogv','webm')
+        HTML5_FORMATS = ('mp4', 'ogv', 'webm')
         _formats = []
         for format, url in self.formats.items():
             if format in HTML5_FORMATS:
-                _formats.append({'format':format, 'url':url})
+                _formats.append({'format': format, 'url': url})
         return _formats
 
     def format_flash(self):

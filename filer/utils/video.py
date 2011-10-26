@@ -53,7 +53,7 @@ def execute_ffmpeg_command(com, targetfile):
             return True, "\n".join([com, ffmpegresult])
     except:
         return True, traceback.format_exc()
-    return False, ffmpegresult
+    return False, "\n".join([com, ffmpegresult])
 
 
 def convert_video(sourcefile, path, extension, dimensions):

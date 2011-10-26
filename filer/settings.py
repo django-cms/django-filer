@@ -115,7 +115,7 @@ FILER_PRIVATEMEDIA_FORMATS_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_FORMAT
 # formats recognized as video file formats (no leading dot)
 FILER_SOURCE_VIDEO_FORMATS = ('mp4', 'avi', 'wmv', 'mov', 'mpg')
 # formats to convert into (no leading dot)
-FILER_VIDEO_FORMATS = ('flv', 'mp4','ogv','webm')
+FILER_VIDEO_FORMATS = ('flv', 'mp4', 'ogv', 'webm')
 # command line for video checking of dimensions
 FFMPEG_CHECK_CMD = "ffmpeg -i %(input_file)s"
 # command line for video conversion
