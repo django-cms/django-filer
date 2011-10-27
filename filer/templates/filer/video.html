@@ -1,12 +1,12 @@
 {% load filermedia %}
 <!-- from: http://camendesign.com/code/video_for_everybody -->
 <!-- first try HTML5 playback: if serving as XML, expand `controls` to `controls="controls"` and autoplay likewise -->
-<video {% if poster %} poster="{{ video.poster }}"{% endif %} width="{{ dimensions.0 }}" height="{{ dimensions.1 }}" controls>
+<video {% if video.poster %} poster="{{ video.poster }}"{% endif %} width="{{ dimensions.0 }}" height="{{ dimensions.1 }}" controls>
 	<!-- MP4 must be first for iPad! -->
     {% for fileformat in video.formats_html5 %}
-    <source src="{{ fileformat.url }}" type='video/{{ fileformat.format }}' />
+    <source src="{{ fileformat.url }}" type='{{ fileformat.mimetype }}' />
     {% empty %}
-    <source src="{{ video.original_format.url }}" type='video/{{ video.original_format.format }}' />
+    <source src="{{ video.original_format.url }}" type='{{ video.original_format.mimetype }}' />
     {% endfor %}
 
 	{% if video.format_flash %}
@@ -17,7 +17,7 @@
 		<param name="wmode" value="transparent" />
 		<param name="flashVars" value="config={'playlist':['{{ video.poster }}',{'url':'{{ video.format_flash }}','autoPlay':false}]}" />
 		<!-- fallback image. note the title field below, put the title of the video there -->
-		<img src="{{ video.poster }}" alt="{{ video.default_alt_text }}"
+		<img src="{{ video.poster }}" alt="{{ video.default_alt_text|default_if_none:'' }}"
 		     title="No video playback capabilities" />
 	</object>
     {% endif %}
