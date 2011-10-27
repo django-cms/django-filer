@@ -17,7 +17,7 @@
 		<param name="wmode" value="transparent" />
 		<param name="flashVars" value="config={'playlist':['{{ video.poster }}',{'url':'{{ video.format_flash }}','autoPlay':false}]}" />
 		<!-- fallback image. note the title field below, put the title of the video there -->
-		<img src="{{ video.poster }}" alt="{{ video.default_alt_text }}"
+		<img src="{{ video.poster }}" alt="{{ video.default_alt_text|default_if_none:'' }}"
 		     title="No video playback capabilities" />
 	</object>
   {% endif %}	
