@@ -67,18 +67,27 @@ templates
     {% load thumbnails %}
     {% thumbnail company.logo 250x250 crop %}
 
+A template tag is also provided to display videos with the multiple available 
+formats.
+
+    {% load filer_video_tags %}
+	{% filer_video video_obj %}
+
+This will generate the html5 video tag with links to the multiple video formats
+and fallback to flash if the flash format is available.
+
 admin
 .....
 
 The default widget provides a popup file selector that also directly supports
-uploading new images.
+uploading new images and new videos.
 
 .. figure:: _static/default_admin_file_widget.png
    :alt: FileField widget in admin
    
-* Clicking on the magnifying glass will display the file selction popup.
+* Clicking on the magnifying glass will display the file selection popup.
 
-* The red X will de-select the currently selected file (usefull if the field
+* The red X will de-select the currently selected file (useful if the field
   can be ``null``).
 
 .. WARNING::
