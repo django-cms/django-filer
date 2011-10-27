@@ -21,8 +21,8 @@ class Command(NoArgsCommand):
                     for root, dirs, files in os.walk(top, topdown=False):
                         subpath = os.path.relpath(root, top)
                         orig_dirs, orig_files = original_storage.listdir(subpath)
-                        orig_files = set([os.path.basename(of) for of in orig_files])
-                        files = set([os.path.basename(f) for f in files])
-                        for f in files.difference(orig_files):
-                            p = format_storage.path(os.path.join(subpath, f))
-                            os.remove(p)
+                        orig_files = set([os.path.splitext(of)[0] for of in orig_files])
+                        for f in files:
+                            if os.path.splitext(f)[0] not in orig_files:
+                                p = format_storage.path(os.path.join(subpath, f))
+                                format_storage.delete(p)

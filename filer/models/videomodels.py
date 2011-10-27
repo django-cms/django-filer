@@ -92,7 +92,7 @@ class Video(File):
         HTML5_FORMATS = {'mp4':'video/mp4', 'ogv':'video/ogg','webm':'video/webm'}
         _formats = []
         for fmt, url in self.formats.items():
-            if fmt in HTML5_FORMATS.keys():
+            if fmt in HTML5_FORMATS:
                 _formats.append({'format': fmt, 'url': url, 'mimetype': HTML5_FORMATS[format]})
         return _formats
 
