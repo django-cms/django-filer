@@ -74,7 +74,16 @@ formats.
 	{% filer_video video_obj %}
 
 This will generate the html5 video tag with links to the multiple video formats
-and fallback to flash if the flash format is available.
+and fallback to flash if the flash format is available, and link to the poster
+image. The filer_video tag can accept optional dimensions parameter for the 
+display window (otherwise uses the video dimensions).
+
+	
+	{% filer_video video_obj 640x480 %}
+
+Note: if ffmpeg is not available for converting the videos, the dimensions of 
+the uploaded video are not extracted from the file and so they need to be set 
+in the tag.
 
 admin
 .....

@@ -104,27 +104,44 @@ To crop an image and respect the subject location::
 video conversion with ffmpeg
 ............................
 
-If installed ffmpeg is used for conversion of uploaded videos in multiple formats, 
-resizing of video dimensions and capture of poster image from the video.
+If installed ffmpeg is used for conversion of uploaded videos in multiple 
+formats, resizing of video dimensions and capture of poster image from the 
+video.
 
-The list of accepted video formats for upload is set in the setting bellow. When using
-ffmpeg this list should match the formats available for conversion. 
+The list of accepted video formats for upload is set in the setting bellow. 
+When using ffmpeg this list should match the formats available for conversion. 
 
     FILER_SOURCE_VIDEO_FORMATS = ('mp4', 'avi', 'wmv', 'mov', 'mpg')
 
-With ffmpeg available, when a file is upload it is converted to the formats in the output 
-formats list. 
+With ffmpeg available, when a file is upload it is converted to the formats in 
+the output formats list. 
 
     FILER_VIDEO_FORMATS = ('flv', 'mp4','webm')
 
-By default the videos are converted maintaining the original video dimensions. For each
-video, in the admin interface it is possible to choose different dimensions, but if all
-videos should be resized to given dimensions, the setting bellow can be used.
+By default the videos are converted maintaining the original video dimensions. 
+For each video, in the admin interface it is possible to choose different 
+dimensions, but if all videos should be resized to given dimensions, the 
+setting bellow can be used.
 
     FFMPEG_TARGET_DIMENSIONS = "640x480" 
 
-Parameters regarding the conversion quality can be adjusted in the setting FFMPEG_CMD, and 
-parameters for the capture of the poster image can be adjusted in the setting GRABIMG_CMD.
+Parameters regarding the conversion quality can be adjusted in the setting 
+FFMPEG_CMD, and parameters for the capture of the poster image can be adjusted 
+in the setting GRABIMG_CMD.
+
+Cron setup for video conversion
+...............................
+
+Converting a video is a time consuming operation that cannot be done during 
+the upload of the file. When the video is uploaded it gets the conversion 
+status "new". A Django management command is provided for running the 
+conversion of all videos with "new" status.
+
+    ./manage.py convert_video
+
+This command should typically be setup in a cron job so that in regular 
+intervals all newly uploaded videos get converted.
+
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer/
 .. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/
