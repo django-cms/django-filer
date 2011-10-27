@@ -115,14 +115,17 @@ FILER_PRIVATEMEDIA_FORMATS_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_FORMAT
 # formats recognized as video file formats (no leading dot)
 FILER_SOURCE_VIDEO_FORMATS = ('mp4', 'avi', 'wmv', 'mov', 'mpg')
 # formats to convert into (no leading dot)
-FILER_VIDEO_FORMATS = ('flv', 'mp4', 'ogv', 'webm')
+FILER_VIDEO_FORMATS = ('flv', 'mp4', 'webm')
 # command line for video checking of dimensions
 FFMPEG_CHECK_CMD = "ffmpeg -i %(input_file)s"
 # command line for video conversion
 FFMPEG_CMD = "ffmpeg -i %(input_file)s -y -b 2326k -ar 44100 -ab 224k -ac 2 -f %(format)s %(dimensions)s %(target_file)s"
-# dimensions of the converted videos - leave blank to keep the original video size
-FFMPEG_TARGET_DIMENSIONS = "640x480"
+# dimensions of the converted videos
+#maintain original video dimensions
+FFMPEG_TARGET_DIMENSIONS = ""
+#always change to given dimensions; use <width>x<height> format
+#FFMPEG_TARGET_DIMENSIONS = "640x480" 
 # argument for setting the size in ffmpeg
 FFMPEG_SIZE_ARGUMENT = "-s %(dimensions)s"
 # command line for grabbing preview image from video
-GRABIMG_CMD = "ffmpeg -y -i %(input_file)s -vframes 1 -ss 00:00:05 -an -vcodec png -f rawvideo %(dimensions)s %(target_file)s"
+GRABIMG_CMD = "ffmpeg -y -i %(input_file)s -vframes 1 -ss 00:00:02 -an -vcodec png -f rawvideo %(dimensions)s %(target_file)s"
