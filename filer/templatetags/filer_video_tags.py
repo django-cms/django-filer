@@ -7,20 +7,8 @@ register = Library()
 
 RE_DIMENSIONS = re.compile(r'(\d+)x(\d+)$')
 
-class FilerVideoNode(Node):
-    def __init__(self, source_var, opts, context_name=None):
-        self.source_var = source_var
-        self.opts = opts
-        self.context_name = context_name
-    
-    def render(self, context):
-        try:
-            source = self.source_var.resolve(context)
-        except VariableDoesNotExist:
-            return ''
-        
 
-def filer_video(source, dimensions=None):
+def filer_video(source, video_dimensions=None):
     """
     Creates HTML5 video tag with the alternative video formats and fallback to 
     flash if that format is available.
@@ -37,12 +25,12 @@ def filer_video(source, dimensions=None):
      the movie dimensions are used.
     """
     tag_syntax_error = False
-    if dimensions:
-        if type(dimensions) == types.TupleType:
-            if len(dimensions) != 2:
+    if video_dimensions:
+        if type(video_dimensions) == types.TupleType:
+            if len(video_dimensions) != 2:
                 tag_syntax_error = True
         else:
-            match = RE_DIMENSIONS.match(size)
+            match = RE_DIMENSIONS.match(video_dimensions)
             if not match or len(match.groups()) != 2:
                 tag_syntax_error = True
             else:
@@ -57,7 +45,6 @@ def filer_video(source, dimensions=None):
         raise TemplateSyntaxError("Invalid syntax. Expected "
             "'{%% %s source [dimensions] %%}'" % tag)
     return {'video': source, 'dimensions': dimensions}
-
 
 
 register.inclusion_tag('filer/video.html')(filer_video)

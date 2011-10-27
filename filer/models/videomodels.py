@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 import os
+import mimetypes
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer import settings as filer_settings
@@ -82,16 +83,17 @@ class Video(File):
     def original_format(self):
         url = self.file.storage.url(self.file.name)
         name, ext = os.path.splitext(self.file.name)
+        mimetype = mimetypes.guess_type(self.file.name)[0]
         format = ext.replace('.','')
-        return {'url':url, 'format':format}
+        return {'url':url, 'format':format, 'mimetype':mimetype}
 
     def formats_html5(self):
         """ Video formats supported by HTML5 browsers """
-        HTML5_FORMATS = ('mp4','ogv','webm')
+        HTML5_FORMATS = {'mp4':'video/mp4', 'ogv':'video/ogg','webm':'video/webm'}
         _formats = []
         for format, url in self.formats.items():
-            if format in HTML5_FORMATS:
-                _formats.append({'format':format, 'url':url})
+            if format in HTML5_FORMATS.keys():
+                _formats.append({'format':format, 'url':url, 'mimetype': HTML5_FORMATS[format]})
         return _formats
 
     def format_flash(self):
