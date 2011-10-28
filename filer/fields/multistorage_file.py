@@ -36,18 +36,21 @@ def generate_filename_multistorage(instance, filename):
 
 
 class FormatNameMixin(object):
+    def get_format_filepath(self, ext):
+        """ Returns the full file pathname for the given format """
+        return self.format_storage.path(self.get_format_name(ext))
+
     def get_format_name(self, ext):
+        """ Returns the local file path in the storage for the given format """
         return get_video_name(self.name, ext)
 
     def get_format_url(self, ext):
+        """ Returns the url for the given format """
         base_name = self.get_format_name(ext)
         if self.format_storage.exists(base_name):
             return self.format_storage.url(base_name)
         else:
             raise NameError
-
-    def get_poster_url(self):
-        return self.get_format_url('png')
 
 
 class FormatFieldFile(FieldFile):

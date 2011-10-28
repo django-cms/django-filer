@@ -72,10 +72,12 @@ class Video(File):
 
     @property
     def formats(self):
-        _formats = {}
+        _formats = []
         for ext in filer_settings.FILER_VIDEO_FORMATS:
             try:
-                _formats[ext] = self.file.get_format_url(ext)
+                url = self.file.get_format_url(ext)
+                filepath = self.file.get_format_filepath(ext)
+                _formats.append({'url': url, 'format':ext, 'filepath':filepath})
             except Exception, e:
                 pass
         return _formats
@@ -88,26 +90,44 @@ class Video(File):
         return {'url': url, 'format': fmt, 'mimetype': mimetype}
 
     def formats_html5(self):
-        """ Video formats supported by HTML5 browsers """
-        HTML5_FORMATS = {'mp4':'video/mp4', 'ogv':'video/ogg','webm':'video/webm'}
+        """ 
+        Subset of video formats to use with HTML5 browsers 
+        """
+        HTML5_FORMATS = {'mp4': 'video/mp4', 'ogv':'video/ogg', 'webm': 'video/webm'}
         _formats = []
-        for fmt, url in self.formats.items():
+        for entry in self.formats:
+            fmt = entry['format']
             if fmt in HTML5_FORMATS:
-                _formats.append({'format': fmt, 'url': url, 'mimetype': HTML5_FORMATS[fmt]})
+                _formats.append({'format': fmt, 'url': entry['url'], 'mimetype': HTML5_FORMATS[fmt]})
         return _formats
 
     def format_flash(self):
-        """ Returns flash video file if available """
-        return self.formats.get('flv', None)
+        """ 
+        Returns the flash video file if available 
+        """
+        for entry in self.formats:
+            if entry['format'] == 'flv':
+                return {'format': entry['format'], 'url': entry['url']}
+        return {}
 
     @property
     def poster(self):
+        """
+        Image file to use as poster in the video display
+        """
         try:
-            return self.file.get_poster_url()
+            ext = 'png'
+            url = self.file.get_format_url(ext)
+            filepath = self.file.get_format_filepath(ext)
+            return {'url': url, 'format':ext, 'filepath':filepath}
         except Exception, e:
-            return ""
+            return {'url': '', 'format':ext, 'filepath':''}
 
     def convert(self):
+        """
+        Conversion of video file to alternative formats and capture of 
+        poster image file
+        """
         original_path = self.file.storage.path(self.file.name)
         path = os.path.split(self.file.format_storage.path(self.file.name))[0]
         # loop in all

@@ -11,7 +11,7 @@ from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
 from filer import settings as filer_settings
-
+from filer.utils.video import check_ffmpeg_available
 
 
 class FilerApiTests(TestCase):
@@ -143,11 +143,19 @@ class FilerVideoApiTest(TestCase):
         self.client.login(username='admin', password='secret')
         self.video_name = 'video_test.mp4'
         self.video_path = os.path.join(os.path.dirname(__file__), 'mediafiles', self.video_name)
-    
+        self.is_ffmpeg_available = check_ffmpeg_available()
+        
     def tearDown(self):
         self.client.logout()
         for video in Video.objects.all():
-            video.delete()
+            self.delete_filer_video(video)
+
+    def delete_filer_video(self, video):
+        for entry in video.formats:
+            os.remove(entry['filepath'])
+        if video.poster.has_key('filepath') and video.poster['filepath']:
+            os.remove(video.poster['filepath'])
+        video.delete()
 
     def create_filer_video(self):
         djfile = DjangoFile(open(self.video_path), name=self.video_name)
@@ -163,7 +171,7 @@ class FilerVideoApiTest(TestCase):
         self.assertEqual(video.conversion_status, 'new')
         self.assertEqual(Video.objects.count(), 1)
         video = Video.objects.all()[0]
-        video.delete()
+        self.delete_filer_video(video)
         self.assertEqual(Video.objects.count(), 0)
     
     def test_upload_video_form(self):
@@ -177,3 +185,27 @@ class FilerVideoApiTest(TestCase):
             video = upoad_video_form.save()
         self.assertEqual(Video.objects.count(), 1)
         self.assertEqual(video.conversion_status, 'new')
+        self.delete_filer_video(video)
+    
+    def test_convert_video(self):
+        if not self.is_ffmpeg_available:
+            return
+        self.assertEqual(Video.objects.count(), 0)
+        video = self.create_filer_video()
+        video.save()
+        self.assertEqual(Video.objects.count(), 1)
+        self.assertEqual(video.width, 320)
+        self.assertEqual(video.height, 240)
+        old_setting = filer_settings.FILER_VIDEO_FORMATS
+        filer_settings.FILER_VIDEO_FORMATS = ('flv', 'mp4', 'webm')
+        video.convert()
+        self.assertEqual(video.original_format()['url'].endswith('video_test.mp4'), True)
+        formats = [ entry['format'] for entry in video.formats ]
+        self.assertEqual('webm' in formats, True)
+        self.assertEqual('flv' in formats, True)
+        self.assertNotEqual(video.format_flash(), None)
+        self.assertEqual(video.poster['url'].endswith('png'), True)
+        video = Video.objects.all()[0]
+        self.delete_filer_video(video)
+        self.assertEqual(Video.objects.count(), 0)
+        filer_settings.FILER_VIDEO_FORMATS = old_setting
