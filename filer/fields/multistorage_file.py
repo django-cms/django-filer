@@ -2,11 +2,12 @@
 import os
 from django.core.files.base import File
 from django.core.files.storage import Storage
+from django.db.models.fields.files import FieldFile
 from easy_thumbnails import fields as easy_thumbnails_fields, \
     files as easy_thumbnails_files
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
-
+from filer.utils.video import get_format_name as get_video_name
 
 STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,
@@ -36,22 +37,24 @@ def generate_filename_multistorage(instance, filename):
 
 class FormatNameMixin(object):
     def get_format_name(self, ext):
-        path, source_filename = os.path.split(self.name)
-        filename, extension = os.path.splitext(source_filename)
-        newfilename = '%s.%s' % (filename, ext)
-        return os.path.join(path, newfilename)
+        return get_video_name(self.name, ext)
 
     def get_format_url(self, ext):
         base_name = self.get_format_name(ext)
         if self.format_storage.exists(base_name):
-            return os.path.join(self.format_storage.base_url, base_name)
+            return self.format_storage.url(base_name)
         else:
             raise NameError
 
     def get_poster_url(self):
-        original_path, filename = os.path.split(self.name)
-        basename = os.path.splitext(filename)[0]
-        return self.format_storage.url(os.path.join(original_path, basename + '.png'))
+        return self.get_format_url('png')
+
+
+class FormatFieldFile(FieldFile):
+    """Used when serving formats through serve_protected_format"""
+    def __init__(self, instance, field, name, storage):
+        super(FormatFieldFile, self).__init__(instance, field, name)
+        self.storage = storage
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,
@@ -94,10 +97,6 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         else:
             return self.format_storages['private']
 
-    def get_format(self, options, save=True):
-        #wtf is opaque vs transparent???
-        pass
-
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
@@ -112,5 +111,3 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
                                       verbose_name=verbose_name, name=name,
                                       upload_to=generate_filename_multistorage,
                                       storage=None, **kwargs)
-
-    # make versions devia estar aki!!!!

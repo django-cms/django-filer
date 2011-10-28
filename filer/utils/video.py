@@ -12,6 +12,18 @@ import traceback
 from filer import settings as filer_settings
 
 FFMPEG_DIMENSIONS_RE = re.compile(r'Stream.*Video.*([0-9]{3,})x([0-9]{3,})')
+LAST_UNDERSCORE_RE = re.compile(r'\_(?=[^_]*$)')
+
+def get_format_name(name, ext):
+    path, source_filename = os.path.split(name)
+    filename, original_ext = os.path.splitext(source_filename)
+    newfilename = u'%s%s.%s' % (filename, original_ext.replace('.', '_'), ext)
+    return os.path.join(path, newfilename)
+
+
+def format_to_original_filename(name):
+    filename, fmt_ext = os.path.splitext(name)
+    return LAST_UNDERSCORE_RE.sub('.', filename)
 
 
 def get_dimensions(sourcefile):
@@ -61,8 +73,7 @@ def convert_video(sourcefile, path, extension, dimensions):
     original_path, filename = os.path.split(sourcefile)
     if sourcefile is None:
         return True, "Sourcefile does not exist"
-    filebase, original_ext = os.path.splitext(filename)
-    convfilename = "%s.%s" % (filebase, extension)
+    convfilename = get_format_name(filename, extension)
     targetfile = os.path.join(path, convfilename)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -80,8 +91,7 @@ def grab_poster(sourcefile, path, dimensions):
     original_path, filename = os.path.split(sourcefile)
     if sourcefile is None:
         return True, "Sourcefile does not exist"
-    filebase, original_ext = os.path.splitext(filename)
-    thumbnailfilename = "%s.png" % filebase
+    thumbnailfilename = get_format_name(filename, 'png')
     thumbnailfile = os.path.join(path, thumbnailfilename)
     if not os.path.exists(path):
         os.makedirs(path)
