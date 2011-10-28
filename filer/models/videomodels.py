@@ -2,10 +2,11 @@
 import os
 import mimetypes
 from django.db import models
+from django.core.files.base import ContentFile
 from django.utils.translation import ugettext_lazy as _
 from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.utils.video import convert_video, grab_poster, get_dimensions
+from filer.utils.video import convert_video, grab_poster, get_dimensions, get_format_name
 
 
 VIDEO_STATUS_TYPE = (
@@ -149,3 +150,83 @@ class Video(File):
         error = error or res
         output.append(out)
         return error, "\n".join(output)
+
+    def _move_file(self):
+        """
+        Move the file from src to dst.
+        """
+        src_file_name = self.file.name
+        dst_file_name = self._meta.get_field('file').generate_filename(
+                                                self, self.original_filename)
+
+        if self.is_public:
+            src_storage = self.file.storages['private']
+            dst_storage = self.file.storages['public']
+            src_fmt_storage = self.file.format_storages['private']
+            dst_fmt_storage = self.file.format_storages['public']
+        else:
+            src_storage = self.file.storages['public']
+            dst_storage = self.file.storages['private']
+            src_fmt_storage = self.file.format_storages['public']
+            dst_fmt_storage = self.file.format_storages['private']
+        extensions = [f['format'] for f in self.formats]
+        if self.poster['filepath']:
+            extensions.append('png')
+
+        # delete the thumbnail
+        # We are toggling the is_public to make sure that easy_thumbnails can
+        # delete the thumbnails
+        self.is_public = not self.is_public
+        self.file.delete_thumbnails()
+        self.is_public = not self.is_public
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
+        src_file = src_storage.open(src_file_name)
+        src_file.open()
+        newfile = dst_storage.save(dst_file_name,
+                                     ContentFile(src_file.read()))
+        src_storage.delete(src_file_name)
+        for ext in extensions:
+            src_fmt_name = get_format_name(src_file_name, ext)
+            dst_fmt_name = get_format_name(newfile, ext)
+            src_file = src_fmt_storage.open(src_fmt_name)
+            src_file.open()
+            dst_fmt_storage.save(dst_fmt_name,
+                                         ContentFile(src_file.read()))
+            src_file.close()
+            src_fmt_storage.delete(src_fmt_name)
+        self.file = newfile
+
+    def _copy_file(self, destination, overwrite=False):
+        """
+        Copies the file to a destination files and returns it.
+        """
+        if overwrite:
+            # If the destination file already exists default storage backend
+            # does not overwrite it but generates another filename.
+            # TODO: Find a way to override this behavior.
+            raise NotImplementedError
+
+        src_file_name = self.file.name
+        stg_type = 'public' if self.is_public else 'private'
+        storage = self.file.storages[stg_type]
+        fmt_storage = self.file.format_storages[stg_type]
+        extensions = [f['format'] for f in self.formats]
+        if self.poster['filepath']:
+            extensions.append('png')
+
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
+        src_file = storage.open(src_file_name)
+        src_file.open()
+        newfile = storage.save(destination, ContentFile(src_file.read()))
+
+        for ext in extensions:
+            src_fmt_name = get_format_name(src_file_name, ext)
+            dst_fmt_name = get_format_name(newfile, ext)
+            src_file = fmt_storage.open(src_fmt_name)
+            src_file.open()
+            fmt_storage.save(dst_fmt_name, ContentFile(src_file.read()))
+            src_file.close()
+
+        return newfile

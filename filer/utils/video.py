@@ -15,20 +15,20 @@ FFMPEG_DIMENSIONS_RE = re.compile(r'Stream.*Video.*([0-9]{3,})x([0-9]{3,})')
 LAST_UNDERSCORE_RE = re.compile(r'\_(?=[^_]*$)')
 
 def get_format_name(name, ext):
-    path, source_filename = os.path.split(name)
-    filename, original_ext = os.path.splitext(source_filename)
-    newfilename = u'%s%s.%s' % (filename, original_ext.replace('.', '_'), ext)
-    return os.path.join(path, newfilename)
+    path, original_ext = os.path.splitext(name)
+    return u'%s%s.%s' % (path, original_ext.replace('.', '_'), ext)
 
 
 def format_to_original_filename(name):
     filename, fmt_ext = os.path.splitext(name)
     return LAST_UNDERSCORE_RE.sub('.', filename)
 
+
 def check_ffmpeg_available():
     status, output = execute_ffmpeg_command('ffmpeg','')
     res = re.search('usage: ffmpeg', output)
     return True if res else False
+
 
 def get_dimensions(sourcefile):
     """Returns the video dimensions for a video file"""
