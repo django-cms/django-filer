@@ -22,6 +22,10 @@ File model is used.
 
    Default admin widget for file fields
 
+Uploaded videos can be automatically converted to multiple formats making it 
+transparent the display of videos in formats HTML5 browsers support with 
+fallback to flash for older browsers.
+
 Getting help
 ------------
 

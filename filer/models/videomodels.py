@@ -90,7 +90,9 @@ class Video(File):
         return {'url': url, 'format': fmt, 'mimetype': mimetype}
 
     def formats_html5(self):
-        """ Video formats supported by HTML5 browsers """
+        """ 
+        Subset of video formats to use with HTML5 browsers 
+        """
         HTML5_FORMATS = {'mp4':'video/mp4', 'ogv':'video/ogg','webm':'video/webm'}
         _formats = []
         for entry in self.formats:
@@ -100,7 +102,9 @@ class Video(File):
         return _formats
 
     def format_flash(self):
-        """ Returns flash video file if available """
+        """ 
+        Returns the flash video file if available 
+        """
         for entry in self.formats:
             if entry['format'] == 'flv':
                 return {'format': entry['format'], 'url': entry['url']}
@@ -108,6 +112,9 @@ class Video(File):
 
     @property
     def poster(self):
+        """
+        Image file to use as poster in the video display
+        """
         try:
             ext = 'png'
             url = self.file.get_format_url(ext)
@@ -117,6 +124,10 @@ class Video(File):
             return {'url': '', 'format':ext, 'filepath':''}
 
     def convert(self):
+        """
+        Conversion of video file to alternative formats and capture of 
+        poster image file
+        """
         original_path = self.file.storage.path(self.file.name)
         path = os.path.split(self.file.format_storage.path(self.file.name))[0]
         # loop in all
