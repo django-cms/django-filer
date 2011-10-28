@@ -13,6 +13,10 @@ from filer import settings as filer_settings
 
 FFMPEG_DIMENSIONS_RE = re.compile(r'Stream.*Video.*([0-9]{3,})x([0-9]{3,})')
 
+def check_ffmpeg_available():
+    status, output = execute_ffmpeg_command('ffmpeg','')
+    res = re.search('usage: ffmpeg', output)
+    return True if res else False
 
 def get_dimensions(sourcefile):
     """Returns the video dimensions for a video file"""

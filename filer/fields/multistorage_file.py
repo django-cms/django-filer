@@ -35,23 +35,23 @@ def generate_filename_multistorage(instance, filename):
 
 
 class FormatNameMixin(object):
+    
+    def get_format_filepath(self, ext):
+        """ Returns the full file pathname for the given format """
+        return self.format_storage.path(self.get_format_name(ext))
+    
     def get_format_name(self, ext):
-        path, source_filename = os.path.split(self.name)
-        filename, extension = os.path.splitext(source_filename)
-        newfilename = '%s.%s' % (filename, ext)
-        return os.path.join(path, newfilename)
+        """ Returns the local file path in the storage for the given format """
+        file_base, file_ext = os.path.splitext(self.name)
+        return '%s.%s' % (file_base, ext)
 
     def get_format_url(self, ext):
+        """ Returns the url for the given format """
         base_name = self.get_format_name(ext)
         if self.format_storage.exists(base_name):
             return os.path.join(self.format_storage.base_url, base_name)
         else:
             raise NameError
-
-    def get_poster_url(self):
-        original_path, filename = os.path.split(self.name)
-        basename = os.path.splitext(filename)[0]
-        return self.format_storage.url(os.path.join(original_path, basename + '.png'))
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,

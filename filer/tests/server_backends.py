@@ -30,8 +30,10 @@ class BaseServerBackendTestCase(TestCase):
         for location in (
                 filer_settings.FILER_PUBLICMEDIA_STORAGE.location,
                 filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_STORAGE.location,
+                filer_settings.FILER_PUBLICMEDIA_FORMATS_STORAGE.location,
                 filer_settings.FILER_PRIVATEMEDIA_STORAGE.location,
-                filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE.location):
+                filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE.location,
+                filer_settings.FILER_PRIVATEMEDIA_FORMATS_STORAGE.location):
             shutil.rmtree(location,ignore_errors=True)
 
 

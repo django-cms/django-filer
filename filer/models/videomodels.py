@@ -72,10 +72,12 @@ class Video(File):
 
     @property
     def formats(self):
-        _formats = {}
+        _formats = []
         for ext in filer_settings.FILER_VIDEO_FORMATS:
             try:
-                _formats[ext] = self.file.get_format_url(ext)
+                url = self.file.get_format_url(ext)
+                filepath = self.file.get_format_filepath(ext)
+                _formats.append({'url': url, 'format':ext, 'filepath':filepath})
             except Exception, e:
                 pass
         return _formats
@@ -91,21 +93,28 @@ class Video(File):
         """ Video formats supported by HTML5 browsers """
         HTML5_FORMATS = {'mp4':'video/mp4', 'ogv':'video/ogg','webm':'video/webm'}
         _formats = []
-        for fmt, url in self.formats.items():
-            if fmt in HTML5_FORMATS:
-                _formats.append({'format': fmt, 'url': url, 'mimetype': HTML5_FORMATS[format]})
+        for entry in self.formats:
+            format = entry['format']
+            if format in HTML5_FORMATS:
+                _formats.append({'format': format, 'url': entry['url'], 'mimetype': HTML5_FORMATS[format]})
         return _formats
 
     def format_flash(self):
         """ Returns flash video file if available """
-        return self.formats.get('flv', None)
+        for entry in self.formats:
+            if entry['format'] == 'flv':
+                return {'format': entry['format'], 'url': entry['url']}
+        return {}
 
     @property
     def poster(self):
         try:
-            return self.file.get_poster_url()
+            ext = 'png'
+            url = self.file.get_format_url(ext)
+            filepath = self.file.get_format_filepath(ext)
+            return {'url': url, 'format':ext, 'filepath':filepath}
         except Exception, e:
-            return ""
+            return {'url': '', 'format':ext, 'filepath':''}
 
     def convert(self):
         original_path = self.file.storage.path(self.file.name)
