@@ -178,7 +178,7 @@ class Video(File):
         extensions = [f['format'] for f in self.formats]
         if self.poster['filepath']:
             extensions.append('png')
-            self.is_public = not self.is_public
+        self.is_public = not self.is_public
         # This is needed because most of the remote File Storage backend do not
         # open the file.
         src_file = src_storage.open(src_file_name)
