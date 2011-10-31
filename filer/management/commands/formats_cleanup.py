@@ -1,7 +1,7 @@
 import os
 from django.core.management.base import NoArgsCommand
 from filer.models.videomodels import Video
-
+from filer.utils.video import format_to_original_filename
 
 class Command(NoArgsCommand):
     help = "Deletes video formats that no longer have an original file."
@@ -21,8 +21,8 @@ class Command(NoArgsCommand):
                     for root, dirs, files in os.walk(top, topdown=False):
                         subpath = os.path.relpath(root, top)
                         orig_dirs, orig_files = original_storage.listdir(subpath)
-                        orig_files = set([os.path.splitext(of)[0] for of in orig_files])
+                        orig_files = set(orig_files)
                         for f in files:
-                            if os.path.splitext(f)[0] not in orig_files:
+                            if format_to_original_filename(f) not in orig_files:
                                 p = format_storage.path(os.path.join(subpath, f))
                                 format_storage.delete(p)
