@@ -169,16 +169,16 @@ class Video(File):
             dst_storage = self.file.storages['private']
             src_fmt_storage = self.file.format_storages['public']
             dst_fmt_storage = self.file.format_storages['private']
-        extensions = [f['format'] for f in self.formats]
-        if self.poster['filepath']:
-            extensions.append('png')
-
+        
         # delete the thumbnail
         # We are toggling the is_public to make sure that easy_thumbnails can
         # delete the thumbnails
         self.is_public = not self.is_public
         self.file.delete_thumbnails()
-        self.is_public = not self.is_public
+        extensions = [f['format'] for f in self.formats]
+        if self.poster['filepath']:
+            extensions.append('png')
+            self.is_public = not self.is_public
         # This is needed because most of the remote File Storage backend do not
         # open the file.
         src_file = src_storage.open(src_file_name)
