@@ -104,35 +104,40 @@ To crop an image and respect the subject location::
 video conversion with ffmpeg
 ............................
 
-If installed ffmpeg is used for conversion of uploaded videos in multiple 
-formats, resizing of video dimensions and capture of poster image from the 
-video.
+If installed, `ffmpeg`_ can be used for the conversion of uploaded videos into multiple
+formats, resizing of video dimensions and capture of a screenshot to use as a poster image.
 
-The list of accepted video formats for upload is set in the setting bellow. 
-When using ffmpeg this list should match the formats available for conversion. 
+The list of accepted video formats for upload is defined in the ``FILER_SOURCE_VIDEO_FORMATS`` setting. Uploaded
+files with these extensions (do not include the leading dot) will be recognized by django-filer as video files. 
+When using ffmpeg this list should match the formats available for conversion.
 
     FILER_SOURCE_VIDEO_FORMATS = ('mp4', 'avi', 'wmv', 'mov', 'mpg')
 
-With ffmpeg available, when a file is upload it is converted to the formats in 
-the output formats list. 
+With `ffmpeg`_ available, django-filer is able to automatically convert uploaded videos to other formats. To define
+the list of formats to which thry should be conevrted to, set the ``FILER_VIDEO_FORMATS`` setting to a list of 
+the correponding file extensions.
 
     FILER_VIDEO_FORMATS = ('flv', 'mp4','webm')
 
 By default the videos are converted maintaining the original video dimensions. 
-For each video, in the admin interface it is possible to choose different 
-dimensions, but if all videos should be resized to given dimensions, the 
-setting bellow can be used.
+It is possible to choose different dimensions in the admin interface [REF] for each video,
+but if all videos should be resized to a preset dimension, the ``FFMPEG_TARGET_DIMENSIONS``
+setting can be used.
 
     FFMPEG_TARGET_DIMENSIONS = "640x480" 
 
-Parameters regarding the conversion quality can be adjusted in the setting 
-FFMPEG_CMD, and parameters for the capture of the poster image can be adjusted 
-in the setting GRABIMG_CMD.
+The value must be a string in the format "<width>x<height>". Leave it blank to revert to
+the default behaviour.
+
+Parameters regarding the conversion quality can be adjusted in the setting
+``FFMPEG_CMD``, and parameters for the capture of the poster image can be adjusted
+in the setting ``GRABIMG_CMD``. Check the `ffmpeg`_ documentation for a list of available
+options.
 
 Cron setup for video conversion
-...............................
+-------------------------------
 
-Converting a video is a time consuming operation that cannot be done during 
+Converting a video is a time consuming operation that cannot be done during
 the upload of the file. When the video is uploaded it gets the conversion 
 status "new". A Django management command is provided for running the 
 conversion of all videos with "new" status.
