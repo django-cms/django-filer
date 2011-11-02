@@ -127,7 +127,7 @@ Defaults to `('mp4', 'avi', 'wmv', 'mov', 'mpg')`
 -----------------------
 
 Formats that uploaded video files will be automatically converted to (if the cronjob is set and
-ffmpeg available REF).
+ffmpeg available).
 
 Defaults to `('flv', 'mp4', 'webm')`
 

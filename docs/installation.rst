@@ -109,22 +109,21 @@ formats, resizing of video dimensions and capture of a screenshot to use as a po
 
 The list of accepted video formats for upload is defined in the ``FILER_SOURCE_VIDEO_FORMATS`` setting. Uploaded
 files with these extensions (do not include the leading dot) will be recognized by django-filer as video files. 
-When using ffmpeg this list should match the formats available for conversion.
+When using ffmpeg, this list should match the formats available for conversion.
 
     FILER_SOURCE_VIDEO_FORMATS = ('mp4', 'avi', 'wmv', 'mov', 'mpg')
 
-With `ffmpeg`_ available, django-filer is able to automatically convert uploaded videos to other formats. To define
-the list of formats to which thry should be conevrted to, set the ``FILER_VIDEO_FORMATS`` setting to a list of 
-the correponding file extensions.
+To define the list of formats to which video files should be converted to, set the ``FILER_VIDEO_FORMATS`` setting to a list of
+corresponding file extensions.
 
     FILER_VIDEO_FORMATS = ('flv', 'mp4','webm')
 
 By default the videos are converted maintaining the original video dimensions. 
-It is possible to choose different dimensions in the admin interface [REF] for each video,
+It is possible to :ref:`choose different dimensions in the admin interface<video_dimensions_manually>` for each video,
 but if all videos should be resized to a preset dimension, the ``FFMPEG_TARGET_DIMENSIONS``
 setting can be used.
 
-    FFMPEG_TARGET_DIMENSIONS = "640x480" 
+    FFMPEG_TARGET_DIMENSIONS = "640x480"
 
 The value must be a string in the format "<width>x<height>". Leave it blank to revert to
 the default behaviour.
@@ -133,6 +132,8 @@ Parameters regarding the conversion quality can be adjusted in the setting
 ``FFMPEG_CMD``, and parameters for the capture of the poster image can be adjusted
 in the setting ``GRABIMG_CMD``. Check the `ffmpeg`_ documentation for a list of available
 options.
+
+.. _cron-video:
 
 Cron setup for video conversion
 -------------------------------
