@@ -163,7 +163,13 @@ class FilerVideoApiTest(TestCase):
                                      original_filename=self.video_name,
                                      file=djfile)
         return video
-        
+
+    def convert_video(self, video, video_formats=('flv', 'mp4', 'webm')):
+        old_setting = filer_settings.FILER_VIDEO_FORMATS
+        filer_settings.FILER_VIDEO_FORMATS = video_formats 
+        video.convert()
+        filer_settings.FILER_VIDEO_FORMATS = old_setting
+
     def test_create_and_delete_video(self):
         self.assertEqual(Video.objects.count(), 0)
         video = self.create_filer_video()
@@ -188,6 +194,9 @@ class FilerVideoApiTest(TestCase):
         self.delete_filer_video(video)
     
     def test_convert_video(self):
+        """
+        Test conversion of the video if ffmpeg is available
+        """
         if not self.is_ffmpeg_available:
             return
         self.assertEqual(Video.objects.count(), 0)
@@ -196,9 +205,7 @@ class FilerVideoApiTest(TestCase):
         self.assertEqual(Video.objects.count(), 1)
         self.assertEqual(video.width, 320)
         self.assertEqual(video.height, 240)
-        old_setting = filer_settings.FILER_VIDEO_FORMATS
-        filer_settings.FILER_VIDEO_FORMATS = ('flv', 'mp4', 'webm')
-        video.convert()
+        self.convert_video(video)
         self.assertEqual(video.original_format()['url'].endswith('video_test.mp4'), True)
         formats = [ entry['format'] for entry in video.formats ]
         self.assertEqual('webm' in formats, True)
@@ -208,4 +215,24 @@ class FilerVideoApiTest(TestCase):
         video = Video.objects.all()[0]
         self.delete_filer_video(video)
         self.assertEqual(Video.objects.count(), 0)
-        filer_settings.FILER_VIDEO_FORMATS = old_setting
+
+    def test_file_move_location(self):
+        """
+        Test the method that move a file between filer_public, filer_private
+        and vice et versa, checking that formats are also moved together
+        """
+        video = self.create_filer_video()
+        video.is_public = False
+        video.save()
+        self.assertTrue(video.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
+        #convert the video to create the alternative formats
+        if self.is_ffmpeg_available:
+            self.convert_video(video)
+            self.assertTrue(video.file.get_format_filepath('mp4').startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
+        video.is_public = True
+        video.save()
+        self.assertTrue(video.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
+        if self.is_ffmpeg_available:
+            self.assertTrue(video.file.get_format_filepath('mp4').startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
+        self.delete_filer_video(video)
+    
