@@ -61,8 +61,8 @@ class Video(File):
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        if not ( self.original_width or self.original_height or \
-                 self.width or self.height ):
+        if not (self.original_width or self.original_height or \
+                 self.width or self.height):
             self.set_initial_dimensions()
         super(Video, self).save(*args, **kwargs)
 
@@ -78,7 +78,7 @@ class Video(File):
             try:
                 url = self.file.get_format_url(ext)
                 filepath = self.file.get_format_filepath(ext)
-                _formats.append({'url': url, 'format':ext, 'filepath':filepath})
+                _formats.append({'url': url, 'format': ext, 'filepath': filepath})
             except Exception, e:
                 pass
         return _formats
@@ -91,10 +91,10 @@ class Video(File):
         return {'url': url, 'format': fmt, 'mimetype': mimetype}
 
     def formats_html5(self):
-        """ 
-        Subset of video formats to use with HTML5 browsers 
         """
-        HTML5_FORMATS = {'mp4': 'video/mp4', 'ogv':'video/ogg', 'webm': 'video/webm'}
+        Subset of video formats to use with HTML5 browsers
+        """
+        HTML5_FORMATS = {'mp4': 'video/mp4', 'ogv': 'video/ogg', 'webm': 'video/webm'}
         _formats = []
         for entry in self.formats:
             fmt = entry['format']
@@ -103,8 +103,8 @@ class Video(File):
         return _formats
 
     def format_flash(self):
-        """ 
-        Returns the flash video file if available 
+        """
+        Returns the flash video file if available
         """
         for entry in self.formats:
             if entry['format'] == 'flv':
@@ -120,13 +120,13 @@ class Video(File):
             ext = 'png'
             url = self.file.get_format_url(ext)
             filepath = self.file.get_format_filepath(ext)
-            return {'url': url, 'format':ext, 'filepath':filepath}
+            return {'url': url, 'format': ext, 'filepath': filepath}
         except Exception, e:
-            return {'url': '', 'format':ext, 'filepath':''}
+            return {'url': '', 'format': ext, 'filepath': ''}
 
     def convert(self):
         """
-        Conversion of video file to alternative formats and capture of 
+        Conversion of video file to alternative formats and capture of
         poster image file
         """
         original_path = self.file.storage.path(self.file.name)
@@ -169,7 +169,7 @@ class Video(File):
             dst_storage = self.file.storages['private']
             src_fmt_storage = self.file.format_storages['public']
             dst_fmt_storage = self.file.format_storages['private']
-        
+
         # delete the thumbnail
         # We are toggling the is_public to make sure that easy_thumbnails can
         # delete the thumbnails
