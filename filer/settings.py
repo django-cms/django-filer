@@ -124,7 +124,7 @@ FFMPEG_CMD = "ffmpeg -i %(input_file)s -y -b 2326k -ar 44100 -ab 224k -ac 2 -f %
 #maintain original video dimensions
 FFMPEG_TARGET_DIMENSIONS = ""
 #always change to given dimensions; use <width>x<height> format
-#FFMPEG_TARGET_DIMENSIONS = "640x480" 
+#FFMPEG_TARGET_DIMENSIONS = "640x480"
 # argument for setting the size in ffmpeg
 FFMPEG_SIZE_ARGUMENT = "-s %(dimensions)s"
 # command line for grabbing preview image from video

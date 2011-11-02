@@ -3,6 +3,7 @@ from django.core.management.base import NoArgsCommand
 from filer.models.videomodels import Video
 from filer.utils.video import format_to_original_filename
 
+
 class Command(NoArgsCommand):
     help = "Deletes video formats that no longer have an original file."
     requires_model_validation = False

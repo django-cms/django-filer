@@ -17,16 +17,16 @@ class VideoAdmin(FileAdmin):
         FileAdmin.fieldsets[0],
         (_('Advanced'), {
             'fields': ('default_alt_text', 'default_caption',
-                       'author', 'file', 'sha1',),
-            'classes': ('collapse',),
+                       'author', 'file', 'sha1', ),
+            'classes': ('collapse', ),
         }),
         (_('Conversion'), {
-            'fields': ('conversion_status', 'height','width',
-                       'conversion_output',),
-            'classes': ('collapse',),
+            'fields': ('conversion_status', 'height', 'width',
+                       'conversion_output', ),
+            'classes': ('collapse', ),
         })
     )
-    
+
     def render_change_form(self, request, context, *args, **kwargs):
         video = Video.objects.get(pk=context['object_id'])
         context['adminform'].form.fields['width'].help_text = _('Uploaded video width %s px') % video.original_width
