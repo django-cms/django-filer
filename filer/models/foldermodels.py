@@ -88,9 +88,9 @@ class Folder(models.Model, mixins.IconsMixin):
     _icon = 'plainfolder'
     
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name=_('name'))
     
-    owner = models.ForeignKey(auth_models.User, related_name='filer_owned_folders', null=True, blank=True)
+    owner = models.ForeignKey(auth_models.User, related_name='filer_owned_folders', null=True, blank=True, verbose_name=_('owner'))
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
@@ -167,6 +167,8 @@ class Folder(models.Model, mixins.IconsMixin):
     def __unicode__(self):
         return u"%s" % (self.name,)
     class Meta:
+        verbose_name = _('Folder')
+        verbose_name_plural = _('Folders')
         unique_together = (('parent','name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing", "Can use directory listing"),)
@@ -188,7 +190,7 @@ class FolderPermission(models.Model):
         (THIS, _('this item only') ),
         (CHILDREN, _('this item and all children') ),
     )
-    folder = models.ForeignKey(Folder, null=True, blank=True)
+    folder = models.ForeignKey(Folder, null=True, blank=True, verbose_name=_("folder"))
     
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=0)
     user = models.ForeignKey(auth_models.User, related_name="filer_folder_permissions", verbose_name=_("user"), blank=True, null=True)

@@ -27,8 +27,8 @@ class FileManager(models.Manager):
 
 class File(models.Model, mixins.IconsMixin):
     _icon = "file"
-    folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True)
-    file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255)
+    folder = models.ForeignKey(Folder, related_name='all_files', null=True, blank=True, verbose_name=_('folder'))
+    file = ThumbnailerField(upload_to=get_directory_name, null=True, blank=True, max_length=255, verbose_name=_('file'))
     _file_type_plugin_name = models.CharField("file_type_plugin_name", max_length=128, null=True, blank=True, editable=False)
     _file_size = models.IntegerField(null=True, blank=True)
     
@@ -37,15 +37,15 @@ class File(models.Model, mixins.IconsMixin):
     has_all_mandatory_data = models.BooleanField(default=False, editable=False)
     
     original_filename = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Name'))
-    description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
+    name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('name'))
+    description = models.TextField(null=True, blank=True, verbose_name=_('description'))
     
     owner = models.ForeignKey(auth_models.User, related_name='owned_%(class)ss', null=True, blank=True, verbose_name=_('Owner'))
     
     uploaded_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False, verbose_name=_('is public'))
     
     objects = FileManager()
     
