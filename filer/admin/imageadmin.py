@@ -39,7 +39,7 @@ class ImageAdmin(FileAdmin):
         FileAdmin.fieldsets[0],
         FileAdmin.fieldsets[1],
         FileAdmin.fieldsets[2],
-        ('Subject Location', {
+        (_('Subject Location'), {
             'fields': ('subject_location',),
             'classes': ('collapse',),
         }),
