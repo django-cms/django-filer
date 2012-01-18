@@ -5,6 +5,10 @@ from filer.admin.fileadmin import FileAdmin
 from filer.admin.clipboardadmin import ClipboardAdmin
 from filer.admin.imageadmin import ImageAdmin
 
+from django.utils.translation import ugettext_lazy as _
+
+# in order to generate proper localization messages
+_("filer")
 
 admin.site.register([FolderPermission,])
 #admin.site.register([Folder,])
