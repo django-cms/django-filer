@@ -1,0 +1,469 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-01-18 21:16+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Petr Filipsky <philodej@gmail.com>\n"
+"Language-Team: Czech <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+
+#: admin/__init__.py:11
+msgid "filer"
+msgstr "Správce souborů"
+
+#: admin/fileadmin.py:36
+msgid "Advanced"
+msgstr "Rozšířené"
+
+#: admin/imageadmin.py:10
+msgid "Subject location"
+msgstr "Umístění subjektu"
+
+#: admin/imageadmin.py:10
+msgid "Location of the main subject of the scene."
+msgstr "Umístění hlavního subjektu na scéně/obrázku"
+
+#: admin/imageadmin.py:42
+msgid "Subject Location"
+msgstr "Umístění subjektu"
+
+#: fields/file.py:47
+msgid "file missing!"
+msgstr "soubor nenalezen!"
+
+#: fields/file.py:54 fields/file.py:55 fields/folder.py:43
+msgid "Lookup"
+msgstr "Vyhledávání"
+
+#: fields/file.py:57 fields/folder.py:48
+msgid "Clear"
+msgstr "Smazat"
+
+#: models/clipboardmodels.py:23
+#: templates/admin/filer/tools/clipboard/clipboard.html:5
+msgid "Clipboard"
+msgstr "Schránka"
+
+#: models/clipboardmodels.py:30
+msgid "Clipboard item"
+msgstr "Položka ve schránce"
+
+#: models/clipboardmodels.py:31
+msgid "Clipboard items"
+msgstr "Položky ve schránce"
+
+#: models/filemodels.py:30 models/foldermodels.py:193
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "folder"
+msgstr "složka"
+
+#: models/filemodels.py:31
+msgid "file"
+msgstr "soubor"
+
+#: models/filemodels.py:40 models/foldermodels.py:91
+msgid "name"
+msgstr "jméno"
+
+#: models/filemodels.py:41
+msgid "description"
+msgstr "popis"
+
+#: models/filemodels.py:43
+#: templates/admin/filer/folder/directory_table.html:25
+#: templates/admin/filer/folder/directory_table.html:40
+msgid "Owner"
+msgstr "Vlastník"
+
+#: models/filemodels.py:48
+msgid "is public"
+msgstr "je veřejný"
+
+#: models/filemodels.py:214
+msgid "File"
+msgstr "Soubor"
+
+#: models/filemodels.py:215
+msgid "Files"
+msgstr "Soubory"
+
+#: models/foldermodels.py:93
+msgid "owner"
+msgstr "vlastník"
+
+#: models/foldermodels.py:170
+msgid "Folder"
+msgstr "Složka"
+
+#: models/foldermodels.py:171
+#: templates/admin/filer/folder/directory_table.html:25
+msgid "Folders"
+msgstr "Složky"
+
+#: models/foldermodels.py:189
+msgid "all items"
+msgstr "všechny položky"
+
+#: models/foldermodels.py:190
+msgid "this item only"
+msgstr "jen tato položka"
+
+#: models/foldermodels.py:191
+msgid "this item and all children"
+msgstr "tato položka včetně potomků"
+
+#: models/foldermodels.py:195
+msgid "type"
+msgstr "typ"
+
+#: models/foldermodels.py:196
+msgid "user"
+msgstr "uživatel"
+
+#: models/foldermodels.py:197
+msgid "group"
+msgstr "skupina"
+
+#: models/foldermodels.py:198
+msgid "everybody"
+msgstr "kdokoli"
+
+#: models/foldermodels.py:200
+msgid "can edit"
+msgstr "povolena editace"
+
+#: models/foldermodels.py:201
+msgid "can read"
+msgstr "povoleno čtení"
+
+#: models/foldermodels.py:202
+msgid "can add children"
+msgstr "povoleno přidávat potomky"
+
+#: models/foldermodels.py:228
+msgid "Folder Permission"
+msgstr "Práva složky"
+
+#: models/foldermodels.py:229
+msgid "Folder Permissions"
+msgstr "Práva složek"
+
+#: models/imagemodels.py:29
+msgid "date taken"
+msgstr "datum pořízení"
+
+#: models/imagemodels.py:188
+msgid "Image"
+msgstr "Obrázek"
+
+#: models/imagemodels.py:189
+#: templates/admin/filer/folder/directory_table.html:25
+msgid "Images"
+msgstr "Obrázky"
+
+#: models/virtualitems.py:36
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "unfiled files"
+msgstr "nezařazené soubory"
+
+#: models/virtualitems.py:46
+msgid "files with missing metadata"
+msgstr "soubory bez metadat"
+
+#: models/virtualitems.py:56 templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/image_filer/image_export_form.html:9
+msgid "root"
+msgstr "Kořen"
+
+#: templates/admin/filer/breadcrumbs.html:3
+msgid "Go back to admin homepage"
+msgstr "Jít zpět na administraci"
+
+#: templates/admin/filer/breadcrumbs.html:3
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/image_filer/image_export_form.html:6
+msgid "Home"
+msgstr "Domů"
+
+#: templates/admin/filer/breadcrumbs.html:4
+msgid "Go back to Filer app"
+msgstr "Jít zpět do Správce souborů"
+
+#: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/image_filer/image_export_form.html:7
+msgid "Filer"
+msgstr "Správce souborů"
+
+#: templates/admin/filer/breadcrumbs.html:5
+#: templates/image_filer/image_export_form.html:9
+msgid "Go back to root folder"
+msgstr "Jít zpět do kořenového adresáře"
+
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/image_filer/image_export_form.html:11
+#: templates/image_filer/image_export_form.html:13
+#, python-format
+msgid "Go back to '%(folder_name)s' folder"
+msgstr "Jít zpět do složky '%(folder_name)s'"
+
+#: templates/admin/filer/change_form.html:24
+msgid "duplicates"
+msgstr "duplikáty"
+
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:52
+#: templates/admin/filer/folder/directory_listing.html:61
+#: templates/image_filer/image_export_form.html:6
+#: templates/image_filer/image_export_form.html:7
+#: templates/image_filer/image_export_form.html:15
+msgid "Go back to"
+msgstr "Jít zpět do"
+
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/image_filer/image_export_form.html:6
+msgid "admin homepage"
+msgstr "Stránka administrace"
+
+#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/image/change_form.html:9
+msgid "History"
+msgstr "Historie"
+
+#: templates/admin/filer/folder/change_form.html:22
+#: templates/admin/filer/image/change_form.html:10
+msgid "View on site"
+msgstr "Zobrazení na webu"
+
+#: templates/admin/filer/folder/change_form.html:30
+#: templates/admin/filer/folder/directory_listing.html:62
+#: templates/admin/filer/folder/directory_listing.html:68
+#: templates/admin/filer/folder/directory_table.html:20
+msgid "Folder Icon"
+msgstr "Ikona složky"
+
+#: templates/admin/filer/folder/directory_listing.html:48
+msgid "Adds a new Folder"
+msgstr "Přidat novou složku"
+
+#: templates/admin/filer/folder/directory_listing.html:48
+#: templates/image_filer/include/export_dialog.html:34
+msgid "New Folder"
+msgstr "Nová složka"
+
+#: templates/admin/filer/folder/directory_listing.html:49
+msgid "Upload files"
+msgstr "Nahrát soubory"
+
+#: templates/admin/filer/folder/directory_listing.html:49
+msgid "Upload"
+msgstr "Nahrát"
+
+#: templates/admin/filer/folder/directory_listing.html:53
+msgid "Show images with missing metadata"
+msgstr "Zobrazit obrázky bez metadat"
+
+#: templates/admin/filer/folder/directory_listing.html:53
+msgid "Incomplete Images"
+msgstr "Nekompletní obrázky"
+
+#: templates/admin/filer/folder/directory_listing.html:54
+msgid "Show unfiled images"
+msgstr "Zobrazit nezařazené obrázky"
+
+#: templates/admin/filer/folder/directory_listing.html:54
+msgid "unfiled images"
+msgstr "nezařazené obrázky"
+
+#: templates/admin/filer/folder/directory_listing.html:61
+msgid "Go back to the parent folder"
+msgstr "Jít zpět do nadřazené složky"
+
+#: templates/admin/filer/folder/directory_listing.html:63
+#: templates/admin/filer/tools/search_form.html:18
+#, python-format
+msgid "1 folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] "1 složka"
+msgstr[1] "%(counter)s složky"
+msgstr[2] "%(counter)s složek"
+
+#: templates/admin/filer/folder/directory_listing.html:63
+#: templates/admin/filer/tools/search_form.html:19
+#, python-format
+msgid "1 file"
+msgid_plural "%(counter)s files"
+msgstr[0] "1 soubor"
+msgstr[1] "%(counter)s soubory"
+msgstr[2] "%(counter)s souborů"
+
+#: templates/admin/filer/folder/directory_listing.html:64
+msgid "Change current folder details"
+msgstr "Upravit detaily složky"
+
+#: templates/admin/filer/folder/directory_listing.html:64
+#: templates/admin/filer/folder/directory_table.html:23
+#: templates/admin/filer/folder/directory_table.html:37
+msgid "Change"
+msgstr "Změnit"
+
+#: templates/admin/filer/folder/directory_table.html:11
+#: templates/admin/filer/folder/new_folder_form.html:13
+msgid "Name"
+msgstr "Jméno"
+
+#: templates/admin/filer/folder/directory_table.html:20
+#: templates/admin/filer/folder/directory_table.html:23
+#: templates/admin/filer/folder/directory_table.html:24
+#, python-format
+msgid "Change '%(item_label)s' folder details"
+msgstr "Upravit detaily složky '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table.html:32
+msgid "Select this file"
+msgstr "Vybrat tento soubor"
+
+#: templates/admin/filer/folder/directory_table.html:34
+#: templates/admin/filer/folder/directory_table.html:37
+#: templates/admin/filer/folder/directory_table.html:38
+#, python-format
+msgid "Change '%(item_label)s' details"
+msgstr "Updavit detaily '%(item_label)s'"
+
+#: templates/admin/filer/folder/directory_table.html:49
+msgid "Move to clipboard"
+msgstr "Přesunout do schránky"
+
+#: templates/admin/filer/folder/directory_table.html:57
+msgid "there are no files or subfolders"
+msgstr "nejsou zde žádné soubory ani podsložky"
+
+#: templates/admin/filer/folder/new_folder_form.html:4
+msgid "Add new"
+msgstr "Přidat novou"
+
+#: templates/admin/filer/folder/new_folder_form.html:18
+msgid "Save"
+msgstr "Uložit"
+
+#: templates/admin/filer/image/change_form.html:21
+msgid "Full size preview"
+msgstr "Náhled v plné velikosti"
+
+#: templates/admin/filer/tools/search_form.html:8
+#: templates/admin/filer/tools/search_form.html:14
+msgid "Search"
+msgstr "Vyhledat"
+
+#: templates/admin/filer/tools/search_form.html:13
+msgid "Enter your search phrase here"
+msgstr "Sem napište vyhledávaný text"
+
+#: templates/admin/filer/tools/search_form.html:14
+msgid "Click here to"
+msgstr "Klikněte sem pro"
+
+#: templates/admin/filer/tools/search_form.html:14
+msgid "run search for entered phrase"
+msgstr "vyhledání zadaného textu"
+
+#: templates/admin/filer/tools/search_form.html:15
+msgid "Check it to"
+msgstr "Zaškrtněte pro"
+
+#: templates/admin/filer/tools/search_form.html:15
+#: templates/admin/filer/tools/search_form.html:16
+msgid "limit the search to current folder"
+msgstr "omezení vyhledávání jen na aktuální složku"
+
+#: templates/admin/filer/tools/search_form.html:18
+msgid "found"
+msgstr "nalezeno"
+
+#: templates/admin/filer/tools/search_form.html:18
+msgid "and"
+msgstr "a"
+
+#: templates/admin/filer/tools/search_form.html:19
+msgid "cancel search"
+msgstr "zrušit prohledávání"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:16
+msgid "Paste all items here"
+msgstr "Vložit všechny položky do aktuální složky"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "discard"
+msgstr "vyprázdnit"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:22
+msgid "Move all clipboard files to"
+msgstr "Přesunout celý obsah schránky do"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:28
+msgid "delete files"
+msgstr "smazat soubory"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:28
+msgid "Delete all files in the clipboard"
+msgstr "Smazat všechny soubory ve schránce"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:38
+msgid "the clipboard is empty"
+msgstr "schránka je prázdná"
+
+#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
+msgid "upload failed"
+msgstr "nahrání se nezdařilo"
+
+#: templates/image_filer/folder.html:3
+#, python-format
+msgid "Folder '%(folder_label)s' files"
+msgstr "Soubory složky '%(folder_label)s'"
+
+#: templates/image_filer/folder.html:6
+msgid "File name"
+msgstr "Jméno souboru"
+
+#: templates/image_filer/image.html:6
+msgid "author"
+msgstr "autor"
+
+#: templates/image_filer/image_export_form.html:16
+msgid "export"
+msgstr "export"
+
+#: templates/image_filer/image_export_form.html:26
+msgid "download image"
+msgstr "stáhnout obrázek"
+
+#: templates/image_filer/include/export_dialog.html:13
+msgid "Folder name already taken."
+msgstr "Jméno složky je už vybráno"
+
+#: templates/image_filer/include/export_dialog.html:15
+msgid "Submit"
+msgstr "Odeslat"
+
+#~ msgid "Set focal point"
+#~ msgstr "Nastavit ohnisko"
