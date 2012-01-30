@@ -6,7 +6,7 @@ from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
 
 
-class ImageAdminFrom(forms.ModelForm):
+class ImageAdminForm(forms.ModelForm):
     subject_location = forms.CharField(
                     max_length=64, required=False,
                     label=_('Subject location'),
@@ -37,7 +37,7 @@ class ImageAdminFrom(forms.ModelForm):
 
 
 class ImageAdmin(FileAdmin):
-    form = ImageAdminFrom
+    form = ImageAdminForm
     fieldsets = (
         FileAdmin.fieldsets[0],
         (_('Advanced'), {
