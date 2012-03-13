@@ -1,11 +1,11 @@
 #-*- coding: utf-8 -*-
 try:
-    import Image
-    import ExifTags
+    from PIL import Image
+    from PIL import ExifTags
 except ImportError:
     try:
-        from PIL import Image
-        from PIL import ExifTags
+        import Image
+        import ExifTags
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 

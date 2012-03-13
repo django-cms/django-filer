@@ -1,12 +1,12 @@
 #-*- coding: utf-8 -*-
 import re
 try:
-    import Image
-    import ImageDraw
+    from PIL import Image
+    from PIL import ImageDraw
 except ImportError:
     try:
-        from PIL import Image
-        from PIL import ImageDraw
+        import Image
+        import ImageDraw
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from easy_thumbnails import processors
