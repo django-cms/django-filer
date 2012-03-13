@@ -4,6 +4,7 @@ from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
 
 from django.conf import settings
+from filer import settings as filer_settings
 
 # forms
 class ImageAdminFrom(forms.ModelForm):
@@ -27,8 +28,8 @@ class ImageAdminFrom(forms.ModelForm):
             #'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
         js = (
-            settings.MEDIA_URL + 'filer/js/raphael.js',
-            settings.MEDIA_URL + 'filer/js/focal_point.js',
+            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/raphael.js',
+            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/focal_point.js',
         )
 
 #ModelAdmins
