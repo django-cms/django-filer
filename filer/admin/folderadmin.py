@@ -354,7 +354,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
                 # needed in the admin/base.html template for logout links
-                'root_path': "/%s" % admin.site.root_path,
+                'root_path': reverse('admin:index'),
                 'action_form': action_form,
                 'actions_on_top': self.actions_on_top,
                 'actions_on_bottom': self.actions_on_bottom,
@@ -614,7 +614,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "perms_lacking": all_perms_needed,
             "protected": all_protected,
             "opts": opts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
@@ -755,7 +755,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "folders_queryset": folders_queryset,
             "perms_lacking": perms_needed,
             "opts": opts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
@@ -839,7 +839,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "folders_queryset": folders_queryset,
             "perms_lacking": perms_needed,
             "opts": opts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
@@ -968,7 +968,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "folders_queryset": folders_queryset,
             "perms_lacking": perms_needed,
             "opts": opts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
@@ -1091,7 +1091,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "folders_queryset": folders_queryset,
             "perms_lacking": perms_needed,
             "opts": opts,
-            "root_path": self.admin_site.root_path,
+            "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
