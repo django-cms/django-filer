@@ -47,7 +47,7 @@ are located in the ``static/filer`` directory in the ``filer`` package. If you a
 already using `django-staticfiles`_ or `django.contrib.staticfiles`_ you're 
 already set and can skip the next paragraph.
 
-By default django-filer will look for those files at ``<MEDIA_URL>/filer/`` . 
+By default django-filer will look for those files at ``<STATIC_URL>/filer/`` . 
 Make sure that they are accessible at one of those locations. 
 See the :ref:`FILER_STATICMEDIA_PREFIX` setting if you want to serve them from
 somewhere else.
