@@ -8,7 +8,7 @@ A file management application for django that makes handling of files and images
 Dependencies
 ------------
 
-* django-cms >= 2.1
+* django >= 1.3 or django == 1.2 with django-staticfiles
 * easy-thumbnails >= 1.0-alpha-13
 
 Getting Started
