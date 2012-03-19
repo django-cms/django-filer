@@ -20,9 +20,9 @@ FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
 if not FILER_STATICMEDIA_PREFIX:
     FILER_STATICMEDIA_PREFIX = (getattr(settings, 'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
 
-FILER_ADMIN_ICON_SIZES = (
+FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES",(
         '16', '32', '48', '64',
-)
+))
 
 # This is an ordered iterable that describes a list of 
 # classes that I should check for when adding files
