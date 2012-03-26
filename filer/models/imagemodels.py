@@ -43,7 +43,7 @@ class Image(File):
     
                                         default=None)
 
-    link = models.URLField(_('External URL'), blank=True, null=True)
+    link = models.CharField(_('External URL'), blank=True, null=True, max_length=255, default=None)
 
 
     @classmethod
