@@ -34,7 +34,7 @@ FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
 )
 
 # Public media (media accessible without any permission checks)
-FILER_PUBLICMEDIA_STORAGE = getattr(
+FILER_PUBLICMEDIA_STORAGE = load_object(getattr(
                     settings,
                     'FILER_PUBLICMEDIA_STORAGE',
                     storage_factory(
@@ -44,9 +44,9 @@ FILER_PUBLICMEDIA_STORAGE = getattr(
                                          'filer')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
                                                   'filer/')
-                    ))
+                    )))
 FILER_PUBLICMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', 'filer.utils.generate_filename.by_date'))
-FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(
+FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = load_object(getattr(
                     settings,
                     'FILER_PUBLICMEDIA_THUMBNAIL_STORAGE',
                     storage_factory(
@@ -56,11 +56,11 @@ FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(
                                          'filer_thumbnails')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
                                                   'filer_thumbnails/')
-                    ))
+                    )))
 
 
 # Private media (media accessible through permissions checks)
-FILER_PRIVATEMEDIA_STORAGE = getattr(
+FILER_PRIVATEMEDIA_STORAGE = load_object(getattr(
                     settings,
                     'FILER_PRIVATEMEDIA_STORAGE',
                     storage_factory(
@@ -70,10 +70,10 @@ FILER_PRIVATEMEDIA_STORAGE = getattr(
                                          '../smedia/filer/')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
                                                   '/smedia/filer/')
-                    ))
+                    )))
 FILER_PRIVATEMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
                                        'filer.utils.generate_filename.by_date'))
-FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(
+FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = load_object(getattr(
                     settings,
                    'FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE',
                     storage_factory(
@@ -83,6 +83,6 @@ FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(
                                          '../smedia/filer_thumbnails/')),
                         base_url=urlparse.urljoin(settings.MEDIA_URL,
                                                   '/smedia/filer_thumbnails/')
-                    ))
+                    )))
 FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', DefaultServer())
 FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_SERVER', DefaultServer())
