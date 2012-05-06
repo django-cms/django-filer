@@ -123,6 +123,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self.file.seek(0)
         sha.update(self.file.read())
         self.sha1 = sha.hexdigest()
+        # to make sure later operations can read the whole file
+        self.file.seek(0)
 
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
