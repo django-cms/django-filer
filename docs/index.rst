@@ -4,7 +4,7 @@ Welcome to django-filer's documentation!
 ========================================
 
 ``django-filer`` is a file management application for django. It handles uploading
-and organizing files and images in contrib.admin.
+and organizing files, images and videos in contrib.admin.
 
 .. figure:: _static/directory_view_1_screenshot.png
    :scale: 50 %
@@ -21,6 +21,10 @@ File model is used.
    :alt: admin widget screenshot
 
    Default admin widget for file fields
+
+Uploaded videos can be automatically converted to multiple formats making it 
+transparent the display of videos in formats HTML5 browsers support with 
+fallback to flash for older browsers.
 
 Getting help
 ------------

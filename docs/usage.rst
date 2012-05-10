@@ -4,7 +4,8 @@ Usage
 ======
 
 ``django-filer`` provides model fields to replace `djangos` own 
-`django.db.models.FileField`_ and `django.db.models.ImageField`_.
+`django.db.models.FileField`_ and `django.db.models.ImageField`_, as well
+as an additional `FilerVideoField`.
 The `django-filer` versions provide the added benefit of being able to manage
 the files independently of where they are actually used in your content. As such
 the same file can be used in multiple places without re-uploading it multiple
@@ -24,13 +25,14 @@ checksums.
      company.logo.icons['64'] # or {{ company.logo.icons.64 }} in a template
 
 
-``FilerFileField`` and ``FilerImageField``
-------------------------------------------
+``FilerFileField``, ``FilerImageField`` and ``FilerVideoField``
+---------------------------------------------------------------
 
 They are subclasses of `django.db.models.ForeignKey`_, so the same rules apply.
 The only difference is, that there is no need to declare what model we are
-referencing (it is always ``filer.models.File`` for the ``FilerFileField`` and 
-``filer.models.Image`` for the ``FilerImageField``).
+referencing (it is always ``filer.models.File`` for the ``FilerFileField``, 
+``filer.models.Image`` for the ``FilerImageField`` and 
+``filer.models.Video`` for the ``FilerVideoField``).
 
 Simple example ``models.py``::
     
@@ -57,6 +59,87 @@ As with `django.db.models.ForeignKey`_ in general, you have to define a
 non-clashing ``related_name`` if there are multiple ``ForeignKey`` s to the
 same model.
 
+
+Video formats
+-------------
+
+Django-filer can be configured to automatically convert uploaded video
+files into alternative formats.
+
+This feature needs to be activated by setting up a cron job and configuring the
+desired output formats.
+
+On the Django admin interface, videos have a fieldset named "Conversion" with four fields:
+
+- conversion status
+- width, height
+- conversion log
+
+When a new video is uploaded, the conversion status is set to "new". This builds up a queue of video processing
+tasks.
+
+When the `convert_video` manage command is run, it  will search for the next file with "new" status, 
+change the status to "being processed" and execute the commands to generate the alternative versions and grab a poster 
+image (see :ref:`cron-video`).
+
+If all conversions are successful, the status will be set to "converted successfully". If any of the commands
+fail, it will be set to "Conversion failed".
+
+The output from these commands will be saved in the Conversion log field.
+
+.. _video_dimensions_manually:
+
+You can change the dimensions of the generated videos for each file individually in the admin.
+Just input the new width and height into the respective fields and set the status to "new" to make sure it's processed
+with these new dimensions.
+
+To process again a video, reset it's status to "new" and run the convert_video manage
+command manually or wait for the scheduled task to execute.
+
+python
+......
+
+The `Video` model class has some useful methods that can be used to access different formats:
+ 
+:meth:`Video.formats`
+
+Lists all available alternative formats for a file. Only those
+formats with files existing on disk are returned.
+
+:rtype: list of dictionaries with the format
+
+  {'url': url, 'format':ext, 'filepath':filepath}
+
+
+:meth:`Video.original_format`
+
+Returns the location of the original file
+
+:rtype: Dictionary with the format
+
+  {'url': url, 'format': fmt, 'mimetype': mimetype}
+
+
+:meth:`Video.formats_html5`
+
+List those formats that should be recognized by browsers.
+
+
+:meth:`Video.format_flash`
+
+Returns the location of the `flv` version of the video, if available, or an empty dict otherwise.
+
+
+:meth:`Video.poster`
+
+Return the url of the poster image
+
+
+:meth:`Video.convert`
+
+Can be used to rocess the video programatically to convert it and grab the screenshot.
+
+
 templates
 .........
 
@@ -67,18 +150,35 @@ templates
     {% load thumbnails %}
     {% thumbnail company.logo 250x250 crop %}
 
+A template tag is also provided to display videos with the multiple available 
+formats.
+
+    {% load filer_video_tags %}
+	{% filer_video video_obj %}
+
+This will generate the html5 video tag with links to the multiple video formats
+and fallback to flash if the flash format is available, and link to the poster
+image. The filer_video tag can accept optional dimensions parameter for the 
+display window (otherwise uses the video dimensions).
+
+	{% filer_video video_obj "640x480" %}
+
+Note: if ffmpeg is not available for converting the videos, the dimensions of 
+the uploaded video are not extracted from the file and so they need to be set 
+in the tag.
+
 admin
 .....
 
 The default widget provides a popup file selector that also directly supports
-uploading new images.
+uploading new images and new videos.
 
 .. figure:: _static/default_admin_file_widget.png
    :alt: FileField widget in admin
    
-* Clicking on the magnifying glass will display the file selction popup.
+* Clicking on the magnifying glass will display the file selection popup.
 
-* The red X will de-select the currently selected file (usefull if the field
+* The red X will de-select the currently selected file (useful if the field
   can be ``null``).
 
 .. WARNING::

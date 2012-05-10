@@ -4,11 +4,14 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from easy_thumbnails.files import ThumbnailFile
 from filer import settings as filer_settings
+from filer.fields.multistorage_file import FormatFieldFile
 from filer.models import File
 from filer.utils.filer_easy_thumbnails import thumbnail_to_original_filename
+from filer.utils.video import format_to_original_filename
 
 server = filer_settings.FILER_PRIVATEMEDIA_SERVER
 thumbnail_server = filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_SERVER
+format_server = filer_settings.FILER_PRIVATEMEDIA_FORMATS_SERVER
 
 
 def serve_protected_file(request, path):
@@ -47,5 +50,29 @@ def serve_protected_thumbnail(request, path):
     try:
         thumbnail = ThumbnailFile(name=path, storage=thefile.file.thumbnail_storage)
         return thumbnail_server.serve(request, thumbnail, save_as=False)
+    except Exception:
+        raise Http404('File not found')
+
+
+def serve_protected_format(request, path):
+    """
+    Serve protected video formats to authenticated users.
+    If the user doesn't have read permissions, redirect to a static image.
+    """
+    source_path = format_to_original_filename(path)
+    if not source_path:
+        raise Http404('File not found')
+    try:
+        thefile = File.objects.get(file=source_path, is_public=False)
+    except File.DoesNotExist:
+        raise Http404('File not found')
+    if not thefile.has_read_permission(request):
+        if settings.DEBUG:
+            raise PermissionDenied
+        else:
+            raise Http404('File not found')
+    try:
+        fmt = FormatFieldFile(name=path, field=thefile.file, instance=thefile, storage=thefile.file.format_storage)
+        return format_server.serve(request, fmt, save_as=False)
     except Exception:
         raise Http404('File not found')
