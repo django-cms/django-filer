@@ -22,17 +22,6 @@ class ThumbnailerNameMixin(object):
     thumbnail_basedir = ''
     thumbnail_subdir = ''
     thumbnail_prefix = ''
-    thumbnail_quality = ''
-    thumbnail_extension = ''
-    thumbnail_transparency_extension = ''
-
-    def __init__(self, *args, **kwargs):
-        """
-        Attributes must be initialized at runtime, following easy_thumbnails 1.0 modifications
-        """
-        self.thumbnail_quality = self.thumbnail_quality
-        self.thumbnail_extension = self.thumbnail_extension
-        self.thumbnail_transparency_extension = self.thumbnail_transparency_extension
 
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
@@ -73,17 +62,6 @@ class ActionThumbnailerMixin(object):
     thumbnail_basedir = ''
     thumbnail_subdir = ''
     thumbnail_prefix = ''
-    thumbnail_quality = ''
-    thumbnail_extension = ''
-    thumbnail_transparency_extension = ''
-
-    def __init__(self, *args, **kwargs):
-        """
-        Attributes must be initialized at runtime, following easy_thumbnails 1.0 modifications
-        """
-        self.thumbnail_quality = self.thumbnail_quality
-        self.thumbnail_extension = self.thumbnail_extension
-        self.thumbnail_transparency_extension = self.thumbnail_transparency_extension
 
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """

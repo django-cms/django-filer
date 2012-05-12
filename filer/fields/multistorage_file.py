@@ -2,10 +2,9 @@
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from easy_thumbnails import fields as easy_thumbnails_fields, \
-    files as easy_thumbnails_files
+    files as easy_thumbnails_files, conf
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
-
 
 STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,
@@ -32,29 +31,39 @@ def generate_filename_multistorage(instance, filename):
 class MultiStorageFieldFile(ThumbnailerNameMixin,
                             easy_thumbnails_files.ThumbnailerFieldFile):
     def __init__(self, instance, field, name):
-        File.__init__(self, None, name)
+        """
+        This is a little weird, but I couldn't find a better solution.
+        Thumbnailer.__init__ is called first for proper object inizialization.
+        Then we override some attributes defined at runtime with properties.
+        We cannot simply call super().__init__ because filer Field objects
+        doesn't have a storage attribute.
+        """
+        easy_thumbnails_files.Thumbnailer.__init__(self, None, name)
         self.instance = instance
         self.field = field
         self._committed = True
         self.storages = self.field.storages
         self.thumbnail_storages = self.field.thumbnail_storages
+        self.storage = self._storage
+        self.source_storage = self._source_storage
+        self.thumbnail_storage = self._thumbnail_storage
 
     @property
-    def storage(self):
+    def _storage(self):
         if self.instance.is_public:
             return self.storages['public']
         else:
             return self.storages['private']
 
     @property
-    def source_storage(self):
+    def _source_storage(self):
         if self.instance.is_public:
             return self.storages['public']
         else:
             return self.storages['private']
 
     @property
-    def thumbnail_storage(self):
+    def _thumbnail_storage(self):
         if self.instance.is_public:
             return self.thumbnail_storages['public']
         else:
