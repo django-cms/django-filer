@@ -8,7 +8,9 @@ downloads
 eggs
 parts
 build
+tmp
 *.egg-info
+*.egg
 .DS_Store
 .project
 .pydevproject
