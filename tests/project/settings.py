@@ -31,7 +31,7 @@ PROJECT_APPS = ['filer'] # list of apps to run tests for
 JENKINS_TASKS = (
         #'django_jenkins.tasks.run_pylint',
         #'django_jenkins.tasks.run_pep8',
-        'django_jenkins.tasks.with_coverage',
+        #'django_jenkins.tasks.with_coverage',  # doesn't work with travis CI
         'django_jenkins.tasks.django_tests',
 )
 COVERAGE_RCFILE = '.coveragerc'
