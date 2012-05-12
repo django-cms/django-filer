@@ -1,5 +1,11 @@
 #-*- coding: utf-8 -*-
-from PIL import Image as PILImage
+try:
+    from PIL import Image as PILImage
+except ImportError:
+    try:
+        import Image as PILImage
+    except ImportError:
+        raise ImportError("The Python Imaging Library was not found.")
 from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
