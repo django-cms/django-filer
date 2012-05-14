@@ -39,11 +39,11 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             attrs['class'] = 'vForeignKeyRawIdAdminField'
         output = []
         if obj:
-            output.append(u'Folder: <span id="%s">%s</span>' % (
-                                            css_id_description_txt, obj.name))
+            output.append(_(u'Folder: <span id="%(cssid)s">%(name)s</span>') \
+                          % {'cssid': css_id_description_txt, 'name':obj.name})
         else:
-            output.append((u'Folder: <span id="%s">' + \
-                           u'none selected</span>') % css_id_description_txt)
+            output.append(_(u'Folder: <span id="%s">none selected</span>') \
+                                            % css_id_description_txt)
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         output.append(

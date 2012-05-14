@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-13 21:11+0100\n"
-"PO-Revision-Date: 2012-03-13 21:25+0100\n"
+"POT-Creation-Date: 2012-05-14 15:46+0200\n"
+"PO-Revision-Date: 2012-05-14 15:46+0200\n"
 "Last-Translator: Iacopo Spalletti <i.spalletti@nephila.it>\n"
-"Language-Team: Italian <>\n"
+"Language-Team: Italian <kde-i18n-it@kde.org>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -215,6 +215,16 @@ msgstr "Posizione del soggetto"
 msgid "Location of the main subject of the scene."
 msgstr "Posizione del soggetto principale della scena."
 
+#: fields/folder.py:42
+#, python-format
+msgid "Folder: <span id=\"%(cssid)s\">%(name)s</span>"
+msgstr "Cartella: <span id=\"%(cssid)s\">%(name)s</span>"
+
+#: fields/folder.py:45
+#, python-format
+msgid "Folder: <span id=\"%s\">none selected</span>"
+msgstr "Cartella: <span id=\"%s\">nessuna</span>"
+
 #: fields/folder.py:55 templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
 msgid "Lookup"
@@ -228,7 +238,7 @@ msgstr "Cancella"
 msgid "user"
 msgstr "utente"
 
-#: models/clipboardmodels.py:11 models/filemodels.py:263
+#: models/clipboardmodels.py:11 models/filemodels.py:268
 msgid "files"
 msgstr "file"
 
@@ -241,7 +251,7 @@ msgid "clipboards"
 msgstr "appunti"
 
 #: models/clipboardmodels.py:39 models/filemodels.py:35
-#: models/filemodels.py:262
+#: models/filemodels.py:267
 msgid "file"
 msgstr "file"
 
@@ -644,9 +654,9 @@ msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
 msgstr ""
-"I file seguenti saranno rinominati (rimarranno nelle rispettive "
-"cartelle e manterranno il nome del file originario, solo il nome "
-"visualizzato sarà modificato):"
+"I file seguenti saranno rinominati (rimarranno nelle rispettive cartelle e "
+"manterranno il nome del file originario, solo il nome visualizzato sarà "
+"modificato):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
