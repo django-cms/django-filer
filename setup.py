@@ -7,13 +7,6 @@ def read(fname):
     # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-install_requires = [
-    'setuptools',
-    'easy-thumbnails>=1.0-alpha-17',
-    'django-mptt>=0.2.1',
-    'django_polymorphic',
-]
-
 setup(
     name = "django-filer",
     version = version,
@@ -25,7 +18,12 @@ setup(
     author = 'Stefan Foulis',
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),
-    install_requires = install_requires,
+    install_requires = (
+        'Django>=1.2',
+        'easy-thumbnails>=1.0',
+        'django-mptt>=0.2.1',
+        'django_polymorphic>=0.2',
+    ),
     include_package_data=True,
     zip_safe=False,
     classifiers = [
@@ -36,5 +34,9 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
-    ]
+    ],
+    test_suite='setuptest.SetupTestSuite',
+    tests_require=(
+        'django-setuptest',
+    ),
 )
