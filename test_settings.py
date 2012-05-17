@@ -18,8 +18,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.sessions',
 )
-if True:
-    INSTALLED_APPS += ('django.contrib.staticfiles',)
+
 ROOT_URLCONF = 'test_urls'
 
 MEDIA_ROOT = os.path.abspath( os.path.join(TMP_ROOT, 'media') )
