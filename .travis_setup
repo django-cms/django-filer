@@ -1,2 +1,2 @@
 #!/bin/bash
-pip install Django==$DJANGO_VERSION PIL
+pip install Django==$DJANGO_VERSION PIL django-staticfiles
