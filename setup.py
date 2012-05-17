@@ -19,9 +19,10 @@ setup(
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),
     install_requires = (
+        'Django>=1.2',
         'easy-thumbnails>=1.0',
         'django-mptt>=0.2.1',
-        'django_polymorphic',
+        'django_polymorphic>=0.2',
     ),
     include_package_data=True,
     zip_safe=False,
