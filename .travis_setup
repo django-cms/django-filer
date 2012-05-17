@@ -1,0 +1,2 @@
+#!/bin/bash
+pip install Django==$DJANGO_VERSION

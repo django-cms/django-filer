@@ -38,6 +38,5 @@ setup(
     test_suite='setuptest.SetupTestSuite',
     tests_require=(
         'django-setuptest',
-#        'Django==1.3.1',
     ),
 )
