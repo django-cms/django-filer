@@ -19,7 +19,8 @@
 })(django.jQuery);
 </script>
 {% endif %}{% endif %}
-{% endblock %}
+<script type="text/javascript" src="{{ STATIC_URL }}filer/js/jquery.zclip.min.js"></script>
+{% endblock extrahead %}
 
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}change-list filebrowser{% endblock %}
