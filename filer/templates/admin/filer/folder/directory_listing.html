@@ -20,6 +20,15 @@
 </script>
 {% endif %}{% endif %}
 <script type="text/javascript" src="{{ STATIC_URL }}filer/js/jquery.zclip.min.js"></script>
+<script>
+$('#clip_1').zclip({
+	path:"{{ STATIC_URL }}filer/flash/ZeroClipboard.swf",
+	copy:"{{ file.url }}",
+	afterCopy:function() {
+		alert('asdf');
+	}
+});
+</script>
 {% endblock extrahead %}
 
 {% block coltype %}colMS{% endblock %}

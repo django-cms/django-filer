@@ -56,12 +56,7 @@
 							<img alt="Copy URL to Clipboard" src="{{ STATIC_URL }}filer/img/clip.png">
 						</a>
 						<script>
-						$(document).ready(function() {
-							$('#clip_{{ file.id }}').zclip({
-								path:"{{ STATIC_URL }}filer/flash/ZeroClipboard.swf",
-								copy:"{{ file.url }}"
-							});
-						});
+						
 						</script>
 						
 					</div>
