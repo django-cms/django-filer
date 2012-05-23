@@ -52,13 +52,10 @@
 						<span>
 							<a href="{{ file.url }}">{{ file.url }}</a>
 						</span>
-						<a id="clip_{{ file.id }}" href="#">
-							<img alt="Copy URL to Clipboard" src="{{ STATIC_URL }}filer/img/clip.png">
-						</a>
-						<script>
-						
-						</script>
-						
+						<span style="position:relative;">
+							<span id="clip_{{ file.id }}" data-copy="{{ file.url }}" class="zclip">
+							</span>
+						</span>
 					</div>
                     <div>
 						<span>{% trans "Owner" %}: {{ file.owner|default:"n/a" }}</span>

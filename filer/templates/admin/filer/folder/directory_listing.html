@@ -21,12 +21,16 @@
 {% endif %}{% endif %}
 <script type="text/javascript" src="{{ STATIC_URL }}filer/js/jquery.zclip.min.js"></script>
 <script>
-$('#clip_1').zclip({
-	path:"{{ STATIC_URL }}filer/flash/ZeroClipboard.swf",
-	copy:"{{ file.url }}",
+$(document).ready(function() {
+$('span.zclip').zclip({
+	path:"{% filer_staticmedia_prefix %}flash/ZeroClipboard.swf",
+	copy:function() {
+		return $(this).attr('data-copy')
+	},
 	afterCopy:function() {
-		alert('asdf');
+		$(this).fadeOut(100, function() {$(this).show()});
 	}
+});
 });
 </script>
 {% endblock extrahead %}
