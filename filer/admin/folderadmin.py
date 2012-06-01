@@ -795,7 +795,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return n
 
     def _rename_folder(self, folder, form_data, global_counter):
-        return self._rename_images_impl(folder.files.all(), folder.children.all(), form_data, global_counter)
+        return self._rename_files_impl(folder.files.all(), folder.children.all(), form_data, global_counter)
 
     def _rename_files_impl(self, files_queryset, folders_queryset, form_data, global_counter):
         n = 0
