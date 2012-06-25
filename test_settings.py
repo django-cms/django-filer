@@ -9,7 +9,7 @@ DATABASES = {
         'NAME': os.path.join(TMP_ROOT,'filer_test.sqlite3'),
         },
     }
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'filer',
     'mptt',
     'easy_thumbnails',
@@ -17,7 +17,8 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.sessions',
-)
+    'django.contrib.staticfiles',
+]
 
 ROOT_URLCONF = 'test_urls'
 
