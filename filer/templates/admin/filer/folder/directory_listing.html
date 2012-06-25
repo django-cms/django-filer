@@ -4,11 +4,11 @@
 {% block extrahead %}{{ block.super }}
 {# upload stuff #}
 {{ media.js }}
-<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{% admin_js_base %}jquery.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
-<script type="text/javascript" src="{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}
 <script type="text/javascript">
@@ -26,7 +26,7 @@
 
 
 {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
+<link rel="stylesheet" type="text/css" href="{% admin_css_base %}changelists.css" />
 {{ media.css }}
 {% if action_form %}
   {% url admin:jsi18n as jsi18nurl %}
