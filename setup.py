@@ -38,5 +38,6 @@ setup(
     test_suite='setuptest.setuptest.SetupTestSuite',
     tests_require=(
         'django-setuptest',
+        'argparse',  # apparently needed by django-setuptest on python 2.6
     ),
 )
