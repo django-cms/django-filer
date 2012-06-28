@@ -50,4 +50,5 @@ Contents
    permissions
    server
    settings
+   extending_filer
    running_tests
