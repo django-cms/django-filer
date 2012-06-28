@@ -1,11 +1,11 @@
 {% extends "admin/base_site.html" %}
-{% load i18n adminmedia %}
+{% load i18n adminmedia filer_admin_tags %}
 
 {% block breadcrumbs %}
 {% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
 
 {% block content %}
 {% if perms_lacking %}
