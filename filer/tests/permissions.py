@@ -35,6 +35,8 @@ class FolderPermissionsTestCase(TestCase):
         self.clipboard.append_file(self.image)
 
         self.folder = Folder.objects.create(name='test_folder')
+        self.subfolder = Folder.objects.create(parent=self.folder, name='sub_folder')
+        
 
     def test_superuser_has_rights(self):
         self.create_fixtures()

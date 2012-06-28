@@ -20,63 +20,7 @@ class FolderPermissionManager(models.Manager):
     Theses methods are called by introspection from "has_generic_permisison" on
     the folder model.
     """
-    def get_read_id_list(self, user):
-        """
-        Give a list of a Folders where the user has read rights or the string
-        "All" if the user has all rights.
-        """
-        return self.__get_id_list(user, "can_read")
-
-    def get_edit_id_list(self, user):
-        return self.__get_id_list(user, "can_edit")
-
-    def get_add_children_id_list(self, user):
-        return self.__get_id_list(user, "can_add_children")
-
-    def __get_id_list(self, user, attr):
-        if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
-            return 'All'
-        allow_list = []
-        deny_list = []
-        group_ids = user.groups.all().values_list('id', flat=True)
-        q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
-        perms = self.filter(q).order_by('folder__tree_id', 'folder__level',
-                                        'folder__lft')
-        for perm in perms:
-            if perm.folder:
-                folder_id = perm.folder.id
-            else:
-                folder_id = None
-            if perm.type == FolderPermission.ALL:
-                if getattr(perm, attr):
-                    allow_list = list(Folder.objects.all().values_list(
-                                                    'id', flat=True))
-                else:
-                    return []
-            if getattr(perm, attr):
-                if folder_id not in allow_list:
-                    allow_list.append(folder_id)
-                if folder_id in deny_list:
-                    deny_list.remove(folder_id)
-            else:
-                if folder_id not in deny_list:
-                    deny_list.append(folder_id)
-                if folder_id in allow_list:
-                    allow_list.remove(folder_id)
-            if perm.type == FolderPermission.CHILDREN:
-                for id in perm.folder.get_descendants().values_list(
-                                                            'id', flat=True):
-                    if getattr(perm, attr):
-                        if id not in allow_list:
-                            allow_list.append(id)
-                        if id in deny_list:
-                            deny_list.remove(id)
-                    else:
-                        if id not in deny_list:
-                            deny_list.append(id)
-                        if id in allow_list:
-                            allow_list.remove(id)
-        return allow_list
+    pass
 
 
 class Folder(models.Model, mixins.IconsMixin):
@@ -141,44 +85,25 @@ class Folder(models.Model, mixins.IconsMixin):
             folder_path.append(self.parent)
         return folder_path
 
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
+    def can_view(self, user):
+        return self.can(user, 'view')
 
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
+    def can_add(self, user):
+        return self.can(user, 'add')
 
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
+    def can_change(self, user):
+        return self.can(user, 'change')
 
-    def has_generic_permission(self, request, type):
+    def can_delete(self, user):
+        return self.can(user, 'delete')
+
+    def can(self, user, permission):
         """
-        Return true if the current user has permission on this
-        folder. Return the string 'ALL' if the user has all rights.
+        return True or False if the user has the permission
         """
-        user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        else:
-            att_name = "permission_%s_cache" % type
-            if not hasattr(self, "permission_user_cache") or \
-               not hasattr(self, att_name) or \
-               request.user.pk != self.permission_user_cache.pk:
-
-                # This calls methods on the manager i.e. get_read_id_list()
-                func = getattr(FolderPermission.objects,
-                               "get_%s_id_list" % type)
-                permission = func(user)
-                self.permission_user_cache = request.user
-                if permission == "All" or self.id in permission:
-                    setattr(self, att_name, True)
-                    self.permission_edit_cache = True
-                else:
-                    setattr(self, att_name, False)
-            return getattr(self, att_name)
+        if isinstance(permission, basestring):
+            permission = PERMISSIONS[permission][0]
+        return Permission.objects.children_with_permission_by_user(user, self.pk, permission)
 
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change',
@@ -214,7 +139,7 @@ except mptt.AlreadyRegistered:
     pass
 
 
-class FolderPermission(models.Model):
+class OldFolderPermission(models.Model):
     ALL = 0
     THIS = 1
     CHILDREN = 2

@@ -6,7 +6,8 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext  as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import File
+from filer.models import File,Permission
+from filer.models.permissionmodels import CHANGE_PERMISSION
 
 
 class FileAdminChangeFrom(forms.ModelForm):
@@ -94,10 +95,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         It seems this is only used for the list view. NICE :-)
         """
         return {
-            'add': False,
-            'change': False,
-            'delete': False,
+            'add': True,
+            'change': True,
+            'delete': True,
         }
+
+    def queryset(self, request):
+        return Permission.objects.children_with_permission_by_user(user=request.user, folder=None, permission=CHANGE_PERMISSION)
 
 if settings.FILER_ENABLE_PERMISSIONS:
     FileAdmin.fieldsets = (
