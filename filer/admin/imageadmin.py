@@ -42,7 +42,7 @@ class ImageAdmin(FileAdmin):
         FileAdmin.fieldsets[0],
         (_('Advanced'), {
             'fields': ('default_alt_text', 'default_caption',
-                       'author', 'file', 'sha1',),
+                       'author', 'file', 'sha1','link'),
             'classes': ('collapse',),
         }),
         ('Subject Location', {

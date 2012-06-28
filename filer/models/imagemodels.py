@@ -44,7 +44,13 @@ class Image(File):
     must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
 
     subject_location = models.CharField(_('subject location'), max_length=64, null=True, blank=True,
+    
+    
+    
                                         default=None)
+
+    link = models.CharField(_('External URL'), blank=True, null=True, max_length=255, default=None)
+
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
