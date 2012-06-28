@@ -1,4 +1,4 @@
-{% load i18n %}{% spaceless %}
+{% load i18n filer_admin_tags %}{% spaceless %}
 {% if object %}
 	{% if object.icons.32 %}
 		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}" /></a>
@@ -12,9 +12,9 @@
 	&nbsp;<span id="{{ span_id }}"></span>
 {% endif %}
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
-	<img src="{{ admin_media_prefix }}img/admin/selector-search.gif" width="16" height="16" alt="{% trans 'Lookup' %}" />
+	<img src="{{ admin_icon_base }}selector-search.gif" width="16" height="16" alt="{% trans 'Lookup' %}" />
 </a>
-<img id="{{ clear_id }}" src="{{ admin_media_prefix }}img/admin/icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}" />
+<img id="{{ clear_id }}" src="{{ admin_icon_base }}icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}" />
 <br />
 {{ hidden_input }}
 <script type="text/javascript">
