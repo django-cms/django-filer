@@ -34,10 +34,16 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
+        ## Code borrowed from django ModelAdmin to determine changelist on the fly
+        opts = obj._meta
+        module_name = opts.module_name
+        post_url = reverse('admin:%s_%s_changelist' %
+                           (opts.app_label, module_name),
+            current_app=self.admin_site.name)
         r = super(FileAdmin, self).response_change(request, obj)
         if r['Location']:
             # it was a successful save
-            if r['Location'] in ['../']:
+            if r['Location'] in ['../'] or r['Location'] == post_url:
                 # this means it was a save: redirect to the directory view
                 if obj.folder:
                     url = reverse('admin:filer-directory_listing',
