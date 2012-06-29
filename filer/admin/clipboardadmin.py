@@ -8,7 +8,6 @@ from django import forms
 from django.contrib.admin.models import User
 from django.conf import settings
 from filer.models import Clipboard, ClipboardItem, File, Image
-from filer.utils.files import generic_handle_file
 from filer.models import tools
 from filer import settings as filer_settings
 from filer.admin.tools import popup_param
@@ -19,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = File
+
+
 class UploadImageFileForm(forms.ModelForm):
     class Meta:
         model = Image
@@ -27,6 +28,8 @@ class UploadImageFileForm(forms.ModelForm):
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
     model = ClipboardItem
+
+
 class ClipboardAdmin(admin.ModelAdmin):
     model = Clipboard
     inlines = [ ClipboardItemInline, ]
@@ -78,35 +81,33 @@ class ClipboardAdmin(admin.ModelAdmin):
 
             # Get clipboad
             clipboard, was_clipboard_created = Clipboard.objects.get_or_create(user=request.user)
-            files = generic_handle_file(upload, filename)
             file_items = []
-            for ifile, iname in files:
+            try:
+                iext = os.path.splitext(filename)[1].lower()
+            except:
+                iext = ''
+            if iext in ['.jpg', '.jpeg', '.png', '.gif']:
+                uploadform = UploadImageFileForm({'original_filename':filename,
+                                                  'owner': request.user.pk},
+                                                {'file':upload})
+            else:
+                uploadform = UploadFileForm({'original_filename':filename,
+                                             'owner': request.user.pk},
+                                            {'file':upload})
+            if uploadform.is_valid():
                 try:
-                    iext = os.path.splitext(iname)[1].lower()
-                except:
-                    iext = ''
-                if iext in ['.jpg', '.jpeg', '.png', '.gif']:
-                    uploadform = UploadImageFileForm({'original_filename':iname,
-                                                      'owner': request.user.pk},
-                                                    {'file':ifile})
-                else:
-                    uploadform = UploadFileForm({'original_filename':iname,
-                                                 'owner': request.user.pk},
-                                                {'file':ifile})
-                if uploadform.is_valid():
-                    try:
-                        file = uploadform.save(commit=False)
-                        # Enforce the FILER_IS_PUBLIC_DEFAULT
-                        file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
-                        file.save()
-                        file_items.append(file)
-                        clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
-                        clipboard_item.save()
-                    except Exception, e:
-                        #print e
-                        pass
-                else:
-                    pass#print uploadform.errors
+                    file = uploadform.save(commit=False)
+                    # Enforce the FILER_IS_PUBLIC_DEFAULT
+                    file.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+                    file.save()
+                    file_items.append(file)
+                    clipboard_item = ClipboardItem(clipboard=clipboard, file=file)
+                    clipboard_item.save()
+                except Exception, e:
+                    #print e
+                    pass
+            else:
+                pass#print uploadform.errors
         except Exception, e:
             #print e
             pass
