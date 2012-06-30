@@ -18,13 +18,18 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
-from filer.admin.forms import CopyFilesAndFoldersForm, ResizeImagesForm, RenameFilesForm
+from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
+                               RenameFilesForm)
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.admin.tools import popup_status, selectfolder_status, \
-    userperms_for_request, check_folder_edit_permissions, check_files_edit_permissions, \
-    check_files_read_permissions, check_folder_read_permissions
-from filer.models import Folder, FolderRoot, UnfiledImages, \
-    ImagesWithMissingData, File, tools, FolderPermission, Image
+from filer.views import (popup_status, popup_param, selectfolder_status,
+                         selectfolder_param, _reset_selection)
+from filer.admin.tools import  (userperms_for_request,
+                                check_folder_edit_permissions,
+                                check_files_edit_permissions,
+                                check_files_read_permissions,
+                                check_folder_read_permissions)
+from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
+                          ImagesWithMissingData, FolderPermission, Image)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
@@ -52,6 +57,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
     actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders', 'copy_files_and_folders', 'resize_images', 'rename_files']
+
+    def _get_post_url(self, obj):
+        """ Needed to retrieve the changelist url as Folder/File cna be extended
+        and admin url may change """
+        ## Code borrowed from django ModelAdmin to determine changelist on the fly
+        opts = obj._meta
+        module_name = opts.module_name
+        return reverse('admin:%s_%s_changelist' %
+                       (opts.app_label, module_name),
+            current_app=self.admin_site.name)
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -83,14 +98,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         r = super(FolderAdmin, self).response_change(request, obj)
+        ## Code borrowed from django ModelAdmin to determine changelist on the fly
         if r['Location']:
             # it was a successful save
-            if r['Location'] in ['../']:
+            if r['Location'] in ['../'] or r['Location'] == self._get_post_url(obj):
                 if obj.parent:
                     url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': obj.parent.id})
                 else:
                     url = reverse('admin:filer-directory_listing-root')
+                url += "?1"
+                url += popup_param(request,"&")
+                url += selectfolder_param(request,"&")
                 return HttpResponseRedirect(url)
             else:
                 # this means it probably was a save_and_continue_editing
@@ -99,7 +118,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
-        extra_context = {'show_delete': True}
+        extra_context = {'show_delete': True,
+                         'is_popup': popup_status(request),
+                         'select_folder': selectfolder_status(request),}
         context.update(extra_context)
         return super(FolderAdmin, self).render_change_form(
                         request=request, context=context, add=False,
@@ -125,12 +146,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     request=request, object_id=object_id,
                     extra_context=extra_context)
         url = r.get("Location", None)
-        if url in ["../../../../", "../../"]:
+        if url in ["../../../../", "../../"] or url == self._get_post_url(obj):
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
+            url += "?1"
+            url += popup_param(request,"&")
+            url += selectfolder_param(request,"&")
             return HttpResponseRedirect(url)
         return r
 
@@ -158,6 +182,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_root_folder'),
+            url(r'^reset_selection/$',
+                self.admin_site.admin_view(views.reset_selection),
+                name='filer-reset_selection'),
 
             url(r'^images_with_missing_data/$',
                 self.admin_site.admin_view(self.directory_listing),
@@ -173,6 +200,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
+        # This code is far from perfect. It resets _popup / select_folder flags
+        # when the view is called with no parameters (i.e. from the admin menu)
+        if (not request.GET.get("t",False) and
+            not popup_status(request,session=False) and
+            not selectfolder_status(request,session=False)):
+            _reset_selection(request)
         clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
@@ -614,6 +647,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "perms_lacking": all_perms_needed,
             "protected": all_protected,
             "opts": opts,
+            'is_popup': popup_status(request),
+            'select_folder': selectfolder_status(request),
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
