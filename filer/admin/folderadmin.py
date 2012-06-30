@@ -61,16 +61,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                'delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
-    def _get_post_url(self, obj):
-        """ Needed to retrieve the changelist url as Folder/File cna be extended
-        and admin url may change """
-        ## Code borrowed from django ModelAdmin to determine changelist on the fly
-        opts = obj._meta
-        module_name = opts.module_name
-        return reverse('admin:%s_%s_changelist' %
-                       (opts.app_label, module_name),
-            current_app=self.admin_site.name)
-
     def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by

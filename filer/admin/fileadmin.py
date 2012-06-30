@@ -31,17 +31,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     form = FileAdminChangeFrom
 
-
-    def _get_post_url(self, obj):
-        """ Needed to retrieve the changelist url as Folder/File cna be extended
-        and admin url may change """
-        ## Code borrowed from django ModelAdmin to determine changelist on the fly
-        opts = obj._meta
-        module_name = opts.module_name
-        return reverse('admin:%s_%s_changelist' %
-                       (opts.app_label, module_name),
-            current_app=self.admin_site.name)
-
     def response_change(self, request, obj):
         """
         Overrides the default to be able to forward to the directory listing
@@ -61,6 +50,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                             'admin:filer-directory_listing-unfiled_images')
                 url = "%s%s%s" % (url,popup_param(request),
                                   selectfolder_param(request,"&"))
+                return HttpResponseRedirect(url)
             else:
                 # this means it probably was a save_and_continue_editing
                 pass
