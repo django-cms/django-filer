@@ -194,8 +194,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
-        # This code is far from perfect. It resets _popup / select_folder flags
-        # when the view is called with no parameters (i.e. from the admin menu)
         clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
