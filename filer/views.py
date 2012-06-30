@@ -21,14 +21,12 @@ class NewFolderForm(forms.ModelForm):
 
 
 
-def popup_status(request, session=True):
-    return ('_popup' in request.REQUEST or 'pop' in request.REQUEST or
-            (session and ('_popup' in request.session or 'pop' in request.session)))
+def popup_status(request):
+    return ('_popup' in request.REQUEST or 'pop' in request.REQUEST)
 
 
-def selectfolder_status(request, session=True):
-    return ('select_folder' in request.REQUEST or
-            (session and 'select_folder' in request.session ))
+def selectfolder_status(request):
+    return ('select_folder' in request.REQUEST)
 
 
 def popup_param(request, separator="?"):
@@ -37,23 +35,11 @@ def popup_param(request, separator="?"):
     else:
         return ""
 
-def selectfolder_param(request, separator="?"):
+def selectfolder_param(request, separator="&"):
     if selectfolder_status(request):
         return "%sselect_folder=1" % separator
     else:
         return ""
-
-def _reset_selection(request):
-    try:
-        del(request.session["select_folder"])
-    except KeyError:
-        ## If select_folder is not is session it's ok
-        pass
-    try:
-        del(request.session["_popup"])
-    except KeyError:
-        ## If _popup is not is session it's ok
-        pass
 
 
 def _userperms(item, request):
@@ -66,13 +52,6 @@ def _userperms(item, request):
             if x:
                 r.append(p)
     return r
-
-
-@login_required
-def reset_selection(request):
-    _reset_selection(request)
-    return  HttpResponse("selection state reset") # We just need a response, content is not checked
-
 
 
 @login_required

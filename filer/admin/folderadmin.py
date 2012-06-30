@@ -22,7 +22,7 @@ from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
                                RenameFilesForm)
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.views import (popup_status, popup_param, selectfolder_status,
-                         selectfolder_param, _reset_selection)
+                         selectfolder_param)
 from filer.admin.tools import  (userperms_for_request,
                                 check_folder_edit_permissions,
                                 check_files_edit_permissions,
@@ -182,10 +182,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_root_folder'),
-            url(r'^reset_selection/$',
-                self.admin_site.admin_view(views.reset_selection),
-                name='filer-reset_selection'),
-
             url(r'^images_with_missing_data/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'images_with_missing_data'},
@@ -202,10 +198,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def directory_listing(self, request, folder_id=None, viewtype=None):
         # This code is far from perfect. It resets _popup / select_folder flags
         # when the view is called with no parameters (i.e. from the admin menu)
-        if (not request.GET.get("t",False) and
-            not popup_status(request,session=False) and
-            not selectfolder_status(request,session=False)):
-            _reset_selection(request)
         clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
