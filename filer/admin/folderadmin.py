@@ -3,7 +3,8 @@ from django import forms
 from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import quote, unquote, get_deleted_objects, capfirst
+from django.contrib.admin.util import (quote, unquote, get_deleted_objects,
+                                       capfirst)
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
@@ -56,7 +57,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private', 'delete_files_or_folders', 'move_files_and_folders', 'copy_files_and_folders', 'resize_images', 'rename_files']
+    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private',
+               'delete_files_or_folders', 'move_files_and_folders',
+               'copy_files_and_folders', 'resize_images', 'rename_files']
 
     def _get_post_url(self, obj):
         """ Needed to retrieve the changelist url as Folder/File cna be extended
@@ -101,7 +104,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         ## Code borrowed from django ModelAdmin to determine changelist on the fly
         if r['Location']:
             # it was a successful save
-            if r['Location'] in ['../'] or r['Location'] == self._get_post_url(obj):
+            if (r['Location'] in ['../'] or
+                r['Location'] == self._get_post_url(obj)):
                 if obj.parent:
                     url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': obj.parent.id})

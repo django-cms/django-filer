@@ -7,7 +7,8 @@ from django.utils.translation import ugettext  as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File
-from filer.views import popup_param, selectfolder_param, popup_status, selectfolder_status
+from filer.views import (popup_param, selectfolder_param, popup_status,
+                         selectfolder_status)
 
 
 class FileAdminChangeFrom(forms.ModelForm):
@@ -49,7 +50,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         r = super(FileAdmin, self).response_change(request, obj)
         if r['Location']:
             # it was a successful save
-            if r['Location'] in ['../'] or r['Location'] == self._get_post_url(obj):
+            if (r['Location'] in ['../'] or
+                r['Location'] == self._get_post_url(obj)):
                 # this means it was a save: redirect to the directory view
                 if obj.folder:
                     url = reverse('admin:filer-directory_listing',
@@ -57,10 +59,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 else:
                     url = reverse(
                             'admin:filer-directory_listing-unfiled_images')
-                url += "?1"
-                url += popup_param(request,"&")
-                url += selectfolder_param(request,"&")
-                return HttpResponseRedirect(url)
+                url = "%s%s%s" % (url,popup_param(request),
+                                  selectfolder_param(request,"&"))
             else:
                 # this means it probably was a save_and_continue_editing
                 pass
