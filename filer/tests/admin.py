@@ -26,7 +26,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_filer_make_root_folder_get(self):
-        response = self.client.get(reverse('admin:filer-directory_listing-make_root_folder'))
+        response = self.client.get(reverse('admin:filer-directory_listing-make_root_folder')+"?_popup=1")
         self.assertEqual(response.status_code, 200)
 
     def test_filer_make_root_folder_post(self):
