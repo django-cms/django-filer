@@ -1,5 +1,6 @@
 #!/bin/bash
 
+extra=""
 django="13"
 args=("$@")
 num_args=${#args[@]}
@@ -16,13 +17,18 @@ do
             echo ""
             echo "usage:"
             echo "    runtests.sh"
-            echo "    or runtests.sh [-d <version>|--django <version>]"
+            echo "    or runtests.sh [-d <version>|--django <version>] [test arguments]"
             echo ""
             echo "flags:"
             echo "    -d, --django <version> - run tests against a django version, options: 13 or 14"
+            echo ""
+            echo "test arguments:"
+            echo "    any other argument is passed to setup.py test command for further evaluation"
             exit 1
             ;;
 
+        *)
+            extra="$extra ${args[$index]}"
     esac
     let "index = $index + 1"
 done
@@ -47,4 +53,4 @@ if [ $django == "14" ]; then
 fi
 
 ./.travis_setup
-python setup.py test
+python setup.py test $extra
