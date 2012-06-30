@@ -106,9 +106,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                                   kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-unfiled_images')
-            url += "?1"
-            url += popup_param(request,"&")
-            url += selectfolder_param(request,"&")
+            url = "%s%s%s" % (url,popup_param(request),
+                              selectfolder_param(request,"&"))
             return HttpResponseRedirect(url)
         return r
 

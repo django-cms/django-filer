@@ -107,9 +107,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                   kwargs={'folder_id': obj.parent.id})
                 else:
                     url = reverse('admin:filer-directory_listing-root')
-                url += "?1"
-                url += popup_param(request,"&")
-                url += selectfolder_param(request,"&")
+                url = "%s%s%s" % (url,popup_param(request),
+                                  selectfolder_param(request,"&"))
                 return HttpResponseRedirect(url)
             else:
                 # this means it probably was a save_and_continue_editing
@@ -152,9 +151,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                   kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url += "?1"
-            url += popup_param(request,"&")
-            url += selectfolder_param(request,"&")
+            url = "%s%s%s" % (url,popup_param(request),
+                              selectfolder_param(request,"&"))
             return HttpResponseRedirect(url)
         return r
 
