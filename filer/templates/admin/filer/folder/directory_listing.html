@@ -20,6 +20,20 @@
 })(django.jQuery);
 </script>
 {% endif %}{% endif %}
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.zclip.min.js"></script>
+<script>
+$(document).ready(function() {
+	$('span.zclip').zclip({
+		path:"{% filer_staticmedia_prefix %}flash/ZeroClipboard.swf",
+		copy:function() {
+			return $(this).attr('data-copy')
+		},
+		afterCopy:function() {
+			$(this).fadeOut(100, function() {$(this).show()});
+		}
+	});
+});
+</script>
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}

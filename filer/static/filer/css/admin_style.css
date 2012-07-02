@@ -58,3 +58,15 @@ a.small_folder_link {
 	line-height: 36px;
 	float: right;
 }
+
+/* zClip */
+span.zclip {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	top: 0;
+	left: 0;
+	margin-top: -1px;
+	margin-left: 3px;
+	background: url('../img/clip.png') no-repeat;
+}
