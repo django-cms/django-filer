@@ -83,7 +83,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                     'alt_text': '',
                     'label': unicode(file_obj),
                 }
-                return HttpResponse(simplejson.dumps(json_response), mimetype='application/json')
+                return HttpResponse(simplejson.dumps(json_response),
+                                    mimetype='application/json')
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
@@ -91,7 +92,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                 ])
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
         except UploadException, e:
-            return HttpResponse(simplejson.dumps({'error': unicode(e)}), mimetype='application/json')
+            return HttpResponse(simplejson.dumps({'error': unicode(e)}),
+                                mimetype='application/json')
 
 
     def get_model_perms(self, request):

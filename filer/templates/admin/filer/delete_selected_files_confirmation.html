@@ -36,6 +36,10 @@
     {% for f in folders_queryset %}
     <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />
     {% endfor %}
+    {% if is_popup %}
+        <input type="hidden" name="_popup" value="1" />
+        {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+    {% endif %}
     <input type="hidden" name="action" value="delete_files_or_folders" />
     <input type="hidden" name="post" value="yes" />
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
