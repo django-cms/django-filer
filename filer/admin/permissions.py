@@ -24,7 +24,7 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
         return self.has_change_permission(request, obj)
 
     def _get_post_url(self, obj):
-        """ Needed to retrieve the changelist url as Folder/File cna be extended
+        """ Needed to retrieve the changelist url as Folder/File can be extended
         and admin url may change """
         ## Code borrowed from django ModelAdmin to determine changelist on the fly
         opts = obj._meta
