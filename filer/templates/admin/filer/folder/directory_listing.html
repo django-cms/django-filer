@@ -77,7 +77,7 @@
             <span>{% if is_popup %}{% else %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}</span>
         </h1>
         {% else %}{% if folder.is_smart_folder %}
-        <h1 class="folder_header"><a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% endif %}">&uarr;</a>
+        <h1 class="folder_header"><a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">&uarr;</a>
             <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
         </h1>
         {% endif %}

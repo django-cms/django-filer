@@ -16,6 +16,10 @@
 
 {% block coltype %}colMS{% endblock %}
 
+{% block after_field_sets %}
+    {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+{% endblock %}
+
 {% block sidebar %}
 <div id="content-related">
 	{% block file_sidebar %}

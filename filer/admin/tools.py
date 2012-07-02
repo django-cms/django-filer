@@ -2,21 +2,6 @@
 from django.core.exceptions import PermissionDenied
 
 
-def popup_status(request):
-    return '_popup' in request.REQUEST or 'pop' in request.REQUEST
-
-
-def selectfolder_status(request):
-    return 'select_folder' in request.REQUEST
-
-
-def popup_param(request):
-    if popup_status(request):
-        return "?_popup=1"
-    else:
-        return ""
-
-
 def check_files_edit_permissions(request, files):
     for f in files:
         if not f.has_edit_permission(request):
