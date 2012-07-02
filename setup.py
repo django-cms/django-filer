@@ -1,6 +1,12 @@
 from setuptools import setup, find_packages
 import os
 
+try:
+    from setuptest import test
+except ImportError:
+    print "erro"
+    from setuptools.command.test import test
+
 version = __import__('filer').__version__
 
 def read(fname):
@@ -35,6 +41,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
     ],
+    cmdclass={'test': test},
     test_suite='setuptest.setuptest.SetupTestSuite',
     tests_require=(
         'django-setuptest',
