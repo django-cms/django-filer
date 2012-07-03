@@ -26,7 +26,7 @@ class ThumbnailerNameMixin(object):
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
-        reproducable thumbnail name that can be converted back to the original
+        reproducible thumbnail name that can be converted back to the original
         filename.
         """
         path, source_filename = os.path.split(self.name)
