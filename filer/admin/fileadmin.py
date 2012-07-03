@@ -23,6 +23,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     raw_id_fields = ('owner',)
     readonly_fields = ('sha1',)
 
+
     # save_as hack, because without save_as it is impossible to hide the
     # save_and_add_another if save_as is False. To show only save_and_continue
     # and save in the submit row we need save_as=True and in
@@ -30,6 +31,26 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     save_as = True
 
     form = FileAdminChangeFrom
+
+    @classmethod
+    def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):
+        fieldsets = (
+            (None, {
+                'fields': ('name', 'owner', 'description',) + extra_main_fields,
+            }),
+            (_('Advanced'), {
+                'fields': ('file', 'sha1',) + extra_advanced_fields,
+                'classes': ('collapse',),
+                }),
+            ) + extra_fieldsets
+        if settings.FILER_ENABLE_PERMISSIONS:
+            fieldsets = fieldsets + (
+                (None, {
+                    'fields': ('is_public',)
+                }),
+            )
+        return fieldsets
+
 
     def response_change(self, request, obj):
         """
@@ -111,26 +132,4 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             'delete': False,
         }
 
-if settings.FILER_ENABLE_PERMISSIONS:
-    FileAdmin.fieldsets = (
-        (None, {
-            'fields': ('name', 'owner', 'description')
-        }),
-        (None, {
-            'fields': ('is_public',)
-        }),
-        (_('Advanced'), {
-            'fields': ('file', 'sha1',),
-            'classes': ('collapse',),
-        }),
-    )
-else:
-    FileAdmin.fieldsets = (
-        (None, {
-            'fields': ('name', 'owner', 'description')
-        }),
-        (_('Advanced'), {
-            'fields': ('file', 'sha1',),
-            'classes': ('collapse',),
-        }),
-    )
+FileAdmin.fieldsets = FileAdmin.build_fieldsets()
