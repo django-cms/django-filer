@@ -1,8 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.conf import settings
-from filer.server.backends.default import DefaultServer
-from filer.storage import PublicFileSystemStorage, PrivateFileSystemStorage
-from filer.utils.loader import load_object, storage_factory
+from django.core.files.storage import get_storage_class
+from filer.utils.loader import load_object
 import os
 import urlparse
 
@@ -33,56 +32,67 @@ FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     )
 )
 
+DEFAULT_FILER_STORAGES = {
+    'public': {
+        'main': {
+            'ENGINE': 'filer.storage.PublicFileSystemStorage',
+            'OPTIONS': {
+                'location': os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'filer/')),
+                'base_url': urlparse.urljoin(settings.MEDIA_URL, 'filer/'),
+            },
+        },
+        'thumbnails': {
+            'ENGINE': 'filer.storage.PublicFileSystemStorage',
+            'OPTIONS': {
+                'location': os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'filer_thumbnails/')),
+                'base_url': urlparse.urljoin(settings.MEDIA_URL, 'filer_thumbnails/'),
+            },
+        }
+    },
+    'private': {
+        'main': {
+            'ENGINE': 'filer.storage.PublicFileSystemStorage',
+            'OPTIONS': {
+                'location': os.path.abspath(os.path.join(settings.MEDIA_ROOT, '../smedia/filer')),
+                'base_url': '/smedia/filer/',
+            },
+        },
+        'thumbnails': {
+            'ENGINE': 'filer.storage.PublicFileSystemStorage',
+            'OPTIONS': {
+                'location': os.path.abspath(os.path.join(settings.MEDIA_ROOT, '../smedia/filer_thumbnails')),
+                'base_url': '/smedia/filer_thumbnails/',
+            },
+        }
+    },
+}
+
+DEFAULT_FILER_SERVERS = {
+    'private': {
+        'main': {
+            'ENGINE': 'filer.server.backends.default.DefaultServer',
+        },
+        'thumbnails': {
+            'ENGINE': 'filer.server.backends.default.DefaultServer',
+        }
+    }
+}
+
+
+
+FILER_STORAGES = getattr(settings, 'FILER_STORAGES', DEFAULT_FILER_STORAGES)
+FILER_SERVERS = getattr(settings, 'FILER_SERVERS', DEFAULT_FILER_SERVERS)
+
 # Public media (media accessible without any permission checks)
-FILER_PUBLICMEDIA_STORAGE = getattr(
-                    settings,
-                    'FILER_PUBLICMEDIA_STORAGE',
-                    storage_factory(
-                        klass=PublicFileSystemStorage,
-                        location=os.path.abspath(
-                            os.path.join(settings.MEDIA_ROOT,
-                                         'filer')),
-                        base_url=urlparse.urljoin(settings.MEDIA_URL,
-                                                  'filer/')
-                    ))
+FILER_PUBLICMEDIA_STORAGE = get_storage_class(FILER_STORAGES['public']['main']['ENGINE'])(**FILER_STORAGES['public']['main'].get('OPTIONS', {}))
 FILER_PUBLICMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PUBLICMEDIA_UPLOAD_TO', 'filer.utils.generate_filename.by_date'))
-FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = getattr(
-                    settings,
-                    'FILER_PUBLICMEDIA_THUMBNAIL_STORAGE',
-                    storage_factory(
-                        klass=PublicFileSystemStorage,
-                        location=os.path.abspath(
-                            os.path.join(settings.MEDIA_ROOT,
-                                         'filer_thumbnails')),
-                        base_url=urlparse.urljoin(settings.MEDIA_URL,
-                                                  'filer_thumbnails/')
-                    ))
+FILER_PUBLICMEDIA_THUMBNAIL_STORAGE = get_storage_class(FILER_STORAGES['public']['thumbnails']['ENGINE'])(**FILER_STORAGES['public']['thumbnails'].get('OPTIONS',{}))
 
 
 # Private media (media accessible through permissions checks)
-FILER_PRIVATEMEDIA_STORAGE = getattr(
-                    settings,
-                    'FILER_PRIVATEMEDIA_STORAGE',
-                    storage_factory(
-                        klass=PrivateFileSystemStorage,
-                        location=os.path.abspath(
-                            os.path.join(settings.MEDIA_ROOT,
-                                         '../smedia/filer/')),
-                        base_url=urlparse.urljoin(settings.MEDIA_URL,
-                                                  '/smedia/filer/')
-                    ))
+FILER_PRIVATEMEDIA_STORAGE = get_storage_class(FILER_STORAGES['private']['main']['ENGINE'])(**FILER_STORAGES['private']['main'].get('OPTIONS', {}))
 FILER_PRIVATEMEDIA_UPLOAD_TO = load_object(getattr(settings, 'FILER_PRIVATEMEDIA_UPLOAD_TO',
                                        'filer.utils.generate_filename.by_date'))
-FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = getattr(
-                    settings,
-                   'FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE',
-                    storage_factory(
-                        klass=PrivateFileSystemStorage,
-                        location=os.path.abspath(
-                            os.path.join(settings.MEDIA_ROOT,
-                                         '../smedia/filer_thumbnails/')),
-                        base_url=urlparse.urljoin(settings.MEDIA_URL,
-                                                  '/smedia/filer_thumbnails/')
-                    ))
-FILER_PRIVATEMEDIA_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_SERVER', DefaultServer())
-FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = getattr(settings, 'FILER_PRIVATEMEDIA_THUMBNAIL_SERVER', DefaultServer())
+FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = get_storage_class(FILER_STORAGES['private']['thumbnails']['ENGINE'])(**FILER_STORAGES['private']['thumbnails'].get('OPTIONS', {}))
+FILER_PRIVATEMEDIA_SERVER = load_object(FILER_SERVERS['private']['main']['ENGINE'])(**FILER_SERVERS['private']['main'].get('OPTIONS', {}))
+FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = load_object(FILER_SERVERS['private']['thumbnails']['ENGINE'])(**FILER_SERVERS['private']['thumbnails'].get('OPTIONS', {}))
