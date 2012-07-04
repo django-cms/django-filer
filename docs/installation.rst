@@ -16,18 +16,17 @@ If you are feeling adventurous you can get
 Dependencies
 ------------
 
-* `Django`_ 1.2
-* `django-mptt`_ >= 0.2.1
-* `easy_thumbnails`_ >= 1.0-alpha-17
-* `django-polymorphic`_ >= 0.2
+* `Django`_ >=1.3.1,<1.5
+* `django-mptt`_ >=0.5.1,<0.6
+* `easy_thumbnails`_ >= 1.0
+* `django-polymorphic`_ >=0.2
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support) I recommend using `Pillow`_ instead.
-* `django-staticfiles`_ or ``django.contrib.staticfiles`` with `Django`_ 1.3 is 
-  recommended
+* ``django.contrib.staticfiles``
 
 Since the `PIL`_ package on `pypi`_ can be notoriously hard to install on some
 platforms it is not listed in the package dependencies in ``setup.py`` and won't
 be installed automatically. Please make sure you install `PIL`_ with JPEG and
-ZLIB support installed. I recommend the better packaged `Pillow`_ a better
+ZLIB support installed. I recommend `Pillow`_ a better
 packaged fork of `PIL`_).
 
 Configuration
