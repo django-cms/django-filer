@@ -6,5 +6,5 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^media/filer_private/', include('filer.server.urls')),
+    url(r'^', include('filer.server.urls')),
 )
