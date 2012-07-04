@@ -24,22 +24,25 @@ nginx docs about this stuff: http://wiki.nginx.org/XSendfile
 
 in ``settings.py``::
 
-    from filer.server.backends.nginx import NginxXAccelRedirectServer
-    from filer.storage import PrivateFileSystemStorage
-    
-    FILER_PRIVATEMEDIA_STORAGE = PrivateFileSystemStorage(
-                           path='/path/to/smedia/filer',
-                           base_url='/smedia/filer/')
-    FILER_PRIVATEMEDIA_SERVER = NginxXAccelRedirectServer(
-                           location='/path/to/smedia/filer',
-                           nginx_location='/nginx_filer_private')
-    
-    FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE = PrivateFileSystemStorage(
-                           location='/path/to/smedia/filer_thumbnails',
-                           base_url='/smedia/filer_thumbnails/')
-    FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = NginxXAccelRedirectServer(
-                           location='/path/to/smedia/filer_thumbnails',
-                           nginx_location='/nginx_filer_private_thumbnails')
+    FILER_SERVERS = {
+        'private': {
+            'main': {
+                'ENGINE': 'filer.server.backends.nginx.NginxXAccelRedirectServer',
+                'OPTIONS': {
+                    'location': '/path/to/smedia/filer',
+                    'nginx_location': '/nginx_filer_private',
+                },
+            },
+            'thumbnails': {
+                'ENGINE': 'filer.server.backends.nginx.NginxXAccelRedirectServer',
+                'OPTIONS': {
+                    'location': '/path/to/smedia/filer_thumbnails',
+                    'nginx_location': '/nginx_filer_private_thumbnails',
+                },
+            },
+        },
+    }
+
 
 ``nginx_location`` is the location directive where nginx "hides"
 permission-checked files from general access. A fitting nginx configuration
@@ -80,10 +83,16 @@ configure the settings.
 
 in ``settings.py``::
     
-    from filer.server.backends.xsendfile import ApacheXSendfileServer
-    
-    FILER_PRIVATEMEDIA_SERVER = ApacheXSendfileServer()
-    FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = ApacheXSendfileServer()
+    FILER_SERVERS = {
+        'private': {
+            'main': {
+                'ENGINE': 'filer.server.backends.xsendfile.ApacheXSendfileServer',
+                },
+            'thumbnails': {
+                'ENGINE': 'filer.server.backends.xsendfile.ApacheXSendfileServer',
+                },
+            },
+        }
 
 in your apache configuration::
     
