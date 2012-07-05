@@ -16,18 +16,17 @@ If you are feeling adventurous you can get
 Dependencies
 ------------
 
-* `Django`_ 1.2
-* `django-mptt`_ >= 0.2.1
-* `easy_thumbnails`_ >= 1.0-alpha-17
-* `django-polymorphic`_ >= 0.2
+* `Django`_ >=1.3.1,<1.5
+* `django-mptt`_ >=0.5.1,<0.6
+* `easy_thumbnails`_ >= 1.0
+* `django-polymorphic`_ >=0.2
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support) I recommend using `Pillow`_ instead.
-* `django-staticfiles`_ or ``django.contrib.staticfiles`` with `Django`_ 1.3 is 
-  recommended
+* ``django.contrib.staticfiles``
 
-Since the `PIL`_ package on `pypi`_ can be notoriously hard to install on some
+Since the `PIL package on pypi <http://pypi.python.org/pypi/PIL/>`_ can be notoriously hard to install on some
 platforms it is not listed in the package dependencies in ``setup.py`` and won't
 be installed automatically. Please make sure you install `PIL`_ with JPEG and
-ZLIB support installed. I recommend the better packaged `Pillow`_ a better
+ZLIB support installed. I recommend `Pillow`_ a better
 packaged fork of `PIL`_).
 
 Configuration
@@ -47,20 +46,16 @@ are located in the ``static/filer`` directory in the ``filer`` package. If you a
 already using `django-staticfiles`_ or `django.contrib.staticfiles`_ you're 
 already set and can skip the next paragraph.
 
-By default django-filer will look for those files at ``<STATIC_URL>/filer/`` . 
-Make sure that they are accessible at one of those locations. 
-See the :ref:`FILER_STATICMEDIA_PREFIX` setting if you want to serve them from
-somewhere else.
-
 permissions on files
 ....................
 
-django-filer supports permissions on files. They can be enabled or disabled. 
+.. warning:: File download permissions are an experimental feature. The api may change at any time.
+
 Files with disabled permissions are your regular world readable files in
-``MEDIA_ROOT``. Files with permissions are a other case however. To be able to 
-check permissions on the file downloads a special view is used and they are 
-saved in a separate location (in a directory called `smedia` next to
-``MEDIA_ROOT`` by default).
+``MEDIA_ROOT``. Files with permissions are a other case however. They can only be downloaded by
+authorized users. To be able to check permissions on the file downloads, a special view is used
+and they are saved in a separate location (in a directory called ``smedia`` at the same level as
+``MEDIA_ROOT``).
 
 ``filer.server.urls`` needs to be included in the root ``urls.py``::
 
@@ -68,10 +63,10 @@ saved in a separate location (in a directory called `smedia` next to
         url(r'^', include('filer.server.urls')),
     )
 
-By default files with permissions are served directly by `django`_. That is
-acceptable in a development environment, but very bad for performance in
-production. See the docs on :ref:`how to serve files more efficiently
-<server>`.
+By default files with permissions are served directly by the `django`_ process. That is
+acceptable in a development environment, but is very bad for performance and security in
+production. See the :ref:`file permission docs <server>` on how to serve files more efficiently
+and how use custom storage backends.
 
 subject location aware cropping
 ...............................
@@ -79,7 +74,7 @@ subject location aware cropping
 It is possible to define the *important* part of an image (the 
 *subject location*) in the admin interface for django-filer images. This is 
 very useful when later resizing and cropping images with easy_thumbnails. The 
-image can then be cropped autamatically in a way, that the important part of
+image can then be cropped automatically in a way, that the important part of
 the image is always visible.
 
 To enable automatic subject location aware cropping of images replace 

@@ -31,57 +31,81 @@ Defaults to ``<STATIC_URL>/filer/`` if ``STATIC_URL`` is defined. Otherwise
 falls back to ``<MEDIA_URL>/filer/``. It is the URL where the ``static/filer/`` 
 directory should be served.
 
-``FILER_PUBLICMEDIA_*``
------------------------
 
-``FILER_PUBLICMEDIA_STORAGE``
-    The storage backend for public (without permission checks) files. Must be
-    an instance of a storage class.
+``FILER_STORAGES``
+------------------
 
-``FILER_PUBLICMEDIA_UPLOAD_TO``
-    The function to generate the path relative to the storage root. The 
-    default generates a date based path like ``2011/05/03/filename.jpg``. This
-    will be applied with the current date whenever a file is uploaded or moved
-    between public (without permission checks) and private (with permission
-    checks) storages.
-    
-    Defaults to ``'filer.utils.generate_filename.by_date'``
-    
-``FILER_PUBLICMEDIA_THUMBNAIL_STORAGE``
-    Same as ``FILER_PUBLICMEDIA_STORAGE`` but for thumbnails
-    
-``FILER_PRIVATEMEDIA_*``
-------------------------
+A dictionary to configure storage backends used for file storage.
 
-``FILER_PRIVATEMEDIA_STORAGE``
-    The storage backend for private (with permission checks) files. Must be
-    an instance of a storage class.
-    
-    default generates a date based path like ``2011/05/03/filename.jpg``. This
-    will be applied with the current date whenever a file is uploaded or moved
-    between public (without permission checks) and private (with permission
-    checks) storages.
-    
-    Defaults to ``'filer.utils.generate_filename.by_date'``
-    
-``FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE``
-    Same as ``FILER_PRIVATEMEDIA_STORAGE`` but for thumbnails.
-    
-    Defaults to ``filer.storage.PrivateFileSystemStorage`` using 
-    ``FILER_PRIVATEMEDIA_THUMBNAIL_ROOT`` and ``FILER_PRIVATEMEDIA_THUMBNAIL_URL``
-    as ``location`` and ``base_url``.
-    
-``FILER_PRIVATEMEDIA_SERVER``
-    The server backend to use to serve the private (with permission checks)
-    files with. The default serves the file entirely with django. This is not
-    what you want on a production server. Use one of the other server backends
-    in production instead:
-        
-    * ``filer.server.backends.nginx.NginxXAccelRedirectServer``
-    * ``filer.server.backends.xsendfile.ApacheXSendfileServer``
-    
-    Defaults to ``filer.server.backends.default.DefaultServer``
-    
+e.g::
+
+    FILER_STORAGES = {
+        'private': {
+            'main': {
+                'ENGINE': 'filer.storage.PublicFileSystemStorage',
+                'OPTIONS': {
+                    'location': '/path/to/media/filer',
+                    'base_url': '/smedia/filer/',
+                },
+                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+            },
+            'thumbnails': {
+                'ENGINE': 'filer.storage.PublicFileSystemStorage',
+                'OPTIONS': {
+                    'location': '/path/to/media/filer_thumbnails',
+                    'base_url': '/smedia/filer_thumbnails/',
+                },
+            },
+        },
+        'private': {
+            'main': {
+                'ENGINE': 'filer.storage.PrivateFileSystemStorage',
+                'OPTIONS': {
+                    'location': '/path/to/smedia/filer',
+                    'base_url': '/smedia/filer/',
+                },
+                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+            },
+            'thumbnails': {
+                'ENGINE': 'filer.storage.PrivateFileSystemStorage',
+                'OPTIONS': {
+                    'location': '/path/to/smedia/filer_thumbnails',
+                    'base_url': '/smedia/filer_thumbnails/',
+                },
+            },
+        },
+    }
+
+Defaults to FileSystemStorage in ``<MEDIA_ROOT>/filer/`` and ``<MEDIA_ROOT>/filer_thumbnails/`` for public files and
+``<MEDIA_ROOT>/../smedia/filer/`` and ``<MEDIA_ROOT>/../smedia/filer_thumbnails/`` for private files.
+
+``UPLOAD_TO`` is the function to generate the path relative to the storage root. The
+default generates a date based path like ``2011/05/03/filename.jpg``. This
+will be applied with the current date whenever a file is uploaded or moved
+between public (without permission checks) and private (with permission
+checks) storages. Defaults to ``'filer.utils.generate_filename.by_date'``
+
+
+``FILER_SERVERS``
+------------------
+
+A dictionary to configure server backends to serve files with permissions.
+
+e.g::
+
+    DEFAULT_FILER_SERVERS = {
+        'private': {
+            'main': {
+                'ENGINE': 'filer.server.backends.default.DefaultServer',
+            },
+            'thumbnails': {
+                'ENGINE': 'filer.server.backends.default.DefaultServer',
+            }
+        }
+    }
+
+Defaults to using the DefaultServer (doh)! This will serve the files with the django app.
+
 
 ``FILER_PAGINATE_BY``
 ---------------------

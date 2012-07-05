@@ -27,9 +27,6 @@ located in the parent directory of ``MEDIA_ROOT``.
 The smedia directory must **NOT** be served by the webserver directly, because
 that would bypass the permission checks.
 
-The base directory and url for private files can be configured with the
-``FILER_PRIVATEMEDIA_STORAGE`` setting.
-
 To hook up the view ``filer.server.urls`` needs to be included in the root
 ``urls.py``::
 
