@@ -40,7 +40,7 @@ A dictionary to configure storage backends used for file storage.
 e.g::
 
     FILER_STORAGES = {
-        'private': {
+        'public': {
             'main': {
                 'ENGINE': 'filer.storage.PublicFileSystemStorage',
                 'OPTIONS': {
