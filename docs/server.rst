@@ -3,7 +3,11 @@
 File Server Backends
 ====================
 
-.. NOTE:: Please follow the instructions for setting up :ref:`permissions` first.
+.. note:: Please follow the instructions for setting up :ref:`permissions` first.
+
+.. warning:: Server Backends are experimental and the API may change at any time.
+
+.. warning:: Server Backends currently only work with files in the local filesystem.
 
 The private file view will serve the permission-checked media files by
 delegating to one of its server backends. The ones bundled with django-filer

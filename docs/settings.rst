@@ -89,6 +89,8 @@ checks) storages. Defaults to ``'filer.utils.generate_filename.by_date'``
 ``FILER_SERVERS``
 ------------------
 
+.. warning:: Server Backends are experimental and the API may change at any time.
+
 A dictionary to configure server backends to serve files with permissions.
 
 e.g::

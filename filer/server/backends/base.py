@@ -5,6 +5,11 @@ import os
 
 
 class ServerBase(object):
+    """
+    Server classes define a way to serve a Django File object.
+
+    Warning: this API is EXPERIMENTAL and may change at any time.
+    """
     def __init__(self, *args, **kwargs):
         pass
 
