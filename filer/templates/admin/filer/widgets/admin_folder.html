@@ -2,7 +2,7 @@
 {% if object %}
     {% trans 'Folder' %}: <span id="{{ span_id }}">{{ object.name }}</span>
 {% else %}
-    {% trans 'Folder' %}: <span id="{{ span_id }}">{% trans 'none selected' %}}</span>
+    {% trans 'Folder' %}: <span id="{{ span_id }}">{% trans 'none selected' %}</span>
 {% endif %}
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
 	<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
