@@ -152,6 +152,15 @@ class File(PolymorphicModel, mixins.IconsMixin):
         except Exception, e:
             pass
         super(File, self).save(*args, **kwargs)
+    save.alters_data = True
+
+    def delete(self, *args, **kwargs):
+        # Delete the model before the file
+        super(File, self).delete(*args, **kwargs)
+        # Delete the file if there are no other Files referencing it.
+        if not File.objects.filter(file=self.file.name, is_public=self.is_public).exists():
+            self.file.delete(False)
+    delete.alters_data = True
 
     @property
     def label(self):
