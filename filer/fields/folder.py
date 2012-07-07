@@ -27,7 +27,15 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         required = self.attrs
         if attrs is None:
             attrs = {}
-        related_url = reverse('admin:filer-directory_listing-root')
+        related_url = None
+        if value:
+            try:
+                folder = Folder.objects.get(pk=value)
+                related_url = folder.get_admin_directory_listing_url_path()
+            except Exception:
+                pass
+        if not related_url:
+            related_url = reverse('admin:filer-directory_listing-root')
         params = self.url_parameters()
         params['select_folder'] = 1
         if params:

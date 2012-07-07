@@ -1,6 +1,6 @@
 {% load i18n filer_admin_tags %}{% spaceless %}
 {% if object %}
-    {% trans 'Folder' %}: <span id="{{ span_id }}">{{ object.name }}</span>
+    {% trans 'Folder' %}: <span id="{{ span_id }}">{{ object.pretty_logical_path }}</span>
 {% else %}
     {% trans 'Folder' %}: <span id="{{ span_id }}">{% trans 'none selected' %}</span>
 {% endif %}
