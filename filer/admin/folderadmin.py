@@ -613,7 +613,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 for folder in folders_queryset:
                     folder_ids.add(folder.id)
                     folder_ids.update(folder.get_descendants().values_list('id', flat=True))
-                for f in File.objects.filter(folder_id__in=folder_ids):
+                for f in File.objects.filter(folder__in=folder_ids):
                     self.log_deletion(request, f, force_unicode(f))
                     f.delete()
                 # delete all folders
