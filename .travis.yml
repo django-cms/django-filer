@@ -11,4 +11,7 @@ env:
 script: python setup.py test
 matrix:
   allow_failures:
-    - env: DJANGO="-e git+git://github.com/django/django.git#egg=Django"
+    - python: 2.6
+      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django"
+    - python: 2.7
+      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django"
