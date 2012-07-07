@@ -17,23 +17,18 @@ from filer.tests.utils import Mock
 
 class BaseServerBackendTestCase(TestCase):
     def setUp(self):
-        original_filename = 'myimage.jpg'
+        original_filename = 'testimage.jpg'
         file_obj = SimpleUploadedFile(
             name=original_filename,
             content=create_image().tostring(),
             content_type='image/jpeg')
         self.filer_file = File.objects.create(
+            is_public=False,
             file=file_obj,
             original_filename=original_filename)
-    def tearDown(self):
-        # delete all the files
-        for location in (
-                filer_settings.FILER_PUBLICMEDIA_STORAGE.location,
-                filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_STORAGE.location,
-                filer_settings.FILER_PRIVATEMEDIA_STORAGE.location,
-                filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE.location):
-            shutil.rmtree(location,ignore_errors=True)
 
+    def tearDown(self):
+        self.filer_file.delete()
 
 class DefaultServerTestCase(BaseServerBackendTestCase):
     def test_normal(self):
@@ -62,8 +57,8 @@ class NginxServerTestCase(BaseServerBackendTestCase):
     def setUp(self):
         super(NginxServerTestCase, self).setUp()
         self.server = NginxXAccelRedirectServer(
-            location='mylocation',
-            nginx_location=filer_settings.FILER_PUBLICMEDIA_STORAGE.location,
+            location=filer_settings.FILER_PRIVATEMEDIA_STORAGE.location,
+            nginx_location='mylocation',
         )
 
     def test_normal(self):

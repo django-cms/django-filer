@@ -9,14 +9,7 @@ from filer.tests.helpers import create_superuser, create_image
 import os
 
 class ToolsTestCase(TestCase):
-
-    def tearDown(self):
-        self.client.logout()
-        os.remove(self.filename)
-        for img in Image.objects.all():
-            img.delete()
-
-    def create_fixtures(self):
+    def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
         self.img = create_image()
@@ -35,14 +28,19 @@ class ToolsTestCase(TestCase):
 
         self.folder = Folder.objects.create(name='test_folder')
 
+    def tearDown(self):
+        self.client.logout()
+        os.remove(self.filename)
+        for img in Image.objects.all():
+            os.remove(img.file.path)
+            img.delete()
+
     def test_clear_clipboard_works(self):
-        self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
         tools.discard_clipboard(self.clipboard)
         self.assertEqual(len(self.clipboard.files.all()), 0)
 
     def test_move_to_clipboard_works(self):
-        self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
 
         file2 = Image.objects.create(owner=self.superuser,
@@ -57,7 +55,6 @@ class ToolsTestCase(TestCase):
         self.assertEqual(len(self.clipboard.files.all()), 3)
 
     def test_move_from_clipboard_to_folder_works(self):
-        self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
 
         tools.move_files_from_clipboard_to_folder(self.clipboard, self.folder)
@@ -65,7 +62,6 @@ class ToolsTestCase(TestCase):
             self.assertEqual(file.folder, self.folder)
 
     def test_delete_clipboard_works(self):
-        self.create_fixtures()
         self.assertEqual(len(self.clipboard.files.all()), 1)
 
         tools.delete_clipboard(self.clipboard)

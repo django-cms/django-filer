@@ -6,6 +6,7 @@ from django.core.files import File as DjangoFile
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
+from filer.models.filemodels import File
 from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
@@ -27,8 +28,8 @@ class FilerApiTests(TestCase):
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
-        for img in Image.objects.all():
-            img.delete()
+        for f in File.objects.all():
+            f.delete()
 
     def create_filer_image(self):
         file = DjangoFile(open(self.filename), name=self.image_name)
@@ -132,3 +133,46 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
+
+    def test_deleting_image_deletes_file_from_filesystem(self):
+        file_1 = self.create_filer_image()
+        self.assertTrue(file_1.file.storage.exists(file_1.file.name))
+
+        # create some thumbnails
+        thumbnail_urls = file_1.thumbnails
+
+        # check if the thumnails exist
+        thumbnails = [x for x in file_1.file.get_thumbnails()]
+        for tn in thumbnails:
+            self.assertTrue(tn.storage.exists(tn.name))
+        storage, name = file_1.file.storage, file_1.file.name
+
+        # delete the file
+        file_1.delete()
+
+        # file should be gone
+        self.assertFalse(storage.exists(name))
+        # thumbnails should be gone
+        for tn in thumbnails:
+            self.assertFalse(tn.storage.exists(tn.name))
+
+    def test_deleting_file_does_not_delete_file_from_filesystem_if_other_references_exist(self):
+        file_1 = self.create_filer_image()
+        # create another file that references the same physical file
+        file_2 = File.objects.get(pk=file_1.pk)
+        file_2.pk = None
+        file_2.id = None
+        file_2.save()
+        self.assertTrue(file_1.file.storage.exists(file_1.file.name))
+        self.assertTrue(file_2.file.storage.exists(file_2.file.name))
+        self.assertEqual(file_1.file.name, file_2.file.name)
+        self.assertEqual(file_1.file.storage, file_2.file.storage)
+
+        storage, name = file_1.file.storage, file_1.file.name
+
+        # delete one file
+        file_1.delete()
+
+        # file should still be here
+        self.assertTrue(storage.exists(name))
+

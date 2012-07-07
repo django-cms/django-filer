@@ -12,7 +12,7 @@ import os
 
 class FolderPermissionsTestCase(TestCase):
 
-    def create_fixtures(self):
+    def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
 
@@ -36,8 +36,10 @@ class FolderPermissionsTestCase(TestCase):
 
         self.folder = Folder.objects.create(name='test_folder')
 
+    def tearDown(self):
+        self.image.delete()
+
     def test_superuser_has_rights(self):
-        self.create_fixtures()
         request = Mock()
         setattr(request, 'user', self.superuser)
 
@@ -47,7 +49,6 @@ class FolderPermissionsTestCase(TestCase):
     def test_unlogged_user_has_no_rights(self):
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         filer_settings.FILER_ENABLE_PERMISSIONS = True
-        self.create_fixtures()
         request = Mock()
         setattr(request, 'user', self.unauth_user)
 
@@ -56,7 +57,6 @@ class FolderPermissionsTestCase(TestCase):
         self.assertEqual(result, False)
 
     def test_unlogged_user_has_rights_when_permissions_disabled(self):
-        self.create_fixtures()
         request = Mock()
         setattr(request, 'user', self.unauth_user)
 
@@ -64,7 +64,6 @@ class FolderPermissionsTestCase(TestCase):
         self.assertEqual(result, True)
 
     def test_owner_user_has_rights(self):
-        self.create_fixtures()
         # Set owner as the owner of the folder.
         self.folder.owner = self.owner
         request = Mock()
