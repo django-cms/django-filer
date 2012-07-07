@@ -18,8 +18,10 @@
 	dismissRelatedFolderLookupPopup = function(win, chosenId, chosenName) {
 		var id = windowname_to_id(win.name);
 		var id_name = id + '_description_txt';
+        alert(id);
+        alert(id_name);
 		document.getElementById(id).value = chosenId;
 		document.getElementById(id_name).innerHTML = chosenName;
-		win.close();
+		//win.close();
 	};
 })(jQuery);
