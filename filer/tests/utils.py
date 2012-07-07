@@ -41,8 +41,7 @@ class ClassLoaderTestCase(TestCase):
 
 class ZippingTestCase(TestCase):
 
-    def create_fixtures(self):
-
+    def setUp(self):
         self.img = create_image()
         self.image_name = 'test_file.jpg'
         self.filename = os.path.join(os.path.dirname(__file__),
@@ -63,6 +62,5 @@ class ZippingTestCase(TestCase):
         os.remove(self.filename)
 
     def test_unzipping_works(self):
-        self.create_fixtures()
         result = unzip(self.zipfilename)
         self.assertEqual(result[0][0].name, self.file.name)
