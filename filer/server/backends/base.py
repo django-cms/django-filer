@@ -10,9 +10,6 @@ class ServerBase(object):
 
     Warning: this API is EXPERIMENTAL and may change at any time.
     """
-    def __init__(self, *args, **kwargs):
-        pass
-
     def get_mimetype(self, path):
         return mimetypes.guess_type(path)[0] or 'application/octet-stream'
 
