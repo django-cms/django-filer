@@ -92,7 +92,7 @@ To enable automatic subject location aware cropping of images replace
 
 To crop an image and respect the subject location::
     
-    {% load thumbnails %}
+    {% load thumbnail %}
     {% thumbnail obj.img 200x300 crop upscale subject_location=obj.img.subject_location %}
 
 
