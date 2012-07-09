@@ -6,6 +6,15 @@ from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 import os
 import urlparse
 
+FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False) # When True makes
+
+FILER_ENABLE_LOGGING = getattr(settings, 'FILER_ENABLE_LOGGING', False)
+
+if FILER_ENABLE_LOGGING:
+    FILER_ENABLE_LOGGING = (FILER_ENABLE_LOGGING and (getattr(settings,'LOGGING') and
+                                                  ('' in settings.LOGGING['loggers'] or
+                                                   'filer' in settings.LOGGING['loggers'])))
+
 FILER_ENABLE_PERMISSIONS = getattr(settings, 'FILER_ENABLE_PERMISSIONS', False)
 
 FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS = getattr(settings, 'FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS', False)
