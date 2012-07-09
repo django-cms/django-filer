@@ -3,8 +3,8 @@ from django import forms
 from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import (quote, unquote, get_deleted_objects,
-                                       capfirst)
+from django.contrib.admin.util import quote, unquote, capfirst
+from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
