@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+from django.template.loader import render_to_string
 import inspect
 from django import forms
 from django.conf import settings
@@ -26,7 +27,15 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         required = self.attrs
         if attrs is None:
             attrs = {}
-        related_url = reverse('admin:filer-directory_listing-root')
+        related_url = None
+        if value:
+            try:
+                folder = Folder.objects.get(pk=value)
+                related_url = folder.get_admin_directory_listing_url_path()
+            except Exception:
+                pass
+        if not related_url:
+            related_url = reverse('admin:filer-directory_listing-root')
         params = self.url_parameters()
         params['select_folder'] = 1
         if params:
@@ -37,51 +46,26 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         if not 'class' in attrs:
             # The JavaScript looks for this hook.
             attrs['class'] = 'vForeignKeyRawIdAdminField'
-        output = []
-        if obj:
-            output.append(_(u'Folder: <span id="%(cssid)s">%(name)s</span>') \
-                          % {'cssid': css_id_description_txt, 'name':obj.name})
-        else:
-            output.append(_(u'Folder: <span id="%s">none selected</span>') \
-                                            % css_id_description_txt)
+        super_attrs = attrs.copy()
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(
+                                                    name, value, super_attrs)
+
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
-        output.append(
-            (u'<a href="%s%s" class="related-lookup" id="lookup_id_%s"' + \
-             u'onclick="return showRelatedObjectLookupPopup(this);"> ') % \
-                (related_url, url, name))
-        output.append(('<img src="%simg/admin/selector-search.gif" ' +\
-                       'width="16" height="16" alt="%s" /></a>') % (
-                                    settings.ADMIN_MEDIA_PREFIX, _('Lookup')))
-        output.append('</br>')
-        clearid = '%s_clear' % css_id
-        output.append(
-            (u'<img id="%s" src="%simg/admin/icon_deletelink.gif" ' +\
-             u'width="10" height="10" alt="%s" title="%s"/>') % (
-                            clearid, settings.ADMIN_MEDIA_PREFIX,
-                            _('Clear'), _('Clear')))
-        output.append('<br />')
-        super_attrs = attrs.copy()
-        output.append(super(ForeignKeyRawIdWidget, self).render(
-                                                    name, value, super_attrs))
-        noimgurl = '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX
-        js = '''<script type="text/javascript">django.jQuery("#%(id)s").hide();
-django.jQuery("#%(id)s_clear").click(function(){
-    django.jQuery("#%(id)s").removeAttr("value");
-    django.jQuery("#%(foldid)s").attr("src", "%(noimg)s");
-    django.jQuery("#%(descid)s").html("");
-});
-django.jQuery(document).ready(function(){
-    var plus = django.jQuery("#add_%(id)s");
-    if (plus.length){
-        plus.remove();
-    }
-});
-</script>'''
-        output.append(js % {'id': css_id, 'foldid': css_id_folder,
-                            'noimg': noimgurl,
-                            'descid': css_id_description_txt})
-        return mark_safe(u''.join(output))
+        context = {
+            'hidden_input': hidden_input,
+            'lookup_url': '%s%s' % (related_url, url),
+            'lookup_name': name,
+            'span_id': css_id_description_txt,
+            'object': obj,
+            'clear_id': '%s_clear' % css_id,
+            'descid': css_id_description_txt,
+            'noimg': '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX,
+            'foldid': css_id_folder,
+            'id': css_id,
+            }
+        html = render_to_string('admin/filer/widgets/admin_folder.html', context)
+        return mark_safe(html)
 
     def label_for_value(self, value):
         obj = self.obj_for_value(value)

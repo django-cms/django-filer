@@ -18,12 +18,14 @@
         {% for item in paginated_items.object_list %}
             {% if item.file_type == 'Folder' or item.file_type == 'DummyFolder' %}{% with item as subfolder%}
             <tr class="{% cycle rowcolors %}">
-                <td>{% if select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.name }}'); return false;" >&nbsp;</a>{% else %}{% if action_form and item.pk and not is_popup %}<input type="checkbox" class="action-select" value="folder-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
+                <td>{% if select_folder and item.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.pretty_logical_path }}'); return false;" >&nbsp;</a>{% else %}{% if action_form and item.pk and not is_popup %}<input type="checkbox" class="action-select" value="folder-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
                 <!-- DirIcon -->
                 <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.48 }}" alt="{% trans "Folder Icon" %}" /></a></td>
                 <!-- Directory details -->
                 <td>
-                    <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
+                    {% if item.file_type == 'Folder' %}
+                        <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
+                    {% endif %}
                     <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b>{% if not subfolder.is_root %}<span class="tiny"> ({% blocktrans count subfolder.children_count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.file_count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>{% endif %}</div>
                     <div>{% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }}</div>
                 </td>
@@ -64,7 +66,7 @@
         {% endif %}
 
         <span class="this-page">
-        	{% blocktrans with paginated_items.number as number and paginated_items.paginator.num_pages as num_pages %}
+            {% blocktrans with paginated_items.number as number and paginated_items.paginator.num_pages as num_pages %}
             Page {{ number }} of {{ num_pages }}.
             {% endblocktrans %}
         </span>

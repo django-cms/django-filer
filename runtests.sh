@@ -46,10 +46,13 @@ esac
 find . -name '*.pyc' -delete
 
 if [ $django == "13" ]; then
-    export DJANGO_VERSION="1.3.1"
+    export DJANGO="django>=1.3,<1.4"
 fi
 if [ $django == "14" ]; then
-    export DJANGO_VERSION="1.4"
+    export DJANGO="django>=1.4,<1.5"
+fi
+if [ $django == "dev" ]; then
+    export DJANGO="-e git+git://github.com/django/django.git#egg=Django"
 fi
 
 ./.travis_setup

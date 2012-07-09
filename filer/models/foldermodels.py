@@ -141,6 +141,10 @@ class Folder(models.Model, mixins.IconsMixin):
             folder_path.append(self.parent)
         return folder_path
 
+    @property
+    def pretty_logical_path(self):
+        return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
 

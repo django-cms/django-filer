@@ -152,6 +152,15 @@ class File(PolymorphicModel, mixins.IconsMixin):
         except Exception, e:
             pass
         super(File, self).save(*args, **kwargs)
+    save.alters_data = True
+
+    def delete(self, *args, **kwargs):
+        # Delete the model before the file
+        super(File, self).delete(*args, **kwargs)
+        # Delete the file if there are no other Files referencing it.
+        if not File.objects.filter(file=self.file.name, is_public=self.is_public).exists():
+            self.file.delete(False)
+    delete.alters_data = True
 
     @property
     def label(self):
@@ -204,6 +213,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
                                     self._meta.module_name,),
             args=(self.pk,)
         )
+
+    @property
+    def file_ptr(self):
+        """
+        Evil hack to get around the cascade delete problem with django_polymorphic.
+        Prevents ``AttributeError: 'File' object has no attribute 'file_ptr'``.
+        This is only a workaround for one level of subclassing. The hierarchy of
+        object in the admin delete view is wrong, but at least it works.
+        """
+        return self
 
     @property
     def url(self):

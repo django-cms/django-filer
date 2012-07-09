@@ -2,7 +2,7 @@
 import os
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from django.core.files import File as DjangoFile
+import django.core.files
 from django.contrib.admin import helpers
 
 from filer.models.filemodels import File
@@ -79,11 +79,11 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
-        file = DjangoFile(open(self.filename))
+        file_obj = django.core.files.File(open(self.filename))
         response = self.client.post(reverse('admin:filer-ajax_upload'),
                                     {
                                        'Filename':self.image_name,
-                                        'Filedata': file,
+                                        'Filedata': file_obj,
                                        'jsessionid':self.client.session.session_key,
                                     })
         self.assertEqual(Image.objects.count(), 1)
@@ -100,13 +100,24 @@ class  BulkOperationsMixin(object):
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
         self.create_src_and_dst_folders()
-        self.create_image(self.src_folder)
+        self.folder = Folder.objects.create(name="root folder", parent=None)
+        self.sub_folder1 = Folder.objects.create(name="sub folder 1", parent=self.folder)
+        self.sub_folder2 = Folder.objects.create(name="sub folder 2", parent=self.folder)
+        self.image_obj = self.create_image(self.src_folder)
+        self.create_file(self.folder)
+        self.create_file(self.folder)
+        self.create_image(self.folder)
+        self.create_image(self.sub_folder1)
+        self.create_file(self.sub_folder1)
+        self.create_file(self.sub_folder1)
+        self.create_image(self.sub_folder2)
+        self.create_image(self.sub_folder2)
 
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
-        for img in Image.objects.all():
-            img.delete()
+        for f in File.objects.all():
+            f.delete()
         for folder in Folder.objects.all():
             folder.delete()
 
@@ -116,10 +127,21 @@ class  BulkOperationsMixin(object):
         self.dst_folder = Folder(name="Dst", parent=None)
         self.dst_folder.save()
 
-    def create_image(self, folder):
-        file = DjangoFile(open(self.filename), name=self.image_name)
-        self.image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file, folder=folder)
-        self.image_obj.save()
+    def create_image(self, folder, filename=None):
+        filename = filename or 'test_image.jpg'
+        file_obj = django.core.files.File(open(self.filename), name=filename)
+        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder)
+        image_obj.save()
+        return image_obj
+
+    def create_file(self, folder, filename=None):
+        filename = filename or 'test_file.dat'
+        file_data = django.core.files.base.ContentFile('some data')
+        file_data.name = filename
+        file_obj = File.objects.create(owner=self.superuser, original_filename=filename, file=file_data, folder=folder)
+        file_obj.save()
+        return file_obj
+
 
 class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
     def test_move_files_and_folders_action(self):
@@ -238,8 +260,28 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
             helpers.ACTION_CHECKBOX_NAME: folders,
         })
         self.assertEqual(File.objects.count(), 0)
-        self.assertEqual(Image.objects.count(), 0)
         self.assertEqual(Folder.objects.count(), 0)
+
+    def test_delete_files_or_folders_action_with_mixed_types(self):
+        # add more files/images so we can test the polymorphic queryset with multiple types
+        self.create_file(folder=self.src_folder)
+        self.create_image(folder=self.src_folder)
+        self.create_file(folder=self.src_folder)
+
+        self.assertNotEqual(File.objects.count(), 0)
+        self.assertNotEqual(Image.objects.count(), 0)
+        url = reverse('admin:filer-directory_listing', args=(self.folder.id,))
+        folders = []
+        for f in File.objects.filter(folder=self.folder):
+            folders.append('file-%d' % (f.id,))
+        folders.append('folder-%d' % self.sub_folder1.id)
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: folders,
+            })
+        self.assertEqual(File.objects.filter(folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
+
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
     def test_resize_images_action(self):
