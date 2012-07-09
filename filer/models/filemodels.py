@@ -215,6 +215,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
         )
 
     @property
+    def file_ptr(self):
+        return self
+
+    @property
     def url(self):
         """
         to make the model behave like a file field
