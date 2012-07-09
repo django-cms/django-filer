@@ -96,6 +96,21 @@ To crop an image and respect the subject location::
     {% thumbnail obj.img 200x300 crop upscale subject_location=obj.img.subject_location %}
 
 
+debugging and logging
+.....................
+
+Since version 0.9 debugging and logging flags have been introduced.
+
+While by default ``django-filer`` usually silently skips icon/thumbnail
+generation errors,  two options is provided to help when working with ``django-filer``:
+
+ * ``FILER_DEBUG``: Boolean, controls whether bubbling up any ``easy-thumbnails``
+   exception (tipically if an image file doesn't exists); is `False` by default;
+ * ``FILER_ENABLE_LOGGING``: Boolean, controls whether logging the above exceptions.
+   It requires proper django logging configuration for default logger or
+   ``filer`` logger. Please see https://docs.djangoproject.com/en/dev/topics/logging/
+   for further information abount django logging configuration.
+
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer/
 .. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/

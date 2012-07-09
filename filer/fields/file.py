@@ -13,6 +13,8 @@ from django.utils.text import truncate_words
 from filer.models import File
 from filer.settings import FILER_STATICMEDIA_PREFIX
 
+import logging
+logger = logging.getLogger(__name__)
 
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
@@ -28,8 +30,15 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 file = File.objects.get(pk=value)
                 related_url = file.logical_folder.\
                                 get_admin_directory_listing_url_path()
-            except Exception:
-                pass
+            except Exception,e:
+                # catch exception and manage it. We can re-raise it for debugging
+                # purposes and/or just logging it, provided user configured
+                # proper logging configuration
+                if filer_settings.FILER_ENABLE_LOGGING:
+                    logger.error('Error while rendering file widget: %s',e)
+                if filer_settings.FILER_DEBUG:
+                    raise e
+        print value,related_url
         if not related_url:
             related_url = reverse('admin:filer-directory_listing-root')
         params = self.url_parameters()
