@@ -64,7 +64,7 @@ templates
 ``FilerImageField`` can be used the same as a regular 
 `django.db.models.ImageField`_::
     
-    {% load thumbnails %}
+    {% load thumbnail %}
     {% thumbnail company.logo 250x250 crop %}
 
 admin
