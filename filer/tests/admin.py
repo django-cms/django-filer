@@ -77,18 +77,29 @@ class FilerClipboardAdminUrlsTests(TestCase):
         for img in Image.objects.all():
             img.delete()
 
-    def test_filer_upload_file(self):
+    def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
-        response = self.client.post(reverse('admin:filer-ajax_upload'),
-                                    {
-                                       'Filename':self.image_name,
-                                        'Filedata': file_obj,
-                                       'jsessionid':self.client.session.session_key,
-                                    })
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload'),
+            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            **extra_headers
+        )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+
+    def test_filer_ajax_upload_file(self):
+        self.assertEqual(Image.objects.count(), 0)
+        file_obj = django.core.files.File(open(self.filename))
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload')+'?filename=%s' % self.image_name,
+            data=file_obj.read(),
+            content_type='application/octet-stream',
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        )
+        self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+
 
 class  BulkOperationsMixin(object):
     def setUp(self):
