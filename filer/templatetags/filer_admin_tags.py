@@ -19,8 +19,8 @@ filer_actions = register.inclusion_tag("admin/filer/actions.html", takes_context
 # This will go away when django < 1.4 compatibility will be dropped
 if LooseVersion(django.get_version()) < LooseVersion('1.4'):
     ADMIN_ICON_BASE = "%sadmin/img/admin/" % settings.STATIC_URL
-    ADMIN_CSS_BASE = "%sadmin/css/admin/" % settings.STATIC_URL
-    ADMIN_JS_BASE = "%sadmin/js/admin/" % settings.STATIC_URL
+    ADMIN_CSS_BASE = "%sadmin/css/" % settings.STATIC_URL
+    ADMIN_JS_BASE = "%sadmin/js/" % settings.STATIC_URL
 else:
     ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
     ADMIN_CSS_BASE = "%sadmin/css/" % settings.STATIC_URL
