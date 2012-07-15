@@ -11,13 +11,13 @@ class Clipboard(models.Model):
                         'File', verbose_name=_('files'), related_name="in_clipboards",
                         through='ClipboardItem')
 
-    def append_file(self, file):
+    def append_file(self, file_obj):
         try:
             # We have to check if file is already in the clipboard as otherwise polymorphic complains
-            self.files.get(pk=file.pk)
+            self.files.get(pk=file_obj.pk)
             return False
         except filemodels.File.DoesNotExist:
-            newitem = ClipboardItem(file=file, clipboard=self)
+            newitem = ClipboardItem(file=file_obj, clipboard=self)
             newitem.save()
             return True
 

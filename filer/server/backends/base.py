@@ -26,12 +26,12 @@ class ServerBase(object):
         save_as = kwargs.get('save_as', None)
         if save_as == False:
             return
-        file = kwargs.get('file', None)
+        file_obj = kwargs.get('file_obj', None)
         filename = None
         if save_as:
             filename = save_as
         else:
-            filename = os.path.basename(file.path)
+            filename = os.path.basename(file_obj.path)
         response['Content-Disposition'] = smart_str(u'attachment; filename=%s' % filename)
 
     def size_header(self, response, **kwargs):

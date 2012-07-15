@@ -32,10 +32,10 @@ class FilerApiTests(TestCase):
             f.delete()
 
     def create_filer_image(self):
-        file = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj= DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
-                                     file=file)
+                                     file=file_obj)
         return image
 
     def test_create_folder_structure(self):
@@ -53,11 +53,11 @@ class FilerApiTests(TestCase):
 
     def test_upload_image_form(self):
         self.assertEqual(Image.objects.count(), 0)
-        file = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename), name=self.image_name)
         ImageUploadForm = modelform_factory(Image, fields=('original_filename', 'owner', 'file'))
         upoad_image_form = ImageUploadForm({'original_filename':self.image_name,
                                                 'owner': self.superuser.pk},
-                                                {'file':file})
+                                                {'file':file_obj})
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
         self.assertEqual(Image.objects.count(), 1)
@@ -67,7 +67,7 @@ class FilerApiTests(TestCase):
         image.save()
         # Get the clipboard of the current user
         clipboard_item = create_clipboard_item(user=self.superuser,
-                              file=image)
+            file_obj=image)
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
 
@@ -117,12 +117,12 @@ class FilerApiTests(TestCase):
         Test that the file is actualy move from the private to the public
         directory when the is_public is checked on an existing private file.
         """
-        file = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename), name=self.image_name)
 
         image = Image.objects.create(owner=self.superuser,
                                      is_public=False,
                                      original_filename=self.image_name,
-                                     file=file)
+                                     file=file_obj)
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         image.is_public = True

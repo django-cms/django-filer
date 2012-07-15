@@ -18,26 +18,26 @@ class FileImporter(object):
         self.image_created = 0
         self.folder_created = 0
 
-    def import_file(self, file, folder):
+    def import_file(self, file_obj, folder):
         """
         Create a File or an Image into the given folder
         """
         try:
-            iext = os.path.splitext(file.name)[1].lower()
+            iext = os.path.splitext(file_obj.name)[1].lower()
         except:
             iext = ''
         if iext in ['.jpg', '.jpeg', '.png', '.gif']:
             obj, created = Image.objects.get_or_create(
-                                original_filename=file.name,
-                                file=file,
+                                original_filename=file_obj.name,
+                                file=file_obj,
                                 folder=folder,
                                 is_public=FILER_IS_PUBLIC_DEFAULT)
             if created:
                 self.image_created += 1
         else:
             obj, created = File.objects.get_or_create(
-                                original_filename=file.name,
-                                file=file,
+                                original_filename=file_obj.name,
+                                file=file_obj,
                                 folder=folder,
                                 is_public=FILER_IS_PUBLIC_DEFAULT)
             if created:
@@ -96,10 +96,10 @@ class FileImporter(object):
             else:
                 folder_names = [root_folder_name] + rel_folders
             folder = self.get_or_create_folder(folder_names)
-            for file in files:
-                dj_file = DjangoFile(open(os.path.join(root, file)),
-                                     name=file)
-                self.import_file(file=dj_file, folder=folder)
+            for file_obj in files:
+                dj_file = DjangoFile(open(os.path.join(root, file_obj)),
+                                     name=file_obj)
+                self.import_file(file_obj=dj_file, folder=folder)
         if self.verbosity >= 1:
             print ('folder_created #%s / file_created #%s / ' + \
                    'image_created #%s') % (
