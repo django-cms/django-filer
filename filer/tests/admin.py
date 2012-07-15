@@ -138,7 +138,6 @@ class  BulkOperationsMixin(object):
         self.dst_folder = Folder(name="Dst", parent=None)
         self.dst_folder.save()
 
-<<<<<<< HEAD
     def create_image(self, folder, filename=None):
         filename = filename or 'test_image.jpg'
         file_obj = django.core.files.File(open(self.filename), name=filename)
@@ -154,12 +153,6 @@ class  BulkOperationsMixin(object):
         file_obj.save()
         return file_obj
 
-=======
-    def create_image(self, folder):
-        file_obj = DjangoFile(open(self.filename), name=self.image_name)
-        self.image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder)
-        self.image_obj.save()
->>>>>>> 975f482... Renamed `file` variables to `file_obj` to avoid overriding the builtin object
 
 class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
     def test_move_files_and_folders_action(self):
