@@ -796,25 +796,25 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     move_files_and_folders.short_description = ugettext_lazy("Move selected files and/or folders")
 
-    def _rename_file(self, file, form_data, counter, global_counter):
-        original_basename, original_extension = os.path.splitext(file.original_filename)
-        if file.name:
-            current_basename, current_extension = os.path.splitext(file.name)
+    def _rename_file(self, file_obj, form_data, counter, global_counter):
+        original_basename, original_extension = os.path.splitext(file_obj.original_filename)
+        if file_obj.name:
+            current_basename, current_extension = os.path.splitext(file_obj.name)
         else:
             current_basename = ""
             current_extension = ""
-        file.name = form_data['rename_format'] % {
-                'original_filename': file.original_filename,
+        file_obj.name = form_data['rename_format'] % {
+                'original_filename': file_obj.original_filename,
                 'original_basename': original_basename,
                 'original_extension': original_extension,
-                'current_filename': file.name or "",
+                'current_filename': file_obj.name or "",
                 'current_basename': current_basename,
                 'current_extension': current_extension,
-                'current_folder': file.folder.name,
+                'current_folder': file_obj.folder.name,
                 'counter': counter + 1, # 1-based
                 'global_counter': global_counter + 1, # 1-based
             }
-        file.save()
+        file_obj.save()
 
     def _rename_files(self, files, form_data, global_counter):
         n = 0
@@ -884,23 +884,23 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         basename, extension = os.path.splitext(filename)
         return basename + suffix + extension
 
-    def _copy_file(self, file, destination, suffix, overwrite):
+    def _copy_file(self, file_obj, destination, suffix, overwrite):
         if overwrite:
             # Not yet implemented as we have to find a portable (for different storage backends) way to overwrite files
             raise NotImplementedError
 
         # We are assuming here that we are operating on an already saved database objects with current database state available
 
-        filename = self._generate_new_filename(file.file.name, suffix)
+        filename = self._generate_new_filename(file_obj.file.name, suffix)
 
         # Due to how inheritance works, we have to set both pk and id to None
-        file.pk = None
-        file.id = None
-        file.save()
-        file.folder = destination
-        file.file = file._copy_file(filename)
-        file.original_filename = self._generate_new_filename(file.original_filename, suffix)
-        file.save()
+        file_obj.pk = None
+        file_obj.id = None
+        file_obj.save()
+        file_obj.folder = destination
+        file_obj.file = file_obj._copy_file(filename)
+        file_obj.original_filename = self._generate_new_filename(file_obj.original_filename, suffix)
+        file_obj.save()
 
     def _copy_files(self, files, destination, suffix, overwrite):
         for f in files:
