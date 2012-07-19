@@ -22,8 +22,8 @@ def get_exif(im):
     return ret
 
 
-def get_exif_for_file(file):
-    im = Image.open(file, 'r')
+def get_exif_for_file(file_obj):
+    im = Image.open(file_obj, 'r')
     return get_exif(im)
 
 

@@ -14,8 +14,8 @@ class DefaultServer(ServerBase):
 
     This will only work for files that can be accessed in the local filesystem.
     """
-    def serve(self, request, file, **kwargs):
-        fullpath = file.path
+    def serve(self, request, file_obj, **kwargs):
+        fullpath = file_obj.path
         # the following code is largely borrowed from `django.views.static.serve`
         # and django-filetransfers: filetransfers.backends.default
         if not os.path.exists(fullpath):
@@ -28,5 +28,5 @@ class DefaultServer(ServerBase):
             return HttpResponseNotModified(mimetype=mimetype)
         response = HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
         response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
-        self.default_headers(request=request, response=response, file=file, **kwargs)
+        self.default_headers(request=request, response=response, file_obj=file_obj, **kwargs)
         return response

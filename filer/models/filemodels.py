@@ -16,15 +16,15 @@ import os
 class FileManager(PolymorphicManager):
     def find_all_duplicates(self):
         r = {}
-        for file in self.all():
-            if file.sha1:
-                q = self.filter(sha1=file.sha1)
+        for file_obj in self.all():
+            if file_obj.sha1:
+                q = self.filter(sha1=file_obj.sha1)
                 if len(q) > 1:
-                    r[file.sha1] = q
+                    r[file_obj.sha1] = q
         return r
 
-    def find_duplicates(self, file):
-        return [i for i in self.exclude(pk=file.pk).filter(sha1=file.sha1)]
+    def find_duplicates(self, file_obj):
+        return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
 
 
 class File(PolymorphicModel, mixins.IconsMixin):

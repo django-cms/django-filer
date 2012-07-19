@@ -16,15 +16,15 @@ def serve_protected_file(request, path):
     Serve protected files to authenticated users with read permissions.
     """
     try:
-        thefile = File.objects.get(file=path, is_public=False)
+        file_obj = File.objects.get(file=path, is_public=False)
     except File.DoesNotExist:
         raise Http404('File not found')
-    if not thefile.has_read_permission(request):
+    if not file_obj.has_read_permission(request):
         if settings.DEBUG:
             raise PermissionDenied
         else:
             raise Http404('File not found')
-    return server.serve(request, file=thefile.file, save_as=False)
+    return server.serve(request, file_obj=file_obj.file, save_as=False)
 
 
 def serve_protected_thumbnail(request, path):
@@ -36,16 +36,16 @@ def serve_protected_thumbnail(request, path):
     if not source_path:
         raise Http404('File not found')
     try:
-        thefile = File.objects.get(file=source_path, is_public=False)
+        file_obj = File.objects.get(file=source_path, is_public=False)
     except File.DoesNotExist:
         raise Http404('File not found')
-    if not thefile.has_read_permission(request):
+    if not file_obj.has_read_permission(request):
         if settings.DEBUG:
             raise PermissionDenied
         else:
             raise Http404('File not found')
     try:
-        thumbnail = ThumbnailFile(name=path, storage=thefile.file.thumbnail_storage)
+        thumbnail = ThumbnailFile(name=path, storage=file_obj.file.thumbnail_storage)
         return thumbnail_server.serve(request, thumbnail, save_as=False)
     except Exception:
         raise Http404('File not found')
