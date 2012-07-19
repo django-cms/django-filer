@@ -64,7 +64,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'span_id': css_id_description_txt,
             'object': obj,
             'lookup_name': name,
-            'admin_media_prefix': globalsettings.ADMIN_MEDIA_PREFIX,
             'filer_static_prefix': filer_static_prefix,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
