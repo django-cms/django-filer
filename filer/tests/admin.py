@@ -315,3 +315,19 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
         self.image_obj = Image.objects.get(id=self.image_obj.id)
         self.assertEqual(self.image_obj.width, 42)
         self.assertEqual(self.image_obj.height, 42)
+
+
+class PermissionAdminTest(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_render_add_view(self):
+        """
+        Really stupid and simple test to see if the add Permission view can be rendered
+        """
+        response = self.client.get(reverse('admin:filer_folderpermission_add'))
+        self.assertEqual(response.status_code, 200)
