@@ -51,6 +51,7 @@ class ClipboardAdmin(admin.ModelAdmin):
         """
         receives an upload from the uploader. Receives only one file at the time.
         """
+        mimetype = "application/json" if request.is_ajax() else "text/html"
         try:
             upload, filename, is_raw = handle_upload(request)
 
@@ -84,7 +85,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                     'label': unicode(file_obj),
                 }
                 return HttpResponse(simplejson.dumps(json_response),
-                                    mimetype='application/json')
+                                    mimetype=mimetype)
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
@@ -93,8 +94,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
         except UploadException, e:
             return HttpResponse(simplejson.dumps({'error': unicode(e)}),
-                                mimetype='application/json')
-
+                                mimetype=mimetype)
 
     def get_model_perms(self, request):
         """
