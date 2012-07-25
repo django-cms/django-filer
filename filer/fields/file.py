@@ -27,8 +27,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         related_url = None
         if value:
             try:
-                file = File.objects.get(pk=value)
-                related_url = file.logical_folder.\
+                file_obj = File.objects.get(pk=value)
+                related_url = file_obj.logical_folder.\
                                 get_admin_directory_listing_url_path()
             except Exception,e:
                 # catch exception and manage it. We can re-raise it for debugging
@@ -64,7 +64,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'span_id': css_id_description_txt,
             'object': obj,
             'lookup_name': name,
-            'admin_media_prefix': globalsettings.ADMIN_MEDIA_PREFIX,
             'filer_static_prefix': filer_static_prefix,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,

@@ -26,3 +26,4 @@ coverage.xml
 pep8.txt
 htmlcov/
 share/
+.idea
