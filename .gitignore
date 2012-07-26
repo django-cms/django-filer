@@ -15,3 +15,8 @@ build
 .settings
 *~
 docs/_build
+*.egg
+coverage.xml
+htmlcov
+pep8.txt
+tmp
