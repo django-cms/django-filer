@@ -1,6 +1,13 @@
 Changelog for django-filer
 =============================
 
+0.8.7
+-----
+
+* minor maintenance release
+* no longer unpack uploaded zip files (#172)
+* removed some print statements
+
 0.8.6
 -----
 
