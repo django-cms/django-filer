@@ -85,7 +85,7 @@ class FolderPermissionsTestCase(TestCase):
         result = self.folder.has_read_permission(request)
         self.assertEqual(result, True)
 
-    def test_groups(self):
+    def test_combined_groups(self):
         request1 = Mock()
         setattr(request1, 'user', self.test_user1)
         request2 = Mock()
@@ -100,8 +100,16 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder_perm.has_read_permission(request1), False)
             self.assertEqual(self.folder_perm.has_read_permission(request2), False)
 
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.ALL, group=self.group1, can_edit=True, can_read=True, can_add_children=True)
-            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.ALL, group=self.group2, can_edit=True, can_read=True, can_add_children=True)
+            self.assertEqual(FolderPermission.objects.count(), 0)
+
+            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group1, can_edit=False, can_read=True, can_add_children=False)
+            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group2, can_edit=False, can_read=True, can_add_children=False)
+
+            self.assertEqual(FolderPermission.objects.count(), 2)
+
+            # We have to invalidate cache
+            delattr(self.folder, 'permission_cache')
+            delattr(self.folder_perm, 'permission_cache')
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_read_permission(request2), False)
@@ -111,10 +119,98 @@ class FolderPermissionsTestCase(TestCase):
             self.test_user1.groups.add(self.group2)
             self.test_user2.groups.add(self.group1)
 
+            # We have to invalidate cache
+            delattr(self.folder, 'permission_cache')
+            delattr(self.folder_perm, 'permission_cache')
+
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_read_permission(request2), True)
             self.assertEqual(self.folder_perm.has_read_permission(request1), True)
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_overlapped_groups1(self):
+        request1 = Mock()
+        setattr(request1, 'user', self.test_user1)
+
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+
+            self.assertEqual(self.folder.has_read_permission(request1), False)
+            self.assertEqual(self.folder_perm.has_read_permission(request1), False)
+
+            self.assertEqual(FolderPermission.objects.count(), 0)
+
+            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group1, can_edit=False, can_read=True, can_add_children=False)
+            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group2, can_edit=True, can_read=True, can_add_children=True)
+
+            self.assertEqual(FolderPermission.objects.count(), 2)
+
+            # We have to invalidate cache
+            delattr(self.folder, 'permission_cache')
+
+            self.assertEqual(self.test_user1.groups.filter(pk=self.group1.pk).exists(), True)
+            self.assertEqual(self.test_user1.groups.filter(pk=self.group2.pk).exists(), False)
+
+            self.assertEqual(self.folder.has_read_permission(request1), True)
+            self.assertEqual(self.folder.has_edit_permission(request1), False)
+
+            self.assertEqual(self.test_user1.groups.count(), 1)
+
+            self.test_user1.groups.add(self.group2)
+
+            self.assertEqual(self.test_user1.groups.count(), 2)
+
+            # We have to invalidate cache
+            delattr(self.folder, 'permission_cache')
+
+            self.assertEqual(self.folder.has_read_permission(request1), True)
+            self.assertEqual(self.folder.has_edit_permission(request1), True)
+
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_overlapped_groups2(self):
+        request2 = Mock()
+        setattr(request2, 'user', self.test_user2)
+
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+
+            self.assertEqual(self.folder.has_read_permission(request2), False)
+            self.assertEqual(self.folder_perm.has_read_permission(request2), False)
+
+            self.assertEqual(FolderPermission.objects.count(), 0)
+
+            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group2, can_edit=False, can_read=True, can_add_children=False)
+            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group1, can_edit=True, can_read=True, can_add_children=True)
+
+            self.assertEqual(FolderPermission.objects.count(), 2)
+
+            # We have to invalidate cache
+            delattr(self.folder_perm, 'permission_cache')
+
+            self.assertEqual(self.test_user2.groups.filter(pk=self.group2.pk).exists(), True)
+            self.assertEqual(self.test_user2.groups.filter(pk=self.group1.pk).exists(), False)
+
+            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.folder_perm.has_edit_permission(request2), False)
+
+            self.assertEqual(self.test_user2.groups.count(), 1)
+
+            self.test_user2.groups.add(self.group1)
+
+            self.assertEqual(self.test_user2.groups.count(), 2)
+
+            # We have to invalidate cache
+            delattr(self.folder_perm, 'permission_cache')
+
+            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.folder_perm.has_edit_permission(request2), True)
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
