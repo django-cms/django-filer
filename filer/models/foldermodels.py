@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -36,47 +37,44 @@ class FolderPermissionManager(models.Manager):
     def __get_id_list(self, user, attr):
         if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
-        allow_list = []
-        deny_list = []
+        allow_list = set()
+        deny_list = set()
         group_ids = user.groups.all().values_list('id', flat=True)
         q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
         perms = self.filter(q).order_by('folder__tree_id', 'folder__level',
                                         'folder__lft')
         for perm in perms:
-            if perm.folder:
-                folder_id = perm.folder.id
-            else:
-                folder_id = None
-            if perm.type == FolderPermission.ALL:
-                if getattr(perm, attr):
-                    allow_list = list(Folder.objects.all().values_list(
-                                                    'id', flat=True))
+            p = getattr(perm, attr)
+
+            if p is None:
+                # Not allow nor deny, we continue with the next permission
+                continue
+
+            if not perm.folder:
+                assert perm.type == FolderPermission.ALL
+
+                if p == FolderPermission.ALLOW:
+                    allow_list.update(Folder.objects.all().values_list('id', flat=True))
                 else:
-                    return []
-            if getattr(perm, attr):
-                if folder_id not in allow_list:
-                    allow_list.append(folder_id)
-                if folder_id in deny_list:
-                    deny_list.remove(folder_id)
+                    deny_list.update(Folder.objects.all().values_list('id', flat=True))
+
+                continue
+
+            folder_id = perm.folder.id
+
+            if p == FolderPermission.ALLOW:
+                allow_list.add(folder_id)
             else:
-                if folder_id not in deny_list:
-                    deny_list.append(folder_id)
-                if folder_id in allow_list:
-                    allow_list.remove(folder_id)
+                deny_list.add(folder_id)
+
             if perm.type == FolderPermission.CHILDREN:
-                for id in perm.folder.get_descendants().values_list(
-                                                            'id', flat=True):
-                    if getattr(perm, attr):
-                        if id not in allow_list:
-                            allow_list.append(id)
-                        if id in deny_list:
-                            deny_list.remove(id)
-                    else:
-                        if id not in deny_list:
-                            deny_list.append(id)
-                        if id in allow_list:
-                            allow_list.remove(id)
-        return allow_list
+                if p == FolderPermission.ALLOW:
+                    allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                else:
+                    deny_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+
+        # Deny has precedence over allow
+        return allow_list - deny_list
 
 
 class Folder(models.Model, mixins.IconsMixin):
@@ -227,14 +225,23 @@ class FolderPermission(models.Model):
     THIS = 1
     CHILDREN = 2
 
+    ALLOW = 1
+    DENY = 0
+
     TYPES = (
         (ALL, _('all items')),
         (THIS, _('this item only')),
         (CHILDREN, _('this item and all children')),
     )
+
+    PERMISIONS = (
+        (ALLOW, _('allow')),
+        (DENY, _('deny')),
+    )
+
     folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
 
-    type = models.SmallIntegerField(_('type'), choices=TYPES, default=0)
+    type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(auth_models.User,
                              related_name="filer_folder_permissions",
                              verbose_name=_("user"), blank=True, null=True)
@@ -243,9 +250,9 @@ class FolderPermission(models.Model):
                               verbose_name=_("group"), blank=True, null=True)
     everybody = models.BooleanField(_("everybody"), default=False)
 
-    can_edit = models.BooleanField(_("can edit"), default=True)
-    can_read = models.BooleanField(_("can read"), default=True)
-    can_add_children = models.BooleanField(_("can add children"), default=True)
+    can_edit = models.SmallIntegerField(_("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)
+    can_read = models.SmallIntegerField(_("can read"), choices=PERMISIONS, blank=True, null=True, default=None)
+    can_add_children = models.SmallIntegerField(_("can add children"), choices=PERMISIONS, blank=True, null=True, default=None)
 
     objects = FolderPermissionManager()
 
@@ -266,12 +273,21 @@ class FolderPermission(models.Model):
         usergroup = " ".join(ug)
         perms = []
         for s in ['can_edit', 'can_read', 'can_add_children']:
-            if getattr(self, s):
+            perm = getattr(self, s)
+            if perm == ALLOW:
                 perms.append(s)
+            elif perm == DENY:
+                perms.append('!%s' % s)
         perms = ', '.join(perms)
         return u"Folder: '%s'->%s [%s] [%s]" % (
                         name, unicode(self.TYPES[self.type][1]),
                         perms, usergroup)
+
+    def clean(self):
+        if self.type == ALL and self.folder:
+            raise ValidationError('Folder cannot be selected with type "all items".')
+        if self.type != ALL and not self.folder:
+            raise ValidationError('Folder has to be selected when type is not "all items".')
 
     class Meta:
         verbose_name = _('folder permission')
