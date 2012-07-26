@@ -4,6 +4,7 @@ from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
+from django.template.defaultfilters import urlencode
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -232,7 +233,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return qs
         q = request.GET.get('q', None)
         if q:
-            search_terms = urllib.unquote_plus(q).split(" ")
+            search_terms = unquote(q).split(" ")
         else:
             search_terms = []
             q = ''
@@ -363,7 +364,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'current_url': request.path,
                 'title': u'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
-                'q': urllib.quote_plus(q),
+                'q': urlencode(q),
                 'show_result_count': show_result_count,
                 'limit_search_to_folder': limit_search_to_folder,
                 'is_popup': popup_status(request),
