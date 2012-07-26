@@ -167,22 +167,26 @@ class Folder(models.Model, mixins.IconsMixin):
         elif user == self.owner:
             return True
         else:
-            att_name = "permission_%s_cache" % type
-            if not hasattr(self, "permission_user_cache") or \
-               not hasattr(self, att_name) or \
-               request.user.pk != self.permission_user_cache.pk:
+            if not hasattr(self, "permission_cache") or \
+               type not in self.permission_cache or \
+               request.user.pk != self.permission_cache['user'].pk:
+                if not hasattr(self, "permission_cache") or request.user.pk != self.permission_cache['user'].pk:
+                    self.permission_cache = {
+                        'user': request.user,
+                    }
 
                 # This calls methods on the manager i.e. get_read_id_list()
                 func = getattr(FolderPermission.objects,
                                "get_%s_id_list" % type)
                 permission = func(user)
-                self.permission_user_cache = request.user
-                if permission == "All" or self.id in permission:
-                    setattr(self, att_name, True)
-                    self.permission_edit_cache = True
+                if permission == "All":
+                    self.permission_cache[type] = True
+                    self.permission_cache['read'] = True
+                    self.permission_cache['edit'] = True
+                    self.permission_cache['add_children'] = True
                 else:
-                    setattr(self, att_name, False)
-            return getattr(self, att_name)
+                    self.permission_cache[type] = self.id in permission
+            return self.permission_cache[type]
 
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change',
