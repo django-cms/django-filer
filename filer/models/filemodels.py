@@ -106,7 +106,7 @@ class File(models.Model, mixins.IconsMixin):
         try:
             self.generate_sha1()
         except Exception,e:
-            print e, type(e)
+            pass  #print e, type(e)
         super(File, self).save(*args, **kwargs)
 
     @property
