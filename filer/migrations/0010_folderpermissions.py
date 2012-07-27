@@ -5,18 +5,23 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
+    ALLOW = 1
+    DENY = 0
 
     def forwards(self, orm):
         for permission in orm.FolderPermission.objects.all():
-            permission.can_edit_new = orm.FolderPermission.ALLOW if permission.can_edit else orm.FolderPermission.DENY
-            permission.can_read_new = orm.FolderPermission.ALLOW if permission.can_read else orm.FolderPermission.DENY
-            permission.can_add_children_new = orm.FolderPermission.ALLOW if permission.can_add_children else orm.FolderPermission.DENY
+            permission.can_edit_new = self.ALLOW if permission.can_edit else self.DENY
+            permission.can_read_new = self.ALLOW if permission.can_read else self.DENY
+            permission.can_add_children_new = self.ALLOW if permission.can_add_children else self.DENY
+            permission.save()
 
     def backwards(self, orm):
+        # Backwards migration is lossy, but we play on a safe side and deny more
         for permission in orm.FolderPermission.objects.all():
-            permission.can_edit = permission.can_edit_new == orm.FolderPermission.ALLOW
-            permission.can_read = permission.can_read == orm.FolderPermission.ALLOW
-            permission.can_add_children = permission.can_add_children == orm.FolderPermission.ALLOW
+            permission.can_edit = permission.can_edit_new == self.ALLOW
+            permission.can_read = permission.can_read_new == self.ALLOW
+            permission.can_add_children = permission.can_add_children_new == self.ALLOW
+            permission.save()
 
     models = {
         'auth.group': {

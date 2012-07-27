@@ -264,7 +264,7 @@ class FolderPermission(models.Model):
 
         ug = []
         if self.everybody:
-            user = 'Everybody'
+            ug.append('Everybody')
         else:
             if self.group:
                 ug.append(u"Group: %s" % self.group)
@@ -274,9 +274,9 @@ class FolderPermission(models.Model):
         perms = []
         for s in ['can_edit', 'can_read', 'can_add_children']:
             perm = getattr(self, s)
-            if perm == ALLOW:
+            if perm == self.ALLOW:
                 perms.append(s)
-            elif perm == DENY:
+            elif perm == self.DENY:
                 perms.append('!%s' % s)
         perms = ', '.join(perms)
         return u"Folder: '%s'->%s [%s] [%s]" % (
@@ -284,10 +284,14 @@ class FolderPermission(models.Model):
                         perms, usergroup)
 
     def clean(self):
-        if self.type == ALL and self.folder:
+        if self.type == self.ALL and self.folder:
             raise ValidationError('Folder cannot be selected with type "all items".')
-        if self.type != ALL and not self.folder:
+        if self.type != self.ALL and not self.folder:
             raise ValidationError('Folder has to be selected when type is not "all items".')
+        if self.everybody and (self.user or self.group):
+            raise ValidationError('User or group cannot be selected together with "everybody".')
+        if not self.user and not self.group and not self.everybody:
+            raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
 
     class Meta:
         verbose_name = _('folder permission')
