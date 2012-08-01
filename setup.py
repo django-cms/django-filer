@@ -4,7 +4,6 @@ import os
 try:
     from setuptest import test
 except ImportError:
-    print "erro"
     from setuptools.command.test import test
 
 version = __import__('filer').__version__
@@ -25,7 +24,7 @@ setup(
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),
     install_requires = (
-        'Django>=1.3.1,<1.5',
+        'Django>=1.3,<1.5',
         'easy-thumbnails>=1.0',
         'django-mptt>=0.5.1,<0.6',
         'django_polymorphic>=0.2',
