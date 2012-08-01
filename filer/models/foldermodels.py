@@ -152,7 +152,7 @@ class Folder(models.Model, mixins.IconsMixin):
     def has_add_children_permission(self, request):
         return self.has_generic_permission(request, 'add_children')
 
-    def has_generic_permission(self, request, type):
+    def has_generic_permission(self, request, permission_type):
         """
         Return true if the current user has permission on this
         folder. Return the string 'ALL' if the user has all rights.
@@ -165,8 +165,8 @@ class Folder(models.Model, mixins.IconsMixin):
         elif user == self.owner:
             return True
         else:
-            if not hasattr(self, "permission_cache") or \
-               type not in self.permission_cache or \
+            if not hasattr(self, "permission_cache") or\
+               permission_type not in self.permission_cache or \
                request.user.pk != self.permission_cache['user'].pk:
                 if not hasattr(self, "permission_cache") or request.user.pk != self.permission_cache['user'].pk:
                     self.permission_cache = {
@@ -175,16 +175,16 @@ class Folder(models.Model, mixins.IconsMixin):
 
                 # This calls methods on the manager i.e. get_read_id_list()
                 func = getattr(FolderPermission.objects,
-                               "get_%s_id_list" % type)
+                               "get_%s_id_list" % permission_type)
                 permission = func(user)
                 if permission == "All":
-                    self.permission_cache[type] = True
+                    self.permission_cache[permission_type] = True
                     self.permission_cache['read'] = True
                     self.permission_cache['edit'] = True
                     self.permission_cache['add_children'] = True
                 else:
-                    self.permission_cache[type] = self.id in permission
-            return self.permission_cache[type]
+                    self.permission_cache[permission_type] = self.id in permission
+            return self.permission_cache[permission_type]
 
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change',
