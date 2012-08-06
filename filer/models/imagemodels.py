@@ -190,9 +190,11 @@ class Image(File):
 
     @property
     def easy_thumbnails_thumbnailer(self):
-        tn = FilerThumbnailer(file=self.file.file, name=self.file.name,
-                         source_storage=self.file.source_storage,
-                         thumbnail_storage=self.file.thumbnail_storage)
+        tn = FilerThumbnailer(
+            file=self.file.file, name=self.file.name,
+            source_storage=self.file.source_storage,
+            thumbnail_storage=self.file.thumbnail_storage,
+            thumbnail_basedir=self.file.thumbnail_basedir)
         return tn
 
     class Meta:

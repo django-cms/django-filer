@@ -6,6 +6,7 @@ from easy_thumbnails import fields as easy_thumbnails_fields, \
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
 
+
 STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,
     'private': filer_settings.FILER_PRIVATEMEDIA_STORAGE,
@@ -13,6 +14,10 @@ STORAGES = {
 THUMBNAIL_STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_STORAGE,
     'private': filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE,
+}
+THUMBNAIL_OPTIONS = {
+    'public': filer_settings.FILER_PUBLICMEDIA_THUMBNAIL_OPTIONS,
+    'private': filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_OPTIONS,
 }
 
 
@@ -44,9 +49,11 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         self._committed = True
         self.storages = self.field.storages
         self.thumbnail_storages = self.field.thumbnail_storages
+        self.thumbnail_options = self.field.thumbnail_options
         self.storage = self._storage
         self.source_storage = self._source_storage
         self.thumbnail_storage = self._thumbnail_storage
+        self.thumbnail_basedir = self._thumbnail_base_dir
 
     @property
     def _storage(self):
@@ -69,17 +76,26 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         else:
             return self.thumbnail_storages['private']
 
+    @property
+    def _thumbnail_base_dir(self):
+        if self.instance.is_public:
+            return self.thumbnail_options['public'].get('base_dir', '')
+        else:
+            return self.thumbnail_options['private'].get('base_dir', '')
+
     def save(self, name, content, save=True):
         content.seek(0) # Ensure we upload the whole file
         super(MultiStorageFieldFile, self).save(name, content, save)
 
+
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
 
-    def __init__(self, verbose_name=None, name=None, upload_to_dict=None,
-                 storages=None, thumbnail_storages=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None,
+                 storages=None, thumbnail_storages=None, thumbnail_options=None, **kwargs):
         self.storages = storages or STORAGES
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
+        self.thumbnail_options = thumbnail_options or THUMBNAIL_OPTIONS
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(
                                       verbose_name=verbose_name, name=name,
                                       upload_to=generate_filename_multistorage,
