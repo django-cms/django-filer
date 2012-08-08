@@ -80,7 +80,9 @@ class ActionThumbnailerMixin(object):
 
 
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.thumbnail_basedir = kwargs.pop('thumbnail_basedir', '')
+        super(FilerThumbnailer, self).__init__(*args, **kwargs)
 
 
 class FilerActionThumbnailer(ActionThumbnailerMixin, Thumbnailer):

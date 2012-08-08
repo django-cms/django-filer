@@ -3,21 +3,28 @@
 Permissions
 ===========
 
+.. WARNING:: File download permissions are an experimental feature. The api may change at any time.
+
 .. NOTE:: For the impatient:
           
           * set ``FILER_ENABLE_PERMISSIONS`` to ``True``
           * include ``filer.server.urls`` in the root ``urls.py`` without a 
             prefix
 
+By default files with permissions are served directly by the `Django`_ process. That is
+acceptable in a development environment, but is very bad for performance and security in
+production. See the :ref:`file permission docs <server>` on how to serve files more efficiently
+and how use custom storage backends.
+
 By default files can be uploaded and managed by all staff members based on the
 standard django model permissions.
-Since the files get uploaded to ``MEDIA_ROOT`` they can be can be downloaded by
+Since the public files get uploaded to ``MEDIA_ROOT`` they can be downloaded by
 everyone.
 
-Optionally permission checking can be activated with the
-``FILER_ENABLE_PERMISSIONS`` setting. This allows setting access rights for
-editing files in the backend (with the `edit` permission) and downloading the
-files (with the `read` permission).
+Activating permission checking with the ``FILER_ENABLE_PERMISSIONS`` setting enables
+permission checking on downloads. This allows setting access rights for
+editing files in the backend (with the ``edit`` permission) and downloading the
+files (with the ``read`` permission).
 For images the permissions also extend to all generated thumbnails.
 
 To be able to check permissions on the file downloads, a special view is used.
@@ -34,8 +41,4 @@ To hook up the view ``filer.server.urls`` needs to be included in the root
         url(r'^', include('filer.server.urls')),
     )
 
-.. WARNING:: With the default settings the private files will be served by
-             django directly.
-             This is not what you'll want in production because performance is
-             not very good (especialy with large files).
-             See the :ref:`server` topic on how to improve this.
+.. _Django: http://djangoproject.com

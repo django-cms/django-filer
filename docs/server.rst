@@ -54,11 +54,11 @@ might look something like this::
     
     location /nginx_filer_private/ {
       internal;
-      alias /path/to/smedia/filer/;
+      alias /path/to/smedia/filer_private/;
     }
     location /nginx_filer_private_thumbnails/ {
       internal;
-      alias /path/to/smedia/filer_thumbnails/;
+      alias /path/to/smedia/filer_private_thumbnails/;
     }
 
 .. Note::

@@ -76,8 +76,9 @@ e.g::
         },
     }
 
-Defaults to FileSystemStorage in ``<MEDIA_ROOT>/filer/`` and ``<MEDIA_ROOT>/filer_thumbnails/`` for public files and
-``<MEDIA_ROOT>/../smedia/filer/`` and ``<MEDIA_ROOT>/../smedia/filer_thumbnails/`` for private files.
+Defaults to FileSystemStorage in ``<MEDIA_ROOT>/filer_public/`` and ``<MEDIA_ROOT>/filer_public_thumbnails/`` for public files and
+``<MEDIA_ROOT>/../smedia/filer_private/`` and ``<MEDIA_ROOT>/../smedia/filer_private_thumbnails/`` for private files.
+Public storage uses ``DEFAULT_FILE_STORAGE`` as default storage backend.
 
 ``UPLOAD_TO`` is the function to generate the path relative to the storage root. The
 default generates a date based path like ``2011/05/03/filename.jpg``. This

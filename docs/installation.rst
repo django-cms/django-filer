@@ -44,29 +44,14 @@ Static media
 In order to operate properly, django-filer needs some js and css files. They
 are located in the ``static/filer`` directory in the ``filer`` package. If you are 
 already using `django-staticfiles`_ or `django.contrib.staticfiles`_ you're 
-already set and can skip the next paragraph.
+already set.
 
 permissions on files
 ....................
 
-.. warning:: File download permissions are an experimental feature. The api may change at any time.
+.. WARNING:: File download permissions are an experimental feature. The api may change at any time.
 
-Files with disabled permissions are your regular world readable files in
-``MEDIA_ROOT``. Files with permissions are a other case however. They can only be downloaded by
-authorized users. To be able to check permissions on the file downloads, a special view is used
-and they are saved in a separate location (in a directory called ``smedia`` at the same level as
-``MEDIA_ROOT``).
-
-``filer.server.urls`` needs to be included in the root ``urls.py``::
-
-    urlpatterns += patterns('',
-        url(r'^', include('filer.server.urls')),
-    )
-
-By default files with permissions are served directly by the `django`_ process. That is
-acceptable in a development environment, but is very bad for performance and security in
-production. See the :ref:`file permission docs <server>` on how to serve files more efficiently
-and how use custom storage backends.
+See :ref:`permissions` section.
 
 subject location aware cropping
 ...............................
@@ -99,13 +84,11 @@ To crop an image and respect the subject location::
 debugging and logging
 .....................
 
-Since version 0.9 debugging and logging flags have been introduced.
-
 While by default ``django-filer`` usually silently skips icon/thumbnail
-generation errors,  two options is provided to help when working with ``django-filer``:
+generation errors,  two options are provided to help when working with ``django-filer``:
 
  * ``FILER_DEBUG``: Boolean, controls whether bubbling up any ``easy-thumbnails``
-   exception (tipically if an image file doesn't exists); is `False` by default;
+   exception (typically if an image file doesn't exists); is ``False`` by default;
  * ``FILER_ENABLE_LOGGING``: Boolean, controls whether logging the above exceptions.
    It requires proper django logging configuration for default logger or
    ``filer`` logger. Please see https://docs.djangoproject.com/en/dev/topics/logging/
