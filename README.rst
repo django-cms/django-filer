@@ -26,29 +26,12 @@ To get started using ``django-filer`` simply install it with
 
     $ pip install django-filer
 
-Add ``"filer"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
-(or ``migrate`` if you're using South).
 
 Configuration
 -------------
 
-django-filer supports permissions on files. They can be enabled or disabled.
-Files with disabled permissions are your regular world readable files in
-``MEDIA_ROOT``. Files with permissions are a other case however. To be able to
-check permissions on the file downloads a special view is used and they are
-saved in a separate location (in a directory called `smedia` next to
-``MEDIA_ROOT`` by default).
-
-``filer.server.urls`` needs to be included in the root ``urls.py``::
-
-    urlpatterns += patterns('',
-        url(r'^', include('filer.server.urls')),
-    )
-
-By default files with permissions are served directly by django. That is
-acceptable in a development environment, but very bad for performance in
-production. See the docs on how to serve files more efficiently.
-
+Add ``"filer"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
+(or ``migrate`` if you're using South).
 
 For automatic subject location aware cropping of images replace 
 ``easy_thumbnails.processors.scale_and_crop`` with
@@ -62,6 +45,7 @@ For automatic subject location aware cropping of images replace
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
+
 
 .. _Django: http://djangoproject.com
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
