@@ -5,3 +5,4 @@ include README.rst
 include HISTORY
 recursive-include filer/templates *
 recursive-include filer/static *
+recursive-include filer/locale *
