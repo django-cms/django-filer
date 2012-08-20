@@ -56,7 +56,7 @@ Contents
    installation
    usage
    permissions
-   server
+   secure_downloads
    settings
    extending_filer
    running_tests

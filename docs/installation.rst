@@ -11,7 +11,9 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
     $ pip install django-filer
 
 If you are feeling adventurous you can get 
-`the latest sourcecode from github <https://github.com/stefanfoulis/django-filer/>`_
+`the latest sourcecode from github <https://github.com/stefanfoulis/django-filer/>`_ or add
+http://stefanfoulis.github.com/django-filer/unstable_releases/ to ``find-links`` for the latest
+alpha and beta releases.
 
 Dependencies
 ------------
@@ -42,16 +44,10 @@ Static media
 ............
 
 In order to operate properly, django-filer needs some js and css files. They
-are located in the ``static/filer`` directory in the ``filer`` package. If you are 
-already using `django-staticfiles`_ or `django.contrib.staticfiles`_ you're 
-already set.
+are located in the ``static/filer`` directory in the ``filer`` package. Use
+`django.contrib.staticfiles`_  (or `django-staticfiles`_) to have them
+automatically included.
 
-permissions on files
-....................
-
-.. WARNING:: File download permissions are an experimental feature. The api may change at any time.
-
-See :ref:`permissions` section.
 
 subject location aware cropping
 ...............................
@@ -80,6 +76,19 @@ To crop an image and respect the subject location::
     {% load thumbnail %}
     {% thumbnail obj.img 200x300 crop upscale subject_location=obj.img.subject_location %}
 
+permissions
+...........
+
+.. WARNING:: File permissions are an experimental feature. The api may change at any time.
+
+See :ref:`permissions` section.
+
+secure downloads
+................
+
+.. WARNING:: File download permissions are an experimental feature. The api may change at any time.
+
+See :ref:`secure_downloads` section.
 
 debugging and logging
 .....................
