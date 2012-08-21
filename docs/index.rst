@@ -54,9 +54,10 @@ Contents
    :maxdepth: 1
 
    installation
+   upgrading
    usage
    permissions
-   server
+   secure_downloads
    settings
    extending_filer
    running_tests

@@ -7,17 +7,17 @@ Settings
 ----------------------------
 
 Activate the or not the Permission check on the files and folders before 
-displaying them in the admin. When set to false it give all the authorization
-to staff members.
+displaying them in the admin. When set to ``False`` it gives all the authorization
+to staff members based on standard Django model permissions.
 
-Defaults to ``True``
+Defaults to ``False``
 
 ``FILER_IS_PUBLIC_DEFAULT``
 ---------------------------
 
 Should newly uploaded files have permission checking disabled (be public) by default.
 
-Defaults to ``False`` (new files have permission checking enabled, are private)
+Defaults to ``False`` (new files have permission checking disable, are public)
 
 .. _FILER_STATICMEDIA_PREFIX:
 
@@ -31,6 +31,7 @@ Defaults to ``<STATIC_URL>/filer/`` if ``STATIC_URL`` is defined. Otherwise
 falls back to ``<MEDIA_URL>/filer/``. It is the URL where the ``static/filer/`` 
 directory should be served.
 
+.. _FILER_STORAGES:
 
 ``FILER_STORAGES``
 ------------------
@@ -116,7 +117,7 @@ Defaults to using the DefaultServer (doh)! This will serve the files with the dj
 The number of items (Folders, Files) that should be displayed per page in
 admin.
 
-Defaults to `20`
+Defaults to ``20``
 
 ``FILER_SUBJECT_LOCATION_IMAGE_DEBUG``
 --------------------------------------
@@ -124,7 +125,7 @@ Defaults to `20`
 Draws a red circle around to point in the image that was used to do the 
 subject location aware image cropping.
 
-Defaults to `False`
+Defaults to ``False``
 
 ``FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS``
 -------------------------------------------------
