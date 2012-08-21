@@ -9,6 +9,8 @@ import os
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False) # When True makes
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 
+FILER_0_8_COMPATIBILITY_MODE = getattr(settings, 'FILER_0_8_COMPATIBILITY_MODE', False)
+
 FILER_ENABLE_LOGGING = getattr(settings, 'FILER_ENABLE_LOGGING', False)
 if FILER_ENABLE_LOGGING:
     FILER_ENABLE_LOGGING = (FILER_ENABLE_LOGGING and (getattr(settings,'LOGGING') and
@@ -127,7 +129,41 @@ DEFAULT_FILER_SERVERS = {
 }
 
 FILER_STORAGES = RecursiveDictionaryWithExcludes(MINIMAL_FILER_STORAGES, rec_excluded_keys=('OPTIONS', 'THUMBNAIL_OPTIONS'))
-FILER_STORAGES.rec_update(getattr(settings, 'FILER_STORAGES', {}))
+if FILER_0_8_COMPATIBILITY_MODE:
+    user_filer_storages = {
+        'public': {
+            'main': {
+                'ENGINE': DEFAULT_FILE_STORAGE,
+                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+                'UPLOAD_TO_PREFIX': getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public'),
+            },
+            'thumbnails': {
+                'ENGINE': DEFAULT_FILE_STORAGE,
+                'OPTIONS': {},
+                'THUMBNAIL_OPTIONS': {
+                    'base_dir': 'filer_public_thumbnails',
+                },
+            },
+        },
+        'private': {
+            'main': {
+                'ENGINE': DEFAULT_FILE_STORAGE,
+                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+                'UPLOAD_TO_PREFIX': getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private'),
+            },
+            'thumbnails': {
+                'ENGINE': DEFAULT_FILE_STORAGE,
+                'OPTIONS': {},
+                'THUMBNAIL_OPTIONS': {
+                    'base_dir': 'filer_private_thumbnails',
+                },
+            },
+        },
+    }
+else:
+    user_filer_storages = getattr(settings, 'FILER_STORAGES', {})
+
+FILER_STORAGES.rec_update(user_filer_storages)
 
 def update_storage_settings(user_settings, defaults, s, t):
     if not user_settings[s][t]['ENGINE']:

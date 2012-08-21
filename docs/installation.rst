@@ -3,6 +3,10 @@
 Installation and Configuration
 ==============================
 
+
+.. important:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
+
+
 Getting the latest release
 --------------------------
 
@@ -46,7 +50,7 @@ Static media
 In order to operate properly, django-filer needs some js and css files. They
 are located in the ``static/filer`` directory in the ``filer`` package. Use
 `django.contrib.staticfiles`_  (or `django-staticfiles`_) to have them
-automatically included.
+automatically served.
 
 
 subject location aware cropping

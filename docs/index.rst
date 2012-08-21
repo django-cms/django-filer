@@ -54,6 +54,7 @@ Contents
    :maxdepth: 1
 
    installation
+   upgrading
    usage
    permissions
    secure_downloads
