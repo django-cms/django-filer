@@ -47,3 +47,10 @@ snippet in the django shell::
 
 After running the script you can delete the ``FILER_0_8_COMPATIBILITY_MODE`` setting. If you want to use secure
 downloads see :ref:`secure_downloads`.
+
+
+
+from pre-0.9a3 develop to 0.9
+-----------------------------
+
+In develop pre-0.9a3
