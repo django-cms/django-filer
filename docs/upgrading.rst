@@ -47,3 +47,51 @@ snippet in the django shell::
 
 After running the script you can delete the ``FILER_0_8_COMPATIBILITY_MODE`` setting. If you want to use secure
 downloads see :ref:`secure_downloads`.
+
+
+
+from pre-0.9a3 develop to 0.9
+-----------------------------
+
+In develop pre-0.9a3 file path was written in the database as relative path inside `filer` directory; since 0.9a3
+this is no longer the case so file must be migrate to the new paths.
+Same disclaimer as 0.8x migration applies: SQL migration is much faster for large datasets.
+
+Manually (SQL)
+..............
+
+Use whatever tool to access you database console and insert the correct directory name at the start of the `file` field.
+Example::
+
+    UPDATE filer_file SET file= 'filer_public/' || file WHERE file LIKE '20%' AND is_public=True;
+    UPDATE filer_file SET file= 'filer_private/' || file WHERE file LIKE '20%' AND is_public=False;
+
+Then you will have to move by hand the files from the `MEDIA_ROOT/filer` directory to the new public and private storage
+directories
+
+Automatic (Django)
+..................
+Make sure the console user can access/write public and private files.
+Please note that the `"filer/"` string below should be modified if your files are not saved in `MEDIA_ROOT/filer`
+Then run this snippet in the django shell::
+
+    from filer.models import File
+    import sys
+    for f in File.objects.filter(is_public=True):
+        sys.stdout.write(u'moving %s to public storage... ' % f.id)
+        f.is_public = False
+        f.file.name = "filer/%s" % f.file.name
+        f.save()
+        f.is_public = True
+        f.save()
+        sys.stdout.write(u'done\n')
+    for f in File.objects.filter(is_public=False):
+        sys.stdout.write(u'moving %s to private storage... ' % f.id)
+        f.is_public = True
+        f.file.name = "filer/%s" % f.file.name
+        f.save()
+        f.is_public = False
+        f.save()
+        sys.stdout.write(u'done\n')
+
+Double access modification is needed to enabled automatic file move.
