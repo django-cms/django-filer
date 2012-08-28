@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.text import truncate_words
 from filer.models import File
-from filer.settings import FILER_STATICMEDIA_PREFIX
+from filer import settings as filer_settings
 
 import logging
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         # ForeignKeyRawIdWidget adds
         hidden_input = super(ForeignKeyRawIdWidget, self).render(
                                                             name, value, attrs)
-        filer_static_prefix = FILER_STATICMEDIA_PREFIX
+        filer_static_prefix = filer_settings.FILER_STATICMEDIA_PREFIX
         if not filer_static_prefix[-1] == '/':
             filer_static_prefix += '/'
         context = {
@@ -84,7 +84,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media:
-        js = (FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
+        js = (filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
 
 
 class AdminFileFormField(forms.ModelChoiceField):
