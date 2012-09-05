@@ -4,7 +4,7 @@ Installation and Configuration
 ==============================
 
 
-.. important:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
+.. note:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
 
 
 Getting the latest release
