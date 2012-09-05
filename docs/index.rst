@@ -7,7 +7,15 @@ Welcome to django-filer's documentation!
 and organizing files and images in contrib.admin.
 
 .. note:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
+
+.. warning::
+   This documentation refers to the development version of ``django-filer``.
    
+   As this version has not been released yet, any part of the API maybe subject
+   to modifications without notice, and this documentation may be outdated and
+   not in sync with the code.
+
+
 .. figure:: _static/directory_view_1_screenshot.png
    :scale: 50 %
    :alt: directory view screenshot
