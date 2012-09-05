@@ -1,6 +1,3 @@
-"""
-django-filer - file and image management for django projects
-"""
-VERSION = (0,8,2)
-__version__ = "0.8.2"
-__authors__ = ["Stefan Foulis <stefan.foulis@gmail.com>", ]
+#-*- coding: utf-8 -*-
+# version string following pep-0396 and pep-0386
+__version__ = '0.9'  # pragma: nocover

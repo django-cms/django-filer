@@ -1,6 +1,6 @@
+#-*- coding: utf-8 -*-
 from django.template import Library
 import math
-import re
 
 register = Library()
 
@@ -11,7 +11,6 @@ filesize_long_formats = {
     'k': 'kilo', 'M': 'mega', 'G': 'giga', 'T': 'tera', 'P': 'peta',
     'E': 'exa', 'Z': 'zetta', 'Y': 'yotta',
 }
-
 
 
 def filesize(bytes, format='auto1024'):

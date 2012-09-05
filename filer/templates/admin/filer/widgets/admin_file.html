@@ -1,0 +1,35 @@
+{% load i18n filer_admin_tags %}{% spaceless %}
+{% if object %}
+	{% if object.icons.32 %}
+		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}" /></a>
+		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+	{% else %}
+		<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
+		&nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
+	{% endif %}
+{% else %}
+	<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
+	&nbsp;<span id="{{ span_id }}"></span>
+{% endif %}
+<a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
+	<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
+</a>
+<img id="{{ clear_id }}" src="{% admin_icon_base %}icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}" />
+<br />
+{{ hidden_input }}
+<script type="text/javascript">
+	django.jQuery("#{{ id }}").hide();
+	django.jQuery("#{{ clear_id }}").click(function(){
+		django.jQuery("#{{ id }}").removeAttr("value");
+		django.jQuery("#{{ thumb_id }}").attr("src", "{{ filer_static_prefix }}icons/nofile_48x48.png");
+		django.jQuery("#{{ span_id }}").html("");
+		django.jQuery("#{{ clear_id }}").hide();
+	});
+	django.jQuery(document).ready(function(){
+		var plus = django.jQuery("#add_{{ id }}");
+		if (plus.length){
+			plus.remove();
+		}
+	});
+</script>
+{% endspaceless %}

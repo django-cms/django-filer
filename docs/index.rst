@@ -1,7 +1,4 @@
-.. django-filer documentation master file, created by
-   sphinx-quickstart on Tue Nov 16 22:05:55 2010.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. django-filer documentation master file
 
 Welcome to django-filer's documentation!
 ========================================
@@ -9,6 +6,8 @@ Welcome to django-filer's documentation!
 ``django-filer`` is a file management application for django. It handles uploading
 and organizing files and images in contrib.admin.
 
+.. note:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
+   
 .. figure:: _static/directory_view_1_screenshot.png
    :scale: 50 %
    :alt: directory view screenshot
@@ -24,12 +23,14 @@ File model is used.
    :alt: admin widget screenshot
 
    Default admin widget for file fields
-
+       
 Getting help
 ------------
 
 * google group: http://groups.google.com/group/django-filer
 * IRC: #django-filer on freenode.net
+
+.. _contributing:
 
 Contributing
 ------------
@@ -43,7 +44,13 @@ Contents
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   getting_started
+   installation
+   upgrading
+   usage
+   permissions
+   secure_downloads
+   settings
+   extending_filer
    running_tests

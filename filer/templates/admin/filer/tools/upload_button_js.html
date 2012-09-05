@@ -1,0 +1,41 @@
+{% load i18n admin_modify adminmedia filermedia %}
+{% load url from future %}
+
+<script type="text/javascript">
+//<![CDATA[
+$(function() {
+    var uploader = new qq.FileUploaderBasic({
+        action: '{% url 'admin:filer-ajax_upload' %}',
+        button: document.getElementById('id_upload_button'),
+        onSubmit: function(id, fileName){
+            $("#fileInputQueue .noItemsRow").hide();
+            $('#fileInputQueue').append('<tr id="fileUpload-' + id + '" class="clipboardItem fileUploadQueueItem"><td class="thumbnail"><div class="loadingThumb" /></td><td class="label"><div><span class="fileName">' + fileName + ' (<span class="size">?</span>)</span> [<span class="percentage">&nbsp;</span>]</div><div class="fileUploadProgress" style="width: 100%;"><div id="fileUpload-' + id + '-ProgressBar" class="fileUploadProgressBar" style="width: 1px; height: 3px;"></div></div></td></tr>');
+        },
+        onProgress: function(id, fileName, loaded, total){
+            var percent = Math.round(loaded / total * 100);
+            $('#fileUpload-' + id + ' .size').html(uploader._formatSize(total));
+            $('#fileUpload-' + id + ' .percentage').html('' + percent + "%");
+            $('#fileUpload-' + id + '-ProgressBar').css('width', percent + "%");
+        },
+        onComplete: function(id, fileName, responseJSON){
+            var file = responseJSON;
+            if (file.error) {
+                var html = '\
+                <td class="thumbnail"><img style="width: 32px;height: 32px;" src="{% filer_staticmedia_prefix %}/icons/missingfile_32x32.png" alt="{% trans 'file missing' %}" /></td>\
+                <td class="label">' + file.error + '</td>\
+                <td class="buttons"></td>';
+            } else {
+                var html = '\
+                    <td class="thumbnail"><img style="width: 32px;height: 32px;" src="' + file.thumbnail + '" alt="' + file.alt_text + '" /></td>\
+                    <td class="label">' + file.label + '</td>\
+                    <td class="buttons"></td>';
+            }
+            $('#fileUpload-' + id).html(html);
+        },
+        onCancel: function(id, fileName){
+            $('#fileUpload-' + id).hide();
+        }
+    });
+});
+//]]>
+</script>

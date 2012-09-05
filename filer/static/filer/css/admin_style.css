@@ -1,0 +1,60 @@
+
+/* focal point */
+#image_container { position: relative; } 
+#image_container img, #image_container svg { margin: 0px; position: absolute; top: 0; left: 0;}
+
+
+/* the directory listing */
+table thead th.thumbHeader {
+	width: 52px;
+}
+#fileUploadFakeLink {
+	position: relative;
+	
+}
+#fileInputUploaderContainer {
+	position: absolute;
+	top:0;
+	left: -8px;
+}
+#fileInputUploader {
+}
+.fileUploadQueueItem .fileUploadProgress .fileUploadProgressBar {
+	background-color: black;
+}
+.loadingThumb {
+	width: 32px;
+	height: 32px;
+	background-image: url(../img/loading_animation.gif);
+	background-repeat:no-repeat;
+	
+}
+.clipboard tr td.thumbnail {
+	width: 40px;
+}
+a.insertlinkButton {
+	padding: 4px;
+	padding-left: 28px;
+	background-image: url(../img/select_item.gif);
+	background-repeat: no-repeat;
+}
+a.insertlinkButton:hover {
+	background-image: url(../img/select_item-hover.gif);
+}
+
+h1.folder_header {
+	background-image: url(../img/nav-bg.gif);
+	background-repeat: repeat-x;
+	background-position: bottom;
+	margin-bottom: 0;
+}
+a.small_folder_link {
+	display: block;
+	height: 36px;
+	background-repeat: no-repeat;
+	padding-left: 36px;
+	padding-right: 4px;
+	background-image: url(../icons/plainfolder_32x32.png);
+	line-height: 36px;
+	float: right;
+}

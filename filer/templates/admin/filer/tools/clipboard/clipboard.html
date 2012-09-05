@@ -1,4 +1,6 @@
 {% load thumbnail i18n %}
+{% load url from future %}
+
 {% for clipboard in user.filer_clipboards.all %}
 <table style="width: 100%; border: 1px solid #DDDDDD;" class="clipboard">
     <thead>
@@ -7,21 +9,23 @@
     <tfoot>
         <tr>
             <td colspan="3">
-                <form action="{% url admin:filer-paste_clipboard_to_folder %}" method="post" style="display: inline;">
+                <form action="{% url 'admin:filer-paste_clipboard_to_folder' %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="folder_id" value="{{ folder.id }}" />
                     <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
                     <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                     {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                    {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
                     <input type="submit" value="&lArr;"{% if folder.is_root %} disabled="disabled" style="color: gray;"{% endif %} title="{% trans "Paste all items here" %}"/>
                 </form>
-                <form action="{% url admin:filer-discard_clipboard %}" method="post"  style="display: inline;">{% csrf_token %}
+                <form action="{% url 'admin:filer-discard_clipboard' %}" method="post"  style="display: inline;">{% csrf_token %}
                     <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
                     <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                     {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                    {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
                     <input type="submit" value="{% trans "discard" %}" title="{% trans "Move all clipboard files to" %} '{% trans "unfiled files" %}' {% trans "folder" %}"/>
                 </form>{% comment %}
-                <form action="{% url admin:filer-delete_clipboard %}" method="post"  style="display: inline;">{% csrf_token %}
+                <form action="{% url 'admin:filer-delete_clipboard' %}" method="post"  style="display: inline;">{% csrf_token %}
                     <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
                     <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                     {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
@@ -41,4 +45,3 @@
     </tbody>
 </table>
 {% endfor %}
-    
