@@ -5,7 +5,7 @@ next
 ----
 
 * django-1.4 compatibility
-* seperate, customizable file storage backends for public and private files
+* separate, customizable file storage backends for public and private files
 * deleting a file in filer now deletes the file and all its thumbnails from the filesystem
 * many bulk operations (admin actions)
 * backwards incompatible changes
