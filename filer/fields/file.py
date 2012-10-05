@@ -115,20 +115,8 @@ class FilerFileField(models.ForeignKey):
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Image model as parameter...
         # a FilerImageFiled can only be a ForeignKey to a Image
-        # self.validate_related_name(kwargs.get('related_name', None))
         return super(FilerFileField, self).__init__(
-                                        self.default_model_class, **kwargs)
-
-    def validate_related_name(self, name):
-        if not name:
-            return
-        if name and hasattr(self.default_model_class, name):
-            raise ImproperlyConfigured(
-                ("%s fields cannot have related name %r, this property " + \
-                 "already exists on %s") % (self.__class__.__name__,
-                                  name,
-                                  self.default_form_class.__name__)
-            )
+            self.default_model_class, **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
