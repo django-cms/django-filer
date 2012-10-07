@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.db import router
 from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
@@ -197,10 +197,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         elif folder_id == None:
             folder = FolderRoot()
         else:
-            try:
-                folder = Folder.objects.get(id=folder_id)
-            except Folder.DoesNotExist:
-                raise Http404
+            folder = get_object_or_404(Folder, id=folder_id)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
