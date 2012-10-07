@@ -1,17 +1,16 @@
 #-*- coding: utf-8 -*-
 from django import forms
 from django import template
-from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
 from django.template.defaultfilters import urlencode
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db import router
 from django.db.models import Q
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.encoding import force_unicode
@@ -292,12 +291,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         items = folder_children + folder_files
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
-        # Make sure page request is an int. If not, deliver first page.
-        try:
-            page = int(request.GET.get('page', '1'))
-        except ValueError:
-            page = 1
-
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
             for f in folder_files:
@@ -344,8 +337,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # If page request (9999) is out of range, deliver last page of results.
         try:
-            paginated_items = paginator.page(page)
-        except (EmptyPage, InvalidPage):
+            paginated_items = paginator.page(request.GET.get('page', 1))
+        except PageNotAnInteger:
+            paginated_items = paginator.page(1)
+        except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
         return render_to_response(
             'admin/filer/folder/directory_listing.html',
