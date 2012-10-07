@@ -162,8 +162,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         url_patterns = patterns('',
             # we override the default list view with our own directory listing
             # of the root directories
-            url(r'^$', self.admin_site.admin_view(self.directory_listing),
+            url(r'^$',
+                self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing-root'),
+
+            url(r'^last/$',
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'last'},
+                name='filer-directory_listing-last'),
+
             url(r'^(?P<folder_id>\d+)/list/$',
                 self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing'),
@@ -174,10 +181,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_root_folder'),
+
             url(r'^images_with_missing_data/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'images_with_missing_data'},
                 name='filer-directory_listing-images_with_missing_data'),
+
             url(r'^unfiled_images/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
@@ -193,10 +202,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder = ImagesWithMissingData()
         elif viewtype == 'unfiled_images':
             folder = UnfiledImages()
+        elif viewtype == 'last':
+            last_folder_id = request.session.get('filer_last_folder_id')
+            url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
+            url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
+            return HttpResponseRedirect(url)
         elif folder_id == None:
             folder = FolderRoot()
         else:
             folder = get_object_or_404(Folder, id=folder_id)
+        request.session['filer_last_folder_id'] = folder_id
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
