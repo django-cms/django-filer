@@ -19,8 +19,10 @@ class FilerFolderAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+
     def tearDown(self):
         self.client.logout()
+
     def test_filer_app_index_get(self):
         response = self.client.get(reverse('admin:app_list', args=('filer',)))
         self.assertEqual(response.status_code, 200)
@@ -40,6 +42,15 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
         #TODO: not sure why the status code is 200
         self.assertEqual(response.status_code, 200)
+
+    def test_filer_remember_last_opened_directory(self):
+        folder = Folder.objects.create(name='remember me please')
+
+        response = self.client.get(reverse('admin:filer-directory_listing', kwargs={'folder_id': folder.id}))
+        self.assertEqual(int(self.client.session['filer_last_folder_id']), folder.id)
+
+        response = self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)
+        self.assertEqual(response.context['folder'], folder)
 
     def test_filer_directory_listing_root_empty_get(self):
         response = self.client.post(reverse('admin:filer-directory_listing-root'))
