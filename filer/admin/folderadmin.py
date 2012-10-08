@@ -204,8 +204,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder = UnfiledImages()
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
-            url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
-            url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
+            try:
+                Folder.objects.get(id=last_folder_id)
+            except Folder.DoesNotExist:
+                url = reverse('admin:filer-directory_listing-root')
+            else:
+                url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
+                url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
             return HttpResponseRedirect(url)
         elif folder_id == None:
             folder = FolderRoot()

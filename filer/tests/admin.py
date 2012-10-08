@@ -46,11 +46,16 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_remember_last_opened_directory(self):
         folder = Folder.objects.create(name='remember me please')
 
-        response = self.client.get(reverse('admin:filer-directory_listing', kwargs={'folder_id': folder.id}))
+        get_last_folder = lambda: self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)
+
+        self.client.get(reverse('admin:filer-directory_listing', kwargs={'folder_id': folder.id}))
         self.assertEqual(int(self.client.session['filer_last_folder_id']), folder.id)
 
-        response = self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)
-        self.assertEqual(response.context['folder'], folder)
+        self.assertEqual(get_last_folder().context['folder'], folder)
+
+        # let's test fallback
+        folder.delete()
+        self.assertTrue(isinstance(get_last_folder().context['folder'], FolderRoot))
 
     def test_filer_directory_listing_root_empty_get(self):
         response = self.client.post(reverse('admin:filer-directory_listing-root'))
