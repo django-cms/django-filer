@@ -39,7 +39,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 if filer_settings.FILER_DEBUG:
                     raise e
         if not related_url:
-            related_url = reverse('admin:filer-directory_listing-root')
+            related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()
         if params:
             lookup_url = '?' + '&amp;'.join(
