@@ -2,8 +2,8 @@ Changelog for django-filer
 ==========================
 
 
-next
-----
+0.9.1 (2012-10-12)
+------------------
 
 * removed nginx X-Accel-Redirect Content-Type header (#245)
 * validate_related_name method appears to break in FilerFileField (#148)
