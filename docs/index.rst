@@ -3,13 +3,14 @@
 Welcome to django-filer's documentation!
 ========================================
 
+.. only:: develop
 
-.. warning::
-   This documentation refers to the development version of ``django-filer``.
+   .. warning::
+      This documentation refers to the development version of ``django-filer``.
 
-   As this version has not been released yet, any part of the API maybe subject
-   to modifications without notice, and this documentation may be outdated and
-   not in sync with the code.
+      As this version has not been released yet, any part of the API maybe subject
+      to modifications without notice, and this documentation may be outdated and
+      not in sync with the code.
 
 
 ``django-filer`` is a file management application for django. It handles uploading
