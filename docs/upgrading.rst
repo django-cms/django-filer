@@ -23,7 +23,7 @@ Manually (SQL)
 *faster for many large files*
 
 Fire up the sql-console and change ``is_public`` to ``True`` on all files in the
-``filer_file`` table (``UPDATE filer_file SET is_public=0 WHERE is_public=1;``). The files will still be in
+``filer_file`` table (``UPDATE filer_file SET is_public=1 WHERE is_public=0;``). The files will still be in
 ``MEDIA_ROOT/filer_private/``, but serving them should already work. Then you can move the files
 into ``filer_private`` in the filesystem and update the corresponding paths in the database.
 

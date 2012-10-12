@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Iacopo Spalletti <i.spalletti@nephila.it>, 2012.
 #   <i.spalletti@nephila.it>, 2012.
@@ -10,10 +10,9 @@ msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2012-09-03 20:11+0100\n"
-"Last-Translator: Stefan Foulis <stefan@foulis.ch>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/django-filer/"
-"language/it/)\n"
+"PO-Revision-Date: 2012-07-18 19:07+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/django-filer/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,9 +31,7 @@ msgstr "Avanzato"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Gli elementi devono essere selezionati in modo da eseguire azioni su di "
-"essi. Nessun elemento è stato modificato."
+msgstr "Gli elementi devono essere selezionati in modo da eseguire azioni su di essi. Nessun elemento è stato modificato."
 
 #: admin/folderadmin.py:344
 #, python-format
@@ -105,9 +102,7 @@ msgstr "Elimina i file e/o le cartelle selezionati"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"%(count)d file e/o le cartelle nella cartella '%(destination)s' spostati con "
-"successo."
+msgstr "%(count)d file e/o le cartelle nella cartella '%(destination)s' spostati con successo."
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
@@ -131,9 +126,7 @@ msgstr "Rinomina file"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"%(count)d file e/o cartelle nella cartella '%(destination)s ' copiati con "
-"successo."
+msgstr "%(count)d file e/o cartelle nella cartella '%(destination)s ' copiati con successo."
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
@@ -165,9 +158,7 @@ msgstr "Suffisso che sarà aggiunto al nome dei file copiati."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Il suffisso dovrebbe essere valido, semplice e minuscolo per quanto riguarda "
-"la parte del nome del file, come \"%(valid)s\"."
+msgstr "Il suffisso dovrebbe essere valido, semplice e minuscolo per quanto riguarda la parte del nome del file, come \"%(valid)s\"."
 
 #: admin/forms.py:54
 #, python-format
@@ -201,9 +192,7 @@ msgstr "ingrandisci"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr ""
-"L'opzione anteprima immagine o parametri di ridimensionamento devono essere "
-"selezionati."
+msgstr "L'opzione anteprima immagine o parametri di ridimensionamento devono essere selezionati."
 
 #: admin/forms.py:73
 msgid "Resize parameters must be choosen."
@@ -472,29 +461,21 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
-"La cancellazione dell'elemento %(object_name)s '%(escaped_object)s' richiede "
-"la cancellazione di elementi collegati, ma il tuo account non ha i permessi "
-"per cancellare i seguenti tipi di oggetto:"
+msgstr "La cancellazione dell'elemento %(object_name)s '%(escaped_object)s' richiede la cancellazione di elementi collegati, ma il tuo account non ha i permessi per cancellare i seguenti tipi di oggetto:"
 
 #: templates/admin/filer/delete_confirmation.html:21
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
-"following protected related objects:"
-msgstr ""
-"La cancellazione dell'elemento %(object_name)s '%(escaped_object)s' richiede "
-"la cancellazione dei seguenti elementi protetti collegati:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
+" following protected related objects:"
+msgstr "La cancellazione dell'elemento %(object_name)s '%(escaped_object)s' richiede la cancellazione dei seguenti elementi protetti collegati:"
 
 #: templates/admin/filer/delete_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
-"Sei sicuro di voler cancellare l'elemento %(object_name)s "
-"\"%(escaped_object)s\"? \n"
-"Tutti gli elementi collegati seguenti saranno cancellati:"
+msgstr "Sei sicuro di voler cancellare l'elemento %(object_name)s \"%(escaped_object)s\"? \nTutti gli elementi collegati seguenti saranno cancellati:"
 
 #: templates/admin/filer/delete_confirmation.html:34
 #: templates/admin/filer/delete_selected_files_confirmation.html:45
@@ -506,26 +487,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Cancellare i file selezionati e/o cartelle comporta l'eliminazione degli "
-"oggetti correlati, ma il tuo account non dispone dell'autorizzazione per "
-"eliminare i seguenti tipi di oggetti:"
+msgstr "Cancellare i file selezionati e/o cartelle comporta l'eliminazione degli oggetti correlati, ma il tuo account non dispone dell'autorizzazione per eliminare i seguenti tipi di oggetti:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Cancellare i file selezionati e/o cartelle richiede eliminazione dei "
-"seguenti oggetti protetti correlati:"
+msgstr "Cancellare i file selezionati e/o cartelle richiede eliminazione dei seguenti oggetti protetti correlati:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Sei sicuro di voler cancellare i file selezionati e/o le cartelle? Tutti gli "
-"oggetti seguenti e quelli correlati verranno cancellati:"
+msgstr "Sei sicuro di voler cancellare i file selezionati e/o le cartelle? Tutti gli oggetti seguenti e quelli correlati verranno cancellati:"
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
@@ -561,11 +535,9 @@ msgstr "Icona della cartella"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
-msgstr ""
-"Il tuo account non dispone delle autorizzazioni per copiare tutti i file e/o "
-"cartelle selezionati."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
+msgstr "Il tuo account non dispone delle autorizzazioni per copiare tutti i file e/o cartelle selezionati."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
 #: templates/admin/filer/folder/choose_move_destination.html:15
@@ -580,9 +552,7 @@ msgstr "Non ci sono file e/o le cartelle disponibili per la copia."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"I seguenti file e/o cartelle verranno copiati in una cartella di "
-"destinazione (mantenendo la loro struttura ad albero):"
+msgstr "I seguenti file e/o cartelle verranno copiati in una cartella di destinazione (mantenendo la loro struttura ad albero):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:32
 #: templates/admin/filer/folder/choose_move_destination.html:32
@@ -596,9 +566,7 @@ msgstr "Copia"
 #: templates/admin/filer/folder/choose_images_resize_options.html:12
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
-"Il tuo account non dispone delle autorizzazioni per ridimensionare tutte le "
-"immagini selezionate."
+msgstr "Il tuo account non dispone delle autorizzazioni per ridimensionare tutte le immagini selezionate."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid "There are no images available to resize."
@@ -610,9 +578,7 @@ msgstr "Le seguenti immagini verranno ridimensionate:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:30
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Scegli un'opzione esistente miniatura o immettere i parametri di "
-"ridimensionamento:"
+msgstr "Scegli un'opzione esistente miniatura o immettere i parametri di ridimensionamento:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose resize parameters:"
@@ -622,9 +588,7 @@ msgstr "Scegli i parametri di ridimensionamento:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Attenzione: Le immagini verranno ridimensionate ora e le immagini originali "
-"andranno perse. Forse è meglio fare una copia per mantenere i file originali."
+msgstr "Attenzione: Le immagini verranno ridimensionate ora e le immagini originali andranno perse. Forse è meglio fare una copia per mantenere i file originali."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
@@ -632,11 +596,9 @@ msgstr "Ridimensiona"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"Il tuo account non dispone delle autorizzazioni per spostare tutti i file e/"
-"o cartelle selezionati."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "Il tuo account non dispone delle autorizzazioni per spostare tutti i file e/o cartelle selezionati."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
@@ -646,9 +608,7 @@ msgstr "Non ci sono file e/o cartelle a disponibili per lo spostamento."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"I seguenti file e/o cartelle verranno spostati in una cartella di "
-"destinazione (mantenendo la loro struttura ad albero):"
+msgstr "I seguenti file e/o cartelle verranno spostati in una cartella di destinazione (mantenendo la loro struttura ad albero):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:38
 msgid "Move"
@@ -657,9 +617,7 @@ msgstr "Sposta"
 #: templates/admin/filer/folder/choose_rename_format.html:12
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr ""
-"Il tuo account non dispone delle autorizzazioni per rinominare tutti i file "
-"selezionati."
+msgstr "Il tuo account non dispone delle autorizzazioni per rinominare tutti i file selezionati."
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "There are no files available to rename."
@@ -669,10 +627,7 @@ msgstr "Non ci sono file disponibili da ridimensionare."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"I file seguenti saranno rinominati (rimarranno nelle rispettive cartelle e "
-"manterranno il nome del file originario, solo il nome visualizzato sarà "
-"modificato):"
+msgstr "I file seguenti saranno rinominati (rimarranno nelle rispettive cartelle e manterranno il nome del file originario, solo il nome visualizzato sarà modificato):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
@@ -793,9 +748,7 @@ msgid ""
 "\n"
 "            Page %(number)s of %(num_pages)s.\n"
 "            "
-msgstr ""
-"\n"
-"Pagina %(number)s su %(num_pages)s ."
+msgstr "\nPagina %(number)s su %(num_pages)s ."
 
 #: templates/admin/filer/folder/directory_table.html:75
 msgid "next"
