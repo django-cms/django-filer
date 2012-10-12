@@ -35,7 +35,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             except Exception:
                 pass
         if not related_url:
-            related_url = reverse('admin:filer-directory_listing-root')
+            related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()
         params['select_folder'] = 1
         if params:
