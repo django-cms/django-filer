@@ -3,6 +3,13 @@
 Upgrading
 =========
 
+from 0.9.1 to 0.9.2
+-------------------
+
+From 0.9.2 ``File.name`` field is ``null=False``.
+
+.. warning::
+    Data migration in 0.9.2 changes existing null values to empty string.
 
 from 0.8.7 to 0.9
 -----------------
