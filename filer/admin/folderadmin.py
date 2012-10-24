@@ -208,6 +208,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 Folder.objects.get(id=last_folder_id)
             except Folder.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
+                url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
             else:
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
                 url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
