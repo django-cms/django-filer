@@ -38,8 +38,17 @@ packaged fork of `PIL`_).
 Configuration
 -------------
 
-Add ``"filer"`` to your project's ``INSTALLED_APPS`` setting and run ``manage.py syncdb``
-(or ``manage.py migrate`` if you're using `South`_).
+Add ``"filer"`` and related apps to your project's ``INSTALLED_APPS`` setting and run ``manage.py syncdb``
+(or ``manage.py migrate`` if you're using `South`_).::
+
+    INSTALLED_APPS = [
+        ...
+        'filer',
+        'easy_thumbnails',
+        ...
+    ]
+
+
 
 Note that `easy_thumbnails`_ also has database tables and needs a ``syncdb`` or 
 ``migrate``.
