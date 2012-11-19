@@ -9,6 +9,8 @@ Changelog for django-filer
 * Fix popup mode when Folder doesn't exists
 * #271 Remove unused templatetag from django 1.4
 * #269 Hide "Folder permissions" entry for "normal" users
+* #265 click on image thumbnail in popup looses context
+* #264 cancel search button looses popup context
 
 
 
