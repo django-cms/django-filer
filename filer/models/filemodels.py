@@ -40,7 +40,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     has_all_mandatory_data = models.BooleanField(_('has all mandatory data'), default=False, editable=False)
 
     original_filename = models.CharField(_('original filename'), max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True,
+    name = models.CharField(max_length=255, default="", blank=True,
         verbose_name=_('name'))
     description = models.TextField(null=True, blank=True,
         verbose_name=_('description'))

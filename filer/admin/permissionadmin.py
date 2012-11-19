@@ -29,7 +29,7 @@ class PermissionAdmin(admin.ModelAdmin):
     def get_model_perms(self, request):
         # don't display the permissions admin if permissions are disabled.
         # This method is easier for testing than not registering the admin at all at import time
-        enable_permissions = settings.FILER_ENABLE_PERMISSIONS
+        enable_permissions = settings.FILER_ENABLE_PERMISSIONS and request.user.has_perm('filer.add_folderpermission')
         return {
             'add': enable_permissions,
             'change': enable_permissions,

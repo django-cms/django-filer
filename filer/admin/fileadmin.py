@@ -111,7 +111,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         # Check against filer_file_changelist as file deletion is always made by
         # the base class
         if (url in ["../../../../", "../../"] or
-            url == reverse("admin:filer_file_changelist")):
+            url == reverse("admin:filer_file_changelist") or
+            url == reverse("admin:filer_image_changelist")):
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': parent_folder.id})
