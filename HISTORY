@@ -11,6 +11,7 @@ Changelog for django-filer
 * #269 Hide "Folder permissions" entry for "normal" users
 * #265 click on image thumbnail in popup looses context
 * #264 cancel search button looses popup context
+* #263 deleting images from the image detail view redirects to the wrong list view
 
 
 
