@@ -2,8 +2,10 @@ Changelog for django-filer
 ==========================
 
 
-next
-----
+0.9.3 (2012-11-29)
+------------------
+
+* Fixes template file permissions (packaging issue)
 
 
 
