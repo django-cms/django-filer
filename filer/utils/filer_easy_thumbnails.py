@@ -30,7 +30,12 @@ class ThumbnailerNameMixin(object):
         filename.
         """
         path, source_filename = os.path.split(self.name)
-        if transparent:
+        source_extension = os.path.splitext(source_filename)[1][1:]
+        if self.thumbnail_preserve_extensions is True or  \
+            (self.thumbnail_preserve_extensions and
+             source_extension.lower() in self.thumbnail_preserve_extensions):
+                extension = source_extension
+        elif transparent:
             extension = self.thumbnail_transparency_extension
         else:
             extension = self.thumbnail_extension
