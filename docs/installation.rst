@@ -114,7 +114,7 @@ generation errors,  two options are provided to help when working with ``django-
  * ``FILER_ENABLE_LOGGING``: Boolean, controls whether logging the above exceptions.
    It requires proper django logging configuration for default logger or
    ``filer`` logger. Please see https://docs.djangoproject.com/en/dev/topics/logging/
-   for further information abount django logging configuration.
+   for further information about Django's logging configuration.
 
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer/
