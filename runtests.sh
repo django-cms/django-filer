@@ -53,6 +53,7 @@ if [ $django == "14" ]; then
 fi
 if [ $django == "dev" ]; then
     export DJANGO="-e git+git://github.com/django/django.git#egg=Django"
+    export EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
 fi
 
 ./.travis_setup
