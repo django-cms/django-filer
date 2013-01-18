@@ -1,7 +1,11 @@
 #-*- coding: utf-8 -*-
 from PIL import Image, ImageChops, ImageDraw
 
-from django.contrib.auth.models import User
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User  # NOQA
 from filer.models.foldermodels import Folder
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 
