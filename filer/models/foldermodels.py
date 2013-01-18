@@ -1,4 +1,9 @@
 #-*- coding: utf-8 -*-
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User  # NOQA
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
@@ -96,7 +101,7 @@ class Folder(models.Model, mixins.IconsMixin):
                                related_name='children')
     name = models.CharField(_('name'), max_length=255)
 
-    owner = models.ForeignKey(auth_models.User, verbose_name=('owner'),
+    owner = models.ForeignKey(User, verbose_name=('owner'),
                               related_name='filer_owned_folders',
                               null=True, blank=True)
 
@@ -242,7 +247,7 @@ class FolderPermission(models.Model):
     folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
-    user = models.ForeignKey(auth_models.User,
+    user = models.ForeignKey(User,
                              related_name="filer_folder_permissions",
                              verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(auth_models.Group,
