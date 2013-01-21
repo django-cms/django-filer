@@ -1,5 +1,10 @@
 #-*- coding: utf-8 -*-
-from django.contrib.auth.models import User, Group
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User  # NOQA
+from django.contrib.auth.models import Group
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 from filer import settings as filer_settings
