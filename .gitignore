@@ -29,3 +29,4 @@ share/
 .idea
 /env
 /envs
+.tox
