@@ -41,10 +41,8 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
     ],
-    cmdclass={'test': test},
-    test_suite='setuptest.setuptest.SetupTestSuite',
+    test_suite='runtests.main',
     tests_require=(
-        'django-setuptest>=0.1.1',
-        'argparse',  # apparently needed by django-setuptest on python 2.6
+        'argparse',  # needed on python 2.6
     ),
 )

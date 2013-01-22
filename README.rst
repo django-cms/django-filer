@@ -30,14 +30,25 @@ To get started using ``django-filer`` simply install it with
 Configuration
 -------------
 
-Add ``"filer"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
-(or ``migrate`` if you're using South).
+Add ``"filer"``, ``"mptt"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
+(and ``migrate`` if you're using South).
 
 See the docs for advanced configuration:
 
   * `subject location docs`_
   * `permission docs`_ (experimental)
   * `secure file downloads docs`_ (experimental)
+
+
+Testsuite
+---------
+
+The easiest way to run the testsuite is to checkout the code and run::
+
+    python setup.py test
+
+
+For serious testing ``tox`` is recommended. See documentation for details.
 
 
 .. _Django: http://djangoproject.com
