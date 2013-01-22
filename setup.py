@@ -21,7 +21,7 @@ setup(
     description = "A file management application for django that makes handling of files and images a breeze.",
     long_description = read('README.rst'),
     author = 'Stefan Foulis',
-    author_email = 'stefan.foulis@gmail.com',
+    author_email = 'stefan@foulis.ch',
     packages=find_packages(),
     install_requires = (
         # 'Django>=1.3,<1.5',  # no need to limit while in development
