@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
+from django.conf import settings
 from filer.models import tools
 from filer.models.clipboardmodels import Clipboard
 from filer.models.foldermodels import Folder
@@ -14,8 +15,7 @@ class ToolsTestCase(TestCase):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
-                                 self.image_name)
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
 
         self.file = DjangoFile(open(self.filename), name=self.image_name)

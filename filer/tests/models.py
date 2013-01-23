@@ -3,6 +3,7 @@ import os
 from django.forms.models import modelform_factory
 from django.test import TestCase
 from django.core.files import File as DjangoFile
+from django.conf import settings
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
@@ -21,8 +22,7 @@ class FilerApiTests(TestCase):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
-                                 self.image_name)
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
 
     def tearDown(self):

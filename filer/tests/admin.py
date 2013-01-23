@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers
+from django.conf import settings
 
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
@@ -11,6 +12,7 @@ from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
+from filer.test_utils.tmpdir import temp_dir
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image)
 
@@ -83,8 +85,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
-                                 self.image_name)
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
 
     def tearDown(self):
@@ -123,7 +124,7 @@ class  BulkOperationsMixin(object):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR,
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
         self.create_src_and_dst_folders()
