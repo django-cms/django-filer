@@ -43,7 +43,7 @@ See the docs for advanced configuration:
 Testsuite
 ---------
 
-The easiest way to run the testsuite is to checkout the code and run::
+The easiest way to run the testsuite is to checkout the code, make sure you have ``PIL`` installed, and run::
 
     python setup.py test
 
