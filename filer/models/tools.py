@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from filer.models import Clipboard
+from filer import settings as filer_settings
 
 
 def discard_clipboard(clipboard):
@@ -33,6 +34,16 @@ def move_files_from_clipboard_to_folder(clipboard, folder):
 
 def move_files_to_folder(files, folder):
     for file_obj in files:
+        if file_obj.is_public:
+            upload_to = filer_settings.FILER_PUBLICMEDIA_UPLOAD_TO
+        else:
+            upload_to = filer_settings.FILER_PRIVATEMEDIA_UPLOAD_TO
+
+        storage = file_obj.file.storage
         file_obj.folder = folder
+        new_location = upload_to(file_obj, file_obj.original_filename)
+        new_name = storage.save(new_location, file_obj.file.file)
+        storage.delete(file_obj.file.name)
+        file_obj.file.name = new_name
         file_obj.save()
     return True

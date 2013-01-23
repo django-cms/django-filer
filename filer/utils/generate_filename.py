@@ -1,4 +1,5 @@
 from filer.utils.files import get_valid_filename
+from django.core.files.uploadedfile import UploadedFile
 from django.utils.encoding import force_unicode, smart_str
 import datetime
 import os
@@ -22,3 +23,22 @@ class prefixed_factory(object):
         if not self.prefix:
             return upload_to_str
         return os.path.join(self.prefix, upload_to_str)
+
+
+def _is_in_memory(file_):
+    return isinstance(file_, UploadedFile)
+
+
+def _construct_logical_folder_path(filer_file):
+    return os.path.join(*(folder.name for folder in filer_file.logical_path))
+
+
+def by_path(instance, filename):
+    if _is_in_memory(instance.file.file):
+        return os.path.join('clipboard', filename)
+    else:
+        filename = filename.strip('/').split('/')[-1]
+        path = os.path.join(
+            _construct_logical_folder_path(instance),
+            filename)
+        return path
