@@ -1,3 +1,4 @@
+import filer.models.clipboardmodels
 from filer.utils.files import get_valid_filename
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.encoding import force_unicode, smart_str
@@ -33,9 +34,14 @@ def _construct_logical_folder_path(filer_file):
     return os.path.join(*(folder.name for folder in filer_file.logical_path))
 
 
+def _goes_to_clipboard(instance):
+    return _is_in_memory(instance.file.file) or instance.folder is None
+
+
 def by_path(instance, filename):
-    if _is_in_memory(instance.file.file):
-        return os.path.join('clipboard', filename)
+    if _goes_to_clipboard(instance):
+        return os.path.join(
+            filer.models.clipboardmodels.Clipboard.folder_name, filename)
     else:
         filename = filename.strip('/').split('/')[-1]
         path = os.path.join(
