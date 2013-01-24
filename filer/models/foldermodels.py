@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
 from filer import settings as filer_settings
 
+import filer.models.clipboardmodels
+
 import mptt
 
 
@@ -106,6 +108,12 @@ class Folder(models.Model, mixins.IconsMixin):
     modified_at = models.DateTimeField(_('modified at'),auto_now=True)
 
     objects = FolderManager()
+
+    def clean(self):
+        if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
+            raise ValidationError(
+                '%s is reserved for internal use. '
+                'Please choose a different name' % self.name)
 
     @property
     def file_count(self):
