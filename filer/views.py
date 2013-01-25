@@ -1,7 +1,9 @@
 #-*- coding: utf-8 -*-
 from django import forms
+from django.db.models import Q
 from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
@@ -136,6 +138,16 @@ def paste_clipboard_to_folder(request):
     if request.method == 'POST':
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
+        files = clipboard.files.all()
+        file_names = [f.display_name for f in files]
+        already_existing = folder.files_with_names(file_names)
+        if already_existing:
+            for f in already_existing:
+                messages.error(request, "File named %s already exists" % f.display_name)
+            return HttpResponseRedirect('%s%s%s' % (
+                    request.REQUEST.get('redirect_to', ''),
+                    popup_param(request),
+                    selectfolder_param(request)))
         if folder.has_add_children_permission(request):
             tools.move_files_from_clipboard_to_folder(clipboard, folder)
             tools.discard_clipboard(clipboard)

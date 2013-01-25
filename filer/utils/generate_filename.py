@@ -1,9 +1,11 @@
-import filer.models.clipboardmodels
-from filer.utils.files import get_valid_filename
-from django.core.files.uploadedfile import UploadedFile
-from django.utils.encoding import force_unicode, smart_str
 import datetime
 import os
+
+import filer.models.clipboardmodels
+from filer.utils.files import get_valid_filename
+
+from django.core.files.uploadedfile import UploadedFile
+from django.utils.encoding import force_unicode, smart_str
 
 
 def by_date(instance, filename):

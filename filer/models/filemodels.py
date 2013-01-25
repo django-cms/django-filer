@@ -2,7 +2,9 @@
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
@@ -68,6 +70,26 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
+        self._old_name = self.name
+        self._old_folder = self.folder
+
+    def clean(self):
+        if not filer_settings.LOGIC_PATH_EQ_ACTUAL:
+            return
+        if self.folder:
+            if self.folder.files_with_names([self.name]):
+                raise ValidationError(
+                    'Current folder already contains a file named %s' % \
+                        self.display_name)
+
+    def _move_file_to_new_location(self):
+        new_location = self.file.field.upload_to(self, self.display_name)
+        storage = self.file.storage
+        src_file_name = self.file.name
+        src_file = storage.open(src_file_name)
+        src_file.open()
+        self.file = storage.save(new_location, ContentFile(src_file.read()))
+        storage.delete(src_file_name)
 
     def _move_file(self):
         """
@@ -145,6 +167,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
+
+        if filer_settings.LOGIC_PATH_EQ_ACTUAL and \
+                (self._old_name != self.name or
+                 self._old_folder != self.folder):
+            self._move_file_to_new_location()
         # generate SHA1 hash
         # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
         try:
@@ -200,12 +227,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             return False
 
-    def __unicode__(self):
+    @property
+    def display_name(self):
         if self.name in ('', None):
-            text = u"%s" % (self.original_filename,)
+            display_name = u"%s" % (self.original_filename,)
         else:
-            text = u"%s" % (self.name,)
-        return text
+            display_name = u"%s" % (self.name,)
+        return display_name
+
+    def __unicode__(self):
+        return self.display_name
 
     def get_admin_url_path(self):
         return urlresolvers.reverse(

@@ -5,10 +5,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from filer.models import mixins
-from filer import settings as filer_settings
 
 import filer.models.clipboardmodels
+from filer.models import mixins
+from filer import settings as filer_settings
 
 import mptt
 
@@ -134,6 +134,12 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def files(self):
         return self.all_files.all()
+
+    def files_with_names(self, names):
+        q = Q(name__in=names)
+        q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
+        return self.all_files.filter(q)
+
 
     @property
     def logical_path(self):
