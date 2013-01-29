@@ -4,7 +4,6 @@ from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
@@ -74,7 +73,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self._old_folder = self.folder
 
     def clean(self):
-        if not filer_settings.LOGIC_PATH_EQ_ACTUAL:
+        if not filer_settings.FOLDER_AFFECTS_URL:
             return
         if self.folder:
             if self.folder.files_with_names([self.name]):
@@ -168,7 +167,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self._move_file()
             self._old_is_public = self.is_public
 
-        if filer_settings.LOGIC_PATH_EQ_ACTUAL and \
+        if filer_settings.FOLDER_AFFECTS_URL and \
                 (self._old_name != self.name or
                  self._old_folder != self.folder):
             self._move_file_to_new_location()
