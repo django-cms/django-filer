@@ -7,10 +7,15 @@ A file management application for django that makes handling of files and images
 
 .. figure:: docs/_static/directory_view_1_screenshot.png
    :scale: 50 %
-   :alt: directory view screenshot
+   :alt: file browser
+
+   file browser
+
 
 .. figure:: docs/_static/default_admin_file_widget.png
-   :alt: admin widget screenshot
+   :alt: file widget
+
+   file widget
 
 
 Documentation: http://django-filer.readthedocs.org/en/latest/index.html
