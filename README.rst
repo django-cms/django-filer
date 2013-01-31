@@ -5,6 +5,14 @@ django-filer
 
 A file management application for django that makes handling of files and images a breeze.
 
+.. figure:: docs/_static/directory_view_1_screenshot.png
+   :scale: 50 %
+   :alt: directory view screenshot
+
+.. figure:: docs/_static/default_admin_file_widget.png
+   :alt: admin widget screenshot
+
+
 Documentation: http://django-filer.readthedocs.org/en/latest/index.html
 
 Wiki: https://github.com/stefanfoulis/django-filer/wiki
