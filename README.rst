@@ -9,13 +9,9 @@ A file management application for django that makes handling of files and images
    :scale: 50 %
    :alt: file browser
 
-   file browser
+Filer picker widget: |file-picker-widget-screeshot|
 
-
-.. figure:: docs/_static/default_admin_file_widget.png
-   :alt: file widget
-
-   file widget
+.. |file-picker-widget-screeshot| image:: docs/_static/default_admin_file_widget.png
 
 
 Documentation: http://django-filer.readthedocs.org/en/latest/index.html
