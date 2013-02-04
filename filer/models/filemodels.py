@@ -82,6 +82,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
                         self.display_name)
 
     def _move_file_to_new_location(self):
+        if self.folder is not None\
+                and self.folder.files_with_names([self.display_name]).exists():
+            # last line of defense; duplicate file names should be caught at
+            # higher levels; however, if higher levels fail, this ensures we 
+            # don't have a missbehaving file hierarchy
+            raise ValueError('Duplicate file names are not allowed')
         new_location = self.file.field.upload_to(self, self.display_name)
         storage = self.file.storage
         src_file_name = self.file.name
