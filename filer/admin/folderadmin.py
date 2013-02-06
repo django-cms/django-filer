@@ -4,6 +4,7 @@ from django import template
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
+from django.contrib import messages
 from django.template.defaultfilters import urlencode
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
@@ -32,7 +33,7 @@ from filer.admin.tools import  (userperms_for_request,
                                 check_folder_read_permissions)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData, FolderPermission, Image)
-from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
+from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY, FOLDER_AFFECTS_URL
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
@@ -50,6 +51,16 @@ class AddFolderPopupForm(forms.ModelForm):
         fields = ('name',)
 
 
+folder_admin_actions = [
+    'move_to_clipboard', 'files_set_public', 'files_set_private',
+    'delete_files_or_folders', 'move_files_and_folders',
+    'copy_files_and_folders', 'resize_images', 'rename_files']
+
+if FOLDER_AFFECTS_URL:
+    folder_admin_actions.remove('move_files_and_folders')
+    folder_admin_actions.remove('copy_files_and_folders')
+
+
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
@@ -58,9 +69,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private',
-               'delete_files_or_folders', 'move_files_and_folders',
-               'copy_files_and_folders', 'resize_images', 'rename_files']
+    actions = folder_admin_actions
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -307,7 +316,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
                     clipboard = tools.get_user_clipboard(request.user)
                     if f.has_edit_permission(request):
-                        tools.move_file_to_clipboard([f], clipboard)
+                        tools.move_file_to_clipboard(request, [f], clipboard)
                         return HttpResponseRedirect(request.get_full_path())
                     else:
                         raise PermissionDenied
@@ -485,7 +494,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         files_count = [0]  # We define it like that so that we can modify it inside the move_files function
 
         def move_files(files):
-            files_count[0] += tools.move_file_to_clipboard(files, clipboard)
+            files_count[0] += tools.move_file_to_clipboard(request, files, clipboard)
 
         def move_folders(folders):
             for f in folders:
@@ -494,10 +503,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         move_files(files_queryset)
         move_folders(folders_queryset)
-
-        self.message_user(request, _("Successfully moved %(count)d files to clipboard.") % {
-            "count": files_count[0],
-        })
+        if files_count[0] > 0:
+            self.message_user(request, _("Successfully moved %(count)d files to clipboard.") % {
+                    "count": files_count[0],
+                    })
 
         return None
 
@@ -768,7 +777,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
             if n:
-                self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
+                self._move_files_and_folders_impl(request, files_queryset, folders_queryset, destination)
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
                     "count": n,
                     "destination": destination,

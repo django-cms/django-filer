@@ -57,6 +57,11 @@ class ClipboardAdmin(admin.ModelAdmin):
 
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
+            if filer_settings.FOLDER_AFFECTS_URL and\
+                    clipboard.files.filter(original_filename=filename).exists():
+                raise UploadException(
+                    "A file named %s already exists in the clipboard" % \
+                        filename)
 
             # find the file type
             for filer_class in filer_settings.FILER_FILE_MODELS:

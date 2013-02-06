@@ -81,21 +81,6 @@ class File(PolymorphicModel, mixins.IconsMixin):
                     'Current folder already contains a file named %s' % \
                         self.display_name)
 
-    def _move_file_to_new_location(self):
-        if self.folder is not None\
-                and self.folder.files_with_names([self.display_name]).exists():
-            # last line of defense; duplicate file names should be caught at
-            # higher levels; however, if higher levels fail, this ensures we 
-            # don't have a missbehaving file hierarchy
-            raise ValueError('Duplicate file names are not allowed')
-        new_location = self.file.field.upload_to(self, self.display_name)
-        storage = self.file.storage
-        src_file_name = self.file.name
-        src_file = storage.open(src_file_name)
-        src_file.open()
-        self.file = storage.save(new_location, ContentFile(src_file.read()))
-        storage.delete(src_file_name)
-
     def _move_file(self):
         """
         Move the file from src to dst.
@@ -173,17 +158,27 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self._move_file()
             self._old_is_public = self.is_public
 
-        if filer_settings.FOLDER_AFFECTS_URL and \
-                (self._old_name != self.name or
-                 self._old_folder != self.folder):
-            self._move_file_to_new_location()
         # generate SHA1 hash
         # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
         try:
             self.generate_sha1()
         except Exception, e:
             pass
-        super(File, self).save(*args, **kwargs)
+
+        if filer_settings.FOLDER_AFFECTS_URL and \
+                (self._old_name != self.name or
+                 self._old_folder != self.folder):
+            old_location = self.file.name
+            new_location = self.file.field.upload_to(self, self.display_name)
+            storage = self.file.storage
+            saved_as = self._copy_file(new_location)
+            assert saved_as == new_location
+            self.file = saved_as
+            super(File, self).save(*args, **kwargs)
+            storage.delete(old_location)
+        else:
+            super(File, self).save(*args, **kwargs)
+        
     save.alters_data = True
 
     def delete(self, *args, **kwargs):

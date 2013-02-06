@@ -43,7 +43,9 @@ def _goes_to_clipboard(instance):
 def by_path(instance, filename):
     if _goes_to_clipboard(instance):
         return os.path.join(
-            filer.models.clipboardmodels.Clipboard.folder_name, filename)
+            filer.models.clipboardmodels.Clipboard.folder_name,
+            instance.owner.username,
+            filename)
     else:
         filename = filename.strip('/').split('/')[-1]
         path = os.path.join(

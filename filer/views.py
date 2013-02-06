@@ -138,18 +138,8 @@ def paste_clipboard_to_folder(request):
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         files = clipboard.files.all()
-        if filer_settings.FOLDER_AFFECTS_URL:
-            file_names = [f.display_name for f in files]
-            already_existing = folder.files_with_names(file_names)
-            if already_existing:
-                for f in already_existing:
-                    messages.error(request, "File named %s already exists" % f.display_name)
-                return HttpResponseRedirect('%s%s%s' % (
-                        request.REQUEST.get('redirect_to', ''),
-                        popup_param(request),
-                        selectfolder_param(request)))
         if folder.has_add_children_permission(request):
-            tools.move_files_from_clipboard_to_folder(clipboard, folder)
+            tools.move_files_from_clipboard_to_folder(request, clipboard, folder)
             tools.discard_clipboard(clipboard)
         else:
             raise PermissionDenied
