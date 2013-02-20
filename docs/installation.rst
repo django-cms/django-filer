@@ -26,7 +26,7 @@ Dependencies
 * `django-mptt`_ >=0.5.1,<0.6
 * `easy_thumbnails`_ >= 1.0
 * `django-polymorphic`_ >=0.2
-* `PIL`_ 1.1.7 (with JPEG and ZLIB support) I recommend using `Pillow`_ instead.
+* `PIL`_ 1.1.7 (**with JPEG and ZLIB support**) I recommend using `Pillow`_ instead.
 * ``django.contrib.staticfiles``
 
 Since the `PIL package on pypi <http://pypi.python.org/pypi/PIL/>`_ can be notoriously hard to install on some
