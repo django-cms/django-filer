@@ -23,7 +23,8 @@ class ThumbnailerNameMixin(object):
     thumbnail_subdir = ''
     thumbnail_prefix = ''
 
-    def get_thumbnail_name(self, thumbnail_options, transparent=False):
+    def get_thumbnail_name(self, thumbnail_options, transparent=False,
+                           high_resolution=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
         reproducible thumbnail name that can be converted back to the original
@@ -58,6 +59,8 @@ class ThumbnailerNameMixin(object):
 
         #make sure our magic delimiter is not used in all_opts
         all_opts = all_opts.replace('__', '_')
+        if high_resolution:
+            all_opts += '@2x'
         filename = u'%s__%s.%s' % (source_filename, all_opts, extension)
 
         return os.path.join(basedir, path, subdir, filename)
@@ -68,7 +71,8 @@ class ActionThumbnailerMixin(object):
     thumbnail_subdir = ''
     thumbnail_prefix = ''
 
-    def get_thumbnail_name(self, thumbnail_options, transparent=False):
+    def get_thumbnail_name(self, thumbnail_options, transparent=False,
+                           high_resolution=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that returns the original
         filename to resize.
