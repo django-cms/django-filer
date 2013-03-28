@@ -777,7 +777,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
             if n:
-                self._move_files_and_folders_impl(request, files_queryset, folders_queryset, destination)
+                self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
                     "count": n,
                     "destination": destination,

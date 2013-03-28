@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers
+from django.http import HttpRequest
 
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
@@ -199,7 +200,8 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.dst_folder.files.count(), 0)
         clipboard = Clipboard.objects.get(user=self.superuser)
         self.assertEqual(clipboard.files.count(), 1)
-        tools.move_files_from_clipboard_to_folder(clipboard, self.src_folder)
+        request = HttpRequest()
+        tools.move_files_from_clipboard_to_folder(request, clipboard, self.src_folder)
         tools.discard_clipboard(clipboard)
         self.assertEqual(clipboard.files.count(), 0)
         self.assertEqual(self.src_folder.files.count(), 1)
