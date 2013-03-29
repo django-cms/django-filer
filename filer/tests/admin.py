@@ -14,6 +14,10 @@ from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image)
+from filer.test_utils.context_managers import SettingsOverride
+from filer.utils.generate_filename import by_path
+
+import filer.settings as filer_settings
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -89,6 +93,29 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
+    def test_filer_upload_file_logical_actual_url(self, extra_headers={}):
+        with SettingsOverride(filer_settings,
+                              FOLDER_AFFECTS_URL=True,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path):
+            self.assertEqual(Image.objects.count(), 0)
+            file_obj = django.core.files.File(open(self.filename))
+            response = self.client.post(
+                reverse('admin:filer-ajax_upload'),
+                {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+                **extra_headers
+            )
+            self.assertEqual(Image.objects.count(), 1)
+            self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+            # upload the same file again. This must fail since the clipboard can't contain
+            # two files with the same name
+            response = self.client.post(
+                reverse('admin:filer-ajax_upload'),
+                {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+                **extra_headers
+            )
+            self.assertEqual(Image.objects.count(), 1)
+            self.assertIn('error', response.content)
+
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
@@ -102,7 +129,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
 
-class  BulkOperationsMixin(object):
+class BulkOperationsMixin(object):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
