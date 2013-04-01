@@ -1,8 +1,10 @@
 #-*- coding: utf-8 -*-
 from django import forms
 from django import template
+from django.core.exceptions import ValidationError
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
+from django.contrib import messages
 from django.template.defaultfilters import urlencode
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
@@ -70,8 +72,19 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if parent_id:
             return AddFolderPopupForm
         else:
-            return super(FolderAdmin, self).get_form(
-                                                request, obj=None, **kwargs)
+            folder_form = super(FolderAdmin, self).get_form(
+                request, obj=None, **kwargs)
+
+            def folder_form_clean(form_obj):
+                cleaned_data = form_obj.cleaned_data
+                if Folder.objects.filter(parent=form_obj.instance.parent,
+                                         name=cleaned_data['name']):
+                    raise ValidationError('Folder with this name already exists.')
+                return cleaned_data
+
+            # attach clean to the default form rather than defining a new form class
+            folder_form.clean = folder_form_clean
+            return folder_form
 
     def save_form(self, request, form, change):
         """
@@ -329,7 +342,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                         raise PermissionDenied
 
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
-
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
                 'index' in request.POST and '_save' not in request.POST):
@@ -785,7 +797,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 raise PermissionDenied
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
-            if n:
+            conflicting_names = [folder.name for folder in Folder.objects.filter(
+                    parent=destination,
+                    name__in=folders_queryset.values('name'))]
+            if conflicting_names:
+                messages.error(request, _("Folders with names %s already exist at the selected "
+                                          "destination" % ", ".join(conflicting_names)))
+            elif n:
                 self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
                     "count": n,
