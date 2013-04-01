@@ -1020,15 +1020,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         try:
             selected_destination_folder = int(request.POST.get('destination', 0))
         except ValueError:
-            selected_destination_folder = 0
-
+            if current_folder:
+                selected_destination_folder = current_folder.pk
+            else:
+                selected_destination_folder = 0
         context = {
             "title": _("Copy files and/or folders"),
             "instance": current_folder,
             "breadcrumbs_action": _("Copy files and/or folders"),
             "to_copy": to_copy,
             "destination_folders": folders,
-            "selected_destination_folder": selected_destination_folder or current_folder.pk,
+            "selected_destination_folder": selected_destination_folder,
             "copy_form": form,
             "files_queryset": files_queryset,
             "folders_queryset": folders_queryset,
