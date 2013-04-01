@@ -46,10 +46,12 @@ def move_files_from_clipboard_to_folder(request, clipboard, folder):
 def move_files_to_folder(request, files, folder):
     if FOLDER_AFFECTS_URL:
         file_names = [f.display_name for f in files]
-        already_existing = [f.display_name for f in folder.files_with_names(file_names)]
+        already_existing = [
+            f.display_name 
+            for f in folder.files_and_folders_with_names(file_names)]
     for file_obj in files:
         if FOLDER_AFFECTS_URL and file_obj.display_name in already_existing:
-            messages.error(request, "File named %s already exists" % file_obj.display_name)
+            messages.error(request, "File or folder named %s already exists" % file_obj.display_name)
             continue
         file_obj.folder = folder
         file_obj.save()

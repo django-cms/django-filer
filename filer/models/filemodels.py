@@ -76,7 +76,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if not filer_settings.FOLDER_AFFECTS_URL:
             return
         if self.folder:
-            if self.folder.files_with_names([self.name]):
+            if self.folder.files_and_folders_with_names([self.name]):
                 raise ValidationError(
                     'Current folder already contains a file named %s' % \
                         self.display_name)

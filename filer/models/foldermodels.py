@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+import itertools
+
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
@@ -135,11 +137,12 @@ class Folder(models.Model, mixins.IconsMixin):
     def files(self):
         return self.all_files.all()
 
-    def files_with_names(self, names):
+    def files_and_folders_with_names(self, names):
         q = Q(name__in=names)
         q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
-        return self.all_files.filter(q)
-
+        files_with_names = self.all_files.filter(q)
+        folders_with_names = self.children.filter(name__in=names)
+        return itertools.chain(files_with_names, folders_with_names)
 
     @property
     def logical_path(self):
@@ -210,6 +213,10 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def __unicode__(self):
         return u"%s" % (self.name,)
+
+    @property
+    def display_name(self):
+        return self.name
 
     def contains_folder(self, folder_name):
         try:
