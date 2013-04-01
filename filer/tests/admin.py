@@ -153,6 +153,40 @@ class FilerClipboardAdminUrlsTests(TestCase):
             self.assertEqual(Image.objects.count(), 1)
             self.assertIn('error', response.content)
 
+    def test_paste_clipboard_to_folder_logical_actual_url(self):
+        with SettingsOverride(filer_settings,
+                              FOLDER_AFFECTS_URL=True,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path):
+            first_folder = Folder.objects.create(name='first')
+
+            def upload():
+                file_obj = django.core.files.File(open(self.filename))
+                response = self.client.post(
+                    reverse('admin:filer-ajax_upload'),
+                    {'Filename': self.image_name, 'Filedata': file_obj,
+                     'jsessionid': self.client.session.session_key,})
+                return Image.objects.all().order_by('-id')[0]
+        
+            uploaded_image = upload()
+            self.assertEqual(uploaded_image.original_filename, self.image_name)
+
+            def paste(uploaded_image):
+                # current user should have one clipboard created
+                clipboard = self.superuser.filer_clipboards.all()[0]
+                response = self.client.post(
+                    reverse('admin:filer-paste_clipboard_to_folder'),
+                    {'folder_id': first_folder.pk,
+                     'clipboard_id': clipboard.pk})
+                return Image.objects.get(pk=uploaded_image.pk)
+        
+            pasted_image = paste(uploaded_image)
+            self.assertEqual(pasted_image.folder.pk, first_folder.pk)
+            # upload and paste the same image again
+            second_upload = upload()
+            second_paste = paste(second_upload)
+            # second paste failed due to name conflict
+            self.assertEqual(second_paste.folder, None)
+
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
