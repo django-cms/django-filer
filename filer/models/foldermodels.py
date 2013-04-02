@@ -138,6 +138,9 @@ class Folder(models.Model, mixins.IconsMixin):
         return self.all_files.all()
 
     def files_and_folders_with_names(self, names):
+        """Returns an iterator yielding the files and folders that are direct
+        children of this folder and have their names in the given list of names.
+        """
         q = Q(name__in=names)
         q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
         files_with_names = self.all_files.filter(q)

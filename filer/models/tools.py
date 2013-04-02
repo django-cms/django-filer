@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 from filer.models import Clipboard
-from filer import settings
 
 
 def discard_clipboard(clipboard):
@@ -23,13 +22,12 @@ def get_user_clipboard(user):
 
 def move_file_to_clipboard(request, files, clipboard):
     count = 0
-    if settings.FOLDER_AFFECTS_URL:
-        file_names = [f.original_filename for f in files]
-        already_existing = [
-            f.original_filename
-            for f in clipboard.files.filter(original_filename__in=file_names)]
+    file_names = [f.original_filename for f in files]
+    already_existing = [
+        f.original_filename
+        for f in clipboard.files.filter(original_filename__in=file_names)]
     for file_obj in files:
-        if settings.FOLDER_AFFECTS_URL and file_obj.original_filename in already_existing:
+        if file_obj.original_filename in already_existing:
             messages.error(request, _(u'Clipboard already contains a file '
                                       'named %s') % file_obj.display_name)
             continue
@@ -45,13 +43,12 @@ def move_files_from_clipboard_to_folder(request, clipboard, folder):
 
 
 def move_files_to_folder(request, files, folder):
-    if settings.FOLDER_AFFECTS_URL:
-        file_names = [f.display_name for f in files]
-        already_existing = [
-            f.display_name 
-            for f in folder.files_and_folders_with_names(file_names)]
+    file_names = [f.display_name for f in files]
+    already_existing = [
+        f.display_name 
+        for f in folder.files_and_folders_with_names(file_names)]
     for file_obj in files:
-        if settings.FOLDER_AFFECTS_URL and file_obj.display_name in already_existing:
+        if file_obj.display_name in already_existing:
             messages.error(request, _(u"File or folder named %s already exists") % file_obj.display_name)
             file_obj.delete()
             continue

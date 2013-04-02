@@ -13,7 +13,7 @@ from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, SettingsOverride)
+                                 create_image)
 from filer.utils.generate_filename import by_path
 
 import filer.settings as filer_settings
@@ -130,62 +130,56 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
     def test_filer_upload_file_logical_actual_url(self, extra_headers={}):
-        with SettingsOverride(filer_settings,
-                              FOLDER_AFFECTS_URL=True,
-                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path):
-            self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(Image.objects.count(), 0)
+        file_obj = django.core.files.File(open(self.filename))
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload'),
+            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            **extra_headers
+        )
+        self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+        # upload the same file again. This must fail since the clipboard can't contain
+        # two files with the same name
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload'),
+            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            **extra_headers
+        )
+        self.assertEqual(Image.objects.count(), 1)
+        self.assertIn('error', response.content)
+
+    def test_paste_clipboard_to_folder_logical_actual_url(self):
+        first_folder = Folder.objects.create(name='first')
+
+        def upload():
             file_obj = django.core.files.File(open(self.filename))
             response = self.client.post(
                 reverse('admin:filer-ajax_upload'),
-                {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
-                **extra_headers
-            )
-            self.assertEqual(Image.objects.count(), 1)
-            self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
-            # upload the same file again. This must fail since the clipboard can't contain
-            # two files with the same name
+                {'Filename': self.image_name, 'Filedata': file_obj,
+                 'jsessionid': self.client.session.session_key,})
+            return Image.objects.all().order_by('-id')[0]
+
+        uploaded_image = upload()
+        self.assertEqual(uploaded_image.original_filename, self.image_name)
+
+        def paste(uploaded_image):
+            # current user should have one clipboard created
+            clipboard = self.superuser.filer_clipboards.all()[0]
             response = self.client.post(
-                reverse('admin:filer-ajax_upload'),
-                {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
-                **extra_headers
-            )
-            self.assertEqual(Image.objects.count(), 1)
-            self.assertIn('error', response.content)
+                reverse('admin:filer-paste_clipboard_to_folder'),
+                {'folder_id': first_folder.pk,
+                 'clipboard_id': clipboard.pk})
+            return Image.objects.get(pk=uploaded_image.pk)
 
-    def test_paste_clipboard_to_folder_logical_actual_url(self):
-        with SettingsOverride(filer_settings,
-                              FOLDER_AFFECTS_URL=True,
-                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path):
-            first_folder = Folder.objects.create(name='first')
-
-            def upload():
-                file_obj = django.core.files.File(open(self.filename))
-                response = self.client.post(
-                    reverse('admin:filer-ajax_upload'),
-                    {'Filename': self.image_name, 'Filedata': file_obj,
-                     'jsessionid': self.client.session.session_key,})
-                return Image.objects.all().order_by('-id')[0]
-        
-            uploaded_image = upload()
-            self.assertEqual(uploaded_image.original_filename, self.image_name)
-
-            def paste(uploaded_image):
-                # current user should have one clipboard created
-                clipboard = self.superuser.filer_clipboards.all()[0]
-                response = self.client.post(
-                    reverse('admin:filer-paste_clipboard_to_folder'),
-                    {'folder_id': first_folder.pk,
-                     'clipboard_id': clipboard.pk})
-                return Image.objects.get(pk=uploaded_image.pk)
-        
-            pasted_image = paste(uploaded_image)
-            self.assertEqual(pasted_image.folder.pk, first_folder.pk)
-            # upload and paste the same image again
-            second_upload = upload()
-            # second paste failed due to name conflict, and file in clipboard
-            # got deleted
-            with self.assertRaises(File.DoesNotExist):
-                paste(second_upload)
+        pasted_image = paste(uploaded_image)
+        self.assertEqual(pasted_image.folder.pk, first_folder.pk)
+        # upload and paste the same image again
+        second_upload = upload()
+        # second paste failed due to name conflict, and file in clipboard
+        # got deleted
+        with self.assertRaises(File.DoesNotExist):
+            paste(second_upload)
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)

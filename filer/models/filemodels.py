@@ -73,13 +73,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self._old_folder = self.folder
 
     def clean(self):
-        if not filer_settings.FOLDER_AFFECTS_URL:
-            return
-        if self.folder:
-            if self.folder.files_and_folders_with_names([self.name]):
-                raise ValidationError(
-                    _(u'Current folder already contains a file named %s') % \
-                        self.display_name)
+        if self.folder and self.folder.files_and_folders_with_names([self.name]):
+            raise ValidationError(
+                _(u'Current folder already contains a file named %s') % \
+                    self.display_name)
 
     def _move_file(self):
         """
