@@ -10,7 +10,7 @@ class Clipboard(models.Model):
     files = models.ManyToManyField(
                         'File', verbose_name=_('files'), related_name="in_clipboards",
                         through='ClipboardItem')
-    folder_name = "_clipboard"
+    folder_name = u"_clipboard"
 
     def append_file(self, file_obj):
         try:

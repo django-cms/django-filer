@@ -78,7 +78,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self.folder:
             if self.folder.files_and_folders_with_names([self.name]):
                 raise ValidationError(
-                    'Current folder already contains a file named %s' % \
+                    _(u'Current folder already contains a file named %s') % \
                         self.display_name)
 
     def _move_file(self):

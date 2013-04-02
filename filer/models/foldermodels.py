@@ -114,8 +114,8 @@ class Folder(models.Model, mixins.IconsMixin):
     def clean(self):
         if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
             raise ValidationError(
-                '%s is reserved for internal use. '
-                'Please choose a different name' % self.name)
+                _(u'%s is reserved for internal use. '
+                  'Please choose a different name') % self.name)
 
     @property
     def file_count(self):

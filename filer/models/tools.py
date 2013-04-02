@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from django.contrib import messages
+from django.utils.translation import ugettext as _
 
 from filer.models import Clipboard
 from filer import settings
@@ -29,8 +30,8 @@ def move_file_to_clipboard(request, files, clipboard):
             for f in clipboard.files.filter(original_filename__in=file_names)]
     for file_obj in files:
         if settings.FOLDER_AFFECTS_URL and file_obj.original_filename in already_existing:
-            messages.error(request, 'Clipboard already contains a file '
-                           'named %s' % file_obj.display_name)
+            messages.error(request, _(u'Clipboard already contains a file '
+                                      'named %s') % file_obj.display_name)
             continue
         if clipboard.append_file(file_obj):
             file_obj .folder = None
@@ -51,7 +52,7 @@ def move_files_to_folder(request, files, folder):
             for f in folder.files_and_folders_with_names(file_names)]
     for file_obj in files:
         if settings.FOLDER_AFFECTS_URL and file_obj.display_name in already_existing:
-            messages.error(request, "File or folder named %s already exists" % file_obj.display_name)
+            messages.error(request, _(u"File or folder named %s already exists") % file_obj.display_name)
             continue
         file_obj.folder = folder
         file_obj.save()

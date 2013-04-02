@@ -3,6 +3,7 @@ from django.forms.models import modelform_factory
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils import simplejson
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem
@@ -60,8 +61,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             if filer_settings.FOLDER_AFFECTS_URL and\
                     clipboard.files.filter(original_filename=filename).exists():
                 raise UploadException(
-                    "A file named %s already exists in the clipboard" % \
-                        filename)
+                    _(u"A file named %s already exists in the clipboard") % filename)
 
             # find the file type
             for filer_class in filer_settings.FILER_FILE_MODELS:
