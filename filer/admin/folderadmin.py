@@ -790,8 +790,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     parent=destination,
                     name__in=folders_queryset.values('name'))]
             if conflicting_names:
-                messages.error(request, _("Folders with names %s already exist at the selected "
-                                          "destination" % ", ".join(conflicting_names)))
+                messages.error(request, _(u"Folders with names %s already exist at the selected "
+                                          "destination") % u", ".join(conflicting_names))
             elif n:
                 self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
