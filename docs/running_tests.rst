@@ -32,5 +32,5 @@ done for you. Tox will setup multiple virtual environments with different python
 
 ``--verbosity=3`` and ``--failfast`` are also supported.
 
-To speed things up a bit use ```detox`` <http://pypi.python.org/pypi/detox/>`_. ``detox`` runs each testsuite in a
+To speed things up a bit use `detox <http://pypi.python.org/pypi/detox/>`_. ``detox`` runs each testsuite in a
 separate process in parallel.
