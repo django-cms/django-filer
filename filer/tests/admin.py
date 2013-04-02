@@ -182,9 +182,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
             self.assertEqual(pasted_image.folder.pk, first_folder.pk)
             # upload and paste the same image again
             second_upload = upload()
-            second_paste = paste(second_upload)
-            # second paste failed due to name conflict
-            self.assertEqual(second_paste.folder, None)
+            # second paste failed due to name conflict, and file in clipboard
+            # got deleted
+            with self.assertRaises(File.DoesNotExist):
+                paste(second_upload)
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)

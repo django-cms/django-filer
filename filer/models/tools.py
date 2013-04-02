@@ -53,6 +53,7 @@ def move_files_to_folder(request, files, folder):
     for file_obj in files:
         if settings.FOLDER_AFFECTS_URL and file_obj.display_name in already_existing:
             messages.error(request, _(u"File or folder named %s already exists") % file_obj.display_name)
+            file_obj.delete()
             continue
         file_obj.folder = folder
         file_obj.save()

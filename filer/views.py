@@ -136,7 +136,6 @@ def paste_clipboard_to_folder(request):
     if request.method == 'POST':
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
-        files = clipboard.files.all()
         if folder.has_add_children_permission(request):
             tools.move_files_from_clipboard_to_folder(request, clipboard, folder)
             tools.discard_clipboard(clipboard)
