@@ -30,3 +30,4 @@ share/
 /env
 /envs
 .tox
+testenv1
