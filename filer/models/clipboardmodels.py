@@ -25,11 +25,6 @@ class Clipboard(models.Model):
             newitem.save()
             return True
 
-    def empty(self):
-        for item in self.bucket_items.all():
-            item.delete()
-    empty.alters_data = True
-
     def __unicode__(self):
         return u"Clipboard %s of %s" % (self.id, self.user)
 
