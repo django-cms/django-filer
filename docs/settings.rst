@@ -134,3 +134,21 @@ Regular users are not allowed to create new folders at the root level, only
 subfolders of already existing folders, unless this setting is set to ``True``.
 
 Defaults to ``False``
+
+``FILER_FOLDER_AFFECTS_URL``
+----------------------------
+
+Set this to ``True`` when your ``UPLOAD_TO`` function generates a path that depends on the
+folder the file belongs to.
+
+Having this set to ``True`` has certain implications:
+
+* when renaming a file or moving it in and out of the clipboard the file is renamed/move on the
+  backend storage as well
+* bulk operations such as *Copy selected files and/or folders* or *Move selected files and/or folders*
+  are disabled. Reasons for disabling them are: 
+
+  * they might cause requests to timeout due to the fact that copying/moving a large number of files on the storage backend would take a long time
+  * in case of failure the database might end up being out of sync with the storage backend
+
+Defaults to ``False``
