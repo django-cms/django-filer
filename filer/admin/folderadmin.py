@@ -266,6 +266,33 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                Q(owner__first_name__icontains=term) | \
                                Q(owner__last_name__icontains=term))
             return qs
+
+        def get_user_read_permissions(user):
+            if not user.is_authenticated():
+                return None
+            elif user.is_superuser:
+                return 'All'
+            else:
+                permission_manager = FolderPermission.objects
+                read_permissions = permission_manager.get_read_id_list(user)
+                return read_permissions
+
+        def _filter_generic_permission(qs, permissions, entry_type):
+            if permissions == 'All':
+                return qs
+
+            if entry_type == 'folder':
+                qs = qs.filter(id__in=permissions)
+            elif entry_type == 'file':
+                qs = qs.filter(folder__id__in=permissions)
+            return qs
+
+        def filter_folder_permission(qs, permissions):
+            return _filter_generic_permission(qs, permissions, 'folder')
+
+        def filter_file_permission(qs, permissions):
+            return _filter_generic_permission(qs, permissions, 'file')
+
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
@@ -300,12 +327,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_children += folder.virtual_folders
 
-        read_permissions = FolderPermission.objects.get_read_id_list(request.user)
-        if read_permissions != 'All':
-            folder_qs = folder_qs.filter(id__in=read_permissions)
-            file_qs = file_qs.filter(folder__id__in=read_permissions)
+        user = request.user
+        permissions = get_user_read_permissions(user)
+        folder_qs = filter_folder_permission(folder_qs, permissions)
+        file_qs = filter_file_permission(file_qs, permissions)
         folder_children += folder_qs
         folder_files += file_qs
+
         try:
             permissions = {
                 'has_edit_permission': folder.has_edit_permission(request),
