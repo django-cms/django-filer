@@ -165,18 +165,24 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if filer_settings.FOLDER_AFFECTS_URL and \
                 (self._old_name != self.name or
                  self._old_folder != self.folder):
-            old_location = self.file.name
-            new_location = self.file.field.upload_to(self, self.display_name)
-            storage = self.file.storage
-            saved_as = self._copy_file(new_location)
-            assert saved_as == new_location
-            self.file = saved_as
-            super(File, self).save(*args, **kwargs)
-            storage.delete(old_location)
+            self.update_location_on_storage(*args, **kwargs)
         else:
             super(File, self).save(*args, **kwargs)
         
     save.alters_data = True
+
+    def update_location_on_storage(self, *args, **kwargs):
+        old_location = self.file.name
+        new_location = self.file.field.upload_to(self, self.display_name)
+        storage = self.file.storage
+        saved_as = self._copy_file(new_location)
+        assert saved_as == new_location, '%s %s' % (saved_as, new_location)
+        self.file = saved_as
+        # TODO: replace 'delete_on_storage' with a better solution...
+        delete_on_storage = kwargs.pop('delete_on_storage', True)
+        super(File, self).save(*args, **kwargs)
+        if old_location != new_location and delete_on_storage:
+            storage.delete(old_location)
 
     def delete(self, *args, **kwargs):
         # Delete the model before the file

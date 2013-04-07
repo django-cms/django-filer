@@ -47,6 +47,7 @@ def by_path(instance, filename):
             instance.owner.username,
             filename)
     else:
+        # TODO: use os.path or urlparse?
         filename = filename.strip('/').split('/')[-1]
         path = os.path.join(
             _construct_logical_folder_path(instance),
