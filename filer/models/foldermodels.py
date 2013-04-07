@@ -145,7 +145,7 @@ class Folder(models.Model, mixins.IconsMixin):
         q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
         files_with_names = self.all_files.filter(q)
         folders_with_names = self.children.filter(name__in=names)
-        return itertools.chain(files_with_names, folders_with_names)
+        return list(itertools.chain(files_with_names, folders_with_names))
 
     @property
     def logical_path(self):
