@@ -2,6 +2,13 @@ Changelog for django-filer
 ==========================
 
 
+0.9.4 (2013-04-09)
+------------------
+
+* experimental Django 1.5 support
+* bugfixes
+
+
 0.9.3 (2012-11-29)
 ------------------
 

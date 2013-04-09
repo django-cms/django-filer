@@ -5,6 +5,15 @@ django-filer
 
 A file management application for django that makes handling of files and images a breeze.
 
+.. figure:: docs/_static/directory_view_1_screenshot.png
+   :scale: 50 %
+   :alt: file browser
+
+Filer picker widget: |file-picker-widget-screeshot|
+
+.. |file-picker-widget-screeshot| image:: docs/_static/default_admin_file_widget.png
+
+
 Documentation: http://django-filer.readthedocs.org/en/latest/index.html
 
 Wiki: https://github.com/stefanfoulis/django-filer/wiki
@@ -30,14 +39,25 @@ To get started using ``django-filer`` simply install it with
 Configuration
 -------------
 
-Add ``"filer"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
-(or ``migrate`` if you're using South).
+Add ``"filer"``, ``"mptt"`` and ``"easy_thumbnails"`` to your project's ``INSTALLED_APPS`` setting and run ``syncdb``
+(and ``migrate`` if you're using South).
 
 See the docs for advanced configuration:
 
   * `subject location docs`_
   * `permission docs`_ (experimental)
   * `secure file downloads docs`_ (experimental)
+
+
+Testsuite
+---------
+
+The easiest way to run the testsuite is to checkout the code, make sure you have ``PIL`` installed, and run::
+
+    python setup.py test
+
+
+For serious testing ``tox`` is recommended. See documentation for details.
 
 
 .. _Django: http://djangoproject.com

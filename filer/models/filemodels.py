@@ -1,5 +1,9 @@
 #-*- coding: utf-8 -*-
-from django.contrib.auth import models as auth_models
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User  # NOQA
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.db import models
@@ -45,7 +49,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     description = models.TextField(null=True, blank=True,
         verbose_name=_('description'))
 
-    owner = models.ForeignKey(auth_models.User,
+    owner = models.ForeignKey(User,
         related_name='owned_%(class)ss',
         null=True, blank=True, verbose_name=_('owner'))
 

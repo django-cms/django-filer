@@ -21,7 +21,7 @@ setup(
     description = "A file management application for django that makes handling of files and images a breeze.",
     long_description = read('README.rst'),
     author = 'Stefan Foulis',
-    author_email = 'stefan.foulis@gmail.com',
+    author_email = 'stefan@foulis.ch',
     packages=find_packages(),
     install_requires = (
         # 'Django>=1.3,<1.5',  # no need to limit while in development
@@ -41,10 +41,8 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
     ],
-    cmdclass={'test': test},
-    test_suite='setuptest.setuptest.SetupTestSuite',
+    test_suite='runtests.main',
     tests_require=(
-        'django-setuptest>=0.1.1',
-        'argparse',  # apparently needed by django-setuptest on python 2.6
+        'argparse',  # needed on python 2.6
     ),
 )

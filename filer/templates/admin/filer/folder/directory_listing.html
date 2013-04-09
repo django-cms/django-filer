@@ -1,5 +1,5 @@
 {% extends "admin/filer/base_site.html" %}
-{% load adminmedia filer_admin_tags filermedia i18n %}
+{% load filer_admin_tags filermedia i18n %}
 {% load url from future %}
 
 {% block extrahead %}{{ block.super }}
@@ -9,6 +9,7 @@
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
 <script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}

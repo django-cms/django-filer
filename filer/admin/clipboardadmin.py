@@ -24,7 +24,12 @@ class ClipboardAdmin(admin.ModelAdmin):
     verbose_name_plural = "DEBUG Clipboards"
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
+        try:
+            # django >=1.4
+            from django.conf.urls import patterns, url
+        except ImportError:
+            # django <1.4
+            from django.conf.urls.defaults import patterns, url
         urls = super(ClipboardAdmin, self).get_urls()
         from filer import views
         url_patterns = patterns('',

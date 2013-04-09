@@ -27,3 +27,7 @@ pep8.txt
 htmlcov/
 share/
 .idea
+/env
+/envs
+.tox
+testenv1

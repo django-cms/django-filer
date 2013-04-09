@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers
+from django.conf import settings
 
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
@@ -67,6 +68,43 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
+    def test_validate_no_duplcate_folders(self):
+        FOLDER_NAME = "root folder 1"
+        self.assertEqual(Folder.objects.count(), 0)
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name":FOLDER_NAME,
+                "_popup": 1
+                })
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
+        # and create another one
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'),
+                                    {"name":FOLDER_NAME, "_popup": 1})
+        # second folder didn't get created
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertIn('Folder with this name already exists', response.content)
+
+    def test_validate_no_duplcate_folders_on_rename(self):
+        self.assertEqual(Folder.objects.count(), 0)
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name": "foo",
+                "_popup": 1})
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertEqual(Folder.objects.all()[0].name, "foo")
+        # and create another one
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name": "bar",
+                "_popup": 1})
+        self.assertEqual(Folder.objects.count(), 2)
+        bar = Folder.objects.get(name="bar")
+        response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
+                "name": "foo",
+                "_popup": 1})
+        self.assertIn('Folder with this name already exists', response.content)
+        # refresh from db and validate that it's name didn't change
+        bar = Folder.objects.get(pk=bar.pk)
+        self.assertEqual(bar.name, "bar")
+
 
 class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):
@@ -83,8 +121,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
-                                 self.image_name)
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
 
     def tearDown(self):
@@ -117,13 +154,13 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
 
-class  BulkOperationsMixin(object):
+class BulkOperationsMixin(object):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR,
                                  self.image_name)
         self.img.save(self.filename, 'JPEG')
         self.create_src_and_dst_folders()
@@ -198,6 +235,35 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         })
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 0)
+
+    def test_validate_no_duplicate_folders_on_move(self):
+        """Create the following folder hierarchy:
+        root
+          |
+          |--foo
+          |   |-bar
+          |
+          |--bar
+        
+        and try to move the owter bar in foo. This has to fail since it would result
+        in two folders with the same name and parent.
+        """
+        root = Folder.objects.create(name='root', owner=self.superuser)
+        foo = Folder.objects.create(name='foo', parent=root, owner=self.superuser)
+        bar = Folder.objects.create(name='bar', parent=root, owner=self.superuser)
+        foos_bar = Folder.objects.create(name='bar', parent=foo, owner=self.superuser)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': root.pk,
+        })
+        response = self.client.post(url, {
+            'action': 'move_files_and_folders',
+            'post': 'yes',
+            'destination': foo.pk,
+            helpers.ACTION_CHECKBOX_NAME: 'folder-%d' % (bar.pk,),
+        })
+        # refresh from db and validate that it hasn't been moved
+        bar = Folder.objects.get(pk=bar.pk)
+        self.assertEqual(bar.parent.pk, root.pk)
 
     def test_move_to_clipboard_action(self):
         # TODO: Test recursive (files and folders tree) move

@@ -7,11 +7,12 @@ install:
 env:
   - DJANGO="django>=1.3,<1.4"
   - DJANGO="django>=1.4,<1.5"
-  - DJANGO="-e git+git://github.com/django/django.git#egg=Django"
+  - DJANGO="django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.2"
+  - DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
 script: python setup.py test
 matrix:
   allow_failures:
     - python: 2.6
-      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django"
+      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
     - python: 2.7
-      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django"
+      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"

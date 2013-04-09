@@ -3,6 +3,7 @@ import os
 from django.forms.models import modelform_factory
 from django.test import TestCase
 from django.core.files import File as DjangoFile
+from django.conf import settings
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
@@ -13,7 +14,6 @@ from filer.tests.helpers import (create_superuser, create_folder_structure,
 from filer import settings as filer_settings
 
 
-
 class FilerApiTests(TestCase):
 
     def setUp(self):
@@ -21,8 +21,7 @@ class FilerApiTests(TestCase):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(os.path.dirname(__file__),
-                                 self.image_name)
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
 
     def tearDown(self):
@@ -32,7 +31,7 @@ class FilerApiTests(TestCase):
             f.delete()
 
     def create_filer_image(self):
-        file_obj= DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
                                      file=file_obj)
@@ -55,9 +54,9 @@ class FilerApiTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = DjangoFile(open(self.filename), name=self.image_name)
         ImageUploadForm = modelform_factory(Image, fields=('original_filename', 'owner', 'file'))
-        upoad_image_form = ImageUploadForm({'original_filename':self.image_name,
+        upoad_image_form = ImageUploadForm({'original_filename': self.image_name,
                                                 'owner': self.superuser.pk},
-                                                {'file':file_obj})
+                                                {'file': file_obj})
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
         self.assertEqual(Image.objects.count(), 1)
@@ -79,7 +78,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + u'__%sx%s_q85_crop_upscale.jpg' %(size,size))
+                             file_basename + u'__%sx%s_q85_crop_upscale.jpg' % (size, size))
 
     def test_file_upload_public_destination(self):
         """
@@ -175,4 +174,3 @@ class FilerApiTests(TestCase):
 
         # file should still be here
         self.assertTrue(storage.exists(name))
-

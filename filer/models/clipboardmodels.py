@@ -1,12 +1,16 @@
 #-*- coding: utf-8 -*-
-from django.contrib.auth import models as auth_models
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User  # NOQA
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer.models import filemodels
 
 
 class Clipboard(models.Model):
-    user = models.ForeignKey(auth_models.User, verbose_name=_('user'), related_name="filer_clipboards")
+    user = models.ForeignKey(User, verbose_name=_('user'), related_name="filer_clipboards")
     files = models.ManyToManyField(
                         'File', verbose_name=_('files'), related_name="in_clipboards",
                         through='ClipboardItem')
@@ -20,11 +24,6 @@ class Clipboard(models.Model):
             newitem = ClipboardItem(file=file_obj, clipboard=self)
             newitem.save()
             return True
-
-    def empty(self):
-        for item in self.bucket_items.all():
-            item.delete()
-    empty.alters_data = True
 
     def __unicode__(self):
         return u"Clipboard %s of %s" % (self.id, self.user)

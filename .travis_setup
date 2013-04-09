@@ -1,2 +1,2 @@
 #!/bin/bash
-pip install $DJANGO PIL
+pip install $DJANGO Pillow $EASY_THUMBNAILS
