@@ -4,14 +4,15 @@
 # 
 # Translators:
 # crunchorn <crunchorn@prokonto.pl>, 2010.
+# Mateusz Marzantowicz <mmarzantowicz@osdf.com.pl>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2012-07-13 17:11+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: en <LL@li.org>\n"
+"PO-Revision-Date: 2013-01-31 12:42+0000\n"
+"Last-Translator: mmarzantowicz <mmarzantowicz@osdf.com.pl>\n"
+"Language-Team: Polish (http://www.transifex.com/projects/p/django-filer/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #: views.py:103
 msgid "Folder with this name already exists."
-msgstr ""
+msgstr "Folder o podanej nazwie już istnieje"
 
 #: admin/fileadmin.py:41
 msgid "Advanced"
@@ -56,7 +57,7 @@ msgstr ""
 
 #: admin/folderadmin.py:503
 msgid "Move selected files to clipboard"
-msgstr ""
+msgstr "Przenieś zaznaczone pliki do schowka"
 
 #: admin/folderadmin.py:537
 #, python-format
@@ -83,19 +84,19 @@ msgstr ""
 
 #: admin/folderadmin.py:630
 msgid "Cannot delete files and/or folders"
-msgstr ""
+msgstr "Nie można usunąć plików i/lub folderów"
 
 #: admin/folderadmin.py:632
 msgid "Are you sure?"
-msgstr ""
+msgstr "Czy na pewno?"
 
 #: admin/folderadmin.py:637
 msgid "Delete files and/or folders"
-msgstr ""
+msgstr "Usuń pliki i/lub foldery"
 
 #: admin/folderadmin.py:656
 msgid "Delete selected files and/or folders"
-msgstr ""
+msgstr "Usuń zaznaczone pliki i/lub foldery"
 
 #: admin/folderadmin.py:771
 #, python-format
@@ -106,20 +107,20 @@ msgstr ""
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
-msgstr ""
+msgstr "Przenieś pliki i/lub foldery"
 
 #: admin/folderadmin.py:797
 msgid "Move selected files and/or folders"
-msgstr ""
+msgstr "Przenieś zaznaczone pliki i/lub foldery"
 
 #: admin/folderadmin.py:854
 #, python-format
 msgid "Successfully renamed %(count)d files."
-msgstr ""
+msgstr "Pomyślnie zmieniono nazwę %(count)d plików."
 
 #: admin/folderadmin.py:862 admin/folderadmin.py:864 admin/folderadmin.py:881
 msgid "Rename files"
-msgstr ""
+msgstr "Zmień nazwy plików"
 
 #: admin/folderadmin.py:975
 #, python-format
@@ -130,11 +131,11 @@ msgstr ""
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
-msgstr ""
+msgstr "Skopiuj pliki i/lub foldery"
 
 #: admin/folderadmin.py:1010
 msgid "Copy selected files and/or folders"
-msgstr ""
+msgstr "Skopiuj zaznaczone pliki i/lub foldery"
 
 #: admin/folderadmin.py:1105
 #, python-format
@@ -176,19 +177,19 @@ msgstr ""
 
 #: admin/forms.py:63
 msgid "width"
-msgstr ""
+msgstr "szerokość"
 
 #: admin/forms.py:64
 msgid "height"
-msgstr ""
+msgstr "wysokość"
 
 #: admin/forms.py:65
 msgid "crop"
-msgstr ""
+msgstr "przytnij"
 
 #: admin/forms.py:66
 msgid "upscale"
-msgstr ""
+msgstr "skaluj"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
@@ -212,11 +213,11 @@ msgstr "użytkownik"
 
 #: models/clipboardmodels.py:11 models/filemodels.py:287
 msgid "files"
-msgstr ""
+msgstr "pliki"
 
 #: models/clipboardmodels.py:34 models/clipboardmodels.py:40
 msgid "clipboard"
-msgstr ""
+msgstr "schowek"
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
@@ -225,7 +226,7 @@ msgstr ""
 #: models/clipboardmodels.py:39 models/filemodels.py:35
 #: models/filemodels.py:286
 msgid "file"
-msgstr ""
+msgstr "plik"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard item"
@@ -244,7 +245,7 @@ msgstr "katalog"
 
 #: models/filemodels.py:36
 msgid "file size"
-msgstr ""
+msgstr "rozmiar pliku"
 
 #: models/filemodels.py:38
 msgid "sha1"
@@ -260,7 +261,7 @@ msgstr ""
 
 #: models/filemodels.py:44 models/foldermodels.py:99
 msgid "name"
-msgstr ""
+msgstr "nazwa"
 
 #: models/filemodels.py:46
 msgid "description"
@@ -294,7 +295,7 @@ msgstr ""
 #: templates/admin/filer/widgets/admin_folder.html:3
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "Folder"
-msgstr ""
+msgstr "Folder"
 
 #: models/foldermodels.py:212
 msgid "Folders"
@@ -374,11 +375,11 @@ msgstr ""
 
 #: models/imagemodels.py:200
 msgid "image"
-msgstr ""
+msgstr "obraz"
 
 #: models/imagemodels.py:201
 msgid "images"
-msgstr ""
+msgstr "obrazy"
 
 #: models/virtualitems.py:45
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
@@ -415,7 +416,7 @@ msgstr ""
 
 #: templates/admin/filer/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Wyczyść zaznaczenie"
 
 #: templates/admin/filer/breadcrumbs.html:4
 msgid "Go back to admin homepage"
@@ -480,7 +481,7 @@ msgstr ""
 #: templates/admin/filer/delete_confirmation.html:34
 #: templates/admin/filer/delete_selected_files_confirmation.html:45
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "Tak, na pewno"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
@@ -557,7 +558,7 @@ msgstr ""
 #: templates/admin/filer/folder/choose_copy_destination.html:32
 #: templates/admin/filer/folder/choose_move_destination.html:32
 msgid "Destination folder:"
-msgstr ""
+msgstr "Folder docelowy:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:39
 msgid "Copy"
@@ -592,7 +593,7 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
-msgstr ""
+msgstr "Zmień rozmiar"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
@@ -602,7 +603,7 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
-msgstr ""
+msgstr "Brak plików i/lub folderów do przeniesienia."
 
 #: templates/admin/filer/folder/choose_move_destination.html:20
 msgid ""
@@ -612,7 +613,7 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:38
 msgid "Move"
-msgstr ""
+msgstr "Przenieś"
 
 #: templates/admin/filer/folder/choose_rename_format.html:12
 msgid ""
@@ -631,7 +632,7 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
-msgstr ""
+msgstr "Zmień nazwę"
 
 #: templates/admin/filer/folder/directory_listing.html:66
 msgid "Adds a new Folder"
@@ -644,7 +645,7 @@ msgstr "Nowy katalog"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "upload files"
-msgstr ""
+msgstr "wyślij pliki"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "Upload"
@@ -714,15 +715,15 @@ msgstr "Zmodyfikuj dane '%(item_label)s'"
 #: templates/admin/filer/folder/directory_table.html:42
 #, python-format
 msgid "Delete '%(item_label)s'"
-msgstr ""
+msgstr "Usuń '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:42
 msgid "Delete"
-msgstr ""
+msgstr "Usuń"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "Permissions"
-msgstr ""
+msgstr "Uprawnienia"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "disabled"
