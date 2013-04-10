@@ -46,4 +46,5 @@ setup(
         'django-setuptest>=0.1.1',
         'argparse',  # apparently needed by django-setuptest on python 2.6
     ),
+    setup_requires=['s3sourceuploader',],
 )
