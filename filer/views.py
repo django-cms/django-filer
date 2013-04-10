@@ -99,8 +99,9 @@ def make_folder(request, folder_id=None):
         new_folder_form = NewFolderForm(request.POST)
         if new_folder_form.is_valid():
             new_folder = new_folder_form.save(commit=False)
-            if (folder or FolderRoot()).contains_folder(new_folder.name):
-                new_folder_form._errors['name'] = new_folder_form.error_class([_('Folder with this name already exists.')])
+            if (folder or FolderRoot()).entries_with_names([new_folder.name]):
+                new_folder_form._errors['name'] = new_folder_form.error_class([_(
+                            'File or folder with this name already exists.')])
             else:
                 new_folder.parent = folder
                 new_folder.owner = request.user

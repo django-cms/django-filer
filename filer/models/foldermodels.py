@@ -137,7 +137,7 @@ class Folder(models.Model, mixins.IconsMixin):
     def files(self):
         return self.all_files.all()
 
-    def files_and_folders_with_names(self, names):
+    def entries_with_names(self, names):
         """Returns an iterator yielding the files and folders that are direct
         children of this folder and have their names in the given list of names.
         """

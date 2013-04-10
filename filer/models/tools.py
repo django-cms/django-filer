@@ -46,7 +46,7 @@ def move_files_to_folder(request, files, folder):
     file_names = [f.display_name for f in files]
     already_existing = [
         f.display_name 
-        for f in folder.files_and_folders_with_names(file_names)]
+        for f in folder.entries_with_names(file_names)]
     for file_obj in files:
         if file_obj.display_name in already_existing:
             messages.error(request, _(u"File or folder named %s already exists") % file_obj.display_name)
