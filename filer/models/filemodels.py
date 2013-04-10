@@ -178,10 +178,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         saved_as = self._copy_file(new_location)
         assert saved_as == new_location, '%s %s' % (saved_as, new_location)
         self.file = saved_as
-        # TODO: replace 'delete_on_storage' with a better solution...
-        delete_on_storage = kwargs.pop('delete_on_storage', True)
         super(File, self).save(*args, **kwargs)
-        if old_location != new_location and delete_on_storage:
+        if old_location != new_location:
             storage.delete(old_location)
 
     def delete(self, *args, **kwargs):
