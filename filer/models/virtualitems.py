@@ -91,5 +91,9 @@ class FolderRoot(DummyFolder):
         except Folder.DoesNotExist:
             return False
 
+    def entries_with_names(self, names):
+        # children of te root folder can only be folders, so we don't have to look for files
+        return self.children.filter(name__in=names)
+
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse('admin:filer-directory_listing-root')

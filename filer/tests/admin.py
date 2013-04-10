@@ -69,7 +69,7 @@ class FilerFolderAdminUrlsTests(TestCase):
                                     {"name":FOLDER_NAME, "_popup": 1})
         # second folder didn't get created
         self.assertEqual(Folder.objects.count(), 1)
-        self.assertIn('Folder with this name already exists', response.content)
+        self.assertIn('File or folder with this name already exists', response.content)
 
     def test_validate_no_duplcate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
