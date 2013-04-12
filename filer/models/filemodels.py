@@ -13,6 +13,8 @@ from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
 import os
 
+from django.db import transaction
+
 
 class FileManager(PolymorphicManager):
     def find_all_duplicates(self):
@@ -171,16 +173,32 @@ class File(PolymorphicModel, mixins.IconsMixin):
         
     save.alters_data = True
 
+    def _delete_thumbnails(self):
+        source = self.file.get_source_cache()
+        self.file.delete_thumbnails()
+        source.delete()
+
+    @transaction.commit_manually
     def update_location_on_storage(self, *args, **kwargs):
         old_location = self.file.name
-        new_location = self.file.field.upload_to(self, self.display_name)
-        storage = self.file.storage
-        saved_as = self._copy_file(new_location)
-        assert saved_as == new_location, '%s %s' % (saved_as, new_location)
-        self.file = saved_as
-        super(File, self).save(*args, **kwargs)
-        if old_location != new_location:
-            storage.delete(old_location)
+        try:
+            # thumbnails might get physically deleted evenif the transaction fails
+            # though luck... they can be regenerated anyway...
+            self._delete_thumbnails()
+            new_location = self.file.field.upload_to(self, self.display_name)
+            storage = self.file.storage
+            saved_as = self._copy_file(new_location)
+            assert saved_as == new_location, '%s %s' % (saved_as, new_location)
+            self.file = saved_as
+            super(File, self).save(*args, **kwargs)
+        except Exception:
+            transaction.rollback()
+            raise
+        else:
+            transaction.commit()
+            # only delete the file on the old_location if all went OK
+            if old_location != new_location:
+                storage.delete(old_location)
 
     def delete(self, *args, **kwargs):
         # Delete the model before the file
