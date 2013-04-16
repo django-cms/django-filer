@@ -22,12 +22,12 @@ def get_user_clipboard(user):
 
 def move_file_to_clipboard(request, files, clipboard):
     count = 0
-    file_names = [f.original_filename for f in files]
+    file_names = [f.display_name for f in files]
     already_existing = [
-        f.original_filename
-        for f in clipboard.files.filter(original_filename__in=file_names)]
+        f.display_name
+        for f in clipboard.files.all() if f.display_name in file_names]
     for file_obj in files:
-        if file_obj.original_filename in already_existing:
+        if file_obj.display_name in already_existing:
             messages.error(request, _(u'Clipboard already contains a file '
                                       'named %s') % file_obj.display_name)
             continue

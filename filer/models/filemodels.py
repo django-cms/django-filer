@@ -75,10 +75,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self._old_folder = self.folder
 
     def clean(self):
-        if self.folder and self.folder.entries_with_names([self.name]):
-            raise ValidationError(
-                _(u'Current folder already contains a file named %s') % \
-                    self.display_name)
+        if self.folder:
+            entries = self.folder.entries_with_names([self.display_name])
+            if entries and any(entry.pk != self.pk for entry in entries):
+                raise ValidationError(
+                    _(u'Current folder already contains a file named %s') % \
+                        self.display_name)
 
     def _move_file(self):
         """
@@ -163,9 +165,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self.generate_sha1()
         except Exception, e:
             pass
-
         if filer_settings.FOLDER_AFFECTS_URL and \
-                (self._old_name != self.name or
+                (self._is_name_chnaged() or
                  self._old_folder != self.folder):
             self.update_location_on_storage(*args, **kwargs)
         else:
@@ -173,10 +174,17 @@ class File(PolymorphicModel, mixins.IconsMixin):
         
     save.alters_data = True
 
+    def _is_name_chnaged(self):
+        if self._old_name in ('', None):
+            return self.name not in ('', None)
+        else:
+            return self._old_name != self.name
+
     def _delete_thumbnails(self):
         source = self.file.get_source_cache()
-        self.file.delete_thumbnails()
-        source.delete()
+        if source:
+            self.file.delete_thumbnails()
+            source.delete()
 
     @transaction.commit_manually
     def update_location_on_storage(self, *args, **kwargs):

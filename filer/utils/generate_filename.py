@@ -37,7 +37,8 @@ def _construct_logical_folder_path(filer_file):
 
 
 def _goes_to_clipboard(instance):
-    return _is_in_memory(instance.file.file) or instance.folder is None
+    return instance.folder is None or (
+        _is_in_memory(instance.file.file) and instance.pk is None)
 
 
 def by_path(instance, filename):
@@ -47,9 +48,6 @@ def by_path(instance, filename):
             instance.owner.username,
             filename)
     else:
-        # TODO: use os.path or urlparse?
-        filename = filename.strip('/').split('/')[-1]
-        path = os.path.join(
+        return os.path.join(
             _construct_logical_folder_path(instance),
-            filename)
-        return path
+            instance.display_name)
