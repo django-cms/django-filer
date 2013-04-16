@@ -76,11 +76,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     def clean(self):
         if self.folder:
-            entries = self.folder.entries_with_names([self.display_name])
+            entries = self.folder.entries_with_names([self.actual_name])
             if entries and any(entry.pk != self.pk for entry in entries):
                 raise ValidationError(
                     _(u'Current folder already contains a file named %s') % \
-                        self.display_name)
+                        self.actual_name)
 
     def _move_file(self):
         """
@@ -193,7 +193,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             # thumbnails might get physically deleted evenif the transaction fails
             # though luck... they can be regenerated anyway...
             self._delete_thumbnails()
-            new_location = self.file.field.upload_to(self, self.display_name)
+            new_location = self.file.field.upload_to(self, self.actual_name)
             storage = self.file.storage
             saved_as = self._copy_file(new_location)
             assert saved_as == new_location, '%s %s' % (saved_as, new_location)
@@ -255,15 +255,20 @@ class File(PolymorphicModel, mixins.IconsMixin):
             return False
 
     @property
-    def display_name(self):
+    def actual_name(self):
+        """The name displayed to the user.
+        Uses self.name if set, otherwise it falls back on self.original_filename.
+
+        This property is used for enforcing unique filenames within the same fodler.
+        """
         if self.name in ('', None):
-            display_name = u"%s" % (self.original_filename,)
+            actual_name = u"%s" % (self.original_filename,)
         else:
-            display_name = u"%s" % (self.name,)
-        return display_name
+            actual_name = u"%s" % (self.name,)
+        return actual_name
 
     def __unicode__(self):
-        return self.display_name
+        return self.actual_name
 
     def get_admin_url_path(self):
         return urlresolvers.reverse(

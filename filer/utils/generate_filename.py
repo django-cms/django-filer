@@ -50,4 +50,4 @@ def by_path(instance, filename):
     else:
         return os.path.join(
             _construct_logical_folder_path(instance),
-            instance.display_name)
+            instance.actual_name)

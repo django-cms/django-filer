@@ -218,7 +218,7 @@ class Folder(models.Model, mixins.IconsMixin):
         return u"%s" % (self.name,)
 
     @property
-    def display_name(self):
+    def actual_name(self):
         return self.name
 
     def contains_folder(self, folder_name):
