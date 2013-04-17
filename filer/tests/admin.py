@@ -14,9 +14,6 @@ from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image)
-from filer.utils.generate_filename import by_path
-
-import filer.settings as filer_settings
 
 
 class FilerFolderAdminUrlsTests(TestCase):
