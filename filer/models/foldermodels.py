@@ -1,10 +1,14 @@
 #-*- coding: utf-8 -*-
+import itertools
+
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+
+import filer.models.clipboardmodels
 from filer.models import mixins
 from filer import settings as filer_settings
 
@@ -107,6 +111,12 @@ class Folder(models.Model, mixins.IconsMixin):
 
     objects = FolderManager()
 
+    def clean(self):
+        if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
+            raise ValidationError(
+                _(u'%s is reserved for internal use. '
+                  'Please choose a different name') % self.name)
+
     @property
     def file_count(self):
         if not hasattr(self, '_file_count_cache'):
@@ -126,6 +136,16 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def files(self):
         return self.all_files.all()
+
+    def entries_with_names(self, names):
+        """Returns an iterator yielding the files and folders that are direct
+        children of this folder and have their names in the given list of names.
+        """
+        q = Q(name__in=names)
+        q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
+        files_with_names = self.all_files.filter(q)
+        folders_with_names = self.children.filter(name__in=names)
+        return list(itertools.chain(files_with_names, folders_with_names))
 
     @property
     def logical_path(self):
@@ -196,6 +216,10 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def __unicode__(self):
         return u"%s" % (self.name,)
+
+    @property
+    def actual_name(self):
+        return self.name
 
     def contains_folder(self, folder_name):
         try:

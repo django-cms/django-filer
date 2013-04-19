@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from django.core.files import File as DjangoFile
+from django.http import HttpRequest
 from django.test.testcases import TestCase
 from filer.models import tools
 from filer.models.clipboardmodels import Clipboard
@@ -50,14 +51,14 @@ class ToolsTestCase(TestCase):
                                      original_filename='file3',
                                      file=self.file)
         files = [file2, file3]
-
-        tools.move_file_to_clipboard(files, self.clipboard)
+        request = HttpRequest()
+        tools.move_file_to_clipboard(request, files, self.clipboard)
         self.assertEqual(len(self.clipboard.files.all()), 3)
 
     def test_move_from_clipboard_to_folder_works(self):
         self.assertEqual(len(self.clipboard.files.all()), 1)
-
-        tools.move_files_from_clipboard_to_folder(self.clipboard, self.folder)
+        request = HttpRequest()
+        tools.move_files_from_clipboard_to_folder(request, self.clipboard, self.folder)
         for file in self.clipboard.files.all():
             self.assertEqual(file.folder, self.folder)
 

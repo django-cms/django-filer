@@ -2,6 +2,7 @@
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
@@ -11,6 +12,8 @@ from filer.models.foldermodels import Folder
 from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
 import os
+
+from django.db import transaction
 
 
 class FileManager(PolymorphicManager):
@@ -68,6 +71,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
+        self._old_name = self.name
+        self._old_folder = self.folder
+
+    def clean(self):
+        if self.folder:
+            entries = self.folder.entries_with_names([self.actual_name])
+            if entries and any(entry.pk != self.pk for entry in entries):
+                raise ValidationError(
+                    _(u'Current folder already contains a file named %s') % \
+                        self.actual_name)
 
     def _move_file(self):
         """
@@ -145,14 +158,55 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
+
         # generate SHA1 hash
         # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
         try:
             self.generate_sha1()
         except Exception, e:
             pass
-        super(File, self).save(*args, **kwargs)
+        if filer_settings.FOLDER_AFFECTS_URL and \
+                (self._is_name_chnaged() or
+                 self._old_folder != self.folder):
+            self.update_location_on_storage(*args, **kwargs)
+        else:
+            super(File, self).save(*args, **kwargs)
+        
     save.alters_data = True
+
+    def _is_name_chnaged(self):
+        if self._old_name in ('', None):
+            return self.name not in ('', None)
+        else:
+            return self._old_name != self.name
+
+    def _delete_thumbnails(self):
+        source = self.file.get_source_cache()
+        if source:
+            self.file.delete_thumbnails()
+            source.delete()
+
+    @transaction.commit_manually
+    def update_location_on_storage(self, *args, **kwargs):
+        old_location = self.file.name
+        try:
+            # thumbnails might get physically deleted evenif the transaction fails
+            # though luck... they can be regenerated anyway...
+            self._delete_thumbnails()
+            new_location = self.file.field.upload_to(self, self.actual_name)
+            storage = self.file.storage
+            saved_as = self._copy_file(new_location)
+            assert saved_as == new_location, '%s %s' % (saved_as, new_location)
+            self.file = saved_as
+            super(File, self).save(*args, **kwargs)
+        except Exception:
+            transaction.rollback()
+            raise
+        else:
+            transaction.commit()
+            # only delete the file on the old_location if all went OK
+            if old_location != new_location:
+                storage.delete(old_location)
 
     def delete(self, *args, **kwargs):
         # Delete the model before the file
@@ -200,12 +254,21 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             return False
 
-    def __unicode__(self):
+    @property
+    def actual_name(self):
+        """The name displayed to the user.
+        Uses self.name if set, otherwise it falls back on self.original_filename.
+
+        This property is used for enforcing unique filenames within the same fodler.
+        """
         if self.name in ('', None):
-            text = u"%s" % (self.original_filename,)
+            actual_name = u"%s" % (self.original_filename,)
         else:
-            text = u"%s" % (self.name,)
-        return text
+            actual_name = u"%s" % (self.name,)
+        return actual_name
+
+    def __unicode__(self):
+        return self.actual_name
 
     def get_admin_url_path(self):
         return urlresolvers.reverse(

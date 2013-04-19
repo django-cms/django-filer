@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers
+from django.http import HttpRequest
 
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
@@ -51,6 +52,43 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
+    def test_validate_no_duplcate_folders(self):
+        FOLDER_NAME = "root folder 1"
+        self.assertEqual(Folder.objects.count(), 0)
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name":FOLDER_NAME,
+                "_popup": 1
+                })
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
+        # and create another one
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'),
+                                    {"name":FOLDER_NAME, "_popup": 1})
+        # second folder didn't get created
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertIn('File or folder with this name already exists', response.content)
+
+    def test_validate_no_duplcate_folders_on_rename(self):
+        self.assertEqual(Folder.objects.count(), 0)
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name": "foo",
+                "_popup": 1})
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertEqual(Folder.objects.all()[0].name, "foo")
+        # and create another one
+        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name": "bar",
+                "_popup": 1})
+        self.assertEqual(Folder.objects.count(), 2)
+        bar = Folder.objects.get(name="bar")
+        response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
+                "name": "foo",
+                "_popup": 1})
+        self.assertIn('Folder with this name already exists', response.content)
+        # refresh from db and validate that it's name didn't change
+        bar = Folder.objects.get(pk=bar.pk)
+        self.assertEqual(bar.name, "bar")
+
 
 class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):
@@ -88,6 +126,58 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
+    def test_filer_upload_file_logical_actual_url(self, extra_headers={}):
+        self.assertEqual(Image.objects.count(), 0)
+        file_obj = django.core.files.File(open(self.filename))
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload'),
+            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            **extra_headers
+        )
+        self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+        # upload the same file again. This must fail since the clipboard can't contain
+        # two files with the same name
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload'),
+            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            **extra_headers
+        )
+        self.assertEqual(Image.objects.count(), 1)
+        self.assertIn('error', response.content)
+
+    def test_paste_clipboard_to_folder_logical_actual_url(self):
+        first_folder = Folder.objects.create(name='first')
+
+        def upload():
+            file_obj = django.core.files.File(open(self.filename))
+            response = self.client.post(
+                reverse('admin:filer-ajax_upload'),
+                {'Filename': self.image_name, 'Filedata': file_obj,
+                 'jsessionid': self.client.session.session_key,})
+            return Image.objects.all().order_by('-id')[0]
+
+        uploaded_image = upload()
+        self.assertEqual(uploaded_image.original_filename, self.image_name)
+
+        def paste(uploaded_image):
+            # current user should have one clipboard created
+            clipboard = self.superuser.filer_clipboards.all()[0]
+            response = self.client.post(
+                reverse('admin:filer-paste_clipboard_to_folder'),
+                {'folder_id': first_folder.pk,
+                 'clipboard_id': clipboard.pk})
+            return Image.objects.get(pk=uploaded_image.pk)
+
+        pasted_image = paste(uploaded_image)
+        self.assertEqual(pasted_image.folder.pk, first_folder.pk)
+        # upload and paste the same image again
+        second_upload = upload()
+        # second paste failed due to name conflict, and file in clipboard
+        # got deleted
+        with self.assertRaises(File.DoesNotExist):
+            paste(second_upload)
+
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
@@ -101,7 +191,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
 
-class  BulkOperationsMixin(object):
+class BulkOperationsMixin(object):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -183,6 +273,35 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 0)
 
+    def test_validate_no_duplicate_folders_on_move(self):
+        """Create the following folder hierarchy:
+        root
+          |
+          |--foo
+          |   |-bar
+          |
+          |--bar
+        
+        and try to move the owter bar in foo. This has to fail since it would result
+        in two folders with the same name and parent.
+        """
+        root = Folder.objects.create(name='root', owner=self.superuser)
+        foo = Folder.objects.create(name='foo', parent=root, owner=self.superuser)
+        bar = Folder.objects.create(name='bar', parent=root, owner=self.superuser)
+        foos_bar = Folder.objects.create(name='bar', parent=foo, owner=self.superuser)
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': root.pk,
+        })
+        response = self.client.post(url, {
+            'action': 'move_files_and_folders',
+            'post': 'yes',
+            'destination': foo.pk,
+            helpers.ACTION_CHECKBOX_NAME: 'folder-%d' % (bar.pk,),
+        })
+        # refresh from db and validate that it hasn't been moved
+        bar = Folder.objects.get(pk=bar.pk)
+        self.assertEqual(bar.parent.pk, root.pk)
+
     def test_move_to_clipboard_action(self):
         # TODO: Test recursive (files and folders tree) move
 
@@ -199,7 +318,8 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.dst_folder.files.count(), 0)
         clipboard = Clipboard.objects.get(user=self.superuser)
         self.assertEqual(clipboard.files.count(), 1)
-        tools.move_files_from_clipboard_to_folder(clipboard, self.src_folder)
+        request = HttpRequest()
+        tools.move_files_from_clipboard_to_folder(request, clipboard, self.src_folder)
         tools.discard_clipboard(clipboard)
         self.assertEqual(clipboard.files.count(), 0)
         self.assertEqual(self.src_folder.files.count(), 1)
