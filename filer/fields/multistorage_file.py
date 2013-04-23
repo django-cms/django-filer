@@ -1,10 +1,10 @@
 #-*- coding: utf-8 -*-
-from django.core.files.base import File
-from django.core.files.storage import Storage
 from easy_thumbnails import fields as easy_thumbnails_fields, \
     files as easy_thumbnails_files
+
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
+from filer.utils.cdn import get_file_url_from_cdn
 
 
 STORAGES = {
@@ -82,6 +82,11 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
             return self.thumbnail_options['public'].get('base_dir', '')
         else:
             return self.thumbnail_options['private'].get('base_dir', '')
+
+    def _get_url(self):
+        url = super(MultiStorageFieldFile, self)._get_url()
+        return get_file_url_from_cdn(self.instance, url)
+    url = property(_get_url)
 
     def save(self, name, content, save=True):
         content.seek(0) # Ensure we upload the whole file
