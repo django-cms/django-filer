@@ -152,3 +152,18 @@ Having this set to ``True`` has certain implications:
   * in case of failure the database might end up being out of sync with the storage backend
 
 Defaults to ``False``
+
+
+``FILER_CDN_DOMAIN`` and ``FILER_CDN_INVALIDATION_TIME``
+--------------------------------------------------------
+
+This settings and ``CDN_INVALIDATION_TIME`` are only useful if using a cdn and if when uploading a newer version of a file object the physical file gets overwritten on the storage backend.
+
+When the above condition is True:
+* make sure you're storage backend returns urls that always point to the origin (NOT to the cdn)
+* make ``FILER_CDN_DOMAIN`` point to the cdn distribution's domain
+* set ``FILER_CDN_INVALIDATION_TIME`` to the time it takes the cdn to clear it's cache
+
+When a file object gets updated to a newer version, setting the above will result in:
+* if the file's url is requested BEFORE the CDN got updated, the origin's domain will be used
+* if the file's url is requested AFTER the CDN got updated, the cdn's domain will be used
