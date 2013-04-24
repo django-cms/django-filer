@@ -24,7 +24,7 @@ Dependencies
 * `Django`_ >= 1.3 (with ``django.contrib.staticfiles``)
 * django-mptt >= 0.2.1
 * `easy_thumbnails`_ >= 1.0-alpha-17
-* `django-polymorphic`_ >= 0.2
+* `django-polymorphic`_ >= 0.2 (<=0.4.0 when used with django 1.3.x)
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support)
 
 Installation
