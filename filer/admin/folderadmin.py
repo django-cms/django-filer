@@ -282,9 +282,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 return qs
 
             if entry_type == 'folder':
-                qs = qs.filter(id__in=permissions)
+                qs = qs.filter(Q(id__in=permissions)|Q(owner=request.user))
             elif entry_type == 'file':
-                qs = qs.filter(folder__id__in=permissions)
+                qs = qs.filter(Q(folder__id__in=permissions)|Q(owner=request.user))
             return qs
 
         def filter_folder_permission(qs, permissions):
