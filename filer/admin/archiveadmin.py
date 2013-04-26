@@ -2,9 +2,13 @@ from django import forms
 from django.contrib import admin
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Archive
+from django.conf.urls.defaults import patterns, url
+from django.http import HttpResponse
+from zipfile import ZipFile
+
 
 class ArchiveAdminForm(forms.ModelForm):
-
+    
     class Meta:
         model = Archive
 
@@ -20,4 +24,15 @@ class ArchiveAdminForm(forms.ModelForm):
 
 class ArchiveAdmin(FileAdmin):
     form = ArchiveAdminForm
+    
+    def get_urls(self):
+        urls = super(ArchiveAdmin, self).get_urls()
+        archive_urls = patterns('',
+            url(r'^(?P<file_id>\d+)/extract/$', self.admin_site.admin_view(self.extract),
+                name='filer_file_extract'),
+        )
+        return archive_urls + urls
+
+    def extract(self, request, file_id):
+        return HttpResponse()
 

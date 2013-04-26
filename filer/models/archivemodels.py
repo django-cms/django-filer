@@ -13,6 +13,9 @@ class Archive(File):
         extension = os.path.splitext(iname)[-1].lower()
         return extension in Archive._filename_extensions
 
+    def extract(self):
+        pass
+
     class Meta:
         app_label = 'filer'    
         verbose_name = _('archive')
