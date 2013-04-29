@@ -3,7 +3,7 @@ from django.contrib import admin
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Archive
 from django.conf.urls.defaults import patterns, url
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from zipfile import ZipFile
 
 
@@ -34,5 +34,6 @@ class ArchiveAdmin(FileAdmin):
         return archive_urls + urls
 
     def extract(self, request, file_id):
-        return HttpResponse()
-
+        archive = Archive.objects.get(id=file_id)
+        archive.extract()
+        # return HttpResponse('')
