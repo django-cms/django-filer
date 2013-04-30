@@ -32,7 +32,8 @@ from filer.admin.tools import  (userperms_for_request,
                                 check_files_read_permissions,
                                 check_folder_read_permissions)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
-                          ImagesWithMissingData, FolderPermission, Image)
+                          ImagesWithMissingData, FolderPermission, Image,
+                          Archive)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY, FOLDER_AFFECTS_URL
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
@@ -54,7 +55,8 @@ class AddFolderPopupForm(forms.ModelForm):
 folder_admin_actions = [
     'move_to_clipboard', 'files_set_public', 'files_set_private',
     'delete_files_or_folders', 'move_files_and_folders',
-    'copy_files_and_folders', 'resize_images', 'rename_files']
+    'copy_files_and_folders', 'resize_images', 'rename_files',
+    'extract_files']
 
 if FOLDER_AFFECTS_URL:
     folder_admin_actions.remove('move_files_and_folders')
@@ -922,6 +924,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         ], context, context_instance=template.RequestContext(request))
 
     rename_files.short_description = ugettext_lazy("Rename files")
+
+    def extract_files(self, request, files_queryset, folder_queryset):
+        for f in files_queryset:
+            if isinstance(f, Archive):
+                f.extract()
+
+    extract_files.short_description = ugettext_lazy("Extract archives")
 
     def _generate_new_filename(self, filename, suffix):
         basename, extension = os.path.splitext(filename)

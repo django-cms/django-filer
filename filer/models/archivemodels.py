@@ -26,32 +26,33 @@ class Archive(File):
         zippy = zipfile.ZipFile(file_info)
         entries = zippy.infolist()
         for entry in entries:
-            fields = entry.filename.split('/')
-            dir_parents_of_entry = fields[:-1]
-            filename = fields[-1]
+            dir_parents_of_entry = entry.filename.split('/')[:-1]
+            filename = os.path.basename(entry.filename)
             parent_dir = self.folder
             for directory_name in dir_parents_of_entry:
-                current_dir, _ = Folder.objects.get_or_create(
-                    name=directory_name,
-                    parent=parent_dir,
-                    owner=self.owner,
-                )
-                parent_dir = current_dir
-            if filename is not '':
-                zippy_file = zippy.open(entry.filename)
-                data = zippy_file.read()
-                zippy_file.close()
-                file_data = ContentFile(data)
-                file_data.name = filename
-                file_object, _ = File.objects.get_or_create(
-                    original_filename=filename,
-                    folder=parent_dir,
-                    owner=self.owner,
-                    file=file_data,
-                )
-                file_object.save()
-                file_data.close()
-        zippy.close()
+                parent_dir = self._create_folder(directory_name, parent_dir)
+            if filename:
+                data = zippy.read(entry)
+                self._create_file(filename, parent_dir, data)
+
+    def _create_folder(self, name, parent):
+        current_dir, _ = Folder.objects.get_or_create(
+            name=name,
+            parent=parent,
+            owner=self.owner,
+        )
+        return current_dir
+
+    def _create_file(self, basename, folder, data):
+        file_data = ContentFile(data)
+        file_data.name = basename
+        file_object = File.objects.create(
+            original_filename=basename,
+            folder=folder,
+            owner=self.owner,
+            file=file_data,
+        )
+        file_data.close()
 
 
     class Meta:
