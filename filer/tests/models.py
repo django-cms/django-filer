@@ -1,12 +1,16 @@
 #-*- coding: utf-8 -*-
 import os
+import zipfile
+import tempfile
 from django.forms.models import modelform_factory
 from django.test import TestCase
 from django.core.files import File as DjangoFile
+from django.core.files.base import ContentFile
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
+from filer.models.archivemodels import Archive
 from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
@@ -176,3 +180,71 @@ class FilerApiTests(TestCase):
         # file should still be here
         self.assertTrue(storage.exists(name))
 
+
+class ArchiveTest(TestCase):
+    
+    def setUp(self):
+        entries = []
+
+        def create_and_register_file(parent, data):
+            fd, path = tempfile.mkstemp(dir=parent)
+            os.write(fd, data)
+            os.close(fd)
+            entries.extend([path])
+            return path
+        
+        def create_and_register_directory(parent):
+            new_dir = tempfile.mkdtemp(dir=parent)
+            entries.extend([new_dir])
+            return new_dir
+
+        def create_zipfile():
+            zippy = zipfile.ZipFile('test.zip', 'w')
+            for entry in entries:
+                zippy.write(entry)
+            zippy.close()
+            local_zipfile = open('test.zip', 'r')
+            dummy_file = ContentFile(local_zipfile.read())
+            local_zipfile.close()
+            File.objects.create(
+                original_filename='test.zip',
+                file=dummy_file,
+            )
+
+        root = create_and_register_directory(None)
+        subdir1 = create_and_register_directory(root)
+        subdir2 = create_and_register_directory(root)
+        subdir3 = create_and_register_directory(root)
+        subdir11 = create_and_register_directory(subdir1)
+        subdir12 = create_and_register_directory(subdir1)
+        subdir21 = create_and_register_directory(subdir2)
+        subdir31 = create_and_register_directory(subdir3)
+        leaf1 = create_and_register_file(root, 'first leaf')
+        leaf2 = create_and_register_file(subdir11, 'second leaf')
+        leaf3 = create_and_register_file(subdir11, 'third leaf')
+        leaf4 = create_and_register_file(subdir11, 'fourth leaf')
+        leaf5 = create_and_register_file(subdir12, 'fifth leaf')
+        leaf6 = create_and_register_file(subdir2, 'sixth leaf')
+        leaf7 = create_and_register_file(subdir2, 'seventh leaf')
+        leaf8 = create_and_register_file(subdir3, 'eight leaf')
+        create_zipfile()
+        self.entries = entries
+
+    def test_extract_zip(self):
+        zippy = Archive.objects.get()
+        zippy.extract()
+        for entry in self.entries:
+            filer_file = File.objects.get(path=entry)
+            self.assertIsNotNone(filer_file)
+            self.assertEqual(filer_file.path, entry)
+        
+    def tearDown(self):
+        os.remove('test.zip')
+        top = self.entries[0]
+        for root, dirs, files in os.walk(top, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        Archive.objects.get().delete()
+        
