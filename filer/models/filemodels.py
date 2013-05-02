@@ -348,4 +348,3 @@ class File(PolymorphicModel, mixins.IconsMixin):
         app_label = 'filer'
         verbose_name = _('file')
         verbose_name_plural = _('files')
-

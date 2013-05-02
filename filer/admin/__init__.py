@@ -6,7 +6,8 @@ from filer.admin.folderadmin import FolderAdmin
 from filer.admin.imageadmin import ImageAdmin
 from filer.admin.permissionadmin import PermissionAdmin
 from filer.admin.archiveadmin import ArchiveAdmin
-from filer.models import FolderPermission, Folder, File, Clipboard, Image, Archive
+from filer.models import (FolderPermission, Folder, File, Clipboard, Image,
+                          Archive)
 
 
 admin.site.register(Folder, FolderAdmin)

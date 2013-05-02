@@ -930,7 +930,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if isinstance(f, Archive):
                 f.extract()
 
-    extract_files.short_description = ugettext_lazy("Extract archives")
+    extract_files.short_description = ugettext_lazy("Extract selected zip files")
 
     def _generate_new_filename(self, filename, suffix):
         basename, extension = os.path.splitext(filename)
