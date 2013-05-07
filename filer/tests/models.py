@@ -3,6 +3,7 @@ import os
 import zipfile
 import tempfile
 from django.forms.models import modelform_factory
+from django.db.models import Q
 from django.test import TestCase
 from django.core.files import File as DjangoFile
 from django.core.files.base import ContentFile
@@ -182,69 +183,80 @@ class FilerApiTests(TestCase):
 
 
 class ArchiveTest(TestCase):
-    
+
     def setUp(self):
-        entries = []
+        self.entries = []
+        self.zipname = 'test.zip'
+        root = self.create_and_register_directory(None)
+        subdir1 = self.create_and_register_directory(root)
+        subdir2 = self.create_and_register_directory(root)
+        subdir3 = self.create_and_register_directory(root)
+        subdir11 = self.create_and_register_directory(subdir1)
+        subdir12 = self.create_and_register_directory(subdir1)
+        subdir21 = self.create_and_register_directory(subdir2)
+        subdir31 = self.create_and_register_directory(subdir3)
+        leaf1 = self.create_and_register_file(root, 'first leaf')
+        leaf2 = self.create_and_register_file(subdir11, 'second leaf')
+        leaf3 = self.create_and_register_file(subdir11, 'third leaf')
+        leaf4 = self.create_and_register_file(subdir11, 'fourth leaf')
+        leaf5 = self.create_and_register_file(subdir12, 'fifth leaf')
+        leaf6 = self.create_and_register_file(subdir2, 'sixth leaf')
+        leaf7 = self.create_and_register_file(subdir2, 'seventh leaf')
+        leaf8 = self.create_and_register_file(subdir3, 'eight leaf')
+        self.create_zipfile()
+        filer_zipfile = Archive.objects.get()
+        filer_zipfile.extract()
 
-        def create_and_register_file(parent, data):
-            fd, path = tempfile.mkstemp(dir=parent)
-            os.write(fd, data)
-            os.close(fd)
-            entries.extend([path])
-            return path
-        
-        def create_and_register_directory(parent):
-            new_dir = tempfile.mkdtemp(dir=parent)
-            entries.extend([new_dir])
-            return new_dir
+    def test_entries_count(self):
+        files = File.objects.filter(~Q(original_filename=self.zipname))
+        folders = Folder.objects.filter(~Q(name='tmp'))
+        filer_entries = list(files) + list(folders)
+        actual = len(filer_entries)
+        expected = len(self.entries)
+        self.assertEqual(actual, expected)
 
-        def create_zipfile():
-            zippy = zipfile.ZipFile('test.zip', 'w')
-            for entry in entries:
-                zippy.write(entry)
-            zippy.close()
-            local_zipfile = open('test.zip', 'r')
-            dummy_file = ContentFile(local_zipfile.read())
-            local_zipfile.close()
-            File.objects.create(
-                original_filename='test.zip',
-                file=dummy_file,
-            )
-
-        root = create_and_register_directory(None)
-        subdir1 = create_and_register_directory(root)
-        subdir2 = create_and_register_directory(root)
-        subdir3 = create_and_register_directory(root)
-        subdir11 = create_and_register_directory(subdir1)
-        subdir12 = create_and_register_directory(subdir1)
-        subdir21 = create_and_register_directory(subdir2)
-        subdir31 = create_and_register_directory(subdir3)
-        leaf1 = create_and_register_file(root, 'first leaf')
-        leaf2 = create_and_register_file(subdir11, 'second leaf')
-        leaf3 = create_and_register_file(subdir11, 'third leaf')
-        leaf4 = create_and_register_file(subdir11, 'fourth leaf')
-        leaf5 = create_and_register_file(subdir12, 'fifth leaf')
-        leaf6 = create_and_register_file(subdir2, 'sixth leaf')
-        leaf7 = create_and_register_file(subdir2, 'seventh leaf')
-        leaf8 = create_and_register_file(subdir3, 'eight leaf')
-        create_zipfile()
-        self.entries = entries
-
-    def test_extract_zip(self):
-        zippy = Archive.objects.get()
-        zippy.extract()
+    def test_entries_path(self):
+        files = File.objects.all()
+        folders = Folder.objects.all()
         for entry in self.entries:
-            filer_file = File.objects.get(path=entry)
-            self.assertIsNotNone(filer_file)
-            self.assertEqual(filer_file.path, entry)
-        
+            basename = os.path.basename(entry)
+            file_match = files.filter(original_filename=basename)
+            folder_match = folders.filter(name=basename)
+            filer_matches = file_match or folder_match
+            self.assertNotEqual(0, len(filer_matches))
+            filer_entry = filer_matches[0]
+            fields = map(lambda x: x.name, filer_entry.logical_path)
+            fields += [filer_entry.name or filer_entry.original_filename]
+            filer_path = os.sep + os.sep.join(fields)
+            self.assertEqual(filer_path, entry)
+
     def tearDown(self):
         os.remove('test.zip')
-        top = self.entries[0]
-        for root, dirs, files in os.walk(top, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        Archive.objects.get().delete()
-        
+        for entry in reversed(self.entries):
+            if os.path.isdir(entry):
+                os.rmdir(entry)
+            elif os.path.isfile(entry):
+                os.remove(entry)
+
+    def create_and_register_file(self, parent, data):
+        fd, path = tempfile.mkstemp(dir=parent)
+        os.write(fd, data)
+        os.close(fd)
+        self.entries.extend([path])
+        return path
+
+    def create_and_register_directory(self, parent):
+        new_dir = tempfile.mkdtemp(dir=parent)
+        self.entries.extend([new_dir])
+        return new_dir
+
+    def create_zipfile(self):
+        zippy = zipfile.ZipFile(self.zipname, 'w')
+        for entry in self.entries:
+            zippy.write(entry)
+        zippy.close()
+        file_obj = DjangoFile(open(self.zipname), name=self.zipname)
+        filer_zipfile = Archive.objects.create(
+            original_filename=self.zipname,
+            file=file_obj,
+        )

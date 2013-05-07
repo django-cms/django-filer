@@ -16,15 +16,11 @@ class Archive(File):
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
-        getext = lambda x: os.path.splitext(x)[-1].lower()
         extension = os.path.splitext(iname)[-1].lower()
         return extension in Archive._filename_extensions
 
     def extract(self):
-        self.file.seek(0)
-        data = self.file.read()  # XXX this blows if the archive is huge.
-        dummy_file = StringIO.StringIO(data)
-        self.extract_zip(dummy_file)
+        self.extract_zip(self.file)
 
     def extract_zip(self, file_info):
         zippy = zipfile.ZipFile(file_info)
