@@ -37,7 +37,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 if filer_settings.FILER_ENABLE_LOGGING:
                     logger.error('Error while rendering file widget: %s',e)
                 if filer_settings.FILER_DEBUG:
-                    raise e
+                    raise
         if not related_url:
             related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()

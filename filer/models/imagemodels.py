@@ -167,7 +167,7 @@ class Image(File):
                 if filer_settings.FILER_ENABLE_LOGGING:
                     logger.error('Error while generating icons: %s',e)
                 if filer_settings.FILER_DEBUG:
-                    raise e
+                    raise
         return _icons
 
     @property
@@ -185,7 +185,7 @@ class Image(File):
                 if filer_settings.FILER_ENABLE_LOGGING:
                     logger.error('Error while generating thumbnail: %s',e)
                 if filer_settings.FILER_DEBUG:
-                    raise e
+                    raise
         return _thumbnails
 
     @property
