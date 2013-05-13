@@ -10,12 +10,6 @@ class ArchiveAdminForm(forms.ModelForm):
     class Meta:
         model = Archive
 
-    class Media:
-        css = {
-        }
-        js = (
-        )
-
 
 class ArchiveAdmin(FileAdmin):
     form = ArchiveAdminForm
