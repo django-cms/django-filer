@@ -31,6 +31,8 @@ class Archive(File):
             if filename:
                 data = zippy.read(entry)
                 self._create_file(filename, parent_dir, data)
+        zippy.close()
+        file_info.close()
 
     def _create_parent_folders(self, entry):
         dir_parents_of_entry = entry.filename.split(os.sep)[:-1]
