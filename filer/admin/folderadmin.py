@@ -20,6 +20,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
+from django.utils import simplejson
 from filer import settings
 from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
                                RenameFilesForm)
@@ -926,9 +927,27 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     rename_files.short_description = ugettext_lazy("Rename files")
 
     def extract_files(self, request, files_queryset, folder_queryset):
-        for f in files_queryset:
-            if isinstance(f, Archive):
-                f.extract()
+        error_format = "Files/Folders from {archive} with names:"
+        error_format += "{names} already exist."
+        success_format = "Successfully extracted archive {}."
+        try:
+            for f in files_queryset:
+                if isinstance(f, Archive):
+                    duplicates = f.validate()
+                    if duplicates:
+                        names = u", ".join(duplicates)
+                        archive = f.actual_name
+                        message = error_format.format(
+                            archive=archive,
+                            names=names,
+                        )
+                        raise Exception(message)
+                    else:
+                        f.extract()
+                        message = success_format.format(f.actual_name)
+                        self.message_user(request, _(message))
+        except Exception, e:
+            messages.error(request, _(e.message))
 
     extract_files.short_description = ugettext_lazy("Extract selected zip files")
 
