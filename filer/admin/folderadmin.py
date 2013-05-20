@@ -20,7 +20,6 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
-from django.utils import simplejson
 from filer import settings
 from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
                                RenameFilesForm)
@@ -928,30 +927,37 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def extract_files(self, request, files_queryset, folder_queryset):
         success_format = "Successfully extracted archive {}."
+
+        def is_valid_archive(filer_file):
+            is_valid = filer_file.is_valid()
+            if not is_valid:
+                error_format = "{} is not a valid zip file"
+                message = error_format.format(filer_file.actual_name)
+                messages.error(request, _(message))
+            return is_valid
+
+        def has_collisions(filer_file):
+            collisions = filer_file.collisions()
+            if collisions:
+                error_format = "Files/Folders from {archive} with names:"
+                error_format += "{names} already exist."
+                names = u", ".join(collisions)
+                archive = filer_file.actual_name
+                message = error_format.format(
+                    archive=archive,
+                    names=names,
+                )
+                messages.error(request, _(message))
+            return len(collisions) > 0
+
         for f in files_queryset:
-            if isinstance(f, Archive):
-                not_valid = not f.validate()
-                if not_valid:
-                    error_format = "{} is not a valid zip file"
-                    message = error_format.format(f.actual_name)
-                    messages.error(request, _(message))
-                    break
-                collisions = f.collisions()
-                if collisions:
-                    error_format = "Files/Folders from {archive} with names:"
-                    error_format += "{names} already exist."
-                    names = u", ".join(collisions)
-                    archive = f.actual_name
-                    message = error_format.format(
-                        archive=archive,
-                        names=names,
-                    )
-                    messages.error(request, _(message))
-                    break
-                else:
-                    f.extract()
-                    message = success_format.format(f.actual_name)
-                    self.message_user(request, _(message))
+            if not isinstance(f, Archive) or \
+                    not is_valid_archive(f) or \
+                    has_collisions(f):
+                continue
+            f.extract()
+            message = success_format.format(f.actual_name)
+            self.message_user(request, _(message))
 
     extract_files.short_description = ugettext_lazy("Extract selected zip files")
 

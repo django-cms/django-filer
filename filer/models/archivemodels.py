@@ -28,48 +28,51 @@ class Archive(File):
 
     def extract(self):
         """Extracts the archive files' contents."""
+        self.file.open()
         try:
-            self.file.open()
             self._extract_zip(self.file)
         finally:
             self.file.close()
 
-    def validate(self):
-        """
-        Verifies that the files or folders  about to be written don't already
-        exist.
-        Returns any duplicated files/folders.
-        """
+    def is_valid(self):
+        """Checks if the file is a proper archive."""
         is_valid = False
+        self.file.open()
         try:
-            self.file.open()
-            is_valid = self._validate_zip(self.file)
+            is_valid = self._is_valid_zip(self.file)
         finally:
             self.file.close()
         return is_valid
 
     def collisions(self):
+        """
+        Verifies that the files or folders about to be written don't already
+        exist.
+        Returns any duplicated files/folders.
+        """
         in_both = []
+        self.file.open()
         try:
-            self.file.open()
             in_both = self._collisions_zip(self.file)
         finally:
             self.file.close()
         return in_both
 
-    def _validate_zip(self, filer_file):
+    def _is_valid_zip(self, filer_file):
         """Validates zip files."""
         is_valid = zipfile.is_zipfile(filer_file)
         return is_valid
 
     def _collisions_zip(self, filer_file):
+        """Checks collisions for zip files."""
         zippy = zipfile.ZipFile(filer_file)
         cwd = self.logical_folder
         cwd_path = cwd.pretty_logical_path + u'/'
         no_end_slash = lambda x: x[:-1] if x.endswith('/') else x
         zip_paths = [cwd_path + no_end_slash(x) for x in zippy.namelist()]
         filer_paths = cwd.pretty_path_entries()
-        intersection = [x for x in zip_paths if x in set(filer_paths)]
+        file_set = set(filer_paths)
+        intersection = [x for x in zip_paths if x in file_set]
         return intersection
 
     def _extract_zip(self, filer_file):
