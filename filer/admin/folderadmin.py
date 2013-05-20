@@ -927,27 +927,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     rename_files.short_description = ugettext_lazy("Rename files")
 
     def extract_files(self, request, files_queryset, folder_queryset):
-        error_format = "Files/Folders from {archive} with names:"
-        error_format += "{names} already exist."
         success_format = "Successfully extracted archive {}."
-        try:
-            for f in files_queryset:
-                if isinstance(f, Archive):
-                    duplicates = f.validate()
-                    if duplicates:
-                        names = u", ".join(duplicates)
-                        archive = f.actual_name
-                        message = error_format.format(
-                            archive=archive,
-                            names=names,
-                        )
-                        raise Exception(message)
-                    else:
-                        f.extract()
-                        message = success_format.format(f.actual_name)
-                        self.message_user(request, _(message))
-        except Exception, e:
-            messages.error(request, _(e.message))
+        for f in files_queryset:
+            if isinstance(f, Archive):
+                not_valid = not f.validate()
+                if not_valid:
+                    error_format = "{} is not a valid zip file"
+                    message = error_format.format(f.actual_name)
+                    messages.error(request, _(message))
+                    break
+                collisions = f.collisions()
+                if collisions:
+                    error_format = "Files/Folders from {archive} with names:"
+                    error_format += "{names} already exist."
+                    names = u", ".join(collisions)
+                    archive = f.actual_name
+                    message = error_format.format(
+                        archive=archive,
+                        names=names,
+                    )
+                    messages.error(request, _(message))
+                    break
+                else:
+                    f.extract()
+                    message = success_format.format(f.actual_name)
+                    self.message_user(request, _(message))
 
     extract_files.short_description = ugettext_lazy("Extract selected zip files")
 

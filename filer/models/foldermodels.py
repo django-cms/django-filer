@@ -147,6 +147,16 @@ class Folder(models.Model, mixins.IconsMixin):
         folders_with_names = self.children.filter(name__in=names)
         return list(itertools.chain(files_with_names, folders_with_names))
 
+    def pretty_path_entries(self):
+        """Returns a list of all the descendant's entries logical path"""
+        subdirs = self.get_descendants(include_self=True)
+        subdir_files = [x.files for x in subdirs]
+        super_files = list(itertools.chain.from_iterable(subdir_files))
+        file_paths = [x.pretty_logical_path for x in super_files]
+        dir_paths = [x.pretty_logical_path for x in subdirs]
+        paths = file_paths + dir_paths
+        return paths
+
     @property
     def logical_path(self):
         """

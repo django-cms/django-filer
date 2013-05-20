@@ -171,7 +171,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self.update_location_on_storage(*args, **kwargs)
         else:
             super(File, self).save(*args, **kwargs)
-        
+
     save.alters_data = True
 
     def _is_name_chnaged(self):
@@ -266,6 +266,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             actual_name = u"%s" % (self.name,)
         return actual_name
+
+    @property
+    def pretty_logical_path(self):
+        its_dir = self.logical_folder
+        if hasattr(its_dir, 'pretty_logical_path'):
+            directory_path = its_dir.pretty_logical_path
+        else:
+            directory_path = u'/'
+        full_path = u'{}/{}'.format(directory_path, self.actual_name)
+        return full_path
 
     def __unicode__(self):
         return self.actual_name
