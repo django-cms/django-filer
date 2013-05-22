@@ -1,12 +1,17 @@
 #-*- coding: utf-8 -*-
 import os
+import zipfile
+import tempfile
 from django.forms.models import modelform_factory
+from django.db.models import Q
 from django.test import TestCase
 from django.core.files import File as DjangoFile
+from django.core.files.base import ContentFile
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
+from filer.models.archivemodels import Archive
 from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
@@ -176,3 +181,82 @@ class FilerApiTests(TestCase):
         # file should still be here
         self.assertTrue(storage.exists(name))
 
+
+class ArchiveTest(TestCase):
+
+    def setUp(self):
+        self.entries = []
+        self.zipname = 'test.zip'
+        root = self.create_and_register_directory(None)
+        subdir1 = self.create_and_register_directory(root)
+        subdir2 = self.create_and_register_directory(root)
+        subdir3 = self.create_and_register_directory(root)
+        subdir11 = self.create_and_register_directory(subdir1)
+        subdir12 = self.create_and_register_directory(subdir1)
+        subdir21 = self.create_and_register_directory(subdir2)
+        subdir31 = self.create_and_register_directory(subdir3)
+        leaf1 = self.create_and_register_file(root, 'first leaf')
+        leaf2 = self.create_and_register_file(subdir11, 'second leaf')
+        leaf3 = self.create_and_register_file(subdir11, 'third leaf')
+        leaf4 = self.create_and_register_file(subdir11, 'fourth leaf')
+        leaf5 = self.create_and_register_file(subdir12, 'fifth leaf')
+        leaf6 = self.create_and_register_file(subdir2, 'sixth leaf')
+        leaf7 = self.create_and_register_file(subdir2, 'seventh leaf')
+        leaf8 = self.create_and_register_file(subdir3, 'eight leaf')
+        self.create_zipfile()
+        filer_zipfile = Archive.objects.get()
+        filer_zipfile.extract()
+
+    def test_entries_count(self):
+        files = File.objects.filter(~Q(original_filename=self.zipname))
+        folders = Folder.objects.filter(~Q(name='tmp'))
+        filer_entries = list(files) + list(folders)
+        actual = len(filer_entries)
+        expected = len(self.entries)
+        self.assertEqual(actual, expected)
+
+    def test_entries_path(self):
+        files = File.objects.all()
+        folders = Folder.objects.all()
+        for entry in self.entries:
+            basename = os.path.basename(entry)
+            file_match = files.filter(original_filename=basename)
+            folder_match = folders.filter(name=basename)
+            filer_matches = file_match or folder_match
+            self.assertNotEqual(0, len(filer_matches))
+            filer_entry = filer_matches[0]
+            fields = map(lambda x: x.name, filer_entry.logical_path)
+            fields += [filer_entry.name or filer_entry.original_filename]
+            filer_path = os.sep + os.sep.join(fields)
+            self.assertEqual(filer_path, entry)
+
+    def tearDown(self):
+        os.remove('test.zip')
+        for entry in reversed(self.entries):
+            if os.path.isdir(entry):
+                os.rmdir(entry)
+            elif os.path.isfile(entry):
+                os.remove(entry)
+
+    def create_and_register_file(self, parent, data):
+        fd, path = tempfile.mkstemp(dir=parent)
+        os.write(fd, data)
+        os.close(fd)
+        self.entries.extend([path])
+        return path
+
+    def create_and_register_directory(self, parent):
+        new_dir = tempfile.mkdtemp(dir=parent)
+        self.entries.extend([new_dir])
+        return new_dir
+
+    def create_zipfile(self):
+        zippy = zipfile.ZipFile(self.zipname, 'w')
+        for entry in self.entries:
+            zippy.write(entry)
+        zippy.close()
+        file_obj = DjangoFile(open(self.zipname), name=self.zipname)
+        filer_zipfile = Archive.objects.create(
+            original_filename=self.zipname,
+            file=file_obj,
+        )

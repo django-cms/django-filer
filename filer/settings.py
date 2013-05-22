@@ -35,6 +35,7 @@ FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES",(
 FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     (
         'filer.models.imagemodels.Image',
+        'filer.models.archivemodels.Archive',
         'filer.models.filemodels.File',
     )
 )

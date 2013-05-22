@@ -32,7 +32,8 @@ from filer.admin.tools import  (userperms_for_request,
                                 check_files_read_permissions,
                                 check_folder_read_permissions)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
-                          ImagesWithMissingData, FolderPermission, Image)
+                          ImagesWithMissingData, FolderPermission, Image,
+                          Archive)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY, FOLDER_AFFECTS_URL
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
@@ -54,7 +55,8 @@ class AddFolderPopupForm(forms.ModelForm):
 folder_admin_actions = [
     'move_to_clipboard', 'files_set_public', 'files_set_private',
     'delete_files_or_folders', 'move_files_and_folders',
-    'copy_files_and_folders', 'resize_images', 'rename_files']
+    'copy_files_and_folders', 'resize_images', 'rename_files',
+    'extract_files']
 
 if FOLDER_AFFECTS_URL:
     folder_admin_actions.remove('move_files_and_folders')
@@ -922,6 +924,42 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         ], context, context_instance=template.RequestContext(request))
 
     rename_files.short_description = ugettext_lazy("Rename files")
+
+    def extract_files(self, request, files_queryset, folder_queryset):
+        success_format = "Successfully extracted archive {}."
+
+        def is_valid_archive(filer_file):
+            is_valid = filer_file.is_valid()
+            if not is_valid:
+                error_format = "{} is not a valid zip file"
+                message = error_format.format(filer_file.actual_name)
+                messages.error(request, _(message))
+            return is_valid
+
+        def has_collisions(filer_file):
+            collisions = filer_file.collisions()
+            if collisions:
+                error_format = "Files/Folders from {archive} with names:"
+                error_format += "{names} already exist."
+                names = u", ".join(collisions)
+                archive = filer_file.actual_name
+                message = error_format.format(
+                    archive=archive,
+                    names=names,
+                )
+                messages.error(request, _(message))
+            return len(collisions) > 0
+
+        for f in files_queryset:
+            if not isinstance(f, Archive) or \
+                    not is_valid_archive(f) or \
+                    has_collisions(f):
+                continue
+            f.extract()
+            message = success_format.format(f.actual_name)
+            self.message_user(request, _(message))
+
+    extract_files.short_description = ugettext_lazy("Extract selected zip files")
 
     def _generate_new_filename(self, filename, suffix):
         basename, extension = os.path.splitext(filename)
