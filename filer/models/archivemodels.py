@@ -9,6 +9,8 @@ from filer.settings import FILER_IS_PUBLIC_DEFAULT
 import os.path
 import zipfile
 
+decode_str = lambda x: x.decode('utf8')
+
 
 class Archive(File):
     """
@@ -69,7 +71,8 @@ class Archive(File):
         cwd = self.logical_folder
         cwd_path = cwd.pretty_logical_path + u'/'
         no_end_slash = lambda x: x[:-1] if x.endswith('/') else x
-        zip_paths = [cwd_path + no_end_slash(x) for x in zippy.namelist()]
+        zip_paths = [cwd_path + decode_str(no_end_slash(x))
+                     for x in zippy.namelist()]
         filer_paths = cwd.pretty_path_entries()
         file_set = set(filer_paths)
         intersection = [x for x in zip_paths if x in file_set]
@@ -84,15 +87,16 @@ class Archive(File):
         zippy = zipfile.ZipFile(filer_file)
         entries = zippy.infolist()
         for entry in entries:
-            parent_dir = self._create_parent_folders(entry)
-            filename = os.path.basename(entry.filename)
+            full_path = decode_str(entry.filename)
+            filename = os.path.basename(full_path)
+            parent_dir = self._create_parent_folders(full_path)
             if filename:
                 data = zippy.read(entry)
                 self._create_file(filename, parent_dir, data)
 
-    def _create_parent_folders(self, entry):
+    def _create_parent_folders(self, filename):
         """Creates the folder parents for a given entry."""
-        dir_parents_of_entry = entry.filename.split(os.sep)[:-1]
+        dir_parents_of_entry = filename.split(os.sep)[:-1]
         parent_dir = self.folder
         for directory_name in dir_parents_of_entry:
             parent_dir = self._create_folder(directory_name, parent_dir)
