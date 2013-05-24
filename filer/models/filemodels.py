@@ -190,14 +190,22 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self.file.delete_thumbnails()
             source.delete()
 
+    # The manual transaction management here breaks the transaction management
+    # from django.contrib.admin.options.ModelAdmin.change_view
+    # This isn't a big problem because the only CRUD operation done afterwards
+    # is an insertion in django_admin_log. If this method rollbacks the transaction
+    # then we will have an entry in the admin log describing an action
+    # that didn't actually finish succesfull.
+    # This 'hack' can be removed once django adds support for on_commit and
+    # on_rollback hooks (see: https://code.djangoproject.com/ticket/14051)
     @transaction.commit_manually
     def update_location_on_storage(self, *args, **kwargs):
         old_location = self.file.name
+        # thumbnails might get physically deleted evenif the transaction fails
+        # though luck... they get re-created anyway...
+        self._delete_thumbnails()
+        new_location = self.file.field.upload_to(self, self.actual_name)
         try:
-            # thumbnails might get physically deleted evenif the transaction fails
-            # though luck... they can be regenerated anyway...
-            self._delete_thumbnails()
-            new_location = self.file.field.upload_to(self, self.actual_name)
             storage = self.file.storage
             saved_as = self._copy_file(new_location)
             assert saved_as == new_location, '%s %s' % (saved_as, new_location)
