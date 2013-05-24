@@ -125,11 +125,15 @@ class File(PolymorphicModel, mixins.IconsMixin):
         src_file_name = self.file.name
         storage = self.file.storages['public' if self.is_public else 'private']
 
-        # This is needed because most of the remote File Storage backend do not
-        # open the file.
-        src_file = storage.open(src_file_name)
-        src_file.open()
-        return storage.save(destination, ContentFile(src_file.read()))
+        if hasattr(storage, 'copy'):
+            storage.copy(src_file_name, destination)
+            return destination
+        else:
+            # This is needed because most of the remote File Storage backend do not
+            # open the file.
+            src_file = storage.open(src_file_name)
+            src_file.open()
+            return storage.save(destination, ContentFile(src_file.read()))
 
     def generate_sha1(self):
         sha = hashlib.sha1()
@@ -201,6 +205,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
             super(File, self).save(*args, **kwargs)
         except Exception:
             transaction.rollback()
+            # delete the file from new_location if the db update failed
+            storage.delete(new_location)
             raise
         else:
             transaction.commit()
