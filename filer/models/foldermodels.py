@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
@@ -116,6 +117,38 @@ class Folder(models.Model, mixins.IconsMixin):
             raise ValidationError(
                 _(u'%s is reserved for internal use. '
                   'Please choose a different name') % self.name)
+
+    def save(self, *args, **kwargs):
+        if not filer_settings.FOLDER_AFFECTS_URL:
+            return super(Folder, self).save(*args, **kwargs)
+
+        with transaction.commit_manually():
+            storages = []
+            old_locations = []
+            new_locations = []
+
+            def delete_from_locations(locations, storages):
+                for location, storage in zip(locations, storages):
+                    storage.delete(location)
+
+            try:
+                super(Folder, self).save(*args, **kwargs)
+                all_files = []
+                for folder in self.get_descendants(include_self=True):
+                    all_files += folder.files
+                for f in all_files:
+                    storages.append(f.file.storage)
+                    old_locations.append(f.file.name)
+                    new_locations.append(f.update_location_on_storage())
+            except:
+                try:
+                    transaction.rollback()
+                finally:
+                    delete_from_locations(new_locations, storages)
+                raise
+            else:
+                transaction.commit()
+                delete_from_locations(old_locations, storages)
 
     @property
     def file_count(self):
@@ -321,3 +354,4 @@ class FolderPermission(models.Model):
         verbose_name = _('folder permission')
         verbose_name_plural = _('folder permissions')
         app_label = 'filer'
+
