@@ -67,10 +67,18 @@ class Archive(File):
         """Checks collisions for zip files."""
         zippy = zipfile.ZipFile(filer_file)
         cwd = self.logical_folder
-        cwd_path = cwd.pretty_logical_path + u'/'
-        no_end_slash = lambda x: x[:-1] if x.endswith('/') else x
-        zip_paths = [cwd_path + no_end_slash(x) for x in zippy.namelist()]
-        filer_paths = cwd.pretty_path_entries()
+        if cwd.is_root:
+            cwd_path = os.sep
+            orphan_files = [x.pretty_logical_path
+                            for x in File.objects.filter(folder=None)]
+            orphan_folders = [x.pretty_logical_path
+                              for x in Folder.objects.filter(parent=None)]
+            filer_paths = orphan_files + orphan_folders
+        else:
+            cwd_path = cwd.pretty_logical_path + os.sep
+            filer_paths = cwd.pretty_path_entries()
+        zip_paths = [cwd_path + x.rstrip(os.sep).decode('utf8')
+                     for x in zippy.namelist()]
         file_set = set(filer_paths)
         intersection = [x for x in zip_paths if x in file_set]
         return intersection
@@ -84,15 +92,16 @@ class Archive(File):
         zippy = zipfile.ZipFile(filer_file)
         entries = zippy.infolist()
         for entry in entries:
-            parent_dir = self._create_parent_folders(entry)
-            filename = os.path.basename(entry.filename)
+            full_path = entry.filename.decode('utf8')
+            filename = os.path.basename(full_path)
+            parent_dir = self._create_parent_folders(full_path)
             if filename:
                 data = zippy.read(entry)
                 self._create_file(filename, parent_dir, data)
 
-    def _create_parent_folders(self, entry):
+    def _create_parent_folders(self, full_path):
         """Creates the folder parents for a given entry."""
-        dir_parents_of_entry = entry.filename.split(os.sep)[:-1]
+        dir_parents_of_entry = full_path.split(os.sep)[:-1]
         parent_dir = self.folder
         for directory_name in dir_parents_of_entry:
             parent_dir = self._create_folder(directory_name, parent_dir)

@@ -270,11 +270,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
     @property
     def pretty_logical_path(self):
         its_dir = self.logical_folder
-        if hasattr(its_dir, 'pretty_logical_path'):
-            directory_path = its_dir.pretty_logical_path
+        if its_dir.is_root:
+            directory_path = u''
         else:
-            directory_path = u'/'
-        full_path = u'{}/{}'.format(directory_path, self.actual_name)
+            directory_path = its_dir.pretty_logical_path
+        full_path = u'{}{}{}'.format(directory_path, os.sep, self.actual_name)
         return full_path
 
     def __unicode__(self):

@@ -931,7 +931,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def is_valid_archive(filer_file):
             is_valid = filer_file.is_valid()
             if not is_valid:
-                error_format = "{} is not a valid zip file"
+                error_format = u"{} is not a valid zip file"
                 message = error_format.format(filer_file.actual_name)
                 messages.error(request, _(message))
             return is_valid
@@ -939,8 +939,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         def has_collisions(filer_file):
             collisions = filer_file.collisions()
             if collisions:
-                error_format = "Files/Folders from {archive} with names:"
-                error_format += "{names} already exist."
+                error_format = u"Files/Folders from {archive} with names:"
+                error_format += u"{names} already exist."
                 names = u", ".join(collisions)
                 archive = filer_file.actual_name
                 message = error_format.format(
