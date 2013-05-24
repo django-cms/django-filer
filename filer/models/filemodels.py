@@ -195,7 +195,6 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self._delete_thumbnails()
             new_location = self.file.field.upload_to(self, self.actual_name)
             storage = self.file.storage
-            import ipdb; ipdb.set_trace()
             saved_as = self._copy_file(new_location)
             assert saved_as == new_location, '%s %s' % (saved_as, new_location)
             self.file = saved_as
