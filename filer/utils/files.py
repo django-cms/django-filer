@@ -3,7 +3,8 @@ import os
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify
 from django.core.files.uploadedfile import SimpleUploadedFile
-
+from filer.settings import FILER_FILE_MODELS
+from filer.utils.loader import load_object
 
 class UploadException(Exception):
     pass
@@ -52,3 +53,16 @@ def get_valid_filename(s):
         return u"%s.%s" % (filename, ext)
     else:
         return u"%s" % (filename,)
+
+
+def matching_file_subtypes(filename, file_pointer, request):
+    """
+    Returns a list of valid subtypes for a given file.
+    """
+    types = map(load_object, FILER_FILE_MODELS)
+
+    def _match_subtype(subtype):
+        is_match = subtype.matches_file_type(filename, file_pointer, request)
+        return is_match
+    type_matches = filter(_match_subtype, types)
+    return type_matches

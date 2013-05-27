@@ -7,8 +7,9 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem
-from filer.utils.files import handle_upload, UploadException
-from filer.utils.loader import load_object
+from filer.utils.files import (
+    handle_upload, UploadException, matching_file_subtypes
+)
 
 
 # ModelAdmins
@@ -61,17 +62,11 @@ class ClipboardAdmin(admin.ModelAdmin):
             if any(f for f in clipboard.files.all() if f.actual_name == filename):
                 raise UploadException(
                     _(u"A file named %s already exists in the clipboard") % filename)
-
-            # find the file type
-            for filer_class in filer_settings.FILER_FILE_MODELS:
-                FileSubClass = load_object(filer_class)
-                #TODO: What if there are more than one that qualify?
-                if FileSubClass.matches_file_type(filename, upload, request):
-                    FileForm = modelform_factory(
-                        model = FileSubClass,
-                        fields = ('original_filename', 'owner', 'file')
-                    )
-                    break
+            matched_file_types = matching_file_subtypes(filename, upload, request)
+            FileForm = modelform_factory(
+                model=matched_file_types[0],
+                fields=('original_filename', 'owner', 'file')
+            )
             uploadform = FileForm({'original_filename': filename,
                                    'owner': request.user.pk},
                                   {'file': upload})

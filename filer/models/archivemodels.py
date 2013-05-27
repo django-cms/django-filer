@@ -4,7 +4,10 @@ Archiving support for filer.
 from filer.models.filemodels import File, Folder
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
-from filer.settings import FILER_IS_PUBLIC_DEFAULT
+from filer.settings import FILER_IS_PUBLIC_DEFAULT, FILER_FILE_MODELS
+from filer.utils.loader import load_object
+from filer.utils.files import matching_file_subtypes
+
 
 import os.path
 import zipfile
@@ -123,7 +126,9 @@ class Archive(File):
         """Helper wrapper of creating a filer file."""
         file_data = ContentFile(data)
         file_data.name = basename
-        file_object, created = File.objects.get_or_create(
+        matched_file_types = matching_file_subtypes(basename, None, None)
+        FileSubClass = matched_file_types[0]
+        file_object, created = FileSubClass.objects.get_or_create(
             original_filename=file_data.name,
             folder=folder,
             owner=self.owner,
