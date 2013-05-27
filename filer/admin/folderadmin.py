@@ -33,7 +33,7 @@ from filer.admin.tools import  (userperms_for_request,
                                 check_folder_read_permissions)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData, FolderPermission, Image)
-from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY, FOLDER_AFFECTS_URL
+from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
