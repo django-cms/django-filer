@@ -9,8 +9,9 @@ from filer.models.imagemodels import Image
 from filer.models.filemodels import File
 from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, create_clipboard_item)
+                                 create_image, create_clipboard_item, SettingsOverride)
 from filer import settings as filer_settings
+from filer.utils.generate_filename import by_path
 
 
 
@@ -111,6 +112,22 @@ class FilerApiTests(TestCase):
         image.is_public = True
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
+
+    def test_folder_rename_updates_file_urls(self):
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            folder = Folder(name='foo')
+            folder.save()
+            file_obj = DjangoFile(open(self.filename))
+            afile = File(name='testfile', folder=folder, file=file_obj)
+            afile.save()
+            self.assertIn('foo/testfile', afile.url)
+            folder.name = 'bar'
+            folder.save()
+            # refetch from db
+            afile = File.objects.get(pk=afile.pk)
+            self.assertIn('bar/testfile', afile.url)
 
     def test_file_change_upload_to_destination(self):
         """
