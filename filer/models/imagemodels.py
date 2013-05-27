@@ -148,32 +148,9 @@ class Image(File):
     def height(self):
         return self._height or 0
 
-    @property
-    def icons(self):
-        _icons = {}
-        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
-            try:
-                thumbnail_options = {
-                    'size': (int(size), int(size)),
-                    'crop': True,
-                    'upscale': True,
-                    'subject_location': self.subject_location}
-                thumb = self.file.get_thumbnail(thumbnail_options)
-                _icons[size] = thumb.url
-            except Exception, e:
-                # catch exception and manage it. We can re-raise it for debugging
-                # purposes and/or just logging it, provided user configured
-                # proper logging configuration
-                if filer_settings.FILER_ENABLE_LOGGING:
-                    logger.error('Error while generating icons: %s',e)
-                if filer_settings.FILER_DEBUG:
-                    raise
-        return _icons
-
-    @property
-    def thumbnails(self):
+    def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
-        for name, opts in Image.DEFAULT_THUMBNAILS.items():
+        for name, opts in required_thumbnails.iteritems():
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
@@ -187,6 +164,20 @@ class Image(File):
                 if filer_settings.FILER_DEBUG:
                     raise
         return _thumbnails
+
+    @property
+    def icons(self):
+        required_thumbnails = dict(
+            (size, {'size': (int(size), int(size)),
+                    'crop': True,
+                    'upscale': True,
+                    'subject_location': self.subject_location})
+            for size in filer_settings.FILER_ADMIN_ICON_SIZES)
+        return self._generate_thumbnails(required_thumbnails)
+
+    @property
+    def thumbnails(self):
+        return self._generate_thumbnails(Image.DEFAULT_THUMBNAILS)
 
     @property
     def easy_thumbnails_thumbnailer(self):
