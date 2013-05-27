@@ -123,6 +123,8 @@ class Folder(models.Model, mixins.IconsMixin):
             return super(Folder, self).save(*args, **kwargs)
 
         with transaction.commit_manually():
+            # The manual transaction management here breaks the transaction management
+            # from django.contrib.admin.options.ModelAdmin.change_view
             storages = []
             old_locations = []
             new_locations = []

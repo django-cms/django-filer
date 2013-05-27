@@ -51,16 +51,6 @@ class AddFolderPopupForm(forms.ModelForm):
         fields = ('name',)
 
 
-folder_admin_actions = [
-    'move_to_clipboard', 'files_set_public', 'files_set_private',
-    'delete_files_or_folders', 'move_files_and_folders',
-    'copy_files_and_folders', 'resize_images', 'rename_files']
-
-if FOLDER_AFFECTS_URL:
-    folder_admin_actions.remove('move_files_and_folders')
-    folder_admin_actions.remove('copy_files_and_folders')
-
-
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
@@ -69,7 +59,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = folder_admin_actions
+    actions = [
+        'move_to_clipboard', 'files_set_public', 'files_set_private',
+        'delete_files_or_folders', 'move_files_and_folders',
+        'copy_files_and_folders', 'resize_images', 'rename_files']
 
     def get_form(self, request, obj=None, **kwargs):
         """
