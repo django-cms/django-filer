@@ -219,9 +219,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
                 try:
                     copy_and_save()
                 except Exception:
-                    transaction.rollback()
-                    # delete the file from new_location if the db update failed
-                    storage.delete(new_location)
+                    try:
+                        transaction.rollback()
+                    finally:
+                        # delete the file from new_location if the db update failed
+                        if old_location != new_location:
+                            storage.delete(new_location)
                     raise
                 else:
                     transaction.commit()
