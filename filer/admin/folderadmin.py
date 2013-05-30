@@ -77,8 +77,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
-                if Folder.objects.filter(parent=form_obj.instance.parent,
-                                         name=cleaned_data['name']):
+                folders_with_same_name = Folder.objects.filter(
+                    parent=form_obj.instance.parent,
+                    name=cleaned_data['name'])
+                if form_obj.instance.pk:
+                    folders_with_same_name = folders_with_same_name.exclude(
+                        pk=form_obj.instance.pk)
+                if folders_with_same_name:
                     raise ValidationError('Folder with this name already exists.')
                 return cleaned_data
 
