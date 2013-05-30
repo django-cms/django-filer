@@ -83,7 +83,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 if form_obj.instance.pk:
                     folders_with_same_name = folders_with_same_name.exclude(
                         pk=form_obj.instance.pk)
-                if folders_with_same_name:
+                if folders_with_same_name.exists():
                     raise ValidationError('Folder with this name already exists.')
                 return cleaned_data
 
