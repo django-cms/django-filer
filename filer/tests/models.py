@@ -14,8 +14,9 @@ from filer.models.filemodels import File
 from filer.models.archivemodels import Archive
 from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, create_clipboard_item)
+                                 create_image, create_clipboard_item, SettingsOverride)
 from filer import settings as filer_settings
+from filer.utils.generate_filename import by_path
 
 
 
@@ -117,6 +118,22 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PUBLICMEDIA_STORAGE.location))
 
+    def test_folder_rename_updates_file_urls(self):
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            folder = Folder(name='foo')
+            folder.save()
+            file_obj = DjangoFile(open(self.filename))
+            afile = File(name='testfile', folder=folder, file=file_obj)
+            afile.save()
+            self.assertIn('foo/testfile', afile.url)
+            folder.name = 'bar'
+            folder.save()
+            # refetch from db
+            afile = File.objects.get(pk=afile.pk)
+            self.assertIn('bar/testfile', afile.url)
+
     def test_file_change_upload_to_destination(self):
         """
         Test that the file is actualy move from the private to the public
@@ -187,7 +204,7 @@ class ArchiveTest(TestCase):
     def setUp(self):
         self.entries = []
         self.zipname = 'test.zip'
-        root = self.create_and_register_directory(None)
+        self.root = root = self.create_and_register_directory(None)
         subdir1 = self.create_and_register_directory(root)
         subdir2 = self.create_and_register_directory(root)
         subdir3 = self.create_and_register_directory(root)
@@ -209,8 +226,11 @@ class ArchiveTest(TestCase):
 
     def test_entries_count(self):
         files = File.objects.filter(~Q(original_filename=self.zipname))
-        folders = Folder.objects.filter(~Q(name='tmp'))
-        filer_entries = list(files) + list(folders)
+        tmp_basedir, _ = os.path.split(self.root)
+        tmp_basedir_comp = tmp_basedir.strip(os.path.sep).split(os.path.sep)
+        folders = [ff for ff in Folder.objects.exclude(name__in=tmp_basedir_comp)
+                   if ff.pretty_logical_path.startswith(tmp_basedir)]
+        filer_entries = list(files) + folders
         actual = len(filer_entries)
         expected = len(self.entries)
         self.assertEqual(actual, expected)

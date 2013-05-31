@@ -126,7 +126,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
 
-    def test_filer_upload_file_logical_actual_url(self, extra_headers={}):
+    def test_file_upload_no_duplicate_files(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
         response = self.client.post(
@@ -146,7 +146,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertIn('error', response.content)
 
-    def test_paste_clipboard_to_folder_logical_actual_url(self):
+    def test_paste_from_clipboard_no_duplicate_files(self):
         first_folder = Folder.objects.create(name='first')
 
         def upload():

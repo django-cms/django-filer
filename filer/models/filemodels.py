@@ -4,6 +4,7 @@ from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
@@ -13,7 +14,6 @@ from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
 import os
 
-from django.db import transaction
 
 
 class FileManager(PolymorphicManager):
@@ -73,6 +73,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self._old_is_public = self.is_public
         self._old_name = self.name
         self._old_folder = self.folder
+        self._force_commit = False
 
     def clean(self):
         if self.folder:
@@ -125,11 +126,15 @@ class File(PolymorphicModel, mixins.IconsMixin):
         src_file_name = self.file.name
         storage = self.file.storages['public' if self.is_public else 'private']
 
-        # This is needed because most of the remote File Storage backend do not
-        # open the file.
-        src_file = storage.open(src_file_name)
-        src_file.open()
-        return storage.save(destination, ContentFile(src_file.read()))
+        if hasattr(storage, 'copy'):
+            storage.copy(src_file_name, destination)
+            return destination
+        else:
+            # This is needed because most of the remote File Storage backend do not
+            # open the file.
+            src_file = storage.open(src_file_name)
+            src_file.open()
+            return storage.save(destination, ContentFile(src_file.read()))
 
     def generate_sha1(self):
         sha = hashlib.sha1()
@@ -168,6 +173,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if filer_settings.FOLDER_AFFECTS_URL and \
                 (self._is_name_chnaged() or
                  self._old_folder != self.folder):
+            self._force_commit = True
             self.update_location_on_storage(*args, **kwargs)
         else:
             super(File, self).save(*args, **kwargs)
@@ -186,27 +192,45 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self.file.delete_thumbnails()
             source.delete()
 
-    @transaction.commit_manually
     def update_location_on_storage(self, *args, **kwargs):
         old_location = self.file.name
-        try:
-            # thumbnails might get physically deleted evenif the transaction fails
-            # though luck... they can be regenerated anyway...
-            self._delete_thumbnails()
-            new_location = self.file.field.upload_to(self, self.actual_name)
-            storage = self.file.storage
+        # thumbnails might get physically deleted evenif the transaction fails
+        # though luck... they get re-created anyway...
+        self._delete_thumbnails()
+        new_location = self.file.field.upload_to(self, self.actual_name)
+        storage = self.file.storage
+
+        def copy_and_save():
             saved_as = self._copy_file(new_location)
             assert saved_as == new_location, '%s %s' % (saved_as, new_location)
             self.file = saved_as
             super(File, self).save(*args, **kwargs)
-        except Exception:
-            transaction.rollback()
-            raise
+
+        if self._force_commit:
+            with transaction.commit_manually():
+                # The manual transaction management here breaks the transaction management
+                # from django.contrib.admin.options.ModelAdmin.change_view
+                # This isn't a big problem because the only CRUD operation done afterwards
+                # is an insertion in django_admin_log. If this method rollbacks the transaction
+                # then we will have an entry in the admin log describing an action
+                # that didn't actually finish succesfull.
+                # This 'hack' can be removed once django adds support for on_commit and
+                # on_rollback hooks (see: https://code.djangoproject.com/ticket/14051)
+                try:
+                    copy_and_save()
+                except Exception:
+                    transaction.rollback()
+                    # delete the file from new_location if the db update failed
+                    storage.delete(new_location)
+                    raise
+                else:
+                    transaction.commit()
+                    # only delete the file on the old_location if all went OK
+                    if old_location != new_location:
+                        storage.delete(old_location)
         else:
-            transaction.commit()
-            # only delete the file on the old_location if all went OK
-            if old_location != new_location:
-                storage.delete(old_location)
+            copy_and_save()
+        return new_location
 
     def delete(self, *args, **kwargs):
         # Delete the model before the file

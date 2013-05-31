@@ -25,7 +25,6 @@ class PrivateFileSystemStorage(FileSystemStorage):
 try:
     from storages.backends.s3boto import S3BotoStorage
 
-
     class PatchedS3BotoStorage(S3BotoStorage):
 
         def url(self, name):
@@ -36,6 +35,11 @@ try:
             return self.connection.generate_url(self.querystring_expire,
                 method='GET', bucket=self.bucket.name, key=self._encode_name(name),
                 query_auth=self.querystring_auth, force_http=not self.secure_urls)
+
+        def copy(self, src_name, dst_name):
+            src_path = self._normalize_name(self._clean_name(src_name))
+            dst_path = self._normalize_name(self._clean_name(dst_name))
+            self.bucket.copy_key(dst_path, self.bucket.name, src_path)
 
 
 except ImportError:

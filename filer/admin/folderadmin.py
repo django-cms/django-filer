@@ -34,7 +34,7 @@ from filer.admin.tools import  (userperms_for_request,
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData, FolderPermission, Image,
                           Archive)
-from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY, FOLDER_AFFECTS_URL
+from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
@@ -52,17 +52,6 @@ class AddFolderPopupForm(forms.ModelForm):
         fields = ('name',)
 
 
-folder_admin_actions = [
-    'move_to_clipboard', 'files_set_public', 'files_set_private',
-    'delete_files_or_folders', 'move_files_and_folders',
-    'copy_files_and_folders', 'resize_images', 'rename_files',
-    'extract_files']
-
-if FOLDER_AFFECTS_URL:
-    folder_admin_actions.remove('move_files_and_folders')
-    folder_admin_actions.remove('copy_files_and_folders')
-
-
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
@@ -71,7 +60,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = folder_admin_actions
+    actions = [
+        'move_to_clipboard', 'files_set_public', 'files_set_private',
+        'delete_files_or_folders', 'move_files_and_folders',
+        'copy_files_and_folders', 'resize_images', 'rename_files',
+        'extract_files']
 
     def get_form(self, request, obj=None, **kwargs):
         """
