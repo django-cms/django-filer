@@ -139,9 +139,12 @@ class Folder(models.Model, mixins.IconsMixin):
                 for folder in self.get_descendants(include_self=True):
                     all_files += folder.files
                 for f in all_files:
-                    storages.append(f.file.storage)
-                    old_locations.append(f.file.name)
-                    new_locations.append(f.update_location_on_storage())
+                    old_location = f.file.name
+                    new_location = f.update_location_on_storage()
+                    if old_location != new_location:
+                        storages.append(f.file.storage)
+                        old_locations.append(old_location)
+                        new_locations.append(new_location)
             except:
                 try:
                     transaction.rollback()
