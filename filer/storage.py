@@ -1,6 +1,8 @@
 #-*- coding: utf-8 -*-
+import urllib
+
 from django.core.files.storage import FileSystemStorage
-from django.utils.encoding import filepath_to_uri
+from django.utils.encoding import smart_str
 
 
 class PublicFileSystemStorage(FileSystemStorage):
@@ -22,13 +24,19 @@ class PrivateFileSystemStorage(FileSystemStorage):
     is_secure = True
 
 
+def filepath_to_url(path):
+    if path is None:
+        return path
+    return urllib.quote(smart_str(path).replace("\\", "/"), safe="/~!*()")
+
+
 try:
     from storages.backends.s3boto import S3BotoStorage
 
     class PatchedS3BotoStorage(S3BotoStorage):
 
         def url(self, name):
-            name = filepath_to_uri(self._normalize_name(self._clean_name(name)))
+            name = self._normalize_name(self._clean_name(filepath_to_url(name)))
             if self.custom_domain:
                 return "%s://%s/%s" % ('https' if self.secure_urls else 'http',
                                        self.custom_domain, name)
