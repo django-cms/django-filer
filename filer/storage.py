@@ -47,7 +47,8 @@ try:
         def copy(self, src_name, dst_name):
             src_path = self._normalize_name(self._clean_name(src_name))
             dst_path = self._normalize_name(self._clean_name(dst_name))
-            self.bucket.copy_key(dst_path, self.bucket.name, src_path)
+            self.bucket.copy_key(
+                dst_path, self.bucket.name, src_path, preserve_acl=True)
 
 
 except ImportError:
