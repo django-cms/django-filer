@@ -36,11 +36,12 @@ try:
     class PatchedS3BotoStorage(S3BotoStorage):
 
         def url(self, name):
-            name = self._normalize_name(self._clean_name(filepath_to_url(name)))
             if self.custom_domain:
+                name = filepath_to_url(self._normalize_name(self._clean_name(name)))
                 return "%s://%s/%s" % ('https' if self.secure_urls else 'http',
                                        self.custom_domain, name)
-            return self.connection.generate_url(self.querystring_expire,
+            return self.connection.generate_url(
+                self.querystring_expire,
                 method='GET', bucket=self.bucket.name, key=self._encode_name(name),
                 query_auth=self.querystring_auth, force_http=not self.secure_urls)
 
