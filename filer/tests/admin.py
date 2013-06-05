@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers
+from django.contrib.auth.models import User
 from django.conf import settings
 
 from filer.models.filemodels import File
@@ -104,6 +105,19 @@ class FilerFolderAdminUrlsTests(TestCase):
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
         self.assertEqual(bar.name, "bar")
+
+    def test_change_folder_owner_keep_name(self):
+        folder = Folder.objects.create(name='foobar')
+        another_superuser = User.objects.create_superuser(
+            'gigi', 'admin@ignore.com', 'secret')
+        response = self.client.post('/admin/filer/folder/%d/' % folder.pk, {
+                'owner': another_superuser.pk,
+                'name': 'foobar',
+                '_continue': 'Save and continue editing'})
+        # succesfful POST returns a redirect
+        self.assertEqual(response.status_code, 302)
+        folder = Folder.objects.get(pk=folder.pk)
+        self.assertEqual(folder.owner.pk, another_superuser.pk)
 
 
 class FilerImageAdminUrlsTests(TestCase):
