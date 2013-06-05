@@ -9,6 +9,7 @@ from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
 from filer import settings as filer_settings
@@ -147,6 +148,10 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def pretty_logical_path(self):
         return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+
+    @property
+    def quoted_logical_path(self):
+        return urlquote(self.pretty_logical_path)
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
