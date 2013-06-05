@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+import urllib
+
 try:
     from django.contrib.auth import get_user_model
     User = get_user_model()

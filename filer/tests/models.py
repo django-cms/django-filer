@@ -174,3 +174,9 @@ class FilerApiTests(TestCase):
 
         # file should still be here
         self.assertTrue(storage.exists(name))
+
+    def test_folder_quoted_logical_path(self):
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        child = Folder.objects.create(name='Bar"s Foo', parent=root_folder)
+        self.assertEqual(child.quoted_logical_path, u'/Foo%27s%20Bar/Bar%22s%20Foo')
+
