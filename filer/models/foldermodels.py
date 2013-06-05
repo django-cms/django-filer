@@ -9,7 +9,6 @@ from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
-from django.template.defaultfilters import urlencode
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
