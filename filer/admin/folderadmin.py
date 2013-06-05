@@ -76,8 +76,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
-                if Folder.objects.filter(parent=form_obj.instance.parent,
-                                         name=cleaned_data['name']):
+                folders_with_same_name = Folder.objects.filter(
+                    parent=form_obj.instance.parent,
+                    name=cleaned_data['name'])
+                if form_obj.instance.pk:
+                    folders_with_same_name = folders_with_same_name.exclude(
+                        pk=form_obj.instance.pk)
+                if folders_with_same_name.exists():
                     raise ValidationError('Folder with this name already exists.')
                 return cleaned_data
 
@@ -1084,7 +1089,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'upscale': form_data['upscale'],
             'subject_location': image.subject_location,
         })
-        from django.db.models.fields.files import ImageFieldFile
         image.file.file = new_image.file
         image.generate_sha1()
         image.save()  # Also gets new width and height
