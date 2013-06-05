@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 import itertools
+import urllib
 
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
@@ -210,6 +211,10 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def pretty_logical_path(self):
         return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+
+    @property
+    def quoted_logical_path(self):
+        return u"/%s" % u"/".join([urllib.quote(f.name) for f in self.logical_path+[self]])
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
