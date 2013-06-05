@@ -37,7 +37,6 @@ from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
-import urllib
 import os
 import itertools
 import inspect
@@ -1090,7 +1089,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'upscale': form_data['upscale'],
             'subject_location': image.subject_location,
         })
-        from django.db.models.fields.files import ImageFieldFile
         image.file.file = new_image.file
         image.generate_sha1()
         image.save()  # Also gets new width and height
