@@ -119,8 +119,13 @@ class Archive(File):
         attrs = dict(name=name, parent=parent)
         if bypass_owner is False:
             attrs['owner'] = self.owner
-        current_dir, created = Folder.objects.get_or_create(**attrs)
-        return current_dir
+
+        existing = Folder.objects.filter(**attrs)
+        if existing:
+            return existing[0]
+        # make sure owner is set
+        attrs['owner'] = self.owner
+        return Folder.objects.create(**attrs)
 
     def _create_file(self, basename, folder, data, bypass_owner=False):
         """Helper wrapper of creating a filer file."""
