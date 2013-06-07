@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
 from django.contrib import messages
-from django.template.defaultfilters import urlencode
+from django.utils.http import urlquote
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -400,7 +400,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'current_url': request.path,
                 'title': u'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
-                'q': urlencode(q),
+                'q': urlquote(q),
                 'show_result_count': show_result_count,
                 'limit_search_to_folder': limit_search_to_folder,
                 'is_popup': popup_status(request),

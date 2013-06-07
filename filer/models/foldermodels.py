@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.db.models import Q
+from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
 import filer.models.clipboardmodels
@@ -210,6 +211,10 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def pretty_logical_path(self):
         return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+
+    @property
+    def quoted_logical_path(self):
+        return urlquote(self.pretty_logical_path)
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
