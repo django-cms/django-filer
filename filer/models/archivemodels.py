@@ -135,10 +135,10 @@ class Archive(File):
         FileSubClass = matched_file_types[0]
         file_manager = FileSubClass.objects
 
-        name_query = (Q(original_filename=basename) & (
+        actual_name_query = (Q(original_filename=basename) & (
             Q(name__isnull=True) | Q(name__exact=''))) | Q(name=basename)
 
-        search_query = Q(folder=folder) & name_query
+        search_query = Q(folder=folder) & actual_name_query
 
         if getattr(self, 'bypass_owner', False) is False:
             search_query &= Q(owner=self.owner)
