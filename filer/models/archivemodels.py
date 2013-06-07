@@ -4,10 +4,9 @@ Archiving support for filer.
 from filer.models.filemodels import File, Folder
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
-from filer.settings import FILER_IS_PUBLIC_DEFAULT, FILER_FILE_MODELS
-from filer.utils.loader import load_object
+from django.db.models import Q
+from filer.settings import FILER_IS_PUBLIC_DEFAULT
 from filer.utils.files import matching_file_subtypes
-
 
 import os.path
 import zipfile
@@ -29,8 +28,9 @@ class Archive(File):
         extension = os.path.splitext(iname)[-1].lower()
         return extension in Archive._filename_extensions
 
-    def extract(self):
+    def extract(self, bypass_owner=False):
         """Extracts the archive files' contents."""
+        self.bypass_owner = bypass_owner
         self.file.open()
         try:
             self._extract_zip(self.file)
@@ -107,7 +107,8 @@ class Archive(File):
         dir_parents_of_entry = full_path.split(os.sep)[:-1]
         parent_dir = self.folder
         for directory_name in dir_parents_of_entry:
-            parent_dir = self._create_folder(directory_name, parent_dir)
+            parent_dir = self._create_folder(
+                directory_name, parent_dir)
         return parent_dir
 
     def _create_folder(self, name, parent):
@@ -115,12 +116,16 @@ class Archive(File):
         Helper wrapper of creating a file in a filer folder.
         If there already is a folder with the given name, it returnes that.
         """
-        current_dir, created = Folder.objects.get_or_create(
-            name=name,
-            parent=parent,
-            owner=self.owner,
-        )
-        return current_dir
+        attrs = dict(name=name, parent=parent)
+        if getattr(self, 'bypass_owner', False) is False:
+            attrs['owner'] = self.owner
+
+        existing = Folder.objects.filter(**attrs)
+        if existing:
+            return existing[0]
+        # make sure owner is set
+        attrs['owner'] = self.owner
+        return Folder.objects.create(**attrs)
 
     def _create_file(self, basename, folder, data):
         """Helper wrapper of creating a filer file."""
@@ -128,13 +133,32 @@ class Archive(File):
         file_data.name = basename
         matched_file_types = matching_file_subtypes(basename, None, None)
         FileSubClass = matched_file_types[0]
-        file_object, created = FileSubClass.objects.get_or_create(
-            original_filename=file_data.name,
-            folder=folder,
-            owner=self.owner,
-            file=file_data,
-            is_public=FILER_IS_PUBLIC_DEFAULT,
-        )
+        file_manager = FileSubClass.objects
+
+        actual_name_query = (Q(original_filename=basename) & (
+            Q(name__isnull=True) | Q(name__exact=''))) | Q(name=basename)
+
+        search_query = Q(folder=folder) & actual_name_query
+
+        if getattr(self, 'bypass_owner', False) is False:
+            search_query &= Q(owner=self.owner)
+
+        existing = file_manager.filter(search_query)
+        file_object = None
+        if existing:
+            file_object = existing[0]
+            file_object.name = None
+            file_object.original_filename = basename
+            file_object.file = file_data
+            file_object.save()
+        else:
+            file_object = file_manager.create(
+                original_filename=basename,
+                folder=folder,
+                owner=self.owner,
+                file=file_data,
+                is_public=FILER_IS_PUBLIC_DEFAULT,
+            )
         return file_object
 
     class Meta:
