@@ -5,8 +5,7 @@ from filer.models.filemodels import File, Folder
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
 from django.db.models import Q
-from filer.settings import FILER_IS_PUBLIC_DEFAULT, FILER_FILE_MODELS
-from filer.utils.loader import load_object
+from filer.settings import FILER_IS_PUBLIC_DEFAULT
 from filer.utils.files import matching_file_subtypes
 
 import os.path
@@ -31,9 +30,10 @@ class Archive(File):
 
     def extract(self, bypass_owner=False):
         """Extracts the archive files' contents."""
+        self.bypass_owner = bypass_owner
         self.file.open()
         try:
-            self._extract_zip(self.file, bypass_owner)
+            self._extract_zip(self.file)
         finally:
             self.file.close()
 
@@ -86,7 +86,7 @@ class Archive(File):
         intersection = [x for x in zip_paths if x in file_set]
         return intersection
 
-    def _extract_zip(self, filer_file, bypass_owner=False):
+    def _extract_zip(self, filer_file):
         """
         Creates the file and folder hierarchy from the contents of the zip
         file. It first creates the parent folder of the selected file if it
@@ -97,27 +97,27 @@ class Archive(File):
         for entry in entries:
             full_path = entry.filename.decode('utf8')
             filename = os.path.basename(full_path)
-            parent_dir = self._create_parent_folders(full_path, bypass_owner)
+            parent_dir = self._create_parent_folders(full_path)
             if filename:
                 data = zippy.read(entry)
-                self._create_file(filename, parent_dir, data, bypass_owner)
+                self._create_file(filename, parent_dir, data)
 
-    def _create_parent_folders(self, full_path, bypass_owner=False):
+    def _create_parent_folders(self, full_path):
         """Creates the folder parents for a given entry."""
         dir_parents_of_entry = full_path.split(os.sep)[:-1]
         parent_dir = self.folder
         for directory_name in dir_parents_of_entry:
             parent_dir = self._create_folder(
-                directory_name, parent_dir, bypass_owner)
+                directory_name, parent_dir)
         return parent_dir
 
-    def _create_folder(self, name, parent, bypass_owner=False):
+    def _create_folder(self, name, parent):
         """
         Helper wrapper of creating a file in a filer folder.
         If there already is a folder with the given name, it returnes that.
         """
         attrs = dict(name=name, parent=parent)
-        if bypass_owner is False:
+        if getattr(self, 'bypass_owner', False) is False:
             attrs['owner'] = self.owner
 
         existing = Folder.objects.filter(**attrs)
@@ -127,7 +127,7 @@ class Archive(File):
         attrs['owner'] = self.owner
         return Folder.objects.create(**attrs)
 
-    def _create_file(self, basename, folder, data, bypass_owner=False):
+    def _create_file(self, basename, folder, data):
         """Helper wrapper of creating a filer file."""
         file_data = ContentFile(data)
         file_data.name = basename
@@ -140,7 +140,7 @@ class Archive(File):
 
         search_query = Q(folder=folder) & name_query
 
-        if bypass_owner is False:
+        if getattr(self, 'bypass_owner', False) is False:
             search_query &= Q(owner=self.owner)
 
         existing = file_manager.filter(search_query)
