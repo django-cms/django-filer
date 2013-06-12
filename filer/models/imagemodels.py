@@ -58,7 +58,7 @@ class Image(File):
       # doing for me was obscuring errors...
       # --Dave Butler <croepha@gmail.com>
       iext = os.path.splitext(iname)[1].lower()
-      return iext in ['.jpg', '.jpeg', '.png', '.gif']
+      return iext in ['.jpg', '.jpeg', '.png', '.gif', '.ico']
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
