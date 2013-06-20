@@ -1,16 +1,12 @@
 #-*- coding: utf-8 -*-
-try:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-except ImportError:
-    from django.contrib.auth.models import User  # NOQA
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from filer.models import filemodels
 
 
 class Clipboard(models.Model):
-    user = models.ForeignKey(User, verbose_name=_('user'), related_name="filer_clipboards")
+    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=_('user'), related_name="filer_clipboards")
     files = models.ManyToManyField(
                         'File', verbose_name=_('files'), related_name="in_clipboards",
                         through='ClipboardItem')
