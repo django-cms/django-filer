@@ -21,4 +21,3 @@ def get_file_url_from_cdn(file_obj, url):
             (scheme, cdn_domain, path, params, query, fragment))
     else:
         return url
-
