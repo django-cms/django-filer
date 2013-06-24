@@ -10,7 +10,7 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from easy_thumbnails import processors
-from filer.settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG
+from filer.settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG, FILER_WHITESPACE_COLOR
 
 RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 
@@ -117,3 +117,29 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
                           (subj_x + esize, subj_y + esize)), outline="#FF0000")
         im = im.crop(crop_box)
     return im
+
+
+def whitespace(image, size, whitespace=False, whitespace_color=None, **kwargs):
+    if not whitespace:
+        return image
+
+    if whitespace_color is None:
+        whitespace_color = FILER_WHITESPACE_COLOR
+    if whitespace_color is None:
+        whitespace_color = '#fff'
+
+    old_image = image
+    source_x, source_y = image.size
+    target_x, target_y = size
+
+    image = Image.new('RGBA', (target_x, target_y), whitespace_color)
+    if source_x < target_x and source_y < target_y:  # whitespace all around
+        image.paste(old_image, ((target_x-source_x)/2, (target_y-source_y)/2))
+    elif source_x < target_x:  # whitespace on top and bottom only
+        image.paste(old_image, ((target_x-source_x)/2, 0))
+    elif source_y < target_y:  # whitespace on sides only
+        image.paste(old_image, (0, (target_y-source_y)/2))
+    else:  # no whitespace needed
+        image = old_image
+
+    return image
