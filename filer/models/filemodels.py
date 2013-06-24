@@ -1,10 +1,6 @@
 #-*- coding: utf-8 -*-
-try:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-except ImportError:
-    from django.contrib.auth.models import User  # NOQA
 from django.core import urlresolvers
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -49,7 +45,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     description = models.TextField(null=True, blank=True,
         verbose_name=_('description'))
 
-    owner = models.ForeignKey(User,
+    owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
         related_name='owned_%(class)ss',
         null=True, blank=True, verbose_name=_('owner'))
 
