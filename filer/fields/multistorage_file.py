@@ -4,7 +4,7 @@ from easy_thumbnails import fields as easy_thumbnails_fields, \
 
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
-from filer.utils.cdn import get_file_url_from_cdn
+from filer.utils.cdn import get_cdn_url
 
 
 STORAGES = {
@@ -44,7 +44,7 @@ class CdnAwareThumbnailFile(object):
 
     @property
     def url(self):
-        return get_file_url_from_cdn(self._filer_file, self._thumbnail_file.url)
+        return get_cdn_url(self._filer_file, self._thumbnail_file.url)
 
 
 
@@ -100,7 +100,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
 
     def _get_url(self):
         url = super(MultiStorageFieldFile, self)._get_url()
-        return get_file_url_from_cdn(self.instance, url)
+        return get_cdn_url(self.instance, url)
     url = property(_get_url)
 
     def save(self, name, content, save=True):

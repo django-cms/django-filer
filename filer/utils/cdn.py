@@ -6,7 +6,7 @@ from django.utils import timezone
 from filer import settings as filer_settings
 
 
-def get_file_url_from_cdn(file_obj, url):
+def get_cdn_url(file_obj, url):
     """If the CDN version of the file is up to date, return it from there"""
     cdn_domain = getattr(filer_settings, 'CDN_DOMAIN', None)
     if cdn_domain is None:
