@@ -47,7 +47,6 @@ class CdnAwareThumbnailFile(object):
         return get_cdn_url(self._filer_file, self._thumbnail_file.url)
 
 
-
 class MultiStorageFieldFile(ThumbnailerNameMixin,
                             easy_thumbnails_files.ThumbnailerFieldFile):
     def __init__(self, instance, field, name):
