@@ -14,6 +14,8 @@ def get_file_url_from_cdn(file_obj, url):
 
     invalidated_at = file_obj.modified_at + datetime.timedelta(
         seconds=filer_settings.CDN_INVALIDATION_TIME)
+    if timezone.is_naive(invalidated_at):
+        invalidated_at = timezone.make_aware(invalidated_at, timezone.get_default_timezone())
     now = timezone.make_aware(datetime.datetime.now(), timezone.get_default_timezone())
     if invalidated_at < now:
         scheme, netloc, path, params, query, fragment = urlparse.urlparse(url)

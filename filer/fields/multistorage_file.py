@@ -33,7 +33,7 @@ def generate_filename_multistorage(instance, filename):
         return upload_to
 
 
-class CdnAwareThumbnailFile(easy_thumbnails_files.ThumbnailFile):
+class CdnAwareThumbnailFile(object):
 
     def __init__(self, thumbnail_file, filer_file):
         self._thumbnail_file = thumbnail_file
@@ -42,10 +42,10 @@ class CdnAwareThumbnailFile(easy_thumbnails_files.ThumbnailFile):
     def __getattr__(self, attr_name):
         return getattr(self._thumbnail_file, attr_name)
 
-    def _get_url(self):
-        url = super(CdnAwareThumbnailFile, self).url
-        return get_file_url_from_cdn(self._filer_file, url)
-    url = property(_get_url)
+    @property
+    def url(self):
+        return get_file_url_from_cdn(self._filer_file, self._thumbnail_file.url)
+
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,

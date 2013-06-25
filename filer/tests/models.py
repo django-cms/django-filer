@@ -1,7 +1,9 @@
 #-*- coding: utf-8 -*-
 import os
-import zipfile
 import tempfile
+import urlparse
+import zipfile
+
 from django.forms.models import modelform_factory
 from django.db.models import Q
 from django.test import TestCase
@@ -197,6 +199,19 @@ class FilerApiTests(TestCase):
 
         # file should still be here
         self.assertTrue(storage.exists(name))
+
+    def test_cdn_urls(self):
+        cdn_domain = 'cdn.foobar.com'
+        with SettingsOverride(filer_settings,
+                              CDN_DOMAIN=cdn_domain,
+                              USE_TZ=True,
+                              CDN_INVALIDATION_TIME=0):
+            image = self.create_filer_image()
+            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            self.assertEqual(netloc, cdn_domain)
+            for url in image.thumbnails.values():
+                _, netloc, _, _, _, _ = urlparse.urlparse(url)
+                self.assertEqual(netloc, cdn_domain)
 
 
 class ArchiveTest(TestCase):
