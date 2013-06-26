@@ -4,7 +4,7 @@ from easy_thumbnails import fields as easy_thumbnails_fields, \
 
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
-from filer.utils.cdn import get_file_url_from_cdn
+from filer.utils.cdn import get_cdn_url
 
 
 STORAGES = {
@@ -31,6 +31,20 @@ def generate_filename_multistorage(instance, filename):
         return upload_to(instance, filename)
     else:
         return upload_to
+
+
+class CdnAwareThumbnailFile(object):
+
+    def __init__(self, thumbnail_file, filer_file):
+        self._thumbnail_file = thumbnail_file
+        self._filer_file = filer_file
+
+    def __getattr__(self, attr_name):
+        return getattr(self._thumbnail_file, attr_name)
+
+    @property
+    def url(self):
+        return get_cdn_url(self._filer_file, self._thumbnail_file.url)
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,
@@ -85,12 +99,16 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
 
     def _get_url(self):
         url = super(MultiStorageFieldFile, self)._get_url()
-        return get_file_url_from_cdn(self.instance, url)
+        return get_cdn_url(self.instance, url)
     url = property(_get_url)
 
     def save(self, name, content, save=True):
         content.seek(0) # Ensure we upload the whole file
         super(MultiStorageFieldFile, self).save(name, content, save)
+
+    def get_thumbnail(self, opts, save=True, generate=None):
+        thumbnail = super(MultiStorageFieldFile, self).get_thumbnail(opts, save, generate)
+        return CdnAwareThumbnailFile(thumbnail, self.instance)
 
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
