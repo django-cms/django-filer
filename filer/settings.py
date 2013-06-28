@@ -70,7 +70,7 @@ DEFAULT_FILER_STORAGES = {
         'main': {
             'ENGINE': DEFAULT_FILE_STORAGE,
             'OPTIONS': {},
-            'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+            'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
             'UPLOAD_TO_PREFIX': 'filer_public',
         },
         'thumbnails': {
@@ -88,7 +88,7 @@ DEFAULT_FILER_STORAGES = {
                 'location': os.path.abspath(os.path.join(settings.MEDIA_ROOT, '../smedia/filer_private')),
                 'base_url': '/smedia/filer_private/',
             },
-            'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+            'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
             'UPLOAD_TO_PREFIX': '',
         },
         'thumbnails': {
@@ -134,7 +134,7 @@ if FILER_0_8_COMPATIBILITY_MODE:
         'public': {
             'main': {
                 'ENGINE': DEFAULT_FILE_STORAGE,
-                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+                'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
                 'UPLOAD_TO_PREFIX': getattr(settings, 'FILER_PUBLICMEDIA_PREFIX', 'filer_public'),
             },
             'thumbnails': {
@@ -148,7 +148,7 @@ if FILER_0_8_COMPATIBILITY_MODE:
         'private': {
             'main': {
                 'ENGINE': DEFAULT_FILE_STORAGE,
-                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+                'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
                 'UPLOAD_TO_PREFIX': getattr(settings, 'FILER_PRIVATEMEDIA_PREFIX', 'filer_private'),
             },
             'thumbnails': {
