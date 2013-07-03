@@ -2,6 +2,14 @@ Changelog for django-filer
 ==========================
 
 
+0.9.5 (2013-06-28)
+------------------
+
+* file paths now contain random component by default (to avoid filename clashes)
+* fixed migrations to be better compatible with custom user models
+* bugfixes, performance improvements
+
+
 0.9.4 (2013-04-09)
 ------------------
 

@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
 from django.contrib import messages
-from django.template.defaultfilters import urlencode
+from django.utils.http import urlquote
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -37,7 +37,6 @@ from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
-import urllib
 import os
 import itertools
 import inspect
@@ -77,8 +76,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
-                if Folder.objects.filter(parent=form_obj.instance.parent,
-                                         name=cleaned_data['name']):
+                folders_with_same_name = Folder.objects.filter(
+                    parent=form_obj.instance.parent,
+                    name=cleaned_data['name'])
+                if form_obj.instance.pk:
+                    folders_with_same_name = folders_with_same_name.exclude(
+                        pk=form_obj.instance.pk)
+                if folders_with_same_name.exists():
                     raise ValidationError('Folder with this name already exists.')
                 return cleaned_data
 
@@ -394,7 +398,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'current_url': request.path,
                 'title': u'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
-                'q': urlencode(q),
+                'q': urlquote(q),
                 'show_result_count': show_result_count,
                 'limit_search_to_folder': limit_search_to_folder,
                 'is_popup': popup_status(request),
@@ -1085,7 +1089,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'upscale': form_data['upscale'],
             'subject_location': image.subject_location,
         })
-        from django.db.models.fields.files import ImageFieldFile
         image.file.file = new_image.file
         image.generate_sha1()
         image.save()  # Also gets new width and height

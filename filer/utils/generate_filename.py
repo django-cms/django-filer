@@ -8,6 +8,12 @@ def by_date(instance, filename):
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
     return os.path.join(datepart, get_valid_filename(filename))
 
+def randomized(instance, filename):
+    import uuid
+    uuid_str = str(uuid.uuid4())
+    random_path = u"%s/%s/%s" % (uuid_str[0:2], uuid_str[2:4], uuid_str)
+    return os.path.join(random_path, get_valid_filename(filename))
+
 
 class prefixed_factory(object):
     def __init__(self, upload_to, prefix):
