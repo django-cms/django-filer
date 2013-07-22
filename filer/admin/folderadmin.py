@@ -253,23 +253,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 pass
 
         # search
-        def filter_folder(qs, terms=[]):
-            for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | \
-                               Q(owner__username__icontains=term) | \
-                               Q(owner__first_name__icontains=term) | \
-                               Q(owner__last_name__icontains=term))
-            return qs
-
-        def filter_file(qs, terms=[]):
-            for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | \
-                               Q(description__icontains=term) | \
-                               Q(original_filename__icontains=term) | \
-                               Q(owner__username__icontains=term) | \
-                               Q(owner__first_name__icontains=term) | \
-                               Q(owner__last_name__icontains=term))
-            return qs
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
@@ -287,8 +270,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 folder_qs = Folder.objects.all()
                 file_qs = File.objects.all()
-            folder_qs = filter_folder(folder_qs, search_terms)
-            file_qs = filter_file(file_qs, search_terms)
+            folder_qs = self.filter_folder(folder_qs, search_terms)
+            file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
         else:
@@ -414,6 +397,26 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'media': self.media,
                 'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
         }, context_instance=RequestContext(request))
+
+    @staticmethod
+    def filter_folder(qs, terms=[]):
+        for term in terms:
+            qs = qs.filter(Q(name__icontains=term) |
+                           Q(owner__username__icontains=term) |
+                           Q(owner__first_name__icontains=term) |
+                           Q(owner__last_name__icontains=term))
+        return qs
+
+    @staticmethod
+    def filter_file(qs, terms=[]):
+        for term in terms:
+            qs = qs.filter(Q(name__icontains=term) |
+                           Q(description__icontains=term) |
+                           Q(original_filename__icontains=term) |
+                           Q(owner__username__icontains=term) |
+                           Q(owner__first_name__icontains=term) |
+                           Q(owner__last_name__icontains=term))
+        return qs
 
     def response_action(self, request, files_queryset, folders_queryset):
         """
