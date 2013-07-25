@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 from django.test import TestCase
 from django.core.urlresolvers import reverse
@@ -8,13 +8,14 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 from filer.models.filemodels import File
-from filer.models.foldermodels import Folder
+from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image)
+from filer import settings as filer_settings
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -427,3 +428,65 @@ class PermissionAdminTest(TestCase):
         """
         response = self.client.get(reverse('admin:filer_folderpermission_add'))
         self.assertEqual(response.status_code, 200)
+
+
+class FolderListingTest(TestCase):
+
+    def setUp(self):
+        superuser = create_superuser()
+        self.staff_user = User.objects.create_user(
+            username='joe', password='x', email='joe@mata.com')
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+        self.parent = Folder.objects.create(name='bar', parent=None, owner=superuser)
+        self.bar_folder = Folder.objects.create(name='bar', parent=self.parent, owner=superuser)
+        self.foo_folder = Folder.objects.create(name='foo', parent=self.parent, owner=self.staff_user)
+        self.client.login(username='joe', password='x')
+
+
+    def test_folder_listing_permissions_disabled(self):
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = False
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            # user sees 3 folder : FOO, BAR
+            self.assertEquals(len(response.context['paginated_items'].object_list), 2)
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_folder_listing_ownership(self):
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            # user sees 1 folder : FOO
+            # he doesn't see BAR because he doesn't own it
+            self.assertEquals(len(response.context['paginated_items'].object_list), 1)
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_folder_listing_with_permissions(self):
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+            # give permissions over bar
+            FolderPermission.objects.create(
+                folder=self.bar_folder,
+                user=self.staff_user,
+                type=FolderPermission.THIS,
+                can_edit=FolderPermission.ALLOW,
+                can_read=FolderPermission.ALLOW,
+                can_add_children=FolderPermission.ALLOW)
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            # user sees 2 folder : FOO, BAR
+            # he is now able to see BAR as well
+            # because an explicit permission has been given
+            self.assertEquals(len(response.context['paginated_items'].object_list), 2)
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting

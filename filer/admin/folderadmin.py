@@ -287,8 +287,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_children += folder.virtual_folders
 
-        if not request.user.is_superuser:
-            perms = FolderPermission.objects.get_read_id_list(request.user)
+        perms = FolderPermission.objects.get_read_id_list(request.user)
+        if perms != 'All':
             folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
             file_qs = file_qs.filter(Q(folder__id__in=perms) | Q(owner=request.user))
 
