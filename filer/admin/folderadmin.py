@@ -252,16 +252,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             except ValueError:
                 pass
 
-        def get_user_read_permissions(user):
-            if not user.is_authenticated():
-                return None
-            elif user.is_superuser:
-                return 'All'
-            else:
-                permission_manager = FolderPermission.objects
-                read_permissions = permission_manager.get_read_id_list(user)
-                return read_permissions
-
         # search
         q = request.GET.get('q', None)
         if q:
@@ -297,11 +287,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_children += folder.virtual_folders
 
-        user = request.user
-        permissions = get_user_read_permissions(user)
-        if permissions != 'All':
-            folder_qs = folder_qs.filter(Q(id__in=permissions) | Q(owner=request.user))
-            file_qs = file_qs.filter(Q(folder__id__in=permissions) | Q(owner=request.user))
+        if not request.user.is_superuser:
+            perms = FolderPermission.objects.get_read_id_list(request.user)
+            folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
+            file_qs = file_qs.filter(Q(folder__id__in=perms) | Q(owner=request.user))
+
         folder_children += folder_qs
         folder_files += file_qs
 
