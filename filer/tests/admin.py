@@ -443,37 +443,43 @@ class FolderListingTest(TestCase):
         self.foo_folder = Folder.objects.create(name='foo', parent=self.parent, owner=self.staff_user)
         self.client.login(username='joe', password='x')
 
-
-    def test_folder_listing_permissions_disabled(self):
+    def test_with_permissions_disabled(self):
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = False
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
-            # user sees 3 folder : FOO, BAR
-            self.assertEquals(len(response.context['paginated_items'].object_list), 2)
+            folder_list = response.context['paginated_items'].object_list
+            # user sees all folders: FOO, BAR
+            self.assertEquals(
+                set(folder.pk for folder in folder_list),
+                set([self.foo_folder.pk, self.bar_folder.pk]))
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
-    def test_folder_listing_ownership(self):
+    def test_folder_ownership(self):
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
-            # user sees 1 folder : FOO
+            folder_list = response.context['paginated_items'].object_list
+            # user sees only 1 folder : FOO
             # he doesn't see BAR because he doesn't own it
-            self.assertEquals(len(response.context['paginated_items'].object_list), 1)
+            # and no permission has been given
+            self.assertEquals(
+                set(folder.pk for folder in folder_list),
+                set([self.foo_folder.pk]))
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
-    def test_folder_listing_with_permissions(self):
+    def test_with_permission_given_to_folder(self):
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
-            # give permissions over bar
+            # give permissions over BAR
             FolderPermission.objects.create(
                 folder=self.bar_folder,
                 user=self.staff_user,
@@ -484,9 +490,13 @@ class FolderListingTest(TestCase):
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
+            folder_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
             # he is now able to see BAR as well
             # because an explicit permission has been given
-            self.assertEquals(len(response.context['paginated_items'].object_list), 2)
+            self.assertEquals(
+                set(folder.pk for folder in folder_list),
+                set([self.foo_folder.pk, self.bar_folder.pk]))
+
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
