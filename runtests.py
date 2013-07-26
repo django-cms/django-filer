@@ -13,9 +13,8 @@ def main(verbosity=1, failfast=False, test_labels=None):
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
             with temp_dir() as FILE_UPLOAD_TEMP_DIR:
-                # from django import VERSION
-                # use_tz = VERSION[:2] >= (1, 4)
-                use_tz = False
+                from django import VERSION
+                use_tz = VERSION[:2] >= (1, 4)
                 warnings.filterwarnings(
                     'error', r"DateTimeField received a naive datetime",
                     RuntimeWarning, r'django\.db\.models\.fields')
