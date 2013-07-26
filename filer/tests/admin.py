@@ -439,8 +439,16 @@ class FolderListingTest(TestCase):
         self.staff_user.is_staff = True
         self.staff_user.save()
         self.parent = Folder.objects.create(name='bar', parent=None, owner=superuser)
-        self.bar_folder = Folder.objects.create(name='bar', parent=self.parent, owner=superuser)
+
         self.foo_folder = Folder.objects.create(name='foo', parent=self.parent, owner=self.staff_user)
+        self.bar_folder = Folder.objects.create(name='bar', parent=self.parent, owner=superuser)
+        self.baz_folder = Folder.objects.create(name='baz', parent=self.parent, owner=superuser)
+
+        file_data = django.core.files.base.ContentFile('some data')
+        file_data.name = 'spam'
+        self.spam_file = File.objects.create(
+            owner=superuser, original_filename='spam',
+            file=file_data, folder=self.parent)
         self.client.login(username='joe', password='x')
 
     def test_with_permissions_disabled(self):
@@ -448,23 +456,24 @@ class FolderListingTest(TestCase):
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
-            folder_list = response.context['paginated_items'].object_list
-            # user sees all folders: FOO, BAR
+            item_list = response.context['paginated_items'].object_list
+            # user sees all items: FOO, BAR, BAZ, SAMP
             self.assertEquals(
-                set(folder.pk for folder in folder_list),
-                set([self.foo_folder.pk, self.bar_folder.pk]))
+                set(folder.pk for folder in item_list),
+                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
+                     self.spam_file.pk]))
 
     def test_folder_ownership(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
-            folder_list = response.context['paginated_items'].object_list
+            item_list = response.context['paginated_items'].object_list
             # user sees only 1 folder : FOO
-            # he doesn't see BAR and BAZ because he doesn't own them
+            # he doesn't see BAR, BAZ and SPAM because he doesn't own them
             # and no permission has been given
             self.assertEquals(
-                set(folder.pk for folder in folder_list),
+                set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk]))
 
     def test_with_permission_given_to_folder(self):
@@ -480,10 +489,27 @@ class FolderListingTest(TestCase):
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
-            folder_list = response.context['paginated_items'].object_list
+            item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
-            # he is now able to see BAR as well
-            # because an explicit permission has been given
             self.assertEquals(
-                set(folder.pk for folder in folder_list),
+                set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk]))
+
+    def test_with_permission_given_to_parent_folder(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            FolderPermission.objects.create(
+                folder=self.parent,
+                user=self.staff_user,
+                type=FolderPermission.CHILDREN,
+                can_edit=FolderPermission.ALLOW,
+                can_read=FolderPermission.ALLOW,
+                can_add_children=FolderPermission.ALLOW)
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            item_list = response.context['paginated_items'].object_list
+            # user sees all items because he has permissions on the parent folder
+            self.assertEquals(
+                set(folder.pk for folder in item_list),
+                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
+                     self.spam_file.pk]))
