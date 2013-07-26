@@ -286,24 +286,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder_files = []
         if folder.is_root:
             folder_children += folder.virtual_folders
-        for f in folder_qs:
-            f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
-                    folder_children.append(f)
-                else:
-                    pass
-            else:
-                folder_children.append(f)
-        for f in file_qs:
-            f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
-                    folder_files.append(f)
-                else:
-                    pass
-            else:
-                folder_files.append(f)
+
+        perms = FolderPermission.objects.get_read_id_list(request.user)
+        if perms != 'All':
+            folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
+            file_qs = file_qs.filter(Q(folder__id__in=perms) | Q(owner=request.user))
+
+        folder_children += folder_qs
+        folder_files += file_qs
+
         try:
             permissions = {
                 'has_edit_permission': folder.has_edit_permission(request),
