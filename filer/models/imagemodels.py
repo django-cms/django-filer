@@ -9,16 +9,25 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from datetime import datetime
+import os
+
+from django import VERSION
+if VERSION[:2] >= (1, 4):
+    from django.utils.timezone import now, make_aware, get_current_timezone
+else:
+    from datetime import now
 from django.core import urlresolvers
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
-import os
 
 logger = logging.getLogger("filer")
+
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
@@ -65,16 +74,22 @@ class Image(File):
             try:
                 exif_date = self.exif.get('DateTimeOriginal', None)
                 if exif_date is not None:
-                    d, t = str.split(exif_date.values)
+                    d, t = exif_date.split(" ")
                     year, month, day = d.split(':')
                     hour, minute, second = t.split(':')
-                    self.date_taken = datetime(
-                                       int(year), int(month), int(day),
-                                       int(hour), int(minute), int(second))
-            except:
+                    if getattr(settings, "USE_TZ", False):
+                        tz = get_current_timezone()
+                        self.date_taken = make_aware(datetime(
+                            int(year), int(month), int(day),
+                            int(hour), int(minute), int(second)), tz)
+                    else:
+                        self.date_taken = datetime(
+                            int(year), int(month), int(day),
+                            int(hour), int(minute), int(second))
+            except Exception, e:
                 pass
         if self.date_taken is None:
-            self.date_taken = datetime.now()
+            self.date_taken = now()
         self.has_all_mandatory_data = self._check_validity()
         try:
             # do this more efficient somehow?
