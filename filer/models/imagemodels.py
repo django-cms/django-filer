@@ -15,7 +15,9 @@ from django import VERSION
 if VERSION[:2] >= (1, 4):
     from django.utils.timezone import now, make_aware, get_current_timezone
 else:
-    from datetime import now
+    from datetime import datetime
+    def now(tz=None):
+        return datetime.now(tz)
 from django.core import urlresolvers
 from django.conf import settings
 from django.db import models
