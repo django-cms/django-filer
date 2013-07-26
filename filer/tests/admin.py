@@ -8,13 +8,14 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 from filer.models.filemodels import File
-from filer.models.foldermodels import Folder
+from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image)
+                                 create_image, SettingsOverride)
+from filer import settings as filer_settings
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -427,3 +428,88 @@ class PermissionAdminTest(TestCase):
         """
         response = self.client.get(reverse('admin:filer_folderpermission_add'))
         self.assertEqual(response.status_code, 200)
+
+
+class FolderListingTest(TestCase):
+
+    def setUp(self):
+        superuser = create_superuser()
+        self.staff_user = User.objects.create_user(
+            username='joe', password='x', email='joe@mata.com')
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+        self.parent = Folder.objects.create(name='bar', parent=None, owner=superuser)
+
+        self.foo_folder = Folder.objects.create(name='foo', parent=self.parent, owner=self.staff_user)
+        self.bar_folder = Folder.objects.create(name='bar', parent=self.parent, owner=superuser)
+        self.baz_folder = Folder.objects.create(name='baz', parent=self.parent, owner=superuser)
+
+        file_data = django.core.files.base.ContentFile('some data')
+        file_data.name = 'spam'
+        self.spam_file = File.objects.create(
+            owner=superuser, original_filename='spam',
+            file=file_data, folder=self.parent)
+        self.client.login(username='joe', password='x')
+
+    def test_with_permissions_disabled(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            item_list = response.context['paginated_items'].object_list
+            # user sees all items: FOO, BAR, BAZ, SAMP
+            self.assertEquals(
+                set(folder.pk for folder in item_list),
+                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
+                     self.spam_file.pk]))
+
+    def test_folder_ownership(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            item_list = response.context['paginated_items'].object_list
+            # user sees only 1 folder : FOO
+            # he doesn't see BAR, BAZ and SPAM because he doesn't own them
+            # and no permission has been given
+            self.assertEquals(
+                set(folder.pk for folder in item_list),
+                set([self.foo_folder.pk]))
+
+    def test_with_permission_given_to_folder(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            # give permissions over BAR
+            FolderPermission.objects.create(
+                folder=self.bar_folder,
+                user=self.staff_user,
+                type=FolderPermission.THIS,
+                can_edit=FolderPermission.ALLOW,
+                can_read=FolderPermission.ALLOW,
+                can_add_children=FolderPermission.ALLOW)
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            item_list = response.context['paginated_items'].object_list
+            # user sees 2 folder : FOO, BAR
+            self.assertEquals(
+                set(folder.pk for folder in item_list),
+                set([self.foo_folder.pk, self.bar_folder.pk]))
+
+    def test_with_permission_given_to_parent_folder(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            FolderPermission.objects.create(
+                folder=self.parent,
+                user=self.staff_user,
+                type=FolderPermission.CHILDREN,
+                can_edit=FolderPermission.ALLOW,
+                can_read=FolderPermission.ALLOW,
+                can_add_children=FolderPermission.ALLOW)
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+            item_list = response.context['paginated_items'].object_list
+            # user sees all items because he has permissions on the parent folder
+            self.assertEquals(
+                set(folder.pk for folder in item_list),
+                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
+                     self.spam_file.pk]))
