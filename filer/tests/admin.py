@@ -14,7 +14,7 @@ from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image)
+                                 create_image, SettingsOverride)
 from filer import settings as filer_settings
 
 
@@ -444,9 +444,7 @@ class FolderListingTest(TestCase):
         self.client.login(username='joe', password='x')
 
     def test_with_permissions_disabled(self):
-        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
-        try:
-            filer_settings.FILER_ENABLE_PERMISSIONS = False
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
@@ -455,30 +453,22 @@ class FolderListingTest(TestCase):
             self.assertEquals(
                 set(folder.pk for folder in folder_list),
                 set([self.foo_folder.pk, self.bar_folder.pk]))
-        finally:
-            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
     def test_folder_ownership(self):
-        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
-        try:
-            filer_settings.FILER_ENABLE_PERMISSIONS = True
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
             folder_list = response.context['paginated_items'].object_list
             # user sees only 1 folder : FOO
-            # he doesn't see BAR because he doesn't own it
+            # he doesn't see BAR and BAZ because he doesn't own them
             # and no permission has been given
             self.assertEquals(
                 set(folder.pk for folder in folder_list),
                 set([self.foo_folder.pk]))
-        finally:
-            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
     def test_with_permission_given_to_folder(self):
-        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
-        try:
-            filer_settings.FILER_ENABLE_PERMISSIONS = True
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
             # give permissions over BAR
             FolderPermission.objects.create(
                 folder=self.bar_folder,
@@ -497,6 +487,3 @@ class FolderListingTest(TestCase):
             self.assertEquals(
                 set(folder.pk for folder in folder_list),
                 set([self.foo_folder.pk, self.bar_folder.pk]))
-
-        finally:
-            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
