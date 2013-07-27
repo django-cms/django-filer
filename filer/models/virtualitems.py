@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
+from django.conf import settings
 
 
 class DummyFolder(mixins.IconsMixin):
@@ -81,6 +82,8 @@ class FolderRoot(DummyFolder):
 
     @property
     def children(self):
+        if settings.FILER_ENABLE_PERMISSIONS:
+            return Folder.objects.all()
         return Folder.objects.filter(parent__isnull=True)
     parent_url = None
 

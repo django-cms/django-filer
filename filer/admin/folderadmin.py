@@ -276,8 +276,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             show_result_count = True
         else:
             folder_qs = folder.children.all()
-            if folder.is_root:
-                folder_qs = Folder.objects.all()
             file_qs = folder.files.all()
             show_result_count = False
 
@@ -295,8 +293,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
             if folder.is_root:
                 folder_qs = folder_qs.exclude(parent__isnull=False, parent__id__in=perms)
-        else:
-            folder_qs = folder_qs.exclude(parent__isnull=False)
 
         folder_children += folder_qs
         folder_files += file_qs
