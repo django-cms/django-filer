@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for item, item_change_permission in paginated_items.object_list %}
+        {% for item, item_perms in paginated_items.object_list %}
             {% if item.file_type == 'Folder' or item.file_type == 'DummyFolder' %}{% with item as subfolder%}
             <tr class="{% cycle rowcolors %}">
                 <td>{% if select_folder and item.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% else %}{% if action_form and item.pk and not is_popup %}<input type="checkbox" class="action-select" value="folder-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
@@ -23,7 +23,7 @@
                 <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.48 }}" alt="{% trans "Folder Icon" %}" /></a></td>
                 <!-- Directory details -->
                 <td>
-                    {% if item.file_type == 'Folder' and item_change_permission %}
+                    {% if item.file_type == 'Folder' and item_perms.change %}
                         <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
                     {% endif %}
                     <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b>{% if not subfolder.is_root %}<span class="tiny"> ({% blocktrans count subfolder.children_count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.file_count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>{% endif %}</div>
@@ -36,20 +36,20 @@
             <tr class="{% cycle rowcolors %}">
                 <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% else %}{% if action_form and not is_popup %}<input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
                 <!-- FileIcon -->
-                <td>{% if item_change_permission %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}<img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" />{% if item_change_permission %}</a>{% endif %}</td>
+                <td>{% if item_perms.change %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}<img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" />{% if item_perms.change %}</a>{% endif %}</td>
                 <!-- Filename/Dimensions -->
                 <td>
-                    {% if item_change_permission %}
+                    {% if item_perms.change %}
                     <a style="display: block; float: right;margin-left: 10px;" class="deletelink" href="{% url 'admin:filer_file_delete' file.pk %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}"" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}">{% trans "Delete" %}</a>
                     <a style="display: block; float: right;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
                     {% endif %}
-                    <div><b>{% if item_change_permission %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}{{ file.label }}{% if item_change_permission %}</a>{% endif %}</b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span></div>
+                    <div><b>{% if item_perms.change %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}{{ file.label }}{% if item_perms.change %}</a>{% endif %}</b><span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span></div>
                     <div>{% trans "Owner" %}: {{ file.owner|default:"n/a" }}</div>
                     {% if enable_permissions %}<div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>{% endif %}
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{% admin_icon_base %}img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{% admin_icon_base %}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
                 <td style="text-align: right;">
-                    <input type="submit" name="move-to-clipboard-{{ file.id }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files or not item_change_permission %} style="color: gray;" disabled="disabled"{% endif %} />
+                    <input type="submit" name="move-to-clipboard-{{ file.id }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files or not item_perms.change %} style="color: gray;" disabled="disabled"{% endif %} />
                 </td>
             </tr>
             {% endwith %}{% endif %}

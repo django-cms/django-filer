@@ -306,7 +306,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             permissions = {}
         folder_files.sort()
         items = folder_children + folder_files
-        items_permissions = [(item, self.has_change_permission(request, item)) for item in items]
+        items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
         paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
@@ -367,7 +367,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     in_clipboards__clipboarditem__clipboard__user=request.user
                     ).distinct(),
                 'paginator': paginator,
-                'paginated_items': paginated_items,  #(item, change_permission)
+                'paginated_items': paginated_items,  # [(item, item_perms), ]
                 'permissions': permissions,
                 'permstest': userperms_for_request(folder, request),
                 'current_url': request.path,

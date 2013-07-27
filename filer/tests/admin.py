@@ -459,7 +459,7 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items: FOO, BAR, BAZ, SAMP
             self.assertEquals(
-                set(folder.pk for folder in item_list),
+                set(folder.pk for folder, folder_perms in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
 
@@ -473,7 +473,7 @@ class FolderListingTest(TestCase):
             # he doesn't see BAR, BAZ and SPAM because he doesn't own them
             # and no permission has been given
             self.assertEquals(
-                set(folder.pk for folder in item_list),
+                set(folder.pk for folder, folder_perms in item_list),
                 set([self.foo_folder.pk]))
 
     def test_with_permission_given_to_folder(self):
@@ -492,7 +492,7 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
             self.assertEquals(
-                set(folder.pk for folder in item_list),
+                set(folder.pk for folder, folder_perms in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk]))
 
     def test_with_permission_given_to_parent_folder(self):
@@ -510,6 +510,6 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items because he has permissions on the parent folder
             self.assertEquals(
-                set(folder.pk for folder in item_list),
+                set(folder.pk for folder, folder_perms in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
