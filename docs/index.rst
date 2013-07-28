@@ -64,3 +64,5 @@ Contents
    settings
    extending_filer
    running_tests
+   dump_payload
+
