@@ -37,11 +37,13 @@ Simple example ``models.py``::
     from django.db import models
     from filer.fields.image import FilerImageField
     from filer.fields.file import FilerFileField
-    
+
     class Company(models.Model):
         name = models.CharField(max_length=255)
-        logo = FilerImageField(null=True, blank=True)
-        disclaimer = FilerFileField(null=True, blank=True)
+        logo = FilerImageField(null=True, blank=True,
+                               related_name="company_logo")
+        disclaimer = FilerFileField(null=True, blank=True,
+                                    related_name="company_disclaimer")
 
 multiple file fields on the same model::
     
