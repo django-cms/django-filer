@@ -3,7 +3,6 @@
 <div id="toolbar">
     <div style="float: left;">
         <form id="changelist-search" action="." method="get">
-            {% csrf_token %}
             <div>
                 <label for="searchbar"><img src="{% admin_icon_base %}icon_searchbox.png" alt="{% trans "Search" %}" /></label>
                 {% if is_popup %}
