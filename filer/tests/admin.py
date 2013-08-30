@@ -1,13 +1,13 @@
 #-*- coding: utf-8 -*-
 import os
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 import django.core.files
-from django.contrib.admin import helpers
+from django.contrib.admin import helpers, site
+from django.contrib.auth.models import User, Group
 from django.http import HttpRequest
-
 from filer.models.filemodels import File
-from filer.models.foldermodels import Folder
+from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
@@ -20,6 +20,7 @@ class FilerFolderAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+
     def tearDown(self):
         self.client.logout()
     def test_filer_app_index_get(self):
@@ -281,7 +282,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |   |-bar
           |
           |--bar
-        
+
         and try to move the owter bar in foo. This has to fail since it would result
         in two folders with the same name and parent.
         """
@@ -441,6 +442,34 @@ class PermissionAdminTest(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+        self.group1 = Group.objects.create(name='group1')
+        self.group2 = Group.objects.create(name='group2')
+        self.user1 = User.objects.create(username='alice', password='secret')
+        self.user2 = User.objects.create(username='bob', password='secret')
+        self.user3 = User.objects.create(username='chuck', password='secret')
+        self.group1.user_set.add(self.user1)
+        self.group1.user_set.add(self.user2)
+        self.group2.user_set.add(self.user3)
+        self.factory = RequestFactory()
+        self.folder1 = Folder.objects.create(name='group1_folder', owner=self.user1)
+        self.folder2 = Folder.objects.create(name='group2_folder', owner=self.user3)
+        self.folder_permission1 = FolderPermission.objects.create(
+            folder=self.folder1,
+            type=FolderPermission.CHILDREN,
+            user=self.user1,
+            can_edit=FolderPermission.ALLOW,
+            can_read=FolderPermission.ALLOW,
+            can_add_children=FolderPermission.ALLOW,
+        )
+        self.folder_permission2 = FolderPermission.objects.create(
+            folder=self.folder2,
+            type=FolderPermission.CHILDREN,
+            user=self.user3,
+            can_edit=FolderPermission.ALLOW,
+            can_read=FolderPermission.ALLOW,
+            can_add_children=FolderPermission.ALLOW,
+        )
+        
 
     def tearDown(self):
         self.client.logout()
@@ -451,3 +480,29 @@ class PermissionAdminTest(TestCase):
         """
         response = self.client.get(reverse('admin:filer_folderpermission_add'))
         self.assertEqual(response.status_code, 200)
+
+    def test_acl_users_see_only_their_folder_permissions(self):
+        """
+        Test the access control for displaying the changelist of the folder permissions.
+        Users should only have access to their own permissions.
+        """
+        folder_permissions_url = reverse('admin:filer_folderpermission_changelist')
+        folder_permission_admin = site._registry[FolderPermission]
+        request = self.factory.get(folder_permissions_url)
+        request.user = self.user1
+        qs = folder_permission_admin.queryset(request)
+        self.assertIn(self.folder_permission1, qs)
+        self.assertNotIn(self.folder_permission2, qs)
+
+    def test_acl_supoerusers_see_all_folder_permissions(self):
+        """
+        Test the access control for displaying the changelist of the folder permissions.
+        SuperUsers should have access to their all folder permissions.
+        """
+        folder_permissions_url = reverse('admin:filer_folderpermission_changelist')
+        folder_permission_admin = site._registry[FolderPermission]
+        request = self.factory.get(folder_permissions_url)
+        request.user = self.superuser
+        permissions_qs = folder_permission_admin.queryset(request)
+        self.assertIn(self.folder_permission1, permissions_qs)
+        self.assertIn(self.folder_permission2, permissions_qs)

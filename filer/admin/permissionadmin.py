@@ -40,6 +40,6 @@ class PermissionAdmin(admin.ModelAdmin):
         qs = super(PermissionAdmin, self).queryset(request)
         if request.user.is_superuser:
             return qs
-        # Only the owner of the directory is able to view/modify permissions
+        # Only the owner of the directory is able to view/modify permissions in the admin
         filtered_qs = qs.filter(folder__owner=request.user)
         return filtered_qs
