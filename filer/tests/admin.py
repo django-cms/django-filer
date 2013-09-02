@@ -497,7 +497,7 @@ class PermissionAdminTest(TestCase):
         }
 
     def assert_user_response(self, user, response):
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         qs = response.context['cl'].query_set
         self.assert_user_folder_permission_qs(user, qs)
 
