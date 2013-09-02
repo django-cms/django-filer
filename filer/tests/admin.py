@@ -1,25 +1,33 @@
 #-*- coding: utf-8 -*-
 import os
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 import django.core.files
-from django.contrib.admin import helpers
+from django.contrib.admin import helpers, site
+from django.contrib.auth.models import User, Group
 from django.http import HttpRequest
-
 from filer.models.filemodels import File
-from filer.models.foldermodels import Folder
+from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
-from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image)
+from filer.tests.helpers import (
+    create_superuser,
+    create_folder_structure,
+    create_image,
+    create_staffuser,
+    create_folder_for_user,
+    create_folderpermission_for_user,
+    grant_all_folderpermissions_for_group,
+)
 
 
 class FilerFolderAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+
     def tearDown(self):
         self.client.logout()
     def test_filer_app_index_get(self):
@@ -281,7 +289,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |   |-bar
           |
           |--bar
-        
+
         and try to move the owter bar in foo. This has to fail since it would result
         in two folders with the same name and parent.
         """
@@ -440,14 +448,94 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
 class PermissionAdminTest(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
-        self.client.login(username='admin', password='secret')
+        self.group1 = Group.objects.create(name='group1')
+        self.group2 = Group.objects.create(name='group2')
+        self.user1 = create_staffuser('Alice')
+        self.user2 = create_staffuser('Bob')
+        self.user3 = create_staffuser('Chuck')
+        self.group1.user_set.add(self.user1)
+        self.group1.user_set.add(self.user2)
+        self.group2.user_set.add(self.user3)
+        grant_all_folderpermissions_for_group(self.group1)
+        grant_all_folderpermissions_for_group(self.group2)
+        self.factory = RequestFactory()
+        self.folder1 = create_folder_for_user('folder1', self.user1)
+        self.folder3 = create_folder_for_user('folder3', self.user1)
+        self.folder2 = create_folder_for_user('folder2', self.user3)
+        self.folder_permission1 = create_folderpermission_for_user(
+            self.folder1, self.user1
+        )
+        self.folder_permission3 = create_folderpermission_for_user(
+            self.folder3, self.user1
+        )
+        self.folder_permission2 = create_folderpermission_for_user(
+            self.folder2, self.user3
+        )
+        all_folderpermissions = [
+            self.folder_permission1,
+            self.folder_permission2,
+            self.folder_permission3,
+        ]
+        self.users = {
+            self.user1: {
+                'folderpermissions': [
+                    self.folder_permission1,
+                    self.folder_permission3,
+                ]
+            },
+            self.user2: {
+                'folderpermissions': [],
+            },
+            self.user3: {
+                'folderpermissions': [
+                    self.folder_permission2,
+                ]
+            },
+            self.superuser: {
+                'folderpermissions': all_folderpermissions,
+            }
+        }
+
+    def assert_user_response(self, user, response):
+        self.assertTrue(200, response.status_code)
+        qs = response.context['cl'].query_set
+        self.assert_user_folder_permission_qs(user, qs)
+
+    def assert_user_folder_permission_qs(self, user, qs):
+        self.assertItemsEqual(qs, self.users[user]['folderpermissions'])
+
+    def assert_user_adminview(self, user):
+        self.client.login(username=user, password='secret')
+        response = self.client.get(
+            reverse('admin:filer_folderpermission_changelist')
+        )
+        self.assert_user_response(user, response)
+        self.client.logout()
+
+    def assert_user_query(self, user):
+        folder_permission_admin = site._registry[FolderPermission]
+        request = self.factory.get(
+            reverse('admin:filer_folderpermission_changelist')
+        )
+        request.user = user
+        qs = folder_permission_admin.queryset(request)
+        self.assert_user_folder_permission_qs(user, qs)
 
     def tearDown(self):
         self.client.logout()
 
     def test_render_add_view(self):
         """
-        Really stupid and simple test to see if the add Permission view can be rendered
+        Really stupid and simple test to see if the add Permission view can
+        be rendered.
         """
         response = self.client.get(reverse('admin:filer_folderpermission_add'))
         self.assertEqual(response.status_code, 200)
+
+    def test_admin_queries(self):
+        for user in self.users.keys():
+            self.assert_user_query(user)
+
+    def test_admin_view(self):
+        for user in self.users.keys():
+            self.assert_user_adminview(user)

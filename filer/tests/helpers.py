@@ -1,8 +1,8 @@
 #-*- coding: utf-8 -*-
 from PIL import Image, ImageChops, ImageDraw
 
-from django.contrib.auth.models import User
-from filer.models.foldermodels import Folder
+from django.contrib.auth.models import User, Permission
+from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 
 
@@ -71,3 +71,42 @@ class SettingsOverride(object):
                 setattr(self.settings_module, key, value)
             else:
                 delattr(self.settings_module,key)
+
+
+def create_staffuser(user):
+    user = User.objects.create_user(
+        username=user,
+        password='secret',
+    )
+    user.is_staff = True
+    user.is_active = True
+    user.save()
+    return user
+
+
+def create_folder_for_user(foldername, user):
+    folder = Folder.objects.create(
+        name=foldername,
+        owner=user,
+    )
+    return folder
+
+
+def create_folderpermission_for_user(folder, user):
+    folder_permission = FolderPermission.objects.create(
+        folder=folder,
+        type=FolderPermission.CHILDREN,
+        user=user,
+        can_edit=FolderPermission.ALLOW,
+        can_read=FolderPermission.ALLOW,
+        can_add_children=FolderPermission.ALLOW,
+    )
+    return folder_permission
+
+
+def grant_all_folderpermissions_for_group(group):
+    permission_set = Permission.objects.filter(
+        codename__endswith='folderpermission',
+    )
+    for permission in permission_set:
+        group.permissions.add(permission)
