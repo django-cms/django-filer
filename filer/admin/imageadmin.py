@@ -43,9 +43,10 @@ class ImageAdmin(FileAdmin):
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
     extra_main_fields=('default_alt_text', 'default_caption',),
     extra_fieldsets=(
-        ('Subject Location', {
-            'fields': ('subject_location',),
-            'classes': ('collapse',),
-        }),
+        # due to custom requirements:Subject Location section should be hidden
+        # ('Subject Location', {
+        #     'fields': ('subject_location',),
+        #     'classes': ('collapse',),
+        # }),
     )
 )

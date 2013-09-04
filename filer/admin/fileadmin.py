@@ -39,7 +39,9 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 'fields': ('name', 'owner', 'description',) + extra_main_fields,
             }),
             (_('Advanced'), {
-                'fields': ('file', 'sha1',) + extra_advanced_fields,
+                # due to custom requirements: sha1 field should be hidden
+                # 'fields': ('file', 'sha1',) + extra_advanced_fields,
+                'fields': ('file', ) + extra_advanced_fields,
                 'classes': ('collapse',),
                 }),
             ) + extra_fieldsets
