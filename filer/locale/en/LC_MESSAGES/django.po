@@ -265,7 +265,7 @@ msgstr ""
 
 #: models/filemodels.py:50
 msgid "owner"
-msgstr ""
+msgstr "uploaded by"
 
 #: models/filemodels.py:52 models/foldermodels.py:105
 msgid "uploaded at"
@@ -693,7 +693,7 @@ msgstr ""
 #: templates/admin/filer/folder/directory_table.html:30
 #: templates/admin/filer/folder/directory_table.html:45
 msgid "Owner"
-msgstr ""
+msgstr "Uploaded by"
 
 #: templates/admin/filer/folder/directory_table.html:37
 msgid "Select this file"
