@@ -63,7 +63,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     actions = [
         'move_to_clipboard', 'files_set_public', 'files_set_private',
         'delete_files_or_folders', 'move_files_and_folders',
-        'copy_files_and_folders', 'resize_images', 'rename_files',
+        'copy_files_and_folders',
+        # custom requirements: hide 'resize_images' and 'rename_files' actions
+        # 'resize_images', 'rename_files',
         'extract_files']
 
     def get_form(self, request, obj=None, **kwargs):
