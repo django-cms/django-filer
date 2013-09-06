@@ -61,7 +61,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
     actions = [
-        'move_to_clipboard', 'files_set_public', 'files_set_private',
+        'move_to_clipboard',
+        # custom requirements: hide 'set public/private' actions
+        # 'files_set_public', 'files_set_private',
         'delete_files_or_folders', 'move_files_and_folders',
         'copy_files_and_folders',
         # custom requirements: hide 'resize_images' and 'rename_files' actions
