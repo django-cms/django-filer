@@ -98,6 +98,14 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
+    SITE_FOLDER = 0
+    CORE_FOLDER = 1
+
+    FOLDER_TYPES = {
+        SITE_FOLDER: 'Site Folder',
+        CORE_FOLDER: 'Core Folder',
+    }
+
     parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
                                related_name='children')
     name = models.CharField(_('name'), max_length=255)
@@ -110,6 +118,9 @@ class Folder(models.Model, mixins.IconsMixin):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'),auto_now=True)
+
+    folder_type = models.IntegerField(choices=FOLDER_TYPES.items(),
+                                      default=SITE_FOLDER)
 
     objects = FolderManager()
 
