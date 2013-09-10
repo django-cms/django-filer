@@ -52,13 +52,48 @@ class AddFolderPopupForm(forms.ModelForm):
         fields = ('name',)
 
 
+class FolderFormWrapper(object):
+
+    def __init__(self, form_obj):
+        self.form = form_obj
+        self.add_validation()
+
+    def get_form(self):
+        return self.form
+
+    def add_validation(self):
+        def clean_site(form_obj):
+            cleaned_site = form_obj.cleaned_data['site']
+            if (form_obj.instance.folder_type == Folder.SITE_FOLDER and
+                not cleaned_site):
+                raise ValidationError('Folder is a Site folder. '
+                                      'Site is required.')
+            if (form_obj.instance.folder_type == Folder.CORE_FOLDER and
+                cleaned_site):
+                raise ValidationError('Folder is a Core folder. '
+                                      'Site must be empty.')
+            return cleaned_site
+
+        def clean(form_obj):
+            cleaned_data = form_obj.cleaned_data
+            folders_with_same_name = Folder.objects.filter(
+                parent=form_obj.instance.parent,
+                name=cleaned_data['name'])
+            if form_obj.instance.pk:
+                folders_with_same_name = folders_with_same_name.exclude(
+                    pk=form_obj.instance.pk)
+            if folders_with_same_name.exists():
+                raise ValidationError('Folder with this name already exists.')
+            return cleaned_data
+
+        self.form.clean = clean
+        self.form.clean_site = clean_site
+
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
-    exclude = ('parent',)
     list_per_page = 20
     list_filter = ('owner',)
     search_fields = ['name', 'files__name']
-    raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
     actions = [
         'move_to_clipboard', 'files_set_public', 'files_set_private',
@@ -67,6 +102,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # custom requirements: hide 'resize_images' and 'rename_files' actions
         # 'resize_images', 'rename_files',
         'extract_files']
+
+    # form fields
+    exclude = ('parent',)
+    raw_id_fields = ('owner', 'site', )
+    readonly_fields = ('folder_type', )
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -79,22 +119,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             folder_form = super(FolderAdmin, self).get_form(
                 request, obj=None, **kwargs)
-
-            def folder_form_clean(form_obj):
-                cleaned_data = form_obj.cleaned_data
-                folders_with_same_name = Folder.objects.filter(
-                    parent=form_obj.instance.parent,
-                    name=cleaned_data['name'])
-                if form_obj.instance.pk:
-                    folders_with_same_name = folders_with_same_name.exclude(
-                        pk=form_obj.instance.pk)
-                if folders_with_same_name.exists():
-                    raise ValidationError('Folder with this name already exists.')
-                return cleaned_data
-
-            # attach clean to the default form rather than defining a new form class
-            folder_form.clean = folder_form_clean
-            return folder_form
+            # it will get ugly if building form from scratch
+            return FolderFormWrapper(folder_form).get_form()
 
     def save_form(self, request, form, change):
         """

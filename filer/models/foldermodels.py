@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 import itertools
-
+from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
@@ -121,6 +121,10 @@ class Folder(models.Model, mixins.IconsMixin):
 
     folder_type = models.IntegerField(choices=FOLDER_TYPES.items(),
                                       default=SITE_FOLDER)
+
+    site = models.ForeignKey(Site, null=True, blank=True,
+                             help_text=_("Select the site which will use "
+                                         "this folder."))
 
     objects = FolderManager()
 
