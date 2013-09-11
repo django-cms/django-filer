@@ -4,11 +4,6 @@ from django.core.urlresolvers import reverse
 
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request):
-        # we don't have a "add" permission... but all adding is handled
-        # by special methods that go around these permissions anyway
-        # TODO: reactivate return False
-        return False
 
     def has_change_permission(self, request, obj=None):
         if hasattr(obj, 'has_edit_permission'):
@@ -24,9 +19,12 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
         return self.has_change_permission(request, obj)
 
     def _get_post_url(self, obj):
-        """ Needed to retrieve the changelist url as Folder/File can be extended
-        and admin url may change """
-        ## Code borrowed from django ModelAdmin to determine changelist on the fly
+        """
+        Needed to retrieve the changelist url as Folder/File can be extended
+            and admin url may change
+        """
+        # Code borrowed from django ModelAdmin to determine
+        #      changelist on the fly
         opts = obj._meta
         module_name = opts.module_name
         return reverse('admin:%s_%s_changelist' %

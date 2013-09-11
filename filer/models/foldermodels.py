@@ -106,8 +106,8 @@ class Folder(models.Model, mixins.IconsMixin):
         CORE_FOLDER: 'Core Folder',
     }
 
-    parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
-                               related_name='children')
+    parent = models.ForeignKey('self', verbose_name=('parent'), null=True,
+                               blank=True, related_name='children')
     name = models.CharField(_('name'), max_length=255)
 
     owner = models.ForeignKey(auth_models.User, verbose_name=('owner'),
@@ -117,7 +117,7 @@ class Folder(models.Model, mixins.IconsMixin):
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('modified at'),auto_now=True)
+    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
 
     folder_type = models.IntegerField(choices=FOLDER_TYPES.items(),
                                       default=SITE_FOLDER)
@@ -129,18 +129,66 @@ class Folder(models.Model, mixins.IconsMixin):
     objects = FolderManager()
 
     def clean(self):
+
         if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
             raise ValidationError(
                 _(u'%s is reserved for internal use. '
                   'Please choose a different name') % self.name)
 
+        duplicate_folders_q = Folder.objects.filter(
+            parent=self.parent_id,
+            name=self.name)
+        if self.pk:
+            duplicate_folders_q = duplicate_folders_q.exclude(
+                pk=self.pk)
+
+        if duplicate_folders_q.exists():
+            raise ValidationError(
+                'File or folder with this name already exists.')
+
+        if not self.parent:
+            if (self.folder_type == Folder.SITE_FOLDER and
+                not self.site):
+                raise ValidationError('Folder is a Site folder. '
+                                      'Site is required.')
+            if (self.folder_type == Folder.CORE_FOLDER and not self.parent and
+                self.site):
+                raise ValidationError('Folder is a Core folder. '
+                                      'Site must be empty.')
+
+    def set_site_for_folder_type(self):
+        """
+        This will keep the rules:
+           * site for site folders can be changed only for the folders
+                with no parent(root folders)
+           * core folders should not have any site
+        """
+        if self.folder_type == Folder.CORE_FOLDER:
+            self.site = None
+        else:
+            # site folders - make sure it keeps the site from parent
+            if self.parent:
+                self.site = self.parent.site
+
+    def update_descendants_folder_type(self):
+        """
+        Folder type should be preserved to all descendants
+        """
+        self.get_descendants().update(
+            folder_type=self.folder_type,
+            site=self.site)
+
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
-            return super(Folder, self).save(*args, **kwargs)
+            self.set_site_for_folder_type()
+            super(Folder, self).save(*args, **kwargs)
+            self.update_descendants_folder_type()
+            return
 
         with transaction.commit_manually():
-            # The manual transaction management here breaks the transaction management
-            # from django.contrib.admin.options.ModelAdmin.change_view
+            # The manual transaction management here breaks the transaction
+            #   management from
+            #   django.contrib.admin.options.ModelAdmin.change_view
             storages = []
             old_locations = []
             new_locations = []
@@ -150,7 +198,9 @@ class Folder(models.Model, mixins.IconsMixin):
                     storage.delete(location)
 
             try:
+                self.set_site_for_folder_type()
                 super(Folder, self).save(*args, **kwargs)
+                self.update_descendants_folder_type()
                 all_files = []
                 for folder in self.get_descendants(include_self=True):
                     all_files += folder.files
@@ -196,7 +246,7 @@ class Folder(models.Model, mixins.IconsMixin):
         children of this folder and have their names in the given list of names.
         """
         q = Q(name__in=names)
-        q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
+        q |= Q(original_filename__in=names) & (Q(name__isnull=True) | Q(name=''))
         files_with_names = self.all_files.filter(q)
         folders_with_names = self.children.filter(name__in=names)
         return list(itertools.chain(files_with_names, folders_with_names))
@@ -225,7 +275,8 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def pretty_logical_path(self):
-        return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+        return u"/%s" % u"/".join([f.name
+                                   for f in self.logical_path + [self]])
 
     @property
     def quoted_logical_path(self):
@@ -389,4 +440,3 @@ class FolderPermission(models.Model):
         verbose_name = _('folder permission')
         verbose_name_plural = _('folder permissions')
         app_label = 'filer'
-

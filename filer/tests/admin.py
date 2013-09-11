@@ -4,6 +4,7 @@ from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers, site
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User, Group
 from django.http import HttpRequest
 from filer.models.filemodels import File
@@ -41,14 +42,22 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_make_root_folder_post(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'),
-                                    {
-                                        "name":FOLDER_NAME,
-                                    })
+        data_to_post = {
+             "name":FOLDER_NAME,
+        }
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            data_to_post)
+        self.assertIn('Site is required', response.content)
+
+        data_to_post['site'] = 1
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            data_to_post)
+
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
-        #TODO: not sure why the status code is 200
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_filer_directory_listing_root_empty_get(self):
         response = self.client.post(reverse('admin:filer-directory_listing-root'))
@@ -63,36 +72,58 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_validate_no_duplcate_folders(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
-                "name":FOLDER_NAME,
-                "_popup": 1
-                })
+        post_data = { "name": FOLDER_NAME, "_popup": 1 }
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
+        self.assertIn('Site is required', response.content)
+        post_data['site'] = 1
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
         # and create another one
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'),
-                                    {"name":FOLDER_NAME, "_popup": 1})
+        post_data = { "name": FOLDER_NAME, "_popup": 1 }
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
         # second folder didn't get created
         self.assertEqual(Folder.objects.count(), 1)
         self.assertIn('File or folder with this name already exists', response.content)
 
     def test_validate_no_duplcate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
-                "name": "foo",
-                "_popup": 1})
+        post_data = { "name": "foo", "_popup": 1}
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
+        self.assertIn('Site is required', response.content)
+        post_data['site'] = 1
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
+
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, "foo")
         # and create another one
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
-                "name": "bar",
-                "_popup": 1})
+        post_data = { "name": "bar", "_popup": 1 }
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
+        self.assertIn('Site is required', response.content)
+
+        post_data['site'] = 1
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            post_data)
+
         self.assertEqual(Folder.objects.count(), 2)
         bar = Folder.objects.get(name="bar")
         response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
                 "name": "foo",
                 "_popup": 1})
-        self.assertIn('Folder with this name already exists', response.content)
+        self.assertIn('File or folder with this name already exists', response.content)
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
         self.assertEqual(bar.name, "bar")
