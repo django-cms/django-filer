@@ -425,9 +425,10 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
     def test_resize_images_action(self):
         # TODO: Test recursive (files and folders tree) processing
-
         self.assertEqual(self.image_obj.width, 800)
         self.assertEqual(self.image_obj.height, 600)
+        # since the 'resize' action is disabled from the admin
+        return
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
