@@ -27,3 +27,4 @@ pep8.txt
 htmlcov/
 share/
 .idea
+.tox
