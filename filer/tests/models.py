@@ -3,6 +3,7 @@ import os
 import tempfile
 import urlparse
 import zipfile
+import time
 
 from django.forms.models import modelform_factory
 from django.db.models import Q
@@ -205,8 +206,11 @@ class FilerApiTests(TestCase):
         with SettingsOverride(filer_settings,
                               CDN_DOMAIN=cdn_domain,
                               USE_TZ=True,
-                              CDN_INVALIDATION_TIME=0):
+                              CDN_INVALIDATION_TIME=1):
             image = self.create_filer_image()
+            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            self.assertEqual(netloc, '')
+            time.sleep(1)
             _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
             self.assertEqual(netloc, cdn_domain)
             for url in image.thumbnails.values():
