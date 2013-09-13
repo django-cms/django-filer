@@ -4,6 +4,23 @@ from PIL import Image, ImageChops, ImageDraw
 from django.contrib.auth.models import User, Permission
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
+from contextlib import contextmanager
+
+
+@contextmanager
+def login_using(client, user_type=None):
+    username = 'login_using_foo'
+    password = 'secret'
+    user = User.objects.create_user(username=username, password=password)
+    if user_type == 'superuser':
+        user.is_superuser = True
+    user.is_staff = True
+    user.is_active = True
+    user.save()
+    client.login(username=username, password=password)
+    yield
+    client.logout()
+    user.delete()
 
 
 def create_superuser():
@@ -48,23 +65,23 @@ class SettingsOverride(object):
     """
     Overrides Django settings within a context and resets them to their inital
     values on exit.
-    
+
     Example:
-    
+
         with SettingsOverride(DEBUG=True):
             # do something
     """
-    
+
     def __init__(self, settings_module, **overrides):
         self.settings_module = settings_module
         self.overrides = overrides
-        
+
     def __enter__(self):
         self.old = {}
         for key, value in self.overrides.items():
             self.old[key] = getattr(self.settings_module, key, None)
             setattr(self.settings_module, key, value)
-        
+
     def __exit__(self, type, value, traceback):
         for key, value in self.old.items():
             if value is not None:

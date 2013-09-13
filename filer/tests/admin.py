@@ -14,6 +14,7 @@ from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (
+    login_using,
     create_superuser,
     create_folder_structure,
     create_image,
@@ -31,6 +32,7 @@ class FilerFolderAdminUrlsTests(TestCase):
 
     def tearDown(self):
         self.client.logout()
+
     def test_filer_app_index_get(self):
         response = self.client.get(reverse('admin:app_list', args=('filer',)))
         self.assertEqual(response.status_code, 200)
@@ -418,6 +420,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
 class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
+
     def test_delete_files_or_folders_action(self):
         self.assertNotEqual(File.objects.count(), 0)
         self.assertNotEqual(Image.objects.count(), 0)
@@ -573,3 +576,220 @@ class PermissionAdminTest(TestCase):
     def test_admin_view(self):
         for user in self.users.keys():
             self.assert_user_adminview(user)
+
+
+class TestFolderTypeFunctionality(TestCase):
+
+    # def setUp(self):
+    #     self.superuser = create_superuser()
+    #     self.client.login(username='admin', password='secret')
+
+    # def tearDown(self):
+    #     self.client.logout()
+
+    def test_default_add_view_is_forbidden(self):
+        with login_using(self.client, 'superuser'):
+            response = self.client.get(reverse('admin:filer_folder_add'))
+            self.assertEqual(response.status_code, 403)
+
+        with login_using(self.client):
+            response = self.client.get(reverse('admin:filer_folder_add'))
+            self.assertEqual(response.status_code, 403)
+
+        # only superusers can do operations on root folders
+        # regular users can do operations inside root folders only
+
+    def test_add_root_folder_for_regular_user(self):
+        with login_using(self.client):
+            # regular users should not be able to add root folders at all
+            response = self.client.get(
+                reverse('admin:filer-directory_listing-make_root_folder'))
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                reverse('admin:filer-directory_listing-make_root_folder'), {})
+            self.assertEqual(response.status_code, 403)
+
+    def test_change_root_folder_for_regular_user(self):
+        with login_using(self.client):
+            f1 = Folder.objects.create(name='foo')
+            # regular users should not be able to change root folders at all
+            for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
+                Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
+                response = self.client.get(
+                    reverse('admin:filer_folder_change', args=(f1.pk, )))
+                self.assertEqual(response.status_code, 403)
+                response = self.client.post(
+                    reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+                self.assertEqual(response.status_code, 403)
+
+    def test_change_child_site_folder_for_regular_user(self):
+        with login_using(self.client):
+            f1 = Folder.objects.create(name='foo')
+            f2 = Folder.objects.create(name='foo_bar', parent=f1)
+            # regular users should be able to create child folders
+            response = self.client.get(
+                reverse('admin:filer_folder_change', args=(f2.pk, )))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('adminform', response.context_data)
+            # make sure the folder that is going to be saved is a site folder
+            form = response.context_data['adminform'].form
+            self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
+            # only field 'name' should be visible
+            self.assertItemsEqual(['name'], form.fields.keys())
+            # check if save worked
+            response = self.client.post(
+                reverse('admin:filer_folder_change', args=(f2.pk, )), {
+                    'name': 'foo_bar__changed'
+                })
+            self.assertEqual(response.status_code, 302)
+            f2__changed = Folder.objects.get(id=f2.pk)
+            self.assertEqual(f2__changed.name, 'foo_bar__changed')
+            self.assertEqual(f2__changed.folder_type, Folder.SITE_FOLDER)
+
+    def test_change_core_folder_for_regular_user(self):
+        with login_using(self.client):
+            f1 = Folder.objects.create(
+                name='foo', folder_type=Folder.CORE_FOLDER)
+            f2 = Folder.objects.create(
+                name='foo_bar', parent=f1, folder_type=Folder.CORE_FOLDER)
+            self.assertEqual(f1.folder_type, Folder.CORE_FOLDER)
+            self.assertEqual(f2.folder_type, Folder.CORE_FOLDER)
+            # No one should be able to change core folders
+            response = self.client.delete(
+                reverse('admin:filer_folder_delete', args=(f2.pk, )))
+            self.assertEqual(response.status_code, 403)
+            response = self.client.delete(
+                reverse('admin:filer_folder_delete', args=(f1.pk, )))
+            self.assertEqual(response.status_code, 403)
+
+
+    def test_delete_root_folder_for_regular_user(self):
+        with login_using(self.client):
+            f1 = Folder.objects.create(name='foo')
+            # regular users should not be able to delete root folders at all
+            for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
+                Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
+                response = self.client.delete(
+                    reverse('admin:filer_folder_delete', args=(f1.pk, )))
+                self.assertEqual(response.status_code, 403)
+                #TODO
+                # response = self.client.post(
+                #     reverse('admin:filer-directory_listing-root'), {
+                #     'action': 'delete_files_or_folders',
+                #     'post': 'yes',
+                #     helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+                # })
+
+    def test_delete_child_site_folder_for_regular_user(self):
+        pass
+    def test_delete_child_core_folder_for_regular_user(self):
+        pass
+
+
+    def test_permissions_on_root_folders(self):
+
+
+        with login_using(self.client, 'superuser'):
+            # superusers should be able to add only root site folders
+            response = self.client.get(
+                reverse('admin:filer-directory_listing-make_root_folder'))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('adminform', response.context_data)
+            # make sure the folder that is going to be saved is a site folder
+            form = response.context_data['adminform'].form
+            self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
+            # only fields 'site', 'name' should be visible
+            self.assertItemsEqual(['site', 'name'], form.fields.keys())
+"""
+    def test_permissions_CRUD_core_folder(self):
+        # nobody can add/change/delete core folders or files from them
+        # these are only set programatically
+
+
+        ### TODO: root & regular folders
+        pass
+
+    def test_permissions_CRUD_site_folder(self):
+        ### TODO: root & regular folders
+        pass
+
+######## UPLOAD FILES ########
+
+    def test_upload_in_core_folders(self):
+        pass
+
+    def test_upload_in_site_folders(self):
+        pass
+
+####### MOVE FILES ######
+
+    def test_move_in_core_folders(self):
+        pass
+
+    def test_move_from_core_folders(self):
+        pass
+
+    def test_move_in_site_folders(self):
+        pass
+
+    def test_move_from_site_folders(self):
+        pass
+
+
+####### COPY FILES #######
+
+    def test_copy_from_core_folders(self):
+        pass
+
+    def test_copy_to_core_folders(self):
+        pass
+
+    def test_copy_from_site_folders(self):
+        pass
+
+    def test_copy_to_site_folders(self):
+        pass
+
+####### EXTRACT FILES #######
+
+    def test_extract_files_in_core_folder(self):
+        # root & regular
+        pass
+
+    def test_extract_files_in_site_folder(self):
+        # root & regular
+        pass
+
+    def test_extract_in_unfiled_folder(self):
+        pass
+
+####### FOLDER auto-set/generate values #######
+
+    def test_folder_owner_set_by_request_user(self):
+        pass
+
+    def test_make_folder_view_sets_parent_id_correctly(self):
+        # from root creation or change
+        # from regular folder creation or change
+        pass
+
+    def test_validation_works_on_model_and_form(self):
+        pass
+
+    def test_folder_type_conversion_propagate_changes(self):
+        pass
+
+    def test_folder_type_conversion(self):
+        # from core to site folder
+        # viceversa
+        # changes are propagated to children
+        pass
+
+    def test_CRUD_operations_on_folder_propagates_changes_to_children(self):
+        pass
+
+############## NO MORE FILES ON unfiled files folder #####
+
+    def test_upload_to_unfiled_files_folder(self):
+        pass
+"""

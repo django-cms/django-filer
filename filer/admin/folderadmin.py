@@ -147,6 +147,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             obj = None
 
+        if obj:
+            if obj.folder_type == Folder.CORE_FOLDER:
+                raise PermissionDenied
+
+            if not obj.parent and not request.user.is_superuser:
+                raise PermissionDenied
+
         r = super(FolderAdmin, self).delete_view(
                     request=request, object_id=object_id,
                     extra_context=extra_context)
@@ -179,10 +186,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^(?P<folder_id>\d+)/list/$',
                 self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing'),
-
-            url(r'^(?P<folder_id>\d+)/make_folder/$',
-                self.admin_site.admin_view(self.make_folder),
-                name='filer-directory_listing-make_folder'),
             url(r'^make_folder/$',
                 self.admin_site.admin_view(self.make_folder),
                 name='filer-directory_listing-make_root_folder'),
@@ -198,6 +201,20 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         url_patterns.extend(urls)
         return url_patterns
 
+    def change_view(self, request, object_id, *args, **kwargs):
+        obj = self.get_object(request, unquote(object_id))
+        if obj.folder_type == Folder.CORE_FOLDER:
+            raise PermissionDenied
+
+        if not obj.parent and not request.user.is_superuser:
+            raise PermissionDenied
+
+        return super(FolderAdmin, self).change_view(
+            request, object_id, *args, **kwargs)
+
+    def add_view(self, request, *args, **kwargs):
+        raise PermissionDenied
+
     def make_folder(self, request, folder_id=None, *args, **kwargs):
         if not folder_id:
             folder_id = request.REQUEST.get('parent_id', None)
@@ -209,15 +226,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if request.user.is_superuser:
             pass
         elif folder is None:
-            # regular users may not add root folders unless configured
-            #       otherwise
-            if not filer_settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS:
-                raise PermissionDenied
+            # regular users may not add root folders
+            raise PermissionDenied
         elif not folder.has_add_children_permission(request):
             # the user does not have the permission to add subfolders
             raise PermissionDenied
 
-        response = self.add_view(request, *args, **kwargs)
+        response = super(FolderAdmin, self).add_view(request, *args, **kwargs)
         # this check should be enough since only save button appears
         if (request.method == 'POST' and "_popup" in request.POST and
             response.status_code == 200 and
@@ -650,6 +665,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Next, it delets all selected files and/or folders and redirects back
         to the folder.
         """
+
+        if folders_queryset.filter(
+                Q(folder_type=Folder.CORE_FOLDER) |
+                Q(parent__isnull=True)).exists():
+            raise PermissionDenied
+
+        if files_queryset.filter(
+            folder__folder_type=Folder.CORE_FOLDER).exists():
+            raise PermissionDenied
+
         opts = self.model._meta
         app_label = opts.app_label
 
