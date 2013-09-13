@@ -45,12 +45,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 'classes': ('collapse',),
                 }),
             ) + extra_fieldsets
-        if settings.FILER_ENABLE_PERMISSIONS:
-            fieldsets = fieldsets + (
-                (None, {
-                    'fields': ('is_public',)
-                }),
-            )
+        # custom requirement: hide 'Permissions disabled' section
+        # if settings.FILER_ENABLE_PERMISSIONS:
+        #     fieldsets = fieldsets + (
+        #         (None, {
+        #             'fields': ('is_public',)
+        #         }),
+        #     )
         return fieldsets
 
 
