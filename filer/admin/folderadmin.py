@@ -253,23 +253,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 pass
 
         # search
-        def filter_folder(qs, terms=[]):
-            for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | \
-                               Q(owner__username__icontains=term) | \
-                               Q(owner__first_name__icontains=term) | \
-                               Q(owner__last_name__icontains=term))
-            return qs
-
-        def filter_file(qs, terms=[]):
-            for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | \
-                               Q(description__icontains=term) | \
-                               Q(original_filename__icontains=term) | \
-                               Q(owner__username__icontains=term) | \
-                               Q(owner__first_name__icontains=term) | \
-                               Q(owner__last_name__icontains=term))
-            return qs
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
@@ -287,8 +270,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 folder_qs = Folder.objects.all()
                 file_qs = File.objects.all()
-            folder_qs = filter_folder(folder_qs, search_terms)
-            file_qs = filter_file(file_qs, search_terms)
+            folder_qs = self.filter_folder(folder_qs, search_terms)
+            file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
         else:
@@ -303,24 +286,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder_files = []
         if folder.is_root:
             folder_children += folder.virtual_folders
-        for f in folder_qs:
-            f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
-                    folder_children.append(f)
-                else:
-                    pass
-            else:
-                folder_children.append(f)
-        for f in file_qs:
-            f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
-                    folder_files.append(f)
-                else:
-                    pass
-            else:
-                folder_files.append(f)
+
+        perms = FolderPermission.objects.get_read_id_list(request.user)
+        if perms != 'All':
+            folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
+            file_qs = file_qs.filter(Q(folder__id__in=perms) | Q(owner=request.user))
+
+        folder_children += folder_qs
+        folder_files += file_qs
+
         try:
             permissions = {
                 'has_edit_permission': folder.has_edit_permission(request),
@@ -414,6 +388,26 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'media': self.media,
                 'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
         }, context_instance=RequestContext(request))
+
+    @staticmethod
+    def filter_folder(qs, terms=[]):
+        for term in terms:
+            qs = qs.filter(Q(name__icontains=term) |
+                           Q(owner__username__icontains=term) |
+                           Q(owner__first_name__icontains=term) |
+                           Q(owner__last_name__icontains=term))
+        return qs
+
+    @staticmethod
+    def filter_file(qs, terms=[]):
+        for term in terms:
+            qs = qs.filter(Q(name__icontains=term) |
+                           Q(description__icontains=term) |
+                           Q(original_filename__icontains=term) |
+                           Q(owner__username__icontains=term) |
+                           Q(owner__first_name__icontains=term) |
+                           Q(owner__last_name__icontains=term))
+        return qs
 
     def response_action(self, request, files_queryset, folders_queryset):
         """

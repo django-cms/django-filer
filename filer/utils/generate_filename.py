@@ -1,11 +1,17 @@
+from django import VERSION
+if VERSION[:2] >= (1, 4):
+    from django.utils.timezone import now
+else:
+    from datetime import datetime
+    def now(tz=None):
+        return datetime.now(tz)
 from filer.utils.files import get_valid_filename
 from django.utils.encoding import force_unicode, smart_str
-import datetime
 import os
 
 
 def by_date(instance, filename):
-    datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
+    datepart = force_unicode(now().strftime(smart_str("%Y/%m/%d")))
     return os.path.join(datepart, get_valid_filename(filename))
 
 def randomized(instance, filename):
