@@ -1,5 +1,6 @@
 [run]
 source = filer
+branch = True
 omit =
     filer/migrations/*
     filer/tests/*
