@@ -9,7 +9,9 @@ env:
   - DJANGO="django>=1.4,<1.5"
   - DJANGO="django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.2"
   - DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
-script: python setup.py test
+script: coverage run --rcfile=coverage.rc setup.py test
+after_success:
+  coveralls --config_file=coverage.rc
 matrix:
   allow_failures:
     - python: 2.6
