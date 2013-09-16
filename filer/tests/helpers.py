@@ -17,6 +17,7 @@ def login_using(client, user_type=None):
     user.is_staff = True
     user.is_active = True
     user.save()
+    user.user_permissions = Permission.objects.all()
     client.login(username=username, password=password)
     yield
     client.logout()

@@ -665,19 +665,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Next, it delets all selected files and/or folders and redirects back
         to the folder.
         """
-
-        if folders_queryset.filter(
-                Q(folder_type=Folder.CORE_FOLDER) |
-                Q(parent__isnull=True)).exists():
-            raise PermissionDenied
-
-        if files_queryset.filter(
-            folder__folder_type=Folder.CORE_FOLDER).exists():
-            raise PermissionDenied
+        self._check_restricted(request, files_queryset, folders_queryset)
 
         opts = self.model._meta
         app_label = opts.app_label
-
         # Check that the user has delete permission for the actual model
         if not self.has_delete_permission(request):
             raise PermissionDenied
@@ -895,6 +886,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             f.move_to(destination, 'last-child')
             f.save()
 
+    def _check_restricted(self, request, files_queryset, folders_queryset):
+        restricted_folder = Q(folder_type=Folder.CORE_FOLDER)
+        if not request.user.is_superuser:
+            restricted_folder |= Q(parent__isnull=True)
+
+        if folders_queryset.filter(restricted_folder).exists():
+            raise PermissionDenied
+
+        restricted_files = Q(folder__folder_type=Folder.CORE_FOLDER)
+        if files_queryset.filter(restricted_files).exists():
+            raise PermissionDenied
+
     def move_files_and_folders(self, request,
                                files_queryset, folders_queryset):
         opts = self.model._meta
@@ -910,6 +913,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             request, folders_queryset, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
+            self._check_restricted(request, files_queryset, folders_queryset)
             if perms_needed:
                 raise PermissionDenied
             try:
@@ -917,10 +921,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     pk=request.POST.get('destination'))
             except Folder.DoesNotExist:
                 raise PermissionDenied
+
+            if destination.folder_type == Folder.CORE_FOLDER:
+                raise PermissionDenied
+
+            # all folders need to belong to the same site as the
+            #   destination site folder
+            if not destination.site:
+                messages.error(request, _(u"Destination folder %s does not "
+                    "belong to any site. Folder needs to be assigned to a "
+                    "site before you can move files in it." % \
+                        destination.pretty_logical_path))
+                return None
+
             folders_dict = dict(folders)
             if (destination not in folders_dict or
                 not folders_dict[destination][1]):
                 raise PermissionDenied
+
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
             conflicting_names = [folder.name

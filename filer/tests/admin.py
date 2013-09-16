@@ -578,14 +578,7 @@ class PermissionAdminTest(TestCase):
             self.assert_user_adminview(user)
 
 
-class TestFolderTypeFunctionality(TestCase):
-
-    # def setUp(self):
-    #     self.superuser = create_superuser()
-    #     self.client.login(username='admin', password='secret')
-
-    # def tearDown(self):
-    #     self.client.logout()
+class TestFolderTypeFolderPermissionLayer(TestCase):
 
     def test_default_add_view_is_forbidden(self):
         with login_using(self.client, 'superuser'):
@@ -622,46 +615,53 @@ class TestFolderTypeFunctionality(TestCase):
                     reverse('admin:filer_folder_change', args=(f1.pk, )), {})
                 self.assertEqual(response.status_code, 403)
 
+    def _test_change_child_site_folder(self):
+        f1 = Folder.objects.create(name='foo')
+        f2 = Folder.objects.create(name='foo_bar', parent=f1)
+        # regular users should be able to change child folders
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(f2.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('adminform', response.context_data)
+        # make sure the folder that is going to be saved is a site folder
+        form = response.context_data['adminform'].form
+        self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
+        # only field 'name' should be visible
+        self.assertItemsEqual(['name'], form.fields.keys())
+        # check if save worked
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(f2.pk, )), {
+                'name': 'foo_bar__changed'
+            })
+        self.assertEqual(response.status_code, 302)
+        f2__changed = Folder.objects.get(id=f2.pk)
+        self.assertEqual(f2__changed.name, 'foo_bar__changed')
+        self.assertEqual(f2__changed.folder_type, Folder.SITE_FOLDER)
+
     def test_change_child_site_folder_for_regular_user(self):
         with login_using(self.client):
-            f1 = Folder.objects.create(name='foo')
-            f2 = Folder.objects.create(name='foo_bar', parent=f1)
-            # regular users should be able to create child folders
-            response = self.client.get(
-                reverse('admin:filer_folder_change', args=(f2.pk, )))
-            self.assertEqual(response.status_code, 200)
-            self.assertIn('adminform', response.context_data)
-            # make sure the folder that is going to be saved is a site folder
-            form = response.context_data['adminform'].form
-            self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
-            # only field 'name' should be visible
-            self.assertItemsEqual(['name'], form.fields.keys())
-            # check if save worked
-            response = self.client.post(
-                reverse('admin:filer_folder_change', args=(f2.pk, )), {
-                    'name': 'foo_bar__changed'
-                })
-            self.assertEqual(response.status_code, 302)
-            f2__changed = Folder.objects.get(id=f2.pk)
-            self.assertEqual(f2__changed.name, 'foo_bar__changed')
-            self.assertEqual(f2__changed.folder_type, Folder.SITE_FOLDER)
+            self._test_change_child_site_folder()
+
+    def _test_change_core_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.CORE_FOLDER)
+        f2 = Folder.objects.create(
+            name='foo_bar', parent=f1, folder_type=Folder.CORE_FOLDER)
+        self.assertEqual(f1.folder_type, Folder.CORE_FOLDER)
+        self.assertEqual(f2.folder_type, Folder.CORE_FOLDER)
+        # No one should be able to change core folders
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(f2.pk, )),
+            {'post': ['yes']})
+        self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(f1.pk, )),
+            {'post': ['yes']})
+        self.assertEqual(response.status_code, 403)
 
     def test_change_core_folder_for_regular_user(self):
         with login_using(self.client):
-            f1 = Folder.objects.create(
-                name='foo', folder_type=Folder.CORE_FOLDER)
-            f2 = Folder.objects.create(
-                name='foo_bar', parent=f1, folder_type=Folder.CORE_FOLDER)
-            self.assertEqual(f1.folder_type, Folder.CORE_FOLDER)
-            self.assertEqual(f2.folder_type, Folder.CORE_FOLDER)
-            # No one should be able to change core folders
-            response = self.client.delete(
-                reverse('admin:filer_folder_delete', args=(f2.pk, )))
-            self.assertEqual(response.status_code, 403)
-            response = self.client.delete(
-                reverse('admin:filer_folder_delete', args=(f1.pk, )))
-            self.assertEqual(response.status_code, 403)
-
+            self._test_change_core_folder()
 
     def test_delete_root_folder_for_regular_user(self):
         with login_using(self.client):
@@ -669,26 +669,89 @@ class TestFolderTypeFunctionality(TestCase):
             # regular users should not be able to delete root folders at all
             for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
                 Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
-                response = self.client.delete(
-                    reverse('admin:filer_folder_delete', args=(f1.pk, )))
+                response = self.client.post(
+                    reverse('admin:filer_folder_delete', args=(f1.pk, )),
+                    {'post': 'yes'})
                 self.assertEqual(response.status_code, 403)
-                #TODO
-                # response = self.client.post(
-                #     reverse('admin:filer-directory_listing-root'), {
-                #     'action': 'delete_files_or_folders',
-                #     'post': 'yes',
-                #     helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-                # })
+
+                response = self.client.post(
+                    reverse('admin:filer-directory_listing-root'), {
+                    'action': 'delete_files_or_folders',
+                    'post': 'yes',
+                    helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+                })
+                self.assertEqual(response.status_code, 403)
+                # case when viewing another folder content
+                # hit search and select a root folder to delete
+                folder_for_view = Folder.objects.create(name='bar')
+                response = self.client.post(
+                    reverse('admin:filer-directory_listing',
+                            args=(folder_for_view.pk, )), {
+                    'action': 'delete_files_or_folders',
+                    'post': 'yes',
+                    helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+                })
+                # this might be a bug since the folder requested for deletion
+                #   is not passed to the delete_files_or_folders. For now
+                #   just make sure it is not deleted
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(
+                    Folder.objects.filter(
+                        id__in=[folder_for_view.id, f1.id]).count(), 2)
+
+    def _test_delete_child_site_folder(self):
+        f1 = Folder.objects.create(name='foo')
+        f2 = Folder.objects.create(name='bar', parent=f1)
+        f3 = Folder.objects.create(name='baz', parent=f1)
+        # regular users should be able to delete child site folders
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(f2.pk, )),
+            {'post': ['yes']})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.filter(id=f2.id).count(), 0)
+
+        response = self.client.post(
+            reverse('admin:filer-directory_listing',
+            kwargs={'folder_id':f1.id}), {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f3.id],
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.filter(id=f3.id).count(), 0)
 
     def test_delete_child_site_folder_for_regular_user(self):
-        pass
+        with login_using(self.client):
+            self._test_delete_child_site_folder()
+
+    def _test_delete_child_core_folder(self):
+        f1 = Folder.objects.create(name='foo')
+        f2 = Folder.objects.create(
+            name='bar', parent=f1, folder_type=Folder.CORE_FOLDER)
+        f3 = Folder.objects.create(
+            name='baz', parent=f1, folder_type=Folder.CORE_FOLDER)
+        # regular users should not be able to delete child core folders
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(f2.pk, )),
+            {'post': ['yes']})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Folder.objects.filter(id=f2.id).count(), 1)
+
+        response = self.client.post(
+            reverse('admin:filer-directory_listing',
+            kwargs={'folder_id':f1.id}), {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f3.id],
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Folder.objects.filter(id=f3.id).count(), 1)
+
     def test_delete_child_core_folder_for_regular_user(self):
-        pass
+        with login_using(self.client):
+            self._test_delete_child_core_folder()
 
-
-    def test_permissions_on_root_folders(self):
-
-
+    def test_add_root_folder_for_superuser(self):
         with login_using(self.client, 'superuser'):
             # superusers should be able to add only root site folders
             response = self.client.get(
@@ -700,20 +763,193 @@ class TestFolderTypeFunctionality(TestCase):
             self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
             # only fields 'site', 'name' should be visible
             self.assertItemsEqual(['site', 'name'], form.fields.keys())
+
+            s1 = Site.objects.create(name='foo_site', domain='foo-domain.com')
+            response = self.client.post(
+                reverse('admin:filer-directory_listing-make_root_folder'),
+                {'name': 'foo', 'site': s1.id})
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Folder.objects.count(), 1)
+
+    def test_change_root_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            f1 = Folder.objects.create(
+                name='foo', folder_type=Folder.CORE_FOLDER)
+            response = self.client.get(
+                reverse('admin:filer_folder_change', args=(f1.pk, )))
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+            self.assertEqual(response.status_code, 403)
+
+            Folder.objects.filter(id=f1.id).update(
+                folder_type=Folder.SITE_FOLDER)
+            response = self.client.get(
+                reverse('admin:filer_folder_change', args=(f1.pk, )))
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(
+                reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_child_site_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_change_child_site_folder()
+
+    def test_change_core_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_change_core_folder()
+
+    def test_delete_root_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            f1 = Folder.objects.create(
+                name='foo', folder_type=Folder.CORE_FOLDER)
+
+            response = self.client.post(
+                reverse('admin:filer_folder_delete', args=(f1.pk, )),
+                {'post': 'yes'})
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+            response = self.client.post(
+                reverse('admin:filer-directory_listing-root'), {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+            })
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+
+            Folder.objects.filter(id=f1.id).update(
+                folder_type=Folder.SITE_FOLDER)
+            response = self.client.post(
+                reverse('admin:filer_folder_delete', args=(f1.pk, )),
+                {'post': 'yes'})
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
+            f1 = Folder.objects.create(
+                name='foo', folder_type=Folder.SITE_FOLDER)
+            response = self.client.post(
+                reverse('admin:filer-directory_listing-root'), {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+            })
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
+
+    def test_delete_child_site_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_delete_child_site_folder()
+
+    def test_delete_child_core_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_delete_child_core_folder()
+
+    def _build_some_folder_structure(self, folder_type, site):
+        _folders, _files = {}, {}
+        foo1 = Folder.objects.create(
+            name='foo1', folder_type=folder_type, site=site)
+        _folders['foo1'] = foo1
+        foo2 = Folder.objects.create(
+            name='foo2', folder_type=folder_type, site=site)
+        _folders['foo2'] = foo2
+        bar = Folder.objects.create(
+            name='bar', folder_type=folder_type, parent=foo1, site=site)
+        _folders['bar'] = bar
+        baz1 = Folder.objects.create(
+            name='baz1', folder_type=folder_type, parent=bar, site=site)
+        _folders['baz1'] = baz1
+        baz2 = Folder.objects.create(
+            name='baz2', folder_type=folder_type, parent=bar, site=site)
+        _folders['baz2'] = baz2
+
+        file_bar = File.objects.create(
+            original_filename='bar_file', folder=bar,
+            file=django.core.files.base.ContentFile('some data'))
+        _files['file_bar'] = file_bar
+        return _folders, _files
+
+    def _test_move_core_folders(self):
+        folders, files = self._build_some_folder_structure(
+            Folder.CORE_FOLDER, None)
+
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-root'), {
+                'action': 'move_files_and_folders',
+                'post': 'yes',
+                'destination': folders['foo2'].id,
+                helpers.ACTION_CHECKBOX_NAME:
+                    'folder-%d' % (folders['bar'].id,),
+        })
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-root'), {
+                'action': 'move_files_and_folders',
+                'post': 'yes',
+                'destination': folders['foo2'].id,
+                helpers.ACTION_CHECKBOX_NAME:
+                    'folder-%d' % (folders['foo1'].id,),
+        })
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_core_folder_for_regular_user(self):
+        with login_using(self.client):
+            self._test_move_core_folders()
+
+    def test_move_core_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_move_core_folders()
+
+    def _test_move_site_folder_to_core_destination_folder(self):
+        folders, files = self._build_some_folder_structure(
+            Folder.SITE_FOLDER, Site.objects.get(id=1))
+        f1 = Folder.objects.create(
+            name='destination', folder_type=Folder.CORE_FOLDER)
+
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-root'), {
+                'action': 'move_files_and_folders',
+                'post': 'yes',
+                'destination': f1.id,
+                helpers.ACTION_CHECKBOX_NAME:
+                    ['folder-%d' % (folders['bar'].id,)],
+        })
+        self.assertEqual(response.status_code, 403)
+        f1.delete()
+        return folders, files
+
+    def test_move_site_folder_for_regular_user(self):
+        with login_using(self.client):
+            folders, files = \
+                self._test_move_site_folder_to_core_destination_folder()
+            other_site = Site.objects.create(
+                name='foo_site', domain='foo_site')
+            f1 = Folder.objects.create(
+                name='destination', site=other_site)
+
+            response = self.client.post(
+                reverse('admin:filer-directory_listing-root'), {
+                    'action': 'move_files_and_folders',
+                    'post': 'yes',
+                    'destination': f1.id,
+                    helpers.ACTION_CHECKBOX_NAME:
+                        'folder-%d' % (folders['bar'].id,),
+            })
+            self.assertEqual(response.status_code, 403)
+
+    def test_move_site_folder_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_move_site_folder_to_core_destination_folder()
+
+
+
+
+class TestFolderTypeFilesPermissionLayer(TestCase):
+    pass
 """
-    def test_permissions_CRUD_core_folder(self):
-        # nobody can add/change/delete core folders or files from them
-        # these are only set programatically
-
-
-        ### TODO: root & regular folders
-        pass
-
-    def test_permissions_CRUD_site_folder(self):
-        ### TODO: root & regular folders
-        pass
-
 ######## UPLOAD FILES ########
+    def test_upload_in_root(self):
+        pass
 
     def test_upload_in_core_folders(self):
         pass

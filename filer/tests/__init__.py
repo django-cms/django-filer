@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from filer.tests.admin import TestFolderTypeFunctionality
+from filer.tests.admin import TestFolderTypeFolderPermissionLayer
 # from filer.tests.admin import *
 # from filer.tests.fields import *
 # from filer.tests.models import *
