@@ -4,30 +4,45 @@ from PIL import Image, ImageChops, ImageDraw
 from django.contrib.auth.models import User, Permission
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
-from contextlib import contextmanager
 from django.core.urlresolvers import reverse
 from django.contrib.admin import helpers
 
 
-def _get_dir_listing_url(folder_id_for_view):
-    if folder_id_for_view is None:
+def get_dir_listing_url(folder):
+    if folder is None:
         return reverse('admin:filer-directory_listing-root')
-    if folder_id_for_view is 'unfiled':
+    if folder is 'unfiled':
         return reverse('admin:filer-directory_listing-unfiled_images')
     return reverse('admin:filer-directory_listing',
-                   kwargs={'folder_id': folder_id_for_view.id})
+                   kwargs={'folder_id': folder.id})
+
+def get_make_root_folder_url():
+    return reverse('admin:filer-directory_listing-make_root_folder')
 
 
-def _filer_object_type(filer_obj):
-    if isinstance(filer_obj, Folder):
-        return 'folder'
-    return 'file'
+def filer_obj_as_checkox(filer_obj):
+
+    def filer_object_type(filer_obj):
+        if isinstance(filer_obj, Folder):
+            return 'folder'
+        return 'file'
+
+    return '%s-%d' % (filer_object_type(filer_obj), filer_obj.id)
+
+
+
+def paste_clipboard_to_folder(client, destination, clipboard):
+    data_to_post = { 'clipboard_id': clipboard.pk }
+    if destination:
+        data_to_post['folder_id'] = destination.id
+    return client.post(
+        reverse('admin:filer-paste_clipboard_to_folder'), data_to_post)
 
 
 def move_to_clipboard_action(client, folder_view, to_move, follow=False):
-    objects_to_move = ['%s-%d' % (_filer_object_type(filer_obj), filer_obj.id)
+    objects_to_move = [filer_obj_as_checkox(filer_obj)
                        for filer_obj in to_move]
-    url = _get_dir_listing_url(folder_view)
+    url = get_dir_listing_url(folder_view)
     return client.post(url, {
         'action': 'move_to_clipboard',
         'post': 'yes',
@@ -35,33 +50,14 @@ def move_to_clipboard_action(client, folder_view, to_move, follow=False):
 
 
 def move_action(client, folder_view, destination, to_move, follow=False):
-    objects_to_move = ['%s-%d' % (_filer_object_type(filer_obj), filer_obj.id)
+    objects_to_move = [filer_obj_as_checkox(filer_obj)
                        for filer_obj in to_move]
-    url = _get_dir_listing_url(folder_view)
+    url = get_dir_listing_url(folder_view)
     return client.post(url, {
         'action': 'move_files_and_folders',
         'post': 'yes',
         'destination': destination.id,
         helpers.ACTION_CHECKBOX_NAME: objects_to_move }, follow=follow), url
-
-
-@contextmanager
-def login_using(client, user_type=None):
-    username = 'login_using_foo'
-    password = 'secret'
-    user = User.objects.create_user(username=username, password=password)
-    if user_type == 'superuser':
-        user.is_superuser = True
-    user.is_staff = True
-    user.is_active = True
-    user.save()
-    user.user_permissions = Permission.objects.all()
-    client.login(username=username, password=password)
-    client.user_used = user
-    yield
-    del client.user_used
-    client.logout()
-    user.delete()
 
 
 def create_superuser():

@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers, site
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.http import HttpRequest
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
@@ -14,10 +14,11 @@ from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (
-    login_using, get_user_message, create_superuser, create_folder_structure,
+    get_user_message, create_superuser, create_folder_structure,
     create_image, create_staffuser, create_folder_for_user, move_action,
     create_folderpermission_for_user, grant_all_folderpermissions_for_group,
-    move_to_clipboard_action,
+    move_to_clipboard_action, paste_clipboard_to_folder, get_dir_listing_url,
+    filer_obj_as_checkox, get_make_root_folder_url
 )
 
 
@@ -34,23 +35,23 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_filer_make_root_folder_get(self):
-        response = self.client.get(reverse('admin:filer-directory_listing-make_root_folder')+"?_popup=1")
+        response = self.client.get(get_make_root_folder_url() + "?_popup=1")
         self.assertEqual(response.status_code, 200)
 
     def test_filer_make_root_folder_post(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
         data_to_post = {
-             "name":FOLDER_NAME,
+             "name": FOLDER_NAME,
         }
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             data_to_post)
         self.assertIn('Site is required', response.content)
 
         data_to_post['site'] = 1
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             data_to_post)
 
         self.assertEqual(Folder.objects.count(), 1)
@@ -58,62 +59,63 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_filer_directory_listing_root_empty_get(self):
-        response = self.client.post(reverse('admin:filer-directory_listing-root'))
+        response = self.client.post(get_dir_listing_url(None))
         self.assertEqual(response.status_code, 200)
 
     def test_filer_directory_listing_root_get(self):
         create_folder_structure(depth=3, sibling=2, parent=None)
-        response = self.client.post(reverse('admin:filer-directory_listing-root'))
+        response = self.client.post(get_dir_listing_url(None))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
     def test_validate_no_duplcate_folders(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
-        post_data = { "name": FOLDER_NAME, "_popup": 1 }
+        post_data = {"name": FOLDER_NAME, "_popup": 1}
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
         self.assertIn('Site is required', response.content)
         post_data['site'] = 1
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
         # and create another one
-        post_data = { "name": FOLDER_NAME, "_popup": 1 }
+        post_data = {"name": FOLDER_NAME, "_popup": 1}
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
         # second folder didn't get created
         self.assertEqual(Folder.objects.count(), 1)
-        self.assertIn('File or folder with this name already exists', response.content)
+        self.assertIn('File or folder with this name already exists',
+                      response.content)
 
     def test_validate_no_duplcate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
-        post_data = { "name": "foo", "_popup": 1}
+        post_data = {"name": "foo", "_popup": 1}
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
         self.assertIn('Site is required', response.content)
         post_data['site'] = 1
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
 
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, "foo")
         # and create another one
-        post_data = { "name": "bar", "_popup": 1 }
+        post_data = {"name": "bar", "_popup": 1}
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
         self.assertIn('Site is required', response.content)
 
         post_data['site'] = 1
         response = self.client.post(
-            reverse('admin:filer-directory_listing-make_root_folder'),
+            get_make_root_folder_url(),
             post_data)
 
         self.assertEqual(Folder.objects.count(), 2)
@@ -121,7 +123,8 @@ class FilerFolderAdminUrlsTests(TestCase):
         response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
                 "name": "foo",
                 "_popup": 1})
-        self.assertIn('File or folder with this name already exists', response.content)
+        self.assertIn('File or folder with this name already exists',
+                      response.content)
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
         self.assertEqual(bar.name, "bar")
@@ -156,28 +159,36 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
         response = self.client.post(
-            reverse('admin:filer-ajax_upload'),
-            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            reverse('admin:filer-ajax_upload'), {
+            'Filename': self.image_name,
+            'Filedata': file_obj,
+            'jsessionid': self.client.session.session_key, },
             **extra_headers
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+        self.assertEqual(Image.objects.all()[0].original_filename,
+                         self.image_name)
 
     def test_file_upload_no_duplicate_files(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
         response = self.client.post(
-            reverse('admin:filer-ajax_upload'),
-            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            reverse('admin:filer-ajax_upload'), {
+            'Filename': self.image_name,
+            'Filedata': file_obj,
+            'jsessionid': self.client.session.session_key, },
             **extra_headers
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
-        # upload the same file again. This must fail since the clipboard can't contain
-        # two files with the same name
+        self.assertEqual(Image.objects.all()[0].original_filename,
+                         self.image_name)
+        # upload the same file again. This must fail since the
+        # clipboard can't contain two files with the same name
         response = self.client.post(
-            reverse('admin:filer-ajax_upload'),
-            {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
+            reverse('admin:filer-ajax_upload'), {
+            'Filename': self.image_name,
+            'Filedata': file_obj,
+            'jsessionid': self.client.session.session_key, },
             **extra_headers
         )
         self.assertEqual(Image.objects.count(), 1)
@@ -191,7 +202,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             response = self.client.post(
                 reverse('admin:filer-ajax_upload'),
                 {'Filename': self.image_name, 'Filedata': file_obj,
-                 'jsessionid': self.client.session.session_key,})
+                 'jsessionid': self.client.session.session_key, })
             return Image.objects.all().order_by('-id')[0]
 
         uploaded_image = upload()
@@ -218,14 +229,15 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename))
-        response = self.client.post(
-            reverse('admin:filer-ajax_upload')+'?filename=%s' % self.image_name,
+        response = self.client.post(reverse('admin:filer-ajax_upload') +
+            '?filename=%s' % self.image_name,
             data=file_obj.read(),
             content_type='application/octet-stream',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename, self.image_name)
+        self.assertEqual(Image.objects.all()[0].original_filename,
+                         self.image_name)
 
 
 class BulkOperationsMixin(object):
@@ -239,8 +251,10 @@ class BulkOperationsMixin(object):
         self.img.save(self.filename, 'JPEG')
         self.create_src_and_dst_folders()
         self.folder = Folder.objects.create(name="root folder", parent=None)
-        self.sub_folder1 = Folder.objects.create(name="sub folder 1", parent=self.folder)
-        self.sub_folder2 = Folder.objects.create(name="sub folder 2", parent=self.folder)
+        self.sub_folder1 = Folder.objects.create(
+            name="sub folder 1", parent=self.folder)
+        self.sub_folder2 = Folder.objects.create(
+            name="sub folder 2", parent=self.folder)
         self.image_obj = self.create_image(self.src_folder)
         self.create_file(self.folder)
         self.create_file(self.folder)
@@ -269,7 +283,9 @@ class BulkOperationsMixin(object):
     def create_image(self, folder, filename=None):
         filename = filename or 'test_image.jpg'
         file_obj = django.core.files.File(open(self.filename), name=filename)
-        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder)
+        image_obj = Image.objects.create(
+            owner=self.superuser, original_filename=self.image_name,
+            file=file_obj, folder=folder)
         image_obj.save()
         return image_obj
 
@@ -277,7 +293,8 @@ class BulkOperationsMixin(object):
         filename = filename or 'test_file.dat'
         file_data = django.core.files.base.ContentFile('some data')
         file_data.name = filename
-        file_obj = File.objects.create(owner=self.superuser, original_filename=filename, file=file_data, folder=folder)
+        file_obj = File.objects.create(owner=self.superuser,
+            original_filename=filename, file=file_data, folder=folder)
         file_obj.save()
         return file_obj
 
@@ -307,16 +324,17 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |
           |--bar
 
-        and try to move the owter bar in foo. This has to fail since it would result
-        in two folders with the same name and parent.
+        and try to move the owter bar in foo. This has to fail since it
+        would result in two folders with the same name and parent.
         """
         root = Folder.objects.create(name='root', owner=self.superuser)
-        foo = Folder.objects.create(name='foo', parent=root, owner=self.superuser)
-        bar = Folder.objects.create(name='bar', parent=root, owner=self.superuser)
-        foos_bar = Folder.objects.create(name='bar', parent=foo, owner=self.superuser)
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': root.pk,
-        })
+        foo = Folder.objects.create(
+            name='foo', parent=root, owner=self.superuser)
+        bar = Folder.objects.create(
+            name='bar', parent=root, owner=self.superuser)
+        foos_bar = Folder.objects.create(
+            name='bar', parent=foo, owner=self.superuser)
+        url = get_dir_listing_url(root)
 
         response, _ = move_action(self.client, root, foo, [bar])
         # refresh from db and validate that it hasn't been moved
@@ -328,9 +346,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
 
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 0)
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.src_folder.id,
-        })
+        url = get_dir_listing_url(self.src_folder)
         response = move_to_clipboard_action(
             self.client, self.src_folder, [self.image_obj])
         self.assertEqual(self.src_folder.files.count(), 0)
@@ -338,7 +354,8 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         clipboard = Clipboard.objects.get(user=self.superuser)
         self.assertEqual(clipboard.files.count(), 1)
         request = HttpRequest()
-        tools.move_files_from_clipboard_to_folder(request, clipboard, self.src_folder)
+        tools.move_files_from_clipboard_to_folder(
+            request, clipboard, self.src_folder)
         tools.discard_clipboard(clipboard)
         self.assertEqual(clipboard.files.count(), 0)
         self.assertEqual(self.src_folder.files.count(), 1)
@@ -348,9 +365,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.image_obj.is_public = False
         self.image_obj.save()
         self.assertEqual(self.image_obj.is_public, False)
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.src_folder.id,
-        })
+        url = get_dir_listing_url(self.src_folder)
         response = self.client.post(url, {
             'action': 'files_set_public',
             helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
@@ -363,9 +378,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.image_obj.is_public = True
         self.image_obj.save()
         self.assertEqual(self.image_obj.is_public, True)
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.src_folder.id,
-        })
+        url = get_dir_listing_url(self.src_folder)
         response = self.client.post(url, {
             'action': 'files_set_private',
             helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
@@ -381,9 +394,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 0)
         self.assertEqual(self.image_obj.original_filename, 'test_file.jpg')
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.src_folder.id,
-        })
+        url = get_dir_listing_url(self.src_folder)
         response = self.client.post(url, {
             'action': 'copy_files_and_folders',
             'post': 'yes',
@@ -397,13 +408,14 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         dst_image_obj = self.dst_folder.files[0]
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
+
 class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 
     def test_delete_files_or_folders_action(self):
         self.assertNotEqual(File.objects.count(), 0)
         self.assertNotEqual(Image.objects.count(), 0)
         self.assertNotEqual(Folder.objects.count(), 0)
-        url = reverse('admin:filer-directory_listing-root')
+        url = get_dir_listing_url(None)
         folders = []
         for folder in FolderRoot().children.all():
             folders.append('folder-%d' % (folder.id,))
@@ -416,14 +428,15 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         self.assertEqual(Folder.objects.count(), 0)
 
     def test_delete_files_or_folders_action_with_mixed_types(self):
-        # add more files/images so we can test the polymorphic queryset with multiple types
+        # add more files/images so we can test the polymorphic queryset
+        # with multiple types
         self.create_file(folder=self.src_folder)
         self.create_image(folder=self.src_folder)
         self.create_file(folder=self.src_folder)
 
         self.assertNotEqual(File.objects.count(), 0)
         self.assertNotEqual(Image.objects.count(), 0)
-        url = reverse('admin:filer-directory_listing', args=(self.folder.id,))
+        url = get_dir_listing_url(self.folder)
         folders = []
         for f in File.objects.filter(folder=self.folder):
             folders.append('file-%d' % (f.id,))
@@ -433,7 +446,8 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: folders,
             })
-        self.assertEqual(File.objects.filter(folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
+        self.assertEqual(File.objects.filter(
+            folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
 
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
@@ -444,9 +458,7 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.image_obj.height, 600)
         # since the 'resize' action is disabled from the admin
         return
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.src_folder.id,
-        })
+        url = get_dir_listing_url(self.src_folder.id)
         response = self.client.post(url, {
             'action': 'resize_images',
             'post': 'yes',
@@ -557,45 +569,13 @@ class PermissionAdminTest(TestCase):
             self.assert_user_adminview(user)
 
 
-class TestFolderTypeFolderPermissionLayer(TestCase):
-
+class BaseTestFolderTypePermissionLayer(object):
 
     def test_default_add_view_is_forbidden(self):
-        with login_using(self.client, 'superuser'):
-            response = self.client.get(reverse('admin:filer_folder_add'))
-            self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse('admin:filer_folder_add'))
+        self.assertEqual(response.status_code, 403)
 
-        with login_using(self.client):
-            response = self.client.get(reverse('admin:filer_folder_add'))
-            self.assertEqual(response.status_code, 403)
-
-        # only superusers can do operations on root folders
-        # regular users can do operations inside root folders only
-
-    def test_add_root_folder_for_regular_user(self):
-        with login_using(self.client):
-            # regular users should not be able to add root folders at all
-            response = self.client.get(
-                reverse('admin:filer-directory_listing-make_root_folder'))
-            self.assertEqual(response.status_code, 403)
-            response = self.client.post(
-                reverse('admin:filer-directory_listing-make_root_folder'), {})
-            self.assertEqual(response.status_code, 403)
-
-    def test_change_root_folder_for_regular_user(self):
-        with login_using(self.client):
-            f1 = Folder.objects.create(name='foo')
-            # regular users should not be able to change root folders at all
-            for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
-                Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
-                response = self.client.get(
-                    reverse('admin:filer_folder_change', args=(f1.pk, )))
-                self.assertEqual(response.status_code, 403)
-                response = self.client.post(
-                    reverse('admin:filer_folder_change', args=(f1.pk, )), {})
-                self.assertEqual(response.status_code, 403)
-
-    def _test_change_child_site_folder(self):
+    def test_change_child_site_folder(self):
         f1 = Folder.objects.create(name='foo')
         f2 = Folder.objects.create(name='foo_bar', parent=f1)
         # regular users should be able to change child folders
@@ -618,11 +598,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(f2__changed.name, 'foo_bar__changed')
         self.assertEqual(f2__changed.folder_type, Folder.SITE_FOLDER)
 
-    def test_change_child_site_folder_for_regular_user(self):
-        with login_using(self.client):
-            self._test_change_child_site_folder()
-
-    def _test_change_core_folder(self):
+    def test_change_core_folder(self):
         f1 = Folder.objects.create(
             name='foo', folder_type=Folder.CORE_FOLDER)
         f2 = Folder.objects.create(
@@ -639,47 +615,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
             {'post': ['yes']})
         self.assertEqual(response.status_code, 403)
 
-    def test_change_core_folder_for_regular_user(self):
-        with login_using(self.client):
-            self._test_change_core_folder()
-
-    def test_delete_root_folder_for_regular_user(self):
-        with login_using(self.client):
-            f1 = Folder.objects.create(name='foo')
-            # regular users should not be able to delete root folders at all
-            for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
-                Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
-                response = self.client.post(
-                    reverse('admin:filer_folder_delete', args=(f1.pk, )),
-                    {'post': 'yes'})
-                self.assertEqual(response.status_code, 403)
-
-                response = self.client.post(
-                    reverse('admin:filer-directory_listing-root'), {
-                    'action': 'delete_files_or_folders',
-                    'post': 'yes',
-                    helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-                })
-                self.assertEqual(response.status_code, 403)
-                # case when viewing another folder content
-                # hit search and select a root folder to delete
-                folder_for_view = Folder.objects.create(name='bar')
-                response = self.client.post(
-                    reverse('admin:filer-directory_listing',
-                            args=(folder_for_view.pk, )), {
-                    'action': 'delete_files_or_folders',
-                    'post': 'yes',
-                    helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-                })
-                # this might be a bug since the folder requested for deletion
-                #   is not passed to the delete_files_or_folders. For now
-                #   just make sure it is not deleted
-                self.assertEqual(response.status_code, 302)
-                self.assertEqual(
-                    Folder.objects.filter(
-                        id__in=[folder_for_view.id, f1.id]).count(), 2)
-
-    def _test_delete_child_site_folder(self):
+    def test_delete_child_site_folder(self):
         f1 = Folder.objects.create(name='foo')
         f2 = Folder.objects.create(name='bar', parent=f1)
         f3 = Folder.objects.create(name='baz', parent=f1)
@@ -690,9 +626,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Folder.objects.filter(id=f2.id).count(), 0)
 
-        response = self.client.post(
-            reverse('admin:filer-directory_listing',
-            kwargs={'folder_id':f1.id}), {
+        response = self.client.post(get_dir_listing_url(f1), {
                 'action': 'delete_files_or_folders',
                 'post': 'yes',
                 helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f3.id],
@@ -700,11 +634,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Folder.objects.filter(id=f3.id).count(), 0)
 
-    def test_delete_child_site_folder_for_regular_user(self):
-        with login_using(self.client):
-            self._test_delete_child_site_folder()
-
-    def _test_delete_child_core_folder(self):
+    def test_delete_child_core_folder(self):
         f1 = Folder.objects.create(name='foo')
         f2 = Folder.objects.create(
             name='bar', parent=f1, folder_type=Folder.CORE_FOLDER)
@@ -717,9 +647,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Folder.objects.filter(id=f2.id).count(), 1)
 
-        response = self.client.post(
-            reverse('admin:filer-directory_listing',
-            kwargs={'folder_id':f1.id}), {
+        response = self.client.post(get_dir_listing_url(f1), {
                 'action': 'delete_files_or_folders',
                 'post': 'yes',
                 helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f3.id],
@@ -727,102 +655,79 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Folder.objects.filter(id=f3.id).count(), 1)
 
-    def test_delete_child_core_folder_for_regular_user(self):
-        with login_using(self.client):
-            self._test_delete_child_core_folder()
+    def test_add_root_folder(self):
+        # superusers should be able to add only root site folders
+        response = self.client.get(
+            get_make_root_folder_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('adminform', response.context_data)
+        # make sure the folder that is going to be saved is a site folder
+        form = response.context_data['adminform'].form
+        self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
+        # only fields 'site', 'name' should be visible
+        self.assertItemsEqual(['site', 'name'], form.fields.keys())
 
-    def test_add_root_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            # superusers should be able to add only root site folders
-            response = self.client.get(
-                reverse('admin:filer-directory_listing-make_root_folder'))
-            self.assertEqual(response.status_code, 200)
-            self.assertIn('adminform', response.context_data)
-            # make sure the folder that is going to be saved is a site folder
-            form = response.context_data['adminform'].form
-            self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
-            # only fields 'site', 'name' should be visible
-            self.assertItemsEqual(['site', 'name'], form.fields.keys())
+        s1 = Site.objects.create(name='foo_site', domain='foo-domain.com')
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'foo', 'site': s1.id})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.count(), 1)
 
-            s1 = Site.objects.create(name='foo_site', domain='foo-domain.com')
-            response = self.client.post(
-                reverse('admin:filer-directory_listing-make_root_folder'),
-                {'name': 'foo', 'site': s1.id})
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(Folder.objects.count(), 1)
+    def test_change_root_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.CORE_FOLDER)
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(f1.pk, )))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+        self.assertEqual(response.status_code, 403)
 
-    def test_change_root_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            f1 = Folder.objects.create(
-                name='foo', folder_type=Folder.CORE_FOLDER)
-            response = self.client.get(
-                reverse('admin:filer_folder_change', args=(f1.pk, )))
-            self.assertEqual(response.status_code, 403)
-            response = self.client.post(
-                reverse('admin:filer_folder_change', args=(f1.pk, )), {})
-            self.assertEqual(response.status_code, 403)
+        Folder.objects.filter(id=f1.id).update(
+            folder_type=Folder.SITE_FOLDER)
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(f1.pk, )))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+        self.assertEqual(response.status_code, 200)
 
-            Folder.objects.filter(id=f1.id).update(
-                folder_type=Folder.SITE_FOLDER)
-            response = self.client.get(
-                reverse('admin:filer_folder_change', args=(f1.pk, )))
-            self.assertEqual(response.status_code, 200)
-            response = self.client.post(
-                reverse('admin:filer_folder_change', args=(f1.pk, )), {})
-            self.assertEqual(response.status_code, 200)
+    def test_delete_root_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.CORE_FOLDER)
 
-    def test_change_child_site_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_change_child_site_folder()
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(f1.pk, )),
+            {'post': 'yes'})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+        response = self.client.post(
+            get_dir_listing_url(None), {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
 
-    def test_change_core_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_change_core_folder()
-
-    def test_delete_root_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            f1 = Folder.objects.create(
-                name='foo', folder_type=Folder.CORE_FOLDER)
-
-            response = self.client.post(
-                reverse('admin:filer_folder_delete', args=(f1.pk, )),
-                {'post': 'yes'})
-            self.assertEqual(response.status_code, 403)
-            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
-            response = self.client.post(
-                reverse('admin:filer-directory_listing-root'), {
-                'action': 'delete_files_or_folders',
-                'post': 'yes',
-                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-            })
-            self.assertEqual(response.status_code, 403)
-            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
-
-            Folder.objects.filter(id=f1.id).update(
-                folder_type=Folder.SITE_FOLDER)
-            response = self.client.post(
-                reverse('admin:filer_folder_delete', args=(f1.pk, )),
-                {'post': 'yes'})
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
-            f1 = Folder.objects.create(
-                name='foo', folder_type=Folder.SITE_FOLDER)
-            response = self.client.post(
-                reverse('admin:filer-directory_listing-root'), {
-                'action': 'delete_files_or_folders',
-                'post': 'yes',
-                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-            })
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
-
-    def test_delete_child_site_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_delete_child_site_folder()
-
-    def test_delete_child_core_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_delete_child_core_folder()
+        Folder.objects.filter(id=f1.id).update(
+            folder_type=Folder.SITE_FOLDER)
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(f1.pk, )),
+            {'post': 'yes'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.SITE_FOLDER)
+        response = self.client.post(
+            get_dir_listing_url(None), {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
 
     def _build_some_folder_structure(self, folder_type, site):
         _folders, _files = {}, {}
@@ -848,25 +753,19 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         _files['file_bar'] = file_bar
         return _folders, _files
 
-    def _test_move_core_folders(self):
+    def test_move_core_folders(self):
         folders, files = self._build_some_folder_structure(
             Folder.CORE_FOLDER, None)
 
-        response, _ = move_action(self.client, None, folders['foo2'], [folders['bar']])
+        response, _ = move_action(
+            self.client, None, folders['foo2'], [folders['bar']])
         self.assertEqual(response.status_code, 403)
 
-        response, _ = move_action(self.client, None, folders['foo2'], [folders['foo1']])
+        response, _ = move_action(
+            self.client, None, folders['foo2'], [folders['foo1']])
         self.assertEqual(response.status_code, 403)
 
-    def test_move_core_folder_for_regular_user(self):
-        with login_using(self.client):
-            self._test_move_core_folders()
-
-    def test_move_core_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_move_core_folders()
-
-    def _test_move_site_folder_to_core_destination_folder(self):
+    def test_move_site_folder_to_core_destination_folder(self):
         folders, files = self._build_some_folder_structure(
             Folder.SITE_FOLDER, Site.objects.get(id=1))
         f1 = Folder.objects.create(
@@ -877,19 +776,15 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         f1.delete()
         return folders, files
 
-    def test_move_site_folder_for_regular_user(self):
-        with login_using(self.client):
-            self._test_move_site_folder_to_core_destination_folder()
-
-    def test_move_site_folder_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_move_site_folder_to_core_destination_folder()
-
     def _get_clipboard_files(self):
-        clipboard, _ = Clipboard.objects.get_or_create(user=self.client.user_used)
+        clipboard, _ = Clipboard.objects.get_or_create(
+            user=self.user)
         return clipboard.files
 
-    def _test_move_to_clipboard_from_root(self):
+    def test_move_to_clipboard_from_root(self):
+        if not self.user.is_superuser:
+            self.assertEqual('This test should work after refactor filer '
+                             'permissions', '')
         file_bar = File.objects.create(
             original_filename='bar', folder=None,
             file=django.core.files.base.ContentFile('some data'))
@@ -899,19 +794,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(
             self._get_clipboard_files().count(), 1)
 
-    def test_move_to_clipboard_from_root_for_regular_user(self):
-        self.assertEqual('This test should work after removing filer '
-                         'permissions', '')
-        with login_using(self.client):
-            self._test_move_to_clipboard_from_root()
-
-    def test_move_to_clipboard_from_root_for_super_user(self):
-        self.assertEqual('This test should work after removing filer '
-                         'permissions', '')
-        with login_using(self.client, 'superuser'):
-            self._test_move_to_clipboard_from_root()
-
-    def _test_move_to_clipboard_from_site_folders(self):
+    def test_move_to_clipboard_from_site_folders(self):
         foo = Folder.objects.create(name='mic', site=Site.objects.get(id=1))
         file_bar = File.objects.create(
             original_filename='mic', folder=foo,
@@ -922,15 +805,7 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(
             self._get_clipboard_files().count(), 1)
 
-    def test_move_to_clipboard_from_site_folders_regular_user(self):
-        with login_using(self.client):
-            self._test_move_to_clipboard_from_site_folders()
-
-    def test_move_to_clipboard_from_site_folders_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_move_to_clipboard_from_site_folders()
-
-    def _test_move_to_clipboard_from_core_folders(self):
+    def test_move_to_clipboard_from_core_folders(self):
         foo = Folder.objects.create(name='foo',
                                     folder_type=Folder.CORE_FOLDER)
         file_bar = File.objects.create(
@@ -943,26 +818,86 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
 
-    def test_move_to_clipboard_from_core_folders_for_regular_user(self):
-        with login_using(self.client):
-            self._test_move_to_clipboard_from_core_folders()
+    def test_move_from_clipboard_to_root(self):
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=django.core.files.base.ContentFile('some data'))
+        clipboard, _ = Clipboard.objects.get_or_create(
+            user=self.user)
+        clipboard.append_file(bar_file)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
+        response = paste_clipboard_to_folder(
+            self.client, None, clipboard)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
 
-    def test_move_to_clipboard_from_core_folders_for_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_move_to_clipboard_from_core_folders()
+    def test_move_from_clipboard_to_core_folders(self):
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=django.core.files.base.ContentFile('some data'))
+        core_folder = Folder.objects.create(
+            name='foo', folder_type=Folder.CORE_FOLDER)
+        clipboard, _ = Clipboard.objects.get_or_create(
+            user=self.user)
+        clipboard.append_file(bar_file)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
+        response = paste_clipboard_to_folder(
+            self.client, core_folder, clipboard)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
 
-    def _test_move_from_clipboard_to_root(self):
-        pass
+    def test_move_from_clipboard_to_site_folders(self):
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=django.core.files.base.ContentFile('some data'))
+        site_folder = Folder.objects.create(
+            name='foo', site=Site.objects.get(id=1))
+        clipboard, _ = Clipboard.objects.get_or_create(
+            user=self.user)
+        clipboard.append_file(bar_file)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
+        response = paste_clipboard_to_folder(
+            self.client, site_folder, clipboard)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+        self.assertEqual(len(site_folder.files), 1)
 
-    def _test_move_from_clipboard_to_core_folders(self):
-        pass
+    def test_message_error_user_no_site_on_move(self):
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        foo = Folder.objects.create(name='foo', parent=foo_root)
+        bar = Folder.objects.create(name='bar', site=site)
+        response, url = move_action(
+            self.client, foo_root, bar, [foo], follow=True)
+        self.assertRedirects(response, url)
+        self.assertIn(
+            "Some of the selected files/folders do not belong to any site.",
+            get_user_message(response).message)
 
-    def _test_move_from_clipboard_to_site_folders(self):
-        pass
+    def test_message_error_user_sites_mismatch_on_move(self):
+        site = Site.objects.get(id=1)
+        other_site = Site.objects.create(name='foo_site', domain='foo_site')
+        # make a root for foo in order to work for regular users
+        foo_root = Folder.objects.create(name='foo_root', site=other_site)
+        foo = Folder.objects.create(
+            name='foo', parent=foo_root)
+        bar = Folder.objects.create(name='bar', site=site)
+        url = get_dir_listing_url(foo_root)
+        response, url = move_action(
+            self.client, foo_root, bar, [foo], follow=True)
+        self.assertRedirects(response, url)
+        self.assertIn(
+            "Selected files/folders need to belong to the same site as the "
+            "destination folder.",
+            get_user_message(response).message)
 
-class TestFolderTypeValidation(TestCase):
-
-    def _test_message_error_user_destination_no_site_on_move(self):
+    def test_message_error_user_destination_no_site_on_move(self):
         site = Site.objects.get(id=1)
         foo = Folder.objects.create(name='foo')
         bar = Folder.objects.create(name='bar', site=site)
@@ -974,57 +909,112 @@ class TestFolderTypeValidation(TestCase):
             'site.' % foo.pretty_logical_path,
             get_user_message(response).message)
 
-    def test_message_error_user_destination_no_site_on_move_regular_user(self):
-        with login_using(self.client):
-            self._test_message_error_user_destination_no_site_on_move()
-
-    def test_message_error_user_destination_no_site_on_move_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_message_error_user_destination_no_site_on_move()
-
-    def _test_message_error_user_no_site_on_move(self):
-        site = Site.objects.get(id=1)
-        foo_root = Folder.objects.create(name='foo_root')
-        foo = Folder.objects.create(name='foo', parent=foo_root)
-        bar = Folder.objects.create(name='bar', site=site)
-        response, url = move_action(self.client, foo_root, bar, [foo], follow=True)
-        self.assertRedirects(response, url)
-        self.assertIn(
-            "Some of the selected files/folders do not belong to any site.",
-            get_user_message(response).message)
-
-    def test_message_error_user_no_site_on_move_regular_user(self):
-        with login_using(self.client):
-            self._test_message_error_user_no_site_on_move()
-
-    def test_message_error_user_no_site_on_move_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_message_error_user_no_site_on_move()
-
-    def _test_message_error_user_sites_mismatch_on_move(self):
-        site = Site.objects.get(id=1)
-        other_site = Site.objects.create(name='foo_site', domain='foo_site')
-        # make a root for foo in order to work for regular users
-        foo_root = Folder.objects.create(name='foo_root', site=other_site)
+    def test_move_destination_filters_core_folders(self):
         foo = Folder.objects.create(
-            name='foo', parent=foo_root)
-        bar = Folder.objects.create(name='bar', site=site)
-        url = reverse('admin:filer-directory_listing',
-                      kwargs={'folder_id': foo_root.id})
-        response, url = move_action(self.client, foo_root, bar, [foo], follow=True)
-        self.assertRedirects(response, url)
-        self.assertIn(
-            "Selected files/folders need to belong to the same site as the "
-            "destination folder.",
-            get_user_message(response).message)
+            name='foo', folder_type=Folder.CORE_FOLDER)
+        bar = Folder.objects.create(
+            name='bar', site=Site.objects.get(id=1))
+        bar2 = Folder.objects.create(
+            name='bar2', site=Site.objects.get(id=1))
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=django.core.files.base.ContentFile('some data'))
 
-    def test_message_error_user_sites_mismatch_on_move_regular_user(self):
-        with login_using(self.client):
-            self._test_message_error_user_sites_mismatch_on_move()
+        url = get_dir_listing_url(bar)
+        response = self.client.post(url, {
+            'action': 'move_files_and_folders',
+            helpers.ACTION_CHECKBOX_NAME: [filer_obj_as_checkox(bar_file)]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('destination_folders', response.context)
+        dest_folders = response.context['destination_folders']
+        self.assertNotIn(foo.id, [el[0].id for el in dest_folders])
 
-    def test_message_error_user_sites_mismatch_on_move_superuser(self):
-        with login_using(self.client, 'superuser'):
-            self._test_message_error_user_sites_mismatch_on_move()
+    def test_copy_destination_filters_restricted_folders(self):
+        pass
+
+
+class TestFolderTypeFolderPermissionForSuperUser(
+    TestCase, BaseTestFolderTypePermissionLayer):
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_superuser = user.is_staff = user.is_active = True
+        user.save()
+        user.user_permissions = Permission.objects.all()
+        self.client.login(username=username, password=password)
+        self.user = user
+
+
+class TestFolderTypeFolderPermissionLayerForRegularUser(
+    TestCase, BaseTestFolderTypePermissionLayer):
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_staff = user.is_active = True
+        user.save()
+        user.user_permissions = Permission.objects.all()
+        self.client.login(username=username, password=password)
+        self.user = user
+
+    def test_add_root_folder(self):
+        # regular users should not be able to add root folders at all
+        response = self.client.get(
+            get_make_root_folder_url())
+        self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            get_make_root_folder_url(), {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_change_root_folder(self):
+        f1 = Folder.objects.create(name='foo')
+        # regular users should not be able to change root folders at all
+        for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
+            Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
+            response = self.client.get(
+                reverse('admin:filer_folder_change', args=(f1.pk, )))
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+            self.assertEqual(response.status_code, 403)
+
+    def test_delete_root_folder(self):
+        f1 = Folder.objects.create(name='foo')
+        # regular users should not be able to delete root folders at all
+        for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
+            Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
+            response = self.client.post(
+                reverse('admin:filer_folder_delete', args=(f1.pk, )),
+                {'post': 'yes'})
+            self.assertEqual(response.status_code, 403)
+
+            response = self.client.post(
+                get_dir_listing_url(None), {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+            })
+            self.assertEqual(response.status_code, 403)
+            # case when viewing another folder content
+            # hit search and select a root folder to delete
+            folder_for_view = Folder.objects.create(name='bar')
+            response = self.client.post(
+                get_dir_listing_url(folder_for_view), {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+            })
+            # this might be a bug since the folder requested for deletion
+            #   is not passed to the delete_files_or_folders. For now
+            #   just make sure it is not deleted
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(
+                Folder.objects.filter(
+                    id__in=[folder_for_view.id, f1.id]).count(), 2)
 
 
 class TestFolderTypeFilesPermissionLayer(TestCase):

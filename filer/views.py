@@ -81,7 +81,12 @@ def upload(request):
 @login_required
 def paste_clipboard_to_folder(request):
     if request.method == 'POST':
-        folder = Folder.objects.get(id=request.POST.get('folder_id'))
+        folder_id = request.POST.get('folder_id')
+
+        if not folder_id:
+            raise PermissionDenied
+
+        folder = Folder.objects.get(id=folder_id)
 
         if folder.is_restricted():
             raise PermissionDenied

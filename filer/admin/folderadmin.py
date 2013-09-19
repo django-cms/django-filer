@@ -855,7 +855,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                                 folders_queryset,
                                                 current_folder, folders,
                                                 allow_self, level):
-        for fo in folders:
+        for fo in folders.exclude(folder_type=Folder.CORE_FOLDER):
             if not allow_self and fo in folders_queryset:
                 # We do not allow moving to selected folders or their
                 #       descendants
