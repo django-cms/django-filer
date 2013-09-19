@@ -10,13 +10,17 @@ from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
 from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
-from polymorphic import PolymorphicModel, PolymorphicManager
+import polymorphic
+# from polymorphic import PolymorphicModel, PolymorphicManager, query
 import hashlib
 import os
 
 
+class FilesChainableQuerySet(object):
 
-class FileManager(PolymorphicManager):
+    def restricted(self):
+        return self.filter(folder__folder_type=Folder.CORE_FOLDER)
+
     def find_all_duplicates(self):
         r = {}
         for file_obj in self.all():
@@ -27,10 +31,30 @@ class FileManager(PolymorphicManager):
         return r
 
     def find_duplicates(self, file_obj):
-        return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
+        return [duplicate_file
+                for duplicate_file in self.exclude(
+                    pk=file_obj.pk).filter(sha1=file_obj.sha1)]
 
 
-class File(PolymorphicModel, mixins.IconsMixin):
+class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
+    pass
+
+
+class FileQuerySet(polymorphic.query.PolymorphicQuerySet,
+                   FilesChainableQuerySet):
+    pass
+
+
+class FileManager(polymorphic.PolymorphicManager):
+
+    def get_query_set(self):
+        return FileQuerySet(self.model, using=self._db)
+
+    def get_empty_query_set(self):
+        return EmptyFilesQS(self.model, using=self._db)
+
+
+class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
@@ -380,6 +404,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
     @property
     def duplicates(self):
         return File.objects.find_duplicates(self)
+
+    def is_restricted(self):
+        if self.folder:
+            return self.folder.is_restricted()
+        return False
 
     class Meta:
         app_label = 'filer'

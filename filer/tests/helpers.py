@@ -5,6 +5,44 @@ from django.contrib.auth.models import User, Permission
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 from contextlib import contextmanager
+from django.core.urlresolvers import reverse
+from django.contrib.admin import helpers
+
+
+def _get_dir_listing_url(folder_id_for_view):
+    if folder_id_for_view is None:
+        return reverse('admin:filer-directory_listing-root')
+    if folder_id_for_view is 'unfiled':
+        return reverse('admin:filer-directory_listing-unfiled_images')
+    return reverse('admin:filer-directory_listing',
+                   kwargs={'folder_id': folder_id_for_view.id})
+
+
+def _filer_object_type(filer_obj):
+    if isinstance(filer_obj, Folder):
+        return 'folder'
+    return 'file'
+
+
+def move_to_clipboard_action(client, folder_view, to_move, follow=False):
+    objects_to_move = ['%s-%d' % (_filer_object_type(filer_obj), filer_obj.id)
+                       for filer_obj in to_move]
+    url = _get_dir_listing_url(folder_view)
+    return client.post(url, {
+        'action': 'move_to_clipboard',
+        'post': 'yes',
+        helpers.ACTION_CHECKBOX_NAME: objects_to_move }, follow=follow), url
+
+
+def move_action(client, folder_view, destination, to_move, follow=False):
+    objects_to_move = ['%s-%d' % (_filer_object_type(filer_obj), filer_obj.id)
+                       for filer_obj in to_move]
+    url = _get_dir_listing_url(folder_view)
+    return client.post(url, {
+        'action': 'move_files_and_folders',
+        'post': 'yes',
+        'destination': destination.id,
+        helpers.ACTION_CHECKBOX_NAME: objects_to_move }, follow=follow), url
 
 
 @contextmanager
@@ -19,7 +57,9 @@ def login_using(client, user_type=None):
     user.save()
     user.user_permissions = Permission.objects.all()
     client.login(username=username, password=password)
+    client.user_used = user
     yield
+    del client.user_used
     client.logout()
     user.delete()
 
@@ -128,3 +168,10 @@ def grant_all_folderpermissions_for_group(group):
     )
     for permission in permission_set:
         group.permissions.add(permission)
+
+def get_user_message(response):
+    """Helper method to return message from response """
+    for c in response.context:
+        message = [m for m in c.get('messages')][0]
+        if message:
+            return message

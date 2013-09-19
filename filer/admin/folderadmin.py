@@ -131,6 +131,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                         request=request, context=context, add=False,
                         change=False, form_url=form_url, obj=obj)
 
+    def _restrict_view(self, request, obj):
+        if not obj:
+            return
+        if obj.is_restricted():
+            raise PermissionDenied
+
+        if not obj.parent and not request.user.is_superuser:
+            raise PermissionDenied
+
     def delete_view(self, request, object_id, extra_context=None):
         """
         Overrides the default to enable redirecting to the directory view after
@@ -147,12 +156,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             obj = None
 
-        if obj:
-            if obj.folder_type == Folder.CORE_FOLDER:
-                raise PermissionDenied
-
-            if not obj.parent and not request.user.is_superuser:
-                raise PermissionDenied
+        self._restrict_view(request, obj)
 
         r = super(FolderAdmin, self).delete_view(
                     request=request, object_id=object_id,
@@ -203,11 +207,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def change_view(self, request, object_id, *args, **kwargs):
         obj = self.get_object(request, unquote(object_id))
-        if obj.folder_type == Folder.CORE_FOLDER:
-            raise PermissionDenied
 
-        if not obj.parent and not request.user.is_superuser:
-            raise PermissionDenied
+        self._restrict_view(request, obj)
 
         return super(FolderAdmin, self).change_view(
             request, object_id, *args, **kwargs)
@@ -558,6 +559,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if request.method != 'POST':
             return None
 
+        self._check_restricted(request, files_queryset, folders_queryset,
+                               allow_regular_users=True)
+
         clipboard = tools.get_user_clipboard(request.user)
 
         check_files_edit_permissions(request, files_queryset)
@@ -886,16 +890,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             f.move_to(destination, 'last-child')
             f.save()
 
-    def _check_restricted(self, request, files_queryset, folders_queryset):
-        restricted_folder = Q(folder_type=Folder.CORE_FOLDER)
-        if not request.user.is_superuser:
-            restricted_folder |= Q(parent__isnull=True)
-
-        if folders_queryset.filter(restricted_folder).exists():
+    def _check_restricted(self, request, files_queryset, folders_queryset,
+                          allow_regular_users=False):
+        user_check = request.user if not allow_regular_users else None
+        if folders_queryset.restricted(user_check).exists():
             raise PermissionDenied
 
-        restricted_files = Q(folder__folder_type=Folder.CORE_FOLDER)
-        if files_queryset.filter(restricted_files).exists():
+        if files_queryset.restricted().exists():
             raise PermissionDenied
 
     def move_files_and_folders(self, request,
@@ -929,10 +930,30 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             #   destination site folder
             if not destination.site:
                 messages.error(request, _(u"Destination folder %s does not "
-                    "belong to any site. Folder needs to be assigned to a "
+                    "belong to any site. Folders need to be assigned to a "
                     "site before you can move files in it." % \
                         destination.pretty_logical_path))
-                return None
+                return
+
+            folders_with_sites_to_move = \
+                set(folders_queryset.values_list('site_id', flat=True)) | \
+                set(files_queryset.values_list('folder__site_id', flat=True))
+
+            if None in folders_with_sites_to_move:
+                messages.error(request, "Some of the selected files/folders "
+                    "do not belong to any site. Folders need to be assigned "
+                    "to a site before you can move files/folders from it.")
+                return
+            elif len(folders_with_sites_to_move) > 1:
+                # it gets here if selection is made through a search view
+                messages.error(request, "You cannot move files/folders that "
+                    "belong to several sites. Select files/folders that "
+                    "belong to only one site.")
+                return
+            elif folders_with_sites_to_move.pop() != destination.site.id:
+                messages.error(request, "Selected files/folders need to "
+                    "belong to the same site as the destination folder.")
+                return
 
             folders_dict = dict(folders)
             if (destination not in folders_dict or

@@ -82,6 +82,10 @@ def upload(request):
 def paste_clipboard_to_folder(request):
     if request.method == 'POST':
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
+
+        if folder.is_restricted():
+            raise PermissionDenied
+
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         if folder.has_add_children_permission(request):
             tools.move_files_from_clipboard_to_folder(request, clipboard, folder)
@@ -119,8 +123,12 @@ def delete_clipboard(request):
 @login_required
 def clone_files_from_clipboard_to_folder(request):
     if request.method == 'POST':
-        clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
+
+        if folder.is_restricted():
+            raise PermissionDenied
+
+        clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.clone_files_from_clipboard_to_folder(clipboard, folder)
     return HttpResponseRedirect('%s%s%s' % (
                                     request.POST.get('redirect_to', ''),

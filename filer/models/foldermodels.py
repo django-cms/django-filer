@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import query
 from django.db import transaction
 from django.db.models import Q
 from django.utils.http import urlquote
@@ -17,9 +18,38 @@ from filer import settings as filer_settings
 import mptt
 
 
-class FolderManager(models.Manager):
+class FoldersChainableQuerySet(object):
+
     def with_bad_metadata(self):
-        return self.get_query_set().filter(has_all_mandatory_data=False)
+        return self.filter(has_all_mandatory_data=False)
+
+    def restricted(self, user=None):
+        restricted_folder = Q(folder_type=Folder.CORE_FOLDER)
+        if user and not user.is_superuser:
+            restricted_folder |= Q(parent__isnull=True)
+
+        return self.filter(restricted_folder)
+
+class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
+    pass
+
+
+class FolderQueryset(query.QuerySet, FoldersChainableQuerySet):
+    pass
+
+
+class FolderManager(models.Manager):
+
+    def get_empty_query_set(self):
+        return EmptyFoldersQS(self.model, using=self._db)
+
+    def get_query_set(self):
+        return FolderQueryset(self.model, using=self._db)
+
+    def __getattr__(self, name):
+        if name.startswith('__'):
+            return super(FolderManager, self).__getattr__(self, name)
+        return getattr(self.get_query_set(), name)
 
 
 class FolderPermissionManager(models.Manager):
@@ -346,6 +376,9 @@ class Folder(models.Model, mixins.IconsMixin):
             return True
         except Folder.DoesNotExist:
             return False
+
+    def is_restricted(self):
+        return self.folder_type == Folder.CORE_FOLDER
 
     class Meta:
         unique_together = (('parent', 'name'),)

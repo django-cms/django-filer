@@ -14,14 +14,10 @@ from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
 from filer.tests.helpers import (
-    login_using,
-    create_superuser,
-    create_folder_structure,
-    create_image,
-    create_staffuser,
-    create_folder_for_user,
-    create_folderpermission_for_user,
-    grant_all_folderpermissions_for_group,
+    login_using, get_user_message, create_superuser, create_folder_structure,
+    create_image, create_staffuser, create_folder_for_user, move_action,
+    create_folderpermission_for_user, grant_all_folderpermissions_for_group,
+    move_to_clipboard_action,
 )
 
 
@@ -264,9 +260,10 @@ class BulkOperationsMixin(object):
             folder.delete()
 
     def create_src_and_dst_folders(self):
-        self.src_folder = Folder(name="Src", parent=None)
+        site = Site.objects.get(id=1)
+        self.src_folder = Folder(name="Src", parent=None, site=site)
         self.src_folder.save()
-        self.dst_folder = Folder(name="Dst", parent=None)
+        self.dst_folder = Folder(name="Dst", parent=None, site=site)
         self.dst_folder.save()
 
     def create_image(self, folder, filename=None):
@@ -291,26 +288,13 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
 
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 0)
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.src_folder.id,
-        })
-        response = self.client.post(url, {
-            'action': 'move_files_and_folders',
-            'post': 'yes',
-            'destination': self.dst_folder.id,
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
-        })
+        response, _ = move_action(
+            self.client, self.src_folder, self.dst_folder, [self.image_obj])
         self.assertEqual(self.src_folder.files.count(), 0)
         self.assertEqual(self.dst_folder.files.count(), 1)
-        url = reverse('admin:filer-directory_listing', kwargs={
-            'folder_id': self.dst_folder.id,
-        })
-        response = self.client.post(url, {
-            'action': 'move_files_and_folders',
-            'post': 'yes',
-            'destination': self.src_folder.id,
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
-        })
+
+        response, _ = move_action(
+            self.client, self.dst_folder, self.src_folder, [self.image_obj])
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 0)
 
@@ -333,12 +317,8 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': root.pk,
         })
-        response = self.client.post(url, {
-            'action': 'move_files_and_folders',
-            'post': 'yes',
-            'destination': foo.pk,
-            helpers.ACTION_CHECKBOX_NAME: 'folder-%d' % (bar.pk,),
-        })
+
+        response, _ = move_action(self.client, root, foo, [bar])
         # refresh from db and validate that it hasn't been moved
         bar = Folder.objects.get(pk=bar.pk)
         self.assertEqual(bar.parent.pk, root.pk)
@@ -351,10 +331,8 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
-        response = self.client.post(url, {
-            'action': 'move_to_clipboard',
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
-        })
+        response = move_to_clipboard_action(
+            self.client, self.src_folder, [self.image_obj])
         self.assertEqual(self.src_folder.files.count(), 0)
         self.assertEqual(self.dst_folder.files.count(), 0)
         clipboard = Clipboard.objects.get(user=self.superuser)
@@ -459,6 +437,7 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
+
     def test_resize_images_action(self):
         # TODO: Test recursive (files and folders tree) processing
         self.assertEqual(self.image_obj.width, 800)
@@ -579,6 +558,7 @@ class PermissionAdminTest(TestCase):
 
 
 class TestFolderTypeFolderPermissionLayer(TestCase):
+
 
     def test_default_add_view_is_forbidden(self):
         with login_using(self.client, 'superuser'):
@@ -872,24 +852,10 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         folders, files = self._build_some_folder_structure(
             Folder.CORE_FOLDER, None)
 
-        response = self.client.post(
-            reverse('admin:filer-directory_listing-root'), {
-                'action': 'move_files_and_folders',
-                'post': 'yes',
-                'destination': folders['foo2'].id,
-                helpers.ACTION_CHECKBOX_NAME:
-                    'folder-%d' % (folders['bar'].id,),
-        })
+        response, _ = move_action(self.client, None, folders['foo2'], [folders['bar']])
         self.assertEqual(response.status_code, 403)
 
-        response = self.client.post(
-            reverse('admin:filer-directory_listing-root'), {
-                'action': 'move_files_and_folders',
-                'post': 'yes',
-                'destination': folders['foo2'].id,
-                helpers.ACTION_CHECKBOX_NAME:
-                    'folder-%d' % (folders['foo1'].id,),
-        })
+        response, _ = move_action(self.client, None, folders['foo2'], [folders['foo1']])
         self.assertEqual(response.status_code, 403)
 
     def test_move_core_folder_for_regular_user(self):
@@ -906,42 +872,159 @@ class TestFolderTypeFolderPermissionLayer(TestCase):
         f1 = Folder.objects.create(
             name='destination', folder_type=Folder.CORE_FOLDER)
 
-        response = self.client.post(
-            reverse('admin:filer-directory_listing-root'), {
-                'action': 'move_files_and_folders',
-                'post': 'yes',
-                'destination': f1.id,
-                helpers.ACTION_CHECKBOX_NAME:
-                    ['folder-%d' % (folders['bar'].id,)],
-        })
+        response, _ = move_action(self.client, None, f1, [folders['bar']])
         self.assertEqual(response.status_code, 403)
         f1.delete()
         return folders, files
 
     def test_move_site_folder_for_regular_user(self):
         with login_using(self.client):
-            folders, files = \
-                self._test_move_site_folder_to_core_destination_folder()
-            other_site = Site.objects.create(
-                name='foo_site', domain='foo_site')
-            f1 = Folder.objects.create(
-                name='destination', site=other_site)
-
-            response = self.client.post(
-                reverse('admin:filer-directory_listing-root'), {
-                    'action': 'move_files_and_folders',
-                    'post': 'yes',
-                    'destination': f1.id,
-                    helpers.ACTION_CHECKBOX_NAME:
-                        'folder-%d' % (folders['bar'].id,),
-            })
-            self.assertEqual(response.status_code, 403)
+            self._test_move_site_folder_to_core_destination_folder()
 
     def test_move_site_folder_for_superuser(self):
         with login_using(self.client, 'superuser'):
             self._test_move_site_folder_to_core_destination_folder()
 
+    def _get_clipboard_files(self):
+        clipboard, _ = Clipboard.objects.get_or_create(user=self.client.user_used)
+        return clipboard.files
 
+    def _test_move_to_clipboard_from_root(self):
+        file_bar = File.objects.create(
+            original_filename='bar', folder=None,
+            file=django.core.files.base.ContentFile('some data'))
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+        move_to_clipboard_action(self.client, 'unfiled', [file_bar])
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
+
+    def test_move_to_clipboard_from_root_for_regular_user(self):
+        self.assertEqual('This test should work after removing filer '
+                         'permissions', '')
+        with login_using(self.client):
+            self._test_move_to_clipboard_from_root()
+
+    def test_move_to_clipboard_from_root_for_super_user(self):
+        self.assertEqual('This test should work after removing filer '
+                         'permissions', '')
+        with login_using(self.client, 'superuser'):
+            self._test_move_to_clipboard_from_root()
+
+    def _test_move_to_clipboard_from_site_folders(self):
+        foo = Folder.objects.create(name='mic', site=Site.objects.get(id=1))
+        file_bar = File.objects.create(
+            original_filename='mic', folder=foo,
+            file=django.core.files.base.ContentFile('some data'))
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+        move_to_clipboard_action(self.client, None, [foo])
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
+
+    def test_move_to_clipboard_from_site_folders_regular_user(self):
+        with login_using(self.client):
+            self._test_move_to_clipboard_from_site_folders()
+
+    def test_move_to_clipboard_from_site_folders_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_move_to_clipboard_from_site_folders()
+
+    def _test_move_to_clipboard_from_core_folders(self):
+        foo = Folder.objects.create(name='foo',
+                                    folder_type=Folder.CORE_FOLDER)
+        file_bar = File.objects.create(
+            original_filename='bar_file', folder=foo,
+            file=django.core.files.base.ContentFile('some data'))
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+        response, _ = move_to_clipboard_action(self.client, None, [foo])
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+
+    def test_move_to_clipboard_from_core_folders_for_regular_user(self):
+        with login_using(self.client):
+            self._test_move_to_clipboard_from_core_folders()
+
+    def test_move_to_clipboard_from_core_folders_for_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_move_to_clipboard_from_core_folders()
+
+    def _test_move_from_clipboard_to_root(self):
+        pass
+
+    def _test_move_from_clipboard_to_core_folders(self):
+        pass
+
+    def _test_move_from_clipboard_to_site_folders(self):
+        pass
+
+class TestFolderTypeValidation(TestCase):
+
+    def _test_message_error_user_destination_no_site_on_move(self):
+        site = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', site=site)
+        baz = Folder.objects.create(name='baz', site=site, parent=bar)
+        response, url = move_action(self.client, None, foo, [baz], follow=True)
+        self.assertRedirects(response, url)
+        self.assertIn(
+            'Destination folder %s does not belong to any '
+            'site.' % foo.pretty_logical_path,
+            get_user_message(response).message)
+
+    def test_message_error_user_destination_no_site_on_move_regular_user(self):
+        with login_using(self.client):
+            self._test_message_error_user_destination_no_site_on_move()
+
+    def test_message_error_user_destination_no_site_on_move_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_message_error_user_destination_no_site_on_move()
+
+    def _test_message_error_user_no_site_on_move(self):
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        foo = Folder.objects.create(name='foo', parent=foo_root)
+        bar = Folder.objects.create(name='bar', site=site)
+        response, url = move_action(self.client, foo_root, bar, [foo], follow=True)
+        self.assertRedirects(response, url)
+        self.assertIn(
+            "Some of the selected files/folders do not belong to any site.",
+            get_user_message(response).message)
+
+    def test_message_error_user_no_site_on_move_regular_user(self):
+        with login_using(self.client):
+            self._test_message_error_user_no_site_on_move()
+
+    def test_message_error_user_no_site_on_move_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_message_error_user_no_site_on_move()
+
+    def _test_message_error_user_sites_mismatch_on_move(self):
+        site = Site.objects.get(id=1)
+        other_site = Site.objects.create(name='foo_site', domain='foo_site')
+        # make a root for foo in order to work for regular users
+        foo_root = Folder.objects.create(name='foo_root', site=other_site)
+        foo = Folder.objects.create(
+            name='foo', parent=foo_root)
+        bar = Folder.objects.create(name='bar', site=site)
+        url = reverse('admin:filer-directory_listing',
+                      kwargs={'folder_id': foo_root.id})
+        response, url = move_action(self.client, foo_root, bar, [foo], follow=True)
+        self.assertRedirects(response, url)
+        self.assertIn(
+            "Selected files/folders need to belong to the same site as the "
+            "destination folder.",
+            get_user_message(response).message)
+
+    def test_message_error_user_sites_mismatch_on_move_regular_user(self):
+        with login_using(self.client):
+            self._test_message_error_user_sites_mismatch_on_move()
+
+    def test_message_error_user_sites_mismatch_on_move_superuser(self):
+        with login_using(self.client, 'superuser'):
+            self._test_message_error_user_sites_mismatch_on_move()
 
 
 class TestFolderTypeFilesPermissionLayer(TestCase):
