@@ -34,3 +34,10 @@
 	{% endblock %}
 </div>
 {% endblock %}
+
+
+{% block submit_buttons_bottom %}
+{% if not original.is_restricted %}
+{{ block.super }}
+{% endif %}
+{% endblock %}

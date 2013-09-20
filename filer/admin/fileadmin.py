@@ -11,11 +11,6 @@ from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
 
-class FileAdminChangeFrom(forms.ModelForm):
-    class Meta:
-        model = File
-
-
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('label',)
     list_per_page = 10
@@ -30,7 +25,11 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     # render_change_form() override add and change to False.
     save_as = True
 
-    form = FileAdminChangeFrom
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.is_restricted():
+            return [field.name
+                    for field in obj.__class__._meta.fields]
+        return super(FileAdmin, self).get_readonly_fields(request, obj)
 
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):

@@ -30,13 +30,19 @@ def filer_obj_as_checkox(filer_obj):
     return '%s-%d' % (filer_object_type(filer_obj), filer_obj.id)
 
 
-
 def paste_clipboard_to_folder(client, destination, clipboard):
     data_to_post = { 'clipboard_id': clipboard.pk }
     if destination:
         data_to_post['folder_id'] = destination.id
     return client.post(
         reverse('admin:filer-paste_clipboard_to_folder'), data_to_post)
+
+
+def move_single_file_to_clipboard_action(client, folder_view, file_to_move):
+    post_data = {"move-to-clipboard-%d" % (f.id,): ''
+                 for f in file_to_move}
+    url = get_dir_listing_url(folder_view)
+    return client.post(url, post_data)
 
 
 def move_to_clipboard_action(client, folder_view, to_move, follow=False):

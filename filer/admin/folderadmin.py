@@ -221,6 +221,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder_id = request.REQUEST.get('parent_id', None)
         if folder_id:
             folder = Folder.objects.get(id=folder_id)
+            if folder.is_restricted():
+                raise PermissionDenied
         else:
             folder = None
 
@@ -380,6 +382,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if request.method == 'POST' and '_save' not in request.POST:
             for f in folder_files:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
+                    if f.is_restricted():
+                        raise PermissionDenied
                     clipboard = tools.get_user_clipboard(request.user)
                     if f.has_edit_permission(request):
                         tools.move_file_to_clipboard(request, [f], clipboard)
@@ -960,17 +964,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 not folders_dict[destination][1]):
                 raise PermissionDenied
 
-            # We count only topmost files and folders here
-            n = files_queryset.count() + folders_queryset.count()
-            conflicting_names = [folder.name
-                                 for folder in Folder.objects.filter(
-                                    parent=destination,
-                                    name__in=folders_queryset.values('name'))]
-            if conflicting_names:
+            conflicting_folder_names = [
+                folder.name for folder in Folder.objects.filter(
+                    parent=destination,
+                    name__in=folders_queryset.values('name'))]
+
+            if conflicting_folder_names:
                 messages.error(request,
                     _(u"Folders with names %s already exist at the selected "
-                      "destination") % u", ".join(conflicting_names))
-            elif n:
+                      "destination") % u", ".join(conflicting_folder_names))
+                return
+
+            valid_files , invalid_files = \
+                tools.split_files_valid_for_destination(
+                    files_queryset, destination)
+            if invalid_files:
+                conflicting_file_names = [f.actual_name
+                                          for f in invalid_files]
+                messages.error(request,
+                    _(u"Files with names %s already exist at the selected "
+                      "destination") % u", ".join(conflicting_file_names))
+                return
+
+            # We count only topmost files and folders here
+            n = files_queryset.count() + folders_queryset.count()
+            if n:
                 self._move_files_and_folders_impl(
                     files_queryset, folders_queryset, destination)
                 self.message_user(request,
@@ -1101,6 +1119,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def extract_files(self, request, files_queryset, folder_queryset):
         success_format = "Successfully extracted archive {}."
+
+        self._check_restricted(
+            request, files_queryset, Folder.objects.get_empty_query_set())
 
         def is_valid_archive(filer_file):
             is_valid = filer_file.is_valid()
