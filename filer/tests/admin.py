@@ -1163,7 +1163,7 @@ class TestFolderTypeFolderPermissionLayerForRegularUser(
                     id__in=[folder_for_view.id, f1.id]).count(), 2)
 
 
-class TestFolderTypeFunctionality(self):
+class TestFolderTypeFunctionality(TestCase):
 
     def setUp(self):
         username = 'login_using_foo'
