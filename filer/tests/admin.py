@@ -2,12 +2,14 @@
 import os
 from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
-import django.core.files
+from django.core.exceptions import ValidationError
+from django.core import files as dj_files
 from django.contrib.admin import helpers, site
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User, Group, Permission
 from django.http import HttpRequest
 from filer.models.filemodels import File
+from filer.models.archivemodels import Archive
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
@@ -24,6 +26,7 @@ from filer.tests.helpers import (
 
 
 class FilerFolderAdminUrlsTests(TestCase):
+
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -132,6 +135,7 @@ class FilerFolderAdminUrlsTests(TestCase):
 
 
 class FilerImageAdminUrlsTests(TestCase):
+
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -141,6 +145,7 @@ class FilerImageAdminUrlsTests(TestCase):
 
 
 class FilerClipboardAdminUrlsTests(TestCase):
+
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -158,7 +163,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename))
+        file_obj = dj_files.File(open(self.filename))
         response = self.client.post(
             reverse('admin:filer-ajax_upload'), {
             'Filename': self.image_name,
@@ -172,7 +177,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_file_upload_no_duplicate_files(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename))
+        file_obj = dj_files.File(open(self.filename))
         response = self.client.post(
             reverse('admin:filer-ajax_upload'), {
             'Filename': self.image_name,
@@ -199,7 +204,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         first_folder = Folder.objects.create(name='first')
 
         def upload():
-            file_obj = django.core.files.File(open(self.filename))
+            file_obj = dj_files.File(open(self.filename))
             response = self.client.post(
                 reverse('admin:filer-ajax_upload'),
                 {'Filename': self.image_name, 'Filedata': file_obj,
@@ -232,7 +237,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename))
+        file_obj = dj_files.File(open(self.filename))
         response = self.client.post(reverse('admin:filer-ajax_upload') +
             '?filename=%s' % self.image_name,
             data=file_obj.read(),
@@ -245,6 +250,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
 
 class BulkOperationsMixin(object):
+
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
@@ -286,7 +292,7 @@ class BulkOperationsMixin(object):
 
     def create_image(self, folder, filename=None):
         filename = filename or 'test_image.jpg'
-        file_obj = django.core.files.File(open(self.filename), name=filename)
+        file_obj = dj_files.File(open(self.filename), name=filename)
         image_obj = Image.objects.create(
             owner=self.superuser, original_filename=self.image_name,
             file=file_obj, folder=folder)
@@ -295,7 +301,7 @@ class BulkOperationsMixin(object):
 
     def create_file(self, folder, filename=None):
         filename = filename or 'test_file.dat'
-        file_data = django.core.files.base.ContentFile('some data')
+        file_data = dj_files.base.ContentFile('some data')
         file_data.name = filename
         file_obj = File.objects.create(owner=self.superuser,
             original_filename=filename, file=file_data, folder=folder)
@@ -304,6 +310,7 @@ class BulkOperationsMixin(object):
 
 
 class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
+
     def test_move_files_and_folders_action(self):
         # TODO: Test recursive (files and folders tree) move
 
@@ -330,10 +337,10 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         bar = Folder.objects.create(name='bar', site=Site.objects.get(id=1))
         file_foo = File.objects.create(
             original_filename='file', folder=foo,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         file_bar = File.objects.create(
             original_filename='file', folder=bar,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
 
         response, url = move_action(
             self.client, foo, bar, [file_foo], follow=True)
@@ -511,6 +518,7 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
 
 
 class PermissionAdminTest(TestCase):
+
     def setUp(self):
         self.superuser = create_superuser()
         self.group1 = Group.objects.create(name='group1')
@@ -805,7 +813,7 @@ class BaseTestFolderTypePermissionLayer(object):
 
         file_bar = File.objects.create(
             original_filename='bar_file', folder=bar,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         _files['file_bar'] = file_bar
         return _folders, _files
 
@@ -843,7 +851,7 @@ class BaseTestFolderTypePermissionLayer(object):
                              'permissions', '')
         file_foo = File.objects.create(
             original_filename='foo', folder=None,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
 
@@ -853,7 +861,7 @@ class BaseTestFolderTypePermissionLayer(object):
 
         file_bar = File.objects.create(
             original_filename='bar', folder=None,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         move_single_file_to_clipboard_action(
             self.client, 'unfiled', [file_bar])
         self.assertEqual(
@@ -863,7 +871,7 @@ class BaseTestFolderTypePermissionLayer(object):
         foo = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
         file_foo = File.objects.create(
             original_filename='foo', folder=foo,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
         move_to_clipboard_action(self.client, None, [foo])
@@ -872,14 +880,14 @@ class BaseTestFolderTypePermissionLayer(object):
 
         file_bar = File.objects.create(
             original_filename='bar', folder=foo,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         move_to_clipboard_action(self.client, foo, [file_bar])
         self.assertEqual(
             self._get_clipboard_files().count(), 2)
 
         file_baz = File.objects.create(
             original_filename='baz', folder=foo,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         move_single_file_to_clipboard_action(
             self.client, foo, [file_baz])
         self.assertEqual(
@@ -890,7 +898,7 @@ class BaseTestFolderTypePermissionLayer(object):
                                     folder_type=Folder.CORE_FOLDER)
         file_foo = File.objects.create(
             original_filename='foo_file', folder=foo,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
         response, _ = move_to_clipboard_action(self.client, None, [foo])
@@ -909,7 +917,7 @@ class BaseTestFolderTypePermissionLayer(object):
     def test_move_from_clipboard_to_root(self):
         bar_file = File.objects.create(
             original_filename='bar_file',
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         clipboard, _ = Clipboard.objects.get_or_create(
             user=self.user)
         clipboard.append_file(bar_file)
@@ -924,7 +932,7 @@ class BaseTestFolderTypePermissionLayer(object):
     def test_move_from_clipboard_to_core_folders(self):
         bar_file = File.objects.create(
             original_filename='bar_file',
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         core_folder = Folder.objects.create(
             name='foo', folder_type=Folder.CORE_FOLDER)
         clipboard, _ = Clipboard.objects.get_or_create(
@@ -941,7 +949,7 @@ class BaseTestFolderTypePermissionLayer(object):
     def test_move_from_clipboard_to_site_folders(self):
         bar_file = File.objects.create(
             original_filename='bar_file',
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         site_folder = Folder.objects.create(
             name='foo', site=Site.objects.get(id=1))
         clipboard, _ = Clipboard.objects.get_or_create(
@@ -1006,7 +1014,7 @@ class BaseTestFolderTypePermissionLayer(object):
             name='bar2', site=Site.objects.get(id=1))
         bar_file = File.objects.create(
             original_filename='bar_file',
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
 
         url = get_dir_listing_url(bar)
         response = self.client.post(url, {
@@ -1047,7 +1055,7 @@ class BaseTestFolderTypePermissionLayer(object):
         f1 = Folder.objects.create(name='foo', folder_type=Folder.CORE_FOLDER)
         file1 = File.objects.create(
             original_filename='bar_file', folder=f1,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         url = reverse('admin:filer_file_change', args=(file1.id, ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -1060,7 +1068,7 @@ class BaseTestFolderTypePermissionLayer(object):
         f1 = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
         file1 = File.objects.create(
             original_filename='bar_file', folder=f1,
-            file=django.core.files.base.ContentFile('some data'))
+            file=dj_files.base.ContentFile('some data'))
         url = reverse('admin:filer_file_change', args=(file1.id, ))
         response = self.client.get(url)
         self.assertIn('submit', response.content)
@@ -1068,16 +1076,50 @@ class BaseTestFolderTypePermissionLayer(object):
         # at least the choose file and csrfmiddlewaretoken
         self.assertGreater(response.content.count('<input'), 2)
 
+    def _build_files_structure_for_archive(self):
+        file_structure = {}
+        file_structure['foo'] = Folder.objects.create(
+            name='foo', folder_type=Folder.CORE_FOLDER)
+        file_structure['bar'] = Folder.objects.create(
+            name='bar', site=Site.objects.get(id=1))
+        file_structure['foo_file'] = Archive.objects.create(
+            original_filename='foo_file.zip', folder=file_structure['foo'],
+            file=dj_files.base.ContentFile('zippy'))
+        file_structure['bar_file'] = Archive.objects.create(
+            original_filename='bar_file.zip', folder=file_structure['bar'],
+            file=dj_files.base.ContentFile('zippy'))
+        file_structure['baz_file'] = Archive.objects.create(
+            original_filename='baz_file.zip',
+            file=dj_files.base.ContentFile('zippy'))
+        return file_structure
+
     def test_extract_files_in_core_folder(self):
-        # root & regular
-        pass
+        files = self._build_files_structure_for_archive()
+        url = get_dir_listing_url(files['foo'])
+        response = self.client.post(url, {
+            'action': 'extract_files',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(files['foo_file'])]})
+        self.assertEqual(response.status_code, 403)
 
     def test_extract_files_in_site_folder(self):
-        # root & regular
-        pass
+        files = self._build_files_structure_for_archive()
+        url = get_dir_listing_url(files['bar'])
+        response = self.client.post(url, {
+            'action': 'extract_files',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(files['bar_file'])]}, follow=True)
+        self.assertEqual(get_user_message(response).message,
+                         'bar_file.zip is not a valid zip file')
 
     def test_extract_in_unfiled_folder(self):
-        pass
+        files = self._build_files_structure_for_archive()
+        url = get_dir_listing_url('unfiled')
+        response = self.client.post(url, {
+            'action': 'extract_files',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(files['baz_file'])]})
+        self.assertEqual(response.status_code, 403)
 
 
 class TestFolderTypeFolderPermissionForSuperUser(
@@ -1174,21 +1216,79 @@ class TestFolderTypeFunctionality(TestCase):
         self.client.login(username=username, password=password)
         self.user = user
 
-    def test_folder_owner_set_by_request_user(self):
-        pass
+    def test_owner_set_by_request_user_on_folder_form(self):
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'foo', 'site': 1})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.count(), 1)
+        self.assertEqual(Folder.objects.all()[0].owner, self.user)
 
     def test_make_folder_view_sets_parent_id_correctly(self):
-        # from root creation or change
-        # from regular folder creation or change
-        pass
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'foo', 'site': 1, 'parent_id': ''})
+        foo = Folder.objects.get(name='foo')
+        self.assertEqual(foo.parent, None)
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'bar', 'site': 1, 'parent_id': foo.id})
+        bar = Folder.objects.get(name='bar')
+        self.assertEqual(bar.parent_id, foo.id)
+
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(bar.pk, )),
+            {'post': ['yes'], 'name': 'baz'})
+        self.assertEqual(response.status_code, 302)
+        bar = Folder.objects.get(name='baz')
+        self.assertEqual(bar.parent_id, foo.id)
 
     def test_folder_validation_works_on_model_and_form(self):
-        pass
+        foo = Folder(name='foo')
+        foo.site_id = 1
+        foo.save()
+
+        bar = Folder(name='foo', site_id=1)
+        with self.assertRaisesRegexp(ValidationError, 'name already exists'):
+            bar.full_clean()
+        bar.name = 'bar'
+        bar.site = None
+        with self.assertRaisesRegexp(ValidationError, 'Site is required'):
+            bar.full_clean()
+        bar.site = Site.objects.get(id=1)
+        bar.folder_type = Folder.CORE_FOLDER
+        with self.assertRaisesRegexp(ValidationError, 'Site must be empty.'):
+            bar.full_clean()
+
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'bar'})
+        self.assertIn('Site is required', response.content)
+
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'foo'})
+        self.assertIn('name already exists', response.content)
 
     def test_folder_type_conversion_propagate_changes(self):
-        pass
-
-    def test_folder_type_conversion(self):
-        # from core to site folder
-        # changes are propagated to children
-        pass
+        site = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo', site=site)
+        bar = Folder.objects.create(
+            name='bar', site=site, parent=foo)
+        foo.folder_type = Folder.CORE_FOLDER
+        foo.save()
+        foo = Folder.objects.get(name='foo')
+        bar = Folder.objects.get(name='bar')
+        self.assertEqual(foo.folder_type, Folder.CORE_FOLDER)
+        self.assertEqual(foo.site, None)
+        self.assertEqual(bar.folder_type, Folder.CORE_FOLDER)
+        self.assertEqual(bar.site, None)
+        foo.folder_type = Folder.SITE_FOLDER
+        foo.site = site
+        foo.save()
+        foo = Folder.objects.get(name='foo')
+        bar = Folder.objects.get(name='bar')
+        self.assertEqual(foo.folder_type, Folder.SITE_FOLDER)
+        self.assertEqual(foo.site, site)
+        self.assertEqual(bar.folder_type, Folder.SITE_FOLDER)
+        self.assertEqual(bar.site, site)

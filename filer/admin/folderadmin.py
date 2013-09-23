@@ -1120,6 +1120,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def extract_files(self, request, files_queryset, folder_queryset):
         success_format = "Successfully extracted archive {}."
 
+        # cannot extract in unfiled files folder
+        if files_queryset.filter(folder=None).exists():
+            raise PermissionDenied
+
         self._check_restricted(
             request, files_queryset, Folder.objects.get_empty_query_set())
 

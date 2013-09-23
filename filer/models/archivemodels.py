@@ -39,13 +39,13 @@ class Archive(File):
 
     def is_valid(self):
         """Checks if the file is a proper archive."""
-        is_valid = False
-        self.file.open()
         try:
-            is_valid = self._is_valid_zip(self.file)
+            self.file.open()
+            return self._is_valid_zip(self.file)
+        except:
+            return False
         finally:
             self.file.close()
-        return is_valid
 
     def collisions(self):
         """
