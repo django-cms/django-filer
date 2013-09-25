@@ -10,8 +10,8 @@ from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
 from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
+from django.db.models import Count
 import polymorphic
-# from polymorphic import PolymorphicModel, PolymorphicManager, query
 import hashlib
 import os
 
@@ -21,19 +21,8 @@ class FilesChainableQuerySet(object):
     def restricted(self):
         return self.filter(folder__folder_type=Folder.CORE_FOLDER)
 
-    def find_all_duplicates(self):
-        r = {}
-        for file_obj in self.all():
-            if file_obj.sha1:
-                q = self.filter(sha1=file_obj.sha1)
-                if len(q) > 1:
-                    r[file_obj.sha1] = q
-        return r
-
     def find_duplicates(self, file_obj):
-        return [duplicate_file
-                for duplicate_file in self.exclude(
-                    pk=file_obj.pk).filter(sha1=file_obj.sha1)]
+        return self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)
 
 
 class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
@@ -52,6 +41,11 @@ class FileManager(polymorphic.PolymorphicManager):
 
     def get_empty_query_set(self):
         return EmptyFilesQS(self.model, using=self._db)
+
+    def find_all_duplicates(self):
+        return {file_data['sha1']: file_data['count']
+                for file_data in File.objects.values('sha1').annotate(
+                    count=Count('id')).filter(count__gt=1)}
 
 
 class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
@@ -403,7 +397,7 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
 
     @property
     def duplicates(self):
-        return File.objects.find_duplicates(self)
+        return list(File.objects.find_duplicates(self))
 
     def is_restricted(self):
         if self.folder:
