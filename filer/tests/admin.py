@@ -10,7 +10,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.http import HttpRequest
 from filer.models.filemodels import File
 from filer.models.archivemodels import Archive
-from filer.models.foldermodels import Folder, FolderPermission
+from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
@@ -18,7 +18,6 @@ from filer.models import tools
 from filer.tests.helpers import (
     get_user_message, create_superuser, create_folder_structure,
     create_image, create_staffuser, create_folder_for_user, move_action,
-    create_folderpermission_for_user, grant_all_folderpermissions_for_group,
     move_to_clipboard_action, paste_clipboard_to_folder, get_dir_listing_url,
     filer_obj_as_checkox, get_make_root_folder_url,
     move_single_file_to_clipboard_action,
@@ -516,7 +515,7 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.image_obj.width, 42)
         self.assertEqual(self.image_obj.height, 42)
 
-
+'''
 class PermissionAdminTest(TestCase):
 
     def setUp(self):
@@ -613,7 +612,7 @@ class PermissionAdminTest(TestCase):
         for user in self.users.keys():
             self.assert_user_adminview(user)
 
-
+'''
 class BaseTestFolderTypePermissionLayer(object):
 
     def test_default_add_view_is_forbidden(self):
@@ -738,7 +737,7 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Folder.objects.count(), 1)
 
-    def test_change_root_folder(self):
+    def test_change_root_core_folder(self):
         f1 = Folder.objects.create(
             name='foo', folder_type=Folder.CORE_FOLDER)
         response = self.client.get(
@@ -748,8 +747,9 @@ class BaseTestFolderTypePermissionLayer(object):
             reverse('admin:filer_folder_change', args=(f1.pk, )), {})
         self.assertEqual(response.status_code, 403)
 
-        Folder.objects.filter(id=f1.id).update(
-            folder_type=Folder.SITE_FOLDER)
+    def test_change_root_site_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.SITE_FOLDER)
         response = self.client.get(
             reverse('admin:filer_folder_change', args=(f1.pk, )))
         self.assertEqual(response.status_code, 200)
@@ -846,9 +846,6 @@ class BaseTestFolderTypePermissionLayer(object):
         return clipboard.files
 
     def test_move_to_clipboard_from_root(self):
-        if not self.user.is_superuser:
-            self.assertEqual('This test should work after refactor filer '
-                             'permissions', '')
         file_foo = File.objects.create(
             original_filename='foo', folder=None,
             file=dj_files.base.ContentFile('some data'))
@@ -1122,7 +1119,7 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(response.status_code, 403)
 
 
-class TestFolderTypeFolderPermissionForSuperUser(
+class TestFolderTypePermissionForSuperUser(
     TestCase, BaseTestFolderTypePermissionLayer):
 
     def setUp(self):
@@ -1136,7 +1133,7 @@ class TestFolderTypeFolderPermissionForSuperUser(
         self.user = user
 
 
-class TestFolderTypeFolderPermissionLayerForRegularUser(
+class TestFolderTypePermissionLayerForRegularUser(
     TestCase, BaseTestFolderTypePermissionLayer):
 
     def setUp(self):
@@ -1158,17 +1155,15 @@ class TestFolderTypeFolderPermissionLayerForRegularUser(
             get_make_root_folder_url(), {})
         self.assertEqual(response.status_code, 403)
 
-    def test_change_root_folder(self):
-        f1 = Folder.objects.create(name='foo')
+    def test_change_root_site_folder(self):
         # regular users should not be able to change root folders at all
-        for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
-            Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
-            response = self.client.get(
-                reverse('admin:filer_folder_change', args=(f1.pk, )))
-            self.assertEqual(response.status_code, 403)
-            response = self.client.post(
-                reverse('admin:filer_folder_change', args=(f1.pk, )), {})
-            self.assertEqual(response.status_code, 403)
+        f1 = Folder.objects.create(name='foo', folder_type=Folder.SITE_FOLDER)
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(f1.pk, )))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(f1.pk, )), {})
+        self.assertEqual(response.status_code, 403)
 
     def test_delete_root_folder(self):
         f1 = Folder.objects.create(name='foo')

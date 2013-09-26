@@ -2,7 +2,7 @@
 from PIL import Image, ImageChops, ImageDraw
 
 from django.contrib.auth.models import User, Permission
-from filer.models.foldermodels import Folder, FolderPermission
+from filer.models.foldermodels import Folder
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 from django.core.urlresolvers import reverse
 from django.contrib.admin import helpers
@@ -151,25 +151,6 @@ def create_folder_for_user(foldername, user):
     )
     return folder
 
-
-def create_folderpermission_for_user(folder, user):
-    folder_permission = FolderPermission.objects.create(
-        folder=folder,
-        type=FolderPermission.CHILDREN,
-        user=user,
-        can_edit=FolderPermission.ALLOW,
-        can_read=FolderPermission.ALLOW,
-        can_add_children=FolderPermission.ALLOW,
-    )
-    return folder_permission
-
-
-def grant_all_folderpermissions_for_group(group):
-    permission_set = Permission.objects.filter(
-        codename__endswith='folderpermission',
-    )
-    for permission in permission_set:
-        group.permissions.add(permission)
 
 def get_user_message(response):
     """Helper method to return message from response """

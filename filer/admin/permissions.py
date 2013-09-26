@@ -6,17 +6,15 @@ from django.core.urlresolvers import reverse
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
-        if hasattr(obj, 'has_edit_permission'):
-            if obj.has_edit_permission(request):
-                return True
-            else:
-                return False
-        else:
-            return True
+        can_change = super(PrimitivePermissionAwareModelAdmin, self).\
+            has_change_permission(request, obj)
+        return getattr(obj, 'has_edit_permission', can_change)
 
     def has_delete_permission(self, request, obj=None):
+        can_delete = super(PrimitivePermissionAwareModelAdmin, self).\
+            has_change_permission(request, obj)
         # we don't have a specific delete permission... so we use change
-        return self.has_change_permission(request, obj)
+        return getattr(obj, 'has_delete_permission', can_delete)
 
     def _get_post_url(self, obj):
         """

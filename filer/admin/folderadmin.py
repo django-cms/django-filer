@@ -31,7 +31,7 @@ from filer.admin.tools import (userperms_for_request,
                                check_files_read_permissions,
                                check_folder_read_permissions)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
-                          ImagesWithMissingData, FolderPermission, Image,
+                          ImagesWithMissingData, Image,
                           Archive)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
@@ -291,33 +291,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                Q(owner__last_name__icontains=term))
             return qs
 
-        def get_user_read_permissions(user):
-            if not user.is_authenticated():
-                return None
-            elif user.is_superuser:
-                return 'All'
-            else:
-                permission_manager = FolderPermission.objects
-                read_permissions = permission_manager.get_read_id_list(user)
-                return read_permissions
-
-        def _filter_generic_permission(qs, permissions, entry_type):
-            if permissions == 'All':
-                return qs
-
-            if entry_type == 'folder':
-                qs = qs.filter(Q(id__in=permissions) | Q(owner=request.user))
-            elif entry_type == 'file':
-                qs = qs.filter(Q(folder__id__in=permissions) |
-                               Q(owner=request.user))
-            return qs
-
-        def filter_folder_permission(qs, permissions):
-            return _filter_generic_permission(qs, permissions, 'folder')
-
-        def filter_file_permission(qs, permissions):
-            return _filter_generic_permission(qs, permissions, 'file')
-
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
@@ -353,9 +326,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder_children += folder.virtual_folders
 
         user = request.user
-        permissions = get_user_read_permissions(user)
-        folder_qs = filter_folder_permission(folder_qs, permissions)
-        file_qs = filter_file_permission(file_qs, permissions)
         folder_children += folder_qs
         folder_files += file_qs
 
@@ -1218,12 +1188,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder.name = foldername
         # We save folder here
         folder.insert_at(destination, 'last-child', True)
-
-        for perm in FolderPermission.objects.filter(folder=old_folder):
-            perm.pk = None
-            perm.id = None
-            perm.folder = folder
-            perm.save()
 
         return 1 + self._copy_files_and_folders_impl(
             old_folder.files.all(), old_folder.children.all(),

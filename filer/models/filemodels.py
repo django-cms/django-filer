@@ -257,7 +257,8 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         # Delete the model before the file
         super(File, self).delete(*args, **kwargs)
         # Delete the file if there are no other Files referencing it.
-        if not File.objects.filter(file=self.file.name, is_public=self.is_public).exists():
+        if not File.objects.filter(file=self.file.name,
+                                   is_public=self.is_public).exists():
             self.file.delete(False)
     delete.alters_data = True
 
@@ -276,6 +277,9 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
 
+    def has_delete_permission(self, request):
+        return self.has_generic_permission(request, 'delete')
+
     def has_read_permission(self, request):
         return self.has_generic_permission(request, 'read')
 
@@ -284,20 +288,11 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
 
     def has_generic_permission(self, request, permission_type):
         """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
+        Return true if the current user has permission on this file.
         """
-        user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
+        if self.folder:
             return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
+        return request.user.is_authenticated()
 
     @property
     def actual_name(self):
