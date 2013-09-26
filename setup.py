@@ -12,6 +12,10 @@ def read(fname):
     # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+dependency_links = [
+    'http://github.com/pbs/django-cms-roles/tarball/master#egg=django-cms-roles',
+]
+
 setup(
     name = "django-filer",
     version = version,
@@ -26,9 +30,11 @@ setup(
     install_requires = (
         'Django>=1.3,<1.5',
         'easy-thumbnails>=1.0',
-        'django-mptt>=0.5.1,<0.6',
+        'django-mptt>=0.5.1,<0.5.3',
         'django_polymorphic>=0.2',
+        'django-cms-roles',
     ),
+    dependency_links=dependency_links,
     include_package_data=True,
     zip_safe=False,
     classifiers = [
