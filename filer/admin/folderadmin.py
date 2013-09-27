@@ -26,6 +26,7 @@ from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.views import (popup_status, popup_param, selectfolder_status,
                          selectfolder_param)
 from filer.admin.tools import (userperms_for_request,
+                               folders_available, files_available,
                                check_folder_edit_permissions,
                                check_files_edit_permissions,
                                check_files_read_permissions,
@@ -302,19 +303,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
-                folder_qs = folder.get_descendants()
-                file_qs = File.objects.filter(
-                                        folder__in=folder.get_descendants())
+                folder_qs = folders_available(request, folder.get_descendants())
+                file_qs = files_available(request, File.objects.filter(
+                    folder__in=folder.get_descendants()))
             else:
-                folder_qs = Folder.objects.all()
-                file_qs = File.objects.all()
+                folder_qs = folders_available(request, Folder.objects.all())
+                file_qs = files_available(request, File.objects.all())
             folder_qs = filter_folder(folder_qs, search_terms)
             file_qs = filter_file(file_qs, search_terms)
-
             show_result_count = True
         else:
-            folder_qs = folder.children.all()
-            file_qs = folder.files.all()
+            folder_qs = folders_available(request, folder.children.all())
+            file_qs = files_available(request, folder.files.all())
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
@@ -829,7 +829,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                                 folders_queryset,
                                                 current_folder, folders,
                                                 allow_self, level):
-        for fo in folders.exclude(folder_type=Folder.CORE_FOLDER):
+        for fo in folders_available(
+                request, folders.exclude(folder_type=Folder.CORE_FOLDER)):
             if not allow_self and fo in folders_queryset:
                 # We do not allow moving to selected folders or their
                 #       descendants
