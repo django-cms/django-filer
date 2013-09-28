@@ -8,13 +8,18 @@ env:
   - DJANGO="django>=1.3,<1.4" POLYMORPHIC="django_polymorphic<=0.4.0"
   - DJANGO="django>=1.4,<1.5"
   - DJANGO="django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.2"
-  - DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
+  - DJANGO="https://github.com/django/django/archive/stable/1.6.x.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
+  - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
 script: coverage run --rcfile=coverage.rc setup.py test
 after_success:
   coveralls --config_file=coverage.rc
 matrix:
   allow_failures:
     - python: 2.6
-      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
+      env: DJANGO="https://github.com/django/django/archive/stable/1.6.x.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
+    - python: 2.6
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
     - python: 2.7
-      env: DJANGO="-e git+git://github.com/django/django.git#egg=Django" EASY_THUMBNAILS="-e git+git://github.com/SmileyChris/easy-thumbnails.git#egg=easy-thumbnails"
+      env: DJANGO="https://github.com/django/django/archive/stable/1.6.x.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
+    - python: 2.7
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
