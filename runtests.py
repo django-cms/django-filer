@@ -8,13 +8,18 @@ import warnings
 
 def main(verbosity=1, failfast=False, test_labels=None):
     verbosity = int(verbosity)
-    if not test_labels:
-        test_labels = ['filer']
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
             with temp_dir() as FILE_UPLOAD_TEMP_DIR:
                 from django import VERSION
                 use_tz = VERSION[:2] >= (1, 4)
+                test_suffix = ""
+                if VERSION[:2] >= (1, 6):
+                    test_suffix = ".tests"
+                if not test_labels:
+                    test_labels = ['filer%s' % test_suffix]
+                else:
+                    test_labels = ["filer%s.%s" % (test_suffix, label) for label in test_labels]
                 warnings.filterwarnings(
                     'error', r"DateTimeField received a naive datetime",
                     RuntimeWarning, r'django\.db\.models\.fields')
