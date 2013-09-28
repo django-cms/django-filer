@@ -1,8 +1,9 @@
 #-*- coding: utf-8 -*-
+import json as simplejson
+
 from django.forms.models import modelform_factory
 from django.contrib import admin
 from django.http import HttpResponse
-from django.utils import simplejson
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem
