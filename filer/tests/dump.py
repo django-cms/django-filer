@@ -2,17 +2,17 @@
 from filer.models import Folder
 import os
 import tempfile
+import json
+
 from django.test import TestCase
 from django.core.files import File as DjangoFile
 from django.conf import settings
 from django.core.management import call_command
-import json
 
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
-from filer.models.clipboardmodels import Clipboard
 from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, create_clipboard_item, SettingsOverride)
+                                 create_image, SettingsOverride)
 from filer import settings as filer_settings
 
 from io import BytesIO
