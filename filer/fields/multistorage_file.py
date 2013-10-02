@@ -1,6 +1,9 @@
 #-*- coding: utf-8 -*-
-from django.core.files.base import File
-from django.core.files.storage import Storage
+import os
+import base64
+import hashlib
+import warnings
+from io import BytesIO
 from easy_thumbnails import fields as easy_thumbnails_fields, \
     files as easy_thumbnails_files
 from filer import settings as filer_settings
@@ -100,3 +103,33 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
                                       verbose_name=verbose_name, name=name,
                                       upload_to=generate_filename_multistorage,
                                       storage=None, **kwargs)
+
+    def value_to_string(self, obj):
+        value = super(MultiStorageFileField, self).value_to_string(obj)
+        if not filer_settings.FILER_DUMP_PAYLOAD:
+            return value
+        try:
+            payload_file = BytesIO(self.storage.open(value).read())
+            sha = hashlib.sha1()
+            sha.update(payload_file.read())
+            if sha.hexdigest() != obj.sha1:
+                warnings.warn('The checksum for "%s" diverges. Check for file consistency!' % obj.original_filename)
+            payload_file.seek(0)
+            encoded_string = base64.b64encode(payload_file.read())
+            return value, encoded_string
+        except IOError:
+            warnings.warn('The payload for "%s" is missing. No such file on disk: %s!' % (obj.original_filename, self.storage.location))
+            return value
+
+    def to_python(self, value):
+        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], basestring):
+            try:
+                payload = base64.b64decode(value[1])
+                filename = os.path.join(self.storage.location, value[0])
+                out_buf = self.storage.open(filename, 'wb')
+                out_buf.write(payload)
+                out_buf.close()
+                return value[0]
+            except TypeError:
+                pass
+        return value
