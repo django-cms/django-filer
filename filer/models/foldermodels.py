@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 import filer.models.clipboardmodels
 from filer.models import mixins
 from filer import settings as filer_settings
+# from filer.admin.tools import has_role_on_site, has_admin_role_on_site
 
 import mptt
 
@@ -250,25 +251,6 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def quoted_logical_path(self):
         return urlquote(self.pretty_logical_path)
-
-    def has_delete_permission(self, request):
-        return self.has_generic_permission(request, 'delete')
-
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        folder.
-        """
-        return request.user.is_authenticated()
 
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change',

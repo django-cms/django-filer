@@ -22,6 +22,9 @@ from filer.tests.helpers import (
     filer_obj_as_checkox, get_make_root_folder_url,
     move_single_file_to_clipboard_action,
 )
+from cmsroles.models import Role
+from cmsroles.tests import HelpersMixin
+from cmsroles.siteadmin import get_site_admin_required_permission
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -62,12 +65,12 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_filer_directory_listing_root_empty_get(self):
-        response = self.client.post(get_dir_listing_url(None))
+        response = self.client.get(get_dir_listing_url(None))
         self.assertEqual(response.status_code, 200)
 
     def test_filer_directory_listing_root_get(self):
         create_folder_structure(depth=3, sibling=2, parent=None)
-        response = self.client.post(get_dir_listing_url(None))
+        response = self.client.get(get_dir_listing_url(None))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
@@ -515,104 +518,7 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.image_obj.width, 42)
         self.assertEqual(self.image_obj.height, 42)
 
-'''
-class PermissionAdminTest(TestCase):
 
-    def setUp(self):
-        self.superuser = create_superuser()
-        self.group1 = Group.objects.create(name='group1')
-        self.group2 = Group.objects.create(name='group2')
-        self.user1 = create_staffuser('Alice')
-        self.user2 = create_staffuser('Bob')
-        self.user3 = create_staffuser('Chuck')
-        self.group1.user_set.add(self.user1)
-        self.group1.user_set.add(self.user2)
-        self.group2.user_set.add(self.user3)
-        grant_all_folderpermissions_for_group(self.group1)
-        grant_all_folderpermissions_for_group(self.group2)
-        self.factory = RequestFactory()
-        self.folder1 = create_folder_for_user('folder1', self.user1)
-        self.folder3 = create_folder_for_user('folder3', self.user1)
-        self.folder2 = create_folder_for_user('folder2', self.user3)
-        self.folder_permission1 = create_folderpermission_for_user(
-            self.folder1, self.user1
-        )
-        self.folder_permission3 = create_folderpermission_for_user(
-            self.folder3, self.user1
-        )
-        self.folder_permission2 = create_folderpermission_for_user(
-            self.folder2, self.user3
-        )
-        all_folderpermissions = [
-            self.folder_permission1,
-            self.folder_permission2,
-            self.folder_permission3,
-        ]
-        self.users = {
-            self.user1: {
-                'folderpermissions': [
-                    self.folder_permission1,
-                    self.folder_permission3,
-                ]
-            },
-            self.user2: {
-                'folderpermissions': [],
-            },
-            self.user3: {
-                'folderpermissions': [
-                    self.folder_permission2,
-                ]
-            },
-            self.superuser: {
-                'folderpermissions': all_folderpermissions,
-            }
-        }
-
-    def assert_user_response(self, user, response):
-        self.assertEqual(200, response.status_code)
-        qs = response.context['cl'].query_set
-        self.assert_user_folder_permission_qs(user, qs)
-
-    def assert_user_folder_permission_qs(self, user, qs):
-        self.assertItemsEqual(qs, self.users[user]['folderpermissions'])
-
-    def assert_user_adminview(self, user):
-        self.client.login(username=user, password='secret')
-        response = self.client.get(
-            reverse('admin:filer_folderpermission_changelist')
-        )
-        self.assert_user_response(user, response)
-        self.client.logout()
-
-    def assert_user_query(self, user):
-        folder_permission_admin = site._registry[FolderPermission]
-        request = self.factory.get(
-            reverse('admin:filer_folderpermission_changelist')
-        )
-        request.user = user
-        qs = folder_permission_admin.queryset(request)
-        self.assert_user_folder_permission_qs(user, qs)
-
-    def tearDown(self):
-        self.client.logout()
-
-    def test_render_add_view(self):
-        """
-        Really stupid and simple test to see if the add Permission view can
-        be rendered.
-        """
-        response = self.client.get(reverse('admin:filer_folderpermission_add'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_admin_queries(self):
-        for user in self.users.keys():
-            self.assert_user_query(user)
-
-    def test_admin_view(self):
-        for user in self.users.keys():
-            self.assert_user_adminview(user)
-
-'''
 class BaseTestFolderTypePermissionLayer(object):
 
     def test_default_add_view_is_forbidden(self):
@@ -620,7 +526,7 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(response.status_code, 403)
 
     def test_change_child_site_folder(self):
-        f1 = Folder.objects.create(name='foo')
+        f1 = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
         f2 = Folder.objects.create(name='foo_bar', parent=f1)
         # regular users should be able to change child folders
         response = self.client.get(
@@ -679,7 +585,7 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(response.status_code, 403)
 
     def test_delete_child_site_folder(self):
-        f1 = Folder.objects.create(name='foo')
+        f1 = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
         f2 = Folder.objects.create(name='bar', parent=f1)
         f3 = Folder.objects.create(name='baz', parent=f1)
         # regular users should be able to delete child site folders
@@ -730,7 +636,8 @@ class BaseTestFolderTypePermissionLayer(object):
         # only fields 'site', 'name' should be visible
         self.assertItemsEqual(['site', 'name'], form.fields.keys())
 
-        s1 = Site.objects.create(name='foo_site', domain='foo-domain.com')
+        s1, _ = Site.objects.get_or_create(
+            name='foo_site', domain='foo-domain.com')
         response = self.client.post(
             get_make_root_folder_url(),
             {'name': 'foo', 'site': s1.id})
@@ -834,7 +741,6 @@ class BaseTestFolderTypePermissionLayer(object):
             Folder.SITE_FOLDER, Site.objects.get(id=1))
         f1 = Folder.objects.create(
             name='destination', folder_type=Folder.CORE_FOLDER)
-
         response, _ = move_action(self.client, None, f1, [folders['bar']])
         self.assertEqual(response.status_code, 403)
         f1.delete()
@@ -871,6 +777,7 @@ class BaseTestFolderTypePermissionLayer(object):
             file=dj_files.base.ContentFile('some data'))
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
+
         move_to_clipboard_action(self.client, None, [foo])
         self.assertEqual(
             self._get_clipboard_files().count(), 1)
@@ -903,7 +810,9 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
         response, _ = move_to_clipboard_action(self.client, foo, [file_foo])
-        self.assertEqual(response.status_code, 403)
+        # actions are not available if current view is core folder
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
 
         response = move_single_file_to_clipboard_action(
             self.client, foo, [file_foo])
@@ -975,12 +884,12 @@ class BaseTestFolderTypePermissionLayer(object):
 
     def test_message_error_user_sites_mismatch_on_move(self):
         site = Site.objects.get(id=1)
-        other_site = Site.objects.create(name='foo_site', domain='foo_site')
+        other_site, _ = Site.objects.get_or_create(
+            name='foo_site', domain='foo-domain.com')
         # make a root for foo in order to work for regular users
         foo_root = Folder.objects.create(name='foo_root', site=other_site)
-        foo = Folder.objects.create(
-            name='foo', parent=foo_root)
-        bar = Folder.objects.create(name='bar', site=site)
+        foo = Folder.objects.create(name='foo', parent=foo_root)
+        bar = Folder.objects.create(name='bar11', site=site)
         url = get_dir_listing_url(foo_root)
         response, url = move_action(
             self.client, foo_root, bar, [foo], follow=True)
@@ -990,17 +899,13 @@ class BaseTestFolderTypePermissionLayer(object):
             "destination folder.",
             get_user_message(response).message)
 
-    def test_message_error_user_destination_no_site_on_move(self):
+    def test_destination_no_site_on_move(self):
         site = Site.objects.get(id=1)
         foo = Folder.objects.create(name='foo')
         bar = Folder.objects.create(name='bar', site=site)
         baz = Folder.objects.create(name='baz', site=site, parent=bar)
-        response, url = move_action(self.client, None, foo, [baz], follow=True)
-        self.assertRedirects(response, url)
-        self.assertIn(
-            'Destination folder %s does not belong to any '
-            'site.' % foo.pretty_logical_path,
-            get_user_message(response).message)
+        response, url = move_action(self.client, None, foo, [baz])
+        assert response.status_code == 403
 
     def _test_folder_destination_filters_core_folders(self, action):
         foo = Folder.objects.create(
@@ -1026,6 +931,16 @@ class BaseTestFolderTypePermissionLayer(object):
     def test_move_destination_filters_core_folders(self):
         self._test_folder_destination_filters_core_folders(
             'move_files_and_folders')
+
+    def test_move_from_unfiled(self):
+        foo_file = File.objects.create(
+            original_filename='foo_file',
+            file=dj_files.base.ContentFile('some data'))
+        bar = Folder.objects.create(
+            name='bar', site=Site.objects.get(id=1))
+        response, url = move_action(self.client, 'unfiled', bar, [foo_file])
+        self.assertEqual(File.objects.filter(folder=bar).count(), 1)
+        self.assertEqual(File.objects.filter(folder__isnull=True).count(), 0)
 
     def test_copy_destination_filters_restricted_folders(self):
         self._test_folder_destination_filters_core_folders(
@@ -1093,11 +1008,13 @@ class BaseTestFolderTypePermissionLayer(object):
     def test_extract_files_in_core_folder(self):
         files = self._build_files_structure_for_archive()
         url = get_dir_listing_url(files['foo'])
+        assert Folder.objects.get(id=files['foo'].id).files.count() == 1
         response = self.client.post(url, {
             'action': 'extract_files',
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(files['foo_file'])]})
-        self.assertEqual(response.status_code, 403)
+        # will not get extracted since no actions available in core folders
+        assert Folder.objects.get(id=files['foo'].id).files.count() == 1
 
     def test_extract_files_in_site_folder(self):
         files = self._build_files_structure_for_archive()
@@ -1136,15 +1053,39 @@ class TestFolderTypePermissionForSuperUser(
 class TestFolderTypePermissionLayerForRegularUser(
     TestCase, BaseTestFolderTypePermissionLayer):
 
+    def _user_setup(self, user):
+        foo_base_group = Group.objects.create(name='foo_base_group')
+        developer_role = Role.objects.create(
+            name='foo_role', group=foo_base_group,
+            is_site_wide=True)
+        other_site, _ = Site.objects.get_or_create(
+            name='foo_site', domain='foo-domain.com')
+        developer_role.grant_to_user(user, Site.objects.get(id=1))
+        developer_role.grant_to_user(user, other_site)
+
     def setUp(self):
         username = 'login_using_foo'
         password = 'secret'
         user = User.objects.create_user(username=username, password=password)
         user.is_staff = user.is_active = True
         user.save()
-        user.user_permissions = Permission.objects.all()
+        filer_perms = Permission.objects.filter(
+            content_type__app_label='filer')
+        user.user_permissions = filer_perms
+        self._user_setup(user)
         self.client.login(username=username, password=password)
         self.user = user
+
+    def _make_user_site_admin(self):
+        base_group = Group.objects.get(name='foo_base_group')
+        base_group.permissions.add(get_site_admin_required_permission())
+
+    def test_add_root_folder_for_site_admins(self):
+        # site admins should be able to do this the same as superusers
+        # add site admin perm to make the current user a site admin
+        self._make_user_site_admin()
+        self_cls = TestFolderTypePermissionLayerForRegularUser
+        super(self_cls, self).test_add_root_folder()
 
     def test_add_root_folder(self):
         # regular users should not be able to add root folders at all
@@ -1166,9 +1107,9 @@ class TestFolderTypePermissionLayerForRegularUser(
         self.assertEqual(response.status_code, 403)
 
     def test_delete_root_folder(self):
-        f1 = Folder.objects.create(name='foo')
+        f1 = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
         # regular users should not be able to delete root folders at all
-        for folder_type in [Folder.CORE_FOLDER, Folder.SITE_FOLDER]:
+        for folder_type in [Folder.SITE_FOLDER, Folder.CORE_FOLDER]:
             Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
             response = self.client.post(
                 reverse('admin:filer_folder_delete', args=(f1.pk, )),
@@ -1184,7 +1125,8 @@ class TestFolderTypePermissionLayerForRegularUser(
             self.assertEqual(response.status_code, 403)
             # case when viewing another folder content
             # hit search and select a root folder to delete
-            folder_for_view = Folder.objects.create(name='bar')
+            folder_for_view = Folder.objects.create(
+                name='bar', site=Site.objects.get(id=1))
             response = self.client.post(
                 get_dir_listing_url(folder_for_view), {
                 'action': 'delete_files_or_folders',
@@ -1198,6 +1140,296 @@ class TestFolderTypePermissionLayerForRegularUser(
             self.assertEqual(
                 Folder.objects.filter(
                     id__in=[folder_for_view.id, f1.id]).count(), 2)
+
+    def test_message_error_user_no_site_on_move_for_site_admins(self):
+        self._make_user_site_admin()
+        self.test_message_error_user_no_site_on_move()
+
+    def test_message_error_user_no_site_on_move(self):
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        foo = Folder.objects.create(name='foo', parent=foo_root)
+        bar = Folder.objects.create(name='bar', site=site)
+        response, url = move_action(
+            self.client, foo_root, bar, [foo])
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_to_clipboard_from_site_folders_for_site_admins(self):
+        self._make_user_site_admin()
+        self_cls = TestFolderTypePermissionLayerForRegularUser
+        super(self_cls, self).test_move_to_clipboard_from_site_folders()
+
+    def test_move_to_clipboard_from_site_folders(self):
+        foo = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
+        file_foo = File.objects.create(
+            original_filename='foo', folder=foo,
+            file=dj_files.base.ContentFile('some data'))
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+
+        move_to_clipboard_action(self.client, None, [foo])
+        self.assertEqual(
+            self._get_clipboard_files().count(), 0)
+
+        file_bar = File.objects.create(
+            original_filename='bar', folder=foo,
+            file=dj_files.base.ContentFile('some data'))
+        move_to_clipboard_action(self.client, foo, [file_bar])
+        self.assertEqual(
+            self._get_clipboard_files().count(), 1)
+
+        file_baz = File.objects.create(
+            original_filename='baz', folder=foo,
+            file=dj_files.base.ContentFile('some data'))
+        move_single_file_to_clipboard_action(
+            self.client, foo, [file_baz])
+        self.assertEqual(
+            self._get_clipboard_files().count(), 2)
+
+
+class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
+
+    def setUp(self):
+        self._create_simple_setup()
+        for user in User.objects.all():
+            user.set_password('secret')
+            user.save()
+        self.foo_site = Site.objects.get(name='foo.site.com')
+        self.bar_site = Site.objects.get(name='bar.site.com')
+        self.folders, self.files = self._build_folder_structure()
+
+    def get_listed_objects(self, folder, data={}):
+        response = self.client.get(get_dir_listing_url(folder), data)
+        try:
+            items = response.context['paginator'].object_list
+        except:
+            items = []
+        return response, items
+
+    def _build_folder_structure(self):
+        unfiled_file = File.objects.create(original_filename='unfiled_file',
+            file=dj_files.base.ContentFile('some data'))
+        foo = Folder.objects.create(name='foo', site=self.foo_site)
+        foo_file = File.objects.create(original_filename='foo_file',
+            file=dj_files.base.ContentFile('some data'), folder=foo)
+        bar = Folder.objects.create(name='bar', site=self.bar_site)
+        bar_file = File.objects.create(original_filename='bar_file',
+            file=dj_files.base.ContentFile('some data'), folder=bar)
+        none = Folder.objects.create(name='no_site')
+        none_file = File.objects.create(original_filename='none_file',
+            file=dj_files.base.ContentFile('some data'), folder=none)
+        core = Folder.objects.create(
+            name='core', folder_type=Folder.CORE_FOLDER)
+        core_file = File.objects.create(original_filename='core_file',
+            file=dj_files.base.ContentFile('some data'), folder=core)
+
+        return {'foo': foo, 'bar': bar, 'none': none, 'core': core}, {
+            'foo_file': foo_file,
+            'bar_file': bar_file,
+            'unfiled_file': unfiled_file,
+            'core_file': core_file,
+            'none_file': none_file}
+
+    def test_search_for_site_admin(self):
+        # jack is admin on bar site
+        self.client.login(username='jack', password='secret')
+        response, items = self.get_listed_objects(None, {'q': 'file'})
+        expected = set([self.files['core_file'], self.files['none_file'],
+                        self.files['bar_file'], self.files['unfiled_file']])
+        assert expected <= set(items)
+        assert self.files['foo_file'] not in items
+        #unfiled present
+        assert len(expected) + 1 <= len(items)
+
+    def test_search_for_other_users(self):
+        # bob is writer on bar site
+        self.client.login(username='bob', password='secret')
+        response, items = self.get_listed_objects(None, {'q': 'file'})
+        expected = set([self.files['core_file'],
+                        self.files['bar_file'], self.files['unfiled_file']])
+        assert expected <= set(items)
+        assert self.files['foo_file'] not in items
+        assert self.files['none_file'] not in items
+        #unfiled present
+        assert len(expected) + 1 <= len(items)
+
+    def test_search_for_multi_site_user(self):
+        # joe is site admin for foo and bar
+        self.client.login(username='joe', password='secret')
+        response, items = self.get_listed_objects(None, {'q': 'file'})
+        expected = set(self.files.values())
+        assert expected <= set(items)
+        #unfiled present
+        assert len(expected) + 1 <= len(items)
+
+    def test_dir_listing_for_site_admin(self):
+        # jack is admin on bar site
+        self.client.login(username='jack', password='secret')
+
+        response, items = self.get_listed_objects(None)
+        expected = set([
+            self.folders['core'], self.folders['bar'], self.folders['none']])
+        assert expected <= set(items)
+        assert self.folders['foo'] not in items
+        #unfiled folder present
+        assert len(expected) + 1 == len(items)
+
+        response, items = self.get_listed_objects('unfiled')
+        assert [self.files['unfiled_file']] == items
+
+        response, items = self.get_listed_objects(self.folders['core'])
+        assert [self.files['core_file']] == items
+
+        response, items = self.get_listed_objects(self.folders['foo'])
+        assert response.status_code == 403
+
+        response, items = self.get_listed_objects(self.folders['none'])
+        assert [self.files['none_file']] == items
+
+    def test_dir_listing_for_other_users(self):
+        # bob is writer on bar site
+        self.client.login(username='bob', password='secret')
+
+        response, items = self.get_listed_objects(None)
+        expected = set([self.folders['core'], self.folders['bar']])
+        assert expected <= set(items)
+        assert self.folders['foo'] not in items
+        assert self.folders['none'] not in items
+        #unfiled folder present
+        assert len(expected) + 1 == len(items)
+
+        response = self.client.get(get_dir_listing_url('unfiled'))
+        items = response.context['paginator'].object_list
+        assert [self.files['unfiled_file']] == items
+
+        response, items = self.get_listed_objects(self.folders['core'])
+        assert [self.files['core_file']] == items
+
+        response, items = self.get_listed_objects(self.folders['foo'])
+        assert response.status_code == 403
+
+        response, items = self.get_listed_objects(self.folders['none'])
+        assert response.status_code == 403
+
+    def _test_destination_on_copy_for_site_admin(self, action):
+        # joe is site admin for foo and bar
+        self.client.login(username='joe', password='secret')
+        url = get_dir_listing_url('unfiled')
+        response = self.client.post(url, {
+            'action': action,
+            helpers.ACTION_CHECKBOX_NAME: [
+                filer_obj_as_checkox(self.files['unfiled_file'])]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('destination_folders', response.context)
+        dest_folders = [_dest[0]
+                        for _dest in response.context['destination_folders']]
+        expected = set([self.folders['bar'], self.folders['foo']])
+        assert expected == set(dest_folders)
+
+    def _test_destination_action_for_multi_site_user(self, action):
+        # bob will be a site admin on foo and writer on bar
+        admin_role = Role.objects.get(name='site admin')
+        admin_role.grant_to_user(
+            User.objects.get(username='bob'), self.foo_site)
+        self.client.login(username='bob', password='secret')
+        url = get_dir_listing_url('unfiled')
+        response = self.client.post(url, {
+            'action': action,
+            helpers.ACTION_CHECKBOX_NAME: [
+                filer_obj_as_checkox(self.files['unfiled_file'])]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('destination_folders', response.context)
+        dest_folders = [_dest[0]
+                        for _dest in response.context['destination_folders']]
+        expected = set([self.folders['bar'], self.folders['foo']])
+        assert expected == set(dest_folders)
+
+    def _test_destination_action_for_other_users(self, action):
+        # bob is writer on bar site
+        self.client.login(username='bob', password='secret')
+        url = get_dir_listing_url('unfiled')
+        response = self.client.post(url, {
+            'action': action,
+            helpers.ACTION_CHECKBOX_NAME: [
+                filer_obj_as_checkox(self.files['unfiled_file'])]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('destination_folders', response.context)
+        dest_folders = [_dest[0]
+                        for _dest in response.context['destination_folders']]
+        assert set([self.folders['bar']]) == set(dest_folders)
+
+    def test_destination_on_copy_for_multi_site_user(self):
+        self._test_destination_action_for_multi_site_user(
+            'copy_files_and_folders')
+
+    def test_destination_on_move_for_multi_site_user(self):
+        self._test_destination_action_for_multi_site_user(
+            'move_files_and_folders')
+
+    def test_destination_on_copy_for_other_users(self):
+        self._test_destination_action_for_other_users(
+            'copy_files_and_folders')
+
+    def test_destination_on_move_for_other_users(self):
+        self._test_destination_action_for_other_users(
+            'move_files_and_folders')
+
+    def test_destination_on_copy_for_site_admin(self):
+        self._test_destination_on_copy_for_site_admin(
+            'copy_files_and_folders')
+
+    def test_destination_on_move_for_site_admin(self):
+        self._test_destination_on_copy_for_site_admin(
+            'move_files_and_folders')
+
+    def test_on_site_change_filtering(self):
+        # jack is site admin on bar site
+        self.client.login(username='jack', password='secret')
+        response = self.client.get(
+            reverse('admin:filer_folder_change',
+                args=(self.folders['bar'].pk, )))
+        self.assertEqual(response.status_code, 200)
+        form = response.context_data['adminform'].form
+        assert set([self.bar_site]) == set(form.fields['site'].queryset)
+        self.client.logout()
+        # bob is writer on bar
+        self.client.login(username='bob', password='secret')
+        response = self.client.get(
+            reverse('admin:filer_folder_change',
+                args=(self.folders['bar'].pk, )))
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
+        # make bob a site admin on foo
+        admin_role = Role.objects.get(name='site admin')
+        admin_role.grant_to_user(
+            User.objects.get(username='bob'), self.foo_site)
+        # bob still doesn't have access on bar folder
+        self.client.login(username='bob', password='secret')
+        response = self.client.get(
+            reverse('admin:filer_folder_change',
+                args=(self.folders['bar'].pk, )))
+        self.assertEqual(response.status_code, 403)
+        # bob should have access on foo folder
+        response = self.client.get(
+            reverse('admin:filer_folder_change',
+                args=(self.folders['foo'].pk, )))
+        self.assertEqual(response.status_code, 200)
+        form = response.context_data['adminform'].form
+        assert set([self.foo_site]) == set(form.fields['site'].queryset)
+        self.client.logout()
+        # joe is multi site admin
+        self.client.login(username='joe', password='secret')
+        response = self.client.get(
+            reverse('admin:filer_folder_change',
+                args=(self.folders['bar'].pk, )))
+        self.assertEqual(response.status_code, 200)
+        form = response.context_data['adminform'].form
+        expected = set([self.bar_site, self.foo_site])
+        assert expected == set(form.fields['site'].queryset)
+        self.client.logout()
 
 
 class TestFolderTypeFunctionality(TestCase):

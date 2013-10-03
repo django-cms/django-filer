@@ -8,9 +8,6 @@
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
 
 {% block content %}
-{% if perms_lacking %}
-    <p>{% blocktrans %}Your account doesn't have permissions to resize all of the selected images.{% endblocktrans %}</p>
-{% else %}
 {% if not to_resize %}
     <p>{% blocktrans %}There are no images available to resize.{% endblocktrans %}</p>
 {% else %}
@@ -36,6 +33,5 @@
     <p><input type="submit" value="{% trans "Resize" %}" /></p>
     </div>
     </form>
-{% endif %}
 {% endif %}
 {% endblock %}

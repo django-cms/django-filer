@@ -8,9 +8,6 @@
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
 
 {% block content %}
-{% if perms_lacking %}
-    <p>{% blocktrans %}Your account doesn't have permissions to copy all of the selected files and/or folders.{% endblocktrans %}</p>
-{% else %}
 {% if not destination_folders %}
     <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
 {% else %}
@@ -39,7 +36,6 @@
     <p><input type="submit" value="{% trans "Copy" %}" /></p>
     </div>
     </form>
-{% endif %}
 {% endif %}
 {% endif %}
 {% endblock %}

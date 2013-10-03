@@ -8,9 +8,6 @@
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
 
 {% block content %}
-{% if perms_lacking %}
-    <p>{% blocktrans %}Your account doesn't have permissions to rename all of the selected files.{% endblocktrans %}</p>
-{% else %}
 {% if not to_rename %}
     <p>{% blocktrans %}There are no files available to rename.{% endblocktrans %}</p>
 {% else %}
@@ -54,6 +51,5 @@
     <p><input type="submit" value="{% trans "Rename" %}" /></p>
     </div>
     </form>
-{% endif %}
 {% endif %}
 {% endblock %}

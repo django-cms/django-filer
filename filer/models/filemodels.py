@@ -274,26 +274,6 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     def __lt__(self, other):
         return cmp(self.label.lower(), other.label.lower()) < 0
 
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_delete_permission(self, request):
-        return self.has_generic_permission(request, 'delete')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this file.
-        """
-        if self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        return request.user.is_authenticated()
-
     @property
     def actual_name(self):
         """The name displayed to the user.

@@ -1,17 +1,14 @@
 #-*- coding: utf-8 -*-
-from django import forms
 from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext  as _
-from filer import settings
-from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import File
+from filer.admin.permissions import FilePermissionModelAdmin
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
 
-class FileAdmin(PrimitivePermissionAwareModelAdmin):
+class FileAdmin(FilePermissionModelAdmin):
     list_display = ('label',)
     list_per_page = 10
     search_fields = ['name', 'original_filename', 'sha1', 'description']
@@ -44,13 +41,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 'classes': ('collapse',),
                 }),
             ) + extra_fieldsets
-        # custom requirement: hide 'Permissions disabled' section
-        # if settings.FILER_ENABLE_PERMISSIONS:
-        #     fieldsets = fieldsets + (
-        #         (None, {
-        #             'fields': ('is_public',)
-        #         }),
-        #     )
         return fieldsets
 
 

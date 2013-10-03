@@ -1,61 +1,64 @@
 #-*- coding: utf-8 -*-
 from django.core.exceptions import PermissionDenied
-from cmsroles.siteadmin import is_site_admin, get_user_roles_on_sites_ids
+from cmsroles.siteadmin import (is_site_admin, get_user_roles_on_sites_ids,
+                                get_administered_sites)
 from django.db.models import Q
 from filer.models.foldermodels import Folder
 
 
-def check_files_edit_permissions(request, files):
-    for f in files:
-        if not f.has_edit_permission(request):
-            raise PermissionDenied
+def has_admin_role(user):
+
+    def _fetch_admin_role():
+        is_admin = is_site_admin(user)
+        setattr(user, '_is_site_admin', is_admin)
+        return is_admin
+
+    return getattr(user, '_is_site_admin', _fetch_admin_role())
 
 
-def check_folder_edit_permissions(request, folders):
-    for f in folders:
-        if not f.has_edit_permission(request):
-            raise PermissionDenied
-        check_files_edit_permissions(request, f.files)
-        check_folder_edit_permissions(request, f.children.all())
+def get_admin_sites_for_user(user):
+
+    def _fetch_admin_sites():
+        admin_sites = get_administered_sites(user)
+        setattr(user, '_administered_sites', admin_sites)
+        return admin_sites
+
+    return getattr(user, '_administered_sites', _fetch_admin_sites())
 
 
-def check_files_read_permissions(request, files):
-    for f in files:
-        if not f.has_read_permission(request):
-            raise PermissionDenied
+def has_role_on_site(user, site):
+    return user.is_superuser or site.id in get_sites_for_user(user)
 
 
-def check_folder_read_permissions(request, folders):
-    for f in folders:
-        if not f.has_read_permission(request):
-            raise PermissionDenied
-        check_files_read_permissions(request, f.files)
-        check_folder_read_permissions(request, f.children.all())
+def has_admin_role_on_site(user, site):
+    return site.id in [_site.id
+                       for _site in get_admin_sites_for_user(user)]
 
-
-def userperms_for_request(item, request):
-    r = []
-    ps = ['read', 'edit', 'add_children']
-    for p in ps:
-        attr = "has_%s_permission" % p
-        if hasattr(item, attr):
-            x = getattr(item, attr)(request)
-            if x:
-                r.append(p)
-    return r
-
-
-def _get_sites_for_user(user):
+def get_sites_for_user(user):
     """
     Returns all sites available for user.
-    This also binds the sites to the user in order to save some
-        queries execution
     """
-    available_sites = set()
-    for sites in get_user_roles_on_sites_ids(user).values():
-        available_sites |= sites
-    setattr(user, '_available_sites', available_sites)
-    return available_sites
+    def _fetch_sites_for_user():
+        available_sites = set()
+        for sites in get_user_roles_on_sites_ids(user).values():
+            available_sites |= sites
+        setattr(user, '_available_sites', available_sites)
+        return available_sites
+
+    return getattr(user, '_available_sites', _fetch_sites_for_user())
+
+
+def is_valid_destination(request, folder):
+    if folder.is_restricted():
+        return False
+    user = request.user
+    if user.is_superuser:
+        return True
+    if not folder.site:
+        return False
+    if folder.site.id in get_sites_for_user(user):
+        return True
+    return False
 
 
 def folders_available(request, folders_qs):
@@ -70,11 +73,10 @@ def folders_available(request, folders_qs):
     if user.is_superuser:
         return folders_qs
 
-    sites = getattr(user, '_available_sites', _get_sites_for_user(user))
     sites_q = Q(Q(folder_type=Folder.CORE_FOLDER) |
-                Q(site__in=sites))
+                Q(site__in=get_sites_for_user(user)))
 
-    if is_site_admin(user):
+    if has_admin_role(user):
         sites_q |= Q(site__isnull=True)
 
     return folders_qs.filter(sites_q)
@@ -93,11 +95,43 @@ def files_available(request, files_qs):
     if user.is_superuser:
         return files_qs
 
-    sites = getattr(user, '_available_sites', _get_sites_for_user(user))
     sites_q = Q(Q(folder__folder_type=Folder.CORE_FOLDER) |
-                Q(folder__site__in=sites) | Q(folder__isnull=True))
+                Q(folder__site__in=get_sites_for_user(user)) |
+                Q(folder__isnull=True))
 
-    if is_site_admin(user):
+    if has_admin_role(user):
         sites_q |= Q(folder__site__isnull=True)
 
     return files_qs.filter(sites_q)
+
+
+def has_multi_file_action_permission(request, files, folders):
+    # unfiled files can be moved/deleted so better to just exclude them
+    #   from checking permissions for them
+    files = files.exclude(folder__isnull=True)
+
+    if files.restricted().exists() or folders.restricted().exists():
+        return False
+    user = request.user
+    if user.is_superuser:
+        return True
+    # only superusers can move/delete files/folders with no site ownership
+    if (files.filter(folder__site__isnull=True).exists() or
+            folders.filter(site__isnull=True).exists()):
+        return False
+
+    _exists_root_folders = folders.filter(parent__isnull=True).exists()
+    if _exists_root_folders:
+        if not has_admin_role(user):
+            return False
+        # allow site admins to move/delete root files/folders that belong
+        #   to the site where is admin
+        sites_allowed = [s.id for s in get_admin_sites_for_user(user)]
+    else:
+        sites_allowed = get_sites_for_user(user)
+
+    if (files.exclude(folder__site__in=sites_allowed).exists() or
+            folders.exclude(site__in=sites_allowed).exists()):
+        return False
+
+    return True
