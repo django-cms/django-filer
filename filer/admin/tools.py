@@ -73,8 +73,17 @@ def folders_available(request, folders_qs):
     if user.is_superuser:
         return folders_qs
 
+    available_sites = get_sites_for_user(user)
+    current_site = request.REQUEST.get('folder__site', None)
+    if current_site:
+        current_site = int(current_site)
+        if current_site not in available_sites:
+            available_sites = []
+        else:
+            available_sites = [current_site]
+
     sites_q = Q(Q(folder_type=Folder.CORE_FOLDER) |
-                Q(site__in=get_sites_for_user(user)))
+                Q(site__in=available_sites))
 
     if has_admin_role(user):
         sites_q |= Q(site__isnull=True)
@@ -95,8 +104,17 @@ def files_available(request, files_qs):
     if user.is_superuser:
         return files_qs
 
+    available_sites = get_sites_for_user(user)
+    current_site = request.REQUEST.get('folder__site', None)
+    if current_site:
+        current_site = int(current_site)
+        if current_site not in available_sites:
+            available_sites = []
+        else:
+            available_sites = [current_site]
+
     sites_q = Q(Q(folder__folder_type=Folder.CORE_FOLDER) |
-                Q(folder__site__in=get_sites_for_user(user)) |
+                Q(folder__site__in=available_sites) |
                 Q(folder__isnull=True))
 
     if has_admin_role(user):

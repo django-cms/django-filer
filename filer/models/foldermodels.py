@@ -277,7 +277,9 @@ class Folder(models.Model, mixins.IconsMixin):
         unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
-                        "Can use directory listing"),)
+                        "Can use directory listing"),
+                       ("can_restrict_folder",
+                        "Can restrict folder"),)
         app_label = 'filer'
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
