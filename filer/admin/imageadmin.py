@@ -26,15 +26,6 @@ class ImageAdminForm(forms.ModelForm):
     class Meta:
         model = Image
 
-    class Media:
-        css = {
-            #'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
-        }
-        js = (
-            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/raphael.js',
-            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/focal_point.js',
-        )
-
 
 class ImageAdmin(FileAdmin):
     form = ImageAdminForm
@@ -42,11 +33,5 @@ class ImageAdmin(FileAdmin):
 
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
     extra_main_fields=('default_alt_text', 'default_caption', 'default_credit'),
-    extra_fieldsets=(
-        # due to custom requirements:Subject Location section should be hidden
-        # ('Subject Location', {
-        #     'fields': ('subject_location',),
-        #     'classes': ('collapse',),
-        # }),
-    )
+    extra_fieldsets=()
 )
