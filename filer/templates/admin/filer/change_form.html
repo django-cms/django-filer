@@ -37,7 +37,7 @@
 
 
 {% block submit_buttons_bottom %}
-{% if not original.is_restricted %}
+{% if not original.is_readonly %}
 {{ block.super }}
 {% endif %}
 {% endblock %}

@@ -49,7 +49,7 @@ def get_sites_for_user(user):
 
 
 def is_valid_destination(request, folder):
-    if folder.is_restricted():
+    if folder.is_readonly():
         return False
     user = request.user
     if user.is_superuser:
@@ -110,7 +110,7 @@ def has_multi_file_action_permission(request, files, folders):
     #   from checking permissions for them
     files = files.exclude(folder__isnull=True)
 
-    if files.restricted().exists() or folders.restricted().exists():
+    if files.readonly().exists() or folders.readonly().exists():
         return False
     user = request.user
     if user.is_superuser:

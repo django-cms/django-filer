@@ -18,7 +18,7 @@ import os
 
 class FilesChainableQuerySet(object):
 
-    def restricted(self):
+    def readonly(self):
         return self.filter(folder__folder_type=Folder.CORE_FOLDER)
 
     def find_duplicates(self, file_obj):
@@ -374,9 +374,9 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     def duplicates(self):
         return list(File.objects.find_duplicates(self))
 
-    def is_restricted(self):
+    def is_readonly(self):
         if self.folder:
-            return self.folder.is_restricted()
+            return self.folder.is_readonly()
         return False
 
     class Meta:

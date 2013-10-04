@@ -93,7 +93,7 @@ class ClipboardAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             folder = Folder.objects.get(id=request.POST.get('folder_id'))
 
-            if folder.is_restricted():
+            if folder.is_readonly():
                 raise PermissionDenied
 
             tools.clone_files_from_clipboard_to_folder(

@@ -90,7 +90,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if obj and obj.pk:
             # change view
             parent_id = obj.parent_id
-            is_core_folder = obj.folder_type == Folder.CORE_FOLDER
+            is_core_folder = obj.is_readonly()
         else:
             # add view
             parent_id = request.REQUEST.get('parent_id', None) or None
@@ -246,7 +246,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 if not self.can_view_folder_content(request, folder):
                     raise PermissionDenied
                 # hide actions from view if folder is core folder
-                hide_all_actions = folder.is_restricted()
+                hide_all_actions = folder.is_readonly()
             except Folder.DoesNotExist:
                 raise Http404
 
@@ -336,7 +336,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method == 'POST' and '_save' not in request.POST:
             for f in folder_files:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
-                    if f.is_restricted():
+                    if f.is_readonly():
                         raise PermissionDenied
                     clipboard = tools.get_user_clipboard(user)
                     tools.move_file_to_clipboard(request, [f], clipboard)

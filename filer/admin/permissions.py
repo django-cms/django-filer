@@ -39,7 +39,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         else:
             folder = Folder.objects.get(id=folder_id)
             # nobody can add subfolders in core folders
-            if folder.is_restricted():
+            if folder.is_readonly():
                 return False
             # only site admins can add subfolders in site folders with no site
             if not folder.site and has_admin_role(request.user):
@@ -62,7 +62,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
             return request.user.has_perm('filer.can_use_directory_listing')
 
         # nobody can change core folder
-        if folder.is_restricted():
+        if folder.is_readonly():
             return False
         # only admins can change site folders with no site owner
         if not folder.site and has_admin_role(request.user):
@@ -84,7 +84,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         if not folder:
             return can_delete
 
-        if folder.is_restricted():
+        if folder.is_readonly():
             return False
 
         # only admins can delete site folders with no site owner
@@ -100,7 +100,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         return False
 
     def can_view_folder_content(self, request, folder):
-        if folder.is_restricted():
+        if folder.is_readonly():
             return True
         # only admins can see site folders with no site owner
         if not folder.site and has_admin_role(request.user):

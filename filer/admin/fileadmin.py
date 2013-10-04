@@ -23,7 +23,7 @@ class FileAdmin(FilePermissionModelAdmin):
     save_as = True
 
     def get_readonly_fields(self, request, obj=None):
-        if obj and obj.is_restricted():
+        if obj and obj.is_readonly():
             return [field.name
                     for field in obj.__class__._meta.fields]
         return super(FileAdmin, self).get_readonly_fields(request, obj)

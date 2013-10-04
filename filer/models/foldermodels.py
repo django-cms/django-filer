@@ -14,8 +14,6 @@ from django.utils.translation import ugettext_lazy as _
 import filer.models.clipboardmodels
 from filer.models import mixins
 from filer import settings as filer_settings
-# from filer.admin.tools import has_role_on_site, has_admin_role_on_site
-
 import mptt
 
 
@@ -24,12 +22,10 @@ class FoldersChainableQuerySet(object):
     def with_bad_metadata(self):
         return self.filter(has_all_mandatory_data=False)
 
-    def restricted(self, user=None):
+    def readonly(self):
         restricted_folder = Q(folder_type=Folder.CORE_FOLDER)
-        if user and not user.is_superuser:
-            restricted_folder |= Q(parent__isnull=True)
-
         return self.filter(restricted_folder)
+
 
 class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
     pass
@@ -133,7 +129,7 @@ class Folder(models.Model, mixins.IconsMixin):
                 with no parent(root folders)
            * core folders should not have any site
         """
-        if self.folder_type == Folder.CORE_FOLDER:
+        if self.is_readonly():
             self.site = None
         else:
             # site folders - make sure it keeps the site from parent
@@ -274,7 +270,7 @@ class Folder(models.Model, mixins.IconsMixin):
         except Folder.DoesNotExist:
             return False
 
-    def is_restricted(self):
+    def is_readonly(self):
         return self.folder_type == Folder.CORE_FOLDER
 
     class Meta:
