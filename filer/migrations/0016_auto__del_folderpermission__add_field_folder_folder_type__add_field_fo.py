@@ -11,6 +11,16 @@ class Migration(SchemaMigration):
         # Deleting model 'FolderPermission'
         db.delete_table('filer_folderpermission')
 
+        # Adding field 'Folder.folder_type'
+        db.add_column('filer_folder', 'folder_type',
+                      self.gf('django.db.models.fields.IntegerField')(default=0),
+                      keep_default=False)
+
+        # Adding field 'Folder.site'
+        db.add_column('filer_folder', 'site',
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sites.Site'], null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
         # Adding model 'FolderPermission'
@@ -26,6 +36,12 @@ class Migration(SchemaMigration):
             ('everybody', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal('filer', ['FolderPermission'])
+
+        # Deleting field 'Folder.folder_type'
+        db.delete_column('filer_folder', 'folder_type')
+
+        # Deleting field 'Folder.site'
+        db.delete_column('filer_folder', 'site_id')
 
 
     models = {
@@ -122,6 +138,7 @@ class Migration(SchemaMigration):
             'date_taken': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'default_alt_text': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'default_caption': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'default_credit': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'file_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['filer.File']", 'unique': 'True', 'primary_key': 'True'}),
             'must_always_publish_author_credit': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),

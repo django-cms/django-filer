@@ -20,6 +20,7 @@ import os
 
 logger = logging.getLogger("filer")
 
+
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
     DEFAULT_THUMBNAILS = {
@@ -41,6 +42,7 @@ class Image(File):
 
     default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
     default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
+    default_credit = models.CharField(_('default credit'), max_length=255, blank=True, null=True)
 
     author = models.CharField(_('author'), max_length=255, null=True, blank=True)
 
