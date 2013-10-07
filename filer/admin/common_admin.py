@@ -197,3 +197,46 @@ class FilePermissionModelAdmin(CommonModelAdmin):
     def _get_parent_for_view(self, obj):
         return obj.folder
 
+    def has_change_permission(self, request, obj=None):
+        can_change = super(FilePermissionModelAdmin, self).\
+            has_change_permission(request, obj)
+        if not can_change or not obj:
+            return False
+
+        folder = obj.folder
+        if not folder:
+            # clipboard and unfiled files
+            return True
+
+        if folder.is_readonly():
+            # nobody can change core folder
+            # leaving these on True based on the fact that core folders are
+            # displayed as readonly fields
+            return True
+        # only admins can change site folders with no site owner
+        if not folder.site and has_admin_role(request.user):
+            return True
+
+        if folder.site:
+            return has_role_on_site(request.user, folder.site)
+
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        can_delete = super(FilePermissionModelAdmin, self).\
+            has_delete_permission(request, obj)
+        if not can_delete or not obj:
+            return False
+        folder = obj.folder
+        if not folder:
+            # clipboard and unfiled files
+            return True
+        # nobody can delete core files
+        if folder.is_readonly():
+            return False
+        # only admins can delete site files with no site owner
+        if not folder.site and has_admin_role(request.user):
+            return True
+        if folder.site:
+            return has_role_on_site(request.user, folder.site)
+        return False
