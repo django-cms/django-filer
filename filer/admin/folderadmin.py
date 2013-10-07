@@ -24,9 +24,9 @@ from django.utils.translation import ungettext, ugettext_lazy
 from filer import settings
 from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
                                RenameFilesForm)
-from filer.admin.permissions import FolderPermissionModelAdmin
+from filer.admin.common_admin import FolderPermissionModelAdmin
 from filer.views import (popup_status, popup_param, selectfolder_status,
-                         selectfolder_param)
+                         selectfolder_param, current_site_param)
 from filer.admin.tools import (folders_available, files_available,
                                has_admin_role, has_role_on_site,
                                has_admin_role_on_site,
@@ -110,72 +110,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         folder_form.clean = clean
         return folder_form
-
-    def response_change(self, request, obj):
-        """
-        Overrides the default to be able to forward to the directory listing
-        instead of the default change_list_view
-        """
-        r = super(FolderAdmin, self).response_change(request, obj)
-        ## Code borrowed from django ModelAdmin to determine changelist
-        ##      on the fly
-        if r['Location']:
-            # it was a successful save
-            if (r['Location'] in ['../'] or
-                r['Location'] == self._get_post_url(obj)):
-                if obj.parent:
-                    url = reverse('admin:filer-directory_listing',
-                                  kwargs={'folder_id': obj.parent.id})
-                else:
-                    url = reverse('admin:filer-directory_listing-root')
-                url = "%s%s%s" % (url, popup_param(request),
-                                  selectfolder_param(request, "&"))
-                return HttpResponseRedirect(url)
-            else:
-                # this means it probably was a save_and_continue_editing
-                pass
-        return r
-
-    def render_change_form(self, request, context, add=False, change=False,
-                           form_url='', obj=None):
-        extra_context = {'show_delete': True,
-                         'is_popup': popup_status(request),
-                         'select_folder': selectfolder_status(request), }
-        context.update(extra_context)
-        return super(FolderAdmin, self).render_change_form(
-                        request=request, context=context, add=False,
-                        change=False, form_url=form_url, obj=obj)
-
-    def delete_view(self, request, object_id, extra_context=None):
-        """
-        Overrides the default to enable redirecting to the directory view after
-        deletion of a folder.
-
-        we need to fetch the object and find out who the parent is
-        before super, because super will delete the object and make it
-        impossible to find out the parent folder to redirect to.
-        """
-        parent_folder = None
-        try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
-            parent_folder = obj.parent
-        except self.model.DoesNotExist:
-            obj = None
-
-        r = super(FolderAdmin, self).delete_view(
-                    request=request, object_id=object_id,
-                    extra_context=extra_context)
-        url = r.get("Location", None)
-        if url in ["../../../../", "../../"] or url == self._get_post_url(obj):
-            if parent_folder:
-                url = reverse('admin:filer-directory_listing',
-                                  kwargs={'folder_id': parent_folder.id})
-            else:
-                url = reverse('admin:filer-directory_listing-root')
-            url = "%s%s%s" % (url, popup_param(request),
-                              selectfolder_param(request, "&"))
-            return HttpResponseRedirect(url)
-        return r
 
     def icon_img(self, xs):
         return mark_safe(('<img src="%simg/icons/plainfolder_32x32.png" ' +
@@ -390,6 +324,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 'clipboard_files': File.objects.filter(
                     in_clipboards__clipboarditem__clipboard__user=user
                     ).distinct(),
+                'current_site': request.REQUEST.get('current_site', None),
                 'paginator': paginator,
                 'paginated_items': paginated_items,
                 'current_url': request.path,

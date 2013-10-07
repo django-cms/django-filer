@@ -60,6 +60,18 @@ def is_valid_destination(request, folder):
         return True
     return False
 
+def _filter_available_sites(request):
+    current_site = request.REQUEST.get('current_site', None)
+    user = request.user
+    available_sites = get_sites_for_user(user)
+    if current_site:
+        current_site = int(current_site)
+        if not user.is_superuser and current_site not in available_sites:
+            available_sites = []
+        else:
+            available_sites = [current_site]
+    return available_sites
+
 
 def folders_available(request, folders_qs):
     """
@@ -67,25 +79,23 @@ def folders_available(request, folders_qs):
         * core folders
         * only site folders with sites available to the user
         * site admins can also see site folder files with no site assigned
+
+    * current_site param is passed only with cms plugin change form so this
+        will restrict visible files/folder for the ones that belong to that
+        site for all users, even superusers
     """
     user = request.user
+    current_site = request.REQUEST.get('current_site', None)
 
-    if user.is_superuser:
+    if user.is_superuser and not current_site:
         return folders_qs
 
-    available_sites = get_sites_for_user(user)
-    current_site = request.REQUEST.get('folder__site', None)
-    if current_site:
-        current_site = int(current_site)
-        if current_site not in available_sites:
-            available_sites = []
-        else:
-            available_sites = [current_site]
+    available_sites = _filter_available_sites(request)
 
     sites_q = Q(Q(folder_type=Folder.CORE_FOLDER) |
                 Q(site__in=available_sites))
 
-    if has_admin_role(user):
+    if has_admin_role(user) and not current_site:
         sites_q |= Q(site__isnull=True)
 
     return folders_qs.filter(sites_q)
@@ -98,27 +108,26 @@ def files_available(request, files_qs):
         * files from 'unfiled files'
         * only site folder files with sites available to the user
         * site admins can also see site folder files with no site assigned
+
+    * current_site param is passed only with cms plugin change form so this
+        will restrict visible files/folder for the ones that belong to that
+        site for all users, even superusers
     """
     user = request.user
+    current_site = request.REQUEST.get('current_site', None)
 
-    if user.is_superuser:
+    if user.is_superuser and not current_site:
         return files_qs
 
-    available_sites = get_sites_for_user(user)
-    current_site = request.REQUEST.get('folder__site', None)
-    if current_site:
-        current_site = int(current_site)
-        if current_site not in available_sites:
-            available_sites = []
-        else:
-            available_sites = [current_site]
+    available_sites = _filter_available_sites(request)
 
     sites_q = Q(Q(folder__folder_type=Folder.CORE_FOLDER) |
-                Q(folder__site__in=available_sites) |
-                Q(folder__isnull=True))
+                Q(folder__site__in=available_sites))
 
-    if has_admin_role(user):
-        sites_q |= Q(folder__site__isnull=True)
+    if not current_site:
+        sites_q |= Q(folder__isnull=True)
+        if has_admin_role(user):
+            sites_q |= Q(folder__site__isnull=True)
 
     return files_qs.filter(sites_q)
 

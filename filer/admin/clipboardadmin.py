@@ -11,7 +11,7 @@ from filer.models import Clipboard, ClipboardItem, Folder, tools
 from filer.utils.files import (
     handle_upload, UploadException, matching_file_subtypes
 )
-from filer.views import popup_param, selectfolder_param
+from filer.views import popup_param, selectfolder_param, current_site_param
 from filer.admin.tools import is_valid_destination
 
 # ModelAdmins
@@ -67,27 +67,30 @@ class ClipboardAdmin(admin.ModelAdmin):
             files_moved = tools.move_files_from_clipboard_to_folder(
                 request, clipboard, folder)
             tools.discard_clipboard_files(clipboard, files_moved)
-        return HttpResponseRedirect('%s%s%s' % (
+        return HttpResponseRedirect('%s%s%s%s' % (
             request.REQUEST.get('redirect_to', ''),
             popup_param(request),
-            selectfolder_param(request)))
+            selectfolder_param(request),
+            current_site_param(request)))
 
     def discard_clipboard(self, request):
         if request.method == 'POST':
             clipboard = self.get_clipboard(request)
             tools.discard_clipboard(clipboard)
-        return HttpResponseRedirect('%s%s%s' % (
-            request.POST.get('redirect_to', ''),
+        return HttpResponseRedirect('%s%s%s%s' % (
+            request.REQUEST.get('redirect_to', ''),
             popup_param(request),
-            selectfolder_param(request)))
+            selectfolder_param(request),
+            current_site_param(request)))
 
     def delete_clipboard(self, request):
         if request.method == 'POST':
             tools.delete_clipboard(self.get_clipboard(request))
-        return HttpResponseRedirect('%s%s%s' % (
-            request.POST.get('redirect_to', ''),
+        return HttpResponseRedirect('%s%s%s%s' % (
+            request.REQUEST.get('redirect_to', ''),
             popup_param(request),
-            selectfolder_param(request)))
+            selectfolder_param(request),
+            current_site_param(request)))
 
     def clone_files_from_clipboard_to_folder(self, request):
         if request.method == 'POST':
@@ -98,10 +101,11 @@ class ClipboardAdmin(admin.ModelAdmin):
 
             tools.clone_files_from_clipboard_to_folder(
                 self.get_clipboard(request), folder)
-        return HttpResponseRedirect('%s%s%s' % (
-            request.POST.get('redirect_to', ''),
+        return HttpResponseRedirect('%s%s%s%s' % (
+            request.REQUEST.get('redirect_to', ''),
             popup_param(request),
-            selectfolder_param(request)))
+            selectfolder_param(request),
+            current_site_param(request)))
 
     @csrf_exempt
     def ajax_upload(self, request, folder_id=None):

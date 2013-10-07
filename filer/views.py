@@ -19,3 +19,9 @@ def selectfolder_param(request, separator="&"):
         return "%sselect_folder=1" % separator
     else:
         return ""
+
+def current_site_param(request, separator="&"):
+    if 'current_site' in request.REQUEST:
+        return '%scurrent_site=%s' % (separator,
+                                      request.REQUEST['current_site'])
+    return ""

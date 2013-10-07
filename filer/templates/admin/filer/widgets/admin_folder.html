@@ -17,6 +17,12 @@ django.jQuery("#{{ id }}_clear").click(function(){
     django.jQuery("#{{ descid }}").html("");
 });
 django.jQuery(document).ready(function(){
+    var current_site = django.jQuery('input[name=_current_site]');
+    if (current_site.length > 0 && current_site.val() != ''){
+        var new_link = '{{lookup_url}}&current_site=' + current_site.val();
+        django.jQuery('a#lookup_id_{{ lookup_name }}').attr(
+            'href', new_link)
+    }
     var plus = django.jQuery("#add_{{ id }}");
     if (plus.length){
         plus.remove();

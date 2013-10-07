@@ -12,6 +12,31 @@
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
 <script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
+{% if current_site %}
+    <script type="text/javascript">
+    /*
+        Makes sure that all links will contain current site parameter
+    */
+    (function($) {
+        $(document).ready(function($) {
+            var current_site_id = '{{current_site}}';
+            var dir_listing_url = "{% url 'admin:filer-directory_listing-root' %}";
+            var links_selectors = ["a[href^=" + dir_listing_url + "]", "a[href^=?]"]
+            $.each(links_selectors, function( index, value ) {
+                $(value).each(function(index){
+                    var link_value = $(this).attr('href');
+                    var q_param = '&';
+                    console.log($(this));
+                    if (link_value.indexOf("?") == -1){
+                        q_param = '?'
+                    }
+                    $(this).attr('href', link_value + q_param + 'current_site=' + current_site_id)
+                });
+            });
+        });
+    })(django.jQuery);
+    </script>
+{% endif %}
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}
 <script type="text/javascript">
 (function($) {
@@ -64,7 +89,7 @@
 {% block content %}
 <div id="content-main">
     <ul class="object-tools">
-        {% if not folder.is_readonly and folder.can_have_subfolders %}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a>{% endif %}</li>
+        {% if not folder.is_readonly and folder.can_have_subfolders %}{%if is_popup and folder.is_root %}{%else%}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a></li>{% endif %}{% endif %}
         <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
         {% include 'admin/filer/tools/upload_button_js.html' %}
     </ul>
