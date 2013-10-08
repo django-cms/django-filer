@@ -23,8 +23,8 @@ class FoldersChainableQuerySet(object):
         return self.filter(has_all_mandatory_data=False)
 
     def readonly(self):
-        restricted_folder = Q(folder_type=Folder.CORE_FOLDER)
-        return self.filter(restricted_folder)
+        readonly_folders = Q(folder_type=Folder.CORE_FOLDER)
+        return self.filter(readonly_folders)
 
 
 class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
