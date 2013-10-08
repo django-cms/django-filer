@@ -51,12 +51,16 @@ class FolderAdmin(FolderPermissionModelAdmin):
     list_filter = ('owner',)
     search_fields = ['name', 'files__name']
     save_as = True  # see ImageAdmin
-    actions = [
+
+    actions_affecting_position = [
         'move_to_clipboard',
         'delete_files_or_folders',
         'move_files_and_folders',
+    ]
+
+    actions = [
         'copy_files_and_folders',
-        'extract_files']
+        'extract_files', ] + actions_affecting_position
 
     # form fields
     exclude = ('parent', 'owner', 'folder_type')
@@ -431,6 +435,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
         actions = super(FolderAdmin, self).get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
+        if not self.has_delete_permission(request, None):
+            for action_to_remove in self.actions_affecting_position:
+                actions.pop(action_to_remove, None)
         return actions
 
     def move_to_clipboard(self, request, files_queryset, folders_queryset):

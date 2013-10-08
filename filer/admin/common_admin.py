@@ -156,7 +156,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         can_delete = super(FolderPermissionModelAdmin, self).\
             has_delete_permission(request, obj)
 
-        if not folder:
+        if not can_delete or not folder:
             return can_delete
 
         if folder.is_readonly():
@@ -220,7 +220,7 @@ class FilePermissionModelAdmin(CommonModelAdmin):
         can_delete = super(FilePermissionModelAdmin, self).\
             has_delete_permission(request, obj)
         if not can_delete or not obj:
-            return False
+            return can_delete
         folder = obj.folder
         if not folder:
             # clipboard and unfiled files
