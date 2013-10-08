@@ -218,7 +218,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             if folder and limit_search_to_folder and not folder.is_root:
                 folder_qs = folders_available(request, folder.get_descendants())
                 file_qs = files_available(request, File.objects.filter(
-                    folder__in=folder.get_descendants()))
+                    folder__in=folder.get_descendants(include_self=True)))
             else:
                 folder_qs = folders_available(request, Folder.objects.all())
                 file_qs = files_available(request, File.objects.all())
