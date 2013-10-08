@@ -435,6 +435,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
         actions = super(FolderAdmin, self).get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
+
+        if (resolve(request.path_info).url_name ==
+                'filer-directory_listing-unfiled_images'):
+            actions.pop('extract_files', None)
+            return actions
+
         if not self.has_delete_permission(request, None):
             for action_to_remove in self.actions_affecting_position:
                 actions.pop(action_to_remove, None)

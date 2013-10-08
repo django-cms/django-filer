@@ -1029,11 +1029,13 @@ class BaseTestFolderTypePermissionLayer(object):
     def test_extract_in_unfiled_folder(self):
         files = self._build_files_structure_for_archive()
         url = get_dir_listing_url('unfiled')
+        count_in_unfiled = File.objects.filter(folder__isnull=True).count()
         response = self.client.post(url, {
             'action': 'extract_files',
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(files['baz_file'])]})
-        self.assertEqual(response.status_code, 403)
+        assert count_in_unfiled == File.objects.filter(
+            folder__isnull=True).count()
 
 
 class TestFolderTypePermissionForSuperUser(
