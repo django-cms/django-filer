@@ -258,8 +258,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         folder_children = []
         folder_files = []
-        if folder.is_root:
-            folder_children += folder.virtual_folders
 
         folder_children += folder_qs
         folder_files += file_qs
