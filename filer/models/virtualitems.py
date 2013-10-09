@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from django.core import urlresolvers
+from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
 from filer.models.filemodels import File
@@ -47,7 +48,8 @@ class UnfiledImages(DummyFolder):
     _icon = "unfiled_folder"
 
     def _files(self):
-        return File.objects.filter(folder__isnull=True)
+        return File.objects.filter(
+            folder__isnull=True).select_related('owner')
     files = property(_files)
 
     def get_admin_directory_listing_url_path(self):
@@ -81,7 +83,11 @@ class FolderRoot(DummyFolder):
 
     @property
     def children(self):
-        return Folder.objects.filter(parent__isnull=True)
+        return Folder.objects.filter(parent__isnull=True).\
+            select_related('parent', 'owner', 'site').\
+            annotate(
+                num_folders=Count('children', distinct=True),
+                num_files=Count('all_files', distinct=True))
     parent_url = None
 
     def contains_folder(self, folder_name):

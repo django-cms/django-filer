@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse, resolve
 from django.db import router
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect, Http404, HttpResponse
@@ -249,8 +249,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
             file_qs = files_available(request, folder.files.all())
             show_result_count = False
 
-        folder_qs = folder_qs.order_by('name')
-        file_qs = file_qs.order_by('name')
+        folder_qs = folder_qs.order_by('name').\
+            select_related('parent', 'owner', 'site').\
+            annotate(
+                num_folders=Count('children', distinct=True),
+                num_files=Count('all_files', distinct=True))
+        file_qs = file_qs.order_by('name').select_related('owner')
 
         folder_children = []
         folder_files = []
@@ -260,7 +264,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
         folder_children += folder_qs
         folder_files += file_qs
 
-        folder_files.sort()
         items = folder_children + folder_files
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
@@ -276,7 +279,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
                     if f.is_readonly():
                         raise PermissionDenied
-                    clipboard = tools.get_user_clipboard(user)
                     tools.move_file_to_clipboard(request, [f], clipboard)
                     return HttpResponseRedirect(request.get_full_path())
 
@@ -325,9 +327,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             'admin/filer/folder/directory_listing.html',
             {
                 'folder': folder,
-                'clipboard_files': File.objects.filter(
-                    in_clipboards__clipboarditem__clipboard__user=user
-                    ).distinct(),
+                'clipboard_files': clipboard.files.distinct(),
                 'current_site': request.REQUEST.get('current_site', None),
                 'paginator': paginator,
                 'paginated_items': paginated_items,
