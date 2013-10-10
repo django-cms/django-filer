@@ -17,7 +17,7 @@
     <div>
         <b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b>
         {% if not subfolder.is_root %}
-            <span class="tiny">({% blocktrans count subfolder.num_folders as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.num_files as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>
+            <span class="tiny">({% blocktrans count subfolder.children.count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.files.count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>
         {% endif %}
     </div>
     <span>{{ subfolder.get_folder_type_display }}{% if subfolder.site %}: {{subfolder.site}}{%endif%}</span>

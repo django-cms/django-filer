@@ -38,6 +38,7 @@ from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           Archive)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
+from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
 import os
@@ -243,36 +244,22 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
             folder_qs = folder_search_qs(folder_qs, search_terms)
             file_qs = file_search_qs(file_qs, search_terms)
-            show_result_count = {
-                'files_found': file_qs.count(),
-                'folders_found': folder_qs.count(),
-            }
+            show_result_count = True
         else:
             folder_qs = folders_available(request, folder.children.all())
             file_qs = files_available(request, folder.files.all())
             show_result_count = False
 
-        folder_qs = folder_qs.order_by('name').\
-            select_related('parent', 'owner', 'site').\
-            annotate(
-                num_folders=Count('children', distinct=True),
-                num_files=Count('all_files', distinct=True))
-        file_qs = file_qs.order_by('name').select_related('owner')
+        folder_qs = folder_qs.order_by('name')
+        file_qs = file_qs.order_by('name')
+        if show_result_count:
+            show_result_count = {
+                'files_found': file_qs.count(),
+                'folders_found': folder_qs.count(),
+            }
 
-        folder_children = []
-        folder_files = []
-
-        folder_children += folder_qs
-        folder_files += file_qs
-
-        items = folder_children + folder_files
+        items = MultiMoldelQuerysetChain([folder_qs, file_qs])
         paginator = Paginator(items, FILER_PAGINATE_BY)
-
-        # Make sure page request is an int. If not, deliver first page.
-        try:
-            page = int(request.GET.get('page', '1'))
-        except ValueError:
-            page = 1
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
@@ -319,15 +306,22 @@ class FolderAdmin(FolderPermissionModelAdmin):
         selection_note_all = ungettext('%(total_count)s selected',
             'All %(total_count)s selected', paginator.count)
 
+        # Make sure page request is an int. If not, deliver first page.
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
         # If page request (9999) is out of range, deliver last page of results.
         try:
             paginated_items = paginator.page(page)
         except (EmptyPage, InvalidPage):
             paginated_items = paginator.page(paginator.num_pages)
-        return render_to_response(
+        response = render_to_response(
             'admin/filer/folder/directory_listing.html',
             {
                 'folder': folder,
+                'user_clipboard': clipboard,
                 'clipboard_files': clipboard.files.distinct(),
                 'current_site': request.REQUEST.get('current_site', None),
                 'paginator': paginator,
@@ -352,6 +346,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                     'total_count': paginator.count},
                 'media': self.media,
         }, context_instance=RequestContext(request))
+        return response
 
     def response_action(self, request, files_queryset, folders_queryset):
         """

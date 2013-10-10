@@ -49,7 +49,7 @@ class UnfiledImages(DummyFolder):
 
     def _files(self):
         return File.objects.filter(
-            folder__isnull=True).select_related('owner')
+            folder__isnull=True)
     files = property(_files)
 
     def get_admin_directory_listing_url_path(self):
@@ -83,11 +83,7 @@ class FolderRoot(DummyFolder):
 
     @property
     def children(self):
-        return Folder.objects.filter(parent__isnull=True).\
-            select_related('parent', 'owner', 'site').\
-            annotate(
-                num_folders=Count('children', distinct=True),
-                num_files=Count('all_files', distinct=True))
+        return Folder.objects.filter(parent__isnull=True)
     parent_url = None
 
     def contains_folder(self, folder_name):
