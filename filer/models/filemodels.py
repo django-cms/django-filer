@@ -8,8 +8,9 @@ from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
-from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
+from filer.utils.cms_roles import *
+from filer import settings as filer_settings
 from django.db.models import Count
 import polymorphic
 import hashlib
@@ -378,6 +379,43 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         if self.folder:
             return self.folder.is_readonly()
         return False
+
+    def has_change_permission(self, user):
+        if not self.folder:
+            # clipboard and unfiled files
+            return True
+
+        if self.is_readonly():
+            # nobody can change core folder
+            # leaving these on True based on the fact that core folders are
+            # displayed as readonly fields
+            return True
+
+        # only admins can change site folders with no site owner
+        if not self.folder.site and has_admin_role(user):
+            return True
+
+        if self.folder.site:
+            return (user.has_perm('filer.change_file') and
+                    has_role_on_site(user, self.folder.site))
+
+        return False
+
+    def has_delete_permission(self, user):
+        if not self.folder:
+            # clipboard and unfiled files
+            return True
+        # nobody can delete core files
+        if self.is_readonly():
+            return False
+        # only admins can delete site files with no site owner
+        if not self.folder.site and has_admin_role(user):
+            return True
+        if self.folder.site:
+            return (user.has_perm('filer.change_file') and
+                    has_role_on_site(user, self.folder.site))
+        return False
+
 
     class Meta:
         app_label = 'filer'

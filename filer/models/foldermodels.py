@@ -10,8 +10,8 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-
 import filer.models.clipboardmodels
+from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
 import mptt
@@ -272,6 +272,52 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def is_readonly(self):
         return self.folder_type == Folder.CORE_FOLDER
+
+    def has_add_permission(self, user):
+        # nobody can add subfolders in core folders
+        if self.is_readonly():
+            return False
+        # only site admins can add subfolders in site folders with no site
+        if not self.site and has_admin_role(user):
+            return True
+        # regular users need to have permissions to add folders and
+        #   need to have a role over the site owner of the folder
+        if (self.site and user.has_perm('filer.add_folder')
+                and has_role_on_site(user, self.site)):
+            return True
+
+    def has_change_permission(self, user):
+        # nobody can change core folder
+        if self.is_readonly():
+            return False
+        # only admins can change site folders with no site owner
+        if not self.site and has_admin_role(user):
+            return True
+
+        if self.site:
+            if not self.parent:
+                # only site admins can change root site folders
+                return has_admin_role_on_site(user, self.site)
+            return (user.has_perm('filer.change_folder') and
+                    has_role_on_site(user, self.site))
+        return False
+
+    def has_delete_permission(self, user):
+        if self.is_readonly():
+            return False
+
+        # only admins can delete site folders with no site owner
+        if not self.site and has_admin_role(user):
+            return True
+
+        if self.site:
+            if not self.parent:
+                # only site admins can change root site folders
+                return has_admin_role_on_site(user, self.site)
+            return (user.has_perm('filer.delete_folder') and
+                    has_role_on_site(user, self.site))
+
+        return False
 
     class Meta:
         unique_together = (('parent', 'name'),)
