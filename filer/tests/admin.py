@@ -816,7 +816,6 @@ class BaseTestFolderTypePermissionLayer(object):
 
         response = move_single_file_to_clipboard_action(
             self.client, foo, [file_foo])
-        self.assertEqual(response.status_code, 403)
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
 
@@ -1240,8 +1239,7 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
                         self.files['bar_file'], self.files['unfiled_file']])
         assert expected <= set(items)
         assert self.files['foo_file'] not in items
-        #unfiled present
-        assert len(expected) + 1 <= len(items)
+        assert len(expected) <= items.length
 
     def test_search_for_other_users(self):
         # bob is writer on bar site
@@ -1252,8 +1250,7 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         assert expected <= set(items)
         assert self.files['foo_file'] not in items
         assert self.files['none_file'] not in items
-        #unfiled present
-        assert len(expected) + 1 <= len(items)
+        assert len(expected) <= items.length
 
     def test_search_for_multi_site_user(self):
         # joe is site admin for foo and bar
@@ -1261,8 +1258,7 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         response, items = self.get_listed_objects(None, {'q': 'file'})
         expected = set(self.files.values())
         assert expected <= set(items)
-        #unfiled present
-        assert len(expected) + 1 <= len(items)
+        assert len(expected) <= items.length
 
     def test_dir_listing_for_site_admin(self):
         # jack is admin on bar site
@@ -1273,20 +1269,22 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
             self.folders['core'], self.folders['bar'], self.folders['none']])
         assert expected <= set(items)
         assert self.folders['foo'] not in items
-        #unfiled folder present
-        assert len(expected) + 1 == len(items)
+        assert len(expected) == items.length
 
         response, items = self.get_listed_objects('unfiled')
-        assert [self.files['unfiled_file']] == items
+        assert items.length == 1
+        assert self.files['unfiled_file'] in items
 
         response, items = self.get_listed_objects(self.folders['core'])
-        assert [self.files['core_file']] == items
+        assert items.length == 1
+        assert self.files['core_file'] in items
 
         response, items = self.get_listed_objects(self.folders['foo'])
         assert response.status_code == 403
 
         response, items = self.get_listed_objects(self.folders['none'])
-        assert [self.files['none_file']] == items
+        assert items.length == 1
+        assert self.files['none_file'] in items
 
     def test_dir_listing_for_other_users(self):
         # bob is writer on bar site
@@ -1297,15 +1295,16 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         assert expected <= set(items)
         assert self.folders['foo'] not in items
         assert self.folders['none'] not in items
-        #unfiled folder present
-        assert len(expected) + 1 == len(items)
+        assert len(expected) == items.length
 
         response = self.client.get(get_dir_listing_url('unfiled'))
         items = response.context['paginator'].object_list
-        assert [self.files['unfiled_file']] == items
+        assert items.length == 1
+        assert self.files['unfiled_file'] in items
 
         response, items = self.get_listed_objects(self.folders['core'])
-        assert [self.files['core_file']] == items
+        assert items.length == 1
+        assert self.files['core_file'] in items
 
         response, items = self.get_listed_objects(self.folders['foo'])
         assert response.status_code == 403
