@@ -16,8 +16,8 @@
                 <input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans "Check it to" %} {% trans "limit the search to current folder" %}"/>
                 <label for="limit_search_to_folder">{% trans "limit the search to current folder" %}</label>
                 {% if show_result_count %}
-                <span class="small quiet">({% trans "found" %} {% blocktrans count folder_children|length as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
-                {% blocktrans count folder_files|length as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?">{% trans "cancel search" %}</a></span>
+                <span class="small quiet">({% trans "found" %} {% blocktrans count show_result_count.folders_found as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
+                {% blocktrans count show_result_count.files_found as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?">{% trans "cancel search" %}</a></span>
 
                 {% endif %}
             </div>

@@ -1,0 +1,26 @@
+{% load i18n %}
+<td>{% if select_folder and subfolder.file_type == 'Folder' %}
+    <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.quoted_logical_path }}'); return false;" >&nbsp;</a>
+    {% else %}
+        {% if action_form and subfolder.pk and not is_popup and not subfolder.is_readonly %}
+        <input type="checkbox" class="action-select" value="folder-{{ subfolder.pk }}" name="_selected_action" />
+        {% endif %}
+    {% endif %}
+</td>
+<!-- DirIcon -->
+<td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.32 }}" alt="{% trans "Folder Icon" %}" /></a></td>
+<!-- Directory details -->
+<td>
+    {% if subfolder.file_type == 'Folder' and not subfolder.is_readonly and not is_popup %}
+        <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
+    {% endif %}
+    <div>
+        <b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b>
+        {% if not subfolder.is_root %}
+            <span class="tiny">({% blocktrans count subfolder.num_folders as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.num_files as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>
+        {% endif %}
+    </div>
+    <span>{{ subfolder.get_folder_type_display }}{% if subfolder.site %}: {{subfolder.site}}{%endif%}</span>
+    <div>{% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }}</div>
+</td>
+<td></td>

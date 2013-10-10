@@ -243,7 +243,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
             folder_qs = folder_search_qs(folder_qs, search_terms)
             file_qs = file_search_qs(file_qs, search_terms)
-            show_result_count = True
+            show_result_count = {
+                'files_found': file_qs.count(),
+                'folders_found': folder_qs.count(),
+            }
         else:
             folder_qs = folders_available(request, folder.children.all())
             file_qs = files_available(request, folder.files.all())
