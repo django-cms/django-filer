@@ -907,8 +907,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
             self._generate_name(file_obj.actual_name, suffix)
             for file_obj in file_qs]
 
-        existing_names = destination.entries_with_names(
-            candidate_folder_names + candidate_file_names)
+        existing_names = [f.actual_name
+                          for f in destination.entries_with_names(
+                            candidate_folder_names + candidate_file_names)]
 
         if existing_names:
             messages.error(request,
