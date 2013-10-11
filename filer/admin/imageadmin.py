@@ -3,6 +3,7 @@ from django import forms
 from django.utils.translation import ugettext  as _
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import Http404
 from filer import settings as filer_settings, settings
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
@@ -45,9 +46,14 @@ class ImageAdmin(FileAdmin):
         return url_patterns
 
     def full_size_preview(self, request, file_id):
+        try:
+            image = Image.objects.get(id=file_id)
+        except Image.DoesNotExist:
+            raise Http404
+
         return render_to_response(
             'admin/filer/image/full_size_preview.html',{
-                'image': Image.objects.get(id=file_id),
+                'image': image,
                 'current_site': request.REQUEST.get('current_site', None),
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
