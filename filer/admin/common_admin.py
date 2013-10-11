@@ -152,15 +152,15 @@ class FilePermissionModelAdmin(CommonModelAdmin):
         return obj.folder
 
     def has_change_permission(self, request, obj=None):
-        # The logic for this stands in showing fields as readonly if user
-        #   does not have change permission for a specific file
-        # See implementation of has_change_permission from File model
-        # Files are accessible only if they belong to users site
-        if not obj:
-            return True
-        return obj.has_view_permission(request.user)
+        can_change = super(FilePermissionModelAdmin, self).\
+            has_change_permission(request, obj)
+        if not can_change or not obj:
+            return can_change
+        return obj.has_change_permission(request.user)
 
     def has_delete_permission(self, request, obj=None):
-        if not obj:
-            return True
+        can_delete = super(FilePermissionModelAdmin, self).\
+            has_delete_permission(request, obj)
+        if not can_delete or not obj:
+            return can_delete
         return obj.has_delete_permission(request.user)

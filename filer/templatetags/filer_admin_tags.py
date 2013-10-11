@@ -38,17 +38,17 @@ def admin_css_base():
 def admin_js_base():
     return ADMIN_JS_BASE
 
-@register.filter
-def can_submit_form(user, filer_object):
-    if filer_object.is_readonly():
-        return False
-    if (filer_object.has_change_permission(user) and
-            filer_object.has_delete_permission(user)):
-        return True
-    return False
 
-@register.filter
-def can_restrict(user, filer_object):
-    if filer_object.is_readonly():
-        return False
-    return user.has_perm('filer.can_restrict_folder')
+@register.simple_tag(takes_context=True)
+def get_popup_params(context, sep='?'):
+    is_popup = context.get('is_popup', False)
+    select_folder = context.get('select_folder', False)
+    current_site = context.get('current_site', False)
+    params = ''
+    if is_popup:
+        params += '%s_popup=1' % sep
+        if select_folder:
+            params += '&select_folder=1'
+        if current_site:
+            params += '&current_site=%s' % current_site
+    return params

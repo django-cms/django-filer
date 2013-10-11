@@ -1,0 +1,9 @@
+{% load i18n filer_admin_tags %}
+<html>
+<head><title>Full size preview {{ image.actual_name }}</title></head>
+<body>
+<center>
+<a href="{{image.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}" title="{% trans "Go back to the parent folder" %}">Go back to folder</a></center>
+<img src="{{ image.url }}"></img>
+</body>
+</html>

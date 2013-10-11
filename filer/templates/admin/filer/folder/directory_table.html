@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load adminmedia admin_list filermedia filer_tags %}
+{% load adminmedia admin_list filermedia filer_tags filer_admin_tags %}
 {% load url from future %}
 {% spaceless %}
 <div id="toolbartable">
@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-        {% if folder.is_root and not show_result_count %}
+        {% if not is_popup and folder.is_root and not show_result_count %}
             {% ifequal paginated_items.number 1 %}
             {% for subfolder in folder.virtual_folders %}
             <tr class="{% cycle rowcolors %}">
@@ -53,7 +53,7 @@
     </table>
     <p class="paginator">
         {% if paginated_items.has_previous %}
-            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if is_popup %}&_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">{% trans "previous" %}</a>
+            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% get_popup_params '&' %}">{% trans "previous" %}</a>
         {% endif %}
 
         <span class="this-page">
@@ -63,7 +63,7 @@
         </span>
 
         {% if paginated_items.has_next %}
-            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if is_popup %}&_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">{% trans "next" %}</a>
+            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% get_popup_params '&' %}">{% trans "next" %}</a>
         {% endif %}
     </p>
 </div>

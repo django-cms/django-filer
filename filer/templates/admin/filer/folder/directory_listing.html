@@ -12,31 +12,7 @@
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
 <script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
-{% if current_site %}
-    <script type="text/javascript">
-    /*
-        Makes sure that all links will contain current site parameter
-    */
-    (function($) {
-        $(document).ready(function($) {
-            var current_site_id = '{{current_site}}';
-            var dir_listing_url = "{% url 'admin:filer-directory_listing-root' %}";
-            var links_selectors = ["a[href^=" + dir_listing_url + "]", "a[href^=?]"]
-            $.each(links_selectors, function( index, value ) {
-                $(value).each(function(index){
-                    var link_value = $(this).attr('href');
-                    var q_param = '&';
-                    console.log($(this));
-                    if (link_value.indexOf("?") == -1){
-                        q_param = '?'
-                    }
-                    $(this).attr('href', link_value + q_param + 'current_site=' + current_site_id)
-                });
-            });
-        });
-    })(django.jQuery);
-    </script>
-{% endif %}
+
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}
 <script type="text/javascript">
 (function($) {
@@ -97,17 +73,17 @@
     <div class="module" id="changelist">
         {% include "admin/filer/tools/search_form.html" %}
         {% if not folder.is_root %}
-        <h1 class="folder_header">{% if folder.parent %}<a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% trans "Go back to the parent folder" %}">&uarr;</a>{% else %}<a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}">&uarr;</a>{% endif %}
+        <h1 class="folder_header">{% if folder.parent %}<a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% get_popup_params %}" title="{% trans "Go back to the parent folder" %}">&uarr;</a>{% else %}<a href="{% url 'admin:filer-directory_listing-root' %}{% get_popup_params %}" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}">&uarr;</a>{% endif %}
             <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
             <div style='display: inline-block; vertical-align: middle;'><div class="small quiet">({% blocktrans count folder.children.count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.files.count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</div><div class="small quiet">{{ folder.get_folder_type_display }}{% if folder.site %}: {{folder.site}}{%endif%}</div></div>
             <span>
                 {% if is_popup %}
                     {% if select_folder and folder.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ folder.id }}, '{{ folder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% endif %}
-                {% elif user|can_restrict:folder %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}
+                {% elif not folder.is_readonly %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}
             </span>
         </h1>
         {% else %}{% if folder.is_smart_folder %}
-        <h1 class="folder_header"><a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">&uarr;</a>
+        <h1 class="folder_header"><a href="{% url 'admin:filer-directory_listing-root' %}{% get_popup_params %}">&uarr;</a>
             <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
         </h1>
         {% endif %}

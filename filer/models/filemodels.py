@@ -380,34 +380,44 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             return self.folder.is_readonly()
         return False
 
-    def has_view_permission(self, user):
-        # everyone can see core folders since they are readonly
-        # everyone can see their site files
-        if self.is_readonly():
-            return True
-
-        if self.folder:
-            if not self.folder.site and not has_admin_role(user):
-                return False
-            if (self.folder.site and
-                    not has_role_on_site(user, self.folder.site)):
-                return False
-        return True
 
     def has_change_permission(self, user):
         if not self.folder:
             # clipboard and unfiled files
             return True
 
-        if self.is_readonly() or not self.has_view_permission(user):
-            return False
+        if self.is_readonly():
+            # nobody can change core folder
+            # leaving these on True based on the fact that core folders are
+            # displayed as readonly fields
+             return True
 
-        if user.has_perm('filer.can_restrict_folder'):
+        # only admins can change site folders with no site owner
+        if not self.folder.site and has_admin_role(user):
             return True
-        return user.id == self.owner_id
+
+        if self.folder.site:
+            return (user.has_perm('filer.change_file') and
+                    has_role_on_site(user, self.folder.site))
+
+        return False
+
 
     def has_delete_permission(self, user):
-        return self.has_change_permission(user)
+        if not self.folder:
+             # clipboard and unfiled files
+             return True
+        # nobody can delete core files
+        if self.is_readonly():
+             return False
+        # only admins can delete site files with no site owner
+        if not self.folder.site and has_admin_role(user):
+             return True
+
+        if self.folder.site:
+            return (user.has_perm('filer.delete_file') and
+                    has_role_on_site(user, self.folder.site))
+        return False
 
     class Meta:
         app_label = 'filer'
