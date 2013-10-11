@@ -113,9 +113,9 @@ class ClipboardAdmin(admin.ModelAdmin):
         receives an upload from the uploader. Receives only one file at the time.
         """
         mimetype = "application/json" if request.is_ajax() else "text/html"
+        upload, file_obj = None ,None
         try:
             upload, filename, is_raw = handle_upload(request)
-
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
             if any(f for f in clipboard.files.all() if f.actual_name == filename):
@@ -153,6 +153,11 @@ class ClipboardAdmin(admin.ModelAdmin):
         except UploadException, e:
             return HttpResponse(simplejson.dumps({'error': unicode(e)}),
                                 mimetype=mimetype)
+        finally:
+            if upload:
+                upload.close()
+            if file_obj and file_obj.file:
+                file_obj.file.close()
 
     def get_model_perms(self, request):
         """
