@@ -10,7 +10,7 @@ class FileAdmin(FilePermissionModelAdmin):
     list_per_page = 10
     search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
-    readonly_fields = ('sha1',)
+    readonly_fields = ('sha1', )
 
 
     # save_as hack, because without save_as it is impossible to hide the
@@ -20,10 +20,15 @@ class FileAdmin(FilePermissionModelAdmin):
     save_as = True
 
     def get_readonly_fields(self, request, obj=None):
-        if obj and obj.is_readonly():
+        if obj and (obj.is_readonly() or \
+                    not obj.has_change_permission(request.user)):
             return [field.name
                     for field in obj.__class__._meta.fields]
-        return super(FileAdmin, self).get_readonly_fields(request, obj)
+        if not request.user.is_superuser:
+            # allow owner to be editable only by superusers
+            return [ro_field for ro_field in self.readonly_fields] + ['owner']
+        return super(FileAdmin, self).get_readonly_fields(
+            request, obj)
 
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):

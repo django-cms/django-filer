@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia filermedia %}
+{% load i18n admin_modify adminmedia filermedia filer_admin_tags %}
 
 {% block extrahead %}{{ block.super }}
 {% endblock %}
@@ -37,7 +37,7 @@
 
 
 {% block submit_buttons_bottom %}
-{% if not original.is_readonly %}
+{% if user|can_submit_form:original %}
 {{ block.super }}
 {% endif %}
 {% endblock %}

@@ -37,3 +37,18 @@ def admin_css_base():
 @register.simple_tag
 def admin_js_base():
     return ADMIN_JS_BASE
+
+@register.filter
+def can_submit_form(user, filer_object):
+    if filer_object.is_readonly():
+        return False
+    if (filer_object.has_change_permission(user) and
+            filer_object.has_delete_permission(user)):
+        return True
+    return False
+
+@register.filter
+def can_restrict(user, filer_object):
+    if filer_object.is_readonly():
+        return False
+    return user.has_perm('filer.can_restrict_folder')
