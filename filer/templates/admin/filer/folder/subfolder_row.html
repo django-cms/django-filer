@@ -1,4 +1,5 @@
 {% load i18n filer_admin_tags %}
+{% load url from future %}
 <td>{% if select_folder and subfolder.file_type == 'Folder' %}
     <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.quoted_logical_path }}'); return false;" >&nbsp;</a>
     {% else %}
@@ -12,7 +13,7 @@
 <!-- Directory details -->
 <td>
     {% if subfolder.file_type == 'Folder' and not subfolder.is_readonly and not is_popup %}
-        <a style="display: block; float: right;" class="changelink" href="{% get_popup_params %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
+        <a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' subfolder.id %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
     {% endif %}
     <div>
         <b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% get_popup_params %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b>
