@@ -41,6 +41,10 @@ class FileAdmin(FilePermissionModelAdmin):
                 'fields': ('file', ) + extra_advanced_fields,
                 'classes': ('collapse',),
                 }),
+            (('Permissions'), {
+                'fields': ('restricted',),
+                'classes': ('collapse', ),
+                })
             ) + extra_fieldsets
         return fieldsets
 

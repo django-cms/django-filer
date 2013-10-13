@@ -92,6 +92,15 @@ class Folder(models.Model, mixins.IconsMixin):
                              help_text=_("Select the site which will use "
                                          "this folder."))
 
+    restricted = models.BooleanField(
+        _("Restrict Editors and Writers from being able to edit "
+          "or delete anything from this folder."), default=False,
+        help_text=_('If this box is checked, '
+                    'Editors and Writers will still be able to '
+                    'view this folder assets, add them to a plugin or smart '
+                    'snippet but will not be able to delete or '
+                    'modify the current version of the assets.'))
+
     objects = FolderManager()
 
     def clean(self):
@@ -324,8 +333,8 @@ class Folder(models.Model, mixins.IconsMixin):
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
                         "Can use directory listing"),
-                       ("can_restrict_folder",
-                        "Can restrict folder"),)
+                       ("can_restrict_operations",
+                        "Can restrict files or folders"),)
         app_label = 'filer'
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")

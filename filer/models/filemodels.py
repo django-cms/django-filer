@@ -81,6 +81,15 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
                     'file. File will be publicly accessible ' +\
                     'to anyone.'))
 
+    restricted = models.BooleanField(
+        _("Restrict Editors and Writers from being able to edit "
+          "or delete this asset."), default=False,
+        help_text=_('If this box is checked, '
+                    'Editors and Writers will still be able to '
+                    'view the asset, add it to a plugin or smart '
+                    'snippet but will not be able to delete or '
+                    'modify the current version of the asset.'))
+
     objects = FileManager()
 
     @classmethod
@@ -380,7 +389,6 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             return self.folder.is_readonly()
         return False
 
-
     def has_change_permission(self, user):
         if not self.folder:
             # clipboard and unfiled files
@@ -401,7 +409,6 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
                     has_role_on_site(user, self.folder.site))
 
         return False
-
 
     def has_delete_permission(self, user):
         if not self.folder:
