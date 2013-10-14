@@ -171,7 +171,12 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         # to make sure later operations can read the whole file
         self.file.seek(0)
 
+    def set_restricted_from_folder(self):
+        if self.folder and self.folder.restricted:
+            self.restricted = self.folder.restricted
+
     def save(self, *args, **kwargs):
+        self.set_restricted_from_folder()
         # check if this is a subclass of "File" or not and set
         # _file_type_plugin_name
         if self.__class__ == File:
@@ -388,10 +393,12 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             return self.folder.is_readonly()
         return False
 
-    def can_change_restricted(self):
+    def can_change_restricted(self, user):
         """
         Checks if restriction operation is available for this folder.
         """
+        if not user.has_perm('filer.can_restrict_operations'):
+            return False
         if not self.folder:
             # cannot restrict unfiled files
             return False

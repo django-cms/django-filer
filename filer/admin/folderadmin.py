@@ -106,6 +106,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         else:
             # add view
             parent_id = request.REQUEST.get('parent_id', None) or None
+            folder_form.base_fields.pop('restricted', None)
 
         # shouldn't show site field if has parent or is core folder
         pop_site_field = parent_id or is_core_folder

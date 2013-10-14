@@ -143,6 +143,10 @@ class Folder(models.Model, mixins.IconsMixin):
             if self.parent:
                 self.site = self.parent.site
 
+    def set_restricted_from_parent(self):
+        if self.parent and self.parent.restricted:
+            self.restricted = self.parent.restricted
+
     def update_descendants_folder_type(self):
         """
         Folder type should be preserved to all descendants
@@ -164,6 +168,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
+            self.set_restricted_from_parent()
             self.set_site_for_folder_type()
             super(Folder, self).save(*args, **kwargs)
             self.update_descendants_folder_type()
@@ -183,6 +188,7 @@ class Folder(models.Model, mixins.IconsMixin):
                     storage.delete(location)
 
             try:
+                self.set_restricted_from_parent()
                 self.set_site_for_folder_type()
                 super(Folder, self).save(*args, **kwargs)
                 self.update_descendants_folder_type()
@@ -293,10 +299,12 @@ class Folder(models.Model, mixins.IconsMixin):
     def is_readonly(self):
         return self.folder_type == Folder.CORE_FOLDER
 
-    def can_change_restricted(self):
+    def can_change_restricted(self, user):
         """
         Checks if restriction operation is available for this folder.
         """
+        if not user.has_perm('filer.can_restrict_operations'):
+            return False
         if not self.parent:
             return True
         if self.parent.restricted == self.restricted == True:
