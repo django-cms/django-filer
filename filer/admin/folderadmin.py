@@ -67,6 +67,13 @@ class FolderAdmin(FolderPermissionModelAdmin):
     exclude = ('parent', 'owner', 'folder_type')
     raw_id_fields = ('owner', )
 
+    def get_readonly_fields(self, request, obj=None):
+        self.readonly_fields = [ro_field
+                                for ro_field in self.readonly_fields]
+        self._make_restricted_field_readonly(request.user)
+        return super(FolderAdmin, self).get_readonly_fields(
+            request, obj)
+
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
         """
             Filters sites available to the user based on his roles on sites

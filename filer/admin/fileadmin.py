@@ -23,9 +23,12 @@ class FileAdmin(FilePermissionModelAdmin):
         if obj and obj.is_readonly():
             return [field.name
                     for field in obj.__class__._meta.fields]
+        self.readonly_fields = [ro_field
+                                for ro_field in self.readonly_fields]
+        self._make_restricted_field_readonly(request.user)
         if not request.user.is_superuser:
             # allow owner to be editable only by superusers
-            return [ro_field for ro_field in self.readonly_fields] + ['owner']
+            self.readonly_fields += ['owner']
         return super(FileAdmin, self).get_readonly_fields(
             request, obj)
 
@@ -43,7 +46,7 @@ class FileAdmin(FilePermissionModelAdmin):
                 }),
             (('Permissions'), {
                 'fields': ('restricted',),
-                'classes': ('collapse', ),
+                'classes': ('collapse', 'wide', 'extrapretty'),
                 })
             ) + extra_fieldsets
         return fieldsets

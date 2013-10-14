@@ -83,7 +83,7 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
 
     restricted = models.BooleanField(
         _("Restrict Editors and Writers from being able to edit "
-          "or delete this asset."), default=False,
+          "or delete this asset"), default=False,
         help_text=_('If this box is checked, '
                     'Editors and Writers will still be able to '
                     'view the asset, add it to a plugin or smart '

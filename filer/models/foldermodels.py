@@ -94,7 +94,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     restricted = models.BooleanField(
         _("Restrict Editors and Writers from being able to edit "
-          "or delete anything from this folder."), default=False,
+          "or delete anything from this folder"), default=False,
         help_text=_('If this box is checked, '
                     'Editors and Writers will still be able to '
                     'view this folder assets, add them to a plugin or smart '

@@ -10,6 +10,14 @@ from filer.views import (popup_param, selectfolder_param, popup_status,
 
 class CommonModelAdmin(admin.ModelAdmin):
 
+    def _make_restricted_field_readonly(self, user):
+        if not user.has_perm('filer.can_restrict_operations'):
+            if 'restricted' not in self.readonly_fields:
+                self.readonly_fields += ['restricted']
+        else:
+            if 'restricted' in self.readonly_fields:
+                self.readonly_fields.remove('restricted')
+
     def _get_post_url(self, obj):
         """
         Needed to retrieve the changelist url as Folder/File can be extended
