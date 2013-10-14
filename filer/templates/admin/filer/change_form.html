@@ -3,6 +3,13 @@
 {% load url from future %}
 
 {% block extrahead %}{{ block.super }}
+<script type="text/javascript">
+(function($) {
+$( document ).ready(function() {
+$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
+});
+})(django.jQuery);
+</script>
 {% endblock %}
 
 {% block pretitle %}

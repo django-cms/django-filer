@@ -62,3 +62,25 @@ a.small_folder_link {
 	line-height: 36px;
 	float: right;
 }
+
+div .field-restricted-read-only > div:first-of-type{
+	position: relative;
+}
+div .field-restricted-read-only p.help{
+	margin-left: 0;
+	padding-left: 0;
+}
+div .field-restricted-read-only * p:first-of-type{
+	float: left;
+	clear: left;
+	margin: 0;
+	position: absolute;
+	left: 0;
+	padding: 0;
+	top: 0;
+}
+div .field-restricted-read-only * label:first-of-type {
+	display: inline;
+	margin-left: 20px;
+	float: none;
+}

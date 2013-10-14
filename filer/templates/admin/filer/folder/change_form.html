@@ -2,6 +2,21 @@
 {% load i18n admin_modify adminmedia filermedia %}
 {% load url from future %}
 
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript">
+(function($) {
+$( document ).ready(function() {
+$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
+});
+})(django.jQuery);
+</script>
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
    <a href="{% url 'admin:index' %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
