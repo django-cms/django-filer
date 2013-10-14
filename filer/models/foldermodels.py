@@ -4,10 +4,8 @@ from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models import query
-from django.db import transaction
-from django.db.models import Q
+from django.db import (models, IntegrityError, transaction)
+from django.db.models import (query, Q)
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 import filer.models.clipboardmodels
@@ -153,11 +151,23 @@ class Folder(models.Model, mixins.IconsMixin):
             folder_type=self.folder_type,
             site=self.site)
 
+    def update_descendants_restricted(self):
+        """
+        Restricted should be preserved to all descendants
+        """
+        descendants = self.get_descendants().select_related('all_files')
+        descendants.update(restricted=self.restricted)
+        self.all_files.update(restricted=self.restricted)
+        for desc_folder in descendants:
+            desc_folder.all_files.update(restricted=self.restricted)
+
+
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
             self.set_site_for_folder_type()
             super(Folder, self).save(*args, **kwargs)
             self.update_descendants_folder_type()
+            self.update_descendants_restricted()
             return
 
         with transaction.commit_manually():
@@ -176,6 +186,7 @@ class Folder(models.Model, mixins.IconsMixin):
                 self.set_site_for_folder_type()
                 super(Folder, self).save(*args, **kwargs)
                 self.update_descendants_folder_type()
+                self.update_descendants_restricted()
                 all_files = []
                 for folder in self.get_descendants(include_self=True):
                     all_files += folder.files
@@ -281,6 +292,23 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def is_readonly(self):
         return self.folder_type == Folder.CORE_FOLDER
+
+    def can_change_restricted(self):
+        """
+        Checks if restriction operation is available for this folder.
+        """
+        if not self.parent:
+            return True
+        if self.parent.restricted == self.restricted == True:
+            # only parent can be set to True
+            return False
+        if self.parent.restricted == self.restricted == False:
+            return True
+        if self.parent.restricted == True and self.restricted == False:
+            raise IntegrityError(
+                'Re-save folder %s to fix restricted property' % (
+                    self.parent.pretty_logical_path))
+        return True
 
     def has_add_permission(self, user):
         # nobody can add subfolders in core folders

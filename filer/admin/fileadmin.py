@@ -25,7 +25,7 @@ class FileAdmin(FilePermissionModelAdmin):
                     for field in obj.__class__._meta.fields]
         self.readonly_fields = [ro_field
                                 for ro_field in self.readonly_fields]
-        self._make_restricted_field_readonly(request.user)
+        self._make_restricted_field_readonly(request.user, obj)
         if not request.user.is_superuser:
             # allow owner to be editable only by superusers
             self.readonly_fields += ['owner']

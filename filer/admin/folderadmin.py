@@ -70,7 +70,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         self.readonly_fields = [ro_field
                                 for ro_field in self.readonly_fields]
-        self._make_restricted_field_readonly(request.user)
+        self._make_restricted_field_readonly(request.user, obj)
         return super(FolderAdmin, self).get_readonly_fields(
             request, obj)
 

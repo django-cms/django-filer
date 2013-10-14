@@ -10,8 +10,9 @@ from filer.views import (popup_param, selectfolder_param, popup_status,
 
 class CommonModelAdmin(admin.ModelAdmin):
 
-    def _make_restricted_field_readonly(self, user):
-        if not user.has_perm('filer.can_restrict_operations'):
+    def _make_restricted_field_readonly(self, user, obj=None):
+        if not user.has_perm('filer.can_restrict_operations') or (
+                obj and not obj.can_change_restricted()):
             if 'restricted' not in self.readonly_fields:
                 self.readonly_fields += ['restricted']
         else:

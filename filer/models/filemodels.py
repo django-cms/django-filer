@@ -3,8 +3,7 @@ from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.db import transaction
+from django.db import (models, IntegrityError, transaction)
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
@@ -388,6 +387,24 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         if self.folder:
             return self.folder.is_readonly()
         return False
+
+    def can_change_restricted(self):
+        """
+        Checks if restriction operation is available for this folder.
+        """
+        if not self.folder:
+            # cannot restrict unfiled files
+            return False
+        if self.folder.restricted == self.restricted == True:
+            # only parent can be set to True
+            return False
+        if self.folder.restricted == self.restricted == False:
+            return True
+        if self.folder.restricted == True and self.restricted == False:
+            raise IntegrityError(
+                'Re-save folder %s to fix restricted property' % (
+                    self.folder.pretty_logical_path))
+        return True
 
     def has_change_permission(self, user):
         if not self.folder:
