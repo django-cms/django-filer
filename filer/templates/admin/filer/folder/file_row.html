@@ -13,7 +13,7 @@
     <a href="{{ file.get_admin_url_path }}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}"><img src="{% if file.icons.32 %}{{ file.icons.32 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" /></a>
 </td>
 <!-- Filename/Dimensions -->
-<td>{% if not file.is_readonly and not is_popup %}
+<td>{% if not file.is_readonly and not is_popup and not file|is_restricted_for_user:user %}
         <!-- File delete link -->
         <a style="display: block; float: right;margin-left: 10px;" class="deletelink" href="{{ file.get_admin_url_path }}delete{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}">{% trans "Delete" %}</a>
         <!-- File change link -->
@@ -21,7 +21,7 @@
     {% endif %}
     <div>
         <b>
-            <a href="{{ file.get_admin_url_path }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a>
+            <a{% if file.restricted %} class="filer-restricted"{% endif %} href="{{ file.get_admin_url_path }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a>
         </b>
         <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
     </div>
@@ -29,7 +29,7 @@
     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{% admin_icon_base %}img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{% admin_icon_base %}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
 </td>
 <td style="text-align: right;">
-    {% if not is_popup and not file.is_readonly %}
+    {% if not is_popup and not file.is_readonly and not file|is_restricted_for_user:user %}
         <input type="submit" name="move-to-clipboard-{{ file.id }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files %} style="color: gray;" disabled="disabled"{% endif %} />
     {% endif %}
 </td>

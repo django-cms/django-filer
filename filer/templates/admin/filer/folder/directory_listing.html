@@ -65,7 +65,7 @@
 {% block content %}
 <div id="content-main">
     <ul class="object-tools">
-        {% if not folder.is_readonly and folder.can_have_subfolders %}{%if is_popup and folder.is_root %}{%else%}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a></li>{% endif %}{% endif %}
+        {% if not folder.is_readonly and not folder|is_restricted_for_user:user and folder.can_have_subfolders %}{%if is_popup and folder.is_root %}{%else%}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a></li>{% endif %}{% endif %}
         <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
         {% include 'admin/filer/tools/upload_button_js.html' %}
     </ul>
@@ -79,7 +79,7 @@
             <span>
                 {% if is_popup %}
                     {% if select_folder and folder.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ folder.id }}, '{{ folder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% endif %}
-                {% elif not folder.is_readonly %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}
+                {% elif not folder.is_readonly and not folder|is_restricted_for_user:user%}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}
             </span>
         </h1>
         {% else %}{% if folder.is_smart_folder %}

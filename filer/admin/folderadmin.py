@@ -212,6 +212,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if not search_terms and not hide_all_actions:
             actions = self.get_actions(request)
 
+        if actions and not folder.is_root and folder.is_restricted_for_user(user):
+            # allow only copy actions
+            actions = 'copy_files_and_folders'
+
         # Remove action checkboxes if there aren't any actions available.
         list_display = list(self.list_display)
         if not actions:
@@ -448,6 +452,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if not self.has_delete_permission(request, None):
             for action_to_remove in self.actions_affecting_position:
                 actions.pop(action_to_remove, None)
+
         return actions
 
     def move_to_clipboard(self, request, files_queryset, folders_queryset):

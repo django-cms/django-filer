@@ -62,7 +62,11 @@ a.small_folder_link {
 	line-height: 36px;
 	float: right;
 }
+a.filer-restricted {
+	color: #666;
+}
 
+/* the change form */
 div .field-restricted-read-only > div:first-of-type{
 	position: relative;
 }

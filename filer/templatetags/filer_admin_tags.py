@@ -52,3 +52,8 @@ def get_popup_params(context, sep='?'):
         if current_site:
             params += '&current_site=%s' % current_site
     return params
+
+
+@register.filter
+def is_restricted_for_user(filer_obj, user):
+    return filer_obj.is_restricted_for_user(user)
