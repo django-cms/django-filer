@@ -24,6 +24,9 @@ class FilesChainableQuerySet(object):
     def find_duplicates(self, file_obj):
         return self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)
 
+    def restricted(self):
+        return self.filter(restricted=True)
+
 
 class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
     pass
@@ -392,6 +395,10 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         if self.folder:
             return self.folder.is_readonly()
         return False
+
+    def is_restricted_for_user(self, user):
+        return (not user.has_perm('filer.can_restrict_operations') and
+                self.restricted)
 
     def can_change_restricted(self, user):
         """

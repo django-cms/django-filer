@@ -273,7 +273,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method == 'POST' and '_save' not in request.POST:
             for f in file_qs:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
-                    if f.is_readonly():
+                    if f.is_readonly() or f.is_restricted_for_user(user):
                         raise PermissionDenied
                     tools.move_file_to_clipboard(request, [f], clipboard)
                     return HttpResponseRedirect(request.get_full_path())

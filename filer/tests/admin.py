@@ -8,6 +8,7 @@ from django.contrib.admin import helpers, site
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User, Group, Permission
 from django.http import HttpRequest
+from django.core.files import File as DjangoFile
 from filer.models.filemodels import File
 from filer.models.archivemodels import Archive
 from filer.models.foldermodels import Folder
@@ -537,7 +538,7 @@ class BaseTestFolderTypePermissionLayer(object):
         form = response.context_data['adminform'].form
         self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
         # only field 'name' should be visible
-        self.assertItemsEqual(['name'], form.fields.keys())
+        self.assertItemsEqual(['name', 'restricted'], form.fields.keys())
         # check if save worked
         response = self.client.post(
             reverse('admin:filer_folder_change', args=(f2.pk, )), {
@@ -1520,3 +1521,206 @@ class TestFolderTypeFunctionality(TestCase):
         self.assertEqual(foo.site, site)
         self.assertEqual(bar.folder_type, Folder.SITE_FOLDER)
         self.assertEqual(bar.site, site)
+
+
+class TestFrozenAssetsPermissions(TestCase):
+
+    def _user_setup(self, user):
+        foo_base_group = Group.objects.create(name='foo_base_group')
+        developer_role = Role.objects.create(
+            name='foo_role', group=foo_base_group,
+            is_site_wide=True)
+        developer_role.grant_to_user(user, self.site)
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_staff = user.is_active = True
+        user.save()
+        filer_perms = Permission.objects.filter(
+            content_type__app_label='filer').exclude(
+            codename='can_restrict_operations')
+        user.user_permissions = filer_perms
+        self.site = Site.objects.get(id=1)
+        self._user_setup(user)
+        self.client.login(username=username, password=password)
+        self.user = user
+        # create file storage image
+        self.img = create_image()
+        self.image_name = 'foo_file.jpg'
+        self.filename = os.path.join(
+            os.path.dirname(__file__), self.image_name)
+        self.img.save(self.filename, 'JPEG')
+        # build filer files structure
+        self.folders, self.files = self._build_folder_structure()
+
+    def _build_folder_structure(self):
+        foo = Folder.objects.create(
+            name='foo', site=self.site, restricted=True)
+        file_obj= DjangoFile(open(self.filename), name=self.image_name)
+        foo_file = Image.objects.create(original_filename=self.image_name,
+            file=file_obj, folder=foo)
+        foo_zippy = Archive.objects.create(original_filename='foo_file.zip',
+            file=dj_files.base.ContentFile('zippy'), folder=foo)
+        assert foo.restricted == foo_file.restricted
+        return {'foo': foo}, {'foo_file': foo_file, 'foo_zippy': foo_zippy}
+
+    def tearDown(self):
+        self.client.logout()
+        os.remove(self.filename)
+
+    def test_make_subfolder_in_restricted(self):
+        post_data = {
+            "name": 'subfolder', "_popup": 1,
+            'parent_id': self.folders['foo'].id}
+        response = self.client.post(get_make_root_folder_url(), post_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_from_clipboard_in_restricted(self):
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=dj_files.base.ContentFile('some data'))
+        clipboard, _ = Clipboard.objects.get_or_create(user=self.user)
+        clipboard.append_file(bar_file)
+        response = paste_clipboard_to_folder(
+            self.client, self.folders['foo'], clipboard)
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_from_restricted_to_clipboard(self):
+        response, url = move_to_clipboard_action(
+            self.client, self.folders['foo'], [self.files['foo_file']])
+        self.assertEqual(response.status_code, 403)
+
+        response = move_single_file_to_clipboard_action(
+            self.client, self.folders['foo'], [self.files['foo_file']])
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_restricted_to_clipboard(self):
+        bar = Folder.objects.create(
+            name='bar', site=self.site)
+        bar_file = File.objects.create(
+            original_filename='bar_file', restricted=True,
+            file=dj_files.base.ContentFile('some data'), folder=bar)
+        response = move_single_file_to_clipboard_action(
+            self.client, bar, [bar_file])
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_in_restricted(self):
+        bar = Folder.objects.create(name='bar', site=self.site)
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=dj_files.base.ContentFile('some data'), folder=bar)
+        response, _ = move_action(
+            self.client, bar, self.folders['foo'], [bar_file])
+        self.assertEqual(response.status_code, 403)
+
+        response, _ = move_action(
+            self.client, None, self.folders['foo'], [bar])
+        self.assertEqual(response.status_code, 403)
+
+        bar_file.folder = None
+        bar_file.save()
+        response, _ = move_action(
+            self.client, 'unfiled', self.folders['foo'], [bar_file])
+        self.assertEqual(response.status_code, 403)
+
+    def test_move_restricted_in_dest(self):
+        bar = Folder.objects.create(name='bar', site=self.site)
+        response, _ = move_action(
+            self.client, None, bar, [self.folders['foo']])
+        self.assertEqual(response.status_code, 403)
+
+        response, _ = move_action(
+            self.client, self.folders['foo'], bar, [self.files['foo_file']])
+        self.assertEqual(response.status_code, 403)
+
+    def test_extract_in_restricted(self):
+        url = get_dir_listing_url(self.folders['foo'])
+        response = self.client.post(url, {
+            'action': 'extract_files',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(self.files['foo_zippy'])]})
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_from_restricted(self):
+        url = get_dir_listing_url(self.folders['foo'])
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(self.files['foo_file'])],
+        })
+        self.assertEqual(response.status_code, 403)
+
+        url = get_dir_listing_url(None)
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(self.folders['foo'])],
+        })
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_restricted(self):
+        bar = Folder.objects.create(name='bar', site=self.site)
+        bar_file = File.objects.create(
+            original_filename='bar_file', restricted=True,
+            file=dj_files.base.ContentFile('some data'), folder=bar)
+
+        url = get_dir_listing_url(bar)
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(bar_file)],
+        })
+        self.assertEqual(response.status_code, 403)
+
+    def test_copy_from_restricted(self):
+        bar = Folder.objects.create(name='bar', site=self.site)
+        url = get_dir_listing_url(self.folders['foo'])
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'destination': bar.id,
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(self.files['foo_file'])]})
+
+        assert File.objects.filter(folder=bar).count() == 1
+
+    def test_copy_in_restricted(self):
+        bar = Folder.objects.create(name='bar', site=self.site)
+        bar_file = File.objects.create(
+            original_filename='bar_file',
+            file=dj_files.base.ContentFile('some data'), folder=bar)
+
+        url = get_dir_listing_url(bar)
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'destination': self.folders['foo'].id,
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(bar_file)]})
+        self.assertEqual(response.status_code, 403)
+
+        url = get_dir_listing_url(None)
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'destination': self.folders['foo'].id,
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(bar)]})
+        self.assertEqual(response.status_code, 403)
+
+        bar_file.folder = None
+        bar_file.save()
+
+        url = get_dir_listing_url('unfiled')
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'destination': self.folders['foo'].id,
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(bar_file)]})
+        self.assertEqual(response.status_code, 403)

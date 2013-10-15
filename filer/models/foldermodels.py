@@ -24,6 +24,9 @@ class FoldersChainableQuerySet(object):
         readonly_folders = Q(folder_type=Folder.CORE_FOLDER)
         return self.filter(readonly_folders)
 
+    def restricted(self):
+        return self.filter(restricted=True)
+
 
 class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
     pass
@@ -299,6 +302,10 @@ class Folder(models.Model, mixins.IconsMixin):
     def is_readonly(self):
         return self.folder_type == Folder.CORE_FOLDER
 
+    def is_restricted_for_user(self, user):
+        return (not user.has_perm('filer.can_restrict_operations') and
+                self.restricted)
+
     def can_change_restricted(self, user):
         """
         Checks if restriction operation is available for this folder.
@@ -320,7 +327,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def has_add_permission(self, user):
         # nobody can add subfolders in core folders
-        if self.is_readonly():
+        if self.is_readonly() or self.is_restricted_for_user(user):
             return False
         # only site admins can add subfolders in site folders with no site
         if not self.site and has_admin_role(user):
@@ -333,7 +340,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def has_change_permission(self, user):
         # nobody can change core folder
-        if self.is_readonly():
+        if self.is_readonly() or self.is_restricted_for_user(user):
             return False
         # only admins can change site folders with no site owner
         if not self.site and has_admin_role(user):
@@ -348,7 +355,7 @@ class Folder(models.Model, mixins.IconsMixin):
         return False
 
     def has_delete_permission(self, user):
-        if self.is_readonly():
+        if self.is_readonly() or self.is_restricted_for_user(user):
             return False
 
         # only admins can delete site folders with no site owner

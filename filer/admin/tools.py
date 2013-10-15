@@ -11,6 +11,8 @@ def is_valid_destination(request, folder):
     user = request.user
     if user.is_superuser:
         return True
+    if folder.is_restricted_for_user(request.user):
+        return False
     if not folder.site:
         return False
     if folder.site.id in get_sites_for_user(user):
@@ -100,6 +102,11 @@ def has_multi_file_action_permission(request, files, folders):
     user = request.user
     if user.is_superuser:
         return True
+
+    if not user.has_perm('filer.can_restrict_operations'):
+        if files.restricted().exists() or folders.restricted().exists():
+            return False
+
     # only superusers can move/delete files/folders with no site ownership
     if (files.filter(folder__site__isnull=True).exists() or
             folders.filter(site__isnull=True).exists()):
