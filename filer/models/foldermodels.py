@@ -25,10 +25,14 @@ class FoldersChainableQuerySet(object):
         return self.filter(readonly_folders)
 
     def restricted(self, user):
+        if user.is_superuser:
+            return self
         return self.filter(restricted=True,
             site__in=get_restricted_sites(user))
 
     def unrestricted(self, user):
+        if user.is_superuser:
+            return self
         return self.exclude(restricted=True,
             site__in=get_restricted_sites(user))
 

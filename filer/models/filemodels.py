@@ -25,11 +25,15 @@ class FilesChainableQuerySet(object):
         return self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)
 
     def unrestricted(self, user):
+        if user.is_superuser:
+            return self
         return self.exclude(
             restricted=True,
             folder__site__in=get_restricted_sites(user))
 
     def restricted(self, user):
+        if user.is_superuser:
+            return self
         return self.filter(
             restricted=True,
             folder__site__in=get_restricted_sites(user))
