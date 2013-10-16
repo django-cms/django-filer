@@ -179,7 +179,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
         user = request.user
-        hide_all_actions = False
         clipboard = tools.get_user_clipboard(user)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
@@ -192,11 +191,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 folder = Folder.objects.get(id=folder_id)
                 if not self.can_view_folder_content(request, folder):
                     raise PermissionDenied
-                # hide actions from view if folder is core folder
-                hide_all_actions = folder.is_readonly()
             except Folder.DoesNotExist:
                 raise Http404
 
+        setattr(request, 'current_dir_list_folder', folder)
         # search
         q = request.GET.get('q', None)
         if q:
@@ -209,12 +207,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # do not let any actions available if we're in search view since
         #   there is no way to detect the current folder
         actions = {}
-        if not search_terms and not hide_all_actions:
+        if not search_terms:
             actions = self.get_actions(request)
-
-        if actions and not folder.is_root and folder.is_restricted_for_user(user):
-            # allow only copy actions
-            actions = 'copy_files_and_folders'
 
         # Remove action checkboxes if there aren't any actions available.
         list_display = list(self.list_display)
@@ -444,14 +438,27 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
 
-        if (resolve(request.path_info).url_name ==
-                'filer-directory_listing-unfiled_images'):
-            actions.pop('extract_files', None)
-            return actions
-
         if not self.has_delete_permission(request, None):
             for action_to_remove in self.actions_affecting_position:
                 actions.pop(action_to_remove, None)
+
+        current_folder = getattr(request, 'current_dir_list_folder', None)
+        if not current_folder:
+            return actions
+
+        if not current_folder.is_root and current_folder.is_readonly():
+            return {}
+
+        if isinstance(current_folder, UnfiledImages):
+            actions.pop('extract_files', None)
+            return actions
+
+        if (actions and not current_folder.is_root and
+                current_folder.is_restricted_for_user(request.user)):
+            # allow only copy
+            if 'copy_files_and_folders' in actions:
+                return {'copy_files_and_folders':
+                            actions['copy_files_and_folders']}
 
         return actions
 
