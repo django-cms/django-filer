@@ -24,19 +24,21 @@ class FilesChainableQuerySet(object):
     def find_duplicates(self, file_obj):
         return self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)
 
+    def restricted(self, user):
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
+            return self.none()
+        return self.filter(
+            restricted=True,
+            folder__site__in=sites)
+
     def unrestricted(self, user):
-        if user.is_superuser:
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
             return self
         return self.exclude(
             restricted=True,
-            folder__site__in=get_restricted_sites(user))
-
-    def restricted(self, user):
-        if user.is_superuser:
-            return self
-        return self.filter(
-            restricted=True,
-            folder__site__in=get_restricted_sites(user))
+            folder__site__in=sites)
 
 
 class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):

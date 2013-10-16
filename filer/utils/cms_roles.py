@@ -45,10 +45,12 @@ def can_restrict_on_site(user, site):
     return False
 
 
-def get_restricted_sites(user):
+def get_sites_without_restriction_perm(user):
+    if user.is_superuser:
+        return []
     return [site
             for site in get_sites_for_user(user)
-            if not can_restrict_on_site(user, site)]
+            if can_restrict_on_site(user, site) is False]
 
 
 def get_admin_sites_for_user(user):

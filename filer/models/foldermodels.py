@@ -25,16 +25,16 @@ class FoldersChainableQuerySet(object):
         return self.filter(readonly_folders)
 
     def restricted(self, user):
-        if user.is_superuser:
-            return self
-        return self.filter(restricted=True,
-            site__in=get_restricted_sites(user))
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
+            return self.none()
+        return self.filter(restricted=True, site__in=sites)
 
     def unrestricted(self, user):
-        if user.is_superuser:
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
             return self
-        return self.exclude(restricted=True,
-            site__in=get_restricted_sites(user))
+        return self.exclude(restricted=True, site__in=sites)
 
 
 class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
