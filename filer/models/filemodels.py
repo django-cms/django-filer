@@ -24,8 +24,15 @@ class FilesChainableQuerySet(object):
     def find_duplicates(self, file_obj):
         return self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)
 
-    def restricted(self):
-        return self.filter(restricted=True)
+    def unrestricted(self, user):
+        return self.exclude(
+            restricted=True,
+            folder__site__in=get_restricted_sites(user))
+
+    def restricted(self, user):
+        return self.filter(
+            restricted=True,
+            folder__site__in=get_restricted_sites(user))
 
 
 class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
@@ -397,18 +404,23 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         return False
 
     def is_restricted_for_user(self, user):
-        return (not user.has_perm('filer.can_restrict_operations') and
-                self.restricted)
+        return (self.restricted and (
+                    not user.has_perm('filer.can_restrict_operations') or
+                    not can_restrict_on_site(user, self.folder.site)))
 
     def can_change_restricted(self, user):
         """
-        Checks if restriction operation is available for this folder.
+        Checks if restriction operation is available for this file.
         """
         if not user.has_perm('filer.can_restrict_operations'):
             return False
         if not self.folder:
             # cannot restrict unfiled files
             return False
+
+        if not can_restrict_on_site(user, self.folder.site):
+            return False
+
         if self.folder.restricted == self.restricted == True:
             # only parent can be set to True
             return False

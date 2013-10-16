@@ -24,8 +24,13 @@ class FoldersChainableQuerySet(object):
         readonly_folders = Q(folder_type=Folder.CORE_FOLDER)
         return self.filter(readonly_folders)
 
-    def restricted(self):
-        return self.filter(restricted=True)
+    def restricted(self, user):
+        return self.filter(restricted=True,
+            site__in=get_restricted_sites(user))
+
+    def unrestricted(self, user):
+        return self.exclude(restricted=True,
+            site__in=get_restricted_sites(user))
 
 
 class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
@@ -303,14 +308,16 @@ class Folder(models.Model, mixins.IconsMixin):
         return self.folder_type == Folder.CORE_FOLDER
 
     def is_restricted_for_user(self, user):
-        return (not user.has_perm('filer.can_restrict_operations') and
-                self.restricted)
+        return (self.restricted and (
+                    not user.has_perm('filer.can_restrict_operations') or
+                    not can_restrict_on_site(user, self.site)))
 
     def can_change_restricted(self, user):
         """
         Checks if restriction operation is available for this folder.
         """
-        if not user.has_perm('filer.can_restrict_operations'):
+        if (not user.has_perm('filer.can_restrict_operations') or
+                not can_restrict_on_site(user, self.site)):
             return False
         if not self.parent:
             return True

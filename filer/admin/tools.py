@@ -103,9 +103,8 @@ def has_multi_file_action_permission(request, files, folders):
     if user.is_superuser:
         return True
 
-    if not user.has_perm('filer.can_restrict_operations'):
-        if files.restricted().exists() or folders.restricted().exists():
-            return False
+    if files.restricted(user).exists() or folders.restricted(user).exists():
+        return False
 
     # only superusers can move/delete files/folders with no site ownership
     if (files.filter(folder__site__isnull=True).exists() or

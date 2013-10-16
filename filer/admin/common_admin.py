@@ -4,7 +4,8 @@ from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect
 from filer.models import Folder
-from filer.admin.tools import (has_admin_role, has_role_on_site)
+from filer.admin.tools import (has_admin_role, has_role_on_site,
+                               can_restrict_on_site)
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status, current_site_param)
 

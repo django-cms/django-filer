@@ -942,7 +942,7 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(File.objects.filter(folder=bar).count(), 1)
         self.assertEqual(File.objects.filter(folder__isnull=True).count(), 0)
 
-    def test_copy_destination_filters_restricted_folders(self):
+    def test_copy_destination_filters_core_folders(self):
         self._test_folder_destination_filters_core_folders(
             'copy_files_and_folders')
 
@@ -1057,6 +1057,10 @@ class TestFolderTypePermissionLayerForRegularUser(
 
     def _user_setup(self, user):
         foo_base_group = Group.objects.create(name='foo_base_group')
+        filer_perms = Permission.objects.filter(
+            content_type__app_label='filer')
+        foo_base_group.permissions = filer_perms
+        foo_base_group.save()
         developer_role = Role.objects.create(
             name='foo_role', group=foo_base_group,
             is_site_wide=True)
@@ -1071,9 +1075,6 @@ class TestFolderTypePermissionLayerForRegularUser(
         user = User.objects.create_user(username=username, password=password)
         user.is_staff = user.is_active = True
         user.save()
-        filer_perms = Permission.objects.filter(
-            content_type__app_label='filer')
-        user.user_permissions = filer_perms
         self._user_setup(user)
         self.client.login(username=username, password=password)
         self.user = user
@@ -1193,6 +1194,11 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
 
     def setUp(self):
         self._create_simple_setup()
+        filer_perms = Permission.objects.filter(
+            content_type__app_label='filer')
+        for gr in Group.objects.filter(
+                id__in=Role.objects.values_list('group', flat=True)):
+            gr.permissions.add(*filer_perms)
         for user in User.objects.all():
             user.set_password('secret')
             user.save()
@@ -1588,13 +1594,27 @@ class TestFrozenAssetsPermissions(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_move_from_restricted_to_clipboard(self):
+        clipboard, _ = Clipboard.objects.get_or_create(user=self.user)
+        self.assertEqual(clipboard.files.count(), 0)
+        self.assertEqual(clipboard.clipboarditem_set.count(), 0)
+
         response, url = move_to_clipboard_action(
             self.client, self.folders['foo'], [self.files['foo_file']])
-        self.assertEqual(response.status_code, 403)
+
+        clipboard, _ = Clipboard.objects.get_or_create(user=self.user)
+        self.assertEqual(clipboard.files.count(), 0)
+        self.assertEqual(clipboard.clipboarditem_set.count(), 0)
+        self.assertEqual(
+            File.objects.filter(folder=self.folders['foo']).count(), 2)
 
         response = move_single_file_to_clipboard_action(
             self.client, self.folders['foo'], [self.files['foo_file']])
-        self.assertEqual(response.status_code, 403)
+
+        clipboard, _ = Clipboard.objects.get_or_create(user=self.user)
+        self.assertEqual(clipboard.files.count(), 0)
+        self.assertEqual(clipboard.clipboarditem_set.count(), 0)
+        self.assertEqual(
+            File.objects.filter(folder=self.folders['foo']).count(), 2)
 
     def test_move_restricted_to_clipboard(self):
         bar = Folder.objects.create(
@@ -1629,21 +1649,27 @@ class TestFrozenAssetsPermissions(TestCase):
         bar = Folder.objects.create(name='bar', site=self.site)
         response, _ = move_action(
             self.client, None, bar, [self.folders['foo']])
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(File.objects.filter(folder=bar).count(), 0)
 
         response, _ = move_action(
             self.client, self.folders['foo'], bar, [self.files['foo_file']])
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(File.objects.filter(folder=bar).count(), 0)
 
     def test_extract_in_restricted(self):
+        self.assertEqual(
+            File.objects.filter(folder=self.folders['foo']).count(), 2)
         url = get_dir_listing_url(self.folders['foo'])
         response = self.client.post(url, {
             'action': 'extract_files',
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(self.files['foo_zippy'])]})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            File.objects.filter(folder=self.folders['foo']).count(), 2)
 
     def test_delete_from_restricted(self):
+        self.assertEqual(
+            File.objects.filter(id=self.files['foo_file'].id).count(), 1)
+
         url = get_dir_listing_url(self.folders['foo'])
         response = self.client.post(url, {
             'action': 'delete_files_or_folders',
@@ -1651,7 +1677,8 @@ class TestFrozenAssetsPermissions(TestCase):
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(self.files['foo_file'])],
         })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            File.objects.filter(id=self.files['foo_file'].id).count(), 1)
 
         url = get_dir_listing_url(None)
         response = self.client.post(url, {
@@ -1660,7 +1687,10 @@ class TestFrozenAssetsPermissions(TestCase):
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(self.folders['foo'])],
         })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            File.objects.filter(id=self.files['foo_file'].id).count(), 1)
+        self.assertEqual(
+            Folder.objects.filter(id=self.folders['foo'].id).count(), 1)
 
     def test_delete_restricted(self):
         bar = Folder.objects.create(name='bar', site=self.site)
