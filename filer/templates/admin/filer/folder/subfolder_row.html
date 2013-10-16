@@ -12,7 +12,7 @@
 <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% get_popup_params %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.32 }}" alt="{% trans "Folder Icon" %}" /></a></td>
 <!-- Directory details -->
 <td>
-    {% if subfolder.file_type == 'Folder' and not subfolder.is_readonly and not is_popup and not subfolder|is_restricted_for_user:user%}
+    {% if subfolder.file_type == 'Folder' and not is_popup and subfolder|can_change_folder:user %}
         <a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' subfolder.id %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
     {% endif %}
     <div>

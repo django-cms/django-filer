@@ -79,7 +79,7 @@
             <span>
                 {% if is_popup %}
                     {% if select_folder and folder.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ folder.id }}, '{{ folder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% endif %}
-                {% elif not folder.is_readonly and not folder|is_restricted_for_user:user%}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}
+                {% elif folder|can_change_folder:user %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}
             </span>
         </h1>
         {% else %}{% if folder.is_smart_folder %}
