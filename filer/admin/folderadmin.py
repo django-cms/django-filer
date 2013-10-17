@@ -60,6 +60,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
     ]
 
     actions = [
+        'disable_restriction',
+        'enable_restriction',
         'copy_files_and_folders',
         'extract_files', ] + actions_affecting_position
 
@@ -435,12 +437,15 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
     def get_actions(self, request):
         actions = super(FolderAdmin, self).get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+
+        def pop_actions(*actions_to_remove):
+            for action in actions_to_remove:
+                actions.pop(action, None)
+
+        pop_actions('delete_selected')
 
         if not self.has_delete_permission(request, None):
-            for action_to_remove in self.actions_affecting_position:
-                actions.pop(action_to_remove, None)
+            pop_actions(*self.actions_affecting_position)
 
         current_folder = getattr(request, 'current_dir_list_folder', None)
         if not current_folder:
@@ -450,11 +455,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
             return {}
 
         if isinstance(current_folder, UnfiledImages):
-            actions.pop('extract_files', None)
+            pop_actions('extract_files', 'enable_restriction',
+                         'disable_restriction')
             return actions
 
-        if (actions and not current_folder.is_root and
-                current_folder.is_restricted_for_user(request.user)):
+        if not current_folder.can_change_restricted(request.user):
+            pop_actions('enable_restriction', 'disable_restriction')
+
+        if (actions and current_folder.is_restricted_for_user(request.user)):
             # allow only copy
             if 'copy_files_and_folders' in actions:
                 return {'copy_files_and_folders':
@@ -1019,6 +1027,59 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
     copy_files_and_folders.short_description = ugettext_lazy(
         "Copy selected files and/or folders")
+
+    def files_toggle_restriction(self, request, restriction,
+                                 files_qs, folders_qs):
+        """
+        Action which enables or disables restriction for files/folders.
+        """
+        if request.method != 'POST':
+            return None
+
+        if files_qs.filter(folder__isnull=True).exists():
+            raise PermissionDenied
+
+        if not has_multi_file_action_permission(
+                request, files_qs, folders_qs):
+            raise PermissionDenied
+
+        count = [0]
+
+        def set_files_or_folders(filer_obj):
+            for f in filer_obj:
+                if f.restricted != restriction:
+                    f.restricted = restriction
+                    f.save()
+                    count[0] += 1
+
+        set_files_or_folders(files_qs)
+        set_files_or_folders(folders_qs)
+        count = count[0]
+        if restriction:
+            self.message_user(request,
+                _("Successfully enabled restriction for %(count)d files "
+                  "and/or folders.") % {"count": count,})
+        else:
+            self.message_user(request,
+                _("Successfully disabled restriction for %(count)d files "
+                  "and/or folders.") % {"count": count,})
+
+        return None
+
+    def enable_restriction(self, request, files_qs, folders_qs):
+        return self.files_toggle_restriction(
+            request, True, files_qs, folders_qs)
+
+    enable_restriction.short_description = ugettext_lazy(
+        "Enable restriction for selected and/or folders")
+
+    def disable_restriction(self, request, files_qs, folders_qs):
+        return self.files_toggle_restriction(
+            request, False, files_qs, folders_qs)
+
+    disable_restriction.short_description = ugettext_lazy(
+        "Disable restriction for selected and/or folders")
+
 '''
     def _rename_file(self, file_obj, form_data, counter, global_counter):
         original_basename, original_extension = os.path.splitext(
