@@ -25,7 +25,7 @@
         </b>
         <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
     </div>
-    <div>{% trans "Owner" %}: {{ file.owner|default:"n/a" }}</div>
+    <div>{% trans "Owner" %}: {% firstof file.owner.email file.owner.username "n/a" %}</div>
     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{% admin_icon_base %}img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{% admin_icon_base %}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
 </td>
 <td style="text-align: right;">

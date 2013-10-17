@@ -22,6 +22,6 @@
         {% endif %}
     </div>
     <span>{{ subfolder.get_folder_type_display }}{% if subfolder.site %}: {{subfolder.site}}{%endif%}</span>
-    <div>{% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }}</div>
+    <div>{% trans "Owner" %}: {% firstof subfolder.owner.email subfolder.owner.username "n/a" %}</div>
 </td>
 <td></td>
