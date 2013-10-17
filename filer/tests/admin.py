@@ -665,14 +665,13 @@ class BaseTestFolderTypePermissionLayer(object):
             reverse('admin:filer_folder_change', args=(f1.pk, )), {})
         self.assertEqual(response.status_code, 200)
 
-    def test_delete_root_folder(self):
+    def test_delete_root_core_folder(self):
         f1 = Folder.objects.create(
             name='foo', folder_type=Folder.CORE_FOLDER)
 
         response = self.client.post(
             reverse('admin:filer_folder_delete', args=(f1.pk, )),
             {'post': 'yes'})
-        self.assertEqual(response.status_code, 403)
         self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
         response = self.client.post(
             get_dir_listing_url(None), {
@@ -680,25 +679,25 @@ class BaseTestFolderTypePermissionLayer(object):
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
         })
-        self.assertEqual(response.status_code, 403)
         self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
 
-        Folder.objects.filter(id=f1.id).update(
-            folder_type=Folder.SITE_FOLDER)
+    def test_delete_root_site_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.SITE_FOLDER,
+            site=Site.objects.get(id=1))
         response = self.client.post(
             reverse('admin:filer_folder_delete', args=(f1.pk, )),
             {'post': 'yes'})
-        self.assertEqual(response.status_code, 302)
         self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
         f1 = Folder.objects.create(
-            name='foo', folder_type=Folder.SITE_FOLDER)
+            name='foo', folder_type=Folder.SITE_FOLDER,
+            site=Site.objects.get(id=1))
         response = self.client.post(
             get_dir_listing_url(None), {
             'action': 'delete_files_or_folders',
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
         })
-        self.assertEqual(response.status_code, 302)
         self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
 
     def _build_some_folder_structure(self, folder_type, site):
@@ -731,11 +730,11 @@ class BaseTestFolderTypePermissionLayer(object):
 
         response, _ = move_action(
             self.client, None, folders['foo2'], [folders['bar']])
-        self.assertEqual(response.status_code, 403)
+        assert Folder.objects.filter(parent=folders['foo2']).count() == 0
 
         response, _ = move_action(
             self.client, None, folders['foo2'], [folders['foo1']])
-        self.assertEqual(response.status_code, 403)
+        assert Folder.objects.filter(parent=folders['foo2']).count() == 0
 
     def test_move_site_folder_to_core_destination_folder(self):
         folders, files = self._build_some_folder_structure(
@@ -743,7 +742,7 @@ class BaseTestFolderTypePermissionLayer(object):
         f1 = Folder.objects.create(
             name='destination', folder_type=Folder.CORE_FOLDER)
         response, _ = move_action(self.client, None, f1, [folders['bar']])
-        self.assertEqual(response.status_code, 403)
+        assert Folder.objects.filter(parent=f1).count() == 0
         f1.delete()
         return folders, files
 
@@ -807,7 +806,6 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
         response, _ = move_to_clipboard_action(self.client, None, [foo])
-        self.assertEqual(response.status_code, 403)
         self.assertEqual(
             self._get_clipboard_files().count(), 0)
         response, _ = move_to_clipboard_action(self.client, foo, [file_foo])
@@ -905,7 +903,7 @@ class BaseTestFolderTypePermissionLayer(object):
         bar = Folder.objects.create(name='bar', site=site)
         baz = Folder.objects.create(name='baz', site=site, parent=bar)
         response, url = move_action(self.client, None, foo, [baz])
-        assert response.status_code == 403
+        assert Folder.objects.filter(parent=foo.id).count() == 0
 
     def _test_folder_destination_filters_core_folders(self, action):
         foo = Folder.objects.create(
@@ -1109,40 +1107,40 @@ class TestFolderTypePermissionLayerForRegularUser(
             reverse('admin:filer_folder_change', args=(f1.pk, )), {})
         self.assertEqual(response.status_code, 403)
 
-    def test_delete_root_folder(self):
-        f1 = Folder.objects.create(name='foo', site=Site.objects.get(id=1))
+    def test_delete_root_core_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', site=Site.objects.get(id=1),
+            folder_type=Folder.SITE_FOLDER)
         # regular users should not be able to delete root folders at all
-        for folder_type in [Folder.SITE_FOLDER, Folder.CORE_FOLDER]:
-            Folder.objects.filter(id=f1.id).update(folder_type=folder_type)
-            response = self.client.post(
-                reverse('admin:filer_folder_delete', args=(f1.pk, )),
-                {'post': 'yes'})
-            self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(f1.pk, )),
+            {'post': 'yes'})
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
 
-            response = self.client.post(
-                get_dir_listing_url(None), {
-                'action': 'delete_files_or_folders',
-                'post': 'yes',
-                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-            })
-            self.assertEqual(response.status_code, 403)
-            # case when viewing another folder content
-            # hit search and select a root folder to delete
-            folder_for_view = Folder.objects.create(
-                name='bar', site=Site.objects.get(id=1))
-            response = self.client.post(
-                get_dir_listing_url(folder_for_view), {
-                'action': 'delete_files_or_folders',
-                'post': 'yes',
-                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
-            })
-            # this might be a bug since the folder requested for deletion
-            #   is not passed to the delete_files_or_folders. For now
-            #   just make sure it is not deleted
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(
-                Folder.objects.filter(
-                    id__in=[folder_for_view.id, f1.id]).count(), 2)
+        response = self.client.post(
+            get_dir_listing_url(None), {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+        })
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+
+    def test_delete_root_site_folder(self):
+        f1 = Folder.objects.create(
+            name='foo', folder_type=Folder.CORE_FOLDER)
+        # regular users should not be able to delete root folders at all
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(f1.pk, )),
+            {'post': 'yes'})
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+
+        response = self.client.post(
+            get_dir_listing_url(None), {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
+        })
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
 
     def test_message_error_user_no_site_on_move_for_site_admins(self):
         self._make_user_site_admin()
@@ -1637,13 +1635,12 @@ class TestFrozenAssetsPermissions(TestCase):
 
         response, _ = move_action(
             self.client, None, self.folders['foo'], [bar])
-        self.assertEqual(response.status_code, 403)
-
+        assert Folder.objects.filter(parent=self.folders['foo']).count() == 0
         bar_file.folder = None
         bar_file.save()
         response, _ = move_action(
             self.client, 'unfiled', self.folders['foo'], [bar_file])
-        self.assertEqual(response.status_code, 403)
+        assert File.objects.filter(folder=self.folders['foo']).count() == 2
 
     def test_move_restricted_in_dest(self):
         bar = Folder.objects.create(name='bar', site=self.site)
