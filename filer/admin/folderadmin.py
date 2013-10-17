@@ -1035,7 +1035,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         """
         if request.method != 'POST':
             return None
-
+        # cannot restrict/unrestrict unfiled files
         if files_qs.filter(folder__isnull=True).exists():
             raise PermissionDenied
 

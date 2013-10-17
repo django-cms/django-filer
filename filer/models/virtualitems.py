@@ -50,7 +50,7 @@ class UnfiledImages(DummyFolder):
 
     def _files(self):
         return File.objects.filter(
-            folder__isnull=True)
+            folder__isnull=True, clipboarditem__isnull=True)
     files = property(_files)
 
     def get_admin_directory_listing_url_path(self):

@@ -85,7 +85,7 @@ def files_available(request, files_qs):
                 Q(folder__site__in=available_sites))
 
     if not current_site:
-        sites_q |= Q(folder__isnull=True)
+        sites_q |= Q(folder__isnull=True, clipboarditem__isnull=True)
         if has_admin_role(user):
             sites_q |= Q(folder__site__isnull=True)
 
