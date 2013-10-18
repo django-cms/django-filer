@@ -155,7 +155,7 @@ class Folder(models.Model, mixins.IconsMixin):
            * site for site folders can be changed only for the folders
                 with no parent(root folders)
            * core folders should not have any site
-           * keep restriction from parent
+           * if parent restricted keep restriction from parent
         """
         if self.is_core():
             self.site = None
@@ -164,7 +164,7 @@ class Folder(models.Model, mixins.IconsMixin):
             if self.parent:
                 self.site = self.parent.site
 
-        if self.parent and self.parent.restricted != self.restricted:
+        if self.parent and self.parent.restricted:
             self.restricted = self.parent.restricted
 
     def update_related_objects_metadata(self):
