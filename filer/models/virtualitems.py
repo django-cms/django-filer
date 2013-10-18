@@ -77,6 +77,7 @@ class FolderRoot(DummyFolder):
     is_root = True
     is_smart_folder = False
     can_have_subfolders = True
+    restricted = False
 
     @property
     def virtual_folders(self):

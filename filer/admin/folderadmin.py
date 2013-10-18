@@ -481,10 +481,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if isinstance(current_folder, UnfiledImages):
             pop_actions('extract_files', 'enable_restriction',
-                         'disable_restriction')
+                        'disable_restriction')
             return actions
 
-        if not current_folder.can_change_restricted(request.user):
+        # these actions are available for descendants not for current folder
+        if not (current_folder.can_change_restricted(request.user) and
+                not current_folder.restricted):
             pop_actions('enable_restriction', 'disable_restriction')
 
         if (actions and current_folder.is_restricted_for_user(request.user)):

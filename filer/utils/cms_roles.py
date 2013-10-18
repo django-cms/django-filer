@@ -25,7 +25,7 @@ def get_roles_on_sites(user):
 
 def can_restrict_on_site(user, site):
     site_id = site
-    if not isinstance(site, int):
+    if not unicode(site_id).isnumeric():
         site_id = getattr(site, 'id', None)
 
     def _fetch_perm_existance():
