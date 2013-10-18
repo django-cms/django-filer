@@ -76,8 +76,12 @@ def files_available(request, files_qs):
     user = request.user
     current_site = request.REQUEST.get('current_site', None)
 
+    # never show unfiled files from other users clipboard
+    unfiled_in_clipboard = Q(Q(folder__isnull=True) &
+                             ~Q(clipboarditem__isnull=True))
+
     if user.is_superuser and not current_site:
-        return files_qs
+        return files_qs.exclude(unfiled_in_clipboard)
 
     available_sites = _filter_available_sites(request)
 
@@ -85,11 +89,14 @@ def files_available(request, files_qs):
                 Q(folder__site__in=available_sites))
 
     if not current_site:
-        sites_q |= Q(folder__isnull=True, clipboarditem__isnull=True)
+        sites_q |= Q(folder__isnull=True)
         if has_admin_role(user):
             sites_q |= Q(folder__site__isnull=True)
+    else:
+        # never show unfiled in popup
+        sites_q &= Q(folder__isnull=False)
 
-    return files_qs.filter(sites_q)
+    return files_qs.exclude(unfiled_in_clipboard).filter(sites_q)
 
 
 def has_multi_file_action_permission(request, files, folders):
