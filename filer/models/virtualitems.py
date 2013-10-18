@@ -106,3 +106,6 @@ class FolderRoot(DummyFolder):
 
     def can_change_restricted(self, user):
         return has_admin_role(user)
+
+    def is_readonly_for_user(self, user):
+        return not has_admin_role(user)
