@@ -111,6 +111,14 @@ class Folder(models.Model, mixins.IconsMixin):
                     'snippet but will not be able to delete or '
                     'modify the current version of the assets.'))
 
+    shared = models.ManyToManyField(Site, null=True, blank=True,
+        related_name='shared',
+        verbose_name=_("Share folder with sites"),
+        help_text=_("All the sites which you share this folder with will "
+                    "be able to use this folder on their pages, with all of "
+                    "its assets. However, they will not be able to change, "
+                    "delete or move it, not even add new assets."))
+
     objects = FolderManager()
 
     def clean(self):
@@ -141,12 +149,13 @@ class Folder(models.Model, mixins.IconsMixin):
                 raise ValidationError('Folder is a Core folder. '
                                       'Site must be empty.')
 
-    def set_site_for_folder_type(self):
+    def set_metadata_from_parent(self):
         """
         This will keep the rules:
            * site for site folders can be changed only for the folders
                 with no parent(root folders)
            * core folders should not have any site
+           * keep restriction from parent
         """
         if self.is_readonly():
             self.site = None
@@ -155,36 +164,34 @@ class Folder(models.Model, mixins.IconsMixin):
             if self.parent:
                 self.site = self.parent.site
 
-    def set_restricted_from_parent(self):
-        if self.parent and self.parent.restricted:
+        if self.parent and self.parent.restricted != self.restricted:
             self.restricted = self.parent.restricted
 
-    def update_descendants_folder_type(self):
+    def update_related_objects_metadata(self):
         """
-        Folder type should be preserved to all descendants
+        Folder type, restriction and shared sites should be preserved
+            to all descendants
+       * keep shared sites from parent (this cannot be done before saving
+            object since this is a m2m relationship)
         """
-        self.get_descendants().update(
-            folder_type=self.folder_type,
-            site=self.site)
+        if self.parent:
+            self.shared = self.parent.shared.all()
+        sites_to_keep_for_descendants = self.shared.all()
 
-    def update_descendants_restricted(self):
-        """
-        Restricted should be preserved to all descendants
-        """
         descendants = self.get_descendants().select_related('all_files')
-        descendants.update(restricted=self.restricted)
+        descendants.update(
+            folder_type=self.folder_type, site=self.site,
+            restricted=self.restricted)
         self.all_files.update(restricted=self.restricted)
         for desc_folder in descendants:
             desc_folder.all_files.update(restricted=self.restricted)
-
+            desc_folder.shared = sites_to_keep_for_descendants
 
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
-            self.set_restricted_from_parent()
-            self.set_site_for_folder_type()
+            self.set_metadata_from_parent()
             super(Folder, self).save(*args, **kwargs)
-            self.update_descendants_folder_type()
-            self.update_descendants_restricted()
+            self.update_related_objects_metadata()
             return
 
         with transaction.commit_manually():
@@ -200,11 +207,9 @@ class Folder(models.Model, mixins.IconsMixin):
                     storage.delete(location)
 
             try:
-                self.set_restricted_from_parent()
-                self.set_site_for_folder_type()
+                self.set_metadata_from_parent()
                 super(Folder, self).save(*args, **kwargs)
-                self.update_descendants_folder_type()
-                self.update_descendants_restricted()
+                self.update_related_objects_metadata()
                 all_files = []
                 for folder in self.get_descendants(include_self=True):
                     all_files += folder.files
@@ -307,6 +312,12 @@ class Folder(models.Model, mixins.IconsMixin):
             return True
         except Folder.DoesNotExist:
             return False
+
+    @property
+    def get_folder_type_display(self):
+        if self.shared.exists():
+            return 'Shared by site'
+        return Folder.FOLDER_TYPES[self.folder_type]
 
     def is_readonly(self):
         return self.folder_type == Folder.CORE_FOLDER

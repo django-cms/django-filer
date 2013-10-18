@@ -76,6 +76,13 @@ class FolderAdmin(FolderPermissionModelAdmin):
         return super(FolderAdmin, self).get_readonly_fields(
             request, obj)
 
+    def _get_sites_available_for_user(self, user):
+        if user.is_superuser:
+            return Site.objects.all()
+        admin_sites = [site.id
+                       for site in get_admin_sites_for_user(user)]
+        return Site.objects.filter(id__in=admin_sites)
+
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
         """
             Filters sites available to the user based on his roles on sites
@@ -83,9 +90,19 @@ class FolderAdmin(FolderPermissionModelAdmin):
         formfield = super(FolderAdmin, self).formfield_for_foreignkey(
             db_field, request, **kwargs)
         if request and db_field.rel.to is Site:
-            admin_sites = [site.id
-                           for site in get_admin_sites_for_user(request.user)]
-            formfield.queryset = Site.objects.filter(id__in=admin_sites)
+            formfield.queryset = self._get_sites_available_for_user(
+                request.user)
+        return formfield
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """
+            Filters sites available to the user based on his roles on sites
+        """
+        formfield = super(FolderAdmin, self).formfield_for_manytomany(
+            db_field, request, **kwargs)
+        if request and db_field.rel.to is Site:
+            formfield.queryset = self._get_sites_available_for_user(
+                request.user)
         return formfield
 
     def get_form(self, request, obj=None, **kwargs):
@@ -99,6 +116,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         folder_form = super(FolderAdmin, self).get_form(
             request, obj=obj, **kwargs)
+        # do show share sites field only for superusers
+        if not request.user.is_superuser:
+            folder_form.base_fields.pop('shared', None)
+
         # check if site field should be visible in the form or not
         is_core_folder = False
         if obj and obj.pk:
@@ -111,8 +132,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
             folder_form.base_fields.pop('restricted', None)
 
         # shouldn't show site field if has parent or is core folder
-        pop_site_field = parent_id or is_core_folder
-        folder_form.base_fields.pop('site', None) if pop_site_field else ''
+        pop_site_fields = parent_id or is_core_folder
+        if pop_site_fields:
+            folder_form.base_fields.pop('site', None)
+            folder_form.base_fields.pop('shared', None)
 
         def clean(form_instance):
             # make sure owner and parent are passed to the model clean method

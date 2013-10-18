@@ -88,3 +88,7 @@ div .field-restricted-read-only * label:first-of-type {
 	margin-left: 20px;
 	float: none;
 }
+#id_shared {
+	width: 300px;
+	height: 250px;
+}

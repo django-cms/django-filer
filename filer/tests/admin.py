@@ -635,7 +635,10 @@ class BaseTestFolderTypePermissionLayer(object):
         form = response.context_data['adminform'].form
         self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
         # only fields 'site', 'name' should be visible
-        self.assertItemsEqual(['site', 'name'], form.fields.keys())
+        expected_fields = ['site', 'name']
+        if self.user.is_superuser:
+            expected_fields.append('shared')
+        self.assertItemsEqual(expected_fields, form.fields.keys())
 
         s1, _ = Site.objects.get_or_create(
             name='foo_site', domain='foo-domain.com')

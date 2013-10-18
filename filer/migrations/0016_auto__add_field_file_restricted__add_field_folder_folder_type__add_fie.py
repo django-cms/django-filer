@@ -8,8 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'FolderPermission'
-        db.delete_table('filer_folderpermission')
+        # Adding field 'File.restricted'
+        db.add_column('filer_file', 'restricted',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
         # Adding field 'Folder.folder_type'
         db.add_column('filer_folder', 'folder_type',
@@ -21,27 +23,35 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sites.Site'], null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'Folder.restricted'
+        db.add_column('filer_folder', 'restricted',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding M2M table for field shared on 'Folder'
+        db.create_table('filer_folder_shared', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('folder', models.ForeignKey(orm['filer.folder'], null=False)),
+            ('site', models.ForeignKey(orm['sites.site'], null=False))
+        ))
+        db.create_unique('filer_folder_shared', ['folder_id', 'site_id'])
+
 
     def backwards(self, orm):
-        # Adding model 'FolderPermission'
-        db.create_table('filer_folderpermission', (
-            ('can_add_children', self.gf('django.db.models.fields.SmallIntegerField')(default=None, null=True, blank=True)),
-            ('can_edit', self.gf('django.db.models.fields.SmallIntegerField')(default=None, null=True, blank=True)),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='filer_folder_permissions', null=True, to=orm['auth.Group'], blank=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='filer_folder_permissions', null=True, to=orm['auth.User'], blank=True)),
-            ('can_read', self.gf('django.db.models.fields.SmallIntegerField')(default=None, null=True, blank=True)),
-            ('folder', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['filer.Folder'], null=True, blank=True)),
-            ('type', self.gf('django.db.models.fields.SmallIntegerField')(default=0)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('everybody', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('filer', ['FolderPermission'])
+        # Deleting field 'File.restricted'
+        db.delete_column('filer_file', 'restricted')
 
         # Deleting field 'Folder.folder_type'
         db.delete_column('filer_folder', 'folder_type')
 
         # Deleting field 'Folder.site'
         db.delete_column('filer_folder', 'site_id')
+
+        # Deleting field 'Folder.restricted'
+        db.delete_column('filer_folder', 'restricted')
+
+        # Removing M2M table for field shared on 'Folder'
+        db.delete_table('filer_folder_shared')
 
 
     models = {
@@ -111,6 +121,7 @@ class Migration(SchemaMigration):
             'original_filename': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_files'", 'null': 'True', 'to': "orm['auth.User']"}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'polymorphic_filer.file_set'", 'null': 'True', 'to': "orm['contenttypes.ContentType']"}),
+            'restricted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'sha1': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '40', 'blank': 'True'}),
             'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
@@ -125,10 +136,24 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'filer_owned_folders'", 'null': 'True', 'to': "orm['auth.User']"}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'children'", 'null': 'True', 'to': "orm['filer.Folder']"}),
+            'restricted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'shared': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'shared'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['sites.Site']"}),
             'site': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sites.Site']", 'null': 'True', 'blank': 'True'}),
             'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'filer.folderpermission': {
+            'Meta': {'object_name': 'FolderPermission'},
+            'can_add_children': ('django.db.models.fields.SmallIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'can_edit': ('django.db.models.fields.SmallIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'can_read': ('django.db.models.fields.SmallIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'everybody': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'folder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['filer.Folder']", 'null': 'True', 'blank': 'True'}),
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'filer_folder_permissions'", 'null': 'True', 'to': "orm['auth.Group']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'type': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'filer_folder_permissions'", 'null': 'True', 'to': "orm['auth.User']"})
         },
         'filer.image': {
             'Meta': {'object_name': 'Image', '_ormbases': ['filer.File']},
