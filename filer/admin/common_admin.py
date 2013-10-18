@@ -144,7 +144,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         return folder.has_delete_permission(request.user)
 
     def can_view_folder_content(self, request, folder):
-        if folder.is_readonly():
+        if folder.is_readonly_for_user(request.user):
             return True
         # only admins can see site folders with no site owner
         if not folder.site and has_admin_role(request.user):

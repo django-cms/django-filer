@@ -3,7 +3,7 @@
 <td>{% if select_folder and subfolder.file_type == 'Folder' %}
     <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.quoted_logical_path }}'); return false;" >&nbsp;</a>
     {% else %}
-        {% if action_form and subfolder.pk and not is_popup and not subfolder.is_readonly %}
+        {% if action_form and subfolder.pk and not is_popup and not subfolder|is_readonly_for_user:user %}
         <input type="checkbox" class="action-select" value="folder-{{ subfolder.pk }}" name="_selected_action" />
         {% endif %}
     {% endif %}

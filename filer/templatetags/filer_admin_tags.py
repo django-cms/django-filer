@@ -56,7 +56,14 @@ def get_popup_params(context, sep='?'):
 
 @register.filter
 def is_restricted_for_user(filer_obj, user):
-    return filer_obj.is_restricted_for_user(user)
+    return (filer_obj.is_readonly_for_user(user) or
+            filer_obj.is_restricted_for_user(user))
+
+
+@register.filter
+def is_readonly_for_user(filer_obj, user):
+    return filer_obj.is_readonly_for_user(user)
+
 
 @register.filter
 def can_change_folder(folder, user):

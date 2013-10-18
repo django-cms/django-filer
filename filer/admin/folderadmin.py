@@ -125,7 +125,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if obj and obj.pk:
             # change view
             parent_id = obj.parent_id
-            is_core_folder = obj.is_readonly()
+            is_core_folder = obj.is_core()
         else:
             # add view
             parent_id = request.REQUEST.get('parent_id', None) or None
@@ -296,7 +296,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method == 'POST' and '_save' not in request.POST:
             for f in file_qs:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
-                    if f.is_readonly() or f.is_restricted_for_user(user):
+                    if (f.is_readonly_for_user(user) or
+                            f.is_restricted_for_user(user)):
                         raise PermissionDenied
                     tools.move_file_to_clipboard(request, [f], clipboard)
                     return HttpResponseRedirect(request.get_full_path())
@@ -474,7 +475,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if not current_folder:
             return actions
 
-        if not current_folder.is_root and current_folder.is_readonly():
+        if (not current_folder.is_root and
+                current_folder.is_readonly_for_user(request.user)):
             return {}
 
         if isinstance(current_folder, UnfiledImages):

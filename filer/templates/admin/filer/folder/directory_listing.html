@@ -65,7 +65,7 @@
 {% block content %}
 <div id="content-main">
     <ul class="object-tools">
-        {% if not folder.is_readonly and not folder|is_restricted_for_user:user and folder.can_have_subfolders %}{%if is_popup and folder.is_root %}{%else%}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a></li>{% endif %}{% endif %}
+        {% if not folder|is_restricted_for_user:user and folder.can_have_subfolders %}{%if is_popup and folder.is_root %}{%else%}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a></li>{% endif %}{% endif %}
         <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
         {% include 'admin/filer/tools/upload_button_js.html' %}
     </ul>

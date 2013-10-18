@@ -6,9 +6,9 @@ from filer.models.foldermodels import Folder
 
 
 def is_valid_destination(request, folder):
-    if folder.is_readonly():
-        return False
     user = request.user
+    if folder.is_readonly_for_user(user):
+        return False
     if user.is_superuser:
         return True
     if folder.is_restricted_for_user(request.user):
@@ -96,10 +96,10 @@ def has_multi_file_action_permission(request, files, folders):
     # unfiled files can be moved/deleted so better to just exclude them
     #   from checking permissions for them
     files = files.exclude(folder__isnull=True)
-
-    if files.readonly().exists() or folders.readonly().exists():
-        return False
     user = request.user
+
+    if files.readonly(user).exists() or folders.readonly(user).exists():
+        return False
     if user.is_superuser:
         return True
 

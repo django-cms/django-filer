@@ -51,7 +51,7 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 
 
 {% block submit_buttons_bottom %}
-{% if not original.is_readonly and not original|is_restricted_for_user:user %}
+{% if not original|is_restricted_for_user:user %}
 {{ block.super }}
 {% endif %}
 {% endblock %}

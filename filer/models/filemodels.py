@@ -18,7 +18,7 @@ import os
 
 class FilesChainableQuerySet(object):
 
-    def readonly(self):
+    def readonly(self, user):
         return self.filter(folder__folder_type=Folder.CORE_FOLDER)
 
     def find_duplicates(self, file_obj):
@@ -404,9 +404,14 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     def duplicates(self):
         return list(File.objects.find_duplicates(self))
 
-    def is_readonly(self):
+    def is_core(self):
         if self.folder:
-            return self.folder.is_readonly()
+            return self.folder.is_core()
+        return False
+
+    def is_readonly_for_user(self, user):
+        if self.folder:
+            return self.folder.is_readonly_for_user(user)
         return False
 
     def is_restricted_for_user(self, user):
@@ -443,7 +448,7 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             # clipboard and unfiled files
             return True
 
-        if self.is_readonly():
+        if self.is_readonly_for_user(user):
             # nobody can change core folder
             # leaving these on True based on the fact that core folders are
             # displayed as readonly fields
@@ -464,7 +469,7 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
              # clipboard and unfiled files
              return True
         # nobody can delete core files
-        if self.is_readonly():
+        if self.is_readonly_for_user(user):
              return False
         # only admins can delete site files with no site owner
         if not self.folder.site and has_admin_role(user):
