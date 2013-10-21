@@ -24,11 +24,27 @@ class FoldersChainableQuerySet(object):
         readonly_folders = Q(folder_type=Folder.CORE_FOLDER)
         return self.filter(readonly_folders)
 
-    def restricted(self, user):
+    def restricted_descendants(self, user):
         sites = get_sites_without_restriction_perm(user)
         if not sites:
             return self.none()
-        return self.filter(restricted=True, site__in=sites)
+        descendant_filter = None
+        for node in self:
+            q = Q(**{
+                'tree_id': node.tree_id,
+                'lft__gt': node.lft - 1,
+                'rght__lt': node.rght + 1,
+            })
+            if descendant_filter is None:
+                descendant_filter = q
+            else:
+                descendant_filter |= q
+        if not descendant_filter:
+            return self.none()
+        restr_q = Q(Q(restricted=True) | Q(all_files__restricted=True))
+        restr_q &= Q(site__in=sites)
+        return self.model.objects.filter(
+            descendant_filter).filter(restr_q).distinct()
 
     def unrestricted(self, user):
         sites = get_sites_without_restriction_perm(user)

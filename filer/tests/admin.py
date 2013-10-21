@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 import os
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core import files as dj_files
@@ -1192,7 +1192,12 @@ class TestFolderTypePermissionLayerForRegularUser(
 
 
 class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
-
+    """
+    Tests filer objects site filtering for following:
+        * files/folders search
+        * files/folders displayed in dir-listing view
+        * destination folder filtering on move/copy actions
+    """
     def setUp(self):
         self._create_simple_setup()
         filer_perms = Permission.objects.filter(
@@ -1458,7 +1463,15 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
 
 
 class TestFolderTypeFunctionality(TestCase):
-
+    """
+    Tests folder operations are done correctly:
+        * folder owner is set by user from request
+        * folder parent id is passed from admin view request to the add folder
+            form
+        * folder validation on save
+        * folder type is kept from parent and changes are passed to
+            descendants
+    """
     def setUp(self):
         username = 'login_using_foo'
         password = 'secret'
@@ -1546,7 +1559,47 @@ class TestFolderTypeFunctionality(TestCase):
         self.assertEqual(bar.site, site)
 
 
+class TestRestrictionFunctionality(TestCase):
+    """
+    Tests that restriction is applied correctly
+        * folder restricted => all descendants are restricted
+        * file restricted => keeps restriction from parent
+            even if set to unrestricted
+    """
+    def test_make_folder_restricted(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        foo_file = File.objects.create(
+            original_filename='foo_file', folder=foo)
+        bar_file = File.objects.create(
+            original_filename='bar_file', folder=bar)
+        assert File.objects.filter(restricted=True).count() == 0
+        assert Folder.objects.filter(restricted=True).count() == 0
+
+        foo.restricted = True
+        foo.save()
+
+        assert File.objects.filter(restricted=False).count() == 0
+        assert Folder.objects.filter(restricted=False).count() == 0
+
+
+    def test_make_file_restricted(self):
+        foo = Folder.objects.create(name='foo', restricted=True)
+        foo_file = File.objects.create(
+            original_filename='foo_file', folder=foo)
+        assert foo_file.restricted == True
+
+        foo_file.restricted = False
+        foo_file.save()
+
+        assert foo_file.restricted == True
+
+
 class TestFrozenAssetsPermissions(TestCase):
+    """
+    Tests folder operations on frozen assets are restricted:
+        * add/move/copy/delete/extract in/from restricted folder
+    """
 
     def _user_setup(self, user):
         foo_base_group = Group.objects.create(name='foo_base_group')
@@ -1734,6 +1787,7 @@ class TestFrozenAssetsPermissions(TestCase):
                 [filer_obj_as_checkox(self.files['foo_file'])]})
 
         assert File.objects.filter(folder=bar).count() == 1
+        assert File.objects.get(folder=bar).restricted == False
 
     def test_copy_in_restricted(self):
         bar = Folder.objects.create(name='bar', site=self.site)
@@ -1758,3 +1812,156 @@ class TestFrozenAssetsPermissions(TestCase):
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(bar)]})
         self.assertEqual(response.status_code, 403)
+
+
+class TestAdminTools(TestCase):
+    """
+    Tests for cases that are not covered by the tests above
+    """
+    def _user_setup(self, user):
+        filer_perms = Permission.objects.filter(
+            content_type__app_label='filer').exclude(
+            codename='can_restrict_operations')
+        foo_base_group = Group.objects.create(name='foo_base_group')
+        foo_base_group.permissions.add(*filer_perms)
+        some_role = Role.objects.create(
+            name='foo_role', group=foo_base_group,
+            is_site_wide=True)
+        some_role.grant_to_user(user, self.site)
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_staff = user.is_active = True
+        user.save()
+        self.site = Site.objects.get(id=1)
+        self.other_site = Site.objects.create(
+            domain='bar@example.com', name='BAR')
+        self._user_setup(user)
+        self.client.login(username=username, password=password)
+        self.user = user
+
+    def test_valid_destination(self):
+        request = HttpRequest()
+        request.user = self.user
+        from filer.admin.tools import is_valid_destination
+
+        foo = Folder.objects.create(name='foo')
+        # no site
+        self.assertEqual(is_valid_destination(request, foo), False)
+        foo.site = self.site
+        foo.save()
+        self.assertEqual(is_valid_destination(request, foo), True)
+        # restricted
+        foo.restricted = True
+        foo.save()
+        self.assertEqual(is_valid_destination(request, foo), False)
+        # core folder
+        foo.folder_type = Folder.CORE_FOLDER
+        foo.restricted = False
+        foo.save()
+        self.assertEqual(is_valid_destination(request, foo), False)
+        # other site's folder
+        bar = Folder.objects.create(name='bar', site=self.other_site)
+        self.assertEqual(is_valid_destination(request, bar), False)
+        self.user.is_superuser = True
+        self.user.save()
+        self.assertEqual(is_valid_destination(request, bar), True)
+
+    def test_current_site_filtering(self):
+        request = HttpRequest()
+        request.REQUEST = {}
+        request.REQUEST['current_site'] = '1'
+        request.user = self.user
+        from filer.admin.tools import _filter_available_sites, files_available
+        self.assertItemsEqual([1L], _filter_available_sites(request))
+        request.REQUEST['current_site'] = 1
+        self.assertItemsEqual([1L], _filter_available_sites(request))
+        request.REQUEST['current_site'] = 1L
+        self.assertItemsEqual([1L], _filter_available_sites(request))
+        request.REQUEST['current_site'] = '2'
+        self.assertEqual([], _filter_available_sites(request))
+        f1 = File.objects.create(original_filename='foo_file')
+        request.REQUEST['current_site'] = '1'
+        self.assertEqual(
+            len(files_available(request, File.objects.filter(id=f1.id))), 0)
+
+    def test_multi_files_perms_for_restricted_descendants(self):
+        f1 = Folder.objects.create(name='1')
+        f2 = Folder.objects.create(name='2', parent=f1)
+        file2 = File.objects.create(original_filename='21', folder=f2)
+        f3 = Folder.objects.create(name='3', parent=f2)
+        file3 = File.objects.create(original_filename='31', folder=f3)
+        f1.site = self.other_site
+        f1.save()
+
+        request = HttpRequest()
+        request.user = self.user
+        from filer.admin.tools import has_multi_file_action_permission
+        # test for folders from other site
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f1.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f2.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f3.id)), False)
+        f1.site = self.site
+        f1.save()
+        # root folder and user is not site admin
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f1.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f2.id)), True)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f3.id)), True)
+        # level 1 file restriction
+        file2.restricted = True
+        file2.save()
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f1.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f2.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f3.id)), True)
+        # level 1 folder restriction
+        file2.restricted = False
+        file2.save()
+        f2.restricted = True
+        f2.save()
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f1.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f2.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f3.id)), False)
+        # level 2 folder restriction
+        f2.restricted = False
+        f2.save()
+        f3.restricted = True
+        f3.save()
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f1.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f2.id)), False)
+        self.assertEqual(has_multi_file_action_permission(
+            request, File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=f3.id)), False)
+        f1.restricted = True
+        f1.save()
+        self.assertEqual(File.objects.filter(restricted=False).count(), 0)
+        self.assertEqual(Folder.objects.filter(restricted=False).count(), 0)

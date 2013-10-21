@@ -733,15 +733,17 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 continue
 
             # We do not allow copying/moving back to the folder itself
-            enabled = ((not fo.is_restricted_for_user(request.user) and
+            is_restricted = fo.is_restricted_for_user(request.user)
+            enabled = ((not is_restricted and
                         (fo != current_folder or allow_self)))
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) +
                                   force_unicode(fo)),
                         enabled))
-            for c in self._list_all_destination_folders_recursive(
-                request, folders_queryset, current_folder,
-                fo.children.all(), allow_self, level + 1):
-                yield c
+            if not is_restricted:
+                for c in self._list_all_destination_folders_recursive(
+                    request, folders_queryset, current_folder,
+                    fo.children.all(), allow_self, level + 1):
+                    yield c
 
     def _list_all_destination_folders(self, request, folders_queryset,
                                       current_folder, allow_self):
@@ -915,7 +917,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # Due to how inheritance works, we have to set both pk and id to None
         file_obj.pk = None
         file_obj.id = None
+        # do not keep restriction
         file_obj.save()
+        file_obj.restricted = False
         file_obj.folder = destination
         file_obj.file = file_obj._copy_file(filename)
         file_obj.original_filename = self._generate_name(
@@ -939,6 +943,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # Due to how inheritance works, we have to set both pk and id to None
         folder.pk = None
         folder.id = None
+        folder.restricted = False
         folder.name = foldername
         # We save folder here
         folder.insert_at(destination, 'last-child', True)

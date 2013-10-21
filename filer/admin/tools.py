@@ -25,7 +25,7 @@ def _filter_available_sites(request):
     user = request.user
     available_sites = get_sites_for_user(user)
     if current_site:
-        current_site = int(current_site)
+        current_site = float(current_site)
         if not user.is_superuser and current_site not in available_sites:
             available_sites = []
         else:
@@ -110,7 +110,10 @@ def has_multi_file_action_permission(request, files, folders):
     if user.is_superuser:
         return True
 
-    if files.restricted(user).exists() or folders.restricted(user).exists():
+    if files.restricted(user).exists():
+        return False
+
+    if folders.restricted_descendants(user).exists():
         return False
 
     # only superusers can move/delete files/folders with no site ownership
