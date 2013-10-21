@@ -55,10 +55,8 @@ class ClipboardAdmin(admin.ModelAdmin):
     def paste_clipboard_to_folder(self, request):
         if request.method == 'POST':
             folder_id = request.POST.get('folder_id')
-
             if not folder_id:
                 raise PermissionDenied
-
             folder = Folder.objects.get(id=folder_id)
             if not is_valid_destination(request, folder):
                 raise PermissionDenied
@@ -94,11 +92,12 @@ class ClipboardAdmin(admin.ModelAdmin):
 
     def clone_files_from_clipboard_to_folder(self, request):
         if request.method == 'POST':
-            folder = Folder.objects.get(id=request.POST.get('folder_id'))
-
-            if folder.is_readonly_for_user(request.user):
+            folder_id = request.POST.get('folder_id')
+            if not folder_id:
                 raise PermissionDenied
-
+            folder = Folder.objects.get(id=folder_id)
+            if not is_valid_destination(request, folder):
+                raise PermissionDenied
             tools.clone_files_from_clipboard_to_folder(
                 self.get_clipboard(request), folder)
         return HttpResponseRedirect('%s%s%s%s' % (
