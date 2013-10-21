@@ -475,16 +475,19 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if not current_folder:
             return actions
 
+        if current_folder.is_root:
+            pop_actions('extract_files')
+
         if (not current_folder.is_root and
                 current_folder.is_readonly_for_user(request.user)):
             return {}
 
         if isinstance(current_folder, UnfiledImages):
-            pop_actions('extract_files', 'enable_restriction',
+            pop_actions('enable_restriction', 'copy_files_and_folders',
                         'disable_restriction')
             return actions
 
-        # these actions are available for descendants not for current folder
+        # actions are available for descendants not for current folder
         if not (current_folder.can_change_restricted(request.user) and
                 not current_folder.restricted):
             pop_actions('enable_restriction', 'disable_restriction')
