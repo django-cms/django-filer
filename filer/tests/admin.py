@@ -1320,55 +1320,71 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         response, items = self.get_listed_objects(self.folders['none'])
         assert response.status_code == 403
 
-    def _test_destination_on_copy_for_site_admin(self, action):
+    def _test_destination_action_for_site_admin(self, action):
         # joe is site admin for foo and bar
         self.client.login(username='joe', password='secret')
-        url = get_dir_listing_url('unfiled')
+
+        bar2 = Folder.objects.create(name='bar2', site=self.bar_site)
+        bar2_file = File.objects.create(original_filename='bar2_file',
+            file=dj_files.base.ContentFile('some data'), folder=bar2)
+
+
+        url = get_dir_listing_url(bar2)
         response = self.client.post(url, {
             'action': action,
             helpers.ACTION_CHECKBOX_NAME: [
-                filer_obj_as_checkox(self.files['unfiled_file'])]
+                filer_obj_as_checkox(bar2_file)]
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('destination_folders', response.context)
         dest_folders = [_dest[0]
                         for _dest in response.context['destination_folders']]
-        expected = set([self.folders['bar'], self.folders['foo']])
-        assert expected == set(dest_folders)
+        expected = set([self.folders['bar'], self.folders['foo'], bar2])
+        self.assertItemsEqual(expected, set(dest_folders))
 
     def _test_destination_action_for_multi_site_user(self, action):
         # bob will be a site admin on foo and writer on bar
         admin_role = Role.objects.get(name='site admin')
         admin_role.grant_to_user(
             User.objects.get(username='bob'), self.foo_site)
+
+        bar2 = Folder.objects.create(name='bar2', site=self.bar_site)
+        bar2_file = File.objects.create(original_filename='bar2_file',
+            file=dj_files.base.ContentFile('some data'), folder=bar2)
+
         self.client.login(username='bob', password='secret')
-        url = get_dir_listing_url('unfiled')
+        url = get_dir_listing_url(bar2)
         response = self.client.post(url, {
             'action': action,
             helpers.ACTION_CHECKBOX_NAME: [
-                filer_obj_as_checkox(self.files['unfiled_file'])]
+                filer_obj_as_checkox(bar2_file)]
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('destination_folders', response.context)
         dest_folders = [_dest[0]
                         for _dest in response.context['destination_folders']]
-        expected = set([self.folders['bar'], self.folders['foo']])
-        assert expected == set(dest_folders)
+        expected = set([self.folders['bar'], self.folders['foo'], bar2])
+        self.assertItemsEqual(expected, set(dest_folders))
 
     def _test_destination_action_for_other_users(self, action):
         # bob is writer on bar site
         self.client.login(username='bob', password='secret')
-        url = get_dir_listing_url('unfiled')
+        bar2 = Folder.objects.create(name='bar2', site=self.bar_site)
+        bar2_file = File.objects.create(original_filename='bar2_file',
+            file=dj_files.base.ContentFile('some data'), folder=bar2)
+
+        url = get_dir_listing_url(bar2)
         response = self.client.post(url, {
             'action': action,
             helpers.ACTION_CHECKBOX_NAME: [
-                filer_obj_as_checkox(self.files['unfiled_file'])]
+                filer_obj_as_checkox(bar2_file)]
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('destination_folders', response.context)
         dest_folders = [_dest[0]
                         for _dest in response.context['destination_folders']]
-        assert set([self.folders['bar']]) == set(dest_folders)
+        expected = set([self.folders['bar'], bar2])
+        self.assertItemsEqual(expected, set(dest_folders))
 
     def test_destination_on_copy_for_multi_site_user(self):
         self._test_destination_action_for_multi_site_user(
@@ -1387,11 +1403,11 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
             'move_files_and_folders')
 
     def test_destination_on_copy_for_site_admin(self):
-        self._test_destination_on_copy_for_site_admin(
+        self._test_destination_action_for_site_admin(
             'copy_files_and_folders')
 
     def test_destination_on_move_for_site_admin(self):
-        self._test_destination_on_copy_for_site_admin(
+        self._test_destination_action_for_site_admin(
             'move_files_and_folders')
 
     def test_on_site_change_filtering(self):
@@ -1741,16 +1757,4 @@ class TestFrozenAssetsPermissions(TestCase):
             'destination': self.folders['foo'].id,
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(bar)]})
-        self.assertEqual(response.status_code, 403)
-
-        bar_file.folder = None
-        bar_file.save()
-
-        url = get_dir_listing_url('unfiled')
-        response = self.client.post(url, {
-            'action': 'copy_files_and_folders',
-            'post': 'yes',
-            'destination': self.folders['foo'].id,
-            helpers.ACTION_CHECKBOX_NAME:
-                [filer_obj_as_checkox(bar_file)]})
         self.assertEqual(response.status_code, 403)

@@ -689,12 +689,15 @@ class FolderAdmin(FolderPermissionModelAdmin):
             return u'%s: %s' % (capfirst(opts.verbose_name),
                                 force_unicode(obj))
 
-    def _get_current_action_folder(self, request,
-                                   files_queryset, folders_queryset):
-        if files_queryset:
-            return files_queryset[0].folder
-        elif folders_queryset:
-            return folders_queryset[0].parent
+    def _get_current_action_folder(self, request, files_qs, folders_qs):
+        current_folder = getattr(request, 'current_dir_list_folder', None)
+        if current_folder:
+            return current_folder
+
+        if files_qs:
+            return files_qs[0].folder
+        elif folders_qs:
+            return folders_qs[0].parent
         else:
             return None
 
@@ -730,7 +733,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 continue
 
             # We do not allow copying/moving back to the folder itself
-            enabled = ((allow_self or fo != current_folder))
+            enabled = ((not fo.is_restricted_for_user(request.user) and
+                        (fo != current_folder or allow_self)))
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) +
                                   force_unicode(fo)),
                         enabled))
