@@ -402,13 +402,13 @@ class Folder(models.Model, mixins.IconsMixin):
                 self.is_restricted_for_user(user)):
             return False
 
-        # only admins can delete site folders with no site owner
-        if not self.site and has_admin_role(user):
+        # only super users can delete site folders with no site owner
+        if not self.site and user.is_superuser:
             return True
 
         if self.site:
             if not self.parent:
-                # only site admins can change root site folders
+                # only site admins can delete root site folders
                 return has_admin_role_on_site(user, self.site)
             return (user.has_perm('filer.delete_folder') and
                     has_role_on_site(user, self.site))

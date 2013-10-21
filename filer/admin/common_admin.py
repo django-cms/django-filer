@@ -3,9 +3,10 @@ from django.contrib import admin
 from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect
-from filer.models import Folder
+from filer.models import Folder, File
 from filer.admin.tools import (has_admin_role, has_role_on_site,
-                               can_restrict_on_site)
+                               can_restrict_on_site,
+                               has_multi_file_action_permission)
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status, current_site_param)
 
@@ -140,6 +141,11 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
 
         if not can_delete or not folder:
             return can_delete
+
+        if request.method == 'POST':
+            return has_multi_file_action_permission(
+                request, File.objects.get_empty_query_set(),
+                Folder.objects.filter(id=folder.id))
 
         return folder.has_delete_permission(request.user)
 
