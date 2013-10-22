@@ -1814,6 +1814,139 @@ class TestFrozenAssetsPermissions(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
+class TestSharedSitePermissions(TestCase):
+    """
+    Tests actions on shared folders
+    """
+    def _user_setup(self, user):
+        filer_perms = Permission.objects.filter(
+            content_type__app_label='filer')
+        foo_base_group = Group.objects.create(name='foo_base_group')
+        foo_base_group.permissions.add(*filer_perms)
+        some_role = Role.objects.create(
+            name='foo_role', group=foo_base_group,
+            is_site_wide=True)
+        some_role.grant_to_user(user, self.site)
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_staff = user.is_active = True
+        user.save()
+        self.site = Site.objects.get(id=1)
+        self.other_site = Site.objects.create(
+            domain='bar@example.com', name='BAR')
+        self._user_setup(user)
+        self.client.login(username=username, password=password)
+        self.user = user
+        self._create_folder_structure()
+
+    def _create_folder_structure(self):
+        self.foo = Folder.objects.create(name='foo', site=self.site)
+        self.foo_child = Folder.objects.create(name='foo_child',
+            parent=self.foo)
+        self.bar = Folder.objects.create(name='bar', site=self.other_site)
+        self.bar_child = Folder.objects.create(name='bar_child',
+            parent=self.bar)
+        self.bar.shared.add(self.site)
+        assert self.foo_child.site.id == self.foo.site.id
+        assert self.bar_child.site.id == self.bar.site.id
+
+    def test_view_shared_folder(self):
+        response = self.client.get(get_dir_listing_url(None))
+        items = response.context['paginator'].object_list
+        self.assertEqual(set([self.foo, self.bar]), set(items))
+
+    def test_add_in_shared_folder(self):
+        response = self.client.post(
+            get_make_root_folder_url(),
+            {'name': 'foo', 'parent_id': self.bar.id})
+        self.assertEqual(response.status_code, 403)
+
+    def test_change_shared_folder(self):
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(self.bar.pk, )))
+        self.assertEqual(response.status_code, 403)
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(self.bar_child.pk, )))
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_shared_folder(self):
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(self.bar.pk, )),
+            {'post': 'yes'})
+        self.assertEqual(response.status_code, 403)
+        response = self.client.post(
+            reverse('admin:filer_folder_delete', args=(self.bar_child.pk, )),
+            {'post': 'yes'})
+        self.assertEqual(response.status_code, 403)
+
+        url = get_dir_listing_url(None)
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: filer_obj_as_checkox(self.bar),
+        })
+        self.assertEqual(Folder.objects.filter(id=self.bar.id).count(), 1)
+        self.assertEqual(
+            Folder.objects.filter(id=self.bar_child.id).count(), 1)
+
+        url = get_dir_listing_url(self.bar)
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: filer_obj_as_checkox(self.bar_child),
+        })
+        self.assertEqual(Folder.objects.filter(id=self.bar.id).count(), 1)
+        self.assertEqual(
+            Folder.objects.filter(id=self.bar_child.id).count(), 1)
+
+    def test_move_from_shared_folder(self):
+        baz = Folder.objects.create(name='baz', site=self.other_site)
+        response, _ = move_action(
+            self.client, None, baz, [self.bar])
+        self.assertEqual(Folder.objects.get(id=self.bar.id).parent, None)
+        response, _ = move_action(
+            self.client, self.bar, baz, [self.bar_child])
+        self.assertEqual(Folder.objects.get(
+            id=self.bar_child.id).parent.id, self.bar.id)
+
+    def test_move_to_shared_folder(self):
+        unfiled_file = File.objects.create(
+            original_filename='bar_file.txt',
+            file=dj_files.base.ContentFile('file'))
+        response, _ = move_action(
+            self.client, 'unfiled', self.bar, [unfiled_file])
+        self.assertEqual(File.objects.get(id=unfiled_file.id).folder, None)
+        response, _ = move_action(
+            self.client, 'unfiled', self.bar_child, [unfiled_file])
+        self.assertEqual(File.objects.get(id=unfiled_file.id).folder, None)
+
+    def test_extract_files_shared_folder(self):
+        bar_zippy = Archive.objects.create(
+            original_filename='bar_zippy.zip', folder=self.bar,
+            file=dj_files.base.ContentFile('zippy'))
+        assert Folder.objects.get(id=self.bar.id).files.count() == 1
+        url = get_dir_listing_url(self.bar)
+        response = self.client.post(url, {
+            'action': 'extract_files',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(bar_zippy)]})
+        assert Folder.objects.get(id=self.bar.id).files.count() == 1
+
+    def test_move_to_clipboard_from_shared_folder(self):
+        bar_file = File.objects.create(
+            original_filename='bar_file.txt', folder=self.bar,
+            file=dj_files.base.ContentFile('file'))
+        response = move_to_clipboard_action(
+            self.client, self.bar, [bar_file])
+        self.assertEqual(Clipboard.objects.values_list('files').count(), 0)
+        move_single_file_to_clipboard_action(
+            self.client, self.bar, [bar_file])
+        self.assertEqual(Clipboard.objects.values_list('files').count(), 0)
+
+
 class TestAdminTools(TestCase):
     """
     Tests for cases that are not covered by the tests above
