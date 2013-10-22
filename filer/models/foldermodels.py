@@ -5,7 +5,8 @@ from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import (models, IntegrityError, transaction)
-from django.db.models import (query, Q)
+from django.db.models import (query, Q, signals)
+from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 import filer.models.clipboardmodels
@@ -194,17 +195,11 @@ class Folder(models.Model, mixins.IconsMixin):
         if self.parent and self.parent.restricted:
             self.restricted = self.parent.restricted
 
-    def update_related_objects_metadata(self):
+    def update_descendants_metadata(self):
         """
-        Folder type, restriction and shared sites should be preserved
+        Folder type and restriction should be preserved
             to all descendants
-       * keep shared sites from parent (this cannot be done before saving
-            object since this is a m2m relationship)
         """
-        if self.parent:
-            self.shared = self.parent.shared.all()
-        sites_to_keep_for_descendants = self.shared.all()
-
         descendants = self.get_descendants().select_related('all_files')
         descendants.update(
             folder_type=self.folder_type, site=self.site,
@@ -212,13 +207,26 @@ class Folder(models.Model, mixins.IconsMixin):
         self.all_files.update(restricted=self.restricted)
         for desc_folder in descendants:
             desc_folder.all_files.update(restricted=self.restricted)
-            desc_folder.shared = sites_to_keep_for_descendants
+
+
+    def propagate_shared_sites_to_descendants(self):
+        """
+        Shared sites should be preserved to all descendants.
+        """
+        if self.parent:
+            return
+        else:
+            sites = self.shared.all()
+            descendants = self.get_descendants()
+            for desc_folder in descendants:
+                desc_folder.shared.add(*sites)
+
 
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
             self.set_metadata_from_parent()
             super(Folder, self).save(*args, **kwargs)
-            self.update_related_objects_metadata()
+            self.update_descendants_metadata()
             return
 
         with transaction.commit_manually():
@@ -236,7 +244,7 @@ class Folder(models.Model, mixins.IconsMixin):
             try:
                 self.set_metadata_from_parent()
                 super(Folder, self).save(*args, **kwargs)
-                self.update_related_objects_metadata()
+                self.update_descendants_metadata()
                 all_files = []
                 for folder in self.get_descendants(include_self=True):
                     all_files += folder.files
@@ -444,3 +452,15 @@ try:
     mptt.register(Folder)
 except mptt.AlreadyRegistered:
     pass
+
+
+@receiver(signals.m2m_changed, sender=Folder.shared.through)
+def update_shared_sites_for_descendants(instance, **kwargs):
+    """
+    Makes sure that folders keep all shared sites from their root folder.
+    """
+    action = kwargs['action']
+    if not action.startswith('post_') or instance.parent:
+        return
+
+    instance.propagate_shared_sites_to_descendants()

@@ -537,7 +537,6 @@ class BaseTestFolderTypePermissionLayer(object):
         # make sure the folder that is going to be saved is a site folder
         form = response.context_data['adminform'].form
         self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
-        # only field 'name' should be visible
         self.assertItemsEqual(['name', 'restricted'], form.fields.keys())
         # check if save worked
         response = self.client.post(
@@ -1853,10 +1852,26 @@ class TestSharedSitePermissions(TestCase):
         assert self.foo_child.site.id == self.foo.site.id
         assert self.bar_child.site.id == self.bar.site.id
 
+    def get_listed_objects(self, folder, data={}):
+        response = self.client.get(get_dir_listing_url(folder), data)
+        try:
+            items = response.context['paginator'].object_list
+        except:
+            items = []
+        return response, items
+
     def test_view_shared_folder(self):
-        response = self.client.get(get_dir_listing_url(None))
-        items = response.context['paginator'].object_list
+        bar_file = File.objects.create(
+            original_filename='bar_file.txt', folder=self.bar,
+            file=dj_files.base.ContentFile('file'))
+        resp, items = self.get_listed_objects(None)
         self.assertEqual(set([self.foo, self.bar]), set(items))
+        resp, items = self.get_listed_objects(self.bar)
+        self.assertEqual(set([bar_file, self.bar_child]), set(items))
+        bar_file.folder = self.bar_child
+        bar_file.save()
+        resp, items = self.get_listed_objects(self.bar_child)
+        self.assertEqual(set([bar_file]), set(items))
 
     def test_add_in_shared_folder(self):
         response = self.client.post(
@@ -1945,6 +1960,49 @@ class TestSharedSitePermissions(TestCase):
         move_single_file_to_clipboard_action(
             self.client, self.bar, [bar_file])
         self.assertEqual(Clipboard.objects.values_list('files').count(), 0)
+
+
+class TestSharedFolderFunctionality(TestCase):
+    """
+       * only root folders can be shared
+       * shared sites changes are propagated for all descendants
+    """
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_superuser = user.is_staff = user.is_active = True
+        user.save()
+        self.client.login(username=username, password=password)
+        self.user = user
+
+    def test_changes_are_propagated_to_all_descendants(self):
+        site = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        baz = Folder.objects.create(name='baz', parent=bar)
+        foo.shared.add(site)
+        for folder in Folder.objects.all():
+            self.assertEqual(folder.shared.count(), 1)
+
+    def test_only_root_folders_can_be_shared(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(foo.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('adminform', response.context_data)
+        form = response.context_data['adminform'].form
+        self.assertItemsEqual(
+            ['name', 'restricted', 'shared', 'site'], form.fields.keys())
+
+        response = self.client.get(
+            reverse('admin:filer_folder_change', args=(bar.pk, )))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('adminform', response.context_data)
+        form = response.context_data['adminform'].form
+        self.assertItemsEqual(
+            ['name', 'restricted'], form.fields.keys())
 
 
 class TestAdminTools(TestCase):
