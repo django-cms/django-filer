@@ -37,6 +37,7 @@ def folders_available(request, folders_qs):
     """
     Returns a queryset with folders that current user can see
         * core folders
+        * shared folders
         * only site folders with sites available to the user
         * site admins can also see site folder files with no site assigned
 
@@ -48,23 +49,25 @@ def folders_available(request, folders_qs):
     current_site = request.REQUEST.get('current_site', None)
 
     if user.is_superuser and not current_site:
-        return folders_qs
+        return folders_qs.distinct()
 
     available_sites = _filter_available_sites(request)
 
     sites_q = Q(Q(folder_type=Folder.CORE_FOLDER) |
-                Q(site__in=available_sites))
+                Q(site__in=available_sites) |
+                Q(shared__in=available_sites))
 
     if has_admin_role(user) and not current_site:
         sites_q |= Q(site__isnull=True)
 
-    return folders_qs.filter(sites_q)
+    return folders_qs.filter(sites_q).distinct()
 
 
 def files_available(request, files_qs):
     """
     Returns a queryset with files that current user can see:
         * core folder files
+        * shared folder files
         * files from 'unfiled files'
         * only site folder files with sites available to the user
         * site admins can also see site folder files with no site assigned
@@ -81,12 +84,13 @@ def files_available(request, files_qs):
                              ~Q(clipboarditem__isnull=True))
 
     if user.is_superuser and not current_site:
-        return files_qs.exclude(unfiled_in_clipboard)
+        return files_qs.exclude(unfiled_in_clipboard).distinct()
 
     available_sites = _filter_available_sites(request)
 
     sites_q = Q(Q(folder__folder_type=Folder.CORE_FOLDER) |
-                Q(folder__site__in=available_sites))
+                Q(folder__site__in=available_sites) |
+                Q(folder__shared__in=available_sites))
 
     if not current_site:
         sites_q |= Q(folder__isnull=True)
@@ -96,7 +100,7 @@ def files_available(request, files_qs):
         # never show unfiled in popup
         sites_q &= Q(folder__isnull=False)
 
-    return files_qs.exclude(unfiled_in_clipboard).filter(sites_q)
+    return files_qs.exclude(unfiled_in_clipboard).filter(sites_q).distinct()
 
 
 def has_multi_file_action_permission(request, files, folders):

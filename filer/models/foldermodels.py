@@ -20,8 +20,19 @@ class FoldersChainableQuerySet(object):
     def with_bad_metadata(self):
         return self.filter(has_all_mandatory_data=False)
 
+    def valid_destinations(self, user):
+        available_sites = get_sites_for_user(user)
+        core_folders = Q(folder_type=Folder.CORE_FOLDER)
+        no_site = Q(site__isnull=True)
+        shared_folders = ~Q(site__in=available_sites)
+        return self.exclude(core_folders | no_site | shared_folders)
+
     def readonly(self, user):
-        readonly_folders = Q(folder_type=Folder.CORE_FOLDER)
+        core_folders = Q(folder_type=Folder.CORE_FOLDER)
+        available_sites = get_sites_for_user(user)
+        shared_folders = Q(~Q(site__in=available_sites) &
+                           Q(shared__in=available_sites))
+        readonly_folders = Q(core_folders | shared_folders)
         return self.filter(readonly_folders)
 
     def restricted_descendants(self, user):
@@ -339,7 +350,9 @@ class Folder(models.Model, mixins.IconsMixin):
         return self.folder_type == Folder.CORE_FOLDER
 
     def is_readonly_for_user(self, user):
-        return self.is_core()
+        return self.is_core() or (
+            self.site and not has_role_on_site(user, self.site) and
+            self.shared.filter(id__in=get_sites_for_user(user)).exists())
 
     def is_restricted_for_user(self, user):
         return (self.restricted and (

@@ -748,9 +748,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
     def _list_all_destination_folders(self, request, folders_queryset,
                                       current_folder, allow_self):
         # do not allow move/copy in core folders or site folders with no site
-        destination_candidates = FolderRoot().children.exclude(
-            folder_type=Folder.CORE_FOLDER).exclude(
-            site__isnull=True).unrestricted(request.user)
+        destination_candidates = FolderRoot().children.valid_destinations(
+            request.user).unrestricted(request.user)
 
         return list(self._list_all_destination_folders_recursive(
             request, folders_queryset, current_folder, destination_candidates,
