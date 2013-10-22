@@ -1,26 +1,32 @@
 from cmsroles.siteadmin import (is_site_admin, get_user_roles_on_sites_ids,
                                 get_administered_sites)
 from django.contrib.auth.models import Permission
+from functools import wraps
 
 
+def get_or_fetch(fetch_func):
+    """
+        Helper decorator that sets the result of the decorated function on
+    a user request object. It is used to minimise the number of queries done
+    per request.
+    """
+    @wraps(fetch_func)
+    def wrapper(user, *args, **kwargs):
+        attr_name = '_%s' % fetch_func.func_name
+        if not hasattr(user, attr_name):
+            result = fetch_func(user, *args, **kwargs)
+            setattr(user, attr_name, result)
+        return getattr(user, attr_name)
+    return wrapper
+
+@get_or_fetch
 def has_admin_role(user):
-
-    def _fetch_admin_role():
-        is_admin = is_site_admin(user)
-        setattr(user, '_is_site_admin', is_admin)
-        return is_admin
-
-    return getattr(user, '_is_site_admin', _fetch_admin_role())
+    return is_site_admin(user)
 
 
+@get_or_fetch
 def get_roles_on_sites(user):
-
-    def _fetch_roles():
-        roles_with_sites = get_user_roles_on_sites_ids(user)
-        setattr(user, '_roles_on_sites', roles_with_sites)
-        return roles_with_sites
-
-    return getattr(user, '_roles_on_sites', _fetch_roles())
+    return get_user_roles_on_sites_ids(user)
 
 
 def can_restrict_on_site(user, site):
@@ -39,8 +45,11 @@ def can_restrict_on_site(user, site):
 
     if user.is_superuser or (site_id is None and has_admin_role(user)):
         return True
+
     if site_id:
-        return getattr(user, '_can_restrict_on_site', {}).setdefault(
+        if not hasattr(user, '_can_restrict_on_site'):
+            setattr(user, '_can_restrict_on_site', {})
+        return user._can_restrict_on_site.setdefault(
             site_id, _fetch_perm_existance())
     return False
 
@@ -53,14 +62,10 @@ def get_sites_without_restriction_perm(user):
             if can_restrict_on_site(user, site) is False]
 
 
+@get_or_fetch
 def get_admin_sites_for_user(user):
-
-    def _fetch_admin_sites():
-        admin_sites = get_administered_sites(user)
-        setattr(user, '_administered_sites', admin_sites)
-        return admin_sites
-
-    return getattr(user, '_administered_sites', _fetch_admin_sites())
+    admin_sites = get_administered_sites(user)
+    return admin_sites
 
 
 def has_role_on_site(user, site):
@@ -72,15 +77,12 @@ def has_admin_role_on_site(user, site):
                        for _site in get_admin_sites_for_user(user)]
 
 
+@get_or_fetch
 def get_sites_for_user(user):
     """
     Returns all sites available for user.
     """
-    def _fetch_sites_for_user():
-        available_sites = set()
-        for sites in get_roles_on_sites(user).values():
-            available_sites |= sites
-        setattr(user, '_available_sites', available_sites)
-        return available_sites
-
-    return getattr(user, '_available_sites', _fetch_sites_for_user())
+    available_sites = set()
+    for sites in get_roles_on_sites(user).values():
+        available_sites |= sites
+    return available_sites
