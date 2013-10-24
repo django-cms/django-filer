@@ -455,6 +455,26 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         dst_image_obj = self.dst_folder.files[0]
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
+    def test_copy_recursion_error(self):
+        ## it's enough to try to move/copy to itself with no error
+        ## this means the operation error is caught
+        url = get_dir_listing_url(None)
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': 'test',
+            'destination': self.src_folder.id,
+            helpers.ACTION_CHECKBOX_NAME:
+                filer_obj_as_checkox(self.src_folder),
+        })
+        response = self.client.post(url, {
+            'action': 'move_files_and_folders',
+            'post': 'yes',
+            'destination': self.src_folder.id,
+            helpers.ACTION_CHECKBOX_NAME:
+                filer_obj_as_checkox(self.src_folder),
+        }, follow=True)
+
 
 class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 

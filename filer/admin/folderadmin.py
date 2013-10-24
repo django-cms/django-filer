@@ -996,7 +996,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         to_copy = self._list_all_to_copy_or_move(
             request, files_queryset, folders_queryset)
         folders = self._list_all_destination_folders(
-            request, folders_queryset, current_folder, True)
+            request, folders_queryset, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
             form = CopyFilesAndFoldersForm(request.POST)
