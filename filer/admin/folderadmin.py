@@ -761,7 +761,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             f.folder = destination
             f.save()
         for f in folders_queryset:
-            f.move_to(destination, 'last-child')
+            f.parent = destination
             f.save()
 
     def move_files_and_folders(self, request,
@@ -945,7 +945,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
         folder.restricted = False
         folder.name = foldername
         # We save folder here
-        folder.insert_at(destination, 'last-child', True)
+        folder.parent = destination
+        folder.save()
 
         return 1 + self._copy_files_and_folders_impl(
             old_folder.files.all(), old_folder.children.all(),

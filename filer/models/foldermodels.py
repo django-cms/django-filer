@@ -116,6 +116,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     owner = models.ForeignKey(auth_models.User, verbose_name=('owner'),
                               related_name='filer_owned_folders',
+                              on_delete=models.SET_NULL,
                               null=True, blank=True)
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
@@ -127,6 +128,7 @@ class Folder(models.Model, mixins.IconsMixin):
                                       default=SITE_FOLDER)
 
     site = models.ForeignKey(Site, null=True, blank=True,
+                             on_delete=models.SET_NULL,
                              help_text=_("Select the site which will use "
                                          "this folder."))
 
@@ -185,28 +187,42 @@ class Folder(models.Model, mixins.IconsMixin):
            * core folders should not have any site
            * if parent restricted keep restriction from parent
         """
+        if self.parent:
+            # site folders - make sure it keeps the site from parent
+            self.site = self.parent.site
+            self.folder_type = self.parent.folder_type
+            if self.parent.restricted:
+                self.restricted = self.parent.restricted
+
         if self.is_core():
             self.site = None
-        else:
-            # site folders - make sure it keeps the site from parent
-            if self.parent:
-                self.site = self.parent.site
 
-        if self.parent and self.parent.restricted:
-            self.restricted = self.parent.restricted
+        self._update_descendants = self.has_new_metadata_value()
+
+    def has_new_metadata_value(self):
+        if not self.pk:
+            return True
+        metadata_fields = ['restricted', 'site_id', 'folder_type']
+        old_metadata = self.__class__._default_manager.\
+                 filter(pk=self.pk).values(*metadata_fields).get()
+        for field in metadata_fields:
+            if getattr(self, field) != old_metadata[field]:
+                return True
+        return False
 
     def update_descendants_metadata(self):
         """
         Folder type and restriction should be preserved
             to all descendants
         """
-        descendants = self.get_descendants().select_related('all_files')
-        descendants.update(
-            folder_type=self.folder_type, site=self.site,
-            restricted=self.restricted)
-        self.all_files.update(restricted=self.restricted)
-        for desc_folder in descendants:
-            desc_folder.all_files.update(restricted=self.restricted)
+        if self._update_descendants:
+            descendants = self.get_descendants().select_related('all_files')
+            descendants.update(
+                folder_type=self.folder_type, site=self.site,
+                restricted=self.restricted)
+            self.all_files.update(restricted=self.restricted)
+            for desc_folder in descendants:
+                desc_folder.all_files.update(restricted=self.restricted)
 
 
     def propagate_shared_sites_to_descendants(self):

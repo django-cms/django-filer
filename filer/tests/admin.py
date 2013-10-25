@@ -624,24 +624,23 @@ class BaseTestFolderTypePermissionLayer(object):
         self.assertEqual(Folder.objects.filter(id=f3.id).count(), 0)
 
     def test_delete_child_core_folder(self):
-        f1 = Folder.objects.create(name='foo')
-        f2 = Folder.objects.create(
-            name='bar', parent=f1, folder_type=Folder.CORE_FOLDER)
-        f3 = Folder.objects.create(
-            name='baz', parent=f1, folder_type=Folder.CORE_FOLDER)
+        f1 = Folder.objects.create(name='foo', folder_type=Folder.CORE_FOLDER)
+        f2 = Folder.objects.create(name='bar', parent=f1)
+        f3 = Folder.objects.create(name='bazbazbazbaz', parent=f1)
+        self.assertEqual(Folder.objects.get(id=f1.id).is_core(), True)
+        self.assertEqual(Folder.objects.get(id=f2.id).is_core(), True)
+        self.assertEqual(Folder.objects.get(id=f3.id).is_core(), True)
         # regular users should not be able to delete child core folders
         response = self.client.post(
             reverse('admin:filer_folder_delete', args=(f2.pk, )),
             {'post': ['yes']})
-        self.assertEqual(response.status_code, 403)
         self.assertEqual(Folder.objects.filter(id=f2.id).count(), 1)
 
         response = self.client.post(get_dir_listing_url(f1), {
                 'action': 'delete_files_or_folders',
                 'post': 'yes',
-                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f3.id],
+                helpers.ACTION_CHECKBOX_NAME: filer_obj_as_checkox(f3),
         })
-        self.assertEqual(response.status_code, 403)
         self.assertEqual(Folder.objects.filter(id=f3.id).count(), 1)
 
     def test_add_root_folder(self):
@@ -1500,6 +1499,22 @@ class TestFolderTypeFunctionality(TestCase):
         self.client.login(username=username, password=password)
         self.user = user
 
+    def test_on_site_delete_folder_is_not_deleted(self):
+        s1 = Site.objects.create(name='bar', domain='bar.example.com')
+        f1 = Folder.objects.create(name='foo', site=s1)
+        s1.delete()
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+        self.assertEqual(Folder.objects.get(id=f1.id).site, None)
+
+    def test_on_owner_delete_folder_is_not_deleted(self):
+        u1 = User.objects.create(username='bar')
+        f1 = Folder.objects.create(name='foo', owner=u1)
+        file1 = File.objects.create(name='some_file', owner=u1)
+        u1.delete()
+        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+        self.assertEqual(Folder.objects.get(id=f1.id).owner, None)
+        self.assertEqual(File.objects.get(id=file1.id).owner, None)
+
     def test_owner_set_by_request_user_on_folder_form(self):
         response = self.client.post(
             get_make_root_folder_url(),
@@ -1585,6 +1600,16 @@ class TestRestrictionFunctionality(TestCase):
         * file restricted => keeps restriction from parent
             even if set to unrestricted
     """
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_superuser = user.is_staff = user.is_active = True
+        user.save()
+        self.client.login(username=username, password=password)
+        self.user = user
+
     def test_make_folder_restricted(self):
         foo = Folder.objects.create(name='foo')
         bar = Folder.objects.create(name='bar', parent=foo)
@@ -1601,6 +1626,44 @@ class TestRestrictionFunctionality(TestCase):
         assert File.objects.filter(restricted=False).count() == 0
         assert Folder.objects.filter(restricted=False).count() == 0
 
+    def test_cascade_change_on_parent_restriction(self):
+        s1 = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo', site=s1)
+        foo_file = File.objects.create(
+            original_filename='foo_file', folder=foo)
+        bar = Folder.objects.create(name='bar', parent=foo)
+        bar_file = File.objects.create(
+            original_filename='bar_file', folder=bar)
+        baz = Folder.objects.create(name='baz', parent=bar)
+        bar.restricted = True
+        bar.save()
+        self.assertEqual(Folder.objects.get(id=foo.id).restricted, False)
+        self.assertEqual(File.objects.get(id=foo_file.id).restricted, False)
+        self.assertEqual(Folder.objects.get(id=bar.id).restricted, True)
+        self.assertEqual(File.objects.get(id=bar_file.id).restricted, True)
+        self.assertEqual(Folder.objects.get(id=baz.id).restricted, True)
+        self.assertEqual(Folder.objects.filter(site=s1).count(), 3)
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(foo.pk, )), {
+                'name': 'foo_only_name_changed', 'post': ['yes'],
+                'restricted': False,
+                'site': s1.id,
+            })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.get(id=foo.id).restricted, False)
+        self.assertEqual(File.objects.get(id=foo_file.id).restricted, False)
+        self.assertEqual(Folder.objects.get(id=bar.id).restricted, True)
+        self.assertEqual(File.objects.get(id=bar_file.id).restricted, True)
+        self.assertEqual(Folder.objects.get(id=baz.id).restricted, True)
+        response = self.client.post(
+            reverse('admin:filer_folder_change', args=(foo.pk, )), {
+                'name': 'foo', 'post': ['yes'],
+                'restricted': True,
+                'site': s1.id,
+            })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Folder.objects.filter(restricted=True).count(), 3)
+        self.assertEqual(File.objects.filter(restricted=True).count(), 2)
 
     def test_make_file_restricted(self):
         foo = Folder.objects.create(name='foo', restricted=True)
@@ -1611,7 +1674,8 @@ class TestRestrictionFunctionality(TestCase):
         foo_file.restricted = False
         foo_file.save()
 
-        assert foo_file.restricted == True
+        assert File.objects.get(pk=foo_file.pk).restricted == True
+        assert Folder.objects.get(pk=foo.pk).restricted == True
 
 
 class TestFrozenAssetsPermissions(TestCase):
