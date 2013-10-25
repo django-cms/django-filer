@@ -224,6 +224,12 @@ class Folder(models.Model, mixins.IconsMixin):
             for desc_folder in descendants:
                 desc_folder.all_files.update(restricted=self.restricted)
 
+        if self.parent:
+            parent_shared_sites = self.parent.shared.values_list(
+                'id', flat=True)
+            instance_shared_sites = self.shared.values_list('id', flat=True)
+            if set(instance_shared_sites) != set(parent_shared_sites):
+                self.shared = self.parent.shared.all()
 
     def propagate_shared_sites_to_descendants(self):
         """
@@ -231,12 +237,10 @@ class Folder(models.Model, mixins.IconsMixin):
         """
         if self.parent:
             return
-        else:
-            sites = self.shared.all()
-            descendants = self.get_descendants()
-            for desc_folder in descendants:
-                desc_folder.shared.add(*sites)
-
+        sites = self.shared.all()
+        descendants = self.get_descendants()
+        for desc_folder in descendants:
+            desc_folder.shared.add(*sites)
 
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:

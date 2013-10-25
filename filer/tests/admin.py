@@ -2069,6 +2069,26 @@ class TestSharedFolderFunctionality(TestCase):
         for folder in Folder.objects.all():
             self.assertEqual(folder.shared.count(), 1)
 
+    def test_subfolder_inherits_from_parent(self):
+        s1 = Site.objects.create(name='foo', domain='foo.example.com')
+        data_to_post = {
+             "name": 'new_root',
+             "site": 1,
+             "shared": [1, s1.id],
+        }
+        response = self.client.post(get_make_root_folder_url(), data_to_post)
+        root = Folder.objects.get(name='new_root')
+        self.assertEqual(root.shared.count(), 2)
+        data_to_post = {
+             "name": 'child',
+             "site": 1,
+             "shared": [1, s1.id],
+             "parent_id": root.id
+        }
+        response = self.client.post(get_make_root_folder_url(), data_to_post)
+        child = Folder.objects.get(name='child')
+        self.assertEqual(child.shared.count(), 2)
+
     def test_only_root_folders_can_be_shared(self):
         foo = Folder.objects.create(name='foo')
         bar = Folder.objects.create(name='bar', parent=foo)
