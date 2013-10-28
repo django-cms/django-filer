@@ -179,6 +179,28 @@ class Folder(models.Model, mixins.IconsMixin):
                 raise ValidationError('Folder is a Core folder. '
                                       'Site must be empty.')
 
+    def _get_children_ids_recursive(self, parent_id, descendants_ids):
+        children_ids = Folder.objects.filter(
+            parent=parent_id).values_list('id', flat=True)
+        descendants_ids += children_ids
+        for child_id in children_ids:
+            self._get_children_ids_recursive(child_id, descendants_ids)
+
+    def get_descendants_ids_recursive(self, include_self=False):
+        """
+        Since tree corruptions might happen on move/copy folder it's safer to
+            always rely on `parent` to get descendants even if it means to
+            execute more queries.
+        """
+        descendants = [self.id] if include_self else []
+        self._get_children_ids_recursive(self.id, descendants)
+        return descendants
+
+    def get_descendants_recursive(self, include_self=False):
+        descendants_ids = self.get_descendants_ids_recursive(
+            include_self=include_self)
+        return Folder.objects.filter(id__in=descendants_ids)
+
     def set_metadata_from_parent(self):
         """
         This will keep the rules:
@@ -216,7 +238,8 @@ class Folder(models.Model, mixins.IconsMixin):
             to all descendants
         """
         if self._update_descendants:
-            descendants = self.get_descendants().select_related('all_files')
+            descendants = self.get_descendants_recursive().\
+                select_related('all_files')
             descendants.update(
                 folder_type=self.folder_type, site=self.site,
                 restricted=self.restricted)
@@ -231,14 +254,14 @@ class Folder(models.Model, mixins.IconsMixin):
             if set(instance_shared_sites) != set(parent_shared_sites):
                 self.shared = self.parent.shared.all()
 
-    def propagate_shared_sites_to_descendants(self):
+    def propagate_shared_sites_to_root_descendants(self):
         """
         Shared sites should be preserved to all descendants.
         """
         if self.parent:
             return
         sites = self.shared.all()
-        descendants = self.get_descendants()
+        descendants = self.get_descendants_recursive()
         for desc_folder in descendants:
             desc_folder.shared.add(*sites)
 
@@ -266,7 +289,8 @@ class Folder(models.Model, mixins.IconsMixin):
                 super(Folder, self).save(*args, **kwargs)
                 self.update_descendants_metadata()
                 all_files = []
-                for folder in self.get_descendants(include_self=True):
+                for folder in self.get_descendants_recursive(
+                        include_self=True):
                     all_files += folder.files
                 for f in all_files:
                     old_location = f.file.name
@@ -483,4 +507,4 @@ def update_shared_sites_for_descendants(instance, **kwargs):
     if not action.startswith('post_') or instance.parent:
         return
 
-    instance.propagate_shared_sites_to_descendants()
+    instance.propagate_shared_sites_to_root_descendants()

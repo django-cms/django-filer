@@ -248,9 +248,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
-                folder_qs = folders_available(request, folder.get_descendants())
-                file_qs = files_available(request, File.objects.filter(
-                    folder__in=folder.get_descendants(include_self=True)))
+                descendants = folder.get_descendants_recursive(
+                    include_self=True)
+                folder_qs = folders_available(
+                    request, descendants.exclude(id=folder.id))
+                file_qs = files_available(
+                    request, File.objects.filter(folder__in=descendants))
             else:
                 folder_qs = folders_available(request, Folder.objects.all())
                 file_qs = files_available(request, File.objects.all())
@@ -619,8 +622,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 folder_ids = set()
                 for folder in folders_queryset:
                     folder_ids.add(folder.id)
-                    folder_ids.update(folder.get_descendants().values_list(
-                        'id', flat=True))
+                    folder_ids.update(folder.get_descendants_ids_recursive())
                 for f in File.objects.filter(folder__in=folder_ids):
                     self.log_deletion(request, f, force_unicode(f))
                     f.delete()
