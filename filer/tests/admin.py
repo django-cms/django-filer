@@ -2067,7 +2067,7 @@ class TestSharedFolderFunctionality(TestCase):
         baz = Folder.objects.create(name='baz', parent=bar)
         foo.shared.add(site)
         for folder in Folder.objects.all():
-            self.assertEqual(folder.shared.count(), 1)
+            self.assertItemsEqual(folder.shared.all(), foo.shared.all())
 
     def test_subfolder_inherits_from_parent(self):
         s1 = Site.objects.create(name='foo', domain='foo.example.com')
@@ -2078,16 +2078,21 @@ class TestSharedFolderFunctionality(TestCase):
         }
         response = self.client.post(get_make_root_folder_url(), data_to_post)
         root = Folder.objects.get(name='new_root')
-        self.assertEqual(root.shared.count(), 2)
+        self.assertItemsEqual(root.shared.all(), Site.objects.all())
         data_to_post = {
              "name": 'child',
-             "site": 1,
-             "shared": [1, s1.id],
              "parent_id": root.id
         }
         response = self.client.post(get_make_root_folder_url(), data_to_post)
         child = Folder.objects.get(name='child')
-        self.assertEqual(child.shared.count(), 2)
+        self.assertItemsEqual(child.shared.all(), root.shared.all())
+        data_to_post = {
+             "name": 'child2',
+             "parent_id": child.id
+        }
+        response = self.client.post(get_make_root_folder_url(), data_to_post)
+        child2 = Folder.objects.get(name='child2')
+        self.assertItemsEqual(child2.shared.all(), child.shared.all())
 
     def test_only_root_folders_can_be_shared(self):
         foo = Folder.objects.create(name='foo')
@@ -2107,6 +2112,62 @@ class TestSharedFolderFunctionality(TestCase):
         form = response.context_data['adminform'].form
         self.assertItemsEqual(
             ['name', 'restricted'], form.fields.keys())
+
+    def test_shared_sites_are_inherited_on_move(self):
+        s1 = Site.objects.create(name='s1', domain='s1.example.com')
+        s2 = Site.objects.create(name='s2', domain='s2.example.com')
+        site = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo', site=s1)
+        foo_1 = Folder.objects.create(name='foo1', parent=foo)
+        bar = Folder.objects.create(name='bar', site=s1)
+        bar_1 = Folder.objects.create(name='bar1', parent=bar)
+        bar_12 = Folder.objects.create(name='bar12', parent=bar_1)
+        foo.shared.add(s1)
+        bar.shared.add(s2)
+        response, _ = move_action(self.client, bar, foo, [bar_1])
+        foo_descendants = Folder.objects.get(
+            name='foo').get_descendants_recursive()
+        for desc_folder in [bar_1, bar_12]:
+            self.assertIn(desc_folder, foo_descendants)
+            self.assertItemsEqual(desc_folder.shared.all(), [s1])
+
+    def test_shared_sites_are_inherited_on_copy(self):
+        s1 = Site.objects.create(name='s1', domain='s1.example.com')
+        s2 = Site.objects.create(name='s2', domain='s2.example.com')
+        site = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo', site=s1)
+        foo_1 = Folder.objects.create(name='foo1', parent=foo)
+        bar = Folder.objects.create(name='bar', site=s1)
+        bar_1 = Folder.objects.create(name='bar1', parent=bar)
+        bar_12 = Folder.objects.create(name='bar12', parent=bar_1)
+        foo.shared.add(s1)
+        bar.shared.add(s2)
+
+        response = self.client.post(get_dir_listing_url(bar), {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': '',
+            'destination': foo.id,
+            helpers.ACTION_CHECKBOX_NAME: filer_obj_as_checkox(bar_1),
+        }, follow=True)
+
+        bar_descendants = Folder.objects.get(
+            name='bar').get_descendants_recursive()
+        for desc_folder in [bar_1, bar_12]:
+            self.assertIn(desc_folder, bar_descendants)
+            self.assertItemsEqual(desc_folder.shared.all(), [s2])
+
+        bar_1_copy = Folder.objects.get(name='bar1', parent=foo)
+        bar_12_copy = Folder.objects.get(name='bar12', parent=bar_1_copy)
+        foo_descendants = Folder.objects.get(
+            name='foo').get_descendants_recursive(include_self=True)
+        for desc_folder in [bar_1_copy, bar_12_copy, foo_1, foo]:
+            self.assertIn(desc_folder, foo_descendants)
+            self.assertItemsEqual(desc_folder.shared.all(), [s1])
+        foo.shared.remove(s1)
+        for desc_folder in [bar_1_copy, bar_12_copy, foo_1, foo]:
+            self.assertIn(desc_folder, foo_descendants)
+            self.assertItemsEqual(desc_folder.shared.all(), [])
 
 
 class TestAdminTools(TestCase):

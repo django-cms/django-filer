@@ -237,6 +237,7 @@ class Folder(models.Model, mixins.IconsMixin):
         Folder type and restriction should be preserved
             to all descendants
         """
+        descendants = None
         if self._update_descendants:
             descendants = self.get_descendants_recursive().\
                 select_related('all_files')
@@ -253,6 +254,10 @@ class Folder(models.Model, mixins.IconsMixin):
             instance_shared_sites = self.shared.values_list('id', flat=True)
             if set(instance_shared_sites) != set(parent_shared_sites):
                 self.shared = self.parent.shared.all()
+                shared_sites = self.shared.all()
+                descendants = descendants or self.get_descendants_recursive()
+                for desc_folder in descendants:
+                    desc_folder.shared = shared_sites
 
     def propagate_shared_sites_to_root_descendants(self):
         """
@@ -263,7 +268,7 @@ class Folder(models.Model, mixins.IconsMixin):
         sites = self.shared.all()
         descendants = self.get_descendants_recursive()
         for desc_folder in descendants:
-            desc_folder.shared.add(*sites)
+            desc_folder.shared = sites
 
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
