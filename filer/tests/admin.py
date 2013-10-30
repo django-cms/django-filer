@@ -1,6 +1,9 @@
 #-*- coding: utf-8 -*-
 import os
+import tempfile
+import zipfile
 from django.test import TestCase
+from django.db.models import Count
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core import files as dj_files
@@ -2117,16 +2120,16 @@ class TestSharedFolderFunctionality(TestCase):
         s1 = Site.objects.create(name='s1', domain='s1.example.com')
         s2 = Site.objects.create(name='s2', domain='s2.example.com')
         site = Site.objects.get(id=1)
-        foo = Folder.objects.create(name='foo', site=s1)
+        foo = Folder.objects.create(name='foo', site=site)
         foo_1 = Folder.objects.create(name='foo1', parent=foo)
-        bar = Folder.objects.create(name='bar', site=s1)
+        bar = Folder.objects.create(name='bar', site=site)
         bar_1 = Folder.objects.create(name='bar1', parent=bar)
         bar_12 = Folder.objects.create(name='bar12', parent=bar_1)
         foo.shared.add(s1)
         bar.shared.add(s2)
         response, _ = move_action(self.client, bar, foo, [bar_1])
         foo_descendants = Folder.objects.get(
-            name='foo').get_descendants_recursive()
+            name='foo').get_descendants()
         for desc_folder in [bar_1, bar_12]:
             self.assertIn(desc_folder, foo_descendants)
             self.assertItemsEqual(desc_folder.shared.all(), [s1])
@@ -2135,9 +2138,9 @@ class TestSharedFolderFunctionality(TestCase):
         s1 = Site.objects.create(name='s1', domain='s1.example.com')
         s2 = Site.objects.create(name='s2', domain='s2.example.com')
         site = Site.objects.get(id=1)
-        foo = Folder.objects.create(name='foo', site=s1)
+        foo = Folder.objects.create(name='foo', site=site)
         foo_1 = Folder.objects.create(name='foo1', parent=foo)
-        bar = Folder.objects.create(name='bar', site=s1)
+        bar = Folder.objects.create(name='bar', site=site)
         bar_1 = Folder.objects.create(name='bar1', parent=bar)
         bar_12 = Folder.objects.create(name='bar12', parent=bar_1)
         foo.shared.add(s1)
@@ -2152,7 +2155,7 @@ class TestSharedFolderFunctionality(TestCase):
         }, follow=True)
 
         bar_descendants = Folder.objects.get(
-            name='bar').get_descendants_recursive()
+            name='bar').get_descendants()
         for desc_folder in [bar_1, bar_12]:
             self.assertIn(desc_folder, bar_descendants)
             self.assertItemsEqual(desc_folder.shared.all(), [s2])
@@ -2160,7 +2163,7 @@ class TestSharedFolderFunctionality(TestCase):
         bar_1_copy = Folder.objects.get(name='bar1', parent=foo)
         bar_12_copy = Folder.objects.get(name='bar12', parent=bar_1_copy)
         foo_descendants = Folder.objects.get(
-            name='foo').get_descendants_recursive(include_self=True)
+            name='foo').get_descendants(include_self=True)
         for desc_folder in [bar_1_copy, bar_12_copy, foo_1, foo]:
             self.assertIn(desc_folder, foo_descendants)
             self.assertItemsEqual(desc_folder.shared.all(), [s1])
@@ -2321,3 +2324,155 @@ class TestAdminTools(TestCase):
         f1.save()
         self.assertEqual(File.objects.filter(restricted=False).count(), 0)
         self.assertEqual(Folder.objects.filter(restricted=False).count(), 0)
+
+
+class TestMPTTCorruptionsOnFolderOperations(TestCase):
+
+    def setUp(self):
+        self.site = Site.objects.get(id=1)
+        self.src_folder = Folder.objects.create(name='1', site=self.site)
+        self.dst_folder = Folder.objects.create(name='2', site=self.site)
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_superuser = user.is_staff = user.is_active = True
+        user.save()
+        self.client.login(username=username, password=password)
+        self.user = user
+        self.dirs, self.files = [], []
+
+    def check_tree(self, pk, lft, tree_id, level=0):
+        rght = lft + 1
+
+        child_ids = Folder.objects.filter(parent__pk=pk).order_by(
+            'tree_id', 'lft', 'rght').values_list('pk', flat=True)
+
+        for child_id in child_ids:
+            rght = self.check_tree(child_id, rght, tree_id, level + 1)
+
+        folder = Folder.objects.get(pk=pk)
+        self.assertEqual(folder.lft, lft)
+        self.assertEqual(folder.rght, rght)
+        self.assertEqual(folder.level, level)
+        self.assertEqual(folder.tree_id, tree_id)
+
+        return rght + 1
+
+    def check_corruptions(self):
+        tree_duplicates = Folder.objects.filter(
+            parent=None).values_list('tree_id').annotate(
+            count=Count('id')).filter(count__gt=1)
+        self.assertEqual(len(tree_duplicates), 0)
+
+        pks = Folder.objects.filter(
+            parent=None).order_by('tree_id', 'lft').values_list('pk', flat=True)
+        idx = 0
+        for pk in pks:
+            idx += 1
+            self.assertEqual(Folder.objects.get(pk=pk).tree_id, idx)
+            self.check_tree(pk, 1, idx)
+
+    def test_move_operation(self):
+        create_folder_structure(
+            depth=2, sibling=2,
+            parent=Folder.objects.get(id=self.src_folder.id))
+        # making sure no corruptions exist
+        self.check_corruptions()
+        to_move = Folder.objects.filter(
+            parent__pk=self.src_folder.pk)
+        move_action(self.client, self.src_folder, self.dst_folder, to_move)
+        self.check_corruptions()
+
+    def test_copy_operation(self):
+        create_folder_structure(
+            depth=2, sibling=2,
+            parent=Folder.objects.get(id=self.src_folder.id))
+        self.check_corruptions()
+        to_copy = [
+            filer_obj_as_checkox(child)
+            for child in Folder.objects.filter(
+                parent__pk=self.src_folder.pk)]
+        self.client.post(get_dir_listing_url(self.src_folder), {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': '',
+            'destination': self.dst_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: to_copy,
+        })
+        self.check_corruptions()
+
+    def test_multi_folders_delete_operation(self):
+        create_folder_structure(
+            depth=2, sibling=2,
+            parent=Folder.objects.get(id=self.src_folder.id))
+        self.check_corruptions()
+        to_delete = [
+            filer_obj_as_checkox(child)
+            for child in Folder.objects.filter(
+                parent__pk=self.src_folder.pk)]
+        response = self.client.post(get_dir_listing_url(self.src_folder), {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: to_delete,
+        })
+        self.check_corruptions()
+
+    def test_single_folder_delete_operation(self):
+        child_src_folder = Folder.objects.create(
+            name='1', parent=self.src_folder)
+        create_folder_structure(
+            depth=2, sibling=2,
+            parent=Folder.objects.get(id=child_src_folder.id))
+        self.check_corruptions()
+        delete_url = reverse(
+            'admin:filer_folder_delete', args=(child_src_folder.pk, ))
+        response = self.client.post(delete_url, {'post': ['yes']})
+        self.check_corruptions()
+
+
+    def create_folder_structure(depth=2, sibling=2, parent=None):
+        if depth > 0 and sibling > 0:
+            depth_range = range(1, depth+1)
+            depth_range.reverse()
+            for d in depth_range:
+                for s in range(1,sibling+1):
+                    name = "%s -- %s" %(str(d), str(s))
+                    folder = Folder(name=name, parent=parent)
+                    folder.save()
+                    create_folder_structure(depth=d-1, sibling=sibling, parent=folder)
+
+    def tearDown(self):
+        for file_path in self.files:
+            os.remove(file_path)
+        for path in self.dirs:
+            os.removedirs(path)
+
+    def test_extract_zip(self):
+        parent_path = os.path.dirname(__file__)
+        self.dirs = ['1/1', '1/2', '2/1']
+        self.dirs = [os.path.join(parent_path, d) for d in self.dirs]
+        self.files = []
+        for path in self.dirs:
+            os.makedirs(path)
+            file_path = os.path.join(path, 'name.txt')
+            with open(file_path, 'w') as fp:
+                fp.write('some data')
+            self.files.append(file_path)
+
+        zip_file_path = os.path.join(parent_path, 'zip_file.zip')
+        zip_file = zipfile.ZipFile(zip_file_path, 'w')
+        for f in self.files:
+            arc_filename = f.replace(parent_path, '')[1:]
+            zip_file.write(f, arc_filename)
+        zip_file.close()
+        self.files.append(zip_file_path)
+
+        filer_zipfile = Archive.objects.create(
+            original_filename='zip_file.zip', folder=self.src_folder,
+            file=dj_files.File(open(zip_file_path), name='zip_file.zip'),
+        )
+        self.client.post(get_dir_listing_url(self.src_folder), {
+            'action': 'extract_files',
+            helpers.ACTION_CHECKBOX_NAME:
+                [filer_obj_as_checkox(filer_zipfile)]})
+        self.check_corruptions()

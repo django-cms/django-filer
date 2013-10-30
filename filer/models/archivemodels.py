@@ -124,6 +124,8 @@ class Archive(File):
         if existing:
             return existing[0]
         # make sure owner is set
+        if parent:
+            attrs['parent'] = Folder.objects.get(id=parent.id)
         attrs['owner'] = self.owner
         return Folder.objects.create(**attrs)
 

@@ -248,8 +248,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
-                descendants = folder.get_descendants_recursive(
-                    include_self=True)
+                descendants = folder.get_descendants(include_self=True)
                 folder_qs = folders_available(
                     request, descendants.exclude(id=folder.id))
                 file_qs = files_available(
@@ -622,12 +621,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 folder_ids = set()
                 for folder in folders_queryset:
                     folder_ids.add(folder.id)
-                    folder_ids.update(folder.get_descendants_ids_recursive())
+                    folder_ids.update(folder.get_descendants()\
+                        .values_list('id', flat=True))
                 for f in File.objects.filter(folder__in=folder_ids):
                     self.log_deletion(request, f, force_unicode(f))
                     f.delete()
                 # delete all folders
-                for f in folders_queryset:
+                for f_id in folders_queryset.values_list('id', flat=True):
+                    f = Folder.objects.get(id=f_id)
                     self.log_deletion(request, f, force_unicode(f))
                     f.delete()
                 self.message_user(request,
@@ -762,7 +763,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
         for f in files_queryset:
             f.folder = destination
             f.save()
-        for f in folders_queryset:
+        for f_id in folders_queryset.values_list('id', flat=True):
+            f = Folder.objects.get(id=f_id)
             f.parent = destination
             f.save()
 
@@ -942,11 +944,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
         old_folder = Folder.objects.get(pk=folder.pk)
 
         # Due to how inheritance works, we have to set both pk and id to None
-        folder.pk = None
-        folder.id = None
+        # lft and rght need to be reset since otherwise will see this node
+        # as 'already set up for insertion' and will not recalculate tree
+        # values
+        folder.pk = folder.id = folder.lft = folder.rght = None
         folder.restricted = False
         folder.name = foldername
-        # We save folder here
         folder.parent = destination
         folder.save()
 
@@ -956,9 +959,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
     def _copy_files_and_folders_impl(self, files_queryset, folders_queryset,
                                      destination, suffix, overwrite):
+
         n = self._copy_files(files_queryset, destination, suffix, overwrite)
 
-        for f in folders_queryset:
+        for f_id in folders_queryset.values_list('id', flat=True):
+            f = Folder.objects.get(id=f_id)
+            destination = Folder.objects.get(id=destination.id)
             n += self._copy_folder(f, destination, suffix, overwrite)
 
         return n
