@@ -3,7 +3,6 @@ import os
 import tempfile
 import zipfile
 from django.test import TestCase
-from django.db.models import Count
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core import files as dj_files
@@ -26,6 +25,7 @@ from filer.tests.helpers import (
     filer_obj_as_checkox, get_make_root_folder_url,
     move_single_file_to_clipboard_action,
 )
+from filer.utils.checktrees import TreeChecker
 from cmsroles.models import Role
 from cmsroles.tests import HelpersMixin
 from cmsroles.siteadmin import get_site_admin_required_permission
@@ -2341,53 +2341,22 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
         self.user = user
         self.dirs, self.files = [], []
 
-    def check_tree(self, pk, lft, tree_id, level=0):
-        rght = lft + 1
-
-        child_ids = Folder.objects.filter(parent__pk=pk).order_by(
-            'tree_id', 'lft', 'rght').values_list('pk', flat=True)
-
-        for child_id in child_ids:
-            rght = self.check_tree(child_id, rght, tree_id, level + 1)
-
-        folder = Folder.objects.get(pk=pk)
-        self.assertEqual(folder.lft, lft)
-        self.assertEqual(folder.rght, rght)
-        self.assertEqual(folder.level, level)
-        self.assertEqual(folder.tree_id, tree_id)
-
-        return rght + 1
-
-    def check_corruptions(self):
-        tree_duplicates = Folder.objects.filter(
-            parent=None).values_list('tree_id').annotate(
-            count=Count('id')).filter(count__gt=1)
-        self.assertEqual(len(tree_duplicates), 0)
-
-        pks = Folder.objects.filter(
-            parent=None).order_by('tree_id', 'lft').values_list('pk', flat=True)
-        idx = 0
-        for pk in pks:
-            idx += 1
-            self.assertEqual(Folder.objects.get(pk=pk).tree_id, idx)
-            self.check_tree(pk, 1, idx)
-
     def test_move_operation(self):
         create_folder_structure(
             depth=2, sibling=2,
             parent=Folder.objects.get(id=self.src_folder.id))
         # making sure no corruptions exist
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
         to_move = Folder.objects.filter(
             parent__pk=self.src_folder.pk)
         move_action(self.client, self.src_folder, self.dst_folder, to_move)
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
 
     def test_copy_operation(self):
         create_folder_structure(
             depth=2, sibling=2,
             parent=Folder.objects.get(id=self.src_folder.id))
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
         to_copy = [
             filer_obj_as_checkox(child)
             for child in Folder.objects.filter(
@@ -2399,13 +2368,13 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
             'destination': self.dst_folder.id,
             helpers.ACTION_CHECKBOX_NAME: to_copy,
         })
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
 
     def test_multi_folders_delete_operation(self):
         create_folder_structure(
             depth=2, sibling=2,
             parent=Folder.objects.get(id=self.src_folder.id))
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
         to_delete = [
             filer_obj_as_checkox(child)
             for child in Folder.objects.filter(
@@ -2415,7 +2384,7 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: to_delete,
         })
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
 
     def test_single_folder_delete_operation(self):
         child_src_folder = Folder.objects.create(
@@ -2423,11 +2392,11 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
         create_folder_structure(
             depth=2, sibling=2,
             parent=Folder.objects.get(id=child_src_folder.id))
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
         delete_url = reverse(
             'admin:filer_folder_delete', args=(child_src_folder.pk, ))
         response = self.client.post(delete_url, {'post': ['yes']})
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
 
     def tearDown(self):
         for file_path in self.files:
@@ -2463,4 +2432,4 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
             'action': 'extract_files',
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(filer_zipfile)]})
-        self.check_corruptions()
+        TreeChecker().find_corruptions()
