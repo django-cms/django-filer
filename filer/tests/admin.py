@@ -2429,18 +2429,6 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
         response = self.client.post(delete_url, {'post': ['yes']})
         self.check_corruptions()
 
-
-    def create_folder_structure(depth=2, sibling=2, parent=None):
-        if depth > 0 and sibling > 0:
-            depth_range = range(1, depth+1)
-            depth_range.reverse()
-            for d in depth_range:
-                for s in range(1,sibling+1):
-                    name = "%s -- %s" %(str(d), str(s))
-                    folder = Folder(name=name, parent=parent)
-                    folder.save()
-                    create_folder_structure(depth=d-1, sibling=sibling, parent=folder)
-
     def tearDown(self):
         for file_path in self.files:
             os.remove(file_path)
