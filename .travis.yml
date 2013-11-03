@@ -5,7 +5,7 @@ python:
 install:
   - ./.travis_setup
 env:
-  - DJANGO="django>=1.3,<1.4" POLYMORPHIC="django_polymorphic<=0.4.0" EASY_THUMBNAILS="easy-thumbnails<1.2"
+  - DJANGO="django>=1.3,<1.4" POLYMORPHIC="django_polymorphic<=0.4.0" EASY_THUMBNAILS="easy-thumbnails<1.2" MPTT="django-mptt<0.6"
   - DJANGO="django>=1.4,<1.5"
   - DJANGO="django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.2"
   - DJANGO="https://github.com/django/django/archive/stable/1.6.x.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
