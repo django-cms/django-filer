@@ -1,42 +1,142 @@
 #-*- coding: utf-8 -*-
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from filer.utils.cms_roles import *
+from filer.models.foldermodels import Folder
 
 
-def check_files_edit_permissions(request, files):
-    for f in files:
-        if not f.has_edit_permission(request):
-            raise PermissionDenied
+def is_valid_destination(request, folder):
+    user = request.user
+    if folder.is_readonly_for_user(user):
+        return False
+    if user.is_superuser:
+        return True
+    if folder.is_restricted_for_user(request.user):
+        return False
+    if not folder.site:
+        return False
+    if folder.site.id in get_sites_for_user(user):
+        return True
+    return False
 
 
-def check_folder_edit_permissions(request, folders):
-    for f in folders:
-        if not f.has_edit_permission(request):
-            raise PermissionDenied
-        check_files_edit_permissions(request, f.files)
-        check_folder_edit_permissions(request, f.children.all())
+def _filter_available_sites(request):
+    current_site = request.REQUEST.get('current_site', None)
+    user = request.user
+    available_sites = get_sites_for_user(user)
+    if current_site:
+        current_site = float(current_site)
+        if not user.is_superuser and current_site not in available_sites:
+            available_sites = []
+        else:
+            available_sites = [current_site]
+    return available_sites
 
 
-def check_files_read_permissions(request, files):
-    for f in files:
-        if not f.has_read_permission(request):
-            raise PermissionDenied
+def folders_available(request, folders_qs):
+    """
+    Returns a queryset with folders that current user can see
+        * core folders
+        * shared folders
+        * only site folders with sites available to the user
+        * site admins can also see site folder files with no site assigned
+
+    * current_site param is passed only with cms plugin change form so this
+        will restrict visible files/folder for the ones that belong to that
+        site for all users, even superusers
+    """
+    user = request.user
+    current_site = request.REQUEST.get('current_site', None)
+
+    if user.is_superuser and not current_site:
+        return folders_qs.distinct()
+
+    available_sites = _filter_available_sites(request)
+
+    sites_q = Q(Q(folder_type=Folder.CORE_FOLDER) |
+                Q(site__in=available_sites) |
+                Q(shared__in=available_sites))
+
+    if has_admin_role(user) and not current_site:
+        sites_q |= Q(site__isnull=True)
+
+    return folders_qs.filter(sites_q).distinct()
 
 
-def check_folder_read_permissions(request, folders):
-    for f in folders:
-        if not f.has_read_permission(request):
-            raise PermissionDenied
-        check_files_read_permissions(request, f.files)
-        check_folder_read_permissions(request, f.children.all())
+def files_available(request, files_qs):
+    """
+    Returns a queryset with files that current user can see:
+        * core folder files
+        * shared folder files
+        * files from 'unfiled files'
+        * only site folder files with sites available to the user
+        * site admins can also see site folder files with no site assigned
+
+    * current_site param is passed only with cms plugin change form so this
+        will restrict visible files/folder for the ones that belong to that
+        site for all users, even superusers
+    """
+    user = request.user
+    current_site = request.REQUEST.get('current_site', None)
+
+    # never show unfiled files from other users clipboard
+    unfiled_in_clipboard = Q(Q(folder__isnull=True) &
+                             ~Q(clipboarditem__isnull=True))
+
+    if user.is_superuser and not current_site:
+        return files_qs.exclude(unfiled_in_clipboard).distinct()
+
+    available_sites = _filter_available_sites(request)
+
+    sites_q = Q(Q(folder__folder_type=Folder.CORE_FOLDER) |
+                Q(folder__site__in=available_sites) |
+                Q(folder__shared__in=available_sites))
+
+    if not current_site:
+        sites_q |= Q(folder__isnull=True)
+        if has_admin_role(user):
+            sites_q |= Q(folder__site__isnull=True)
+    else:
+        # never show unfiled in popup
+        sites_q &= Q(folder__isnull=False)
+
+    return files_qs.exclude(unfiled_in_clipboard).filter(sites_q).distinct()
 
 
-def userperms_for_request(item, request):
-    r = []
-    ps = ['read', 'edit', 'add_children']
-    for p in ps:
-        attr = "has_%s_permission" % p
-        if hasattr(item, attr):
-            x = getattr(item, attr)(request)
-            if x:
-                r.append(p)
-    return r
+def has_multi_file_action_permission(request, files, folders):
+    # unfiled files can be moved/deleted so better to just exclude them
+    #   from checking permissions for them
+    files = files.exclude(folder__isnull=True)
+    user = request.user
+
+    if files.readonly(user).exists() or folders.readonly(user).exists():
+        return False
+    if user.is_superuser:
+        return True
+
+    if files.restricted(user).exists():
+        return False
+
+    if folders.restricted_descendants(user).exists():
+        return False
+
+    # only superusers can move/delete files/folders with no site ownership
+    if (files.filter(folder__site__isnull=True).exists() or
+            folders.filter(site__isnull=True).exists()):
+        return False
+
+    _exists_root_folders = folders.filter(parent__isnull=True).exists()
+    if _exists_root_folders:
+        if not has_admin_role(user):
+            return False
+        # allow site admins to move/delete root files/folders that belong
+        #   to the site where is admin
+        sites_allowed = [s.id for s in get_admin_sites_for_user(user)]
+    else:
+        sites_allowed = get_sites_for_user(user)
+
+    if (files.exclude(folder__site__in=sites_allowed).exists() or
+            folders.exclude(site__in=sites_allowed).exists()):
+        return False
+
+    return True

@@ -1,9 +1,11 @@
 #-*- coding: utf-8 -*-
 from django.core import urlresolvers
+from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
+from filer.utils.cms_roles import *
 
 
 class DummyFolder(mixins.IconsMixin):
@@ -47,7 +49,8 @@ class UnfiledImages(DummyFolder):
     _icon = "unfiled_folder"
 
     def _files(self):
-        return File.objects.filter(folder__isnull=True)
+        return File.objects.filter(
+            folder__isnull=True, clipboarditem__isnull=True)
     files = property(_files)
 
     def get_admin_directory_listing_url_path(self):
@@ -74,6 +77,7 @@ class FolderRoot(DummyFolder):
     is_root = True
     is_smart_folder = False
     can_have_subfolders = True
+    restricted = False
 
     @property
     def virtual_folders(self):
@@ -97,3 +101,12 @@ class FolderRoot(DummyFolder):
 
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse('admin:filer-directory_listing-root')
+
+    def is_restricted_for_user(self, user):
+        return not has_admin_role(user)
+
+    def can_change_restricted(self, user):
+        return has_admin_role(user)
+
+    def is_readonly_for_user(self, user):
+        return not has_admin_role(user)

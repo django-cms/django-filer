@@ -1,7 +1,21 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify adminmedia filermedia %}
+{% load i18n admin_modify adminmedia filermedia filer_admin_tags %}
+{% load url from future %}
 
 {% block extrahead %}{{ block.super }}
+<script type="text/javascript">
+(function($) {
+$( document ).ready(function() {
+$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
+});
+})(django.jQuery);
+</script>
+{% endblock %}
+
+{% block pretitle %}
+{% if is_popup %}
+<a style="float:left; margin-right:10px; font-size: large;" href="{% if original.folder %}{{original.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}{% endif %}" title="{% trans "Go back to the parent folder" %}">&larr;</a>
+{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -27,10 +41,17 @@
 			{% if duplicates %}
 				<h3>{% trans 'duplicates' %}</h3>
 				<ul>
-					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>{% endfor %}
+					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
 				</ul>
 			{% endif %}
 		{% endwith %}
 	{% endblock %}
 </div>
+{% endblock %}
+
+
+{% block submit_buttons_bottom %}
+{% if not original|is_restricted_for_user:user %}
+{{ block.super }}
+{% endif %}
 {% endblock %}

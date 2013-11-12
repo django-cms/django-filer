@@ -1,6 +1,6 @@
 {% extends "admin/filer/change_form.html" %}
-{% load i18n admin_modify adminmedia %}
-
+{% load i18n admin_modify adminmedia filer_admin_tags %}
+{% load url from future %}
 
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
@@ -16,9 +16,8 @@
 <div id="navcontainer">
     <div id="image_container">
         <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
-        <div id="paper">&nbsp;</div>
     </div>
-    <a href="{{ original.url }}">{% trans "Full size preview" %}</a>
+    <a href="{% url 'admin:filer-image-preview' original.id %}{% get_popup_params %}">{% trans "Full size preview" %}</a>
 </div>
 {{ block.super }}
 {% endblock %}

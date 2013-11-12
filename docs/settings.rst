@@ -6,7 +6,7 @@ Settings
 ``FILER_ENABLE_PERMISSIONS``
 ----------------------------
 
-Activate the or not the Permission check on the files and folders before 
+Activate the or not the Permission check on the files and folders before
 displaying them in the admin. When set to ``False`` it gives all the authorization
 to staff members based on standard Django model permissions.
 
@@ -28,7 +28,7 @@ The prefix for static media where filer will look for bundled javascript, css
 and images.
 
 Defaults to ``<STATIC_URL>/filer/`` if ``STATIC_URL`` is defined. Otherwise
-falls back to ``<MEDIA_URL>/filer/``. It is the URL where the ``static/filer/`` 
+falls back to ``<MEDIA_URL>/filer/``. It is the URL where the ``static/filer/``
 directory should be served.
 
 .. _FILER_STORAGES:
@@ -122,16 +122,8 @@ Defaults to ``20``
 ``FILER_SUBJECT_LOCATION_IMAGE_DEBUG``
 --------------------------------------
 
-Draws a red circle around to point in the image that was used to do the 
+Draws a red circle around to point in the image that was used to do the
 subject location aware image cropping.
-
-Defaults to ``False``
-
-``FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS``
--------------------------------------------------
-
-Regular users are not allowed to create new folders at the root level, only
-subfolders of already existing folders, unless this setting is set to ``True``.
 
 Defaults to ``False``
 

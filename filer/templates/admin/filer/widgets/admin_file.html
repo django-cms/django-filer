@@ -11,7 +11,7 @@
 	<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
 	&nbsp;<span id="{{ span_id }}"></span>
 {% endif %}
-<a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
+<a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedFilerObjectLookupPopup(this);">
 	<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
 </a>
 <img id="{{ clear_id }}" src="{% admin_icon_base %}icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}" />

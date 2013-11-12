@@ -8,6 +8,9 @@ from filer.models import Clipboard
 def discard_clipboard(clipboard):
     clipboard.files.clear()
 
+def discard_clipboard_files(clipboard, files):
+    clipboard.clipboarditem_set.filter(file__in=files).delete()
+
 
 def delete_clipboard(clipboard):
     for file_obj in clipboard.files.all():
@@ -32,7 +35,7 @@ def move_file_to_clipboard(request, files, clipboard):
                                       'named %s') % file_obj.actual_name)
             continue
         if clipboard.append_file(file_obj):
-            file_obj .folder = None
+            file_obj.folder = None
             file_obj.save()
             count += 1
     return count
@@ -42,16 +45,31 @@ def move_files_from_clipboard_to_folder(request, clipboard, folder):
     return move_files_to_folder(request, clipboard.files.all(), folder)
 
 
-def move_files_to_folder(request, files, folder):
+def split_files_valid_for_destination(files, destination):
     file_names = [f.actual_name for f in files]
     already_existing = [
-        f.actual_name 
-        for f in folder.entries_with_names(file_names)]
+        f.actual_name
+        for f in destination.entries_with_names(file_names)]
+
+    valid_files, invalid_files = [], []
     for file_obj in files:
         if file_obj.actual_name in already_existing:
-            messages.error(request, _(u"File or folder named %s already exists") % file_obj.actual_name)
-            file_obj.delete()
-            continue
-        file_obj.folder = folder
+            invalid_files.append(file_obj)
+        else:
+            valid_files.append(file_obj)
+    return valid_files, invalid_files
+
+
+def move_files_to_folder(request, files, destination):
+    valid_files, invalid_files = split_files_valid_for_destination(
+        files, destination)
+
+    for file_obj in valid_files:
+        file_obj.folder = destination
         file_obj.save()
-    return True
+
+    for file_obj in invalid_files:
+        messages.error(
+            request, _(u"File or folder named %s already exists in "
+                       "this folder.") % file_obj.actual_name)
+    return valid_files

@@ -39,13 +39,13 @@ class Archive(File):
 
     def is_valid(self):
         """Checks if the file is a proper archive."""
-        is_valid = False
-        self.file.open()
         try:
-            is_valid = self._is_valid_zip(self.file)
+            self.file.open()
+            return self._is_valid_zip(self.file)
+        except:
+            return False
         finally:
             self.file.close()
-        return is_valid
 
     def collisions(self):
         """
@@ -124,6 +124,8 @@ class Archive(File):
         if existing:
             return existing[0]
         # make sure owner is set
+        if parent:
+            attrs['parent'] = Folder.objects.get(id=parent.id)
         attrs['owner'] = self.owner
         return Folder.objects.create(**attrs)
 

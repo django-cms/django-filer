@@ -22,4 +22,18 @@
 		document.getElementById(id_name).innerHTML = chosenName;
 		win.close();
 	};
+	showRelatedFilerObjectLookupPopup = function(triggerlink){
+		if (typeof current_site !== 'undefined' && current_site == parseInt(current_site)){
+			if (triggerlink.href.indexOf("current_site=") == -1){
+				var new_link;
+				if (triggerlink.href.search(/\?/) >= 0) {
+		            new_link = triggerlink.href + '&current_site=' + current_site;
+			    } else {
+		            new_link = triggerlink.href + '?current_site=' + current_site;
+			    }
+			    triggerlink.href = new_link;
+			}
+		}
+		return showRelatedObjectLookupPopup(triggerlink)
+	}
 })(jQuery);

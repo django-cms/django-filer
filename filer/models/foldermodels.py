@@ -1,86 +1,90 @@
 #-*- coding: utf-8 -*-
 import itertools
-
+from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.db import transaction
-from django.db.models import Q
+from django.db import (models, IntegrityError, transaction)
+from django.db.models import (query, Q, signals)
+from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-
 import filer.models.clipboardmodels
+from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
-
 import mptt
 
 
-class FolderManager(models.Manager):
+class FoldersChainableQuerySet(object):
+
     def with_bad_metadata(self):
-        return self.get_query_set().filter(has_all_mandatory_data=False)
+        return self.filter(has_all_mandatory_data=False)
 
+    def valid_destinations(self, user):
+        available_sites = get_sites_for_user(user)
+        core_folders = Q(folder_type=Folder.CORE_FOLDER)
+        no_site = Q(site__isnull=True)
+        shared_folders = ~Q(site__in=available_sites)
+        return self.exclude(core_folders | no_site | shared_folders)
 
-class FolderPermissionManager(models.Manager):
-    """
-    Theses methods are called by introspection from "has_generic_permisison" on
-    the folder model.
-    """
-    def get_read_id_list(self, user):
-        """
-        Give a list of a Folders where the user has read rights or the string
-        "All" if the user has all rights.
-        """
-        return self.__get_id_list(user, "can_read")
+    def readonly(self, user):
+        core_folders = Q(folder_type=Folder.CORE_FOLDER)
+        available_sites = get_sites_for_user(user)
+        shared_folders = Q(~Q(site__in=available_sites) &
+                           Q(shared__in=available_sites))
+        readonly_folders = Q(core_folders | shared_folders)
+        return self.filter(readonly_folders)
 
-    def get_edit_id_list(self, user):
-        return self.__get_id_list(user, "can_edit")
-
-    def get_add_children_id_list(self, user):
-        return self.__get_id_list(user, "can_add_children")
-
-    def __get_id_list(self, user, attr):
-        if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
-            return 'All'
-        allow_list = set()
-        deny_list = set()
-        group_ids = user.groups.all().values_list('id', flat=True)
-        q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
-        perms = self.filter(q).order_by('folder__tree_id', 'folder__level',
-                                        'folder__lft')
-        for perm in perms:
-            p = getattr(perm, attr)
-
-            if p is None:
-                # Not allow nor deny, we continue with the next permission
-                continue
-
-            if not perm.folder:
-                assert perm.type == FolderPermission.ALL
-
-                if p == FolderPermission.ALLOW:
-                    allow_list.update(Folder.objects.all().values_list('id', flat=True))
-                else:
-                    deny_list.update(Folder.objects.all().values_list('id', flat=True))
-
-                continue
-
-            folder_id = perm.folder.id
-
-            if p == FolderPermission.ALLOW:
-                allow_list.add(folder_id)
+    def restricted_descendants(self, user):
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
+            return self.none()
+        descendant_filter = None
+        for node in self:
+            q = Q(**{
+                'tree_id': node.tree_id,
+                'lft__gt': node.lft - 1,
+                'rght__lt': node.rght + 1,
+            })
+            if descendant_filter is None:
+                descendant_filter = q
             else:
-                deny_list.add(folder_id)
+                descendant_filter |= q
+        if not descendant_filter:
+            return self.none()
+        restr_q = Q(Q(restricted=True) | Q(all_files__restricted=True))
+        restr_q &= Q(site__in=sites)
+        return self.model.objects.filter(
+            descendant_filter).filter(restr_q).distinct()
 
-            if perm.type == FolderPermission.CHILDREN:
-                if p == FolderPermission.ALLOW:
-                    allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
-                else:
-                    deny_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+    def unrestricted(self, user):
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
+            return self
+        return self.exclude(restricted=True, site__in=sites)
 
-        # Deny has precedence over allow
-        return allow_list - deny_list
+
+class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
+    pass
+
+
+class FolderQueryset(query.QuerySet, FoldersChainableQuerySet):
+    pass
+
+
+class FolderManager(models.Manager):
+
+    def get_empty_query_set(self):
+        return EmptyFoldersQS(self.model, using=self._db)
+
+    def get_query_set(self):
+        return FolderQueryset(self.model, using=self._db)
+
+    def __getattr__(self, name):
+        if name.startswith('__'):
+            return super(FolderManager, self).__getattr__(self, name)
+        return getattr(self.get_query_set(), name)
 
 
 class Folder(models.Model, mixins.IconsMixin):
@@ -98,34 +102,152 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
-    parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
-                               related_name='children')
+    SITE_FOLDER = 0
+    CORE_FOLDER = 1
+
+    FOLDER_TYPES = {
+        SITE_FOLDER: 'Site Folder',
+        CORE_FOLDER: 'Core Folder',
+    }
+
+    parent = models.ForeignKey('self', verbose_name=('parent'), null=True,
+                               blank=True, related_name='children')
     name = models.CharField(_('name'), max_length=255)
 
     owner = models.ForeignKey(auth_models.User, verbose_name=('owner'),
                               related_name='filer_owned_folders',
+                              on_delete=models.SET_NULL,
                               null=True, blank=True)
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('modified at'),auto_now=True)
+    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
+
+    folder_type = models.IntegerField(choices=FOLDER_TYPES.items(),
+                                      default=SITE_FOLDER)
+
+    site = models.ForeignKey(Site, null=True, blank=True,
+                             on_delete=models.SET_NULL,
+                             help_text=_("Select the site which will use "
+                                         "this folder."))
+
+    restricted = models.BooleanField(
+        _("Restrict Editors and Writers from being able to edit "
+          "or delete anything from this folder"), default=False,
+        help_text=_('If this box is checked, '
+                    'Editors and Writers will still be able to '
+                    'view this folder assets, add them to a plugin or smart '
+                    'snippet but will not be able to delete or '
+                    'modify the current version of the assets.'))
+
+    shared = models.ManyToManyField(Site, null=True, blank=True,
+        related_name='shared',
+        verbose_name=_("Share folder with sites"),
+        help_text=_("All the sites which you share this folder with will "
+                    "be able to use this folder on their pages, with all of "
+                    "its assets. However, they will not be able to change, "
+                    "delete or move it, not even add new assets."))
 
     objects = FolderManager()
 
     def clean(self):
+
         if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
             raise ValidationError(
                 _(u'%s is reserved for internal use. '
                   'Please choose a different name') % self.name)
 
+        duplicate_folders_q = Folder.objects.filter(
+            parent=self.parent_id,
+            name=self.name)
+        if self.pk:
+            duplicate_folders_q = duplicate_folders_q.exclude(
+                pk=self.pk)
+
+        if duplicate_folders_q.exists():
+            raise ValidationError(
+                'File or folder with this name already exists.')
+
+        if not self.parent:
+            if (self.folder_type == Folder.SITE_FOLDER and
+                not self.site):
+                raise ValidationError('Folder is a Site folder. '
+                                      'Site is required.')
+            if (self.folder_type == Folder.CORE_FOLDER and not self.parent and
+                self.site):
+                raise ValidationError('Folder is a Core folder. '
+                                      'Site must be empty.')
+
+    def set_metadata_from_parent(self):
+        """
+        This will keep the rules:
+           * site for site folders can be changed only for the folders
+                with no parent(root folders)
+           * core folders should not have any site
+           * if parent restricted keep restriction from parent
+        """
+        if self.parent:
+            # site folders - make sure it keeps the site from parent
+            self.site = self.parent.site
+            self.folder_type = self.parent.folder_type
+            if self.parent.restricted:
+                self.restricted = self.parent.restricted
+
+        if self.is_core():
+            self.site = None
+
+        self._update_descendants = self.has_new_metadata_value()
+
+    def has_new_metadata_value(self):
+        if not self.pk:
+            return True
+        metadata_fields = ['restricted', 'site_id', 'folder_type']
+        old_metadata = self.__class__._default_manager.\
+                 filter(pk=self.pk).values(*metadata_fields).get()
+        for field in metadata_fields:
+            if getattr(self, field) != old_metadata[field]:
+                return True
+        return False
+
+    def update_descendants_metadata(self):
+        """
+        Folder type and restriction should be preserved
+            to all descendants
+        """
+        descendants = None
+        if self._update_descendants:
+            descendants = self.get_descendants().\
+                select_related('all_files')
+            descendants.update(
+                folder_type=self.folder_type, site=self.site,
+                restricted=self.restricted)
+            self.all_files.update(restricted=self.restricted)
+            for desc_folder in descendants:
+                desc_folder.all_files.update(restricted=self.restricted)
+
+        if self.parent:
+            parent_shared_sites = self.parent.shared.values_list(
+                'id', flat=True)
+            instance_shared_sites = self.shared.values_list('id', flat=True)
+            if set(instance_shared_sites) != set(parent_shared_sites):
+                self.shared = self.parent.shared.all()
+                shared_sites = self.shared.all()
+                descendants = descendants or self.get_descendants()
+                for desc_folder in descendants:
+                    desc_folder.shared = shared_sites
+
     def save(self, *args, **kwargs):
         if not filer_settings.FOLDER_AFFECTS_URL:
-            return super(Folder, self).save(*args, **kwargs)
+            self.set_metadata_from_parent()
+            super(Folder, self).save(*args, **kwargs)
+            self.update_descendants_metadata()
+            return
 
         with transaction.commit_manually():
-            # The manual transaction management here breaks the transaction management
-            # from django.contrib.admin.options.ModelAdmin.change_view
+            # The manual transaction management here breaks the transaction
+            #   management from
+            #   django.contrib.admin.options.ModelAdmin.change_view
             storages = []
             old_locations = []
             new_locations = []
@@ -135,9 +257,12 @@ class Folder(models.Model, mixins.IconsMixin):
                     storage.delete(location)
 
             try:
+                self.set_metadata_from_parent()
                 super(Folder, self).save(*args, **kwargs)
+                self.update_descendants_metadata()
                 all_files = []
-                for folder in self.get_descendants(include_self=True):
+                for folder in self.get_descendants(
+                        include_self=True):
                     all_files += folder.files
                 for f in all_files:
                     old_location = f.file.name
@@ -181,7 +306,7 @@ class Folder(models.Model, mixins.IconsMixin):
         children of this folder and have their names in the given list of names.
         """
         q = Q(name__in=names)
-        q |= Q(original_filename__in=names) & (Q(name__isnull=True)|Q(name=''))
+        q |= Q(original_filename__in=names) & (Q(name__isnull=True) | Q(name=''))
         files_with_names = self.all_files.filter(q)
         folders_with_names = self.children.filter(name__in=names)
         return list(itertools.chain(files_with_names, folders_with_names))
@@ -210,54 +335,12 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def pretty_logical_path(self):
-        return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+        return u"/%s" % u"/".join([f.name
+                                   for f in self.logical_path + [self]])
 
     @property
     def quoted_logical_path(self):
         return urlquote(self.pretty_logical_path)
-
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        folder. Return the string 'ALL' if the user has all rights.
-        """
-        user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        else:
-            if not hasattr(self, "permission_cache") or\
-               permission_type not in self.permission_cache or \
-               request.user.pk != self.permission_cache['user'].pk:
-                if not hasattr(self, "permission_cache") or request.user.pk != self.permission_cache['user'].pk:
-                    self.permission_cache = {
-                        'user': request.user,
-                    }
-
-                # This calls methods on the manager i.e. get_read_id_list()
-                func = getattr(FolderPermission.objects,
-                               "get_%s_id_list" % permission_type)
-                permission = func(user)
-                if permission == "All":
-                    self.permission_cache[permission_type] = True
-                    self.permission_cache['read'] = True
-                    self.permission_cache['edit'] = True
-                    self.permission_cache['add_children'] = True
-                else:
-                    self.permission_cache[permission_type] = self.id in permission
-            return self.permission_cache[permission_type]
 
     def get_admin_url_path(self):
         return urlresolvers.reverse('admin:filer_folder_change',
@@ -281,11 +364,101 @@ class Folder(models.Model, mixins.IconsMixin):
         except Folder.DoesNotExist:
             return False
 
+    @property
+    def get_folder_type_display(self):
+        if self.shared.exists():
+            return 'Shared by site'
+        return Folder.FOLDER_TYPES[self.folder_type]
+
+    def is_core(self):
+        return self.folder_type == Folder.CORE_FOLDER
+
+    def is_readonly_for_user(self, user):
+        return self.is_core() or (
+            self.site and not has_role_on_site(user, self.site) and
+            self.shared.filter(id__in=get_sites_for_user(user)).exists())
+
+    def is_restricted_for_user(self, user):
+        return (self.restricted and (
+                    not user.has_perm('filer.can_restrict_operations') or
+                    not can_restrict_on_site(user, self.site)))
+
+    def can_change_restricted(self, user):
+        """
+        Checks if restriction operation is available for this folder.
+        """
+        if (not user.has_perm('filer.can_restrict_operations') or
+                not can_restrict_on_site(user, self.site)):
+            return False
+        if not self.parent:
+            return True
+        if self.parent.restricted == self.restricted == True:
+            # only parent can be set to True
+            return False
+        if self.parent.restricted == self.restricted == False:
+            return True
+        if self.parent.restricted == True and self.restricted == False:
+            raise IntegrityError(
+                'Re-save folder %s to fix restricted property' % (
+                    self.parent.pretty_logical_path))
+        return True
+
+    def has_add_permission(self, user):
+        # nobody can add subfolders in core folders
+        if (self.is_readonly_for_user(user) or
+                self.is_restricted_for_user(user)):
+            return False
+        # only site admins can add subfolders in site folders with no site
+        if not self.site and has_admin_role(user):
+            return True
+        # regular users need to have permissions to add folders and
+        #   need to have a role over the site owner of the folder
+        if (self.site and user.has_perm('filer.add_folder')
+                and has_role_on_site(user, self.site)):
+            return True
+
+    def has_change_permission(self, user):
+        # nobody can change core folder
+        if (self.is_readonly_for_user(user) or
+                self.is_restricted_for_user(user)):
+            return False
+        # only admins can change site folders with no site owner
+        if not self.site and has_admin_role(user):
+            return True
+
+        if self.site:
+            if not self.parent:
+                # only site admins can change root site folders
+                return has_admin_role_on_site(user, self.site)
+            return (user.has_perm('filer.change_folder') and
+                    has_role_on_site(user, self.site))
+        return False
+
+    def has_delete_permission(self, user):
+        if (self.is_readonly_for_user(user) or
+                self.is_restricted_for_user(user)):
+            return False
+
+        # only super users can delete site folders with no site owner
+        if not self.site and user.is_superuser:
+            return True
+
+        if self.site:
+            if not self.parent:
+                # only site admins can delete root site folders
+                return has_admin_role_on_site(user, self.site)
+            return (user.has_perm('filer.delete_folder') and
+                    has_role_on_site(user, self.site))
+
+        return False
+
     class Meta:
         unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
-                        "Can use directory listing"),)
+                        "Can use directory listing"),
+                       ("can_restrict_operations",
+                        "Can restrict files or folders"),)
         app_label = 'filer'
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
@@ -297,81 +470,17 @@ except mptt.AlreadyRegistered:
     pass
 
 
-class FolderPermission(models.Model):
-    ALL = 0
-    THIS = 1
-    CHILDREN = 2
+@receiver(signals.m2m_changed, sender=Folder.shared.through)
+def update_shared_sites_for_descendants(instance, **kwargs):
+    """
+    Makes sure that folders keep all shared sites from their root folder.
+    """
+    action = kwargs['action']
+    if not action.startswith('post_') or instance.parent:
+        return
 
-    ALLOW = 1
-    DENY = 0
-
-    TYPES = (
-        (ALL, _('all items')),
-        (THIS, _('this item only')),
-        (CHILDREN, _('this item and all children')),
-    )
-
-    PERMISIONS = (
-        (ALLOW, _('allow')),
-        (DENY, _('deny')),
-    )
-
-    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
-
-    type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
-    user = models.ForeignKey(auth_models.User,
-                             related_name="filer_folder_permissions",
-                             verbose_name=_("user"), blank=True, null=True)
-    group = models.ForeignKey(auth_models.Group,
-                              related_name="filer_folder_permissions",
-                              verbose_name=_("group"), blank=True, null=True)
-    everybody = models.BooleanField(_("everybody"), default=False)
-
-    can_edit = models.SmallIntegerField(_("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)
-    can_read = models.SmallIntegerField(_("can read"), choices=PERMISIONS, blank=True, null=True, default=None)
-    can_add_children = models.SmallIntegerField(_("can add children"), choices=PERMISIONS, blank=True, null=True, default=None)
-
-    objects = FolderPermissionManager()
-
-    def __unicode__(self):
-        if self.folder:
-            name = u'%s' % self.folder
-        else:
-            name = u'All Folders'
-
-        ug = []
-        if self.everybody:
-            ug.append('Everybody')
-        else:
-            if self.group:
-                ug.append(u"Group: %s" % self.group)
-            if self.user:
-                ug.append(u"User: %s" % self.user)
-        usergroup = " ".join(ug)
-        perms = []
-        for s in ['can_edit', 'can_read', 'can_add_children']:
-            perm = getattr(self, s)
-            if perm == self.ALLOW:
-                perms.append(s)
-            elif perm == self.DENY:
-                perms.append('!%s' % s)
-        perms = ', '.join(perms)
-        return u"Folder: '%s'->%s [%s] [%s]" % (
-                        name, unicode(self.TYPES[self.type][1]),
-                        perms, usergroup)
-
-    def clean(self):
-        if self.type == self.ALL and self.folder:
-            raise ValidationError('Folder cannot be selected with type "all items".')
-        if self.type != self.ALL and not self.folder:
-            raise ValidationError('Folder has to be selected when type is not "all items".')
-        if self.everybody and (self.user or self.group):
-            raise ValidationError('User or group cannot be selected together with "everybody".')
-        if not self.user and not self.group and not self.everybody:
-            raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
-
-    class Meta:
-        verbose_name = _('folder permission')
-        verbose_name_plural = _('folder permissions')
-        app_label = 'filer'
-
+    instance = Folder.objects.get(id=instance.id)
+    sites = instance.shared.all()
+    descendants = instance.get_descendants()
+    for desc_folder in descendants:
+        desc_folder.shared = sites

@@ -2,18 +2,26 @@
 {% load i18n admin_modify adminmedia filermedia %}
 {% load url from future %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-   <a href="{% url 'admin:index' %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
-    &rsaquo; <a href="{% url 'admin:index' %}filer/" title="{% trans "Go back to" %} {% trans "Filer" %}"> {% trans "Filer" %}</a>
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to" %} '{% trans "root"|title %}' {% trans "folder" %}">{% trans "root"|title %}</a>
-    {% for ancestor_folder in original.get_ancestors %}
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a>
-    {% endfor %}
-    &rsaquo; {{ original.name }}
-</div>
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
 {% endblock %}
 
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript">
+(function($) {
+$( document ).ready(function() {
+$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
+});
+})(django.jQuery);
+</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% with original as instance %}
+{% include "admin/filer/breadcrumbs.html" %}
+{% endwith %}
+{% endblock %}
 
 {% block coltype %}{% if is_popup %}colM{% else %}colMS{% endif %}{% endblock %}
 {% block object-tools %}

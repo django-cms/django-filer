@@ -3,34 +3,68 @@ from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.db import transaction
+from django.db import (models, IntegrityError, transaction)
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
-from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
-from polymorphic import PolymorphicModel, PolymorphicManager
+from filer.utils.cms_roles import *
+from filer import settings as filer_settings
+from django.db.models import Count
+import polymorphic
 import hashlib
 import os
 
 
+class FilesChainableQuerySet(object):
 
-class FileManager(PolymorphicManager):
-    def find_all_duplicates(self):
-        r = {}
-        for file_obj in self.all():
-            if file_obj.sha1:
-                q = self.filter(sha1=file_obj.sha1)
-                if len(q) > 1:
-                    r[file_obj.sha1] = q
-        return r
+    def readonly(self, user):
+        return self.filter(folder__folder_type=Folder.CORE_FOLDER)
 
     def find_duplicates(self, file_obj):
-        return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
+        return self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)
+
+    def restricted(self, user):
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
+            return self.none()
+        return self.filter(
+            restricted=True,
+            folder__site__in=sites)
+
+    def unrestricted(self, user):
+        sites = get_sites_without_restriction_perm(user)
+        if not sites:
+            return self
+        return self.exclude(
+            restricted=True,
+            folder__site__in=sites)
 
 
-class File(PolymorphicModel, mixins.IconsMixin):
+class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
+    pass
+
+
+class FileQuerySet(polymorphic.query.PolymorphicQuerySet,
+                   FilesChainableQuerySet):
+    pass
+
+
+class FileManager(polymorphic.PolymorphicManager):
+
+    def get_query_set(self):
+        return FileQuerySet(self.model, using=self._db)
+
+    def get_empty_query_set(self):
+        return EmptyFilesQS(self.model, using=self._db)
+
+    def find_all_duplicates(self):
+        return {file_data['sha1']: file_data['count']
+                for file_data in File.objects.values('sha1').annotate(
+                    count=Count('id')).filter(count__gt=1)}
+
+
+class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
@@ -49,7 +83,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         verbose_name=_('description'))
 
     owner = models.ForeignKey(auth_models.User,
-        related_name='owned_%(class)ss',
+        related_name='owned_%(class)ss', on_delete=models.SET_NULL,
         null=True, blank=True, verbose_name=_('owner'))
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
@@ -61,6 +95,15 @@ class File(PolymorphicModel, mixins.IconsMixin):
         help_text=_('Disable any permission checking for this ' +\
                     'file. File will be publicly accessible ' +\
                     'to anyone.'))
+
+    restricted = models.BooleanField(
+        _("Restrict Editors and Writers from being able to edit "
+          "or delete this asset"), default=False,
+        help_text=_('If this box is checked, '
+                    'Editors and Writers will still be able to '
+                    'view the asset, add it to a plugin or smart '
+                    'snippet but will not be able to delete or '
+                    'modify the current version of the asset.'))
 
     objects = FileManager()
 
@@ -144,7 +187,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # to make sure later operations can read the whole file
         self.file.seek(0)
 
+    def set_restricted_from_folder(self):
+        if self.folder and self.folder.restricted:
+            self.restricted = self.folder.restricted
+
     def save(self, *args, **kwargs):
+        self.set_restricted_from_folder()
         # check if this is a subclass of "File" or not and set
         # _file_type_plugin_name
         if self.__class__ == File:
@@ -239,7 +287,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # Delete the model before the file
         super(File, self).delete(*args, **kwargs)
         # Delete the file if there are no other Files referencing it.
-        if not File.objects.filter(file=self.file.name, is_public=self.is_public).exists():
+        if not File.objects.filter(file=self.file.name,
+                                   is_public=self.is_public).exists():
             self.file.delete(False)
     delete.alters_data = True
 
@@ -254,32 +303,6 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     def __lt__(self, other):
         return cmp(self.label.lower(), other.label.lower()) < 0
-
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
-        """
-        user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
 
     @property
     def actual_name(self):
@@ -379,7 +402,83 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     @property
     def duplicates(self):
-        return File.objects.find_duplicates(self)
+        return list(File.objects.find_duplicates(self))
+
+    def is_core(self):
+        if self.folder:
+            return self.folder.is_core()
+        return False
+
+    def is_readonly_for_user(self, user):
+        if self.folder:
+            return self.folder.is_readonly_for_user(user)
+        return False
+
+    def is_restricted_for_user(self, user):
+        return (self.restricted and (
+                    not user.has_perm('filer.can_restrict_operations') or
+                    not can_restrict_on_site(user, self.folder.site)))
+
+    def can_change_restricted(self, user):
+        """
+        Checks if restriction operation is available for this file.
+        """
+        if not user.has_perm('filer.can_restrict_operations'):
+            return False
+        if not self.folder:
+            # cannot restrict unfiled files
+            return False
+
+        if not can_restrict_on_site(user, self.folder.site):
+            return False
+
+        if self.folder.restricted == self.restricted == True:
+            # only parent can be set to True
+            return False
+        if self.folder.restricted == self.restricted == False:
+            return True
+        if self.folder.restricted == True and self.restricted == False:
+            raise IntegrityError(
+                'Re-save folder %s to fix restricted property' % (
+                    self.folder.pretty_logical_path))
+        return True
+
+    def has_change_permission(self, user):
+        if not self.folder:
+            # clipboard and unfiled files
+            return True
+
+        if self.is_readonly_for_user(user):
+            # nobody can change core folder
+            # leaving these on True based on the fact that core folders are
+            # displayed as readonly fields
+             return True
+
+        # only admins can change site folders with no site owner
+        if not self.folder.site and has_admin_role(user):
+            return True
+
+        if self.folder.site:
+            return (user.has_perm('filer.change_file') and
+                    has_role_on_site(user, self.folder.site))
+
+        return False
+
+    def has_delete_permission(self, user):
+        if not self.folder:
+             # clipboard and unfiled files
+             return True
+        # nobody can delete core files
+        if self.is_readonly_for_user(user):
+             return False
+        # only admins can delete site files with no site owner
+        if not self.folder.site and has_admin_role(user):
+             return True
+
+        if self.folder.site:
+            return (user.has_perm('filer.delete_file') and
+                    has_role_on_site(user, self.folder.site))
+        return False
 
     class Meta:
         app_label = 'filer'

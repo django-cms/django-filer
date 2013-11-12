@@ -10,14 +10,17 @@
                     <input type="hidden" name="_popup" value="1" />
                     {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
                 {% endif %}
+                {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
                 <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" />
                 <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}"  />
+                {% if not folder.is_root %}
                 <input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans "Check it to" %} {% trans "limit the search to current folder" %}"/>
                 <label for="limit_search_to_folder">{% trans "limit the search to current folder" %}</label>
+                {% endif %}
                 {% if show_result_count %}
-                <span class="small quiet">({% trans "found" %} {% blocktrans count folder_children|length as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
-                {% blocktrans count folder_files|length as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?">{% trans "cancel search" %}</a></span>
-                
+                <span class="small quiet">({% trans "found" %} {% blocktrans count show_result_count.folders_found as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
+                {% blocktrans count show_result_count.files_found as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?{% get_popup_params '&' %}">{% trans "cancel search" %}</a></span>
+
                 {% endif %}
             </div>
         </form>

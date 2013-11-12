@@ -109,32 +109,6 @@ class Image(File):
         return self._exif_cache
     exif = property(_get_exif)
 
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
-        """
-        user = request.user
-        if not user.is_authenticated() or not user.is_staff:
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
-
     @property
     def label(self):
         if self.name in ['', None]:
