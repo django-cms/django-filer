@@ -189,8 +189,9 @@ class Migration(DataMigration):
         if self.guess_site_by_owner_email(folder, candidates):
             self.share_site_folder(folder, candidates)
             return
-        self.log.error("\tCouldn't guess site from candidates: %s" % (
-            folder, ', '.join(candidates.values_list('domain', flat=True))))
+        self.log.error(
+            "\tCouldn't guess site for folder %s from candidates: %s" % (
+            folder.name, ', '.join(candidates.values_list('domain', flat=True))))
 
     def migrate_by_folderpermissions(self, folder, folder_perms):
         self.log.info("\ttrying to migrate by folder permission")
