@@ -915,18 +915,21 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # We are assuming here that we are operating on an already saved
         #       database objects with current database state available
 
-        filename = self._generate_name(file_obj.file.name, suffix)
-
         # Due to how inheritance works, we have to set both pk and id to None
         file_obj.pk = None
         file_obj.id = None
-        # do not keep restriction
-        file_obj.save()
         file_obj.restricted = False
         file_obj.folder = destination
-        file_obj.file = file_obj._copy_file(filename)
-        file_obj.original_filename = self._generate_name(
-            file_obj.original_filename, suffix)
+        # add suffix to actual name
+        if file_obj.name in ('', None):
+            file_obj.original_filename = self._generate_name(
+                file_obj.original_filename, suffix)
+        else:
+            file_obj.name = self._generate_name(file_obj.name, suffix)
+        new_file_name_in_storage = self._generate_name(
+            file_obj._meta.get_field('file').generate_filename(
+                file_obj, file_obj.actual_name), suffix)
+        file_obj.file = file_obj._copy_file(new_file_name_in_storage)
         file_obj.save()
 
     def _copy_files(self, files, destination, suffix, overwrite):
