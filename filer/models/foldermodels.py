@@ -281,6 +281,15 @@ class Folder(models.Model, mixins.IconsMixin):
                 transaction.commit()
                 delete_from_locations(old_locations, storages)
 
+    def delete(self, *args, **kwargs):
+        # This would happen automatically by ways of the delete
+        #       cascade, but then the individual .delete() methods
+        #       won't be called and the files won't be deleted
+        #       from the filesystem.
+        for file_obj in self.all_files.all():
+            file_obj.delete()
+        super(Folder, self).delete(*args, **kwargs)
+
     @property
     def file_count(self):
         if not hasattr(self, '_file_count_cache'):

@@ -10,14 +10,17 @@ from django.db.models import Q
 from django.test import TestCase
 from django.core.files import File as DjangoFile
 from django.core.files.base import ContentFile
+from django.contrib.admin import helpers
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
 from filer.models.archivemodels import Archive
 from filer.models.clipboardmodels import Clipboard
-from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, create_clipboard_item, SettingsOverride)
+from filer.tests.helpers import (
+    get_dir_listing_url, create_superuser, create_folder_structure,
+    create_image, create_clipboard_item, SettingsOverride,
+    filer_obj_as_checkox)
 from filer import settings as filer_settings
 from filer.utils.generate_filename import by_path
 
@@ -158,6 +161,31 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
+
+    def test_deleting_folder_deletes_all_files_from_filesystem(self):
+        folder = Folder.objects.create(name='to_delete')
+        file_1 = self.create_filer_image()
+        file_1.folder = folder
+        file_1.save()
+        self.assertTrue(file_1.file.storage.exists(file_1.file.name))
+        storage, name = file_1.file.storage, file_1.file.name
+        folder.delete()
+        self.assertFalse(storage.exists(name))
+
+    def test_bulk_deleting_folder_deletes_all_files_from_filesystem(self):
+        folder = Folder.objects.create(name='to_delete')
+        file_1 = self.create_filer_image()
+        file_1.folder = folder
+        file_1.save()
+        self.assertTrue(file_1.file.storage.exists(file_1.file.name))
+        storage, name = file_1.file.storage, file_1.file.name
+
+        response = self.client.post(get_dir_listing_url(None), {
+            'action': 'delete_files_or_folders',
+            'post': 'yes',
+            helpers.ACTION_CHECKBOX_NAME: filer_obj_as_checkox(folder),
+        })
+        self.assertFalse(storage.exists(name))
 
     def test_deleting_image_deletes_file_from_filesystem(self):
         file_1 = self.create_filer_image()
