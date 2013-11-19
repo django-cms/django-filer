@@ -158,6 +158,9 @@ class Folder(models.Model, mixins.IconsMixin):
                 _(u'%s is reserved for internal use. '
                   'Please choose a different name') % self.name)
 
+        if self.name and "/" in self.name:
+            raise ValidationError("Slashes are not allowed in folder names.")
+
         duplicate_folders_q = Folder.objects.filter(
             parent=self.parent_id,
             name=self.name)
@@ -167,7 +170,8 @@ class Folder(models.Model, mixins.IconsMixin):
 
         if duplicate_folders_q.exists():
             raise ValidationError(
-                'File or folder with this name already exists.')
+                'This folder name is already in use. '
+                'Please choose a different name.')
 
         if not self.parent:
             if (self.folder_type == Folder.SITE_FOLDER and
