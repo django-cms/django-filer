@@ -613,19 +613,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 for f in files_queryset:
                     self.log_deletion(request, f, force_unicode(f))
                     f.delete()
-                # delete all files in all selected folders and their children
-                # This would happen automatically by ways of the delete
-                #       cascade, but then the individual .delete() methods
-                #       won't be called and the files won't be deleted
-                #       from the filesystem.
-                folder_ids = set()
-                for folder in folders_queryset:
-                    folder_ids.add(folder.id)
-                    folder_ids.update(folder.get_descendants()\
-                        .values_list('id', flat=True))
-                for f in File.objects.filter(folder__in=folder_ids):
-                    self.log_deletion(request, f, force_unicode(f))
-                    f.delete()
                 # delete all folders
                 for f_id in folders_queryset.values_list('id', flat=True):
                     f = Folder.objects.get(id=f_id)
