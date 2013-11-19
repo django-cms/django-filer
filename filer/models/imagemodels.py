@@ -12,6 +12,7 @@ from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
@@ -61,6 +62,13 @@ class Image(File):
       # --Dave Butler <croepha@gmail.com>
       iext = os.path.splitext(iname)[1].lower()
       return iext in ['.jpg', '.jpeg', '.png', '.gif', '.ico']
+
+    def clean(self):
+        if len(self.default_credit or '') > 30:
+            raise ValidationError(
+                "Ensure default credit text has at most 30 characters ("
+                "%s characters found)." % len(self.default_credit))
+        super(Image, self).clean()
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:

@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.test import TestCase
 from django.core.files import File as DjangoFile
 from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
@@ -200,6 +201,13 @@ class FilerApiTests(TestCase):
 
         # file should still be here
         self.assertTrue(storage.exists(name))
+
+    def test_credit_text_length_max_size(self):
+        file_1 = self.create_filer_image()
+        file_1.full_clean()
+        file_1.default_credit = '*' * 31
+        with self.assertRaises(ValidationError):
+            file_1.full_clean()
 
     def test_cdn_urls(self):
         cdn_domain = 'cdn.foobar.com'
