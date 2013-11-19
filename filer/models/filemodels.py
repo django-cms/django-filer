@@ -119,6 +119,9 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         self._force_commit = False
 
     def clean(self):
+        if self.name and "/" in self.name:
+            raise ValidationError("Slashes are not allowed in filenames.")
+
         if self.folder:
             entries = self.folder.entries_with_names([self.actual_name])
             if entries and any(entry.pk != self.pk for entry in entries):
