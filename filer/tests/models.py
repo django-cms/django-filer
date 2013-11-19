@@ -209,6 +209,20 @@ class FilerApiTests(TestCase):
         with self.assertRaises(ValidationError):
             file_1.full_clean()
 
+    def test_slash_not_allowed_in_name(self):
+        file_1 = self.create_filer_image()
+        file_1.full_clean()
+        file_1.name = "something/with/slash"
+        with self.assertRaises(ValidationError):
+            file_1.full_clean()
+
+        folder = Folder.objects.create(
+            name="cleaned", site_id=1)
+        folder.full_clean()
+        folder.name = "something/with/slash"
+        with self.assertRaises(ValidationError):
+            folder.full_clean()
+
     def test_cdn_urls(self):
         cdn_domain = 'cdn.foobar.com'
         with SettingsOverride(filer_settings,

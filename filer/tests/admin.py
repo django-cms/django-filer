@@ -99,7 +99,7 @@ class FilerFolderAdminUrlsTests(TestCase):
             post_data)
         # second folder didn't get created
         self.assertEqual(Folder.objects.count(), 1)
-        self.assertIn('File or folder with this name already exists',
+        self.assertIn('folder name is already in use',
                       response.content)
 
     def test_validate_no_duplcate_folders_on_rename(self):
@@ -133,7 +133,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
                 "name": "foo",
                 "_popup": 1})
-        self.assertIn('File or folder with this name already exists',
+        self.assertIn('folder name is already in use',
                       response.content)
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
@@ -1551,7 +1551,7 @@ class TestFolderTypeFunctionality(TestCase):
         foo.save()
 
         bar = Folder(name='foo', site_id=1)
-        with self.assertRaisesRegexp(ValidationError, 'name already exists'):
+        with self.assertRaisesRegexp(ValidationError, 'name is already in use'):
             bar.full_clean()
         bar.name = 'bar'
         bar.site = None
@@ -1570,7 +1570,7 @@ class TestFolderTypeFunctionality(TestCase):
         response = self.client.post(
             get_make_root_folder_url(),
             {'name': 'foo'})
-        self.assertIn('name already exists', response.content)
+        self.assertIn('name is already in use', response.content)
 
     def test_folder_type_conversion_propagate_changes(self):
         site = Site.objects.get(id=1)
