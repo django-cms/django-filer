@@ -4,8 +4,9 @@ from django.db import models
 from filer.models import *
 
 
-class UserSafeMetaClass(type):
-    def __new__(cls, clsname, bases, dct):
+class Migration:
+
+    def __init__(self, *args, **kwargs):
         try:
             from django.contrib.auth import get_user_model
         except ImportError: # django < 1.5
@@ -16,7 +17,7 @@ class UserSafeMetaClass(type):
         user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
         user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
 
-        dct['models'] = {
+        self.models = {
             'auth.group': {
                 'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
                 'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
@@ -113,12 +114,6 @@ class UserSafeMetaClass(type):
                 'subject_location': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '64', 'null': 'True', 'blank': 'True'})
             }
         }
-
-        return type.__new__(cls, clsname, bases, dct)
-
-
-class Migration:
-    __metaclass__ = UserSafeMetaClass
     
     def forwards(self, orm):
         
