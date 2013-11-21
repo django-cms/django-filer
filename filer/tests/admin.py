@@ -560,7 +560,8 @@ class BaseTestFolderTypePermissionLayer(object):
         # make sure the folder that is going to be saved is a site folder
         form = response.context_data['adminform'].form
         self.assertEqual(form.instance.folder_type, Folder.SITE_FOLDER)
-        self.assertItemsEqual(['name', 'restricted'], form.fields.keys())
+        self.assertItemsEqual(sorted(['name', 'restricted']),
+                              sorted(form.fields.keys()))
         # check if save worked
         response = self.client.post(
             reverse('admin:filer_folder_change', args=(f2.pk, )), {
@@ -659,7 +660,8 @@ class BaseTestFolderTypePermissionLayer(object):
         expected_fields = ['site', 'name']
         if self.user.is_superuser:
             expected_fields.append('shared')
-        self.assertItemsEqual(expected_fields, form.fields.keys())
+        self.assertItemsEqual(sorted(expected_fields),
+                              sorted(form.fields.keys()))
 
         s1, _ = Site.objects.get_or_create(
             name='foo_site', domain='foo-domain.com')
@@ -2070,7 +2072,8 @@ class TestSharedFolderFunctionality(TestCase):
         baz = Folder.objects.create(name='baz', parent=bar)
         foo.shared.add(site)
         for folder in Folder.objects.all():
-            self.assertItemsEqual(folder.shared.all(), foo.shared.all())
+            self.assertItemsEqual(folder.shared.order_by('domain'),
+                                  foo.shared.order_by('domain'))
 
     def test_subfolder_inherits_from_parent(self):
         s1 = Site.objects.create(name='foo', domain='foo.example.com')
@@ -2081,21 +2084,24 @@ class TestSharedFolderFunctionality(TestCase):
         }
         response = self.client.post(get_make_root_folder_url(), data_to_post)
         root = Folder.objects.get(name='new_root')
-        self.assertItemsEqual(root.shared.all(), Site.objects.all())
+        self.assertItemsEqual(root.shared.order_by('domain'),
+                              Site.objects.order_by('domain'))
         data_to_post = {
              "name": 'child',
              "parent_id": root.id
         }
         response = self.client.post(get_make_root_folder_url(), data_to_post)
         child = Folder.objects.get(name='child')
-        self.assertItemsEqual(child.shared.all(), root.shared.all())
+        self.assertItemsEqual(child.shared.order_by('domain'),
+                              root.shared.order_by('domain'))
         data_to_post = {
              "name": 'child2',
              "parent_id": child.id
         }
         response = self.client.post(get_make_root_folder_url(), data_to_post)
         child2 = Folder.objects.get(name='child2')
-        self.assertItemsEqual(child2.shared.all(), child.shared.all())
+        self.assertItemsEqual(child2.shared.order_by('domain'),
+                              child.shared.order_by('domain'))
 
     def test_only_root_folders_can_be_shared(self):
         foo = Folder.objects.create(name='foo')
@@ -2106,7 +2112,8 @@ class TestSharedFolderFunctionality(TestCase):
         self.assertIn('adminform', response.context_data)
         form = response.context_data['adminform'].form
         self.assertItemsEqual(
-            ['name', 'restricted', 'shared', 'site'], form.fields.keys())
+            sorted(['name', 'restricted', 'shared', 'site']),
+            sorted(form.fields.keys()))
 
         response = self.client.get(
             reverse('admin:filer_folder_change', args=(bar.pk, )))
@@ -2114,7 +2121,7 @@ class TestSharedFolderFunctionality(TestCase):
         self.assertIn('adminform', response.context_data)
         form = response.context_data['adminform'].form
         self.assertItemsEqual(
-            ['name', 'restricted'], form.fields.keys())
+            sorted(['name', 'restricted']), sorted(form.fields.keys()))
 
     def test_shared_sites_are_inherited_on_move(self):
         s1 = Site.objects.create(name='s1', domain='s1.example.com')
