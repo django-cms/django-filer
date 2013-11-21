@@ -1363,10 +1363,10 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('destination_folders', response.context)
-        dest_folders = [_dest[0]
+        dest_folders = [_dest[0].name
                         for _dest in response.context['destination_folders']]
-        expected = set([self.folders['bar'], self.folders['foo'], bar2])
-        self.assertItemsEqual(expected, set(dest_folders))
+        expected = sorted(['bar', 'bar2', 'foo'])
+        self.assertItemsEqual(expected, sorted(dest_folders))
 
     def _test_destination_action_for_multi_site_user(self, action):
         # bob will be a site admin on foo and writer on bar
@@ -1387,10 +1387,10 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('destination_folders', response.context)
-        dest_folders = [_dest[0]
+        dest_folders = [_dest[0].name
                         for _dest in response.context['destination_folders']]
-        expected = set([self.folders['bar'], self.folders['foo'], bar2])
-        self.assertItemsEqual(expected, set(dest_folders))
+        expected = sorted(['bar', 'bar2', 'foo'])
+        self.assertItemsEqual(expected, sorted(dest_folders))
 
     def _test_destination_action_for_other_users(self, action):
         # bob is writer on bar site
@@ -1407,10 +1407,10 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('destination_folders', response.context)
-        dest_folders = [_dest[0]
+        dest_folders = [_dest[0].name
                         for _dest in response.context['destination_folders']]
-        expected = set([self.folders['bar'], bar2])
-        self.assertItemsEqual(expected, set(dest_folders))
+        expected = sorted(['bar', 'bar2'])
+        self.assertItemsEqual(expected, sorted(dest_folders))
 
     def test_destination_on_copy_for_multi_site_user(self):
         self._test_destination_action_for_multi_site_user(
