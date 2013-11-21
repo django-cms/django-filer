@@ -290,7 +290,10 @@ class Folder(models.Model, mixins.IconsMixin):
         #       cascade, but then the individual .delete() methods
         #       won't be called and the files won't be deleted
         #       from the filesystem.
-        for file_obj in self.all_files.all():
+        all_files = []
+        for folder in self.get_descendants(include_self=True):
+            all_files += folder.all_files.all()
+        for file_obj in all_files:
             file_obj.delete()
         super(Folder, self).delete(*args, **kwargs)
 
