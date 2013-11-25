@@ -504,14 +504,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
     def move_to_clipboard(self, request, files_queryset, folders_queryset):
         """
-        Action which moves the selected files and files in selected folders
-            to clipboard.
+        Action which moves the selected files to clipboard.
         """
         if request.method != 'POST':
             return None
 
         if not has_multi_file_action_permission(
-                request, files_queryset, folders_queryset):
+                request, files_queryset,
+                Folder.objects.get_empty_query_set()):
             raise PermissionDenied
 
         clipboard = tools.get_user_clipboard(request.user)
@@ -523,18 +523,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
             files_count[0] += tools.move_file_to_clipboard(
                 request, files, clipboard)
 
-        def move_folders(folders):
-            for f in folders:
-                move_files(f.files)
-                move_folders(f.children.all())
-
         move_files(files_queryset)
-        move_folders(folders_queryset)
         if files_count[0] > 0:
             self.message_user(request,
                 _("Successfully moved %(count)d files to clipboard.") % {
                     "count": files_count[0], })
-
+        else:
+            self.message_user(request,
+                _("No files were moved to clipboard."))
         return None
 
     move_to_clipboard.short_description = ugettext_lazy(

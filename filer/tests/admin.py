@@ -806,14 +806,14 @@ class BaseTestFolderTypePermissionLayer(object):
 
         move_to_clipboard_action(self.client, None, [foo])
         self.assertEqual(
-            self._get_clipboard_files().count(), 1)
+            self._get_clipboard_files().count(), 0)
 
         file_bar = File.objects.create(
             original_filename='bar', folder=foo,
             file=dj_files.base.ContentFile('some data'))
         move_to_clipboard_action(self.client, foo, [file_bar])
         self.assertEqual(
-            self._get_clipboard_files().count(), 2)
+            self._get_clipboard_files().count(), 1)
 
         file_baz = File.objects.create(
             original_filename='baz', folder=foo,
@@ -821,7 +821,7 @@ class BaseTestFolderTypePermissionLayer(object):
         move_single_file_to_clipboard_action(
             self.client, foo, [file_baz])
         self.assertEqual(
-            self._get_clipboard_files().count(), 3)
+            self._get_clipboard_files().count(), 2)
 
     def test_move_to_clipboard_from_core_folders(self):
         foo = Folder.objects.create(name='foo',
