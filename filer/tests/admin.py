@@ -207,7 +207,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertIn('error', response.content)
 
     def test_paste_from_clipboard_no_duplicate_files(self):
-        first_folder = Folder.objects.create(name='first')
+        first_folder = Folder.objects.create(
+            name='first', site=Site.objects.get(id=1))
 
         def upload():
             file_obj = dj_files.File(open(self.filename))
@@ -755,11 +756,7 @@ class BaseTestFolderTypePermissionLayer(object):
             Folder.CORE_FOLDER, None)
 
         response, _ = move_action(
-            self.client, None, folders['foo2'], [folders['bar']])
-        assert Folder.objects.filter(parent=folders['foo2']).count() == 0
-
-        response, _ = move_action(
-            self.client, None, folders['foo2'], [folders['foo1']])
+            self.client, folders['bar'], folders['foo2'], [folders['baz1']])
         assert Folder.objects.filter(parent=folders['foo2']).count() == 0
 
     def test_move_site_folder_to_core_destination_folder(self):
@@ -767,7 +764,8 @@ class BaseTestFolderTypePermissionLayer(object):
             Folder.SITE_FOLDER, Site.objects.get(id=1))
         f1 = Folder.objects.create(
             name='destination', folder_type=Folder.CORE_FOLDER)
-        response, _ = move_action(self.client, None, f1, [folders['bar']])
+        response, _ = move_action(
+            self.client, folders['bar'], f1, [folders['baz1']])
         assert Folder.objects.filter(parent=f1).count() == 0
         f1.delete()
         return folders, files
@@ -894,6 +892,21 @@ class BaseTestFolderTypePermissionLayer(object):
             self._get_clipboard_files().count(), 0)
         self.assertEqual(len(site_folder.files), 1)
 
+    def test_message_error_move_root_folder(self):
+        site = Site.objects.get(id=1)
+        foo = Folder.objects.create(name='foo', site=site)
+        bar = Folder.objects.create(name='bar', site=site)
+        response, url = move_action(
+            self.client, None, foo, [bar], follow=True)
+        if self.user.is_superuser:
+            self.assertIn(
+                "not allowed to move root folders",
+                get_user_message(response).message)
+        else:
+            self.assertIn(
+                "No action selected.",
+                get_user_message(response).message)
+
     def test_message_error_user_no_site_on_move(self):
         site = Site.objects.get(id=1)
         foo_root = Folder.objects.create(name='foo_root')
@@ -928,7 +941,7 @@ class BaseTestFolderTypePermissionLayer(object):
         foo = Folder.objects.create(name='foo')
         bar = Folder.objects.create(name='bar', site=site)
         baz = Folder.objects.create(name='baz', site=site, parent=bar)
-        response, url = move_action(self.client, None, foo, [baz])
+        response, url = move_action(self.client, bar, foo, [baz])
         assert Folder.objects.filter(parent=foo.id).count() == 0
 
     def _test_folder_destination_filters_core_folders(self, action):
@@ -1786,6 +1799,8 @@ class TestFrozenAssetsPermissions(TestCase):
 
     def test_move_in_restricted(self):
         bar = Folder.objects.create(name='bar', site=self.site)
+        bar_subfolder = Folder.objects.create(
+            name='bar1', site=self.site, parent=bar)
         bar_file = File.objects.create(
             original_filename='bar_file',
             file=dj_files.base.ContentFile('some data'), folder=bar)
@@ -1794,7 +1809,7 @@ class TestFrozenAssetsPermissions(TestCase):
         self.assertEqual(response.status_code, 403)
 
         response, _ = move_action(
-            self.client, None, self.folders['foo'], [bar])
+            self.client, bar, self.folders['foo'], [bar_subfolder])
         assert Folder.objects.filter(parent=self.folders['foo']).count() == 0
         bar_file.folder = None
         bar_file.save()
@@ -1804,8 +1819,12 @@ class TestFrozenAssetsPermissions(TestCase):
 
     def test_move_restricted_in_dest(self):
         bar = Folder.objects.create(name='bar', site=self.site)
+        foo_subfolder = Folder.objects.create(
+            name='foo_subfolder', site=self.site)
+        foo_subfolder.parent = self.folders['foo']
+        foo_subfolder.save()
         response, _ = move_action(
-            self.client, None, bar, [self.folders['foo']])
+            self.client, self.folders['foo'], bar, [foo_subfolder])
         self.assertEqual(File.objects.filter(folder=bar).count(), 0)
 
         response, _ = move_action(
@@ -2008,9 +2027,6 @@ class TestSharedSitePermissions(TestCase):
 
     def test_move_from_shared_folder(self):
         baz = Folder.objects.create(name='baz', site=self.other_site)
-        response, _ = move_action(
-            self.client, None, baz, [self.bar])
-        self.assertEqual(Folder.objects.get(id=self.bar.id).parent, None)
         response, _ = move_action(
             self.client, self.bar, baz, [self.bar_child])
         self.assertEqual(Folder.objects.get(
