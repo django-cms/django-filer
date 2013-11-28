@@ -755,9 +755,16 @@ class FolderAdmin(FolderPermissionModelAdmin):
                                files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
+
         if not has_multi_file_action_permission(
                 request, files_queryset, folders_queryset):
             raise PermissionDenied
+
+        if folders_queryset.filter(parent=None).exists():
+            messages.error(request, "To prevent potential problems, users "
+                "are not allowed to move root folders. You may copy folders "
+                "and files.")
+            return
 
         current_folder = self._get_current_action_folder(
             request, files_queryset, folders_queryset)
@@ -777,25 +784,25 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
             # all folders need to belong to the same site as the
             #   destination site folder
-            folders_with_sites_to_move = \
+            sites_from_folders = \
                 set(folders_queryset.values_list('site_id', flat=True)) | \
                 set(files_queryset.exclude(folder__isnull=True).\
                         values_list('folder__site_id', flat=True))
 
-            if (folders_with_sites_to_move and
-                    None in folders_with_sites_to_move):
+            if (sites_from_folders and
+                    None in sites_from_folders):
                 messages.error(request, "Some of the selected files/folders "
                     "do not belong to any site. Folders need to be assigned "
                     "to a site before you can move files/folders from it.")
                 return
-            elif len(folders_with_sites_to_move) > 1:
+            elif len(sites_from_folders) > 1:
                 # it gets here if selection is made through a search view
                 messages.error(request, "You cannot move files/folders that "
                     "belong to several sites. Select files/folders that "
                     "belong to only one site.")
                 return
-            elif (folders_with_sites_to_move and
-                    folders_with_sites_to_move.pop() != destination.site.id):
+            elif (sites_from_folders and
+                    sites_from_folders.pop() != destination.site.id):
                 messages.error(request, "Selected files/folders need to "
                     "belong to the same site as the destination folder.")
                 return

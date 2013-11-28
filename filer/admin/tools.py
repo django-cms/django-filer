@@ -9,11 +9,11 @@ def is_valid_destination(request, folder):
     user = request.user
     if folder.is_readonly_for_user(user):
         return False
+    if not folder.site:
+        return False
     if user.is_superuser:
         return True
     if folder.is_restricted_for_user(request.user):
-        return False
-    if not folder.site:
         return False
     if folder.site.id in get_sites_for_user(user):
         return True
