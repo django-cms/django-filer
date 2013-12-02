@@ -151,6 +151,11 @@ class Folder(models.Model, mixins.IconsMixin):
 
     objects = FolderManager()
 
+    def __init__(self, *args, **kwargs):
+        super(Folder, self).__init__(*args, **kwargs)
+        self._old_name = self.name
+        self._old_parent_id = self.parent_id
+
     def clean(self):
 
         if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
@@ -214,6 +219,10 @@ class Folder(models.Model, mixins.IconsMixin):
                 return True
         return False
 
+    def is_affecting_file_paths(self):
+        return (self._old_name != self.name or
+                self._old_parent_id != getattr(self.parent, 'id', None))
+
     def update_descendants_metadata(self):
         """
         Folder type and restriction should be preserved
@@ -264,17 +273,18 @@ class Folder(models.Model, mixins.IconsMixin):
                 self.set_metadata_from_parent()
                 super(Folder, self).save(*args, **kwargs)
                 self.update_descendants_metadata()
-                all_files = []
-                for folder in self.get_descendants(
-                        include_self=True):
-                    all_files += folder.files
-                for f in all_files:
-                    old_location = f.file.name
-                    new_location = f.update_location_on_storage()
-                    if old_location != new_location:
-                        storages.append(f.file.storage)
-                        old_locations.append(old_location)
-                        new_locations.append(new_location)
+                if self.is_affecting_file_paths():
+                    desc_ids = list(self.get_descendants(
+                        include_self=True).values_list('id', flat=True))
+                    File = filer.models.filemodels.File
+                    all_files = File.objects.filter(id__in=desc_ids)
+                    for f in all_files:
+                        old_location = f.file.name
+                        new_location = f.update_location_on_storage()
+                        if old_location != new_location:
+                            storages.append(f.file.storage)
+                            old_locations.append(old_location)
+                            new_locations.append(new_location)
             except:
                 try:
                     transaction.rollback()
