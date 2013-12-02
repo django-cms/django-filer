@@ -277,7 +277,7 @@ class Folder(models.Model, mixins.IconsMixin):
                     desc_ids = list(self.get_descendants(
                         include_self=True).values_list('id', flat=True))
                     File = filer.models.filemodels.File
-                    all_files = File.objects.filter(id__in=desc_ids)
+                    all_files = File.objects.filter(folder_id__in=desc_ids)
                     for f in all_files:
                         old_location = f.file.name
                         new_location = f.update_location_on_storage()
