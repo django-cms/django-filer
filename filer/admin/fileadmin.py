@@ -37,12 +37,12 @@ class FileAdmin(FilePermissionModelAdmin):
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):
         fieldsets = (
             (None, {
-                'fields': ('name', 'owner', 'description',) + extra_main_fields,
+                'fields': ('title', 'owner', 'description',) + extra_main_fields,
             }),
             (_('Advanced'), {
                 # due to custom requirements: sha1 field should be hidden
                 # 'fields': ('file', 'sha1',) + extra_advanced_fields,
-                'fields': ('file', ) + extra_advanced_fields,
+                'fields': ('file', 'name',) + extra_advanced_fields,
                 'classes': ('collapse',),
                 }),
             (('Permissions'), {
