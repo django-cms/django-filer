@@ -1611,6 +1611,73 @@ class TestFolderTypeFunctionality(TestCase):
         self.assertEqual(bar.site, site)
 
 
+class TestValidationOnFileName(TestCase):
+    """
+    Test if validation errors are thrown when user tries to enter an invalid
+        file name.
+    """
+
+    def _make_file_for_each_type(self):
+        return [
+            Archive.objects.create(
+                original_filename='zippy.zip',
+                file=dj_files.base.ContentFile('zippy')),
+            Image.objects.create(
+                original_filename='image.jpg',
+                file=dj_files.base.ContentFile('image')),
+            File.objects.create(
+                original_filename='file.txt',
+                file=dj_files.base.ContentFile('file'))]
+
+    def test_name_with_slash(self):
+        files = self._make_file_for_each_type()
+        for a_file in files:
+            a_file.full_clean()
+            a_file.name = "some/name"
+            with self.assertRaisesRegexp(
+                    ValidationError, 'Slashes are not allowed'):
+                a_file.full_clean()
+
+    def test_name_without_extension(self):
+        files = self._make_file_for_each_type()
+        for a_file in files:
+            a_file.full_clean()
+            a_file.name = "some_name"
+            with self.assertRaisesRegexp(
+                    ValidationError, 'without extension is not allowed'):
+                a_file.full_clean()
+
+    def test_name_extension_change(self):
+        zip_file, image_file, plain_file = self._make_file_for_each_type()
+        err_msg1 = 'preserve.*extensions'
+        err_msg2 = 'Extension.*not allowed'
+
+        # should work for valid extensions
+        zip_file.name = 'abc.zip'
+        zip_file.full_clean()
+
+        # should allow image extensions change(ex.: from .png to .jpg)
+        for valid_ext in Image._filename_extensions:
+            image_file.name = 'abc%s' % valid_ext
+            image_file.full_clean()
+
+        # should allow extension changes that "imply" filer objects conversion
+        for ext in ['.txt', '.png', '.jpeg', '.tiff']:
+            with self.assertRaisesRegexp(ValidationError, err_msg1):
+                zip_file.name = 'abc%s' % ext
+                zip_file.full_clean()
+
+        for ext in ['.txt', '.zip', '.tiff']:
+            with self.assertRaisesRegexp(ValidationError, err_msg1):
+                image_file.name = 'abc%s' % ext
+                image_file.full_clean()
+
+        for ext in Image._filename_extensions + Archive._filename_extensions:
+            with self.assertRaisesRegexp(ValidationError, err_msg2):
+                plain_file.name = 'abc%s' % ext
+                plain_file.full_clean()
+
+
 class TestRestrictionFunctionality(TestCase):
     """
     Tests that restriction is applied correctly
