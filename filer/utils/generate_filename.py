@@ -38,7 +38,7 @@ def _construct_logical_folder_path(filer_file):
 
 def _goes_to_clipboard(instance):
     return instance.folder is None or (
-        _is_in_memory(instance.file.file) and instance.pk is None)
+        instance.pk is None and _is_in_memory(instance.file.file))
 
 
 def by_path(instance, filename):
