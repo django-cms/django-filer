@@ -34,6 +34,7 @@ class Image(File):
     }
     file_type = 'Image'
     _icon = "image"
+    _filename_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.ico']
 
     _height = models.IntegerField(null=True, blank=True)
     _width = models.IntegerField(null=True, blank=True)
@@ -41,9 +42,26 @@ class Image(File):
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
                                       editable=False)
 
-    default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
-    default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
-    default_credit = models.CharField(_('default credit'), max_length=255, blank=True, null=True)
+    default_alt_text = models.CharField(
+        _('default alt text'), max_length=255, blank=True, null=True,
+        help_text=_('Describes the essence of the image for users who have '
+                    'images turned off in their browser, or are visually '
+                    'impaired and using a screen reader; and it is used to '
+                    'identify images to search engines.'))
+    default_caption = models.CharField(
+        _('default caption'), max_length=255, blank=True, null=True,
+        help_text=_('Caption text is displayed directly below an image '
+                    'plugin to add context; there is a 140-character limit,'
+                    ' including spaces; for images fewer than 200 pixels '
+                    'wide, the caption text is only displayed on hover.'))
+    default_credit = models.CharField(
+        _('default credit text'), max_length=255, blank=True, null=True,
+        help_text=_('Credit text gives credit to the owner or licensor of '
+                    'an image; it is displayed below the image plugin, or '
+                    'below the caption text on an image plugin, if that '
+                    'option is selected; it is displayed along the bottom '
+                    'of an image in the photo gallery plugin; there is a '
+                    '30-character limit, including spaces.'))
 
     author = models.CharField(_('author'), max_length=255, null=True, blank=True)
 
@@ -61,13 +79,24 @@ class Image(File):
       # doing for me was obscuring errors...
       # --Dave Butler <croepha@gmail.com>
       iext = os.path.splitext(iname)[1].lower()
-      return iext in ['.jpg', '.jpeg', '.png', '.gif', '.ico']
+      return iext in Image._filename_extensions
 
     def clean(self):
+        if self.default_credit:
+            self.default_credit = self.default_credit.strip()
+        if self.default_alt_text:
+            self.default_alt_text = self.default_alt_text.strip()
+        if self.default_caption:
+            self.default_caption = self.default_caption.strip()
+
         if len(self.default_credit or '') > 30:
             raise ValidationError(
                 "Ensure default credit text has at most 30 characters ("
                 "%s characters found)." % len(self.default_credit))
+        if len(self.default_caption or '') > 140:
+            raise ValidationError(
+                "Ensure default caption text has at most 140 characters ("
+                "%s characters found)." % len(self.default_caption))
         super(Image, self).clean()
 
     def save(self, *args, **kwargs):

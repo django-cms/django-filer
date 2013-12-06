@@ -9,6 +9,7 @@ from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
 from filer.models.foldermodels import Folder
 from filer.utils.cms_roles import *
+from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
 import polymorphic
@@ -77,10 +78,20 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
     has_all_mandatory_data = models.BooleanField(_('has all mandatory data'), default=False, editable=False)
 
     original_filename = models.CharField(_('original filename'), max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True,
-        verbose_name=_('name'))
-    description = models.TextField(null=True, blank=True,
-        verbose_name=_('description'))
+    name = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name=_('file name'),
+        help_text=_('Change the FILE name for an image in the cloud storage'
+                    ' system; be sure to include the extension '
+                    '(.jpg or .png, for example) to ensure asset remains '
+                    'valid.'))
+    title = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name=_('name'),
+        help_text=_('Used in the Photo Gallery plugin as a title or name for'
+                    ' an image; not displayed via the image plugin.'))
+    description = models.TextField(
+        null=True, blank=True, verbose_name=_('description'),
+        help_text=_('Used in the Photo Gallery plugin as a description;'
+                    ' not displayed via the image plugin.'))
 
     owner = models.ForeignKey(auth_models.User,
         related_name='owned_%(class)ss', on_delete=models.SET_NULL,
@@ -119,8 +130,31 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         self._force_commit = False
 
     def clean(self):
-        if self.name and "/" in self.name:
-            raise ValidationError("Slashes are not allowed in filenames.")
+        if self.name:
+            self.name = self.name.strip()
+            if "/" in self.name:
+                raise ValidationError(
+                    "Slashes are not allowed in file names.")
+            extension = os.path.splitext(self.name)[1]
+            if not extension:
+                raise ValidationError(
+                    "File name without extension is not allowed.")
+
+            old_file_type = self.get_real_instance_class()
+            new_file_type = matching_file_subtypes(self.name, None, None)[0]
+
+            if not old_file_type is new_file_type:
+                supported_extensions = getattr(
+                    old_file_type, '_filename_extensions', [])
+                if supported_extensions:
+                    err_msg = "File name (%s) for this %s should preserve " \
+                              "one of the supported extensions %s" % (
+                                self.name, old_file_type.file_type.lower(),
+                                ', '.join(supported_extensions))
+                else:
+                    err_msg = "Extension %s is not allowed for this file " \
+                              "type." % (extension, )
+                raise ValidationError(err_msg)
 
         if self.folder:
             entries = self.folder.entries_with_names([self.actual_name])
