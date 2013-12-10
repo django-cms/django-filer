@@ -26,14 +26,12 @@ Dependencies
 * `django-mptt`_ >=0.5.1,<0.6
 * `easy_thumbnails`_ >= 1.0
 * `django-polymorphic`_ >=0.2
-* `PIL`_ 1.1.7 (**with JPEG and ZLIB support**) I recommend using `Pillow`_ instead.
+* `Pillow`_ >= 2.0 (**with JPEG and ZLIB support**).
 * ``django.contrib.staticfiles``
 
-Since the `PIL package on pypi <http://pypi.python.org/pypi/PIL/>`_ can be notoriously hard to install on some
-platforms it is not listed in the package dependencies in ``setup.py`` and won't
-be installed automatically. Please make sure you install `PIL`_ with JPEG and
-ZLIB support installed. I recommend `Pillow`_ a better
-packaged fork of `PIL`_).
+Please make sure you install `Pillow`_ with JPEG and  ZLIB support installed;
+for further information on Pillow installation and its binary dependencies,
+check `Pillow doc`_.
 
 Configuration
 -------------
@@ -124,8 +122,8 @@ generation errors,  two options are provided to help when working with ``django-
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
-.. _PIL: http://www.pythonware.com/products/pil/
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
+.. _Pillow doc: http://pillow.readthedocs.org/en/latest/installation.html
 .. _pip: http://pypi.python.org/pypi/pip
 .. _South: http://south.aeracode.org/
