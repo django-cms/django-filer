@@ -55,6 +55,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
 )
 
 TEMPLATE_LOADERS = (
@@ -64,6 +65,7 @@ TEMPLATE_LOADERS = (
     )
 
 CMS_TEMPLATES = [('cms_mock_template.html', 'cms_mock_template.html')]
+SEKIZAI_IGNORE_VALIDATION = True
 CMS_MODERATOR = True
 CMS_PERMISSION = True
 
