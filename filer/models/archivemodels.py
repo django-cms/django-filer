@@ -1,7 +1,8 @@
 """
 Archiving support for filer.
 """
-from filer.models.filemodels import File, Folder
+from filer.models.filemodels import File
+from filer.models.foldermodels import Folder
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
 from django.db.models import Q
