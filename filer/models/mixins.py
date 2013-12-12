@@ -1,5 +1,8 @@
 #-*- coding: utf-8 -*-
 from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_STATICMEDIA_PREFIX
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from datetime import datetime
 
 
 class IconsMixin(object):
@@ -15,3 +18,30 @@ class IconsMixin(object):
                 r[size] = "%sicons/%s_%sx%s.png" % (
                             FILER_STATICMEDIA_PREFIX, self._icon, size, size)
         return r
+
+
+class TrashableMixin(models.Model):
+
+    deleted_at = models.DateTimeField(
+        _('deleted at'), editable=False, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+    def soft_delete(self):
+        raise NotImplementedError
+
+    def hard_delete(self):
+        raise NotImplementedError
+
+    def delete_restorable(self, *args, **kwargs):
+        move_to_trash = kwargs.get('move_to_trash', True)
+        if not self.deleted_at and move_to_trash:
+            self.soft_delete()
+        else:
+            self.hard_delete()
+
+    def restore(self, commit=True):
+        self.deleted_at = None
+        if commit:
+            self.save()

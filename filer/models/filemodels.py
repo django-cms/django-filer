@@ -7,19 +7,18 @@ from django.db import (models, IntegrityError, transaction)
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
-from filer.models.foldermodels import Folder
 from filer.utils.cms_roles import *
 from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
-import polymorphic
-import hashlib
-import os
+from datetime import datetime
+import polymorphic, hashlib, os, filer
 
 
 class FilesChainableQuerySet(object):
 
     def readonly(self, user):
+        Folder = filer.models.foldermodels.Folder
         return self.filter(folder__folder_type=Folder.CORE_FOLDER)
 
     def find_duplicates(self, file_obj):
@@ -56,6 +55,12 @@ class FileManager(polymorphic.PolymorphicManager):
     def get_query_set(self):
         return FileQuerySet(self.model, using=self._db)
 
+    def alive(self):
+        return self.get_query_set().filter(deleted_at__isnull=True)
+
+    def in_trash(self):
+        return self.get_query_set().filter(deleted_at__isnull=False)
+
     def get_empty_query_set(self):
         return EmptyFilesQS(self.model, using=self._db)
 
@@ -65,10 +70,13 @@ class FileManager(polymorphic.PolymorphicManager):
                     count=Count('id')).filter(count__gt=1)}
 
 
-class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
+class File(mixins.TrashableMixin,
+           polymorphic.PolymorphicModel,
+           mixins.IconsMixin):
+
     file_type = 'File'
     _icon = "file"
-    folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
+    folder = models.ForeignKey('filer.Folder', verbose_name=_('folder'), related_name='all_files',
         null=True, blank=True)
     file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=255)
     _file_size = models.IntegerField(_('file size'), null=True, blank=True)
@@ -320,13 +328,20 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             copy_and_save()
         return new_location
 
-    def delete(self, *args, **kwargs):
+    def soft_delete(self):
+        self.deleted_at = datetime.now()
+        self.save()
+
+    def hard_delete(self):
         # Delete the model before the file
-        super(File, self).delete(*args, **kwargs)
+        super(File, self).delete()
         # Delete the file if there are no other Files referencing it.
         if not File.objects.filter(file=self.file.name,
                                    is_public=self.is_public).exists():
             self.file.delete(False)
+
+    def delete(self, *args, **kwargs):
+        super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
     @property

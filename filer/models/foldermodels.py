@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-import itertools
 from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
@@ -9,11 +8,11 @@ from django.db.models import (query, Q, signals)
 from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-import filer.models.clipboardmodels
 from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
-import mptt
+from datetime import datetime
+import mptt, itertools, filer
 
 
 class FoldersChainableQuerySet(object):
@@ -81,13 +80,19 @@ class FolderManager(models.Manager):
     def get_query_set(self):
         return FolderQueryset(self.model, using=self._db)
 
+    def alive(self):
+        return self.get_query_set().filter(deleted_at__isnull=True)
+
+    def in_trash(self):
+        return self.get_query_set().filter(deleted_at__isnull=False)
+
     def __getattr__(self, name):
         if name.startswith('__'):
             return super(FolderManager, self).__getattr__(self, name)
         return getattr(self.get_query_set(), name)
 
 
-class Folder(models.Model, mixins.IconsMixin):
+class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -295,17 +300,31 @@ class Folder(models.Model, mixins.IconsMixin):
                 transaction.commit()
                 delete_from_locations(old_locations, storages)
 
-    def delete(self, *args, **kwargs):
+    def soft_delete(self):
+        deleted_at = datetime.now()
+        desc_ids = self.get_descendants(
+            include_self=True).values_list('id', flat=True)
+        File = filer.models.filemodels.File
+        File.objects.filter(id__in=desc_ids).update(deleted_at=deleted_at)
+        Folder.objects.filter(id__in=desc_ids).update(deleted_at=deleted_at)
+        self.deleted_at = deleted_at
+
+    def hard_delete(self):
         # This would happen automatically by ways of the delete
         #       cascade, but then the individual .delete() methods
         #       won't be called and the files won't be deleted
         #       from the filesystem.
-        all_files = []
-        for folder in self.get_descendants(include_self=True):
-            all_files += folder.all_files.all()
-        for file_obj in all_files:
-            file_obj.delete()
-        super(Folder, self).delete(*args, **kwargs)
+        desc_ids = self.get_descendants(
+            include_self=True).values_list('id', flat=True)
+        File = filer.models.filemodels.File
+        for file_obj in File.objects.filter(id__in=desc_ids):
+            file_obj.hard_delete()
+        super(Folder, self).delete()
+
+    def delete(self, *args, **kwargs):
+        super(Folder, self).delete_restorable(*args, **kwargs)
+    delete.alters_data = True
+
 
     @property
     def file_count(self):
