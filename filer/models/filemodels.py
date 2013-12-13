@@ -15,7 +15,7 @@ from datetime import datetime
 import polymorphic, hashlib, os, filer
 
 
-class FilesChainableQuerySet(object):
+class FilesChainableQuerySet(mixins.TrashableQuerysetMixin):
 
     def readonly(self, user):
         Folder = filer.models.foldermodels.Folder
@@ -54,12 +54,6 @@ class FileManager(polymorphic.PolymorphicManager):
 
     def get_query_set(self):
         return FileQuerySet(self.model, using=self._db)
-
-    def alive(self):
-        return self.get_query_set().filter(deleted_at__isnull=True)
-
-    def in_trash(self):
-        return self.get_query_set().filter(deleted_at__isnull=False)
 
     def get_empty_query_set(self):
         return EmptyFilesQS(self.model, using=self._db)

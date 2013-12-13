@@ -15,7 +15,7 @@ from datetime import datetime
 import mptt, itertools, filer
 
 
-class FoldersChainableQuerySet(object):
+class FoldersChainableQuerySet(mixins.TrashableQuerysetMixin):
 
     def with_bad_metadata(self):
         return self.filter(has_all_mandatory_data=False)
@@ -79,12 +79,6 @@ class FolderManager(models.Manager):
 
     def get_query_set(self):
         return FolderQueryset(self.model, using=self._db)
-
-    def alive(self):
-        return self.get_query_set().filter(deleted_at__isnull=True)
-
-    def in_trash(self):
-        return self.get_query_set().filter(deleted_at__isnull=False)
 
     def __getattr__(self, name):
         if name.startswith('__'):
@@ -305,7 +299,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         desc_ids = self.get_descendants(
             include_self=True).values_list('id', flat=True)
         File = filer.models.filemodels.File
-        File.objects.filter(id__in=desc_ids).update(deleted_at=deleted_at)
+        File.objects.filter(folder__in=desc_ids).update(deleted_at=deleted_at)
         Folder.objects.filter(id__in=desc_ids).update(deleted_at=deleted_at)
         self.deleted_at = deleted_at
 
@@ -317,7 +311,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         desc_ids = self.get_descendants(
             include_self=True).values_list('id', flat=True)
         File = filer.models.filemodels.File
-        for file_obj in File.objects.filter(id__in=desc_ids):
+        for file_obj in File.objects.filter(folder__in=desc_ids):
             file_obj.hard_delete()
         super(Folder, self).delete()
 

@@ -28,7 +28,7 @@ class BaseServerBackendTestCase(TestCase):
             original_filename=original_filename)
 
     def tearDown(self):
-        self.filer_file.delete()
+        self.filer_file.delete(to_trash=False)
 
 class DefaultServerTestCase(BaseServerBackendTestCase):
     def test_normal(self):

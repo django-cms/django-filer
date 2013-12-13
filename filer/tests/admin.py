@@ -165,7 +165,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():
-            img.delete()
+            img.delete(to_trash=False)
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
@@ -286,9 +286,9 @@ class BulkOperationsMixin(object):
         self.client.logout()
         os.remove(self.filename)
         for f in File.objects.all():
-            f.delete()
+            f.delete(to_trash=False)
         for folder in Folder.objects.all():
-            folder.delete()
+            folder.delete(to_trash=False)
 
     def create_src_and_dst_folders(self):
         site = Site.objects.get(id=1)
@@ -483,9 +483,10 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
 class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 
     def test_delete_files_or_folders_action(self):
-        self.assertNotEqual(File.objects.count(), 0)
-        self.assertNotEqual(Image.objects.count(), 0)
-        self.assertNotEqual(Folder.objects.count(), 0)
+        file_count = File.objects.count()
+        folder_count = Folder.objects.count()
+        self.assertNotEqual(file_count, 0)
+        self.assertNotEqual(folder_count, 0)
         url = get_dir_listing_url(None)
         folders = []
         for folder in FolderRoot().children.all():
@@ -495,8 +496,10 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: folders,
         })
-        self.assertEqual(File.objects.count(), 0)
-        self.assertEqual(Folder.objects.count(), 0)
+        self.assertEqual(File.objects.alive().count(), 0)
+        self.assertEqual(File.objects.trash().count(), file_count)
+        self.assertEqual(Folder.objects.alive().count(), 0)
+        self.assertEqual(Folder.objects.trash().count(), folder_count)
 
     def test_delete_files_or_folders_action_with_mixed_types(self):
         # add more files/images so we can test the polymorphic queryset
@@ -504,21 +507,24 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         self.create_file(folder=self.src_folder)
         self.create_image(folder=self.src_folder)
         self.create_file(folder=self.src_folder)
+        qs = File.objects.filter(
+            folder__in=[self.folder.id, self.sub_folder1.id])
+        file_count = qs.count()
 
-        self.assertNotEqual(File.objects.count(), 0)
-        self.assertNotEqual(Image.objects.count(), 0)
         url = get_dir_listing_url(self.folder)
-        folders = []
-        for f in File.objects.filter(folder=self.folder):
-            folders.append('file-%d' % (f.id,))
-        folders.append('folder-%d' % self.sub_folder1.id)
+        items_to_delete = []
+        for f in File.objects.alive().filter(folder=self.folder):
+            items_to_delete.append('file-%d' % (f.id,))
+        items_to_delete.append('folder-%d' % self.sub_folder1.id)
         response = self.client.post(url, {
             'action': 'delete_files_or_folders',
             'post': 'yes',
-            helpers.ACTION_CHECKBOX_NAME: folders,
+            helpers.ACTION_CHECKBOX_NAME: items_to_delete,
             })
-        self.assertEqual(File.objects.filter(
-            folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
+
+        alive_files = qs.alive().count()
+        self.assertEqual(alive_files, 0)
+        self.assertEqual(qs.trash().count(), file_count - alive_files)
 
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
@@ -618,7 +624,7 @@ class BaseTestFolderTypePermissionLayer(object):
             reverse('admin:filer_folder_delete', args=(f2.pk, )),
             {'post': ['yes']})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Folder.objects.filter(id=f2.id).count(), 0)
+        self.assertEqual(Folder.objects.alive().filter(id=f2.id).count(), 0)
 
         response = self.client.post(get_dir_listing_url(f1), {
                 'action': 'delete_files_or_folders',
@@ -626,7 +632,7 @@ class BaseTestFolderTypePermissionLayer(object):
                 helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f3.id],
         })
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Folder.objects.filter(id=f3.id).count(), 0)
+        self.assertEqual(Folder.objects.alive().filter(id=f3.id).count(), 0)
 
     def test_delete_child_core_folder(self):
         f1 = Folder.objects.create(name='foo', folder_type=Folder.CORE_FOLDER)
@@ -715,7 +721,7 @@ class BaseTestFolderTypePermissionLayer(object):
         response = self.client.post(
             reverse('admin:filer_folder_delete', args=(f1.pk, )),
             {'post': 'yes'})
-        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
+        self.assertEqual(Folder.objects.alive().filter(id=f1.id).count(), 0)
         f1 = Folder.objects.create(
             name='foo', folder_type=Folder.SITE_FOLDER,
             site=Site.objects.get(id=1))
@@ -725,7 +731,7 @@ class BaseTestFolderTypePermissionLayer(object):
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
         })
-        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 0)
+        self.assertEqual(Folder.objects.alive().filter(id=f1.id).count(), 0)
 
     def _build_some_folder_structure(self, folder_type, site):
         _folders, _files = {}, {}
@@ -767,7 +773,7 @@ class BaseTestFolderTypePermissionLayer(object):
         response, _ = move_action(
             self.client, folders['bar'], f1, [folders['baz1']])
         assert Folder.objects.filter(parent=f1).count() == 0
-        f1.delete()
+        f1.delete(to_trash=False)
         return folders, files
 
     def _get_clipboard_files(self):
@@ -1171,7 +1177,7 @@ class TestFolderTypePermissionLayerForRegularUser(
         response = self.client.post(
             reverse('admin:filer_folder_delete', args=(f1.pk, )),
             {'post': 'yes'})
-        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+        self.assertEqual(Folder.objects.alive().filter(id=f1.id).count(), 1)
 
         response = self.client.post(
             get_dir_listing_url(None), {
@@ -1179,7 +1185,7 @@ class TestFolderTypePermissionLayerForRegularUser(
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % f1.id],
         })
-        self.assertEqual(Folder.objects.filter(id=f1.id).count(), 1)
+        self.assertEqual(Folder.objects.alive().filter(id=f1.id).count(), 1)
 
     def test_message_error_user_no_site_on_move_for_site_admins(self):
         self._make_user_site_admin()

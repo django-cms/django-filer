@@ -42,7 +42,7 @@ class FilerApiTests(TestCase):
         self.client.logout()
         os.remove(self.filename)
         for f in File.objects.all():
-            f.delete()
+            f.delete(to_trash=False)
 
     def create_filer_image(self):
         file_obj= DjangoFile(open(self.filename), name=self.image_name)
@@ -61,7 +61,7 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertEqual(Image.objects.count(), 1)
         image = Image.objects.all()[0]
-        image.delete()
+        image.delete(to_trash=False)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_upload_image_form(self):
@@ -170,7 +170,7 @@ class FilerApiTests(TestCase):
         file_1.save()
         self.assertTrue(file_1.file.storage.exists(file_1.file.name))
         storage, name = file_1.file.storage, file_1.file.name
-        folder.delete()
+        folder.delete(to_trash=False)
         self.assertFalse(storage.exists(name))
 
     def test_bulk_deleting_folder_deletes_all_files_from_filesystem(self):
@@ -186,6 +186,9 @@ class FilerApiTests(TestCase):
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: filer_obj_as_checkox(folder),
         })
+
+        self.assertTrue(storage.exists(name))
+        folder.delete(to_trash=False)
         self.assertFalse(storage.exists(name))
 
     def test_deleting_image_deletes_file_from_filesystem(self):
@@ -202,7 +205,7 @@ class FilerApiTests(TestCase):
         storage, name = file_1.file.storage, file_1.file.name
 
         # delete the file
-        file_1.delete()
+        file_1.delete(to_trash=False)
 
         # file should be gone
         self.assertFalse(storage.exists(name))
@@ -225,7 +228,7 @@ class FilerApiTests(TestCase):
         storage, name = file_1.file.storage, file_1.file.name
 
         # delete one file
-        file_1.delete()
+        file_1.delete(to_trash=False)
 
         # file should still be here
         self.assertTrue(storage.exists(name))

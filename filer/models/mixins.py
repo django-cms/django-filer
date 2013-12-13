@@ -21,6 +21,11 @@ class IconsMixin(object):
 
 
 class TrashableMixin(models.Model):
+    """
+        Abstract model that makes a regular django model restorable.
+        This mixin needs to be placed first in the list of inherited classes
+            in order to overwrite the delete method as it should.
+    """
 
     deleted_at = models.DateTimeField(
         _('deleted at'), editable=False, blank=True, null=True)
@@ -35,8 +40,8 @@ class TrashableMixin(models.Model):
         raise NotImplementedError
 
     def delete_restorable(self, *args, **kwargs):
-        move_to_trash = kwargs.get('move_to_trash', True)
-        if not self.deleted_at and move_to_trash:
+        to_trash = kwargs.get('to_trash', True)
+        if not self.deleted_at and to_trash:
             self.soft_delete()
         else:
             self.hard_delete()
@@ -45,3 +50,13 @@ class TrashableMixin(models.Model):
         self.deleted_at = None
         if commit:
             self.save()
+
+
+class TrashableQuerysetMixin(object):
+
+    def alive(self):
+        return self.filter(deleted_at__isnull=True)
+
+    def trash(self):
+        return self.filter(deleted_at__isnull=False)
+
