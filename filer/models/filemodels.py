@@ -15,7 +15,7 @@ from datetime import datetime
 import polymorphic, hashlib, os, filer
 
 
-class FilesChainableQuerySet(mixins.TrashableQuerysetMixin):
+class FilesChainableQuerySetMixin(object):
 
     def readonly(self, user):
         Folder = filer.models.foldermodels.Folder
@@ -41,12 +41,13 @@ class FilesChainableQuerySet(mixins.TrashableQuerysetMixin):
             folder__site__in=sites)
 
 
-class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
+class EmptyFilesQS(models.query.EmptyQuerySet,
+                   FilesChainableQuerySetMixin):
     pass
 
 
 class FileQuerySet(polymorphic.query.PolymorphicQuerySet,
-                   FilesChainableQuerySet):
+                   FilesChainableQuerySetMixin):
     pass
 
 
@@ -60,8 +61,22 @@ class FileManager(polymorphic.PolymorphicManager):
 
     def find_all_duplicates(self):
         return {file_data['sha1']: file_data['count']
-                for file_data in File.objects.values('sha1').annotate(
+                for file_data in self.get_query_set().values('sha1').annotate(
                     count=Count('id')).filter(count__gt=1)}
+
+
+class AliveFileManager(FileManager):
+
+    def get_query_set(self):
+        return FileQuerySet(self.model, using=self._db).filter(
+            deleted_at__isnull=True)
+
+
+class TrashFileManager(FileManager):
+
+    def get_query_set(self):
+        return FileQuerySet(self.model, using=self._db).filter(
+            deleted_at__isnull=False)
 
 
 class File(mixins.TrashableMixin,
@@ -118,7 +133,9 @@ class File(mixins.TrashableMixin,
                     'snippet but will not be able to delete or '
                     'modify the current version of the asset.'))
 
-    objects = FileManager()
+    objects = AliveFileManager()
+    trash = TrashFileManager()
+    all_objects = FileManager()
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):

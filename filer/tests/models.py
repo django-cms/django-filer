@@ -41,7 +41,7 @@ class FilerApiTests(TestCase):
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
-        for f in File.objects.all():
+        for f in File.all_objects.all():
             f.delete(to_trash=False)
 
     def create_filer_image(self):
@@ -168,17 +168,16 @@ class FilerApiTests(TestCase):
         file_1 = self.create_filer_image()
         file_1.folder = folder
         file_1.save()
-        self.assertTrue(file_1.file.storage.exists(file_1.file.name))
         storage, name = file_1.file.storage, file_1.file.name
+        self.assertTrue(storage.exists(name))
         folder.delete(to_trash=False)
         self.assertFalse(storage.exists(name))
 
     def test_bulk_deleting_folder_deletes_all_files_from_filesystem(self):
-        folder = Folder.objects.create(name='to_delete')
+        folder = Folder.objects.create(name='to_delete2')
         file_1 = self.create_filer_image()
         file_1.folder = folder
         file_1.save()
-        self.assertTrue(file_1.file.storage.exists(file_1.file.name))
         storage, name = file_1.file.storage, file_1.file.name
 
         response = self.client.post(get_dir_listing_url(None), {

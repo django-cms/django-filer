@@ -36,7 +36,7 @@ class TreeChecker(object):
             self._get_parents_names(folder.parent, names)
 
     def _get_folder_path(self, pk):
-        folder = Folder.objects.get(pk=pk)
+        folder = Folder._tree_manager.get(pk=pk)
         names = []
         self._get_parents_names(folder, names)
         return '/'.join(names)
@@ -44,10 +44,10 @@ class TreeChecker(object):
     def get_corrupted_root_nodes(self):
         if not self.corruption_check_done:
             self.check_corruptions()
-        corrupted_trees = Folder.objects.filter(
+        corrupted_trees = Folder._tree_manager.filter(
             pk__in=self.corrupted_folders.keys()).\
             values_list('tree_id', flat=True).distinct()
-        return Folder.objects.filter(
+        return Folder._tree_manager.filter(
             parent__isnull=True, tree_id__in=corrupted_trees)
 
     def check_tree(self, pk, lft, tree_id, level=0):
@@ -56,13 +56,13 @@ class TreeChecker(object):
             * uses the same logic as django-mptt's rebuild tree
         """
         rght = lft + 1
-        child_ids = Folder.objects.filter(parent__pk=pk).\
+        child_ids = Folder._tree_manager.filter(parent__pk=pk).\
             order_by(*self.ordering).values_list('pk', flat=True)
 
         for child_id in child_ids:
             rght = self.check_tree(child_id, rght, tree_id, level + 1)
 
-        folder = Folder.objects.get(pk=pk)
+        folder = Folder._tree_manager.get(pk=pk)
         expected = (lft, rght, level, tree_id)
         actual = (folder.lft, folder.rght, folder.level, folder.tree_id)
         if expected != actual:
@@ -77,7 +77,7 @@ class TreeChecker(object):
             * checks if there are multiple root folders with the
         same tree id(fixing this will require a full rebuild)
         """
-        tree_duplicates = Folder.objects.filter(parent=None).\
+        tree_duplicates = Folder._tree_manager.filter(parent=None).\
             values_list('tree_id').\
             annotate(count=Count('id')).filter(count__gt=1)
         if len(tree_duplicates) > 0:
@@ -85,12 +85,12 @@ class TreeChecker(object):
             self.corruption_check_done = True
             return
 
-        pks = Folder.objects.filter(parent=None).\
+        pks = Folder._tree_manager.filter(parent=None).\
             order_by(*self.ordering).values_list('pk', flat=True)
         idx = 0
         for pk in pks:
             idx += 1
-            self.check_tree(pk, 1, Folder.objects.get(pk=pk).tree_id)
+            self.check_tree(pk, 1, Folder._tree_manager.get(pk=pk).tree_id)
 
         self.corruption_check_done = True
 

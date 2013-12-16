@@ -33,6 +33,9 @@ class TrashableMixin(models.Model):
     class Meta:
         abstract = True
 
+    def is_in_trash(self):
+        return self.deleted_at is not None
+
     def soft_delete(self):
         raise NotImplementedError
 
@@ -50,13 +53,3 @@ class TrashableMixin(models.Model):
         self.deleted_at = None
         if commit:
             self.save()
-
-
-class TrashableQuerysetMixin(object):
-
-    def alive(self):
-        return self.filter(deleted_at__isnull=True)
-
-    def trash(self):
-        return self.filter(deleted_at__isnull=False)
-
