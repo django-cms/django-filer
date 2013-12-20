@@ -10,7 +10,6 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from filer.utils.compatibility import truncate_words
-from filer.models import File
 from filer import settings as filer_settings
 
 import logging
@@ -20,6 +19,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
     def render(self, name, value, attrs=None):
+        from filer.models import File
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
@@ -108,9 +108,6 @@ class AdminFileFormField(forms.ModelChoiceField):
 
 
 class FilerFileField(models.ForeignKey):
-    default_form_class = AdminFileFormField
-    default_model_class = File
-
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
         if "to" in kwargs.keys():  # pragma: no cover
@@ -131,11 +128,18 @@ class FilerFileField(models.ForeignKey):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
         defaults = {
-            'form_class': self.default_form_class,
+            'form_class': self.get_default_form_class(),
             'rel': self.rel,
         }
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)
+
+    def get_default_form_class(self):
+        return AdminFileFormField
+
+    def get_default_model_class(self):
+        from filer.models import File
+        return File
 
     def south_field_triple(self):
         "Returns a suitable description of this field for South."
@@ -144,4 +148,4 @@ class FilerFileField(models.ForeignKey):
         field_class = "django.db.models.fields.related.ForeignKey"
         args, kwargs = introspector(self)
         # That's our definition!
-        return (field_class, args, kwargs)
+        return field_class, args, kwargs

@@ -1,13 +1,14 @@
 #-*- coding: utf-8 -*-
 from django import forms
+from django.contrib import admin
 from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import File
 from filer.utils.compatibility import DJANGO_1_5
+from filer.models import File, Permission
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
@@ -18,12 +19,20 @@ class FileAdminChangeFrom(forms.ModelForm):
         exclude = ()
 
 
+class PermissionInlineAdmin(admin.TabularInline):
+    model = Permission
+    extra = 0
+    fields = ('who', 'user', 'group', 'can_read', 'can_edit')
+    raw_id_fields = ('user', 'group',)
+
+
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('label',)
     list_per_page = 10
     search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
     readonly_fields = ('sha1',)
+    inlines = (PermissionInlineAdmin,)
 
     # save_as hack, because without save_as it is impossible to hide the
     # save_and_add_another if save_as is False. To show only save_and_continue

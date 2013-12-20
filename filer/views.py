@@ -93,8 +93,8 @@ def make_folder(request, folder_id=None):
         # regular users may not add root folders unless configured otherwise
         if not filer_settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS:
             raise PermissionDenied
-    elif not folder.has_add_children_permission(request):
-        # the user does not have the permission to add subfolders
+    elif not folder.can_edit(request.user):
+        # the user does not have the permission to add/edit subfolders
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -138,7 +138,7 @@ def paste_clipboard_to_folder(request):
     if request.method == 'POST':
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
-        if folder.has_add_children_permission(request):
+        if folder.can_edit(request.user):
             tools.move_files_from_clipboard_to_folder(clipboard, folder)
             tools.discard_clipboard(clipboard)
         else:
