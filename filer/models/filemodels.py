@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
+from filer.fields.permission_set import PermissionSetField
 from filer.models import mixins
 from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
@@ -26,8 +27,23 @@ class FileManager(PolymorphicManager):
     def find_duplicates(self, file_obj):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
 
+    def can(self, user, perm):
+        from filer.models.permissionmodels import filter_queryset_by_permissions_for_user
+        return filter_queryset_by_permissions_for_user(self.all(), user, perm)
 
-class File(PolymorphicModel, mixins.IconsMixin):
+    def can_edit(self, user):
+        return self.can(user, 'edit')
+
+    def can_read(self, user):
+        return self.can(user, 'read')
+
+
+class File(PolymorphicModel, mixins.IconsMixin, mixins.PermissionRefreshMixin):
+    WHO_CAN_CHOICES = (
+        ('everyone', 'Anonymous Users'),
+        ('authenticated', 'All Authenticated (logged in) Users'),
+        ('staff', 'All Staff Users'),
+    )
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
@@ -58,6 +74,14 @@ class File(PolymorphicModel, mixins.IconsMixin):
         help_text=_('Disable any permission checking for this ' +\
                     'file. File will be publicly accessible ' +\
                     'to anyone.'))
+
+    who_can_read_local = PermissionSetField()
+    who_can_edit_local = PermissionSetField()
+
+    # de-normalised permission data (for performance)
+    who_can_read = PermissionSetField()
+    who_can_edit = PermissionSetField()
+
 
     objects = FileManager()
 
@@ -129,6 +153,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def save(self, *args, **kwargs):
         # check if this is a subclass of "File" or not and set
         # _file_type_plugin_name
+        refresh_metadata = kwargs.pop('refresh_metadata', True)
         if self.__class__ == File:
             # what should we do now?
             # maybe this has a subclass, but is being saved as a File instance
@@ -137,21 +162,23 @@ class File(PolymorphicModel, mixins.IconsMixin):
         elif issubclass(self.__class__, File):
             self._file_type_plugin_name = self.__class__.__name__
         # cache the file size
-        # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
-        try:
-            self._file_size = self.file.size
-        except:
-            pass
+        if refresh_metadata:
+            try:
+                self._file_size = self.file.size
+            except:
+                pass
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
-        # generate SHA1 hash
-        # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
-        try:
-            self.generate_sha1()
-        except Exception, e:
-            pass
-        super(File, self).save(*args, **kwargs)
+        if refresh_metadata:
+            # generate SHA1 hash
+            try:
+                self.generate_sha1()
+            except Exception, e:
+                pass
+        if kwargs.pop('refresh_aggregated_permissions', True):
+            self.refresh_aggregated_permissions(save=False, recursively=False)
+        return super(File, self).save(*args, **kwargs)
     save.alters_data = True
 
     def delete(self, *args, **kwargs):
@@ -174,31 +201,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def __lt__(self, other):
         return cmp(self.label.lower(), other.label.lower()) < 0
 
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
+    def can_edit(self, user):
+        return self.who_can_edit.check(user)
 
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
-        """
-        user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
+    def can_read(self, user):
+        return self.who_can_read.check(user)
 
     def __unicode__(self):
         if self.name in ('', None):
@@ -280,6 +287,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
     @property
     def duplicates(self):
         return File.objects.find_duplicates(self)
+
+    @property
+    def parent(self):
+        return self.folder
 
     class Meta:
         app_label = 'filer'

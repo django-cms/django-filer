@@ -72,35 +72,38 @@ class Image(File):
       return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
     def save(self, *args, **kwargs):
-        if self.date_taken is None:
+        # FIXME: use signal
+        refresh_metadata = kwargs.get('refresh_metadata', True)
+        if refresh_metadata:
+            if self.date_taken is None:
+                try:
+                    exif_date = self.exif.get('DateTimeOriginal', None)
+                    if exif_date is not None:
+                        d, t = exif_date.split(" ")
+                        year, month, day = d.split(':')
+                        hour, minute, second = t.split(':')
+                        if getattr(settings, "USE_TZ", False):
+                            tz = get_current_timezone()
+                            self.date_taken = make_aware(datetime(
+                                int(year), int(month), int(day),
+                                int(hour), int(minute), int(second)), tz)
+                        else:
+                            self.date_taken = datetime(
+                                int(year), int(month), int(day),
+                                int(hour), int(minute), int(second))
+                except Exception, e:  # FIXME: to broad exception
+                    pass
+            if self.date_taken is None:
+                self.date_taken = now()
+            self.has_all_mandatory_data = self._check_validity()
             try:
-                exif_date = self.exif.get('DateTimeOriginal', None)
-                if exif_date is not None:
-                    d, t = exif_date.split(" ")
-                    year, month, day = d.split(':')
-                    hour, minute, second = t.split(':')
-                    if getattr(settings, "USE_TZ", False):
-                        tz = get_current_timezone()
-                        self.date_taken = make_aware(datetime(
-                            int(year), int(month), int(day),
-                            int(hour), int(minute), int(second)), tz)
-                    else:
-                        self.date_taken = datetime(
-                            int(year), int(month), int(day),
-                            int(hour), int(minute), int(second))
-            except Exception, e:
+                # do this more efficient somehow?
+                self.file.seek(0)
+                self._width, self._height = PILImage.open(self.file).size
+            except Exception:  # FIXME: to broad exception
+                # probably the image is missing. nevermind.
                 pass
-        if self.date_taken is None:
-            self.date_taken = now()
-        self.has_all_mandatory_data = self._check_validity()
-        try:
-            # do this more efficient somehow?
-            self.file.seek(0)
-            self._width, self._height = PILImage.open(self.file).size
-        except Exception:
-            # probably the image is missing. nevermind.
-            pass
-        super(Image, self).save(*args, **kwargs)
+        return super(Image, self).save(*args, **kwargs)
 
     def _check_validity(self):
         if not self.name:
@@ -123,32 +126,6 @@ class Image(File):
                 self._exif_cache = {}
         return self._exif_cache
     exif = property(_get_exif)
-
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
-        """
-        user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
 
     @property
     def label(self):

@@ -5,14 +5,17 @@ from django.core.urlresolvers import reverse
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
-        # we don't have a "add" permission... but all adding is handled
+        # We check permissions here instead of the default django implementation.
+        # Otherwise we'd have to create a custom auth backend to make it work.
+        # We don't have a "add" permission... but all adding is handled
         # by special methods that go around these permissions anyway
-        # TODO: reactivate return False
         return False
 
     def has_change_permission(self, request, obj=None):
-        if hasattr(obj, 'has_edit_permission'):
-            if obj.has_edit_permission(request):
+        # We check permissions here instead of the default django implementation.
+        # Otherwise we'd have to create a custom auth backend to make it work.
+        if hasattr(obj, 'can_edit'):
+            if obj.can_edit(request.user):
                 return True
             else:
                 return False

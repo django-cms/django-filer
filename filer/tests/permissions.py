@@ -52,6 +52,9 @@ class FolderPermissionsTestCase(TestCase):
 
         self.folder_perm = Folder.objects.create(name='test_folder2')
 
+        self.subfolder = Folder.objects.create(name='test_subfolder', parent=self.folder_perm)
+        self.subsubfolder = Folder.objects.create(name='test_subsubfolder', parent=self.subfolder)
+
     def tearDown(self):
         self.image.delete()
 
@@ -104,6 +107,8 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder.has_read_permission(request2), False)
             self.assertEqual(self.folder_perm.has_read_permission(request1), False)
             self.assertEqual(self.folder_perm.has_read_permission(request2), False)
+            self.assertEqual(self.subsubfolder.has_read_permission(request1), False)
+            self.assertEqual(self.subsubfolder.has_read_permission(request2), False)
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
@@ -120,6 +125,8 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder.has_read_permission(request2), False)
             self.assertEqual(self.folder_perm.has_read_permission(request1), False)
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.subsubfolder.has_read_permission(request1), False)
+            self.assertEqual(self.subsubfolder.has_read_permission(request2), True)
 
             self.test_user1.groups.add(self.group2)
             self.test_user2.groups.add(self.group1)
@@ -132,6 +139,8 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder.has_read_permission(request2), True)
             self.assertEqual(self.folder_perm.has_read_permission(request1), True)
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.subsubfolder.has_read_permission(request1), True)
+            self.assertEqual(self.subsubfolder.has_read_permission(request2), True)
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
