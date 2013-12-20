@@ -98,6 +98,8 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
             return self.thumbnail_options['private'].get('base_dir', '')
 
     def _get_url(self):
+        if self.instance.is_in_trash():
+            return ''
         url = super(MultiStorageFieldFile, self)._get_url()
         return get_cdn_url(self.instance, url)
     url = property(_get_url)
@@ -107,8 +109,16 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         super(MultiStorageFieldFile, self).save(name, content, save)
 
     def get_thumbnail(self, opts, save=True, generate=None):
+        if self.instance.is_in_trash():
+            return None
         thumbnail = super(MultiStorageFieldFile, self).get_thumbnail(opts, save, generate)
         return CdnAwareThumbnailFile(thumbnail, self.instance)
+
+    def get_thumbnails(self, *args, **kwargs):
+        if self.instance.is_in_trash():
+            return []
+        return super(MultiStorageFieldFile, self).get_thumbnails(
+            *args, **kwargs)
 
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):

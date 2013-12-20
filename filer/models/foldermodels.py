@@ -93,6 +93,7 @@ class FolderManager(models.Manager):
 
 
 class AliveFolderManager(FolderManager):
+    use_for_related_fields = True
 
     def get_query_set(self):
         return FolderQueryset(self.model, using=self._db).filter(
@@ -301,8 +302,8 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
                     desc_ids = list(self.get_descendants(
                         include_self=True).values_list('id', flat=True))
                     # update location only for alive files
-                    file_mgr = filer.models.filemodels.File.all_objects
-                    all_files = file_mgr.filter(folder_id__in=desc_ids)
+                    file_mgr = filer.models.filemodels.File.objects
+                    all_files = file_mgr.filter(folder__in=desc_ids)
                     for f in all_files:
                         old_location = f.file.name
                         new_location = f.update_location_on_storage()
@@ -321,23 +322,26 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
                 delete_from_locations(old_locations, storages)
 
     def soft_delete(self):
-        deleted_at = datetime.now()
-        desc_ids = self.get_descendants(
-            include_self=True).values_list('id', flat=True)
-        # get manager for either trashed or alive files
-        file_mgr = filer.models.filemodels.File.all_objects
-        file_mgr.filter(folder__in=desc_ids).update(deleted_at=deleted_at)
-        self.__class__.all_objects.filter(
-            id__in=desc_ids).update(deleted_at=deleted_at)
-        self.deleted_at = deleted_at
+        deletion_time = datetime.now()
+        desc_ids = list(self.get_descendants(
+            include_self=True).values_list('id', flat=True))
+        # soft delete all alive files
+        file_mgr = filer.models.filemodels.File.objects
+        files_qs = file_mgr.filter(folder__in=desc_ids)
+        for filer_file in files_qs:
+            filer_file.soft_delete(deletion_time=deletion_time)
+        # soft delete all alive folders
+        Folder.objects.filter(
+            id__in=desc_ids).update(deleted_at=deletion_time)
+        self.deleted_at = deletion_time
 
     def hard_delete(self):
         # This would happen automatically by ways of the delete
         #       cascade, but then the individual .delete() methods
         #       won't be called and the files won't be deleted
         #       from the filesystem.
-        desc_ids = self.get_descendants(
-            include_self=True).values_list('id', flat=True)
+        desc_ids = list(self.get_descendants(
+            include_self=True).values_list('id', flat=True))
         file_mgr = filer.models.filemodels.File.all_objects
         for file_obj in file_mgr.filter(folder__in=desc_ids):
             file_obj.hard_delete()

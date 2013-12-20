@@ -12,7 +12,9 @@ from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
 from datetime import datetime
-import polymorphic, hashlib, os, filer
+import polymorphic, hashlib, os, filer, logging
+
+logger = logging.getLogger(__name__)
 
 
 class FilesChainableQuerySetMixin(object):
@@ -66,6 +68,7 @@ class FileManager(polymorphic.PolymorphicManager):
 
 
 class AliveFileManager(FileManager):
+    use_for_related_fields = True
 
     def get_query_set(self):
         return FileQuerySet(self.model, using=self._db).filter(
@@ -145,7 +148,7 @@ class File(mixins.TrashableMixin,
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self._old_name = self.name
-        self._old_folder = self.folder
+        self._old_folder_id = self.folder_id
         self._force_commit = False
 
     def clean(self):
@@ -276,7 +279,7 @@ class File(mixins.TrashableMixin,
             pass
         if filer_settings.FOLDER_AFFECTS_URL and \
                 (self._is_name_chnaged() or
-                 self._old_folder != self.folder):
+                 self._old_folder_id != getattr(self.folder, 'id', None)):
             self._force_commit = True
             self.update_location_on_storage(*args, **kwargs)
         else:
@@ -339,14 +342,49 @@ class File(mixins.TrashableMixin,
             copy_and_save()
         return new_location
 
-    def soft_delete(self):
-        self.deleted_at = datetime.now()
-        self.save()
+    def soft_delete(self, *args, **kwargs):
+        deletion_time = kwargs.pop('deletion_time', datetime.now())
+        # move file to a `trash` location
+        to_trash = filer.utils.generate_filename.get_trash_path(self)
+        old_location, new_location = self.file.name, None
+        try:
+            new_location = self._copy_file(to_trash)
+        except Exception as e:
+            # sice there can be many types of storages better to check in
+            #   this way if the error is saying that the file doesn't exist
+            #   in which case nothing to do
+            missing_files_errs = ('no such file', 'does not exist')
 
-    def hard_delete(self):
-        # Delete the model before the file
-        super(File, self).delete()
-        # Delete the file if there are no other Files referencing it.
+            def find_msg_in_error(msg):
+                return msg in str(e).lower()
+
+            if not any(map(find_msg_in_error, missing_files_errs)):
+                raise e
+            if filer_settings.FILER_ENABLE_LOGGING:
+                logger.error('Error while trying to copy file: %s to %s.' % (
+                    old_location, to_trash), e)
+        else:
+            # if there are no more references to the file on storage delete it
+            #   and all its thumbnails
+            if not File.objects.exclude(pk=self.pk).filter(
+                file=old_location, is_public=self.is_public).exists():
+                self.file.delete(False)
+        finally:
+            # even if `copy_file` fails, user is trying to delete this file so
+            #   in worse case scenario this file is not restorable
+            new_location = new_location or to_trash
+            File.objects.filter(pk=self.pk).update(
+                deleted_at=deletion_time, file=new_location)
+
+            self.deleted_at = deletion_time
+            self.file = new_location
+
+
+    def hard_delete(self, *args, **kwargs):
+        # delete the model before deleting the file from storage
+        super(File, self).delete(*args, **kwargs)
+        # delete the actual file from storage and all its thumbnails
+        #   if there are no other filer files referencing it.
         if not File.objects.filter(file=self.file.name,
                                    is_public=self.is_public).exists():
             self.file.delete(False)

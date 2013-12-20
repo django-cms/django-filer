@@ -51,3 +51,12 @@ def by_path(instance, filename):
         return os.path.join(
             _construct_logical_folder_path(instance),
             instance.actual_name)
+
+
+def get_trash_path(instance):
+    path = ['_trash']
+    # enforce uniqueness by using file's pk
+    path.append("%s" % instance.pk)
+    # add folder path
+    path.append(instance.pretty_logical_path.strip('/'))
+    return os.path.join(*path)

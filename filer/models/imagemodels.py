@@ -163,6 +163,8 @@ class Image(File):
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
+        if self.is_in_trash():
+            return _thumbnails
         for name, opts in required_thumbnails.iteritems():
             try:
                 opts.update({'subject_location': self.subject_location})

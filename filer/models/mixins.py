@@ -36,18 +36,18 @@ class TrashableMixin(models.Model):
     def is_in_trash(self):
         return self.deleted_at is not None
 
-    def soft_delete(self):
+    def soft_delete(self, *args, **kwargs):
         raise NotImplementedError
 
-    def hard_delete(self):
+    def hard_delete(self, *args, **kwargs):
         raise NotImplementedError
 
     def delete_restorable(self, *args, **kwargs):
-        to_trash = kwargs.get('to_trash', True)
+        to_trash = kwargs.pop('to_trash', True)
         if not self.deleted_at and to_trash:
-            self.soft_delete()
+            self.soft_delete(*args, **kwargs)
         else:
-            self.hard_delete()
+            self.hard_delete(*args, **kwargs)
 
     def restore(self, commit=True):
         self.deleted_at = None
