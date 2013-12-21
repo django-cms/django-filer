@@ -2,15 +2,12 @@
 from django.template.loader import render_to_string
 import inspect
 from django import forms
-from django.conf import settings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.safestring import mark_safe
 from filer.utils.compatibility import truncate_words
-from django.utils.translation import ugettext as _
-from filer.models import Folder
 from filer.settings import FILER_STATICMEDIA_PREFIX
 
 
@@ -20,11 +17,11 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     is_hidden = True
 
     def render(self, name, value, attrs=None):
+        from filer.models import Folder
         obj = self.obj_for_value(value)
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
-        required = self.attrs
         if attrs is None:
             attrs = {}
         related_url = None
@@ -105,21 +102,26 @@ class AdminFolderFormField(forms.ModelChoiceField):
 
 
 class FilerFolderField(models.ForeignKey):
-    default_form_class = AdminFolderFormField
-    default_model_class = Folder
-
     def __init__(self, **kwargs):
-        return super(FilerFolderField, self).__init__(Folder, **kwargs)
+        from filer.models import Folder
+        super(FilerFolderField, self).__init__(Folder, **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
         defaults = {
-            'form_class': self.default_form_class,
+            'form_class': self.get_default_form_class(),
             'rel': self.rel,
         }
         defaults.update(kwargs)
         return super(FilerFolderField, self).formfield(**defaults)
+
+    def get_default_form_class(self):
+        return AdminFolderFormField
+
+    def get_default_model_class(self):
+        from filer.models import Folder
+        return Folder
 
     def south_field_triple(self):
         "Returns a suitable description of this field for South."

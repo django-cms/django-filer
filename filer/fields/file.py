@@ -1,16 +1,13 @@
 #-*- coding: utf-8 -*-
 import inspect
 from django import forms
-from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from filer.utils.compatibility import truncate_words
-from filer.models import File
 from filer import settings as filer_settings
 
 import logging
@@ -20,6 +17,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
     def render(self, name, value, attrs=None):
+        from filer.models import File
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
@@ -96,7 +94,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.to_field_name = to_field_name
         self.max_value = None
         self.min_value = None
-        other_widget = kwargs.pop('widget', None)
+        kwargs.pop('widget', None)
         if 'admin_site' in inspect.getargspec(self.widget.__init__)[0]: # Django 1.4
             widget_instance = self.widget(rel, site)
         else: # Django <= 1.3
@@ -109,24 +107,28 @@ class AdminFileFormField(forms.ModelChoiceField):
 
 
 class FilerFileField(models.ForeignKey):
-    default_form_class = AdminFileFormField
-    default_model_class = File
-
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Image model as parameter...
         # a FilerImageFiled can only be a ForeignKey to a Image
-        return super(FilerFileField, self).__init__(
-            self.default_model_class, **kwargs)
+        super(FilerFileField, self).__init__(
+            self.get_default_model_class(), **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
         defaults = {
-            'form_class': self.default_form_class,
+            'form_class': self.get_default_form_class(),
             'rel': self.rel,
         }
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)
+
+    def get_default_form_class(self):
+        return AdminFileFormField
+
+    def get_default_model_class(self):
+        from filer.models import File
+        return File
 
     def south_field_triple(self):
         "Returns a suitable description of this field for South."
@@ -135,4 +137,4 @@ class FilerFileField(models.ForeignKey):
         field_class = "django.db.models.fields.related.ForeignKey"
         args, kwargs = introspector(self)
         # That's our definition!
-        return (field_class, args, kwargs)
+        return field_class, args, kwargs
