@@ -190,7 +190,7 @@ class Permission(models.Model):
 def handle_permission_change(sender, instance, **kwargs):
     # update the de-normalised field on the subject and update all descendants.
     subject = instance.get_subject()
-    if subject.is_root:
+    if getattr(subject, 'is_root', False):
         # can't actually save anything to a model, since it's the virtual root object.
         # but we should trigger the refresh for all descendants
         for child in subject.children.all():
