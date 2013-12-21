@@ -24,7 +24,8 @@ def serve_protected_file(request, path):
             raise PermissionDenied
         else:
             raise Http404('File not found')
-    return server.serve(request, file_obj=file_obj.file, save_as=False)
+    save_as = 'download' in request.GET
+    return server.serve(request, file_obj=file_obj.file, save_as=save_as)
 
 
 def serve_protected_thumbnail(request, path):
@@ -46,6 +47,7 @@ def serve_protected_thumbnail(request, path):
             raise Http404('File not found')
     try:
         thumbnail = ThumbnailFile(name=path, storage=file_obj.file.thumbnail_storage)
-        return thumbnail_server.serve(request, thumbnail, save_as=False)
+        save_as = 'download' in request.GET
+        return thumbnail_server.serve(request, thumbnail, save_as=save_as)
     except Exception:
         raise Http404('File not found')
