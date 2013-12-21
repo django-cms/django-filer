@@ -36,7 +36,7 @@ def userperms_for_request(item, request):
     for p in ps:
         attr = "can_%s" % p
         if hasattr(item, attr):
-            x = getattr(item, attr)(request)
+            x = getattr(item, attr)(request.user)
             if x:
                 r.append(p)
     return r
