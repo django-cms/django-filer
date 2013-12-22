@@ -20,18 +20,17 @@ class ServerBase(object):
     def save_as_header(self, response, **kwargs):
         """
         * if save_as is False the header will not be added
+        * if save_as is True the filename will be determined from the file path
         * if save_as is a filename, it will be used in the header
-        * if save_as is None the filename will be determined from the file path
         """
-        save_as = kwargs.get('save_as', None)
-        if save_as == False:
+        save_as = kwargs.get('save_as', False)
+        if save_as is False:
             return
         file_obj = kwargs.get('file_obj', None)
-        filename = None
-        if save_as:
-            filename = save_as
-        else:
+        if save_as is True:
             filename = os.path.basename(file_obj.path)
+        else:
+            filename = save_as
         response['Content-Disposition'] = smart_str(u'attachment; filename=%s' % filename)
 
     def size_header(self, response, **kwargs):
