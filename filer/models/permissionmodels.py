@@ -394,7 +394,12 @@ class PermissionUser(object):
     """
     def __init__(self, user):
         self.id = user.pk
-        self.group_ids = set(user.groups.values_list('pk', flat=True))
+        cache_key = '_filer_permissionuser_hacky_cached_group_ids'
+        group_ids = getattr(user, cache_key, None)
+        if group_ids is None:
+            group_ids = set(user.groups.values_list('pk', flat=True))
+            setattr(user, cache_key, group_ids.copy())
+        self.group_ids = group_ids
         self.is_superuser = user.is_superuser
         self.is_authenticated = user.is_authenticated()
 
