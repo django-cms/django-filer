@@ -4,8 +4,7 @@ Copy of ``django.contrib.admin.utils.get_deleted_objects`` and a subclass of
 ``django.contrib.admin.utils.NestedObjects`` that work with djongo_polymorphic querysets.
 Ultimatly these should go directly into django_polymorphic or, in a more generic way, into django itself.
 
-This code has been copied from
-django 1.4. ``get_deleted_objects`` and ``NestedObjects`` have not changed compared to 1.3.1.
+This code has been copied from Django 1.4.
 
 At all locations where something has been changed, there are inline comments in the code.
 """
@@ -70,4 +69,3 @@ class PolymorphicAwareNestedObjects(NestedObjects):
             # .filter() is needed, because there may already be cached polymorphic results in the queryset
             objs = objs.non_polymorphic().filter()
         return super(PolymorphicAwareNestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
-
