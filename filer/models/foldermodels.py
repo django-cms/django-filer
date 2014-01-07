@@ -351,6 +351,14 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         super(Folder, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
+    @property
+    def trashed_file_count(self):
+        file_mgr = filer.models.filemodels.File.trash
+        return file_mgr.filter(folder_id=self.id).count()
+
+    @property
+    def trashed_children_count(self):
+        return Folder.trash.filter(parent_id=self.id).count()
 
     @property
     def file_count(self):
