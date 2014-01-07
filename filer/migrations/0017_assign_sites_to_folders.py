@@ -6,7 +6,6 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import Group, User
-from filer.models.foldermodels import Folder
 from filer.utils.cms_roles import get_sites_for_user
 from filer.utils.checktrees import TreeChecker
 from cmsroles.models import Role
@@ -306,31 +305,32 @@ class Migration(DataMigration):
 
     def make_core_folder(self, folder):
         self.log.info("\tSUCCESS: core folder")
-        folder = Folder.objects.get(id=folder.id)
+        folder = self.folder_cls.objects.get(id=folder.id)
         folder.get_descendants(include_self=True).update(
-            folder_type=Folder.CORE_FOLDER, site=None)
+            folder_type=1, site=None)
         self.folders_migrated.add(folder.id)
 
     def make_site_folder(self, folder, site):
         self.log.info('\tSUCCESS: folder binded to %s' % site.domain)
-        folder = Folder.objects.get(id=folder.id)
+        folder = self.folder_cls.objects.get(id=folder.id)
         folder.get_descendants(include_self=True).update(site=site)
         self.folders_migrated.add(folder.id)
 
     def share_site_folder(self, folder, sites):
-        folder = Folder.objects.get(id=folder.id)
-        if not folder.is_core():
+        folder = self.folder_cls.objects.get(id=folder.id)
+        if not folder.folder_type == 1:
             folder.shared.add(*sites)
         self.log.info('\tSUCCESS: folder shared with %s' % ', '.join(
             [s.domain for s in sites]))
 
     def fix_tree(self):
         self.log.info("Fixing folder trees.")
-        TreeChecker().rebuild()
+        TreeChecker(self.folder_cls.objects).rebuild()
         self.log.info("Folder trees fixed.")
 
     def forwards(self, orm):
-        if not Folder.objects.exists():
+        self.folder_cls = orm.Folder
+        if not self.folder_cls.objects.exists():
             return
 
         self.init_logger()
@@ -338,9 +338,9 @@ class Migration(DataMigration):
 
         self.folders_migrated = set()
         FolderPermission = orm.FolderPermission
-        root_folders = Folder.objects.filter(parent__isnull=True)
+        root_folders = self.folder_cls.objects.filter(parent__isnull=True)
         for folder in root_folders:
-            self.log.info("Folder: %s" % folder.pretty_logical_path)
+            self.log.info("Folder: %s" % folder.name)
             if folder.name in self.core_folders:
                 self.make_core_folder(folder)
                 continue
@@ -356,10 +356,10 @@ class Migration(DataMigration):
 
         self.log.info("\nFollowing folders were migrated with success\n")
         for folder_id in self.folders_migrated:
-            folder = Folder.objects.get(id=folder_id)
+            folder = self.folder_cls.objects.get(id=folder_id)
             self.log.info("%s | %s | %s" % (
-                folder.pretty_logical_path,
-                'Core Folder' if folder.is_core() else folder.site.domain,
+                folder.name,
+                'Core Folder' if folder.folder_type == 1 else folder.site.domain,
                 ', '.join(folder.shared.values_list('domain', flat=True))))
 
         orphans = root_folders.exclude(id__in=self.folders_migrated)
@@ -367,7 +367,7 @@ class Migration(DataMigration):
             return
         self.log.info('\nFollowing folders will remain with no site assigned\n')
         for folder in orphans:
-            self.log.info(folder.pretty_logical_path)
+            self.log.info(folder.name)
 
     def backwards(self, orm):
         "No going back"
