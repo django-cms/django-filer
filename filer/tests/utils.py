@@ -48,7 +48,7 @@ class ZippingTestCase(TestCase):
         self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
 
-        self.file = DjangoFile(open(self.filename), name=self.image_name)
+        self.file = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
 
         self.zipfilename = 'test_zip.zip'
 

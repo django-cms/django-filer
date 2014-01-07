@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from django.template import Library
+from django.utils import six
 import math
 
 register = Library()
@@ -49,9 +50,10 @@ def filesize(bytes, format='auto1024'):
     elif format not in ('auto1024', 'auto1000',
                         'auto1024long', 'auto1000long'):
         return bytes
+
     # Check for valid bytes
     try:
-        bytes = long(bytes)
+        bytes = int(bytes) if six.PY3 else long(bytes)
     except (ValueError, TypeError):
         return bytes
 
