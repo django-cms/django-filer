@@ -4,11 +4,13 @@
 <td><img src="{{ subfolder.icons.32 }}" alt="{% trans "Folder Icon" %}" /></td>
 <!-- Directory details -->
 <td>
-    <a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_trash_folder' subfolder.id %}" title="{% blocktrans with subfolder.name as item_label %}Restore '{{ item_label }}' folder{% endblocktrans %}">{% trans "Restore" %}</a>
     <div>
-        <b><span>{{ subfolder.pretty_logical_path }}</span></b>&nbsp;
+        <b><a class="changelink" href="{% url 'admin:filer_trash_item' filer_model='folder' filer_obj_id=subfolder.id %}" title="{% blocktrans with subfolder.name as item_label %}Restore '{{ item_label }}' folder{% endblocktrans %}">{{ subfolder.pretty_logical_path }}</a></b>&nbsp;
         <span class="tiny">({% blocktrans count subfolder.trashed_children_count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.trashed_file_count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span>
     </div>
     <span>{{ subfolder.get_folder_type_display }}{% if subfolder.site %}: {{subfolder.site}}{%endif%}</span>
     <div>{% trans "Owner" %}: {% firstof subfolder.owner.email subfolder.owner.username "n/a" %}</div>
+</td>
+<td>
+    {% client_timezone subfolder.deleted_at %}
 </td>

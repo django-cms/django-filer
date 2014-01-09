@@ -67,6 +67,9 @@ class FoldersChainableQuerySetMixin(object):
             return self
         return self.exclude(restricted=True, site__in=sites)
 
+    def in_trash(self):
+        return self.filter(deleted_at__isnull=False)
+
 
 class EmptyFoldersQS(models.query.EmptyQuerySet,
                      FoldersChainableQuerySetMixin):
@@ -375,6 +378,14 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     @property
     def item_count(self):
         return self.file_count + self.children_count
+
+    @property
+    def trashed_files(self):
+        trash_file_mgr = filer.models.filemodels.File.trash
+        if not self.pk:
+            return trash_file_mgr.get_empty_query_set()
+        return trash_file_mgr.filter(folder=self).order_by(
+            'title', 'name', 'original_filename')
 
     @property
     def files(self):

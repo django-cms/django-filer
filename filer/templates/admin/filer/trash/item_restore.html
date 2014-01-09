@@ -1,0 +1,125 @@
+{% extends "admin/filer/base_site.html" %}
+{% load url from future %}
+{% load filer_admin_tags i18n filermedia %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a>
+    &rsaquo; <a href="{% url 'admin:filer_trash_changelist'%}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Restore {{current_item_type}} {{ current_item.pretty_logical_path }}
+    </div>
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+{# upload stuff #}
+{{ media.js }}
+<script type="text/javascript" src="{% admin_js_base %}jquery.min.js"></script>
+<script type="text/javascript">
+    jQuery(function() {
+        jQuery("#overlay").ajaxStart(function () {
+            jQuery(this).show();
+            jQuery("#loading").show();
+        });
+        jQuery("#overlay").ajaxStop(function () {
+            jQuery(this).hide();
+            jQuery("#loading").hide();
+        });
+
+        jQuery('li.filer-file input').each(function(){
+            var li_element = jQuery(this).parent();
+            var url = '/admin/filer/trash/file/check/' + jQuery(this).attr('value');
+            jQuery.get(url, function(data) {
+                if (data.exists == true){
+                    li_element.addClass('errornote infonote');
+                    var icon_url = "{% filer_staticmedia_prefix %}icons/file_16x16.png";
+                    if (li_element.hasClass('archive') == true){
+                        icon_url = "{% filer_staticmedia_prefix %}icons/archive_16x16.png";
+                    } else if (li_element.hasClass('file') == false){
+                        icon_url = data.file_url;
+                    }
+                    li_element.css('background-image', 'url("'+ icon_url +'")')
+                    var file_name_elem = li_element.children(":first");
+                    file_name_elem.html("<a href='" + data.file_url + "' title='Preview'>" + file_name_elem.text() + "</a>");
+                } else {
+                    li_element.append(' &rarr; File cannot be retrieved from storage. This item cannot be restored.')
+                    li_element.addClass('errornote');
+                    li_element.css('font-weight', 'normal')
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+{{ media.css }}
+<style type="text/css">
+    .files li{
+        list-style-type: none;
+    }
+    .infonote {
+        color: #666;
+        background: #ffe 5px .3em no-repeat;
+        background-size: 16px 16px;
+        border: 1px solid green;
+        font-weight: bold;
+    }
+    .full-page-overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0%;
+        left: 0;
+        right: 0%;
+        display:none;
+    }
+    #overlay {
+        z-index: 98;
+        opacity: 0.6;
+        background-color: #ACD1E3;
+    }
+    #loading {
+        z-index: 99;
+        color: white;
+        text-align: center;
+        font-size: x-large;
+        margin-top: 100px;
+        font-weight: bold;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+{% spaceless %}
+<div class="full-page-overlay" id="overlay"></div>
+<div class="full-page-overlay" id='loading'>LOADING ...</div>
+<div id="content-main">
+{% if descendants %}
+    <ul>
+    {% for descendant in descendants %}
+        <li>
+        <b style='font-size: larger;'>{{ descendant.pretty_logical_path }}</b>
+
+        <ul class='files'>
+        {% for file in descendant.trashed_files %}
+            <li class='filer-file {{current_item.file_type|lower}}'>
+                <span>{{file.actual_name}}</span>
+                <input type='hidden' name='file-{{file.pk}}' value='{{file.pk}}'/>
+            </li>
+        {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+<ul class='files'>
+    <li class='filer-file {{current_item.file_type|lower}}'>
+        <span>{{current_item.actual_name}}</span>
+        <input type='hidden' name='file-{{current_item.pk}}' value='{{current_item.pk}}'/>
+    </li>
+</ul>
+{% endif %}
+</div>
+{% endspaceless %}
+{% endblock %}
