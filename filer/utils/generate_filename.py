@@ -1,12 +1,12 @@
 import datetime
 import os
+import filer
 
 import filer.models.clipboardmodels
 from filer.utils.files import get_valid_filename
 
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.encoding import force_unicode, smart_str
-
 
 def by_date(instance, filename):
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
@@ -51,3 +51,12 @@ def by_path(instance, filename):
         return os.path.join(
             _construct_logical_folder_path(instance),
             instance.actual_name)
+
+
+def get_trash_path(instance):
+    path = [filer.settings.FILER_TRASH_PREFIX]
+    # enforce uniqueness by using file's pk
+    path.append("%s" % instance.pk)
+    # add folder path
+    path.append(instance.pretty_logical_path.strip('/'))
+    return os.path.join(*path)

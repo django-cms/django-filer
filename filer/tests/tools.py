@@ -33,8 +33,9 @@ class ToolsTestCase(TestCase):
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():
-            os.remove(img.file.path)
-            img.delete()
+            img_path = img.file.path
+            img.delete(to_trash=False)
+            assert os.path.exists(img_path) == False
 
     def test_clear_clipboard_works(self):
         self.assertEqual(len(self.clipboard.files.all()), 1)

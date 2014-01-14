@@ -28,6 +28,7 @@ setup(
     author_email = 'stefan.foulis@gmail.com',
     packages=find_packages(),
     install_requires = (
+        'pytz',
         'Django>=1.3,<1.5',
         'easy-thumbnails>=1.0',
         'django-mptt>=0.5.1,<0.5.3',

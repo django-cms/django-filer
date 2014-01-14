@@ -1,0 +1,17 @@
+{% load i18n filermedia filer_admin_tags filer_tags %}
+{% load url from future %}
+<!-- FileIcon -->
+<td>
+    <img src="{% filer_staticmedia_prefix %}icons/{{file.file_type|lower}}_32x32.png" alt="{{ file.default_alt_text }}" />
+</td>
+<!-- Filename/Dimensions -->
+<td>
+    <div>
+        <b><a class="changelink" href="{% url 'admin:filer_trash_item' filer_model='file' filer_obj_id=file.id %}" title="{% blocktrans with file.label as item_label %}Restore '{{ item_label }}' file{% endblocktrans %}">{{ file.pretty_logical_path }}</a></b>
+        <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
+    </div>
+    <div>{% trans "Owner" %}: {% firstof file.owner.email file.owner.username "n/a" %}</div>
+</td>
+<td>
+    {% client_timezone file.deleted_at %}
+</td>

@@ -1,0 +1,77 @@
+{% extends "admin/filer/base_site.html" %}
+{% load url from future %}
+{% load filer_admin_tags i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a>
+    &rsaquo; {{ opts.verbose_name_plural|capfirst }}
+    </div>
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% admin_css_base %}changelists.css" />
+{{ media.css }}
+{% endblock %}
+
+{% block content %}
+{% spaceless %}
+<div id="content-main">
+    <div class="module" id="changelist">
+        <form id="changelist-form" action="" method="post">{% csrf_token %}
+
+        <div id="toolbartable">
+            <table cellspacing="0">
+                <thead>
+                    <tr class="{% cycle 'row1' 'row2' as rowcolors %}">
+                        <th class="thumbHeader">&nbsp;</th>
+                        <th>{% trans 'Path' %}</th>
+                        <th>{% trans 'Deletion Date' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in paginated_items.object_list %}
+                    {% if item.file_type == 'Folder' %}
+                        {% with item as subfolder %}
+                        <tr class="{% cycle rowcolors %}">
+                            {% include "admin/filer/trash/subfolder_row.html" %}
+                        </tr>
+                        {% endwith %}
+                    {% endif %}
+
+                    {% if item.file_type == 'File' or item.file_type == 'Image' or item.file_type == 'Archive' %}
+                        {% with item as file %}
+                        <tr class="{% cycle rowcolors %}">
+                            {% include "admin/filer/trash/file_row.html" %}
+                        </tr>
+                        {% endwith %}
+                    {% endif %}
+                {% empty %}
+                    <tr class="{% cycle rowcolors %}">
+                        <td colspan="5" class="row1" style="text-align: center;vertical-align: middle;height:128px;color: gray;">{% trans "there are no files or subfolders" %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="paginator">
+                {% if paginated_items.has_previous %}
+                    <a href="?page={{ paginated_items.previous_page_number }}">{% trans "previous" %}</a>
+                {% endif %}
+
+                <span class="this-page">
+                    {% blocktrans with paginated_items.number as number and paginated_items.paginator.num_pages as num_pages %}
+                    Page {{ number }} of {{ num_pages }}.
+                    {% endblocktrans %}
+                </span>
+
+                {% if paginated_items.has_next %}
+                    <a href="?page={{ paginated_items.next_page_number }}">{% trans "next" %}</a>
+                {% endif %}
+            </p>
+        </div>
+
+        </form>
+    </div>
+</div>
+{% endspaceless %}
+{% endblock %}

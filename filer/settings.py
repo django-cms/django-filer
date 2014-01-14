@@ -218,3 +218,4 @@ FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = load_object(FILER_SERVERS['private']['thum
 FOLDER_AFFECTS_URL = getattr(settings, 'FILER_FOLDER_AFFECTS_URL', False)
 CDN_DOMAIN = getattr(settings, 'FILER_CDN_DOMAIN', None)
 CDN_INVALIDATION_TIME = getattr(settings, 'FILER_CDN_INVALIDATION_TIME', 0)
+FILER_TRASH_PREFIX = getattr(settings, 'FILER_TRASH_PREFIX', '_trash')

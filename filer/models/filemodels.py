@@ -7,19 +7,24 @@ from django.db import (models, IntegrityError, transaction)
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
-from filer.models.foldermodels import Folder
 from filer.utils.cms_roles import *
 from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
+from datetime import datetime
 import polymorphic
 import hashlib
 import os
+import filer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-class FilesChainableQuerySet(object):
+class FilesChainableQuerySetMixin(object):
 
     def readonly(self, user):
+        Folder = filer.models.foldermodels.Folder
         return self.filter(folder__folder_type=Folder.CORE_FOLDER)
 
     def find_duplicates(self, file_obj):
@@ -42,12 +47,13 @@ class FilesChainableQuerySet(object):
             folder__site__in=sites)
 
 
-class EmptyFilesQS(models.query.EmptyQuerySet, FilesChainableQuerySet):
+class EmptyFilesQS(models.query.EmptyQuerySet,
+                   FilesChainableQuerySetMixin):
     pass
 
 
 class FileQuerySet(polymorphic.query.PolymorphicQuerySet,
-                   FilesChainableQuerySet):
+                   FilesChainableQuerySetMixin):
     pass
 
 
@@ -61,14 +67,35 @@ class FileManager(polymorphic.PolymorphicManager):
 
     def find_all_duplicates(self):
         return {file_data['sha1']: file_data['count']
-                for file_data in File.objects.values('sha1').annotate(
+                for file_data in self.get_query_set().values('sha1').annotate(
                     count=Count('id')).filter(count__gt=1)}
 
 
-class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
+class AliveFileManager(FileManager):
+    # this is required in order to make sure that other models that are
+    #   related to filer files will get an DoesNotExist exception if the file
+    #   is in trash
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return FileQuerySet(self.model, using=self._db).filter(
+            deleted_at__isnull=True)
+
+
+class TrashFileManager(FileManager):
+
+    def get_query_set(self):
+        return FileQuerySet(self.model, using=self._db).filter(
+            deleted_at__isnull=False)
+
+
+class File(mixins.TrashableMixin,
+           polymorphic.PolymorphicModel,
+           mixins.IconsMixin):
+
     file_type = 'File'
     _icon = "file"
-    folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
+    folder = models.ForeignKey('filer.Folder', verbose_name=_('folder'), related_name='all_files',
         null=True, blank=True)
     file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=255)
     _file_size = models.IntegerField(_('file size'), null=True, blank=True)
@@ -116,7 +143,9 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
                     'snippet but will not be able to delete or '
                     'modify the current version of the asset.'))
 
-    objects = FileManager()
+    objects = AliveFileManager()
+    trash = TrashFileManager()
+    all_objects = FileManager()
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -126,7 +155,7 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self._old_name = self.name
-        self._old_folder = self.folder
+        self._old_folder_id = self.folder_id
         self._force_commit = False
 
     def clean(self):
@@ -257,7 +286,7 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             pass
         if filer_settings.FOLDER_AFFECTS_URL and \
                 (self._is_name_chnaged() or
-                 self._old_folder != self.folder):
+                 self._old_folder_id != getattr(self.folder, 'id', None)):
             self._force_commit = True
             self.update_location_on_storage(*args, **kwargs)
         else:
@@ -320,13 +349,75 @@ class File(polymorphic.PolymorphicModel, mixins.IconsMixin):
             copy_and_save()
         return new_location
 
-    def delete(self, *args, **kwargs):
-        # Delete the model before the file
+    def soft_delete(self, *args, **kwargs):
+        """
+        This method works as a default delete action of a filer file.
+        It will not actually delete the item from the database, instead it
+            will make it inaccessible for the default manager.
+        It just `fakes` a deletion by doing the following:
+            1. sets a deletion time that will be used to distinguish
+                `alive` and `trashed` filer files.
+            2. makes a copy of the actual file on storage and saves it to
+                a trash location on storage. Also tries to ignore if the
+                actual file is missing from storage.
+            3. updates only the filer file path in the database (no model
+                save is done since it tries to bypass the logic defined
+                in the save method)
+            4. deletes the file(and all it's thumbnails) from the
+                original location if no other filer files are referencing
+                it.
+        All the metadata of this filer file will remain intact.
+        """
+        deletion_time = kwargs.pop('deletion_time', datetime.now())
+        # move file to a `trash` location
+        to_trash = filer.utils.generate_filename.get_trash_path(self)
+        old_location, new_location = self.file.name, None
+        try:
+            new_location = self._copy_file(to_trash)
+        except Exception as e:
+            # sice there can be many types of storages better to check in
+            #   this way if the error is saying that the file doesn't exist
+            #   in which case nothing to do
+            missing_files_errs = ('no such file', 'does not exist')
+
+            def find_msg_in_error(msg):
+                return msg in str(e).lower()
+
+            if not any(map(find_msg_in_error, missing_files_errs)):
+                raise e
+            if filer_settings.FILER_ENABLE_LOGGING:
+                logger.error('Error while trying to copy file: %s to %s.' % (
+                    old_location, to_trash), e)
+        else:
+            # if there are no more references to the file on storage delete it
+            #   and all its thumbnails
+            if not File.objects.exclude(pk=self.pk).filter(
+                file=old_location, is_public=self.is_public).exists():
+                self.file.delete(False)
+        finally:
+            # even if `copy_file` fails, user is trying to delete this file so
+            #   in worse case scenario this file is not restorable
+            new_location = new_location or to_trash
+            File.objects.filter(pk=self.pk).update(
+                deleted_at=deletion_time, file=new_location)
+
+            self.deleted_at = deletion_time
+            self.file = new_location
+
+    def hard_delete(self, *args, **kwargs):
+        """
+        This method deletes the filer file from the database and from storage.
+        """
+        # delete the model before deleting the file from storage
         super(File, self).delete(*args, **kwargs)
-        # Delete the file if there are no other Files referencing it.
+        # delete the actual file from storage and all its thumbnails
+        #   if there are no other filer files referencing it.
         if not File.objects.filter(file=self.file.name,
                                    is_public=self.is_public).exists():
             self.file.delete(False)
+
+    def delete(self, *args, **kwargs):
+        super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
     @property

@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-import itertools
 from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
@@ -9,14 +8,16 @@ from django.db.models import (query, Q, signals)
 from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-import filer.models.clipboardmodels
 from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
+from datetime import datetime
 import mptt
+import itertools
+import filer
 
 
-class FoldersChainableQuerySet(object):
+class FoldersChainableQuerySetMixin(object):
 
     def with_bad_metadata(self):
         return self.filter(has_all_mandatory_data=False)
@@ -53,7 +54,11 @@ class FoldersChainableQuerySet(object):
                 descendant_filter |= q
         if not descendant_filter:
             return self.none()
-        restr_q = Q(Q(restricted=True) | Q(all_files__restricted=True))
+        # since this method is called to check permissions on descendants it
+        #   should only query the alive assets
+        restr_q = Q(Q(restricted=True) | Q(
+                        Q(all_files__restricted=True) & \
+                        Q(all_files__deleted_at__isnull=True)))
         restr_q &= Q(site__in=sites)
         return self.model.objects.filter(
             descendant_filter).filter(restr_q).distinct()
@@ -64,12 +69,17 @@ class FoldersChainableQuerySet(object):
             return self
         return self.exclude(restricted=True, site__in=sites)
 
+    def in_trash(self):
+        return self.filter(deleted_at__isnull=False)
 
-class EmptyFoldersQS(models.query.EmptyQuerySet, FoldersChainableQuerySet):
+
+class EmptyFoldersQS(models.query.EmptyQuerySet,
+                     FoldersChainableQuerySetMixin):
     pass
 
 
-class FolderQueryset(query.QuerySet, FoldersChainableQuerySet):
+class FolderQueryset(query.QuerySet,
+                     FoldersChainableQuerySetMixin):
     pass
 
 
@@ -87,7 +97,25 @@ class FolderManager(models.Manager):
         return getattr(self.get_query_set(), name)
 
 
-class Folder(models.Model, mixins.IconsMixin):
+class AliveFolderManager(FolderManager):
+    # this is required in order to make sure that other models that are
+    #   related to filer folders will get an DoesNotExist exception if the
+    #   folder is in trash
+    use_for_related_fields = True
+
+    def get_query_set(self):
+        return FolderQueryset(self.model, using=self._db).filter(
+            deleted_at__isnull=True)
+
+
+class TrashFolderManager(FolderManager):
+
+    def get_query_set(self):
+        return FolderQueryset(self.model, using=self._db).filter(
+            deleted_at__isnull=False)
+
+
+class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -149,7 +177,9 @@ class Folder(models.Model, mixins.IconsMixin):
                     "its assets. However, they will not be able to change, "
                     "delete or move it, not even add new assets."))
 
-    objects = FolderManager()
+    objects = AliveFolderManager()
+    trash = TrashFolderManager()
+    all_objects = FolderManager()
 
     def __init__(self, *args, **kwargs):
         super(Folder, self).__init__(*args, **kwargs)
@@ -212,7 +242,8 @@ class Folder(models.Model, mixins.IconsMixin):
         if not self.pk:
             return True
         metadata_fields = ['restricted', 'site_id', 'folder_type']
-        old_metadata = self.__class__._default_manager.\
+        # metadata should be preserved for trashed folder too
+        old_metadata = self.__class__.all_objects.\
                  filter(pk=self.pk).values(*metadata_fields).get()
         for field in metadata_fields:
             if getattr(self, field) != old_metadata[field]:
@@ -230,22 +261,24 @@ class Folder(models.Model, mixins.IconsMixin):
         """
         descendants = None
         if self._update_descendants:
-            descendants = self.get_descendants().\
-                select_related('all_files')
+            descendants = self.get_descendants()
             descendants.update(
                 folder_type=self.folder_type, site=self.site,
                 restricted=self.restricted)
-            self.all_files.update(restricted=self.restricted)
-            for desc_folder in descendants:
-                desc_folder.all_files.update(restricted=self.restricted)
+            desc_ids = [desc.pk for desc in descendants]
+            if self.pk:
+                desc_ids.append(self.pk)
+            file_mgr = filer.models.filemodels.File.all_objects
+            file_mgr.filter(
+                folder__in=desc_ids).update(restricted=self.restricted)
 
         if self.parent:
             parent_shared_sites = self.parent.shared.values_list(
                 'id', flat=True)
             instance_shared_sites = self.shared.values_list('id', flat=True)
             if set(instance_shared_sites) != set(parent_shared_sites):
-                self.shared = self.parent.shared.all()
-                shared_sites = self.shared.all()
+                shared_sites = self.parent.shared.all()
+                self.shared = shared_sites
                 descendants = descendants or self.get_descendants()
                 for desc_folder in descendants:
                     desc_folder.shared = shared_sites
@@ -276,8 +309,9 @@ class Folder(models.Model, mixins.IconsMixin):
                 if self.is_affecting_file_paths():
                     desc_ids = list(self.get_descendants(
                         include_self=True).values_list('id', flat=True))
-                    File = filer.models.filemodels.File
-                    all_files = File.objects.filter(folder_id__in=desc_ids)
+                    # update location only for alive files
+                    file_mgr = filer.models.filemodels.File.objects
+                    all_files = file_mgr.filter(folder__in=desc_ids)
                     for f in all_files:
                         old_location = f.file.name
                         new_location = f.update_location_on_storage()
@@ -295,17 +329,44 @@ class Folder(models.Model, mixins.IconsMixin):
                 transaction.commit()
                 delete_from_locations(old_locations, storages)
 
-    def delete(self, *args, **kwargs):
+    def soft_delete(self):
+        deletion_time = datetime.now()
+        desc_ids = list(self.get_descendants(
+            include_self=True).values_list('id', flat=True))
+        # soft delete all alive files
+        file_mgr = filer.models.filemodels.File.objects
+        files_qs = file_mgr.filter(folder__in=desc_ids)
+        for filer_file in files_qs:
+            filer_file.soft_delete(deletion_time=deletion_time)
+        # soft delete all alive folders
+        Folder.objects.filter(
+            id__in=desc_ids).update(deleted_at=deletion_time)
+        self.deleted_at = deletion_time
+
+    def hard_delete(self):
         # This would happen automatically by ways of the delete
         #       cascade, but then the individual .delete() methods
         #       won't be called and the files won't be deleted
         #       from the filesystem.
-        all_files = []
-        for folder in self.get_descendants(include_self=True):
-            all_files += folder.all_files.all()
-        for file_obj in all_files:
-            file_obj.delete()
-        super(Folder, self).delete(*args, **kwargs)
+        desc_ids = list(self.get_descendants(
+            include_self=True).values_list('id', flat=True))
+        file_mgr = filer.models.filemodels.File.all_objects
+        for file_obj in file_mgr.filter(folder__in=desc_ids):
+            file_obj.hard_delete()
+        super(Folder, self).delete()
+
+    def delete(self, *args, **kwargs):
+        super(Folder, self).delete_restorable(*args, **kwargs)
+    delete.alters_data = True
+
+    @property
+    def trashed_file_count(self):
+        file_mgr = filer.models.filemodels.File.trash
+        return file_mgr.filter(folder_id=self.id).count()
+
+    @property
+    def trashed_children_count(self):
+        return Folder.trash.filter(parent_id=self.id).count()
 
     @property
     def file_count(self):
@@ -322,6 +383,14 @@ class Folder(models.Model, mixins.IconsMixin):
     @property
     def item_count(self):
         return self.file_count + self.children_count
+
+    @property
+    def trashed_files(self):
+        trash_file_mgr = filer.models.filemodels.File.trash
+        if not self.pk:
+            return trash_file_mgr.get_empty_query_set()
+        return trash_file_mgr.filter(folder=self).order_by(
+            'title', 'name', 'original_filename')
 
     @property
     def files(self):
@@ -505,7 +574,7 @@ def update_shared_sites_for_descendants(instance, **kwargs):
     if not action.startswith('post_') or instance.parent:
         return
 
-    instance = Folder.objects.get(id=instance.id)
+    instance = Folder.all_objects.get(id=instance.id)
     sites = instance.shared.all()
     descendants = instance.get_descendants()
     for desc_folder in descendants:

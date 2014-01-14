@@ -1,7 +1,9 @@
-import django
 from django.conf import settings
 from django.template import Library
 from distutils.version import LooseVersion
+import django
+import pytz
+import datetime
 
 register = Library()
 
@@ -69,3 +71,23 @@ def is_readonly_for_user(filer_obj, user):
 def can_change_folder(folder, user):
     return folder.has_change_permission(user)
 
+
+def _build_timezone_dict():
+    offset_with_timezone = {}
+    for zone in pytz.common_timezones:
+        timezone_obj = pytz.timezone(zone)
+        zone_offset = datetime.datetime.now(timezone_obj).strftime("%z")
+        offset_with_timezone[zone_offset] = timezone_obj
+    return offset_with_timezone
+
+_OFFSETS_WITH_TIMEZONES = _build_timezone_dict()
+
+@register.simple_tag(takes_context=True)
+def client_timezone(context, date):
+    gmt_offset = context.get('request').COOKIES.get('gmt_offset', None)
+    if not gmt_offset:
+        return date
+    client_timezone = _OFFSETS_WITH_TIMEZONES.get(gmt_offset, None)
+    if not client_timezone:
+        return date
+    return date.astimezone(client_timezone)

@@ -8,9 +8,11 @@ from filer.admin.archiveadmin import ArchiveAdmin
 from filer.models import (Folder, File, Clipboard, Image,
                           Archive)
 
+from filer.admin.trashadmin import Trash, TrashAdmin
 
 admin.site.register(Folder, FolderAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(Clipboard, ClipboardAdmin)
 admin.site.register(Image, ImageAdmin)
 admin.site.register(Archive, ArchiveAdmin)
+admin.site.register(Trash, TrashAdmin)
