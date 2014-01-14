@@ -61,7 +61,7 @@ For serious testing ``tox`` is recommended. See documentation for details.
 
 
 .. _Django: http://djangoproject.com
-.. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
+.. _django-polymorphic: https://github.com/chrisglass/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _PIL: http://www.pythonware.com/products/pil/
