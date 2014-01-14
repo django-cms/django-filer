@@ -1,7 +1,9 @@
-import django, pytz, datetime
 from django.conf import settings
 from django.template import Library
 from distutils.version import LooseVersion
+import django
+import pytz
+import datetime
 
 register = Library()
 
