@@ -12,7 +12,9 @@ from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
 from datetime import datetime
-import mptt, itertools, filer
+import mptt
+import itertools
+import filer
 
 
 class FoldersChainableQuerySetMixin(object):
@@ -96,6 +98,9 @@ class FolderManager(models.Manager):
 
 
 class AliveFolderManager(FolderManager):
+    # this is required in order to make sure that other models that are
+    #   related to filer folders will get an DoesNotExist exception if the
+    #   folder is in trash
     use_for_related_fields = True
 
     def get_query_set(self):

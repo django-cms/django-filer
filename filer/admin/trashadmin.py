@@ -9,7 +9,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 from filer.settings import FILER_PAGINATE_BY
-import filer, json
+import filer
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Trash(models.Model):
@@ -66,6 +70,8 @@ class TrashAdmin(admin.ModelAdmin):
             raise PermissionDenied
 
         if filer_model not in ['file', 'folder']:
+            logger.warning(
+                'Restorable view for model %s is not available' % filer_model)
             raise Http404
 
         filer_model_cls = getattr(filer.models, filer_model.capitalize())

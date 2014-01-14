@@ -12,7 +12,11 @@ from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
 from datetime import datetime
-import polymorphic, hashlib, os, filer, logging
+import polymorphic
+import hashlib
+import os
+import filer
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +72,9 @@ class FileManager(polymorphic.PolymorphicManager):
 
 
 class AliveFileManager(FileManager):
+    # this is required in order to make sure that other models that are
+    #   related to filer files will get an DoesNotExist exception if the file
+    #   is in trash
     use_for_related_fields = True
 
     def get_query_set(self):
@@ -343,6 +350,24 @@ class File(mixins.TrashableMixin,
         return new_location
 
     def soft_delete(self, *args, **kwargs):
+        """
+        This method works as a default delete action of a filer file.
+        It will not actually delete the item from the database, instead it
+            will make it inaccessible for the default manager.
+        It just `fakes` a deletion by doing the following:
+            1. sets a deletion time that will be used to distinguish
+                `alive` and `trashed` filer files.
+            2. makes a copy of the actual file on storage and saves it to
+                a trash location on storage. Also tries to ignore if the
+                actual file is missing from storage.
+            3. updates only the filer file path in the database (no model
+                save is done since it tries to bypass the logic defined
+                in the save method)
+            4. deletes the file(and all it's thumbnails) from the
+                original location if no other filer files are referencing
+                it.
+        All the metadata of this filer file will remain intact.
+        """
         deletion_time = kwargs.pop('deletion_time', datetime.now())
         # move file to a `trash` location
         to_trash = filer.utils.generate_filename.get_trash_path(self)
@@ -379,8 +404,10 @@ class File(mixins.TrashableMixin,
             self.deleted_at = deletion_time
             self.file = new_location
 
-
     def hard_delete(self, *args, **kwargs):
+        """
+        This method deletes the filer file from the database and from storage.
+        """
         # delete the model before deleting the file from storage
         super(File, self).delete(*args, **kwargs)
         # delete the actual file from storage and all its thumbnails

@@ -3,10 +3,10 @@ import os
 
 import filer.models.clipboardmodels
 from filer.utils.files import get_valid_filename
+from filer import settings as filer_settings
 
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.encoding import force_unicode, smart_str
-
 
 def by_date(instance, filename):
     datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
@@ -54,7 +54,7 @@ def by_path(instance, filename):
 
 
 def get_trash_path(instance):
-    path = ['_trash']
+    path = [filer_settings.FILER_TRASH_PREFIX]
     # enforce uniqueness by using file's pk
     path.append("%s" % instance.pk)
     # add folder path
