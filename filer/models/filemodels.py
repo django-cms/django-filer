@@ -147,6 +147,9 @@ class File(mixins.TrashableMixin,
     trash = TrashFileManager()
     all_objects = FileManager()
 
+    # fix for https://github.com/chrisglass/django_polymorphic/issues/34
+    _base_manager = models.Manager()
+
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
         return True  # I match all files...
