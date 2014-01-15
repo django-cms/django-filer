@@ -4,10 +4,10 @@ from django.utils.encoding import force_unicode
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
+from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 from filer.settings import FILER_PAGINATE_BY
 import filer
 import json
