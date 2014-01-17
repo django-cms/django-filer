@@ -21,6 +21,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _is_missing_file_error(exception):
+    """
+    Ugly way of checking in an exception is a 'missing file' error.
+    """
+    # sice there can be many types of storages better to check in
+    #   this way if the error is saying that the file doesn't exist
+    #   in which case nothing to do
+    missing_files_errs = ('no such file', 'does not exist', )
+
+    def find_msg_in_error(msg):
+        return msg in str(exception).lower()
+
+    if not any(map(find_msg_in_error, missing_files_errs)):
+        raise exception
+
+
 class FilesChainableQuerySetMixin(object):
 
     def readonly(self, user):
@@ -378,16 +394,7 @@ class File(mixins.TrashableMixin,
         try:
             new_location = self._copy_file(to_trash)
         except Exception as e:
-            # sice there can be many types of storages better to check in
-            #   this way if the error is saying that the file doesn't exist
-            #   in which case nothing to do
-            missing_files_errs = ('no such file', 'does not exist')
-
-            def find_msg_in_error(msg):
-                return msg in str(e).lower()
-
-            if not any(map(find_msg_in_error, missing_files_errs)):
-                raise e
+            _is_missing_file_error(e)
             if filer_settings.FILER_ENABLE_LOGGING:
                 logger.error('Error while trying to copy file: %s to %s.' % (
                     old_location, to_trash), e)
@@ -422,6 +429,39 @@ class File(mixins.TrashableMixin,
     def delete(self, *args, **kwargs):
         super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
+
+    def restore(self, restore_folders=True):
+        if self.folder_id:
+            Folder = filer.models.foldermodels.Folder
+            try:
+                self.folder
+            except Folder.DoesNotExist:
+                self.folder = Folder.all_objects.get(id=self.folder_id)
+            if restore_folders:
+                self.folder.restore_path()
+        # owner username is required when generating a path to a unfiled file
+        if not self.owner:
+            fake_owner = object()
+            fake_owner.username = '_missing_owner'
+            self.owner = fake_owner
+
+        old_location, new_location = self.file.name, None
+        destination = self.file.field.upload_to(self, self.actual_name)
+        try:
+            new_location = self._copy_file(destination)
+        except Exception as e:
+            _is_missing_file_error(e)
+            if filer_settings.FILER_ENABLE_LOGGING:
+                logger.error('Error while trying to copy file: %s to %s.' % (
+                    old_location, destination), e)
+        else:
+            self.file.delete(False)
+        finally:
+            new_location = new_location or destination
+            File.trash.filter(pk=self.pk).update(
+                deleted_at=None, file=new_location)
+            self.deleted_at = None
+            self.file.name = new_location
 
     @property
     def label(self):

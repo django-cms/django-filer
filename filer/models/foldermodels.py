@@ -359,6 +359,27 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         super(Folder, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
+    def restore_path(self):
+        # TODO check if destination name available
+        ancestors_ids = self.get_ancestors(include_self=True).\
+            filter(deleted_at__isnull=False).\
+            values_list('id', flat=True)
+        manager = Folder.all_objects
+        manager.filter(id__in=ancestors_ids).update(deleted_at=None)
+
+    def restore(self):
+        self.restore_path()
+        desc_ids = list(self.get_descendants(include_self=True).\
+                            values_list('id', flat=True))
+        manager = Folder.all_objects
+        manager.filter(id__in=desc_ids).update(deleted_at=None)
+        # restore self and descendants files
+        file_mgr = filer.models.filemodels.File.trash
+        files_qs = file_mgr.filter(folder__in=desc_ids)
+        for filer_file in files_qs:
+            filer_file.restore(restore_folders=False)
+        self.deleted_at = None
+
     @property
     def trashed_file_count(self):
         file_mgr = filer.models.filemodels.File.trash

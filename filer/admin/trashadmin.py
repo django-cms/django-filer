@@ -108,7 +108,7 @@ class TrashAdmin(admin.ModelAdmin):
             raise Http404
 
         data = {}
-        file_exists = file_obj.file.storage.exists(file_obj.path)
+        file_exists = file_obj.file.storage.exists(file_obj.file.name)
         data['exists'] = file_exists
         if file_exists:
             # a bit of hack to force getting url even if it's in trash
