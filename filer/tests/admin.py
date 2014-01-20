@@ -27,7 +27,7 @@ from filer.tests.helpers import (
 )
 from filer.utils.checktrees import TreeChecker
 from cmsroles.models import Role
-from cmsroles.tests import HelpersMixin
+from cmsroles.tests.tests import HelpersMixin
 from cmsroles.siteadmin import get_site_admin_required_permission
 
 

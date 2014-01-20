@@ -59,7 +59,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 TEMPLATE_LOADERS = (
-    'cmsroles.test_utils.MockLoader',
+    'cmsroles.tests.utils.MockLoader',
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     )
