@@ -180,6 +180,9 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     objects = AliveFolderManager()
     trash = TrashFolderManager()
     all_objects = FolderManager()
+    # required in order for django to know about trashed folders in case of
+    #   deleting owners or other related objects
+    _base_manager = models.Manager()
 
     def __init__(self, *args, **kwargs):
         super(Folder, self).__init__(*args, **kwargs)
@@ -569,7 +572,6 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         return False
 
     class Meta:
-        unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
                         "Can use directory listing"),
