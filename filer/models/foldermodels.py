@@ -551,7 +551,6 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         return False
 
     class Meta:
-        unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
                         "Can use directory listing"),
