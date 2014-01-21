@@ -72,6 +72,9 @@ class FoldersChainableQuerySetMixin(object):
     def in_trash(self):
         return self.filter(deleted_at__isnull=False)
 
+    def alive(self):
+        return self.filter(deleted_at__isnull=True)
+
 
 class EmptyFoldersQS(models.query.EmptyQuerySet,
                      FoldersChainableQuerySetMixin):
@@ -104,15 +107,13 @@ class AliveFolderManager(FolderManager):
     use_for_related_fields = True
 
     def get_query_set(self):
-        return FolderQueryset(self.model, using=self._db).filter(
-            deleted_at__isnull=True)
+        return FolderQueryset(self.model, using=self._db).alive()
 
 
 class TrashFolderManager(FolderManager):
 
     def get_query_set(self):
-        return FolderQueryset(self.model, using=self._db).filter(
-            deleted_at__isnull=False)
+        return FolderQueryset(self.model, using=self._db).in_trash()
 
 
 class Folder(mixins.TrashableMixin, mixins.IconsMixin):
@@ -362,25 +363,51 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         super(Folder, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
+    def _generate_valid_name_for_restore(self):
+        name = self.name
+        i = 1
+        while self.get_siblings().filter(
+                deleted_at__isnull=True, name=name).exists():
+            name = "%s_%s" % (self.name, i)
+            i += 1
+        return name
+
     def restore_path(self):
-        # TODO check if destination name available
-        ancestors_ids = self.get_ancestors(include_self=True).\
-            filter(deleted_at__isnull=False).\
-            values_list('id', flat=True)
-        manager = Folder.all_objects
-        manager.filter(id__in=ancestors_ids).update(deleted_at=None)
+        """
+        This method makes this folder path to be a valid destination for
+            for restoring files/sub-folders.
+        * it restores all the trashed folders in this folder's path.
+        * files from the folders in path will not be restored.
+        """
+        trashed_ancestors = self.get_ancestors(include_self=True).filter(
+            deleted_at__isnull=False)
+        first_node_trashed = trashed_ancestors[:1]
+        if first_node_trashed:
+            first_node_trashed = first_node_trashed[0]
+            new_name = first_node_trashed._generate_valid_name_for_restore()
+            if new_name != first_node_trashed.name:
+                Folder.trash.filter(
+                    id=first_node_trashed.id).update(name=new_name)
+            trashed_ancestors.update(deleted_at=None)
 
     def restore(self):
+        """
+            Restores all files and subfolders contained in this folder.
+        """
         self.restore_path()
-        desc_ids = list(self.get_descendants(include_self=True).\
-                            values_list('id', flat=True))
-        manager = Folder.all_objects
-        manager.filter(id__in=desc_ids).update(deleted_at=None)
+        desc_ids = []
+        descendants = self.get_descendants(include_self=True).filter(
+            deleted_at__isnull=False)
+        for descendant in descendants:
+            new_name = descendant._generate_valid_name_for_restore()
+            Folder.trash.filter(id=descendant.id).update(
+                deleted_at=None, name=new_name)
+            desc_ids.append(descendant.id)
         # restore self and descendants files
         file_mgr = filer.models.filemodels.File.trash
         files_qs = file_mgr.filter(folder__in=desc_ids)
         for filer_file in files_qs:
-            filer_file.restore(restore_folders=False)
+            filer_file.restore()
         self.deleted_at = None
 
     @property

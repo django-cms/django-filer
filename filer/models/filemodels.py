@@ -430,23 +430,53 @@ class File(mixins.TrashableMixin,
         super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
-    def restore(self, restore_folders=True):
+    def _get_path_for_restore(self):
+        """
+        Returns the first available destination path where this file
+            will be restored to.
+        """
+        filename = self.actual_name
+        basename, extension = os.path.splitext(filename)
+        destination = self.file.field.upload_to(self, filename)
+        i = 1
+        while File.objects.filter(file=destination).exists():
+            filename = "%s_%s%s" % (basename, i, extension)
+            destination = self.file.field.upload_to(self, filename)
+            i += 1
+        # set actual name
+        if self.name in ('', None):
+            self.original_filename = filename
+        else:
+            self.name = filename
+        return destination
+
+    def restore(self):
+        """
+            Restores the file to its folder location.
+            If there's already an existing file with the same name, it will
+                generate a new filename.
+        """
         if self.folder_id:
             Folder = filer.models.foldermodels.Folder
             try:
                 self.folder
             except Folder.DoesNotExist:
-                self.folder = Folder.all_objects.get(id=self.folder_id)
-            if restore_folders:
-                self.folder.restore_path()
-        # owner username is required when generating a path to a unfiled file
-        if not self.owner:
-            fake_owner = object()
-            fake_owner.username = '_missing_owner'
-            self.owner = fake_owner
+                self.folder = Folder.trash.get(id=self.folder_id)
+
+            self.folder.restore_path()
+            # at this point this file's folder should be `alive`
+            self.folder = filer.models.Folder.objects.get(id=self.folder_id)
+        else:
+            # owner username is required when generating a path to an
+            #       unfiled file
+            if not self.owner:
+                fake_owner = object()
+                fake_owner.username = '_missing_owner'
+                self.owner = fake_owner
 
         old_location, new_location = self.file.name, None
-        destination = self.file.field.upload_to(self, self.actual_name)
+        destination = self._get_path_for_restore()
+
         try:
             new_location = self._copy_file(destination)
         except Exception as e:
@@ -459,9 +489,14 @@ class File(mixins.TrashableMixin,
         finally:
             new_location = new_location or destination
             File.trash.filter(pk=self.pk).update(
-                deleted_at=None, file=new_location)
+                deleted_at=None, file=new_location,
+                name=self.name, original_filename=self.original_filename)
             self.deleted_at = None
             self.file.name = new_location
+            # restore to user clipboard
+            if self.owner_id and not self.folder_id:
+                clipboard = filer.models.tools.get_user_clipboard(self.owner)
+                clipboard.append_file(File.objects.get(id=self.id))
 
     @property
     def label(self):

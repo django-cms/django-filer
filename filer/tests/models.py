@@ -478,3 +478,22 @@ class TrashableModelTestCase(TestCase):
         self.assertFalse(Folder.objects.filter(pk=foo_pk).exists())
         self.assertEqual(File.trash.get(pk=file_foo_pk).file.name,
                          '_trash/%s/foo/image.jpg' % file_foo_pk)
+
+    def test_restore_file_missing_user(self):
+        pass
+
+    def test_restore_file_with_trashed_folder(self):
+        pass
+
+    def test_restore_file_with_alive_folder(self):
+        pass
+
+    def test_restore_clipboard_file_where_location_not_available(self):
+        pass
+
+    def test_restore_file_where_location_not_available(self):
+        # another file exists at the same path
+        pass
+
+    def test_restore_file_where_trashed_folder_location_not_available(self):
+        pass
