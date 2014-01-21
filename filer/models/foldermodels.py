@@ -395,7 +395,8 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
             Restores all files and subfolders contained in this folder.
         """
         self.restore_path()
-        desc_ids = []
+        # add self since it was restored with restore_path method
+        desc_ids = [self.id]
         descendants = self.get_descendants(include_self=True).filter(
             deleted_at__isnull=False)
         for descendant in descendants:
