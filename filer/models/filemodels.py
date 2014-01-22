@@ -430,7 +430,7 @@ class File(mixins.TrashableMixin,
         super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
-    def _get_path_for_restore(self):
+    def _generate_valid_location_for_restore(self):
         """
         Returns the first available destination path where this file
             will be restored to.
@@ -467,7 +467,7 @@ class File(mixins.TrashableMixin,
             self.folder = filer.models.Folder.objects.get(id=self.folder_id)
 
         old_location, new_location = self.file.name, None
-        destination = self._get_path_for_restore()
+        destination = self._generate_valid_location_for_restore()
 
         try:
             new_location = self._copy_file(destination)

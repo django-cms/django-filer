@@ -469,6 +469,7 @@ class TrashableModelTestCase(TestCase):
         img.file.get_thumbnail({'size': (60, 80)})
         thumb_no = len(filer_settings.FILER_ADMIN_ICON_SIZES) + 1
         self.assertEqual(sum(1 for i in img.file.get_thumbnails()), thumb_no)
+        self.assertNotEqual(img.url, '')
 
     def test_folders_deletion_is_soft_by_default(self):
         foo = Folder.objects.create(name='foo')
@@ -496,6 +497,29 @@ class TrashableModelTestCase(TestCase):
         File.trash.get(id=foo.id).restore()
         foo = File.objects.get(id=foo.id)
         self.assertEqual(foo.file.name, '_clipboard/_missing_owner/foo.jpg')
+
+    def test_file_restore_moves_file_on_storage(self):
+        foo = Folder.objects.create(name='foo')
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        storage = foo_img.file.storage
+        alive_path = 'foo/foo.jpg'
+        trashed_path = '_trash/%s/foo/foo.jpg' % foo_img.pk
+        self.assertEqual(foo_img.file.name, alive_path)
+        self.assertTrue(storage.exists(alive_path))
+        self.assertFalse(storage.exists(trashed_path))
+        foo.delete()
+        self.assertFalse(storage.exists(alive_path))
+        self.assertTrue(storage.exists(trashed_path))
+        File.trash.get(id=foo_img.id).restore()
+        self.assertTrue(storage.exists(alive_path))
+        self.assertFalse(storage.exists(trashed_path))
+        # thumbnails should get generated
+        foo_img = File.objects.get(id=foo_img.id)
+        self.assertEqual(sum(1 for i in foo_img.file.get_thumbnails()), 0)
+        generated_thumbnails = foo_img.icons
+        foo_img.file.get_thumbnail({'size': (60, 80)})
+        thumb_no = len(filer_settings.FILER_ADMIN_ICON_SIZES) + 1
+        self.assertEqual(sum(1 for i in foo_img.file.get_thumbnails()), thumb_no)
 
     def test_restore_clipboard_file(self):
         from filer.models.tools import get_user_clipboard, delete_clipboard
@@ -596,4 +620,90 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(Folder.trash.count() + File.trash.count(), 1)
         self.assertEqual(Folder.objects.count(), 4)
 
-    # def test_restore_folder
+    def test_restore_empty_folder(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        baz = Folder.objects.create(name='baz', parent=foo)
+        self.assertEqual(Folder.objects.count(), 3)
+        foo.delete()
+        self.assertEqual(Folder.objects.count(), 0)
+        Folder.trash.get(id=foo.id).restore()
+        self.assertEqual(Folder.objects.count(), 3)
+        bar_img = File.objects.get(id=bar_img.id)
+        self.assertEqual(bar_img.file.name, 'foo/bar/bar.jpg')
+        # add file/folder to the empty folder make sure it works after restore
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        self.assertEqual(foo_img.file.name, 'foo/foo.jpg')
+        baz_img = self.create_filer_image('baz.jpg', folder=baz)
+        self.assertEqual(baz_img.file.name, 'foo/baz/baz.jpg')
+        baz_child = Folder.objects.create(name='baz', parent=baz)
+        baz_child_img = self.create_filer_image('baz.jpg', folder=baz_child)
+        self.assertEqual(baz_child_img.file.name, 'foo/baz/baz/baz.jpg')
+
+    def test_restore_folder_at_unavailable_location(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        baz = Folder.objects.create(name='baz', parent=bar)
+        bar.delete()
+        # make restore location unavailable
+        Folder.objects.create(name='bar', parent=foo)
+        Folder.trash.get(id=bar.id).restore()
+        bar = Folder.objects.get(id=bar.id)
+        self.assertEqual(bar.name, 'bar_1')
+        baz = Folder.objects.get(id=baz.id)
+        self.assertEqual(baz.pretty_logical_path, '/foo/bar_1/baz')
+
+    def test_folder_restore_restores_all_files(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        baz = Folder.objects.create(name='baz', parent=bar)
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        baz_img = self.create_filer_image('baz.jpg', folder=baz)
+        foo_img1 = self.create_filer_image('foo1.jpg', folder=foo)
+        bar_img1 = self.create_filer_image('bar1.jpg', folder=bar)
+        baz_img1 = self.create_filer_image('baz1.jpg', folder=baz)
+        self.assertEqual(Folder.objects.count()+File.objects.count(), 9)
+        foo.delete()
+        self.assertEqual(Folder.objects.count()+File.objects.count(), 0)
+        Folder.trash.get(id=foo.id).restore()
+        self.assertEqual(Folder.objects.count()+File.objects.count(), 9)
+        foo = Folder.objects.get(id=foo.id)
+        self.assertEqual(foo.get_descendants(include_self=True).count(), 3)
+        self.assertEqual(File.objects.get(id=foo_img.id).file.name,
+                         'foo/foo.jpg')
+        self.assertEqual(File.objects.get(id=foo_img1.id).file.name,
+                         'foo/foo1.jpg')
+        self.assertEqual(File.objects.get(id=bar_img.id).file.name,
+                         'foo/bar/bar.jpg')
+        self.assertEqual(File.objects.get(id=bar_img1.id).file.name,
+                         'foo/bar/bar1.jpg')
+        self.assertEqual(File.objects.get(id=baz_img.id).file.name,
+                         'foo/bar/baz/baz.jpg')
+        self.assertEqual(File.objects.get(id=baz_img1.id).file.name,
+                         'foo/bar/baz/baz1.jpg')
+
+    def test_restore_folder_with_duplicated_children(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        bar.delete()
+        new_bar = Folder.objects.create(name='bar', parent=foo)
+        new_bar_img = self.create_filer_image('bar.jpg', folder=new_bar)
+        new_bar.delete()
+        foo.delete()
+        self.assertEqual(Folder.objects.count()+File.objects.count(), 0)
+        Folder.trash.get(id=foo.id).restore()
+        self.assertEqual(Folder.objects.count()+File.objects.count(), 6)
+        bar_folder_names = Folder.objects.filter(
+            parent=foo.id).values_list('name', flat=True)
+        self.assertEqual(len(bar_folder_names), 2)
+        self.assertEqual(sorted(['bar', 'bar_1']), sorted(bar_folder_names))
+        self.assertEqual(File.objects.get(id=foo_img.id).file.name,
+                         'foo/foo.jpg')
+        self.assertEqual(File.objects.get(id=bar_img.id).file.name,
+                         'foo/bar/bar.jpg')
+        self.assertEqual(File.objects.get(id=new_bar_img.id).file.name,
+                         'foo/bar_1/bar.jpg')
