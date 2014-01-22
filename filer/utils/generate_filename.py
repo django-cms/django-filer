@@ -45,7 +45,7 @@ def by_path(instance, filename):
     if _goes_to_clipboard(instance):
         return os.path.join(
             filer.models.clipboardmodels.Clipboard.folder_name,
-            instance.owner.username,
+            instance.owner.username if instance.owner else '_missing_owner',
             filename)
     else:
         return os.path.join(

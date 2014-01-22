@@ -370,6 +370,9 @@ class ArchiveTest(TestCase):
                          u'/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
 
 
+@SettingsOverride(filer_settings,
+                  FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                  FOLDER_AFFECTS_URL=True)
 class TrashableModelTestCase(TestCase):
 
     def tearDown(self):
@@ -386,13 +389,16 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(File.trash.get(pk=file_foo.pk).file.name,
                          '_trash/%s/file.txt' % file_foo.pk)
 
-    def create_filer_image(self, image_name):
+    def create_filer_image(self, image_name, **kwargs):
         image = create_image()
         image_path = os.path.join(os.path.dirname(__file__), image_name)
         image.save(image_path, 'JPEG')
         file_obj = DjangoFile(open(image_path), name=image_name)
-        image = Image.objects.create(original_filename=image_name,
-                                     file=file_obj)
+        kwargs.update({
+            'original_filename': image_name,
+            'file': file_obj
+            })
+        image = Image.objects.create(**kwargs)
         os.remove(image_path)
         return image
 
@@ -479,21 +485,115 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(File.trash.get(pk=file_foo_pk).file.name,
                          '_trash/%s/foo/image.jpg' % file_foo_pk)
 
-    def test_restore_file_missing_user(self):
-        pass
+    def test_restore_clipboard_file_missing_user(self):
+        from filer.models.tools import get_user_clipboard, delete_clipboard
+        user = create_superuser()
+        foo = self.create_filer_image('foo.jpg', owner=user)
+        clipboard = get_user_clipboard(user)
+        clipboard.append_file(foo)
+        delete_clipboard(clipboard)
+        user.delete()
+        File.trash.get(id=foo.id).restore()
+        foo = File.objects.get(id=foo.id)
+        self.assertEqual(foo.file.name, '_clipboard/_missing_owner/foo.jpg')
+
+    def test_restore_clipboard_file(self):
+        from filer.models.tools import get_user_clipboard, delete_clipboard
+        user = create_superuser()
+        foo = self.create_filer_image('foo.jpg', owner=user)
+        clipboard = get_user_clipboard(user)
+        self.assertEqual(clipboard.files.count(), 0)
+        clipboard.append_file(foo)
+        delete_clipboard(clipboard)
+        self.assertEqual(clipboard.files.count(), 0)
+        File.trash.get(id=foo.id).restore()
+        self.assertEqual(clipboard.files.count(), 1)
+        foo = File.objects.get(id=foo.id)
+        self.assertEqual(foo.file.name,
+                         '_clipboard/%s/foo.jpg' % user.username)
 
     def test_restore_file_with_trashed_folder(self):
-        pass
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 0)
+        foo.delete()
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 4)
+        File.trash.get(id=bar_img.id).restore()
+        self.assertEqual(Folder.objects.count() + File.objects.count(), 3)
+        # foo image should still be in trash since only folders path to
+        #   bar file were restored
+        File.trash.get(id=foo_img.id)
+        self.assertEqual(File.objects.get(id=bar_img.id).file.name,
+                         'foo/bar/bar.jpg')
 
     def test_restore_file_with_alive_folder(self):
-        pass
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 0)
+        bar_img.delete()
+        self.assertEqual(File.trash.get(id=bar_img.id).file.name,
+                         '_trash/%s/foo/bar/bar.jpg' % bar_img.id)
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 1)
+        File.trash.get(id=bar_img.id).restore()
+        self.assertEqual(File.objects.get(id=foo_img.id).file.name,
+                         'foo/foo.jpg')
+        self.assertEqual(File.objects.get(id=bar_img.id).file.name,
+                         'foo/bar/bar.jpg')
 
     def test_restore_clipboard_file_where_location_not_available(self):
-        pass
+        from filer.models.tools import get_user_clipboard, delete_clipboard
+        user = create_superuser()
+        foo = self.create_filer_image('foo.jpg', owner=user)
+        clipboard = get_user_clipboard(user)
+        self.assertEqual(clipboard.files.count(), 0)
+        clipboard.append_file(foo)
+        delete_clipboard(clipboard)
+        self.assertEqual(clipboard.files.count(), 0)
+        # add file to the same location as foo
+        foo_duplicate = self.create_filer_image('foo.jpg', owner=user)
+        clipboard.append_file(foo_duplicate)
+        self.assertEqual(foo_duplicate.file.name,
+                         '_clipboard/%s/foo.jpg' % user.username)
+        self.assertEqual(clipboard.files.count(), 1)
+        # restore foo
+        File.trash.get(id=foo.id).restore()
+        self.assertEqual(clipboard.files.count(), 2)
+        self.assertEqual(File.objects.get(id=foo.id).file.name,
+                         '_clipboard/%s/foo_1.jpg' % user.username)
+        self.assertEqual(File.objects.get(id=foo_duplicate.id).file.name,
+                         '_clipboard/%s/foo.jpg' % user.username)
 
-    def test_restore_file_where_location_not_available(self):
-        # another file exists at the same path
-        pass
+    def test_restore_file_where_file_location_not_available(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 0)
+        bar_img.delete()
+        bar_img_duplicate = self.create_filer_image('bar.jpg', folder=bar)
+        File.trash.get(id=bar_img.id).restore()
+        self.assertEqual(File.objects.get(id=bar_img_duplicate.id).file.name,
+                         'foo/bar/bar.jpg')
+        self.assertEqual(File.objects.get(id=bar_img.id).file.name,
+                         'foo/bar/bar_1.jpg')
 
-    def test_restore_file_where_trashed_folder_location_not_available(self):
-        pass
+    def test_restore_file_where_file_path_location_not_available(self):
+        foo = Folder.objects.create(name='foo')
+        bar = Folder.objects.create(name='bar', parent=foo)
+        foo_img = self.create_filer_image('foo.jpg', folder=foo)
+        bar_img = self.create_filer_image('bar.jpg', folder=bar)
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 0)
+        foo.delete()
+        foo_duplicate = Folder.objects.create(name='foo')
+        bar_duplicate = Folder.objects.create(name='bar', parent=foo_duplicate)
+        File.trash.get(id=bar_img.id).restore()
+        self.assertEqual(File.objects.get(id=bar_img.id).file.name,
+                         'foo_1/bar/bar.jpg')
+        self.assertEqual(Folder.trash.count() + File.trash.count(), 1)
+        self.assertEqual(Folder.objects.count(), 4)
+
+    # def test_restore_folder

@@ -435,19 +435,18 @@ class File(mixins.TrashableMixin,
         Returns the first available destination path where this file
             will be restored to.
         """
-        filename = self.actual_name
-        basename, extension = os.path.splitext(filename)
-        destination = self.file.field.upload_to(self, filename)
+        basename, extension = os.path.splitext(self.actual_name)
+        destination = self.file.field.upload_to(self, self.actual_name)
         i = 1
         while File.objects.filter(file=destination).exists():
             filename = "%s_%s%s" % (basename, i, extension)
-            destination = self.file.field.upload_to(self, filename)
+            # set actual name
+            if self.name in ('', None):
+                self.original_filename = filename
+            else:
+                self.name = filename
+            destination = self.file.field.upload_to(self, self.actual_name)
             i += 1
-        # set actual name
-        if self.name in ('', None):
-            self.original_filename = filename
-        else:
-            self.name = filename
         return destination
 
     def restore(self):
@@ -466,13 +465,6 @@ class File(mixins.TrashableMixin,
             self.folder.restore_path()
             # at this point this file's folder should be `alive`
             self.folder = filer.models.Folder.objects.get(id=self.folder_id)
-        else:
-            # owner username is required when generating a path to an
-            #       unfiled file
-            if not self.owner:
-                fake_owner = object()
-                fake_owner.username = '_missing_owner'
-                self.owner = fake_owner
 
         old_location, new_location = self.file.name, None
         destination = self._get_path_for_restore()
