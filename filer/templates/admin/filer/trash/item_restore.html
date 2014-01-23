@@ -41,7 +41,7 @@
                     var file_name_elem = li_element.children(":first");
                     file_name_elem.html("<a href='" + data.file_url + "' title='Preview'>" + file_name_elem.text() + "</a>");
                 } else {
-                    li_element.append(' &rarr; File cannot be retrieved from storage. This item cannot be restored.')
+                    li_element.append(' &rarr; File cannot be retrieved from storage.')
                     li_element.addClass('errornote');
                     li_element.css('font-weight', 'normal')
                 }

@@ -115,7 +115,6 @@ class TrashAdmin(admin.ModelAdmin):
            context, context_instance=RequestContext(request))
 
     def restore_items(self, request, filer_model, filer_obj_id):
-        # TODO exclude files missing from storage
         filer_model_cls, filer_object = self._check_restore_view_valid(
             request, filer_model, filer_obj_id)
 
@@ -127,7 +126,7 @@ class TrashAdmin(admin.ModelAdmin):
                     filer_object.get_admin_directory_listing_url_path())
             else:
                 if not filer_object.folder_id:
-                    # if file in clipboard
+                    # clipboard files
                     return redirect('admin:filer-directory_listing-root')
                 return redirect(filer_object.get_admin_url_path())
 

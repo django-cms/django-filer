@@ -21,13 +21,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _is_missing_file_error(exception):
+def silence_error_if_missing_file(exception):
     """
-    Ugly way of checking in an exception is a 'missing file' error.
+    Ugly way of checking in an exception describes a 'missing file'.
     """
-    # sice there can be many types of storages better to check in
-    #   this way if the error is saying that the file doesn't exist
-    #   in which case nothing to do
     missing_files_errs = ('no such file', 'does not exist', )
 
     def find_msg_in_error(msg):
@@ -394,7 +391,7 @@ class File(mixins.TrashableMixin,
         try:
             new_location = self._copy_file(to_trash)
         except Exception as e:
-            _is_missing_file_error(e)
+            silence_error_if_missing_file(e)
             if filer_settings.FILER_ENABLE_LOGGING:
                 logger.error('Error while trying to copy file: %s to %s.' % (
                     old_location, to_trash), e)
@@ -472,7 +469,7 @@ class File(mixins.TrashableMixin,
         try:
             new_location = self._copy_file(destination)
         except Exception as e:
-            _is_missing_file_error(e)
+            silence_error_if_missing_file(e)
             if filer_settings.FILER_ENABLE_LOGGING:
                 logger.error('Error while trying to copy file: %s to %s.' % (
                     old_location, destination), e)
