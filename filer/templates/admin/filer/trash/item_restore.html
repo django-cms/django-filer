@@ -126,6 +126,14 @@
 {% endif %}
 
 <div class="submit-row">
+<script type="text/javascript">
+(function ($) {
+    var i = 0;
+    $('form').submit(function () {
+        i++; if(i > 1) { return false; }
+    });
+})(jQuery);
+</script>
 <input type="hidden" name="post" value="yes" />
 <input type="submit" value="Restore" title="Restore files & folders" />
 </div>
