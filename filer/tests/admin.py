@@ -167,6 +167,22 @@ class FilerClipboardAdminUrlsTests(TestCase):
         for img in Image.objects.all():
             img.delete(to_trash=False)
 
+    def test_filer_upload_image_no_extension(self):
+        image = create_image()
+        image_path = os.path.join(os.path.dirname(__file__), 'image_name')
+        image.save(image_path, 'JPEG')
+        file_obj = dj_files.File(open(image_path))
+        self.assertEqual(Image.objects.count(), 0)
+        response = self.client.post(
+            reverse('admin:filer-ajax_upload'), {
+            'Filename': 'image_name',
+            'Filedata': file_obj,
+            'jsessionid': self.client.session.session_key, },
+        )
+        self.assertEqual(Image.objects.count(), 1)
+        self.assertEqual(Image.objects.all()[0].actual_name, 'image_name.jpeg')
+        os.remove(image_path)
+
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = dj_files.File(open(self.filename))
