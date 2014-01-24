@@ -449,7 +449,11 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
                                     args=(self.id,))
 
     def __unicode__(self):
-        return u"%s" % (self.name,)
+        try:
+            name = self.pretty_logical_path
+        except:
+            name = self.name
+        return name
 
     @property
     def actual_name(self):

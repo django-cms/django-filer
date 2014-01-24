@@ -459,7 +459,11 @@ class File(mixins.TrashableMixin,
         return full_path
 
     def __unicode__(self):
-        return self.actual_name
+        try:
+            name = self.pretty_logical_path
+        except:
+            name = self.actual_name
+        return name
 
     def get_admin_url_path(self):
         return urlresolvers.reverse(
