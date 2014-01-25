@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-import django
 import os
 
 gettext = lambda s: s
 
 urlpatterns = []
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(**extra):
     from django.conf import settings

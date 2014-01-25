@@ -1,10 +1,4 @@
-from django import VERSION
-if VERSION[:2] >= (1, 4):
-    from django.utils.timezone import now
-else:
-    from datetime import datetime
-    def now(tz=None):
-        return datetime.now(tz)
+from django.utils.timezone import now
 from filer.utils.files import get_valid_filename
 from django.utils.encoding import force_unicode, smart_str
 import os

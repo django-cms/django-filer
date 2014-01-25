@@ -173,12 +173,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        try:
-            # django >=1.4
-            from django.conf.urls import patterns, url
-        except ImportError:
-            # django <1.4
-            from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(FolderAdmin, self).get_urls()
         from filer import views
         url_patterns = patterns('',
@@ -608,18 +603,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # will also be deleted.
         # Hopefully this also checks for necessary permissions.
         # TODO: Check if permissions are really verified
-        (args, varargs, keywords, defaults) = inspect.getargspec(get_deleted_objects)
-        if 'levels_to_root' in args:
-            # Django 1.2
-            deletable_files, perms_needed_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
-            deletable_folders, perms_needed_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
-        else:
-            # Django 1.3
-            using = router.db_for_write(self.model)
-            deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
-            deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
-            all_protected.extend(protected_files)
-            all_protected.extend(protected_folders)
+        using = router.db_for_write(self.model)
+        deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
+        deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
+        all_protected.extend(protected_files)
+        all_protected.extend(protected_folders)
 
         all_deletable_objects = [deletable_files, deletable_folders]
         all_perms_needed = perms_needed_files.union(perms_needed_folders)
