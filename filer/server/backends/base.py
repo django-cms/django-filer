@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.utils.encoding import smart_str
 import mimetypes
 import os
@@ -32,7 +34,7 @@ class ServerBase(object):
             filename = save_as
         else:
             filename = os.path.basename(file_obj.path)
-        response['Content-Disposition'] = smart_str(u'attachment; filename=%s' % filename)
+        response['Content-Disposition'] = smart_str('attachment; filename=%s' % filename)
 
     def size_header(self, response, **kwargs):
         size = kwargs.get('size', None)

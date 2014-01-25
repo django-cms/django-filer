@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django import forms
 from django import template
 from django.core.exceptions import ValidationError
@@ -15,7 +17,11 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.utils.encoding import force_unicode
+try:
+    from django.utils.encoding import force_str
+except ImportError:
+    # Django < 1.5
+    from django.utils.encoding import force_unicode as force_str
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -366,7 +372,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'permissions': permissions,
                 'permstest': userperms_for_request(folder, request),
                 'current_url': request.path,
-                'title': u'Directory listing for %s' % folder.name,
+                'title': 'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
                 'q': urlquote(q),
                 'show_result_count': show_result_count,
@@ -625,7 +631,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if n:
                 # delete all explicitly selected files
                 for f in files_queryset:
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_str(f))
                     f.delete()
                 # delete all files in all selected folders and their children
                 # This would happen automatically by ways of the delete cascade, but then the individual .delete()
@@ -635,11 +641,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     folder_ids.add(folder.id)
                     folder_ids.update(folder.get_descendants().values_list('id', flat=True))
                 for f in File.objects.filter(folder__in=folder_ids):
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_str(f))
                     f.delete()
                 # delete all folders
                 for f in folders_queryset:
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_str(f))
                     f.delete()
                 self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {
                     "count": n,
@@ -691,15 +697,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return mark_safe(u'%s: <a href="%s">%s</a>' %
+            return mark_safe('%s: <a href="%s">%s</a>' %
                              (escape(capfirst(opts.verbose_name)),
                               admin_url,
                               escape(obj)))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj))
+            return '%s: %s' % (capfirst(opts.verbose_name),
+                                force_str(obj))
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -751,7 +757,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             # We do not allow copying/moving back to the folder itself
             enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
-            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_unicode(fo)), enabled))
+            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
             for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
                 yield c
 
@@ -791,8 +797,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     parent=destination,
                     name__in=folders_queryset.values('name'))]
             if conflicting_names:
-                messages.error(request, _(u"Folders with names %s already exist at the selected "
-                                          "destination") % u", ".join(conflicting_names))
+                messages.error(request, _("Folders with names %s already exist at the selected "
+                                          "destination") % ", ".join(conflicting_names))
             elif n:
                 self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
@@ -938,7 +944,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         count = itertools.count(1)
         original = name
         while destination.contains_folder(name):
-            name = "%s_%s" % (original, count.next())
+            name = "%s_%s" % (original, next(count))
         return name
 
     def _copy_folder(self, folder, destination, suffix, overwrite):

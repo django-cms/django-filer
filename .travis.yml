@@ -2,6 +2,7 @@ language: python
 python:
   - 2.6
   - 2.7
+  - 3.3
 install:
   - ./.travis_setup
 env:
@@ -16,6 +17,10 @@ matrix:
   exclude:
     - python: 2.6
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
+    - python: 3.3
+      env: DJANGO="django>=1.4,<1.5"
   allow_failures:
     - python: 2.7
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"
+    - python: 3.3
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4"

@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.core import urlresolvers
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -8,6 +10,7 @@ from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
 from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
+from filer.utils.compatibility import python_2_unicode_compatible
 from polymorphic import PolymorphicModel, PolymorphicManager
 import hashlib
 import os
@@ -27,6 +30,7 @@ class FileManager(PolymorphicManager):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
 
 
+@python_2_unicode_compatible
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
@@ -149,7 +153,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
         try:
             self.generate_sha1()
-        except Exception, e:
+        except Exception:
             pass
         super(File, self).save(*args, **kwargs)
     save.alters_data = True
@@ -168,11 +172,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
-        text = u"%s" % (text,)
+        text = "%s" % (text,)
         return text
 
     def __lt__(self, other):
-        return cmp(self.label.lower(), other.label.lower()) < 0
+        return self.label.lower() < other.label.lower()
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
@@ -200,11 +204,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             return False
 
-    def __unicode__(self):
+    def __str__(self):
         if self.name in ('', None):
-            text = u"%s" % (self.original_filename,)
+            text = "%s" % (self.original_filename,)
         else:
-            text = u"%s" % (self.name,)
+            text = "%s" % (self.name,)
         return text
 
     def get_admin_url_path(self):

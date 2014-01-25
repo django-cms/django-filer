@@ -40,7 +40,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         params['select_folder'] = 1
         if params:
             url = '?' + '&amp;'.join(
-                            ['%s=%s' % (k, v) for k, v in params.items()])
+                            ['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
             url = ''
         if not 'class' in attrs:

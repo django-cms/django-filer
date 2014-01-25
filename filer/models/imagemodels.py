@@ -15,6 +15,7 @@ from django.utils.timezone import now, make_aware, get_current_timezone
 from django.core import urlresolvers
 from django.conf import settings
 from django.db import models
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from filer import settings as filer_settings
@@ -82,7 +83,7 @@ class Image(File):
                         self.date_taken = datetime(
                             int(year), int(month), int(day),
                             int(hour), int(minute), int(second))
-            except Exception, e:
+            except Exception:
                 pass
         if self.date_taken is None:
             self.date_taken = now()
@@ -161,12 +162,12 @@ class Image(File):
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
-        for name, opts in required_thumbnails.iteritems():
+        for name, opts in six.iteritems(required_thumbnails):
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
                 _thumbnails[name] = thumb.url
-            except Exception,e:
+            except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration

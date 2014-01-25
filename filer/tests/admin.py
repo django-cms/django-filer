@@ -84,7 +84,7 @@ class FilerFolderAdminUrlsTests(TestCase):
                                     {"name":FOLDER_NAME, "_popup": 1})
         # second folder didn't get created
         self.assertEqual(Folder.objects.count(), 1)
-        self.assertIn('Folder with this name already exists', response.content)
+        self.assertContains(response, 'Folder with this name already exists')
 
     def test_validate_no_duplcate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
@@ -102,7 +102,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
                 "name": "foo",
                 "_popup": 1})
-        self.assertIn('Folder with this name already exists', response.content)
+        self.assertContains(response, 'Folder with this name already exists')
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
         self.assertEqual(bar.name, "bar")
@@ -147,7 +147,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename))
+        file_obj = django.core.files.File(open(self.filename, 'rb'))
         response = self.client.post(
             reverse('admin:filer-ajax_upload'),
             {'Filename': self.image_name, 'Filedata': file_obj, 'jsessionid': self.client.session.session_key,},
@@ -158,7 +158,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename))
+        file_obj = django.core.files.File(open(self.filename, 'rb'))
         response = self.client.post(
             reverse('admin:filer-ajax_upload')+'?filename=%s' % self.image_name,
             data=file_obj.read(),
@@ -208,7 +208,7 @@ class BulkOperationsMixin(object):
 
     def create_image(self, folder, filename=None):
         filename = filename or 'test_image.jpg'
-        file_obj = django.core.files.File(open(self.filename), name=filename)
+        file_obj = django.core.files.File(open(self.filename, 'rb'), name=filename)
         image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder)
         image_obj.save()
         return image_obj
