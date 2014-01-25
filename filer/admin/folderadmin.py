@@ -301,7 +301,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             permissions = {}
         folder_files.sort()
         items = folder_children + folder_files
-        paginator = Paginator(items, FILER_PAGINATE_BY)
+        items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
+        paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
@@ -361,7 +362,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     in_clipboards__clipboarditem__clipboard__user=request.user
                     ).distinct(),
                 'paginator': paginator,
-                'paginated_items': paginated_items,
+                'paginated_items': paginated_items,  # [(item, item_perms), ]
                 'permissions': permissions,
                 'permstest': userperms_for_request(folder, request),
                 'current_url': request.path,
@@ -381,7 +382,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
                 'selection_note_all': selection_note_all % {'total_count': paginator.count},
                 'media': self.media,
-                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
+                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
+                'can_make_folder': request.user.is_superuser or \
+                        (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or \
+                        permissions.get("has_add_children_permission"),
         }, context_instance=RequestContext(request))
 
     @staticmethod
