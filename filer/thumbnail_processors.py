@@ -9,6 +9,7 @@ except ImportError:
         import ImageDraw
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
+from django.utils import six
 from easy_thumbnails import processors
 from filer.settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG, FILER_WHITESPACE_COLOR
 
@@ -17,7 +18,7 @@ RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 
 def normalize_subject_location(subject_location):
     if subject_location:
-        if isinstance(subject_location, basestring):
+        if isinstance(subject_location, six.string_types):
             m = RE_SUBJECT_LOCATION.match(subject_location)
             if m:
                 return (int(m.group(1)), int(m.group(2)))

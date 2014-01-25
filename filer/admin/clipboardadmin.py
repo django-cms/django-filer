@@ -1,6 +1,5 @@
 #-*- coding: utf-8 -*-
 import json
-
 from django.forms.models import modelform_factory
 from django.contrib import admin
 from django.http import HttpResponse
@@ -86,18 +85,18 @@ class ClipboardAdmin(admin.ModelAdmin):
                 json_response = {
                     'thumbnail': file_obj.icons['32'],
                     'alt_text': '',
-                    'label': unicode(file_obj),
+                    'label': str(file_obj),
                 }
                 return HttpResponse(json.dumps(json_response),
                                     **response_params)
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
-                    ', '.join(errors)) for field, errors in uploadform.errors.items()
+                    ', '.join(errors)) for field, errors in list(uploadform.errors.items())
                 ])
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
         except UploadException, e:
-            return HttpResponse(json.dumps({'error': unicode(e)}),
+            return HttpResponse(json.dumps({'error': str(e)}),
                                 **response_params)
 
     def get_model_perms(self, request):

@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
 from django.forms.models import modelform_factory
 from django.test import TestCase
@@ -31,7 +33,7 @@ class FilerApiTests(TestCase):
             f.delete()
 
     def create_filer_image(self):
-        file_obj = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
                                      file=file_obj)
@@ -52,7 +54,7 @@ class FilerApiTests(TestCase):
 
     def test_upload_image_form(self):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         ImageUploadForm = modelform_factory(Image, fields=('original_filename', 'owner', 'file'))
         upoad_image_form = ImageUploadForm({'original_filename': self.image_name,
                                                 'owner': self.superuser.pk},
@@ -78,7 +80,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + u'__%sx%s_q85_crop_upscale.jpg' % (size, size))
+                             file_basename + '__%sx%s_q85_crop_upscale.jpg' % (size, size))
 
     def test_file_upload_public_destination(self):
         """
@@ -116,7 +118,7 @@ class FilerApiTests(TestCase):
         Test that the file is actualy move from the private to the public
         directory when the is_public is checked on an existing private file.
         """
-        file_obj = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
 
         image = Image.objects.create(owner=self.superuser,
                                      is_public=False,
@@ -176,14 +178,14 @@ class FilerApiTests(TestCase):
         self.assertTrue(storage.exists(name))
 
     def test_folder_quoted_logical_path(self):
-        root_folder = Folder.objects.create(name=u"Foo's Bar", parent=None)
-        child = Folder.objects.create(name=u'Bar"s Foo', parent=root_folder)
-        self.assertEqual(child.quoted_logical_path, u'/Foo%27s%20Bar/Bar%22s%20Foo')
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        child = Folder.objects.create(name='Bar"s Foo', parent=root_folder)
+        self.assertEqual(child.quoted_logical_path, '/Foo%27s%20Bar/Bar%22s%20Foo')
 
     def test_folder_quoted_logical_path_with_unicode(self):
-        root_folder = Folder.objects.create(name=u"Foo's Bar", parent=None)
-        child = Folder.objects.create(name=u'Bar"s 日本 Foo', parent=root_folder)
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        child = Folder.objects.create(name='Bar"s 日本 Foo', parent=root_folder)
         self.assertEqual(child.quoted_logical_path,
-                         u'/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
+                         '/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
 
 

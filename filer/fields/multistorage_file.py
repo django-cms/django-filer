@@ -4,6 +4,7 @@ import base64
 import hashlib
 import warnings
 from io import BytesIO
+from django.utils import six
 from easy_thumbnails import fields as easy_thumbnails_fields, \
     files as easy_thumbnails_files
 from filer import settings as filer_settings
@@ -115,14 +116,14 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
             if sha.hexdigest() != obj.sha1:
                 warnings.warn('The checksum for "%s" diverges. Check for file consistency!' % obj.original_filename)
             payload_file.seek(0)
-            encoded_string = base64.b64encode(payload_file.read())
+            encoded_string = base64.b64encode(payload_file.read()).decode('utf-8')
             return value, encoded_string
         except IOError:
             warnings.warn('The payload for "%s" is missing. No such file on disk: %s!' % (obj.original_filename, self.storage.location))
             return value
 
     def to_python(self, value):
-        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], basestring):
+        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], six.text_type):
             try:
                 payload = base64.b64decode(value[1])
                 filename = os.path.join(self.storage.location, value[0])

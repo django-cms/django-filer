@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from filer.models import Folder
 import os
 import tempfile
@@ -8,14 +10,13 @@ from django.test import TestCase
 from django.core.files import File as DjangoFile
 from django.conf import settings
 from django.core.management import call_command
+from django.utils.six import StringIO
 
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, SettingsOverride)
 from filer import settings as filer_settings
-
-from io import BytesIO
 
 
 class DumpDataTests(TestCase):
@@ -34,14 +35,14 @@ class DumpDataTests(TestCase):
         pass
 
     def create_filer_image(self, folder=None):
-        file_obj = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
                                      file=file_obj, folder=folder)
         return image
 
     def create_filer_file(self, folder=None):
-        file_obj = DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         fileobj = File.objects.create(owner=self.superuser,
                                       original_filename=self.image_name,
                                       file=file_obj, folder=folder)
@@ -52,7 +53,7 @@ class DumpDataTests(TestCase):
         Testing the case of dump full and empty dataset
         """
         fileobj = self.create_filer_file()
-        jdata, jdata2 = BytesIO(), BytesIO()
+        jdata, jdata2 = StringIO(), StringIO()
         call_command("dumpdata", "filer", stdout=jdata)
         fileobj.delete()
         call_command("dumpdata", "filer", stdout=jdata2)
@@ -68,19 +69,19 @@ class DumpDataTests(TestCase):
         # Initialize the test data
         create_folder_structure(1,1)
         fileobj = self.create_filer_file(Folder.objects.all()[0])
-        jdata = BytesIO()
+        jdata = StringIO()
 
         # Dump the current data
         fobj = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
         call_command("dumpdata", "filer", stdout=jdata, indent=3)
 
-        # Delete database and filesystem data and
+        # Delete database and filesystem data
         complete = os.path.join(fileobj.file.storage.location, fileobj.path)
         os.unlink(complete)
         fileobj.delete()
 
         # Dump data to json file
-        fobj.write(jdata.getvalue())
+        fobj.write(jdata.getvalue().encode('utf-8'))
         fobj.seek(0)
 
         # Load data back
@@ -104,7 +105,7 @@ class DumpDataTests(TestCase):
             # Initialize the test data
             create_folder_structure(1,1)
             fileobj = self.create_filer_file(Folder.objects.all()[0])
-            jdata = BytesIO()
+            jdata = StringIO()
 
             # Dump the current data
             fobj = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
@@ -116,7 +117,7 @@ class DumpDataTests(TestCase):
             fileobj.delete()
 
             # Dump data to json file
-            fobj.write(jdata.getvalue())
+            fobj.write(jdata.getvalue().encode('utf-8'))
             fobj.seek(0)
 
             # Load data back
