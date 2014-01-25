@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem
+from filer.utils.compatibility import DJANGO_1_4
 from filer.utils.files import handle_upload, UploadException
 from filer.utils.loader import load_object
 
@@ -53,6 +54,8 @@ class ClipboardAdmin(admin.ModelAdmin):
         receives an upload from the uploader. Receives only one file at the time.
         """
         mimetype = "application/json" if request.is_ajax() else "text/html"
+        content_type_key = 'mimetype' if DJANGO_1_4 else 'content_type'
+        response_params = {content_type_key: mimetype}
         try:
             upload, filename, is_raw = handle_upload(request)
 
@@ -86,7 +89,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                     'label': unicode(file_obj),
                 }
                 return HttpResponse(simplejson.dumps(json_response),
-                                    mimetype=mimetype)
+                                    **response_params)
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
@@ -95,7 +98,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
         except UploadException, e:
             return HttpResponse(simplejson.dumps({'error': unicode(e)}),
-                                mimetype=mimetype)
+                                **response_params)
 
     def get_model_perms(self, request):
         """
