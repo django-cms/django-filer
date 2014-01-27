@@ -203,7 +203,7 @@ models.signals.post_save.connect(
     sender=Permission,
     dispatch_uid='filer.permission.pre_save.handle_permission_change')
 
-models.signals.post_delete.connect(
+models.signals.pre_delete.connect(
     handle_permission_change,
     sender=Permission,
     dispatch_uid='filer.permission.post_delete.handle_permission_change')
