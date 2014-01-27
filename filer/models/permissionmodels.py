@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 from django.contrib.auth import models as auth_models
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext as _
@@ -189,14 +190,18 @@ class Permission(models.Model):
 
 def handle_permission_change(sender, instance, **kwargs):
     # update the de-normalised field on the subject and update all descendants.
-    subject = instance.get_subject()
-    if getattr(subject, 'is_root', False):
-        # can't actually save anything to a model, since it's the virtual root object.
-        # but we should trigger the refresh for all descendants
-        for child in subject.children.all():
-            child.refresh_aggregated_permissions()
+    try:
+        subject = instance.get_subject()
+    except ObjectDoesNotExist:
+        pass
     else:
-        subject.refresh_permissions_from_model_workaround()
+        if getattr(subject, 'is_root', False):
+            # can't actually save anything to a model, since it's the virtual root object.
+            # but we should trigger the refresh for all descendants
+            for child in subject.children.all():
+                child.refresh_aggregated_permissions()
+        else:
+            subject.refresh_permissions_from_model_workaround()
 
 models.signals.post_save.connect(
     handle_permission_change,
