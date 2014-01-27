@@ -158,6 +158,8 @@ class File(mixins.TrashableMixin,
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self._old_name = self.name
+        self._old_file_location = self.file.name
+        self._old_sha1 = self.sha1
         self._old_folder_id = self.folder_id
         self._force_commit = False
 
@@ -235,7 +237,7 @@ class File(mixins.TrashableMixin,
             # TODO: Find a way to override this behavior.
             raise NotImplementedError
 
-        src_file_name = self.file.name
+        src_file_name = self._old_file_location
         storage = self.file.storages['public' if self.is_public else 'private']
 
         if hasattr(storage, 'copy'):
@@ -310,10 +312,15 @@ class File(mixins.TrashableMixin,
             source.delete()
 
     def update_location_on_storage(self, *args, **kwargs):
-        old_location = self.file.name
+        old_location = self._old_file_location
         # thumbnails might get physically deleted evenif the transaction fails
         # though luck... they get re-created anyway...
         self._delete_thumbnails()
+        # check if file content has changed
+        if self._old_sha1 != self.sha1:
+            # actual file content needs to be replaced on storage prior to
+            #   filer file instance save
+            self.file.storage.save(self._old_file_location, self.file)
         new_location = self.file.field.upload_to(self, self.actual_name)
         storage = self.file.storage
 
