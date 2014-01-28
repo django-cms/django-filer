@@ -2,9 +2,10 @@ from django.db import models
 from django.contrib import admin
 from django.utils.encoding import force_unicode
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, Http404
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
@@ -12,6 +13,7 @@ from filer.settings import FILER_PAGINATE_BY
 import filer
 import json
 import logging
+import operator
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +49,18 @@ class TrashAdmin(admin.ModelAdmin):
         return url_patterns
 
     def queryset(self, request):
-        files_q = Q(folder__deleted_at__isnull=True)
-        folders_q = Q(Q(parent=None) | Q(parent__deleted_at__isnull=True))
+        search_q = request.GET.get('q', '').split()
+        if search_q:
+            folders_q = reduce(operator.or_,
+                               [Q(name__icontains=bit) for bit in search_q])
+            files_q = reduce(operator.or_,
+                             [Q(Q(name__icontains=bit) |
+                                Q(original_filename__icontains=bit))
+                              for bit in search_q])
+        else:
+            files_q = Q(folder__deleted_at__isnull=True)
+            folders_q = Q(Q(parent=None) | Q(parent__deleted_at__isnull=True))
+
         file_qs = filer.models.filemodels.File.trash.filter(files_q)
         folder_qs = filer.models.foldermodels.Folder.trash.filter(folders_q)
         return MultiMoldelQuerysetChain([
@@ -63,6 +75,12 @@ class TrashAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def _get_restorable_parent(self, folder_id):
+        trashed = filer.models.Folder.all_objects.get(
+            id=folder_id).get_ancestors(include_self=True).filter(
+                deleted_at__isnull=False)[:1]
+        return trashed[0] if trashed else None
 
     def restorable_item_view(self, request, filer_model, filer_obj_id):
         opts = self.model._meta
@@ -80,10 +98,27 @@ class TrashAdmin(admin.ModelAdmin):
         except filer_model_cls.DoesNotExist, e:
             raise Http404
 
-        if hasattr(filer_object, 'get_descendants'):
+        # if this item cannot be restored alone redirect to the nearest
+        #   ancestor that is allowed to be restored
+        if filer_model == 'folder':
+            # a folder can be restored only if its parent is not in trash
+            restorable_item = self._get_restorable_parent(filer_object.id)
+            if restorable_item and restorable_item.id != filer_object.id:
+                return redirect(reverse(
+                    'admin:filer_trash_item',
+                    args=['folder', restorable_item.id]))
+
             descendants = filer_object.get_descendants(include_self=True).\
                 select_related('parent').filter(deleted_at__isnull=False)
         else:
+            # a single file can be restored only if it's folder is not in trash
+            if filer_object.folder_id:
+                restorable_item = self._get_restorable_parent(
+                    filer_object.folder_id)
+                if restorable_item:
+                    return redirect(reverse(
+                        'admin:filer_trash_item',
+                        args=['folder', restorable_item.id]))
             descendants = []
 
         context = {
@@ -122,6 +157,15 @@ class TrashAdmin(admin.ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
 
+        search_q = request.GET.get('q', '').split()
+        if search_q:
+            folder_q = reduce(operator.or_,
+                              [Q(name__icontains=bit) for bit in search_q])
+            files_q = reduce(operator.or_,
+                             [Q(Q(name__icontains=bit) |
+                                Q(original_filename__icontains=bit))
+                              for bit in search_q])
+
         items = self.queryset(request)
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
@@ -144,6 +188,7 @@ class TrashAdmin(admin.ModelAdmin):
             'app_label': opts.app_label,
             'paginator': paginator,
             'paginated_items': paginated_items,
+            'search_string': request.GET.get('q', '')
         }
         context.update(extra_context or {})
         return render_to_response('admin/filer/trash/directory_listing.html',

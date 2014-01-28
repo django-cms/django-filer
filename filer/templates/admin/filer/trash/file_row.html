@@ -7,7 +7,7 @@
 <!-- Filename/Dimensions -->
 <td>
     <div>
-        <b><a class="changelink" href="{% url 'admin:filer_trash_item' filer_model='file' filer_obj_id=file.id %}" title="{% blocktrans with file.label as item_label %}Restore '{{ item_label }}' file{% endblocktrans %}">{{ file.pretty_logical_path }}</a></b>
+        <b><a class="changelink" href="{% url 'admin:filer_trash_item' filer_model='file' filer_obj_id=file.id %}" title="{% blocktrans with file.label as item_label %}Restore '{{ item_label }}' file{% endblocktrans %}">{{ file|pretty_display }}</a></b>
         <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
     </div>
     <div>{% trans "Owner" %}: {% firstof file.owner.email file.owner.username "n/a" %}</div>

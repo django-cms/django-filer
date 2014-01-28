@@ -1,6 +1,6 @@
 {% extends "admin/filer/base_site.html" %}
 {% load url from future %}
-{% load filer_admin_tags i18n %}
+{% load filer_admin_tags i18n filermedia adminmedia %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
@@ -18,8 +18,24 @@
 {% spaceless %}
 <div id="content-main">
     <div class="module" id="changelist">
+        <div id="toolbar">
+            <div style="float: left;">
+                <form id="changelist-search" action="." method="get">
+                    {% csrf_token %}
+                    <div>
+                        <label for="searchbar"><img src="{% admin_icon_base %}icon_searchbox.png" alt="{% trans "Search" %}" /></label>
+                        <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" />
+                        <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}"  />
+                        {% if search_string %}
+                        <span class="small quiet" style='margin-left:10px;'><a href="?">{% trans "cancel search" %}</a></span>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <script type="text/javascript">document.getElementById("searchbar").focus();</script>
         <form id="changelist-form" action="" method="post">{% csrf_token %}
-
         <div id="toolbartable">
             <table cellspacing="0">
                 <thead>
@@ -55,7 +71,7 @@
             </table>
             <p class="paginator">
                 {% if paginated_items.has_previous %}
-                    <a href="?page={{ paginated_items.previous_page_number }}">{% trans "previous" %}</a>
+                    <a href="?page={{ paginated_items.previous_page_number }}{% if search_string %}&q={{search_string}}{% endif %}">{% trans "previous" %}</a>
                 {% endif %}
 
                 <span class="this-page">
@@ -65,7 +81,7 @@
                 </span>
 
                 {% if paginated_items.has_next %}
-                    <a href="?page={{ paginated_items.next_page_number }}">{% trans "next" %}</a>
+                    <a href="?page={{ paginated_items.next_page_number }}{% if search_string %}&q={{search_string}}{% endif %}">{% trans "next" %}</a>
                 {% endif %}
             </p>
         </div>
