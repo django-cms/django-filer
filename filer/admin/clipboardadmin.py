@@ -95,7 +95,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                     ', '.join(errors)) for field, errors in list(uploadform.errors.items())
                 ])
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
-        except UploadException, e:
+        except UploadException as e:
             return HttpResponse(json.dumps({'error': str(e)}),
                                 **response_params)
 
