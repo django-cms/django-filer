@@ -301,6 +301,25 @@ class ArchiveTest(TestCase):
         filer_zipfile = Archive.objects.get()
         filer_zipfile.extract()
 
+    def test_collision_when_extracting(self):
+        foo = Folder.objects.create(name="foo")
+        # move zip into a folder
+        archive = Archive.objects.get()
+        archive.folder = foo
+        archive.save()
+        # no collisions should be detected
+        self.assertEqual(archive.collisions(), [])
+        # extract zip in the new folder
+        Archive.objects.get().extract()
+        # collisions should be detected
+        self.assertNotEqual(Archive.objects.get().collisions(), [])
+        # delete foo content and re-try
+        for a_file in File.objects.exclude(id=archive.id).filter(folder=foo):
+            a.delete()
+        for subfolder in Folder.objects.filter(parent=foo):
+            subfolder.delete()
+        self.assertEqual(Archive.objects.get().collisions(), [])
+
     def test_entries_count(self):
         files = File.objects.filter(~Q(original_filename=self.zipname))
         tmp_basedir, _ = os.path.split(self.root)
@@ -329,6 +348,8 @@ class ArchiveTest(TestCase):
 
     def tearDown(self):
         os.remove('test.zip')
+        for f in File.all_objects.all():
+            f.delete(to_trash=False)
         for entry in reversed(self.entries):
             if os.path.isdir(entry):
                 os.rmdir(entry)

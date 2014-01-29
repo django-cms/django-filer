@@ -397,7 +397,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
 
     @property
     def files(self):
-        return self.all_files.all()
+        return filer.models.File.objects.filter(folder=self)
 
     def entries_with_names(self, names):
         """Returns an iterator yielding the files and folders that are direct
@@ -405,16 +405,18 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         """
         q = Q(name__in=names)
         q |= Q(original_filename__in=names) & (Q(name__isnull=True) | Q(name=''))
-        files_with_names = self.all_files.filter(q)
-        folders_with_names = self.children.filter(name__in=names)
+        files_with_names = filer.models.File.objects.filter(
+            folder=self).filter(q)
+        folders_with_names = Folder.objects.filter(
+            parent=self, name__in=names)
         return list(itertools.chain(files_with_names, folders_with_names))
 
     def pretty_path_entries(self):
-        """Returns a list of all the descendant's entries logical path"""
-        subdirs = self.get_descendants(include_self=True)
-        subdir_files = [x.files for x in subdirs]
-        super_files = list(itertools.chain.from_iterable(subdir_files))
-        file_paths = [x.pretty_logical_path for x in super_files]
+        """Returns a list of all the descendant's `alive` entries logical path"""
+        subdirs = self.get_descendants(include_self=True).filter(
+            deleted_at__isnull=True)
+        subdir_files = filer.models.File.objects.filter(folder__in=subdirs)
+        file_paths = [x.pretty_logical_path for x in subdir_files]
         dir_paths = [x.pretty_logical_path for x in subdirs]
         paths = file_paths + dir_paths
         return paths
@@ -426,9 +428,12 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         Used to generate breadcrumbs
         """
         folder_path = []
-        if self.parent:
-            folder_path.extend(self.parent.get_ancestors())
-            folder_path.append(self.parent)
+        try:
+            if self.parent:
+                folder_path.extend(self.parent.get_ancestors(
+                    include_self=True).filter(deleted_at__isnull=True))
+        except Folder.DoesNotExist:
+            pass
         return folder_path
 
     @property
