@@ -248,7 +248,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
-                descendants = folder.get_descendants(include_self=True)
+                descendants = folder.get_descendants(
+                    include_self=True).filter(deleted_at__isnull=True)
                 folder_qs = folders_available(
                     request, descendants.exclude(id=folder.id))
                 file_qs = files_available(
