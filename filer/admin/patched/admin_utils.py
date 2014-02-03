@@ -65,7 +65,26 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
 
 class PolymorphicAwareNestedObjects(NestedObjects):
-     def collect(self, objs, source_attr=None, **kwargs):
+
+    def _nested(self, obj, seen, format_callback):
+        if obj in seen:
+            return []
+        seen.add(obj)
+        children = []
+        for child in self.edges.get(obj, ()):
+            children.extend(self._nested(child, seen, format_callback))
+        if hasattr(obj, 'is_in_trash') and obj.is_in_trash():
+            ret = []
+        else:
+            if format_callback:
+                ret = [format_callback(obj)]
+            else:
+                ret = [obj]
+        if children:
+            ret.append(children)
+        return ret
+
+    def collect(self, objs, source_attr=None, **kwargs):
         if hasattr(objs, 'non_polymorphic'):
             # .filter() is needed, because there may already be cached polymorphic results in the queryset
             objs = objs.non_polymorphic().filter()
