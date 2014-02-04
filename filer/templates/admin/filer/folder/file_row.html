@@ -21,7 +21,7 @@
     {% endif %}
     <div>
         <b>
-            <a{% if file.restricted %} class="filer-restricted"{% endif %} href="{{ file.get_admin_url_path }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{{ file.label }}</a>
+            <a{% if file.restricted %} class="filer-restricted"{% endif %} href="{{ file.get_admin_url_path }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% if show_result_count %}{{ file.pretty_logical_path }}{% else %}{{ file.label }}{% endif %}</a>
         </b>
         <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
     </div>
