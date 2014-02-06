@@ -111,6 +111,8 @@ class FilerFileField(models.ForeignKey):
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Image model as parameter...
         # a FilerImageFiled can only be a ForeignKey to a Image
+        if "to" in kwargs.keys():
+            kwargs.pop("to")
         return super(FilerFileField, self).__init__(
             self.default_model_class, **kwargs)
 
