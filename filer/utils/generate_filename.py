@@ -1,23 +1,24 @@
-from django import VERSION
-if VERSION[:2] >= (1, 4):
-    from django.utils.timezone import now
-else:
-    from datetime import datetime
-    def now(tz=None):
-        return datetime.now(tz)
+from __future__ import unicode_literals
+
+try:
+    from django.utils.encoding import force_str
+except ImportError:
+    # Django < 1.5
+    from django.utils.encoding import force_unicode as force_str
+from django.utils.timezone import now
 from filer.utils.files import get_valid_filename
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import smart_str
 import os
 
 
 def by_date(instance, filename):
-    datepart = force_unicode(now().strftime(smart_str("%Y/%m/%d")))
+    datepart = force_str(now().strftime(smart_str("%Y/%m/%d")))
     return os.path.join(datepart, get_valid_filename(filename))
 
 def randomized(instance, filename):
     import uuid
     uuid_str = str(uuid.uuid4())
-    random_path = u"%s/%s/%s" % (uuid_str[0:2], uuid_str[2:4], uuid_str)
+    random_path = "%s/%s/%s" % (uuid_str[0:2], uuid_str[2:4], uuid_str)
     return os.path.join(random_path, get_valid_filename(filename))
 
 

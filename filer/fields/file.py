@@ -30,7 +30,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 file_obj = File.objects.get(pk=value)
                 related_url = file_obj.logical_folder.\
                                 get_admin_directory_listing_url_path()
-            except Exception,e:
+            except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration
@@ -43,7 +43,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         params = self.url_parameters()
         if params:
             lookup_url = '?' + '&amp;'.join(
-                                ['%s=%s' % (k, v) for k, v in params.items()])
+                                ['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
             lookup_url = ''
         if not 'class' in attrs:
@@ -97,11 +97,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         other_widget = kwargs.pop('widget', None)
-        if 'admin_site' in inspect.getargspec(self.widget.__init__)[0]: # Django 1.4
-            widget_instance = self.widget(rel, site)
-        else: # Django <= 1.3
-            widget_instance = self.widget(rel)
-        forms.Field.__init__(self, widget=widget_instance, *args, **kwargs)
+        forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required

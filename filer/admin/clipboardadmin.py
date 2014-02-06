@@ -1,11 +1,12 @@
 #-*- coding: utf-8 -*-
+import json
 from django.forms.models import modelform_factory
 from django.contrib import admin
 from django.http import HttpResponse
-from django.utils import simplejson
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem
+from filer.utils.compatibility import DJANGO_1_4
 from filer.utils.files import handle_upload, UploadException
 from filer.utils.loader import load_object
 
@@ -24,12 +25,7 @@ class ClipboardAdmin(admin.ModelAdmin):
     verbose_name_plural = "DEBUG Clipboards"
 
     def get_urls(self):
-        try:
-            # django >=1.4
-            from django.conf.urls import patterns, url
-        except ImportError:
-            # django <1.4
-            from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(ClipboardAdmin, self).get_urls()
         from filer import views
         url_patterns = patterns('',
@@ -57,6 +53,8 @@ class ClipboardAdmin(admin.ModelAdmin):
         receives an upload from the uploader. Receives only one file at the time.
         """
         mimetype = "application/json" if request.is_ajax() else "text/html"
+        content_type_key = 'mimetype' if DJANGO_1_4 else 'content_type'
+        response_params = {content_type_key: mimetype}
         try:
             upload, filename, is_raw = handle_upload(request)
 
@@ -87,19 +85,19 @@ class ClipboardAdmin(admin.ModelAdmin):
                 json_response = {
                     'thumbnail': file_obj.icons['32'],
                     'alt_text': '',
-                    'label': unicode(file_obj),
+                    'label': str(file_obj),
                 }
-                return HttpResponse(simplejson.dumps(json_response),
-                                    mimetype=mimetype)
+                return HttpResponse(json.dumps(json_response),
+                                    **response_params)
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
-                    ', '.join(errors)) for field, errors in uploadform.errors.items()
+                    ', '.join(errors)) for field, errors in list(uploadform.errors.items())
                 ])
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
-        except UploadException, e:
-            return HttpResponse(simplejson.dumps({'error': unicode(e)}),
-                                mimetype=mimetype)
+        except UploadException as e:
+            return HttpResponse(json.dumps({'error': str(e)}),
+                                **response_params)
 
     def get_model_perms(self, request):
         """

@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
@@ -9,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from filer.models import mixins
 from filer import settings as filer_settings
+from filer.utils.compatibility import python_2_unicode_compatible
 
 import mptt
 
@@ -79,6 +82,7 @@ class FolderPermissionManager(models.Manager):
         return allow_list - deny_list
 
 
+@python_2_unicode_compatible
 class Folder(models.Model, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
@@ -143,7 +147,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def pretty_logical_path(self):
-        return u"/%s" % u"/".join([f.name for f in self.logical_path+[self]])
+        return "/%s" % "/".join([f.name for f in self.logical_path+[self]])
 
     @property
     def quoted_logical_path(self):
@@ -200,8 +204,8 @@ class Folder(models.Model, mixins.IconsMixin):
         return urlresolvers.reverse('admin:filer-directory_listing',
                                     args=(self.id,))
 
-    def __unicode__(self):
-        return u"%s" % (self.name,)
+    def __str__(self):
+        return "%s" % (self.name,)
 
     def contains_folder(self, folder_name):
         try:
@@ -226,6 +230,7 @@ except mptt.AlreadyRegistered:
     pass
 
 
+@python_2_unicode_compatible
 class FolderPermission(models.Model):
     ALL = 0
     THIS = 1
@@ -262,20 +267,20 @@ class FolderPermission(models.Model):
 
     objects = FolderPermissionManager()
 
-    def __unicode__(self):
+    def __str__(self):
         if self.folder:
-            name = u'%s' % self.folder
+            name = '%s' % self.folder
         else:
-            name = u'All Folders'
+            name = 'All Folders'
 
         ug = []
         if self.everybody:
             ug.append('Everybody')
         else:
             if self.group:
-                ug.append(u"Group: %s" % self.group)
+                ug.append("Group: %s" % self.group)
             if self.user:
-                ug.append(u"User: %s" % self.user)
+                ug.append("User: %s" % self.user)
         usergroup = " ".join(ug)
         perms = []
         for s in ['can_edit', 'can_read', 'can_add_children']:
@@ -285,8 +290,8 @@ class FolderPermission(models.Model):
             elif perm == self.DENY:
                 perms.append('!%s' % s)
         perms = ', '.join(perms)
-        return u"Folder: '%s'->%s [%s] [%s]" % (
-                        name, unicode(self.TYPES[self.type][1]),
+        return "Folder: '%s'->%s [%s] [%s]" % (
+                        name, str(self.TYPES[self.type][1]),
                         perms, usergroup)
 
     def clean(self):

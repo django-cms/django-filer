@@ -40,7 +40,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         params['select_folder'] = 1
         if params:
             url = '?' + '&amp;'.join(
-                            ['%s=%s' % (k, v) for k, v in params.items()])
+                            ['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
             url = ''
         if not 'class' in attrs:
@@ -93,11 +93,7 @@ class AdminFolderFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        if 'admin_site' in inspect.getargspec(self.widget.__init__)[0]: # Django 1.4
-            widget_instance = self.widget(rel, site)
-        else: # Django <= 1.3
-            widget_instance = self.widget(rel)
-        forms.Field.__init__(self, widget=widget_instance, *args, **kwargs)
+        forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required

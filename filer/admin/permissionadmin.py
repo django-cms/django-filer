@@ -16,16 +16,12 @@ class PermissionAdmin(admin.ModelAdmin):
     )
     raw_id_fields = ('user', 'group',)
     list_filter = ['user']
-    list_display = ['__unicode__', 'folder', 'user']
+    list_display = ['__str__', 'folder', 'user']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         db = kwargs.get('using')
         if db_field.name == 'folder':
-            if 'admin_site' in inspect.getargspec(folder.AdminFolderWidget.__init__)[0]: # Django 1.4
-                widget_instance = folder.AdminFolderWidget(db_field.rel, self.admin_site, using=db)
-            else: # Django <= 1.3
-                widget_instance = folder.AdminFolderWidget(db_field.rel, using=db)
-            kwargs['widget'] = widget_instance
+            kwargs['widget'] = folder.AdminFolderWidget(db_field.rel, self.admin_site, using=db)
         return super(PermissionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_model_perms(self, request):

@@ -21,10 +21,10 @@ Wiki: https://github.com/stefanfoulis/django-filer/wiki
 Dependencies
 ------------
 
-* `Django`_ >= 1.3 (with ``django.contrib.staticfiles``)
+* `Django`_ >= 1.4 (with ``django.contrib.staticfiles``)
 * django-mptt >= 0.2.1
 * `easy_thumbnails`_ >= 1.0-alpha-17
-* `django-polymorphic`_ >= 0.2 (<=0.4.0 when used with django 1.3.x)
+* `django-polymorphic`_ >= 0.2
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support)
 
 Installation
@@ -61,7 +61,7 @@ For serious testing ``tox`` is recommended. See documentation for details.
 
 
 .. _Django: http://djangoproject.com
-.. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
+.. _django-polymorphic: https://github.com/chrisglass/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _PIL: http://www.pythonware.com/products/pil/

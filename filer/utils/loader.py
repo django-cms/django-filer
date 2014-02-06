@@ -8,6 +8,7 @@ local changes:
   or method.
 
 """
+from django.utils import six
 from django.utils.importlib import import_module
 
 
@@ -26,7 +27,7 @@ def load_object(import_path):
 
     If the attribute does not exist in the module, a AttributeError is raised.
     """
-    if not isinstance(import_path, basestring):
+    if not isinstance(import_path, six.string_types):
         return import_path
     if '.' not in import_path:
         raise TypeError(

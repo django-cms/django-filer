@@ -1,10 +1,13 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.core.files import File as DjangoFile
 from django.core.management.base import BaseCommand, NoArgsCommand
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.settings import FILER_IS_PUBLIC_DEFAULT
+from filer.utils.compatibility import upath
 from optparse import make_option
 import os
 
@@ -43,9 +46,9 @@ class FileImporter(object):
             if created:
                 self.file_created += 1
         if self.verbosity >= 2:
-            print u"file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
+            print("file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
                                                         self.image_created,
-                                                        obj, created)
+                                                        obj, created))
         return obj
 
     def get_or_create_folder(self, folder_names):
@@ -66,8 +69,8 @@ class FileImporter(object):
             if created:
                 self.folder_created += 1
                 if self.verbosity >= 2:
-                    print u"folder_created #%s folder : %s -- created : %s" % (self.folder_created,
-                                                                               current_parent, created)
+                    print("folder_created #%s folder : %s -- created : %s" % (self.folder_created,
+                                                                               current_parent, created))
         return current_parent
 
     def walker(self, path=None, base_folder=None):
@@ -78,14 +81,12 @@ class FileImporter(object):
         path = path or self.path
         base_folder = base_folder or self.base_folder
         # prevent trailing slashes and other inconsistencies on path.
-        # cast to unicode so that os.walk returns path names in unicode
-        # (prevents encoding/decoding errors)
-        path = unicode(os.path.normpath(path))
+        path = os.path.normpath(upath(path))
         if base_folder:
-            base_folder = unicode(os.path.normpath(base_folder))
-            print u"The directory structure will be imported in %s" % (base_folder,)
+            base_folder = os.path.normpath(upath(base_folder))
+            print("The directory structure will be imported in %s" % (base_folder,))
         if self.verbosity >= 1:
-            print u"Import the folders and files in %s" % (path,)
+            print("Import the folders and files in %s" % (path,))
         root_folder_name = os.path.basename(path)
         for root, dirs, files in os.walk(path):
             rel_folders = root.partition(path)[2].strip(os.path.sep).split(os.path.sep)
@@ -101,10 +102,10 @@ class FileImporter(object):
                                      name=file_obj)
                 self.import_file(file_obj=dj_file, folder=folder)
         if self.verbosity >= 1:
-            print ('folder_created #%s / file_created #%s / ' + \
+            print(('folder_created #%s / file_created #%s / ' + \
                    'image_created #%s') % (
                                 self.folder_created, self.file_created,
-                                self.image_created)
+                                self.image_created))
 
 
 class Command(NoArgsCommand):
