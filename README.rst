@@ -25,7 +25,7 @@ Dependencies
 * django-mptt >= 0.2.1
 * `easy_thumbnails`_ >= 1.0-alpha-17
 * `django-polymorphic`_ >= 0.2
-* `PIL`_ 1.1.7 (with JPEG and ZLIB support)
+* `PIL`_ 1.1.7 (with JPEG and ZLIB support) or Pillow 2.3.0 (with JPEG and ZLIB support, Better to use Pillow)
 
 Installation
 ------------
