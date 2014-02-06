@@ -1,9 +1,9 @@
 #-*- coding: utf-8 -*-
-import os
 import base64
 import hashlib
 import warnings
 from io import BytesIO
+from django.core.files.base import ContentFile
 from django.utils import six
 from easy_thumbnails import fields as easy_thumbnails_fields, \
     files as easy_thumbnails_files
@@ -124,13 +124,14 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
 
     def to_python(self, value):
         if isinstance(value, list) and len(value) == 2 and isinstance(value[0], six.text_type):
+            filename, payload = value
             try:
-                payload = base64.b64decode(value[1])
-                filename = os.path.join(self.storage.location, value[0])
-                out_buf = self.storage.open(filename, 'wb')
-                out_buf.write(payload)
-                out_buf.close()
-                return value[0]
+                payload = base64.b64decode(payload)
             except TypeError:
                 pass
+            else:
+                if self.storage.exists(filename):
+                    self.storage.delete(filename)
+                self.storage.save(filename, ContentFile(payload))
+                return filename
         return value
