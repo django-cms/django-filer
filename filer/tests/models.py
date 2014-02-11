@@ -24,6 +24,7 @@ from filer.tests.helpers import (
     get_dir_listing_url, create_superuser, create_folder_structure,
     create_image, create_clipboard_item, SettingsOverride,
     filer_obj_as_checkox)
+from django.test.utils import override_settings
 from filer import settings as filer_settings
 from filer.utils.generate_filename import by_path
 
@@ -259,11 +260,29 @@ class FilerApiTests(TestCase):
         with self.assertRaises(ValidationError):
             folder.full_clean()
 
+    @override_settings(USE_TZ=True)
     def test_cdn_urls(self):
         cdn_domain = 'cdn.foobar.com'
         with SettingsOverride(filer_settings,
                               CDN_DOMAIN=cdn_domain,
                               USE_TZ=True,
+                              CDN_INVALIDATION_TIME=1):
+            image = self.create_filer_image()
+            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            self.assertEqual(netloc, '')
+            time.sleep(1)
+            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            self.assertEqual(netloc, cdn_domain)
+            for url in image.thumbnails.values():
+                _, netloc, _, _, _, _ = urlparse.urlparse(url)
+                self.assertEqual(netloc, cdn_domain)
+
+    @override_settings(USE_TZ=False)
+    def test_cdn_urls_no_timezone_support(self):
+        cdn_domain = 'cdn.foobar.com'
+        with SettingsOverride(filer_settings,
+                              CDN_DOMAIN=cdn_domain,
+                              USE_TZ=False,
                               CDN_INVALIDATION_TIME=1):
             image = self.create_filer_image()
             _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
