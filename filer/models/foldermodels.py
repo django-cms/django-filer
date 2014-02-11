@@ -582,7 +582,7 @@ def update_shared_sites_for_descendants(instance, **kwargs):
     Makes sure that folders keep all shared sites from their root folder.
     """
     action = kwargs['action']
-    if not action.startswith('post_') or instance.parent:
+    if not action.startswith('post_') or instance.parent_id:
         return
 
     instance = Folder.all_objects.get(id=instance.id)

@@ -499,3 +499,12 @@ class TrashableModelTestCase(TestCase):
         self.assertFalse(Folder.objects.filter(pk=foo_pk).exists())
         self.assertEqual(File.trash.get(pk=file_foo_pk).file.name,
                          '_trash/%s/foo/image.jpg' % file_foo_pk)
+
+    def test_folder_save_with_trashed_subfolder(self):
+        foo = Folder.objects.create(name='foo')
+        foo_child = Folder.objects.create(name='foo_child', parent=foo)
+        foo_child2 = Folder.objects.create(name='foo_child2', parent=foo_child)
+        foo_child.delete()
+        foo.shared.add(1)
+        foo.restricted = True
+        foo.save()
