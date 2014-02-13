@@ -1,14 +1,16 @@
-
+# -*- coding: utf-8 -*-
+import datetime
 from south.db import db
+from south.v2 import SchemaMigration
 from django.db import models
-from filer.models import *
 
-class Migration:
+
+class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
         # Adding field 'File.description'
-        db.add_column('filer_file', 'description', orm['filer.file:description'])
+        db.add_column('filer_file', 'description', self.gf('django.db.models.fields.TextField')(null=True, blank=True))
         
     
     
