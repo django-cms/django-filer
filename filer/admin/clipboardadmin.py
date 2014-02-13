@@ -13,6 +13,8 @@ from filer.utils.files import (
 )
 from filer.views import popup_param, selectfolder_param, current_site_param
 from filer.admin.tools import is_valid_destination
+import imghdr
+import os
 
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
@@ -115,6 +117,15 @@ class ClipboardAdmin(admin.ModelAdmin):
         upload, file_obj = None ,None
         try:
             upload, filename, is_raw = handle_upload(request)
+
+            extension = os.path.splitext(filename)[1]
+            if not extension:
+                # try to guess if it's an image and append extension
+                # imghdr will detect file is a '.jpeg', '.png' or '.gif' image
+                guessed_extension = imghdr.what(upload)
+                if guessed_extension:
+                    filename = '%s.%s' % (filename, guessed_extension)
+
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
             if any(f for f in clipboard.files.all() if f.actual_name == filename):
