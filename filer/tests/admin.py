@@ -23,9 +23,11 @@ from filer.tests.helpers import (
     create_image, create_staffuser, create_folder_for_user, move_action,
     move_to_clipboard_action, paste_clipboard_to_folder, get_dir_listing_url,
     filer_obj_as_checkox, get_make_root_folder_url,
-    move_single_file_to_clipboard_action,
+    move_single_file_to_clipboard_action, SettingsOverride
 )
 from filer.utils.checktrees import TreeChecker
+from filer import settings as filer_settings
+from filer.utils.generate_filename import by_path
 from cmsroles.models import Role
 from cmsroles.tests.tests import HelpersMixin
 from cmsroles.siteadmin import get_site_admin_required_permission
@@ -2545,3 +2547,104 @@ class TestMPTTCorruptionsOnFolderOperations(TestCase):
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(filer_zipfile)]})
         TreeChecker().find_corruptions()
+
+
+class TestImageChangeForm(TestCase):
+
+    def setUp(self):
+        self.user = create_superuser()
+        self.client.login(username='admin', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+        for f in File.all_objects.all():
+            f.delete(to_trash=False)
+
+    def create_filer_image(self, image_name, **kwargs):
+        image = create_image()
+        image_path = os.path.join(os.path.dirname(__file__), image_name)
+        image.save(image_path, 'JPEG')
+        file_obj = DjangoFile(open(image_path), name=image_name)
+        kwargs.update({'original_filename': image_name, 'file': file_obj})
+        image = Image.objects.create(**kwargs)
+        os.remove(image_path)
+        return image
+
+    def _create_another_PIL_image(self):
+        import PIL
+        size = (100, 50)
+        im = PIL.Image.new('RGB', size)
+        draw = PIL.ImageDraw.Draw(im)
+        red = (255, 0, 0)
+        text_pos = (10, 10)
+        text = "Hello World!"
+        draw.text(text_pos, text, fill=red)
+        del draw
+        return im
+
+    def test_image_change_name_and_data(self):
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            foo = Folder.objects.create(name='foo')
+            orig_img = self.create_filer_image(
+                'one.jpg', folder=foo, owner=self.user)
+            self.assertEqual(orig_img.file.name, 'foo/one.jpg')
+            sha1_before = orig_img.sha1
+
+            another_img_name = 'new_one.jpg'
+            another_img_path = os.path.join(os.path.dirname(__file__),
+                                            another_img_name)
+            pil_img = self._create_another_PIL_image()
+            pil_img.save(another_img_path, 'JPEG')
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            with open(another_img_path, 'rb') as new_img:
+                img_url = reverse('admin:filer_image_change',
+                                  args=(orig_img.pk, ))
+                response = self.client.post(img_url, {
+                    'name': another_img_name,
+                    'file': SimpleUploadedFile(new_img.name, new_img.read())
+                })
+                orig_img = File.objects.get(id=orig_img.id)
+                self.assertEqual(orig_img.file.name, 'foo/new_one.jpg')
+                self.assertNotEqual(sha1_before, orig_img.sha1)
+            os.remove(another_img_path)
+
+    def test_image_change_name_only(self):
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            foo = Folder.objects.create(name='foo')
+            orig_img = self.create_filer_image(
+                'two.jpg', folder=foo, owner=self.user)
+            img_url = reverse('admin:filer_image_change',
+                              args=(orig_img.pk, ))
+            response = self.client.post(img_url, {
+                'name': 'new_two.jpg',
+            })
+            orig_img = File.objects.get(id=orig_img.id)
+            self.assertEqual(orig_img.file.name, 'foo/new_two.jpg')
+
+    def test_image_change_data_only(self):
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            foo = Folder.objects.create(name='foo')
+            orig_img = self.create_filer_image(
+                'three.jpg', folder=foo, owner=self.user)
+            sha1_before = orig_img.sha1
+            another_img_name = 'new_three.jpg'
+            another_img_path = os.path.join(os.path.dirname(__file__),
+                                            another_img_name)
+            pil_img = self._create_another_PIL_image()
+            pil_img.save(another_img_path, 'JPEG')
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            with open(another_img_path, 'rb') as new_img:
+                img_url = reverse('admin:filer_image_change',
+                                  args=(orig_img.pk, ))
+                response = self.client.post(img_url, {
+                    'file': SimpleUploadedFile(new_img.name, new_img.read())
+                })
+                orig_img = File.objects.get(id=orig_img.id)
+                self.assertNotEqual(sha1_before, orig_img.sha1)
+            os.remove(another_img_path)

@@ -484,6 +484,8 @@ class TrashableModelTestCase(TestCase):
 
     def test_thumbnails_removed_when_source_is_soft_deleted(self):
         img = self.create_filer_image('foo_image.jpg')
+        Image.objects.filter(id=img.id).update(owner=create_superuser())
+        img = Image.objects.get(id=img.id)
         self.assertEqual(sum(1 for i in img.file.get_thumbnails()), 0)
         # generate some thumbnails
         generated_thumbnails = img.icons
@@ -497,7 +499,10 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(img.file.get_thumbnail({'size': (60, 80)}), None)
         self.assertEqual(sum(1 for i in img.file.get_thumbnails()), 0)
         self.assertEqual(img.url, '')
-        img.deleted_at = None
+        Image.trash.filter(id=img.id).update(deleted_at=None)
+        img = Image.objects.get(id=img.id)
+        img.name = 'asdasda.jpg'
+        img.save()
         # thumbnail generation should work after restoring
         generated_thumbnails = img.icons
         img.file.get_thumbnail({'size': (60, 80)})
