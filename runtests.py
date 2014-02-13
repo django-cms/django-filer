@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--failfast', action='store_true', default=False,
                         dest='failfast')
     parser.add_argument('--verbosity', default=1)
-    parser.add_argument('--migrate', action='store_true', default=False)
+    parser.add_argument('--migrate', action='store_true', default=True)
     parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
     test_labels = ['%s' % label for label in args.test_labels]
