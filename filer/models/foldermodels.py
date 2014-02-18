@@ -72,6 +72,9 @@ class FoldersChainableQuerySetMixin(object):
     def in_trash(self):
         return self.filter(deleted_at__isnull=False)
 
+    def alive(self):
+        return self.filter(deleted_at__isnull=True)
+
 
 class EmptyFoldersQS(models.query.EmptyQuerySet,
                      FoldersChainableQuerySetMixin):
@@ -104,15 +107,13 @@ class AliveFolderManager(FolderManager):
     use_for_related_fields = True
 
     def get_query_set(self):
-        return FolderQueryset(self.model, using=self._db).filter(
-            deleted_at__isnull=True)
+        return FolderQueryset(self.model, using=self._db).alive()
 
 
 class TrashFolderManager(FolderManager):
 
     def get_query_set(self):
-        return FolderQueryset(self.model, using=self._db).filter(
-            deleted_at__isnull=False)
+        return FolderQueryset(self.model, using=self._db).in_trash()
 
 
 class Folder(mixins.TrashableMixin, mixins.IconsMixin):
@@ -362,6 +363,54 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         super(Folder, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
+    def _generate_valid_name_for_restore(self):
+        name = self.name
+        i = 1
+        while self.get_siblings().filter(
+                deleted_at__isnull=True, name=name).exists():
+            name = "%s_%s" % (self.name, i)
+            i += 1
+        return name
+
+    def restore_path(self):
+        """
+        This method makes this folder path to be a valid destination for
+            for restoring files/sub-folders.
+        * it restores all the trashed folders in this folder's path.
+        * files from the folders in path will not be restored.
+        """
+        trashed_ancestors = self.get_ancestors(include_self=True).filter(
+            deleted_at__isnull=False)
+        first_node_trashed = trashed_ancestors[:1]
+        if first_node_trashed:
+            first_node_trashed = first_node_trashed[0]
+            new_name = first_node_trashed._generate_valid_name_for_restore()
+            if new_name != first_node_trashed.name:
+                Folder.trash.filter(
+                    id=first_node_trashed.id).update(name=new_name)
+            trashed_ancestors.update(deleted_at=None)
+
+    def restore(self):
+        """
+            Restores all files and subfolders contained in this folder.
+        """
+        self.restore_path()
+        # add self since it was restored with restore_path method
+        desc_ids = [self.id]
+        descendants = self.get_descendants(include_self=True).filter(
+            deleted_at__isnull=False)
+        for descendant in descendants:
+            new_name = descendant._generate_valid_name_for_restore()
+            Folder.trash.filter(id=descendant.id).update(
+                deleted_at=None, name=new_name)
+            desc_ids.append(descendant.id)
+        # restore self and descendants files
+        file_mgr = filer.models.filemodels.File.trash
+        files_qs = file_mgr.filter(folder__in=desc_ids)
+        for filer_file in files_qs:
+            filer_file.restore()
+        self.deleted_at = None
+
     @property
     def trashed_file_count(self):
         file_mgr = filer.models.filemodels.File.trash
@@ -397,7 +446,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
 
     @property
     def files(self):
-        return self.all_files.all()
+        return filer.models.File.objects.filter(folder=self)
 
     def entries_with_names(self, names):
         """Returns an iterator yielding the files and folders that are direct
@@ -405,16 +454,18 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         """
         q = Q(name__in=names)
         q |= Q(original_filename__in=names) & (Q(name__isnull=True) | Q(name=''))
-        files_with_names = self.all_files.filter(q)
-        folders_with_names = self.children.filter(name__in=names)
+        files_with_names = filer.models.File.objects.filter(
+            folder=self).filter(q)
+        folders_with_names = Folder.objects.filter(
+            parent=self, name__in=names)
         return list(itertools.chain(files_with_names, folders_with_names))
 
     def pretty_path_entries(self):
-        """Returns a list of all the descendant's entries logical path"""
-        subdirs = self.get_descendants(include_self=True)
-        subdir_files = [x.files for x in subdirs]
-        super_files = list(itertools.chain.from_iterable(subdir_files))
-        file_paths = [x.pretty_logical_path for x in super_files]
+        """Returns a list of all the descendant's `alive` entries logical path"""
+        subdirs = self.get_descendants(include_self=True).filter(
+            deleted_at__isnull=True)
+        subdir_files = filer.models.File.objects.filter(folder__in=subdirs)
+        file_paths = [x.pretty_logical_path for x in subdir_files]
         dir_paths = [x.pretty_logical_path for x in subdirs]
         paths = file_paths + dir_paths
         return paths
@@ -426,9 +477,12 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
         Used to generate breadcrumbs
         """
         folder_path = []
-        if self.parent:
-            folder_path.extend(self.parent.get_ancestors())
-            folder_path.append(self.parent)
+        try:
+            if self.parent:
+                folder_path.extend(self.parent.get_ancestors(
+                    include_self=True).filter(deleted_at__isnull=True))
+        except Folder.DoesNotExist:
+            pass
         return folder_path
 
     @property
@@ -449,7 +503,11 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
                                     args=(self.id,))
 
     def __unicode__(self):
-        return u"%s" % (self.name,)
+        try:
+            name = self.pretty_logical_path
+        except:
+            name = self.name
+        return name
 
     @property
     def actual_name(self):
@@ -573,7 +631,7 @@ def update_shared_sites_for_descendants(instance, **kwargs):
     Makes sure that folders keep all shared sites from their root folder.
     """
     action = kwargs['action']
-    if not action.startswith('post_') or instance.parent:
+    if not action.startswith('post_') or instance.parent_id:
         return
 
     instance = Folder.all_objects.get(id=instance.id)

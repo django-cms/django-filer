@@ -41,7 +41,7 @@
                     var file_name_elem = li_element.children(":first");
                     file_name_elem.html("<a href='" + data.file_url + "' title='Preview'>" + file_name_elem.text() + "</a>");
                 } else {
-                    li_element.append(' &rarr; File cannot be retrieved from storage. This item cannot be restored.')
+                    li_element.append(' &rarr; File cannot be retrieved from storage.')
                     li_element.addClass('errornote');
                     li_element.css('font-weight', 'normal')
                 }
@@ -53,6 +53,7 @@
 
 {% block extrastyle %}
 {{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />
 {{ media.css }}
 <style type="text/css">
     .files li{
@@ -95,6 +96,9 @@
 <div class="full-page-overlay" id="overlay"></div>
 <div class="full-page-overlay" id='loading'>LOADING ...</div>
 <div id="content-main">
+<form action="{% url 'admin:filer_restore_items' filer_model=current_item_type filer_obj_id=current_item.id %}" method="post"  style="display: inline;">
+{% csrf_token %}
+
 {% if descendants %}
     <ul>
     {% for descendant in descendants %}
@@ -113,13 +117,27 @@
     {% endfor %}
     </ul>
 {% else %}
-<ul class='files'>
-    <li class='filer-file {{current_item.file_type|lower}}'>
-        <span>{{current_item.actual_name}}</span>
-        <input type='hidden' name='file-{{current_item.pk}}' value='{{current_item.pk}}'/>
-    </li>
-</ul>
+    <ul class='files'>
+        <li class='filer-file {{current_item.file_type|lower}}'>
+            <span>{{current_item.actual_name}}</span>
+            <input type='hidden' name='file-{{current_item.pk}}' value='{{current_item.pk}}'/>
+        </li>
+    </ul>
 {% endif %}
+
+<div class="submit-row">
+<script type="text/javascript">
+(function ($) {
+    var i = 0;
+    $('form').submit(function () {
+        i++; if(i > 1) { return false; }
+    });
+})(jQuery);
+</script>
+<input type="hidden" name="post" value="yes" />
+<input type="submit" value="Restore" title="Restore files & folders" />
+</div>
+</form>
 </div>
 {% endspaceless %}
 {% endblock %}

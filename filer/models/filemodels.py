@@ -21,6 +21,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def silence_error_if_missing_file(exception):
+    """
+    Ugly way of checking in an exception describes a 'missing file'.
+    """
+    missing_files_errs = ('no such file', 'does not exist', )
+
+    def find_msg_in_error(msg):
+        return msg in str(exception).lower()
+
+    if not any(map(find_msg_in_error, missing_files_errs)):
+        raise exception
+
+
 class FilesChainableQuerySetMixin(object):
 
     def readonly(self, user):
@@ -158,6 +171,8 @@ class File(mixins.TrashableMixin,
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self._old_name = self.name
+        self._old_file_location = self.file.name
+        self._old_sha1 = self.sha1
         self._old_folder_id = self.folder_id
         self._force_commit = False
 
@@ -235,7 +250,7 @@ class File(mixins.TrashableMixin,
             # TODO: Find a way to override this behavior.
             raise NotImplementedError
 
-        src_file_name = self.file.name
+        src_file_name = self._old_file_location
         storage = self.file.storages['public' if self.is_public else 'private']
 
         if hasattr(storage, 'copy'):
@@ -310,10 +325,15 @@ class File(mixins.TrashableMixin,
             source.delete()
 
     def update_location_on_storage(self, *args, **kwargs):
-        old_location = self.file.name
+        old_location = self._old_file_location
         # thumbnails might get physically deleted evenif the transaction fails
         # though luck... they get re-created anyway...
         self._delete_thumbnails()
+        # check if file content has changed
+        if self._old_sha1 != self.sha1:
+            # actual file content needs to be replaced on storage prior to
+            #   filer file instance save
+            self.file.storage.save(self._old_file_location, self.file)
         new_location = self.file.field.upload_to(self, self.actual_name)
         storage = self.file.storage
 
@@ -378,16 +398,7 @@ class File(mixins.TrashableMixin,
         try:
             new_location = self._copy_file(to_trash)
         except Exception as e:
-            # sice there can be many types of storages better to check in
-            #   this way if the error is saying that the file doesn't exist
-            #   in which case nothing to do
-            missing_files_errs = ('no such file', 'does not exist')
-
-            def find_msg_in_error(msg):
-                return msg in str(e).lower()
-
-            if not any(map(find_msg_in_error, missing_files_errs)):
-                raise e
+            silence_error_if_missing_file(e)
             if filer_settings.FILER_ENABLE_LOGGING:
                 logger.error('Error while trying to copy file: %s to %s.' % (
                     old_location, to_trash), e)
@@ -422,6 +433,66 @@ class File(mixins.TrashableMixin,
     def delete(self, *args, **kwargs):
         super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
+
+    def _generate_valid_location_for_restore(self):
+        """
+        Returns the first available destination path where this file
+            will be restored to.
+        """
+        basename, extension = os.path.splitext(self.actual_name)
+        destination = self.file.field.upload_to(self, self.actual_name)
+        i = 1
+        while File.objects.filter(file=destination).exists():
+            filename = "%s_%s%s" % (basename, i, extension)
+            # set actual name
+            if self.name in ('', None):
+                self.original_filename = filename
+            else:
+                self.name = filename
+            destination = self.file.field.upload_to(self, self.actual_name)
+            i += 1
+        return destination
+
+    def restore(self):
+        """
+            Restores the file to its folder location.
+            If there's already an existing file with the same name, it will
+                generate a new filename.
+        """
+        if self.folder_id:
+            Folder = filer.models.foldermodels.Folder
+            try:
+                self.folder
+            except Folder.DoesNotExist:
+                self.folder = Folder.trash.get(id=self.folder_id)
+
+            self.folder.restore_path()
+            # at this point this file's folder should be `alive`
+            self.folder = filer.models.Folder.objects.get(id=self.folder_id)
+
+        old_location, new_location = self.file.name, None
+        destination = self._generate_valid_location_for_restore()
+
+        try:
+            new_location = self._copy_file(destination)
+        except Exception as e:
+            silence_error_if_missing_file(e)
+            if filer_settings.FILER_ENABLE_LOGGING:
+                logger.error('Error while trying to copy file: %s to %s.' % (
+                    old_location, destination), e)
+        else:
+            self.file.delete(False)
+        finally:
+            new_location = new_location or destination
+            File.trash.filter(pk=self.pk).update(
+                deleted_at=None, file=new_location,
+                name=self.name, original_filename=self.original_filename)
+            self.deleted_at = None
+            self.file.name = new_location
+            # restore to user clipboard
+            if self.owner_id and not self.folder_id:
+                clipboard = filer.models.tools.get_user_clipboard(self.owner)
+                clipboard.append_file(File.objects.get(id=self.id))
 
     @property
     def label(self):
@@ -459,7 +530,11 @@ class File(mixins.TrashableMixin,
         return full_path
 
     def __unicode__(self):
-        return self.actual_name
+        try:
+            name = self.pretty_logical_path
+        except:
+            name = self.actual_name
+        return name
 
     def get_admin_url_path(self):
         return urlresolvers.reverse(

@@ -201,6 +201,38 @@ class FolderAdmin(FolderPermissionModelAdmin):
                                 '</script>')
         return response
 
+    def delete_view(self, request, object_id, extra_context=None):
+        # override delete view since we need to hide already trashed
+        #   files/folders
+        opts = self.model._meta
+        obj = self.get_object(request, unquote(object_id))
+
+        if obj is None:
+            raise Http404(_('%(name)s object with primary key %(key)r '
+                            'does not exist.') % {
+                                'name': force_unicode(opts.verbose_name),
+                                'key': escape(object_id)})
+        if obj.parent:
+            redirect_url = reverse('admin:filer-directory_listing',
+                kwargs={'folder_id': obj.parent_id})
+        else:
+            redirect_url = reverse('admin:filer-directory_listing-root')
+        redirect_url = "%s%s%s%s" % (redirect_url, popup_param(request),
+                            selectfolder_param(request, "&"),
+                            current_site_param(request),)
+
+        setattr(request, 'current_dir_list_folder',
+                obj.parent or FolderRoot())
+
+        response = self.delete_files_or_folders(
+            request,
+            File.objects.get_empty_query_set(),
+            Folder.objects.filter(id=obj.id))
+
+        if response is None:
+            return HttpResponseRedirect(redirect_url)
+        return response
+
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
         user = request.user
@@ -248,7 +280,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
-                descendants = folder.get_descendants(include_self=True)
+                descendants = folder.get_descendants(
+                    include_self=True).filter(deleted_at__isnull=True)
                 folder_qs = folders_available(
                     request, descendants.exclude(id=folder.id))
                 file_qs = files_available(
