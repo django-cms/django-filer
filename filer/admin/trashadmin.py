@@ -109,7 +109,9 @@ class TrashAdmin(admin.ModelAdmin):
             'app_label': opts.app_label,
             'current_item': filer_object,
             'current_item_type': filer_model,
-            'descendants': descendants
+            'descendants': descendants,
+            'title': u'Restore %s %s' % (
+                filer_model.capitalize(), force_unicode(filer_object)),
         }
         return render_to_response('admin/filer/trash/item_restore.html',
            context, context_instance=RequestContext(request))
@@ -178,6 +180,7 @@ class TrashAdmin(admin.ModelAdmin):
             'app_label': opts.app_label,
             'paginator': paginator,
             'paginated_items': paginated_items,
+            'title': u'Deleted Files and Folders',
         }
         context.update(extra_context or {})
         return render_to_response('admin/filer/trash/directory_listing.html',

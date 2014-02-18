@@ -24,6 +24,7 @@ from filer.tests.helpers import (
     get_dir_listing_url, create_superuser, create_folder_structure,
     create_image, create_clipboard_item, SettingsOverride,
     filer_obj_as_checkox)
+from django.test.utils import override_settings
 from filer import settings as filer_settings
 from filer.utils.generate_filename import by_path
 
@@ -259,11 +260,29 @@ class FilerApiTests(TestCase):
         with self.assertRaises(ValidationError):
             folder.full_clean()
 
+    @override_settings(USE_TZ=True)
     def test_cdn_urls(self):
         cdn_domain = 'cdn.foobar.com'
         with SettingsOverride(filer_settings,
                               CDN_DOMAIN=cdn_domain,
                               USE_TZ=True,
+                              CDN_INVALIDATION_TIME=1):
+            image = self.create_filer_image()
+            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            self.assertEqual(netloc, '')
+            time.sleep(1)
+            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            self.assertEqual(netloc, cdn_domain)
+            for url in image.thumbnails.values():
+                _, netloc, _, _, _, _ = urlparse.urlparse(url)
+                self.assertEqual(netloc, cdn_domain)
+
+    @override_settings(USE_TZ=False)
+    def test_cdn_urls_no_timezone_support(self):
+        cdn_domain = 'cdn.foobar.com'
+        with SettingsOverride(filer_settings,
+                              CDN_DOMAIN=cdn_domain,
+                              USE_TZ=False,
                               CDN_INVALIDATION_TIME=1):
             image = self.create_filer_image()
             _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
@@ -301,6 +320,25 @@ class ArchiveTest(TestCase):
         filer_zipfile = Archive.objects.get()
         filer_zipfile.extract()
 
+    def test_collision_when_extracting(self):
+        foo = Folder.objects.create(name="foo")
+        # move zip into a folder
+        archive = Archive.objects.get()
+        archive.folder = foo
+        archive.save()
+        # no collisions should be detected
+        self.assertEqual(archive.collisions(), [])
+        # extract zip in the new folder
+        Archive.objects.get().extract()
+        # collisions should be detected
+        self.assertNotEqual(Archive.objects.get().collisions(), [])
+        # delete foo content and re-try
+        for a_file in File.objects.exclude(id=archive.id).filter(folder=foo):
+            a.delete()
+        for subfolder in Folder.objects.filter(parent=foo):
+            subfolder.delete()
+        self.assertEqual(Archive.objects.get().collisions(), [])
+
     def test_entries_count(self):
         files = File.objects.filter(~Q(original_filename=self.zipname))
         tmp_basedir, _ = os.path.split(self.root)
@@ -329,6 +367,8 @@ class ArchiveTest(TestCase):
 
     def tearDown(self):
         os.remove('test.zip')
+        for f in File.all_objects.all():
+            f.delete(to_trash=False)
         for entry in reversed(self.entries):
             if os.path.isdir(entry):
                 os.rmdir(entry)
@@ -407,7 +447,7 @@ class TrashableModelTestCase(TestCase):
         folder = Folder.objects.create(name='foo')
         img.folder = folder
         img.save()
-        img.delete()
+        Image.objects.get(id=img.id).delete()
         img = Image.trash.get(original_filename='foo_image.jpg')
         self.assertEqual(img.file.name, '_trash/%s/foo/foo_image.jpg' % img.pk)
         # rename folder
@@ -450,6 +490,8 @@ class TrashableModelTestCase(TestCase):
 
     def test_thumbnails_removed_when_source_is_soft_deleted(self):
         img = self.create_filer_image('foo_image.jpg')
+        Image.objects.filter(id=img.id).update(owner=create_superuser())
+        img = Image.objects.get(id=img.id)
         self.assertEqual(sum(1 for i in img.file.get_thumbnails()), 0)
         # generate some thumbnails
         generated_thumbnails = img.icons
@@ -463,7 +505,10 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(img.file.get_thumbnail({'size': (60, 80)}), None)
         self.assertEqual(sum(1 for i in img.file.get_thumbnails()), 0)
         self.assertEqual(img.url, '')
-        img.deleted_at = None
+        Image.trash.filter(id=img.id).update(deleted_at=None)
+        img = Image.objects.get(id=img.id)
+        img.name = 'asdasda.jpg'
+        img.save()
         # thumbnail generation should work after restoring
         generated_thumbnails = img.icons
         img.file.get_thumbnail({'size': (60, 80)})
@@ -597,7 +642,7 @@ class TrashableModelTestCase(TestCase):
         foo_img = self.create_filer_image('foo.jpg', folder=foo)
         bar_img = self.create_filer_image('bar.jpg', folder=bar)
         self.assertEqual(Folder.trash.count() + File.trash.count(), 0)
-        bar_img.delete()
+        File.objects.get(id=bar_img.id).delete()
         bar_img_duplicate = self.create_filer_image('bar.jpg', folder=bar)
         File.trash.get(id=bar_img.id).restore()
         self.assertEqual(File.objects.get(id=bar_img_duplicate.id).file.name,
@@ -707,3 +752,12 @@ class TrashableModelTestCase(TestCase):
                          'foo/bar/bar.jpg')
         self.assertEqual(File.objects.get(id=new_bar_img.id).file.name,
                          'foo/bar_1/bar.jpg')
+
+    def test_folder_save_with_trashed_subfolder(self):
+        foo = Folder.objects.create(name='foo')
+        foo_child = Folder.objects.create(name='foo_child', parent=foo)
+        foo_child2 = Folder.objects.create(name='foo_child2', parent=foo_child)
+        foo_child.delete()
+        foo.shared.add(1)
+        foo.restricted = True
+        foo.save()
