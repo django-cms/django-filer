@@ -6,7 +6,7 @@
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
     &rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a>
     &rsaquo; <a href="{% url 'admin:filer_trash_changelist'%}">{{ opts.verbose_name_plural|capfirst }}</a>
-    &rsaquo; Restore {{current_item_type}} {{ current_item.pretty_logical_path }}
+    &rsaquo; Restore {{current_item_type}} {{ current_item|pretty_display }}
     </div>
 {% endblock %}
 
@@ -103,7 +103,7 @@
     <ul>
     {% for descendant in descendants %}
         <li>
-        <b style='font-size: larger;'>{{ descendant.pretty_logical_path }}</b>
+        <b style='font-size: larger;'>{{ descendant|pretty_display }}</b>
 
         <ul class='files'>
         {% for file in descendant.trashed_files %}

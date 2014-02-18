@@ -4,6 +4,7 @@ from distutils.version import LooseVersion
 import django
 import pytz
 import datetime
+import filer
 
 register = Library()
 
@@ -70,6 +71,22 @@ def is_readonly_for_user(filer_obj, user):
 @register.filter
 def can_change_folder(folder, user):
     return folder.has_change_permission(user)
+
+
+@register.filter
+def pretty_display(filer_obj):
+    if isinstance(filer_obj, filer.models.Folder):
+        return '/%s' % '/'.join(filer_obj.get_ancestors(include_self=True)
+                                    .values_list('name', flat=True))
+    if isinstance(filer_obj, filer.models.File):
+        name = filer_obj.actual_name
+        if not filer_obj.folder_id:
+            return '/%s' % name
+        return '/%s' % '/'.join(
+            list(filer.models.Folder.all_objects.get(id=filer_obj.folder_id)
+                    .get_ancestors(include_self=True)
+                    .values_list('name', flat=True)) + [name])
+    return ''
 
 
 def _build_timezone_dict():
