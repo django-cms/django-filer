@@ -119,18 +119,47 @@ class SettingsOverride(object):
         self.settings_module = settings_module
         self.overrides = overrides
 
-    def __enter__(self):
+    def __call__(self, func):
+        if isinstance(func, type):
+            def _pre_setup(test_instance):
+                self.enable()
+                func.setUp(test_instance)
+            def _post_teardown(test_instance):
+                func.tearDown(test_instance)
+                self.disable()
+            # preserve cls name for tests discovery tools
+            inner = type(func.__name__, (func,), {
+                    'setUp': _pre_setup,
+                    'tearDown': _post_teardown,
+                    '__module__': func.__module__,
+                })
+            return inner
+        else:
+            @wraps(func)
+            def inner(*args, **kwargs):
+                with self:
+                    return func(*args, **kwargs)
+            return inner
+
+
+    def enable(self):
         self.old = {}
         for key, value in self.overrides.items():
             self.old[key] = getattr(self.settings_module, key, None)
             setattr(self.settings_module, key, value)
 
-    def __exit__(self, type, value, traceback):
-        for key, value in self.old.items():
+    def disable(self):
+       for key, value in self.old.items():
             if value is not None:
                 setattr(self.settings_module, key, value)
             else:
                 delattr(self.settings_module,key)
+
+    def __enter__(self):
+        self.enable()
+
+    def __exit__(self, type, value, traceback):
+        self.disable()
 
 
 def create_staffuser(user):

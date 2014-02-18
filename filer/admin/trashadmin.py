@@ -4,7 +4,7 @@ from django.utils.encoding import force_unicode
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, Http404
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
@@ -39,6 +39,9 @@ class TrashAdmin(admin.ModelAdmin):
             url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
                 self.admin_site.admin_view(self.restorable_item_view),
                 name='filer_trash_item'),
+            url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/restore/$',
+                self.admin_site.admin_view(self.restore_items),
+                name='filer_restore_items'),
             url(r'^file/check/(?P<file_id>\d+)/$',
                 self.admin_site.admin_view(self.file_check),
                 name='filer_trash_file_check'),
@@ -64,8 +67,7 @@ class TrashAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def restorable_item_view(self, request, filer_model, filer_obj_id):
-        opts = self.model._meta
+    def _check_restore_view_valid(self, request, filer_model, filer_obj_id):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
 
@@ -79,6 +81,20 @@ class TrashAdmin(admin.ModelAdmin):
             filer_object = filer_model_cls.trash.get(id=filer_obj_id)
         except filer_model_cls.DoesNotExist, e:
             raise Http404
+
+        # should not allow view for items that do not have alive container
+        container_attr = 'folder' if filer_model == 'file' else 'parent'
+        try:
+            getattr(filer_object, container_attr)
+        except filer.models.Folder.DoesNotExist, e:
+            raise PermissionDenied
+
+        return filer_model_cls, filer_object
+
+    def restorable_item_view(self, request, filer_model, filer_obj_id):
+        opts = self.model._meta
+        filer_model_cls, filer_object = self._check_restore_view_valid(
+            request, filer_model, filer_obj_id)
 
         if hasattr(filer_object, 'get_descendants'):
             descendants = filer_object.get_descendants(include_self=True).\
@@ -99,6 +115,24 @@ class TrashAdmin(admin.ModelAdmin):
         }
         return render_to_response('admin/filer/trash/item_restore.html',
            context, context_instance=RequestContext(request))
+
+    def restore_items(self, request, filer_model, filer_obj_id):
+        filer_model_cls, filer_object = self._check_restore_view_valid(
+            request, filer_model, filer_obj_id)
+
+        if request.method == 'POST' and request.POST.get('post'):
+            filer_object.restore()
+
+            if filer_model_cls is filer.models.Folder:
+                return redirect(
+                    filer_object.get_admin_directory_listing_url_path())
+            else:
+                if not filer_object.folder_id:
+                    # clipboard files
+                    return redirect('admin:filer-directory_listing-root')
+                return redirect(filer_object.get_admin_url_path())
+
+        raise PermissionDenied
 
     def file_check(self, request, file_id):
         if not self.has_change_permission(request, None):

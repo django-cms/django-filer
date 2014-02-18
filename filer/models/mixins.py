@@ -49,7 +49,5 @@ class TrashableMixin(models.Model):
         else:
             self.hard_delete(*args, **kwargs)
 
-    def restore(self, commit=True):
-        self.deleted_at = None
-        if commit:
-            self.save()
+    def restore(self):
+        raise NotImplementedError
