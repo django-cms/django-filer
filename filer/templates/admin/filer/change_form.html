@@ -14,7 +14,7 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 
 {% block pretitle %}
 {% if is_popup %}
-<a style="float:left; margin-right:10px; font-size: large;" href="{% if original.folder %}{{original.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}{% endif %}" title="{% trans "Go back to the parent folder" %}">&larr;</a>
+<a style="float:left; margin-right:10px; font-size: large;" href="{% if original.folder %}{{original.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}{% endif %}" title="{% trans "Go back to the parent folder" %}" onclick="history.go(-1);return false">&larr;</a>
 {% endif %}
 {% endblock %}
 
