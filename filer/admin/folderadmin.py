@@ -255,7 +255,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # search
         q = request.GET.get('q', None)
         if q:
-            search_terms = unquote(q).split(" ")
+            search_terms = q.split(" ")
         else:
             search_terms = []
             q = ''
@@ -396,7 +396,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 'current_url': request.path,
                 'title': u'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
-                'q': urlquote(q),
+                'q': q,
                 'show_result_count': show_result_count,
                 'limit_search_to_folder': limit_search_to_folder,
                 'is_popup': popup_status(request),
