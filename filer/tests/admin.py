@@ -2648,3 +2648,61 @@ class TestImageChangeForm(TestCase):
                 orig_img = File.objects.get(id=orig_img.id)
                 self.assertNotEqual(sha1_before, orig_img.sha1)
             os.remove(another_img_path)
+
+
+class TrashAdminTests(TestCase):
+
+    def setUp(self):
+        self.user = create_superuser()
+        self.client.login(username='admin', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+        for f in File.all_objects.all():
+            f.delete(to_trash=False)
+
+    def create_filer_image(self, image_name, **kwargs):
+        image = create_image()
+        image_path = os.path.join(os.path.dirname(__file__), image_name)
+        image.save(image_path, 'JPEG')
+        file_obj = DjangoFile(open(image_path), name=image_name)
+        kwargs.update({
+            'original_filename': image_name,
+            'file': file_obj
+            })
+        image = Image.objects.create(**kwargs)
+        os.remove(image_path)
+        return image
+
+    def test_restore_item_view(self):
+        img_dir = Folder.objects.create(name='dir')
+        img_dir_child = Folder.objects.create(
+            name='img_dir_child', parent=img_dir)
+        img = self.create_filer_image('to_be_deleted.jpg', folder=img_dir)
+        img_child = self.create_filer_image(
+            'child_to_be_deleted.jpg', folder=img_dir_child)
+        Image.objects.get(id=img.id).delete()
+        Image.objects.get(id=img_child.id).delete()
+        Folder.objects.get(id=img_dir.id).delete()
+
+        # search for child file
+        response = self.client.get(reverse('admin:filer_trash_changelist'), {
+            'q': 'child_to_be_deleted'})
+        items_displayed = response.context['paginator'].object_list
+        self.assertEqual(len(items_displayed), 1)
+        self.assertEqual(items_displayed[0].id, img_child.id)
+
+        root_restore_url = reverse(
+            'admin:filer_trash_item', args=('folder', img_dir.id,))
+        for filer_model, filer_obj_id in [('file', img_child.id), (
+                                          'folder', img_dir_child.id)]:
+            restorable_item_url = reverse('admin:filer_trash_item',
+                                          args=(filer_model, filer_obj_id,))
+            response = self.client.get(restorable_item_url)
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(
+                response.get('location').endswith(root_restore_url))
+            restore_item_url = reverse('admin:filer_restore_items',
+                                       args=(filer_model, filer_obj_id,))
+            response = self.client.post(restore_item_url, {'post': 'yes'})
+            self.assertEqual(response.status_code, 403)
