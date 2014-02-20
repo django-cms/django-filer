@@ -100,13 +100,6 @@ class TrashAdmin(admin.ModelAdmin):
         except filer_model_cls.DoesNotExist, e:
             raise Http404
 
-        # should not allow view for items that do not have alive container
-        container_attr = 'folder' if filer_model == 'file' else 'parent'
-        try:
-            getattr(filer_object, container_attr)
-        except filer.models.Folder.DoesNotExist, e:
-            raise PermissionDenied
-
         return filer_model_cls, filer_object
 
     def restorable_item_view(self, request, filer_model, filer_obj_id):
@@ -153,6 +146,13 @@ class TrashAdmin(admin.ModelAdmin):
     def restore_items(self, request, filer_model, filer_obj_id):
         filer_model_cls, filer_object = self._check_restore_view_valid(
             request, filer_model, filer_obj_id)
+
+        # should not allow view for items that do not have alive container
+        container_attr = 'folder' if filer_model == 'file' else 'parent'
+        try:
+            getattr(filer_object, container_attr)
+        except filer.models.Folder.DoesNotExist, e:
+            raise PermissionDenied
 
         if request.method == 'POST' and request.POST.get('post'):
             filer_object.restore()
