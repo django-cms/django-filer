@@ -701,12 +701,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
             return mark_safe(u'%s: <a href="%s">%s</a>' %
                              (escape(capfirst(opts.verbose_name)),
                               admin_url,
-                              escape(obj)))
+                              escape(obj.actual_name)))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
             return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj))
+                                force_unicode(obj.actual_name))
 
     def _get_current_action_folder(self, request, files_qs, folders_qs):
         current_folder = getattr(request, 'current_dir_list_folder', None)
@@ -755,8 +755,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
             is_restricted = fo.is_restricted_for_user(request.user)
             enabled = ((not is_restricted and
                         (fo != current_folder or allow_self)))
-            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) +
-                                  force_unicode(fo)),
+            yield (fo, (mark_safe(("&nbsp" * 4 * level) +
+                                  force_unicode(fo.actual_name)),
                         enabled))
             if not is_restricted:
                 for c in self._list_all_destination_folders_recursive(
