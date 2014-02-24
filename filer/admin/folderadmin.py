@@ -236,7 +236,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
                 url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
             return HttpResponseRedirect(url)
-        elif folder_id == None:
+        elif folder_id is None:
             folder = FolderRoot()
         else:
             folder = get_object_or_404(Folder, id=folder_id)
