@@ -9,7 +9,7 @@
     <tfoot>
         <tr>
             <td colspan="3">
-                <form action="{% url 'admin:filer-paste_clipboard_to_folder' %}" method="post" style="display: inline;">
+                <form action="{% url 'admin:filer-paste_clipboard_to_folder' %}" method="post" style="display: inline;" class='avoid-multiple-submissions'>
                     {% csrf_token %}
                     <input type="hidden" name="folder_id" value="{{ folder.id }}" />
                     <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
@@ -28,7 +28,7 @@
                     {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
                     <input type="submit" value="{% trans "discard" %}" title="{% trans "Move all clipboard files to" %} '{% trans "unfiled files" %}' {% trans "folder" %}"/>
                 </form>{% endcomment %}
-                <form action="{% url 'admin:filer-delete_clipboard' %}" method="post"  style="display: inline;">{% csrf_token %}
+                <form action="{% url 'admin:filer-delete_clipboard' %}" method="post"  style="display: inline;" class='avoid-multiple-submissions'>{% csrf_token %}
                     <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
                     <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                     {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
@@ -48,4 +48,12 @@
     {% endif %}
     </tbody>
 </table>
+<script type="text/javascript">
+(function ($) {
+    var i = 0;
+    $('form.avoid-multiple-submissions').submit(function () {
+        i++; if(i > 1) { return false; }
+    });
+})(jQuery);
+</script>
 {% endwith %}
