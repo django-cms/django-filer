@@ -170,11 +170,12 @@ class File(mixins.TrashableMixin,
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
-        self._old_name = self.name
-        self._old_file_location = self.file.name
         self._old_sha1 = self.sha1
-        self._old_folder_id = self.folder_id
         self._force_commit = False
+        # see method _is_path_changed
+        self._old_name = self.name
+        self._current_file_location = self.file.name
+        self._old_folder_id = self.folder_id
 
     def clean(self):
         if self.name:
@@ -237,6 +238,7 @@ class File(mixins.TrashableMixin,
         src_file.open()
         self.file = dst_storage.save(dst_file_name,
             ContentFile(src_file.read()))
+        src_file.close()
         src_storage.delete(src_file_name)
 
     def _copy_file(self, destination, overwrite=False):
@@ -250,18 +252,23 @@ class File(mixins.TrashableMixin,
             # TODO: Find a way to override this behavior.
             raise NotImplementedError
 
-        src_file_name = self._old_file_location
+        src_file_name = self._current_file_location
         storage = self.file.storages['public' if self.is_public else 'private']
 
         if hasattr(storage, 'copy'):
             storage.copy(src_file_name, destination)
-            return destination
         else:
             # This is needed because most of the remote File Storage backend do not
             # open the file.
             src_file = storage.open(src_file_name)
             src_file.open()
-            return storage.save(destination, ContentFile(src_file.read()))
+            destination = storage.save(destination,
+                                       ContentFile(src_file.read()))
+            src_file.close()
+        self._current_file_location = destination
+        self.old_name = self.name
+        self._old_folder_id = getattr(self.folder, 'id', None)
+        return destination
 
     def generate_sha1(self):
         sha = hashlib.sha1()
@@ -302,9 +309,7 @@ class File(mixins.TrashableMixin,
             self.generate_sha1()
         except Exception, e:
             pass
-        if filer_settings.FOLDER_AFFECTS_URL and \
-                (self._is_name_chnaged() or
-                 self._old_folder_id != getattr(self.folder, 'id', None)):
+        if filer_settings.FOLDER_AFFECTS_URL and self._is_path_changed():
             self._force_commit = True
             self.update_location_on_storage(*args, **kwargs)
         else:
@@ -312,11 +317,22 @@ class File(mixins.TrashableMixin,
 
     save.alters_data = True
 
-    def _is_name_chnaged(self):
+    def _is_path_changed(self):
+        """
+        Used to detect if file location on storage should be updated or not.
+        Since this is used only to check if location should be updated,
+            the values will be reset after the file is copied in the
+            destination location on storage.
+        """
+        # check if file name changed
         if self._old_name in ('', None):
-            return self.name not in ('', None)
+            name_changed = self.name not in ('', None)
         else:
-            return self._old_name != self.name
+            name_changed = self._old_name != self.name
+
+        folder_changed = self._old_folder_id != getattr(self.folder, 'id', None)
+
+        return name_changed or folder_changed
 
     def _delete_thumbnails(self):
         source = self.file.get_source_cache()
@@ -325,7 +341,7 @@ class File(mixins.TrashableMixin,
             source.delete()
 
     def update_location_on_storage(self, *args, **kwargs):
-        old_location = self._old_file_location
+        old_location = self._current_file_location
         # thumbnails might get physically deleted evenif the transaction fails
         # though luck... they get re-created anyway...
         self._delete_thumbnails()
@@ -333,7 +349,8 @@ class File(mixins.TrashableMixin,
         if self._old_sha1 != self.sha1:
             # actual file content needs to be replaced on storage prior to
             #   filer file instance save
-            self.file.storage.save(self._old_file_location, self.file)
+            self.file.storage.save(self._current_file_location, self.file)
+            self._old_sha1 = self.sha1
         new_location = self.file.field.upload_to(self, self.actual_name)
         storage = self.file.storage
 

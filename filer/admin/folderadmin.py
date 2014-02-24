@@ -949,8 +949,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 file_obj.original_filename, suffix)
         else:
             file_obj.name = self._generate_name(file_obj.name, suffix)
-        new_path = file_obj._meta.get_field('file').generate_filename(
-                file_obj, file_obj.actual_name)
+        new_path = file_obj.file.field.upload_to(file_obj, file_obj.actual_name)
         file_obj.file = file_obj._copy_file(new_path)
         file_obj.save()
 
