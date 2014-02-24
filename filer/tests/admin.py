@@ -334,6 +334,8 @@ class BulkOperationsMixin(object):
         return file_obj
 
 
+@SettingsOverride(filer_settings,
+    FILER_PUBLICMEDIA_UPLOAD_TO=by_path, FOLDER_AFFECTS_URL=True)
 class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
 
     def test_move_files_and_folders_action(self):
@@ -476,6 +478,10 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(self.src_folder.files[0].id, self.image_obj.id)
         dst_image_obj = self.dst_folder.files[0]
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
+        self.assertTrue(os.path.exists(
+            File.objects.get(id=dst_image_obj.id).file.path))
+        self.assertTrue(os.path.exists(
+            File.objects.get(id=self.image_obj.id).file.path))
 
     def test_copy_recursion_error(self):
         ## it's enough to try to move/copy to itself with no error
