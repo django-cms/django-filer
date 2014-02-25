@@ -50,12 +50,12 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             return mark_safe(u'%s: <a href="%s">%s</a>' %
                              (escape(capfirst(opts.verbose_name)),
                               admin_url,
-                              escape(obj)))
+                              escape(obj.actual_name)))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
             return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj))
+                                force_unicode(obj.actual_name))
 
     to_delete = collector.nested(format_callback)
 
