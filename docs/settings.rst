@@ -48,7 +48,7 @@ e.g::
                     'location': '/path/to/media/filer',
                     'base_url': '/smedia/filer/',
                 },
-                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+                'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
             },
             'thumbnails': {
                 'ENGINE': 'filer.storage.PublicFileSystemStorage',
@@ -65,7 +65,7 @@ e.g::
                     'location': '/path/to/smedia/filer',
                     'base_url': '/smedia/filer/',
                 },
-                'UPLOAD_TO': 'filer.utils.generate_filename.by_date',
+                'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
             },
             'thumbnails': {
                 'ENGINE': 'filer.storage.PrivateFileSystemStorage',
@@ -82,10 +82,9 @@ Defaults to FileSystemStorage in ``<MEDIA_ROOT>/filer_public/`` and ``<MEDIA_ROO
 Public storage uses ``DEFAULT_FILE_STORAGE`` as default storage backend.
 
 ``UPLOAD_TO`` is the function to generate the path relative to the storage root. The
-default generates a date based path like ``2011/05/03/filename.jpg``. This
-will be applied with the current date whenever a file is uploaded or moved
-between public (without permission checks) and private (with permission
-checks) storages. Defaults to ``'filer.utils.generate_filename.by_date'``
+default generates a random path like ``1d/a5/1da50fee-5003-46a1-a191-b547125053a8/filename.jpg``. This
+will be applied whenever a file is uploaded or moved between public (without permission checks) and 
+private (with permission checks) storages. Defaults to ``'filer.utils.generate_filename.randomized'``.
 
 
 ``FILER_SERVERS``
