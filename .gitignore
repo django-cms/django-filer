@@ -28,3 +28,4 @@ htmlcov/
 share/
 .idea
 .tox
+*.pyo
