@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-
+from __future__ import unicode_literals
 
 import os
 from django.utils.text import get_valid_filename as get_valid_filename_django

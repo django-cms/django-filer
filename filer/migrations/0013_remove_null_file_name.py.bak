@@ -1,37 +1,21 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import datetime
-from django.core.exceptions import ObjectDoesNotExist
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        try:
-            image_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='image').id
-            file_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='file').id
-            for file in orm['filer.file'].objects.all():
-                if file._file_type_plugin_name == 'Image':
-                    file.polymorphic_ctype_id = image_ct
-                else:
-                    file.polymorphic_ctype_id = file_ct
-                file.save()
-        except ObjectDoesNotExist:
-            print("No filer contentypes to migrate. This is probably because migrate is running on a new database.")
-
+        for file_name_null in orm.File.objects.filter(name__isnull=True):
+            file_name_null.name = ""
+            file_name_null.save()
+            print 'Setting empty string in null name for File object %s. See Release notes for further info' % file_name_null.pk
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        image_ct = orm['contenttypes.ContentType'].objects.get(app_label='filer', model='image').id
-        for file in orm['filer.file'].objects.all():
-            if file.polymorphic_ctype_id == image_ct:
-                file._file_type_plugin_name = "Image"
-            else:
-                file._file_type_plugin_name = None
-            file.save()
-
+        pass
+        #raise RuntimeError("Cannot reverse this migration.")
 
     models = {
         'auth.group': {
@@ -85,15 +69,14 @@ class Migration(DataMigration):
         'filer.file': {
             'Meta': {'object_name': 'File'},
             '_file_size': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            '_file_type_plugin_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'folder': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'all_files'", 'null': 'True', 'to': "orm['filer.Folder']"}),
             'has_all_mandatory_data': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_public': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_public': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'modified_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'original_filename': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_files'", 'null': 'True', 'to': "orm['auth.User']"}),
             'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'polymorphic_filer.file_set'", 'null': 'True', 'to': "orm['contenttypes.ContentType']"}),
@@ -116,9 +99,9 @@ class Migration(DataMigration):
         },
         'filer.folderpermission': {
             'Meta': {'object_name': 'FolderPermission'},
-            'can_add_children': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'can_edit': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'can_read': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'can_add_children': ('django.db.models.fields.SmallIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'can_edit': ('django.db.models.fields.SmallIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'can_read': ('django.db.models.fields.SmallIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'everybody': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'folder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['filer.Folder']", 'null': 'True', 'blank': 'True'}),
             'group': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'filer_folder_permissions'", 'null': 'True', 'to': "orm['auth.Group']"}),
@@ -138,6 +121,19 @@ class Migration(DataMigration):
             'must_always_publish_author_credit': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'subject_location': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '64', 'null': 'True', 'blank': 'True'})
+        },
+        'taggit.tag': {
+            'Meta': {'object_name': 'Tag'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '100'})
+        },
+        'taggit.taggeditem': {
+            'Meta': {'object_name': 'TaggedItem'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'taggit_taggeditem_tagged_items'", 'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
+            'tag': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'taggit_taggeditem_items'", 'to': "orm['taggit.Tag']"})
         }
     }
 
