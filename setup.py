@@ -33,7 +33,7 @@ setup(
         'easy-thumbnails>=1.0',
         'django-mptt>=0.5.1,<0.5.3',
         'django_polymorphic>=0.2',
-        'django-cms-roles>=0.2',
+        'django-cms-roles',
     ),
     dependency_links=dependency_links,
     include_package_data=True,
