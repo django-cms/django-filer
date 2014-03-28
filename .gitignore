@@ -29,3 +29,4 @@ share/
 .idea
 .tox
 *.pyo
+full.log
