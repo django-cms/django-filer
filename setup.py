@@ -13,7 +13,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 dependency_links = [
-    'http://github.com/pbs/django-cms-roles/tarball/master#egg=django-cms-roles-0.2',
+    'http://github.com/pbs/django-cms-roles/tarball/master#egg=django-cms-roles-dev',
 ]
 
 setup(
