@@ -2,15 +2,17 @@
 from __future__ import unicode_literals
 
 import os
+from django.conf import settings
+from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
-from django.core.files import File as DjangoFile
-from django.conf import settings
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
 from filer.models.clipboardmodels import Clipboard
+from filer.test_utils.cli import ET_2
+from filer.test_utils.compat import skipIf, skipUnless
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
 from filer import settings as filer_settings
@@ -72,6 +74,7 @@ class FilerApiTests(TestCase):
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
 
+    @skipIf(ET_2, 'Skipping for easy_thumbnails version >= 2.0')
     def test_create_icons(self):
         image = self.create_filer_image()
         image.save()
@@ -81,6 +84,17 @@ class FilerApiTests(TestCase):
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
                              file_basename + '__%sx%s_q85_crop_upscale.jpg' % (size, size))
+
+    @skipUnless(ET_2, 'Skipping for easy_thumbnails version < 2.0')
+    def test_create_icons(self):
+        image = self.create_filer_image()
+        image.save()
+        icons = image.icons
+        file_basename = os.path.basename(image.file.path)
+        self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
+        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
+            self.assertEqual(os.path.basename(icons[size]),
+                             file_basename + '__%sx%s_q85_crop_subsampling-2_upscale.jpg' % (size, size))
 
     def test_file_upload_public_destination(self):
         """
