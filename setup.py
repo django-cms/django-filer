@@ -44,5 +44,6 @@ setup(
     test_suite='runtests.main',
     tests_require=(
         'argparse',  # needed on python 2.6
+        'south',
     ),
 )
