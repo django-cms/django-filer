@@ -27,19 +27,23 @@ def configure(**extra):
             'django.template.loaders.app_directories.Loader',
             'django.template.loaders.eggs.Loader',
             ),
+        SOUTH_TESTS_MIGRATE=True,
         INSTALLED_APPS = [
-            'filer',
-            'mptt',
-            'easy_thumbnails',
             'django.contrib.auth',
             'django.contrib.contenttypes',
             'django.contrib.admin',
             'django.contrib.sessions',
             'django.contrib.staticfiles',
+            'easy_thumbnails',
+            'mptt',
+            'filer',
+            'south',
             ],
         ROOT_URLCONF='filer.test_utils.cli',
     )
     defaults.update(extra)
     settings.configure(**defaults)
+    from south.management.commands import patch_for_test_db_setup
+    patch_for_test_db_setup()
     from django.contrib import admin
     admin.autodiscover()
