@@ -11,7 +11,7 @@ class Migration(DataMigration):
         for file_name_null in orm.File.objects.filter(name__isnull=True):
             file_name_null.name = ""
             file_name_null.save()
-            print 'Setting empty string in null name for File object %s. See Release notes for further info' % file_name_null.pk
+            print('Setting empty string in null name for File object %s. See Release notes for further info' % file_name_null.pk)
 
     def backwards(self, orm):
         pass

@@ -3,6 +3,13 @@ import os
 
 gettext = lambda s: s
 
+import easy_thumbnails
+from distutils.version import LooseVersion
+if hasattr(easy_thumbnails, 'get_version'):
+    ET_2 = LooseVersion(easy_thumbnails.get_version()) > LooseVersion('2.0')
+else:
+    ET_2 = LooseVersion(easy_thumbnails.VERSION) > LooseVersion('2.0')
+
 urlpatterns = []
 
 def configure(**extra):
@@ -41,6 +48,11 @@ def configure(**extra):
             ],
         ROOT_URLCONF='filer.test_utils.cli',
     )
+    if ET_2:
+        extra['SOUTH_MIGRATION_MODULES'] = {
+            'easy_thumbnails': 'easy_thumbnails.south_migrations',
+        }
+
     defaults.update(extra)
     settings.configure(**defaults)
     from south.management.commands import patch_for_test_db_setup

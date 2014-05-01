@@ -1,27 +1,22 @@
 #-*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from distutils.version import LooseVersion
 
 import os
-import easy_thumbnails
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
-from django.utils.unittest.case import skipIf, skipUnless
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
 from filer.models.clipboardmodels import Clipboard
+from filer.test_utils.cli import ET_2
+from filer.test_utils.compat import skipIf, skipUnless
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, create_clipboard_item)
 from filer import settings as filer_settings
 
-if hasattr(easy_thumbnails, 'get_version'):
-    ET_2 = LooseVersion(easy_thumbnails.get_version()) > LooseVersion('2.0')
-else:
-    ET_2 = LooseVersion(easy_thumbnails.VERSION) > LooseVersion('2.0')
 
 class FilerApiTests(TestCase):
 
