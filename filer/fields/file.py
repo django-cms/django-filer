@@ -1,14 +1,14 @@
 #-*- coding: utf-8 -*-
-import inspect
+import warnings
+
 from django import forms
-from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+
 from filer.utils.compatibility import truncate_words
 from filer.models import File
 from filer import settings as filer_settings
@@ -113,8 +113,10 @@ class FilerFileField(models.ForeignKey):
         # a FilerImageFiled can only be a ForeignKey to a Image
         if "to" in kwargs.keys():
             kwargs.pop("to")
-        return super(FilerFileField, self).__init__(
-            self.default_model_class, **kwargs)
+            warnings.warn("FilerImageFiled can only be a ForeignKey to a Image;"
+                          "%s passed" % kwargs['to'], SyntaxWarning)
+        return super(FilerFileField, self).__init__(self.default_model_class,
+                                                    **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
