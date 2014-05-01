@@ -1,23 +1,27 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # crunchorn <crunchorn@prokonto.pl>, 2010.
 # Mateusz Marzantowicz <mmarzantowicz@osdf.com.pl>, 2013.
+# Marcin Puhacz <marcinpuhacz@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-01-31 12:42+0000\n"
-"Last-Translator: mmarzantowicz <mmarzantowicz@osdf.com.pl>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/django-filer/language/pl/)\n"
+"PO-Revision-Date: 2014-03-15 15:33+0100\n"
+"Last-Translator: Marcin Puhacz <marcinpuhacz@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/projects/p/django-filer/"
+"language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.6.4\n"
 
 #: views.py:103
 msgid "Folder with this name already exists."
@@ -48,7 +52,7 @@ msgstr ""
 
 #: admin/folderadmin.py:456
 msgid "No action selected."
-msgstr ""
+msgstr "Nie wybrano akcji"
 
 #: admin/folderadmin.py:497
 #, python-format
@@ -221,7 +225,7 @@ msgstr "schowek"
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
-msgstr ""
+msgstr "schowki"
 
 #: models/clipboardmodels.py:39 models/filemodels.py:35
 #: models/filemodels.py:286
@@ -230,11 +234,11 @@ msgstr "plik"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard item"
-msgstr ""
+msgstr "plik ze schowka"
 
 #: models/clipboardmodels.py:45
 msgid "clipboard items"
-msgstr ""
+msgstr "pliki ze schowka"
 
 #: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:74
@@ -249,15 +253,15 @@ msgstr "rozmiar pliku"
 
 #: models/filemodels.py:38
 msgid "sha1"
-msgstr ""
+msgstr "sha1"
 
 #: models/filemodels.py:40
 msgid "has all mandatory data"
-msgstr ""
+msgstr "zawiera wszystkie wymagane dane"
 
 #: models/filemodels.py:42
 msgid "original filename"
-msgstr ""
+msgstr "oryginalna nazwa"
 
 #: models/filemodels.py:44 models/foldermodels.py:99
 msgid "name"
@@ -265,19 +269,19 @@ msgstr "nazwa"
 
 #: models/filemodels.py:46
 msgid "description"
-msgstr ""
+msgstr "opis"
 
 #: models/filemodels.py:50
 msgid "owner"
-msgstr ""
+msgstr "właściciel"
 
 #: models/filemodels.py:52 models/foldermodels.py:105
 msgid "uploaded at"
-msgstr ""
+msgstr "wysłane"
 
 #: models/filemodels.py:53 models/foldermodels.py:108
 msgid "modified at"
-msgstr ""
+msgstr "zmodyfikowane"
 
 #: models/filemodels.py:57
 msgid "Permissions disabled"
@@ -289,7 +293,7 @@ msgstr ""
 
 #: models/foldermodels.py:107
 msgid "created at"
-msgstr ""
+msgstr "utworzone"
 
 #: models/foldermodels.py:211
 #: templates/admin/filer/widgets/admin_folder.html:3
@@ -355,7 +359,7 @@ msgstr ""
 
 #: models/imagemodels.py:43
 msgid "default caption"
-msgstr ""
+msgstr "domyślna nazwa"
 
 #: models/imagemodels.py:45 templates/image_filer/image.html:6
 msgid "author"
@@ -403,7 +407,7 @@ msgstr ""
 
 #: templates/admin/filer/actions.html:4
 msgid "Go"
-msgstr ""
+msgstr "Idź"
 
 #: templates/admin/filer/actions.html:11
 msgid "Click here to select the objects across all pages"
@@ -467,8 +471,8 @@ msgstr ""
 #: templates/admin/filer/delete_confirmation.html:21
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
-" following protected related objects:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
 msgstr ""
 
 #: templates/admin/filer/delete_confirmation.html:29
@@ -536,8 +540,8 @@ msgstr "Ikona katalogu"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
@@ -562,34 +566,38 @@ msgstr "Folder docelowy:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:39
 msgid "Copy"
-msgstr ""
+msgstr "Kopiuj"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:12
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
 msgstr ""
+"Twoje konto nie ma uprawnień do zmiany rozmiaru wszystkich zaznaczonych "
+"obrazów."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid "There are no images available to resize."
-msgstr ""
+msgstr "Nie ma plików do skalowania."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:17
 msgid "The following images will be resized:"
-msgstr ""
+msgstr "Następujące obrazy zostaną przeskalowane:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:30
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
+msgstr "Wybierz miniaturkę lub wpisz parametry zmiany rozmiaru:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose resize parameters:"
-msgstr ""
+msgstr "Wybierz parametry zmiany rozmiaru:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
 msgstr ""
+"Uwaga: Obrazy zostaną przeskalowane w miejscu, a oryginały zostaną utracone. "
+"Pamiętaj o kopii zapasowej!"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
@@ -597,9 +605,11 @@ msgstr "Zmień rozmiar"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
 msgstr ""
+"Twoje konto nie ma uprawnień, aby przenieść wszystkie wybrane  pliki i / lub "
+"foldery."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
@@ -610,6 +620,8 @@ msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
 msgstr ""
+"Następujące pliki i / lub foldery zostaną przeniesione do folderu docelowego "
+"(zachowując strukturę drzewa):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:38
 msgid "Move"
@@ -619,16 +631,20 @@ msgstr "Przenieś"
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
 msgstr ""
+"Twoje konto nie posiada uprawnień do zmiany nazwy wszystkich zaznaczonych "
+"plików"
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "There are no files available to rename."
-msgstr ""
+msgstr "Nie ma plików do zmiany nazwy"
 
 #: templates/admin/filer/folder/choose_rename_format.html:17
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
 msgstr ""
+"Nazwy ponizszych plików zostaną zmienione(wyłącznie widoczne nazwy, w "
+"folderach pozostaną te same)"
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
@@ -649,7 +665,7 @@ msgstr "wyślij pliki"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "Upload"
-msgstr ""
+msgstr "Wyślij"
 
 #: templates/admin/filer/folder/directory_listing.html:74
 msgid "Go back to the parent folder"
@@ -727,11 +743,11 @@ msgstr "Uprawnienia"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "disabled"
-msgstr ""
+msgstr "wyłączony"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "enabled"
-msgstr ""
+msgstr "włączony"
 
 #: templates/admin/filer/folder/directory_table.html:50
 msgid "Move to clipboard"
@@ -743,7 +759,7 @@ msgstr "Nie dodano tutaj jeszcze żadnych plików, bądź katalogów"
 
 #: templates/admin/filer/folder/directory_table.html:65
 msgid "previous"
-msgstr ""
+msgstr "poprzedni"
 
 #: templates/admin/filer/folder/directory_table.html:69
 #, python-format
@@ -752,10 +768,13 @@ msgid ""
 "            Page %(number)s of %(num_pages)s.\n"
 "            "
 msgstr ""
+"\n"
+"            Strona %(number)s z %(num_pages)s.\n"
+"            "
 
 #: templates/admin/filer/folder/directory_table.html:75
 msgid "next"
-msgstr ""
+msgstr "następny"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 msgid "Add new"
@@ -764,9 +783,9 @@ msgstr "Dodaj nowy"
 #: templates/admin/filer/folder/new_folder_form.html:13
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Popraw proszę poniższy błąd"
+msgstr[1] "Popraw proszę poniższy błędy"
+msgstr[2] "Popraw proszę poniższy błędy"
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"
@@ -818,7 +837,7 @@ msgstr "anuluj wyszukiwanie"
 #: templates/admin/filer/widgets/admin_file.html:7
 #: templates/admin/filer/widgets/admin_file.html:8
 msgid "file missing"
-msgstr ""
+msgstr "brak pliku"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:7
 msgid "Clipboard"
@@ -846,7 +865,7 @@ msgstr "Nie udało się przesłać pliku"
 
 #: templates/admin/filer/widgets/admin_file.html:11
 msgid "no file selected"
-msgstr ""
+msgstr "nie zaznaczono żadnego pliku"
 
 #: templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
@@ -862,7 +881,7 @@ msgstr "Usuń"
 
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "none selected"
-msgstr ""
+msgstr "nic nie zaznaczono"
 
 #: templates/image_filer/folder.html:3
 #, python-format
