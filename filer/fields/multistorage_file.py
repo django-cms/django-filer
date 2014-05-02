@@ -102,7 +102,7 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
                  storages=None, thumbnail_storages=None, thumbnail_options=None, **kwargs):
         if 'upload_to' in kwargs:
             kwargs.pop("to")
-            warnings.warn("MultiStorageFileField can handle only Field objects;"
+            warnings.warn("MultiStorageFileField can handle only File objects;"
                           "%s passed" % kwargs['to'], SyntaxWarning)
         self.storages = storages or STORAGES
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
