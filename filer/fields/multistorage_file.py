@@ -3,10 +3,13 @@ import base64
 import hashlib
 import warnings
 from io import BytesIO
+
 from django.core.files.base import ContentFile
 from django.utils import six
-from easy_thumbnails import fields as easy_thumbnails_fields, \
-    files as easy_thumbnails_files
+
+from easy_thumbnails import (fields as easy_thumbnails_fields,
+                             files as easy_thumbnails_files)
+
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
 
@@ -97,6 +100,10 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
 
     def __init__(self, verbose_name=None, name=None,
                  storages=None, thumbnail_storages=None, thumbnail_options=None, **kwargs):
+        if 'upload_to' in kwargs:
+            kwargs.pop("to")
+            warnings.warn("MultiStorageFileField can handle only File objects;"
+                          "%s passed" % kwargs['to'], SyntaxWarning)
         self.storages = storages or STORAGES
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
         self.thumbnail_options = thumbnail_options or THUMBNAIL_OPTIONS
