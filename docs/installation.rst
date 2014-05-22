@@ -51,6 +51,13 @@ Add ``"filer"`` and related apps to your project's ``INSTALLED_APPS`` setting an
 Note that `easy_thumbnails`_ also has database tables and needs a ``syncdb`` or
 ``migrate``.
 
+For `easy_thumbnails`_ to support retina displays (recent MacBooks, iOS) add to settings.py::
+
+    THUMBNAIL_HIGH_RESOLUTION = True
+    
+If you forget this, you may not see thumbnails for your uploaded files. Adding this line and 
+refreshing the admin page will create the missing thumbnails.
+
 Static media
 ............
 
