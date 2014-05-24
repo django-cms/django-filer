@@ -27,6 +27,8 @@ Dependencies
 * `django-polymorphic`_ >= 0.2
 * `PIL`_ 1.1.7 (with JPEG and ZLIB support) or Pillow 2.3.0 (with JPEG and ZLIB support, Better to use Pillow)
 
+**`Django`_ >= 1.6** is supported together with `django-polymorphic`_ >= 0.5.4
+
 Installation
 ------------
 
