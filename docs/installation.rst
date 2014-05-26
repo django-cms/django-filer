@@ -22,12 +22,15 @@ alpha and beta releases.
 Dependencies
 ------------
 
-* `Django`_ >=1.4
-* `django-mptt`_ >=0.5.1,<0.6
+* `Django`_ >= 1.4
+* `django-mptt`_ >=0.5.1
 * `easy_thumbnails`_ >= 1.0
-* `django-polymorphic`_ >=0.2
-* `Pillow`_ >= 2.0 (**with JPEG and ZLIB support**).
-* ``django.contrib.staticfiles``
+* `django-polymorphic`_ >= 0.2
+* `Pillow`_ 2.3.0 (with JPEG and ZLIB support, `PIL`_ 1.1.7 is supported but not recommended)
+
+``django.contrib.staticfiles`` is required.
+
+**Django >= 1.6** is supported together with `django-polymorphic`_ >= 0.5.4
 
 Please make sure you install `Pillow`_ with JPEG and  ZLIB support installed;
 for further information on Pillow installation and its binary dependencies,

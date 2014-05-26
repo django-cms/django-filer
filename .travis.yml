@@ -3,6 +3,7 @@ python:
   - 2.6
   - 2.7
   - 3.3
+  - 3.4
 install:
   - ./.travis_setup
 env:
@@ -10,18 +11,22 @@ env:
   - DJANGO="django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0"
-  - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
+  - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
 script: coverage run --rcfile=coverage.rc setup.py test
 after_success:
   coveralls --config_file=coverage.rc
 matrix:
   exclude:
     - python: 2.6
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 3.3
+      env: DJANGO="django>=1.4,<1.5" EASY_THUMBNAILS="easy-thumbnails>=1.2,<2.0"
+    - python: 3.4
       env: DJANGO="django>=1.4,<1.5" EASY_THUMBNAILS="easy-thumbnails>=1.2,<2.0"
   allow_failures:
     - python: 2.7
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 3.3
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
+    - python: 3.4
+      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
