@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 try:
     from django.utils.encoding import force_str
@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from filer.utils.files import get_valid_filename
 from django.utils.encoding import smart_str
 import os
+import collections
 
 
 def by_date(instance, filename):
@@ -28,7 +29,7 @@ class prefixed_factory(object):
         self.prefix = prefix
 
     def __call__(self, instance, filename):
-        if callable(self.upload_to):
+        if isinstance(self.upload_to, collections.Callable):
             upload_to_str = self.upload_to(instance, filename)
         else:
             upload_to_str = self.upload_to

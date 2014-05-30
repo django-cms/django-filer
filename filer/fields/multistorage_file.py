@@ -12,6 +12,7 @@ from easy_thumbnails import (fields as easy_thumbnails_fields,
 
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
+import collections
 
 
 STORAGES = {
@@ -34,7 +35,7 @@ def generate_filename_multistorage(instance, filename):
     else:
         upload_to = filer_settings.FILER_PRIVATEMEDIA_UPLOAD_TO
 
-    if callable(upload_to):
+    if isinstance(upload_to, collections.Callable):
         return upload_to(instance, filename)
     else:
         return upload_to

@@ -53,7 +53,7 @@ def filesize(bytes, format='auto1024'):
 
     # Check for valid bytes
     try:
-        bytes = int(bytes) if six.PY3 else long(bytes)
+        bytes = int(bytes) if six.PY3 else int(bytes)
     except (ValueError, TypeError):
         return bytes
 

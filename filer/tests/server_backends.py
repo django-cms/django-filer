@@ -65,7 +65,7 @@ class NginxServerTestCase(BaseServerBackendTestCase):
         request = Mock()
         request.META = {}
         response = self.server.serve(request, self.filer_file.file)
-        headers = dict(response.items())
+        headers = dict(list(response.items()))
         self.assertTrue(response.has_header('X-Accel-Redirect'))
         self.assertTrue(headers['X-Accel-Redirect'].startswith(self.server.nginx_location))
         # make sure the file object was never opened (otherwise the whole delegating to nginx would kinda
@@ -81,7 +81,7 @@ class NginxServerTestCase(BaseServerBackendTestCase):
         request.META = {}
         os.remove(self.filer_file.file.path)
         response = self.server.serve(request, self.filer_file.file)
-        headers = dict(response.items())
+        headers = dict(list(response.items()))
         self.assertTrue(response.has_header('X-Accel-Redirect'))
         self.assertTrue(headers['X-Accel-Redirect'].startswith(self.server.nginx_location))
         self.assertTrue(self.filer_file.file.closed)
@@ -96,7 +96,7 @@ class XSendfileServerTestCase(BaseServerBackendTestCase):
         request = Mock()
         request.META = {}
         response = self.server.serve(request, self.filer_file.file)
-        headers = dict(response.items())
+        headers = dict(list(response.items()))
         self.assertTrue(response.has_header('X-Sendfile'))
         self.assertEqual(headers['X-Sendfile'], self.filer_file.file.path)
         # make sure the file object was never opened (otherwise the whole delegating to nginx would kinda
@@ -112,7 +112,7 @@ class XSendfileServerTestCase(BaseServerBackendTestCase):
         request.META = {}
         os.remove(self.filer_file.file.path)
         response = self.server.serve(request, self.filer_file.file)
-        headers = dict(response.items())
+        headers = dict(list(response.items()))
         self.assertTrue(response.has_header('X-Sendfile'))
         self.assertEqual(headers['X-Sendfile'], self.filer_file.file.path)
         # make sure the file object was never opened (otherwise the whole delegating to nginx would kinda
