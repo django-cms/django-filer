@@ -125,7 +125,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def generate_sha1(self):
         sha = hashlib.sha1()
         self.file.seek(0)
-        sha.update(self.file.read())
+        while True:
+            buf = self.file.read(104857600)
+            if not buf:
+                break
+            sha.update(buf)
         self.sha1 = sha.hexdigest()
         # to make sure later operations can read the whole file
         self.file.seek(0)
