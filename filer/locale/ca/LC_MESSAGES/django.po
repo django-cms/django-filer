@@ -3,248 +3,247 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Pavel <neoascetic@gmail.com>, 2012
+# Roger Pons <rogerpons@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Pavel <neoascetic@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django-filer/language/ru/)\n"
+"PO-Revision-Date: 2014-02-06 14:46+0000\n"
+"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"Language-Team: Catalan (http://www.transifex.com/projects/p/django-filer/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: views.py:103
 msgid "Folder with this name already exists."
-msgstr "Папка с таким именем уже существует"
+msgstr "Ja existeix una carpeta amb aquest nom."
 
 #: admin/fileadmin.py:41
 msgid "Advanced"
-msgstr "Дополнительно"
+msgstr "Avançat"
 
 #: admin/folderadmin.py:324 admin/folderadmin.py:427
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Для выполнения действий нужно выбрать хотя бы один объект. Не произведено никаких изменений."
+msgstr "Cal seleccionar els elements en ordre per tal de realitzar accions sobre ells. No s'ha modificat cap element."
 
 #: admin/folderadmin.py:344
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count)s выбран"
-msgstr[1] "%(total_count)s выбрано"
-msgstr[2] "Все %(total_count)s выбраны"
+msgstr[0] "%(total_count)s seleccionat"
+msgstr[1] "Tots %(total_count)s seleccionats"
 
 #: admin/folderadmin.py:377
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr "0 из %(cnt)s выбрано"
+msgstr "0 de %(cnt)s seleccionats"
 
 #: admin/folderadmin.py:456
 msgid "No action selected."
-msgstr "Действие не выбрано."
+msgstr "No s'ha seleccionat cap acció."
 
 #: admin/folderadmin.py:497
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
-msgstr "Успешно перемещено %(count)d файлов в буфер обмена."
+msgstr "S'han mogut %(count)d fitxers al portapapers."
 
 #: admin/folderadmin.py:503
 msgid "Move selected files to clipboard"
-msgstr "Переместить выбранные файлы в буфер обмена"
+msgstr "Moure els fitxers seleccionats al portapapers."
 
 #: admin/folderadmin.py:537
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
-msgstr "Разрешения успешно отключены для %(count)d файлов."
+msgstr "S'han desactivat els permisos de %(count)d fitxers."
 
 #: admin/folderadmin.py:541
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
-msgstr "Разрешения успешно применены для %(count)d файлов."
+msgstr "S'han activat els permisos de %(count)d fitxers."
 
 #: admin/folderadmin.py:550
 msgid "Enable permissions for selected files"
-msgstr "Включить разрешения для выбранных файлов"
+msgstr "Activar els permisos dels fitxers seleccionats"
 
 #: admin/folderadmin.py:555
 msgid "Disable permissions for selected files"
-msgstr "Отключить разрешения для выбранных файлов"
+msgstr "Desactivaer els permisos dels fitxers seleccionats"
 
 #: admin/folderadmin.py:623
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
-msgstr "Успешно удалено %(count)d файлов/папок."
+msgstr "S'han esborrat %(count)d fitxers i/o carpetes."
 
 #: admin/folderadmin.py:630
 msgid "Cannot delete files and/or folders"
-msgstr "Невозможно удалить файлы/папки"
+msgstr "No es poden esborrar els fitxers i/o carpetes"
 
 #: admin/folderadmin.py:632
 msgid "Are you sure?"
-msgstr "Вы уверены?"
+msgstr "Esteu segur?"
 
 #: admin/folderadmin.py:637
 msgid "Delete files and/or folders"
-msgstr "Удалить файлы/папки"
+msgstr "Esborrar fitxers i/o carpetes"
 
 #: admin/folderadmin.py:656
 msgid "Delete selected files and/or folders"
-msgstr "Удалить выбранные файлы/папки"
+msgstr "Esborrar els fitxers i/o carpetes seleccionats"
 
 #: admin/folderadmin.py:771
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Успешно перемещено %(count)d файлов/папок в папку '%(destination)s'."
+msgstr "S'han mogut %(count)d fitxers i/o carpetes a la carpeta '%(destination)s'"
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
-msgstr "Переместить файлы/папки"
+msgstr "Moure fitxers i/o carpetes"
 
 #: admin/folderadmin.py:797
 msgid "Move selected files and/or folders"
-msgstr "Переместить выбранные файлы/папки"
+msgstr "Moure els fitxers i/o carpetes seleccionats"
 
 #: admin/folderadmin.py:854
 #, python-format
 msgid "Successfully renamed %(count)d files."
-msgstr "Успешно переименовано %(count)d файлов."
+msgstr "S'ha canviat el nom de %(count)d fitxers."
 
 #: admin/folderadmin.py:862 admin/folderadmin.py:864 admin/folderadmin.py:881
 msgid "Rename files"
-msgstr "Переименовать файлы"
+msgstr "Canviar el nom a fitxers"
 
 #: admin/folderadmin.py:975
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Успешно скопировано %(count)d файлов/папок в папку '%(destination)s'."
+msgstr "S'han copiat %(count)d fitxeres i/o carpetes a la carpeta '%(destination)s'."
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
-msgstr "Скопировать файлы/папки"
+msgstr "Copiar fitxers i/o carpetes"
 
 #: admin/folderadmin.py:1010
 msgid "Copy selected files and/or folders"
-msgstr "Скопировать выбранные файлы/папки"
+msgstr "Copiar els fitxers i/o carpetes seleccionats"
 
 #: admin/folderadmin.py:1105
 #, python-format
 msgid "Successfully resized %(count)d images."
-msgstr "Успешно изменен размер %(count)d изображений."
+msgstr "S'han redimensionat %(count)d imatges."
 
 #: admin/folderadmin.py:1113 admin/folderadmin.py:1115
 msgid "Resize images"
-msgstr "Изменить размер изображений"
+msgstr "Redimensionar imatges"
 
 #: admin/folderadmin.py:1133
 msgid "Resize selected images"
-msgstr "Изменить размер выбранных изображений"
+msgstr "Redimensionar les imatges seleccionades"
 
 #: admin/forms.py:26
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr "Окончание, которое будет добавлено к именам скопированных файлов."
+msgstr "Sufix que serà afegit als noms de fitxer dels fitxers copiats"
 
 #: admin/forms.py:33
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Окончание должно быть правильной, простой и в нижнем регистре частью имени файла, например \"%(valid)s\"."
+msgstr "El sufix ha de ser una part de nom de fitxer vàlida, simple i en minúscules, com ara \"%(valid)s\"."
 
 #: admin/forms.py:54
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
-msgstr "Неизвестный ключ форматирования \"%(key)s\"."
+msgstr "Format de renombrat amb valor de clau \"%(key)s\" desconegut."
 
 #: admin/forms.py:56
 #, python-format
 msgid "Invalid rename format: %(error)s."
-msgstr "Неверный формат переименования: %(error)s."
+msgstr "Format de renombrat no vàlid: %(error)s"
 
 #: admin/forms.py:62
 msgid "thumbnail option"
-msgstr "опция миниатюры"
+msgstr "opció de miniatures"
 
 #: admin/forms.py:63
 msgid "width"
-msgstr "ширина"
+msgstr "ample"
 
 #: admin/forms.py:64
 msgid "height"
-msgstr "высота"
+msgstr "alçada"
 
 #: admin/forms.py:65
 msgid "crop"
-msgstr "обрезать"
+msgstr "retallar"
 
 #: admin/forms.py:66
 msgid "upscale"
-msgstr "увеличивать"
+msgstr "ampliar"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Опция миниатюры или параметры изменения размера должны быть указаны."
+msgstr "Heu de triar una opció de miniatura o paràmetres de redimensionat."
 
 #: admin/forms.py:73
 msgid "Resize parameters must be choosen."
-msgstr "Параметры изменения размеры должны быть указаны."
+msgstr "Heu de triar paràmetres de redimensionat."
 
 #: admin/imageadmin.py:12
 msgid "Subject location"
-msgstr "Расположение объекта"
+msgstr "Lloc del subjecte."
 
 #: admin/imageadmin.py:13
 msgid "Location of the main subject of the scene."
-msgstr "Расположение главного объекта в сцене."
+msgstr "Lloc del subjecte principal de l'escena."
 
 #: models/clipboardmodels.py:9 models/foldermodels.py:236
 msgid "user"
-msgstr "пользователь"
+msgstr "usuari"
 
 #: models/clipboardmodels.py:11 models/filemodels.py:287
 msgid "files"
-msgstr "файлы"
+msgstr "fitxers"
 
 #: models/clipboardmodels.py:34 models/clipboardmodels.py:40
 msgid "clipboard"
-msgstr "буфер обмена"
+msgstr "portapapers"
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
-msgstr "буферы обмена"
+msgstr "portapapers"
 
 #: models/clipboardmodels.py:39 models/filemodels.py:35
 #: models/filemodels.py:286
 msgid "file"
-msgstr "файл"
+msgstr "fitxer"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard item"
-msgstr "элемент буфера обмена"
+msgstr "element del portapapers"
 
 #: models/clipboardmodels.py:45
 msgid "clipboard items"
-msgstr "элементы буфера обмена"
+msgstr "elements del portapapers"
 
 #: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:74
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
-msgstr "папка"
+msgstr "carpeta"
 
 #: models/filemodels.py:36
 msgid "file size"
-msgstr "размер файла"
+msgstr "tamany del fitxer"
 
 #: models/filemodels.py:38
 msgid "sha1"
@@ -252,184 +251,184 @@ msgstr "sha1"
 
 #: models/filemodels.py:40
 msgid "has all mandatory data"
-msgstr "это обязательные данные"
+msgstr "té totes les dades obligatòries"
 
 #: models/filemodels.py:42
 msgid "original filename"
-msgstr "оригинальное имя файла"
+msgstr "nom de fitxer original"
 
 #: models/filemodels.py:44 models/foldermodels.py:99
 msgid "name"
-msgstr "имя"
+msgstr "nom"
 
 #: models/filemodels.py:46
 msgid "description"
-msgstr "описание"
+msgstr "descripció"
 
 #: models/filemodels.py:50
 msgid "owner"
-msgstr "владелец"
+msgstr "propietari"
 
 #: models/filemodels.py:52 models/foldermodels.py:105
 msgid "uploaded at"
-msgstr "загружено"
+msgstr "pujat a"
 
 #: models/filemodels.py:53 models/foldermodels.py:108
 msgid "modified at"
-msgstr "изменено"
+msgstr "modificat a"
 
 #: models/filemodels.py:57
 msgid "Permissions disabled"
-msgstr "Разрешения отключены"
+msgstr "Permisos desactivats"
 
 #: models/filemodels.py:58
 msgid "Disable any permission checking for this "
-msgstr "Отключить проверку разрешений для этого"
+msgstr "Desactivar qualsevol comprovació de permisos per aquest"
 
 #: models/foldermodels.py:107
 msgid "created at"
-msgstr "создан"
+msgstr "creat a"
 
 #: models/foldermodels.py:211
 #: templates/admin/filer/widgets/admin_folder.html:3
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "Folder"
-msgstr "Папка"
+msgstr "Carpeta"
 
 #: models/foldermodels.py:212
 msgid "Folders"
-msgstr "Папки"
+msgstr "Carpetes"
 
 #: models/foldermodels.py:227
 msgid "all items"
-msgstr "все элементы"
+msgstr "tots els elements"
 
 #: models/foldermodels.py:228
 msgid "this item only"
-msgstr "только этот элемент"
+msgstr "només aquest element"
 
 #: models/foldermodels.py:229
 msgid "this item and all children"
-msgstr "этот элемент и потомки"
+msgstr "aquest elements i els seus fills"
 
 #: models/foldermodels.py:233
 msgid "type"
-msgstr "тип"
+msgstr "tipus"
 
 #: models/foldermodels.py:239
 msgid "group"
-msgstr "группа"
+msgstr "group"
 
 #: models/foldermodels.py:240
 msgid "everybody"
-msgstr "все"
+msgstr "tothom"
 
 #: models/foldermodels.py:242
 msgid "can edit"
-msgstr "могут редактировать"
+msgstr "pot editar"
 
 #: models/foldermodels.py:243
 msgid "can read"
-msgstr "могут читать"
+msgstr "pot llegir"
 
 #: models/foldermodels.py:244
 msgid "can add children"
-msgstr "могут добавлять потомков"
+msgstr "pot afegir fills"
 
 #: models/foldermodels.py:273
 msgid "folder permission"
-msgstr "разрешение папки"
+msgstr "permís de carpeta"
 
 #: models/foldermodels.py:274
 msgid "folder permissions"
-msgstr "разрешения папки"
+msgstr "permisos de carpeta"
 
 #: models/imagemodels.py:39
 msgid "date taken"
-msgstr "дата создания"
+msgstr "data agafada"
 
 #: models/imagemodels.py:42
 msgid "default alt text"
-msgstr "альтернативный текст"
+msgstr "text alternatiu per defecte"
 
 #: models/imagemodels.py:43
 msgid "default caption"
-msgstr "описание"
+msgstr "títol per defecte"
 
 #: models/imagemodels.py:45 templates/image_filer/image.html:6
 msgid "author"
-msgstr "автор"
+msgstr "autor"
 
 #: models/imagemodels.py:47
 msgid "must always publish author credit"
-msgstr "необходимо всегда указывать авторство"
+msgstr "cal publicar sempre crèdits d'autor"
 
 #: models/imagemodels.py:48
 msgid "must always publish copyright"
-msgstr "необходимо всегда указывать copyright"
+msgstr "cal publicar sempre els drets d'autor"
 
 #: models/imagemodels.py:50
 msgid "subject location"
-msgstr "расположение объекта"
+msgstr "lloc del subjecte"
 
 #: models/imagemodels.py:200
 msgid "image"
-msgstr "изображение"
+msgstr "imatge"
 
 #: models/imagemodels.py:201
 msgid "images"
-msgstr "изображения"
+msgstr "imatges"
 
 #: models/virtualitems.py:45
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "unfiled files"
-msgstr "неразобранные файлы"
+msgstr "fitxers no arxivats"
 
 #: models/virtualitems.py:59
 msgid "files with missing metadata"
-msgstr "файлы с отсутсвующими метаданными"
+msgstr "fitxer als que els falten metadades"
 
 #: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:6
 #: templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:74
 #: templates/image_filer/image_export_form.html:10
 msgid "root"
-msgstr "корень"
+msgstr "arrel"
 
 #: templates/admin/filer/actions.html:4
 msgid "Run the selected action"
-msgstr "Выполнить выбранное действие"
+msgstr "Executar l'acció seleccionada"
 
 #: templates/admin/filer/actions.html:4
 msgid "Go"
-msgstr "Выполнить"
+msgstr "Anar"
 
 #: templates/admin/filer/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr "Нажмите здесь, чтобы выбрать объекты на всех страницах"
+msgstr "Cliqueu aquí per seleccionar els objectes a través de totes les pàgines"
 
 #: templates/admin/filer/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
-msgstr "Выбрать все %(total_count)s файлов/папок"
+msgstr "Seleccionar tots els %(total_count)s fitixers i/o carpetes"
 
 #: templates/admin/filer/actions.html:13
 msgid "Clear selection"
-msgstr "Очистить выбор"
+msgstr "Netejar la selecció"
 
 #: templates/admin/filer/breadcrumbs.html:4
 msgid "Go back to admin homepage"
-msgstr "Вернуться на главную страницу администрирования"
+msgstr "Tornar a la pàgina principal d'administració"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/image_filer/image_export_form.html:7
 msgid "Home"
-msgstr "Домой"
+msgstr "Inici"
 
 #: templates/admin/filer/breadcrumbs.html:5
 msgid "Go back to Filer app"
-msgstr "Вернуться на главную Filer'а"
+msgstr "Tornar a l'aplicació Filer"
 
 #: templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:8
@@ -440,7 +439,7 @@ msgstr "Filer"
 #: templates/admin/filer/breadcrumbs.html:6
 #: templates/image_filer/image_export_form.html:10
 msgid "Go back to root folder"
-msgstr "Вернуться в корневую папку"
+msgstr "Tornar a la carpeta arrel"
 
 #: templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:11
@@ -449,11 +448,11 @@ msgstr "Вернуться в корневую папку"
 #: templates/image_filer/image_export_form.html:14
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
-msgstr "Вернуться в папку \"%(folder_name)s\""
+msgstr "Tornar a la carpeta '%(folder_name)s'"
 
 #: templates/admin/filer/change_form.html:28
 msgid "duplicates"
-msgstr "дубликаты"
+msgstr "duplicats"
 
 #: templates/admin/filer/delete_confirmation.html:13
 #, python-format
@@ -461,45 +460,45 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr "Удаление объекта %(object_name)s \"%(escaped_object)s\" приведет к удалению связанных объектов, но у вас нет прав на удаление следующих типов объектов:"
+msgstr "Esborrar el %(object_name)s '%(escaped_object)s' comporta esborrar objectes relacionats, però el vostre compte no té permisos per esborrar els següents tipus d'objecte:"
 
 #: templates/admin/filer/delete_confirmation.html:21
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
 " following protected related objects:"
-msgstr "Удаление %(object_name)s \"%(escaped_object)s\" требует удаления следующих связанных объектов:"
+msgstr "Esborrar el %(object_name)s '%(escaped_object)s' requereix esborrar els següents objectes protegits relacionats:"
 
 #: templates/admin/filer/delete_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr "Вы уверены, что хотите удалить %(object_name)s \"%(escaped_object)s\"? Следующие связанные элементы будут удалены:"
+msgstr "Esteu segur que voleu esborrar el %(object_name)s \"%(escaped_object)s\"? Tots els elements relacionats seran esborrats:"
 
 #: templates/admin/filer/delete_confirmation.html:34
 #: templates/admin/filer/delete_selected_files_confirmation.html:45
 msgid "Yes, I'm sure"
-msgstr "Да, я уверен"
+msgstr "Sí, estic segur"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Удаление выбранных файлов/папок приведет к удалению связанных объектов, но у вас нет прав удалять следующие объекты:"
+msgstr "Esborrar els fitxers seleccionats provocarà l'esborrar d'objectes relacionats, però el teu compte no té permisos per esborrar els següents tipus d'objectes:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Удаление выбранных файлов/папок потребует удаления следующих защищенных связанных объектов:"
+msgstr "Esborrer els fitxers i/o carpetes seleccionades provocarà l'esborrat dels següents objectes protegits relacionats:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Вы уверены, что хотите удалить выбранные файлы/папки? Следующие объекты вместе со связанными объектами будут удалены:"
+msgstr "Segur que voleu esborrar els fitxers i/o carpetes seleccionades? Els següents objectes i els seus elements relacionats seran esborrats:"
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
@@ -509,150 +508,150 @@ msgstr "Вы уверены, что хотите удалить выбранны
 #: templates/image_filer/image_export_form.html:8
 #: templates/image_filer/image_export_form.html:16
 msgid "Go back to"
-msgstr "Вернуться к"
+msgstr "Tornar a"
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/image_filer/image_export_form.html:7
 msgid "admin homepage"
-msgstr "главная страница администрирования"
+msgstr "pàgina principal d'administració"
 
 #: templates/admin/filer/folder/change_form.html:22
 #: templates/admin/filer/image/change_form.html:9
 msgid "History"
-msgstr "История"
+msgstr "Història"
 
 #: templates/admin/filer/folder/change_form.html:23
 #: templates/admin/filer/image/change_form.html:10
 msgid "View on site"
-msgstr "Посмотреть на сайте"
+msgstr "Veure al lloc"
 
 #: templates/admin/filer/folder/change_form.html:35
 #: templates/admin/filer/folder/directory_listing.html:75
 #: templates/admin/filer/folder/directory_listing.html:85
 #: templates/admin/filer/folder/directory_table.html:23
 msgid "Folder Icon"
-msgstr "Иконка папки"
+msgstr "Icona de la carpeta"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
 "Your account doesn't have permissions to copy all of the selected files "
 "and/or folders."
-msgstr "У вас нет прав на копирование выбранных файлов/папок"
+msgstr "Sense permisos per copiar tots els fitxers i/o carpetes seleccionats."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
 #: templates/admin/filer/folder/choose_move_destination.html:15
 msgid "There are no destination folders available."
-msgstr "Нет доступной целевой папки."
+msgstr "No hi ha carpetes de destí disponibles."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:18
 msgid "There are no files and/or folders available to copy."
-msgstr "Нет файлов для копирования."
+msgstr "No hi ha fitxers i/o carpetes disponibles."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:20
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "Эти файлы/папки будут скопированы в целевую папку (с сохранением иерархичности):"
+msgstr "Els següents fitxers i/o carpetes seran copiats a una carpeta de destí (mantenint la seva estructura d'arbre):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:32
 #: templates/admin/filer/folder/choose_move_destination.html:32
 msgid "Destination folder:"
-msgstr "Целевая папка:"
+msgstr "Carpeta de destí:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:39
 msgid "Copy"
-msgstr "Копировать"
+msgstr "Copiar"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:12
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Вы не имеете прав для изменения размеров выбранных изображений."
+msgstr "El vostre compte no té permisos per redimensionar totes les imatges seleccionades."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid "There are no images available to resize."
-msgstr "Нет доступных изображений для изменения размеров."
+msgstr "No hi ha imatges disponibles per redimensionar."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:17
 msgid "The following images will be resized:"
-msgstr "У этих изображений будет изменен размер:"
+msgstr "Les següents imatges seran redimensionades:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:30
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Выберите опцию миниатюры или введите параметры изменения размеров:"
+msgstr "Trieu una opció de miniatura existent o especifiqueu paràmetres de redimensionat:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose resize parameters:"
-msgstr "Выбрите параметры изменения размеров:"
+msgstr "Trieu els paràmetres de redimensionat:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Внимание: изображения будут изменены в размерах с заменой оригиналов. Возможно, лучше будет сперва сделать копии."
+msgstr "Avís: les imatges seran redimensionades al mateix lloc i les originals es perdran. Considereu realitzar abans una còpia d'aquestes per mantenir els originals."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
-msgstr "Изменить размеры"
+msgstr "Redimensionar"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
 "Your account doesn't have permissions to move all of the selected files "
 "and/or folders."
-msgstr "Вы не имеете прав для перемещения выбранных файлов/папок."
+msgstr "El vostre compte no té permisos per moure tots els fitxers i/o carpetes seleccionats."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
-msgstr "Нет файлов/папок для перемещения."
+msgstr "No hi ha fitxers i/o carpetes disponibles per moure."
 
 #: templates/admin/filer/folder/choose_move_destination.html:20
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "Следующие файлы/папки будут перемещены в целевую папку (сохраняя иерархичность):"
+msgstr "Els següents fitxers i/o carpetes seran moguts a una carpeta de destí (mantenint la seva estructura d'arbre):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:38
 msgid "Move"
-msgstr "Переместить"
+msgstr "Moure"
 
 #: templates/admin/filer/folder/choose_rename_format.html:12
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "У вас нет прав на переименование выбранных файлов."
+msgstr "El vostre compte no té permisos per canviar el nom de tots els fitxers seleccionats."
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "There are no files available to rename."
-msgstr "Нет файлов для переименовывания."
+msgstr "No hi ha fitxers per canviar el nom disponibles."
 
 #: templates/admin/filer/folder/choose_rename_format.html:17
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "Эти файлы будут переименованы (они остануться в их папках и сохранят имена оригинальных файлов, только отображаемое имя измениться):"
+msgstr "En canviarà el nom dels següents fitxers (seguiran estant a les seves carpetes i mantindran el seu nom de fitxers original, només serà modificat el nom que es mostrarà):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
-msgstr "Переименовать"
+msgstr "Canviar el nom"
 
 #: templates/admin/filer/folder/directory_listing.html:66
 msgid "Adds a new Folder"
-msgstr "Добавляет новую папку"
+msgstr "Afegir una Carpeta nova"
 
 #: templates/admin/filer/folder/directory_listing.html:66
 #: templates/image_filer/include/export_dialog.html:34
 msgid "New Folder"
-msgstr "Новая папка"
+msgstr "Carpeta nova"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "upload files"
-msgstr "загрузить файлы"
+msgstr "pujar fitxers"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "Upload"
-msgstr "Загрузить"
+msgstr "Pujar"
 
 #: templates/admin/filer/folder/directory_listing.html:74
 msgid "Go back to the parent folder"
-msgstr "Возвратиться к родительской папке"
+msgstr "Tornar a la carpeta pare"
 
 #: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:29
@@ -660,9 +659,8 @@ msgstr "Возвратиться к родительской папке"
 #, python-format
 msgid "1 folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] "1 папка"
-msgstr[1] "%(counter)s папок"
-msgstr[2] "%(counter)s папок"
+msgstr[0] "1 carpeta"
+msgstr[1] "%(counter)s carpetes"
 
 #: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:29
@@ -670,79 +668,78 @@ msgstr[2] "%(counter)s папок"
 #, python-format
 msgid "1 file"
 msgid_plural "%(counter)s files"
-msgstr[0] "1 файл"
-msgstr[1] "%(counter)s файлов"
-msgstr[2] "%(counter)s файлов"
+msgstr[0] "1 fitxer"
+msgstr[1] "%(counter)s fitxers"
 
 #: templates/admin/filer/folder/directory_listing.html:80
 msgid "Change current folder details"
-msgstr "Изменить текущую папку"
+msgstr "Modificar els detalls de la carpeta actual"
 
 #: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:43
 msgid "Change"
-msgstr "Изменить"
+msgstr "Modificar"
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
-msgstr "Имя"
+msgstr "Nom"
 
 #: templates/admin/filer/folder/directory_table.html:23
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:29
 #, python-format
 msgid "Change '%(item_label)s' folder details"
-msgstr "Изменить данные папки \"%(item_label)s\""
+msgstr "Modificar els detalls de la carpeta '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:30
 #: templates/admin/filer/folder/directory_table.html:45
 msgid "Owner"
-msgstr "Владелец"
+msgstr "Propietari"
 
 #: templates/admin/filer/folder/directory_table.html:37
 msgid "Select this file"
-msgstr "Выбрать этот файл"
+msgstr "Seleccionar aquest fitxer"
 
 #: templates/admin/filer/folder/directory_table.html:39
 #: templates/admin/filer/folder/directory_table.html:43
 #: templates/admin/filer/folder/directory_table.html:44
 #, python-format
 msgid "Change '%(item_label)s' details"
-msgstr "Изменить данные \"%(item_label)s\""
+msgstr "Modificar els detalls de '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:42
 #, python-format
 msgid "Delete '%(item_label)s'"
-msgstr "Удалить %(item_label)s"
+msgstr "Esborrar '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:42
 msgid "Delete"
-msgstr "Удалить"
+msgstr "Esborrar"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "Permissions"
-msgstr "Разрешения"
+msgstr "Permisos"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "disabled"
-msgstr "отключены"
+msgstr "desactivat"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "enabled"
-msgstr "включены"
+msgstr "activat"
 
 #: templates/admin/filer/folder/directory_table.html:50
 msgid "Move to clipboard"
-msgstr "Переместить в буфер обмена"
+msgstr "Moure al portapapers"
 
 #: templates/admin/filer/folder/directory_table.html:58
 msgid "there are no files or subfolders"
-msgstr "нет файлов или подпапок"
+msgstr "no hi ha fitxers o subcarpetes"
 
 #: templates/admin/filer/folder/directory_table.html:65
 msgid "previous"
-msgstr "предыдущая"
+msgstr "anterior"
 
 #: templates/admin/filer/folder/directory_table.html:69
 #, python-format
@@ -750,140 +747,139 @@ msgid ""
 "\n"
 "            Page %(number)s of %(num_pages)s.\n"
 "            "
-msgstr "\nСтраница %(number)s из %(num_pages)s."
+msgstr "\n            Pàgina %(number)s de %(num_pages)s.\n            "
 
 #: templates/admin/filer/folder/directory_table.html:75
 msgid "next"
-msgstr "следующая"
+msgstr "següent"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 msgid "Add new"
-msgstr "Добавить новую"
+msgstr "Afegir nou"
 
 #: templates/admin/filer/folder/new_folder_form.html:13
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Пожалуйста, исправьте указанную ошибку."
-msgstr[1] "Пожалуйста, исправьте указанные ошибки."
-msgstr[2] "Пожалуйста, исправьте указанные ошибки."
+msgstr[0] "Corregiu el següent error."
+msgstr[1] "Corregiu els següents errors."
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"
-msgstr "Сохранить"
+msgstr "Desar"
 
 #: templates/admin/filer/image/change_form.html:21
 msgid "Full size preview"
-msgstr "Посмотреть в полном размере"
+msgstr "Vista prèvia en tamany complet"
 
 #: templates/admin/filer/tools/search_form.html:8
 #: templates/admin/filer/tools/search_form.html:14
 msgid "Search"
-msgstr "Поиск"
+msgstr "Cercar"
 
 #: templates/admin/filer/tools/search_form.html:13
 msgid "Enter your search phrase here"
-msgstr "Введите фразу для поиска"
+msgstr "Entreu el text de cerca aquí"
 
 #: templates/admin/filer/tools/search_form.html:14
 msgid "Click here to"
-msgstr "Нажмите здесь для"
+msgstr "Clicar aquí per"
 
 #: templates/admin/filer/tools/search_form.html:14
 msgid "run search for entered phrase"
-msgstr "поиска по указанной фразе"
+msgstr "executar la cerca del text introduït"
 
 #: templates/admin/filer/tools/search_form.html:15
 msgid "Check it to"
-msgstr "Установите для"
+msgstr "Comprovar-ho a"
 
 #: templates/admin/filer/tools/search_form.html:15
 #: templates/admin/filer/tools/search_form.html:16
 msgid "limit the search to current folder"
-msgstr "ограничить поиск текущей папкой"
+msgstr "limitar la cerca a la carpeta actual"
 
 #: templates/admin/filer/tools/search_form.html:18
 msgid "found"
-msgstr "найдено"
+msgstr "trobat"
 
 #: templates/admin/filer/tools/search_form.html:18
 msgid "and"
-msgstr "и"
+msgstr "i"
 
 #: templates/admin/filer/tools/search_form.html:19
 msgid "cancel search"
-msgstr "закрыть поиск"
+msgstr "cancel·lar la cerca"
 
 #: templates/admin/filer/tools/upload_button_js.html:24
 #: templates/admin/filer/widgets/admin_file.html:7
 #: templates/admin/filer/widgets/admin_file.html:8
 msgid "file missing"
-msgstr "файл не найден"
+msgstr "no s'ha trobat el fitxer"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:7
 msgid "Clipboard"
-msgstr "Буфер обмена"
+msgstr "Portapapers"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:19
 msgid "Paste all items here"
-msgstr "Вставить все элементы здесь"
+msgstr "Enganxar aquí tots els elements"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "discard"
-msgstr "очистить"
+msgstr "descartar"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Move all clipboard files to"
-msgstr "Переместить элементы буфера обмена в"
+msgstr "Moure tots els fitxer del portapapers a"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:43
 msgid "the clipboard is empty"
-msgstr "буфер обмена пуст"
+msgstr "el portapapers és buït"
 
 #: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
 msgid "upload failed"
-msgstr "загрузка не удалась"
+msgstr "ha fallat la pujada"
 
 #: templates/admin/filer/widgets/admin_file.html:11
 msgid "no file selected"
-msgstr "файл не выбран"
+msgstr "no s'ha seleccionat cap fitxer"
 
 #: templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
 #: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:8
 msgid "Lookup"
-msgstr "Выбрать"
+msgstr "Cercar"
 
 #: templates/admin/filer/widgets/admin_file.html:17
 #: templates/admin/filer/widgets/admin_folder.html:10
 msgid "Clear"
-msgstr "Очистить"
+msgstr "Netejar"
 
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "none selected"
-msgstr "ничего не выбрано"
+msgstr "cap seleccionat"
 
 #: templates/image_filer/folder.html:3
 #, python-format
 msgid "Folder '%(folder_label)s' files"
-msgstr "Файлы папки \"%(folder_label)s\""
+msgstr "Fitxers de la carpeta '%(folder_label)s'"
 
 #: templates/image_filer/folder.html:6
 msgid "File name"
-msgstr "Имя файла"
+msgstr "Nom de fitxer"
 
 #: templates/image_filer/image_export_form.html:17
 msgid "export"
-msgstr "экспорт"
+msgstr "exportar"
 
 #: templates/image_filer/image_export_form.html:27
 msgid "download image"
-msgstr "скачать изображение"
+msgstr "baixar imatge"
 
 #: templates/image_filer/include/export_dialog.html:13
 msgid "Folder name already taken."
-msgstr "Имя папки уже занято."
+msgstr "Ja existeix aquest nom de carpeta."
 
 #: templates/image_filer/include/export_dialog.html:15
 msgid "Submit"
-msgstr "Отправить"
+msgstr "Trametre"

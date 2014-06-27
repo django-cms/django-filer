@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Iacopo Spalletti <i.spalletti@nephila.it>, 2012.
-#   <i.spalletti@nephila.it>, 2012.
+# yakky <i.spalletti@nephila.it>, 2012
+# yakky <i.spalletti@nephila.it>, 2013
+# yakky <i.spalletti@nephila.it>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2012-07-18 19:07+0000\n"
+"PO-Revision-Date: 2013-11-20 10:35+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/django-filer/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -37,8 +38,8 @@ msgstr "Gli elementi devono essere selezionati in modo da eseguire azioni su di 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] " %(total_count)s selezionati"
-msgstr[1] "Tutti %(total_count)s selezionato"
+msgstr[0] " %(total_count)s elemento selezionato"
+msgstr[1] "Tutti e %(total_count)s selezionati"
 
 #: admin/folderadmin.py:377
 #, python-format
@@ -102,11 +103,11 @@ msgstr "Elimina i file e/o le cartelle selezionati"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d file e/o le cartelle nella cartella '%(destination)s' spostati con successo."
+msgstr "%(count)d file e/o le cartelle spostati con successo nella cartella '%(destination)s'."
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
-msgstr "Sposta file e/o le cartelle"
+msgstr "Sposta i file e/o le cartelle"
 
 #: admin/folderadmin.py:797
 msgid "Move selected files and/or folders"
@@ -126,7 +127,7 @@ msgstr "Rinomina file"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d file e/o cartelle nella cartella '%(destination)s ' copiati con successo."
+msgstr "%(count)d file e/o cartelle copiati con successo nella cartella '%(destination)s '."
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
@@ -158,7 +159,7 @@ msgstr "Suffisso che sarà aggiunto al nome dei file copiati."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Il suffisso dovrebbe essere valido, semplice e minuscolo per quanto riguarda la parte del nome del file, come \"%(valid)s\"."
+msgstr "Il suffisso deve essere una sezione del nome del file valida, semplice e minuscola, come \"%(valid)s\"."
 
 #: admin/forms.py:54
 #, python-format
@@ -192,11 +193,11 @@ msgstr "ingrandisci"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "L'opzione anteprima immagine o parametri di ridimensionamento devono essere selezionati."
+msgstr "Devi selezionare l'opzione anteprima immagine o i parametri di ridimensionamento."
 
 #: admin/forms.py:73
 msgid "Resize parameters must be choosen."
-msgstr "Devono essere scelte le opzioni di ridimensionamento."
+msgstr "Seleziona le opzioni di ridimensionamento."
 
 #: admin/imageadmin.py:12
 msgid "Subject location"
@@ -216,7 +217,7 @@ msgstr "file"
 
 #: models/clipboardmodels.py:34 models/clipboardmodels.py:40
 msgid "clipboard"
-msgstr "Appunti"
+msgstr "appunti"
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
@@ -229,11 +230,11 @@ msgstr "file"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard item"
-msgstr "Elemento Appunti"
+msgstr "elemento degli appunti"
 
 #: models/clipboardmodels.py:45
 msgid "clipboard items"
-msgstr "Elementi Appunti"
+msgstr "elementi degli appunti"
 
 #: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:74
@@ -272,11 +273,11 @@ msgstr "proprietario"
 
 #: models/filemodels.py:52 models/foldermodels.py:105
 msgid "uploaded at"
-msgstr "caricato in "
+msgstr "caricato il"
 
 #: models/filemodels.py:53 models/foldermodels.py:108
 msgid "modified at"
-msgstr "modificato in"
+msgstr "modificato il"
 
 #: models/filemodels.py:57
 msgid "Permissions disabled"
@@ -288,7 +289,7 @@ msgstr "Disabilitare controllo permessi per questo"
 
 #: models/foldermodels.py:107
 msgid "created at"
-msgstr "creato in"
+msgstr "creato il"
 
 #: models/foldermodels.py:211
 #: templates/admin/filer/widgets/admin_folder.html:3
@@ -310,7 +311,7 @@ msgstr "solo questo elemento"
 
 #: models/foldermodels.py:229
 msgid "this item and all children"
-msgstr "questa elemento e tutti i figli"
+msgstr "questo elemento e tutti i figli"
 
 #: models/foldermodels.py:233
 msgid "type"
@@ -326,15 +327,15 @@ msgstr "tutti"
 
 #: models/foldermodels.py:242
 msgid "can edit"
-msgstr "in grado modificare"
+msgstr "può modificare"
 
 #: models/foldermodels.py:243
 msgid "can read"
-msgstr "in grado di leggere"
+msgstr "può leggere"
 
 #: models/foldermodels.py:244
 msgid "can add children"
-msgstr "in grado di aggiungere figli"
+msgstr "può aggiungere figli"
 
 #: models/foldermodels.py:273
 msgid "folder permission"
@@ -346,7 +347,7 @@ msgstr "permessi cartella"
 
 #: models/imagemodels.py:39
 msgid "date taken"
-msgstr "data presa"
+msgstr "data di creazione"
 
 #: models/imagemodels.py:42
 msgid "default alt text"
@@ -578,7 +579,7 @@ msgstr "Le seguenti immagini verranno ridimensionate:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:30
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Scegli un'opzione esistente miniatura o immettere i parametri di ridimensionamento:"
+msgstr "Scegli un'opzione miniatura esistente o immetti i parametri di ridimensionamento:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose resize parameters:"
@@ -621,7 +622,7 @@ msgstr "Il tuo account non dispone delle autorizzazioni per rinominare tutti i f
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "There are no files available to rename."
-msgstr "Non ci sono file disponibili da ridimensionare."
+msgstr "Non ci sono file disponibili da rinominare."
 
 #: templates/admin/filer/folder/choose_rename_format.html:17
 msgid ""
@@ -674,13 +675,13 @@ msgstr[1] "%(counter)s file"
 
 #: templates/admin/filer/folder/directory_listing.html:80
 msgid "Change current folder details"
-msgstr "Modifica dettagli cartella corrente"
+msgstr "Modifica i dettagli della cartella corrente"
 
 #: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:43
 msgid "Change"
-msgstr "Cambia"
+msgstr "Modifica"
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
@@ -691,7 +692,7 @@ msgstr "Nome"
 #: templates/admin/filer/folder/directory_table.html:29
 #, python-format
 msgid "Change '%(item_label)s' folder details"
-msgstr "Modifica dettagli cartella '%(item_label)s'"
+msgstr "Modifica i dettagli della cartella '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:30
 #: templates/admin/filer/folder/directory_table.html:45
@@ -707,7 +708,7 @@ msgstr "Seleziona questo file"
 #: templates/admin/filer/folder/directory_table.html:44
 #, python-format
 msgid "Change '%(item_label)s' details"
-msgstr "Cambia dettagli ' %(item_label)s ' "
+msgstr "Modifica i dettagli di ' %(item_label)s ' "
 
 #: templates/admin/filer/folder/directory_table.html:42
 #, python-format
@@ -732,7 +733,7 @@ msgstr "abilitato"
 
 #: templates/admin/filer/folder/directory_table.html:50
 msgid "Move to clipboard"
-msgstr "Sposta negli Appunti"
+msgstr "Sposta negli appunti"
 
 #: templates/admin/filer/folder/directory_table.html:58
 msgid "there are no files or subfolders"
@@ -756,7 +757,7 @@ msgstr "prossima"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 msgid "Add new"
-msgstr "Aggiungi nuova"
+msgstr "Aggiungi nuovo"
 
 #: templates/admin/filer/folder/new_folder_form.html:13
 msgid "Please correct the error below."
@@ -787,7 +788,7 @@ msgstr "Clicca qui per"
 
 #: templates/admin/filer/tools/search_form.html:14
 msgid "run search for entered phrase"
-msgstr "esegui la ricerca per frase inserita"
+msgstr "ricerca la frase inserita"
 
 #: templates/admin/filer/tools/search_form.html:15
 msgid "Check it to"
@@ -796,7 +797,7 @@ msgstr "Seleziona per"
 #: templates/admin/filer/tools/search_form.html:15
 #: templates/admin/filer/tools/search_form.html:16
 msgid "limit the search to current folder"
-msgstr "limitare la ricerca alla cartella corrente"
+msgstr "limita la ricerca alla cartella corrente"
 
 #: templates/admin/filer/tools/search_form.html:18
 msgid "found"
@@ -834,7 +835,7 @@ msgstr "Sposta tutti i file negli Appunti in"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:43
 msgid "the clipboard is empty"
-msgstr "gli Appunti sono vuoti"
+msgstr "gli appunti sono vuoti"
 
 #: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
 msgid "upload failed"
@@ -863,7 +864,7 @@ msgstr "nessun elemento selezionato"
 #: templates/image_filer/folder.html:3
 #, python-format
 msgid "Folder '%(folder_label)s' files"
-msgstr "File cartella ' %(folder_label)s '"
+msgstr "File della cartella ' %(folder_label)s '"
 
 #: templates/image_filer/folder.html:6
 msgid "File name"

@@ -3,248 +3,248 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Pavel <neoascetic@gmail.com>, 2012
+# Eirik Krogstad <eirikkr@gmail.com>, 2013
+# Eirik Krogstad <eirikkr@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
 "PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Pavel <neoascetic@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django-filer/language/ru/)\n"
+"Last-Translator: Eirik Krogstad <eirikkr@gmail.com>\n"
+"Language-Team: Norwegian Nynorsk (http://www.transifex.com/projects/p/django-filer/language/nn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: nn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: views.py:103
 msgid "Folder with this name already exists."
-msgstr "Папка с таким именем уже существует"
+msgstr "Ein mappe med dette namnet eksisterer allereie."
 
 #: admin/fileadmin.py:41
 msgid "Advanced"
-msgstr "Дополнительно"
+msgstr "Avansert"
 
 #: admin/folderadmin.py:324 admin/folderadmin.py:427
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Для выполнения действий нужно выбрать хотя бы один объект. Не произведено никаких изменений."
+msgstr "Element må vere vald for å utføre handlingar på dei. Ingen element vart endra."
 
 #: admin/folderadmin.py:344
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "%(total_count)s выбран"
-msgstr[1] "%(total_count)s выбрано"
-msgstr[2] "Все %(total_count)s выбраны"
+msgstr[0] "%(total_count)s vald"
+msgstr[1] "Alle %(total_count)s vald"
 
 #: admin/folderadmin.py:377
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr "0 из %(cnt)s выбрано"
+msgstr "0 av %(cnt)s vald"
 
 #: admin/folderadmin.py:456
 msgid "No action selected."
-msgstr "Действие не выбрано."
+msgstr "Ingen handling vald."
 
 #: admin/folderadmin.py:497
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
-msgstr "Успешно перемещено %(count)d файлов в буфер обмена."
+msgstr "Flytta %(count)d filer til utklippstavla."
 
 #: admin/folderadmin.py:503
 msgid "Move selected files to clipboard"
-msgstr "Переместить выбранные файлы в буфер обмена"
+msgstr "Flytt valde filer til utklippstavla"
 
 #: admin/folderadmin.py:537
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
-msgstr "Разрешения успешно отключены для %(count)d файлов."
+msgstr "Fjerna løyve for %(count)d filer."
 
 #: admin/folderadmin.py:541
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
-msgstr "Разрешения успешно применены для %(count)d файлов."
+msgstr "Satte løyve for %(count)d filer."
 
 #: admin/folderadmin.py:550
 msgid "Enable permissions for selected files"
-msgstr "Включить разрешения для выбранных файлов"
+msgstr "Sett løyve for valde filer"
 
 #: admin/folderadmin.py:555
 msgid "Disable permissions for selected files"
-msgstr "Отключить разрешения для выбранных файлов"
+msgstr "Fjern løyve for valde filer"
 
 #: admin/folderadmin.py:623
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
-msgstr "Успешно удалено %(count)d файлов/папок."
+msgstr "Sletta %(count)d filer og/eller mapper."
 
 #: admin/folderadmin.py:630
 msgid "Cannot delete files and/or folders"
-msgstr "Невозможно удалить файлы/папки"
+msgstr "Kan ikkje slette filer og/eller mapper"
 
 #: admin/folderadmin.py:632
 msgid "Are you sure?"
-msgstr "Вы уверены?"
+msgstr "Er du sikker?"
 
 #: admin/folderadmin.py:637
 msgid "Delete files and/or folders"
-msgstr "Удалить файлы/папки"
+msgstr "Slett filer og/eller mapper"
 
 #: admin/folderadmin.py:656
 msgid "Delete selected files and/or folders"
-msgstr "Удалить выбранные файлы/папки"
+msgstr "Slett valde filer og/eller mapper"
 
 #: admin/folderadmin.py:771
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Успешно перемещено %(count)d файлов/папок в папку '%(destination)s'."
+msgstr "Flytta %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
-msgstr "Переместить файлы/папки"
+msgstr "Flytt filer og/eller mapper"
 
 #: admin/folderadmin.py:797
 msgid "Move selected files and/or folders"
-msgstr "Переместить выбранные файлы/папки"
+msgstr "Flytt valde filer og/eller mapper"
 
 #: admin/folderadmin.py:854
 #, python-format
 msgid "Successfully renamed %(count)d files."
-msgstr "Успешно переименовано %(count)d файлов."
+msgstr "Endra namn på %(count)d filer."
 
 #: admin/folderadmin.py:862 admin/folderadmin.py:864 admin/folderadmin.py:881
 msgid "Rename files"
-msgstr "Переименовать файлы"
+msgstr "Endre namn på filer"
 
 #: admin/folderadmin.py:975
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Успешно скопировано %(count)d файлов/папок в папку '%(destination)s'."
+msgstr "Kopierte %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
-msgstr "Скопировать файлы/папки"
+msgstr "Kopier filer og/eller mapper"
 
 #: admin/folderadmin.py:1010
 msgid "Copy selected files and/or folders"
-msgstr "Скопировать выбранные файлы/папки"
+msgstr "Kopier valde filer og/eller mapper"
 
 #: admin/folderadmin.py:1105
 #, python-format
 msgid "Successfully resized %(count)d images."
-msgstr "Успешно изменен размер %(count)d изображений."
+msgstr "Endra storleik på %(count)d bilete."
 
 #: admin/folderadmin.py:1113 admin/folderadmin.py:1115
 msgid "Resize images"
-msgstr "Изменить размер изображений"
+msgstr "Endre storleik på bilete"
 
 #: admin/folderadmin.py:1133
 msgid "Resize selected images"
-msgstr "Изменить размер выбранных изображений"
+msgstr "Endre storleik på valde bilete"
 
 #: admin/forms.py:26
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr "Окончание, которое будет добавлено к именам скопированных файлов."
+msgstr "Ending som vert tilføyd filnamn på kopierte filer."
 
 #: admin/forms.py:33
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Окончание должно быть правильной, простой и в нижнем регистре частью имени файла, например \"%(valid)s\"."
+msgstr "Ending bør vere ein gyldig, enkel del av filnamnet med små bokstavar, som \"%(valid)s\"."
 
 #: admin/forms.py:54
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
-msgstr "Неизвестный ключ форматирования \"%(key)s\"."
+msgstr "Ugyldig nykel \"%(key)s\" for endring av namn."
 
 #: admin/forms.py:56
 #, python-format
 msgid "Invalid rename format: %(error)s."
-msgstr "Неверный формат переименования: %(error)s."
+msgstr "Ugyldig format for endring av namn: %(error)s"
 
 #: admin/forms.py:62
 msgid "thumbnail option"
-msgstr "опция миниатюры"
+msgstr "miniatyrbileteval"
 
 #: admin/forms.py:63
 msgid "width"
-msgstr "ширина"
+msgstr "breidd"
 
 #: admin/forms.py:64
 msgid "height"
-msgstr "высота"
+msgstr "høgd"
 
 #: admin/forms.py:65
 msgid "crop"
-msgstr "обрезать"
+msgstr "skjering"
 
 #: admin/forms.py:66
 msgid "upscale"
-msgstr "увеличивать"
+msgstr "oppskalering"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Опция миниатюры или параметры изменения размера должны быть указаны."
+msgstr "Miniatyrbileteval eller parametrar for endring av storleik må veljast."
 
 #: admin/forms.py:73
 msgid "Resize parameters must be choosen."
-msgstr "Параметры изменения размеры должны быть указаны."
+msgstr "Parametrar for endring av storleik må veljast."
 
 #: admin/imageadmin.py:12
 msgid "Subject location"
-msgstr "Расположение объекта"
+msgstr "Fokuseringsområde"
 
 #: admin/imageadmin.py:13
 msgid "Location of the main subject of the scene."
-msgstr "Расположение главного объекта в сцене."
+msgstr "Område for viktigste innhald i biletet."
 
 #: models/clipboardmodels.py:9 models/foldermodels.py:236
 msgid "user"
-msgstr "пользователь"
+msgstr "brukar"
 
 #: models/clipboardmodels.py:11 models/filemodels.py:287
 msgid "files"
-msgstr "файлы"
+msgstr "filer"
 
 #: models/clipboardmodels.py:34 models/clipboardmodels.py:40
 msgid "clipboard"
-msgstr "буфер обмена"
+msgstr "utklippstavle"
 
 #: models/clipboardmodels.py:35
 msgid "clipboards"
-msgstr "буферы обмена"
+msgstr "utklippstavler"
 
 #: models/clipboardmodels.py:39 models/filemodels.py:35
 #: models/filemodels.py:286
 msgid "file"
-msgstr "файл"
+msgstr "fil"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard item"
-msgstr "элемент буфера обмена"
+msgstr "element på utklippstavle"
 
 #: models/clipboardmodels.py:45
 msgid "clipboard items"
-msgstr "элементы буфера обмена"
+msgstr "element på utklippstavle"
 
 #: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:74
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
-msgstr "папка"
+msgstr "mappe"
 
 #: models/filemodels.py:36
 msgid "file size"
-msgstr "размер файла"
+msgstr "filstorleik"
 
 #: models/filemodels.py:38
 msgid "sha1"
@@ -252,184 +252,184 @@ msgstr "sha1"
 
 #: models/filemodels.py:40
 msgid "has all mandatory data"
-msgstr "это обязательные данные"
+msgstr "har alle påkravde data"
 
 #: models/filemodels.py:42
 msgid "original filename"
-msgstr "оригинальное имя файла"
+msgstr "originalt filnamn"
 
 #: models/filemodels.py:44 models/foldermodels.py:99
 msgid "name"
-msgstr "имя"
+msgstr "namn"
 
 #: models/filemodels.py:46
 msgid "description"
-msgstr "описание"
+msgstr "beskriving"
 
 #: models/filemodels.py:50
 msgid "owner"
-msgstr "владелец"
+msgstr "eigar"
 
 #: models/filemodels.py:52 models/foldermodels.py:105
 msgid "uploaded at"
-msgstr "загружено"
+msgstr "lasta opp"
 
 #: models/filemodels.py:53 models/foldermodels.py:108
 msgid "modified at"
-msgstr "изменено"
+msgstr "endra"
 
 #: models/filemodels.py:57
 msgid "Permissions disabled"
-msgstr "Разрешения отключены"
+msgstr "Løyve er deaktivert"
 
 #: models/filemodels.py:58
 msgid "Disable any permission checking for this "
-msgstr "Отключить проверку разрешений для этого"
+msgstr "Deaktiver kontroll av løyve"
 
 #: models/foldermodels.py:107
 msgid "created at"
-msgstr "создан"
+msgstr "oppretta"
 
 #: models/foldermodels.py:211
 #: templates/admin/filer/widgets/admin_folder.html:3
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "Folder"
-msgstr "Папка"
+msgstr "Mappe"
 
 #: models/foldermodels.py:212
 msgid "Folders"
-msgstr "Папки"
+msgstr "Mapper"
 
 #: models/foldermodels.py:227
 msgid "all items"
-msgstr "все элементы"
+msgstr "alle element"
 
 #: models/foldermodels.py:228
 msgid "this item only"
-msgstr "только этот элемент"
+msgstr "berre dette elementet"
 
 #: models/foldermodels.py:229
 msgid "this item and all children"
-msgstr "этот элемент и потомки"
+msgstr "dette elementet og alle underliggjande nivå"
 
 #: models/foldermodels.py:233
 msgid "type"
-msgstr "тип"
+msgstr "type"
 
 #: models/foldermodels.py:239
 msgid "group"
-msgstr "группа"
+msgstr "gruppe"
 
 #: models/foldermodels.py:240
 msgid "everybody"
-msgstr "все"
+msgstr "alle"
 
 #: models/foldermodels.py:242
 msgid "can edit"
-msgstr "могут редактировать"
+msgstr "kan redigere"
 
 #: models/foldermodels.py:243
 msgid "can read"
-msgstr "могут читать"
+msgstr "kan lese"
 
 #: models/foldermodels.py:244
 msgid "can add children"
-msgstr "могут добавлять потомков"
+msgstr "kan leggje til undernivå"
 
 #: models/foldermodels.py:273
 msgid "folder permission"
-msgstr "разрешение папки"
+msgstr "løyve for mappe"
 
 #: models/foldermodels.py:274
 msgid "folder permissions"
-msgstr "разрешения папки"
+msgstr "løyve for mappe"
 
 #: models/imagemodels.py:39
 msgid "date taken"
-msgstr "дата создания"
+msgstr "dato biletet vert tatt"
 
 #: models/imagemodels.py:42
 msgid "default alt text"
-msgstr "альтернативный текст"
+msgstr "standard alternativtekst"
 
 #: models/imagemodels.py:43
 msgid "default caption"
-msgstr "описание"
+msgstr "standard undertekst"
 
 #: models/imagemodels.py:45 templates/image_filer/image.html:6
 msgid "author"
-msgstr "автор"
+msgstr "opphavsperson"
 
 #: models/imagemodels.py:47
 msgid "must always publish author credit"
-msgstr "необходимо всегда указывать авторство"
+msgstr "må alltid publisere opphavsperson"
 
 #: models/imagemodels.py:48
 msgid "must always publish copyright"
-msgstr "необходимо всегда указывать copyright"
+msgstr "må alltid publisere opphavsrett"
 
 #: models/imagemodels.py:50
 msgid "subject location"
-msgstr "расположение объекта"
+msgstr "fokuseringsområde"
 
 #: models/imagemodels.py:200
 msgid "image"
-msgstr "изображение"
+msgstr "bilete"
 
 #: models/imagemodels.py:201
 msgid "images"
-msgstr "изображения"
+msgstr "bilete"
 
 #: models/virtualitems.py:45
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "unfiled files"
-msgstr "неразобранные файлы"
+msgstr "ukategoriserte filer"
 
 #: models/virtualitems.py:59
 msgid "files with missing metadata"
-msgstr "файлы с отсутсвующими метаданными"
+msgstr "filer med manglande metadata"
 
 #: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:6
 #: templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:74
 #: templates/image_filer/image_export_form.html:10
 msgid "root"
-msgstr "корень"
+msgstr "rot"
 
 #: templates/admin/filer/actions.html:4
 msgid "Run the selected action"
-msgstr "Выполнить выбранное действие"
+msgstr "Utfør den valde handlinga"
 
 #: templates/admin/filer/actions.html:4
 msgid "Go"
-msgstr "Выполнить"
+msgstr "Utfør"
 
 #: templates/admin/filer/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr "Нажмите здесь, чтобы выбрать объекты на всех страницах"
+msgstr "Klikk her for å velje objekt på tvers av alle sider"
 
 #: templates/admin/filer/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
-msgstr "Выбрать все %(total_count)s файлов/папок"
+msgstr "Vel alle %(total_count)s filer og/eller mapper"
 
 #: templates/admin/filer/actions.html:13
 msgid "Clear selection"
-msgstr "Очистить выбор"
+msgstr "Tøm utval"
 
 #: templates/admin/filer/breadcrumbs.html:4
 msgid "Go back to admin homepage"
-msgstr "Вернуться на главную страницу администрирования"
+msgstr "Gå tilbake til administrasjonssida"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/image_filer/image_export_form.html:7
 msgid "Home"
-msgstr "Домой"
+msgstr "Heim"
 
 #: templates/admin/filer/breadcrumbs.html:5
 msgid "Go back to Filer app"
-msgstr "Вернуться на главную Filer'а"
+msgstr "Gå tilbake til Filer"
 
 #: templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:8
@@ -440,7 +440,7 @@ msgstr "Filer"
 #: templates/admin/filer/breadcrumbs.html:6
 #: templates/image_filer/image_export_form.html:10
 msgid "Go back to root folder"
-msgstr "Вернуться в корневую папку"
+msgstr "Gå tilbake til rotmappa"
 
 #: templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:11
@@ -449,11 +449,11 @@ msgstr "Вернуться в корневую папку"
 #: templates/image_filer/image_export_form.html:14
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
-msgstr "Вернуться в папку \"%(folder_name)s\""
+msgstr "Gå tilbake til mappa \"%(folder_name)s\""
 
 #: templates/admin/filer/change_form.html:28
 msgid "duplicates"
-msgstr "дубликаты"
+msgstr "duplikat"
 
 #: templates/admin/filer/delete_confirmation.html:13
 #, python-format
@@ -461,45 +461,45 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr "Удаление объекта %(object_name)s \"%(escaped_object)s\" приведет к удалению связанных объектов, но у вас нет прав на удаление следующих типов объектов:"
+msgstr "Å slette %(object_name)s \"%(escaped_object)s\" ville resultere i sletting av relaterte objekt, men din konto har ikkje løyve til å slette objekt av følgjande typer:"
 
 #: templates/admin/filer/delete_confirmation.html:21
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
 " following protected related objects:"
-msgstr "Удаление %(object_name)s \"%(escaped_object)s\" требует удаления следующих связанных объектов:"
+msgstr "Å slette %(object_name)s \"%(escaped_object)s\" ville kreve å slette følgjande beskytta relaterte objekt:"
 
 #: templates/admin/filer/delete_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr "Вы уверены, что хотите удалить %(object_name)s \"%(escaped_object)s\"? Следующие связанные элементы будут удалены:"
+msgstr "Er du sikker på at du vil slette %(object_name)s \"%(escaped_object)s\"? Alle dei følgjande relaterte elementa vil verte sletta:"
 
 #: templates/admin/filer/delete_confirmation.html:34
 #: templates/admin/filer/delete_selected_files_confirmation.html:45
 msgid "Yes, I'm sure"
-msgstr "Да, я уверен"
+msgstr "Ja, eg er sikker"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Удаление выбранных файлов/папок приведет к удалению связанных объектов, но у вас нет прав удалять следующие объекты:"
+msgstr "Å slette dei valde filene og/eller mappene ville resultere i sletting av relaterte objekt, men din konto har ikkje løyve til å slette objekt av følgjande typer:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Удаление выбранных файлов/папок потребует удаления следующих защищенных связанных объектов:"
+msgstr "Å slette dei valde filene og/eller mappene ville kreve å slette følgjande beskytta relaterte objekt:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Вы уверены, что хотите удалить выбранные файлы/папки? Следующие объекты вместе со связанными объектами будут удалены:"
+msgstr "Er du sikker på at du vil slette dei valde filene og/eller mappene? Alle dei følgjande objekta og deira relaterte element vil verte sletta:"
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
@@ -509,150 +509,150 @@ msgstr "Вы уверены, что хотите удалить выбранны
 #: templates/image_filer/image_export_form.html:8
 #: templates/image_filer/image_export_form.html:16
 msgid "Go back to"
-msgstr "Вернуться к"
+msgstr "Gå tilbake til"
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/image_filer/image_export_form.html:7
 msgid "admin homepage"
-msgstr "главная страница администрирования"
+msgstr "administrasjonssida"
 
 #: templates/admin/filer/folder/change_form.html:22
 #: templates/admin/filer/image/change_form.html:9
 msgid "History"
-msgstr "История"
+msgstr "Historie"
 
 #: templates/admin/filer/folder/change_form.html:23
 #: templates/admin/filer/image/change_form.html:10
 msgid "View on site"
-msgstr "Посмотреть на сайте"
+msgstr "Se på nettstaden"
 
 #: templates/admin/filer/folder/change_form.html:35
 #: templates/admin/filer/folder/directory_listing.html:75
 #: templates/admin/filer/folder/directory_listing.html:85
 #: templates/admin/filer/folder/directory_table.html:23
 msgid "Folder Icon"
-msgstr "Иконка папки"
+msgstr "Mappeikon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
 "Your account doesn't have permissions to copy all of the selected files "
 "and/or folders."
-msgstr "У вас нет прав на копирование выбранных файлов/папок"
+msgstr "Din konto har ikkje løyve til å kopiere alle dei valde filene og/eller mappene."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
 #: templates/admin/filer/folder/choose_move_destination.html:15
 msgid "There are no destination folders available."
-msgstr "Нет доступной целевой папки."
+msgstr "Det er ingen målmapper tilgjengelig."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:18
 msgid "There are no files and/or folders available to copy."
-msgstr "Нет файлов для копирования."
+msgstr "Det er ingen filer og/eller mapper å kopiere."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:20
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "Эти файлы/папки будут скопированы в целевую папку (с сохранением иерархичности):"
+msgstr "Dei følgjande filene og/eller mappene vil verte kopiert til ein målmappe (mappestruktur vil behaldes):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:32
 #: templates/admin/filer/folder/choose_move_destination.html:32
 msgid "Destination folder:"
-msgstr "Целевая папка:"
+msgstr "Målmappe:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:39
 msgid "Copy"
-msgstr "Копировать"
+msgstr "Kopier"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:12
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Вы не имеете прав для изменения размеров выбранных изображений."
+msgstr "Din konto har ikkje løyve til å endre storleik på alle valde bilete."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid "There are no images available to resize."
-msgstr "Нет доступных изображений для изменения размеров."
+msgstr "Det er ingen bilete å endre storleik på."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:17
 msgid "The following images will be resized:"
-msgstr "У этих изображений будет изменен размер:"
+msgstr "Dei følgjande bileta vil få endra storleik:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:30
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Выберите опцию миниатюры или введите параметры изменения размеров:"
+msgstr "Vel eit eksisterande miniatyrbileteval eller skriv inn parametrar for endring av storleik:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose resize parameters:"
-msgstr "Выбрите параметры изменения размеров:"
+msgstr "Vel parametrar for endring av storleik:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Внимание: изображения будут изменены в размерах с заменой оригиналов. Возможно, лучше будет сперва сделать копии."
+msgstr "Åtvaring: Bileta vil få sin storleik endra, og originalane vil gå tapt. Det kan være ønskjeleg å først gjere ein kopi for å behalde originalane."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
-msgstr "Изменить размеры"
+msgstr "Endre storleik"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
 "Your account doesn't have permissions to move all of the selected files "
 "and/or folders."
-msgstr "Вы не имеете прав для перемещения выбранных файлов/папок."
+msgstr "Din konto har ikke løyve til å flytte alle dei valde filene og/eller mappene."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
-msgstr "Нет файлов/папок для перемещения."
+msgstr "Det er ingen filer og/eller mapper å flytte."
 
 #: templates/admin/filer/folder/choose_move_destination.html:20
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "Следующие файлы/папки будут перемещены в целевую папку (сохраняя иерархичность):"
+msgstr "Dei følgjande filene og/eller mappene vil verte flytta til ein målmappe (mappestruktur vil behaldes):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:38
 msgid "Move"
-msgstr "Переместить"
+msgstr "Flytt"
 
 #: templates/admin/filer/folder/choose_rename_format.html:12
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "У вас нет прав на переименование выбранных файлов."
+msgstr "Din konto har ikkje løyve til å endre namn på alle dei valde filene."
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "There are no files available to rename."
-msgstr "Нет файлов для переименовывания."
+msgstr "Det er ingen filer å endre namn på."
 
 #: templates/admin/filer/folder/choose_rename_format.html:17
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "Эти файлы будут переименованы (они остануться в их папках и сохранят имена оригинальных файлов, только отображаемое имя измениться):"
+msgstr "Dei følgjande filene vil få endra namn (dei vil framleis vere på samme stad og behalde originalt filnamn, berre visningsnamn vil verte endra):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
-msgstr "Переименовать"
+msgstr "Endre namn"
 
 #: templates/admin/filer/folder/directory_listing.html:66
 msgid "Adds a new Folder"
-msgstr "Добавляет новую папку"
+msgstr "Legg til ein ny mappe"
 
 #: templates/admin/filer/folder/directory_listing.html:66
 #: templates/image_filer/include/export_dialog.html:34
 msgid "New Folder"
-msgstr "Новая папка"
+msgstr "Ny mappe"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "upload files"
-msgstr "загрузить файлы"
+msgstr "last opp filer"
 
 #: templates/admin/filer/folder/directory_listing.html:67
 msgid "Upload"
-msgstr "Загрузить"
+msgstr "Last opp"
 
 #: templates/admin/filer/folder/directory_listing.html:74
 msgid "Go back to the parent folder"
-msgstr "Возвратиться к родительской папке"
+msgstr "Gå tilbake til overordna nivå"
 
 #: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:29
@@ -660,9 +660,8 @@ msgstr "Возвратиться к родительской папке"
 #, python-format
 msgid "1 folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] "1 папка"
-msgstr[1] "%(counter)s папок"
-msgstr[2] "%(counter)s папок"
+msgstr[0] "1 mappe"
+msgstr[1] "%(counter)s mapper"
 
 #: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:29
@@ -670,79 +669,78 @@ msgstr[2] "%(counter)s папок"
 #, python-format
 msgid "1 file"
 msgid_plural "%(counter)s files"
-msgstr[0] "1 файл"
-msgstr[1] "%(counter)s файлов"
-msgstr[2] "%(counter)s файлов"
+msgstr[0] "1 fil"
+msgstr[1] "%(counter)s filer"
 
 #: templates/admin/filer/folder/directory_listing.html:80
 msgid "Change current folder details"
-msgstr "Изменить текущую папку"
+msgstr "Endre detaljar for gjeldande mappe"
 
 #: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:43
 msgid "Change"
-msgstr "Изменить"
+msgstr "Endre"
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
-msgstr "Имя"
+msgstr "Namn"
 
 #: templates/admin/filer/folder/directory_table.html:23
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:29
 #, python-format
 msgid "Change '%(item_label)s' folder details"
-msgstr "Изменить данные папки \"%(item_label)s\""
+msgstr "Endre detaljar for mappen \"%(item_label)s\""
 
 #: templates/admin/filer/folder/directory_table.html:30
 #: templates/admin/filer/folder/directory_table.html:45
 msgid "Owner"
-msgstr "Владелец"
+msgstr "Eigar"
 
 #: templates/admin/filer/folder/directory_table.html:37
 msgid "Select this file"
-msgstr "Выбрать этот файл"
+msgstr "Vel denne filen"
 
 #: templates/admin/filer/folder/directory_table.html:39
 #: templates/admin/filer/folder/directory_table.html:43
 #: templates/admin/filer/folder/directory_table.html:44
 #, python-format
 msgid "Change '%(item_label)s' details"
-msgstr "Изменить данные \"%(item_label)s\""
+msgstr "Endre detaljar for \"%(item_label)s\""
 
 #: templates/admin/filer/folder/directory_table.html:42
 #, python-format
 msgid "Delete '%(item_label)s'"
-msgstr "Удалить %(item_label)s"
+msgstr "Slett \"%(item_label)s\""
 
 #: templates/admin/filer/folder/directory_table.html:42
 msgid "Delete"
-msgstr "Удалить"
+msgstr "Slett"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "Permissions"
-msgstr "Разрешения"
+msgstr "Løyve"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "disabled"
-msgstr "отключены"
+msgstr "deaktivert"
 
 #: templates/admin/filer/folder/directory_table.html:46
 msgid "enabled"
-msgstr "включены"
+msgstr "aktivert"
 
 #: templates/admin/filer/folder/directory_table.html:50
 msgid "Move to clipboard"
-msgstr "Переместить в буфер обмена"
+msgstr "Flytt til utklippstavle"
 
 #: templates/admin/filer/folder/directory_table.html:58
 msgid "there are no files or subfolders"
-msgstr "нет файлов или подпапок"
+msgstr "det er ingen filer eller undermapper"
 
 #: templates/admin/filer/folder/directory_table.html:65
 msgid "previous"
-msgstr "предыдущая"
+msgstr "førre"
 
 #: templates/admin/filer/folder/directory_table.html:69
 #, python-format
@@ -750,140 +748,139 @@ msgid ""
 "\n"
 "            Page %(number)s of %(num_pages)s.\n"
 "            "
-msgstr "\nСтраница %(number)s из %(num_pages)s."
+msgstr "\n            Side %(number)s av %(num_pages)s.\n            "
 
 #: templates/admin/filer/folder/directory_table.html:75
 msgid "next"
-msgstr "следующая"
+msgstr "neste"
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 msgid "Add new"
-msgstr "Добавить новую"
+msgstr "Legg til ny"
 
 #: templates/admin/filer/folder/new_folder_form.html:13
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Пожалуйста, исправьте указанную ошибку."
-msgstr[1] "Пожалуйста, исправьте указанные ошибки."
-msgstr[2] "Пожалуйста, исправьте указанные ошибки."
+msgstr[0] "Ver venleg og rett feilen under"
+msgstr[1] "Ver venleg og rett feila under."
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"
-msgstr "Сохранить"
+msgstr "Lagre"
 
 #: templates/admin/filer/image/change_form.html:21
 msgid "Full size preview"
-msgstr "Посмотреть в полном размере"
+msgstr "Vis full storleik"
 
 #: templates/admin/filer/tools/search_form.html:8
 #: templates/admin/filer/tools/search_form.html:14
 msgid "Search"
-msgstr "Поиск"
+msgstr "Søk"
 
 #: templates/admin/filer/tools/search_form.html:13
 msgid "Enter your search phrase here"
-msgstr "Введите фразу для поиска"
+msgstr "Skriv søkjeord her"
 
 #: templates/admin/filer/tools/search_form.html:14
 msgid "Click here to"
-msgstr "Нажмите здесь для"
+msgstr "Klikk her for å"
 
 #: templates/admin/filer/tools/search_form.html:14
 msgid "run search for entered phrase"
-msgstr "поиска по указанной фразе"
+msgstr "søk med valde søkjeord"
 
 #: templates/admin/filer/tools/search_form.html:15
 msgid "Check it to"
-msgstr "Установите для"
+msgstr "Vel for å"
 
 #: templates/admin/filer/tools/search_form.html:15
 #: templates/admin/filer/tools/search_form.html:16
 msgid "limit the search to current folder"
-msgstr "ограничить поиск текущей папкой"
+msgstr "avgrens søk til gjeldande mappe"
 
 #: templates/admin/filer/tools/search_form.html:18
 msgid "found"
-msgstr "найдено"
+msgstr "funne"
 
 #: templates/admin/filer/tools/search_form.html:18
 msgid "and"
-msgstr "и"
+msgstr "og"
 
 #: templates/admin/filer/tools/search_form.html:19
 msgid "cancel search"
-msgstr "закрыть поиск"
+msgstr "avbryt søk"
 
 #: templates/admin/filer/tools/upload_button_js.html:24
 #: templates/admin/filer/widgets/admin_file.html:7
 #: templates/admin/filer/widgets/admin_file.html:8
 msgid "file missing"
-msgstr "файл не найден"
+msgstr "fil manglar"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:7
 msgid "Clipboard"
-msgstr "Буфер обмена"
+msgstr "Utklippstavle"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:19
 msgid "Paste all items here"
-msgstr "Вставить все элементы здесь"
+msgstr "Lim inn alle element her"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "discard"
-msgstr "очистить"
+msgstr "forkast"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "Move all clipboard files to"
-msgstr "Переместить элементы буфера обмена в"
+msgstr "Flytt alle filer på utklippstavla til"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:43
 msgid "the clipboard is empty"
-msgstr "буфер обмена пуст"
+msgstr "utklippstavla er tom"
 
 #: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
 msgid "upload failed"
-msgstr "загрузка не удалась"
+msgstr "feil ved opplasting"
 
 #: templates/admin/filer/widgets/admin_file.html:11
 msgid "no file selected"
-msgstr "файл не выбран"
+msgstr "ingen fil vald"
 
 #: templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
 #: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:8
 msgid "Lookup"
-msgstr "Выбрать"
+msgstr "Slå opp"
 
 #: templates/admin/filer/widgets/admin_file.html:17
 #: templates/admin/filer/widgets/admin_folder.html:10
 msgid "Clear"
-msgstr "Очистить"
+msgstr "Tøm"
 
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "none selected"
-msgstr "ничего не выбрано"
+msgstr "ingen vald"
 
 #: templates/image_filer/folder.html:3
 #, python-format
 msgid "Folder '%(folder_label)s' files"
-msgstr "Файлы папки \"%(folder_label)s\""
+msgstr "Filer i mappen \"%(folder_label)s\""
 
 #: templates/image_filer/folder.html:6
 msgid "File name"
-msgstr "Имя файла"
+msgstr "Filnamn"
 
 #: templates/image_filer/image_export_form.html:17
 msgid "export"
-msgstr "экспорт"
+msgstr "eksport"
 
 #: templates/image_filer/image_export_form.html:27
 msgid "download image"
-msgstr "скачать изображение"
+msgstr "last ned bilete"
 
 #: templates/image_filer/include/export_dialog.html:13
 msgid "Folder name already taken."
-msgstr "Имя папки уже занято."
+msgstr "Mappenamn er allereie tatt."
 
 #: templates/image_filer/include/export_dialog.html:15
 msgid "Submit"
-msgstr "Отправить"
+msgstr "Utfør"
