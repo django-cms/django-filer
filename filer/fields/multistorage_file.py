@@ -1,8 +1,15 @@
 #-*- coding: utf-8 -*-
-from django.core.files.base import File
-from django.core.files.storage import Storage
-from easy_thumbnails import fields as easy_thumbnails_fields, \
-    files as easy_thumbnails_files
+import base64
+import hashlib
+import warnings
+from io import BytesIO
+
+from django.core.files.base import ContentFile
+from django.utils import six
+
+from easy_thumbnails import (fields as easy_thumbnails_fields,
+                             files as easy_thumbnails_files)
+
 from filer import settings as filer_settings
 from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
 
@@ -93,6 +100,10 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
 
     def __init__(self, verbose_name=None, name=None,
                  storages=None, thumbnail_storages=None, thumbnail_options=None, **kwargs):
+        if 'upload_to' in kwargs:
+            kwargs.pop("to")
+            warnings.warn("MultiStorageFileField can handle only File objects;"
+                          "%s passed" % kwargs['to'], SyntaxWarning)
         self.storages = storages or STORAGES
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
         self.thumbnail_options = thumbnail_options or THUMBNAIL_OPTIONS
@@ -100,3 +111,34 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
                                       verbose_name=verbose_name, name=name,
                                       upload_to=generate_filename_multistorage,
                                       storage=None, **kwargs)
+
+    def value_to_string(self, obj):
+        value = super(MultiStorageFileField, self).value_to_string(obj)
+        if not filer_settings.FILER_DUMP_PAYLOAD:
+            return value
+        try:
+            payload_file = BytesIO(self.storage.open(value).read())
+            sha = hashlib.sha1()
+            sha.update(payload_file.read())
+            if sha.hexdigest() != obj.sha1:
+                warnings.warn('The checksum for "%s" diverges. Check for file consistency!' % obj.original_filename)
+            payload_file.seek(0)
+            encoded_string = base64.b64encode(payload_file.read()).decode('utf-8')
+            return value, encoded_string
+        except IOError:
+            warnings.warn('The payload for "%s" is missing. No such file on disk: %s!' % (obj.original_filename, self.storage.location))
+            return value
+
+    def to_python(self, value):
+        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], six.text_type):
+            filename, payload = value
+            try:
+                payload = base64.b64decode(payload)
+            except TypeError:
+                pass
+            else:
+                if self.storage.exists(filename):
+                    self.storage.delete(filename)
+                self.storage.save(filename, ContentFile(payload))
+                return filename
+        return value

@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django import forms
 from django import template
 from django.core.exceptions import ValidationError
@@ -15,7 +17,11 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.utils.encoding import force_unicode
+try:
+    from django.utils.encoding import force_str
+except ImportError:
+    # Django < 1.5
+    from django.utils.encoding import force_unicode as force_str
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -173,12 +179,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        try:
-            # django >=1.4
-            from django.conf.urls import patterns, url
-        except ImportError:
-            # django <1.4
-            from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(FolderAdmin, self).get_urls()
         from filer import views
         url_patterns = patterns('',
@@ -235,7 +236,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
                 url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
             return HttpResponseRedirect(url)
-        elif folder_id == None:
+        elif folder_id is None:
             folder = FolderRoot()
         else:
             folder = get_object_or_404(Folder, id=folder_id)
@@ -253,23 +254,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 pass
 
         # search
-        def filter_folder(qs, terms=[]):
-            for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | \
-                               Q(owner__username__icontains=term) | \
-                               Q(owner__first_name__icontains=term) | \
-                               Q(owner__last_name__icontains=term))
-            return qs
-
-        def filter_file(qs, terms=[]):
-            for term in terms:
-                qs = qs.filter(Q(name__icontains=term) | \
-                               Q(description__icontains=term) | \
-                               Q(original_filename__icontains=term) | \
-                               Q(owner__username__icontains=term) | \
-                               Q(owner__first_name__icontains=term) | \
-                               Q(owner__last_name__icontains=term))
-            return qs
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
@@ -287,8 +271,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 folder_qs = Folder.objects.all()
                 file_qs = File.objects.all()
-            folder_qs = filter_folder(folder_qs, search_terms)
-            file_qs = filter_file(file_qs, search_terms)
+            folder_qs = self.filter_folder(folder_qs, search_terms)
+            file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
         else:
@@ -303,24 +287,20 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder_files = []
         if folder.is_root:
             folder_children += folder.virtual_folders
-        for f in folder_qs:
-            f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
-                    folder_children.append(f)
-                else:
-                    pass
-            else:
-                folder_children.append(f)
-        for f in file_qs:
-            f.perms = userperms_for_request(f, request)
-            if hasattr(f, 'has_read_permission'):
-                if f.has_read_permission(request):
-                    folder_files.append(f)
-                else:
-                    pass
-            else:
-                folder_files.append(f)
+
+        perms = FolderPermission.objects.get_read_id_list(request.user)
+        root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
+        if perms != 'All':
+            file_qs = file_qs.filter(Q(folder__id__in=perms) | Q(owner=request.user))
+            folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
+        else:
+            root_exclude_kw.pop('parent__id__in')
+        if folder.is_root:
+            folder_qs = folder_qs.exclude(**root_exclude_kw)
+
+        folder_children += folder_qs
+        folder_files += file_qs
+
         try:
             permissions = {
                 'has_edit_permission': folder.has_edit_permission(request),
@@ -332,7 +312,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             permissions = {}
         folder_files.sort()
         items = folder_children + folder_files
-        paginator = Paginator(items, FILER_PAGINATE_BY)
+        items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
+        paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
@@ -392,11 +373,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     in_clipboards__clipboarditem__clipboard__user=request.user
                     ).distinct(),
                 'paginator': paginator,
-                'paginated_items': paginated_items,
+                'paginated_items': paginated_items,  # [(item, item_perms), ]
                 'permissions': permissions,
                 'permstest': userperms_for_request(folder, request),
                 'current_url': request.path,
-                'title': u'Directory listing for %s' % folder.name,
+                'title': 'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
                 'q': urlquote(q),
                 'show_result_count': show_result_count,
@@ -412,8 +393,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
                 'selection_note_all': selection_note_all % {'total_count': paginator.count},
                 'media': self.media,
-                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS
+                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
+                'can_make_folder': request.user.is_superuser or \
+                        (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or \
+                        permissions.get("has_add_children_permission"),
         }, context_instance=RequestContext(request))
+
+    @staticmethod
+    def filter_folder(qs, terms=[]):
+        for term in terms:
+            qs = qs.filter(Q(name__icontains=term) |
+                           Q(owner__username__icontains=term) |
+                           Q(owner__first_name__icontains=term) |
+                           Q(owner__last_name__icontains=term))
+        return qs
+
+    @staticmethod
+    def filter_file(qs, terms=[]):
+        for term in terms:
+            qs = qs.filter(Q(name__icontains=term) |
+                           Q(description__icontains=term) |
+                           Q(original_filename__icontains=term) |
+                           Q(owner__username__icontains=term) |
+                           Q(owner__first_name__icontains=term) |
+                           Q(owner__last_name__icontains=term))
+        return qs
 
     def response_action(self, request, files_queryset, folders_queryset):
         """
@@ -614,18 +618,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # will also be deleted.
         # Hopefully this also checks for necessary permissions.
         # TODO: Check if permissions are really verified
-        (args, varargs, keywords, defaults) = inspect.getargspec(get_deleted_objects)
-        if 'levels_to_root' in args:
-            # Django 1.2
-            deletable_files, perms_needed_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
-            deletable_folders, perms_needed_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, levels_to_root=2)
-        else:
-            # Django 1.3
-            using = router.db_for_write(self.model)
-            deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
-            deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
-            all_protected.extend(protected_files)
-            all_protected.extend(protected_folders)
+        using = router.db_for_write(self.model)
+        deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
+        deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
+        all_protected.extend(protected_files)
+        all_protected.extend(protected_folders)
 
         all_deletable_objects = [deletable_files, deletable_folders]
         all_perms_needed = perms_needed_files.union(perms_needed_folders)
@@ -639,7 +636,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if n:
                 # delete all explicitly selected files
                 for f in files_queryset:
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_str(f))
                     f.delete()
                 # delete all files in all selected folders and their children
                 # This would happen automatically by ways of the delete cascade, but then the individual .delete()
@@ -649,11 +646,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     folder_ids.add(folder.id)
                     folder_ids.update(folder.get_descendants().values_list('id', flat=True))
                 for f in File.objects.filter(folder__in=folder_ids):
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_str(f))
                     f.delete()
                 # delete all folders
                 for f in folders_queryset:
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_str(f))
                     f.delete()
                 self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {
                     "count": n,
@@ -705,15 +702,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return mark_safe(u'%s: <a href="%s">%s</a>' %
+            return mark_safe('%s: <a href="%s">%s</a>' %
                              (escape(capfirst(opts.verbose_name)),
                               admin_url,
                               escape(obj)))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj))
+            return '%s: %s' % (capfirst(opts.verbose_name),
+                                force_str(obj))
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -765,7 +762,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             # We do not allow copying/moving back to the folder itself
             enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
-            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_unicode(fo)), enabled))
+            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
             for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
                 yield c
 
@@ -805,8 +802,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     parent=destination,
                     name__in=folders_queryset.values('name'))]
             if conflicting_names:
-                messages.error(request, _(u"Folders with names %s already exist at the selected "
-                                          "destination") % u", ".join(conflicting_names))
+                messages.error(request, _("Folders with names %s already exist at the selected "
+                                          "destination") % ", ".join(conflicting_names))
             elif n:
                 self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
                 self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
@@ -952,7 +949,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         count = itertools.count(1)
         original = name
         while destination.contains_folder(name):
-            name = "%s_%s" % (original, count.next())
+            name = "%s_%s" % (original, next(count))
         return name
 
     def _copy_folder(self, folder, destination, suffix, overwrite):

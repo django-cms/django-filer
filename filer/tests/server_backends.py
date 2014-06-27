@@ -20,7 +20,7 @@ class BaseServerBackendTestCase(TestCase):
         original_filename = 'testimage.jpg'
         file_obj = SimpleUploadedFile(
             name=original_filename,
-            content=create_image().tostring(),
+            content=create_image().tobytes(),
             content_type='image/jpeg')
         self.filer_file = File.objects.create(
             is_public=False,
@@ -30,6 +30,7 @@ class BaseServerBackendTestCase(TestCase):
     def tearDown(self):
         self.filer_file.delete()
 
+
 class DefaultServerTestCase(BaseServerBackendTestCase):
     def test_normal(self):
         server = DefaultServer()
@@ -37,6 +38,19 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
         request.META = {}
         response = server.serve(request, self.filer_file.file)
         self.assertTrue(response.has_header('Last-Modified'))
+
+    def test_save_as(self):
+        server = DefaultServer()
+        request = Mock()
+        request.META = {}
+        response = server.serve(request, self.filer_file.file, save_as=True)
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename=testimage.jpg')
+
+        response = server.serve(request, self.filer_file.file, save_as=False)
+        self.assertFalse(response.has_header('Content-Disposition'))
+
+        response = server.serve(request, self.filer_file.file, save_as='whatever.png')
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename=whatever.png')
 
     def test_not_modified(self):
         server = DefaultServer()

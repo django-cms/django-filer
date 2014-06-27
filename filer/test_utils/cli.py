@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-import django
 import os
 
 gettext = lambda s: s
 
+import easy_thumbnails
+from distutils.version import LooseVersion
+if hasattr(easy_thumbnails, 'get_version'):
+    ET_2 = LooseVersion(easy_thumbnails.get_version()) > LooseVersion('2.0')
+else:
+    ET_2 = LooseVersion(easy_thumbnails.VERSION) > LooseVersion('2.0')
+
 urlpatterns = []
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
 
 def configure(**extra):
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'filer.test_utils.cli'
     defaults = dict(
-        CACHE_BACKEND='locmem:///',
         DEBUG=True,
         TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
@@ -24,7 +27,6 @@ def configure(**extra):
         STATIC_ROOT='/static/',
         MEDIA_URL='/media/',
         STATIC_URL='/static/',
-        ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
         SECRET_KEY='key',
         TEMPLATE_LOADERS=(
@@ -32,54 +34,28 @@ def configure(**extra):
             'django.template.loaders.app_directories.Loader',
             'django.template.loaders.eggs.Loader',
             ),
-#        TEMPLATE_CONTEXT_PROCESSORS=[
-#            "django.contrib.auth.context_processors.auth",
-#            'django.contrib.messages.context_processors.messages',
-#            "django.core.context_processors.i18n",
-#            "django.core.context_processors.debug",
-#            "django.core.context_processors.request",
-#            "django.core.context_processors.media",
-#            'django.core.context_processors.csrf',
-#            "django.core.context_processors.static",
-#            ],
-#        TEMPLATE_DIRS=[
-#            os.path.abspath(os.path.join(os.path.dirname(__file__), 'project', 'templates'))
-#        ],
-#        MIDDLEWARE_CLASSES=[
-#            'django.contrib.sessions.middleware.SessionMiddleware',
-#            'django.contrib.auth.middleware.AuthenticationMiddleware',
-#            'django.contrib.messages.middleware.MessageMiddleware',
-#            'django.middleware.csrf.CsrfViewMiddleware',
-#            'django.middleware.locale.LocaleMiddleware',
-#            'django.middleware.doc.XViewMiddleware',
-#            'django.middleware.common.CommonMiddleware',
-#            'django.middleware.transaction.TransactionMiddleware',
-#            'django.middleware.cache.FetchFromCacheMiddleware',
-#            'cms.middleware.user.CurrentUserMiddleware',
-#            'cms.middleware.page.CurrentPageMiddleware',
-#            'cms.middleware.toolbar.ToolbarMiddleware',
-#            ],
+        SOUTH_TESTS_MIGRATE=True,
         INSTALLED_APPS = [
-            'filer',
-            'mptt',
-            'easy_thumbnails',
             'django.contrib.auth',
             'django.contrib.contenttypes',
             'django.contrib.admin',
             'django.contrib.sessions',
             'django.contrib.staticfiles',
+            'easy_thumbnails',
+            'mptt',
+            'filer',
+            'south',
             ],
         ROOT_URLCONF='filer.test_utils.cli',
     )
-#    if DJANGO_1_3:
-#        defaults['INSTALLED_APPS'].append("i18nurls")
-#        defaults['MIDDLEWARE_CLASSES'][4] = 'i18nurls.middleware.LocaleMiddleware'
-#    else:
-#        from django.utils.functional import empty
-#        settings._wrapped = empty
+    if ET_2:
+        extra['SOUTH_MIGRATION_MODULES'] = {
+            'easy_thumbnails': 'easy_thumbnails.south_migrations',
+        }
+
     defaults.update(extra)
     settings.configure(**defaults)
-#    from south.management.commands import patch_for_test_db_setup
-#    patch_for_test_db_setup()
+    from south.management.commands import patch_for_test_db_setup
+    patch_for_test_db_setup()
     from django.contrib import admin
     admin.autodiscover()

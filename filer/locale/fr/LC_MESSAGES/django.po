@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Bertrand Bordage <bordage.bertrand@gmail.com>, 2012.
-# Marion Balensi <kitsunesama@laposte.net>, 2012.
+# Bertrand Bordage <bordage.bertrand@gmail.com>, 2012-2013
+# Marion Balensi <kitsunesama@laposte.net>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2012-08-14 00:41+0000\n"
+"PO-Revision-Date: 2013-11-20 10:35+0000\n"
 "Last-Translator: Bertrand Bordage <bordage.bertrand@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/django-filer/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -284,7 +284,7 @@ msgstr "Permissions désactivées"
 
 #: models/filemodels.py:58
 msgid "Disable any permission checking for this "
-msgstr ""
+msgstr "Désactiver toute vérification de permission pour ceci"
 
 #: models/foldermodels.py:107
 msgid "created at"

@@ -14,7 +14,7 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
 
     $ pip install django-filer
 
-If you are feeling adventurous you can get 
+If you are feeling adventurous you can get
 `the latest sourcecode from github <https://github.com/stefanfoulis/django-filer/>`_ or add
 http://stefanfoulis.github.com/django-filer/unstable_releases/ to ``find-links`` for the latest
 alpha and beta releases.
@@ -22,18 +22,19 @@ alpha and beta releases.
 Dependencies
 ------------
 
-* `Django`_ >=1.3.1,<1.5
-* `django-mptt`_ >=0.5.1,<0.6
+* `Django`_ >= 1.4
+* `django-mptt`_ >=0.5.1
 * `easy_thumbnails`_ >= 1.0
-* `django-polymorphic`_ >=0.2
-* `PIL`_ 1.1.7 (**with JPEG and ZLIB support**) I recommend using `Pillow`_ instead.
-* ``django.contrib.staticfiles``
+* `django-polymorphic`_ >= 0.2
+* `Pillow`_ 2.3.0 (with JPEG and ZLIB support, `PIL`_ 1.1.7 is supported but not recommended)
 
-Since the `PIL package on pypi <http://pypi.python.org/pypi/PIL/>`_ can be notoriously hard to install on some
-platforms it is not listed in the package dependencies in ``setup.py`` and won't
-be installed automatically. Please make sure you install `PIL`_ with JPEG and
-ZLIB support installed. I recommend `Pillow`_ a better
-packaged fork of `PIL`_).
+``django.contrib.staticfiles`` is required.
+
+**Django >= 1.6** is supported together with `django-polymorphic`_ >= 0.5.4
+
+Please make sure you install `Pillow`_ with JPEG and  ZLIB support installed;
+for further information on Pillow installation and its binary dependencies,
+check `Pillow doc`_.
 
 Configuration
 -------------
@@ -50,28 +51,34 @@ Add ``"filer"`` and related apps to your project's ``INSTALLED_APPS`` setting an
 
 
 
-Note that `easy_thumbnails`_ also has database tables and needs a ``syncdb`` or 
+Note that `easy_thumbnails`_ also has database tables and needs a ``syncdb`` or
 ``migrate``.
+
+For `easy_thumbnails`_ to support retina displays (recent MacBooks, iOS) add to settings.py::
+
+    THUMBNAIL_HIGH_RESOLUTION = True
+    
+If you forget this, you may not see thumbnails for your uploaded files. Adding this line and 
+refreshing the admin page will create the missing thumbnails.
 
 Static media
 ............
 
 In order to operate properly, django-filer needs some js and css files. They
 are located in the ``static/filer`` directory in the ``filer`` package. Use
-`django.contrib.staticfiles`_  (or `django-staticfiles`_) to have them
-automatically served.
+`django.contrib.staticfiles`_  to have them automatically served.
 
 
 subject location aware cropping
 ...............................
 
-It is possible to define the *important* part of an image (the 
-*subject location*) in the admin interface for django-filer images. This is 
-very useful when later resizing and cropping images with easy_thumbnails. The 
+It is possible to define the *important* part of an image (the
+*subject location*) in the admin interface for django-filer images. This is
+very useful when later resizing and cropping images with easy_thumbnails. The
 image can then be cropped automatically in a way, that the important part of
 the image is always visible.
 
-To enable automatic subject location aware cropping of images replace 
+To enable automatic subject location aware cropping of images replace
 ``easy_thumbnails.processors.scale_and_crop`` with
 ``filer.thumbnail_processors.scale_and_crop_with_subject_location`` in the
 ``THUMBNAIL_PROCESSORS`` setting::
@@ -85,7 +92,7 @@ To enable automatic subject location aware cropping of images replace
     )
 
 To crop an image and respect the subject location::
-    
+
     {% load thumbnail %}
     {% thumbnail obj.img 200x300 crop upscale subject_location=obj.img.subject_location %}
 
@@ -118,14 +125,13 @@ generation errors,  two options are provided to help when working with ``django-
 
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer/
-.. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/
-.. _django.contrib.staticfiles: http://docs.djangoproject.com/en/1.3/howto/static-files/
+.. _django.contrib.staticfiles: http://docs.djangoproject.com/en/stable/howto/static-files/
 .. _Django: http://djangoproject.com
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
-.. _PIL: http://www.pythonware.com/products/pil/
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
+.. _Pillow doc: http://pillow.readthedocs.org/en/latest/installation.html
 .. _pip: http://pypi.python.org/pypi/pip
 .. _South: http://south.aeracode.org/

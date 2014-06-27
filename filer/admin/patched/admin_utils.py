@@ -4,8 +4,7 @@ Copy of ``django.contrib.admin.utils.get_deleted_objects`` and a subclass of
 ``django.contrib.admin.utils.NestedObjects`` that work with djongo_polymorphic querysets.
 Ultimatly these should go directly into django_polymorphic or, in a more generic way, into django itself.
 
-This code has been copied from
-django 1.4. ``get_deleted_objects`` and ``NestedObjects`` have not changed compared to 1.3.1.
+This code has been copied from Django 1.4.
 
 At all locations where something has been changed, there are inline comments in the code.
 """
@@ -13,7 +12,11 @@ from django.contrib.admin.util import NestedObjects, quote
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.encoding import force_unicode
+try:
+    from django.utils.encoding import force_str
+except ImportError:
+    # Django < 1.5
+    from django.utils.encoding import force_unicode as force_str
 from django.core.urlresolvers import reverse
 
 
@@ -47,15 +50,15 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
                 # Display a link to the admin page.
-            return mark_safe(u'%s: <a href="%s">%s</a>' %
+            return mark_safe('%s: <a href="%s">%s</a>' %
                              (escape(capfirst(opts.verbose_name)),
                               admin_url,
                               escape(obj)))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj))
+            return '%s: %s' % (capfirst(opts.verbose_name),
+                               force_str(obj))
 
     to_delete = collector.nested(format_callback)
 
@@ -70,4 +73,3 @@ class PolymorphicAwareNestedObjects(NestedObjects):
             # .filter() is needed, because there may already be cached polymorphic results in the queryset
             objs = objs.non_polymorphic().filter()
         return super(PolymorphicAwareNestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
-

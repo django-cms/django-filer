@@ -24,7 +24,7 @@ def create_folder_structure(depth=2, sibling=2, parent=None):
     * parent: is the folder instance of the parent.
     """
     if depth > 0 and sibling > 0:
-        depth_range = range(1, depth+1)
+        depth_range = list(range(1, depth+1))
         depth_range.reverse()
         for d in depth_range:
             for s in range(1,sibling+1):
@@ -45,3 +45,32 @@ def create_image(mode='RGB', size=(800, 600)):
     draw.rectangle((x_bit, y_bit * 2, x_bit * 7, y_bit * 3), 'red')
     draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), 'red')
     return image
+
+
+class SettingsOverride(object):
+    """
+    Overrides Django settings within a context and resets them to their inital
+    values on exit.
+
+    Example:
+
+        with SettingsOverride(DEBUG=True):
+            # do something
+    """
+
+    def __init__(self, settings_module, **overrides):
+        self.settings_module = settings_module
+        self.overrides = overrides
+
+    def __enter__(self):
+        self.old = {}
+        for key, value in list(self.overrides.items()):
+            self.old[key] = getattr(self.settings_module, key, None)
+            setattr(self.settings_module, key, value)
+
+    def __exit__(self, _type, value, traceback):
+        for key, value in list(self.old.items()):
+            if value is not None:
+                setattr(self.settings_module, key, value)
+            else:
+                delattr(self.settings_module, key)

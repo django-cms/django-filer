@@ -24,10 +24,10 @@ setup(
     author_email = 'stefan@foulis.ch',
     packages=find_packages(),
     install_requires = (
-        # 'Django>=1.3,<1.5',  # no need to limit while in development
-        'Django>=1.3',
+        # 'Django>=1.4,<1.5',  # no need to limit while in development
+        'Django>=1.4',
         'easy-thumbnails>=1.0',
-        'django-mptt>=0.5.1,<0.6',
+        'django-mptt==0.5.2,==0.6,==0.6.1',
         'django_polymorphic>=0.2',
     ),
     include_package_data=True,
@@ -40,9 +40,14 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
     ],
     test_suite='runtests.main',
     tests_require=(
         'argparse',  # needed on python 2.6
+        'south',
     ),
 )

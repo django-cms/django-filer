@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify
@@ -16,14 +18,7 @@ def handle_upload(request):
         # the file is stored raw in the request
         is_raw = True
         filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
-        if hasattr(request, 'body'):
-            # raw_post_data was depreciated in django 1.4:
-            # https://docs.djangoproject.com/en/dev/releases/1.4/#httprequest-raw-post-data-renamed-to-httprequest-body
-            data = request.body
-        else:
-            # fallback for django 1.3
-            data = request.raw_post_data
-        upload = SimpleUploadedFile(name=filename, content=data)
+        upload = SimpleUploadedFile(name=filename, content=request.body)
     else:
         if len(request.FILES) == 1:
             # FILES is a dictionary in Django but Ajax Upload gives the uploaded file an
@@ -32,7 +27,7 @@ def handle_upload(request):
             # each upload is a separate request so FILES should only have one entry.
             # Thus, we can just grab the first (and only) value in the dict.
             is_raw = False
-            upload = request.FILES.values()[0]
+            upload = list(request.FILES.values())[0]
             filename = upload.name
         else:
             raise UploadException("AJAX request not valid: Bad Upload")
@@ -49,6 +44,6 @@ def get_valid_filename(s):
     filename = slugify(filename)
     ext = slugify(ext)
     if ext:
-        return u"%s.%s" % (filename, ext)
+        return "%s.%s" % (filename, ext)
     else:
-        return u"%s" % (filename,)
+        return "%s" % (filename,)

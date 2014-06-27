@@ -11,7 +11,7 @@ class Migration(DataMigration):
         for file_name_null in orm.File.objects.filter(name__isnull=True):
             file_name_null.name = ""
             file_name_null.save()
-            print 'Setting empty string in null name for File object %s. See Release notes for further info' % file_name_null.pk
+            print('Setting empty string in null name for File object %s. See Release notes for further info' % file_name_null.pk)
 
     def backwards(self, orm):
         pass
@@ -120,7 +120,6 @@ class Migration(DataMigration):
             'file_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['filer.File']", 'unique': 'True', 'primary_key': 'True'}),
             'must_always_publish_author_credit': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'related_url': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
             'subject_location': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '64', 'null': 'True', 'blank': 'True'})
         },
         'taggit.tag': {

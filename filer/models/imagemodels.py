@@ -9,16 +9,22 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from datetime import datetime
+import os
+
+from django.utils.timezone import now, make_aware, get_current_timezone
 from django.core import urlresolvers
+from django.conf import settings
 from django.db import models
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
-import os
 
 logger = logging.getLogger("filer")
+
 
 class Image(File):
     SIDEBAR_IMAGE_WIDTH = 210
@@ -65,16 +71,22 @@ class Image(File):
             try:
                 exif_date = self.exif.get('DateTimeOriginal', None)
                 if exif_date is not None:
-                    d, t = str.split(exif_date.values)
+                    d, t = exif_date.split(" ")
                     year, month, day = d.split(':')
                     hour, minute, second = t.split(':')
-                    self.date_taken = datetime(
-                                       int(year), int(month), int(day),
-                                       int(hour), int(minute), int(second))
-            except:
+                    if getattr(settings, "USE_TZ", False):
+                        tz = get_current_timezone()
+                        self.date_taken = make_aware(datetime(
+                            int(year), int(month), int(day),
+                            int(hour), int(minute), int(second)), tz)
+                    else:
+                        self.date_taken = datetime(
+                            int(year), int(month), int(day),
+                            int(hour), int(minute), int(second))
+            except Exception:
                 pass
         if self.date_taken is None:
-            self.date_taken = datetime.now()
+            self.date_taken = now()
         self.has_all_mandatory_data = self._check_validity()
         try:
             # do this more efficient somehow?
@@ -150,12 +162,12 @@ class Image(File):
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
-        for name, opts in required_thumbnails.iteritems():
+        for name, opts in six.iteritems(required_thumbnails):
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
                 _thumbnails[name] = thumb.url
-            except Exception,e:
+            except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration
@@ -182,7 +194,7 @@ class Image(File):
     @property
     def easy_thumbnails_thumbnailer(self):
         tn = FilerThumbnailer(
-            file=self.file.file, name=self.file.name,
+            file=self.file, name=self.file.name,
             source_storage=self.file.source_storage,
             thumbnail_storage=self.file.thumbnail_storage,
             thumbnail_basedir=self.file.thumbnail_basedir)

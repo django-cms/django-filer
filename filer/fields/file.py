@@ -1,14 +1,14 @@
 #-*- coding: utf-8 -*-
-import inspect
+import warnings
+
 from django import forms
-from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+
 from filer.utils.compatibility import truncate_words
 from filer.models import File
 from filer import settings as filer_settings
@@ -30,7 +30,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 file_obj = File.objects.get(pk=value)
                 related_url = file_obj.logical_folder.\
                                 get_admin_directory_listing_url_path()
-            except Exception,e:
+            except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration
@@ -43,7 +43,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         params = self.url_parameters()
         if params:
             lookup_url = '?' + '&amp;'.join(
-                                ['%s=%s' % (k, v) for k, v in params.items()])
+                                ['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
             lookup_url = ''
         if not 'class' in attrs:
@@ -97,11 +97,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         other_widget = kwargs.pop('widget', None)
-        if 'admin_site' in inspect.getargspec(self.widget.__init__)[0]: # Django 1.4
-            widget_instance = self.widget(rel, site)
-        else: # Django <= 1.3
-            widget_instance = self.widget(rel)
-        forms.Field.__init__(self, widget=widget_instance, *args, **kwargs)
+        forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -114,9 +110,13 @@ class FilerFileField(models.ForeignKey):
 
     def __init__(self, **kwargs):
         # we call ForeignKey.__init__ with the Image model as parameter...
-        # a FilerImageFiled can only be a ForeignKey to a Image
-        return super(FilerFileField, self).__init__(
-            self.default_model_class, **kwargs)
+        # a FilerImageField can only be a ForeignKey to a Image
+        if "to" in kwargs.keys():
+            kwargs.pop("to")
+            warnings.warn("FilerImageField can only be a ForeignKey to a Image;"
+                          "%s passed" % kwargs['to'], SyntaxWarning)
+        return super(FilerFileField, self).__init__(self.default_model_class,
+                                                    **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
