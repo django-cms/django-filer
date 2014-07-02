@@ -1,5 +1,6 @@
 {% load i18n admin_modify filermedia %}
 {% load url from future %}
+{% trans "file missing" as file_missing %}
 
 <script type="text/javascript">
 //<![CDATA[
@@ -21,7 +22,7 @@ $(function() {
             var file = responseJSON;
             if (file.error) {
                 var html = '\
-                <td class="thumbnail"><img style="width: 32px;height: 32px;" src="{% filer_staticmedia_prefix %}/icons/missingfile_32x32.png" alt="{% trans 'file missing' %}" /></td>\
+                <td class="thumbnail"><img style="width: 32px;height: 32px;" src="{% filer_staticmedia_prefix %}/icons/missingfile_32x32.png" alt="{{ file_missing|escapejs }}" /></td>\
                 <td class="label">' + file.error + '</td>\
                 <td class="buttons"></td>';
             } else {
