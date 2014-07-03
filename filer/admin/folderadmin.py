@@ -18,10 +18,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 try:
-    from django.utils.encoding import force_str
+    from django.utils.encoding import force_text
 except ImportError:
     # Django < 1.5
-    from django.utils.encoding import force_unicode as force_str
+    from django.utils.encoding import force_unicode as force_text
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -636,7 +636,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if n:
                 # delete all explicitly selected files
                 for f in files_queryset:
-                    self.log_deletion(request, f, force_str(f))
+                    self.log_deletion(request, f, force_text(f))
                     f.delete()
                 # delete all files in all selected folders and their children
                 # This would happen automatically by ways of the delete cascade, but then the individual .delete()
@@ -646,11 +646,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     folder_ids.add(folder.id)
                     folder_ids.update(folder.get_descendants().values_list('id', flat=True))
                 for f in File.objects.filter(folder__in=folder_ids):
-                    self.log_deletion(request, f, force_str(f))
+                    self.log_deletion(request, f, force_text(f))
                     f.delete()
                 # delete all folders
                 for f in folders_queryset:
-                    self.log_deletion(request, f, force_str(f))
+                    self.log_deletion(request, f, force_text(f))
                     f.delete()
                 self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {
                     "count": n,
@@ -710,7 +710,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
             return '%s: %s' % (capfirst(opts.verbose_name),
-                                force_str(obj))
+                                force_text(obj))
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -762,7 +762,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             # We do not allow copying/moving back to the folder itself
             enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
-            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
+            yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_text(fo)), enabled))
             for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
                 yield c
 

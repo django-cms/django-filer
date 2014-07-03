@@ -1,18 +1,17 @@
 from __future__ import unicode_literals
 
 try:
-    from django.utils.encoding import force_str
+    from django.utils.encoding import force_text
 except ImportError:
     # Django < 1.5
-    from django.utils.encoding import force_unicode as force_str
+    from django.utils.encoding import force_unicode as force_text
 from django.utils.timezone import now
 from filer.utils.files import get_valid_filename
-from django.utils.encoding import smart_str
 import os
 
 
 def by_date(instance, filename):
-    datepart = force_str(now().strftime(smart_str("%Y/%m/%d")))
+    datepart = force_text(now().strftime("%Y/%m/%d"))
     return os.path.join(datepart, get_valid_filename(filename))
 
 def randomized(instance, filename):
