@@ -993,7 +993,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
         perms_needed = self._check_copy_perms(request, files_queryset, folders_queryset)
         to_copy = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, True)
+        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
             if perms_needed:
