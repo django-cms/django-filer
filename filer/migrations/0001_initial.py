@@ -51,7 +51,7 @@ class Migration(SchemaMigration):
             ('has_all_mandatory_data', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('original_filename', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_files', null=True, to=orm['auth.User'])),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_files', null=True, to=orm[user_orm_label])),
             ('uploaded_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modified_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
@@ -62,7 +62,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('parent', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='children', null=True, to=orm['filer.Folder'])),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='filer_owned_folders', null=True, to=orm['auth.User'])),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='filer_owned_folders', null=True, to=orm[user_orm_label])),
             ('uploaded_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modified_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
@@ -76,7 +76,7 @@ class Migration(SchemaMigration):
         # Adding model 'Clipboard'
         db.create_table('filer_clipboard', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='filer_clipboards', to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='filer_clipboards', to=orm[user_orm_label])),
         ))
         db.send_create_signal('filer', ['Clipboard'])
         
@@ -85,7 +85,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('folder', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['filer.Folder'], null=True, blank=True)),
             ('type', self.gf('django.db.models.fields.SmallIntegerField')(default=0)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='filer_folder_permissions', null=True, to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='filer_folder_permissions', null=True, to=orm[user_orm_label])),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='filer_folder_permissions', null=True, to=orm['auth.Group'])),
             ('everybody', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('can_edit', self.gf('django.db.models.fields.SmallIntegerField')(default=None, null=True, blank=True)),
