@@ -1,25 +1,24 @@
 from __future__ import unicode_literals
 
 try:
-    from django.utils.encoding import force_str
+    from django.utils.encoding import force_text
 except ImportError:
     # Django < 1.5
-    from django.utils.encoding import force_unicode as force_str
+    from django.utils.encoding import force_unicode as force_text
 from django.utils.timezone import now
 from filer.utils.files import get_valid_filename
-from django.utils.encoding import smart_str
 import os
 
 
 def by_date(instance, filename):
-    datepart = force_str(now().strftime(smart_str("%Y/%m/%d")))
+    datepart = force_text(now().strftime("%Y/%m/%d"))
     return os.path.join(datepart, get_valid_filename(filename))
 
 def randomized(instance, filename):
     import uuid
     uuid_str = str(uuid.uuid4())
-    random_path = "%s/%s/%s" % (uuid_str[0:2], uuid_str[2:4], uuid_str)
-    return os.path.join(random_path, get_valid_filename(filename))
+    return os.path.join(uuid_str[0:2], uuid_str[2:4], uuid_str,
+            get_valid_filename(filename))
 
 
 class prefixed_factory(object):

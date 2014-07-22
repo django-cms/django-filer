@@ -1,6 +1,17 @@
 Changelog for django-filer
 ==========================
 
+
+0.9.7 (2014-07-22)
+------------------
+
+* thumbnails: add zoom support
+* Fixed migration custom User compatibility.
+* Disallow copying folders to self
+* Build random path using os.path.join
+* Replace use of force_str by force_text
+
+
 0.9.6 (2014-06-27)
 ------------------
 

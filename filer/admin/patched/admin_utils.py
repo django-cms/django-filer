@@ -8,15 +8,17 @@ This code has been copied from Django 1.4.
 
 At all locations where something has been changed, there are inline comments in the code.
 """
+from __future__ import unicode_literals
+
 from django.contrib.admin.util import NestedObjects, quote
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 try:
-    from django.utils.encoding import force_str
+    from django.utils.encoding import force_text
 except ImportError:
     # Django < 1.5
-    from django.utils.encoding import force_unicode as force_str
+    from django.utils.encoding import force_unicode as force_text
 from django.core.urlresolvers import reverse
 
 
@@ -58,7 +60,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
             return '%s: %s' % (capfirst(opts.verbose_name),
-                               force_str(obj))
+                               force_text(obj))
 
     to_delete = collector.nested(format_callback)
 
