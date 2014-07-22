@@ -30,7 +30,7 @@ def normalize_subject_location(subject_location):
     return False
 
 
-def scale_and_crop_with_subject_location(im, size, subject_location=False,
+def scale_and_crop_with_subject_location(im, size, subject_location=False, zoom=None,
                                          crop=False, upscale=False, **kwargs):
     """
     Like ``easy_thumbnails.processors.scale_and_crop``, but will use the
@@ -65,6 +65,12 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
         target_x = source_x * scale
     elif not target_y:
         target_y = source_y * scale
+
+    if zoom:
+        if not crop:
+            target_x = round(source_x * scale)
+            target_y = round(source_y * scale)
+        scale *= (100 + int(zoom)) / 100.0
 
     if scale < 1.0 or (scale > 1.0 and upscale):
         im = im.resize((int(source_x * scale), int(source_y * scale)),
