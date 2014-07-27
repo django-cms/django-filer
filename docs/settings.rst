@@ -133,3 +133,12 @@ Regular users are not allowed to create new folders at the root level, only
 subfolders of already existing folders, unless this setting is set to ``True``.
 
 Defaults to ``False``
+
+
+``FILER_IMAGE_MODEL``
+---------------------
+
+Defines the dotted path to a custom Image model; please include the model name.
+Example: 'my.app.models.CustomImage'
+
+Defaults to ``False``
