@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 import argparse
+import os
 import sys
 import warnings
 from filer.test_utils.cli import configure
 from filer.test_utils.tmpdir import temp_dir
 
+from filer.test_utils.cli import configure
+from filer.test_utils.tmpdir import temp_dir
 
-def main(verbosity=1, failfast=False, test_labels=None, migrate=False):
+
+def main(verbosity=1, failfast=False, test_labels=None, migrate=False,
+         filer_image_model=False):
     verbosity = int(verbosity)
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
@@ -28,6 +33,7 @@ def main(verbosity=1, failfast=False, test_labels=None, migrate=False):
                     STATIC_ROOT=STATIC_ROOT, MEDIA_ROOT=MEDIA_ROOT,
                     FILE_UPLOAD_TEMP_DIR=FILE_UPLOAD_TEMP_DIR,
                     SOUTH_TESTS_MIGRATE=migrate,
+                    FILER_IMAGE_MODEL=filer_image_model,
                     USE_TZ=use_tz)
                 from django.conf import settings
                 from django.test.utils import get_runner
@@ -43,8 +49,9 @@ if __name__ == '__main__':
                         dest='failfast')
     parser.add_argument('--verbosity', default=1)
     parser.add_argument('--migrate', action='store_true', default=True)
+    parser.add_argument('--custom-image', action='store', default=os.environ.get('CUSTOM_IMAGE', False))
     parser.add_argument('test_labels', nargs='*')
     args = parser.parse_args()
     test_labels = ['%s' % label for label in args.test_labels]
     main(verbosity=args.verbosity, failfast=args.failfast,
-         test_labels=test_labels, migrate=args.migrate)
+         test_labels=test_labels, migrate=args.migrate, filer_image_model=args.custom_image)
