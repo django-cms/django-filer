@@ -5,7 +5,7 @@ from filer.utils.loader import load_object
 from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 import os
 
-
+FILER_IMAGE_MODEL = getattr(settings, 'FILER_IMAGE_MODEL', False)
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False) # When True makes
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 FILER_WHITESPACE_COLOR = getattr(settings, 'FILER_WHITESPACE_COLOR', '#FFFFFF')
@@ -35,7 +35,7 @@ FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES",(
 # classes that I should check for when adding files
 FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
     (
-        'filer.models.imagemodels.Image',
+        FILER_IMAGE_MODEL if FILER_IMAGE_MODEL else 'filer.models.imagemodels.Image',
         'filer.models.filemodels.File',
     )
 )

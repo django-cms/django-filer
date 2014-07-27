@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from django import forms
-from django.utils.translation import ugettext  as _
-from filer import settings as filer_settings, settings
+from django.utils.translation import ugettext as _
+from filer import settings as filer_settings
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
 
