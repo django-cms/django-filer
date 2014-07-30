@@ -12,7 +12,7 @@ from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.db import router
+from django.db import router, models
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
@@ -399,25 +399,47 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                         permissions.get("has_add_children_permission"),
         }, context_instance=RequestContext(request))
 
-    @staticmethod
-    def filter_folder(qs, terms=[]):
+    def filter_folder(self, qs, terms=[]):
         for term in terms:
-            qs = qs.filter(Q(name__icontains=term) |
-                           Q(owner__username__icontains=term) |
-                           Q(owner__first_name__icontains=term) |
-                           Q(owner__last_name__icontains=term))
+            filters = Q(name__icontains=term)
+            for filter_ in self.get_owner_filter_lookups():
+                filters |= Q(**{filter_: term})
+            qs = qs.filter(filters)
         return qs
 
-    @staticmethod
-    def filter_file(qs, terms=[]):
+    def filter_file(self, qs, terms=[]):
         for term in terms:
-            qs = qs.filter(Q(name__icontains=term) |
-                           Q(description__icontains=term) |
-                           Q(original_filename__icontains=term) |
-                           Q(owner__username__icontains=term) |
-                           Q(owner__first_name__icontains=term) |
-                           Q(owner__last_name__icontains=term))
+            filters = (Q(name__icontains=term) |
+                       Q(description__icontains=term) |
+                       Q(original_filename__icontains=term))
+            for filter_ in self.get_owner_filter_lookups():
+                filters |= Q(**{filter_: term})
+            qs = qs.filter(filters)
         return qs
+
+    @property
+    def owner_search_fields(self):
+        """
+        Returns all the fields that are CharFields except for password from the
+        User model.  For the built-in User model, that means username,
+        first_name, last_name, and email.
+        """
+        try:
+            from django.contrib.auth import get_user_model
+        except ImportError:  # Django < 1.5
+            from django.contrib.auth.models import User
+        else:
+            User = get_user_model()
+        return [
+            field.name for field in User._meta.fields
+            if isinstance(field, models.CharField) and field.name != 'password'
+        ]
+
+    def get_owner_filter_lookups(self):
+        return [
+            'owner__{field}__icontains'.format(field=field)
+            for field in self.owner_search_fields
+        ]
 
     def response_action(self, request, files_queryset, folders_queryset):
         """
