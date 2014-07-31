@@ -10,7 +10,7 @@
 </td>
 <!-- FileIcon -->
 <td>
-    <a href="{{ file.get_admin_url_path }}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}"><img src="{% if file.icons.32 %}{{ file.icons.32 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" /></a>
+    <a href="{{ file.get_admin_url_path }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}"><img src="{% if file.icons.32 %}{{ file.icons.32 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" /></a>
 </td>
 <!-- Filename/Dimensions -->
 <td>{% if not is_popup and not file|is_restricted_for_user:user %}
