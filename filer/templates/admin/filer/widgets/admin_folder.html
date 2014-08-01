@@ -7,7 +7,7 @@
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
 	<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
 </a>
-<img id="{{ clear_id }}" src="{% admin_icon_base %}icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}" />
+<img id="{{ clear_id }}" src="{% admin_icon_base %}icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %} />
 <br />
 {{ hidden_input }}
 <script type="text/javascript">django.jQuery("#{{ id }}").hide();
