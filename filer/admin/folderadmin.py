@@ -68,6 +68,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                'delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
+    directory_listing_template = 'admin/filer/folder/directory_listing.html'
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by
@@ -366,7 +368,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
         return render_to_response(
-            'admin/filer/folder/directory_listing.html',
+            self.directory_listing_template,
             {
                 'folder': folder,
                 'clipboard_files': File.objects.filter(
