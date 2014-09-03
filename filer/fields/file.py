@@ -112,9 +112,9 @@ class FilerFileField(models.ForeignKey):
         # we call ForeignKey.__init__ with the Image model as parameter...
         # a FilerImageField can only be a ForeignKey to a Image
         if "to" in kwargs.keys():
-            kwargs.pop("to")
+            old_to = kwargs.pop("to")
             warnings.warn("FilerImageField can only be a ForeignKey to a Image;"
-                          "%s passed" % kwargs['to'], SyntaxWarning)
+                          "%s passed" % old_to, SyntaxWarning)
         return super(FilerFileField, self).__init__(self.default_model_class,
                                                     **kwargs)
 
