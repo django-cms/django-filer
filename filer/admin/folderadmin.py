@@ -45,7 +45,6 @@ from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
 import os
 import itertools
-import inspect
 
 
 class AddFolderPopupForm(forms.ModelForm):

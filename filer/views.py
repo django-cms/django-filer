@@ -23,13 +23,12 @@ class NewFolderForm(forms.ModelForm):
         }
 
 
-
 def popup_status(request):
-    return ('_popup' in request.REQUEST or 'pop' in request.REQUEST)
+    return '_popup' in request.REQUEST or 'pop' in request.REQUEST
 
 
 def selectfolder_status(request):
-    return ('select_folder' in request.REQUEST)
+    return 'select_folder' in request.REQUEST
 
 
 def popup_param(request, separator="?"):
@@ -37,6 +36,7 @@ def popup_param(request, separator="?"):
         return "%s_popup=1" % separator
     else:
         return ""
+
 
 def selectfolder_param(request, separator="&"):
     if selectfolder_status(request):
@@ -62,10 +62,10 @@ def edit_folder(request, folder_id):
     # TODO: implement edit_folder view
     folder = None
     return render_to_response('admin/filer/folder/folder_edit.html', {
-            'folder': folder,
-            'is_popup': popup_status(request),
-            'select_folder': selectfolder_status(request),
-        }, context_instance=RequestContext(request))
+        'folder': folder,
+        'is_popup': popup_status(request),
+        'select_folder': selectfolder_status(request),
+    }, context_instance=RequestContext(request))
 
 
 @login_required
@@ -73,10 +73,10 @@ def edit_image(request, folder_id):
     # TODO: implement edit_image view
     folder = None
     return render_to_response('filer/image_edit.html', {
-            'folder': folder,
-            'is_popup': popup_status(request),
-            'select_folder': selectfolder_status(request),
-        }, context_instance=RequestContext(request))
+        'folder': folder,
+        'is_popup': popup_status(request),
+        'select_folder': selectfolder_status(request),
+    }, context_instance=RequestContext(request))
 
 
 @login_required
@@ -90,7 +90,7 @@ def make_folder(request, folder_id=None):
 
     if request.user.is_superuser:
         pass
-    elif folder == None:
+    elif folder is None:
         # regular users may not add root folders unless configured otherwise
         if not filer_settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS:
             raise PermissionDenied
@@ -114,9 +114,9 @@ def make_folder(request, folder_id=None):
     else:
         new_folder_form = NewFolderForm()
     return render_to_response('admin/filer/folder/new_folder_form.html', {
-            'new_folder_form': new_folder_form,
-            'is_popup': popup_status(request),
-            'select_folder': selectfolder_status(request),
+        'new_folder_form': new_folder_form,
+        'is_popup': popup_status(request),
+        'select_folder': selectfolder_status(request),
     }, context_instance=RequestContext(request))
 
 
@@ -146,9 +146,9 @@ def paste_clipboard_to_folder(request):
         else:
             raise PermissionDenied
     return HttpResponseRedirect('%s%s%s' % (
-                                    request.REQUEST.get('redirect_to', ''),
-                                    popup_param(request),
-                                    selectfolder_param(request)))
+                                request.REQUEST.get('redirect_to', ''),
+                                popup_param(request),
+                                selectfolder_param(request)))
 
 
 @login_required
@@ -157,9 +157,9 @@ def discard_clipboard(request):
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.discard_clipboard(clipboard)
     return HttpResponseRedirect('%s%s%s' % (
-                                    request.POST.get('redirect_to', ''),
-                                    popup_param(request),
-                                    selectfolder_param(request)))
+                                request.POST.get('redirect_to', ''),
+                                popup_param(request),
+                                selectfolder_param(request)))
 
 
 @login_required
@@ -168,9 +168,9 @@ def delete_clipboard(request):
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.delete_clipboard(clipboard)
     return HttpResponseRedirect('%s%s%s' % (
-                                    request.POST.get('redirect_to', ''),
-                                    popup_param(request),
-                                    selectfolder_param(request)))
+                                request.POST.get('redirect_to', ''),
+                                popup_param(request),
+                                selectfolder_param(request)))
 
 
 @login_required
@@ -180,6 +180,6 @@ def clone_files_from_clipboard_to_folder(request):
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
         tools.clone_files_from_clipboard_to_folder(clipboard, folder)
     return HttpResponseRedirect('%s%s%s' % (
-                                    request.POST.get('redirect_to', ''),
-                                    popup_param(request),
-                                    selectfolder_param(request)))
+                                request.POST.get('redirect_to', ''),
+                                popup_param(request),
+                                selectfolder_param(request)))
