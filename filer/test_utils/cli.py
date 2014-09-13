@@ -37,6 +37,16 @@ def configure(**extra):
             'django.template.loaders.app_directories.Loader',
             'django.template.loaders.eggs.Loader',
             ),
+        MIDDLEWARE_CLASSES=[
+            'django.middleware.http.ConditionalGetMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.doc.XViewMiddleware',
+            'django.middleware.common.CommonMiddleware',
+        ],
         SOUTH_TESTS_MIGRATE=True,
         INSTALLED_APPS = [
             'django.contrib.auth',
@@ -58,7 +68,7 @@ def configure(**extra):
             }
     else:
         extra['MIGRATION_MODULES'] = {
-            'filer': 'filer.south_migrations',
+            'filer': 'filer.migrations_django',
         }
 
     defaults.update(extra)
@@ -68,3 +78,5 @@ def configure(**extra):
         patch_for_test_db_setup()
         from django.contrib import admin
         admin.autodiscover()
+    else:
+        django.setup()
