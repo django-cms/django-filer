@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 import os
 
 gettext = lambda s: s
@@ -9,8 +10,10 @@ if hasattr(easy_thumbnails, 'get_version'):
     ET_2 = LooseVersion(easy_thumbnails.get_version()) > LooseVersion('2.0')
 else:
     ET_2 = LooseVersion(easy_thumbnails.VERSION) > LooseVersion('2.0')
+DJ_1_7 = LooseVersion(django.get_version()) >= LooseVersion('1.7')
 
 urlpatterns = []
+
 
 def configure(**extra):
     from django.conf import settings
@@ -44,18 +47,24 @@ def configure(**extra):
             'easy_thumbnails',
             'mptt',
             'filer',
-            'south',
             ],
         ROOT_URLCONF='filer.test_utils.cli',
     )
-    if ET_2:
-        extra['SOUTH_MIGRATION_MODULES'] = {
-            'easy_thumbnails': 'easy_thumbnails.south_migrations',
+    if not DJ_1_7:
+        defaults['INSTALLED_APPS'].append('south')
+        if ET_2:
+            extra['SOUTH_MIGRATION_MODULES'] = {
+                'easy_thumbnails': 'easy_thumbnails.south_migrations',
+            }
+    else:
+        extra['MIGRATION_MODULES'] = {
+            'filer': 'filer.south_migrations',
         }
 
     defaults.update(extra)
     settings.configure(**defaults)
-    from south.management.commands import patch_for_test_db_setup
-    patch_for_test_db_setup()
-    from django.contrib import admin
-    admin.autodiscover()
+    if not DJ_1_7:
+        from south.management.commands import patch_for_test_db_setup
+        patch_for_test_db_setup()
+        from django.contrib import admin
+        admin.autodiscover()
