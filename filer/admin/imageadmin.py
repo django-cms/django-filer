@@ -25,6 +25,7 @@ class ImageAdminForm(forms.ModelForm):
 
     class Meta:
         model = Image
+        exclude = ()
 
     class Media:
         css = {

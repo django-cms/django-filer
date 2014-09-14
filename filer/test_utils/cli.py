@@ -44,7 +44,6 @@ def configure(**extra):
             'django.contrib.messages.middleware.MessageMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
         ],
         SOUTH_TESTS_MIGRATE=True,

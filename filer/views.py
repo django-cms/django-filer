@@ -123,7 +123,7 @@ def make_folder(request, folder_id=None):
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = Image
-        fields = ('original_filename', 'owner', 'file')
+        exclude = ()
 
 
 @login_required
