@@ -30,7 +30,7 @@ setup(
     install_requires = (
         'pytz',
         'Django>=1.3,<1.5',
-        'easy-thumbnails>=1.0',
+        'easy-thumbnails>=1.0,<2.0.0',
         'django-mptt>=0.5.1,<0.5.3',
         'django_polymorphic>=0.2',
         'django-cms-roles',
