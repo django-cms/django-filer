@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 2606d5f (30.09.2014, 13:35 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Avoid upgrade to easy-thumbnails 2.x.x versions since would break the tests
+
 Revision a58cd5e (06.08.2014, 07:56 UTC)
 ----------------------------------------
 
