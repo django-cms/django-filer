@@ -90,6 +90,7 @@ class AdminFolderFormField(forms.ModelChoiceField):
     def __init__(self, rel, queryset, to_field_name, *args, **kwargs):
         self.rel = rel
         self.queryset = queryset
+        self.limit_choices_to = kwargs.pop('limit_choices_to', None)
         self.to_field_name = to_field_name
         self.max_value = None
         self.min_value = None
