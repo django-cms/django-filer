@@ -11,6 +11,7 @@ env:
   - DJANGO="Django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0"
+  - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
 script: coverage run --rcfile=coverage.rc setup.py test
 after_success:
@@ -18,6 +19,8 @@ after_success:
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
 matrix:
   exclude:
+    - python: 2.6
+      env: DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 2.6
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 3.3

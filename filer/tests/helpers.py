@@ -1,15 +1,15 @@
 #-*- coding: utf-8 -*-
 from PIL import Image, ImageChops, ImageDraw
 
-try:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-except ImportError:
-    from django.contrib.auth.models import User  # NOQA
 from filer.models.foldermodels import Folder
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 
 def create_superuser():
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+    except ImportError:
+        from django.contrib.auth.models import User  # NOQA
     superuser = User.objects.create_superuser('admin',
                                               'admin@free.fr',
                                               'secret')
