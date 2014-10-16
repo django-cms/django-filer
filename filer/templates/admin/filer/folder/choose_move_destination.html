@@ -1,16 +1,65 @@
 {% extends "admin/base_site.html" %}
-{% load i18n adminmedia filer_admin_tags %}
+{% load i18n adminmedia filer_admin_tags filermedia %}
+{% load url from future %}
 
 {% block breadcrumbs %}
 {% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.11.1.min.js"></script>
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.fancytree-all.min.js"></script>
+<script type="text/javascript">
+$( document ).ready(function() {
+    var fetchDestinations = function(parent){
+        return $.ajax({
+            url: "{% url 'admin:filer-destination_folders' %}",
+            data: {
+                selected_folders: JSON.stringify([{% for f in folders_queryset %}{{f.pk}} {% if not forloop.last %},{% endif %}{% endfor %}]),
+                parent: parent || null,
+                current_folder: {{instance.pk|default:'null'}}
+            },
+            complete: function(){
+                var children = $('#destination-tree').fancytree("getTree").getRootNode().getChildren() || [];
+                if(children.length == 0){
+                    $('form').html("{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}");
+                }
+            },
+            cache: false
+        });
+    }
+    $('#destination-tree').fancytree({
+        source: fetchDestinations(),
+        checkbox: true,
+        selectMode: 1,
+        lazyLoad: function(event, data){
+            data.result = fetchDestinations(data.node.key);
+        },
+        activate: function(event, data) {
+            data.node.toggleSelected();
+        },
+        select: function(event, data) {
+            var path = $.map(
+                data.node.getParentList(),
+                function(el){return "/" + el.title;}
+            ).join('') + "/" + data.node.title;
+            $('#destination').val(data.node.key);
+            $('#destination-name').text(path);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />
+<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/ui.fancytree.min.css" />
+{% endblock %}
 
 {% block content %}
-{% if not destination_folders %}
-    <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
-{% else %}
 {% if not to_move %}
     <p>{% blocktrans %}There are no files and/or folders available to move.{% endblocktrans %}</p>
 {% else %}
@@ -26,15 +75,14 @@
     {% endfor %}
     <input type="hidden" name="action" value="move_files_and_folders" />
     <input type="hidden" name="post" value="yes" />
-    <p><label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
-    <select name="destination" id="destination">
-    {% for folder, name_and_enabled in destination_folders %}
-        <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}>{{ name_and_enabled.0 }}</option>
-    {% endfor %}
-    </select></p>
+    <p>
+    <label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
+    <span id="destination-name">Select a folder below.</span>
+    <input type='hidden' name="destination" id="destination" value=''/>
+    </p>
+    <div id="destination-tree"></div>
     <p><input type="submit" value="{% trans "Move" %}" /></p>
     </div>
     </form>
-{% endif %}
 {% endif %}
 {% endblock %}
