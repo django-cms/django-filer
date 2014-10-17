@@ -1,0 +1,55 @@
+{% load url from future %}
+{% load i18n filermedia %}
+{% if requirements_only == 'yes' %}
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.11.1.min.js"></script>
+<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.fancytree-all.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/ui.fancytree.min.css" />
+{% else %}
+<p>
+<label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
+<span id="destination-name">Select a folder below.</span>
+<input type='hidden' name="destination" id="destination" value=''/>
+</p>
+<div id="destination-tree"></div>
+<script type="text/javascript">
+$( document ).ready(function() {
+    var fetchDestinations = function(parent){
+        return $.ajax({
+            url: "{% url 'admin:filer-destination_folders' %}",
+            data: {
+                selected_folders: JSON.stringify([{% for f in folders_queryset %}{{f.pk}} {% if not forloop.last %},{% endif %}{% endfor %}]),
+                parent: parent || null,
+                current_folder: {{instance.pk|default:'null'}}
+            },
+            complete: function(){
+                var children = $('#destination-tree').fancytree("getTree").getRootNode().getChildren() || [];
+                if(children.length == 0){
+                    $('form').html("{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}");
+                }
+            },
+            cache: false
+        });
+    }
+    $('#destination-tree').fancytree({
+        source: fetchDestinations(),
+        checkbox: true,
+        selectMode: 1,
+        lazyLoad: function(event, data){
+            data.result = fetchDestinations(data.node.key);
+        },
+        activate: function(event, data) {
+            data.node.toggleSelected();
+        },
+        select: function(event, data) {
+            var path = $.map(
+                data.node.getParentList(),
+                function(el){return "/" + el.title;}
+            ).join('') + "/" + data.node.title;
+            $('#destination').val(data.node.key);
+            $('#destination-name').text(path);
+        }
+    });
+});
+</script>
+{% endif %}

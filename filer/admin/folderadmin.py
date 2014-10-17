@@ -794,7 +794,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
 
         def _valid_candidates(request, folders_qs):
-            # don't show orphaned/core/shared/restricted or selected folders
+            # exclude orphaned/core/shared/restricted or any selected folders
             return folders_available(request, folders_qs) \
                 .valid_destinations(request.user) \
                 .unrestricted(request.user) \
