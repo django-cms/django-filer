@@ -793,25 +793,25 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if not all_required:
             raise PermissionDenied
 
-        def _valid_candidates(request, folders_qs):
+        def _valid_candidates(request, candidates_qs, selected):
             # exclude orphaned/core/shared/restricted or any selected folders
-            return folders_available(request, folders_qs) \
+            return folders_available(request, candidates_qs) \
                 .valid_destinations(request.user) \
                 .unrestricted(request.user) \
-                .exclude(id__in=selected_ids)
+                .exclude(id__in=selected)
 
         current_folder = self._as_folder(request.GET, 'current_folder')
         parent = self._as_folder(request.GET, 'parent')
         selected_ids = filter(
             None,
             map(lambda f_id: f_id or None,
-                json.loads(request.GET.get('selected_folders') or ''))
+                json.loads(request.GET.get('selected_folders') or '[]'))
         )
         candidates = Folder.objects.filter(parent=parent)
         fancytree_candidates = []
-        for folder in _valid_candidates(request, candidates):
+        for folder in _valid_candidates(request, candidates, selected_ids):
             has_children = _valid_candidates(
-                request, Folder.objects.filter(parent=folder)
+                request, Folder.objects.filter(parent=folder), selected_ids
             ).exists()
             # don't allow move/copy files&folders to itself
             disabled = current_folder and current_folder.pk == folder.pk
