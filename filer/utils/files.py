@@ -103,7 +103,7 @@ def handle_upload(request):
 if sys.version_info < (3, ):
     def slugify(string):
         return slugify_django(unidecode(unicode(string)))
-else
+else:
     def slugify(string):
         return slugify_django(unidecode(string))
 
