@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 import os
 from django.utils.text import get_valid_filename as get_valid_filename_django
-from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify as slugify_django
 from django.http.multipartparser import ChunkIter, exhaust, \
     StopFutureHandlers, SkipFile, StopUpload
-
+from unihandecode import unidecode
 
 class UploadException(Exception):
     pass
@@ -99,6 +99,9 @@ def handle_upload(request):
             raise UploadException("AJAX request not valid: Bad Upload")
     return upload, filename, is_raw
 
+
+def slugify(string):
+    return slugify_django(unidecode(unicode(string)))
 
 def get_valid_filename(s):
     """

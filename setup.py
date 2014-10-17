@@ -29,6 +29,7 @@ setup(
         'easy-thumbnails>=1.0',
         'django-mptt==0.5.2,==0.6,==0.6.1',
         'django_polymorphic>=0.2',
+        'Unihandecode>=0.40',
     ),
     include_package_data=True,
     zip_safe=False,
