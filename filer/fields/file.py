@@ -97,7 +97,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        super(AdminFileFormField, self).__init__(self, widget=self.widget(rel, site), *args, **kwargs)
+        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
