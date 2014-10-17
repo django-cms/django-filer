@@ -6,7 +6,7 @@ from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify as slugify_django
 from django.http.multipartparser import ChunkIter, exhaust, \
     StopFutureHandlers, SkipFile, StopUpload
-from unihandecode import unidecode
+from unidecode import unidecode
 
 class UploadException(Exception):
     pass
