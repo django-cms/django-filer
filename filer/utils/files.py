@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import os
+import os, sys
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify as slugify_django
 from django.http.multipartparser import ChunkIter, exhaust, \
@@ -100,8 +100,12 @@ def handle_upload(request):
     return upload, filename, is_raw
 
 
-def slugify(string):
-    return slugify_django(unidecode(unicode(string)))
+if sys.version_info < (3, ):
+    def slugify(string):
+        return slugify_django(unidecode(unicode(string)))
+else
+    def slugify(string):
+        return slugify_django(unidecode(string))
 
 def get_valid_filename(s):
     """
