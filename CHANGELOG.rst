@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 77bf2d1 (21.10.2014, 11:16 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Switch the import order to avoid a circular dependcy in case filer.models is imported before filer.fields.image
+
 Revision 2606d5f (30.09.2014, 13:35 UTC)
 ----------------------------------------
 
