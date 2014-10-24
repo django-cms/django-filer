@@ -178,3 +178,30 @@ You might want to extend this, so that the list includes the apprpriate informat
         file_type = 'Video'
         
 Note that if you do this, you *will* need to override the template - otherwise your items will fail to display in the folder lists.
+
+Overriding the Directory Listing Search
+---------------------------------------
+
+By default, filer will search against ``name`` for :py:class:`Folders
+<filer.models.foldermodels.Folder>` and ``name``, ``description``, and
+``original_filename`` for :py:class:`Files <filer.models.filemodels.File>`, in
+addition to searching against the owner.  If you are using ``auth.User`` as
+your User model, filer will search against the ``username``, ``first_name``,
+``last_name``, ``email`` fields.  If you are using a custom User model, filer
+will search against all fields that are CharFields except for the password
+field.  You can override this behavior by subclassing the
+:py:class:`filer.admin.folderadmin.FolderAdmin` class and overriding the
+:py:attr:`~filer.admin.FolderAdmin.owner_search_fields` property.
+
+.. code-block:: python
+
+    # in an admin.py file
+    from django.contrib import admin
+    from filer.admin import FolderAdmin
+    from filer.models import Folder
+
+    class MyFolderAdmin(FolderAdmin):
+        owner_search_fields = ['field1', 'field2']
+
+    admin.site.unregister(Folder)
+    admin.site.register(Folder, FolderAdmin)

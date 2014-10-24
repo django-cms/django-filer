@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-from filer.test_utils.cli import configure
-from filer.test_utils.tmpdir import temp_dir
 import argparse
 import sys
 import warnings
+from filer.test_utils.cli import configure
+from filer.test_utils.tmpdir import temp_dir
 
 
 def main(verbosity=1, failfast=False, test_labels=None, migrate=False):

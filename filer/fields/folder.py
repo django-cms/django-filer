@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.template.loader import render_to_string
 import inspect
+import warnings
 from django import forms
 from django.conf import settings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
@@ -89,6 +90,7 @@ class AdminFolderFormField(forms.ModelChoiceField):
     def __init__(self, rel, queryset, to_field_name, *args, **kwargs):
         self.rel = rel
         self.queryset = queryset
+        self.limit_choices_to = kwargs.pop('limit_choices_to', None)
         self.to_field_name = to_field_name
         self.max_value = None
         self.min_value = None
@@ -105,7 +107,15 @@ class FilerFolderField(models.ForeignKey):
     default_model_class = Folder
 
     def __init__(self, **kwargs):
-        return super(FilerFolderField, self).__init__(Folder, **kwargs)
+        # We hard-code the `to` argument for ForeignKey.__init__
+        if "to" in kwargs.keys():
+            old_to = kwargs.pop("to")
+            msg = "%s can only be a ForeignKey to %s; %s passed" % (
+                self.__class__.__name__, self.default_model_class.__name__, old_to
+            )
+            warnings.warn(msg, SyntaxWarning)
+        kwargs['to'] = self.default_model_class
+        return super(FilerFolderField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults

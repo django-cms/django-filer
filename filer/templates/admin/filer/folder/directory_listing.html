@@ -6,7 +6,6 @@
 {# upload stuff #}
 {{ media.js }}
 <script type="text/javascript" src="{% admin_js_base %}jquery.min.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
 <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
@@ -63,12 +62,16 @@
 {% block content_title %}<h2>&nbsp;</h2>{% endblock %}
 {% block content %}
 <div id="content-main">
-    <ul class="object-tools">
-        {% if folder.can_have_subfolders %}{% if can_make_folder %}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a>{% endif %}{% endif %}</li>
-        <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
-        {% include 'admin/filer/tools/upload_button_js.html' %}
-    </ul>
-    
+    {% block object-tools %}
+        <ul class="object-tools">
+            {% block object-tools-items %}
+                {% if folder.can_have_subfolders %}{% if can_make_folder %}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a>{% endif %}{% endif %}</li>
+                <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
+                {% include 'admin/filer/tools/upload_button_js.html' %}
+            {% endblock %}
+        </ul>
+    {% endblock %}
+
     <div class="module" id="changelist">
         {% include "admin/filer/tools/search_form.html" %}
         {% if not folder.is_root %}

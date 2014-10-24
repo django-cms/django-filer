@@ -96,8 +96,8 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.to_field_name = to_field_name
         self.max_value = None
         self.min_value = None
-        other_widget = kwargs.pop('widget', None)
-        forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
+        kwargs.pop('widget', None)
+        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -109,14 +109,15 @@ class FilerFileField(models.ForeignKey):
     default_model_class = File
 
     def __init__(self, **kwargs):
-        # we call ForeignKey.__init__ with the Image model as parameter...
-        # a FilerImageField can only be a ForeignKey to a Image
+        # We hard-code the `to` argument for ForeignKey.__init__
         if "to" in kwargs.keys():
-            kwargs.pop("to")
-            warnings.warn("FilerImageField can only be a ForeignKey to a Image;"
-                          "%s passed" % kwargs['to'], SyntaxWarning)
-        return super(FilerFileField, self).__init__(self.default_model_class,
-                                                    **kwargs)
+            old_to = kwargs.pop("to")
+            msg = "%s can only be a ForeignKey to %s; %s passed" % (
+                self.__class__.__name__, self.default_model_class.__name__, old_to
+            )
+            warnings.warn(msg, SyntaxWarning)
+        kwargs['to'] = self.default_model_class
+        return super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
