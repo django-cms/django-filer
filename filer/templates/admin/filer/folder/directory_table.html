@@ -52,7 +52,7 @@
                     <input type="submit" name="move-to-clipboard-{{ file.id|unlocalize }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files or not item_perms.change %} style="color: gray;" disabled="disabled"{% endif %} />
                 </td>
             </tr>
-            {% endif %}
+            {% endwith %}
         {% endfor %}
         {% if not folder.is_root %}{% ifequal folder.item_count 0 %}
         <tr class="{% cycle rowcolors %}">
