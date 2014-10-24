@@ -31,8 +31,7 @@
                 </td>
                 <td></td>
             </tr>
-            {% endwith %}{% endif %}
-            {% with item as file %}
+            {% endwith %}{% else %}{% with item as file %}
             <tr class="{% cycle rowcolors %}">
                 <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% else %}{% if action_form and not is_popup %}<input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
                 <!-- FileIcon -->
@@ -52,7 +51,7 @@
                     <input type="submit" name="move-to-clipboard-{{ file.id|unlocalize }}" value="&rarr;" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files or not item_perms.change %} style="color: gray;" disabled="disabled"{% endif %} />
                 </td>
             </tr>
-            {% endwith %}
+            {% endwith %}{% endif %}
         {% endfor %}
         {% if not folder.is_root %}{% ifequal folder.item_count 0 %}
         <tr class="{% cycle rowcolors %}">
