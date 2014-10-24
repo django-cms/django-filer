@@ -365,6 +365,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
+
         return render_to_response(
             'admin/filer/folder/directory_listing.html',
             {
