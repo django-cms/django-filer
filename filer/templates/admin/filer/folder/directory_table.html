@@ -31,8 +31,7 @@
                 </td>
                 <td></td>
             </tr>
-            {% endwith %}{% endif %}
-            {% if item.file_type == 'File' or item.file_type == 'Image' %}{% with item as file %}
+            {% endwith %}{% else %}{% with item as file %}
             <tr class="{% cycle rowcolors %}">
                 <td>{% if is_popup and not select_folder %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>{% else %}{% if action_form and not is_popup %}<input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action" />{% endif %}{% endif %}</td>
                 <!-- FileIcon -->
