@@ -6,7 +6,9 @@ Extending Django Filer
 Django Filer ships with support for image files, and generic files (everything
 that's not an image).
 
-So what if you wanted to add support for a particular kind of file thats's not already included? It's easy to extend it to do this, without needing to touch the Filer's code at all (and no-one wants to have to maintain fork if they can avoid it).
+So what if you wanted to add support for a particular kind of file thats's not already included?
+It's easy to extend it to do this, without needing to touch the Filer's code at all
+(and no-one wants to have to maintain fork if they can avoid it).
 
 So for example, you might want to be able to manage video files. You could of
 course simply store and file them as generic file types, but that might not be
@@ -14,7 +16,7 @@ enough - perhaps your own application needs to know that certain files are in
 fact video files, so that it can treat them appropriately (process them, allow
 only them to be selected in certain widgets, and so on).
 
-In this example we will create suport for video files.
+In this example we will create support for video files.
 
 The model
 ---------
@@ -168,9 +170,11 @@ Other things you could add
 Admin templating
 ................
 
-``filer/templates/templates/admin/filer/folder`` lists the individual items in each folder. It checks ``item.file_type`` to determine how to display those items and what to display for them. 
+``filer/templates/templates/admin/filer/folder`` lists the individual items in each folder.
+It checks ``item.file_type`` to determine how to display those items and what to display for them.
 
-You might want to extend this, so that the list includes the apprpriate information for your new file type. In that case you will need to override the template, and in the ``Video`` model:
+You might want to extend this, so that the list includes the appropriate information for your new file type.
+In that case you will need to override the template, and in the ``Video`` model:
 
 .. code-block:: python
 
@@ -205,3 +209,80 @@ field.  You can override this behavior by subclassing the
 
     admin.site.unregister(Folder)
     admin.site.register(Folder, FolderAdmin)
+
+Providing custom Image model
+----------------------------
+
+As the ``Image`` model is special, a different way to implement custom Image model is required.
+
+Defining the model
+..................
+
+First a custom model must be defined; it should inherit from BaseImage, the basic abstract class:
+
+.. code-block:: python
+
+    from filer.models.abstract.BaseImage
+
+    class CustomImage(BaseImage):
+        my_field = models.CharField(max_length=10)
+
+        class Meta:
+            # You must define a meta even an empty one) to make your
+            # model concrete
+            pass
+
+The model can be defined in any installed application declared **after** ``django-filer``.
+
+``BaseImage`` defines the following fields (plus the basic fields defined in ``File``):
+
+ * default_alt_text
+ * default_caption
+ * subject_location
+
+you may add whatever fields you need, just like any other model.
+
+
+Customize the admin
+...................
+
+If you added fields in your custom Image model, you have to customize the admin too:
+
+
+.. code-block:: python
+
+    from django.contrib import admin
+    from filer.admin.imageadmin import ImageAdmin
+    from filer.models.imagemodels import Image
+
+    class CustomImageAdmin(ImageAdmin):
+        # your custom code
+        pass
+
+    # Using build_fieldsets allows to easily integrate common field in the admin
+    # Don't define fieldsets in the ModelAdmin above and add the custom fields
+    # to the ``extra_main_fields`` or ``extra_fieldsets`` as shown below
+    CustomImageAdmin.fieldsets = CustomImageAdmin.build_fieldsets(
+        extra_main_fields=('default_alt_text', 'default_caption', 'my_field'...),
+        extra_fieldsets=(
+            ('Subject Location', {
+                'fields': ('subject_location',),
+                'classes': ('collapse',),
+            }),
+        )
+    )
+
+    # Unregister the default admin
+    admin.site.unregister(ImageAdmin)
+    # Register your own
+    admin.site.register(Image, CustomImageAdmin)
+
+Swap the Image model
+....................
+
+Set ``FILER_IMAGE_MODEL`` to the dotted path of your custom model:
+
+
+.. code-block:: python
+
+    FILER_IMAGE_MODEL = 'my.app.models.CustomImage'

@@ -69,6 +69,8 @@ def configure(**extra):
         extra['MIGRATION_MODULES'] = {
             'filer': 'filer.migrations_django',
         }
+    if extra.get('FILER_IMAGE_MODEL', False):
+        defaults['INSTALLED_APPS'].append('filer.test_utils.custom_image')
 
     defaults.update(extra)
     settings.configure(**defaults)
