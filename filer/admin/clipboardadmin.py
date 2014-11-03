@@ -67,8 +67,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                 #TODO: What if there are more than one that qualify?
                 if FileSubClass.matches_file_type(filename, upload, request):
                     FileForm = modelform_factory(
-                        model = FileSubClass,
-                        fields = ('original_filename', 'owner', 'file')
+                        model=FileSubClass,
+                        fields=('original_filename', 'owner', 'file')
                     )
                     break
             uploadform = FileForm({'original_filename': filename,
@@ -80,7 +80,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
                 file_obj.save()
                 clipboard_item = ClipboardItem(
-                                    clipboard=clipboard, file=file_obj)
+                    clipboard=clipboard, file=file_obj)
                 clipboard_item.save()
                 json_response = {
                     'thumbnail': file_obj.icons['32'],

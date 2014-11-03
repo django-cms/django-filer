@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
 from django.contrib.admin import helpers
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -13,6 +14,7 @@ from filer.models.imagemodels import Image
 from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
 from filer.models import tools
+from filer.admin.folderadmin import FolderAdmin
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, SettingsOverride)
 from filer import settings as filer_settings
@@ -513,3 +515,30 @@ class FolderListingTest(TestCase):
                 set(folder.pk for folder, folder_perms in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
+
+    def test_search_against_owner(self):
+        url = reverse('admin:filer-directory_listing',
+                      kwargs={'folder_id': self.parent.id})
+
+        response = self.client.get(url, {'q': 'joe'})
+        item_list = response.context['paginated_items'].object_list
+        self.assertEqual(len(item_list), 1)
+
+        response = self.client.get(url, {'q': 'admin'})
+        item_list = response.context['paginated_items'].object_list
+        self.assertEqual(len(item_list), 4)
+
+    def test_owner_search_fields(self):
+        folderadmin = FolderAdmin(Folder, admin.site)
+        self.assertEqual(folderadmin.owner_search_fields, ['username', 'first_name', 'last_name', 'email'])
+
+        folder_qs = folderadmin.filter_folder(Folder.objects.all(), ['joe@mata.com'])
+        self.assertEqual(len(folder_qs), 1)
+
+        class DontSearchOwnerEmailFolderAdmin(FolderAdmin):
+            owner_search_fields = ['username', 'first_name', 'last_name']
+
+        folderadmin = DontSearchOwnerEmailFolderAdmin(Folder, admin.site)
+
+        folder_qs = folderadmin.filter_folder(Folder.objects.all(), ['joe@mata.com'])
+        self.assertEqual(len(folder_qs), 0)

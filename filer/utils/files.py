@@ -1,11 +1,12 @@
 #-*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import os
+import os, sys
 from django.utils.text import get_valid_filename as get_valid_filename_django
-from django.template.defaultfilters import slugify
-from django.core.files.uploadedfile import SimpleUploadedFile
-
+from django.template.defaultfilters import slugify as slugify_django
+from django.http.multipartparser import ChunkIter, exhaust, \
+    StopFutureHandlers, SkipFile, StopUpload
+from unidecode import unidecode
 
 class UploadException(Exception):
     pass
@@ -18,7 +19,72 @@ def handle_upload(request):
         # the file is stored raw in the request
         is_raw = True
         filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
-        upload = SimpleUploadedFile(name=filename, content=request.body)
+
+        try:
+            content_length = int(request.META['CONTENT_LENGTH'])
+        except (IndexError, TypeError, ValueError):
+            content_length = None
+
+        if content_length < 0:
+            # This means we shouldn't continue...raise an error.
+            raise UploadException("Invalid content length: %r" % content_length)
+
+        upload_handlers = request.upload_handlers
+        for handler in upload_handlers:
+            handler.handle_raw_input(request,
+                                     request.META,
+                                     content_length,
+                                     None,
+                                     None)
+            pass
+
+        # For compatibility with low-level network APIs (with 32-bit integers),
+        # the chunk size should be < 2^31, but still divisible by 4.
+        possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
+        chunk_size = min([2 ** 31 - 4] + possible_sizes)
+
+        stream = ChunkIter(request, chunk_size)
+        counters = [0] * len(upload_handlers)
+
+        try:
+            for handler in upload_handlers:
+                try:
+                    handler.new_file(None, filename,
+                                     None, content_length, None)
+                except StopFutureHandlers:
+                    break
+
+            for chunk in stream:
+                for i, handler in enumerate(upload_handlers):
+                    chunk_length = len(chunk)
+                    chunk = handler.receive_data_chunk(chunk,
+                                                       counters[i])
+                    counters[i] += chunk_length
+                    if chunk is None:
+                        # If the chunk received by the handler is None, then don't continue.
+                        break
+
+        except SkipFile:
+            # Just use up the rest of this file...
+            exhaust(stream)
+        except StopUpload as e:
+            if not e.connection_reset:
+                exhaust(request)
+        else:
+            # Make sure that the request data is all fed
+            exhaust(request)
+
+        # Signal that the upload has completed.
+        for handler in upload_handlers:
+            retval = handler.upload_complete()
+            if retval:
+                break
+
+        for i, handler in enumerate(upload_handlers):
+            file_obj = handler.file_complete(counters[i])
+            if file_obj:
+                upload = file_obj
+                break
     else:
         if len(request.FILES) == 1:
             # FILES is a dictionary in Django but Ajax Upload gives the uploaded file an
@@ -33,6 +99,13 @@ def handle_upload(request):
             raise UploadException("AJAX request not valid: Bad Upload")
     return upload, filename, is_raw
 
+
+if sys.version_info < (3, ):
+    def slugify(string):
+        return slugify_django(unidecode(unicode(string)))
+else:
+    def slugify(string):
+        return slugify_django(unidecode(string))
 
 def get_valid_filename(s):
     """

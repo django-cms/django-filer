@@ -202,4 +202,24 @@ class FilerApiTests(TestCase):
         self.assertEqual(child.quoted_logical_path,
                          '/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
 
+    def test_custom_model(self):
+        """
+        Check that the correct model is loaded and save / reload data
+        """
+        image = self.create_filer_image()
+        if settings.FILER_IMAGE_MODEL:
+            self.assertTrue(hasattr(image, 'extra_description'))
+            self.assertFalse(hasattr(image, 'author'))
+            image.extra_description = 'Extra'
+            image.save()
 
+            reloaded = Image.objects.get(pk=image.pk)
+            self.assertEqual(reloaded.extra_description, image.extra_description)
+        else:
+            self.assertFalse(hasattr(image, 'extra_description'))
+            self.assertTrue(hasattr(image, 'author'))
+            image.author = 'Me'
+            image.save()
+
+            reloaded = Image.objects.get(pk=image.pk)
+            self.assertEqual(reloaded.author, image.author)

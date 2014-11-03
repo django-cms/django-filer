@@ -1,6 +1,12 @@
 Changelog for django-filer
 ==========================
 
+0.9.8 (2014-11-03)
+------------------
+
+* experimental Django 1.7 support
+* bugfixes
+
 
 0.9.7 (2014-07-22)
 ------------------
