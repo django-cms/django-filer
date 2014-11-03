@@ -282,7 +282,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
-        file_qs = file_qs.order_by('name')
+        order_by = request.GET.get('order_by', None)
+        if order_by is not None:
+            order_by = order_by.split(',')
+            file_qs = file_qs.order_by(*order_by)
 
         folder_children = []
         folder_files = []
@@ -311,7 +314,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:
             permissions = {}
-        folder_files.sort()
+
+        if order_by is None:
+            folder_files.sort()
+        
         items = folder_children + folder_files
         items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
         paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
