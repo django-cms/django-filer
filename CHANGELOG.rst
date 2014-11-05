@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision d7f700c (05.11.2014, 16:58 UTC)
+----------------------------------------
+
+* LUN-1934
+
+  * fixed circular import reproducible when DEBUG is False * this happend while running management command from other apps that depend on filer.
+
+No other commits.
+
 Revision 77bf2d1 (21.10.2014, 11:16 UTC)
 ----------------------------------------
 
