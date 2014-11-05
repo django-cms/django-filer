@@ -2,7 +2,6 @@ import datetime
 import os
 import filer
 
-import filer.models.clipboardmodels
 from filer.utils.files import get_valid_filename
 
 from django.core.files.uploadedfile import UploadedFile
@@ -43,8 +42,9 @@ def _goes_to_clipboard(instance):
 
 def by_path(instance, filename):
     if _goes_to_clipboard(instance):
+        from filer.models import Clipboard
         return os.path.join(
-            filer.models.clipboardmodels.Clipboard.folder_name,
+            Clipboard.folder_name,
             instance.owner.username if instance.owner else '_missing_owner',
             filename)
     else:
