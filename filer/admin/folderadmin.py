@@ -68,6 +68,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
+                            'uploaded_at', 'modified_at')
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -285,6 +287,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         order_by = request.GET.get('order_by', None)
         if order_by is not None:
             order_by = order_by.split(',')
+            order_by = [field for field in order_by
+                        if field.replace('-', '') in self.order_by_file_fields]
             file_qs = file_qs.order_by(*order_by)
 
         folder_children = []
