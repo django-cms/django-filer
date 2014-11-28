@@ -84,7 +84,10 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media:
-        js = (filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
+        js = (
+            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',
+            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/widget.js',
+        )
 
 
 class AdminFileFormField(forms.ModelChoiceField):
