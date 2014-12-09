@@ -45,7 +45,7 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False, zoom=
     subject_location = normalize_subject_location(subject_location)
     if not (subject_location and crop):
         # use the normal scale_and_crop
-        return processors.scale_and_crop(im, size, crop=crop,
+        return processors.scale_and_crop(im, size, zoom=zoom, crop=crop,
                                          upscale=upscale, **kwargs)
 
     # for here on we have a subject_location and cropping is on
