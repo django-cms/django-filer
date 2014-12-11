@@ -1,11 +1,16 @@
 language: python
+
 python:
   - 2.6
   - 2.7
   - 3.3
   - 3.4
+
+sudo: false
+
 install:
   - ./.travis_setup
+
 env:
   - DJANGO="Django>=1.4,<1.5" EASY_THUMBNAILS="easy-thumbnails>=1.2,<2.0"
   - DJANGO="Django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
@@ -14,10 +19,13 @@ env:
   - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
+
 script: coverage run --rcfile=coverage.rc setup.py test
+
 after_success:
   - coveralls --config_file=coverage.rc
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
+
 matrix:
   exclude:
     - python: 2.6
