@@ -1,2 +1,2 @@
 #!/bin/bash
-pip install $DJANGO Pillow $EASY_THUMBNAILS $POLYMORPHIC $MPTT python-coveralls coverage south
+pip install djangocms-helper==0.5.0.b2 unidecode $DJANGO Pillow $EASY_THUMBNAILS django-polymorphic $MPTT python-coveralls coverage south

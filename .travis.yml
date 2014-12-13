@@ -16,12 +16,12 @@ env:
   - DJANGO="Django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0"
-  - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
+  - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
 
-script: coverage run --rcfile=coverage.rc setup.py test
+script: coverage run --rcfile=coverage.rc `which djangocms-helper` filer test
 
 after_success:
   - coveralls --config_file=coverage.rc

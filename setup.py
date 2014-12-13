@@ -24,7 +24,6 @@ setup(
     author_email = 'stefan@foulis.ch',
     packages=find_packages(),
     install_requires = (
-        # 'Django>=1.4,<1.5',  # no need to limit while in development
         'Django>=1.4',
         'easy-thumbnails>=1.0',
         'django-mptt>=0.6,<0.6.2',
@@ -46,7 +45,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
-    test_suite='runtests.main',
+    test_suite='cms_helper.run',
     tests_require=(
         'argparse',  # needed on python 2.6
         'south',
