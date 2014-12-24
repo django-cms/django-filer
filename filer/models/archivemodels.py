@@ -81,7 +81,8 @@ class Archive(File):
         else:
             cwd_path = cwd.pretty_logical_path + os.sep
             filer_paths = cwd.pretty_path_entries()
-        zip_paths = [cwd_path + x.rstrip(os.sep).decode('utf8')
+
+        zip_paths = [cwd_path + to_unicode(x).rstrip(os.sep)
                      for x in zippy.namelist()]
         file_set = set(filer_paths)
         intersection = [x for x in zip_paths if x in file_set]
@@ -96,7 +97,7 @@ class Archive(File):
         zippy = zipfile.ZipFile(filer_file)
         entries = zippy.infolist()
         for entry in entries:
-            full_path = entry.filename.decode('utf8')
+            full_path = to_unicode(entry.filename)
             filename = os.path.basename(full_path)
             parent_dir = self._create_parent_folders(full_path)
             if filename:
@@ -169,3 +170,9 @@ class Archive(File):
         app_label = 'filer'
         verbose_name = _('archive')
         verbose_name_plural = _('archives')
+
+
+def to_unicode(x):  # expects str or unicode
+    if isinstance(x, unicode):
+        return x
+    return x.decode('utf8')
