@@ -925,6 +925,11 @@ class FolderAdmin(FolderPermissionModelAdmin):
             f.extract()
             message = success_format.format(f.actual_name)
             self.message_user(request, _(message))
+            for err_msg in f.extract_errors:
+                messages.warning(
+                    request,
+                    _("%s: %s" % (f.actual_name, err_msg))
+                )
 
     extract_files.short_description = ugettext_lazy(
         "Extract selected zip files")
