@@ -3,14 +3,22 @@ Archiving support for filer.
 """
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
+from filer.models.imagemodels import Image as FilerImage
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
 from django.db.models import Q
 from filer.settings import FILER_IS_PUBLIC_DEFAULT
 from filer.utils.files import matching_file_subtypes
-
 import os.path
 import zipfile
+
+try:
+    from PIL import Image as PILImage
+except ImportError:
+    try:
+        import Image as PILImage
+    except ImportError:
+        raise ImportError("The Python Imaging Library was not found.")
 
 
 class Archive(File):
@@ -23,6 +31,10 @@ class Archive(File):
     _icon = 'archive'
     _filename_extensions = ['.zip', ]
 
+    def __init__(self, *args, **kwargs):
+        super(Archive, self).__init__(*args, **kwargs)
+        self.extract_errors = []
+
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
         """Checks if the file has an archive type extension."""
@@ -33,6 +45,7 @@ class Archive(File):
         """Extracts the archive files' contents."""
         self.bypass_owner = bypass_owner
         self.file.open()
+        self.extract_errors = []
         try:
             self._extract_zip(self.file)
         finally:
@@ -130,13 +143,25 @@ class Archive(File):
         attrs['owner'] = self.owner
         return Folder.objects.create(**attrs)
 
+    def _is_valid_image(self, content_file):
+        try:
+            PILImage.open(content_file)
+        except (IOError, ):
+            self.extract_errors.append(
+                "%s is not a valid image." % content_file.name)
+        else:
+            return True
+        return False
+
     def _create_file(self, basename, folder, data):
         """Helper wrapper of creating a filer file."""
         file_data = ContentFile(data)
         file_data.name = basename
         matched_file_types = matching_file_subtypes(basename, None, None)
         FileSubClass = matched_file_types[0]
-        file_manager = FileSubClass.objects
+        if (FileSubClass is FilerImage and
+                not self._is_valid_image(file_data)):
+            return
 
         actual_name_query = (Q(original_filename=basename) & (
             Q(name__isnull=True) | Q(name__exact=''))) | Q(name=basename)
@@ -146,6 +171,7 @@ class Archive(File):
         if getattr(self, 'bypass_owner', False) is False:
             search_query &= Q(owner=self.owner)
 
+        file_manager = FileSubClass.objects
         existing = file_manager.filter(search_query)
         file_object = None
         if existing:
