@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+from django.db import models, migrations, connection
 from filer.settings import FILER_IMAGE_MODEL
 
 
@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = []
-    if not FILER_IMAGE_MODEL:
+    if not FILER_IMAGE_MODEL and 'filer_image' not in connection.introspection.table_names():
         operations.append(
             migrations.CreateModel(
                 name='Image',
