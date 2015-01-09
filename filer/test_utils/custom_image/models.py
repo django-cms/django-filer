@@ -8,4 +8,4 @@ class Image(BaseImage):
     extra_description = models.TextField()
 
     class Meta:
-        pass
+        app_label = 'custom_image'
