@@ -3,6 +3,7 @@ source = filer
 branch = True
 omit =
     filer/migrations/*
+    filer/migrations_django/*
     filer/tests/*
     filer/test_utils/*
 
