@@ -13,6 +13,7 @@ HELPER_SETTINGS = {
         'easy_thumbnails',
         'mptt',
         'filer',
+        'filer.test_utils.test_app',
     ],
     'LANGUAGE_CODE': 'en',
     'LANGUAGES': (
@@ -62,9 +63,8 @@ if os.environ.get('CUSTOM_IMAGE', False):
 
 
 def run():
-    from collections import defaultdict
-    from djangocms_helper import main
-    args = defaultdict(str)
-    args['<application>'] = 'filer'
-    args['test'] = True
-    main.core(args=args, application='filer')
+    from djangocms_helper import runner
+    runner.run('filer')
+
+if __name__ == "__main__":
+    run()
