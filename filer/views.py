@@ -143,9 +143,9 @@ def paste_clipboard_to_folder(request):
             tools.discard_clipboard(clipboard)
         else:
             raise PermissionDenied
-    return HttpResponseRedirect('%s%s%s' % (
+    return HttpResponseRedirect('%s?order_by=-modified_at%s%s' % (
                                 request.REQUEST.get('redirect_to', ''),
-                                popup_param(request),
+                                popup_param(request, separator='&'),
                                 selectfolder_param(request)))
 
 
