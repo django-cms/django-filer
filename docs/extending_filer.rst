@@ -228,9 +228,8 @@ First a custom model must be defined; it should inherit from BaseImage, the basi
         my_field = models.CharField(max_length=10)
 
         class Meta:
-            # You must define a meta even an empty one) to make your
-            # model concrete
-            pass
+            # You must define a meta with en explicit app_label
+            app_label = 'myapp'
 
 The model can be defined in any installed application declared **after** ``django-filer``.
 
@@ -241,6 +240,8 @@ The model can be defined in any installed application declared **after** ``djang
  * subject_location
 
 you may add whatever fields you need, just like any other model.
+
+..warning: ``app_label`` in ``Meta`` must be explicitly defined.
 
 
 Customize the admin

@@ -1,0 +1,8 @@
+{% extends "admin/filer/base_site.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript">
+opener.dismissPopupAndReload(window);
+</script>
+{% endblock %}
