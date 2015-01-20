@@ -9,6 +9,16 @@ next
 * ...
 
 
+0.9.9 (2015-01-20)
+------------------
+
+* Fixes in Django 1.7 support
+* Implement PEP440 compliant 
+* Add author to admin
+* Allow customizing dismiss popup
+* Add order_by parameter in directory listing
+
+
 0.9.8 (2014-11-03)
 ------------------
 
