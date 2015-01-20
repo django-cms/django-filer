@@ -18,6 +18,7 @@ env:
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
+  - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
 
 script: coverage run --rcfile=coverage.rc setup.py test
@@ -30,6 +31,8 @@ matrix:
   exclude:
     - python: 2.6
       env: DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
+    - python: 2.6
+      env: DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
     - python: 2.6
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 3.3
