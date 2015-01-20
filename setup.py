@@ -27,7 +27,7 @@ setup(
         # 'Django>=1.4,<1.5',  # no need to limit while in development
         'Django>=1.4',
         'easy-thumbnails>=1.0',
-        'django-mptt==0.5.2,==0.6,==0.6.1',
+        'django-mptt>=0.6,<0.6.2',
         'django_polymorphic>=0.2',
         'Unidecode>=0.04',
     ),

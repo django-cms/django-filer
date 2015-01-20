@@ -44,6 +44,7 @@ from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
 import os
+import re
 import itertools
 
 
@@ -68,6 +69,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
+                            'uploaded_at', 'modified_at')
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -282,7 +285,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
-        file_qs = file_qs.order_by('name')
+        order_by = request.GET.get('order_by', None)
+        if order_by is not None:
+            order_by = order_by.split(',')
+            order_by = [field for field in order_by
+                        if re.sub(r'^-', '', field) in self.order_by_file_fields]
+            if len(order_by) > 0:
+                file_qs = file_qs.order_by(*order_by)
 
         folder_children = []
         folder_files = []
@@ -311,7 +320,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:
             permissions = {}
-        folder_files.sort()
+
+        if order_by is None or len(order_by) == 0:
+            folder_files.sort()
+        
         items = folder_children + folder_files
         items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
         paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
