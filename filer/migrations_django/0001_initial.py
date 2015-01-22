@@ -13,7 +13,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('auth', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        migrations.swappable_dependency(FILER_IMAGE_MODEL or 'filer.models.imagemodels.Image'),
         ('contenttypes', '0001_initial'),
     ]
 
