@@ -50,9 +50,9 @@ Add ``"filer"``, ``"mptt"`` and ``"easy_thumbnails"`` to your project's ``INSTAL
 
 See the docs for advanced configuration:
 
-  * `subject location docs`_
-  * `permission docs`_ (experimental)
-  * `secure file downloads docs`_ (experimental)
+* `subject location docs`_
+* `permission docs`_ (experimental)
+* `secure file downloads docs`_ (experimental)
 
 Django 1.7
 ----------
