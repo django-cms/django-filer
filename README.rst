@@ -59,7 +59,7 @@ Django 1.7
 
 Django 1.7 is supported together with the new migrations.
 To avoid disrupting user experience the new migrations are installed in `filer.migrations_django`.
-If you are going to deploy `filer` in a Django 1.7 project you are required to add the following configuration:
+If you are going to deploy `filer` in a Django 1.7 project you are required to add the following configuration::
 
     MIGRATION_MODULES = {
             'filer': 'filer.migrations_django',
