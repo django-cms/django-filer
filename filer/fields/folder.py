@@ -18,6 +18,7 @@ from filer.settings import FILER_STATICMEDIA_PREFIX
 class AdminFolderWidget(ForeignKeyRawIdWidget):
     choices = None
     input_type = 'hidden'
+    is_hidden = False
 
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
