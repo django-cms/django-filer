@@ -113,7 +113,7 @@ class FilerFileField(models.ForeignKey):
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
-        if "to" in kwargs.keys():
+        if "to" in kwargs.keys():  # pragma: no cover
             old_to = kwargs.pop("to")
             dfl = "%s.%s" % (
                     self.default_model_class._meta.app_label,
