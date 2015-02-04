@@ -5,8 +5,8 @@ from filer.fields.image import FilerImageField
 from filer.fields.file import FilerFileField
 
 
-class TestModel(models.Model):
+class MyModel(models.Model):
 
-    file = FilerFileField(related_name='test_file')
+    general = FilerFileField(related_name='test_file')
     image = FilerImageField(related_name='test_image')
     folder = FilerFolderField(related_name='test_folder')

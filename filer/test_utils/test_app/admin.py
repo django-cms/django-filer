@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import TestModel
+from .models import MyModel
 
 
-class TestModelAdmin(admin.ModelAdmin):
-    pass
+class MyModelAdmin(admin.ModelAdmin):
+    model = MyModel
 
-admin.site.register(TestModel, TestModelAdmin)
+admin.site.register(MyModel, MyModelAdmin)
