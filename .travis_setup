@@ -1,2 +1,2 @@
 #!/bin/bash
-pip install djangocms-helper>=0.7 unidecode $DJANGO 'Pillow<2.6' $EASY_THUMBNAILS django-polymorphic $MPTT python-coveralls coverage south
+pip install https://github.com/nephila/djangocms-helper/archive/develop.zip unidecode $DJANGO 'Pillow<2.6' $EASY_THUMBNAILS django-polymorphic $MPTT python-coveralls coverage south
