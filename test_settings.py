@@ -51,7 +51,6 @@ HELPER_SETTINGS = {
     ),
     'MIGRATION_MODULES': {
         'filer': 'filer.migrations_django',
-        'custom_image': 'filer.test_utils.custom_image.migrations_django',
     },
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'FILER_IMAGE_MODEL': False

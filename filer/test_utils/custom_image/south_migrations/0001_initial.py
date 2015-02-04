@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
             ('subject_location', self.gf('django.db.models.fields.CharField')(default=None, max_length=64, null=True, blank=True)),
             ('extra_description', self.gf('django.db.models.fields.TextField')()),
         ))
-        db.send_create_signal(u'custom_image', ['Image'])
+        db.send_create_signal('custom_image', ['Image'])
 
 
     def backwards(self, orm):
@@ -63,7 +63,7 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        u'custom_image.image': {
+        'custom_image.image': {
             'Meta': {'object_name': 'Image'},
             '_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             '_width': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
