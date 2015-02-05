@@ -7,10 +7,8 @@ from optparse import make_option
 from django.core.files import File as DjangoFile
 from django.core.management.base import BaseCommand, NoArgsCommand
 
-from ...models.filemodels import File
+from ... import settings as filer_settings
 from ...models.foldermodels import Folder
-from ...models.imagemodels import Image
-from ...settings import FILER_IS_PUBLIC_DEFAULT
 from ...utils.compatibility import upath
 
 
@@ -19,39 +17,40 @@ class FileImporter(object):
         self.path = kwargs.get('path')
         self.base_folder = kwargs.get('base_folder')
         self.verbosity = int(kwargs.get('verbosity', 1))
-        self.file_created = 0
-        self.image_created = 0
+        self.files_created = {}  # mapping of <file class>:<how many have been created>
         self.folder_created = 0
 
     def import_file(self, file_obj, folder):
         """
         Create a File or an Image into the given folder
         """
-        try:
-            iext = os.path.splitext(file_obj.name)[1].lower()
-        except:
-            iext = ''
-        if iext in ['.jpg', '.jpeg', '.png', '.gif']:
-            obj, created = Image.objects.get_or_create(
-                original_filename=file_obj.name,
-                file=file_obj,
-                folder=folder,
-                is_public=FILER_IS_PUBLIC_DEFAULT)
-            if created:
-                self.image_created += 1
-        else:
-            obj, created = File.objects.get_or_create(
-                original_filename=file_obj.name,
-                file=file_obj,
-                folder=folder,
-                is_public=FILER_IS_PUBLIC_DEFAULT)
-            if created:
-                self.file_created += 1
+        # find the file type
+        for filer_class in filer_settings.FILER_FILE_MODELS:
+            FileSubClass = load_object(filer_class)
+            # TODO: What if there are more than one that qualify?
+            if FileSubClass.matches_file_type(file_obj.name, None, None):
+                obj = FileSubClass.objects.create(
+                    original_filename=file_obj.name,
+                    file=file_obj,
+                    folder=folder,
+                    is_public=filer_settings.FILER_IS_PUBLIC_DEFAULT)
+                class_name = FileSubClass.__name__
+                if class_name not in self.files_created:
+                    self.files_created[class_name] = 0
+                self.files_created[class_name] += 1
+                break
         if self.verbosity >= 2:
-            print("file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
-                                                        self.image_created,
-                                                        obj, created))
+            self._print_created('-- file : %s' % obj)
         return obj
+
+    def _print_created(self, add=''):
+        file_count = sum(self.files_created.values())
+        file_types = ['%s: %d' % (k, v) for k, v in self.files_created.items()]
+        print('Files created: %d (%s) / folders created: %d %s' % (
+            file_count,
+            ', '.join(file_types),
+            self.folder_created,
+            add))
 
     def get_or_create_folder(self, folder_names):
         """
@@ -71,7 +70,7 @@ class FileImporter(object):
             if created:
                 self.folder_created += 1
                 if self.verbosity >= 2:
-                    print("folder_created #%s folder : %s -- created : %s" % (self.folder_created, current_parent, created))
+                    self._print_created('%s -- created : %s' % (current_parent, created))
         return current_parent
 
     def walker(self, path=None, base_folder=None):
@@ -103,7 +102,7 @@ class FileImporter(object):
                                      name=file_obj)
                 self.import_file(file_obj=dj_file, folder=folder)
         if self.verbosity >= 1:
-            print(('folder_created #%s / file_created #%s / ' + 'image_created #%s') % (self.folder_created, self.file_created, self.image_created))
+            self._print_created()
 
 
 class Command(NoArgsCommand):
@@ -130,3 +129,4 @@ class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         file_importer = FileImporter(**options)
         file_importer.walker()
+
