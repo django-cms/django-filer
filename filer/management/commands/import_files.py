@@ -4,18 +4,24 @@ from __future__ import absolute_import, unicode_literals
 import os
 from optparse import make_option
 
-from django.core.files import File as DjangoFile
+from django.core.files.storage import get_storage_class
 from django.core.management.base import BaseCommand, NoArgsCommand
 
 from ... import settings as filer_settings
 from ...models.foldermodels import Folder
 from ...utils.compatibility import upath
+from ...utils.loader import load_object
 
 
 class FileImporter(object):
     def __init__(self, * args, **kwargs):
-        self.path = kwargs.get('path')
-        self.base_folder = kwargs.get('base_folder')
+        self.path = kwargs.get('path') or ''
+        self.base_folder = kwargs.get('base_folder') or ''
+        # prevent trailing slashes and other inconsistencies on path.
+        self.path = os.path.expanduser(upath(self.path))
+        self.path = os.path.normpath(self.path)
+        self.base_folder = os.path.normpath(upath(self.base_folder))
+        self.storage = kwargs.get('storage_class')(self.path)
         self.verbosity = int(kwargs.get('verbosity', 1))
         self.files_created = {}  # mapping of <file class>:<how many have been created>
         self.folder_created = 0
@@ -52,55 +58,45 @@ class FileImporter(object):
             self.folder_created,
             add))
 
-    def get_or_create_folder(self, folder_names):
+    def get_or_create_folder(self, folder_names, parent=None):
         """
         Gets or creates a Folder based the list of folder names in hierarchical
-        order (like breadcrumbs).
+        order (like breadcrumbs) starting at parent folder (if specified) or root.
 
-        get_or_create_folder(['root', 'subfolder', 'subsub folder'])
+        get_or_create_folder(['root', 'subfolder', 'subsub folder'], parent)
 
         creates the folders with correct parent relations and returns the
         'subsub folder' instance.
         """
         if not len(folder_names):
             return None
-        current_parent = None
         for folder_name in folder_names:
-            current_parent, created = Folder.objects.get_or_create(name=folder_name, parent=current_parent)
+            parent, created = Folder.objects.get_or_create(name=folder_name, parent=parent)
             if created:
                 self.folder_created += 1
                 if self.verbosity >= 2:
-                    self._print_created('%s -- created : %s' % (current_parent, created))
-        return current_parent
+                    self._print_created('%s -- created : %s' % (parent, created))
+        return parent
 
-    def walker(self, path=None, base_folder=None):
+    def _import_dir(self, path, target_folder):
+        dirs, files = self.storage.listdir(path)
+        for dir in dirs:
+            folder = self.get_or_create_folder((dir,), target_folder)
+            self._import_dir(os.path.join(path, dir), folder)
+        for file in files:
+            with self.storage.open(os.path.join(path, file)) as dj_file:
+                self.import_file(dj_file, target_folder)
+
+    def walker(self):
         """
         This method walk a directory structure and create the
         Folders and Files as they appear.
         """
-        path = path or self.path
-        base_folder = base_folder or self.base_folder
-        # prevent trailing slashes and other inconsistencies on path.
-        path = os.path.normpath(upath(path))
-        if base_folder:
-            base_folder = os.path.normpath(upath(base_folder))
-            print("The directory structure will be imported in %s" % (base_folder,))
+        print("The directory structure will be imported in %s" % (self.base_folder,))
         if self.verbosity >= 1:
-            print("Import the folders and files in %s" % (path,))
-        root_folder_name = os.path.basename(path)
-        for root, dirs, files in os.walk(path):
-            rel_folders = root.partition(path)[2].strip(os.path.sep).split(os.path.sep)
-            while '' in rel_folders:
-                rel_folders.remove('')
-            if base_folder:
-                folder_names = base_folder.split('/') + [root_folder_name] + rel_folders
-            else:
-                folder_names = [root_folder_name] + rel_folders
-            folder = self.get_or_create_folder(folder_names)
-            for file_obj in files:
-                dj_file = DjangoFile(open(os.path.join(root, file_obj), mode='rb'),
-                                     name=file_obj)
-                self.import_file(file_obj=dj_file, folder=folder)
+            print("Import the folders and files in %s" % (self.path,))
+        target_folder = self.get_or_create_folder(self.base_folder.split('/'))
+        self._import_dir('', target_folder)
         if self.verbosity >= 1:
             self._print_created()
 
@@ -117,16 +113,22 @@ class Command(NoArgsCommand):
         make_option('--path',
             action='store',
             dest='path',
-            default=False,
+            default=None,
             help='Import files located in the path into django-filer'),
         make_option('--folder',
             action='store',
             dest='base_folder',
-            default=False,
+            default=None,
             help='Specify the destination folder in which the directory structure should be imported'),
+        make_option('--storage',
+            action='store',
+            dest='storage_class',
+            default=None,
+            help='Specify a storage class to use for retrieving files instead of default storage'),
     )
 
     def handle_noargs(self, **options):
+        options['storage_class'] = get_storage_class(options['storage_class'])
         file_importer = FileImporter(**options)
         file_importer.walker()
 
