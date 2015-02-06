@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision db6f7e5 (06.02.2015, 12:23 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * convert both str & unicode to unicode
+
 Revision d7f700c (05.11.2014, 16:58 UTC)
 ----------------------------------------
 
