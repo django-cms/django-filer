@@ -8,6 +8,9 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 
+import logging
+logger = logging.getLogger(__name__)
+
 from django.db import models
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
