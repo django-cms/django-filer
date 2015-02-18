@@ -2,15 +2,21 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+from collections import namedtuple
 from optparse import make_option
 
 from django.core.files.storage import get_storage_class
 from django.core.management.base import BaseCommand, NoArgsCommand
 
 from ... import settings as filer_settings
+from ...models.filemodels import File
 from ...models.foldermodels import Folder
 from ...utils.compatibility import upath
 from ...utils.loader import load_object
+
+_dup_actions = ['overwrite', 'skip', 'update', 'new']
+DuplicateActions = namedtuple('DuplicateActions', _dup_actions)
+DUPLICATE_ACTIONS = DuplicateActions(*_dup_actions)
 
 
 class FileImporter(object):
@@ -21,15 +27,23 @@ class FileImporter(object):
         self.path = os.path.expanduser(upath(self.path))
         self.path = os.path.normpath(self.path)
         self.base_folder = os.path.normpath(upath(self.base_folder))
-        self.storage = kwargs.get('storage_class')(self.path)
+        self.storage = kwargs.get('storage_class')(location=self.path)
+        self.dup_action = kwargs.get('dup_action')
         self.verbosity = int(kwargs.get('verbosity', 1))
         self.files_created = {}  # mapping of <file class>:<how many have been created>
         self.folder_created = 0
 
-    def import_file(self, file_obj, folder):
+    def import_file(self, file_obj, folder, file_path):
         """
         Create a File or an Image into the given folder
         """
+
+        def del_orphan_file(obj):
+            # Delete the file if there are no other Files referencing it.
+            qs = File.objects.exclude(pk=obj.pk)
+            if not qs.filter(file=obj.file.name, is_public=obj.is_public).exists():
+                obj.file.delete(False)
+
         # find the file type
         for filer_class in filer_settings.FILER_FILE_MODELS:
             FileSubClass = load_object(filer_class)
@@ -43,8 +57,36 @@ class FileImporter(object):
                 class_name = FileSubClass.__name__
                 if class_name not in self.files_created:
                     self.files_created[class_name] = 0
-                self.files_created[class_name] += 1
                 break
+        # check if such file was already imported in this folder
+        duplicates = folder.all_files.filter(
+                        original_filename__exact=file_obj.name)
+        if self.dup_action != DUPLICATE_ACTIONS.new and duplicates.count():
+            dup_action = self.dup_action
+            if dup_action is None:
+                # no default duplicate action provided, do interactive choice
+                print('A matching file already exists in Filer (same original filename and folder)'
+                      ' for source file: %s' % file_path)
+                dup_action = ''
+                while dup_action.lower() not in DUPLICATE_ACTIONS:
+                    dup_action = input('Choose action from %s:' % list(DUPLICATE_ACTIONS))
+            if dup_action == DUPLICATE_ACTIONS.skip:
+                return None
+            if dup_action == DUPLICATE_ACTIONS.overwrite:
+                obj = duplicates.first()
+                del_orphan_file(obj)
+                obj.file = file_obj
+            elif dup_action == DUPLICATE_ACTIONS.update:
+                obj.generate_sha1() # generate sha1 now to compare
+                diff_sha_q = duplicates.exclude(sha1__exact=obj.sha1)
+                if not diff_sha_q.count():
+                    return None # no need to update, skip
+                obj = diff_sha_q.first()
+                del_orphan_file(obj)
+                obj.file = file_obj
+
+        obj.save()
+        self.files_created[class_name] += 1
         if self.verbosity >= 2:
             self._print_created('-- file : %s' % obj)
         return obj
@@ -84,12 +126,13 @@ class FileImporter(object):
             folder = self.get_or_create_folder((dir,), target_folder)
             self._import_dir(os.path.join(path, dir), folder)
         for file in files:
-            with self.storage.open(os.path.join(path, file)) as dj_file:
-                self.import_file(dj_file, target_folder)
+            file_path = os.path.join(path, file)
+            with self.storage.open(file_path) as dj_file:
+                self.import_file(dj_file, target_folder, file_path)
 
     def walker(self):
         """
-        This method walk a directory structure and create the
+        This method walks a directory structure and creates
         Folders and Files as they appear.
         """
         print("The directory structure will be imported in %s" % (self.base_folder,))
@@ -105,8 +148,10 @@ class Command(NoArgsCommand):
     """
     Import directory structure into the filer ::
 
-        manage.py --path=/tmp/assets/images
-        manage.py --path=/tmp/assets/news --folder=images
+        manage.py import_files --path=/tmp/assets/images
+        manage.py import_files --path=/tmp/assets/news --folder=images
+        manage.py import_files --path=/tmp --folder=a --storage=storages.backends.ftp.FTPStorage
+        manage.py import_files --path=/tmp/assets/news --folder=images --duplicate-action=update
     """
 
     option_list = BaseCommand.option_list + (
@@ -125,7 +170,15 @@ class Command(NoArgsCommand):
             dest='storage_class',
             default=None,
             help='Specify a storage class to use for retrieving files instead of default storage'),
-    )
+        make_option('--duplicate-action',
+            action='store',
+            type='choice',
+            choices=DUPLICATE_ACTIONS,
+            dest='dup_action',
+            default=None,
+            help='Specify constanct action when duplicate file is already found in Filer '
+                 '(one of %s)' % list(DUPLICATE_ACTIONS)),
+        )
 
     def handle_noargs(self, **options):
         options['storage_class'] = get_storage_class(options['storage_class'])
