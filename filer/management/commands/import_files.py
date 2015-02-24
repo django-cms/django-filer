@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import inspect
 import os
 from collections import namedtuple
 from optparse import make_option
@@ -60,13 +61,14 @@ class FileImporter(object):
             if not qs.filter(file=obj.file.name, is_public=obj.is_public).exists():
                 obj.file.delete(False)
 
+        basename = os.path.basename(file_obj.name)
         # find the file type
         for filer_class in filer_settings.FILER_FILE_MODELS:
             FileSubClass = load_object(filer_class)
-            # TODO: What if there are more than one that qualify?
-            if FileSubClass.matches_file_type(file_obj.name, None, None):
+            #TODO: What if there are more than one that qualify?
+            if FileSubClass.matches_file_type(basename, None, None):
                 obj = FileSubClass(
-                        original_filename=os.path.basename(file_obj.name),
+                        original_filename=basename,
                         file=file_obj,
                         folder=folder,
                         is_public=filer_settings.FILER_IS_PUBLIC_DEFAULT)
@@ -76,7 +78,7 @@ class FileImporter(object):
                 break
         # check if such file was already imported in this folder
         duplicates = folder.all_files.filter(
-                        original_filename__exact=file_obj.name)
+                        original_filename__exact=basename)
         if self.dup_action != DUPLICATE_ACTIONS.new and duplicates.count():
             dup_action = self.dup_action
             if dup_action is None:
@@ -198,7 +200,8 @@ class Command(BaseCommand):
         if not len(paths):
             raise CommandError('No paths to import provided!')
         options['storage_class'] = get_storage_class(options['storage_class'])
-        stor_is_filesystem = issubclass(options['storage_class'], FileSystemStorage)
+        stor_is_filesystem = (inspect.isclass(options['storage_class']) and
+                             issubclass(options['storage_class'], FileSystemStorage))
         if options['path']:
             options['path'] = normpath(options['path'],
                                        no_dots=not stor_is_filesystem,
