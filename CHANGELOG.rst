@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+Revision b594c8f (03.03.2015, 12:20 UTC)
+----------------------------------------
+
+* LUN-1426
+
+  * fixed tests for folder destination filtering
+  * added destination cacndidates tree view for move action
+
+* LUN-1587
+
+  * displayed error mesages for zip extract process
+  * files with image extension but without valid image data will be ignored upon extraction.
+
+* Misc commits
+
+  * deleted pytest leftovers
+  * added destination field to copy action template
+
 Revision db6f7e5 (06.02.2015, 12:23 UTC)
 ----------------------------------------
 
