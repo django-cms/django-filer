@@ -5,12 +5,10 @@
 {% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
+{% block extrahead %}{{ block.super }}{% include 'admin/filer/folder/destination_field.html' with requirements_only='yes' %}{% endblock %}
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
 
 {% block content %}
-{% if not destination_folders %}
-    <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
-{% else %}
 {% if not to_copy %}
     <p>{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}</p>
 {% else %}
@@ -18,24 +16,14 @@
     <ul>{{ to_copy|unordered_list }}</ul>
     <form action="" method="post">{% csrf_token %}
     <div>
-    {% for f in files_queryset %}
-    <input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}" />
-    {% endfor %}
-    {% for f in folders_queryset %}
-    <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />
-    {% endfor %}
+    {% for f in files_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}" />{% endfor %}
+    {% for f in folders_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />{% endfor %}
     <input type="hidden" name="action" value="copy_files_and_folders" />
     <input type="hidden" name="post" value="yes" />
-    <p><label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
-    <select name="destination" id="destination">
-    {% for folder, name_and_enabled in destination_folders %}
-        <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}{% if selected_destination_folder and folder.pk == selected_destination_folder %} selected="selected"{% endif %}>{{ name_and_enabled.0 }}</option>
-    {% endfor %}
-    </select></p>
+    {% include 'admin/filer/folder/destination_field.html' %}
     {{ copy_form.as_p_with_help }}
     <p><input type="submit" value="{% trans "Copy" %}" /></p>
     </div>
     </form>
-{% endif %}
 {% endif %}
 {% endblock %}

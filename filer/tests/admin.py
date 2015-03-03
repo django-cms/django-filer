@@ -31,6 +31,7 @@ from filer.utils.generate_filename import by_path
 from cmsroles.models import Role
 from cmsroles.tests.tests import HelpersMixin
 from cmsroles.siteadmin import get_site_admin_required_permission
+import json
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -974,30 +975,38 @@ class BaseTestFolderTypePermissionLayer(object):
         response, url = move_action(self.client, bar, foo, [baz])
         assert Folder.objects.filter(parent=foo.id).count() == 0
 
-    def _test_folder_destination_filters_core_folders(self, action):
+    def test_folder_destination_filtering(self):
+        orphaned = Folder.objects.create(name='orphaned')
+        core = Folder.objects.create(
+            name='core', folder_type=Folder.CORE_FOLDER)
         foo = Folder.objects.create(
-            name='foo', folder_type=Folder.CORE_FOLDER)
-        bar = Folder.objects.create(
-            name='bar', site=Site.objects.get(id=1))
-        bar2 = Folder.objects.create(
-            name='bar2', site=Site.objects.get(id=1))
-        bar_file = File.objects.create(
-            original_filename='bar_file',
+            name='foo', site=Site.objects.get(id=1))
+        selected = Folder.objects.create(
+            parent=foo, name='selected', site=Site.objects.get(id=1))
+        file_in_selected = File.objects.create(
+            folder=selected, original_filename='file_in_selected',
             file=dj_files.base.ContentFile('some data'))
+        valid_destination = Folder.objects.create(
+            parent=foo, name='valid', site=Site.objects.get(id=1))
 
-        url = get_dir_listing_url(bar)
-        response = self.client.post(url, {
-            'action': action,
-            helpers.ACTION_CHECKBOX_NAME: [filer_obj_as_checkox(bar_file)]
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('destination_folders', response.context)
-        dest_folders = response.context['destination_folders']
-        self.assertNotIn(foo.id, [el[0].id for el in dest_folders])
+        def _fetch_destinations(parent):
+            url = reverse('admin:filer-destination_folders')
+            tree_data = json.loads(
+                self.client.get(
+                    url, {
+                        'parent': parent,
+                        'selected_folders': json.dumps([selected.pk]),
+                        'current_folder': foo.pk
+                    }, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                ).content)
+            return {int(el['key']): el for el in tree_data}
 
-    def test_move_destination_filters_core_folders(self):
-        self._test_folder_destination_filters_core_folders(
-            'move_files_and_folders')
+        root_destinations = _fetch_destinations('null')
+        assert root_destinations.keys() == [foo.id]
+        assert root_destinations[foo.id]['unselectable'] == True
+        foo_destinations = _fetch_destinations(foo.pk)
+        assert foo_destinations.keys() == [valid_destination.id]
+        assert foo_destinations[valid_destination.id]['unselectable'] == False
 
     def test_move_from_unfiled(self):
         foo_file = File.objects.create(
@@ -1008,10 +1017,6 @@ class BaseTestFolderTypePermissionLayer(object):
         response, url = move_action(self.client, 'unfiled', bar, [foo_file])
         self.assertEqual(File.objects.filter(folder=bar).count(), 1)
         self.assertEqual(File.objects.filter(folder__isnull=True).count(), 0)
-
-    def test_copy_destination_filters_core_folders(self):
-        self._test_folder_destination_filters_core_folders(
-            'copy_files_and_folders')
 
     def test_copy_site_folder_to_core_destination_folder(self):
         folders, files = self._build_some_folder_structure(
@@ -1271,6 +1276,16 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         for gr in Group.objects.filter(
                 id__in=Role.objects.values_list('group', flat=True)):
             gr.permissions.add(*filer_perms)
+        restricted_groups = Group.objects.filter(
+            id__in=Role.objects.filter(
+                name__in=['editor', 'writer']
+            ).values_list('group', flat=True)
+        )
+        for gr in restricted_groups:
+            gr.permissions.remove(*list(Permission.objects.filter(
+                content_type__app_label='filer',
+                codename='can_restrict_operations')))
+
         for user in User.objects.all():
             user.set_password('secret')
             user.save()
@@ -1391,95 +1406,45 @@ class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
         response, items = self.get_listed_objects(self.folders['none'])
         assert response.status_code == 403
 
-    def _test_destination_action_for_site_admin(self, action):
+    def _fetch_destination_names(self, current_folder):
+        url = reverse('admin:filer-destination_folders')
+        tree_data = json.loads(
+            self.client.get(
+                url, {
+                    'parent': None,
+                    'current_folder': current_folder
+                }, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            ).content)
+        return sorted([el['title'] for el in tree_data])
+
+    def test_destination_filtering_for_site_admin(self):
         # joe is site admin for foo and bar
         self.client.login(username='joe', password='secret')
 
         bar2 = Folder.objects.create(name='bar2', site=self.bar_site)
-        bar2_file = File.objects.create(original_filename='bar2_file',
-            file=dj_files.base.ContentFile('some data'), folder=bar2)
-
-
-        url = get_dir_listing_url(bar2)
-        response = self.client.post(url, {
-            'action': action,
-            helpers.ACTION_CHECKBOX_NAME: [
-                filer_obj_as_checkox(bar2_file)]
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('destination_folders', response.context)
-        dest_folders = [_dest[0].name
-                        for _dest in response.context['destination_folders']]
         expected = sorted(['bar', 'bar2', 'foo'])
-        self.assertItemsEqual(expected, sorted(dest_folders))
+        self.assertItemsEqual(expected, self._fetch_destination_names(bar2.pk))
 
-    def _test_destination_action_for_multi_site_user(self, action):
+    def test_destination_filtering_for_multi_site_user(self):
         # bob will be a site admin on foo and writer on bar
         admin_role = Role.objects.get(name='site admin')
         admin_role.grant_to_user(
             User.objects.get(username='bob'), self.foo_site)
-
         bar2 = Folder.objects.create(name='bar2', site=self.bar_site)
-        bar2_file = File.objects.create(original_filename='bar2_file',
-            file=dj_files.base.ContentFile('some data'), folder=bar2)
-
         self.client.login(username='bob', password='secret')
-        url = get_dir_listing_url(bar2)
-        response = self.client.post(url, {
-            'action': action,
-            helpers.ACTION_CHECKBOX_NAME: [
-                filer_obj_as_checkox(bar2_file)]
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('destination_folders', response.context)
-        dest_folders = [_dest[0].name
-                        for _dest in response.context['destination_folders']]
         expected = sorted(['bar', 'bar2', 'foo'])
-        self.assertItemsEqual(expected, sorted(dest_folders))
+        self.assertItemsEqual(expected, self._fetch_destination_names(bar2.pk))
 
-    def _test_destination_action_for_other_users(self, action):
+    def test_destination_filtering_for_other_users(self):
         # bob is writer on bar site
         self.client.login(username='bob', password='secret')
         bar2 = Folder.objects.create(name='bar2', site=self.bar_site)
-        bar2_file = File.objects.create(original_filename='bar2_file',
-            file=dj_files.base.ContentFile('some data'), folder=bar2)
-
-        url = get_dir_listing_url(bar2)
-        response = self.client.post(url, {
-            'action': action,
-            helpers.ACTION_CHECKBOX_NAME: [
-                filer_obj_as_checkox(bar2_file)]
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('destination_folders', response.context)
-        dest_folders = [_dest[0].name
-                        for _dest in response.context['destination_folders']]
-        expected = sorted(['bar', 'bar2'])
-        self.assertItemsEqual(expected, sorted(dest_folders))
-
-    def test_destination_on_copy_for_multi_site_user(self):
-        self._test_destination_action_for_multi_site_user(
-            'copy_files_and_folders')
-
-    def test_destination_on_move_for_multi_site_user(self):
-        self._test_destination_action_for_multi_site_user(
-            'move_files_and_folders')
-
-    def test_destination_on_copy_for_other_users(self):
-        self._test_destination_action_for_other_users(
-            'copy_files_and_folders')
-
-    def test_destination_on_move_for_other_users(self):
-        self._test_destination_action_for_other_users(
-            'move_files_and_folders')
-
-    def test_destination_on_copy_for_site_admin(self):
-        self._test_destination_action_for_site_admin(
-            'copy_files_and_folders')
-
-    def test_destination_on_move_for_site_admin(self):
-        self._test_destination_action_for_site_admin(
-            'move_files_and_folders')
+        expected = sorted(['bar', bar2.name])
+        self.assertItemsEqual(expected, self._fetch_destination_names(bar2.pk))
+        bar = Folder.objects.get(name='bar')
+        bar.restricted = True
+        bar.save()
+        assert ['bar2'] == self._fetch_destination_names(bar2.pk)
 
     def test_on_site_change_filtering(self):
         # jack is site admin on bar site

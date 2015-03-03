@@ -41,6 +41,7 @@ from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 from filer.thumbnail_processors import normalize_subject_location
 from django.conf import settings as django_settings
+import json
 import os
 import itertools
 import inspect
@@ -176,6 +177,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
                 name='filer-directory_listing-unfiled_images'),
+            url(r'^destination_folders/$',
+                self.admin_site.admin_view(self.destination_folders),
+                name='filer-destination_folders'),
         )
         url_patterns.extend(urls)
         return url_patterns
@@ -741,39 +745,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
                                 for f in sorted(files_queryset)])
         return to_copy_or_move
 
-    def _list_all_destination_folders_recursive(self, request,
-                                                folders_queryset,
-                                                current_folder, folders,
-                                                allow_self, level):
-        for fo in folders_available(request, folders):
-            if not allow_self and fo in folders_queryset:
-                # We do not allow moving to selected folders or their
-                #       descendants
-                continue
-
-            # We do not allow copying/moving back to the folder itself
-            is_restricted = fo.is_restricted_for_user(request.user)
-            enabled = ((not is_restricted and
-                        (fo != current_folder or allow_self)))
-            yield (fo, (mark_safe(("&nbsp" * 4 * level) +
-                                  force_unicode(fo.actual_name)),
-                        enabled))
-            if not is_restricted:
-                for c in self._list_all_destination_folders_recursive(
-                    request, folders_queryset, current_folder,
-                    fo.children.all(), allow_self, level + 1):
-                    yield c
-
-    def _list_all_destination_folders(self, request, folders_queryset,
-                                      current_folder, allow_self):
-        # do not allow move/copy in core folders or site folders with no site
-        destination_candidates = FolderRoot().children.valid_destinations(
-            request.user).unrestricted(request.user)
-
-        return list(self._list_all_destination_folders_recursive(
-            request, folders_queryset, current_folder, destination_candidates,
-            allow_self, 0))
-
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset,
                                      destination):
         for f in files_queryset:
@@ -784,42 +755,108 @@ class FolderAdmin(FolderPermissionModelAdmin):
             f.parent = destination
             f.save()
 
+    def _as_folder(self, request_data, param):
+        try:
+            return Folder.objects.get(id=int(request_data.get(param, None)))
+        except (Folder.DoesNotExist, ValueError, TypeError):
+            return None
+
+    def _clean_destination(self, request, current_folder,
+                           selected_folders):
+        destination = self._as_folder(request.POST, 'destination')
+        if not destination:
+            raise PermissionDenied
+        # check destination permissions
+        if not is_valid_destination(request, destination):
+            raise PermissionDenied
+        # don't allow copy/move from folder to the same folder
+        if (hasattr(current_folder, 'pk') and
+                destination.pk == current_folder.pk):
+            raise PermissionDenied
+        # don't allow selected folders to be copied/moved inside
+        #   themselves or inside any of their descendants
+        mgr = Folder._tree_manager
+        destination_in_selected = mgr.get_queryset_descendants(
+            selected_folders, include_self=True
+        ).filter(id=destination.pk).exists()
+        if destination_in_selected:
+            raise PermissionDenied
+        return destination
+
+    def destination_folders(self, request):
+        all_required = all((
+            request.method == 'GET',
+            request.is_ajax(),
+            request.user.is_authenticated(),
+            'parent' in request.GET
+        ))
+        if not all_required:
+            raise PermissionDenied
+
+        def _valid_candidates(request, candidates_qs, selected):
+            # exclude orphaned/core/shared/restricted or any selected folders
+            return folders_available(request, candidates_qs) \
+                .valid_destinations(request.user) \
+                .unrestricted(request.user) \
+                .exclude(id__in=selected)
+
+        current_folder = self._as_folder(request.GET, 'current_folder')
+        parent = self._as_folder(request.GET, 'parent')
+        selected_ids = filter(
+            None,
+            map(lambda f_id: f_id or None,
+                json.loads(request.GET.get('selected_folders') or '[]'))
+        )
+        candidates = Folder.objects.filter(parent=parent)
+        fancytree_candidates = []
+        for folder in _valid_candidates(request, candidates, selected_ids):
+            has_children = _valid_candidates(
+                request, Folder.objects.filter(parent=folder), selected_ids
+            ).exists()
+            # don't allow move/copy files&folders to itself
+            disabled = current_folder and current_folder.pk == folder.pk
+            fancytree_candidates.append({
+                'title': folder.name,
+                'key': "%d" % folder.pk,
+                'folder': has_children,
+                'lazy': has_children,
+                'hideCheckbox': disabled,
+                'unselectable': disabled,
+                'icon': folder.icons.get('32', '')
+            })
+
+        return HttpResponse(
+            json.dumps(fancytree_candidates), content_type="application/json")
+
     def move_files_and_folders(self, request,
-                               files_queryset, folders_queryset):
+                               selected_files, selected_folders):
         opts = self.model._meta
         app_label = opts.app_label
 
         if not has_multi_file_action_permission(
-                request, files_queryset, folders_queryset):
+                request, selected_files, selected_folders):
             raise PermissionDenied
 
-        if folders_queryset.filter(parent=None).exists():
+        if selected_folders.filter(parent=None).exists():
             messages.error(request, "To prevent potential problems, users "
                 "are not allowed to move root folders. You may copy folders "
                 "and files.")
             return
 
         current_folder = self._get_current_action_folder(
-            request, files_queryset, folders_queryset)
+            request, selected_files, selected_folders)
         to_move = self._list_all_to_copy_or_move(
-            request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(
-            request, folders_queryset, current_folder, False)
+            request, selected_files, selected_folders)
 
         if request.method == 'POST' and request.POST.get('post'):
-            try:
-                destination = Folder.objects.get(
-                    pk=request.POST.get('destination'))
-                if not is_valid_destination(request, destination):
-                    raise PermissionDenied
-            except Folder.DoesNotExist:
-                raise PermissionDenied
+            destination = self._clean_destination(
+                request, current_folder, selected_folders)
 
             # all folders need to belong to the same site as the
             #   destination site folder
             sites_from_folders = \
-                set(folders_queryset.values_list('site_id', flat=True)) | \
-                set(files_queryset.exclude(folder__isnull=True).\
+                set(selected_folders.values_list('site_id', flat=True)) | \
+                set(selected_files.exclude(folder__isnull=True).\
                         values_list('folder__site_id', flat=True))
 
             if (sites_from_folders and
@@ -840,20 +877,15 @@ class FolderAdmin(FolderPermissionModelAdmin):
                     "belong to the same site as the destination folder.")
                 return
 
-            folders_dict = dict(folders)
-            if (destination not in folders_dict or
-                    not folders_dict[destination][1]):
-                raise PermissionDenied
-
             if not self._are_candidate_names_valid(
-                request, files_queryset, folders_queryset, destination):
+                request, selected_files, selected_folders, destination):
                 return
 
             # We count only topmost files and folders here
-            n = files_queryset.count() + folders_queryset.count()
+            n = selected_files.count() + selected_folders.count()
             if n:
                 self._move_files_and_folders_impl(
-                    files_queryset, folders_queryset, destination)
+                    selected_files, selected_folders, destination)
                 self.message_user(request,
                      _("Successfully moved %(count)d files and/or "
                        "folders to folder '%(destination)s'.") % {
@@ -867,9 +899,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
             "instance": current_folder,
             "breadcrumbs_action": _("Move files and/or folders"),
             "to_move": to_move,
-            "destination_folders": folders,
-            "files_queryset": files_queryset,
-            "folders_queryset": folders_queryset,
+            "files_queryset": selected_files,
+            "folders_queryset": selected_folders,
             "opts": opts,
             "root_path": reverse('admin:index'),
             "app_label": app_label,
@@ -1028,24 +1059,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
             request, files_queryset, folders_queryset)
         to_copy = self._list_all_to_copy_or_move(
             request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(
-            request, folders_queryset, current_folder, False)
 
         if request.method == 'POST' and request.POST.get('post'):
             form = CopyFilesAndFoldersForm(request.POST)
             if form.is_valid():
-                try:
-                    destination = Folder.objects.get(
-                        pk=request.POST.get('destination'))
-                    if not is_valid_destination(request, destination):
-                        raise PermissionDenied
-                except Folder.DoesNotExist:
-                    raise PermissionDenied
-
-                folders_dict = dict(folders)
-                if (destination not in folders_dict or
-                    not folders_dict[destination][1]):
-                    raise PermissionDenied
+                destination = self._clean_destination(
+                    request, current_folder, folders_queryset)
 
                 suffix = form.cleaned_data['suffix']
                 if not self._are_candidate_names_valid(
@@ -1080,7 +1099,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
             "instance": current_folder,
             "breadcrumbs_action": _("Copy files and/or folders"),
             "to_copy": to_copy,
-            "destination_folders": folders,
             "selected_destination_folder": selected_destination_folder,
             "copy_form": form,
             "files_queryset": files_queryset,
