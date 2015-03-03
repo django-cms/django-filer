@@ -109,7 +109,7 @@ def make_folder(request, folder_id=None):
                 new_folder.owner = request.user
                 new_folder.save()
                 return render_to_response('admin/filer/dismiss_popup.html',
-                                          context_instance=RequestContext(request)))
+                                          context_instance=RequestContext(request))
     else:
         new_folder_form = NewFolderForm()
     return render_to_response('admin/filer/folder/new_folder_form.html', {
