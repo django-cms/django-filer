@@ -916,7 +916,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         "Move selected files and/or folders")
 
     def extract_files(self, request, files_queryset, folder_queryset):
-        success_format = "Successfully extracted archive {}."
+        success_format = u"Successfully extracted archive {}."
 
         files_queryset = files_queryset.filter(
             polymorphic_ctype=ContentType.objects.get_for_model(Archive).id)
