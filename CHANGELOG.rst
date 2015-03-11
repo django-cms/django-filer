@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 553cd36 (11.03.2015, 10:41 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Fix success message
+
 Revision b594c8f (03.03.2015, 12:20 UTC)
 ----------------------------------------
 
