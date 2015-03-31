@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import warnings
 
 from django import forms
@@ -10,10 +11,14 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.six import text_type
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+
 
 from filer.utils.compatibility import truncate_words
 from filer.utils.model_label import get_model_label
 from filer.models import File
+from filer.validators import FileMimetypeValidator
 from filer import settings as filer_settings
 
 import logging
@@ -21,9 +26,16 @@ logger = logging.getLogger(__name__)
 
 
 class AdminFileWidget(ForeignKeyRawIdWidget):
+    template = 'admin/filer/widgets/admin_file.html'
     choices = None
 
-    def render(self, name, value, attrs=None):
+    def __init__(self, rel, site, *args, **kwargs):
+        self.file_lookup_enabled = kwargs.pop('file_lookup_enabled', True)
+        self.direct_upload_enabled = kwargs.pop('direct_upload_enabled', False)
+        self.folder_key = kwargs.pop('folder_key', None)
+        super(AdminFileWidget, self).__init__(rel, site, *args, **kwargs)
+
+    def get_context(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
@@ -41,7 +53,13 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                     logger.error('Error while rendering file widget: %s', e)
                 if filer_settings.FILER_DEBUG:
                     raise
-        if not related_url:
+
+        if self.folder_key:
+            related_url = reverse(
+                'admin:filer-directory_listing_by_key',
+                kwargs={'folder_key': self.folder_key}
+            )
+        elif not related_url:
             related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()
         if params:
@@ -64,8 +82,38 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'lookup_name': name,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
+            'file_lookup_enabled': self.file_lookup_enabled,
+            'direct_upload_enabled': self.direct_upload_enabled,
         }
-        html = render_to_string('admin/filer/widgets/admin_file.html', context)
+        if self.direct_upload_enabled:
+            context.update({
+                'direct_upload_name': '%s_direct_upload' % name,
+                'json_opts': json.dumps({
+                    'msg': {
+                        'error': text_type(_('An error occured during the file transfer. '
+                                             'Error was : %(error)s')),
+                        'wait_sing': text_type(_('Please wait until the file is sent.')),
+                        'wait_plur': text_type(_('Please wait until the %(nb_files)d files '
+                                                 'are sent.')),
+                        'no_file_selected': text_type(_('No file selected')),
+                        'choose_new_file': text_type(_('Choose a file')),
+                        'choose_replace_file': text_type(_('Choose another file')),
+                    },
+                    'url': reverse('filer:direct_upload'),
+                    'folder_key': self.folder_key,
+                }),
+            })
+            context['direct_upload_related_field'] = '%s.%s.%s' % (
+                self.rel.field.model._meta.app_label,
+                self.rel.field.model.__name__,
+                self.rel.field.name,
+            )
+
+        return context
+
+    def render(self, name, value, attrs=None):
+        context = self.get_context(name, value, attrs)
+        html = render_to_string(self.template, context)
         return mark_safe(html)
 
     def label_for_value(self, value):
@@ -80,11 +128,23 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
-        js = (
-            static('filer/js/addons/popup_handling.js'),
-            static('filer/js/addons/widget.js'),
-        )
+    @property
+    def media(self):
+        kwargs = {
+            'css': {
+                'all': (filer_settings.FILER_STATICMEDIA_PREFIX + 'css/admin_style.css',),
+            },
+            'js': [
+
+                static('filer/js/libs/jquery.min.js'),
+                static('filer/js/libs/dropzone.min.js'),
+                static('filer/js/addons/dropzone.init.js'),
+                static('filer/js/addons/widget.js'),
+            ],
+        }
+        if self.file_lookup_enabled:
+            kwargs['js'].append(filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js')
+        return forms.Media(**kwargs)
 
 
 class AdminFileFormField(forms.ModelChoiceField):
@@ -97,7 +157,37 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
+        widgetkwargs = {
+            'file_lookup_enabled': kwargs.pop('file_lookup_enabled', True),
+            'direct_upload_enabled': kwargs.pop('direct_upload_enabled', False),
+            'folder_key': kwargs.pop('folder_key', None),
+        }
+
+        super(AdminFileFormField, self).__init__(
+            queryset,
+            widget=self.widget(rel, site, **widgetkwargs),
+            *args, **kwargs
+        )
+
+        if not self.help_text:
+            validators = self.validators + self.rel.field.validators
+            for validator in validators:
+                if isinstance(validator, FileMimetypeValidator):
+                    if len(validator.mimetypes) > 1:
+                        mimetypes = '%s" and "%s' % (
+                            '", "'.join(validator.mimetypes[0:-1]),
+                            validator.mimetypes[-1]
+                        )
+                    else:
+                        mimetypes = validator.mimetypes[0]
+                    self.help_text = ungettext_lazy(
+                        'Only files of type "%(mimetypes)s" are allowed',
+                        'Only files of types "%(mimetypes)s" are allowed',
+                        len(validator.mimetypes)
+                    ) % {
+                        'mimetypes': mimetypes
+                    }
+                    break
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -119,15 +209,22 @@ class FilerFileField(models.ForeignKey):
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
+        default_keys = (
+            'form_class', 'file_lookup_enabled',
+            'direct_upload_enabled', 'folder_key'
+        )
+        self.default_formfield_kwargs = {'form_class': self.default_form_class, }
+        for key in default_keys:
+            default_key = 'default_%s' % key
+            if default_key in kwargs:
+                self.default_formfield_kwargs[key] = kwargs.pop(default_key)
         super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
-        defaults = {
-            'form_class': self.default_form_class,
-            'rel': self.rel,
-        }
+        defaults = {'rel': self.rel, }
+        defaults.update(self.default_formfield_kwargs)
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)
 

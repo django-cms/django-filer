@@ -11,4 +11,5 @@ urlpatterns = [
         views.canonical,
         name='canonical'
     ),
+    url(r'^direct_upload/$', ajax_upload, name='direct_upload',),
 ]

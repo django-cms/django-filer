@@ -5,20 +5,37 @@ from __future__ import unicode_literals
 import os
 import sys
 
+from django.core.exceptions import ValidationError
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify as slugify_django
 from django.http.multipartparser import (
     ChunkIter, exhaust, StopFutureHandlers, SkipFile, StopUpload)
 from unidecode import unidecode
 
+from filer.validators import FileMimetypeValidator
+
 
 class UploadException(Exception):
     pass
 
 
-def handle_upload(request):
-    if not request.method == "POST":
+class ChunkFile(object):
+    """
+    Simple class for mimetype detection for a file's chunk.
+    FileMimetypeValidator needs an object with `.name` and `.read()`
+    """
+    def __init__(self, name, chunk):
+        self.name = name
+        self.chunk = chunk
+
+    def read(self, length):
+        return self.chunk[0:length]
+
+
+def handle_upload(request, mimetypes=None):
+    if request.method != "POST":
         raise UploadException("AJAX request not valid: must be POST")
+
     if request.is_ajax():
         # the file is stored raw in the request
         is_raw = True
@@ -50,6 +67,7 @@ def handle_upload(request):
         stream = ChunkIter(request, chunk_size)
         counters = [0] * len(upload_handlers)
 
+        mimetype_to_check = bool(mimetypes)
         try:
             for handler in upload_handlers:
                 try:
@@ -59,6 +77,13 @@ def handle_upload(request):
                     break
 
             for chunk in stream:
+                if mimetype_to_check:
+                    try:
+                        FileMimetypeValidator(mimetypes)(ChunkFile(filename, chunk))
+                    except ValidationError as e:
+                        raise UploadException(' ; '.join(e.messages))
+                    mimetype_to_check = False
+
                 for i, handler in enumerate(upload_handlers):
                     chunk_length = len(chunk)
                     chunk = handler.receive_data_chunk(chunk,

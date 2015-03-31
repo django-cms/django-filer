@@ -18,6 +18,7 @@ HELPER_SETTINGS = {
         'mptt',
         'filer',
         'filer.test_utils.test_app',
+        'filer.test_utils.thirdparty_app',
     ],
     'LANGUAGE_CODE': 'en',
     'LANGUAGES': (
@@ -58,7 +59,7 @@ HELPER_SETTINGS = {
     'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer',
                                    'test_utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
-
+    'FILER_DEFAULT_FOLDER_GETTER': 'filer.test_utils.thirdparty_app.handlers.CustomFolderGetter',
 }
 if os.environ.get('CUSTOM_IMAGE', False):
     HELPER_SETTINGS['FILER_IMAGE_MODEL'] = os.environ.get('CUSTOM_IMAGE', False)

@@ -83,6 +83,12 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
+    def test_filer_directory_listing_by_key(self):
+        response = self.client.get(reverse(
+            'admin:filer-directory_listing_by_key', kwargs={'folder_key':'DOCUMENTS'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['folder'].name, 'Documents')
+
     def test_validate_no_duplcate_folders(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)

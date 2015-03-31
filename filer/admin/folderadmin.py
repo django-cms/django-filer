@@ -205,7 +205,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^(?P<folder_id>\d+)/list/$',
                 self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing'),
-
+            url(r'^(?P<folder_key>[a-zA-Z][a-zA-Z0-9_]*)/list/$',
+                self.admin_site.admin_view(self.directory_listing_by_key),
+                name='filer-directory_listing_by_key'),
             url(r'^(?P<folder_id>\d+)/make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_folder'),
@@ -227,6 +229,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return url_patterns
 
     # custom views
+    def directory_listing_by_key(self, request, folder_key):
+        from filer.utils.folders import get_default_folder_getter
+        folder = get_default_folder_getter().get(folder_key, request)
+        return self.directory_listing(request, folder.pk)
+    
     def directory_listing(self, request, folder_id=None, viewtype=None):
         clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':

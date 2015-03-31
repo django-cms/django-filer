@@ -17,38 +17,62 @@
         </div>
 
         <span class="filerFile js-file-selector">
-            {% if object %}
-                {% if object.icons.32 %}
-                    <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
-                    &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+            {% block object_display %}
+                {% if object %}
+                    {% if object.icons.32 %}
+                        <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
+                        &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+                    {% else %}
+                        <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
+                        &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
+                    {% endif %}
                 {% else %}
-                    <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
-                    &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
+                    <img id="{{ thumb_id }}" class="quiet hidden" alt="">
+                    &nbsp;<span id="{{ span_id }}"></span>
                 {% endif %}
-            {% else %}
-                <img id="{{ thumb_id }}" class="quiet hidden" alt="">
-                &nbsp;<span id="{{ span_id }}"></span>
-            {% endif %}
+            {% endblock object_display %}
 
-            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                {% trans 'Choose File' %}
-            </a>
+            {% block object_change %}
+                {% if file_lookup_enabled %}
+                    <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+                        {% trans 'Choose File' %}
+                    </a>
+                {% endif %}
+                {% if direct_upload_enabled %}
+                    <span id="{{ id }}_uploader" class="filerUploader">
+                        <strong>{% trans 'You must have a recent browser with javascript enabled to be able to use direct file upload'%}</strong>
+                        <span style="display:none;">
+                            <span class="filerFilename">{% trans 'No file selected' %}</span>
+                            <input type="file" name="{{ direct_upload_name }}" />
+                            <button class="filerChoose" type="button" data-filer="{{ json_opts }}">{% trans 'Choose a file' %}</button>
+                            <span class="filerProgress" style="display:none;">{% trans 'Uploading, please wait...' %}</span>
+                        </span>
+                    </span>
+                {% endif %}
+            {% endblock object_change %}
 
-            <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
+
+            {% block object_remove %}
+                <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
+            {% endblock object_remove %}
 
             <br>
 
             {{ hidden_input }}
-            <script type="text/javascript" id="{{id}}_javascript">
-                django.jQuery(document).ready(function(){
-                    var plus = django.jQuery('#add_{{ id }}');
-                    if (plus.length){
-                        plus.remove();
-                    }
-                    // Delete this javascript once loaded to avoid the "add new" link duplicates it
-                    django.jQuery('#{{id}}_javascript').remove();
-                });
-            </script>
+
+            {% block object_javascript %}
+                <script type="text/javascript" id="{{id}}_javascript">
+                    django.jQuery('#{{id}}').attr('type', 'hidden').attr('data-filer', 1);
+                    django.jQuery(document).ready(function(){
+                        var plus = django.jQuery('#add_{{ id }}');
+                        if (plus.length){
+                            plus.remove();
+                        }
+                        // Delete this javascript once loaded to avoid the "add new" link duplicates it
+                        django.jQuery('#{{id}}_javascript').remove();
+                    });
+                </script>
+            {% endblock object_javascript %}
         </span>
     </div>
 {% endspaceless %}

@@ -6,7 +6,7 @@ Settings
 ``FILER_ENABLE_PERMISSIONS``
 ----------------------------
 
-Activate the or not the Permission check on the files and folders before 
+Activate the or not the Permission check on the files and folders before
 displaying them in the admin. When set to ``False`` it gives all the authorization
 to staff members based on standard Django model permissions.
 
@@ -73,7 +73,7 @@ Public storage uses ``DEFAULT_FILE_STORAGE`` as default storage backend.
 
 ``UPLOAD_TO`` is the function to generate the path relative to the storage root. The
 default generates a random path like ``1d/a5/1da50fee-5003-46a1-a191-b547125053a8/filename.jpg``. This
-will be applied whenever a file is uploaded or moved between public (without permission checks) and 
+will be applied whenever a file is uploaded or moved between public (without permission checks) and
 private (with permission checks) storages. Defaults to ``'filer.utils.generate_filename.randomized'``.
 
 
@@ -111,7 +111,7 @@ Defaults to ``20``
 ``FILER_SUBJECT_LOCATION_IMAGE_DEBUG``
 --------------------------------------
 
-Draws a red circle around to point in the image that was used to do the 
+Draws a red circle around to point in the image that was used to do the
 subject location aware image cropping.
 
 Defaults to ``False``
@@ -150,3 +150,30 @@ Number of simultaneous AJAX uploads. Defaults to 3.
 If your database backend is SQLite it would be set to 1 by default. This allows
 to avoid ``database is locked`` errors on SQLite during multiple simultaneous
 file uploads.
+
+
+``FILER_DEFAULT_FOLDER_GETTER``
+-------------------------------
+
+Path to a subclass of `filer.utils.folders.DefaultFolderGetter`.
+Methods name of this subclass can be used as value for the
+`default_folder_key` of ``FilerFileField`` and ``FilerImageField``.
+
+e.g::
+
+    FILER_DEFAULT_FOLDER_GETTER = 'myapp.handlers.FolderGetter'
+
+and in myapp/hanlers.py::
+
+    from filer.utils.folders import DefaultFolderGetter
+
+    class FolderGetter(DefaultFolderGetter):
+        @classmethod
+        def USER_OWN_FOLDER(cls, request):
+            if not request.user.is_authenticated():
+                return None
+            parent_kwargs = {
+                name: 'users_files',
+
+            }
+            return cls._get_or_create(name=user.username, owner=user, parent_kwargs=parent_kwargs)
