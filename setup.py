@@ -31,7 +31,7 @@ setup(
         'pytz',
         'Django>=1.3,<1.5',
         'easy-thumbnails>=1.0,<2.0.0',
-        'django-mptt>=0.6.1',
+        'django-mptt==0.6.1',
         'django_polymorphic>=0.2',
         'django-cms-roles',
     ),
