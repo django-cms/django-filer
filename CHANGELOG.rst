@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 9bdd109 (08.04.2015, 08:55 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * django-mptt 0.7.1 was released recently, it doesn't work out of the box
+
 Revision 553cd36 (11.03.2015, 10:41 UTC)
 ----------------------------------------
 
