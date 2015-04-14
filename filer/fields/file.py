@@ -2,7 +2,8 @@
 import inspect
 from django import forms
 from django.conf import settings as globalsettings
-from django.contrib.admin import widgets
+from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+from django.contrib.admin.widgets import AdminFileWidget
 from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -16,7 +17,7 @@ from filer import settings as filer_settings
 import logging
 logger = logging.getLogger(__name__)
 
-class AdminFileWidget(widgets.ForeignKeyRawIdWidget):
+class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
     def render(self, name, value, attrs=None):
@@ -52,7 +53,7 @@ class AdminFileWidget(widgets.ForeignKeyRawIdWidget):
         # rendering the super for ForeignKeyRawIdWidget on purpose here because
         # we only need the input and none of the other stuff that
         # ForeignKeyRawIdWidget adds
-        hidden_input = super(widgets.ForeignKeyRawIdWidget, self).render(
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(
                                                             name, value, attrs)
         filer_static_prefix = filer_settings.FILER_STATICMEDIA_PREFIX
         if not filer_static_prefix[-1] == '/':
@@ -150,5 +151,5 @@ class FilerFileField(models.ForeignKey):
         return (field_class, args, kwargs)
 
 
-class NonClearableFileInput(widgets.AdminFileWidget):
+class NonClearableFileInput(AdminFileWidget):
     template_with_clear = u''
