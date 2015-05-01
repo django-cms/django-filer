@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
-import django
 import sys
+
+import django
 from django.utils import six
 
 try:
@@ -16,6 +17,10 @@ except ImportError:
     truncate_words = allow_lazy(truncate_words, six.text_type)
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
+DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
+DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
+DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
+DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
 
 
 if not six.PY3:
@@ -49,3 +54,13 @@ try:
 except ImportError:
     force_unicode = lambda s: str(s)
     from django.utils.encoding import python_2_unicode_compatible
+
+
+def get_delete_permission(opts):
+    try:
+        from django.contrib.auth import get_permission_codename
+        return '%s.%s' % (opts.app_label,
+                          get_permission_codename('delete', opts))
+    except ImportError:
+        return '%s.%s' % (opts.app_label,
+                          opts.get_delete_permission())
