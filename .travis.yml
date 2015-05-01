@@ -36,6 +36,10 @@ matrix:
     - python: 2.6
       env: DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
     - python: 2.6
+      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
+    - python: 2.6
+      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
+    - python: 2.6
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 3.3
       env: DJANGO="Django>=1.4,<1.5" EASY_THUMBNAILS="easy-thumbnails>=1.2,<2.0"
