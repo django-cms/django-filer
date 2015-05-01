@@ -113,6 +113,7 @@ def make_folder(request, folder_id=None):
     else:
         new_folder_form = NewFolderForm()
     return render_to_response('admin/filer/folder/new_folder_form.html', {
+        'opts': Folder._meta,
         'new_folder_form': new_folder_form,
         'is_popup': popup_status(request),
         'select_folder': selectfolder_status(request),
