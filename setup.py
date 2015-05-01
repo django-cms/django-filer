@@ -26,7 +26,7 @@ setup(
     install_requires = (
         'Django>=1.4',
         'easy-thumbnails>=1.0',
-        'django-mptt>=0.6,<0.6.2',
+        'django-mptt>=0.6',
         'django_polymorphic>=0.2',
         'Unidecode>=0.04',
     ),
