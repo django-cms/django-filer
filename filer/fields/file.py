@@ -109,19 +109,15 @@ class AdminFileFormField(forms.ModelChoiceField):
 
 class FilerFileField(models.ForeignKey):
     default_form_class = AdminFileFormField
-    default_model_class = File
+    default_model_class = 'filer.File'
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
         if "to" in kwargs.keys():  # pragma: no cover
             old_to = kwargs.pop("to")
-            dfl = "%s.%s" % (
-                    self.default_model_class._meta.app_label,
-                    self.default_model_class.__name__
-            )
-            if old_to != dfl:
+            if old_to != self.default_model_class:
                 msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                    self.__class__.__name__, self.default_model_class.__name__, old_to
+                    self.__class__.__name__, self.default_model_class, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = self.default_model_class
