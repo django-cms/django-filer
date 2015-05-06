@@ -1,3 +1,4 @@
+(function(jQuery) {
 /**
  * Cookie plugin
  *
@@ -95,3 +96,4 @@ jQuery.cookie = function(name, value, options) {
         return cookieValue;
     }
 };
+})(django.jQuery);
