@@ -1,4 +1,7 @@
 #-*- coding: utf-8 -*-
+
+import django
+
 from django import forms
 from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse
@@ -31,6 +34,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     save_as = True
 
     form = FileAdminChangeFrom
+
+    def get_queryset(self, request):
+        if django.VERSION >= (1, 6):
+            return super(FileAdmin, self).get_queryset(request)
+        return super(FileAdmin, self).queryset(request)
+
+    queryset = get_queryset
 
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):
