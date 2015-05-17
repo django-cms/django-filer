@@ -1,4 +1,7 @@
 #-*- coding: utf-8 -*-
+
+import django
+
 from django import forms
 from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse
@@ -32,6 +35,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     form = FileAdminChangeFrom
 
+    def get_queryset(self, request):
+        if django.VERSION >= (1, 6):
+            return super(FileAdmin, self).get_queryset(request)
+        return super(FileAdmin, self).queryset(request)
+
+    queryset = get_queryset
+
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):
         fieldsets = (
@@ -57,7 +67,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         r = super(FileAdmin, self).response_change(request, obj)
-        if r['Location']:
+        if 'Location' in r and r['Location']:
             # it was a successful save
             if (r['Location'] in ['../'] or
                 r['Location'] == self._get_post_url(obj)):
