@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from filer.utils.compatibility import truncate_words
+from filer.utils.model_label import get_model_label
 from filer.models import File
 from filer import settings as filer_settings
 
@@ -113,18 +114,15 @@ class FilerFileField(models.ForeignKey):
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
+        dfl = get_model_label(self.default_model_class)
         if "to" in kwargs.keys():  # pragma: no cover
-            old_to = kwargs.pop("to")
-            dfl = "%s.%s" % (
-                    self.default_model_class._meta.app_label,
-                    self.default_model_class.__name__
-            )
+            old_to = get_model_label(kwargs.pop("to"))
             if old_to != dfl:
                 msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                    self.__class__.__name__, self.default_model_class.__name__, old_to
+                    self.__class__.__name__, dfl, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = self.default_model_class
+        kwargs['to'] = dfl
         super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
