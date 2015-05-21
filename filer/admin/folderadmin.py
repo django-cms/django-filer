@@ -4,7 +4,7 @@ import itertools
 import os
 import re
 
-from django import forms, template
+from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.admin import helpers
@@ -15,8 +15,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db import router, models
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 
 try:
     from django.utils.encoding import force_text
@@ -379,7 +378,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
-        return render_to_response(
+        return render(
+            request,
             self.directory_listing_template,
             {
                 'folder': folder,
@@ -411,7 +411,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'can_make_folder': request.user.is_superuser or \
                         (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or \
                         permissions.get("has_add_children_permission"),
-        }, context_instance=RequestContext(request))
+        })
 
     def filter_folder(self, qs, terms=[]):
         for term in terms:
@@ -717,9 +717,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         }
 
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/delete_selected_files_confirmation.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/delete_selected_files_confirmation.html", context)
 
     delete_files_or_folders.short_description = ugettext_lazy("Delete selected files and/or folders")
 
@@ -863,9 +861,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         }
 
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/folder/choose_move_destination.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_move_destination.html", context)
 
     move_files_and_folders.short_description = ugettext_lazy("Move selected files and/or folders")
 
@@ -947,9 +943,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         }
 
         # Display the rename format selection page
-        return render_to_response([
-            "admin/filer/folder/choose_rename_format.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_rename_format.html", context)
 
     rename_files.short_description = ugettext_lazy("Rename files")
 
@@ -1078,9 +1072,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         }
 
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/folder/choose_copy_destination.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_copy_destination.html", context)
 
     copy_files_and_folders.short_description = ugettext_lazy("Copy selected files and/or folders")
 
@@ -1200,8 +1192,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         }
 
         # Display the resize options page
-        return render_to_response([
-            "admin/filer/folder/choose_images_resize_options.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_images_resize_options.html", context)
 
     resize_images.short_description = ugettext_lazy("Resize selected images")

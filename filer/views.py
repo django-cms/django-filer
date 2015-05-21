@@ -6,8 +6,7 @@ from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from .models import Folder, Image, Clipboard, tools, FolderRoot
@@ -61,22 +60,22 @@ def _userperms(item, request):
 def edit_folder(request, folder_id):
     # TODO: implement edit_folder view
     folder = None
-    return render_to_response('admin/filer/folder/folder_edit.html', {
+    return render(request, 'admin/filer/folder/folder_edit.html', {
         'folder': folder,
         'is_popup': popup_status(request),
         'select_folder': selectfolder_status(request),
-    }, context_instance=RequestContext(request))
+    })
 
 
 @login_required
 def edit_image(request, folder_id):
     # TODO: implement edit_image view
     folder = None
-    return render_to_response('filer/image_edit.html', {
+    return render(request, 'filer/image_edit.html', {
         'folder': folder,
         'is_popup': popup_status(request),
         'select_folder': selectfolder_status(request),
-    }, context_instance=RequestContext(request))
+    })
 
 
 @login_required
@@ -108,16 +107,15 @@ def make_folder(request, folder_id=None):
                 new_folder.parent = folder
                 new_folder.owner = request.user
                 new_folder.save()
-                return render_to_response('admin/filer/dismiss_popup.html',
-                                          context_instance=RequestContext(request))
+                return render(request, 'admin/filer/dismiss_popup.html')
     else:
         new_folder_form = NewFolderForm()
-    return render_to_response('admin/filer/folder/new_folder_form.html', {
+    return render(request, 'admin/filer/folder/new_folder_form.html', {
         'opts': Folder._meta,
         'new_folder_form': new_folder_form,
         'is_popup': popup_status(request),
         'select_folder': selectfolder_status(request),
-    }, context_instance=RequestContext(request))
+    })
 
 
 class UploadFileForm(forms.ModelForm):
@@ -128,11 +126,11 @@ class UploadFileForm(forms.ModelForm):
 
 @login_required
 def upload(request):
-    return render_to_response('filer/upload.html', {
+    return render(request, 'filer/upload.html', {
                     'title': 'Upload files',
                     'is_popup': popup_status(request),
                     'select_folder': selectfolder_status(request),
-                    }, context_instance=RequestContext(request))
+                    })
 
 
 @login_required
