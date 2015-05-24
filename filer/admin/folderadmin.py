@@ -157,7 +157,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         """
         parent_folder = None
         try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
+            obj = self.get_queryset(request).get(pk=unquote(object_id))
             parent_folder = obj.parent
         except self.model.DoesNotExist:
             obj = None
