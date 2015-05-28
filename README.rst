@@ -54,18 +54,11 @@ See the docs for advanced configuration:
 * `permission docs`_ (experimental)
 * `secure file downloads docs`_ (experimental)
 
-Django 1.7
-----------
+Django <1.7 and South
+---------------------
 
-Django 1.7 is supported together with the new migrations.
-To avoid disrupting user experience the new migrations are installed in `filer.migrations_django`.
-If you are going to deploy `filer` in a Django 1.7 project you are required to add the following configuration::
-
-    MIGRATION_MODULES = {
-            'filer': 'filer.migrations_django',
-    }
-
-South and Django migrations will be swapped in `filer` 1.0.
+Django 1.7 is supported together with the new migrations. For South still find
+the old migrations, you need at least South>=1.0.
 
 
 Testsuite
