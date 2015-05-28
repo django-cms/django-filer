@@ -57,8 +57,8 @@ See the docs for advanced configuration:
 Django <1.7 and South
 ---------------------
 
-Django 1.7 is supported together with the new migrations. For South still find
-the old migrations, you need at least South>=1.0.
+Django 1.7 is supported together with the new migrations. For Django<1.7 South
+is still supported, you need at least South>=1.0 for South to find them though.
 
 
 Testsuite
