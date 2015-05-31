@@ -2,11 +2,12 @@ Changelog for django-filer
 ==========================
 
 
-next
-----
+0.9.10 (2015-05-31)
+-------------------
 
-* bugfixes
-* ...
+* migrations in default locations for Django 1.7 and South>=1.0
+* jQuery isolation fixes
+* various bugfixes
 
 
 0.9.9 (2015-01-20)

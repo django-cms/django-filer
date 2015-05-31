@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File
+from filer.utils.compatibility import DJANGO_1_5
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
@@ -31,6 +32,11 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     save_as = True
 
     form = FileAdminChangeFrom
+
+    def get_queryset(self, request):
+        if DJANGO_1_5:
+            return super(FileAdmin, self).queryset(request)
+        return super(FileAdmin, self).get_queryset(request)
 
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):
@@ -57,7 +63,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         r = super(FileAdmin, self).response_change(request, obj)
-        if r['Location']:
+        if 'Location' in r and r['Location']:
             # it was a successful save
             if (r['Location'] in ['../'] or
                 r['Location'] == self._get_post_url(obj)):
@@ -97,7 +103,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         """
         parent_folder = None
         try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
+            obj = self.get_queryset(request).get(pk=unquote(object_id))
             parent_folder = obj.folder
         except self.model.DoesNotExist:
             obj = None

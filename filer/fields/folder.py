@@ -18,6 +18,7 @@ from filer.settings import FILER_STATICMEDIA_PREFIX
 class AdminFolderWidget(ForeignKeyRawIdWidget):
     choices = None
     input_type = 'hidden'
+    is_hidden = False
 
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
@@ -107,14 +108,19 @@ class FilerFolderField(models.ForeignKey):
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
-        if "to" in kwargs.keys():
+        if "to" in kwargs.keys():  # pragma: no cover
             old_to = kwargs.pop("to")
-            msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                self.__class__.__name__, self.default_model_class.__name__, old_to
+            dfl = "%s.%s" % (
+                    self.default_model_class._meta.app_label,
+                    self.default_model_class.__name__
             )
-            warnings.warn(msg, SyntaxWarning)
+            if old_to != dfl:
+                msg = "%s can only be a ForeignKey to %s; %s passed" % (
+                    self.__class__.__name__, self.default_model_class.__name__, old_to
+                )
+                warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = self.default_model_class
-        return super(FilerFolderField, self).__init__(**kwargs)
+        super(FilerFolderField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults

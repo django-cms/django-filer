@@ -8,22 +8,19 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Image'
-        db.create_table(u'custom_image_image', (
-            (u'file_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['filer.File'], unique=True, primary_key=True)),
-            ('_height', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('_width', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('default_alt_text', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('default_caption', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('subject_location', self.gf('django.db.models.fields.CharField')(default=None, max_length=64, null=True, blank=True)),
-            ('extra_description', self.gf('django.db.models.fields.TextField')()),
+        # Adding model 'MyModel'
+        db.create_table(u'test_app_mymodel', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('general', self.gf('django.db.models.fields.related.ForeignKey')(related_name='test_file', to=orm['filer.File'])),
+            ('image', self.gf('django.db.models.fields.related.ForeignKey')(related_name='test_image', to=orm['filer.Image'])),
+            ('folder', self.gf('django.db.models.fields.related.ForeignKey')(related_name='test_folder', to=orm['filer.Folder'])),
         ))
-        db.send_create_signal('custom_image', ['Image'])
+        db.send_create_signal(u'test_app', ['MyModel'])
 
 
     def backwards(self, orm):
-        # Deleting model 'Image'
-        db.delete_table(u'custom_image_image')
+        # Deleting model 'MyModel'
+        db.delete_table(u'test_app_mymodel')
 
 
     models = {
@@ -63,16 +60,6 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'custom_image.image': {
-            'Meta': {'object_name': 'Image'},
-            '_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            '_width': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'default_alt_text': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'default_caption': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'extra_description': ('django.db.models.fields.TextField', [], {}),
-            u'file_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['filer.File']", 'unique': 'True', 'primary_key': 'True'}),
-            'subject_location': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '64', 'null': 'True', 'blank': 'True'})
-        },
         u'filer.file': {
             'Meta': {'object_name': 'File'},
             '_file_size': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -103,7 +90,27 @@ class Migration(SchemaMigration):
             u'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             u'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'filer.image': {
+            'Meta': {'object_name': 'Image'},
+            '_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            '_width': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'author': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'date_taken': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'default_alt_text': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'default_caption': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            u'file_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['filer.File']", 'unique': 'True', 'primary_key': 'True'}),
+            'must_always_publish_author_credit': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'subject_location': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '64', 'null': 'True', 'blank': 'True'})
+        },
+        u'test_app.mymodel': {
+            'Meta': {'object_name': 'MyModel'},
+            'folder': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'test_folder'", 'to': u"orm['filer.Folder']"}),
+            'general': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'test_file'", 'to': u"orm['filer.File']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'test_image'", 'to': "orm['filer.Image']"})
         }
     }
 
-    complete_apps = ['custom_image']
+    complete_apps = ['test_app']

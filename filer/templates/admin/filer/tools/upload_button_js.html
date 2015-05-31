@@ -3,6 +3,7 @@
 
 <script type="text/javascript">
 //<![CDATA[
+(function($) {
 $(function() {
     var uploader = new qq.FileUploaderBasic({
         action: '{% url 'admin:filer-ajax_upload' %}',
@@ -37,5 +38,6 @@ $(function() {
         }
     });
 });
+})(django.jQuery);
 //]]>
 </script>

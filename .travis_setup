@@ -1,2 +1,2 @@
 #!/bin/bash
-pip install $DJANGO Pillow $EASY_THUMBNAILS $POLYMORPHIC $MPTT python-coveralls coverage south
+pip install https://github.com/nephila/djangocms-helper/archive/develop.zip unidecode $DJANGO 'Pillow<2.6' $EASY_THUMBNAILS django-polymorphic django-mptt python-coveralls coverage south
