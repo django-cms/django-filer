@@ -34,6 +34,7 @@ setup(
         'django-mptt==0.6.1',
         'django_polymorphic>=0.2',
         'django-cms-roles',
+        'requests',
     ),
     dependency_links=dependency_links,
     include_package_data=True,
