@@ -27,7 +27,11 @@ class PermissionSetField(models.TextField):
         return PermissionSet.from_txt(value)
 
     def get_prep_value(self, value):
-        return value.to_txt()
+        from filer.models import PermissionSet
+        if isinstance(value, PermissionSet):
+            return value.to_txt()
+        else:
+            return value
 
     def south_field_triple(self):
         "Returns a suitable description of this field for South."

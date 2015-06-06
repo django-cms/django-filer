@@ -49,5 +49,6 @@ setup(
     tests_require=(
         'argparse',  # needed on python 2.6
         'south',
+        'djangocms-helper>=0.8.1',
     ),
 )
