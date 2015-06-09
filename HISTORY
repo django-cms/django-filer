@@ -1,6 +1,11 @@
 Changelog for django-filer
 ==========================
 
+0.9.11 (2015-06-09)
+-------------------
+
+* update Django 1.7 migrations because of change in django_polymorphic>=0.7
+
 
 0.9.10 (2015-05-31)
 -------------------
