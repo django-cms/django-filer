@@ -7,6 +7,7 @@ import re
 from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
+from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.util import quote, unquote, capfirst
 from django.core.exceptions import ValidationError
@@ -39,7 +40,8 @@ from filer.admin.tools import (userperms_for_request,
                                check_files_read_permissions,
                                check_folder_read_permissions)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
-                          ImagesWithMissingData, FolderPermission, Image)
+                          ImagesWithMissingData, FolderPermission, Image,
+                          Permission, filter_queryset_by_permissions_for_user)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.compatibility import get_delete_permission
@@ -56,6 +58,13 @@ class AddFolderPopupForm(forms.ModelForm):
         fields = ('name',)
 
 
+class PermissionInlineAdmin(admin.TabularInline):
+    model = Permission
+    extra = 0
+    fields = ('who', 'user', 'group', 'can_read', 'can_edit')
+    raw_id_fields = ('user', 'group',)
+
+
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
@@ -63,10 +72,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_filter = ('owner',)
     search_fields = ['name', 'files__name']
     raw_id_fields = ('owner',)
+    readonly_fields = ('who_can_read_local', 'who_can_read', 'who_can_edit_local', 'who_can_edit',)
     save_as = True  # see ImageAdmin
-    actions = ['move_to_clipboard', 'files_set_public', 'files_set_private',
+    actions = ('move_to_clipboard', 'files_set_public', 'files_set_private',
                'delete_files_or_folders', 'move_files_and_folders',
-               'copy_files_and_folders', 'resize_images', 'rename_files']
+               'copy_files_and_folders', 'resize_images', 'rename_files',)
+    inlines = (PermissionInlineAdmin,)
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
     order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
@@ -232,7 +243,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
-                Folder.objects.get(id=last_folder_id)
+                Folder.objects.get(id=last_folder_id)  # FIXME: check permissions already here
             except Folder.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
                 url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request,"&"))
@@ -244,6 +255,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder = FolderRoot()
         else:
             folder = get_object_or_404(Folder, id=folder_id)
+            if not folder.can_read(request.user):
+                raise PermissionDenied
         request.session['filer_last_folder_id'] = folder_id
 
         # Check actions to see if any are available on this changelist
@@ -298,25 +311,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_children += folder.virtual_folders
 
-        perms = FolderPermission.objects.get_read_id_list(request.user)
-        root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
-        if perms != 'All':
-            file_qs = file_qs.filter(models.Q(folder__id__in=perms) | models.Q(owner=request.user))
-            folder_qs = folder_qs.filter(models.Q(id__in=perms) | models.Q(owner=request.user))
-        else:
-            root_exclude_kw.pop('parent__id__in')
-        if folder.is_root:
-            folder_qs = folder_qs.exclude(**root_exclude_kw)
+        # TODO: new permission system
+        # perms = FolderPermission.objects.get_read_id_list(request.user)
+        # if perms != 'All':
+        #     folder_qs = folder_qs.filter(Q(id__in=perms) | Q(owner=request.user))
+        #     file_qs = file_qs.filter(Q(folder__id__in=perms) | Q(owner=request.user))
+        folder_qs = filter_queryset_by_permissions_for_user(folder_qs, request.user, 'read')
+        file_qs = filter_queryset_by_permissions_for_user(file_qs, request.user, 'read')
 
+        # FIXME: this evaluates the whole qs. Find a way to do it without this.
+        #        probably need to de-normalise a "sort" field to do that.
         folder_children += folder_qs
         folder_files += file_qs
 
         try:
             permissions = {
-                'has_edit_permission': folder.has_edit_permission(request),
-                'has_read_permission': folder.has_read_permission(request),
-                'has_add_children_permission': \
-                                folder.has_add_children_permission(request),
+                'has_edit_permission': folder.can_edit(request.user),
+                'has_read_permission': folder.can_read(request.user),
+                'has_add_children_permission': folder.can_edit(request.user),
             }
         except:
             permissions = {}
@@ -333,7 +345,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             for f in folder_files:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
                     clipboard = tools.get_user_clipboard(request.user)
-                    if f.has_edit_permission(request):
+                    if f.can_edit(request.user):
                         tools.move_file_to_clipboard([f], clipboard)
                         return HttpResponseRedirect(request.get_full_path())
                     else:
@@ -790,11 +802,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # We do not allow moving to selected folders or their descendants
                 continue
 
-            if not fo.has_read_permission(request):
+            if not fo.can_read(request.user):
                 continue
 
             # We do not allow copying/moving back to the folder itself
-            enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
+            enabled = (allow_self or fo != current_folder) and fo.can_edit(request.user)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_text(fo)), enabled))
             for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
                 yield c

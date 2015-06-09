@@ -33,26 +33,28 @@ if not filer_settings.FILER_IMAGE_MODEL:
         must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
 
         def save(self, *args, **kwargs):
-            if self.date_taken is None:
-                try:
-                    exif_date = self.exif.get('DateTimeOriginal', None)
-                    if exif_date is not None:
-                        d, t = exif_date.split(" ")
-                        year, month, day = d.split(':')
-                        hour, minute, second = t.split(':')
-                        if getattr(settings, "USE_TZ", False):
-                            tz = get_current_timezone()
-                            self.date_taken = make_aware(datetime(
-                                int(year), int(month), int(day),
-                                int(hour), int(minute), int(second)), tz)
-                        else:
-                            self.date_taken = datetime(
-                                int(year), int(month), int(day),
-                                int(hour), int(minute), int(second))
-                except Exception:
-                    pass
-            if self.date_taken is None:
-                self.date_taken = now()
+            refresh_metadata = kwargs.get('refresh_metadata', True)
+            if refresh_metadata:
+                if self.date_taken is None:
+                    try:
+                        exif_date = self.exif.get('DateTimeOriginal', None)
+                        if exif_date is not None:
+                            d, t = exif_date.split(" ")
+                            year, month, day = d.split(':')
+                            hour, minute, second = t.split(':')
+                            if getattr(settings, "USE_TZ", False):
+                                tz = get_current_timezone()
+                                self.date_taken = make_aware(datetime(
+                                    int(year), int(month), int(day),
+                                    int(hour), int(minute), int(second)), tz)
+                            else:
+                                self.date_taken = datetime(
+                                    int(year), int(month), int(day),
+                                    int(hour), int(minute), int(second))
+                    except Exception:
+                        pass
+                if self.date_taken is None:
+                    self.date_taken = now()
             super(Image, self).save(*args, **kwargs)
 else:
     # This is just an alias for the real model defined elsewhere

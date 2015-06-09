@@ -96,3 +96,40 @@ class FolderRoot(DummyFolder):
 
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse('admin:filer-directory_listing-root')
+
+    @property
+    def who_can_read(self):
+        return self._get_permissions()['who_can_read']
+
+    @property
+    def who_can_edit(self):
+        return self._get_permissions()['who_can_edit']
+
+    @property
+    def who_can_read_local(self):
+        return self._get_permissions()['who_can_read_local']
+
+    @property
+    def who_can_edit_local(self):
+        return self._get_permissions()['who_can_edit_local']
+
+    def _get_permissions(self):
+        from .permissionmodels import PermissionSet, Permission
+        cache_key = '_get_permissions_cache'
+        if not hasattr(self, cache_key):
+            who_can_read = PermissionSet()
+            who_can_edit = PermissionSet()
+            for permission in Permission.objects.filter(subject='root'):
+                if permission.can_read_bool in (True, False):
+                    who_can_read.add_permission(
+                        permission.who, permission.get_who_id(), permission.can_read_bool)
+                if permission.can_edit_bool in (True, False):
+                    who_can_edit.add_permission(
+                        permission.who, permission.get_who_id(), permission.can_edit_bool)
+            setattr(self, cache_key, {
+                'who_can_read': who_can_read,
+                'who_can_edit': who_can_edit,
+                'who_can_read_local': who_can_read.clone(),
+                'who_can_edit_local': who_can_edit.clone(),
+            })
+        return getattr(self, cache_key)

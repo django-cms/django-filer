@@ -1,7 +1,5 @@
 #-*- coding: utf-8 -*-
-from filer.fields.file import AdminFileWidget, AdminFileFormField, \
-    FilerFileField
-from filer.models import Image
+from filer.fields.file import AdminFileWidget, AdminFileFormField, FilerFileField
 
 
 class AdminImageWidget(AdminFileWidget):
@@ -13,5 +11,9 @@ class AdminImageFormField(AdminFileFormField):
 
 
 class FilerImageField(FilerFileField):
-    default_form_class = AdminImageFormField
-    default_model_class = Image
+    def get_default_form_class(self):
+        return AdminImageFormField
+
+    def get_default_model_class(self):
+        from filer.models import Image
+        return Image

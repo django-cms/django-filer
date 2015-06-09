@@ -1,4 +1,9 @@
 #-*- coding: utf-8 -*-
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User, Permission  # NOQA
 from django.contrib.auth.models import Group
 from django.core.files import File as DjangoFile
 from django.conf import settings
@@ -52,58 +57,46 @@ class FolderPermissionsTestCase(TestCase):
 
         self.folder_perm = Folder.objects.create(name='test_folder2')
 
+        self.subfolder = Folder.objects.create(name='test_subfolder', parent=self.folder_perm)
+        self.subsubfolder = Folder.objects.create(name='test_subsubfolder', parent=self.subfolder)
+
     def tearDown(self):
         self.image.delete()
 
     def test_superuser_has_rights(self):
-        request = Mock()
-        setattr(request, 'user', self.superuser)
-
-        result = self.folder.has_read_permission(request)
+        result = self.folder.can_read(self.superuser)
         self.assertEqual(result, True)
 
     def test_unlogged_user_has_no_rights(self):
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
-            request = Mock()
-            setattr(request, 'user', self.unauth_user)
-
-            result = self.folder.has_read_permission(request)
+            result = self.folder.can_read(self.unauth_user)
             self.assertEqual(result, False)
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
     def test_unlogged_user_has_rights_when_permissions_disabled(self):
-        request = Mock()
-        setattr(request, 'user', self.unauth_user)
-
-        result = self.folder.has_read_permission(request)
+        result = self.folder.can_read(self.unauth_user)
         self.assertEqual(result, True)
 
     def test_owner_user_has_rights(self):
         # Set owner as the owner of the folder.
         self.folder.owner = self.owner
-        request = Mock()
-        setattr(request, 'user', self.owner)
-
-        result = self.folder.has_read_permission(request)
+        result = self.folder.can_read(self.owner)
         self.assertEqual(result, True)
 
     def test_combined_groups(self):
-        request1 = Mock()
-        setattr(request1, 'user', self.test_user1)
-        request2 = Mock()
-        setattr(request2, 'user', self.test_user2)
-
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
 
-            self.assertEqual(self.folder.has_read_permission(request1), False)
-            self.assertEqual(self.folder.has_read_permission(request2), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request1), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request2), False)
+            self.assertEqual(self.folder.can_read(self.test_user1), False)
+            self.assertEqual(self.folder.can_read(self.test_user2), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user1), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), False)
+            self.assertEqual(self.subsubfolder.can_read(self.test_user1), False)
+            self.assertEqual(self.subsubfolder.can_read(self.test_user2), False)
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
@@ -116,10 +109,12 @@ class FolderPermissionsTestCase(TestCase):
             delattr(self.folder, 'permission_cache')
             delattr(self.folder_perm, 'permission_cache')
 
-            self.assertEqual(self.folder.has_read_permission(request1), True)
-            self.assertEqual(self.folder.has_read_permission(request2), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request1), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.folder.can_read(self.test_user1), True)
+            self.assertEqual(self.folder.can_read(self.test_user2), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user1), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), True)
+            self.assertEqual(self.subsubfolder.can_read(self.test_user1), False)
+            self.assertEqual(self.subsubfolder.can_read(self.test_user2), True)
 
             self.test_user1.groups.add(self.group2)
             self.test_user2.groups.add(self.group1)
@@ -128,10 +123,12 @@ class FolderPermissionsTestCase(TestCase):
             delattr(self.folder, 'permission_cache')
             delattr(self.folder_perm, 'permission_cache')
 
-            self.assertEqual(self.folder.has_read_permission(request1), True)
-            self.assertEqual(self.folder.has_read_permission(request2), True)
-            self.assertEqual(self.folder_perm.has_read_permission(request1), True)
-            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.folder.can_read(self.test_user1), True)
+            self.assertEqual(self.folder.can_read(self.test_user2), True)
+            self.assertEqual(self.folder_perm.can_read(self.test_user1), True)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), True)
+            self.assertEqual(self.subsubfolder.can_read(self.test_user1), True)
+            self.assertEqual(self.subsubfolder.can_read(self.test_user2), True)
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
@@ -146,13 +143,13 @@ class FolderPermissionsTestCase(TestCase):
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
 
-            self.assertEqual(self.folder.has_read_permission(request1), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request1), False)
+            self.assertEqual(self.folder.can_read(self.test_user1), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user1), False)
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group1, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group2, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            Permission.objects.create(folder=self.folder, subject='folder', who='group', group=self.group1, can_edit=0, can_read=1)
+            Permission.objects.create(folder=self.folder, subject='folder', who='group', group=self.group2, can_edit=1, can_read=1)
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
@@ -162,8 +159,8 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.test_user1.groups.filter(pk=self.group1.pk).exists(), True)
             self.assertEqual(self.test_user1.groups.filter(pk=self.group2.pk).exists(), False)
 
-            self.assertEqual(self.folder.has_read_permission(request1), True)
-            self.assertEqual(self.folder.has_edit_permission(request1), False)
+            self.assertEqual(self.folder.can_read(self.test_user1), True)
+            self.assertEqual(self.folder.can_edit(self.test_user1), False)
 
             self.assertEqual(self.test_user1.groups.count(), 1)
 
@@ -174,8 +171,8 @@ class FolderPermissionsTestCase(TestCase):
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
 
-            self.assertEqual(self.folder.has_read_permission(request1), True)
-            self.assertEqual(self.folder.has_edit_permission(request1), False)
+            self.assertEqual(self.folder.can_read(self.test_user1), True)
+            self.assertEqual(self.folder.can_edit(self.test_user1), False)
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
@@ -191,8 +188,8 @@ class FolderPermissionsTestCase(TestCase):
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
 
-            self.assertEqual(self.folder.has_read_permission(request2), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request2), False)
+            self.assertEqual(self.folder.can_read(self.test_user2), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), False)
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
@@ -207,7 +204,7 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.test_user2.groups.filter(pk=self.group2.pk).exists(), True)
             self.assertEqual(self.test_user2.groups.filter(pk=self.group1.pk).exists(), False)
 
-            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), True)
             self.assertEqual(self.folder_perm.has_edit_permission(request2), False)
 
             self.assertEqual(self.test_user2.groups.count(), 1)
@@ -219,7 +216,7 @@ class FolderPermissionsTestCase(TestCase):
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
 
-            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), True)
             self.assertEqual(self.folder_perm.has_edit_permission(request2), False)
 
         finally:
@@ -235,8 +232,8 @@ class FolderPermissionsTestCase(TestCase):
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
 
-            self.assertEqual(self.folder.has_read_permission(request1), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request1), False)
+            self.assertEqual(self.folder.can_read(self.test_user1), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user1), False)
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
@@ -251,7 +248,7 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.test_user1.groups.filter(pk=self.group1.pk).exists(), True)
             self.assertEqual(self.test_user1.groups.filter(pk=self.group2.pk).exists(), False)
 
-            self.assertEqual(self.folder.has_read_permission(request1), True)
+            self.assertEqual(self.folder.can_read(self.test_user1), True)
             self.assertEqual(self.folder.has_edit_permission(request1), False)
 
             self.assertEqual(self.test_user1.groups.count(), 1)
@@ -263,7 +260,7 @@ class FolderPermissionsTestCase(TestCase):
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
 
-            self.assertEqual(self.folder.has_read_permission(request1), True)
+            self.assertEqual(self.folder.can_read(self.test_user1), True)
             self.assertEqual(self.folder.has_edit_permission(request1), True)
 
         finally:
@@ -273,15 +270,12 @@ class FolderPermissionsTestCase(TestCase):
         # Tests overlapped groups without explicit deny
         # Similar test to test_overlapped_groups1, only order of groups is different
 
-        request2 = Mock()
-        setattr(request2, 'user', self.test_user2)
-
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
 
-            self.assertEqual(self.folder.has_read_permission(request2), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request2), False)
+            self.assertEqual(self.folder.can_read(self.test_user2), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), False)
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
@@ -296,8 +290,8 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.test_user2.groups.filter(pk=self.group2.pk).exists(), True)
             self.assertEqual(self.test_user2.groups.filter(pk=self.group1.pk).exists(), False)
 
-            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
-            self.assertEqual(self.folder_perm.has_edit_permission(request2), False)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), True)
+            self.assertEqual(self.folder_perm.can_edit(self.test_user2), False)
 
             self.assertEqual(self.test_user2.groups.count(), 1)
 
@@ -308,8 +302,8 @@ class FolderPermissionsTestCase(TestCase):
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
 
-            self.assertEqual(self.folder_perm.has_read_permission(request2), True)
-            self.assertEqual(self.folder_perm.has_edit_permission(request2), True)
+            self.assertEqual(self.folder_perm.can_read(self.test_user2), True)
+            self.assertEqual(self.folder_perm.can_edit(self.test_user2), True)
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting

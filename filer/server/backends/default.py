@@ -20,6 +20,7 @@ class DefaultServer(ServerBase):
         # the following code is largely borrowed from `django.views.static.serve`
         # and django-filetransfers: filetransfers.backends.default
         if not os.path.exists(fullpath):
+            # FIXME: don't expose fullpath.
             raise Http404('"%s" does not exist' % fullpath)
         # Respect the If-Modified-Since header.
         statobj = os.stat(fullpath)
