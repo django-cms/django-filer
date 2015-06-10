@@ -30,7 +30,7 @@ class ClipboardAdmin(admin.ModelAdmin):
     verbose_name_plural = "DEBUG Clipboards"
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(ClipboardAdmin, self).get_urls()
         url_patterns = patterns('',
             url(r'^operations/paste_clipboard_to_folder/$',

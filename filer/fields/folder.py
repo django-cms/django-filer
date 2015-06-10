@@ -8,10 +8,14 @@ from django.contrib.admin.sites import site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.safestring import mark_safe
-from django.utils.text import truncate_words
 from django.utils.translation import ugettext as _
 from filer.models import Folder
 from filer.settings import FILER_STATICMEDIA_PREFIX
+
+try:
+    from django.utils.text import truncate_words
+except ImportError:
+    from django.template.defaultfilters import truncatewords as truncate_words
 
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):

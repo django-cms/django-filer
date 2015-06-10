@@ -9,9 +9,13 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from django.utils.text import truncate_words
 from filer.models import File
 from filer import settings as filer_settings
+
+try:
+    from django.utils.text import truncate_words
+except ImportError:
+    from django.template.defaultfilters import truncatewords as truncate_words
 
 import logging
 logger = logging.getLogger(__name__)

@@ -144,7 +144,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
 
         if request.method == 'POST':
             return has_multi_file_action_permission(
-                request, File.objects.get_empty_query_set(),
+                request, File.objects.none(),
                 Folder.objects.filter(id=folder.id))
 
         return folder.has_delete_permission(request.user)

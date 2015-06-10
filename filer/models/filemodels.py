@@ -60,11 +60,6 @@ class FilesChainableQuerySetMixin(object):
             folder__site__in=sites)
 
 
-class EmptyFilesQS(models.query.EmptyQuerySet,
-                   FilesChainableQuerySetMixin):
-    pass
-
-
 class FileQuerySet(polymorphic.query.PolymorphicQuerySet,
                    FilesChainableQuerySetMixin):
     pass
@@ -74,9 +69,6 @@ class FileManager(polymorphic.PolymorphicManager):
 
     def get_query_set(self):
         return FileQuerySet(self.model, using=self._db)
-
-    def get_empty_query_set(self):
-        return EmptyFilesQS(self.model, using=self._db)
 
     def find_all_duplicates(self):
         return {file_data['sha1']: file_data['count']
@@ -361,30 +353,26 @@ class File(mixins.TrashableMixin,
             super(File, self).save(*args, **kwargs)
 
         if self._force_commit:
-            with transaction.commit_manually():
-                # The manual transaction management here breaks the transaction management
-                # from django.contrib.admin.options.ModelAdmin.change_view
-                # This isn't a big problem because the only CRUD operation done afterwards
-                # is an insertion in django_admin_log. If this method rollbacks the transaction
-                # then we will have an entry in the admin log describing an action
-                # that didn't actually finish succesfull.
-                # This 'hack' can be removed once django adds support for on_commit and
-                # on_rollback hooks (see: https://code.djangoproject.com/ticket/14051)
-                try:
+            try:
+                with transaction.atomic(savepoint=False):
+                    # The manual transaction management here breaks the transaction management
+                    # from django.contrib.admin.options.ModelAdmin.change_view
+                    # This isn't a big problem because the only CRUD operation done afterwards
+                    # is an insertion in django_admin_log. If this method rollbacks the transaction
+                    # then we will have an entry in the admin log describing an action
+                    # that didn't actually finish succesfull.
+                    # This 'hack' can be removed once django adds support for on_commit and
+                    # on_rollback hooks (see: https://code.djangoproject.com/ticket/14051)
                     copy_and_save()
-                except Exception:
-                    try:
-                        transaction.rollback()
-                    finally:
-                        # delete the file from new_location if the db update failed
-                        if old_location != new_location:
-                            storage.delete(new_location)
-                    raise
-                else:
-                    transaction.commit()
-                    # only delete the file on the old_location if all went OK
-                    if old_location != new_location:
-                        storage.delete(old_location)
+            except:
+                # delete the file from new_location if the db update failed
+                if old_location != new_location:
+                    storage.delete(new_location)
+                raise
+            else:
+                # only delete the file on the old_location if all went OK
+                if old_location != new_location:
+                    storage.delete(old_location)
         else:
             copy_and_save()
         return new_location

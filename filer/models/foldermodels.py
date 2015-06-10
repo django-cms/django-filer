@@ -76,20 +76,12 @@ class FoldersChainableQuerySetMixin(object):
         return self.filter(deleted_at__isnull=True)
 
 
-class EmptyFoldersQS(models.query.EmptyQuerySet,
-                     FoldersChainableQuerySetMixin):
-    pass
-
-
 class FolderQueryset(query.QuerySet,
                      FoldersChainableQuerySetMixin):
     pass
 
 
 class FolderManager(models.Manager):
-
-    def get_empty_query_set(self):
-        return EmptyFoldersQS(self.model, using=self._db)
 
     def get_query_set(self):
         return FolderQueryset(self.model, using=self._db)
@@ -294,19 +286,16 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
             self.update_descendants_metadata()
             return
 
-        with transaction.commit_manually():
-            # The manual transaction management here breaks the transaction
-            #   management from
-            #   django.contrib.admin.options.ModelAdmin.change_view
-            storages = []
-            old_locations = []
-            new_locations = []
+        storages = []
+        old_locations = []
+        new_locations = []
 
-            def delete_from_locations(locations, storages):
-                for location, storage in zip(locations, storages):
-                    storage.delete(location)
+        def delete_from_locations(locations, storages):
+            for location, storage in zip(locations, storages):
+                storage.delete(location)
 
-            try:
+        try:
+            with transaction.atomic(savepoint=False):
                 self.set_metadata_from_parent()
                 super(Folder, self).save(*args, **kwargs)
                 self.update_descendants_metadata()
@@ -323,15 +312,11 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
                             storages.append(f.file.storage)
                             old_locations.append(old_location)
                             new_locations.append(new_location)
-            except:
-                try:
-                    transaction.rollback()
-                finally:
-                    delete_from_locations(new_locations, storages)
-                raise
-            else:
-                transaction.commit()
-                delete_from_locations(old_locations, storages)
+        except:
+            delete_from_locations(new_locations, storages)
+            raise
+        else:
+            delete_from_locations(old_locations, storages)
 
     def soft_delete(self):
         deletion_time = datetime.now()
@@ -440,7 +425,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     def trashed_files(self):
         trash_file_mgr = filer.models.filemodels.File.trash
         if not self.pk:
-            return trash_file_mgr.get_empty_query_set()
+            return trash_file_mgr.none()
         return trash_file_mgr.filter(folder=self).order_by(
             'title', 'name', 'original_filename')
 

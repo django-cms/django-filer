@@ -29,10 +29,10 @@ setup(
     packages=find_packages(),
     install_requires = (
         'pytz',
-        'Django>=1.3,<1.5',
-        'easy-thumbnails>=1.0,<2.0.0',
+        'Django>=1.3,<1.6',
+        'easy-thumbnails<=2.2',
         'django-mptt==0.6.1',
-        'django_polymorphic>=0.2',
+        'django_polymorphic<=0.7.1',
         'django-cms-roles',
     ),
     dependency_links=dependency_links,
@@ -53,5 +53,4 @@ setup(
         'django-setuptest>=0.1.1',
         'argparse',  # apparently needed by django-setuptest on python 2.6
     ),
-    setup_requires=['s3sourceuploader',],
 )

@@ -156,7 +156,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(FolderAdmin, self).get_urls()
         url_patterns = patterns('',
             # we override the default list view with our own directory listing
@@ -230,7 +230,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         response = self.delete_files_or_folders(
             request,
-            File.objects.get_empty_query_set(),
+            File.objects.none(),
             Folder.objects.filter(id=obj.id))
 
         if response is None:
@@ -548,7 +548,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if not has_multi_file_action_permission(
                 request, files_queryset,
-                Folder.objects.get_empty_query_set()):
+                Folder.objects.none()):
             raise PermissionDenied
 
         clipboard = tools.get_user_clipboard(request.user)
@@ -925,7 +925,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
 
         if not has_multi_file_action_permission(request, files_queryset,
-                Folder.objects.get_empty_query_set()):
+                Folder.objects.none()):
             raise PermissionDenied
 
         def is_valid_archive(filer_file):
