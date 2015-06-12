@@ -2,71 +2,85 @@
 {% load adminmedia filer_admin_tags filermedia i18n %}
 {% load url from future %}
 
-{% block extrahead %}{{ block.super }}
-{# upload stuff #}
-{{ media.js }}
-<script type="text/javascript" src="{% admin_js_base %}jquery.min.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
-<script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
+{% block extrahead %}
+    {{ block.super }}
+    {# upload stuff #}
+    {{ media.js }}
+    <script type="text/javascript" src="{% admin_js_base %}jquery.min.js"></script>
+    <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery-ui-1.7.2.custom.min.js"></script>
+    <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
+    <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
+    <script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
+    <script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
 
-{% if action_form %}{% if actions_on_top or actions_on_bottom %}
-<script type="text/javascript">
-(function($) {
-    $(document).ready(function($) {
-        $("tr input.action-select").actions();
-    });
-})(django.jQuery);
-</script>
-{% endif %}{% endif %}
+    {% if action_form %}
+        {% if actions_on_top or actions_on_bottom %}
+            <script type="text/javascript">
+                (function($) {
+                    $(document).ready(function($) {
+                        $("tr input.action-select").actions();
+                    });
+                })(django.jQuery);
+            </script>
+        {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}change-list filebrowser{% endblock %}
 
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% admin_css_base %}changelists.css" />
-{{ media.css }}
-{% if action_form %}
-  {% url 'admin:jsi18n' as jsi18nurl %}
-  <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
-{% endif %}
-{% if query.pop %}
-<style type="text/css">
-    #header { display: none; }
-</style>
-{% endif %}
-{% if not actions_on_top and not actions_on_bottom %}
-<style>
-    #changelist table thead th:first-child {width: inherit}
-</style>
-{% endif %}
+{% block extrastyle %}
+    {{ block.super }}
+    {{ media.css }}
+    
+    {% if action_form %}
+        {% url 'admin:jsi18n' as jsi18nurl %}
+        <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
+    {% endif %}
+
+    {% if query.pop %}
+        <style type="text/css">
+            #header { display: none; }
+        </style>
+    {% endif %}
+    {% if not actions_on_top and not actions_on_bottom %}
+        <style>
+            #changelist table thead th:first-child {width: inherit}
+        </style>
+    {% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
-{% with folder as instance %}
-{% include "admin/filer/breadcrumbs.html" %}
-{% endwith %}
+    {% with folder as instance %}
+        {% include "admin/filer/breadcrumbs.html" %}
+    {% endwith %}
 {% endblock %}
 
 
 {% block sidebar %}
-<div id="content-related">
-    {% include "admin/filer/tools/clipboard/clipboard.html" %}
-</div>
+    <div id="content-related">
+        {% include "admin/filer/tools/clipboard/clipboard.html" %}
+    </div>
 {% endblock %}
 
 
-{% block content_title %}<h2>&nbsp;</h2>{% endblock %}
+{% block content_title %}{% endblock %}
 {% block content %}
 <div id="content-main">
-    <ul class="object-tools">
-        {% if not folder|is_restricted_for_user:user and folder.can_have_subfolders %}{%if is_popup and folder.is_root %}{%else%}<li><a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}">{% trans "New Folder" %}</a></li>{% endif %}{% endif %}
-        <li><a id="id_upload_button" href="#" class="addlink" title="{% trans 'upload files' %}">{% trans 'Upload' %}</a></li>
+    <ul class="object-tools list-unstyled list-inline text-right">
+        {% if not folder|is_restricted_for_user:user and folder.can_have_subfolders %}
+            {%if is_popup and folder.is_root %}
+            {%else%}
+                <li>
+                    <a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink btn btn-success btn-sm" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}"><i class="ace-icon fa fa-folder-open"></i>{% trans "New Folder" %}</a>
+                </li>
+            {% endif %}
+        {% endif %}
+        <li>
+            <a id="id_upload_button" href="#" class="addlink btn btn-purple btn-sm" title="{% trans 'upload files' %}"><i class="ace-icon fa fa-cloud-upload"></i>{% trans 'Upload' %}</a>
+        </li>
         {% include 'admin/filer/tools/upload_button_js.html' %}
     </ul>
 
