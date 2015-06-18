@@ -1,26 +1,27 @@
 {% load adminmedia filermedia filer_admin_tags %}
 {% load i18n %}
-<div id="toolbar">
-    <div style="float: left;">
-        <form id="changelist-search" action="." method="get">
+<div id="toolbar" class="dataTables_wrapper">
+    <div class="row">
+        <form id="changelist-search" action="." method="get" class="col-xs-5 pull-right text-right">
             {% csrf_token %}
             <div>
-                <label for="searchbar"><img src="{% admin_icon_base %}icon_searchbox.png" alt="{% trans "Search" %}" /></label>
                 {% if is_popup %}
                     <input type="hidden" name="_popup" value="1" />
                     {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
                 {% endif %}
-                {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
-                <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" />
-                <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}"  />
+                    {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
+                    <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" class="pull-left"/>
+                    <button title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}" class="btn btn-sm btn-primary pull-left"><i class="fa fa-search"></i></button>
+
                 {% if not folder.is_root %}
-                <input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans "Check it to" %} {% trans "limit the search to current folder" %}"/>
-                <label for="limit_search_to_folder">{% trans "limit the search to current folder" %}</label>
+                <div class="limiter-wrapper pull-left">
+                    <input type="checkbox" class="ace" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}    checked="checked"{% endif %} title="{% trans "Check it to" %} {% trans "limit the search to current folder" %}"/><span class="lbl">
+                    <label for="limit_search_to_folder">{% trans "limit the search to current folder" %}</label>
+                </div>
                 {% endif %}
                 {% if show_result_count %}
-                <span class="small quiet">({% trans "found" %} {% blocktrans count show_result_count.folders_found as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
-                {% blocktrans count show_result_count.files_found as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?{% get_popup_params '&' %}">{% trans "cancel search" %}</a></span>
-
+                    <span class="small quiet">({% trans "found" %} {% blocktrans count show_result_count.folders_found as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
+                    {% blocktrans count show_result_count.files_found as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %}) <a href="?{% get_popup_params '&' %}">{% trans "cancel search" %}</a></span>
                 {% endif %}
             </div>
         </form>

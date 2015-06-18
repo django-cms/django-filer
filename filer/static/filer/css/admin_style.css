@@ -1,0 +1,124 @@
+body {
+	background: white;
+}
+.dataTables_wrapper.custom-style {
+	position: absolute;
+	top: 44px;
+	left: 0px;
+}
+.text-right  div {
+	float: right;
+}
+.dataTables_wrapper.custom-style .row {
+	border: none;
+}
+#toolbar {
+	border-bottom: 1px solid #e0e0e0;
+	margin-bottom: 10px;
+}
+.actions .list-unstyled {
+	line-height: 34px;
+}
+.thumbHeader, .action-checkbox-column{
+	width: 5em;
+}
+.clipboard {
+	max-width: 100%;
+  	width: 100%;
+  	min-width: 100%;
+  	overflow: hidden;
+}
+.clipboardItem td {
+	word-wrap: break-word;
+	max-width: 150px;
+}
+.table-bordered .selected, .table-bordered .selected td {
+	background-color: #E4EFC9 !important;
+}
+.table-bordered td.center, .table-bordered td.middle {
+	vertical-align: middle !important;
+}
+.table-bordered td strong {
+	margin-right: 5px;
+}
+.this-page, .avoid-multiple-submissions {
+	margin-right: 10px;
+}
+.thumbnail.custom-margin {
+	margin: 10px 10px 0 0;
+}
+.limiter-wrapper {
+	line-height: 34px;
+	margin-left: 10px;
+}
+.page-header .go-up {
+	margin-right: 5px;
+	display: inline-block;
+	text-align: center;
+}
+.go-back {
+	margin: 7px 10px 0 0px;
+}
+.left-20 {
+	margin-left: 20px;
+}
+.padding-20 {
+	padding: 20px;
+}
+table a.changelink, table a.deletelink {
+ 	line-height: 36px;
+}
+.ace-icon {
+	margin-right: 3px;
+}
+table a.deletelink {
+	margin-left: 15px;
+}
+.colMS.no-padding .page-header {
+	padding-left: 12px;
+}
+.change-form .form-horizontal input,
+.change-form .form-horizontal select,
+.change-form .form-horizontal textarea {
+	width: 50%;
+}
+.change-form .clear {
+	display: none;
+}
+.loadingThumb {
+	width: 50px;
+	height: 42px;
+}
+.percentage.small {
+	font-size: 11px;
+	vertical-align: middle;
+}
+.add-another img {
+	display: none;
+}
+.add-another {
+	text-decoration: none !important;
+	display: inline-block;
+	margin: 0 0 0 10px;
+  	vertical-align: middle;
+}
+.add-another:after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content: "\f067";
+	color: #9585bf;
+}
+.popover-content, .popover {
+	box-shadow: none;
+}
+ul.custom-bullets li:before {
+	content: "\f111";
+	font: normal normal normal 14px/1 FontAwesome;
+	display: inline-block;
+	width: 18px;
+	color: #9585bf;
+	font-size: 10px;
+  	vertical-align: middle;
+}
+.form-actions {
+	background: transparent;
+}

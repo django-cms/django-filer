@@ -14,7 +14,7 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 
 {% block pretitle %}
 {% if is_popup %}
-<a style="float:left; margin-right:10px; font-size: large;" href="{% if original.folder %}{{original.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}{% endif %}" title="{% trans "Go back to the parent folder" %}" onclick="history.go(-1);return false">&larr;</a>
+<a href="{% if original.folder %}{{original.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}{% endif %}" title="{% trans "Go back to the parent folder" %}" onclick="history.go(-1);return false" class="go-back pull-left"><i class="ace-icon fa fa-long-arrow-left bigger-220"></i></a>
 {% endif %}
 {% endblock %}
 
@@ -24,8 +24,12 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 {% endwith %}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
+{% block extrastyle %}
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin/libs/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin/libs/ace/css/ace.min.css" />
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300" type="text/css" media="all" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}filer/css/admin_style.css" />
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}
@@ -34,24 +38,26 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
     {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
 {% endblock %}
 
-{% block sidebar %}
-<div id="content-related">
-	{% block file_sidebar %}
-		{% with original.duplicates as duplicates %}
-			{% if duplicates %}
-				<h3>{% trans 'duplicates' %}</h3>
-				<ul>
-					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
-				</ul>
-			{% endif %}
-		{% endwith %}
-	{% endblock %}
-</div>
+{% block field_sets %}
+	{% for fieldset in adminform %}
+	  {% include "admin/filer/fieldset.html" %}
+	{% endfor %}
 {% endblock %}
 
-
-{% block submit_buttons_bottom %}
-{% if not original|is_restricted_for_user:user %}
-{{ block.super }}
-{% endif %}
+{% block sidebar %}
+	<div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
+		{% block file_sidebar %}
+			{% with original.duplicates as duplicates %}
+				{% if duplicates %}
+					<h3>{% trans 'duplicates' %}</h3>
+					<ul>
+						{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
+					</ul>
+				{% endif %}
+			{% endwith %}
+		{% endblock %}
+	</div>
+{% endblock %}
+{% block submit_buttons_bottom %}	
+	{% submit_row %}
 {% endblock %}
