@@ -1,0 +1,39 @@
+// PBS custom overides
+.help-block {
+	font-size: 12px !important;
+	font-style: italic;
+}
+.form-actions .btn-info {
+	min-width: 100px;
+	margin-left: 8px;
+}
+.form-horizontal {
+	width: 100%;
+}
+table td.control-label {
+	vertical-align: top;
+	text-transform: capitalize;
+}
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+select { 
+	color: #393939;
+	width: 55%;
+}
+textarea {
+	min-height: 100px;
+	resize: vertical;
+}
