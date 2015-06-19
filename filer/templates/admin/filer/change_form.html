@@ -32,7 +32,7 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}filer/css/admin_style.css" />
 {% endblock %}
 
-{% block coltype %}colMS{% endblock %}
+{% block coltype %}colMS row{% endblock %}
 
 {% block after_field_sets %}
     {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
@@ -44,20 +44,29 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 	{% endfor %}
 {% endblock %}
 
-{% block sidebar %}
-	<div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
-		{% block file_sidebar %}
-			{% with original.duplicates as duplicates %}
-				{% if duplicates %}
-					<h3>{% trans 'duplicates' %}</h3>
-					<ul>
-						{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
-					</ul>
-				{% endif %}
-			{% endwith %}
-		{% endblock %}
-	</div>
-{% endblock %}
+
+	{% block content %} 
+		{% with original.duplicates as duplicates %}
+		<div id="content-main" class=" no-padding-right no-padding-left {% if duplicates %}col-lg-10 col-md-9 col-xs-12{% else %}col-lg-12 col-md-12 col-xs-12{% endif %}">
+			{{block.super}}	
+		</div>
+		{% endwith %}
+	{% endblock %}
+
+	
+	{% block sidebar %}
+		{% with original.duplicates as duplicates %}
+			{% if duplicates %}
+			<div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
+				<h3>{% trans 'duplicates' %}</h3>
+				<ul>
+					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
+				</ul>
+			</div>
+			{% endif %}
+		{% endwith %}
+	{% endblock %}
+
 {% block submit_buttons_bottom %}	
 	{% submit_row %}
 {% endblock %}
