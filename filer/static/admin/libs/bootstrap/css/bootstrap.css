@@ -8066,10 +8066,9 @@ input[type="tel"],
 input[type="color"],
 select {
   color: #393939;
-  width: 55%;
 }
 
-/* line 36, ../sass/_pbs.overrides.scss */
+/* line 35, ../sass/_pbs.overrides.scss */
 textarea {
   min-height: 100px;
   resize: vertical;
