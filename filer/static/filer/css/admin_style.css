@@ -122,3 +122,8 @@ ul.custom-bullets li:before {
 .form-actions {
 	background: transparent;
 }
+.full-preview-page {
+	width: 100%;
+	max-width: 1140px;
+	margin: auto;
+}

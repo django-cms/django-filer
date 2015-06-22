@@ -45,27 +45,25 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 {% endblock %}
 
 
-	{% block content %} 
-		{% with original.duplicates as duplicates %}
-		<div id="content-main" class=" no-padding-right no-padding-left {% if duplicates %}col-lg-10 col-md-9 col-xs-12{% else %}col-lg-12 col-md-12 col-xs-12{% endif %}">
-			{{block.super}}	
-		</div>
-		{% endwith %}
-	{% endblock %}
+{% block content %} 
+	<div id="content-main" class="no-padding-right col-lg-10 col-md-9 col-xs-12">
+		{{block.super}}	
+	</div>
+{% endblock %}
 
-	
-	{% block sidebar %}
-		{% with original.duplicates as duplicates %}
-			{% if duplicates %}
-			<div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
-				<h3>{% trans 'duplicates' %}</h3>
-				<ul>
-					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
-				</ul>
-			</div>
-			{% endif %}
-		{% endwith %}
-	{% endblock %}
+
+{% block sidebar %}
+	{% with original.duplicates as duplicates %}
+		{% if duplicates %}
+		<div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
+			<h3>{% trans 'duplicates' %}</h3>
+			<ul>
+				{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}{% get_popup_params %}">{{ duplicate }}</a></li>{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+	{% endwith %}
+{% endblock %}
 
 {% block submit_buttons_bottom %}	
 	{% submit_row %}

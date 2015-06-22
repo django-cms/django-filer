@@ -1,9 +1,17 @@
-{% load i18n filer_admin_tags %}
+{% load i18n filer_admin_tags filermedia %}
 <html>
-<head><title>Full size preview {{ image.actual_name }}</title></head>
+<head>
+	<title>Full size preview {{ image.actual_name }}</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin/libs/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin/libs/ace/css/ace.min.css" />
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300" type="text/css" media="all" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
+</head>
 <body>
-<center>
-<a href="{{image.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}" title="{% trans "Go back" %}" onclick="history.go(-1);return false">Go back</a></center>
-<img src="{{ image.url }}"></img>
+	<div class="full-preview-page">
+		<a href="{{image.folder.get_admin_directory_listing_url_path}}{% get_popup_params %}" title="{% trans "Go back" %}" onclick="history.go(-1);return false" class="btn btn-danger"><i class="ace-icon fa fa-reply"></i>Go back</a>
+		<img src="{{ image.url }}"></img>
+	</div>
 </body>
 </html>
