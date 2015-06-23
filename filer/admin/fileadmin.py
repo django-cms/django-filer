@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import File
+from filer.models import File, Image
 from filer.utils.compatibility import DJANGO_1_5
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
@@ -113,11 +113,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             extra_context=extra_context)
 
         url = r.get("Location", None)
+        # Account for custom Image model
+        image_admin_url_name = 'admin:filer_{0}_changelist'.format(Image._meta.model_name)
         # Check against filer_file_changelist as file deletion is always made by
         # the base class
         if (url in ["../../../../", "../../"] or
                 url == reverse("admin:filer_file_changelist") or
-                url == reverse("admin:filer_image_changelist")):
+                url == reverse(image_admin_url_name)):
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': parent_folder.id})
