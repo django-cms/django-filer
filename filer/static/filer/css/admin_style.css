@@ -6,15 +6,13 @@ body {
 	top: 44px;
 	left: 0px;
 }
-.text-right  div {
-	float: right;
-}
 .dataTables_wrapper.custom-style .row {
 	border: none;
 }
 #toolbar {
 	border-bottom: 1px solid #e0e0e0;
 	margin-bottom: 10px;
+	position: relative;
 }
 .actions .list-unstyled {
 	line-height: 34px;
@@ -122,8 +120,36 @@ ul.custom-bullets li:before {
 .form-actions {
 	background: transparent;
 }
-.full-preview-page {
-	width: 100%;
-	max-width: 1140px;
-	margin: auto;
+.full-preview-page .btn {
+	vertical-align: top;
+}
+.quiet {
+	clear: both;
+	margin-top: -5px;
+}
+.cancel-search {
+	margin-left: 20px;
+	margin-top: 10px;
+}
+#changelist-search {
+	position: static;
+}
+.special-info {
+	position: absolute;
+	left: 15px;
+	top: 0;
+}
+.errornote {
+	padding: 15px;
+	margin-bottom: 20px;
+	border: 1px solid #ebccd1;
+	background-color: #f2dede;
+    color: #a94442;
+    font-size: 14px;
+}
+.errorlist {
+	color: #dd5a43;
+}
+.action-counter {
+	margin-left: 10px;
 }

@@ -6,14 +6,13 @@
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}{% include 'admin/filer/folder/destination_field.html' with requirements_only='yes' %}{% endblock %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
 
 {% block content %}
 {% if not to_copy %}
     <p>{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}</p>
 {% else %}
     <p>{% blocktrans %}The following files and/or folders will be copied to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
-    <ul>{{ to_copy|unordered_list }}</ul>
+    <ul class="list-unstyled">{{ to_copy|unordered_list }}</ul>
     <form action="" method="post">{% csrf_token %}
     <div>
     {% for f in files_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}" />{% endfor %}

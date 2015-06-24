@@ -12,12 +12,13 @@
             {% if actions_selection_counter %}
                 <script type="text/javascript">var _actions_icnt="{{ paginated_items.object_list|length|default:"0" }}";</script>
 
-                <ul class="list-unstyled margin-5 list-inline no-margin-bottom pull-right">
-                    <li class="action-counter">{{ selection_note }}</li>
+                <div class="list-unstyled margin-5 list-inline no-margin-bottom pull-right">
+                    <span class="action-counter">{{ selection_note }}</span>
                     {% if paginator.count != paginated_items.object_list|length %}
-                        <li class="all hidden">{{ selection_note_all }}</li>
-                        <li class="clear hidden"><a href="javascript:;">{% trans "Clear selection" %}</a></li>
+                        <span class="all hidden">{{ selection_note_all }}</span>
+                        <span class="clear hidden"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
                     {% endif %}
+                </div>
             {% endif %}
         </div>
     </div>
