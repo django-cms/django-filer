@@ -5,8 +5,6 @@
 {% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
-
 {% block content %}
 {% if not to_rename %}
     <p>{% blocktrans %}There are no files available to rename.{% endblocktrans %}</p>

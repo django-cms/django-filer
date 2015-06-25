@@ -6,9 +6,6 @@
 {% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
-{% block extrahead %}{{ block.super }}{% include 'admin/filer/folder/destination_field.html' with requirements_only='yes' %}{% endblock %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />{% endblock %}
-
 {% block content %}
 {% if not to_move %}
     <p>{% blocktrans %}There are no files and/or folders available to move.{% endblocktrans %}</p>

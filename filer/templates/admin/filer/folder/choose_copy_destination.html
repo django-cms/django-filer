@@ -1,12 +1,13 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/filer/base_site.html" %}
 {% load i18n adminmedia filer_admin_tags %}
 
 {% block breadcrumbs %}
 {% include "admin/filer/breadcrumbs.html" %}
 {% endblock %}
 
-{% block extrahead %}{{ block.super }}{% include 'admin/filer/folder/destination_field.html' with requirements_only='yes' %}{% endblock %}
-
+{% block extrahead %}
+    {{ block.super }}
+{% endblock %}
 {% block content %}
 {% if not to_copy %}
     <p>{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}</p>
