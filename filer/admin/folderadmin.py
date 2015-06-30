@@ -1143,7 +1143,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             return None
         # cannot restrict/unrestrict unfiled files
         unfiled_files = files_qs.filter(folder__isnull=True)
-        if bool(unfiled_files):
+        if unfiled_files.exists():
             messages.warning(request, _("Some of the selected files do not have parents: %s, "
                                         "so their rights cannot be changed.") %
                              ', '.join([str(unfiled_file) for unfiled_file in unfiled_files.all()]))
