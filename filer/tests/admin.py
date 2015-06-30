@@ -22,7 +22,7 @@ from filer.tests.helpers import (
     get_user_message, create_superuser, create_folder_structure,
     create_image, create_staffuser, create_folder_for_user, move_action,
     move_to_clipboard_action, paste_clipboard_to_folder, get_dir_listing_url,
-    filer_obj_as_checkox, get_make_root_folder_url,
+    filer_obj_as_checkox, get_make_root_folder_url, enable_restriction,
     move_single_file_to_clipboard_action, SettingsOverride
 )
 from filer.utils.checktrees import TreeChecker
@@ -1125,6 +1125,16 @@ class TestFolderTypePermissionForSuperUser(
         self.client.login(username=username, password=password)
         self.user = user
 
+    def test_restriction_change(self):
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        unfiled_file = File.objects.create(name='unfiled_file', folder=foo_root, restricted=False)
+        response, url = enable_restriction(
+            self.client, foo_root, [unfiled_file], follow=False)
+        assert "Successfully enabled restriction for 1 files and/or folders."\
+            in response.cookies['messages'].value,\
+            "Operation was expected to fail."
+
 
 class TestFolderTypePermissionLayerForRegularUser(
     TestCase, BaseTestFolderTypePermissionLayer):
@@ -1267,6 +1277,17 @@ class TestFolderTypePermissionLayerForRegularUser(
             self.client, foo, [file_baz])
         self.assertEqual(
             self._get_clipboard_files().count(), 2)
+
+    def test_error_unallowed_restriction_change(self):
+        self._make_user_site_admin()
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        unfiled_file = File.objects.create(name='unfiled_file', folder=foo_root)
+        response, url = enable_restriction(
+            self.client, foo_root, [unfiled_file], follow=False)
+        assert "You are not allowed to modify the restrictions on the selected "\
+            "files and folders." in response.cookies['messages'].value,\
+            "Operation was expected to fail."
 
 
 class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):

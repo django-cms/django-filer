@@ -66,6 +66,15 @@ def move_action(client, folder_view, destination, to_move, follow=False):
         helpers.ACTION_CHECKBOX_NAME: objects_to_move }, follow=follow), url
 
 
+def enable_restriction(client, folder_view, filer_objects, follow=True):
+    url = get_dir_listing_url(folder_view)
+    return client.post(url, {
+        'action': 'enable_restriction',
+        'post': 'yes',
+        helpers.ACTION_CHECKBOX_NAME: [filer_obj_as_checkox(obj) for obj in filer_objects]},
+                       follow=follow), url
+
+
 def create_superuser():
     superuser = User.objects.create_superuser('admin',
                                               'admin@free.fr',
