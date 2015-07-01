@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
-from datetime import datetime
+from django.utils import timezone
 import mptt
 import itertools
 import filer
@@ -83,13 +83,13 @@ class FolderQueryset(query.QuerySet,
 
 class FolderManager(models.Manager):
 
-    def get_query_set(self):
+    def get_queryset(self):
         return FolderQueryset(self.model, using=self._db)
 
     def __getattr__(self, name):
         if name.startswith('__'):
             return super(FolderManager, self).__getattr__(self, name)
-        return getattr(self.get_query_set(), name)
+        return getattr(self.get_queryset(), name)
 
 
 class AliveFolderManager(FolderManager):
@@ -98,17 +98,18 @@ class AliveFolderManager(FolderManager):
     #   folder is in trash
     use_for_related_fields = True
 
-    def get_query_set(self):
+    def get_queryset(self):
         return FolderQueryset(self.model, using=self._db).alive()
 
 
 class TrashFolderManager(FolderManager):
 
-    def get_query_set(self):
+    def get_queryset(self):
         return FolderQueryset(self.model, using=self._db).in_trash()
 
 
-class Folder(mixins.TrashableMixin, mixins.IconsMixin):
+@mixins.trashable
+class Folder(models.Model, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -118,6 +119,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     in this way. Make sure the linked models obey the AbstractFile interface
     (Duck Type).
     """
+
     file_type = 'Folder'
     is_root = False
     can_have_subfolders = True
@@ -319,7 +321,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
             delete_from_locations(old_locations, storages)
 
     def soft_delete(self):
-        deletion_time = datetime.now()
+        deletion_time = timezone.now()
         desc_ids = list(self.get_descendants(
             include_self=True).values_list('id', flat=True))
         # soft delete all alive files

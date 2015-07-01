@@ -51,7 +51,7 @@ class TrashAdmin(admin.ModelAdmin):
         url_patterns.extend(urls)
         return url_patterns
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         search_q = request.GET.get('q', '').split()
         if search_q:
             folders_q = reduce(operator.or_,
@@ -130,7 +130,7 @@ class TrashAdmin(admin.ModelAdmin):
             descendants = []
 
         context = {
-            'module_name': force_unicode(opts.verbose_name_plural),
+            'model_name': force_unicode(opts.verbose_name_plural),
             'media': self.media,
             'opts': opts,
             'app_label': opts.app_label,
@@ -201,7 +201,7 @@ class TrashAdmin(admin.ModelAdmin):
                                 Q(original_filename__icontains=bit))
                               for bit in search_q])
 
-        items = self.queryset(request)
+        items = self.get_queryset(request)
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Make sure page request is an int. If not, deliver first page.
@@ -217,7 +217,7 @@ class TrashAdmin(admin.ModelAdmin):
             paginated_items = paginator.page(paginator.num_pages)
 
         context = {
-            'module_name': force_unicode(opts.verbose_name_plural),
+            'model_name': force_unicode(opts.verbose_name_plural),
             'media': self.media,
             'opts': opts,
             'app_label': opts.app_label,

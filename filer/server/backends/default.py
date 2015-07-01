@@ -25,8 +25,8 @@ class DefaultServer(ServerBase):
         mimetype = self.get_mimetype(fullpath)
         if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                                   statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
-            return HttpResponseNotModified(mimetype=mimetype)
-        response = HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
+            return HttpResponseNotModified(content_type=mimetype)
+        response = HttpResponse(open(fullpath, 'rb').read(), content_type=mimetype)
         response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
         self.default_headers(request=request, response=response, file_obj=file_obj, **kwargs)
         return response

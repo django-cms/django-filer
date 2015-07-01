@@ -3,7 +3,6 @@ from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied
 from django.contrib import admin
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils import simplejson
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
@@ -15,6 +14,7 @@ from filer.views import popup_param, selectfolder_param, current_site_param
 from filer.admin.tools import is_valid_destination
 import imghdr
 import os
+import json
 
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
@@ -152,8 +152,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                     'alt_text': '',
                     'label': unicode(file_obj),
                 }
-                return HttpResponse(simplejson.dumps(json_response),
-                                    mimetype=mimetype)
+                return HttpResponse(json.dumps(json_response),
+                                    content_type=mimetype)
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
@@ -161,8 +161,8 @@ class ClipboardAdmin(admin.ModelAdmin):
                 ])
                 raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
         except UploadException, e:
-            return HttpResponse(simplejson.dumps({'error': unicode(e)}),
-                                mimetype=mimetype)
+            return HttpResponse(json.dumps({'error': unicode(e)}),
+                                content_type=mimetype)
         finally:
             if upload:
                 upload.close()

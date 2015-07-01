@@ -12,6 +12,7 @@ from django.db import router
 from django.db.models import Q, Count
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import get_permission_codename
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -52,7 +53,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
     list_per_page = 20
     list_filter = ('owner',)
     search_fields = ['name', 'files__name']
-    save_as = True  # see ImageAdmin
 
     actions_affecting_position = [
         'move_to_clipboard',
@@ -196,7 +196,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # since only save button appears its enough to make sure that the
         #   request is a POST from a popup view and the response is a
         #   successed HttpResponse
-        if (request.method == 'POST' and "_popup" in request.POST and
+        if (request.method == 'POST' and popup_status(request) and
             response.status_code == 200 and
             not isinstance(response, TemplateResponse) and
             not isinstance(response, HttpResponseRedirect)):
@@ -697,8 +697,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
                                    opts.app_label,
                                    opts.object_name.lower()),
                                 None, (quote(obj._get_pk_val()),))
+            get_permission_codename('delete', opts)
             p = '%s.%s' % (opts.app_label,
-                           opts.get_delete_permission())
+                           get_permission_codename('delete', opts))
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.

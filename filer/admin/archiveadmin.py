@@ -9,6 +9,7 @@ class ArchiveAdminForm(forms.ModelForm):
 
     class Meta:
         model = Archive
+        exclude = ()
 
 
 class ArchiveAdmin(FileAdmin):

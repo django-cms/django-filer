@@ -29,9 +29,9 @@ setup(
     packages=find_packages(),
     install_requires = (
         'pytz',
-        'Django>=1.3,<1.6',
+        'Django>=1.3,<1.8',
         'easy-thumbnails<=2.2',
-        'django-mptt==0.6.1',
+        'django-mptt>=0.7.4',
         'django_polymorphic<=0.7.1',
         'django-cms-roles',
     ),

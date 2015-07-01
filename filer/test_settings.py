@@ -22,7 +22,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cms',
     'menus',
-    'south',
     'sekizai',
     'cmsroles',
 ]
@@ -71,4 +70,5 @@ CMS_PERMISSION = True
 
 CACHE_BACKEND = 'locmem:///'
 
-SOUTH_TESTS_MIGRATE = False
+SECRET_KEY = 'secret'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'

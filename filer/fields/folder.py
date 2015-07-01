@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.template.loader import render_to_string
 import inspect
+
 from django import forms
 from django.conf import settings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
@@ -97,11 +98,7 @@ class AdminFolderFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        if 'admin_site' in inspect.getargspec(self.widget.__init__)[0]: # Django 1.4
-            widget_instance = self.widget(rel, site)
-        else: # Django <= 1.3
-            widget_instance = self.widget(rel)
-        forms.Field.__init__(self, widget=widget_instance, *args, **kwargs)
+        super(AdminFolderFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -113,7 +110,8 @@ class FilerFolderField(models.ForeignKey):
     default_model_class = Folder
 
     def __init__(self, **kwargs):
-        return super(FilerFolderField, self).__init__(Folder, **kwargs)
+        kwargs['to'] = self.default_model_class
+        super(FilerFolderField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
