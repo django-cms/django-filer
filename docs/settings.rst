@@ -17,7 +17,7 @@ Defaults to ``False``
 
 Should newly uploaded files have permission checking disabled (be public) by default.
 
-Defaults to ``False`` (new files have permission checking disable, are public)
+Defaults to ``True`` (new files have permission checking disable, are public)
 
 .. _FILER_STATICMEDIA_PREFIX:
 
