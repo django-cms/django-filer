@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Alexander Schoemaker <alexander.schoemaker@gmail.com>, 2012
 # Alexander Schoemaker <alexander.schoemaker@gmail.com>, 2012
@@ -11,14 +11,16 @@ msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Maikel Wever\n"
-"Language-Team: Dutch (Netherlands) (http://www.transifex.com/projects/p/django-filer/language/nl_NL/)\n"
+"PO-Revision-Date: 2015-07-07 14:57+0200\n"
+"Last-Translator: Philippe Pomédio <philippe.pomedio@unice.fr>\n"
+"Language-Team: Dutch (Netherlands) (http://www.transifex.com/projects/p/"
+"django-filer/language/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.2\n"
 
 #: views.py:103
 msgid "Folder with this name already exists."
@@ -32,7 +34,8 @@ msgstr "Geavanceerd"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "De actie kan niet worden uitgevoerd omdat er zijn geen items geselecteerd."
+msgstr ""
+"De actie kan niet worden uitgevoerd omdat er zijn geen items geselecteerd."
 
 #: admin/folderadmin.py:344
 #, python-format
@@ -103,7 +106,9 @@ msgstr "Verwijder geselecteerde bestanden en/of mappen"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d bestanden en of mappen zijn succesvol verplaatst naar map '%(destination)s'."
+msgstr ""
+"%(count)d bestanden en of mappen zijn succesvol verplaatst naar map "
+"'%(destination)s'."
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
@@ -127,7 +132,9 @@ msgstr "Hernoem bestanden"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d bestanden en/of mappen zijn succesvol gekopieerd naar map '%(destination)s'."
+msgstr ""
+"%(count)d bestanden en/of mappen zijn succesvol gekopieerd naar map "
+"'%(destination)s'."
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
@@ -152,14 +159,17 @@ msgstr "Afmetingen aanpassen van geselecteerde afbeeldingen"
 
 #: admin/forms.py:26
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr "Achtervoegsel wordt toegevoegd aan bestandsnaam van gekopieerde bestanden"
+msgstr ""
+"Achtervoegsel wordt toegevoegd aan bestandsnaam van gekopieerde bestanden"
 
 #: admin/forms.py:33
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Achtervoegsel moet een geldige waarde zijn in kleine letters, bv. \"%(valid)s\"."
+msgstr ""
+"Achtervoegsel moet een geldige waarde zijn in kleine letters, bv. \"%(valid)s"
+"\"."
 
 #: admin/forms.py:54
 #, python-format
@@ -462,21 +472,28 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr "Het verwijderen van %(object_name)s '%(escaped_object)s' resulteert in het verwijderen van gerelateerde objecten. Je hebt echter geen toegangsrechten voor het verwijderen van de volgende objecttypes:"
+msgstr ""
+"Het verwijderen van %(object_name)s '%(escaped_object)s' resulteert in het "
+"verwijderen van gerelateerde objecten. Je hebt echter geen toegangsrechten "
+"voor het verwijderen van de volgende objecttypes:"
 
 #: templates/admin/filer/delete_confirmation.html:21
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
-" following protected related objects:"
-msgstr "Het verwijderen van %(object_name)s '%(escaped_object)s' leidt tot het verwijderen van:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Het verwijderen van %(object_name)s '%(escaped_object)s' leidt tot het "
+"verwijderen van:"
 
 #: templates/admin/filer/delete_confirmation.html:29
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr "Weet je zeker dat je %(object_name)s \"%(escaped_object)s\" wilt verwijderen? Alle volgende gerelateerde items zullen ook worden verwijderd:"
+msgstr ""
+"Weet je zeker dat je %(object_name)s \"%(escaped_object)s\" wilt "
+"verwijderen? Alle volgende gerelateerde items zullen ook worden verwijderd:"
 
 #: templates/admin/filer/delete_confirmation.html:34
 #: templates/admin/filer/delete_selected_files_confirmation.html:45
@@ -488,19 +505,27 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Het verwijderen van de geselecteerde bestanden en/of mappen resulteert in het verwijderen van gerelateerde objecten. Je hebt echter geen toegangsrechten voor het verwijderen van de volgende objecttypes:"
+msgstr ""
+"Het verwijderen van de geselecteerde bestanden en/of mappen resulteert in "
+"het verwijderen van gerelateerde objecten. Je hebt echter geen "
+"toegangsrechten voor het verwijderen van de volgende objecttypes:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Het verwijderen van de geselecteerde bestanden en/of mappen leidt tot het verwijderen van de volgende beschermde gerelateerde objecten:"
+msgstr ""
+"Het verwijderen van de geselecteerde bestanden en/of mappen leidt tot het "
+"verwijderen van de volgende beschermde gerelateerde objecten:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Weet je zeker dat je de geselecteerde bestanden en/of folders wilt verwijderen? Alle volgende objecten en gerelateerde items zullen worden verwijderd: "
+msgstr ""
+"Weet je zeker dat je de geselecteerde bestanden en/of folders wilt "
+"verwijderen? Alle volgende objecten en gerelateerde items zullen worden "
+"verwijderd: "
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
@@ -536,9 +561,11 @@ msgstr "Map icoon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Je account heeft geen toegangsrechten voor het kopiëren van de geselecteerde bestanden en/of mappen"
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Je account heeft geen toegangsrechten voor het kopiëren van de geselecteerde "
+"bestanden en/of mappen"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
 #: templates/admin/filer/folder/choose_move_destination.html:15
@@ -553,7 +580,9 @@ msgstr "Er zijn geen bestanden en/of mappen beschikbaar om te kopiëren."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "De volgende bestanden en/of mappen zullen worden gekopieerd naar een bestemmingsmap (structuur blijft behouden):"
+msgstr ""
+"De volgende bestanden en/of mappen zullen worden gekopieerd naar een "
+"bestemmingsmap (structuur blijft behouden):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:32
 #: templates/admin/filer/folder/choose_move_destination.html:32
@@ -567,11 +596,14 @@ msgstr "Kopiëren"
 #: templates/admin/filer/folder/choose_images_resize_options.html:12
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Je account heeft geen toegangsrechten om afmetingen van alle geselecteerde afbeeldingen aan te passen."
+msgstr ""
+"Je account heeft geen toegangsrechten om afmetingen van alle geselecteerde "
+"afbeeldingen aan te passen."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid "There are no images available to resize."
-msgstr "Er zijn geen afbeeldingen beschikbaar voor het aanpassen van afmetingen."
+msgstr ""
+"Er zijn geen afbeeldingen beschikbaar voor het aanpassen van afmetingen."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:17
 msgid "The following images will be resized:"
@@ -589,7 +621,10 @@ msgstr "Selecteer afmetingsopties:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Waarschuwing: bestaande afmetingen van afbeeldingen zullen worden aangepast. Oorspronkelijke bestanden zullen verloren gaan. Maak eventueel eerst een kopie om de oorspronkelijke bestanden te behouden."
+msgstr ""
+"Waarschuwing: bestaande afmetingen van afbeeldingen zullen worden aangepast. "
+"Oorspronkelijke bestanden zullen verloren gaan. Maak eventueel eerst een "
+"kopie om de oorspronkelijke bestanden te behouden."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
@@ -597,9 +632,11 @@ msgstr "Afmetingen aanpassen"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Je account heeft geen toegangsrechten om alle geselecteerde bestanden en/of mappen te verplaatsen."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Je account heeft geen toegangsrechten om alle geselecteerde bestanden en/of "
+"mappen te verplaatsen."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
@@ -609,7 +646,9 @@ msgstr "Er zijn geen bestanden en/of mappen beschikbaar om te verplaatsen."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "De volgende bestanden en/of mappen zullen worden verplaatst naar een bestemmingsmap (huidige mapstructuur blijft behouden): "
+msgstr ""
+"De volgende bestanden en/of mappen zullen worden verplaatst naar een "
+"bestemmingsmap (huidige mapstructuur blijft behouden): "
 
 #: templates/admin/filer/folder/choose_move_destination.html:38
 msgid "Move"
@@ -618,7 +657,9 @@ msgstr "Verplaatsen"
 #: templates/admin/filer/folder/choose_rename_format.html:12
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "Je account heeft onvoldoende toegangsrechten om alle geselecteerde bestanden te hernoemen."
+msgstr ""
+"Je account heeft onvoldoende toegangsrechten om alle geselecteerde bestanden "
+"te hernoemen."
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "There are no files available to rename."
@@ -628,7 +669,10 @@ msgstr "Er zijn geen bestanden beschikbaar om te hernoemen."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "De volgende bestanden zullen worden hernoemd (de oorspronkelijke mapstructuur en bestandsnamen blijven behouden, alleen de weergave zal worden gewijzigd):"
+msgstr ""
+"De volgende bestanden zullen worden hernoemd (de oorspronkelijke "
+"mapstructuur en bestandsnamen blijven behouden, alleen de weergave zal "
+"worden gewijzigd):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:54
 msgid "Rename"
@@ -659,18 +703,18 @@ msgstr "Ga terug naar de bovenliggende folder"
 #: templates/admin/filer/folder/directory_table.html:29
 #: templates/admin/filer/tools/search_form.html:18
 #, python-format
-msgid "1 folder"
+msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] "1 map"
+msgstr[0] "%(counter)s map"
 msgstr[1] "%(counter)s mappen"
 
 #: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:29
 #: templates/admin/filer/tools/search_form.html:19
 #, python-format
-msgid "1 file"
+msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] "1 bestand"
+msgstr[0] "%(counter)s bestand"
 msgstr[1] "%(counter)s bestanden"
 
 #: templates/admin/filer/folder/directory_listing.html:80
@@ -749,7 +793,10 @@ msgid ""
 "\n"
 "            Page %(number)s of %(num_pages)s.\n"
 "            "
-msgstr "\nPagina %(number)s van %(num_pages)s.\n "
+msgstr ""
+"\n"
+"Pagina %(number)s van %(num_pages)s.\n"
+" "
 
 #: templates/admin/filer/folder/directory_table.html:75
 msgid "next"

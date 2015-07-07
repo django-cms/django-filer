@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Ales Zabala Alava <shagi@gisa-elkartea.org>, 2013
 msgid ""
@@ -9,14 +9,16 @@ msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Ales Zabala Alava <shagi@gisa-elkartea.org>\n"
-"Language-Team: Basque (http://www.transifex.com/projects/p/django-filer/language/eu/)\n"
+"PO-Revision-Date: 2015-07-07 14:56+0200\n"
+"Last-Translator: Philippe Pomédio <philippe.pomedio@unice.fr>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django-filer/"
+"language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.2\n"
 
 #: views.py:103
 msgid "Folder with this name already exists."
@@ -30,7 +32,9 @@ msgstr "Aurreratua"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Elementuak hautatu behar dira beraiekin zeozer egiteko. Ez da elementurik aldatu."
+msgstr ""
+"Elementuak hautatu behar dira beraiekin zeozer egiteko. Ez da elementurik "
+"aldatu."
 
 #: admin/folderadmin.py:344
 #, python-format
@@ -101,7 +105,8 @@ msgstr "Ezabatu hautatutako fitxategi eta/edo karpetak"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d fitxategi eta/edo karpeta '%(destination)s' karpetara mugituta."
+msgstr ""
+"%(count)d fitxategi eta/edo karpeta '%(destination)s' karpetara mugituta."
 
 #: admin/folderadmin.py:778 admin/folderadmin.py:780
 msgid "Move files and/or folders"
@@ -125,7 +130,8 @@ msgstr "Fitxategiak berrizendatu"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d fitxategi eta/edo karpeta %(destination)s karpetara kopiatuta."
+msgstr ""
+"%(count)d fitxategi eta/edo karpeta %(destination)s karpetara kopiatuta."
 
 #: admin/folderadmin.py:989 admin/folderadmin.py:991
 msgid "Copy files and/or folders"
@@ -157,7 +163,9 @@ msgstr "Kopiatutako fitxategiei gehituko zaien atzizkia."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Atzizkia baliozko, sinple eta letra xehetan dagoen fitxategi izen zatia izan beharko luke, \"%(valid)s\" bezala."
+msgstr ""
+"Atzizkia baliozko, sinple eta letra xehetan dagoen fitxategi izen zatia izan "
+"beharko luke, \"%(valid)s\" bezala."
 
 #: admin/forms.py:54
 #, python-format
@@ -191,7 +199,8 @@ msgstr "handitu"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Argazkitxo aukerak edo tamaina aldatzeko parametroak zehaztu behar dira."
+msgstr ""
+"Argazkitxo aukerak edo tamaina aldatzeko parametroak zehaztu behar dira."
 
 #: admin/forms.py:73
 msgid "Resize parameters must be choosen."
@@ -465,8 +474,8 @@ msgstr ""
 #: templates/admin/filer/delete_confirmation.html:21
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
-" following protected related objects:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
 msgstr ""
 
 #: templates/admin/filer/delete_confirmation.html:29
@@ -498,7 +507,9 @@ msgstr ""
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Ziur hautatutako fitxategi eta/edo karpetak ezabatu nahi dituzula? Ondoko objektu eta erlazionatutako elementu guztiak ezabatuko lirateke:"
+msgstr ""
+"Ziur hautatutako fitxategi eta/edo karpetak ezabatu nahi dituzula? Ondoko "
+"objektu eta erlazionatutako elementu guztiak ezabatuko lirateke:"
 
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
@@ -534,8 +545,8 @@ msgstr "Karpeta ikonoa"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:12
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:15
@@ -577,7 +588,8 @@ msgstr "Ondoko irudien tamaina aldatuko da:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:30
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Argazkitxo aukera bat hautatu edo tamaina aldatzeko parametroak ezarri:"
+msgstr ""
+"Argazkitxo aukera bat hautatu edo tamaina aldatzeko parametroak ezarri:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose resize parameters:"
@@ -587,7 +599,9 @@ msgstr "Tamaina aldatzeko parametroak aukeratu:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Kontuz: Irudien tamaina aldatzean jatorrizkoak galduko dira. Lehenbizi jatorrizkoen kopia egin zenezake."
+msgstr ""
+"Kontuz: Irudien tamaina aldatzean jatorrizkoak galduko dira. Lehenbizi "
+"jatorrizkoen kopia egin zenezake."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid "Resize"
@@ -595,9 +609,11 @@ msgstr "Tamaina aldatu"
 
 #: templates/admin/filer/folder/choose_move_destination.html:12
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Zure kontuak ez du hautatutako fitxategi eta/edo karpeta guztiak mugitzeko baimenik."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Zure kontuak ez du hautatutako fitxategi eta/edo karpeta guztiak mugitzeko "
+"baimenik."
 
 #: templates/admin/filer/folder/choose_move_destination.html:18
 msgid "There are no files and/or folders available to move."
@@ -657,18 +673,18 @@ msgstr "Karpeta gurasora joan"
 #: templates/admin/filer/folder/directory_table.html:29
 #: templates/admin/filer/tools/search_form.html:18
 #, python-format
-msgid "1 folder"
+msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] "karpeta bat"
+msgstr[0] "karpeta %(counter)s"
 msgstr[1] "%(counter)s karpeta"
 
 #: templates/admin/filer/folder/directory_listing.html:76
 #: templates/admin/filer/folder/directory_table.html:29
 #: templates/admin/filer/tools/search_form.html:19
 #, python-format
-msgid "1 file"
+msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] "fitxategi bat"
+msgstr[0] "fitxategi %(counter)s"
 msgstr[1] "%(counter)s fitxategi"
 
 #: templates/admin/filer/folder/directory_listing.html:80
@@ -747,7 +763,10 @@ msgid ""
 "\n"
 "            Page %(number)s of %(num_pages)s.\n"
 "            "
-msgstr "\n            %(num_pages)s orritatik %(number)s orria.\n            "
+msgstr ""
+"\n"
+"            %(num_pages)s orritatik %(number)s orria.\n"
+"            "
 
 #: templates/admin/filer/folder/directory_table.html:75
 msgid "next"
