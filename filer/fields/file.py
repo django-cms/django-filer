@@ -124,7 +124,7 @@ class FilerFileField(models.ForeignKey):
                     self.__class__.__name__, self.default_model_class.__name__, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = self.default_model_class
+        kwargs['to'] = 'filer.File'
         super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
