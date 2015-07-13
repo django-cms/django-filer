@@ -124,17 +124,6 @@ class Migration(migrations.Migration):
             },
             bases=('filer.file',),
         ),
-        migrations.CreateModel(
-            name='Trash',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-            ],
-            options={
-                'verbose_name_plural': 'Deleted Files and Folders',
-                'permissions': (),
-            },
-            bases=(models.Model,),
-        ),
         migrations.AddField(
             model_name='file',
             name='folder',

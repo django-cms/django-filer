@@ -18,15 +18,20 @@ import operator
 logger = logging.getLogger(__name__)
 
 
-class Trash(models.Model):
+class Trash(object):
     """Dummy model without any associated db table.
     It's only purpose is to provide an additional
     entry in the admin index.
     """
-    class Meta:
+    class _meta:
+        app_label = 'filer'  # This is the app that the form will exist under
+        model_name = 'trash'  # This is what will be used in the link url
+        object_name = 'Trash'
         verbose_name_plural = 'Deleted Files and Folders'
+        verbose_name = 'Deleted Files and Folders'
         permissions = ()
-        app_label = 'filer'
+        swapped = False
+        abstract = False
 
 
 class TrashAdmin(admin.ModelAdmin):
