@@ -114,7 +114,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
         url = r.get("Location", None)
         # Account for custom Image model
-        image_change_list_url_name = 'admin:filer_{0}_changelist'.format(Image._meta.model_name)
+        image_change_list_url_name = 'admin:{0}_{1}_changelist'.format(Image._meta.app_label,
+                                                                       Image._meta.model_name)
         # Check against filer_file_changelist as file deletion is always made by
         # the base class
         if (url in ["../../../../", "../../"] or
