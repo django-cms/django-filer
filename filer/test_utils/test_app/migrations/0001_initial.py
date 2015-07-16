@@ -10,9 +10,15 @@ import filer.fields.image
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('filer', '0001_initial'),
-    ]
+    if FILER_IMAGE_MODEL:
+        dependencies = [
+            ('filer', '0001_initial'),
+            ('custom_image', '0001_initial'),
+        ]
+    else:
+        dependencies = [
+            ('filer', '0001_initial'),
+        ]
 
     operations = [
         migrations.CreateModel(
