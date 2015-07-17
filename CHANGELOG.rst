@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+Revision 3a18983 (17.07.2015, 13:47 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * tox: Don't allow django 1.8 prereleases
+  * Django 1.7 upgrade: fixed dummy model for admin index page
+  * django 1.7 upgrade: fixed trash feature & deprecation warnings
+  * Django 1.7 upgrade; regenerated migrations
+  * Django 1.6 upgrade; fixed sites allowed on move action
+  * Django 1.6 upgrade changes
+
 Revision 9bdd109 (08.04.2015, 08:55 UTC)
 ----------------------------------------
 
