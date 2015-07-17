@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand
 import cms
 from filer.models import File, Folder
 from filer import settings as filer_settings
-from datetime import datetime, timedelta
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Command(BaseCommand):
@@ -12,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         no_of_sec = filer_settings.FILER_TRASH_CLEAN_INTERVAL
-        time_threshold = datetime.now() - timedelta(seconds=no_of_sec)
+        time_threshold = timezone.now() - timedelta(seconds=no_of_sec)
         files_ids = File.trash.filter(deleted_at__lt=time_threshold)\
             .values_list('id', flat=True)
         folder_ids = Folder.trash.filter(deleted_at__lt=time_threshold)\

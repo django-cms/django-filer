@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-import inspect
 from django import forms
 from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
@@ -9,9 +8,13 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from django.utils.text import truncate_words
 from filer.models import File
 from filer import settings as filer_settings
+
+try:
+    from django.utils.text import truncate_words
+except ImportError:
+    from django.template.defaultfilters import truncatewords as truncate_words
 
 import logging
 logger = logging.getLogger(__name__)
@@ -96,12 +99,8 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.to_field_name = to_field_name
         self.max_value = None
         self.min_value = None
-        other_widget = kwargs.pop('widget', None)
-        if 'admin_site' in inspect.getargspec(self.widget.__init__)[0]: # Django 1.4
-            widget_instance = self.widget(rel, site)
-        else: # Django <= 1.3
-            widget_instance = self.widget(rel)
-        forms.Field.__init__(self, widget=widget_instance, *args, **kwargs)
+        kwargs.pop('widget', None)
+        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -113,22 +112,8 @@ class FilerFileField(models.ForeignKey):
     default_model_class = File
 
     def __init__(self, **kwargs):
-        # we call ForeignKey.__init__ with the Image model as parameter...
-        # a FilerImageFiled can only be a ForeignKey to a Image
-        self.validate_related_name(kwargs.get('related_name', None))
-        return super(FilerFileField, self).__init__(
-                                        self.default_model_class, **kwargs)
-
-    def validate_related_name(self, name):
-        if not name:
-            return
-        if name and hasattr(self.default_model_class, name):
-            raise ImproperlyConfigured(
-                ("%s fields cannot have related name %r, this property " + \
-                 "already exists on %s") % (self.__class__.__name__,
-                                  name,
-                                  self.default_form_class.__name__)
-            )
+        kwargs['to'] = self.default_model_class
+        super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults

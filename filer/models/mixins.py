@@ -2,7 +2,6 @@
 from filer.settings import FILER_ADMIN_ICON_SIZES, FILER_STATICMEDIA_PREFIX
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from datetime import datetime
 
 
 class IconsMixin(object):
@@ -20,34 +19,33 @@ class IconsMixin(object):
         return r
 
 
-class TrashableMixin(models.Model):
-    """
-        Abstract model that makes a regular django model restorable.
-        This mixin needs to be placed first in the list of inherited classes
-            in order to overwrite the delete method as it should.
-    """
+def trashable(cls):
 
     deleted_at = models.DateTimeField(
         _('deleted at'), editable=False, blank=True, null=True)
 
-    class Meta:
-        abstract = True
+    for custom_method in ['soft_delete', 'hard_delete', 'restore']:
+        if not hasattr(cls, custom_method):
+            raise NotImplementedError("Method %s required." % custom_method)
 
-    def is_in_trash(self):
-        return self.deleted_at is not None
+    def is_in_trash(instance):
+        return instance.deleted_at is not None
 
-    def soft_delete(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def hard_delete(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def delete_restorable(self, *args, **kwargs):
+    # custom delete method
+    def delete_restorable(instance, *args, **kwargs):
         to_trash = kwargs.pop('to_trash', True)
-        if not self.deleted_at and to_trash:
-            self.soft_delete(*args, **kwargs)
+        if not instance.deleted_at and to_trash:
+            instance.soft_delete(*args, **kwargs)
         else:
-            self.hard_delete(*args, **kwargs)
+            instance.hard_delete(*args, **kwargs)
 
-    def restore(self):
-        raise NotImplementedError
+    # override delete method
+    def delete(instance, *args, **kwargs):
+        delete_restorable(instance, *args, **kwargs)
+    delete.alters_data = True
+
+    cls.add_to_class('is_in_trash', is_in_trash)
+    cls.add_to_class('delete_restorable', delete_restorable)
+    cls.add_to_class('delete', delete)
+    cls.add_to_class('deleted_at', deleted_at)
+    return cls

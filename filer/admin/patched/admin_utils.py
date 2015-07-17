@@ -10,6 +10,7 @@ django 1.4. ``get_deleted_objects`` and ``NestedObjects`` have not changed compa
 At all locations where something has been changed, there are inline comments in the code.
 """
 from django.contrib.admin.util import NestedObjects, quote
+from django.contrib.auth import get_permission_codename
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -43,7 +44,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                opts.object_name.lower()),
                 None, (quote(obj._get_pk_val()),))
             p = '%s.%s' % (opts.app_label,
-                           opts.get_delete_permission())
+                           get_permission_codename('delete', opts))
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
                 # Display a link to the admin page.

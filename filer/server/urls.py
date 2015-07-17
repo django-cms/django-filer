@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django.conf.urls.defaults import patterns, url, include
+from django.conf.urls import patterns, url, include
 from filer import settings as filer_settings
 
 if not filer_settings.FILER_0_8_COMPATIBILITY_MODE:

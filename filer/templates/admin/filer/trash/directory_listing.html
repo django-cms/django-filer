@@ -1,6 +1,7 @@
 {% extends "admin/filer/base_site.html" %}
 {% load url from future %}
-{% load filer_admin_tags i18n filermedia adminmedia %}
+{% load cycle from future %}
+{% load filer_admin_tags i18n filermedia %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>

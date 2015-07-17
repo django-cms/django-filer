@@ -2345,37 +2345,37 @@ class TestAdminTools(TestCase):
         from filer.admin.tools import has_multi_file_action_permission
         # test for folders from other site
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f1.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f2.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f3.id)), False)
         f1.site = self.site
         f1.save()
         # root folder and user is not site admin
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f1.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f2.id)), True)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f3.id)), True)
         # level 1 file restriction
         file2.restricted = True
         file2.save()
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f1.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f2.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f3.id)), True)
         # level 1 folder restriction
         file2.restricted = False
@@ -2383,13 +2383,13 @@ class TestAdminTools(TestCase):
         f2.restricted = True
         f2.save()
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f1.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f2.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f3.id)), False)
         # level 2 folder restriction
         f2.restricted = False
@@ -2397,13 +2397,13 @@ class TestAdminTools(TestCase):
         f3.restricted = True
         f3.save()
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f1.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f2.id)), False)
         self.assertEqual(has_multi_file_action_permission(
-            request, File.objects.get_empty_query_set(),
+            request, File.objects.none(),
             Folder.objects.filter(id=f3.id)), False)
         f1.restricted = True
         f1.save()
