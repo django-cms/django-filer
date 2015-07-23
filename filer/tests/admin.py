@@ -1,5 +1,7 @@
 #-*- coding: utf-8 -*-
 import os
+from unittest import skipIf
+import django
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 import django.core.files
@@ -125,6 +127,19 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         folder = Folder.objects.get(pk=folder.pk)
         self.assertEqual(folder.owner.pk, another_superuser.pk)
+
+
+    @skipIf(django.get_version() < '1.7',
+            'admin context not supported in django < 1.7')
+    def test_folder_admin_uses_admin_context(self):
+        folder = Folder.objects.create(name='foo')
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': folder.id})
+        response = self.client.get(url)
+        self.assertTrue('site_header' in response.context)
+        self.assertTrue('site_title' in response.context)
+
+
 
 
 class FilerImageAdminUrlsTests(TestCase):
@@ -265,7 +280,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |   |-bar
           |
           |--bar
-        
+
         and try to move the owter bar in foo. This has to fail since it would result
         in two folders with the same name and parent.
         """
