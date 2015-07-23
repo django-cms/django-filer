@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django import forms
@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+
 from .models import Folder, Image, Clipboard, tools, FolderRoot
 from . import settings as filer_settings
 
@@ -23,11 +23,12 @@ class NewFolderForm(forms.ModelForm):
 
 
 def popup_status(request):
-    return '_popup' in request.REQUEST or 'pop' in request.REQUEST
+    return ('_popup' in request.GET or 'pop' in request.GET or
+            '_popup' in request.POST or 'pop' in request.POST)
 
 
 def selectfolder_status(request):
-    return 'select_folder' in request.REQUEST
+    return 'select_folder' in request.GET or 'select_folder' in request.POST
 
 
 def popup_param(request, separator="?"):
@@ -81,7 +82,9 @@ def edit_image(request, folder_id):
 @login_required
 def make_folder(request, folder_id=None):
     if not folder_id:
-        folder_id = request.REQUEST.get('parent_id', None)
+        folder_id = request.GET.get('parent_id', None)
+    if not folder_id:
+        folder_id = request.POST.get('parent_id', None)
     if folder_id:
         folder = Folder.objects.get(id=folder_id)
     else:
@@ -127,10 +130,10 @@ class UploadFileForm(forms.ModelForm):
 @login_required
 def upload(request):
     return render(request, 'filer/upload.html', {
-                    'title': 'Upload files',
-                    'is_popup': popup_status(request),
-                    'select_folder': selectfolder_status(request),
-                    })
+        'title': 'Upload files',
+        'is_popup': popup_status(request),
+        'select_folder': selectfolder_status(request),
+    })
 
 
 @login_required
@@ -143,8 +146,11 @@ def paste_clipboard_to_folder(request):
             tools.discard_clipboard(clipboard)
         else:
             raise PermissionDenied
+    redirect = request.GET.get('redirect_to', '')
+    if not redirect:
+        redirect = request.POST.get('redirect_to', '')
     return HttpResponseRedirect('%s?order_by=-modified_at%s%s' % (
-                                request.REQUEST.get('redirect_to', ''),
+                                redirect,
                                 popup_param(request, separator='&'),
                                 selectfolder_param(request)))
 

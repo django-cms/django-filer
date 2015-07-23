@@ -77,7 +77,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Returns a Form class for use in the admin add view. This is used by
         add_view and change_view.
         """
-        parent_id = request.REQUEST.get('parent_id', None)
+        parent_id = request.GET.get('parent_id', None)
+        if not parent_id:
+            parent_id = request.POST.get('parent_id', None)
         if parent_id:
             return AddFolderPopupForm
         else:
@@ -106,7 +108,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         the object is being changed, and False if it's being added.
         """
         r = form.save(commit=False)
-        parent_id = request.REQUEST.get('parent_id', None)
+        parent_id = request.GET.get('parent_id', None)
+        if not parent_id:
+            parent_id = request.POST.get('parent_id', None)
         if parent_id:
             parent = Folder.objects.get(id=parent_id)
             r.parent = parent
@@ -122,7 +126,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if r['Location']:
             # it was a successful save
             if (r['Location'] in ['../'] or
-                r['Location'] == self._get_post_url(obj)):
+                    r['Location'] == self._get_post_url(obj)):
                 if obj.parent:
                     url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': obj.parent.id})
@@ -143,8 +147,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                          'select_folder': selectfolder_status(request),}
         context.update(extra_context)
         return super(FolderAdmin, self).render_change_form(
-                        request=request, context=context, add=False,
-                        change=False, form_url=form_url, obj=obj)
+            request=request, context=context, add=False,
+            change=False, form_url=form_url, obj=obj)
 
     def delete_view(self, request, object_id, extra_context=None):
         """
@@ -163,16 +167,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             obj = None
 
         r = super(FolderAdmin, self).delete_view(
-                    request=request, object_id=object_id,
-                    extra_context=extra_context)
+            request=request, object_id=object_id,
+            extra_context=extra_context)
         url = r.get("Location", None)
         if url in ["../../../../", "../../"] or url == self._get_post_url(obj):
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
-                                  kwargs={'folder_id': parent_folder.id})
+                              kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "%s%s%s" % (url,popup_param(request),
+            url = "%s%s%s" % (url, popup_param(request),
                               selectfolder_param(request,"&"))
             return HttpResponseRedirect(url)
         return r
