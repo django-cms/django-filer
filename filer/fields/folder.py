@@ -21,8 +21,7 @@ except ImportError:
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):
     choices = None
-    input_type = 'hidden'
-    is_hidden = True
+
 
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
