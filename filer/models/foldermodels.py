@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from filer.utils.cms_roles import *
 from filer.models import mixins
 from filer import settings as filer_settings
-from datetime import datetime
+from django.utils import timezone
 import mptt
 import itertools
 import filer
@@ -76,11 +76,6 @@ class FoldersChainableQuerySetMixin(object):
         return self.filter(deleted_at__isnull=True)
 
 
-class EmptyFoldersQS(models.query.EmptyQuerySet,
-                     FoldersChainableQuerySetMixin):
-    pass
-
-
 class FolderQueryset(query.QuerySet,
                      FoldersChainableQuerySetMixin):
     pass
@@ -88,16 +83,13 @@ class FolderQueryset(query.QuerySet,
 
 class FolderManager(models.Manager):
 
-    def get_empty_query_set(self):
-        return EmptyFoldersQS(self.model, using=self._db)
-
-    def get_query_set(self):
+    def get_queryset(self):
         return FolderQueryset(self.model, using=self._db)
 
     def __getattr__(self, name):
         if name.startswith('__'):
             return super(FolderManager, self).__getattr__(self, name)
-        return getattr(self.get_query_set(), name)
+        return getattr(self.get_queryset(), name)
 
 
 class AliveFolderManager(FolderManager):
@@ -106,17 +98,18 @@ class AliveFolderManager(FolderManager):
     #   folder is in trash
     use_for_related_fields = True
 
-    def get_query_set(self):
+    def get_queryset(self):
         return FolderQueryset(self.model, using=self._db).alive()
 
 
 class TrashFolderManager(FolderManager):
 
-    def get_query_set(self):
+    def get_queryset(self):
         return FolderQueryset(self.model, using=self._db).in_trash()
 
 
-class Folder(mixins.TrashableMixin, mixins.IconsMixin):
+@mixins.trashable
+class Folder(models.Model, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -126,6 +119,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     in this way. Make sure the linked models obey the AbstractFile interface
     (Duck Type).
     """
+
     file_type = 'Folder'
     is_root = False
     can_have_subfolders = True
@@ -294,19 +288,16 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
             self.update_descendants_metadata()
             return
 
-        with transaction.commit_manually():
-            # The manual transaction management here breaks the transaction
-            #   management from
-            #   django.contrib.admin.options.ModelAdmin.change_view
-            storages = []
-            old_locations = []
-            new_locations = []
+        storages = []
+        old_locations = []
+        new_locations = []
 
-            def delete_from_locations(locations, storages):
-                for location, storage in zip(locations, storages):
-                    storage.delete(location)
+        def delete_from_locations(locations, storages):
+            for location, storage in zip(locations, storages):
+                storage.delete(location)
 
-            try:
+        try:
+            with transaction.atomic(savepoint=False):
                 self.set_metadata_from_parent()
                 super(Folder, self).save(*args, **kwargs)
                 self.update_descendants_metadata()
@@ -323,18 +314,14 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
                             storages.append(f.file.storage)
                             old_locations.append(old_location)
                             new_locations.append(new_location)
-            except:
-                try:
-                    transaction.rollback()
-                finally:
-                    delete_from_locations(new_locations, storages)
-                raise
-            else:
-                transaction.commit()
-                delete_from_locations(old_locations, storages)
+        except:
+            delete_from_locations(new_locations, storages)
+            raise
+        else:
+            delete_from_locations(old_locations, storages)
 
     def soft_delete(self):
-        deletion_time = datetime.now()
+        deletion_time = timezone.now()
         desc_ids = list(self.get_descendants(
             include_self=True).values_list('id', flat=True))
         # soft delete all alive files
@@ -440,7 +427,7 @@ class Folder(mixins.TrashableMixin, mixins.IconsMixin):
     def trashed_files(self):
         trash_file_mgr = filer.models.filemodels.File.trash
         if not self.pk:
-            return trash_file_mgr.get_empty_query_set()
+            return trash_file_mgr.none()
         return trash_file_mgr.filter(folder=self).order_by(
             'title', 'name', 'original_filename')
 

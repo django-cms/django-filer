@@ -1,5 +1,6 @@
 {% load i18n filer_admin_tags %}
 {% load url from future %}
+{% load firstof from future %}
 <td class="center">
     {% if select_folder and subfolder.file_type == 'Folder' %}
         <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.quoted_logical_path }}'); return false;" >&nbsp;</a>

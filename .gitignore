@@ -30,3 +30,4 @@ share/
 .tox
 *.pyo
 full.log
+pytest-results.xml

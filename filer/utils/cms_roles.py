@@ -1,3 +1,4 @@
+from django.contrib.sites.models import Site
 from cmsroles.siteadmin import (is_site_admin, get_user_roles_on_sites_ids,
                                 get_administered_sites)
 from django.contrib.auth.models import Permission
@@ -82,6 +83,8 @@ def get_sites_for_user(user):
     """
     Returns all sites available for user.
     """
+    if user.is_superuser:
+        return set(Site.objects.values_list('id', flat=True))
     available_sites = set()
     for sites in get_roles_on_sites(user).values():
         available_sites |= sites

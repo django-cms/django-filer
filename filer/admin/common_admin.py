@@ -11,6 +11,7 @@ from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status, current_site_param)
 
 class CommonModelAdmin(admin.ModelAdmin):
+    save_as = False
 
     def _make_restricted_field_readonly(self, user, obj=None):
         if not user.has_perm('filer.can_restrict_operations') or (
@@ -29,7 +30,7 @@ class CommonModelAdmin(admin.ModelAdmin):
         # Code borrowed from django ModelAdmin to determine
         #      changelist on the fly
         opts = obj._meta
-        module_name = opts.module_name
+        module_name = opts.model_name
         return reverse('admin:%s_%s_changelist' %
                        (opts.app_label, module_name),
             current_app=self.admin_site.name)
@@ -68,7 +69,7 @@ class CommonModelAdmin(admin.ModelAdmin):
         """
         parent_folder = None
         try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
+            obj = self.get_queryset(request).get(pk=unquote(object_id))
             parent_folder = self._get_parent_for_view(obj)
         except self.model.DoesNotExist:
             obj = None
@@ -92,7 +93,7 @@ class CommonModelAdmin(admin.ModelAdmin):
         })
         return super(CommonModelAdmin, self).render_change_form(
                         request=request, context=context, add=False,
-                        change=False, form_url=form_url, obj=obj)
+                        change=change, form_url=form_url, obj=obj)
 
     def response_change(self, request, obj):
         """
@@ -144,7 +145,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
 
         if request.method == 'POST':
             return has_multi_file_action_permission(
-                request, File.objects.get_empty_query_set(),
+                request, File.objects.none(),
                 Folder.objects.filter(id=folder.id))
 
         return folder.has_delete_permission(request.user)

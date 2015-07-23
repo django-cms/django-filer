@@ -12,6 +12,8 @@ from datetime import datetime
 from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from filer import settings as filer_settings
 from filer.models.filemodels import File
@@ -107,13 +109,19 @@ class Image(File):
                     d, t = str.split(exif_date.values)
                     year, month, day = d.split(':')
                     hour, minute, second = t.split(':')
-                    self.date_taken = datetime(
-                                       int(year), int(month), int(day),
-                                       int(hour), int(minute), int(second))
+                    if getattr(settings, "USE_TZ", False):
+                        tz = timezone.get_current_timezone()
+                        self.date_taken = timezone.make_aware(datetime(
+                            int(year), int(month), int(day),
+                            int(hour), int(minute), int(second)), tz)
+                    else:
+                        self.date_taken = datetime(
+                            int(year), int(month), int(day),
+                            int(hour), int(minute), int(second))
             except:
                 pass
         if self.date_taken is None:
-            self.date_taken = datetime.now()
+            self.date_taken = timezone.now()
         self.has_all_mandatory_data = self._check_validity()
         try:
             # do this more efficient somehow?

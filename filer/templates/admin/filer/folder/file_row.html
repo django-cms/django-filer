@@ -1,5 +1,6 @@
-{% load i18n filermedia filer_tags filer_admin_tags %}
+{% load i18n filermedia filer_tags filer_admin_tags %}{% load firstof from future %}
 <td class="center">
+
     {% if is_popup and not select_folder %}
         <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.32|escapejs }}', '{{ file.label|escapejs }}'); return false;" title="{% trans "Select this file" %}">&nbsp;</a>
     {% else %}
