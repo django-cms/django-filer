@@ -1,6 +1,11 @@
 #-*- coding: utf-8 -*-
 import os
-from unittest import skipIf
+
+try:
+    from unittest import skipIf
+except ImportError: # for python 2.6
+    from unittest2 import skipIf
+
 import django
 from django.test import TestCase
 from django.core.urlresolvers import reverse
