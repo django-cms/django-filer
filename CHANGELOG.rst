@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 9c535d2 (24.07.2015, 14:46 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Django 1.7 upgrade: Folder widget should be visible.
+
 Revision 3a18983 (17.07.2015, 13:47 UTC)
 ----------------------------------------
 
