@@ -4,9 +4,9 @@
 
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
-  <ul class="object-tools">
+  <ul class="object-tools list-unstyled list-inline text-right">
     {#<li><a href="export/">{% trans "Export" %}</a></li>#}
-    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    <li><a href="history/" class="historylink btn btn-success btn-sm"><i class="ace-icon fa fa-history"></i>{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}

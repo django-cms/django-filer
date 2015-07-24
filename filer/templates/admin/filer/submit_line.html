@@ -2,7 +2,7 @@
 <div class="submit-row form-actions text-right no-margin-bottom">
 	{% if show_delete_link %}<a href="delete/" class="deletelink btn btn-danger"><i class="ace-icon fa fa-trash-o"></i>{% trans "Delete" %}</a>{% endif %}
 	{% if show_save_as_new %}<button class="btn btn-primary" name="_saveasnew" {{ onclick_attrib }}>{% trans 'Save as new' %}</button>{%endif%}
-	{% if show_save_and_add_another %}<button class="btn btn-primary btn-pink" name="_addanother" {{ onclick_attrib }}>{% trans 'Save and add another' %}</button>{% endif %}
+	{% if show_save_and_add_another %}<button class="btn btn-primary btn-pink" name="_addanother" {{ onclick_attrib }}><i class="ace-icon fa fa-check-square-o"></i>{% trans 'Save and add another' %}</button>{% endif %}
 	{% if show_save_and_continue %}<button class="btn btn-primary btn-purple" name="_continue" {{ onclick_attrib }}><i class="ace-icon fa fa-pencil-square-o"></i>{% trans 'Save and continue editing' %}</button>{% endif %}
 	{% if show_save %}<button class="default btn btn-primary" name="_save" {{ onclick_attrib }}><i class="ace-icon fa fa-check bigger-110"></i>{% trans 'Save' %}</button>{% endif %}
 </div>

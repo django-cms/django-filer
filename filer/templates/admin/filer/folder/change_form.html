@@ -15,11 +15,6 @@
 
 {% block coltype %}{% if is_popup %}colM{% else %}colMS{% endif %}{% endblock %}
 
-{# {% block content %} 
-	<div id="content-main" class="{% if not is_popup %}col-xs-12 no-padding-right no-padding-left{% endif %}">
-		{{block.super}}	
-	</div>
-{% endblock %} #}
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools list-unstyled list-inline text-right">

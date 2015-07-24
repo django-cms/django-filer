@@ -55,7 +55,7 @@
     <div class="paginator row center">
         <div class="col-xs-12">
             {% if paginated_items.has_previous %}
-                <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% get_popup_params '&' %}">{% trans "previous" %}</a>
+                <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% get_popup_params '&' %}" class="btn btn-success btn-sm"><i class="ace-icon fa fa-long-arrow-left"></i>{% trans "previous" %}</a>
             {% endif %}
 
             <span class="this-page">
