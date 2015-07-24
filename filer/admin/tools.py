@@ -1,5 +1,18 @@
 #-*- coding: utf-8 -*-
+
+import django
 from django.core.exceptions import PermissionDenied
+
+
+if django.get_version() > '1.8':
+    def admin_each_context(admin_site, request):
+        return admin_site.each_context(request)
+elif django.get_version() > '1.7':
+    def admin_each_context(admin_site, request):
+        return admin_site.each_context()
+else:
+    def admin_each_context(admin_site, request):
+        return {}
 
 
 def check_files_edit_permissions(request, files):

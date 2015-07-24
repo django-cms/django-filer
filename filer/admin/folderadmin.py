@@ -37,7 +37,8 @@ from filer.admin.tools import (userperms_for_request,
                                check_folder_edit_permissions,
                                check_files_edit_permissions,
                                check_files_read_permissions,
-                               check_folder_read_permissions)
+                               check_folder_read_permissions,
+                               admin_each_context)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData, FolderPermission, Image)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
@@ -382,40 +383,40 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
-        return render(
-            request,
-            self.directory_listing_template,
-            {
-                'folder': folder,
-                'clipboard_files': File.objects.filter(
-                    in_clipboards__clipboarditem__clipboard__user=request.user
-                    ).distinct(),
-                'paginator': paginator,
-                'paginated_items': paginated_items,  # [(item, item_perms), ]
-                'permissions': permissions,
-                'permstest': userperms_for_request(folder, request),
-                'current_url': request.path,
-                'title': 'Directory listing for %s' % folder.name,
-                'search_string': ' '.join(search_terms),
-                'q': urlquote(q),
-                'show_result_count': show_result_count,
-                'limit_search_to_folder': limit_search_to_folder,
-                'is_popup': popup_status(request),
-                'select_folder': selectfolder_status(request),
-                # needed in the admin/base.html template for logout links
-                'root_path': reverse('admin:index'),
-                'action_form': action_form,
-                'actions_on_top': self.actions_on_top,
-                'actions_on_bottom': self.actions_on_bottom,
-                'actions_selection_counter': self.actions_selection_counter,
-                'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
-                'selection_note_all': selection_note_all % {'total_count': paginator.count},
-                'media': self.media,
-                'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
-                'can_make_folder': request.user.is_superuser or \
-                        (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or \
-                        permissions.get("has_add_children_permission"),
+
+        context = admin_each_context(self.admin_site, request)
+        context.update({
+            'folder': folder,
+            'clipboard_files': File.objects.filter(
+                in_clipboards__clipboarditem__clipboard__user=request.user
+            ).distinct(),
+            'paginator': paginator,
+            'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'permissions': permissions,
+            'permstest': userperms_for_request(folder, request),
+            'current_url': request.path,
+            'title': 'Directory listing for %s' % folder.name,
+            'search_string': ' '.join(search_terms),
+            'q': urlquote(q),
+            'show_result_count': show_result_count,
+            'limit_search_to_folder': limit_search_to_folder,
+            'is_popup': popup_status(request),
+            'select_folder': selectfolder_status(request),
+            # needed in the admin/base.html template for logout links
+            'root_path': reverse('admin:index'),
+            'action_form': action_form,
+            'actions_on_top': self.actions_on_top,
+            'actions_on_bottom': self.actions_on_bottom,
+            'actions_selection_counter': self.actions_selection_counter,
+            'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
+            'selection_note_all': selection_note_all % {'total_count': paginator.count},
+            'media': self.media,
+            'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
+            'can_make_folder': request.user.is_superuser or \
+            (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or \
+            permissions.get("has_add_children_permission"),
         })
+        return render(request, self.directory_listing_template, context)
 
     def filter_folder(self, qs, terms=[]):
         for term in terms:
@@ -703,7 +704,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             title = _("Are you sure?")
 
-        context = {
+        context = admin_each_context(self.admin_site, request)
+        context.update({
             "title": title,
             "instance": current_folder,
             "breadcrumbs_action": _("Delete files and/or folders"),
@@ -718,7 +720,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        }
+        })
 
         # Display the destination folder selection page
         return render(request, "admin/filer/delete_selected_files_confirmation.html", context)
@@ -849,7 +851,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 })
             return None
 
-        context = {
+        context = admin_each_context(self.admin_site, request)
+        context.update({
             "title": _("Move files and/or folders"),
             "instance": current_folder,
             "breadcrumbs_action": _("Move files and/or folders"),
@@ -862,7 +865,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        }
+        })
 
         # Display the destination folder selection page
         return render(request, "admin/filer/folder/choose_move_destination.html", context)
@@ -931,7 +934,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             form = RenameFilesForm()
 
-        context = {
+        context = admin_each_context(self.admin_site, request)
+        context.update({
             "title": _("Rename files"),
             "instance": current_folder,
             "breadcrumbs_action": _("Rename files"),
@@ -944,7 +948,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        }
+        })
 
         # Display the rename format selection page
         return render(request, "admin/filer/folder/choose_rename_format.html", context)
@@ -1058,7 +1062,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 selected_destination_folder = current_folder.pk
             else:
                 selected_destination_folder = 0
-        context = {
+
+        context = admin_each_context(self.admin_site, request)
+        context.update({
             "title": _("Copy files and/or folders"),
             "instance": current_folder,
             "breadcrumbs_action": _("Copy files and/or folders"),
@@ -1073,7 +1079,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        }
+        })
 
         # Display the destination folder selection page
         return render(request, "admin/filer/folder/choose_copy_destination.html", context)
@@ -1179,7 +1185,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             form = ResizeImagesForm()
 
-        context = {
+        context = admin_each_context(self.admin_site, request)
+        context.update({
             "title": _("Resize images"),
             "instance": current_folder,
             "breadcrumbs_action": _("Resize images"),
@@ -1193,7 +1200,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        }
+        })
 
         # Display the resize options page
         return render(request, "admin/filer/folder/choose_images_resize_options.html", context)
