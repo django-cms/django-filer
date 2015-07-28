@@ -22,6 +22,7 @@ checksums.
      company.logo.width
      company.logo.height
      company.logo.icons['64'] # or {{ company.logo.icons.64 }} in a template
+     company.logo.url         # prints path to original image
 
 
 ``FilerFileField`` and ``FilerImageField``

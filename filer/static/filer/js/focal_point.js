@@ -77,7 +77,7 @@ $(function(){
 		add(x, y);
 		image_loaded = true
 	}
-	jQuery(document).ready(function() {
+	$(document).ready(function() {
 		$('#image_container img').load(image_init);
 		// If image has not been loaded after 250ms after pageload,
 		// assume it's allready loaded and try initializing.

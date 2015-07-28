@@ -80,7 +80,7 @@ class BaseImage(File):
             return self._exif_cache
         else:
             if self.file:
-                self._exif_cache = get_exif_for_file(self.file.path)
+                self._exif_cache = get_exif_for_file(self.file)
             else:
                 self._exif_cache = {}
         return self._exif_cache

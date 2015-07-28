@@ -1,2 +1,5 @@
 #!/bin/bash
-pip install https://github.com/nephila/djangocms-helper/archive/develop.zip unidecode $DJANGO 'Pillow<2.6' $EASY_THUMBNAILS django-polymorphic django-mptt python-coveralls coverage south
+pip install djangocms-helper==0.8.1 unidecode $DJANGO 'Pillow<2.6' $EASY_THUMBNAILS django-polymorphic django-mptt python-coveralls coverage south
+if [[ "$TRAVIS_PYTHON_VERSION" == 2.6 ]]; then
+    pip install unittest2
+fi
