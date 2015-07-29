@@ -834,9 +834,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        if not has_multi_file_action_permission(
-                request, selected_files, selected_folders):
-            raise PermissionDenied
+        if not has_multi_file_action_permission(request, selected_files, selected_folders):
+            messages.error(request, "You are not allowed to move some of the "\
+                           "files and folders you selected.")
+            return
 
         if selected_folders.filter(parent=None).exists():
             messages.error(request, "To prevent potential problems, users "
@@ -850,8 +851,13 @@ class FolderAdmin(FolderPermissionModelAdmin):
             request, selected_files, selected_folders)
 
         if request.method == 'POST' and request.POST.get('post'):
-            destination = self._clean_destination(
-                request, current_folder, selected_folders)
+            try:
+                destination = self._clean_destination(
+                    request, current_folder, selected_folders)
+            except PermissionDenied:
+                messages.error(request, "The destination was not valid so the selected "\
+                               "files and folders were not moved. Please try again.")
+                return
 
             # all folders need to belong to the same site as the
             #   destination site folder
@@ -1069,8 +1075,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method == 'POST' and request.POST.get('post'):
             form = CopyFilesAndFoldersForm(request.POST)
             if form.is_valid():
-                destination = self._clean_destination(
-                    request, current_folder, folders_queryset)
+                try:
+                    destination = self._clean_destination(
+                        request, current_folder, folders_queryset)
+                except PermissionDenied:
+                    messages.error(request,
+                                   _("The selected destination was not valid, so the selected "\
+                                     "files and folders were not copied. Please try again."))
+                    return None
 
                 suffix = form.cleaned_data['suffix']
                 if not self._are_candidate_names_valid(
@@ -1131,12 +1143,17 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method != 'POST':
             return None
         # cannot restrict/unrestrict unfiled files
-        if files_qs.filter(folder__isnull=True).exists():
-            raise PermissionDenied
+        unfiled_files = files_qs.filter(folder__isnull=True)
+        if unfiled_files.exists():
+            messages.warning(request, _("Some of the selected files do not have parents: %s, "
+                                        "so their rights cannot be changed.") %
+                             ', '.join([str(unfiled_file) for unfiled_file in unfiled_files.all()]))
+            return None
 
-        if not has_multi_file_action_permission(
-                request, files_qs, folders_qs):
-            raise PermissionDenied
+        if not has_multi_file_action_permission(request, files_qs, folders_qs):
+            messages.warning(request, _("You are not allowed to modify the restrictions on "\
+                                        "the selected files and folders."))
+            return None
 
         count = [0]
 

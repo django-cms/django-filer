@@ -22,7 +22,7 @@ from filer.tests.helpers import (
     get_user_message, create_superuser, create_folder_structure,
     create_image, create_staffuser, create_folder_for_user, move_action,
     move_to_clipboard_action, paste_clipboard_to_folder, get_dir_listing_url,
-    filer_obj_as_checkox, get_make_root_folder_url,
+    filer_obj_as_checkox, get_make_root_folder_url, enable_restriction,
     move_single_file_to_clipboard_action, SettingsOverride
 )
 from filer.utils.checktrees import TreeChecker
@@ -1032,7 +1032,9 @@ class BaseTestFolderTypePermissionLayer(object):
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(folders['bar'])]})
 
-        self.assertEqual(response.status_code, 403)
+        assert "The selected destination was not valid, so the selected files and folders "\
+            "were not copied. Please try again." in response.cookies['messages'].value,\
+            "Warning message not found in wrong copy response"
         return folders, files
 
     def test_file_from_core_folder_is_unchangeable(self):
@@ -1122,6 +1124,16 @@ class TestFolderTypePermissionForSuperUser(
         user.user_permissions = Permission.objects.all()
         self.client.login(username=username, password=password)
         self.user = user
+
+    def test_restriction_change(self):
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        unfiled_file = File.objects.create(name='unfiled_file', folder=foo_root, restricted=False)
+        response, url = enable_restriction(
+            self.client, foo_root, [unfiled_file], follow=False)
+        assert "Successfully enabled restriction for 1 files and/or folders."\
+            in response.cookies['messages'].value,\
+            "Operation was expected to fail."
 
 
 class TestFolderTypePermissionLayerForRegularUser(
@@ -1218,16 +1230,21 @@ class TestFolderTypePermissionLayerForRegularUser(
 
     def test_message_error_user_no_site_on_move_for_site_admins(self):
         self._make_user_site_admin()
-        self.test_message_error_user_no_site_on_move()
+        response, url = self.request_move_root_folder()
+        assert "You are not allowed to move some of the files and folders you selected." in\
+            response.cookies['messages'].value, "Expected error message not found."
+        assert response.status_code == 302
 
     def test_message_error_user_no_site_on_move(self):
+        response, url = self.request_move_root_folder()
+        assert response.status_code == 403, "Permission denied should be raised for no user"
+
+    def request_move_root_folder(self):
         site = Site.objects.get(id=1)
         foo_root = Folder.objects.create(name='foo_root')
         foo = Folder.objects.create(name='foo', parent=foo_root)
         bar = Folder.objects.create(name='bar', site=site)
-        response, url = move_action(
-            self.client, foo_root, bar, [foo])
-        self.assertEqual(response.status_code, 403)
+        return move_action(self.client, foo_root, bar, [foo])
 
     def test_move_to_clipboard_from_site_folders_for_site_admins(self):
         self._make_user_site_admin()
@@ -1260,6 +1277,17 @@ class TestFolderTypePermissionLayerForRegularUser(
             self.client, foo, [file_baz])
         self.assertEqual(
             self._get_clipboard_files().count(), 2)
+
+    def test_error_unallowed_restriction_change(self):
+        self._make_user_site_admin()
+        site = Site.objects.get(id=1)
+        foo_root = Folder.objects.create(name='foo_root')
+        unfiled_file = File.objects.create(name='unfiled_file', folder=foo_root)
+        response, url = enable_restriction(
+            self.client, foo_root, [unfiled_file], follow=False)
+        assert "You are not allowed to modify the restrictions on the selected "\
+            "files and folders." in response.cookies['messages'].value,\
+            "Operation was expected to fail."
 
 
 class TestSiteFolderRoleFiltering(TestCase, HelpersMixin):
@@ -1868,7 +1896,7 @@ class TestFrozenAssetsPermissions(TestCase):
             file=dj_files.base.ContentFile('some data'), folder=bar)
         response, _ = move_action(
             self.client, bar, self.folders['foo'], [bar_file])
-        self.assertEqual(response.status_code, 403)
+        self.assert_invalid_move_destination_response(response)
 
         response, _ = move_action(
             self.client, bar, self.folders['foo'], [bar_subfolder])
@@ -1878,6 +1906,13 @@ class TestFrozenAssetsPermissions(TestCase):
         response, _ = move_action(
             self.client, 'unfiled', self.folders['foo'], [bar_file])
         assert File.objects.filter(folder=self.folders['foo']).count() == 2
+
+
+    def assert_invalid_move_destination_response(self, response):
+        assert "The destination was not valid so the selected files and folders were "\
+            "not moved. Please try again." in response.cookies['messages'].value,\
+            "Was expecting error message because the destination is invalid"
+        assert response.status_code == 302
 
     def test_move_restricted_in_dest(self):
         bar = Folder.objects.create(name='bar', site=self.site)
@@ -1971,7 +2006,7 @@ class TestFrozenAssetsPermissions(TestCase):
             'destination': self.folders['foo'].id,
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(bar_file)]})
-        self.assertEqual(response.status_code, 403)
+        self.assert_invalid_copy_destination_response(response)
 
         url = get_dir_listing_url(None)
         response = self.client.post(url, {
@@ -1980,7 +2015,13 @@ class TestFrozenAssetsPermissions(TestCase):
             'destination': self.folders['foo'].id,
             helpers.ACTION_CHECKBOX_NAME:
                 [filer_obj_as_checkox(bar)]})
-        self.assertEqual(response.status_code, 403)
+        self.assert_invalid_copy_destination_response(response)
+
+    def assert_invalid_copy_destination_response(self, response):
+        assert "The selected destination was not valid, so the selected files and "\
+            "folders were not copied. Please try again." in response.cookies['messages'].value,\
+            "Was expecting error message because the destination is invalid"
+        assert response.status_code == 302
 
 
 class TestSharedSitePermissions(TestCase):
