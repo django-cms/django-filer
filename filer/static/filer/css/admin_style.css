@@ -3,6 +3,16 @@
 #image_container { position: relative; } 
 #image_container img, #image_container svg { margin: 0px; position: absolute; top: 0; left: 0;}
 
+/* Tile pattern as background for transparent images: */
+.transpTiling {
+    /* light tiles */
+    background-image: url(data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7);
+    outline: 1px solid #E3E3E3;
+}
+.transpTiling:hover {
+    /* dark tiles */
+    background-image: url(data:image/gif;base64,R0lGODlhCAAIAKECAEFBQXR0dP///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7);
+}
 
 /* the directory listing */
 table thead th.thumbHeader {
