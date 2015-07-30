@@ -1,8 +1,10 @@
 #-*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.db import models
 from django.utils.translation import ugettext  as _
 from filer.admin.common_admin import FilePermissionModelAdmin
+from filer.fields.file import NonClearableFileInput
 
 
 class FileAdmin(FilePermissionModelAdmin):
@@ -11,6 +13,10 @@ class FileAdmin(FilePermissionModelAdmin):
     search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
     readonly_fields = ('sha1', )
+
+    formfield_overrides = {
+        models.FileField:       {'widget': NonClearableFileInput},
+    }
 
     def get_readonly_fields(self, request, obj=None):
         if obj and (obj.is_readonly_for_user(request.user) or
