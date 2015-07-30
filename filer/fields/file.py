@@ -2,7 +2,7 @@
 from django import forms
 from django.conf import settings as globalsettings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.contrib.admin.widgets import AdminFileWidget
+from django.contrib.admin import widgets as django_widgets
 from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -136,5 +136,5 @@ class FilerFileField(models.ForeignKey):
         return (field_class, args, kwargs)
 
 
-class NonClearableFileInput(AdminFileWidget):
+class NonClearableFileInput(django_widgets.AdminFileWidget):
     template_with_clear = u''
