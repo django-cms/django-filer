@@ -12,6 +12,7 @@ from django.db import router
 from django.db.models import Q, Count
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import get_permission_codename
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -52,7 +53,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
     list_per_page = 20
     list_filter = ('owner',)
     search_fields = ['name', 'files__name']
-    save_as = True  # see ImageAdmin
 
     actions_affecting_position = [
         'move_to_clipboard',
@@ -156,7 +156,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(FolderAdmin, self).get_urls()
         url_patterns = patterns('',
             # we override the default list view with our own directory listing
@@ -196,7 +196,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         # since only save button appears its enough to make sure that the
         #   request is a POST from a popup view and the response is a
         #   successed HttpResponse
-        if (request.method == 'POST' and "_popup" in request.POST and
+        if (request.method == 'POST' and popup_status(request) and
             response.status_code == 200 and
             not isinstance(response, TemplateResponse) and
             not isinstance(response, HttpResponseRedirect)):
@@ -230,7 +230,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         response = self.delete_files_or_folders(
             request,
-            File.objects.get_empty_query_set(),
+            File.objects.none(),
             Folder.objects.filter(id=obj.id))
 
         if response is None:
@@ -548,7 +548,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if not has_multi_file_action_permission(
                 request, files_queryset,
-                Folder.objects.get_empty_query_set()):
+                Folder.objects.none()):
             raise PermissionDenied
 
         clipboard = tools.get_user_clipboard(request.user)
@@ -697,8 +697,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
                                    opts.app_label,
                                    opts.object_name.lower()),
                                 None, (quote(obj._get_pk_val()),))
+            get_permission_codename('delete', opts)
             p = '%s.%s' % (opts.app_label,
-                           opts.get_delete_permission())
+                           get_permission_codename('delete', opts))
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
@@ -833,9 +834,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        if not has_multi_file_action_permission(
-                request, selected_files, selected_folders):
-            raise PermissionDenied
+        if not has_multi_file_action_permission(request, selected_files, selected_folders):
+            messages.error(request, "You are not allowed to move some of the "\
+                           "files and folders you selected.")
+            return
 
         if selected_folders.filter(parent=None).exists():
             messages.error(request, "To prevent potential problems, users "
@@ -849,8 +851,13 @@ class FolderAdmin(FolderPermissionModelAdmin):
             request, selected_files, selected_folders)
 
         if request.method == 'POST' and request.POST.get('post'):
-            destination = self._clean_destination(
-                request, current_folder, selected_folders)
+            try:
+                destination = self._clean_destination(
+                    request, current_folder, selected_folders)
+            except PermissionDenied:
+                messages.error(request, "The destination was not valid so the selected "\
+                               "files and folders were not moved. Please try again.")
+                return
 
             # all folders need to belong to the same site as the
             #   destination site folder
@@ -925,7 +932,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
 
         if not has_multi_file_action_permission(request, files_queryset,
-                Folder.objects.get_empty_query_set()):
+                Folder.objects.none()):
             raise PermissionDenied
 
         def is_valid_archive(filer_file):
@@ -1068,8 +1075,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method == 'POST' and request.POST.get('post'):
             form = CopyFilesAndFoldersForm(request.POST)
             if form.is_valid():
-                destination = self._clean_destination(
-                    request, current_folder, folders_queryset)
+                try:
+                    destination = self._clean_destination(
+                        request, current_folder, folders_queryset)
+                except PermissionDenied:
+                    messages.error(request,
+                                   _("The selected destination was not valid, so the selected "\
+                                     "files and folders were not copied. Please try again."))
+                    return None
 
                 suffix = form.cleaned_data['suffix']
                 if not self._are_candidate_names_valid(
@@ -1130,12 +1143,17 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.method != 'POST':
             return None
         # cannot restrict/unrestrict unfiled files
-        if files_qs.filter(folder__isnull=True).exists():
-            raise PermissionDenied
+        unfiled_files = files_qs.filter(folder__isnull=True)
+        if unfiled_files.exists():
+            messages.warning(request, _("Some of the selected files do not have parents: %s, "
+                                        "so their rights cannot be changed.") %
+                             ', '.join([str(unfiled_file) for unfiled_file in unfiled_files.all()]))
+            return None
 
-        if not has_multi_file_action_permission(
-                request, files_qs, folders_qs):
-            raise PermissionDenied
+        if not has_multi_file_action_permission(request, files_qs, folders_qs):
+            messages.warning(request, _("You are not allowed to modify the restrictions on "\
+                                        "the selected files and folders."))
+            return None
 
         count = [0]
 

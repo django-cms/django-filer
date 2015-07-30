@@ -1,213 +1,163 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-from south.db import db
-from django.db import models
-from filer.models import *
+from django.db import models, migrations
+import filer.fields.multistorage_file
+import filer.models.mixins
+import django.db.models.deletion
+from django.conf import settings
 
-class Migration:
-    
-    def forwards(self, orm):
-        
-        # Adding model 'Image'
-        db.create_table('filer_image', (
-            ('file_ptr', orm['filer.Image:file_ptr']),
-            ('_height', orm['filer.Image:_height']),
-            ('_width', orm['filer.Image:_width']),
-            ('date_taken', orm['filer.Image:date_taken']),
-            ('default_alt_text', orm['filer.Image:default_alt_text']),
-            ('default_caption', orm['filer.Image:default_caption']),
-            ('author', orm['filer.Image:author']),
-            ('must_always_publish_author_credit', orm['filer.Image:must_always_publish_author_credit']),
-            ('must_always_publish_copyright', orm['filer.Image:must_always_publish_copyright']),
-            ('subject_location', orm['filer.Image:subject_location']),
-        ))
-        db.send_create_signal('filer', ['Image'])
-        
-        # Adding model 'ClipboardItem'
-        db.create_table('filer_clipboarditem', (
-            ('id', orm['filer.ClipboardItem:id']),
-            ('file', orm['filer.ClipboardItem:file']),
-            ('clipboard', orm['filer.ClipboardItem:clipboard']),
-        ))
-        db.send_create_signal('filer', ['ClipboardItem'])
-        
-        # Adding model 'File'
-        db.create_table('filer_file', (
-            ('id', orm['filer.File:id']),
-            ('folder', orm['filer.File:folder']),
-            ('file_field', orm['filer.File:file_field']),
-            ('_file_type_plugin_name', orm['filer.File:_file_type_plugin_name']),
-            ('_file_size', orm['filer.File:_file_size']),
-            ('has_all_mandatory_data', orm['filer.File:has_all_mandatory_data']),
-            ('original_filename', orm['filer.File:original_filename']),
-            ('name', orm['filer.File:name']),
-            ('owner', orm['filer.File:owner']),
-            ('uploaded_at', orm['filer.File:uploaded_at']),
-            ('modified_at', orm['filer.File:modified_at']),
-        ))
-        db.send_create_signal('filer', ['File'])
-        
-        # Adding model 'Folder'
-        db.create_table('filer_folder', (
-            ('id', orm['filer.Folder:id']),
-            ('parent', orm['filer.Folder:parent']),
-            ('name', orm['filer.Folder:name']),
-            ('owner', orm['filer.Folder:owner']),
-            ('uploaded_at', orm['filer.Folder:uploaded_at']),
-            ('created_at', orm['filer.Folder:created_at']),
-            ('modified_at', orm['filer.Folder:modified_at']),
-            ('lft', orm['filer.Folder:lft']),
-            ('rght', orm['filer.Folder:rght']),
-            ('tree_id', orm['filer.Folder:tree_id']),
-            ('level', orm['filer.Folder:level']),
-        ))
-        db.send_create_signal('filer', ['Folder'])
-        
-        # Adding model 'Clipboard'
-        db.create_table('filer_clipboard', (
-            ('id', orm['filer.Clipboard:id']),
-            ('user', orm['filer.Clipboard:user']),
-        ))
-        db.send_create_signal('filer', ['Clipboard'])
-        
-        # Adding model 'FolderPermission'
-        db.create_table('filer_folderpermission', (
-            ('id', orm['filer.FolderPermission:id']),
-            ('folder', orm['filer.FolderPermission:folder']),
-            ('type', orm['filer.FolderPermission:type']),
-            ('user', orm['filer.FolderPermission:user']),
-            ('group', orm['filer.FolderPermission:group']),
-            ('everybody', orm['filer.FolderPermission:everybody']),
-            ('can_edit', orm['filer.FolderPermission:can_edit']),
-            ('can_read', orm['filer.FolderPermission:can_read']),
-            ('can_add_children', orm['filer.FolderPermission:can_add_children']),
-        ))
-        db.send_create_signal('filer', ['FolderPermission'])
-        
-        # Creating unique_together for [parent, name] on Folder.
-        db.create_unique('filer_folder', ['parent_id', 'name'])
-        
-    
-    
-    def backwards(self, orm):
-        
-        # Deleting unique_together for [parent, name] on Folder.
-        db.delete_unique('filer_folder', ['parent_id', 'name'])
-        
-        # Deleting model 'Image'
-        db.delete_table('filer_image')
-        
-        # Deleting model 'ClipboardItem'
-        db.delete_table('filer_clipboarditem')
-        
-        # Deleting model 'File'
-        db.delete_table('filer_file')
-        
-        # Deleting model 'Folder'
-        db.delete_table('filer_folder')
-        
-        # Deleting model 'Clipboard'
-        db.delete_table('filer_clipboard')
-        
-        # Deleting model 'FolderPermission'
-        db.delete_table('filer_folderpermission')
-        
-    
-    
-    models = {
-        'auth.group': {
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'unique_together': "(('content_type', 'codename'),)"},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'unique_together': "(('app_label', 'model'),)", 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'filer.clipboard': {
-            'files': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['filer.File']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'clipboards'", 'to': "orm['auth.User']"})
-        },
-        'filer.clipboarditem': {
-            'clipboard': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['filer.Clipboard']"}),
-            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['filer.File']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        'filer.file': {
-            '_file_size': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            '_file_type_plugin_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
-            'file_field': ('django.db.models.fields.files.FileField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'folder': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'all_files'", 'null': 'True', 'to': "orm['filer.Folder']"}),
-            'has_all_mandatory_data': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'original_filename': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_files'", 'null': 'True', 'to': "orm['auth.User']"}),
-            'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
-        },
-        'filer.folder': {
-            'Meta': {'unique_together': "(('parent', 'name'),)"},
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'modified_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_folders'", 'null': 'True', 'to': "orm['auth.User']"}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'children'", 'null': 'True', 'to': "orm['filer.Folder']"}),
-            'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
-        },
-        'filer.folderpermission': {
-            'can_add_children': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'can_edit': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'can_read': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'everybody': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'folder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['filer.Folder']", 'null': 'True', 'blank': 'True'}),
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'type': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
-        },
-        'filer.image': {
-            '_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            '_width': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'author': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'date_taken': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'default_alt_text': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'default_caption': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'file_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['filer.File']", 'unique': 'True', 'primary_key': 'True'}),
-            'must_always_publish_author_credit': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'must_always_publish_copyright': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'subject_location': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '64', 'null': 'True', 'blank': 'True'})
-        }
-    }
-    
-    complete_apps = ['filer']
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('sites', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('contenttypes', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Clipboard',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+            options={
+                'verbose_name': 'clipboard',
+                'verbose_name_plural': 'clipboards',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ClipboardItem',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard')),
+            ],
+            options={
+                'verbose_name': 'clipboard item',
+                'verbose_name_plural': 'clipboard items',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='File',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('file', filer.fields.multistorage_file.MultiStorageFileField(upload_to=filer.fields.multistorage_file.generate_filename_multistorage, max_length=255, blank=True, null=True, verbose_name='file', db_index=True)),
+                ('_file_size', models.IntegerField(null=True, verbose_name='file size', blank=True)),
+                ('sha1', models.CharField(default=b'', max_length=40, verbose_name='sha1', blank=True)),
+                ('has_all_mandatory_data', models.BooleanField(default=False, verbose_name='has all mandatory data', editable=False)),
+                ('original_filename', models.CharField(max_length=255, null=True, verbose_name='original filename', blank=True)),
+                ('name', models.CharField(help_text='Change the FILE name for an image in the cloud storage system; be sure to include the extension (.jpg or .png, for example) to ensure asset remains valid.', max_length=255, null=True, verbose_name='file name', blank=True)),
+                ('title', models.CharField(help_text='Used in the Photo Gallery plugin as a title or name for an image; not displayed via the image plugin.', max_length=255, null=True, verbose_name='name', blank=True)),
+                ('description', models.TextField(help_text='Used in the Photo Gallery plugin as a description; not displayed via the image plugin.', null=True, verbose_name='description', blank=True)),
+                ('uploaded_at', models.DateTimeField(auto_now_add=True, verbose_name='uploaded at')),
+                ('modified_at', models.DateTimeField(auto_now=True, verbose_name='modified at')),
+                ('is_public', models.BooleanField(default=True, help_text='Disable any permission checking for this file. File will be publicly accessible to anyone.', verbose_name='Permissions disabled')),
+                ('restricted', models.BooleanField(default=False, help_text='If this box is checked, Editors and Writers will still be able to view the asset, add it to a plugin or smart snippet but will not be able to delete or modify the current version of the asset.', verbose_name='Restrict Editors and Writers from being able to edit or delete this asset')),
+                ('deleted_at', models.DateTimeField(verbose_name='deleted at', null=True, editable=False, blank=True)),
+            ],
+            options={
+                'verbose_name': 'file',
+                'verbose_name_plural': 'files',
+            },
+            bases=(models.Model, filer.models.mixins.IconsMixin),
+        ),
+        migrations.CreateModel(
+            name='Archive',
+            fields=[
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+            ],
+            options={
+                'verbose_name': 'archive',
+                'verbose_name_plural': 'archives',
+            },
+            bases=('filer.file',),
+        ),
+        migrations.CreateModel(
+            name='Folder',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255, verbose_name='name')),
+                ('uploaded_at', models.DateTimeField(auto_now_add=True, verbose_name='uploaded at')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('modified_at', models.DateTimeField(auto_now=True, verbose_name='modified at')),
+                ('folder_type', models.IntegerField(default=0, choices=[(0, b'Site Folder'), (1, b'Core Folder')])),
+                ('restricted', models.BooleanField(default=False, help_text='If this box is checked, Editors and Writers will still be able to view this folder assets, add them to a plugin or smart snippet but will not be able to delete or modify the current version of the assets.', verbose_name='Restrict Editors and Writers from being able to edit or delete anything from this folder')),
+                ('deleted_at', models.DateTimeField(verbose_name='deleted at', null=True, editable=False, blank=True)),
+                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('owner', models.ForeignKey(related_name='filer_owned_folders', on_delete=django.db.models.deletion.SET_NULL, verbose_name=b'owner', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('parent', models.ForeignKey(related_name='children', verbose_name=b'parent', blank=True, to='filer.Folder', null=True)),
+                ('shared', models.ManyToManyField(related_name='shared', to='sites.Site', blank=True, help_text='All the sites which you share this folder with will be able to use this folder on their pages, with all of its assets. However, they will not be able to change, delete or move it, not even add new assets.', null=True, verbose_name='Share folder with sites')),
+                ('site', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to='sites.Site', help_text='Select the site which will use this folder.', null=True)),
+            ],
+            options={
+                'ordering': ('name',),
+                'verbose_name': 'Folder',
+                'verbose_name_plural': 'Folders',
+                'permissions': (('can_use_directory_listing', 'Can use directory listing'), ('can_restrict_operations', 'Can restrict files or folders')),
+            },
+            bases=(models.Model, filer.models.mixins.IconsMixin),
+        ),
+        migrations.CreateModel(
+            name='Image',
+            fields=[
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+                ('_height', models.IntegerField(null=True, blank=True)),
+                ('_width', models.IntegerField(null=True, blank=True)),
+                ('date_taken', models.DateTimeField(verbose_name='date taken', null=True, editable=False, blank=True)),
+                ('default_alt_text', models.CharField(help_text='Describes the essence of the image for users who have images turned off in their browser, or are visually impaired and using a screen reader; and it is used to identify images to search engines.', max_length=255, null=True, verbose_name='default alt text', blank=True)),
+                ('default_caption', models.CharField(help_text='Caption text is displayed directly below an image plugin to add context; there is a 140-character limit, including spaces; for images fewer than 200 pixels wide, the caption text is only displayed on hover.', max_length=255, null=True, verbose_name='default caption', blank=True)),
+                ('default_credit', models.CharField(help_text='Credit text gives credit to the owner or licensor of an image; it is displayed below the image plugin, or below the caption text on an image plugin, if that option is selected; it is displayed along the bottom of an image in the photo gallery plugin; there is a 30-character limit, including spaces.', max_length=255, null=True, verbose_name='default credit text', blank=True)),
+                ('author', models.CharField(max_length=255, null=True, verbose_name='author', blank=True)),
+                ('must_always_publish_author_credit', models.BooleanField(default=False, verbose_name='must always publish author credit')),
+                ('must_always_publish_copyright', models.BooleanField(default=False, verbose_name='must always publish copyright')),
+                ('subject_location', models.CharField(default=None, max_length=64, null=True, verbose_name='subject location', blank=True)),
+            ],
+            options={
+                'verbose_name': 'image',
+                'verbose_name_plural': 'images',
+            },
+            bases=('filer.file',),
+        ),
+        migrations.AddField(
+            model_name='file',
+            name='folder',
+            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='file',
+            name='owner',
+            field=models.ForeignKey(related_name='owned_files', on_delete=django.db.models.deletion.SET_NULL, verbose_name='uploaded by', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='file',
+            name='polymorphic_ctype',
+            field=models.ForeignKey(related_name='polymorphic_filer.file_set+', editable=False, to='contenttypes.ContentType', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='clipboarditem',
+            name='file',
+            field=models.ForeignKey(verbose_name='file', to='filer.File'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='clipboard',
+            name='files',
+            field=models.ManyToManyField(related_name='in_clipboards', verbose_name='files', through='filer.ClipboardItem', to='filer.File'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='clipboard',
+            name='user',
+            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL),
+            preserve_default=True,
+        ),
+    ]

@@ -11,7 +11,7 @@ from filer.utils.cms_roles import *
 from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
-from datetime import datetime
+from django.utils import timezone
 import polymorphic
 import hashlib
 import os
@@ -34,7 +34,7 @@ def silence_error_if_missing_file(exception):
         raise exception
 
 
-class FilesChainableQuerySetMixin(object):
+class FileQuerySet(polymorphic.PolymorphicQuerySet):
 
     def readonly(self, user):
         Folder = filer.models.foldermodels.Folder
@@ -60,27 +60,12 @@ class FilesChainableQuerySetMixin(object):
             folder__site__in=sites)
 
 
-class EmptyFilesQS(models.query.EmptyQuerySet,
-                   FilesChainableQuerySetMixin):
-    pass
-
-
-class FileQuerySet(polymorphic.query.PolymorphicQuerySet,
-                   FilesChainableQuerySetMixin):
-    pass
-
-
 class FileManager(polymorphic.PolymorphicManager):
-
-    def get_query_set(self):
-        return FileQuerySet(self.model, using=self._db)
-
-    def get_empty_query_set(self):
-        return EmptyFilesQS(self.model, using=self._db)
+    queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
         return {file_data['sha1']: file_data['count']
-                for file_data in self.get_query_set().values('sha1').annotate(
+                for file_data in self.get_queryset().values('sha1').annotate(
                     count=Count('id')).filter(count__gt=1)}
 
 
@@ -90,20 +75,20 @@ class AliveFileManager(FileManager):
     #   is in trash
     use_for_related_fields = True
 
-    def get_query_set(self):
-        return FileQuerySet(self.model, using=self._db).filter(
+    def get_queryset(self):
+        return super(AliveFileManager, self).get_queryset().filter(
             deleted_at__isnull=True)
 
 
 class TrashFileManager(FileManager):
 
-    def get_query_set(self):
-        return FileQuerySet(self.model, using=self._db).filter(
+    def get_queryset(self):
+        return super(TrashFileManager, self).get_queryset().filter(
             deleted_at__isnull=False)
 
 
-class File(mixins.TrashableMixin,
-           polymorphic.PolymorphicModel,
+@mixins.trashable
+class File(polymorphic.PolymorphicModel,
            mixins.IconsMixin):
 
     file_type = 'File'
@@ -361,30 +346,26 @@ class File(mixins.TrashableMixin,
             super(File, self).save(*args, **kwargs)
 
         if self._force_commit:
-            with transaction.commit_manually():
-                # The manual transaction management here breaks the transaction management
-                # from django.contrib.admin.options.ModelAdmin.change_view
-                # This isn't a big problem because the only CRUD operation done afterwards
-                # is an insertion in django_admin_log. If this method rollbacks the transaction
-                # then we will have an entry in the admin log describing an action
-                # that didn't actually finish succesfull.
-                # This 'hack' can be removed once django adds support for on_commit and
-                # on_rollback hooks (see: https://code.djangoproject.com/ticket/14051)
-                try:
+            try:
+                with transaction.atomic(savepoint=False):
+                    # The manual transaction management here breaks the transaction management
+                    # from django.contrib.admin.options.ModelAdmin.change_view
+                    # This isn't a big problem because the only CRUD operation done afterwards
+                    # is an insertion in django_admin_log. If this method rollbacks the transaction
+                    # then we will have an entry in the admin log describing an action
+                    # that didn't actually finish succesfull.
+                    # This 'hack' can be removed once django adds support for on_commit and
+                    # on_rollback hooks (see: https://code.djangoproject.com/ticket/14051)
                     copy_and_save()
-                except Exception:
-                    try:
-                        transaction.rollback()
-                    finally:
-                        # delete the file from new_location if the db update failed
-                        if old_location != new_location:
-                            storage.delete(new_location)
-                    raise
-                else:
-                    transaction.commit()
-                    # only delete the file on the old_location if all went OK
-                    if old_location != new_location:
-                        storage.delete(old_location)
+            except:
+                # delete the file from new_location if the db update failed
+                if old_location != new_location:
+                    storage.delete(new_location)
+                raise
+            else:
+                # only delete the file on the old_location if all went OK
+                if old_location != new_location:
+                    storage.delete(old_location)
         else:
             copy_and_save()
         return new_location
@@ -408,7 +389,7 @@ class File(mixins.TrashableMixin,
                 it.
         All the metadata of this filer file will remain intact.
         """
-        deletion_time = kwargs.pop('deletion_time', datetime.now())
+        deletion_time = kwargs.pop('deletion_time', timezone.now())
         # move file to a `trash` location
         to_trash = filer.utils.generate_filename.get_trash_path(self)
         old_location, new_location = self.file.name, None
@@ -556,19 +537,9 @@ class File(mixins.TrashableMixin,
     def get_admin_url_path(self):
         return urlresolvers.reverse(
             'admin:%s_%s_change' % (self._meta.app_label,
-                                    self._meta.module_name,),
+                                    self._meta.model_name,),
             args=(self.pk,)
         )
-
-    @property
-    def file_ptr(self):
-        """
-        Evil hack to get around the cascade delete problem with django_polymorphic.
-        Prevents ``AttributeError: 'File' object has no attribute 'file_ptr'``.
-        This is only a workaround for one level of subclassing. The hierarchy of
-        object in the admin delete view is wrong, but at least it works.
-        """
-        return self
 
     @property
     def url(self):

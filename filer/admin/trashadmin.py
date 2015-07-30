@@ -18,15 +18,20 @@ import operator
 logger = logging.getLogger(__name__)
 
 
-class Trash(models.Model):
+class Trash(object):
     """Dummy model without any associated db table.
     It's only purpose is to provide an additional
     entry in the admin index.
     """
-    class Meta:
+    class _meta:
+        app_label = 'filer'  # This is the app that the form will exist under
+        model_name = 'trash'  # This is what will be used in the link url
+        object_name = 'Trash'
         verbose_name_plural = 'Deleted Files and Folders'
+        verbose_name = 'Deleted Files and Folders'
         permissions = ()
-        app_label = 'filer'
+        swapped = False
+        abstract = False
 
 
 class TrashAdmin(admin.ModelAdmin):
@@ -35,7 +40,7 @@ class TrashAdmin(admin.ModelAdmin):
         model = Trash
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         urls = super(TrashAdmin, self).get_urls()
         url_patterns = patterns('',
             url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
@@ -51,7 +56,7 @@ class TrashAdmin(admin.ModelAdmin):
         url_patterns.extend(urls)
         return url_patterns
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         search_q = request.GET.get('q', '').split()
         if search_q:
             folders_q = reduce(operator.or_,
@@ -130,7 +135,7 @@ class TrashAdmin(admin.ModelAdmin):
             descendants = []
 
         context = {
-            'module_name': force_unicode(opts.verbose_name_plural),
+            'model_name': force_unicode(opts.verbose_name_plural),
             'media': self.media,
             'opts': opts,
             'app_label': opts.app_label,
@@ -201,7 +206,7 @@ class TrashAdmin(admin.ModelAdmin):
                                 Q(original_filename__icontains=bit))
                               for bit in search_q])
 
-        items = self.queryset(request)
+        items = self.get_queryset(request)
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Make sure page request is an int. If not, deliver first page.
@@ -217,7 +222,7 @@ class TrashAdmin(admin.ModelAdmin):
             paginated_items = paginator.page(paginator.num_pages)
 
         context = {
-            'module_name': force_unicode(opts.verbose_name_plural),
+            'model_name': force_unicode(opts.verbose_name_plural),
             'media': self.media,
             'opts': opts,
             'app_label': opts.app_label,

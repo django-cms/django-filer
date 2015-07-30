@@ -18,12 +18,6 @@ class FileAdmin(FilePermissionModelAdmin):
         models.FileField:       {'widget': NonClearableFileInput},
     }
 
-    # save_as hack, because without save_as it is impossible to hide the
-    # save_and_add_another if save_as is False. To show only save_and_continue
-    # and save in the submit row we need save_as=True and in
-    # render_change_form() override add and change to False.
-    save_as = True
-
     def get_readonly_fields(self, request, obj=None):
         if obj and (obj.is_readonly_for_user(request.user) or
                     obj.is_restricted_for_user(request.user)):
