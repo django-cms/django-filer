@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+Revision 0aca38c (03.08.2015, 09:19 UTC)
+----------------------------------------
+
+* LUN-1434
+
+  * -celery-task Added tests for trash management command.
+  * -celery-task Added celery task for take_out_filer_trash command.
+
+* LUN-2124
+
+  * Small optimization since this error in improbable.
+  * Added tests for restriction changes.
+  * Updated tests to expect warning messages instead of permission denied.
+  * Added warning messages for some possible incorrect usage cases.
+
+* LUN-2156
+
+  * Fixed widgets name clash.
+  * Refactor imports
+  * Adding new line
+  * Do not show Clear checkbox on Filer asset details form
+
+* Misc commits
+
+  * added filer status command to check all files on storage
+
 Revision 9c535d2 (24.07.2015, 14:46 UTC)
 ----------------------------------------
 
