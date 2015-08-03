@@ -13,7 +13,7 @@
     }
 
     $(document).ready(function(){
-        $('.filerFile .vForeignKeyRawIdAdminField').attr('type', 'hidden');
+        $('.filerFile .vForeignKeyRawIdAdminField').hide();
         //if this file is included multiple time, we ensure that filer_clear is attached only once.
         $(document).off('click.filer', '.filerFile .filerClearer', filer_clear).on('click.filer', '.filerFile .filerClearer', filer_clear);
     });
