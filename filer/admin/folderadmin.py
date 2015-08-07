@@ -62,7 +62,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     exclude = ('parent',)
     list_per_page = 20
     list_filter = ('owner',)
-    search_fields = ['name', 'files__name']
+    search_fields = ['name__icontains', ]
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
     actions = ['move_to_clipboard', 'files_set_public', 'files_set_private',
@@ -420,7 +420,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def filter_folder(self, qs, terms=[]):
         for term in terms:
-            filters = models.Q(name__icontains=term)
+            filters = models.Q()
+            for filter_ in self.search_fields:
+                filters |= models.Q(**{filter_: term})
             for filter_ in self.get_owner_filter_lookups():
                 filters |= models.Q(**{filter_: term})
             qs = qs.filter(filters)
