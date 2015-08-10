@@ -153,3 +153,64 @@ ul.custom-bullets li:before {
 .action-counter {
 	margin-left: 10px;
 }
+#destination-tree {
+	margin-bottom: 20px;
+}
+#destination-name {
+	color: #87b87f;
+	font-size: 14px;
+}
+ul.fancytree-container {
+	outline: none !important;
+    border: 1px solid #ddd !important;
+}
+.help {
+	display: block;
+    margin-bottom: 10px;
+    color: #737373;
+    font-size: 12px !important;
+    font-style: italic;
+}
+#id_suffix {
+	margin-left: 15px;
+}
+#destination-tree + p + .help {
+	margin-top: -5px;
+	margin-left: 60px;
+}
+.insertlinkButton .ace-icon {
+	transform: rotate(-135deg);
+	-moz-transform: rotate(-135deg);
+	webkit-transform: rotate(-135deg);
+}
+@media only screen and (max-width: 900px) {
+	#changelist-search {
+		width: 100% !important;
+	}
+	#content-related {
+		padding-left: 0;
+		margin-top: 20px;
+	}
+	#content-main {
+		padding-right: 0;
+	}
+	.special-info h4.smaller {
+		margin-bottom: 3px;
+	}
+	.special-info h4.smaller .blue {
+		text-overflow: ellipsis;
+	    overflow: hidden;
+	    white-space: nowrap;
+	    width: 105px;
+	    display: block;
+	    float: right;
+	    text-align: right;
+	}
+	.special-info .cancel-search {
+		clear: both;
+		margin-top: 0;
+	}
+	.special-info .quiet {
+		display: none;
+	}
+}

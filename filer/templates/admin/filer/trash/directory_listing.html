@@ -4,14 +4,18 @@
 {% load filer_admin_tags i18n filermedia %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a>
-    &rsaquo; {{ opts.verbose_name_plural|capfirst }}
+        <ul class="breadcrumb">
+            <li>
+                <i class="ace-icon fa fa-home home-icon"></i>
+                <a href="/admin/" title="Go back to admin homepage">Home</a>
+            </li>
+            <li><a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a></li>
+            <li>{{ opts.verbose_name_plural|capfirst }}</li>
+        </ul>
     </div>
 {% endblock %}
 
 {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% admin_css_base %}changelists.css" />
 {{ media.css }}
 {% endblock %}
 
@@ -19,26 +23,27 @@
 {% spaceless %}
 <div id="content-main">
     <div class="module" id="changelist">
-        <div id="toolbar">
-            <div style="float: left;">
-                <form id="changelist-search" action="." method="get">
+        <div id="toolbar" class="dataTables_wrapper">
+            <div class="row">
+                <form id="changelist-search" action="." method="get" class="col-xs-5 pull-right text-right">
                     {% csrf_token %}
-                    <div>
-                        <label for="searchbar"><img src="{% admin_icon_base %}icon_searchbox.png" alt="{% trans "Search" %}" /></label>
-                        <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}" />
-                        <input type="submit" value="{% trans 'Search' %}" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}"  />
-                        {% if search_string %}
-                        <span class="small quiet" style='margin-left:10px;'><a href="?">{% trans "cancel search" %}</a></span>
-                        {% endif %}
+                     <div class="search-wrapper">
+                        <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}"/>
+                        <button title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}" class="btn btn-sm btn-primary pull-right"><i class="fa fa-search"></i></button>
                     </div>
+                    {% if search_string %}
+                        <div class="special-info">
+                            <h4 class="smaller pull-left">Search results for: <span class="blue">{{ search_string }}</span></h4>
+                            <a href="?{% get_popup_params '&' %}" class="pull-left cancel-search btn btn-xs btn-white btn-default btn-round"><i class="ace-icon fa fa-times red2"></i>{% trans "Cancel search" %}</a>
+                        </div>
+                    {% endif %}
                 </form>
             </div>
-            <div style="clear: both;"></div>
         </div>
         <script type="text/javascript">document.getElementById("searchbar").focus();</script>
         <form id="changelist-form" action="" method="post">{% csrf_token %}
-        <div id="toolbartable">
-            <table cellspacing="0">
+        <div id="toolbartable" class="dataTables_wrapper">
+            <table cellspacing="0" class="table table-bordered table-hover table-striped no-margin-bottom">
                 <thead>
                     <tr class="{% cycle 'row1' 'row2' as rowcolors %}">
                         <th class="thumbHeader">&nbsp;</th>
@@ -70,21 +75,23 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <p class="paginator">
-                {% if paginated_items.has_previous %}
-                    <a href="?page={{ paginated_items.previous_page_number }}{% if search_string %}&q={{search_string}}{% endif %}">{% trans "previous" %}</a>
-                {% endif %}
+            <div class="paginator row center">
+                 <div class="col-xs-12">
+                    {% if paginated_items.has_previous %}
+                        <a href="?page={{ paginated_items.previous_page_number }}{% if search_string %}&q={{search_string}}{% endif %}" class="btn btn-success btn-sm"><i class="ace-icon fa fa-long-arrow-left"></i>{% trans "previous" %}</a>
+                    {% endif %}
 
-                <span class="this-page">
-                    {% blocktrans with paginated_items.number as number and paginated_items.paginator.num_pages as num_pages %}
-                    Page {{ number }} of {{ num_pages }}.
-                    {% endblocktrans %}
-                </span>
+                    <span class="this-page">
+                        {% blocktrans with paginated_items.number as number and paginated_items.paginator.num_pages as num_pages %}
+                        Page {{ number }} of {{ num_pages }}.
+                        {% endblocktrans %}
+                    </span>
 
-                {% if paginated_items.has_next %}
-                    <a href="?page={{ paginated_items.next_page_number }}{% if search_string %}&q={{search_string}}{% endif %}">{% trans "next" %}</a>
-                {% endif %}
-            </p>
+                    {% if paginated_items.has_next %}
+                        <a href="?page={{ paginated_items.next_page_number }}{% if search_string %}&q={{search_string}}{% endif %}" class="btn btn-success btn-sm">{% trans "next" %}<i class="ace-icon fa fa-long-arrow-right"></i></a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
         </form>

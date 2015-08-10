@@ -6,7 +6,7 @@
 <script type="text/javascript">
 (function($) {
 $( document ).ready(function() {
-$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
+	$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
 });
 })(django.jQuery);
 </script>
@@ -51,6 +51,13 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 	</div>
 {% endblock %}
 
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools list-unstyled list-inline text-right">
+      <li><a href="history/" class="historylink btn btn-success btn-sm"><i class="ace-icon fa fa-history"></i>{% trans "History" %}</a></li>
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
 
 {% block sidebar %}
 	{% with original.duplicates as duplicates %}

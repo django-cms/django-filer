@@ -15,15 +15,16 @@
     <p>{% blocktrans %}The following files and/or folders will be copied to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
     <ul class="list-unstyled">{{ to_copy|unordered_list }}</ul>
     <form action="" method="post">{% csrf_token %}
-    <div>
-    {% for f in files_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}" />{% endfor %}
-    {% for f in folders_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />{% endfor %}
-    <input type="hidden" name="action" value="copy_files_and_folders" />
-    <input type="hidden" name="post" value="yes" />
-    {% include 'admin/filer/folder/destination_field.html' %}
-    {{ copy_form.as_p_with_help }}
-    <p><input type="submit" value="{% trans "Copy" %}" /></p>
-    </div>
+        <div>
+        {% for f in files_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}" />{% endfor %}
+        {% for f in folders_queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}" />{% endfor %}
+        <input type="hidden" name="action" value="copy_files_and_folders" />
+        <input type="hidden" name="post" value="yes" />
+        {% include 'admin/filer/folder/destination_field.html' %}
+        {{ copy_form.as_p_with_help }}
+        <div class="submit-row form-actions text-right no-margin-bottom">
+            <input type="submit" value="{% trans "Copy" %}" class="default btn btn-primary"/></div>
+        </div>
     </form>
 {% endif %}
 {% endblock %}

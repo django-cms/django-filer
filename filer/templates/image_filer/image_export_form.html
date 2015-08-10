@@ -4,17 +4,22 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
-    &rsaquo; <a href="{% url 'admin:index' %}filer/" title="{% trans "Go back to" %} {% trans "Filer" %}">{% trans "Filer" %}</a>
-    {% if original.folder %} 
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to root folder" %}">{% trans "root" %}</a>
-    {% for ancestor_folder in original.folder.get_ancestors %}
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a>
-    {% endfor %}
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing' original.folder.id %}" title="{% blocktrans with original.folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ original.folder.name }}</a>
-    {% endif %}
-    &rsaquo; <a href="{% url 'admin:index' %}image_filer/image/{{ image.id }}" title="{% trans "Go back to" %} '{{ image.label }}'" >{{ image.label }}</a>
-    &rsaquo; {% trans 'export' %}
+    <ul class="breadcrumb">
+        <li>
+            <i class="ace-icon fa fa-home home-icon"></i>
+            <a href="{% url 'admin:index' %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
+        </li> 
+        <li><a href="{% url 'admin:index' %}filer/" title="{% trans "Go back to" %} {% trans "Filer" %}">{% trans "Filer" %}</a></li>
+        {% if original.folder %} 
+        <li><a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to root folder" %}">{% trans "root" %}</a></li>
+        {% for ancestor_folder in original.folder.get_ancestors %}
+        <li><a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a></li>
+        {% endfor %}
+        <li><a href="{% url 'admin:filer-directory_listing' original.folder.id %}" title="{% blocktrans with original.folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ original.folder.name }}</a></li>
+        {% endif %}
+        <li><a href="{% url 'admin:index' %}image_filer/image/{{ image.id }}" title="{% trans "Go back to" %} '{{ image.label }}'" >{{ image.label }}</a></li>
+        <li>{% trans 'export' %}</li>
+    </ul>
 </div>
 {% endblock %}
 
