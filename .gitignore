@@ -12,6 +12,7 @@ tmp
 *.egg-info
 *.egg
 .DS_Store
+.sass-cache
 .project
 .pydevproject
 .settings

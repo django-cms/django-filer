@@ -6,3 +6,7 @@ include HISTORY
 recursive-include filer/templates *
 recursive-include filer/static *
 recursive-include filer/locale *
+recursive-exclude filer/static/libs/bootstrap/.sass-cache *
+exclude filer/static/libs/bootstrap/js/bootstrap.js
+recursive-exclude filer/static/libs/bootstrap/sass *
+exclude filer/static/libs/bootstrap/config.rb
