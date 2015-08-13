@@ -80,6 +80,9 @@ table a.deletelink {
 .change-form .form-horizontal textarea {
 	width: 50%;
 }
+.form-actions .btn {
+  margin-left: 5px;
+}
 .change-form .clear {
 	display: none;
 }
