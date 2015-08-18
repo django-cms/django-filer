@@ -62,7 +62,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     exclude = ('parent',)
     list_per_page = 20
     list_filter = ('owner',)
-    search_fields = ['name', 'files__name']
+    search_fields = ['name', ]
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
     actions = ['move_to_clipboard', 'files_set_public', 'files_set_private',
