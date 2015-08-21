@@ -210,6 +210,21 @@ field.  You can override this behavior by subclassing the
     admin.site.unregister(Folder)
     admin.site.register(Folder, FolderAdmin)
 
+You can also override the search behavior for :py:class:`Folders<filer.models.foldermodels.Folder>`.
+Just override :py:attr:`~filer.admin.folderadmin.FolderAdmin.search_fields` by subclassing
+the :py:class:`filer.admin.folderadmin.FolderAdmin`. It works as described in
+`Django's docs <https://docs.djangoproject.com/en/1.8/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>`_. E.g.:
+
+
+.. code-block:: python
+
+    # in an admin.py file
+    class MyFolderAdmin(FolderAdmin):
+        search_fields = ['=field1', '^field2']
+
+    admin.site.unregister(Folder)
+    admin.site.register(Folder, MyFolderAdmin)
+
 Providing custom Image model
 ----------------------------
 

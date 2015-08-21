@@ -62,7 +62,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     exclude = ('parent',)
     list_per_page = 20
     list_filter = ('owner',)
-    search_fields = ['name', 'files__name']
+    search_fields = ['name', ]
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
     actions = ['move_to_clipboard', 'files_set_public', 'files_set_private',
@@ -419,8 +419,21 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return render(request, self.directory_listing_template, context)
 
     def filter_folder(self, qs, terms=[]):
+        # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
         for term in terms:
-            filters = models.Q(name__icontains=term)
+            filters = models.Q()
+            for filter_ in self.search_fields:
+                filters |= models.Q(**{construct_search(filter_): term})
             for filter_ in self.get_owner_filter_lookups():
                 filters |= models.Q(**{filter_: term})
             qs = qs.filter(filters)
