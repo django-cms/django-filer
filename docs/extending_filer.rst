@@ -198,6 +198,7 @@ field.  You can override this behavior by subclassing the
 :py:attr:`~filer.admin.FolderAdmin.owner_search_fields` property.
 
 .. code-block:: python
+
     # in an admin.py file
     from django.contrib import admin
     from filer.admin import FolderAdmin
