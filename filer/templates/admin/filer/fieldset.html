@@ -23,7 +23,7 @@
                             <div class="col-sm-3 control-label no-padding-right">{{ field.label_tag }}</div>
                             <div class="col-sm-9">
                                 {% if field.is_readonly %}
-                                    <p>{{ field.contents }}</p>
+                                    <p class="read-only-field">{{ field.contents }}</p>
                                 {% else %}
                                     {{ field.field }}                                
                                 {% endif %}
