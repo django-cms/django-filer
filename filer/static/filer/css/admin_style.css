@@ -122,6 +122,7 @@ ul.custom-bullets li:before {
 }
 .form-actions {
 	background: transparent;
+	padding-right: 0;
 }
 .full-preview-page .btn {
 	vertical-align: top;
