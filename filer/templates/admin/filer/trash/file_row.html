@@ -2,16 +2,16 @@
 {% load url from future %}
 {% load firstof from future %}
 <!-- FileIcon -->
-<td>
+<td class="center">
     <img src="{% filer_staticmedia_prefix %}icons/{{file.file_type|lower}}_32x32.png" alt="{{ file.default_alt_text }}" />
 </td>
 <!-- Filename/Dimensions -->
 <td>
     <div>
-        <b><a class="changelink" href="{% url 'admin:filer_trash_item' filer_model='file' filer_obj_id=file.id %}" title="{% blocktrans with file.label as item_label %}Restore '{{ item_label }}' file{% endblocktrans %}">{{ file|pretty_display }}</a></b>
+        <strong><a href="{% url 'admin:filer_trash_item' filer_model='file' filer_obj_id=file.id %}" title="{% blocktrans with file.label as item_label %}Restore '{{ item_label }}' file{% endblocktrans %}">{{ file|pretty_display }}</a></strong>
         <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
     </div>
-    <div>{% trans "Owner" %}: {% firstof file.owner.email file.owner.username "n/a" %}</div>
+    <span class="small">{% trans "Owner" %}: {% firstof file.owner.email file.owner.username "n/a" %}</span>
 </td>
 <td>
     {% client_timezone file.deleted_at %}

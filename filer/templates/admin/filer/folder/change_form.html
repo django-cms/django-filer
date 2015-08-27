@@ -1,34 +1,25 @@
-{% extends "admin/change_form.html" %}
+{% extends "admin/filer/change_form.html" %}
 {% load i18n admin_modify filermedia %}
 {% load url from future %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
-{% endblock %}
-
 {% block extrahead %}
-{{ block.super }}
-<script type="text/javascript">
-(function($) {
-$( document ).ready(function() {
-$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
-});
-})(django.jQuery);
-</script>
-{% endblock %}
-
-{% block breadcrumbs %}
-{% with original as instance %}
-{% include "admin/filer/breadcrumbs.html" %}
-{% endwith %}
+	{{ block.super }}
+	<script type="text/javascript">
+	(function($) {
+		$( document ).ready(function() {
+			$('.field-restricted').not(':has(input)').addClass('field-restricted-read-only');
+		});
+	})(django.jQuery);
+	</script>
 {% endblock %}
 
 {% block coltype %}{% if is_popup %}colM{% else %}colMS{% endif %}{% endblock %}
+
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
-  <ul class="object-tools">
-      <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  <ul class="object-tools list-unstyled list-inline text-right">
+      <li><a href="history/" class="historylink btn btn-success btn-sm"><i class="ace-icon fa fa-history"></i>{% trans "History" %}</a></li>
+  {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink  btn btn-purple btn-sm"><i class="ace-icon fa fa-external-link"></i>{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
@@ -37,10 +28,4 @@ $('.field-restricted').not(':has(input)').addClass('field-restricted-read-only')
 {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
 {% endblock %}
 
-{% block sidebar %}{% if not is_popup %}
-<div id="content-related">
-    <div id="navcontainer">
-        <img src="{% filer_staticmedia_prefix %}icons/plainfolder_128x128.png" alt="{% trans "Folder Icon" %}" />
-    </div>
-</div>
-{% endif %}{% endblock %}
+{% block sidebar %}{% endblock %}

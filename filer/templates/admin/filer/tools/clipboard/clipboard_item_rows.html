@@ -1,13 +1,13 @@
 {% load thumbnail i18n %}{% if items %}
 {% for generic_item in items %}{% with generic_item as item %}
         <tr class="clipboardItem">
-            <td class="thumbnail"><img src="{{ item.icons.32 }}" alt="{{ item.default_alt_text }}" /></td>
-            <td class="label">{{ item.label }}</td>
-            <td class="buttons"></td>
+            <td class="no-border" width="60"><div class="thumbnail no-radius custom-margin"><img src="{{ item.icons.32 }}" alt="{{ item.default_alt_text }}" /></div></td>
+            <td class="no-border">{{ item.label }}</td>
+            <td class="buttons no-border"></td>
         </tr>
 {% endwith %}{% endfor %}{% else %}
         <tr class="clipboardItem">
-            <td class="thumbnail"></td>
-            <td class="label">{% trans "upload failed" %}</td>
-            <td class="buttons"></td>
+            <td class="thumbnail no-border"></td>
+            <td class="no-border">{% trans "upload failed" %}</td>
+            <td class="buttons no-border"></td>
         </tr>{% endif %}

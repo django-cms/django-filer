@@ -19,19 +19,19 @@
     {% endif %}
     {% if protected %}
         <p>{% blocktrans with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktrans %}</p>
-        <ul>
+        <ul class="list-unstyled spaced2">
         {% for obj in protected %}
-            <li>{{ obj }}</li>
+            <li><i class="ace-icon fa fa-circle green"></i>{{ obj }}</li>
         {% endfor %}
         </ul>
     {% endif %}
 {% else %}
-    <p>{% blocktrans with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
-    <ul>{{ deleted_objects|unordered_list }}</ul>
-    <form action="" method="post">{% csrf_token %}
-    <div>
-    <input type="hidden" name="post" value="yes" />
-    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <p>{% blocktrans with escaped_object=object %}Are you sure you want to delete the {{ object_name }} <span class="purple">"{{ escaped_object }}"</span>? All of the following related items will be deleted:{% endblocktrans %}</p>
+        <ul class="list-unstyled spaced2 custom-bullets">{{ deleted_objects|unordered_list }}</ul>
+    <form action="" method="post" class="form-horizontal">{% csrf_token %}
+    <div class="form-actions text-right">
+        <input type="hidden" name="post" value="yes" />
+        <button class="btn btn-primary"><i class="ace-icon fa fa-check bigger-110"></i>{% trans 'Yes, I am sure' %}</button>
     </div>
     </form>
 {% endif %}

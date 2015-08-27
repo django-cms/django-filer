@@ -3,10 +3,15 @@
 {% load filer_admin_tags i18n filermedia %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a>
-    &rsaquo; <a href="{% url 'admin:filer_trash_changelist'%}">{{ opts.verbose_name_plural|capfirst }}</a>
-    &rsaquo; Restore {{current_item_type}} {{ current_item|pretty_display }}
+        <ul class="breadcrumb">
+            <li>
+                <i class="ace-icon fa fa-home home-icon"></i>
+                <a href="/admin/" title="Go back to admin homepage">Home</a>
+            </li> 
+            <li><a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a></li>
+            <li><a href="{% url 'admin:filer_trash_changelist'%}">{{ opts.verbose_name_plural|capfirst }}</a></li>
+            <li>Restore {{current_item_type}} {{ current_item|pretty_display }}</li>
+        </ul>
     </div>
 {% endblock %}
 
@@ -53,7 +58,6 @@
 
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% admin_css_base %}forms.css" />
 {{ media.css }}
 <style type="text/css">
     .files li{
@@ -125,17 +129,17 @@
     </ul>
 {% endif %}
 
-<div class="submit-row">
-<script type="text/javascript">
-(function ($) {
-    var i = 0;
-    $('form').submit(function () {
-        i++; if(i > 1) { return false; }
-    });
-})(jQuery);
-</script>
-<input type="hidden" name="post" value="yes" />
-<input type="submit" value="Restore" title="Restore files & folders" />
+<div class="submit-row form-actions text-right no-margin-bottom">
+    <script type="text/javascript">
+    (function ($) {
+        var i = 0;
+        $('form').submit(function () {
+            i++; if(i > 1) { return false; }
+        });
+    })(jQuery);
+    </script>
+    <input type="hidden" name="post" value="yes" />
+    <button name="_restore" title="Restore files & folders" class="btn btn-primary default"><i class="ace-icon fa fa-history"></i>Restore</button>
 </div>
 </form>
 </div>

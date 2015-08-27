@@ -4,20 +4,33 @@
 
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
-  <ul class="object-tools">
+  <ul class="object-tools list-unstyled list-inline text-right">
     {#<li><a href="export/">{% trans "Export" %}</a></li>#}
-    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+    <li><a href="history/" class="historylink btn btn-success btn-sm"><i class="ace-icon fa fa-history"></i>{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
 
-{% block file_sidebar %}
-<div id="navcontainer">
-    <div id="image_container">
-        <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
-    </div>
-    <a href="{% url 'admin:filer-image-preview' original.id %}{% get_popup_params %}">{% trans "Full size preview" %}</a>
-</div>
-{{ block.super }}
+{% block coltype %}colMS row{% endblock %}
+{% block field_sets %}
+	{% for fieldset in adminform %}
+	  {% include "admin/filer/fieldset.html" %}
+	{% endfor %}
 {% endblock %}
+
+{% block content %} 
+    {{block.super}} 
+{% endblock %}
+
+
+{%block sidebar %}
+  <div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
+    <div id="navcontainer">
+        <div id="image_container" class="thumbnail no-radius">
+            <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
+        </div>
+        <a href="{% url 'admin:filer-image-preview' original.id %}{% get_popup_params %}"><i class="ace-icon fa fa-arrows-alt"></i>{% trans "Full size preview" %}</a>
+    </div>
+  </div>
+{%endblock%}

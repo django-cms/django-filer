@@ -1,16 +1,42 @@
 {% load i18n %}
 {% load url from future %}
 <div class="breadcrumbs">
-   <a href="{% url 'admin:index' %}" title="{% trans "Go back to admin homepage" %}">{% trans "Home" %}</a>
-    &rsaquo; <a href="{% url 'admin:index' %}filer/" title="{% trans "Go back to Filer app" %}"> {% trans "Filer" %}</a>
-    {% if instance.is_root and not instance.is_smart_folder %}{%else %}&rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to root folder" %}">{% trans "root" %}</a>{% endif %}
-    {% for ancestor_folder in instance.logical_path %}
-    &rsaquo; <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}</a>
-    {% endfor %}
-    {% if breadcrumbs_action %}
-    &rsaquo; <a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a>
-    &rsaquo; {{ breadcrumbs_action }}
-    {% else %}
-    &rsaquo; {% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}
-    {% endif %}
+    <ul class="breadcrumb">
+        <li>
+            <i class="ace-icon fa fa-home home-icon"></i>
+            <a href="{% url 'admin:index' %}" title="{% trans "Go back to admin homepage" %}">{% trans "Home" %}</a>
+        </li>
+        <li>
+            <a href="{% url 'admin:index' %}filer/" title="{% trans "Go back to Filer app" %}"> {% trans "Filer" %}</a>
+        </li>
+        {% if instance.is_root and not instance.is_smart_folder %}
+        {%else %}
+            <li><a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to root folder" %}">{% trans "root" %}</a></li>
+        {% endif %}
+        {% for ancestor_folder in instance.logical_path %}
+            <li><a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                {% if ancestor_folder.label %}
+                    {{ ancestor_folder.label }}
+                {% else %}
+                    {{ ancestor_folder.name }}
+                {% endif %}
+            </a></li>
+        {% endfor %}
+        {% if breadcrumbs_action %}
+           <li><a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                {% if instance.label %}
+                    {{ instance.label }}
+                {% else %}
+                    {{ instance.name }}
+                {% endif %}
+            </a></li>
+            <li>{{ breadcrumbs_action }}</li>
+        {% else %}
+            {% if instance.label %}
+                <li class="active">{{ instance.label }}</li>
+            {% else %}
+                <li class="active">{{ instance.name }}</li>
+            {% endif %}
+        {% endif %}
+    </ul>
 </div>
