@@ -1,9 +1,6 @@
 <fieldset class="module aligned form-horizontal {{ fieldset.classes }}">
     {% if fieldset.name %}
-        <div class="widget-header" id="{{fieldset.name|lower|slugify}}">
-            <h5 class="widget-title">{{ fieldset.name }}</h5>
-            <div class="widget-toolbar"><a href="{{fieldset.name|lower|slugify}}" class="widget-anchor "><i class="1 ace-icon glyphicon glyphicon-chevron-down bigger-125 middle"></i></a></div>
-        </div>
+        <h4 class="header smaller lighter blue block">{{ fieldset.name }}</h4>
     {% endif %}
     <div class="widget-body">
         {% if fieldset.description %}
@@ -11,14 +8,13 @@
         {% endif %}
         {% for line in fieldset %}
             <div class="form-row form-group{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% for field in line %} {{ field.field.name }}{% endfor %}">
-                {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
 
                 {% for field in line %}
                     <div class="row{% if not line.fields|length_is:'1' %} field-box{% if not field.is_readonly and field.errors %} errors{% endif %}{% endif %}">
                         {% if not line.fields|length_is:'1' and not field.is_readonly %}{{ field.errors }}{% endif %}
                         {% if field.is_checkbox %}
-                            <div class="col-sm-3 control-label no-padding">{{ field.label_tag }}</div>
-                            <div class="col-sm-9">{{ field.field }}</div>
+                            <div class="col-sm-3 control-label no-padding"></div>
+                            <div class="col-sm-9">{{ field.field }} {{ field.label_tag }}</div>
                         {% else %}
                             <div class="col-sm-3 control-label no-padding-right">{{ field.label_tag }}</div>
                             <div class="col-sm-9">
@@ -27,8 +23,13 @@
                                 {% else %}
                                     {{ field.field }}                                
                                 {% endif %}
-                                 {% if field.field.help_text %}
+                                {% if field.field.help_text %}
                                     <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="right" data-content='{{ field.field.help_text|safe }}'>?</span>
+                                {% endif %}
+                                {% if line.errors %}
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+                                        {{ line.errors }}
+                                    </div>
                                 {% endif %}
                             </div>
                         {% endif %}
