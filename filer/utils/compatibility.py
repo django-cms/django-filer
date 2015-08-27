@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
 import sys
 
 import django
@@ -16,11 +15,11 @@ except ImportError:
         return Truncator(s).words(num, truncate=truncate)
     truncate_words = allow_lazy(truncate_words, six.text_type)
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
-DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
-DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
-DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
-DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
+DJANGO_1_4 = django.VERSION < (1, 5)
+DJANGO_1_5 = django.VERSION < (1, 6)
+DJANGO_1_6 = django.VERSION < (1, 7)
+DJANGO_1_7 = django.VERSION < (1, 8)
+DJANGO_1_8 = django.VERSION < (1, 9)
 
 
 if not six.PY3:
