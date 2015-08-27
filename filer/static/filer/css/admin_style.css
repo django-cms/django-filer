@@ -143,6 +143,9 @@ ul.custom-bullets li:before {
 	left: 15px;
 	top: 0;
 }
+a.filer-restricted {
+  color: #666;
+}
 .errornote {
 	padding: 15px;
 	margin-bottom: 20px;
