@@ -28,6 +28,7 @@ pep8.txt
 htmlcov/
 share/
 .idea
+*.iml
 .tox
 *.pyo
 full.log
