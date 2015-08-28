@@ -72,6 +72,8 @@ $( document ).ready(function() {
 	{% endwith %}
 {% endblock %}
 
-{% block submit_buttons_bottom %}	
+{% block submit_buttons_bottom %}
+    {% if not original|is_restricted_for_user:user %}
 	{% submit_row %}
+    {% endif %}
 {% endblock %}
