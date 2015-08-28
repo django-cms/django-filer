@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+Revision 017a043 (28.08.2015, 08:51 UTC)
+----------------------------------------
+
+* LUN-2309
+
+  * collapsible fieldset style fix
+  * changed restricted link color changed
+  * add error messages wrapper only if they exist
+  * remove submit buttons padding around wrapper
+  * submit buttons updates
+  * updated manifest.in and .gitignore
+  * removed .sass-cache files
+  * filer updates for small resolutions and bug fixes
+  * updates after django upgrade
+  * remove deprecated function get_ordered_objects()
+  * Filer updates on forms
+  * Filer forms updates
+  * re-structure of change forms
+  * default boostrap updates
+  * Ace resources added to plugin
+  * updates on edit, delete pages
+  * Filer refactoring
+
+* Misc commits
+
+  * Add .iml files to gitignore.
+  * Restore check for permission before rendering save buttons.
+  * copy-folder form updates
+
 Revision 0aca38c (03.08.2015, 09:19 UTC)
 ----------------------------------------
 
