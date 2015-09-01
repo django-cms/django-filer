@@ -8,7 +8,6 @@ from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.contrib.admin.util import quote, unquote, capfirst
 from django.core.exceptions import ValidationError
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -43,7 +42,7 @@ from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData, FolderPermission, Image)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.thumbnail_processors import normalize_subject_location
-from filer.utils.compatibility import get_delete_permission
+from filer.utils.compatibility import get_delete_permission, quote, unquote, capfirst
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.views import (popup_status, popup_param, selectfolder_status,
                          selectfolder_param)

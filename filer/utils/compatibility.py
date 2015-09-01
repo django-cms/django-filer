@@ -63,3 +63,15 @@ def get_delete_permission(opts):
     except ImportError:
         return '%s.%s' % (opts.app_label,
                           opts.get_delete_permission())
+
+try:
+    from django.contrib.admin.utils import unquote, quote, NestedObjects, capfirst
+except ImportError:
+    # django < 1.7
+    from django.contrib.admin.util import unquote, quote, NestedObjects, capfirst
+
+try:
+    from importlib import import_module
+except ImportError:
+    # python < 2.7
+    from django.utils.importlib import import_module
