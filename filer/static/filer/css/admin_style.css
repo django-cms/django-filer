@@ -215,6 +215,11 @@ ul.fancytree-container {
 		display: none;
 	}
 }
+@media only screen and (max-width: 1200px){
+	.popup .col-xs-5 {
+		width: 100%
+	}
+}
 .form-row.errors .help-block {
   color: #a94442;
 }
