@@ -42,6 +42,9 @@ body {
 .this-page, .avoid-multiple-submissions {
 	margin-right: 10px;
 }
+.avoid-multiple-submissions + .avoid-multiple-submissions {
+	margin-right: 0;
+}
 .thumbnail.custom-margin {
 	margin: 10px 10px 0 0;
 }
