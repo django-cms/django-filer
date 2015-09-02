@@ -4,6 +4,7 @@ import warnings
 from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
@@ -55,9 +56,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         # ForeignKeyRawIdWidget adds
         hidden_input = super(ForeignKeyRawIdWidget, self).render(
                                                             name, value, attrs)
-        filer_static_prefix = filer_settings.FILER_STATICMEDIA_PREFIX
-        if not filer_static_prefix[-1] == '/':
-            filer_static_prefix += '/'
         context = {
             'hidden_input': hidden_input,
             'lookup_url': '%s%s' % (related_url, lookup_url),
@@ -65,7 +63,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'span_id': css_id_description_txt,
             'object': obj,
             'lookup_name': name,
-            'filer_static_prefix': filer_static_prefix,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
         }
@@ -86,8 +83,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
 
     class Media:
         js = (
-            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',
-            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/widget.js',
+            static('filer/js/popup_handling.js'),
+            static('filer/js/widget.js'),
         )
 
 

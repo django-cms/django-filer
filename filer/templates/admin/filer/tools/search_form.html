@@ -1,10 +1,9 @@
-{% load filermedia filer_admin_tags %}
-{% load i18n %}
+{% load i18n staticfiles %}
 <div id="toolbar">
     <div style="float: left;">
         <form id="changelist-search" action="." method="get">
             <div>
-                <label for="searchbar"><img src="{% admin_icon_base %}icon_searchbox.png" alt="{% trans "Search" %}" /></label>
+                <label for="searchbar"><img src="{% static "admin/img/icon_searchbox.png" %}" alt="{% trans "Search" %}" /></label>
                 {% if is_popup %}
                     <input type="hidden" name="_popup" value="1" />
                     {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
