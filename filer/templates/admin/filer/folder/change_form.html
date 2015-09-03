@@ -1,5 +1,6 @@
 {% extends "admin/filer/change_form.html" %}
-{% load i18n admin_modify filermedia %}
+{% load i18n admin_modify filermedia filer_admin_tags %}
+
 {% load url from future %}
 
 {% block extrahead %}
@@ -29,3 +30,9 @@
 {% endblock %}
 
 {% block sidebar %}{% endblock %}
+
+{% block submit_buttons_bottom %}
+    {% if not original or not original|is_restricted_for_user:user %}
+			{% submit_row %}
+    {% endif %}
+{% endblock %}
