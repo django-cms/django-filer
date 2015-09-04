@@ -2164,10 +2164,10 @@ class TestSharedSitePermissions(TestCase):
             file=dj_files.base.ContentFile('file'))
         response = move_to_clipboard_action(
             self.client, self.bar, [bar_file])
-        self.assertEqual(Clipboard.objects.values_list('files').count(), 0)
+        self.assertEqual(Clipboard.objects.all().get().files.count(), 0)
         move_single_file_to_clipboard_action(
             self.client, self.bar, [bar_file])
-        self.assertEqual(Clipboard.objects.values_list('files').count(), 0)
+        self.assertEqual(Clipboard.objects.all().get().files.count(), 0)
 
 
 class TestSharedFolderFunctionality(TestCase):

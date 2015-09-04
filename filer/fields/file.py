@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from filer.models import File
 from filer import settings as filer_settings
+from filer.utils.model_label import get_model_label
 
 try:
     from django.utils.text import truncate_words
@@ -113,7 +114,7 @@ class FilerFileField(models.ForeignKey):
     default_model_class = File
 
     def __init__(self, **kwargs):
-        kwargs['to'] = self.default_model_class
+        kwargs['to'] = get_model_label(self.default_model_class)
         super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
