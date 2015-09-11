@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Copy of ``django.contrib.admin.utils.get_deleted_objects`` and a subclass of
 ``django.contrib.admin.utils.NestedObjects`` that work with djongo_polymorphic querysets.
@@ -9,13 +9,12 @@ django 1.4. ``get_deleted_objects`` and ``NestedObjects`` have not changed compa
 
 At all locations where something has been changed, there are inline comments in the code.
 """
-from django.contrib.admin.util import NestedObjects, quote
+from django.contrib.admin.utils import NestedObjects, quote
 from django.contrib.auth import get_permission_codename
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.encoding import force_unicode
-from django.core.urlresolvers import reverse
+from django.utils.html import format_html
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.utils.encoding import force_text
 
 
 def get_deleted_objects(objs, opts, user, admin_site, using):
@@ -37,32 +36,39 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
         has_admin = obj.__class__ in admin_site._registry
         opts = obj._meta
 
+        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name),
+                                   force_text(obj))
+
         if has_admin:
-            admin_url = reverse('%s:%s_%s_change'
-            % (admin_site.name,
-               opts.app_label,
-               opts.object_name.lower()),
-                None, (quote(obj._get_pk_val()),))
+            try:
+                admin_url = reverse('%s:%s_%s_change'
+                                    % (admin_site.name,
+                                       opts.app_label,
+                                       opts.model_name),
+                                    None, (quote(obj._get_pk_val()),))
+            except NoReverseMatch:
+                # Change url doesn't exist -- don't display link to edit
+                return no_edit_link
+
             p = '%s.%s' % (opts.app_label,
                            get_permission_codename('delete', opts))
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
-                # Display a link to the admin page.
-            return mark_safe(u'%s: <a href="%s">%s</a>' %
-                             (escape(capfirst(opts.verbose_name)),
-                              admin_url,
-                              escape(obj.actual_name)))
+            # Display a link to the admin page.
+            return format_html('{}: <a href="{}">{}</a>',
+                               capfirst(opts.verbose_name),
+                               admin_url,
+                               obj)
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj.actual_name))
+            return no_edit_link
 
     to_delete = collector.nested(format_callback)
 
     protected = [format_callback(obj) for obj in collector.protected]
 
-    return to_delete, perms_needed, protected
+    return to_delete, collector.model_count, perms_needed, protected
 
 
 class PolymorphicAwareNestedObjects(NestedObjects):
@@ -87,7 +93,8 @@ class PolymorphicAwareNestedObjects(NestedObjects):
 
     def collect(self, objs, source_attr=None, **kwargs):
         if hasattr(objs, 'non_polymorphic'):
-            # .filter() is needed, because there may already be cached polymorphic results in the queryset
+            # .filter() is needed, because there may already be
+            #   cached polymorphic results in the queryset
             objs = objs.non_polymorphic().filter()
-        return super(PolymorphicAwareNestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
-
+        return super(PolymorphicAwareNestedObjects, self).collect(
+            objs, source_attr=source_attr, **kwargs)

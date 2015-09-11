@@ -1,6 +1,5 @@
 {% extends "admin/filer/base_site.html" %}
 {% load filer_admin_tags filermedia i18n %}
-{% load url from future %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -34,7 +33,7 @@
 {% block extrastyle %}
     {{ block.super }}
     {{ media.css }}
-    
+
     {% if action_form %}
         {% url 'admin:jsi18n' as jsi18nurl %}
         <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
@@ -94,19 +93,19 @@
                 {% else %}
                     <a href="{% url 'admin:filer-directory_listing-root' %}{% get_popup_params %}" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}" class="middle go-up"><i class="ace-icon fa fa-long-arrow-up bigger-125 pink"></i></a>
                 {% endif %}
-            
-                <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> 
-                
+
+                <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" />
+
                 <h1 class="folder_header inline middle">
-                {{ folder.name }}    
+                {{ folder.name }}
 
                  <small class="middle inline">
                     <i class="ace-icon fa fa-angle-double-right"></i>
                     <span>({% blocktrans count folder.children.count as counter %}1 folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.files.count as counter %}1 file{% plural %}{{ counter }} files{% endblocktrans %})</span><span class="green left-20"><i class="ace-icon fa fa-share"></i>{{ folder.get_folder_type_display }}{% if folder.site %}: {{folder.site}}{%endif%}</span>
                 </small>
                 </h1>
-                
-                
+
+
                 {% if is_popup %}
                     {% if select_folder and folder.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ folder.id }}, '{{ folder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% endif %}
                 {% elif folder|can_change_folder:user %}<a class="changelink block pull-right" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}"><i class="ace-icon fa fa-pencil"></i><span>{% trans "Change" %}</span></a>{% endif %}
@@ -123,7 +122,7 @@
             </div>
             {% endif %}
         {% endif %}
-        
+
         <form id="changelist-form" action="" method="post">{% csrf_token %}
         {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
         {% if action_form and actions_on_top and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}

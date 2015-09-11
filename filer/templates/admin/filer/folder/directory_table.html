@@ -1,7 +1,5 @@
 {% load i18n %}
 {% load admin_list filermedia filer_tags filer_admin_tags %}
-{% load url from future %}
-{% load cycle from future %}
 {% spaceless %}
 <div id="toolbartable" class="dataTables_wrapper">
     <table cellspacing="0" class="table table-bordered table-hover table-striped no-margin-bottom">
@@ -67,7 +65,7 @@
             {% if paginated_items.has_next %}
                 <a href="?page={{ paginated_items.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% get_popup_params '&' %}" class="btn btn-success btn-sm">{% trans "next" %} <i class="ace-icon fa fa-long-arrow-right"></i></a>
             {% endif %}
-        </div> 
+        </div>
     </div>
 </div>
 {% endspaceless %}

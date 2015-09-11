@@ -1,15 +1,14 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from django import template
 from django.contrib.admin import helpers
-from django.contrib.admin.util import quote, unquote, capfirst
+from django.contrib.admin.utils import quote, unquote, capfirst
 from django.contrib import messages
-from django.utils.http import urlquote
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse, resolve
+from django.core.urlresolvers import reverse
 from django.db import router
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_permission_codename
@@ -17,35 +16,26 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext, ugettext_lazy
-from filer import settings
-from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
-                               RenameFilesForm)
+from filer.admin.forms import CopyFilesAndFoldersForm
 from filer.admin.common_admin import FolderPermissionModelAdmin
 from filer.views import (popup_status, popup_param, selectfolder_status,
                          selectfolder_param, current_site_param)
 from filer.admin.tools import (folders_available, files_available,
-                               has_admin_role, has_role_on_site,
-                               has_admin_role_on_site,
                                get_admin_sites_for_user,
                                has_multi_file_action_permission,
                                is_valid_destination,)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
-                          ImagesWithMissingData, Image,
+                          ImagesWithMissingData,
                           Archive)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
-from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
-from filer.thumbnail_processors import normalize_subject_location
-from django.conf import settings as django_settings
 import json
 import os
-import itertools
-import inspect
 
 
 class FolderAdmin(FolderPermissionModelAdmin):
@@ -214,7 +204,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r '
                             'does not exist.') % {
-                                'name': force_unicode(opts.verbose_name),
+                                'name': force_text(opts.verbose_name),
                                 'key': escape(object_id)})
         if obj.parent:
             redirect_url = reverse('admin:filer-directory_listing',
@@ -603,33 +593,19 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         all_protected = []
 
-        # Populate deletable_objects, a data structure of all related
-        # objects that will also be deleted.
-        # Hopefully this also checks for necessary permissions.
-        # TODO: Check if permissions are really verified
-        (args, varargs, keywords, defaults) = \
-            inspect.getargspec(get_deleted_objects)
-        if 'levels_to_root' in args:
-            # Django 1.2
-            deletable_files, perms_needed_files = get_deleted_objects(
-                files_queryset, files_queryset.model._meta, request.user,
-                self.admin_site, levels_to_root=2)
-            deletable_folders, perms_needed_folders = get_deleted_objects(
-                folders_queryset, folders_queryset.model._meta, request.user,
-                self.admin_site, levels_to_root=2)
-        else:
-            # Django 1.3
-            using = router.db_for_write(self.model)
-            deletable_files, perms_needed_files, protected_files = \
-                get_deleted_objects(
-                    files_queryset, files_queryset.model._meta,
-                    request.user, self.admin_site, using)
-            deletable_folders, perms_needed_folders, protected_folders = \
-                get_deleted_objects(
-                    folders_queryset, folders_queryset.model._meta,
-                    request.user, self.admin_site, using)
-            all_protected.extend(protected_files)
-            all_protected.extend(protected_folders)
+        using = router.db_for_write(self.model)
+        deletable_files, model_count, perms_needed_files, protected_files = \
+            get_deleted_objects(
+                files_queryset, files_queryset.model._meta,
+                request.user, self.admin_site, using)
+        files_count = model_count[File._meta.verbose_name_plural]
+        deletable_folders, model_count, perms_needed_folders, protected_folders = \
+            get_deleted_objects(
+                folders_queryset, folders_queryset.model._meta,
+                request.user, self.admin_site, using)
+        folders_count = model_count[Folder._meta.verbose_name_plural]
+        all_protected.extend(protected_files)
+        all_protected.extend(protected_folders)
 
         all_deletable_objects = [deletable_files, deletable_folders]
         all_perms_needed = perms_needed_files.union(perms_needed_folders)
@@ -640,16 +616,16 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.POST.get('post'):
             if all_perms_needed:
                 raise PermissionDenied
-            n = files_queryset.count() + folders_queryset.count()
+            n = files_count + folders_count
             if n:
                 # delete all explicitly selected files
                 for f in files_queryset:
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_text(f))
                     f.delete()
                 # delete all folders
                 for f_id in folders_queryset.values_list('id', flat=True):
                     f = Folder.objects.get(id=f_id)
-                    self.log_deletion(request, f, force_unicode(f))
+                    self.log_deletion(request, f, force_text(f))
                     f.delete()
                 self.message_user(request,
                     _("Successfully deleted %(count)d files "
@@ -711,7 +687,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
             return u'%s: %s' % (capfirst(opts.verbose_name),
-                                force_unicode(obj.actual_name))
+                                force_text(obj.actual_name))
 
     def _get_current_action_folder(self, request, files_qs, folders_qs):
         current_folder = getattr(request, 'current_dir_list_folder', None)
