@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 6cbcd3b (12.09.2015, 11:23 UTC)
+----------------------------------------
+
+* LUN-2620
+
+  * resize file/folder plugin popup
+
+No other commits.
+
 Revision eef2065 (04.09.2015, 09:05 UTC)
 ----------------------------------------
 
