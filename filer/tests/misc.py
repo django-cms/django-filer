@@ -32,7 +32,7 @@ class FilerTestMixin(object):
             name='users_files', parent=None, defaults={'owner': self.superuser,})
 
     def tearDown(self):
-        File.objects.delete()
+        File.objects.all().delete()
         if self.usersfolder_created:
             self.usersfolder.delete()
         self.client.logout()
@@ -51,8 +51,9 @@ class FilerDynamicFolderTest(FilerTestMixin, TestCase):
     def test_filer_dynamic_folder_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = DjangoFile(open(self.filename, 'rb'))
-        url = reverse('filer:direct_upload')
-        url += '?qqfile=%s&folder_key=%s' % (self.image_name, 'USER_OWN_FOLDER')
+
+        url = reverse('admin:filer-ajax_upload', kwargs={'folder_key': 'USER_OWN_FOLDER'})
+        url += '?qqfile=%s' % (self.image_name, )
         response = self.client.post(
             url, data=file_obj.read(), content_type='application/octet-stream',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
@@ -99,8 +100,10 @@ class FilerMimetypeLimitationTest(FilerTestMixin, TestCase):
     def test_filer_partial_ajax_upload_mimetype_validator(self):
         self.assertEqual(File.objects.count(), 1)
         file_obj = DjangoFile(open(self.filename, 'rb'))
-        url = reverse('filer:direct_upload')
-        url += '?qqfile=other.jpeg&related_field=thirdparty_app.Example.illustration_browse_only'
+        url = reverse('admin:filer-ajax_upload',
+                      kwargs={'related_field': 'thirdparty_app.Example.illustration_browse_only',
+                              'folder_key': 'no_folder'})
+        url += '?qqfile=other.jpeg'
         response = self.client.post(
             url, data=file_obj.read(), content_type='application/octet-stream',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
@@ -110,8 +113,11 @@ class FilerMimetypeLimitationTest(FilerTestMixin, TestCase):
         self.assertEqual(Image.objects.count(), 2)
 
         file_obj.seek(0)
-        url = reverse('filer:direct_upload')
-        url += '?qqfile=again.jpeg&related_field=thirdparty_app.Example.document_choose_or_browse'
+
+        url = reverse('admin:filer-ajax_upload',
+                      kwargs={'related_field': 'thirdparty_app.Example.document_choose_or_browse',
+                              'folder_key': 'no_folder'})
+        url += '?qqfile=again.jpeg'
         response = self.client.post(
             url, data=file_obj.read(), content_type='application/octet-stream',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
@@ -128,17 +134,18 @@ class FilerWidgetTest(FilerTestMixin, TestCase):
         url = reverse('admin:thirdparty_app_example_add')
         response = self.client.get(url)
         dom = html.fromstring(response.content)
-
         ids = [
-            el.attrib['id'] for el in dom.xpath('//a[@class="related-lookup"]')]
+            el.attrib['id'] for el in dom.xpath('//a[@class="js-related-lookup related-lookup"]')]
         expected_choose_ids = [
-            'lookup_id_file_choose_only', 'lookup_id_document_choose_or_browse']
+            'id_file_choose_only_lookup', 'id_document_choose_or_browse_lookup']
         self.assertEqual(ids, expected_choose_ids)
 
         ids = [
-            el.attrib['id'] for el in dom.xpath('//span[@class="filerUploader"]')]
+            el.attrib['id'] for el in dom.xpath('//div[@class="dz-default dz-message '\
+                                                'js-filer-dropzone-message"]')]
         expected_browse_ids = [
-            'id_illustration_browse_only_uploader', 'id_document_choose_or_browse_uploader']
+            'id_illustration_browse_only_filer_dropzone_message',
+            'id_document_choose_or_browse_filer_dropzone_message']
         self.assertEqual(ids, expected_browse_ids)
 
 
@@ -153,18 +160,8 @@ class FilerWidgetTest(FilerTestMixin, TestCase):
             expected_href = reverse(
                 'admin:filer-directory_listing_by_key', kwargs={'folder_key':folder_key})
             try:
-                href = dom.get_element_by_id('lookup_id_%s' % field_name).attrib['href']
+                href = dom.get_element_by_id('id_%s_lookup' % field_name).attrib['href']
             except (KeyError, IndexError):
                 self.fail('DOM for "%s" field is not as expected.' % field_name)[0]
             href = href.split('?')[0]
             self.assertEqual(href, expected_href)
-
-        for field_name in ('illustration_browse_only', 'document_choose_or_browse'):
-            field = Example._meta.get_field_by_name(field_name)[0]
-            folder_key = field.default_formfield_kwargs.get('folder_key')
-            try:
-                uploader = dom.get_element_by_id('id_%s_uploader' % field_name)
-                data = json.loads(uploader.find_class('filerChoose')[0].attrib['data-filer'])
-            except (KeyError, IndexError):
-                self.fail('DOM for "%s" field is not as expected.' % field_name)
-            self.assertEqual(folder_key, data.get('folder_key'))

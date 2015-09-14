@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import json
 import warnings
 
 from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 
@@ -31,7 +28,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
 
     def __init__(self, rel, site, *args, **kwargs):
         self.file_lookup_enabled = kwargs.pop('file_lookup_enabled', True)
-        self.direct_upload_enabled = kwargs.pop('direct_upload_enabled', False)
+        self.direct_upload_enabled = kwargs.pop('direct_upload_enabled', True)
         self.folder_key = kwargs.pop('folder_key', None)
         super(AdminFileWidget, self).__init__(rel, site, *args, **kwargs)
 
@@ -72,6 +69,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         # rendering the super for ForeignKeyRawIdWidget on purpose here because
         # we only need the input and none of the other stuff that
         # ForeignKeyRawIdWidget adds
+        attrs['type'] = 'hidden'
         hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)
         context = {
             'hidden_input': hidden_input,
@@ -85,30 +83,19 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'file_lookup_enabled': self.file_lookup_enabled,
             'direct_upload_enabled': self.direct_upload_enabled,
         }
-        if self.direct_upload_enabled:
-            context.update({
-                'direct_upload_name': '%s_direct_upload' % name,
-                'json_opts': json.dumps({
-                    'msg': {
-                        'error': text_type(_('An error occured during the file transfer. '
-                                             'Error was : %(error)s')),
-                        'wait_sing': text_type(_('Please wait until the file is sent.')),
-                        'wait_plur': text_type(_('Please wait until the %(nb_files)d files '
-                                                 'are sent.')),
-                        'no_file_selected': text_type(_('No file selected')),
-                        'choose_new_file': text_type(_('Choose a file')),
-                        'choose_replace_file': text_type(_('Choose another file')),
-                    },
-                    'url': reverse('filer:direct_upload'),
-                    'folder_key': self.folder_key,
-                }),
-            })
-            context['direct_upload_related_field'] = '%s.%s.%s' % (
-                self.rel.field.model._meta.app_label,
-                self.rel.field.model.__name__,
-                self.rel.field.name,
-            )
-
+        related_field = '%s.%s.%s' % (
+            self.rel.field.model._meta.app_label,
+            self.rel.field.model.__name__,
+            self.rel.field.name,
+        )
+        direct_upload_url = reverse('admin:filer-ajax_upload',
+                                    kwargs={'related_field': related_field,
+                                            'folder_key': self.folder_key})
+        context.update({
+            'direct_upload_related_field': related_field,
+            'folder_key': self.folder_key or 'no_folder',
+            'direct_upload_url': direct_upload_url,
+        })
         return context
 
     def render(self, name, value, attrs=None):
@@ -132,19 +119,21 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     def media(self):
         kwargs = {
             'css': {
-                'all': (filer_settings.FILER_STATICMEDIA_PREFIX + 'css/admin_style.css',),
+                'all': ('css/admin_style.css',),
             },
             'js': [
-
-                static('filer/js/libs/jquery.min.js'),
-                static('filer/js/libs/dropzone.min.js'),
-                static('filer/js/addons/dropzone.init.js'),
-                static('filer/js/addons/widget.js'),
+                'filer/js/libs/jquery.min.js',
+                'filer/js/addons/widget.js',
             ],
         }
+        if self.direct_upload_enabled:
+            kwargs['js'] += [
+                'filer/js/libs/dropzone.min.js',
+                'filer/js/addons/dropzone.init.js',
+            ]
         if self.file_lookup_enabled:
-            kwargs['js'].append(filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js')
-        return forms.Media(**kwargs)
+            kwargs['js'].append('filer/js/addons/popup_handling.js')
+        return super(AdminFileWidget, self).media + forms.Media(**kwargs)
 
 
 class AdminFileFormField(forms.ModelChoiceField):
@@ -174,7 +163,7 @@ class AdminFileFormField(forms.ModelChoiceField):
             for validator in validators:
                 if isinstance(validator, FileMimetypeValidator):
                     if len(validator.mimetypes) > 1:
-                        mimetypes = '%s" and "%s' % (
+                        mimetypes = _('%s" and "%s') % (
                             '", "'.join(validator.mimetypes[0:-1]),
                             validator.mimetypes[-1]
                         )

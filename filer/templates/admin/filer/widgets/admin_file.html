@@ -1,6 +1,8 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
+
+{% if direct_upload_enabled %}
     <div class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
@@ -10,74 +12,46 @@
         </span>
     </div>
 
-    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{{ direct_upload_url }}" data-max-file-size="20">
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}" id="{{ id }}_filer_dropzone_message">
-            <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
+            <span class="icon fa fa-arrow-down"></span>
+            {% if file_lookup_enabled %}
+                <span>{% trans "or drop your file here" %}</span>
+            {% else %}
+                <span>{% trans "drop your file here" %}</span>
+            {% endif %}
         </div>
-
-        <span class="filerFile js-file-selector">
-            {% block object_display %}
-                {% if object %}
-                    {% if object.icons.32 %}
-                        <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
-                        &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
-                    {% else %}
-                        <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
-                        &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
-                    {% endif %}
+{% endif %}
+        <span class="filerFile js-file-selector" data-id="{{ id }}">
+            {% if object %}
+                {% if object.icons.32 %}
+                    <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
+                    &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
                 {% else %}
-                    <img id="{{ thumb_id }}" class="quiet hidden" alt="">
-                    &nbsp;<span id="{{ span_id }}"></span>
+                    <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
+                    &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
                 {% endif %}
-            {% endblock object_display %}
+            {% else %}
+                <img id="{{ thumb_id }}" class="quiet hidden" alt="">
+                &nbsp;<span id="{{ span_id }}"></span>
+            {% endif %}
 
-            {% block object_change %}
-                {% if file_lookup_enabled %}
-                    <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                        {% trans 'Choose File' %}
-                    </a>
-                {% endif %}
-                {% if direct_upload_enabled %}
-                    <span id="{{ id }}_uploader" class="filerUploader">
-                        <strong>{% trans 'You must have a recent browser with javascript enabled to be able to use direct file upload'%}</strong>
-                        <span style="display:none;">
-                            <span class="filerFilename">{% trans 'No file selected' %}</span>
-                            <input type="file" name="{{ direct_upload_name }}" />
-                            <button class="filerChoose" type="button" data-filer="{{ json_opts }}">{% trans 'Choose a file' %}</button>
-                            <span class="filerProgress" style="display:none;">{% trans 'Uploading, please wait...' %}</span>
-                        </span>
-                    </span>
-                {% endif %}
-            {% endblock object_change %}
+            {% if file_lookup_enabled %}
+                <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+                    {% trans 'Choose File' %}
+                </a>
+            {% endif %}
 
-
-            {% block object_remove %}
-                <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
-            {% endblock object_remove %}
+            <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
 
             <br>
 
             {{ hidden_input }}
-
-            {% block object_javascript %}
-                <script type="text/javascript" id="{{id}}_javascript">
-                    django.jQuery('#{{id}}').attr('type', 'hidden').attr('data-filer', 1);
-                    django.jQuery(document).ready(function(){
-                        var plus = django.jQuery('#add_{{ id }}');
-                        if (plus.length){
-                            plus.remove();
-                        }
-                        // Delete this javascript once loaded to avoid the "add new" link duplicates it
-                        django.jQuery('#{{id}}_javascript').remove();
-                    });
-                </script>
-            {% endblock object_javascript %}
         </span>
-    </div>
-{% endspaceless %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
-<script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
-<script src="{% static 'filer/js/libs/dropzone.min.js' %}"></script>
-<script src="{% static 'filer/js/addons/dropzone.init.js' %}"></script>
+{% if direct_upload_enabled %}
+    </div>
+{% endif %}
+
+{% endspaceless %}

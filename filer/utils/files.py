@@ -36,6 +36,7 @@ def handle_upload(request, mimetypes=None):
     if request.method != "POST":
         raise UploadException("AJAX request not valid: must be POST")
 
+    re_raise_exception = None
     if request.is_ajax():
         # the file is stored raw in the request
         is_raw = True
@@ -81,7 +82,8 @@ def handle_upload(request, mimetypes=None):
                     try:
                         FileMimetypeValidator(mimetypes)(ChunkFile(filename, chunk))
                     except ValidationError as e:
-                        raise UploadException(' ; '.join(e.messages))
+                        re_raise_exception = UploadException(' ; '.join(e.messages))
+                        raise StopUpload(connection_reset=True)
                     mimetype_to_check = False
 
                 for i, handler in enumerate(upload_handlers):
@@ -103,6 +105,9 @@ def handle_upload(request, mimetypes=None):
             # Make sure that the request data is all fed
             exhaust(request)
 
+        if re_raise_exception:
+            raise(re_raise_exception)
+
         # Signal that the upload has completed.
         for handler in upload_handlers:
             retval = handler.upload_complete()
@@ -116,13 +121,13 @@ def handle_upload(request, mimetypes=None):
                 break
     else:
         if len(request.FILES) == 1:
-            upload, filename, is_raw = handle_request_files_upload(request)
+            upload, filename, is_raw = handle_request_files_upload(request, mimetypes=None)
         else:
             raise UploadException("AJAX request not valid: Bad Upload")
     return upload, filename, is_raw
 
 
-def handle_request_files_upload(request):
+def handle_request_files_upload(request, mimetypes=None):
     """
     Handle request.FILES if len(request.FILES) == 1.
     Returns tuple(upload, filename, is_raw) where upload is file itself.
@@ -136,6 +141,11 @@ def handle_request_files_upload(request):
     is_raw = False
     upload = list(request.FILES.values())[0]
     filename = upload.name
+    if mimetypes:
+        try:
+            FileMimetypeValidator(mimetypes)(upload)
+        except ValidationError as e:
+            raise UploadException(' ; '.join(e.messages))
     return upload, filename, is_raw
 
 

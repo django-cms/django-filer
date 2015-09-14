@@ -26,14 +26,14 @@ class DefaultFolderGetter(object):
             return None
         parent_kwargs = {
             name: 'users_files',
-            
+
         }
         return cls._get_or_create(name=user.username, owner=user, parent_kwargs=parent_kwargs)
     """
 
     @classmethod
     def _get_or_create(cls, name, owner=None, parent_kwargs=None):
-        filters = {}
+        filters = {'name': name}
         if parent_kwargs:
             parent_folder, created = Folder.objects.get_or_create(**parent_kwargs)
             filters['parent_id'] = parent_folder.pk
