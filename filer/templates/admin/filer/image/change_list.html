@@ -1,0 +1,21 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_modify filer_admin_tags %}
+{% load url from future %}
+
+{% block object-tools %}
+	{% comment %}
+	Do not show any options here. These operations should be performed elsewhere.
+	For this to be ok, the css for actions drop-down must be adjusted.
+	{% endcomment %}
+{% endblock %}
+
+{% block extrastyle %}
+{{block.super}}
+<style type="text/css">
+    .dataTables_wrapper .custom-style {
+        top: 0px;
+    }
+</style>
+{% endblock %}
+
+
