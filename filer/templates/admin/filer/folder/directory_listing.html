@@ -73,23 +73,24 @@
     {% endblock %}
 
     <div class="module" id="changelist">
-        {% include "admin/filer/tools/search_form.html" %}
         {% if not folder.is_root %}
-        <h1 class="folder_header">{% if folder.parent %}<a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% trans "Go back to the parent folder" %}">&uarr;</a>{% else %}<a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}">&uarr;</a>{% endif %}
-            <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
-            <span class="small quiet">({% blocktrans count folder.children_count as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.file_count as counter %}{{ counter }} file{% plural %}{{ counter }} files{% endblocktrans %})</span>
-            <span>
-                {% if is_popup %}
-                    {% if select_folder and folder.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ folder.id }}, '{{ folder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% endif %}
-                {% else %}{% if permissions.has_edit_permission %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}{% endif %}
-            </span>
-        </h1>
-        {% else %}{% if folder.is_smart_folder %}
-        <h1 class="folder_header"><a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">&uarr;</a>
-            <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
-        </h1>
+                <h1 class="folder_header">{% if folder.parent %}<a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% trans "Go back to the parent folder" %}">&uarr;</a>{% else %}<a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% trans "Go back to" %} {% trans "root"|title %} {% trans "folder" %}">&uarr;</a>{% endif %}
+                    <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
+                    <span class="small quiet">({% blocktrans count folder.children_count as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.file_count as counter %}{{ counter }} file{% plural %}{{ counter }} files{% endblocktrans %})</span>
+                    <span>
+                        {% if is_popup %}
+                            {% if select_folder and folder.file_type == 'Folder' %}<a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ folder.id }}, '{{ folder.quoted_logical_path }}'); return false;" >&nbsp;</a>{% endif %}
+                        {% else %}{% if permissions.has_edit_permission %}<a style="display: block; float: right;" class="changelink" href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans "Change current folder details" %}">{% trans "Change" %}</a>{% endif %}{% endif %}
+                    </span>
+                </h1>
+            {% else %}
+            {% if folder.is_smart_folder %}
+                <h1 class="folder_header"><a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}">&uarr;</a>
+                    <img src="{{ folder.icons.32 }}" alt="{% trans "Folder Icon" %}" /> {{ folder.name }}
+                </h1>
+            {% endif %}
         {% endif %}
-        {% endif %}
+        {% include "admin/filer/tools/search_form.html" %}
         <form id="changelist-form" action="" method="post">{% csrf_token %}
         {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
         {% if action_form and actions_on_top and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}
