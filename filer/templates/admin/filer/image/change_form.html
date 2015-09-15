@@ -25,12 +25,14 @@
 
 
 {%block sidebar %}
-  <div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
-    <div id="navcontainer">
-        <div id="image_container" class="thumbnail no-radius">
-            <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
-        </div>
-        <a href="{% url 'admin:filer-image-preview' original.id %}{% get_popup_params %}"><i class="ace-icon fa fa-arrows-alt"></i>{% trans "Full size preview" %}</a>
-    </div>
-  </div>
+	{% if original %}
+		<div id="content-related" class="col-lg-2 col-md-3 col-xs-12 well">
+			<div id="navcontainer">
+				<div id="image_container" class="thumbnail no-radius">
+					<img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}" />
+				</div>
+				<a href="{% url 'admin:filer-image-preview' original.id %}{% get_popup_params %}"><i class="ace-icon fa fa-arrows-alt"></i>{% trans "Full size preview" %}</a>
+			</div>
+		</div>
+	{% endif %}
 {%endblock%}
