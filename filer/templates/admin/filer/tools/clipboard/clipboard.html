@@ -2,7 +2,8 @@
 {% load url from future %}
 
 {% for clipboard in user.filer_clipboards.all %}
-<table style="width: 100%; border: 1px solid #DDDDDD;" class="clipboard" xmlns="http://www.w3.org/1999/html">
+<table style="width: 100%; border: 1px solid #DDDDDD;" class="clipboard" xmlns="http://www.w3.org/1999/html"
+       xmlns="http://www.w3.org/1999/html">
     <thead>
         <tr><th colspan="3">{% trans "Clipboard" %}</th></tr>
     </thead>
@@ -23,13 +24,13 @@
                     <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                     {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
                     {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
-                    <input type="submit" value="{% trans "Empty Clipboard" %}" title="{% trans "Move all clipboard files to" %} '{% trans "unfiled files" %}' {% trans "folder" %}"/>
+                    <button type="submit"  title="{% trans "Move all clipboard files to" %} '{% trans "unfiled files" %}' {% trans "folder" %}">{% trans "Empty Clipboard" %}</button>
                 </form>{% comment %}
                 <form action="{% url 'admin:filer-delete_clipboard' %}" method="post"  style="display: inline;">{% csrf_token %}
                     <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}" />
                     <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                     {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-                    <input type="submit" value="{% trans "delete files" %}" title="{% trans "Delete all files in the clipboard" %}" />
+                    <button type="submit"  title="{% trans "Delete all files in the clipboard" %}">{% trans "delete files" %}</button>
                 </form>{% endcomment %}
             </td>
         </tr>
