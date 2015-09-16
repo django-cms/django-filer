@@ -2,7 +2,8 @@
 {% load url from future %}
 
 {% for clipboard in user.filer_clipboards.all %}
-<table style="width: 100%; border: 1px solid #DDDDDD;" class="clipboard" xmlns="http://www.w3.org/1999/html"
+<div class="clipboard">
+    <table style="width: 100%; border: 1px solid #DDDDDD;" xmlns="http://www.w3.org/1999/html"
        xmlns="http://www.w3.org/1999/html">
     <thead>
         <tr><th colspan="3">{% trans "Clipboard" %}</th></tr>
@@ -45,4 +46,5 @@
     {% endif %}
     </tbody>
 </table>
+</div>
 {% endfor %}
