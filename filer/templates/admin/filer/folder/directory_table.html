@@ -64,7 +64,7 @@
                         <a style="display: inline; float:right;" class="deletelink" href="{% url 'admin:filer_file_delete' file.pk %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}">{% trans "Delete" %}</a>
                     {% endif %}
                 </td>
-                <td style="text-align: right;">
+                <td class="moveto" style="text-align: right;">
                     <button class="movetolink" type="submit" name="move-to-clipboard-{{ file.id|unlocalize }}" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files or not item_perms.change %} style="color: gray;" disabled="disabled"{% endif %}><span>&rarr;</span></button>
                 </td>
             </tr>
