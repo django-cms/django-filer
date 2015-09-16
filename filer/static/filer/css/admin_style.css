@@ -49,8 +49,6 @@ table thead th.thumbHeader {
 	margin-top: -32px;
 }
 #content-top-bar .changelink {
-	display: inline !important;
-	float: none !important;
 	background-position: 0 center;
 }
 #content-top-bar .object-tools li {
