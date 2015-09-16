@@ -57,18 +57,18 @@ table thead th.thumbHeader {
 	display: inline-block !important;
 	float: none !important;
 }
-.filebrowser #changelist-form {
+.filebrowser.change-list #changelist {
 	float: left;
-    width: 80% !important;
-}
-.filebrowser #changelist {
 	overflow: hidden;
+	width: 78% !important;
+	margin-right: 2% !important;
+	padding-left: 1%;
+	padding-right: 1%;
 }
 .clipboard {
 	width: 18% !important;
     float: left;
-    margin-left: 2% !important;
-    margin-top: 35px !important;
+    margin-top: 0 !important;
 	box-sizing: border-box;
 }
 .clipboard tr td.thumbnail {
