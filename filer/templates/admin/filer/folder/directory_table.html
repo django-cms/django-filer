@@ -26,7 +26,7 @@
                 <td><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}"><img src="{{ subfolder.icons.48 }}" alt="{% trans "Folder Icon" %}" /></a></td>
                 <!-- Directory details -->
                 <td>
-                    <div><b><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></b></div>
+                    <div><strong><a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{{ subfolder.name }}</a></strong></div>
                 </td>
                 <td>
                     {% if not subfolder.is_root %}<span class="tiny"> ({% blocktrans count subfolder.children_count as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count subfolder.file_count as counter %}{{ counter }} file{% plural %}{{ counter }} files{% endblocktrans %})</span>{% endif %}
@@ -48,7 +48,7 @@
                 <td class="transpTiling">{% if item_perms.change %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}<img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% filer_staticmedia_prefix %}icons/missingfile_48x48.png{% endif %}" alt="{{ file.default_alt_text }}" />{% if item_perms.change %}</a>{% endif %}</td>
                 <!-- Filename/Dimensions -->
                 <td>
-                    <div><b>{% if item_perms.change %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}{{ file.label }}{% if item_perms.change %}</a>{% endif %}</b></div>
+                    <div><strong>{% if item_perms.change %}<a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% endif %}{{ file.label }}{% if item_perms.change %}</a>{% endif %}</strong></div>
                     {% if enable_permissions %}<div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>{% endif %}
                     {# {% if file.has_all_mandatory_data %}<div><img alt="0" src="{% admin_icon_base %}img/admin/icon-yes.gif" /> {% trans "has all mandatory metadata" %}</div>{% else %}<div><img alt="1" src="{% admin_icon_base %}img/admin/icon-no.gif"/> {% trans "missing metadata!" %}</div>{% endif %} #}
                 </td>
