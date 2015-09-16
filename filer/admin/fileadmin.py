@@ -1,13 +1,12 @@
 #-*- coding: utf-8 -*-
 from django import forms
-from django.contrib.admin.util import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File, Image
-from filer.utils.compatibility import DJANGO_1_5
+from filer.utils.compatibility import DJANGO_1_5, unquote
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
