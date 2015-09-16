@@ -49,7 +49,13 @@ table thead th.thumbHeader {
 	margin-top: -32px;
 }
 #content-top-bar .changelink {
-	background-position: 0 center;
+	color: #029eee !important;
+	font-weight: normal !important;
+	padding-left: 15px !important;
+	background: url(../img/icon_changelink.gif) 0 center no-repeat !important;
+	background-color: transparent !important;
+	box-shadow: none !important;
+	border: 0 !important;
 }
 #content-top-bar .object-tools li {
 	display: inline-block !important;
