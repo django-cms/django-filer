@@ -73,7 +73,7 @@
             {%if is_popup and folder.is_root %}
             {%else%}
                 <li>
-                    <a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" class="addlink btn btn-success btn-sm" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}"><i class="ace-icon fa fa-folder-open"></i>{% trans "New Folder" %}</a>
+                    <a id="id_new_folder" href="{% url 'admin:filer-directory_listing-make_root_folder' %}?_popup=1&parent_id={{ folder.id }}" class="addlink btn btn-success btn-sm" onclick="return showAddAnotherPopup(this);" title="{% trans "Adds a new Folder" %}"><i class="ace-icon fa fa-folder-open"></i>{% trans "New Folder" %}</a>
                 </li>
             {% endif %}
         {% endif %}
