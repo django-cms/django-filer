@@ -61,6 +61,9 @@ table thead th.thumbHeader {
 	display: inline-block !important;
 	float: none !important;
 }
+.filebrowser #changelist {
+	overflow: hidden;
+}
 #changelist-wrapper {
 	float: left;
 	width: 80%;
