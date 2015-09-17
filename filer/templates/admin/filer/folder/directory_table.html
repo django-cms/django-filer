@@ -33,7 +33,7 @@
                     <td>
                         {% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }}
                     </td>
-                    <td style="text-align: right;">
+                    <td class="moveto">
                         {% if item.file_type == 'Folder' and item_perms.change %}
                             <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
                         {% endif %}
@@ -56,10 +56,10 @@
                     <td>
                         {% trans "Owner" %}: {{ file.owner|default:"n/a" }}
                     </td>
-                    <td class="moveto" style="text-align: right;">
+                    <td class="moveto">
                         {% if item_perms.change %}
-                            <a style="display: inline; float:right; margin-left: 10px;" class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
-                            <a style="display: inline; float:right;" class="deletelink" href="{% url 'admin:filer_file_delete' file.pk %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}">{% trans "Delete" %}</a>
+                            <a class="changelink" href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">{% trans "Change" %}</a>
+                            <a class="deletelink" href="{% url 'admin:filer_file_delete' file.pk %}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}">{% trans "Delete" %}</a>
                         {% endif %}
                         <button class="movetolink" type="submit" name="move-to-clipboard-{{ file.id|unlocalize }}" title="{% trans "Move to clipboard" %}"{% if file in clipboard_files or not item_perms.change %} style="color: gray;" disabled="disabled"{% endif %}><span>&rarr;</span></button>
                     </td>
