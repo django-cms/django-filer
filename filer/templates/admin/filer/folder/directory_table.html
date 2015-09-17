@@ -33,9 +33,9 @@
                     <td>
                         {% trans "Owner" %}: {{ subfolder.owner|default:"n/a" }}
                     </td>
-                    <td class="moveto">
+                    <td class="change">
                         {% if item.file_type == 'Folder' and item_perms.change %}
-                            <a style="display: block; float: right;" class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
+                            <a class="changelink" href="{{ subfolder.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">{% trans "Change" %}</a>
                         {% endif %}
                     </td>
                 </tr>

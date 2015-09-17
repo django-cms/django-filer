@@ -64,10 +64,18 @@ table thead th.thumbHeader {
 .filebrowser #changelist {
 	overflow: hidden;
 }
+.filebrowser #changelist .change {
+	text-align: right;
+}
+.filebrowser #changelist .change a {
+	display: block;
+	float: right;
+}
 .filebrowser #changelist .moveto {
 	text-align: right;
 	min-width: 180px
 }
+
 .filebrowser #changelist .moveto a {
 	display: inline-block; margin-right: 10px; margin-top: 10px;
 }
