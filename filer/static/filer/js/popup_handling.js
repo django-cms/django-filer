@@ -34,6 +34,20 @@
 			    triggerlink.href = new_link;
 			}
 		}
-		return showRelatedObjectLookupPopup(triggerlink)
+		return _showRelatedObjectLookupPopup(triggerlink)
+	}
+	_showRelatedObjectLookupPopup = function (triggeringLink) {
+    var name = triggeringLink.id.replace(/^lookup_/, '');
+    name = id_to_windowname(name);
+    var href;
+    if (triggeringLink.href.search(/\?/) >= 0) {
+        href = triggeringLink.href + '&_popup=1';
+    } else {
+        href = triggeringLink.href + '?_popup=1';
+    }
+    var win = window.open(href, name, 'height=500,width=1120,resizable=yes,scrollbars=yes');
+    win.focus();
+    return false;
 	}
 })(jQuery);
+	

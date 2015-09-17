@@ -1,6 +1,36 @@
 CHANGELOG
 =========
 
+Revision 6cbcd3b (12.09.2015, 11:23 UTC)
+----------------------------------------
+
+* LUN-2620
+
+  * resize file/folder plugin popup
+
+No other commits.
+
+Revision eef2065 (04.09.2015, 09:05 UTC)
+----------------------------------------
+
+* LUN-2569
+
+  * 6.Revisit the layout of the filer upload pop-up window
+
+* LUN-2580
+
+  * fixes on sidebar
+
+* LUN-2596
+
+  * left align fieldsets
+
+* LUN-2603
+
+  * save button should appear when creating new folders on Filer
+
+No other commits.
+
 Revision 017a043 (28.08.2015, 08:51 UTC)
 ----------------------------------------
 

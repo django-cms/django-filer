@@ -1,6 +1,9 @@
 body {
 	background: white;
 }
+.text-left {
+	text-align: left !important;
+}
 .dataTables_wrapper.custom-style {
 	position: absolute;
 	top: 44px;
@@ -42,6 +45,9 @@ body {
 .this-page, .avoid-multiple-submissions {
 	margin-right: 10px;
 }
+.avoid-multiple-submissions + .avoid-multiple-submissions {
+	margin-right: 0;
+}
 .thumbnail.custom-margin {
 	margin: 10px 10px 0 0;
 }
@@ -63,6 +69,9 @@ body {
 .padding-20 {
 	padding: 20px;
 }
+.padding-right-15 {
+	padding-right: 15px !important;
+}
 table a.changelink, table a.deletelink {
  	line-height: 36px;
 }
@@ -78,7 +87,7 @@ table a.deletelink {
 .change-form .form-horizontal input,
 .change-form .form-horizontal select,
 .change-form .form-horizontal textarea {
-	width: 50%;
+	width: 76%;
 }
 .change-form .form-horizontal input[type="checkbox"] {
 	width: auto;
@@ -215,6 +224,11 @@ ul.fancytree-container {
 		display: none;
 	}
 }
+@media only screen and (max-width: 1200px){
+	.popup .col-xs-5 {
+		width: 100%
+	}
+}
 .form-row.errors .help-block {
   color: #a94442;
 }
@@ -319,6 +333,13 @@ ul.fancytree-container {
 .change-form .form-horizontal .clearable-file-input input[type="checkbox"] {
 	margin-right: 3px;
 }
+.form-horizontal .form-group .row {
+  margin: 0;
+}
+
+.owner strong {
+	margin-left: 10px;
+}
 .owner .related-lookup {
   height: 28px;
   vertical-align: top;
@@ -327,7 +348,6 @@ ul.fancytree-container {
   text-align: center;
   position: absolute;
   top: 3px;
-  left: 50%;
   margin-left: -63px;
 }
 .owner .related-lookup img {

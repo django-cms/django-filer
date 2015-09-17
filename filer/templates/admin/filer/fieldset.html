@@ -7,17 +7,17 @@
             <div class="description">{{ fieldset.description|safe }}</div>
         {% endif %}
         {% for line in fieldset %}
-            <div class="form-row form-group{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% for field in line %} {{ field.field.name }}{% endfor %}">
+            <div class="form-row form-group{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% for field in line %} {{ field.field.name }}{% endfor %} no-margin-left no-margin-right">
 
                 {% for field in line %}
                     <div class="row{% if not line.fields|length_is:'1' %} field-box{% if not field.is_readonly and field.errors %} errors{% endif %}{% endif %}">
                         {% if not line.fields|length_is:'1' and not field.is_readonly %}{{ field.errors }}{% endif %}
                         {% if field.is_checkbox %}
-                            <div class="col-sm-3 control-label no-padding"></div>
-                            <div class="col-sm-9">{{ field.field }} {{ field.label_tag }}</div>
+                            <div class="col-sm-2 control-label text-left"></div>
+                            <div class="col-sm-9 no-padding-left margin-top-5">{{ field.field }} {{ field.label_tag }}</div>
                         {% else %}
-                            <div class="col-sm-3 control-label no-padding-right">{{ field.label_tag }}</div>
-                            <div class="col-sm-9">
+                            <div class="col-sm-2 control-label text-left">{{ field.label_tag }}</div>
+                            <div class="col-sm-9 no-padding-left">
                                 {% if field.is_readonly %}
                                     <p class="read-only-field">{{ field.contents }}</p>
                                 {% else %}
@@ -26,9 +26,9 @@
                                 {% if field.field.help_text %}
                                     <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="right" data-content='{{ field.field.help_text|safe }}'>?</span>
                                 {% endif %}
-                                {% if line.errors %}
+                                {% if not field.is_readonly and field.errors %}
                                     <div class="help-block col-xs-12 col-sm-reset inline">
-                                        {{ line.errors }}
+                                        {{ field.errors }}
                                     </div>
                                 {% endif %}
                             </div>
