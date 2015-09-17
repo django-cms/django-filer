@@ -61,13 +61,10 @@ table thead th.thumbHeader {
 	display: inline-block !important;
 	float: none !important;
 }
-.filebrowser.change-list #changelist {
+#changelist-wrapper {
 	float: left;
-	overflow: hidden;
-	width: 78% !important;
-	margin-right: 2% !important;
-	padding-left: 1%;
-	padding-right: 1%;
+	width: 80%;
+	margin-right: 2%;
 }
 .clipboard {
 	width: 18% !important;
