@@ -378,9 +378,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
             paginated_items = paginator.page(page)
         except (EmptyPage, InvalidPage):
             paginated_items = paginator.page(paginator.num_pages)
+        context = RequestContext(request)
+        context.update(self.admin_site.each_context(request))
         response = render_to_response(
-            'admin/filer/folder/directory_listing.html',
-            {
+            'admin/filer/folder/directory_listing.html', {
                 'folder': folder,
                 'user_clipboard': clipboard,
                 'clipboard_files': clipboard.files.distinct(),
@@ -406,7 +407,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 'selection_note_all': selection_note_all % {
                     'total_count': paginator.count},
                 'media': self.media,
-        }, context_instance=RequestContext(request))
+            }, context_instance=context)
         return response
 
     def response_action(self, request, files_queryset, folders_queryset):
@@ -654,7 +655,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-
+        context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
         return render_to_response([
             "admin/filer/delete_selected_files_confirmation.html"
@@ -889,7 +890,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-
+        context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
         return render_to_response([
             "admin/filer/folder/choose_move_destination.html"
@@ -1102,7 +1103,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         }
-
+        context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
         return render_to_response([
             "admin/filer/folder/choose_copy_destination.html"
