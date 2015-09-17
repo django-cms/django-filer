@@ -80,7 +80,7 @@ table thead th.thumbHeader {
 	display: inline-block; margin-right: 10px; margin-top: 10px;
 }
 .filebrowser #changelist .moveto button {
-float: right;
+	float: right;
 }
 #changelist-wrapper {
 	float: left;
