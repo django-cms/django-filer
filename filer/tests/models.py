@@ -257,5 +257,7 @@ class FilerApiTests(TestCase):
         image.save()
         self.assertEqual(self.client.get(canonical).status_code, 404)
         # Teardown
+        image.file = file_2
+        image.save()
         os.remove(filename_2)
 
