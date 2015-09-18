@@ -77,7 +77,8 @@ table thead th.thumbHeader {
 }
 
 .filebrowser #changelist .moveto a {
-	display: inline-block; margin-right: 10px; margin-top: 10px;
+	display: inline-block;
+	margin-right: 10px;
 }
 .filebrowser #changelist .moveto button {
 	float: right;
@@ -90,7 +91,8 @@ table thead th.thumbHeader {
 .clipboard {
 	width: 18% !important;
     float: left;
-    margin-top: 0 !important;
+	margin-top: -1px !important;
+	border: 1px solid #ddd !important;
 	box-sizing: border-box;
 	overflow-x: auto;
 }
@@ -99,6 +101,23 @@ table thead th.thumbHeader {
 }
 .clipboard table {
 	margin: 0;
+	border: 0 !important;
+}
+.clipboard table td {
+	border-right: 0 !important;
+	border-color: #ddd;
+}
+.clipboard table th {
+	padding-top: 1px !important;
+	padding-bottom: 1px !important;
+}
+.clipboard table tfoot td {
+	border-bottom: 0 !important;
+}
+.clipboard .deletelink {
+	padding: 4px 10px;
+	background: #e1e1e1 url(../img/button-bg.gif) bottom left repeat-x;
+    border: 1px solid #999;
 }
 a.insertlinkButton {
 	padding: 4px;
@@ -128,4 +147,12 @@ a.small_folder_link {
 }
 #toolbartable {
 	overflow-x: auto;
+}
+#toolbartable td,
+#toolbartable th {
+	border-right: solid 1px #ddd;
+}
+
+#toolbartable + .paginator {
+	border-right: solid 1px #ddd;
 }
