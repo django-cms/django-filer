@@ -1,16 +1,16 @@
 {% extends "admin/filer/base_site.html" %}
-{% load filer_admin_tags filermedia i18n %}
+{% load i18n staticfiles filer_admin_tags %}
 {% load url from future %}
 
 {% block extrahead %}{{ block.super }}
 {# upload stuff #}
 {{ media.js }}
-<script type="text/javascript" src="{% admin_js_base %}jquery.min.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/jquery.cookie.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/fileuploader.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/retina.js"></script>
-<script type="text/javascript" src="{% admin_js_base %}admin/RelatedObjectLookups.js"></script>
-<script type="text/javascript" src="{% filer_staticmedia_prefix %}js/popup_handling.js"></script>
+<script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>
+<script type="text/javascript" src="{% static "filer/js/jquery.cookie.js" %}"></script>
+<script type="text/javascript" src="{% static "filer/js/fileuploader.js" %}"></script>
+<script type="text/javascript" src="{% static "filer/js/retina.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
+<script type="text/javascript" src="{% static "filer/js/popup_handling.js" %}"></script>
 {% if action_form %}{% if actions_on_top or actions_on_bottom %}
 <script type="text/javascript">
 (function($) {
@@ -27,7 +27,7 @@
 
 
 {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% admin_css_base %}changelists.css" />
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
 {{ media.css }}
 {% if action_form %}
   {% url 'admin:jsi18n' as jsi18nurl %}

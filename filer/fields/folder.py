@@ -6,6 +6,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.safestring import mark_safe
@@ -13,7 +14,6 @@ from filer.utils.compatibility import truncate_words
 from filer.utils.model_label import get_model_label
 from django.utils.translation import ugettext as _
 from filer.models import Folder
-from filer.settings import FILER_STATICMEDIA_PREFIX
 
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):
@@ -62,7 +62,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             'object': obj,
             'clear_id': '%s_clear' % css_id,
             'descid': css_id_description_txt,
-            'noimg': '%sicons/nofile_32x32.png' % FILER_STATICMEDIA_PREFIX,
+            'noimg': 'filer/icons/nofile_32x32.png',
             'foldid': css_id_folder,
             'id': css_id,
             }
@@ -82,7 +82,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media:
-        js = (FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
+        js = (static('filer/js/popup_handling.js'), )
 
 
 class AdminFolderFormField(forms.ModelChoiceField):

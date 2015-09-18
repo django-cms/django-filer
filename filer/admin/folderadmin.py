@@ -41,7 +41,7 @@ from filer.admin.tools import (userperms_for_request,
                                admin_each_context)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData, FolderPermission, Image)
-from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
+from filer.settings import FILER_PAGINATE_BY
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.compatibility import get_delete_permission
 from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
@@ -328,7 +328,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if order_by is None or len(order_by) == 0:
             folder_files.sort()
-        
+
         items = folder_children + folder_files
         items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
         paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
