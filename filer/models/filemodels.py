@@ -247,7 +247,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             try:
                 url = urlresolvers.reverse('canonical', kwargs={
                     'uploaded_at': self.uploaded_at.strftime('%s'),
-                    'id': self.id
+                    'file_id': self.id
                 })
             except urlresolvers.NoReverseMatch:
                 pass  # No canonical url, return empty string
