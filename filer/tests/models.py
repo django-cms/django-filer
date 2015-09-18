@@ -242,9 +242,10 @@ class FilerApiTests(TestCase):
         file_url_1 = image.file.url
         self.assertRedirects(self.client.get(canonical), file_url_1)
         # Second public version
+        img_2 = create_image()
         image_name_2 = 'test_file_2.jpg'
         filename_2 = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, image_name_2)
-        self.img.save(filename_2, 'JPEG')
+        img_2.save(filename_2, 'JPEG')
         file_2 = DjangoFile(open(filename_2, 'rb'), name=image_name_2)
         image.file = file_2
         image.save()

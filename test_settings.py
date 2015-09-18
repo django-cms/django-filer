@@ -50,7 +50,12 @@ HELPER_SETTINGS = {
         'easy_thumbnails.processors.filters',
     ),
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
-    'FILER_IMAGE_MODEL': False
+    'FILER_IMAGE_MODEL': False,
+    'TEMPLATES': [
+        {
+            'DIRS': 'filer.test_utils.templates',
+        },
+    ],
 
 }
 if os.environ.get('CUSTOM_IMAGE', False):
