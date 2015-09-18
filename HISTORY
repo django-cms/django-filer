@@ -2,6 +2,11 @@ Changelog for django-filer
 ==========================
 
 
+next
+----
+* Remove `FILER_STATICMEDIA_PREFIX` and use `staticfiles` for static files.
+
+
 0.9.12 (2015-07-28)
 -------------------
 
