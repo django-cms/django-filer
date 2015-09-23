@@ -164,7 +164,7 @@ class Folder(models.Model, mixins.IconsMixin):
                     'snippet but will not be able to delete or '
                     'modify the current version of the assets.'))
 
-    shared = models.ManyToManyField(Site, null=True, blank=True,
+    shared = models.ManyToManyField(Site, blank=True,
         related_name='shared',
         verbose_name=_("Share folder with sites"),
         help_text=_("All the sites which you share this folder with will "

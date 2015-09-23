@@ -8,6 +8,7 @@ except ImportError:
 
 version = __import__('filer').__version__
 
+
 def read(fname):
     # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -17,19 +18,19 @@ dependency_links = [
 ]
 
 setup(
-    name = "django-filer",
-    version = version,
-    url = 'http://github.com/stefanfoulis/django-filer',
-    license = 'BSD',
+    name="django-filer",
+    version=version,
+    url='http://github.com/stefanfoulis/django-filer',
+    license='BSD',
     platforms=['OS Independent'],
-    description = "A file management application for django that makes handling of files and images a breeze.",
-    long_description = read('README.rst'),
-    author = 'Stefan Foulis',
-    author_email = 'stefan.foulis@gmail.com',
+    description="A file management application for django that makes handling of files and images a breeze.",
+    long_description=read('README.rst'),
+    author='Stefan Foulis',
+    author_email='stefan.foulis@gmail.com',
     packages=find_packages(),
-    install_requires = (
+    install_requires=(
         'pytz',
-        'Django>=1.3,<1.8',
+        'Django>=1.8,<1.9',
         'easy-thumbnails<=2.2',
         'django-mptt>=0.7.4',
         'django_polymorphic<=0.7.1',
@@ -39,7 +40,7 @@ setup(
     dependency_links=dependency_links,
     include_package_data=True,
     zip_safe=False,
-    classifiers = [
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Django',
         'Intended Audience :: Developers',
