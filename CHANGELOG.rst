@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+Revision df8010a (24.09.2015, 11:12 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Django 1.8: fixed popup opening for add folder
+  * Django 1.8: updated extra context for custom admin view
+  * Django 1.8 upgrade: removed some django1.9 deprecation warnings
+  * Django 1.8 upgrade: updated test settings & fixed file/folder model related fields
+
 Revision 6cbcd3b (12.09.2015, 11:23 UTC)
 ----------------------------------------
 
