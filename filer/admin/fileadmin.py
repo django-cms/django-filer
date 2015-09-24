@@ -51,12 +51,17 @@ class FileAdmin(FilePermissionModelAdmin):
             ) + extra_fieldsets
         return fieldsets
 
+    def has_add_permission(self, request):
+        return False
+
     def get_model_perms(self, request):
         """
-        It seems this is only used for the list view. NICE :-)
+        While this method is used by Django, it is no longer used to determine if the
+        option is available in the changelist view, which was the original intention.
+        The has_xxx_permission is used instead.
         """
         return {
-            'add': False,
+            'add': self.has_add_permission(request),
             'change': False,
             'delete': False,
         }
