@@ -142,12 +142,30 @@ class FilerFolderAdminUrlsTests(TestCase):
         bar = Folder.objects.get(pk=bar.pk)
         self.assertEqual(bar.name, "bar")
 
+    def test_changelist_not_accessible(self):
+        response = self.client.get("/admin/filer/file", follow=True)
+        self.assertEqual(response.status_code, 403)
+
+    def test_change_view_accessible(self):
+        file1 = File.objects.create()
+        response = self.client.get("/admin/filer/file/{}".format(file1.id), follow=True)
+        self.assertEqual(response.status_code, 200)
+
 
 class FilerImageAdminUrlsTests(TestCase):
 
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+
+    def test_changelist_not_accessible(self):
+        response = self.client.get("/admin/filer/image", follow=True)
+        self.assertEqual(response.status_code, 403)
+
+    def test_change_view_accessible(self):
+        image1 = Image.objects.create()
+        response = self.client.get("/admin/filer/image/{}".format(image1.id), follow=True)
+        self.assertEqual(response.status_code, 200)
 
     def tearDown(self):
         self.client.logout()
