@@ -1,5 +1,4 @@
 {% extends "admin/filer/base_site.html" %}
-{% load url from future %}
 {% load filer_admin_tags i18n filermedia %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">
@@ -7,7 +6,7 @@
             <li>
                 <i class="ace-icon fa fa-home home-icon"></i>
                 <a href="/admin/" title="Go back to admin homepage">Home</a>
-            </li> 
+            </li>
             <li><a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst }}</a></li>
             <li><a href="{% url 'admin:filer_trash_changelist'%}">{{ opts.verbose_name_plural|capfirst }}</a></li>
             <li>Restore {{current_item_type}} {{ current_item|pretty_display }}</li>

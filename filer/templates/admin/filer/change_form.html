@@ -1,6 +1,5 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_modify filermedia filer_admin_tags %}
-{% load url from future %}
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript">
@@ -45,9 +44,9 @@ $( document ).ready(function() {
 {% endblock %}
 
 
-{% block content %} 
+{% block content %}
 	<div class="no-padding-right col-lg-10 col-md-9 col-xs-12">
-		{{block.super}}	
+		{{block.super}}
 	</div>
 {% endblock %}
 

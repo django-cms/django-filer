@@ -1,6 +1,5 @@
 {% extends "admin/image_filer/image/change_form.html" %}
 {% trans i18n %}
-{% load url from future %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -8,9 +7,9 @@
         <li>
             <i class="ace-icon fa fa-home home-icon"></i>
             <a href="{% url 'admin:index' %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
-        </li> 
+        </li>
         <li><a href="{% url 'admin:index' %}filer/" title="{% trans "Go back to" %} {% trans "Filer" %}">{% trans "Filer" %}</a></li>
-        {% if original.folder %} 
+        {% if original.folder %}
         <li><a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to root folder" %}">{% trans "root" %}</a></li>
         {% for ancestor_folder in original.folder.get_ancestors %}
         <li><a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a></li>

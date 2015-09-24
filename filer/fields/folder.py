@@ -12,6 +12,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from filer.models import Folder
 from filer.settings import FILER_STATICMEDIA_PREFIX
+from filer.utils.model_label import get_model_label
 
 try:
     from django.utils.text import truncate_words
@@ -109,7 +110,7 @@ class FilerFolderField(models.ForeignKey):
     default_model_class = Folder
 
     def __init__(self, **kwargs):
-        kwargs['to'] = self.default_model_class
+        kwargs['to'] = get_model_label(self.default_model_class)
         super(FilerFolderField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):

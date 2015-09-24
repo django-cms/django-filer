@@ -1,6 +1,5 @@
 {% extends "admin/filer/change_form.html" %}
 {% load i18n admin_modify filer_admin_tags %}
-{% load url from future %}
 
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
@@ -19,8 +18,8 @@
 	{% endfor %}
 {% endblock %}
 
-{% block content %} 
-    {{block.super}} 
+{% block content %}
+    {{block.super}}
 {% endblock %}
 
 
