@@ -223,3 +223,41 @@ class FilerApiTests(TestCase):
 
             reloaded = Image.objects.get(pk=image.pk)
             self.assertEqual(reloaded.author, image.author)
+
+    def test_canonical_url(self):
+        """
+        Check that a public file's canonical url redirects to the file's current version
+        """
+        image = self.create_filer_image()
+        image.save()
+        # Private file
+        image.is_public = False
+        image.save()
+        canonical = image.canonical_url
+        self.assertEqual(self.client.get(canonical).status_code, 404)
+        # First public version
+        image.is_public = True
+        image.save()
+        canonical = image.canonical_url
+        file_url_1 = image.file.url
+        self.assertRedirects(self.client.get(canonical), file_url_1)
+        # Second public version
+        img_2 = create_image()
+        image_name_2 = 'test_file_2.jpg'
+        filename_2 = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, image_name_2)
+        img_2.save(filename_2, 'JPEG')
+        file_2 = DjangoFile(open(filename_2, 'rb'), name=image_name_2)
+        image.file = file_2
+        image.save()
+        file_url_2 = image.file.url
+        self.assertNotEqual(file_url_1, file_url_2)
+        self.assertRedirects(self.client.get(canonical), file_url_2)
+        # No file
+        image.file = None
+        image.save()
+        self.assertEqual(self.client.get(canonical).status_code, 404)
+        # Teardown
+        image.file = file_2
+        image.save()
+        os.remove(filename_2)
+
