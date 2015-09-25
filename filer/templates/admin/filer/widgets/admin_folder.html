@@ -1,20 +1,16 @@
-{% load i18n filer_admin_tags %}{% spaceless %}
-{% if object %}
-    {% trans 'Folder' %}: <span id="{{ span_id }}">{{ object.pretty_logical_path }}</span>
-{% else %}
-    {% trans 'Folder' %}: <span id="{{ span_id }}">{% trans 'none selected' %}</span>
-{% endif %}
+{% load i18n filer_admin_tags filermedia %}{% spaceless %}
+<img src="{% filer_staticmedia_prefix %}icons/plainfolder_48x48.png" class="quiet" alt="{% trans 'no folder selected' %}" />&nbsp;<span id="{{ span_id }}">{% if object %}{{ object.pretty_logical_path }}{% else %}{% trans 'none selected' %}{% endif %}</span>
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedFilerObjectLookupPopup(this);">
 	<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
 </a>
-<img id="{{ clear_id }}" src="{% admin_icon_base %}icon_deletelink.gif" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %} />
+<i id="{{ clear_id }}" {% if not object %} style="display: none;"{% endif %} class="ace-icon fa fa-times red"></i>
 <br />
 {{ hidden_input }}
 <script type="text/javascript">django.jQuery("#{{ id }}").hide();
-django.jQuery("#{{ id }}_clear").click(function(){
+django.jQuery("#{{ clear_id }}").click(function(){
     django.jQuery("#{{ id }}").removeAttr("value");
     django.jQuery("#{{ foldid }}").attr("src", "{{ noimg }}");
-    django.jQuery("#{{ descid }}").html("");
+    django.jQuery("#{{ descid }}").html("{% trans 'none selected' %}");
 });
 django.jQuery(document).ready(function(){
     var plus = django.jQuery("#add_{{ id }}");
