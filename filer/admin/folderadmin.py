@@ -124,7 +124,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         """
         r = super(FolderAdmin, self).response_change(request, obj)
         ## Code borrowed from django ModelAdmin to determine changelist on the fly
-        if r['Location']:
+        if 'Location' in r and r['Location']:
             # it was a successful save
             if (r['Location'] in ['../'] or
                     r['Location'] == self._get_post_url(obj)):
