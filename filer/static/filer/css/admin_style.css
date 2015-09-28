@@ -376,3 +376,35 @@ ul.fancytree-container {
 .change-form .owner input {
   padding-right: 65px;
 }
+/*related objects lookup buttons*/
+.add-related, .add-another, .related-lookup, .change-related, .delete-related {
+  margin: 0 5px;
+  vertical-align: middle;
+  display: inline-block;
+}
+.add-related img, .add-another img, .related-lookup img, .change-related img, .delete-related img {
+  display: none;
+}
+.add-related:before, .add-another:before, .related-lookup:before, .change-related:before, .delete-related:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  text-rendering: auto;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.add-related:before, .add-another:before {
+  content: "\f067";
+}
+.delete-related:before {
+  content: "\f00d";
+}
+.related-lookup:before {
+  content: "\f002";
+}
+.change-related:before {
+  content: "\f040";
+}
+.related-widget-wrapper {
+  display: inline;
+}
