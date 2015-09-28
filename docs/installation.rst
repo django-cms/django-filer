@@ -126,7 +126,16 @@ Contrary to the file's actual URL, the canonical URL does not change if you uplo
 Thus, you can safely share the canonical URL. As long as the file exists, people will be redirected to its
 latest version.
 
-The canonical URL is displayed in the "advanced" panel on the file's admin page.
+The canonical URL is displayed in the "advanced" panel on the file's admin page. It has the form::
+
+    /filer/canonical/1442488644/12/
+
+The "filer" part of the URL is configured in the project's URLconf as described above. The "canonical" part can be
+changed with the setting ``FILER_CANONICAL_URL``, which defaults to ``'canonical/'``. Example::
+
+    # settings.py
+
+    FILER_CANONICAL_URL = 'sharing/'
 
 
 debugging and logging

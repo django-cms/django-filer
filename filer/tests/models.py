@@ -261,3 +261,9 @@ class FilerApiTests(TestCase):
         image.save()
         os.remove(filename_2)
 
+    def test_canonical_url_settings(self):
+        image = self.create_filer_image()
+        image.save()
+        canonical = image.canonical_url
+        self.assertTrue(canonical.startswith('/filer/test-path/'))
+
