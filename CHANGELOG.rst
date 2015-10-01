@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+Revision 49fdf9b (01.10.2015, 12:23 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Add migration 0002.
+  * Fixed related lookup popup icons
+
 Revision df8010a (24.09.2015, 11:12 UTC)
 ----------------------------------------
 
