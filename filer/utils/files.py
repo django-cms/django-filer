@@ -21,9 +21,11 @@ def handle_upload(request):
             # raw_post_data was depreciated in django 1.4:
             # https://docs.djangoproject.com/en/dev/releases/1.4/#httprequest-raw-post-data-renamed-to-httprequest-body
             data = request.body
-        else:
+        elif hasattr(request, 'raw_post_data'):
             # fallback for django 1.3
             data = request.raw_post_data
+        else:
+            raise UploadException("Request is not valid: there is no request body.")
         upload = SimpleUploadedFile(name=filename, content=data)
     else:
         if len(request.FILES) == 1:
