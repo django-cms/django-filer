@@ -20,7 +20,7 @@ class BaseServerBackendTestCase(TestCase):
         original_filename = 'testimage.jpg'
         file_obj = SimpleUploadedFile(
             name=original_filename,
-            content=create_image().tostring(),
+            content=create_image().tobytes(),
             content_type='image/jpeg')
         self.filer_file = File.objects.create(
             is_public=False,
