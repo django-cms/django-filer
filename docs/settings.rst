@@ -132,3 +132,12 @@ Defines the dotted path to a custom Image model; please include the model name.
 Example: 'my.app.models.CustomImage'
 
 Defaults to ``False``
+
+
+``FILER_CANONICAL_URL``
+-----------------------
+
+Defines the path element common to all canonical file URLs.
+
+Defaults to ``'canonical/'``
+
