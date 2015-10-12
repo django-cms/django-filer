@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+
+{% block extrastyle %}
+{{block.super}}
+	{% comment %}
+	Because there are no general action in the changelist, the css for actions
+	drop-down must be adjusted.
+	{% endcomment %}
+<style type="text/css">
+    .dataTables_wrapper .custom-style {
+        top: 0px;
+    }
+</style>
+{% endblock %}
+
+
