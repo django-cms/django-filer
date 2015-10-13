@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+Revision 5352d52 (13.10.2015, 13:15 UTC)
+----------------------------------------
+
+* LUN-2643
+
+  * Prevent access to image/file changelist views.
+  * Remove useless stuff.
+  * Revert fix as view will not be accessible.
+  * . Remove the option to add files/images from their changelist/change admin view.
+  * Move styling fix so it will be used in both image and file changelists.
+  * Remove the "Add image" link from the admin/filer/image changelist view.
+  * Handle case when view is reached without an object.
+
+* Misc commits
+
+  * Update server_backends.py. Replace deprecated method.
+
 Revision 49fdf9b (01.10.2015, 12:23 UTC)
 ----------------------------------------
 
