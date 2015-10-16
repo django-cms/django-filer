@@ -21,7 +21,7 @@ Wiki: https://github.com/stefanfoulis/django-filer/wiki
 Dependencies
 ------------
 
-* `Django`_ >= 1.4
+* `Django`_ >= 1.5
 * `django-mptt`_ >=0.5.1
 * `easy_thumbnails`_ >= 1.0
 * `django-polymorphic`_ >= 0.2
