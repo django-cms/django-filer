@@ -17,7 +17,7 @@
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools list-unstyled list-inline text-right">
-      <li><a href="history/" class="historylink btn btn-success btn-sm"><i class="ace-icon fa fa-history"></i>{% trans "History" %}</a></li>
+      <li><a href="history/" class="historylink btn btn-warning btn-sm"><i class="ace-icon fa fa-clock-o"></i>{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink  btn btn-purple btn-sm"><i class="ace-icon fa fa-external-link"></i>{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
