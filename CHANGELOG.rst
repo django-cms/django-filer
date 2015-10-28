@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision 47a0d53 (28.10.2015, 12:04 UTC)
+----------------------------------------
+
+* LUN-2647
+
+  * history button made yellow
+
+No other commits.
+
 Revision 5352d52 (13.10.2015, 13:15 UTC)
 ----------------------------------------
 
