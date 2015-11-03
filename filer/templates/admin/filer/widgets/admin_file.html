@@ -1,21 +1,10 @@
 {% load i18n filer_admin_tags %}{% spaceless %}
-{% if object %}
-  {% if custom_preview %}
-		<a href="{{ object.url }}" target="_blank"><img width="{{ custom_preview_width  }}" id="{{ thumb_id }}" src="{{ custom_preview_image }}" alt="{{ object.label }}" /></a>
-  {% elif object.icons.32 %}
-		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.32 }}" alt="{{ object.label }}" /></a>
-		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
-	{% else %}
-		<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
-		&nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
-	{% endif %}
-{% else %}
-{% if custom_preview %}<div class="no-image-preview">{% endif %}
-	<img id="{{ thumb_id }}" {% if custom_preview %} width="{{ custom_preview_width }}" {% endif %} src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
-	&nbsp;<span id="{{ span_id }}"></span>
-{% if custom_preview %}</div>{% endif %}
 
-{% endif %}
+	{% if custom_preview %}
+		{% include 'admin/filer/widgets/image_preview_custom.html' %}
+	{% else %}
+		{% include 'admin/filer/widgets/image_preview.html' %}
+	{% endif %}
 
 <a href="{{ lookup_url }}" class="related-lookup {% if search_label %}custom{%endif%}" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedFilerObjectLookupPopup(this);">
 	{% if search_label %}

@@ -1,0 +1,14 @@
+{% load i18n filer_admin_tags %}{% spaceless %}
+{% if object %}
+	{% if object.icons.32 %}
+		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.32 }}" alt="{{ object.label }}" /></a>
+		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+	{% else %}
+		<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
+		&nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
+	{% endif %}
+{% else %}
+	<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
+	&nbsp;<span id="{{ span_id }}"></span>
+{% endif %}
+{% endspaceless %}

@@ -1,0 +1,15 @@
+{% load i18n filer_admin_tags %}{% spaceless %}
+{% if object %}
+	<a href="{{ object.url }}" target="_blank">
+		<img width="{{ custom_preview_width  }}" id="{{ thumb_id }}"
+			src="{{ custom_preview_image }}" alt="{{ object.label }}" />
+	</a>
+{% else %}
+	<div class="no-image-preview">
+		<img id="{{ thumb_id }}" width="{{ custom_preview_width }}"
+			src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet"
+			alt="{% trans 'no file selected' %}" />
+		&nbsp;<span id="{{ span_id }}"></span>
+	</div>
+{% endif %}
+{% endspaceless %}
