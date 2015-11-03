@@ -64,9 +64,9 @@ refreshing the admin page will create the missing thumbnails.
 Static media
 ............
 
-In order to operate properly, django-filer needs some js and css files. They
-are located in the ``static/filer`` directory in the ``filer`` package. Use
-`django.contrib.staticfiles`_  to have them automatically served.
+django-filer javascript and css files are managed by ``django.contrib.staticfiles``;
+please see `staticfiles documentation`_ to know how to deploy filer static files
+in your environment.
 
 
 subject location aware cropping
@@ -125,7 +125,7 @@ generation errors,  two options are provided to help when working with ``django-
 
 
 .. _django-filer: https://github.com/stefanfoulis/django-filer/
-.. _django.contrib.staticfiles: http://docs.djangoproject.com/en/stable/howto/static-files/
+.. _staticfiles documentation: http://docs.djangoproject.com/en/stable/howto/static-files/
 .. _Django: http://djangoproject.com
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails

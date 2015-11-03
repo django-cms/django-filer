@@ -132,6 +132,7 @@ in ``settings.py``::
 
 in your apache configuration::
 
+    XSendFile On
     XSendFilePath /path/to/smedia/
 
 ``XSendFilePath`` is a whitelist for directories where apache will serve files
