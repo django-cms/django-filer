@@ -806,7 +806,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 yield c
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, FolderRoot().children, allow_self, 0))
+        root_folders = Folder.objects.filter(parent__isnull=True).order_by('name')
+        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         for f in files_queryset:
