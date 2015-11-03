@@ -85,10 +85,12 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'remove_label': self.remove_label,
         }
 
+        template = 'admin/filer/widgets/admin_file.html'
         if self.custom_preview_width:
             self.update_context_for_custom_preview(context, obj)
+            template = 'admin/filer/widgets/admin_file_custom.html'
 
-        html = render_to_string('admin/filer/widgets/admin_file.html', context)
+        html = render_to_string(template, context)
         return mark_safe(html)
 
     def label_for_value(self, value):
