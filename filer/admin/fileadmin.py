@@ -1,6 +1,12 @@
 #-*- coding: utf-8 -*-
+
 from django import forms
-from django.contrib.admin.util import unquote
+try:
+    # Django <1.9
+    from django.contrib.admin.util import unquote
+except ImportError:
+    # Django 1.9+
+    from django.contrib.admin.utils import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _

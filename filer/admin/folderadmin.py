@@ -1,11 +1,17 @@
 #-*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 from django import forms
 from django import template
 from django.core.exceptions import ValidationError
 from django.contrib.admin import helpers
-from django.contrib.admin.util import quote, unquote, capfirst
+try:
+    # Django <1.9
+    from django.contrib.admin.util import quote, unquote, capfirst
+except ImportError:
+    # Django 1.9+
+    from django.contrib.admin.utils import quote, unquote, capfirst
 from django.contrib import messages
 from django.utils.http import urlquote
 from filer.admin.patched.admin_utils import get_deleted_objects

@@ -10,7 +10,10 @@ At all locations where something has been changed, there are inline comments in 
 """
 from __future__ import unicode_literals
 
-from django.contrib.admin.util import NestedObjects, quote
+try:
+    from django.contrib.admin.util import NestedObjects, quote
+except ImportError:
+    from django.contrib.admin.utils import NestedObjects, quote
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
