@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 from django.utils.encoding import smart_str
@@ -27,21 +28,22 @@ class ServerBase(object):
           file path
         """
         save_as = kwargs.get('save_as', None)
-        if save_as == False:
+        if save_as is False:
             return
         file_obj = kwargs.get('file_obj', None)
-        filename = None
         if save_as is True or save_as is None:
             filename = os.path.basename(file_obj.path)
         else:
             filename = save_as
-        response['Content-Disposition'] = smart_str('attachment; filename=%s' % filename)
+        response['Content-Disposition'] = smart_str(
+            'attachment; filename=%s' % filename)
 
     def size_header(self, response, **kwargs):
         size = kwargs.get('size', None)
-        #file = kwargs.get('file', None)
+        # file = kwargs.get('file', None)
         if size:
             response['Content-Length'] = size
-        # we should not do this, because it accesses the file. and that might be an expensive operation.
+        # we should not do this, because it accesses the file. and that might
+        # be an expensive operation.
         # elif file and file.size is not None:
         #     response['Content-Length'] = file.size

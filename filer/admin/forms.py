@@ -1,10 +1,13 @@
+# -*- coding: utf-8 -*-
+
 from django import forms
-from django.db import models
-from django.contrib.admin import widgets
-from filer.utils.files import get_valid_filename
-from django.utils.translation import ugettext as _
-from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib.admin import widgets
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import ugettext as _
+
+from filer.utils.files import get_valid_filename
 
 
 if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
@@ -25,7 +28,7 @@ class AsPWithHelpMixin(object):
 class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
     suffix = forms.CharField(required=False, help_text=_("Suffix which will be appended to filenames of copied files."))
     # TODO: We have to find a way to overwrite files with different storage backends first.
-    #overwrite_files = forms.BooleanField(required=False, help_text=_("Overwrite a file if there already exists a file with the same filename?"))
+    # overwrite_files = forms.BooleanField(required=False, help_text=_("Overwrite a file if there already exists a file with the same filename?"))
 
     def clean_suffix(self):
         valid = get_valid_filename(self.cleaned_data['suffix'])

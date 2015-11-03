@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from filer.settings import FILER_ADMIN_ICON_SIZES
@@ -14,5 +15,6 @@ class IconsMixin(object):
         r = {}
         if getattr(self, '_icon', False):
             for size in FILER_ADMIN_ICON_SIZES:
-                r[size] = static("filer/icons/%s_%sx%s.png" % (self._icon, size, size))
+                r[size] = static("filer/icons/%s_%sx%s.png" % (
+                    self._icon, size, size))
         return r

@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 import warnings
 
 from django import forms
@@ -18,6 +19,7 @@ from filer import settings as filer_settings
 import logging
 logger = logging.getLogger(__name__)
 
+
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
@@ -30,32 +32,29 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         if value:
             try:
                 file_obj = File.objects.get(pk=value)
-                related_url = file_obj.logical_folder.\
-                                get_admin_directory_listing_url_path()
+                related_url = file_obj.logical_folder.get_admin_directory_listing_url_path()
             except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration
                 if filer_settings.FILER_ENABLE_LOGGING:
-                    logger.error('Error while rendering file widget: %s',e)
+                    logger.error('Error while rendering file widget: %s', e)
                 if filer_settings.FILER_DEBUG:
                     raise
         if not related_url:
             related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()
         if params:
-            lookup_url = '?' + '&amp;'.join(
-                                ['%s=%s' % (k, v) for k, v in list(params.items())])
+            lookup_url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
             lookup_url = ''
-        if not 'class' in attrs:
+        if 'class' not in attrs:
             # The JavaScript looks for this hook.
             attrs['class'] = 'vForeignKeyRawIdAdminField'
         # rendering the super for ForeignKeyRawIdWidget on purpose here because
         # we only need the input and none of the other stuff that
         # ForeignKeyRawIdWidget adds
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(
-                                                            name, value, attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)
         context = {
             'hidden_input': hidden_input,
             'lookup_url': '%s%s' % (related_url, lookup_url),

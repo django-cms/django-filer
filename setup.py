@@ -5,12 +5,8 @@ from __future__ import unicode_literals
 from setuptools import setup, find_packages
 import os
 
-try:
-    from setuptest import test
-except ImportError:
-    from setuptools.command.test import test
-
 version = __import__('filer').__version__
+
 
 def read(fname):
     # read the contents of a text file

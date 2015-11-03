@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 import base64
 import hashlib
 import warnings
@@ -91,7 +92,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
             return self.thumbnail_options['private'].get('base_dir', '')
 
     def save(self, name, content, save=True):
-        content.seek(0) # Ensure we upload the whole file
+        content.seek(0)  # Ensure we upload the whole file
         super(MultiStorageFieldFile, self).save(name, content, save)
 
 
@@ -109,9 +110,9 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
         self.thumbnail_storages = thumbnail_storages or THUMBNAIL_STORAGES
         self.thumbnail_options = thumbnail_options or THUMBNAIL_OPTIONS
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(
-                                      verbose_name=verbose_name, name=name,
-                                      upload_to=generate_filename_multistorage,
-                                      storage=None, **kwargs)
+            verbose_name=verbose_name, name=name,
+            upload_to=generate_filename_multistorage,
+            storage=None, **kwargs)
 
     def value_to_string(self, obj):
         value = super(MultiStorageFileField, self).value_to_string(obj)

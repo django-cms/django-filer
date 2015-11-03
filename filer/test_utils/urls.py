@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.contrib import admin

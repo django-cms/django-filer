@@ -1,15 +1,19 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
+
+import os
 
 from django.core.files import File as DjangoFile
 from django.core.management.base import BaseCommand, NoArgsCommand
+
+from optparse import make_option
+
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.settings import FILER_IS_PUBLIC_DEFAULT
 from filer.utils.compatibility import upath
-from optparse import make_option
-import os
 
 
 class FileImporter(object):
@@ -31,18 +35,18 @@ class FileImporter(object):
             iext = ''
         if iext in ['.jpg', '.jpeg', '.png', '.gif']:
             obj, created = Image.objects.get_or_create(
-                                original_filename=file_obj.name,
-                                file=file_obj,
-                                folder=folder,
-                                is_public=FILER_IS_PUBLIC_DEFAULT)
+                original_filename=file_obj.name,
+                file=file_obj,
+                folder=folder,
+                is_public=FILER_IS_PUBLIC_DEFAULT)
             if created:
                 self.image_created += 1
         else:
             obj, created = File.objects.get_or_create(
-                                original_filename=file_obj.name,
-                                file=file_obj,
-                                folder=folder,
-                                is_public=FILER_IS_PUBLIC_DEFAULT)
+                original_filename=file_obj.name,
+                file=file_obj,
+                folder=folder,
+                is_public=FILER_IS_PUBLIC_DEFAULT)
             if created:
                 self.file_created += 1
         if self.verbosity >= 2:
@@ -69,8 +73,7 @@ class FileImporter(object):
             if created:
                 self.folder_created += 1
                 if self.verbosity >= 2:
-                    print("folder_created #%s folder : %s -- created : %s" % (self.folder_created,
-                                                                               current_parent, created))
+                    print("folder_created #%s folder : %s -- created : %s" % (self.folder_created, current_parent, created))
         return current_parent
 
     def walker(self, path=None, base_folder=None):
@@ -102,10 +105,7 @@ class FileImporter(object):
                                      name=file_obj)
                 self.import_file(file_obj=dj_file, folder=folder)
         if self.verbosity >= 1:
-            print(('folder_created #%s / file_created #%s / ' + \
-                   'image_created #%s') % (
-                                self.folder_created, self.file_created,
-                                self.image_created))
+            print(('folder_created #%s / file_created #%s / ' + 'image_created #%s') % (self.folder_created, self.file_created, self.image_created))
 
 
 class Command(NoArgsCommand):
@@ -127,7 +127,7 @@ class Command(NoArgsCommand):
             dest='base_folder',
             default=False,
             help='Specify the destination folder in which the directory structure should be imported'),
-        )
+    )
 
     def handle_noargs(self, **options):
         file_importer = FileImporter(**options)

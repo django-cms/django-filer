@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 This function is snatched from
 https://github.com/ojii/django-load/blob/3058ab9d9d4875589638cc45e84b59e7e1d7c9c3/django_load/core.py#L49
@@ -8,6 +8,7 @@ local changes:
   or method.
 
 """
+
 from django.utils import six
 from filer.utils.compatibility import import_module
 
@@ -31,8 +32,8 @@ def load_object(import_path):
         return import_path
     if '.' not in import_path:
         raise TypeError(
-            "'import_path' argument to 'django_load.core.load_object' " +\
-            "must contain at least one dot.")
+            "'import_path' argument to 'django_load.core.load_object' must "
+            "contain at least one dot.")
     module_name, object_name = import_path.rsplit('.', 1)
     module = import_module(module_name)
     return getattr(module, object_name)

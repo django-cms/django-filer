@@ -1,13 +1,7 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 import logging
-try:
-    from PIL import Image as PILImage
-except ImportError:
-    try:
-        import Image as PILImage
-    except ImportError:
-        raise ImportError("The Python Imaging Library was not found.")
 
 from django.conf import settings
 from django.db import models

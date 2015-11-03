@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.template import Library
 from django.utils import six
 import re
@@ -16,8 +17,8 @@ def _recalculate_size(size, index, divisor=0, padding=0,
     if padding:
         new_one = new_one - padding
     if keep_aspect_ratio:
-        new_two = int(float(new_one) * \
-                      float(size[int(not index)]) / size[index])
+        new_two = int(
+            float(new_one) * float(size[int(not index)]) / size[index])
     else:
         new_two = int(size[int(not index)])
 

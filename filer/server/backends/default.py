@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import stat
 from django.http import Http404, HttpResponse, HttpResponseNotModified

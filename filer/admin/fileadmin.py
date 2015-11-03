@@ -1,15 +1,10 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from django import forms
-try:
-    # Django <1.9
-    from django.contrib.admin.util import unquote
-except ImportError:
-    # Django 1.9+
-    from django.contrib.admin.utils import unquote
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
+
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File, Image
@@ -45,16 +40,17 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         return super(FileAdmin, self).get_queryset(request)
 
     @classmethod
-    def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(), extra_fieldsets=()):
+    def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(),
+                        extra_fieldsets=()):
         fieldsets = (
             (None, {
-                'fields': ('name', 'owner', 'description',) + extra_main_fields,
+                'fields': ('name', 'owner', 'description', ) + extra_main_fields,  # flake8: noqa
             }),
             (_('Advanced'), {
-                'fields': ('file', 'sha1', 'display_canonical') + extra_advanced_fields,
+                'fields': ('file', 'sha1', 'display_canonical', ) + extra_advanced_fields,  # flake8: noqa
                 'classes': ('collapse',),
-                }),
-            ) + extra_fieldsets
+            }),
+        ) + extra_fieldsets
         if settings.FILER_ENABLE_PERMISSIONS:
             fieldsets = fieldsets + (
                 (None, {
@@ -72,16 +68,16 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         if 'Location' in r and r['Location']:
             # it was a successful save
             if (r['Location'] in ['../'] or
-                r['Location'] == self._get_post_url(obj)):
+                    r['Location'] == self._get_post_url(obj)):
                 # this means it was a save: redirect to the directory view
                 if obj.folder:
                     url = reverse('admin:filer-directory_listing',
                                   kwargs={'folder_id': obj.folder.id})
                 else:
                     url = reverse(
-                            'admin:filer-directory_listing-unfiled_images')
-                url = "%s%s%s" % (url,popup_param(request),
-                                  selectfolder_param(request,"&"))
+                        'admin:filer-directory_listing-unfiled_images')
+                url = "%s%s%s" % (url, popup_param(request),
+                                  selectfolder_param(request, "&"))
                 return HttpResponseRedirect(url)
             else:
                 # this means it probably was a save_and_continue_editing
@@ -92,7 +88,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                            form_url='', obj=None):
         extra_context = {'show_delete': True,
                          'is_popup': popup_status(request),
-                         'select_folder': selectfolder_status(request),}
+                         'select_folder': selectfolder_status(request), }
         context.update(extra_context)
         return super(FileAdmin, self).render_change_form(
             request=request, context=context, add=False, change=False,
@@ -120,8 +116,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
         url = r.get("Location", None)
         # Account for custom Image model
-        image_change_list_url_name = 'admin:{0}_{1}_changelist'.format(Image._meta.app_label,
-                                                                       Image._meta.model_name)
+        image_change_list_url_name = 'admin:{0}_{1}_changelist'.format(
+            Image._meta.app_label, Image._meta.model_name)
         # Check against filer_file_changelist as file deletion is always made by
         # the base class
         if (url in ["../../../../", "../../"] or
@@ -132,8 +128,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-unfiled_images')
-            url = "%s%s%s" % (url,popup_param(request),
-                              selectfolder_param(request,"&"))
+            url = "%s%s%s" % (url, popup_param(request),
+                              selectfolder_param(request, "&"))
             return HttpResponseRedirect(url)
         return r
 

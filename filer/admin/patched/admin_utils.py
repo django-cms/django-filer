@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Copy of ``django.contrib.admin.utils.get_deleted_objects`` and a subclass of
 ``django.contrib.admin.utils.NestedObjects`` that work with djongo_polymorphic querysets.
@@ -10,10 +10,6 @@ At all locations where something has been changed, there are inline comments in 
 """
 from __future__ import unicode_literals
 
-try:
-    from django.contrib.admin.util import NestedObjects, quote
-except ImportError:
-    from django.contrib.admin.utils import NestedObjects, quote
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -75,8 +71,10 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
 
 class PolymorphicAwareNestedObjects(NestedObjects):
-     def collect(self, objs, source_attr=None, **kwargs):
+    def collect(self, objs, source_attr=None, **kwargs):
         if hasattr(objs, 'non_polymorphic'):
-            # .filter() is needed, because there may already be cached polymorphic results in the queryset
+            # .filter() is needed, because there may already be cached
+            # polymorphic results in the queryset
             objs = objs.non_polymorphic().filter()
-        return super(PolymorphicAwareNestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+        return super(PolymorphicAwareNestedObjects, self).collect(
+            objs, source_attr=source_attr, **kwargs)

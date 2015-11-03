@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # https://gist.github.com/114831
 # recursive_dictionary.py
@@ -27,6 +27,7 @@
 from django.utils import six
 
 __author__ = 'jannis@itisme.org (Jannis Andrija Schnitzer)'
+
 
 class RecursiveDictionary(dict):
     """RecursiveDictionary provides the methods rec_update and iter_rec_update

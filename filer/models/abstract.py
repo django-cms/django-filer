@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 import os
 try:
     from PIL import Image as PILImage
@@ -139,7 +140,7 @@ class BaseImage(File):
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration
                 if filer_settings.FILER_ENABLE_LOGGING:
-                    logger.error('Error while generating thumbnail: %s',e)
+                    logger.error('Error while generating thumbnail: %s', e)
                 if filer_settings.FILER_DEBUG:
                     raise
         return _thumbnails

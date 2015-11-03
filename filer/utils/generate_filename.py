@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 try:
@@ -13,6 +15,7 @@ import os
 def by_date(instance, filename):
     datepart = force_text(now().strftime("%Y/%m/%d"))
     return os.path.join(datepart, get_valid_filename(filename))
+
 
 def randomized(instance, filename):
     import uuid

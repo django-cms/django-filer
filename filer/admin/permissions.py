@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
@@ -26,9 +27,11 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
         return self.has_change_permission(request, obj)
 
     def _get_post_url(self, obj):
-        """ Needed to retrieve the changelist url as Folder/File can be extended
-        and admin url may change """
-        ## Code borrowed from django ModelAdmin to determine changelist on the fly
+        """
+        Needed to retrieve the changelist url as Folder/File can be extended
+        and admin url may change
+        """
+        # Code from django ModelAdmin to determine changelist on the fly
         opts = obj._meta
         if DJANGO_1_7:
             model_name = opts.module_name

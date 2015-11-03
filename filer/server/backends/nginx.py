@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from django.http import HttpResponse
 from filer.server.backends.base import ServerBase
 

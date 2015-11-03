@@ -38,7 +38,7 @@ def upath(path):
 
 # copied from django-cms (for compatibility with Django 1.4)
 try:
-    from django.utils.encoding import force_unicode
+    from django.utils.encoding import force_unicode  # flake8: noqa
     def python_2_unicode_compatible(klass):
         """
         A decorator that defines __unicode__ and __str__ methods under Python 2.
@@ -52,12 +52,12 @@ try:
         return klass
 except ImportError:
     force_unicode = lambda s: str(s)
-    from django.utils.encoding import python_2_unicode_compatible
+    from django.utils.encoding import python_2_unicode_compatible  # flake8: noqa
 
 
 def get_delete_permission(opts):
     try:
-        from django.contrib.auth import get_permission_codename
+        from django.contrib.auth import get_permission_codename  # flake8: noqa
         return '%s.%s' % (opts.app_label,
                           get_permission_codename('delete', opts))
     except ImportError:
@@ -65,13 +65,13 @@ def get_delete_permission(opts):
                           opts.get_delete_permission())
 
 try:
-    from django.contrib.admin.utils import unquote, quote, NestedObjects, capfirst
+    from django.contrib.admin.utils import unquote, quote, NestedObjects, capfirst  # flake8: noqa
 except ImportError:
     # django < 1.7
-    from django.contrib.admin.util import unquote, quote, NestedObjects, capfirst
+    from django.contrib.admin.util import unquote, quote, NestedObjects, capfirst  # flake8: noqa
 
 try:
-    from importlib import import_module
+    from importlib import import_module  # flake8: noqa
 except ImportError:
     # python < 2.7
-    from django.utils.importlib import import_module
+    from django.utils.importlib import import_module  # flake8: noqa

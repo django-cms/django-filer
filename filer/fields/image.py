@@ -1,6 +1,8 @@
-#-*- coding: utf-8 -*-
-from filer.fields.file import AdminFileWidget, AdminFileFormField, \
-    FilerFileField
+# -*- coding: utf-8 -*-
+
+from filer.fields.file import (
+    AdminFileWidget, AdminFileFormField, FilerFileField
+)
 from filer.models import Image
 
 

@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import re
 try:
     from PIL import Image
@@ -11,7 +11,10 @@ except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from django.utils import six
 from easy_thumbnails import processors
-from filer.settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG, FILER_WHITESPACE_COLOR
+from filer.settings import (
+    FILER_SUBJECT_LOCATION_IMAGE_DEBUG,
+    FILER_WHITESPACE_COLOR,
+)
 
 RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 
@@ -30,8 +33,9 @@ def normalize_subject_location(subject_location):
     return False
 
 
-def scale_and_crop_with_subject_location(im, size, subject_location=False, zoom=None,
-                                         crop=False, upscale=False, **kwargs):
+def scale_and_crop_with_subject_location(im, size, subject_location=False,
+                                         zoom=None, crop=False, upscale=False,
+                                         **kwargs):
     """
     Like ``easy_thumbnails.processors.scale_and_crop``, but will use the
     coordinates in ``subject_location`` to make sure that that part of the
@@ -141,11 +145,12 @@ def whitespace(image, size, whitespace=False, whitespace_color=None, **kwargs):
 
     image = Image.new('RGBA', (target_x, target_y), whitespace_color)
     if source_x < target_x and source_y < target_y:  # whitespace all around
-        image.paste(old_image, ((target_x-source_x)/2, (target_y-source_y)/2))
+        image.paste(old_image, (
+            (target_x - source_x) / 2, (target_y - source_y) / 2))
     elif source_x < target_x:  # whitespace on top and bottom only
-        image.paste(old_image, ((target_x-source_x)/2, 0))
+        image.paste(old_image, ((target_x - source_x) / 2, 0))
     elif source_y < target_y:  # whitespace on sides only
-        image.paste(old_image, (0, (target_y-source_y)/2))
+        image.paste(old_image, (0, (target_y - source_y) / 2))
     else:  # no whitespace needed
         image = old_image
 

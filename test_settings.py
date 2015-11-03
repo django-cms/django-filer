@@ -53,7 +53,8 @@ HELPER_SETTINGS = {
     ),
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'FILER_IMAGE_MODEL': False,
-    'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'test_utils', 'templates'),),
+    'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer',
+                                   'test_utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
 
 }

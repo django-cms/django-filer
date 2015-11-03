@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 try:
     from PIL import Image
     from PIL import ExifTags

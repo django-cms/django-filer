@@ -1,10 +1,10 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 from easy_thumbnails.files import Thumbnailer
 import os
 import re
-from filer import settings as filer_settings
 
 # match the source filename using `__` as the seperator. ``opts_and_ext`` is non
 # greedy so it should match the last occurence of `__`.
@@ -59,7 +59,7 @@ class ThumbnailerNameMixin(object):
         basedir = self.thumbnail_basedir
         subdir = self.thumbnail_subdir
 
-        #make sure our magic delimiter is not used in all_opts
+        # make sure our magic delimiter is not used in all_opts
         all_opts = all_opts.replace('__', '_')
         if high_resolution:
             try:

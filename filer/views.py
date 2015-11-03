@@ -62,7 +62,8 @@ def canonical(request, uploaded_at, file_id):
     Redirect to the current url of a public file
     """
     filer_file = get_object_or_404(File, pk=file_id, is_public=True)
-    if uploaded_at != filer_file.uploaded_at.strftime('%s') or not filer_file.file:
+    if (uploaded_at != filer_file.uploaded_at.strftime('%s') or
+            not filer_file.file):
         raise Http404('No %s matches the given query.' % File._meta.object_name)
     return redirect(filer_file.url)
 
@@ -115,7 +116,8 @@ def make_folder(request, folder_id=None):
         if new_folder_form.is_valid():
             new_folder = new_folder_form.save(commit=False)
             if (folder or FolderRoot()).contains_folder(new_folder.name):
-                new_folder_form._errors['name'] = new_folder_form.error_class([_('Folder with this name already exists.')])
+                new_folder_form._errors['name'] = new_folder_form.error_class(
+                    [_('Folder with this name already exists.')])
             else:
                 new_folder.parent = folder
                 new_folder.owner = request.user

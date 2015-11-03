@@ -1,7 +1,9 @@
-from django.conf import settings
+# -*- coding: utf-8 -*-
+
 from django.template import Library
 
 register = Library()
+
 
 def filer_actions(context):
     """

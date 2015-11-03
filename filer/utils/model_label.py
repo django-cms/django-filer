@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.utils import six
 
 

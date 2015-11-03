@@ -1,9 +1,11 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 import json
 from django.forms.models import modelform_factory
 from django.contrib import admin
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem
 from filer.utils.compatibility import DJANGO_1_4
@@ -50,7 +52,7 @@ class ClipboardAdmin(admin.ModelAdmin):
     @csrf_exempt
     def ajax_upload(self, request, folder_id=None):
         """
-        receives an upload from the uploader. Receives only one file at the time.
+        Receives an upload from the uploader. Receives only one file at a time.
         """
         mimetype = "application/json" if request.is_ajax() else "text/html"
         content_type_key = 'mimetype' if DJANGO_1_4 else 'content_type'
@@ -64,7 +66,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             # find the file type
             for filer_class in filer_settings.FILER_FILE_MODELS:
                 FileSubClass = load_object(filer_class)
-                #TODO: What if there are more than one that qualify?
+                # TODO: What if there are more than one that qualify?
                 if FileSubClass.matches_file_type(filename, upload, request):
                     FileForm = modelform_factory(
                         model=FileSubClass,
@@ -92,9 +94,12 @@ class ClipboardAdmin(admin.ModelAdmin):
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
-                    ', '.join(errors)) for field, errors in list(uploadform.errors.items())
+                    ', '.join(errors)) for field, errors in list(
+                        uploadform.errors.items())
                 ])
-                raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
+                raise UploadException(
+                    "AJAX request not valid: form invalid '%s'" % (
+                        form_errors,))
         except UploadException as e:
             return HttpResponse(json.dumps({'error': str(e)}),
                                 **response_params)

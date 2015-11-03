@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from filer.utils.loader import load_object
@@ -6,7 +7,7 @@ from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 import os
 
 FILER_IMAGE_MODEL = getattr(settings, 'FILER_IMAGE_MODEL', False)
-FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False) # When True makes
+FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False)  # When True makes
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 FILER_WHITESPACE_COLOR = getattr(settings, 'FILER_WHITESPACE_COLOR', '#FFFFFF')
 
@@ -14,9 +15,10 @@ FILER_0_8_COMPATIBILITY_MODE = getattr(settings, 'FILER_0_8_COMPATIBILITY_MODE',
 
 FILER_ENABLE_LOGGING = getattr(settings, 'FILER_ENABLE_LOGGING', False)
 if FILER_ENABLE_LOGGING:
-    FILER_ENABLE_LOGGING = (FILER_ENABLE_LOGGING and (getattr(settings,'LOGGING') and
-                                                      ('' in settings.LOGGING['loggers'] or
-                                                       'filer' in settings.LOGGING['loggers'])))
+    FILER_ENABLE_LOGGING = (
+        FILER_ENABLE_LOGGING and (getattr(settings, 'LOGGING') and
+                                  ('' in settings.LOGGING['loggers'] or
+                                   'filer' in settings.LOGGING['loggers'])))
 
 FILER_ENABLE_PERMISSIONS = getattr(settings, 'FILER_ENABLE_PERMISSIONS', False)
 FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS = getattr(settings, 'FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS', False)
@@ -24,18 +26,15 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
-FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES",(
+FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES", (
     '16', '32', '48', '64',
-    ))
+))
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
-FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS',
-    (
-        FILER_IMAGE_MODEL if FILER_IMAGE_MODEL else 'filer.models.imagemodels.Image',
-        'filer.models.filemodels.File',
-    )
-)
+FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS', (
+    FILER_IMAGE_MODEL if FILER_IMAGE_MODEL else 'filer.models.imagemodels.Image',
+        'filer.models.filemodels.File',))
 
 DEFAULT_FILE_STORAGE = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
 
@@ -44,23 +43,23 @@ MINIMAL_FILER_STORAGES = {
         'main': {
             'ENGINE': None,
             'OPTIONS': {},
-            },
+        },
         'thumbnails': {
             'ENGINE': None,
             'OPTIONS': {},
-            }
+        }
     },
     'private': {
         'main': {
             'ENGINE': None,
             'OPTIONS': {},
-            },
+        },
         'thumbnails': {
             'ENGINE': None,
             'OPTIONS': {},
-            },
         },
-    }
+    },
+}
 
 
 DEFAULT_FILER_STORAGES = {
@@ -163,17 +162,18 @@ else:
 
 FILER_STORAGES.rec_update(user_filer_storages)
 
+
 def update_storage_settings(user_settings, defaults, s, t):
     if not user_settings[s][t]['ENGINE']:
         user_settings[s][t]['ENGINE'] = defaults[s][t]['ENGINE']
         user_settings[s][t]['OPTIONS'] = defaults[s][t]['OPTIONS']
     if t == 'main':
-        if not 'UPLOAD_TO' in user_settings[s][t]:
+        if 'UPLOAD_TO' not in user_settings[s][t]:
             user_settings[s][t]['UPLOAD_TO'] = defaults[s][t]['UPLOAD_TO']
-        if not 'UPLOAD_TO_PREFIX' in user_settings[s][t]:
+        if 'UPLOAD_TO_PREFIX' not in user_settings[s][t]:
             user_settings[s][t]['UPLOAD_TO_PREFIX'] = defaults[s][t]['UPLOAD_TO_PREFIX']
     if t == 'thumbnails':
-        if not 'THUMBNAIL_OPTIONS' in user_settings[s][t]:
+        if 'THUMBNAIL_OPTIONS' not in user_settings[s][t]:
             user_settings[s][t]['THUMBNAIL_OPTIONS'] = defaults[s][t]['THUMBNAIL_OPTIONS']
     return user_settings
 
@@ -185,6 +185,7 @@ update_storage_settings(FILER_STORAGES, DEFAULT_FILER_STORAGES, 'private', 'thum
 FILER_SERVERS = RecursiveDictionaryWithExcludes(MINIMAL_FILER_SERVERS, rec_excluded_keys=('OPTIONS',))
 FILER_SERVERS.rec_update(getattr(settings, 'FILER_SERVERS', {}))
 
+
 def update_server_settings(settings, defaults, s, t):
     if not settings[s][t]['ENGINE']:
         settings[s][t]['ENGINE'] = defaults[s][t]['ENGINE']
@@ -193,7 +194,6 @@ def update_server_settings(settings, defaults, s, t):
 
 update_server_settings(FILER_SERVERS, DEFAULT_FILER_SERVERS, 'private', 'main')
 update_server_settings(FILER_SERVERS, DEFAULT_FILER_SERVERS, 'private', 'thumbnails')
-
 
 
 # Public media (media accessible without any permission checks)
@@ -218,4 +218,3 @@ FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = load_object(FILER_SERVERS['private']['thum
 FILER_DUMP_PAYLOAD = getattr(settings, 'FILER_DUMP_PAYLOAD', False)  # Whether the filer shall dump the files payload
 
 FILER_CANONICAL_URL = getattr(settings, 'FILER_CANONICAL_URL', 'canonical/')
-

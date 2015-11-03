@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 import hashlib
@@ -62,8 +63,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
     is_public = models.BooleanField(
         default=filer_settings.FILER_IS_PUBLIC_DEFAULT,
         verbose_name=_('Permissions disabled'),
-        help_text=_('Disable any permission checking for this ' +\
-                    'file. File will be publicly accessible ' +\
+        help_text=_('Disable any permission checking for this '
+                    'file. File will be publicly accessible '
                     'to anyone.'))
 
     objects = FileManager()

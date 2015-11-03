@@ -1,6 +1,8 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.exceptions import ValidationError
@@ -8,7 +10,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+
 from filer.models import mixins
 from filer import settings as filer_settings
 from filer.utils.compatibility import python_2_unicode_compatible
@@ -109,7 +111,7 @@ class Folder(models.Model, mixins.IconsMixin):
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('modified at'),auto_now=True)
+    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
 
     objects = FolderManager()
 
@@ -147,7 +149,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def pretty_logical_path(self):
-        return "/%s" % "/".join([f.name for f in self.logical_path+[self]])
+        return "/%s" % "/".join([f.name for f in self.logical_path + [self]])
 
     @property
     def quoted_logical_path(self):
@@ -291,8 +293,8 @@ class FolderPermission(models.Model):
                 perms.append('!%s' % s)
         perms = ', '.join(perms)
         return "Folder: '%s'->%s [%s] [%s]" % (
-                        name, self.get_type_display(),
-                        perms, usergroup)
+            name, self.get_type_display(),
+            perms, usergroup)
 
     def clean(self):
         if self.type == self.ALL and self.folder:

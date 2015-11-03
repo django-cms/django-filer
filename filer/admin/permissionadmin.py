@@ -1,18 +1,18 @@
-#-*- coding: utf-8 -*-
-import inspect
+# -*- coding: utf-8 -*-
+
 from django.contrib import admin
+
 from filer import settings
 from filer.fields import folder
 
 
 class PermissionAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': (('type', 'folder',))}),
-        (None, {'fields': (('user', 'group', 'everybody'),)}),
+        (None, {'fields': (('type', 'folder', ))}),
+        (None, {'fields': (('user', 'group', 'everybody'), )}),
         (None, {'fields': (
-                    ('can_edit', 'can_read', 'can_add_children')
-                    )}
-        ),
+            ('can_edit', 'can_read', 'can_add_children')
+        )}),
     )
     raw_id_fields = ('user', 'group',)
     list_filter = ['user']

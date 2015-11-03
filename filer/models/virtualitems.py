@@ -1,10 +1,12 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
+
+from filer import settings as filer_settings
 from filer.models import mixins
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
-from filer import settings as filer_settings
 
 
 class DummyFolder(mixins.IconsMixin):
@@ -53,7 +55,7 @@ class UnfiledImages(DummyFolder):
 
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse(
-                            'admin:filer-directory_listing-unfiled_images')
+            'admin:filer-directory_listing-unfiled_images')
 
 
 class ImagesWithMissingData(DummyFolder):
@@ -67,7 +69,7 @@ class ImagesWithMissingData(DummyFolder):
 
     def get_admin_directory_listing_url_path(self):
         return urlresolvers.reverse(
-                    'admin:filer-directory_listing-images_with_missing_data')
+            'admin:filer-directory_listing-images_with_missing_data')
 
 
 class FolderRoot(DummyFolder):

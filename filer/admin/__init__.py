@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.contrib import admin
 from filer.admin.clipboardadmin import ClipboardAdmin
 from filer.admin.fileadmin import FileAdmin
