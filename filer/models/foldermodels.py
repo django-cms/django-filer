@@ -291,7 +291,7 @@ class FolderPermission(models.Model):
                 perms.append('!%s' % s)
         perms = ', '.join(perms)
         return "Folder: '%s'->%s [%s] [%s]" % (
-                        name, str(self.TYPES[self.type][1]),
+                        name, self.get_type_display(),
                         perms, usergroup)
 
     def clean(self):

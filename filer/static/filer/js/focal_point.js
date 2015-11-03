@@ -3,6 +3,7 @@ $(function(){
 	var PAPER_WIDTH, PAPER_HEIGTH;
 	var paper, ratio;
 	var isDrag = false;
+	var image_loaded = false;
     var dragger = function (e) {
 		this.dx = e.clientX;
         this.dy = e.clientY;
@@ -58,8 +59,7 @@ $(function(){
 		$("#id_subject_location").val(x === undefined ? '' : parseInt(parseInt(x)*ratio) + ',' + parseInt(parseInt(y)*ratio) );
 	}
 	
-	
-	$('#image_container img').load(function(){
+	function image_init(){
 		PAPER_WIDTH = $('#image_container img').width();
 		PAPER_HEIGTH = $('#image_container img').height();
 		$('#image_container').height(PAPER_HEIGTH + 'px');
@@ -75,6 +75,17 @@ $(function(){
 			y = parseInt(parseInt(location.split(',')[1])/ratio);		
 		}
 		add(x, y);
+		image_loaded = true
+	}
+	$(document).ready(function() {
+		$('#image_container img').load(image_init);
+		// If image has not been loaded after 250ms after pageload,
+		// assume it's allready loaded and try initializing.
+		window.setTimeout(function() {
+			if (!image_loaded) {
+				image_init();
+			}
+		},250);
 	});
 });
 })(django.jQuery);

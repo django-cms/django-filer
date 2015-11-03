@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from django import forms
-from django.utils.translation import ugettext  as _
-from filer import settings as filer_settings, settings
+from django.utils.translation import ugettext as _
+from filer import settings as filer_settings
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
 
@@ -42,7 +42,7 @@ class ImageAdmin(FileAdmin):
 
 
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
-    extra_main_fields=('default_alt_text', 'default_caption',),
+    extra_main_fields=('author', 'default_alt_text', 'default_caption',),
     extra_fieldsets=(
         ('Subject Location', {
             'fields': ('subject_location',),

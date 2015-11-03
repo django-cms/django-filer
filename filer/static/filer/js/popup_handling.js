@@ -9,10 +9,14 @@
 		var txt_name = name + '_description_txt';
 		var clear_name = name + '_clear';
 		var elem = document.getElementById(name);
+		var old_id = elem.value;
 		document.getElementById(name).value = chosenId;
 		document.getElementById(img_name).src = chosenThumbnailUrl;
 		document.getElementById(txt_name).innerHTML = chosenDescriptionTxt;
 		document.getElementById(clear_name).style.display = 'inline';
+		if (old_id != chosenId) {
+			$(elem).trigger('change');
+		}
 		win.close();
 	};
 	dismissRelatedFolderLookupPopup = function(win, chosenId, chosenName) {
@@ -22,4 +26,4 @@
 		document.getElementById(id_name).innerHTML = chosenName;
 		win.close();
 	};
-})(jQuery);
+})(django.jQuery);

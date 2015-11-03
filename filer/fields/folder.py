@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.safestring import mark_safe
 from filer.utils.compatibility import truncate_words
+from filer.utils.model_label import get_model_label
 from django.utils.translation import ugettext as _
 from filer.models import Folder
 from filer.settings import FILER_STATICMEDIA_PREFIX
@@ -18,7 +19,7 @@ from filer.settings import FILER_STATICMEDIA_PREFIX
 class AdminFolderWidget(ForeignKeyRawIdWidget):
     choices = None
     input_type = 'hidden'
-    is_hidden = True
+    is_hidden = False
 
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
@@ -108,14 +109,16 @@ class FilerFolderField(models.ForeignKey):
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
-        if "to" in kwargs.keys():
-            old_to = kwargs.pop("to")
-            msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                self.__class__.__name__, self.default_model_class.__name__, old_to
-            )
-            warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = self.default_model_class
-        return super(FilerFolderField, self).__init__(**kwargs)
+        dfl = get_model_label(self.default_model_class)
+        if "to" in kwargs.keys():  # pragma: no cover
+            old_to = get_model_label(kwargs.pop("to"))
+            if old_to != dfl:
+                msg = "%s can only be a ForeignKey to %s; %s passed" % (
+                    self.__class__.__name__, dfl, old_to
+                )
+                warnings.warn(msg, SyntaxWarning)
+        kwargs['to'] = dfl
+        super(FilerFolderField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults

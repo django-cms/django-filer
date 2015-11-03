@@ -1,10 +1,42 @@
 Changelog for django-filer
 ==========================
 
-next
+
+0.9.12 (2015-07-28)
+-------------------
+
+* various bugfixes
+* better Django 1.7 and 1.8 support
+
+0.9.11 (2015-06-09)
+-------------------
+
+* update Django 1.7 migrations because of change in django_polymorphic>=0.7
+
+
+0.9.10 (2015-05-31)
+-------------------
+
+* migrations in default locations for Django 1.7 and South>=1.0
+* jQuery isolation fixes
+* various bugfixes
+
+
+0.9.9 (2015-01-20)
 ------------------
 
-* ...
+* Fixes in Django 1.7 support
+* Implement PEP440 compliant
+* Add author to admin
+* Allow customizing dismiss popup
+* Add order_by parameter in directory listing
+
+
+0.9.8 (2014-11-03)
+------------------
+
+* experimental Django 1.7 support
+* bugfixes
 
 
 1.0.0 (2015-11-03)
@@ -92,7 +124,7 @@ next
 * backwards incompatible changes
   * storage refactor: path to private files in the db has changed (no longer relative to MEDIA_ROOT)
   * `filer.server.urls` needs to be included to serve private files
-  * static media has been moved from 'media' to 'static' 
+  * static media has been moved from 'media' to 'static'
     (as proposed by django.contrib.staticfiles and django 1.3)
   * django 1.2 no longer supported
 

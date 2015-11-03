@@ -1,19 +1,22 @@
 #-*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import hashlib
+import os
+
 from django.core import urlresolvers
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from polymorphic import PolymorphicModel, PolymorphicManager
+
+from filer import settings as filer_settings
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
-from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
-from filer.utils.compatibility import python_2_unicode_compatible
-from polymorphic import PolymorphicModel, PolymorphicManager
-import hashlib
-import os
+from filer.utils.compatibility import python_2_unicode_compatible, DJANGO_1_7
 
 
 class FileManager(PolymorphicManager):
@@ -216,9 +219,13 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_url_path(self):
+        if DJANGO_1_7:
+            model_name = self._meta.module_name
+        else:
+            model_name = self._meta.model_name
         return urlresolvers.reverse(
             'admin:%s_%s_change' % (self._meta.app_label,
-                                    self._meta.module_name,),
+                                    model_name,),
             args=(self.pk,)
         )
 

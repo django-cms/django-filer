@@ -12,7 +12,6 @@ except ImportError:
 
 version = __import__('filer').__version__
 
-
 def read(fname):
     # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -33,7 +32,8 @@ setup(
         'Django>=1.5',
         'easy-thumbnails>=1.0',
         'django-mptt>=0.6',
-        'django_polymorphic>=0.2',
+        'django_polymorphic>=0.7',
+        'Unidecode>=0.04',
     ),
     include_package_data=True,
     zip_safe=False,
@@ -51,7 +51,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
-    test_suite='runtests.main',
+    test_suite='cms_helper.run',
     tests_require=(
         'argparse',  # needed on python 2.6
         'south',

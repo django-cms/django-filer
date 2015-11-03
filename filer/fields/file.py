@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from filer.utils.compatibility import truncate_words
+from filer.utils.model_label import get_model_label
 from filer.models import File
 from filer import settings as filer_settings
 
@@ -84,7 +85,10 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media:
-        js = (filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
+        js = (
+            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',
+            filer_settings.FILER_STATICMEDIA_PREFIX + 'js/widget.js',
+        )
 
 
 class AdminFileFormField(forms.ModelChoiceField):
@@ -97,7 +101,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        super(AdminFileFormField, self).__init__(self, widget=self.widget(rel, site), *args, **kwargs)
+        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -110,14 +114,16 @@ class FilerFileField(models.ForeignKey):
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
-        if "to" in kwargs.keys():
-            old_to = kwargs.pop("to")
-            msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                self.__class__.__name__, self.default_model_class.__name__, old_to
-            )
-            warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = self.default_model_class
-        return super(FilerFileField, self).__init__(**kwargs)
+        dfl = get_model_label(self.default_model_class)
+        if "to" in kwargs.keys():  # pragma: no cover
+            old_to = get_model_label(kwargs.pop("to"))
+            if old_to != dfl:
+                msg = "%s can only be a ForeignKey to %s; %s passed" % (
+                    self.__class__.__name__, dfl, old_to
+                )
+                warnings.warn(msg, SyntaxWarning)
+        kwargs['to'] = dfl
+        super(FilerFileField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults

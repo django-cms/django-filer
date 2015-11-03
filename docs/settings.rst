@@ -17,7 +17,7 @@ Defaults to ``False``
 
 Should newly uploaded files have permission checking disabled (be public) by default.
 
-Defaults to ``False`` (new files have permission checking disable, are public)
+Defaults to ``True`` (new files have permission checking disable, are public)
 
 .. _FILER_STATICMEDIA_PREFIX:
 
@@ -49,6 +49,7 @@ e.g::
                     'base_url': '/smedia/filer/',
                 },
                 'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
+                'UPLOAD_TO_PREFIX': 'filer_public',
             },
             'thumbnails': {
                 'ENGINE': 'filer.storage.PublicFileSystemStorage',
@@ -66,6 +67,7 @@ e.g::
                     'base_url': '/smedia/filer/',
                 },
                 'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
+                'UPLOAD_TO_PREFIX': 'filer_public',
             },
             'thumbnails': {
                 'ENGINE': 'filer.storage.PrivateFileSystemStorage',
@@ -131,5 +133,14 @@ Defaults to ``False``
 
 Regular users are not allowed to create new folders at the root level, only
 subfolders of already existing folders, unless this setting is set to ``True``.
+
+Defaults to ``False``
+
+
+``FILER_IMAGE_MODEL``
+---------------------
+
+Defines the dotted path to a custom Image model; please include the model name.
+Example: 'my.app.models.CustomImage'
 
 Defaults to ``False``
