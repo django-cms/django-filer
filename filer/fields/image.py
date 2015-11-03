@@ -7,7 +7,7 @@ from filer.models import Image
 class AdminImageWidget(AdminFileWidget):
 
     def get_custom_preview_image(self, obj):
-        return obj.url
+        return obj.url if obj else None
 
 
 class AdminImageFormField(AdminFileFormField):

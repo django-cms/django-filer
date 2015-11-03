@@ -85,7 +85,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'remove_label': self.remove_label,
         }
 
-        if self.custom_preview_width and obj:
+        if self.custom_preview_width:
             self.update_context_for_custom_preview(context, obj)
 
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
@@ -110,7 +110,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return context
 
     def get_custom_preview_image(self, obj):
-        return obj.icons['32']
+        return obj.icons['32'] if obj else None
 
     class Media:
         js = (filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)
