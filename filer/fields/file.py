@@ -24,6 +24,15 @@ logger = logging.getLogger(__name__)
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
+    def __init__(self, *args, **kwargs):
+        super(AdminFileWidget, self).__init__(*args, **kwargs)
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.custom_preview_width = None
+        self.search_label = None
+        self.remove_label = None
+
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
@@ -72,7 +81,13 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'filer_static_prefix': filer_static_prefix,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
+            'search_label': self.search_label,
+            'remove_label': self.remove_label,
         }
+
+        if self.custom_preview_width and obj:
+            self.update_context_for_custom_preview(context, obj)
+
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
 
@@ -87,6 +102,15 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         except:
             obj = None
         return obj
+
+    def update_context_for_custom_preview(self, context, obj):
+        context['custom_preview'] = True
+        context['custom_preview_width'] = self.custom_preview_width
+        context['custom_preview_image'] = self.get_custom_preview_image(obj=obj)
+        return context
+
+    def get_custom_preview_image(self, obj):
+        return obj.icons['32']
 
     class Media:
         js = (filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)

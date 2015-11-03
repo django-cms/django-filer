@@ -1,6 +1,9 @@
 {% load i18n filer_admin_tags %}{% spaceless %}
 {% if object %}
-	{% if object.icons.32 %}
+        {% if custom_preview %}
+		<a href="{{ object.url }}" target="_blank"><img width="{{ custom_preview_width  }}px" id="{{ thumb_id }}" src="{{ custom_preview_image }}" alt="{{ object.label }}" /></a>
+		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+        {% elif object.icons.32 %}
 		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.32 }}" alt="{{ object.label }}" /></a>
 		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
 	{% else %}
@@ -12,9 +15,14 @@
 	&nbsp;<span id="{{ span_id }}"></span>
 {% endif %}
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedFilerObjectLookupPopup(this);">
-	<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
+	{% if search_label %}
+		{{ search_label }}
+	{% else %}
+		<img src="{% admin_icon_base %}icon_searchbox.png" width="16" height="16" alt="{% trans 'Lookup' %}" />
+	{% endif %}
 </a>
-<i id="{{ clear_id }}" {% if not object %} style="display: none;"{% endif %} class="ace-icon fa fa-times red"></i>
+
+<i id="{{ clear_id }}" {% if not object %} style="display: none;"{% endif %} class="ace-icon fa fa-times red"> {{ remove_label  }}</i>
 <br />
 {{ hidden_input }}
 <script type="text/javascript">
