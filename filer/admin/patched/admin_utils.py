@@ -24,7 +24,8 @@ except ImportError:
     # Django < 1.5
     from django.utils.encoding import force_unicode as force_text
 
-from filer.utils.compatibility import get_delete_permission
+from filer.utils.compatibility import (get_delete_permission, NestedObjects,
+                                       quote)
 
 
 def get_deleted_objects(objs, opts, user, admin_site, using):

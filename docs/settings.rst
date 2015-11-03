@@ -19,18 +19,6 @@ Should newly uploaded files have permission checking disabled (be public) by def
 
 Defaults to ``True`` (new files have permission checking disable, are public)
 
-.. _FILER_STATICMEDIA_PREFIX:
-
-``FILER_STATICMEDIA_PREFIX``
-----------------------------
-
-The prefix for static media where filer will look for bundled javascript, css
-and images.
-
-Defaults to ``<STATIC_URL>/filer/`` if ``STATIC_URL`` is defined. Otherwise
-falls back to ``<MEDIA_URL>/filer/``. It is the URL where the ``static/filer/`` 
-directory should be served.
-
 .. _FILER_STORAGES:
 
 ``FILER_STORAGES``
@@ -144,3 +132,12 @@ Defines the dotted path to a custom Image model; please include the model name.
 Example: 'my.app.models.CustomImage'
 
 Defaults to ``False``
+
+
+``FILER_CANONICAL_URL``
+-----------------------
+
+Defines the path element common to all canonical file URLs.
+
+Defaults to ``'canonical/'``
+

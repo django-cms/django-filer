@@ -1,9 +1,8 @@
 {% extends "admin/delete_confirmation.html" %}
-{% load i18n filermedia %}
-{% load url from future %}
+{% load i18n staticfiles %}
 
 {% block extrastyle %}{{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% filer_staticmedia_prefix %}css/admin_style.css" />
+    <link rel="stylesheet" type="text/css" href="{% static "filer/css/admin_style.css" %}"/>
 {% endblock %}
 
 {% block breadcrumbs %}

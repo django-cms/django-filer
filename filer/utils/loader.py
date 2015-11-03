@@ -9,10 +9,7 @@ local changes:
 
 """
 from django.utils import six
-try:
-    from django.utils.importlib import import_module
-except ImportError:
-    from importlib import import_module
+from filer.utils.compatibility import import_module
 
 
 def load_object(import_path):

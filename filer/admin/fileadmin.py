@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File, Image
-from filer.utils.compatibility import DJANGO_1_5
+from filer.utils.compatibility import DJANGO_1_5, unquote
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
@@ -29,7 +29,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_per_page = 10
     search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
-    readonly_fields = ('sha1',)
+    readonly_fields = ('sha1', 'display_canonical')
 
     # save_as hack, because without save_as it is impossible to hide the
     # save_and_add_another if save_as is False. To show only save_and_continue
@@ -51,7 +51,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 'fields': ('name', 'owner', 'description',) + extra_main_fields,
             }),
             (_('Advanced'), {
-                'fields': ('file', 'sha1',) + extra_advanced_fields,
+                'fields': ('file', 'sha1', 'display_canonical') + extra_advanced_fields,
                 'classes': ('collapse',),
                 }),
             ) + extra_fieldsets
@@ -146,5 +146,14 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             'change': False,
             'delete': False,
         }
+
+    def display_canonical(self, instance):
+        canonical = instance.canonical_url
+        if canonical:
+            return '<a href="%s">%s</a>' % (canonical, canonical)
+        else:
+            return '-'
+    display_canonical.allow_tags = True
+    display_canonical.short_description = _('canonical URL')
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()
