@@ -3,16 +3,24 @@
         document.location.reload();
         win.close();
     };
-    dismissRelatedImageLookupPopup = function(win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt) {
+    dismissRelatedImageLookupPopup = function(win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt, file_url) {
         var name = windowname_to_id(win.name);
         var img_name = name + '_thumbnail_img';
         var txt_name = name + '_description_txt';
         var clear_name = name + '_clear';
+	var link_name = name + '_link_to_file';
         var elem = document.getElementById(name);
         document.getElementById(name).value = chosenId;
         document.getElementById(img_name).src = chosenThumbnailUrl;
-        document.getElementById(txt_name).innerHTML = chosenDescriptionTxt;
+        description = document.getElementById(txt_name);
+	if (description) {
+	    description.innerHTML = chosenDescriptionTxt;
+	}
         document.getElementById(clear_name).style.display = 'inline';
+	link = document.getElementById(link_name);
+	if (link && file_url) {
+	    link.href = file_url;
+	}
         win.close();
     };
     dismissRelatedFolderLookupPopup = function(win, chosenId, chosenName) {

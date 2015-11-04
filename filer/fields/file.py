@@ -38,6 +38,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
+        css_id_link_to_file = "%s_link_to_file" % css_id
         related_url = None
         if value:
             try:
@@ -76,6 +77,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'lookup_url': '%s%s' % (related_url, lookup_url),
             'thumb_id': css_id_thumbnail_img,
             'span_id': css_id_description_txt,
+            'link_id': css_id_link_to_file,
             'object': obj,
             'lookup_name': name,
             'filer_static_prefix': filer_static_prefix,
