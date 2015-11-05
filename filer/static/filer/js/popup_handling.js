@@ -11,7 +11,13 @@
 	var link_name = name + '_link_to_file';
         var elem = document.getElementById(name);
         document.getElementById(name).value = chosenId;
-        document.getElementById(img_name).src = chosenThumbnailUrl;
+        img_element = document.getElementById(img_name);
+	use_full_image = img_element.attributes["data-use-full-image"];
+	if (use_full_image === undefined || !file_url) {
+	    img_element.src = chosenThumbnailUrl;
+	} else {
+	    img_element.src = file_url;
+	}
         description = document.getElementById(txt_name);
 	if (description) {
 	    description.innerHTML = chosenDescriptionTxt;
