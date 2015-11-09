@@ -60,21 +60,6 @@ next
 * bugfixes
 
 
-1.0.0 (2015-11-03)
-------------------
-
-* Substantial UI/UX overhaul
-* Fixes some Django 1.9 issues
-* Drop support for Django older than v1.5
-* Fixes urls for changed files
-* Fixes an issue with KeyErrors during saving folder
-* Provides support for configuring the canonical URLs
-* Abandons FILER_STATICMEDIA_PREFIX in favor of Django's MEDIA_ROOT
-* Fixes searching for folders
-* Adds checkerboard-tile backgrounds to illustrate transparency in thumbnails
-* Other fixes
-
-
 0.9.7 (2014-07-22)
 ------------------
 
