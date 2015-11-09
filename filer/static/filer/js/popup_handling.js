@@ -18,7 +18,7 @@
 	} else {
 	    img_element.src = file_url;
 	}
-	img.element.classList.remove("no-filer-image")
+	img_element.classList.remove("no-filer-image")
         description = document.getElementById(txt_name);
 	if (description) {
 	    description.innerHTML = chosenDescriptionTxt;
