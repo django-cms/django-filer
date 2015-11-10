@@ -10,14 +10,17 @@
 {% endwith %}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static "filer/css/admin_style.css" %}" />
+{% block extrastyle %}
+	{{ block.super }}
+	<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_style.css' %}">
 {% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 
 {% block after_field_sets %}
-    {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+    {% if is_popup and select_folder %}
+    	<input type="hidden" name="select_folder" value="1">
+    {% endif %}
 {% endblock %}
 
 {% block sidebar %}
@@ -27,7 +30,9 @@
 			{% if duplicates %}
 				<h3>{% trans 'duplicates' %}</h3>
 				<ul>
-					{% for duplicate in duplicates %}<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>{% endfor %}
+					{% for duplicate in duplicates %}
+						<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>
+					{% endfor %}
 				</ul>
 			{% endif %}
 		{% endwith %}

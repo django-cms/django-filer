@@ -2,36 +2,40 @@
 {% load i18n admin_modify staticfiles %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-   <a href="{% url 'admin:index' %}" title="{% trans "Go back to" %} {% trans "admin homepage" %}">{% trans "Home" %}</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans "Go back to" %} {% trans "Filer" %}"> {% trans "Filer" %}</a>
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans "Go back to" %} '{% trans "root"|title %}' {% trans "folder" %}">{% trans "root"|title %}</a>
-    {% for ancestor_folder in original.get_ancestors %}
-    &rsaquo; <a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a>
-    {% endfor %}
-    &rsaquo; {{ original.name }}
-</div>
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}" title="{% trans 'Go back to' %} {% trans 'admin homepage' %}">{% trans "Home" %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to' %} {% trans 'Filer' %}"> {% trans "Filer" %}</a>
+        &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to' %} '{% trans 'root'|title %}' {% trans 'folder' %}">{% trans "root"|title %}</a>
+        {% for ancestor_folder in original.get_ancestors %}
+            &rsaquo; <a href="{% url 'admin:filer-directory_listing' ancestor_folder.id %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{{ ancestor_folder.name }}</a>
+        {% endfor %}
+        &rsaquo; {{ original.name }}
+    </div>
 {% endblock %}
 
-
 {% block coltype %}{% if is_popup %}colM{% else %}colMS{% endif %}{% endblock %}
+
 {% block object-tools %}
-{% if change %}{% if not is_popup %}
-  <ul class="object-tools">
-      <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-  </ul>
-{% endif %}{% endif %}
+    {% if change and not is_popup %}
+        <ul class="object-tools">
+            <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+            {% if has_absolute_url %}
+                <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
+            {% endif%}
+        </ul>
+    {% endif %}
 {% endblock %}
 
 {% block after_field_sets %}
-{% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+    {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1">{% endif %}
 {% endblock %}
 
-{% block sidebar %}{% if not is_popup %}
-<div id="content-related">
-    <div id="navcontainer">
-        <img src="{% static "icons/plainfolder_128x128.png" %}" alt="{% trans "Folder Icon" %}" />
-    </div>
-</div>
-{% endif %}{% endblock %}
+{% block sidebar %}
+    {% if not is_popup %}
+        <div id="content-related">
+            <div id="navcontainer">
+                <img src="{% static 'icons/plainfolder_128x128.png' %}" alt="{% trans 'Folder Icon' %}" />
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
