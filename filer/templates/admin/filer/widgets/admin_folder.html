@@ -14,13 +14,13 @@
     <br>
     {{ hidden_input }}
     <script type="text/javascript">django.jQuery("#{{ id }}").hide();
-        django.jQuery("#{{ id }}_clear").click(function(){
-            django.jQuery("#{{ id }}").removeAttr("value");
-            django.jQuery("#{{ foldid }}").attr("src", "{% static noimg %}");
-            django.jQuery("#{{ descid }}").html("");
+        django.jQuery('#{{ id }}_clear').click(function(){
+            django.jQuery('#{{ id }}').removeAttr('value');
+            django.jQuery('#{{ foldid }}').attr('src', '{% static noimg %}');
+            django.jQuery('#{{ descid }}').empty();
         });
         django.jQuery(document).ready(function(){
-            var plus = django.jQuery("#add_{{ id }}");
+            var plus = django.jQuery('#add_{{ id }}');
             if (plus.length){
                 plus.remove();
             }
