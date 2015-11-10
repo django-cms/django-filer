@@ -28,7 +28,7 @@
 	{% block file_sidebar %}
 		{% with original.duplicates as duplicates %}
 			{% if duplicates %}
-				<h3>{% trans 'duplicates' %}</h3>
+				<h3>{% trans "duplicates" %}</h3>
 				<ul>
 					{% for duplicate in duplicates %}
 						<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>

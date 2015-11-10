@@ -8,7 +8,7 @@
                 &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
             {% else %}
                 <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
-                &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
+                &nbsp;<span id="{{ span_id }}">{% trans "file missing" %}</span>
             {% endif %}
         {% else %}
             <img id="{{ thumb_id }}" src="{% static 'filer/icons/nofile_48x48.png' %}" class="quiet" alt="{% trans 'no file selected' %}">

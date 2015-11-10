@@ -36,7 +36,7 @@
                     if (file.error) {
                         html =
                         '<td class="thumbnail">' +
-                            '<img style="width: 32px;height: 32px;" src="{% static "static/icons/missingfile_32x32.png" %}" alt="{% filter escapejs %}{% trans "file missing" %}{% endfilter %}">' +
+                            '<img style="width: 32px;height: 32px;" src="{% static 'static/icons/missingfile_32x32.png' %}" alt="{% filter escapejs %}{% trans "file missing" %}{% endfilter %}">' +
                         '</td>' +
                         '<td class="label">' + file.error + '</td>' +
                         '<td class="buttons"></td>';
