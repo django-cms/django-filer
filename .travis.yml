@@ -26,10 +26,10 @@ env:
   - DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
   - DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
+  - FRONTEND="true"
 
 script:
-  - coverage run --rcfile=coverage.rc test_settings.py
-  # - gulp ci
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.4' && FRONTEND == "true" ]]; then gulp ci; else coverage run --rcfile=coverage.rc test_settings.py; fi
 
 after_success:
   - coveralls --config_file=coverage.rc
@@ -47,6 +47,12 @@ matrix:
       env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
     - python: 2.6
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
+    - python: 2.6
+      env: FRONTEND="true"
+    - python: 2.7
+      env: FRONTEND="true"
+    - python: 3.3
+      env: FRONTEND="true"
   allow_failures:
     - python: 2.7
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
