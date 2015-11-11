@@ -7,6 +7,7 @@ var autoprefixer = require('gulp-autoprefixer');
 var sourcemaps = require('gulp-sourcemaps');
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
+var stylish = require('jshint-stylish');
 
 var PROJECT_ROOT = __dirname;
 var PROJECT_PATH = {
@@ -42,15 +43,15 @@ gulp.task('scss:watch', function () {
 // LINTING
 gulp.task('lint', function () {
     return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(jshint())
-        .pipe(jscs())
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter(stylish))
+        .pipe(jscs('.jscsrc'))
         .on('error', function (error) {
             gutil.log('\n' + error.message);
             if (process.env.CI) {
                 process.exit(1);
             }
-        })
-        .pipe(jshint.reporter('jshint-stylish'));
+        });
 });
 
 gulp.task('lint:watch', function () {
