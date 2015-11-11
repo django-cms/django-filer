@@ -59,3 +59,4 @@ gulp.task('lint:watch', function () {
 
 gulp.task('compile', ['scss']);
 gulp.task('watch', ['scss:watch', 'lint:watch']);
+gulp.task('ci', ['lint']);
