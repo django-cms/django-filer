@@ -13,7 +13,7 @@
     <img id="{{ clear_id }}" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
     <br>
     {{ hidden_input }}
-    <script type="text/javascript">django.jQuery("#{{ id }}").hide();
+    <script type="text/javascript">django.jQuery('#{{ id }}').hide();
         django.jQuery('#{{ id }}_clear').click(function(){
             django.jQuery('#{{ id }}').removeAttr('value');
             django.jQuery('#{{ foldid }}').attr('src', '{% static noimg %}');
