@@ -54,7 +54,7 @@ matrix:
     - python: 3.4
       env: FRONTEND="true"
   allow_failures:
-    # - env: FRONTEND="true"
+    - env: FRONTEND="true"
     - python: 2.7
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
     - python: 3.3
