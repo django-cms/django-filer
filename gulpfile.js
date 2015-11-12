@@ -10,13 +10,13 @@ var stylish = require('jshint-stylish');
 
 var PROJECT_ROOT = __dirname;
 var PROJECT_PATH = {
-    'scss': PROJECT_ROOT + '/filer/private/sass/',
+    'sass': PROJECT_ROOT + '/filer/private/sass/',
     'css': PROJECT_ROOT + '/filer/static/filer/css/',
     'js': PROJECT_ROOT + '/filer/static/filer/js/'
 };
 
 var PROJECT_PATTERNS = {
-    'scss': PROJECT_PATH.scss + '**/*.scss',
+    'sass': PROJECT_PATH.sass + '**/*.scss',
     'lint': [
         PROJECT_PATH.js + '**/*.js',
         PROJECT_ROOT + '/gulpfile.js'
@@ -24,9 +24,9 @@ var PROJECT_PATTERNS = {
 };
 
 // #############################################################################
-// SCSS
-gulp.task('scss', function () {
-    gulp.src(PROJECT_PATTERNS.scss)
+// sass
+gulp.task('sass', function () {
+    gulp.src(PROJECT_PATTERNS.sass)
         .pipe(sourcemaps.init())
         .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
         .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
@@ -34,8 +34,8 @@ gulp.task('scss', function () {
         .pipe(gulp.dest(PROJECT_PATH.css));
 });
 
-gulp.task('scss:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.scss, ['scss']);
+gulp.task('sass:watch', function () {
+    gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
 });
 
 // #############################################################################
@@ -57,21 +57,23 @@ gulp.task('jscs:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, ['jscs']);
 });
 
-gulp.task('lint', function () {
+gulp.task('jshint', function () {
     return gulp.src(PROJECT_PATTERNS.lint)
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('lint:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.lint, ['lint']);
+gulp.task('jshint:watch', function () {
+    gulp.watch(PROJECT_PATTERNS.lint, ['jshint']);
 });
+
+gulp.task('js', ['jshint', 'jscs']);
 
 gulp.task('js:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.lint, ['lint', 'jscs']);
+    gulp.watch(PROJECT_PATTERNS.lint, ['js']);
 });
 
-gulp.task('compile', ['scss']);
-gulp.task('watch', ['scss:watch', 'lint:watch']);
-gulp.task('ci', ['lint', 'jscs']);
+gulp.task('watch', ['sass:watch', 'js:watch']);
+gulp.task('lint', ['js']);
+gulp.task('default', ['js', 'sass', 'js:watch', 'sass:watch']);
