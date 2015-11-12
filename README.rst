@@ -91,6 +91,10 @@ To run javascript linting and code styling analysis:
 
 ``gulp ci``
 
+To run javascript linting and code styling analysis watcher:
+
+``gulp js:watch``
+
 To run javascript linting:
 
 ``gulp lint``

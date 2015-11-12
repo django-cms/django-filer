@@ -65,6 +65,10 @@ gulp.task('lint', function () {
 });
 
 gulp.task('lint:watch', function () {
+    gulp.watch(PROJECT_PATTERNS.lint, ['lint']);
+});
+
+gulp.task('js:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, ['lint', 'jscs']);
 });
 
