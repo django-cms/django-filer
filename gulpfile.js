@@ -40,17 +40,21 @@ gulp.task('scss:watch', function () {
 
 // #############################################################################
 // LINTING
+gulp.task('jscs', function () {
+    return gulp.src(PROJECT_PATTERNS.lint)
+        .pipe(jscs())
+        .pipe(jscs.reporter())
+        .pipe(jscs.reporter('fail'));
+});
+
 gulp.task('jscs:fix', function () {
     return gulp.src(PROJECT_PATH.js + '**/*.js')
         .pipe(jscs({fix: true}))
         .pipe(gulp.dest(PROJECT_PATH.js));
 });
 
-gulp.task('jscs', function () {
-    return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(jscs())
-        .pipe(jscs.reporter())
-        .pipe(jscs.reporter('fail'));
+gulp.task('jscs:watch', function () {
+    gulp.watch(PROJECT_PATTERNS.lint, ['jscs']);
 });
 
 gulp.task('lint', function () {

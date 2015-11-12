@@ -87,13 +87,29 @@ To run scss watcher:
 
 ``gulp scss:watch``
 
-To lint javascript code:
+To run javascript linting and code styling analysis:
+
+``gulp ci``
+
+To run javascript linting:
 
 ``gulp lint``
 
 To run javascript linter watcher:
 
 ``gulp lint:watch``
+
+To run javascript code style analysis:
+
+``gulp jscs``
+
+To run javascript code style analysis watcher:
+
+``gulp jscs:watch``
+
+To fix javascript code style errors:
+
+``gulp jscs:fix``
 
 
 .. _Django: http://djangoproject.com
