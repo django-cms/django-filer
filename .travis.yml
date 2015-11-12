@@ -29,7 +29,7 @@ env:
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
 
 script:
-  - if [ $TRAVIS_PYTHON_VERSION == "3.4" -a $FRONTEND == "true" ]; then gulp ci; else coverage run --rcfile=coverage.rc test_settings.py; fi;
+  - if [[ $TRAVIS_PYTHON_VERSION = "3.4" && $FRONTEND = "true" ]]; then gulp ci; else coverage run --rcfile=coverage.rc test_settings.py; fi;
 
 after_success:
   - coveralls --config_file=coverage.rc
