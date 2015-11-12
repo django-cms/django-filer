@@ -79,21 +79,44 @@ To started development fron-end part of ``django-filer`` simply install all the 
 
 ``npm install``
 
+To compile and watch scss and run jshint and jscs watchers:
+``gulp``
+
 To compile scss to css:
 
-``gulp scss`` or ``gulp compile``
+``gulp sass``
 
-To run scss watcher:
+To run sass watcher:
 
-``gulp scss:watch``
+``gulp sass:watch``
 
-To lint javascript code:
+To run javascript linting and code styling analysis:
 
 ``gulp lint``
 
-To run javascript linter watcher:
+To run javascript linting and code styling analysis watcher:
 
 ``gulp lint:watch``
+
+To run javascript linting:
+
+``gulp jshint``
+
+To run javascript linter watcher:
+
+``gulp jshint:watch``
+
+To run javascript code style analysis:
+
+``gulp jscs``
+
+To run javascript code style analysis watcher:
+
+``gulp jscs:watch``
+
+To fix javascript code style errors:
+
+``gulp jscs:fix``
 
 
 .. _Django: http://djangoproject.com
