@@ -3,7 +3,6 @@
   "private": true,
   "devDependencies": {
     "gulp": "3.9.*",
-    "gulp-util": "3.0.*",
     "gulp-autoprefixer": "3.1.*",
     "gulp-jscs": "3.0.*",
     "gulp-jshint": "1.12.*",
