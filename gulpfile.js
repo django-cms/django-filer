@@ -1,12 +1,12 @@
 'use strict';
 
 var gulp = require('gulp');
-var gutil = require('gulp-util');
 var sass = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var sourcemaps = require('gulp-sourcemaps');
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
+var stylish = require('jshint-stylish');
 
 var PROJECT_ROOT = __dirname;
 var PROJECT_PATH = {
@@ -40,22 +40,30 @@ gulp.task('scss:watch', function () {
 
 // #############################################################################
 // LINTING
+gulp.task('jscs:fix', function () {
+    return gulp.src(PROJECT_PATH.js + '**/*.js')
+        .pipe(jscs({fix: true}))
+        .pipe(gulp.dest(PROJECT_PATH.js));
+});
+
+gulp.task('jscs', function () {
+    return gulp.src(PROJECT_PATTERNS.lint)
+        .pipe(jscs())
+        .pipe(jscs.reporter())
+        .pipe(jscs.reporter('fail'));
+});
+
 gulp.task('lint', function () {
     return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(jshint())
-        .pipe(jscs())
-        .on('error', function (error) {
-            gutil.log('\n' + error.message);
-            if (process.env.CI) {
-                process.exit(1);
-            }
-        })
-        .pipe(jshint.reporter('jshint-stylish'));
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter(stylish))
+        .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('lint:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.lint, ['lint']);
+    gulp.watch(PROJECT_PATTERNS.lint, ['lint', 'jscs']);
 });
 
 gulp.task('compile', ['scss']);
 gulp.task('watch', ['scss:watch', 'lint:watch']);
+gulp.task('ci', ['lint', 'jscs']);
