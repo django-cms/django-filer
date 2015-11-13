@@ -19,7 +19,8 @@ var PROJECT_PATTERNS = {
     'sass': PROJECT_PATH.sass + '**/*.scss',
     'lint': [
         PROJECT_PATH.js + '**/*.js',
-        PROJECT_ROOT + '/gulpfile.js'
+        PROJECT_ROOT + '/gulpfile.js',
+        '!' + PROJECT_PATH.js + '**/*.min.js'
     ]
 };
 
@@ -48,7 +49,7 @@ gulp.task('jscs', function () {
 });
 
 gulp.task('jscs:fix', function () {
-    return gulp.src(PROJECT_PATH.js + '**/*.js')
+    return gulp.src([PROJECT_PATH.js + '**/*.js', '!' + PROJECT_PATH.js + '**/*.min.js'])
         .pipe(jscs({fix: true}))
         .pipe(gulp.dest(PROJECT_PATH.js));
 });
