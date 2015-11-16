@@ -3,7 +3,7 @@
 
 (function ($) {
     $(function () {
-        var PAPER_WIDTH, PAPER_HEIGTH;
+        var paperWidth, pagerHeight;
         var paper, ratio;
         var isDrag = false;
         var image_loaded = false;
@@ -13,6 +13,7 @@
             isDrag = this;
             this.animate({'fill-opacity': 0.3, 'fill': '#fffccc'}, 500);
         };
+        var imageContainerImage = $('#image_container img');
         var focalPoint;
 
         document.onmousemove = function (e) {
@@ -39,8 +40,8 @@
             var el;
 
             if (isNaN(x)) {
-                x = PAPER_WIDTH / 2;
-                y = PAPER_HEIGTH / 2;
+                x = paperWidth / 2;
+                y = pagerHeight / 2;
             }
             el = paper.circle(x, y, 15);
             el.attr('fill', '#fff');
@@ -64,17 +65,17 @@
                 .val(x === undefined ? '' : parseInt(parseInt(x) * ratio) + ',' + parseInt(parseInt(y) * ratio));
         }
 
-        function image_init() {
+        function imageInit() {
             var location = $('#id_subject_location').val();
             var x, y;
 
-            PAPER_WIDTH = $('#image_container img').width();
-            PAPER_HEIGTH = $('#image_container img').height();
-            $('#image_container').height(PAPER_HEIGTH + 'px');
+            paperWidth = imageContainerImage.width();
+            pagerHeight = imageContainerImage.height();
+            $('#image_container').height(pagerHeight + 'px');
 
             // interface
-            ratio = parseFloat($('#image_container img').attr('rel'));
-            paper = new Raphael(document.getElementById('paper'), PAPER_WIDTH, PAPER_HEIGTH);
+            ratio = parseFloat(imageContainerImage.attr('rel'));
+            paper = new Raphael(document.getElementById('paper'), paperWidth, pagerHeight);
 
             // read location from form
             if (location) {
@@ -84,15 +85,14 @@
             add(x, y);
             image_loaded = true;
         }
-        $(document).ready(function () {
-            $('#image_container img').load(image_init);
-            // If image has not been loaded after 250ms after pageload,
-            // assume it's allready loaded and try initializing.
-            window.setTimeout(function () {
-                if (!image_loaded) {
-                    image_init();
-                }
-            }, 250);
-        });
+
+        imageContainerImage.load(imageInit);
+        // If image has not been loaded after 250ms after pageload,
+        // assume it's allready loaded and try initializing.
+        window.setTimeout(function () {
+            if (!image_loaded) {
+                imageInit();
+            }
+        }, 250);
     });
 })(django.jQuery);
