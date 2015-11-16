@@ -13,6 +13,7 @@
             isDrag = this;
             this.animate({'fill-opacity': 0.3, 'fill': '#fffccc'}, 500);
         };
+        var focalPoint;
 
         document.onmousemove = function (e) {
             e = e || window.event;
@@ -34,14 +35,14 @@
             isDrag = false;
         };
 
-        var focalPoint;
-
         function add(x, y) {
+            var el;
+
             if (isNaN(x)) {
                 x = PAPER_WIDTH / 2;
                 y = PAPER_HEIGTH / 2;
             }
-            var el = paper.circle(x, y, 15);
+            el = paper.circle(x, y, 15);
             el.attr('fill', '#fff');
             el.attr('fill-opacity', 0.2);
             el.attr('stroke', '#c00');
@@ -59,10 +60,14 @@
         };
 
         function updatePosition(x, y) {
-            $('#id_subject_location').val(x === undefined ? '' : parseInt(parseInt(x) * ratio) + ',' + parseInt(parseInt(y) * ratio));
+            $('#id_subject_location')
+                .val(x === undefined ? '' : parseInt(parseInt(x) * ratio) + ',' + parseInt(parseInt(y) * ratio));
         }
 
         function image_init() {
+            var location = $('#id_subject_location').val();
+            var x, y;
+
             PAPER_WIDTH = $('#image_container img').width();
             PAPER_HEIGTH = $('#image_container img').height();
             $('#image_container').height(PAPER_HEIGTH + 'px');
@@ -70,9 +75,8 @@
             // interface
             ratio = parseFloat($('#image_container img').attr('rel'));
             paper = new Raphael(document.getElementById('paper'), PAPER_WIDTH, PAPER_HEIGTH);
+
             // read location from form
-            var location = $('#id_subject_location').val();
-            var x, y;
             if (location) {
                 x = parseInt(parseInt(location.split(',')[0]) / ratio);
                 y = parseInt(parseInt(location.split(',')[1]) / ratio);
