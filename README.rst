@@ -80,6 +80,7 @@ To started development fron-end part of ``django-filer`` simply install all the 
 ``npm install``
 
 To compile and watch scss and run jshint and jscs watchers:
+
 ``gulp``
 
 To compile scss to css:
