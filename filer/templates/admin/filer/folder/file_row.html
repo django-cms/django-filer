@@ -2,7 +2,7 @@
 <td class="center">
 
     {% if is_popup and not select_folder %}
-        <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.32|escapejs }}', '{{ file.label|escapejs }}', '{{ file.url }}'); return false;" title="{% trans "Select this file" %}"><i class="ace-icon fa fa-long-arrow-up bigger-125 blue"></i></a>
+        <a class="insertlink insertlinkButton" href="" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id }}, '{{ file.icons.32|escapejs }}', '{{ file.label|escapejs }}', '{{ file.url|escapejs }}'); return false;" title="{% trans "Select this file" %}"><i class="ace-icon fa fa-long-arrow-up bigger-125 blue"></i></a>
     {% else %}
         {% if action_form and not is_popup and not file|is_readonly_for_user:user %}
             <input type="checkbox" class="action-select ace" value="file-{{ file.pk }}" name="_selected_action"/><span class="lbl"></span>
