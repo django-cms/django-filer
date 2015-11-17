@@ -8,26 +8,26 @@
         var img_name = name + '_thumbnail_img';
         var txt_name = name + '_description_txt';
         var clear_name = name + '_clear';
-	var link_name = name + '_link_to_file';
+        var link_name = name + '_link_to_file';
         var elem = document.getElementById(name);
         document.getElementById(name).value = chosenId;
-        img_element = document.getElementById(img_name);
-	use_full_image = img_element.attributes["data-use-full-image"];
-	if (use_full_image === undefined || !file_url) {
-	    img_element.src = chosenThumbnailUrl;
-	} else {
-	    img_element.src = file_url;
-	}
-	img_element.classList.remove("no-filer-image")
-        description = document.getElementById(txt_name);
-	if (description) {
-	    description.innerHTML = chosenDescriptionTxt;
-	}
+        var img_element = document.getElementById(img_name);
+        var use_full_image = img_element.attributes["data-use-full-image"];
+        if (!use_full_image || !file_url) {
+            img_element.src = chosenThumbnailUrl;
+        } else {
+            img_element.src = file_url;
+        }
+        img_element.classList.remove("no-filer-image")
+        var description = document.getElementById(txt_name);
+        if (description) {
+            description.innerHTML = chosenDescriptionTxt;
+        }
         document.getElementById(clear_name).style.display = 'inline';
-	link = document.getElementById(link_name);
-	if (link && file_url) {
-	    link.href = file_url;
-	}
+        var link = document.getElementById(link_name);
+        if (link && file_url) {
+            link.href = file_url;
+        }
         win.close();
     };
     dismissRelatedFolderLookupPopup = function(win, chosenId, chosenName) {
