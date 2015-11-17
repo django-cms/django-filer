@@ -24,11 +24,21 @@ logger = logging.getLogger(__name__)
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
+    def __init__(self, *args, **kwargs):
+        super(AdminFileWidget, self).__init__(*args, **kwargs)
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.custom_preview_width = None
+        self.search_label = None
+        self.remove_label = None
+
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
+        css_id_link_to_file = "%s_link_to_file" % css_id
         related_url = None
         if value:
             try:
@@ -67,13 +77,22 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'lookup_url': '%s%s' % (related_url, lookup_url),
             'thumb_id': css_id_thumbnail_img,
             'span_id': css_id_description_txt,
+            'link_id': css_id_link_to_file,
             'object': obj,
             'lookup_name': name,
             'filer_static_prefix': filer_static_prefix,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
+            'search_label': self.search_label,
+            'remove_label': self.remove_label,
         }
-        html = render_to_string('admin/filer/widgets/admin_file.html', context)
+
+        template = 'admin/filer/widgets/admin_file.html'
+        if self.custom_preview_width:
+            self.update_context_for_custom_preview(context, obj)
+            template = 'admin/filer/widgets/admin_file_custom.html'
+
+        html = render_to_string(template, context)
         return mark_safe(html)
 
     def label_for_value(self, value):
@@ -87,6 +106,15 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         except:
             obj = None
         return obj
+
+    def update_context_for_custom_preview(self, context, obj):
+        context['custom_preview'] = True
+        context['custom_preview_width'] = self.custom_preview_width
+        context['custom_preview_image'] = self.get_custom_preview_image(obj=obj)
+        return context
+
+    def get_custom_preview_image(self, obj):
+        return obj.icons['32'] if obj else None
 
     class Media:
         js = (filer_settings.FILER_STATICMEDIA_PREFIX + 'js/popup_handling.js',)

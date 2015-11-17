@@ -1,14 +1,22 @@
+{% comment "Template for file widget" %}
+	Changes made here should also be considered for the customizable version
+	admin_file_custom.html.
+{% endcomment %}
 {% load i18n filer_admin_tags %}{% spaceless %}
 {% if object %}
 	{% if object.icons.32 %}
-		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.32 }}" alt="{{ object.label }}" /></a>
+		<a id="{{ link_id }}" href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.32 }}" alt="{{ object.label }}" /></a>
 		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
 	{% else %}
-		<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
+		<a id="{{ link_id }}" href="javascript:void(0)" target="_blank">
+			<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/missingfile_48x48.png" alt="{% trans 'file missing' %}" />
+		</a>
 		&nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
 	{% endif %}
 {% else %}
-	<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
+	<a id="{{ link_id }}" href="javascript:void(0)" target="_blank">
+		<img id="{{ thumb_id }}" src="{{ filer_static_prefix }}icons/nofile_48x48.png" class="quiet" alt="{% trans 'no file selected' %}" />
+	</a>
 	&nbsp;<span id="{{ span_id }}"></span>
 {% endif %}
 <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedFilerObjectLookupPopup(this);">
@@ -26,10 +34,7 @@
 		django.jQuery("#{{ clear_id }}").hide();
 	});
 	django.jQuery(document).ready(function(){
-		var plus = django.jQuery("#add_{{ id }}");
-		if (plus.length){
-			plus.remove();
-		}
+		django.jQuery("#add_{{ id }}").remove();
 	});
 </script>
 {% endspaceless %}
