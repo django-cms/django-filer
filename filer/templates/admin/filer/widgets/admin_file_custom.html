@@ -49,10 +49,7 @@
 		django.jQuery("#{{ clear_id }}").hide();
 	});
 	django.jQuery(document).ready(function(){
-		var plus = django.jQuery("#add_{{ id }}");
-		if (plus.length){
-			plus.remove();
-		}
+		django.jQuery("#add_{{ id }}").remove();
 	});
 </script>
 {% endspaceless %}
