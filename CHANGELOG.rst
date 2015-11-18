@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+Revision 8cd8cf3 (18.11.2015, 08:15 UTC)
+----------------------------------------
+
+* LUN-2744
+
+  * Review: Refactored code that should be dead. Kept because not sure of intention.
+  * Review: identation & remove global variables.
+  * Review: Handle invalid urls.
+  * Add marker css class to show if a image is selected or not.
+  * Use full image size when widget is customized.
+  * Fix bug with file link not changing.
+  * Reworked customizable file widget to have a separate template.
+  * Refactored templates to separate custom image widget preview.
+  * custom preview- buttons updated
+  * Use widget customization for default case.
+  * Add option in file widget to enlarge preview and customize labels.
+
+* Misc commits
+
+  * fixed misspelling from js file
+
 Revision 47a0d53 (28.10.2015, 12:04 UTC)
 ----------------------------------------
 
