@@ -3,5 +3,24 @@
 
 {% block extrastyle %}
     {{ block.super }}
+
     <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    {# upload stuff #}
+    {{ media.js }}
+    <script src="{% static 'admin/js/jquery.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/jquery.cookie.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/fileuploader.min.js' %}"></script>
+    <script src="{% static 'filer/js/libs/retina.min.js' %}"></script>
+    <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
+    <script src="{% static 'filer/js/addons/popup_handling.js' %}"></script>
+
+    <script src="{% static 'filer/js/addons/mediator.min.js' %}"></script>
+    <script src="{% static 'filer/js/libs/raphael.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/focal_point.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
 {% endblock %}

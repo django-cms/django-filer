@@ -4,14 +4,6 @@
 {% block extrahead %}
     {{ block.super }}
 
-    {# upload stuff #}
-    {{ media.js }}
-    <script type="text/javascript" src="{% static 'admin/js/jquery.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'filer/js/addons/jquery.cookie.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'filer/js/addons/fileuploader.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'filer/js/libs/retina.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
-    <script type="text/javascript" src="{% static 'filer/js/addons/popup_handling.js' %}"></script>
     {% if action_form and actions_on_top or actions_on_bottom %}
         <script type="text/javascript">
             (function($) {
