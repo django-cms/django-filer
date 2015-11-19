@@ -1,61 +1,150 @@
 {% load i18n %}
 
-{% for clipboard in user.filer_clipboards.all %}
-<div class="clipboard">
-    <table style="width: 100%; border: 1px solid #DDDDDD;" xmlns="http://www.w3.org/1999/html"
-           xmlns="http://www.w3.org/1999/html">
-        <thead>
-            <tr>
-                <th colspan="3">{% trans "Clipboard" %}</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <td colspan="3">
-                    <form action="{% url 'admin:filer-paste_clipboard_to_folder' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="folder_id" value="{{ folder.id }}">
-                        <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}">
-                        <input type="hidden" name="redirect_to" value="{{ current_url }}">
-                        {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
-                        {% if select_folder %}<input type="hidden" name="select_folder" value="1">{% endif %}
-                        <button class="pastelink" type="submit" {% if folder.is_root or not permissions.has_add_children_permission %} disabled="disabled" style="color: gray;"{% endif %} title="{% trans 'Paste all items here' %}"><span>&lArr;</span>&nbsp;Paste</button>
-                    </form>
-                    <form action="{% url 'admin:filer-discard_clipboard' %}" method="post" style="display: inline;">{% csrf_token %}
-                        <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}">
-                        <input type="hidden" name="redirect_to" value="{{ current_url }}">
-                        {% if is_popup %}
-                            <input type="hidden" name="_popup" value="1">
-                        {% endif %}
-                        {% if select_folder %}
-                            <input type="hidden" name="select_folder" value="1">
-                        {% endif %}
-                        <button class="deletelink" type="submit" title="{% trans 'Move all clipboard files to' %} &#39;{% trans 'unfiled files' %}&#39; {% trans 'folder' %}"><span>{% trans "Empty Clipboard" %}</span></button>
-                    </form>
-                    {% comment %}
-                    <form action="{% url 'admin:filer-delete_clipboard' %}" method="post" style="display: inline;">{% csrf_token %}
-                        <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}">
-                        <input type="hidden" name="redirect_to" value="{{ current_url }}">
-                        {% if is_popup %}
-                            <input type="hidden" name="_popup" value="1">
-                        {% endif %}
-                        <button class="deletelink" type="submit" title="{% trans 'Delete all files in the clipboard' %}"><span>{% trans "delete files" %}</span></button>
-                    </form>
-                    {% endcomment %}
-                </td>
-            </tr>
-        </tfoot>
-        <tbody id="fileInputQueue" class="fileUploadQueue">
-            {% if clipboard.files.count %}
-                {% with clipboard.files.all as items %}
-                    {% include "admin/filer/tools/clipboard/clipboard_item_rows.html" %}
-                {% endwith %}
-            {% else %}
-                <tr class="noItemsRow">
-                    <td colspan="3" style="color: gray;text-align: center; height: 48px; vertical-align: middle;">{% trans "the clipboard is empty" %}</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
-{% endfor %}
+<section class="image-info">
+    <a class="image-info-close"><span class="fa fa-times"></span></a>
+
+    <div class="image-info-title">
+        holiday-foto.jpg
+        <a href="#" class="fa fa-pencil"></a>
+    </div>
+
+    <div class="image-preview-container">
+        <!-- Old stuff here, will be replaced soon -->
+        <div class="image-preview js-focal-point" id="image_container">
+            <img src="http://lorempixel.com/210/266" rel="4.638095" width="210" height="266">
+            <div class="js-focal-point-paper" id="paper">&nbsp;</div>
+            <input type="hidden" class="js-focal-point-location">
+        </div>
+        <!-- End of old stuff -->
+
+        <div class="text-right">
+            <a href="http://lorempixel.com/210/266" class="btn">Full size preview</a>
+        </div>
+    </div>
+
+    <ul class="image-details">
+        <li class="row">
+            <div class="col-sm-4">
+                Type
+            </div>
+            <div class="col-sm-8">
+                Image
+            </div>
+        </li>
+
+        <li class="row">
+            <div class="col-sm-4">
+                Size
+            </div>
+            <div class="col-sm-8">
+                1765x1249 px
+            </div>
+        </li>
+
+        <li class="row">
+            <div class="col-sm-4">
+                File-size
+            </div>
+            <div class="col-sm-8">
+                2.3 MB
+            </div>
+        </li>
+
+        <li class="row">
+            <div class="col-sm-4">
+                Modified
+            </div>
+            <div class="col-sm-8">
+                25/10/2015 8:02 PM
+            </div>
+        </li>
+
+        <li class="row">
+            <div class="col-sm-4">
+                Created
+            </div>
+            <div class="col-sm-8">
+                25/10/2015 8:02 PM
+            </div>
+        </li>
+    </ul>
+
+    <div class="image-actions">
+        <ul class="actions-list">
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-lock"></span>
+                    <span class="text">This file is public</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-user"></span>
+                    <span class="text">Owner: User</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-font"></span>
+                    <span class="text">Add Description</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="actions-list-dropdown">
+            Advanced
+            <span class="fa fa-caret-down"></span>
+            <span class="fa fa-caret-up hidden"></span>
+        </div>
+
+        <ul class="actions-list">
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-user"></span>
+                    <span class="text">Author: User</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-font"></span>
+                    <span class="text">Add Alt-Text</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-font"></span>
+                    <span class="text">Add caption</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-font"></span>
+                    <span class="text">Add Tags</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-picture-o"></span>
+                    <span class="text">Change File</span>
+                    <span class="icon fa fa-pencil"></span>
+                </a>
+            </li>
+        </ul>
+        <ul class="actions-list">
+            <li>
+                <a href="#">
+                    <span class="icon fa fa-trash"></span>
+                    <span class="text">Delete</span>
+                </a>
+        </ul>
+    </div>
+</section>
