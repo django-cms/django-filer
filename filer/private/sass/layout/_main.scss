@@ -53,13 +53,29 @@
 .image-preview-container {
     margin: 10px 0;
     padding: 0 10px;
+    text-align: center;
     .image-preview {
+        display: inline-block;
+        position: relative;
         margin-bottom: 15px;
         outline: 1px solid #e3e3e3;
         background-image: url('data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7');
-        &:hover {
-            background-image: url('data:image/gif;base64,R0lGODlhCAAIAKECAEFBQXR0dP///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7');
+        img {
+            display: block;
         }
+    }
+    .image-preview-circle {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 50%;
+        width: 26px;
+        height: 26px;
+        margin: -15px 0 0 -15px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, .5);
+        border: solid 2px #f00;
+        cursor: move;
     }
 }
 .actions-list-dropdown {

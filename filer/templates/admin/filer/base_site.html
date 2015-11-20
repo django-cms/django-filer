@@ -12,7 +12,9 @@
 
     {# upload stuff #}
     {{ media.js }}
+    <script src="{% static 'filer/js/libs/class.min.js' %}"></script>
     <script src="{% static 'admin/js/jquery.min.js' %}"></script>
+    <script src="{% static 'filer/js/libs/jquery-ui.min.js' %}"></script>
     <script src="{% static 'filer/js/addons/jquery.cookie.min.js' %}"></script>
     <script src="{% static 'filer/js/addons/fileuploader.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/retina.min.js' %}"></script>
@@ -20,7 +22,6 @@
     <script src="{% static 'filer/js/addons/popup_handling.js' %}"></script>
 
     <script src="{% static 'filer/js/addons/mediator.min.js' %}"></script>
-    <script src="{% static 'filer/js/libs/raphael.min.js' %}"></script>
     <script src="{% static 'filer/js/addons/focal_point.js' %}"></script>
-    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'filer/js/base.js' %}"></script>
 {% endblock %}

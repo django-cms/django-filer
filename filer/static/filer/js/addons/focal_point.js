@@ -1,98 +1,120 @@
+// #FOCAL POINT#
+// This script implements the
 'use strict';
-/* globals Raphael, django */
+
+var Cl = window.Cl || {};
+/* global Class */
 
 (function ($) {
-    $(function () {
-        var paperWidth, pagerHeight;
-        var paper, ratio;
-        var isDrag = false;
-        var image_loaded = false;
-        var dragger = function (e) {
-            this.dx = e.clientX;
-            this.dy = e.clientY;
-            isDrag = this;
-            this.animate({'fill-opacity': 0.3, 'fill': '#fffccc'}, 500);
-        };
-        var imageContainerImage = $('#image_container img');
-        var focalPoint;
 
-        document.onmousemove = function (e) {
-            e = e || window.event;
-            if (isDrag) {
-                isDrag.translate(e.clientX - isDrag.dx, e.clientY - isDrag.dy);
-                paper.safari();
-                isDrag.dx = e.clientX;
-                isDrag.dy = e.clientY;
-            }
-        };
+    Cl.FocalPoint = new Class({
+        options: {
+            containerSelector: '.js-focal-point',
+            imageSelector: '.js-focal-point-image',
+            circleSelector: '.js-focal-point-circle',
+            locationSelector: '.js-focal-point-location',
+            hiddenClass: 'hidden'
+        },
+        _init: function (container) {
+            var focalPointInstance = new Cl.FocalPointConstructor(container, this.options);
+            this.focalPointInstances.push(focalPointInstance);
+        },
+        initialize: function (options) {
+            var that = this;
 
-        document.onmouseup = function () {
-            if (isDrag) {
-                isDrag.animate({'fill-opacity': 0.2, 'fill': '#fff'}, 500);
-                if (isDrag.type === 'circle') {
-                    updatePosition(isDrag.attrs.cx, isDrag.attrs.cy);
-                }
-            }
-            isDrag = false;
-        };
+            this.options = $.extend({}, this.options, options);
+            this.focalPointInstances = [];
 
-        function add(x, y) {
-            var el;
+            $(this.options.containerSelector).each(function () {
+                that._init(this);
+            });
 
-            if (isNaN(x)) {
-                x = paperWidth / 2;
-                y = pagerHeight / 2;
-            }
-            el = paper.circle(x, y, 15);
-            el.attr('fill', '#fff');
-            el.attr('fill-opacity', 0.2);
-            el.attr('stroke', '#c00');
-            el.attr('stroke-width', 2);
+            Cl.mediator.subscribe('focal-point:init', this._init);
+        },
+        destroy: function () {
+            Cl.mediator.remove('focal-point:init', this._init);
 
+            this.focalPointInstances.forEach(function (focalPointInstance) {
+                focalPointInstance.destroy();
+            });
 
-            el.mousedown(dragger);
-            el.node.style.cursor = 'move';
-            focalPoint = el;
+            this.focalPointInstances = [];
         }
-
-        window.remove = function () {
-            focalPoint.remove();
-            focalPoint = null;
-        };
-
-        function updatePosition(x, y) {
-            $('#id_subject_location')
-                .val(x === undefined ? '' : parseInt(parseInt(x) * ratio) + ',' + parseInt(parseInt(y) * ratio));
-        }
-
-        function imageInit() {
-            var location = $('#id_subject_location').val();
-            var x, y;
-
-            paperWidth = imageContainerImage.width();
-            pagerHeight = imageContainerImage.height();
-            $('#image_container').height(pagerHeight + 'px');
-
-            // interface
-            ratio = parseFloat(imageContainerImage.attr('rel'));
-            paper = new Raphael(document.getElementById('paper'), paperWidth, pagerHeight);
-
-            // read location from form
-            if (location) {
-                x = parseInt(parseInt(location.split(',')[0]) / ratio);
-                y = parseInt(parseInt(location.split(',')[1]) / ratio);
-            }
-            add(x, y);
-            image_loaded = true;
-        }
-
-        imageContainerImage.load(imageInit);
-        // If image has not been loaded after 250ms after pageload,
-        // assume it's allready loaded and try initializing.
-        window.setTimeout(function () {
-            if (!image_loaded) {
-                imageInit();
-            }
-        }, 250);
     });
-})(django.jQuery);
+
+    Cl.FocalPointConstructor = new Class({
+        _updateLocationValue: function (x, y) {
+            var locationValue;
+
+            if (isNaN(x) && isNaN(y)) {
+                locationValue = '';
+            } else {
+                locationValue = parseInt(x * this.ratio) + ',' + parseInt(y * this.ratio);
+            }
+            this.location.val(locationValue);
+        },
+        _onImageLoaded: function () {
+            var that = this;
+            var x = null;
+            var y = null;
+            var locationValue = this.location.val();
+            var imageWidth = this.image.width();
+            var imageHeight = this.image.height();
+
+            this.circle.removeClass(this.options.hiddenClass);
+
+            if (locationValue.length) {
+                x = parseInt(parseInt(locationValue.split(',')[0]) / this.ratio);
+                y = parseInt(parseInt(locationValue.split(',')[1]) / this.ratio);
+            } else {
+                y = imageHeight / 2;
+                x = imageWidth / 2;
+            }
+
+            this.circle.css({
+                'top': y,
+                'left': x
+            });
+
+            this.circle.draggable({
+                containment : [
+                    this.containerOffset.left,
+                    this.containerOffset.top,
+                    this.containerOffset.left + imageWidth,
+                    this.containerOffset.top + imageHeight
+                ],
+                drag: function (event, ui) {
+                    that._updateLocationValue(ui.position.left, ui.position.top);
+                }
+            });
+
+            this._updateLocationValue();
+        },
+        initialize: function (container, options) {
+            this.options = $.extend({}, this.options, options);
+
+            this.container = $(container);
+            this.containerOffset = this.container.offset();
+            this.image = this.container.find(this.options.imageSelector);
+            this.circle = this.container.find(this.options.circleSelector);
+            this.location = this.container.find(this.options.locationSelector);
+            this.ratio = parseFloat(this.image.data('ratio'));
+
+            this._onImageLoaded = $.proxy(this._onImageLoaded, this);
+
+            this.image.on('load', this._onImageLoaded);
+        },
+        destroy: function () {
+            this.circle.draggable('disable');
+
+            this.options = null;
+
+            this.container = null;
+            this.containerOffset = null;
+            this.image = null;
+            this.circle = null;
+            this.location = null;
+            this.ratio = null;
+        }
+    });
+})(jQuery);

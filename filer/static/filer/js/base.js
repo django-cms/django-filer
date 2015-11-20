@@ -1,14 +1,20 @@
 // #####################################################################################################################
 // #BASE#
 // Basic logic django filer
+'use strict';
+
 var Cl = window.Cl || {};
-/* global django, Mediator */
+/* global Mediator */
 
 (function ($) {
-    'use strict';
 
     $(function () {
         // mediator init
         Cl.mediator = new Mediator();
+
+        // Focal point logic init
+        if (Cl.FocalPoint) {
+            new Cl.FocalPoint();
+        }
     });
-})(django.jQuery);
+})(jQuery);
