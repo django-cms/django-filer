@@ -1,11 +1,11 @@
 // #FOCAL POINT#
 // This script implements the
+'use strict';
 
 var Cl = window.Cl || {};
 /* global Class */
 
 (function ($) {
-    'use strict';
 
     Cl.FocalPoint = new Class({
         options: {
