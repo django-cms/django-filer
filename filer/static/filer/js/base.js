@@ -10,5 +10,10 @@ var Cl = window.Cl || {};
     $(function () {
         // mediator init
         Cl.mediator = new Mediator();
+
+        // Focal point logic init
+        if (Cl.FocalPoint) {
+            new Cl.FocalPoint();
+        }
     });
 })(django.jQuery);
