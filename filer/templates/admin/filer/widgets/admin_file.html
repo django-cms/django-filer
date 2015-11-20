@@ -1,4 +1,4 @@
-{% load i18n staticfiles %}{% spaceless %}
+{% load i18n filer_admin_tags staticfiles %}{% spaceless %}
 <span class="filerFile">
 {% if object %}
 	{% if object.icons.32 %}
@@ -12,9 +12,7 @@
 	<img id="{{ thumb_id }}" src="{% static "filer/icons/nofile_48x48.png" %}" class="quiet" alt="{% trans 'no file selected' %}" />
 	&nbsp;<span id="{{ span_id }}"></span>
 {% endif %}
-<a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}" onclick="return showRelatedObjectLookupPopup(this);">
-    <img src="{% static 'admin/img/icon_searchbox.png' %}" width="16" height="16" alt="{% trans 'Lookup' %}" />
-</a>
+{% render_filer_lookup_button %}
 <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %} />
 <br />
 {{ hidden_input }}
