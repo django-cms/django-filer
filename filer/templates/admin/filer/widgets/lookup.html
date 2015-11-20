@@ -1,0 +1,5 @@
+{% load i18n static %}
+
+<a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+    <img src="{% static 'admin/img/icon_searchbox.png' %}" width="16" height="16" alt="{% trans 'Lookup' %}" />
+</a>
