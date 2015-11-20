@@ -5,7 +5,12 @@ Changelog for django-filer
 next
 ----
 
-* --
+1.0.3 (2015-11-20)
+------------------
+
+* Fixes a bad static path
+* Adds a fix for Django 1.8 envs.
+
 
 1.0.2 (2015-11-10)
 ------------------
