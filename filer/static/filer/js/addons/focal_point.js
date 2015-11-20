@@ -51,29 +51,24 @@ var Cl = window.Cl || {};
             } else {
                 locationValue = parseInt(x * this.ratio) + ',' + parseInt(y * this.ratio);
             }
-            this.location
-                .val(locationValue);
+            this.location.val(locationValue);
         },
         _onImageLoaded: function () {
             var that = this;
             var x = null;
             var y = null;
             var locationValue = this.location.val();
+            var imageWidth = this.image.width();
+            var imageHeight = this.image.height();
 
             this.circle.removeClass(this.options.hiddenClass);
-
-            this.imageWidth = this.image.width();
-            this.imageHeight = this.image.height();
-            this.ratio = parseFloat(this.image.data('ratio'));
-            this.circleWidth = this.circle.outerWidth();
-            this.circleHeight = this.circle.outerHeight();
 
             if (locationValue.length) {
                 x = parseInt(parseInt(locationValue.split(',')[0]) / this.ratio);
                 y = parseInt(parseInt(locationValue.split(',')[1]) / this.ratio);
             } else {
-                y = this.imageHeight / 2;
-                x = this.imageWidth / 2;
+                y = imageHeight / 2;
+                x = imageWidth / 2;
             }
 
             this.circle.css({
@@ -85,8 +80,8 @@ var Cl = window.Cl || {};
                 containment : [
                     this.containerOffset.left,
                     this.containerOffset.top,
-                    this.containerOffset.left + this.imageWidth,
-                    this.containerOffset.top + this.imageHeight
+                    this.containerOffset.left + imageWidth,
+                    this.containerOffset.top + imageHeight
                 ],
                 drag: function (event, ui) {
                     that._updateLocationValue(ui.position.left, ui.position.top);
@@ -94,8 +89,6 @@ var Cl = window.Cl || {};
             });
 
             this._updateLocationValue();
-
-            this.isImageLoaded = true;
         },
         initialize: function (container, options) {
             this.options = $.extend({}, this.options, options);
@@ -105,9 +98,7 @@ var Cl = window.Cl || {};
             this.image = this.container.find(this.options.imageSelector);
             this.circle = this.container.find(this.options.circleSelector);
             this.location = this.container.find(this.options.locationSelector);
-
-            this.isDrag = null;
-            this.isImageLoaded = false;
+            this.ratio = parseFloat(this.image.data('ratio'));
 
             this._onImageLoaded = $.proxy(this._onImageLoaded, this);
 
@@ -116,18 +107,14 @@ var Cl = window.Cl || {};
         destroy: function () {
             this.circle.draggable('disable');
 
-            this.focalPoint.remove();
-            this.focalPoint = null;
-
             this.options = null;
 
             this.container = null;
+            this.containerOffset = null;
             this.image = null;
-            this.paper = null;
+            this.circle = null;
             this.location = null;
-
-            this.isDrag = null;
-            this.isImageLoaded = null;
+            this.ratio = null;
         }
     });
 })(jQuery);
