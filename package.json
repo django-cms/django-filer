@@ -6,8 +6,16 @@
     "gulp-autoprefixer": "3.1.*",
     "gulp-jscs": "3.0.*",
     "gulp-jshint": "1.12.*",
-    "jshint-stylish": "2.0.*",
     "gulp-sass": "2.1.*",
-    "gulp-sourcemaps": "1.6.*"
+    "gulp-sourcemaps": "1.6.*",
+    "jasmine": "2.3.*",
+    "jshint-stylish": "2.0.*",
+    "karma": "0.13.*",
+    "karma-fixture": "0.2.*",
+    "karma-html2js-preprocessor": "0.1.*",
+    "karma-jasmine": "0.3.*",
+    "karma-json-fixtures-preprocessor": "0.0.*",
+    "karma-phantomjs-launcher": "0.2.*",
+    "phantomjs": "1.9.*"
   }
 }

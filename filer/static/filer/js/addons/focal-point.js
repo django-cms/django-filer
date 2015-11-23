@@ -13,6 +13,7 @@ var Cl = window.Cl || {};
             imageSelector: '.js-focal-point-image',
             circleSelector: '.js-focal-point-circle',
             locationSelector: '.js-focal-point-location',
+            draggableClass: 'ui-draggable',
             hiddenClass: 'hidden'
         },
         _init: function (container) {
@@ -105,7 +106,9 @@ var Cl = window.Cl || {};
             this.image.on('load', this._onImageLoaded);
         },
         destroy: function () {
-            this.circle.draggable('disable');
+            if (this.circle.hasClass(this.options.draggableClass)) {
+                this.circle.draggable('disable');
+            }
 
             this.options = null;
 
