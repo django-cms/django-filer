@@ -14,7 +14,7 @@ var PROJECT_PATH = {
     'sass': PROJECT_ROOT + '/filer/private/sass/',
     'css': PROJECT_ROOT + '/filer/static/filer/css/',
     'js': PROJECT_ROOT + '/filer/static/filer/js/',
-    'tests': PROJECT_ROOT + '/filer/tests/frontend/',
+    'tests': PROJECT_ROOT + '/filer/tests/frontend/'
 };
 
 var PROJECT_PATTERNS = {
