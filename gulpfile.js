@@ -7,12 +7,14 @@ var sourcemaps = require('gulp-sourcemaps');
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
 var stylish = require('jshint-stylish');
+var Server = require('karma').Server;
 
 var PROJECT_ROOT = __dirname;
 var PROJECT_PATH = {
     'sass': PROJECT_ROOT + '/filer/private/sass/',
     'css': PROJECT_ROOT + '/filer/static/filer/css/',
-    'js': PROJECT_ROOT + '/filer/static/filer/js/'
+    'js': PROJECT_ROOT + '/filer/static/filer/js/',
+    'tests': PROJECT_ROOT + '/filer/tests/frontend/',
 };
 
 var PROJECT_PATTERNS = {
@@ -75,6 +77,14 @@ gulp.task('js:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, ['js']);
 });
 
+gulp.task('tests:unit', function (done) {
+    new Server({
+        configFile: PROJECT_PATH.tests + '/karma.conf.js',
+        singleRun: true
+    }, done).start();
+});
+
 gulp.task('watch', ['sass:watch', 'js:watch']);
 gulp.task('lint', ['js']);
+gulp.task('ci', ['js', 'tests:unit']);
 gulp.task('default', ['js', 'sass', 'js:watch', 'sass:watch']);
