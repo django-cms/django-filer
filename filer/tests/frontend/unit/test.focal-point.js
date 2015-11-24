@@ -41,8 +41,12 @@ describe('Cl.FocalPoint', function () {
         expect(location.val()).toBe('');
     });
 
-    it('sets the location value to center and updates location value according to the ratio', function () {
-        var updateLocationValueStub = spyOn(Cl.FocalPointConstructor.prototype, '_updateLocationValue').and.callThrough();
+    it('sets the location value to center and updates ' +
+        'location value according to the ratio', function () {
+        var updateLocationValueStub = spyOn(
+                Cl.FocalPointConstructor.prototype,
+                '_updateLocationValue'
+            ).and.callThrough();
 
         image.trigger('load');
 
@@ -60,7 +64,10 @@ describe('Cl.FocalPoint', function () {
     });
 
     it('updates location value according to the ratio and latest position', function () {
-        var updateLocationValueStub = spyOn(Cl.FocalPointConstructor.prototype, '_updateLocationValue').and.callThrough();
+        var updateLocationValueStub = spyOn(
+                Cl.FocalPointConstructor.prototype,
+                '_updateLocationValue'
+            ).and.callThrough();
 
         image.trigger('load');
 

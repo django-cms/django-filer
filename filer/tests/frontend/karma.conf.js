@@ -27,7 +27,7 @@ module.exports = function (config) {
             '../static/filer/js/addons/mediator.min.js',
 
             'frontend/unit/mocks.js',
-            'frontend/unit/mock-ajax.js',
+            'frontend/unit/mock-ajax.min.js',
 
             '../static/filer/js/addons/!(mediator.min)*.js',
 
