@@ -79,7 +79,7 @@ To started development fron-end part of ``django-filer`` simply install all the 
 
 ``npm install``
 
-To compile and watch scss and run jshint and jscs watchers:
+To compile and watch scss, run javascript unit-tests, jshint and jscs watchers:
 
 ``gulp``
 
@@ -103,21 +103,17 @@ To run javascript linting:
 
 ``gulp jshint``
 
-To run javascript linter watcher:
-
-``gulp jshint:watch``
-
 To run javascript code style analysis:
 
 ``gulp jscs``
 
-To run javascript code style analysis watcher:
-
-``gulp jscs:watch``
-
 To fix javascript code style errors:
 
 ``gulp jscs:fix``
+
+To run javascript unit-tests:
+
+``gulp tests:unit``
 
 
 .. _Django: http://djangoproject.com

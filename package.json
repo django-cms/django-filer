@@ -8,6 +8,7 @@
     "gulp-jshint": "1.12.*",
     "gulp-sass": "2.1.*",
     "gulp-sourcemaps": "1.6.*",
+    "gulp-sync": "0.1.*",
     "jasmine": "2.3.*",
     "jshint-stylish": "2.0.*",
     "karma": "0.13.*",
