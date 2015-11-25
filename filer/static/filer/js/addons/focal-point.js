@@ -1,12 +1,11 @@
 // #FOCAL POINT#
-// This script implements the
+// This script implements the image focal point setting
 'use strict';
 
 var Cl = window.Cl || {};
 /* global Class */
 
 (function ($) {
-
     Cl.FocalPoint = new Class({
         options: {
             containerSelector: '.js-focal-point',
