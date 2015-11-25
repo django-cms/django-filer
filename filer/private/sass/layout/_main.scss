@@ -79,14 +79,36 @@
     }
 }
 .actions-list-dropdown {
-    padding: 5px 10px;
+    a {
+        display: block;
+        padding: 5px 10px;
+    }
+    .caret-down {
+        display: inline-block;
+    }
+    .caret-right {
+        display: none;
+    }
+    &.js-collapsed {
+        border-bottom: solid 1px $color-separator;
+        .caret-down {
+            display: none;
+        }
+        .caret-right {
+            display: inline-block;
+        }
+    }
 }
 .actions-list {
     border-top: solid 1px $color-separator;
     &:last-child {
         border-top: none;
+        a {
+            border-bottom: none;
+        }
     }
-    li {
+    a {
+        display: block;
         padding: 5px 10px;
         border-bottom: solid 1px $color-separator;
     }

@@ -16,5 +16,10 @@ var Cl = window.Cl || {};
         if (Cl.FocalPoint) {
             new Cl.FocalPoint();
         }
+
+        // Toggler init
+        if (Cl.Toggler) {
+            new Cl.Toggler();
+        }
     });
 })(jQuery);
