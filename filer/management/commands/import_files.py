@@ -41,7 +41,7 @@ class FileImporter(object):
         self.storage = storage_class(**stor_kwargs)
         self.dup_action = dup_action
         self.verbosity = int(verbosity)
-        self.files_created = {} # mapping of <file class>:<how many have been created>
+        self.files_created = {}  # mapping of <file class>:<how many have been created>
         self.folder_created = 0
         self.target_folder = None
         folder_name = 'root folder'
@@ -65,20 +65,20 @@ class FileImporter(object):
         # find the file type
         for filer_class in filer_settings.FILER_FILE_MODELS:
             FileSubClass = load_object(filer_class)
-            #TODO: What if there are more than one that qualify?
+            # TODO: What if there are more than one that qualify?
             if FileSubClass.matches_file_type(basename, None, None):
                 obj = FileSubClass(
-                        original_filename=basename,
-                        file=file_obj,
-                        folder=folder,
-                        is_public=filer_settings.FILER_IS_PUBLIC_DEFAULT)
+                    original_filename=basename,
+                    file=file_obj,
+                    folder=folder,
+                    is_public=filer_settings.FILER_IS_PUBLIC_DEFAULT)
                 class_name = FileSubClass.__name__
                 if class_name not in self.files_created:
                     self.files_created[class_name] = 0
                 break
         # check if such file was already imported in this folder
         duplicates = folder.all_files.filter(
-                        original_filename__exact=basename)
+            original_filename__exact=basename)
         if self.dup_action != DUPLICATE_ACTIONS.new and duplicates.count():
             dup_action = self.dup_action
             if dup_action is None:
@@ -95,10 +95,10 @@ class FileImporter(object):
                 del_orphan_file(obj)
                 obj.file = file_obj
             elif dup_action == DUPLICATE_ACTIONS.update:
-                obj.generate_sha1() # generate sha1 now to compare
+                obj.generate_sha1()  # generate sha1 now to compare
                 diff_sha_q = duplicates.exclude(sha1__exact=obj.sha1)
                 if not diff_sha_q.count():
-                    return None # no need to update, skip
+                    return None  # no need to update, skip
                 obj = diff_sha_q.first()
                 del_orphan_file(obj)
                 obj.file = file_obj
@@ -194,7 +194,7 @@ class Command(BaseCommand):
             default=None,
             help='Specify constanct action when duplicate file is found in Filer '
                  '(one of %s)' % list(DUPLICATE_ACTIONS)),
-        )
+    )
 
     def handle(self, *paths, **options):
         if not len(paths):
@@ -213,4 +213,3 @@ class Command(BaseCommand):
         file_importer = FileImporter(**options)
         for path in paths:
             file_importer.import_path(path)
-
