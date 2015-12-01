@@ -10,7 +10,18 @@
         var options = $.extend({}, $.fn.actions.defaults, opts);
         var actionCheckboxes = $(this);
         var list_editable_changed = false;
-        var checker = function (checked) {
+        var reset = function () {
+            $(options.acrossClears).hide();
+            $(options.acrossQuestions).hide();
+            $(options.allContainer).hide();
+            $(options.counterContainer).show();
+        },
+        showQuestion = function () {
+            $(options.acrossClears).hide();
+            $(options.acrossQuestions).show();
+            $(options.allContainer).hide();
+        },
+        checker = function (checked) {
             if (checked) {
                 showQuestion();
             } else {
@@ -19,23 +30,12 @@
             $(actionCheckboxes).prop('checked', checked)
                 .parent().parent().toggleClass(options.selectedClass, checked);
         },
-        showQuestion = function () {
-            $(options.acrossClears).hide();
-            $(options.acrossQuestions).show();
-            $(options.allContainer).hide();
-        },
         showClear = function () {
             $(options.acrossClears).show();
             $(options.acrossQuestions).hide();
             $(options.actionContainer).toggleClass(options.selectedClass);
             $(options.allContainer).show();
             $(options.counterContainer).hide();
-        },
-        reset = function () {
-            $(options.acrossClears).hide();
-            $(options.acrossQuestions).hide();
-            $(options.allContainer).hide();
-            $(options.counterContainer).show();
         },
         clearAcross = function () {
             reset();
