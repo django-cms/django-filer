@@ -19,27 +19,6 @@
             $(actionCheckboxes).prop('checked', checked)
                 .parent().parent().toggleClass(options.selectedClass, checked);
         },
-        updateCounter = function () {
-            var sel = $(actionCheckboxes).filter(':checked').length;
-            // _actions_icnt is defined in the generated HTML
-            // and contains the total amount of objects in the queryset
-            $(options.counterContainer).html(interpolate(
-            ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
-                sel: sel,
-                cnt: _actions_icnt
-            }, true));
-            $(options.allToggle).prop('checked', function () {
-                var value;
-                if (sel == actionCheckboxes.length) {
-                    value = true;
-                    showQuestion();
-                } else {
-                    value = false;
-                    clearAcross();
-                }
-                return value;
-            });
-        },
         showQuestion = function () {
             $(options.acrossClears).hide();
             $(options.acrossQuestions).show();
@@ -62,6 +41,27 @@
             reset();
             $(options.acrossInput).val(0);
             $(options.actionContainer).removeClass(options.selectedClass);
+        },
+        updateCounter = function () {
+            var sel = $(actionCheckboxes).filter(':checked').length;
+            // _actions_icnt is defined in the generated HTML
+            // and contains the total amount of objects in the queryset
+            $(options.counterContainer).html(interpolate(
+            ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
+                sel: sel,
+                cnt: _actions_icnt
+            }, true));
+            $(options.allToggle).prop('checked', function () {
+                var value;
+                if (sel == actionCheckboxes.length) {
+                    value = true;
+                    showQuestion();
+                } else {
+                    value = false;
+                    clearAcross();
+                }
+                return value;
+            });
         };
         // Show counter by default
         $(options.counterContainer).show();
@@ -116,10 +116,12 @@
             lastChecked = target;
             updateCounter();
         });
-        $('form#changelist-form table#result_list tr, .js-navigator-table tr').find('td:gt(0) :input').change(function () {
+        $('form#changelist-form table#result_list tr, .js-navigator-table tr')
+            .find('td:gt(0) :input').change(function () {
             list_editable_changed = true;
         });
-        $('form#changelist-form button[name="index"], .js-navigator-form button[name="index"]').click(function () {
+        $('form#changelist-form button[name="index"], .js-navigator-form button[name="index"]')
+            .click(function () {
             if (list_editable_changed) {
                 return confirm(gettext('You have unsaved changes on individual editable fields. ' +
                     'If you run an action, your unsaved changes will be lost.'));
