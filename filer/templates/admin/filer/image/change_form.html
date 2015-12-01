@@ -31,7 +31,7 @@
 {% endblock %}
 
 {% block content %}
-    {% include "admin/filer/tools/image_info.html" %}
+    {% include "admin/filer/tools/image_info.html" with detail=True %}
     {{ block.super }}
 {% endblock %}
 

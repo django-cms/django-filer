@@ -105,7 +105,7 @@
                 {% include "admin/filer/folder/directory_table.html" %}
                 {% if action_form and actions_on_bottom and paginator.count and not select_folder and not is_popup %}{% filer_actions %}{% endif %}
             </form>
-            {% include "admin/filer/tools/clipboard/clipboard.html" %}
+            {% include "admin/filer/tools/image_info.html" %}
         </div>
     </div>
 {% endblock %}
