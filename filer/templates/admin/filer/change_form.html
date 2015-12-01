@@ -15,8 +15,24 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
 {% endblock %}
 
+
 {% block after_field_sets %}
     {% if is_popup and select_folder %}
     	<input type="hidden" name="select_folder" value="1">
     {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+	{% block file_sidebar %}
+		{% with original.duplicates as duplicates %}
+			{% if duplicates %}
+				<h3>{% trans "duplicates" %}</h3>
+				<ul>
+					{% for duplicate in duplicates %}
+						<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	{% endblock %}
 {% endblock %}
