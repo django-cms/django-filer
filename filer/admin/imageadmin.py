@@ -34,8 +34,7 @@ class ImageAdminForm(forms.ModelForm):
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
         js = (
-            static('filer/js/libs/raphael.min.js'),
-            static('filer/js/addons/focal_point.js'),
+
         )
 
 

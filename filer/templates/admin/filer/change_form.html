@@ -15,7 +15,6 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
 {% endblock %}
 
-{% block coltype %}colMS{% endblock %}
 
 {% block after_field_sets %}
     {% if is_popup and select_folder %}
@@ -24,7 +23,6 @@
 {% endblock %}
 
 {% block sidebar %}
-<div id="content-related">
 	{% block file_sidebar %}
 		{% with original.duplicates as duplicates %}
 			{% if duplicates %}
@@ -37,5 +35,4 @@
 			{% endif %}
 		{% endwith %}
 	{% endblock %}
-</div>
 {% endblock %}

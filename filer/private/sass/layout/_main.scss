@@ -6,7 +6,6 @@
 .text-right {
     text-align: right;
 }
-
 .image-info {
     position: relative;
     float: right;
@@ -31,6 +30,60 @@
         }
         a {
             cursor: pointer;
+        }
+    }
+    &.image-info-detail {
+        position: static;
+        float: none;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 25px;
+        border-radius: 0;
+        > .row {
+            width: 80%;
+        }
+        .image-details, .actions-list {
+            border: 0 !important;
+            &.image-details {
+                margin-top: 20px;
+                margin-bottom: 15px;
+                padding: 0;
+            }
+            .fa-user {
+                font-size: 18px;
+            }
+            .text {
+                margin-right: 15px;
+            }
+            li {
+                font-weight: normal !important;
+                padding: 0 !important;
+                border: 0 !important;
+            }
+            a {
+                padding: 0;
+            }
+        }
+        .image-info-title {
+            width: 80%;
+            padding: 0 0 5px;
+        }
+        .image-preview-container {
+            margin: 20px 0 0;
+            padding: 0;
+            text-align: left;
+            .image-preview {
+                width: 250px;
+                height: 150px;
+            }
+        }
+        .actions-list {
+            .icon {
+                font-size: 16px;
+                &:last-child {
+                    float: none;
+                }
+            }
         }
     }
 }

@@ -1,150 +1,218 @@
 {% load i18n %}
+{% if detail %}
+    <section class="image-info image-info-detail">
+        {% if original.original_filename %}
+            <div class="image-info-title">
+                {{ original.original_filename }}
+                <a href="#" class="icon fa fa-pencil"></a>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="image-preview-container">
+                    <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
+                        <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-focal-point-image">
+                        <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                    </div>
 
-<section class="image-info">
-    <a class="image-info-close"><span class="fa fa-times"></span></a>
+                    <div class="text-left">
+                        <a href="{{ original.url }}" target="_blank" class="btn">Full size preview</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                {% if original.file_type or original.modified_at or original.uploaded_at %}
+                    <ul class="image-details">
+                        {% if original.file_type %}
+                            <li class="row">
+                                <div class="col-xs-3">Type</div>
+                                <div class="col-xs-9">{{ original.file_type }}</div>
+                            </li>
+                        {% endif %}
+                            <li class="row">
+                                <div class="col-xs-3">Size</div>
+                                <div class="col-xs-9">1765x1249 px</div>
+                            </li>
+                            <li class="row">
+                                <div class="col-xs-3">File-size</div>
+                                <div class="col-xs-9">2.3 MB</div>
+                            </li>
+                        {% if original.modified_at %}
+                            <li class="row">
+                                <div class="col-xs-3">Modified</div>
+                                <div class="col-xs-9">{{ original.modified_at }}</div>
+                            </li>
+                        {% endif %}
+                        {% if original.uploaded_at %}
+                            <li class="row">
+                                <div class="col-xs-3">Created</div>
+                                <div class="col-xs-9">{{ original.uploaded_at }}</div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <div class="image-actions">
+                        <ul class="actions-list">
+                            <li>
+                                <a href="#">
+                                    <span class="icon fa fa-user"></span>
+                                    {% if original.owner %}<span class="text">Owner: {{ original.owner }}</span>{% endif %}
+                                    <span class="icon fa fa-pencil"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% else %}
+    <section class="image-info">
+        <a class="image-info-close"><span class="fa fa-times"></span></a>
 
-    <div class="image-info-title">
-        holiday-foto.jpg
-        <a href="#" class="fa fa-pencil"></a>
-    </div>
-
-    <div class="image-preview-container">
-        <div class="image-preview js-focal-point">
-            <img src="http://lorempixel.com/210/266" data-ratio="4.638095" width="210" height="266" class="js-focal-point-image">
-            <div class="js-focal-point-circle image-preview-circle hidden"></div>
-            <input type="hidden" class="js-focal-point-location">
+        <div class="image-info-title">
+            holiday-foto.jpg
+            <a href="#" class="fa fa-pencil"></a>
         </div>
 
-        <div class="text-right">
-            <a href="http://lorempixel.com/210/266" target="_blank" class="btn">Full size preview</a>
+        <div class="image-preview-container">
+            <div class="image-preview js-focal-point">
+                <img src="http://lorempixel.com/210/266" data-ratio="4.638095" width="210" height="266" class="js-focal-point-image">
+                <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                <input type="hidden" class="js-focal-point-location">
+            </div>
+
+            <div class="text-right">
+                <a href="http://lorempixel.com/210/266" target="_blank" class="btn">Full size preview</a>
+            </div>
         </div>
-    </div>
 
-    <ul class="image-details">
-        <li class="row">
-            <div class="col-xs-4">
-                Type
-            </div>
-            <div class="col-xs-8">
-                Image
-            </div>
-        </li>
-
-        <li class="row">
-            <div class="col-xs-4">
-                Size
-            </div>
-            <div class="col-xs-8">
-                1765x1249 px
-            </div>
-        </li>
-
-        <li class="row">
-            <div class="col-xs-4">
-                File-size
-            </div>
-            <div class="col-xs-8">
-                2.3 MB
-            </div>
-        </li>
-
-        <li class="row">
-            <div class="col-xs-4">
-                Modified
-            </div>
-            <div class="col-xs-8">
-                25/10/2015 8:02 PM
-            </div>
-        </li>
-
-        <li class="row">
-            <div class="col-xs-4">
-                Created
-            </div>
-            <div class="col-xs-8">
-                25/10/2015 8:02 PM
-            </div>
-        </li>
-    </ul>
-
-    <div class="image-actions">
-        <ul class="actions-list">
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-lock"></span>
-                    <span class="text">This file is public</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
+        <ul class="image-details">
+            <li class="row">
+                <div class="col-xs-4">
+                    Type
+                </div>
+                <div class="col-xs-8">
+                    Image
+                </div>
             </li>
 
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-user"></span>
-                    <span class="text">Owner: User</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
+            <li class="row">
+                <div class="col-xs-4">
+                    Size
+                </div>
+                <div class="col-xs-8">
+                    1765x1249 px
+                </div>
             </li>
 
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-font"></span>
-                    <span class="text">Add Description</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
+            <li class="row">
+                <div class="col-xs-4">
+                    File-size
+                </div>
+                <div class="col-xs-8">
+                    2.3 MB
+                </div>
+            </li>
+
+            <li class="row">
+                <div class="col-xs-4">
+                    Modified
+                </div>
+                <div class="col-xs-8">
+                    25/10/2015 8:02 PM
+                </div>
+            </li>
+
+            <li class="row">
+                <div class="col-xs-4">
+                    Created
+                </div>
+                <div class="col-xs-8">
+                    25/10/2015 8:02 PM
+                </div>
             </li>
         </ul>
 
-        <div class="actions-list-dropdown">
-            <a href="#" class="js-toggler-link" data-toggler-header-selector=".actions-list-dropdown" data-toggler-content-selector=".actions-advanced">
-                Advanced
-                <span class="fa fa-caret-down caret-down"></span>
-                <span class="fa fa-caret-right caret-right"></span>
-            </a>
-        </div>
+        <div class="image-actions">
+            <ul class="actions-list">
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-lock"></span>
+                        <span class="text">This file is public</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
 
-        <ul class="actions-list actions-advanced hidden">
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-user"></span>
-                    <span class="text">Author: User</span>
-                    <span class="icon fa fa-pencil"></span>
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-user"></span>
+                        <span class="text">Owner: User</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-font"></span>
+                        <span class="text">Add Description</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="actions-list-dropdown">
+                <a href="#" class="js-toggler-link" data-toggler-header-selector=".actions-list-dropdown" data-toggler-content-selector=".actions-advanced">
+                    Advanced
+                    <span class="fa fa-caret-down caret-down"></span>
+                    <span class="fa fa-caret-right caret-right"></span>
                 </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-font"></span>
-                    <span class="text">Add Alt-Text</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-font"></span>
-                    <span class="text">Add caption</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-font"></span>
-                    <span class="text">Add Tags</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-picture-o"></span>
-                    <span class="text">Change File</span>
-                    <span class="icon fa fa-pencil"></span>
-                </a>
-            </li>
-        </ul>
-        <ul class="actions-list">
-            <li>
-                <a href="#">
-                    <span class="icon fa fa-trash"></span>
-                    <span class="text">Delete</span>
-                </a>
-        </ul>
-    </div>
-</section>
+            </div>
+
+            <ul class="actions-list actions-advanced hidden">
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-user"></span>
+                        <span class="text">Author: User</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-font"></span>
+                        <span class="text">Add Alt-Text</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-font"></span>
+                        <span class="text">Add caption</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-font"></span>
+                        <span class="text">Add Tags</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-picture-o"></span>
+                        <span class="text">Change File</span>
+                        <span class="icon fa fa-pencil"></span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="actions-list">
+                <li>
+                    <a href="#">
+                        <span class="icon fa fa-trash"></span>
+                        <span class="text">Delete</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </section>
+{% endif %}

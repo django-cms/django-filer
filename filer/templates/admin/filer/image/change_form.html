@@ -1,5 +1,23 @@
 {% extends "admin/filer/change_form.html" %}
-{% load i18n admin_modify %}
+{% load i18n admin_modify staticfiles %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    {# upload stuff #}
+    <script src="{% static 'filer/js/libs/class.min.js' %}"></script>
+    <script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
+    <script src="{% static 'filer/js/libs/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/jquery.cookie.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/fileuploader.min.js' %}"></script>
+    <script src="{% static 'filer/js/libs/retina.min.js' %}"></script>
+    <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
+    <script src="{% static 'filer/js/addons/popup_handling.js' %}"></script>
+    <script src="{% static 'filer/js/addons/mediator.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/focal-point.js' %}"></script>
+    <script src="{% static 'filer/js/addons/toggler.js' %}"></script>
+    <script src="{% static 'filer/js/base.js' %}"></script>
+{% endblock %}
 
 {% block object-tools %}
   {% if change and not is_popup %}
@@ -12,13 +30,8 @@
   {% endif %}
 {% endblock %}
 
-{% block file_sidebar %}
-    <div id="navcontainer">
-        <div id="image_container" class="transpTiling">
-            <img src="{{ original.thumbnails.admin_sidebar_preview }}" alt="{{ original.label }}" rel="{{ adminform.form.sidebar_image_ratio }}">
-            <div id="paper">&nbsp;</div>
-        </div>
-        <a href="{{ original.url }}">{% trans "Full size preview" %}</a>
-    </div>
+{% block content %}
+    {% include "admin/filer/tools/image_info.html" with detail=True %}
     {{ block.super }}
 {% endblock %}
+

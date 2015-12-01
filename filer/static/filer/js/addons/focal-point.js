@@ -4,7 +4,6 @@
 
 var Cl = window.Cl || {};
 /* global Class */
-
 (function ($) {
     Cl.FocalPoint = new Class({
         options: {
@@ -13,7 +12,8 @@ var Cl = window.Cl || {};
             circleSelector: '.js-focal-point-circle',
             locationSelector: '.js-focal-point-location',
             draggableClass: 'ui-draggable',
-            hiddenClass: 'hidden'
+            hiddenClass: 'hidden',
+            dataLocation: 'location-selector'
         },
         _init: function (container) {
             var focalPointInstance = new Cl.FocalPointConstructor(container, this.options);
@@ -77,7 +77,7 @@ var Cl = window.Cl || {};
             });
 
             this.circle.draggable({
-                containment : [
+                containment: [
                     this.containerOffset.left,
                     this.containerOffset.top,
                     this.containerOffset.left + imageWidth,
@@ -90,6 +90,15 @@ var Cl = window.Cl || {};
 
             this._updateLocationValue();
         },
+        _getLocation: function () {
+            var newLocationSelector = this.container.data(this.options.dataLocation);
+            var newLocation = $(newLocationSelector);
+            if (newLocation.length) {
+                return newLocation;
+            } else {
+                return this.container.find(this.options.locationSelector);
+            }
+        },
         initialize: function (container, options) {
             this.options = $.extend({}, this.options, options);
 
@@ -97,12 +106,16 @@ var Cl = window.Cl || {};
             this.containerOffset = this.container.offset();
             this.image = this.container.find(this.options.imageSelector);
             this.circle = this.container.find(this.options.circleSelector);
-            this.location = this.container.find(this.options.locationSelector);
             this.ratio = parseFloat(this.image.data('ratio'));
-
+            this.location = this._getLocation();
             this._onImageLoaded = $.proxy(this._onImageLoaded, this);
 
-            this.image.on('load', this._onImageLoaded);
+            if (this.image.prop('complete')) {
+                this._onImageLoaded();
+            } else {
+                this.image.on('load', this._onImageLoaded);
+            }
+
         },
         destroy: function () {
             if (this.circle.hasClass(this.options.draggableClass)) {
