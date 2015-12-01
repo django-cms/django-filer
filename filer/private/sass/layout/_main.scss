@@ -28,6 +28,12 @@
         &.image-details {
             margin-top: 20px;
         }
+        .fa-user {
+            font-size: 18px;
+        }
+        .text {
+            margin-right: 15px;
+        }
         li {
             font-weight: normal !important;
             list-style-type: none;
@@ -50,6 +56,9 @@
 }
 
 .image-info-title {
+    width: 80%;
+    padding-bottom: 5px;
+    border-bottom: solid 1px $color-separator;
     a {
         margin-left: 5px;
     }
@@ -117,6 +126,7 @@
         border-bottom: solid 1px $color-separator;
     }
     .icon {
+        font-size: 16px;
         &:first-child {
             width: 20px;
         }

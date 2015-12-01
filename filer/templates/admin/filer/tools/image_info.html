@@ -4,7 +4,7 @@
     {% if original.original_filename %}
     <div class="image-info-title">
         {{ original.original_filename }}
-        <a href="#" class="fa fa-pencil"></a>
+        <a href="#" class="icon fa fa-pencil"></a>
     </div>
     {% endif %}
     <div class="row">
@@ -21,55 +21,36 @@
     </div>
         </div>
         <div class="col-sm-6">
-            <ul class="image-details">
-                {% if original.file_type %}
-                <li class="row">
-                    <div class="col-xs-3">
-                        Type
-                    </div>
-                    <div class="col-xs-9">
-                        {{ original.file_type }}
-                    </div>
-                </li>
-                {% endif %}
-                <li class="row">
-                    <div class="col-xs-3">
-                        Size
-                    </div>
-                    <div class="col-xs-9">
-                        <span style="color:red">1765x1249 px</span>
-                    </div>
-                </li>
-                <li class="row">
-                    <div class="col-xs-3">
-                        File-size
-                    </div>
-                    <div class="col-xs-9">
-                        <span style="color:red">2.3 MB</span>
-                    </div>
-                </li>
-                {% if original.modified_at %}
-                <li class="row">
-                    <div class="col-xs-3">
-                        Modified
-                    </div>
-                    <div class="col-xs-9">
-                         {{ original.modified_at }}
-                    </div>
-                </li>
-                {% endif %}
-                {% if original.uploaded_at %}
-                <li class="row">
-                    <div class="col-xs-3">
-                        Created
-                    </div>
-                    <div class="col-xs-9">
-                        {{ original.uploaded_at }}
-                    </div>
-                </li>
-                {% endif %}
-            </ul>
-
+            {% if original.file_type or original.modified_at or original.uploaded_at %}
+                <ul class="image-details">
+                    {% if original.file_type %}
+                        <li class="row">
+                            <div class="col-xs-3">Type</div>
+                            <div class="col-xs-9">{{ original.file_type }}</div>
+                        </li>
+                    {% endif %}
+                        <li class="row">
+                            <div class="col-xs-3">Size</div>
+                            <div class="col-xs-9">1765x1249 px</div>
+                        </li>
+                        <li class="row">
+                            <div class="col-xs-3">File-size</div>
+                            <div class="col-xs-9">2.3 MB</div>
+                        </li>
+                    {% if original.modified_at %}
+                        <li class="row">
+                            <div class="col-xs-3">Modified</div>
+                            <div class="col-xs-9">{{ original.modified_at }}</div>
+                        </li>
+                    {% endif %}
+                    {% if original.uploaded_at %}
+                        <li class="row">
+                            <div class="col-xs-3">Created</div>
+                            <div class="col-xs-9">{{ original.uploaded_at }}</div>
+                        </li>
+                    {% endif %}
+                </ul>
+            {% endif %}
             <div class="image-actions">
                 <ul class="actions-list">
                     <li>
