@@ -4,7 +4,6 @@
         {% if original.original_filename %}
             <div class="image-info-title">
                 {{ original.original_filename }}
-                <a href="#" class="icon fa fa-pencil"></a>
             </div>
         {% endif %}
         <div class="row">
@@ -53,11 +52,10 @@
                     <div class="image-actions">
                         <ul class="actions-list">
                             <li>
-                                <a href="#">
-                                    <span class="icon fa fa-user"></span>
-                                    {% if original.owner %}<span class="text">{% trans "Owner" %}: {{ original.owner }}</span>{% endif %}
-                                    <span class="icon fa fa-pencil"></span>
-                                </a>
+                                <span class="icon fa fa-user"></span>
+                                {% if original.owner %}
+                                    <span class="text">{% trans "Owner" %}: <strong>{{ original.owner }}</strong></span>
+                                {% endif %}
                             </li>
                         </ul>
                     </div>
