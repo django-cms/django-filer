@@ -30,11 +30,11 @@
                         {% endif %}
                             <li class="row">
                                 <div class="col-xs-3">{% trans "Size" %}</div>
-                                <div class="col-xs-9">1765x1249 px</div>
+                                <div class="col-xs-9">{{ original.width }}x{{ original.height }} px</div>
                             </li>
                             <li class="row">
                                 <div class="col-xs-3">{% trans "File-size" %}</div>
-                                <div class="col-xs-9">2.3 MB</div>
+                                <div class="col-xs-9">{{ original.size|filesizeformat }}</div>
                             </li>
                         {% if original.modified_at %}
                             <li class="row">
