@@ -16,7 +16,7 @@
                     </div>
 
                     <div class="text-left">
-                        <a href="{{ original.url }}" target="_blank" class="btn">Full size preview</a>
+                        <a href="{{ original.url }}" target="_blank" class="btn">{% trans "Full size preview" %}</a>
                     </div>
                 </div>
             </div>
@@ -25,27 +25,27 @@
                     <ul class="image-details">
                         {% if original.file_type %}
                             <li class="row">
-                                <div class="col-xs-3">Type</div>
+                                <div class="col-xs-3">{% trans "Type" %}</div>
                                 <div class="col-xs-9">{{ original.file_type }}</div>
                             </li>
                         {% endif %}
                             <li class="row">
-                                <div class="col-xs-3">Size</div>
+                                <div class="col-xs-3">{% trans "Size" %}</div>
                                 <div class="col-xs-9">1765x1249 px</div>
                             </li>
                             <li class="row">
-                                <div class="col-xs-3">File-size</div>
+                                <div class="col-xs-3">{% trans "File-size" %}</div>
                                 <div class="col-xs-9">2.3 MB</div>
                             </li>
                         {% if original.modified_at %}
                             <li class="row">
-                                <div class="col-xs-3">Modified</div>
+                                <div class="col-xs-3">{% trans "Modified" %}</div>
                                 <div class="col-xs-9">{{ original.modified_at }}</div>
                             </li>
                         {% endif %}
                         {% if original.uploaded_at %}
                             <li class="row">
-                                <div class="col-xs-3">Created</div>
+                                <div class="col-xs-3">{% trans "Created" %}</div>
                                 <div class="col-xs-9">{{ original.uploaded_at }}</div>
                             </li>
                         {% endif %}
@@ -55,7 +55,7 @@
                             <li>
                                 <a href="#">
                                     <span class="icon fa fa-user"></span>
-                                    {% if original.owner %}<span class="text">Owner: {{ original.owner }}</span>{% endif %}
+                                    {% if original.owner %}<span class="text">{% trans "Owner" %}: {{ original.owner }}</span>{% endif %}
                                     <span class="icon fa fa-pencil"></span>
                                 </a>
                             </li>
@@ -82,14 +82,14 @@
             </div>
 
             <div class="text-right">
-                <a href="http://lorempixel.com/210/266" target="_blank" class="btn">Full size preview</a>
+                <a href="http://lorempixel.com/210/266" target="_blank" class="btn">{% trans "Full size preview" %}</a>
             </div>
         </div>
 
         <ul class="image-details">
             <li class="row">
                 <div class="col-xs-4">
-                    Type
+                    {% trans "Type" %}
                 </div>
                 <div class="col-xs-8">
                     Image
@@ -98,7 +98,7 @@
 
             <li class="row">
                 <div class="col-xs-4">
-                    Size
+                    {% trans "Size" %}
                 </div>
                 <div class="col-xs-8">
                     1765x1249 px
@@ -107,7 +107,7 @@
 
             <li class="row">
                 <div class="col-xs-4">
-                    File-size
+                    {% trans "File-size" %}
                 </div>
                 <div class="col-xs-8">
                     2.3 MB
@@ -116,7 +116,7 @@
 
             <li class="row">
                 <div class="col-xs-4">
-                    Modified
+                    {% trans "Modified" %}
                 </div>
                 <div class="col-xs-8">
                     25/10/2015 8:02 PM
@@ -125,7 +125,7 @@
 
             <li class="row">
                 <div class="col-xs-4">
-                    Created
+                    {% trans "Created" %}
                 </div>
                 <div class="col-xs-8">
                     25/10/2015 8:02 PM
@@ -146,7 +146,7 @@
                 <li>
                     <a href="#">
                         <span class="icon fa fa-user"></span>
-                        <span class="text">Owner: User</span>
+                        <span class="text">{% trans "Owner" %}: User</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
@@ -154,7 +154,7 @@
                 <li>
                     <a href="#">
                         <span class="icon fa fa-font"></span>
-                        <span class="text">Add Description</span>
+                        <span class="text">{% trans "Add Description" %}</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
@@ -162,7 +162,7 @@
 
             <div class="actions-list-dropdown">
                 <a href="#" class="js-toggler-link" data-toggler-header-selector=".actions-list-dropdown" data-toggler-content-selector=".actions-advanced">
-                    Advanced
+                    {% trans "Advanced" %}
                     <span class="fa fa-caret-down caret-down"></span>
                     <span class="fa fa-caret-right caret-right"></span>
                 </a>
@@ -172,35 +172,35 @@
                 <li>
                     <a href="#">
                         <span class="icon fa fa-user"></span>
-                        <span class="text">Author: User</span>
+                        <span class="text">{% trans "Author" %}: User</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <span class="icon fa fa-font"></span>
-                        <span class="text">Add Alt-Text</span>
+                        <span class="text">{% trans "Add Alt-Text" %}</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <span class="icon fa fa-font"></span>
-                        <span class="text">Add caption</span>
+                        <span class="text">{% trans "Add caption" %}</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <span class="icon fa fa-font"></span>
-                        <span class="text">Add Tags</span>
+                        <span class="text">{% trans "Add Tags" %}</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <span class="icon fa fa-picture-o"></span>
-                        <span class="text">Change File</span>
+                        <span class="text">{% trans "Change File" %}</span>
                         <span class="icon fa fa-pencil"></span>
                     </a>
                 </li>
@@ -209,7 +209,7 @@
                 <li>
                     <a href="#">
                         <span class="icon fa fa-trash"></span>
-                        <span class="text">Delete</span>
+                        <span class="text">{% trans "Delete" %}</span>
                     </a>
                 </li>
             </ul>
