@@ -25,7 +25,7 @@
                         {% if original.file_type %}
                             <li class="row">
                                 <div class="col-xs-3">{% trans "Type" %}</div>
-                                <div class="col-xs-9">{{ original.file_type }}</div>
+                                <div class="col-xs-9">{{ original.extension|upper }} {{ original.file_type }}</div>
                             </li>
                         {% endif %}
                             <li class="row">
