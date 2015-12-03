@@ -4,7 +4,7 @@ Running tests
 =============
 
 
-django-filer is continuously being tested on `travis-ci <https://travis-ci.org/stefanfoulis/django-filer>`_.
+django-filer is continuously being tested on `travis-ci <https://travis-ci.org/divio/django-filer>`_.
 
 The simplest way to run the testsuite locally is to checkout the sourcecode, make sure you have ``Pillow`` installed and
 run::
