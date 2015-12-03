@@ -120,7 +120,7 @@
             .find('td:gt(0) :input').change(function () {
             list_editable_changed = true;
         });
-        $('form#changelist-form button[name="index"], .js-navigator-form button[name="index"]')
+        $('form#changelist-form button[name="index"], .actions button[name="index"]')
             .click(function () {
             if (list_editable_changed) {
                 return confirm(gettext('You have unsaved changes on individual editable fields. ' +
