@@ -6,12 +6,18 @@ python:
   - 3.3
   - 3.4
 
-sudo: false
+sudo: true
+
+before_install:
+  - if [[ $FRONTEND == "true" ]]; then npm install; fi;
+  - if [[ $FRONTEND == "true" ]]; then sudo apt-get update; fi;
+  - if [[ $FRONTEND == "true" ]]; then sudo apt-get install nodejs npm; fi;
 
 install:
   - ./.travis_setup
 
 env:
+  - FRONTEND="true"
   - DJANGO="Django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
   - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0"
@@ -22,7 +28,8 @@ env:
   - DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
   - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
 
-script: coverage run --rcfile=coverage.rc test_settings.py
+script:
+  - if [[ $TRAVIS_PYTHON_VERSION = "2.6" && $FRONTEND = "true" ]]; then gulp ci; else coverage run --rcfile=coverage.rc test_settings.py; fi;
 
 after_success:
   - coveralls --config_file=coverage.rc
@@ -40,6 +47,12 @@ matrix:
       env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
     - python: 2.6
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
+    - python: 2.7
+      env: FRONTEND="true"
+    - python: 3.3
+      env: FRONTEND="true"
+    - python: 3.4
+      env: FRONTEND="true"
   allow_failures:
     - python: 2.7
       env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
