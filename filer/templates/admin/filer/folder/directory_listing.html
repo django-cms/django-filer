@@ -63,28 +63,28 @@
                     <span class="small quiet">
                         ({% blocktrans count folder.children_count as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.file_count as counter %}{{ counter }} file{% plural %}{{ counter }} files{% endblocktrans %})
                     </span>
-
-                    <div class="dropdown-container dropdown-container-down">
-                        <a href="#" data-toggle="dropdown" aria-expanded="false">
-                            <span class="fa fa-caret-down"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% if is_popup %}
-                                {% if select_folder and folder.file_type == 'Folder' %}
-                                    <li>
-                                        <a href="#">&nbsp;</a>
-                                    </li>
-                                {% endif %}
-                            {% else %}
-                                {% if permissions.has_edit_permission %}
-                                    <li>
-                                        <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
-                                    </li>
-                                {% endif %}
-                            {% endif %}
-                        </ul>
-                    </div>
                 </h1>
+
+                <div class="dropdown-container dropdown-container-down">
+                    <a href="#" data-toggle="dropdown" aria-expanded="false">
+                        <span class="fa fa-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if is_popup %}
+                            {% if select_folder and folder.file_type == 'Folder' %}
+                                <li>
+                                    <a href="#">&nbsp;</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            {% if permissions.has_edit_permission %}
+                                <li>
+                                    <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
             {% else %}
                 {% if folder.is_smart_folder %}
                     <h1 class="folder_header"><a class="backtoroot" href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">&uarr;</a>
@@ -109,13 +109,13 @@
                         <span class="fa fa-ellipsis-v"></span>
                     </a>
                     <ul class="create-menu-dropdown dropdown-menu">
-                        <li><a href="#">{% trans 'Delete selected files and/or folders' %}</a></li>
-                        <li><a href="#">{% trans 'Move selected files and/or folders' %}</a></li>
-                        <li><a href="#">{% trans 'Copy selected files and/or folders' %}</a></li>
-                        <li><a href="#">{% trans 'Resize selected images' %}</a></li>
-                        <li><a href="#">{% trans 'Rename files' %}</a></li>
-                        <li><a href="#">{% trans 'Disable permissions for selected files' %}</a></li>
-                        <li><a href="#">{% trans 'Enable permissions for selected files' %}</a></li>
+                        <li><a href="#">{% trans "Delete selected files and/or folders" %}</a></li>
+                        <li><a href="#">{% trans "Move selected files and/or folders" %}</a></li>
+                        <li><a href="#">{% trans "Copy selected files and/or folders" %}</a></li>
+                        <li><a href="#">{% trans "Resize selected images" %}</a></li>
+                        <li><a href="#">{% trans "Rename files" %}</a></li>
+                        <li><a href="#">{% trans "Disable permissions for selected files" %}</a></li>
+                        <li><a href="#">{% trans "Enable permissions for selected files" %}</a></li>
                     </ul>
                 </div>
                 <span class="separator"></span>
@@ -146,7 +146,7 @@
         <input type="text" placeholder="Filter files" class="filter-files">
 
         <div class="js-navigator navigator{% if not actions_on_top and not actions_on_bottom %}navigator-no-actions{% endif %}">
-            <form class="js-navigator-form" action="" method="post">
+            <form class="js-navigator-form" method="post">
                 {% csrf_token %}
                 {% if is_popup %}
                     <input type="hidden" name="_popup" value="1">
