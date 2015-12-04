@@ -268,24 +268,24 @@ body {
 }
 .navigator-tools {
     margin-top: 10px;
-    .navigator-button {
-        display: inline-block;
-        position: relative;
-        top: -3px;
-        color: #555;
-        line-height: 30px;
-        vertical-align: top;
-        text-transform: uppercase;
-        box-sizing: border-box;
-        height: 30px;
-        padding: 0 20px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        background-color: #fff;
-    }
-    .navigator-button + .dropdown-menu {
-        margin-top: -2px;
-    }
+}
+.navigator-button {
+    display: inline-block;
+    position: relative;
+    top: -3px;
+    color: #555;
+    line-height: 30px;
+    vertical-align: top;
+    text-transform: uppercase;
+    box-sizing: border-box;
+    height: 30px;
+    padding: 0 20px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #fff;
+}
+.navigator-button + .dropdown-menu {
+    margin-top: -2px;
 }
 
 .dropdown-container {
