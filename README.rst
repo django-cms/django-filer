@@ -16,7 +16,7 @@ Filer picker widget: |file-picker-widget-screeshot|
 
 Documentation: http://django-filer.readthedocs.org/en/latest/index.html
 
-Wiki: https://github.com/stefanfoulis/django-filer/wiki
+Wiki: https://github.com/divio/django-filer/wiki
 
 Dependencies
 ------------

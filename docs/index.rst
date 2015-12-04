@@ -45,10 +45,10 @@ Getting help
 Contributing
 ------------
 
-The code is hosted on github at http://github.com/stefanfoulis/django-filer/ 
+The code is hosted on github at http://github.com/divio/django-filer/
 and is fully open source. We hope you choose to help us on the project! More 
-about `how to contribute <https://github.com/stefanfoulis/django-filer/wiki/Contributing>`_ 
-can be found on `the wiki <https://github.com/stefanfoulis/django-filer/wiki/>`_.
+about `how to contribute <https://github.com/divio/django-filer/wiki/Contributing>`_
+can be found on `the wiki <https://github.com/divio/django-filer/wiki/>`_.
 
 Contents
 ========
