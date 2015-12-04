@@ -42,32 +42,55 @@ body {
         }
     }
     &.image-info-detail {
+        @include clearfix();
         position: static;
         float: none;
         width: 100%;
         margin-bottom: 20px;
         padding: 25px;
         border-radius: 0;
-        > .row {
-            width: 80%;
+        .image-details-left {
+            float: left;
+        }
+        .image-details-right {
+            float: left;
+            margin-left: 50px;
+        }
+        .icon {
+            font-size: 18px;
         }
         .image-details,
         .actions-list {
+            margin-top: 0;
             border: 0 !important;
             &.image-details {
                 margin-top: 20px;
                 margin-bottom: 15px;
                 padding: 0;
             }
-            .fa-user {
-                font-size: 18px;
+            dt {
+                float: left;
+                font-size: 13px;
+                color: #808080;
+                font-weight: normal;
+            }
+            dd {
+                font-size: 13px;
+                color: $gray;
+                padding-left: 80px;
             }
             .text {
+                font-size: 13px;
                 margin-right: 15px;
+                strong {
+                    font-size: 13px;
+                }
             }
             li {
+                font-size: 13px !important;
+                color: $gray;
                 font-weight: normal !important;
-                padding: 0 !important;
+                padding: 1px 0 !important;
                 border: 0 !important;
             }
             a {
@@ -75,16 +98,22 @@ body {
             }
         }
         .image-info-title {
-            width: 80%;
+            .icon {
+                flot: left;
+                margin-right: 5px;
+            }
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: $gray;
             padding: 0 0 5px;
         }
         .image-preview-container {
             text-align: left;
             margin: 20px 0 0;
             padding: 0;
-            .image-preview {
-                width: 250px;
-                height: 150px;
+            > img {
+                margin-bottom: 15px;
             }
         }
         .actions-list {
@@ -108,7 +137,7 @@ body {
 
 .image-info-title {
     padding: 5px 10px;
-    border-bottom: solid 1px $color-separator;
+    border-bottom: solid 1px $gray-lighter;
     a {
         margin-left: 5px;
     }
@@ -153,7 +182,7 @@ body {
         display: none;
     }
     &.js-collapsed {
-        border-bottom: solid 1px $color-separator;
+        border-bottom: solid 1px $gray-lighter;
         .caret-down {
             display: none;
         }
@@ -163,7 +192,7 @@ body {
     }
 }
 .actions-list {
-    border-top: solid 1px $color-separator;
+    border-top: solid 1px $gray-lighter;
     &:last-child {
         border-top: none;
         a {
@@ -173,7 +202,7 @@ body {
     a {
         display: block;
         padding: 5px 10px;
-        border-bottom: solid 1px $color-separator;
+        border-bottom: solid 1px $gray-lighter;
     }
     .icon {
         &:first-child {
@@ -186,17 +215,9 @@ body {
     }
 }
 
-@media screen and (max-width: 768px) {
-    .image-info {
-        float: none;
-        width: 100%;
-        margin-top: 60px;
-    }
-}
-
 .filter-files {
     color: #333;
-    font-size: 14px;
+    font-size: $font-size-normal;
     box-sizing: border-box;
     width: 100%;
     margin-bottom: 10px;
@@ -339,4 +360,19 @@ body {
 
 .nav-pages {
     padding: 10px 15px;
+}
+
+@media screen and (max-width: $screen-tablet) {
+    .image-info {
+        float: none;
+        width: 100%;
+        margin-top: 60px;
+        &.image-info-detail {
+            .image-details-left,
+            .image-details-right {
+                float: none;
+                margin-left: 0;
+            }
+        }
+    }
 }

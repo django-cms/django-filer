@@ -56,7 +56,7 @@
     box-sizing: border-box;
     width: 18% !important;
     margin-top: -1px !important;
-    border: 1px solid $color-separator !important;
+    border: 1px solid $gray-lighter !important;
     form {
         padding-top: 0 !important;
     }
@@ -64,7 +64,7 @@
         margin: 0;
         border: 0 !important;
         td {
-            border-color: $color-separator;
+            border-color: $gray-lighter;
             border-right: 0 !important;
         }
         th {
@@ -106,13 +106,13 @@ a.small_folder_link {
 #toolbartable {
     overflow-x: auto;
     td {
-        border-right: solid 1px $color-separator;
+        border-right: solid 1px $gray-lighter;
     }
     th {
-        border-right: solid 1px $color-separator;
+        border-right: solid 1px $gray-lighter;
     }
     + .paginator {
-        border-right: solid 1px $color-separator;
+        border-right: solid 1px $gray-lighter;
     }
 }
 table thead th.thumbHeader {

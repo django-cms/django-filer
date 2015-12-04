@@ -1,0 +1,15 @@
+// #############################################################################
+// OTHER
+
+// add clearfix which doesnt add overflow:hidden
+@mixin clearfix() {
+    *zoom: 1;
+    &:before,
+    &:after {
+        content: " ";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
