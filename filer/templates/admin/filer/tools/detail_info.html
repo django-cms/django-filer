@@ -3,57 +3,65 @@
     <section class="image-info image-info-detail">
         {% if original.original_filename %}
             <div class="image-info-title">
-                {{ original.original_filename }}
+                <span class="icon fa {% if file %}fa-file{% else %}fa-file-image-o{% endif %}"></span> {{ original.original_filename }}
             </div>
         {% endif %}
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="image-preview-container">
-                        <img src="{% if original.icons.48 %}{{ original.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}">
-
-                    <div class="text-left">
-                        <a href="{{ original.url }}" target="_blank" class="btn">{% trans "Open file in new tab" %}</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                {% if original.file_type or original.modified_at or original.uploaded_at %}
-                    <ul class="image-details">
-                        {% if original.file_type %}
-                            <li class="row">
-                                <div class="col-xs-3">{% trans "Type" %}</div>
-                                <div class="col-xs-9">{{ original.extension|upper }} {{ original.file_type }}</div>
-                            </li>
-                        {% endif %}
-                            <li class="row">
-                                <div class="col-xs-3">{% trans "File-size" %}</div>
-                                <div class="col-xs-9">{{ original.size|filesizeformat }}</div>
-                            </li>
-                        {% if original.modified_at %}
-                            <li class="row">
-                                <div class="col-xs-3">{% trans "Modified" %}</div>
-                                <div class="col-xs-9">{{ original.modified_at }}</div>
-                            </li>
-                        {% endif %}
-                        {% if original.uploaded_at %}
-                            <li class="row">
-                                <div class="col-xs-3">{% trans "Created" %}</div>
-                                <div class="col-xs-9">{{ original.uploaded_at }}</div>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    <div class="image-actions">
-                        <ul class="actions-list">
-                            <li>
-                                <span class="icon fa fa-user"></span>
-                                {% if original.owner %}
-                                    <span class="text">{% trans "Owner" %}: <strong>{{ original.owner }}</strong></span>
-                                {% endif %}
-                            </li>
-                        </ul>
+        <div class="image-details-left">
+            <div class="image-preview-container">
+                {% if file %}
+                    <img src="{% if original.icons.48 %}{{ original.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}">
+                {% else %}
+                    <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
+                        <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-focal-point-image">
+                        <div class="js-focal-point-circle image-preview-circle hidden"></div>
                     </div>
                 {% endif %}
+                <div class="text-left">
+                    <a href="{{ original.url }}" target="_blank" class="btn">
+                        {% if file %}
+                            {% trans "Open file" %}
+                        {% else %}
+                            {% trans "Full size preview" %}
+                        {% endif %}
+                    </a>
+                </div>
             </div>
+        </div>
+        <div class="image-details-right">
+            {% if original.file_type or original.modified_at or original.uploaded_at or original.width or original.height or original.size %}
+                <dl class="image-details">
+                    {% if original.file_type %}
+                        <dt>{% trans "Type" %}</dt>
+                        <dd>{{ original.extension|upper }} {{ original.file_type }}</dd>
+                    {% endif %}
+                    {% if original.width or original.height %}
+                        <dt>{% trans "Size" %}</dt>
+                        <dd>{{ original.width }}x{{ original.height }} px</dd>
+                    {% endif %}
+                    {% if original.size %}
+                        <dt>{% trans "File-size" %}</dt>
+                        <dd>{{ original.size|filesizeformat }}</dd>
+                    {% endif %}
+                    {% if original.modified_at %}
+                        <dt>{% trans "Modified" %}</dt>
+                        <dd>{{ original.modified_at }}</dd>
+                    {% endif %}
+                    {% if original.uploaded_at %}
+                        <dt>{% trans "Created" %}</dt>
+                        <dd>{{ original.uploaded_at }}</dd>
+                    {% endif %}
+                </dl>
+                <div class="image-actions">
+                    <ul class="actions-list">
+                        <li>
+                            <span class="icon fa fa-user"></span>
+                            {% if original.owner %}
+                                <span class="text">{% trans "Owner" %}: <strong>{{ original.owner }}</strong></span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
         </div>
     </section>
 {% else %}
