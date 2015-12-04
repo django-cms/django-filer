@@ -194,7 +194,7 @@ body {
     }
 }
 
-body .filter-files {
+.filter-files {
     box-sizing: border-box;
     width: 100%;
     margin-bottom: 10px;
@@ -203,7 +203,6 @@ body .filter-files {
     outline: none;
     font-size: 14px;
     color: #333;
-
     appearance: none;
 }
 
