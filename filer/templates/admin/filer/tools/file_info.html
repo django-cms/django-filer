@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n staticfiles %}
 {% if detail %}
     <section class="image-info image-info-detail">
         {% if original.original_filename %}
@@ -9,13 +9,10 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="image-preview-container">
-                    <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
-                        <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-focal-point-image">
-                        <div class="js-focal-point-circle image-preview-circle hidden"></div>
-                    </div>
+                        <img src="{% if original.icons.48 %}{{ original.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}">
 
                     <div class="text-left">
-                        <a href="{{ original.url }}" target="_blank" class="btn">{% trans "Full size preview" %}</a>
+                        <a href="{{ original.url }}" target="_blank" class="btn">{% trans "Open file in new tab" %}</a>
                     </div>
                 </div>
             </div>
@@ -28,10 +25,6 @@
                                 <div class="col-xs-9">{{ original.extension|upper }} {{ original.file_type }}</div>
                             </li>
                         {% endif %}
-                            <li class="row">
-                                <div class="col-xs-3">{% trans "Size" %}</div>
-                                <div class="col-xs-9">{{ original.width }}x{{ original.height }} px</div>
-                            </li>
                             <li class="row">
                                 <div class="col-xs-3">{% trans "File-size" %}</div>
                                 <div class="col-xs-9">{{ original.size|filesizeformat }}</div>
