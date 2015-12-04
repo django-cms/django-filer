@@ -15,7 +15,7 @@ def read(fname):
 setup(
     name="django-filer",
     version=version,
-    url='http://github.com/stefanfoulis/django-filer',
+    url='http://github.com/divio/django-filer',
     license='BSD',
     platforms=['OS Independent'],
     description="A file management application for django that makes handling "

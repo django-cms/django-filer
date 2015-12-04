@@ -15,8 +15,8 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
     $ pip install django-filer
 
 If you are feeling adventurous you can get
-`the latest sourcecode from github <https://github.com/stefanfoulis/django-filer/>`_ or add
-http://stefanfoulis.github.com/django-filer/unstable_releases/ to ``find-links`` for the latest
+`the latest sourcecode from github <https://github.com/divio/django-filer/>`_ or add
+http://divio.github.com/django-filer/unstable_releases/ to ``find-links`` for the latest
 alpha and beta releases.
 
 Dependencies
@@ -152,7 +152,7 @@ generation errors,  two options are provided to help when working with ``django-
    for further information about Django's logging configuration.
 
 
-.. _django-filer: https://github.com/stefanfoulis/django-filer/
+.. _django-filer: https://github.com/divio/django-filer/
 .. _staticfiles documentation: http://docs.djangoproject.com/en/stable/howto/static-files/
 .. _Django: http://djangoproject.com
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
