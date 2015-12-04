@@ -39,7 +39,7 @@ Installation
 To get started using ``django-filer`` simply install it with
 ``pip``::
 
-    $ pip install django-filer
+    pip install django-filer
 
 
 Configuration
@@ -70,6 +70,50 @@ The easiest way to run the testsuite is to checkout the code, make sure you have
 
 
 For serious testing ``tox`` is recommended. See documentation for details.
+
+
+Development front-end
+---------------------
+
+To started development fron-end part of ``django-filer`` simply install all the packages over npm:
+
+``npm install``
+
+To compile and watch scss, run javascript unit-tests, jshint and jscs watchers:
+
+``gulp``
+
+To compile scss to css:
+
+``gulp sass``
+
+To run sass watcher:
+
+``gulp sass:watch``
+
+To run javascript linting and code styling analysis:
+
+``gulp lint``
+
+To run javascript linting and code styling analysis watcher:
+
+``gulp lint:watch``
+
+To run javascript linting:
+
+``gulp jshint``
+
+To run javascript code style analysis:
+
+``gulp jscs``
+
+To fix javascript code style errors:
+
+``gulp jscs:fix``
+
+To run javascript unit-tests:
+
+``gulp tests:unit``
 
 
 .. _Django: http://djangoproject.com

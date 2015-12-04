@@ -1,37 +1,39 @@
 {% extends "admin/change_form.html" %}
 {% load i18n %}
-{% block content %}
-<h1>{% trans "Add new" %} {% trans "folder" %}</h1>
-<div id="content-main">
-    <form id="folder_form" method="post" action="" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div>
-          <input type="hidden" value="1" name="_popup"/>
-          {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
-          {% if new_folder_form.errors %}
-            <p class="errornote">
-            {% blocktrans count new_folder_form.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
-            </p>
-            {{ new_folder_form.non_field_errors }}
-          {% endif %}
-          <fieldset class="module aligned">
-            <div class="form-row {% if new_folder_form.errors.name %}errors {% endif %}name">
-              {{ new_folder_form.errors.name.as_ul }}
-              <div>
-              {% for field in new_folder_form %}
-                <label class="required" for="id_{{ field.name }}">{{ field.label }}:</label>{{ field }}
-              {% endfor %}
-              </div>
-            </div>
-          </fieldset>
-        <div style="overflow: auto;" class="submit-row">
-            <input type="submit" name="_save" class="default" value="{% trans "Save" %}"/>
-        </div>
-        <script type="text/javascript">document.getElementById("id_name").focus();</script>
-        </div>
-    </form>
-</div>
 
-        
- <br class="clear"/>
+{% block content %}
+    <h1>{% trans "Add new" %} {% trans "folder" %}</h1>
+    <div id="content-main">
+        <form id="folder_form" method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                <input type="hidden" value="1" name="_popup">
+                {% if select_folder %}
+                    <input type="hidden" name="select_folder" value="1">
+                {% endif %}
+                {% if new_folder_form.errors %}
+                    <p class="errornote">
+                        {% blocktrans count new_folder_form.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+                    </p>
+                    {{ new_folder_form.non_field_errors }}
+                {% endif %}
+                <fieldset class="module aligned">
+                    <div class="form-row {% if new_folder_form.errors.name %}errors {% endif %}name">
+                        {{ new_folder_form.errors.name.as_ul }}
+                        <div>
+                        {% for field in new_folder_form %}
+                            <label class="required" for="id_{{ field.name }}">{{ field.label }}:</label>{{ field }}
+                        {% endfor %}
+                        </div>
+                    </div>
+                </fieldset>
+                <div style="overflow: auto;" class="submit-row">
+                    <input type="submit" name="_save" class="default" value="{% trans 'Save' %}">
+                </div>
+                <script type="text/javascript">
+                    document.getElementById('id_name').focus();
+                </script>
+            </div>
+        </form>
+    </div>
 {% endblock %}

@@ -1,30 +1,32 @@
-{% load i18n filer_admin_tags staticfiles %}{% spaceless %}
-<span class="filerFile">
-{% if object %}
-	{% if object.icons.32 %}
-		<a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}" /></a>
-		&nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
-	{% else %}
-		<img id="{{ thumb_id }}" src="{% static "filer/icons/missingfile_48x48.png" %}" alt="{% trans 'file missing' %}" />
-		&nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
-	{% endif %}
-{% else %}
-	<img id="{{ thumb_id }}" src="{% static "filer/icons/nofile_48x48.png" %}" class="quiet" alt="{% trans 'no file selected' %}" />
-	&nbsp;<span id="{{ span_id }}"></span>
-{% endif %}
-{% render_filer_lookup_button %}
-<img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %} />
-<br />
-{{ hidden_input }}
-<script type="text/javascript" id="{{id}}_javascript">
-    django.jQuery(document).ready(function(){
-        var plus = django.jQuery("#add_{{ id }}");
-        if (plus.length){
-            plus.remove();
-        }
-        {# Delete this javascript once loaded to avoid the "add new" link duplicates it #}
-        django.jQuery('#{{id}}_javascript').remove();
-    });
-</script>
-</span>
+{% load i18n filer_admin_tags staticfiles %}
+
+{% spaceless %}
+    <span class="filerFile">
+        {% if object %}
+            {% if object.icons.32 %}
+                <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
+                &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+            {% else %}
+                <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
+                &nbsp;<span id="{{ span_id }}">{% trans "file missing" %}</span>
+            {% endif %}
+        {% else %}
+            <img id="{{ thumb_id }}" src="{% static 'filer/icons/nofile_48x48.png' %}" class="quiet" alt="{% trans 'no file selected' %}">
+            &nbsp;<span id="{{ span_id }}"></span>
+        {% endif %}
+        {% render_filer_lookup_button %}
+        <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
+        <br>
+        {{ hidden_input }}
+        <script type="text/javascript" id="{{id}}_javascript">
+            django.jQuery(document).ready(function(){
+                var plus = django.jQuery('#add_{{ id }}');
+                if (plus.length){
+                    plus.remove();
+                }
+                // Delete this javascript once loaded to avoid the "add new" link duplicates it
+                django.jQuery('#{{id}}_javascript').remove();
+            });
+        </script>
+    </span>
 {% endspaceless %}
