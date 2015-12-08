@@ -1,6 +1,7 @@
 .dropzone {
     border-radius: $border-radius-base;
-    border-color: $color-primary;
+    border: solid 1px $gray-lighter;
+    background-color: $gray-lightest;
     .dz-message {
         color: $gray;
         float: right;
@@ -28,6 +29,5 @@
         font-size: 20px;
         cursor: pointer;
         opacity: 0;
-        filter: alpha(opacity=0);
     }
 }
