@@ -83,7 +83,18 @@
         }
         &.dz-image-preview,
         &.dz-file-preview {
-           background-color: transparent;
+            background-color: transparent;
+            .dz-image {
+                overflow: hidden;
+                width: 36px;
+                height: 36px;
+                border-radius: 0;
+                border: solid 1px $gray-lighter;
+                img {
+                    width: 100%;
+                    height: auto;
+                }
+            }
         }
         .dz-progress {
             top: 18px;
@@ -91,17 +102,6 @@
             height: 10px;
             width: calc(100% - 40px);
             margin-left: 40px;
-        }
-        .dz-image {
-            overflow: hidden;
-            width: 36px;
-            height: 36px;
-            border-radius: 0;
-            border: solid 1px $gray-light;
-            img {
-                width: 100%;
-                height: auto;
-            }
         }
     }
     .dz-message {
