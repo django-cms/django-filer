@@ -25,7 +25,7 @@ var Cl = window.Cl || {};
             clickEvent.stopPropagation();
         });
 
-        // Temporary stuff here, please do not review
+        // mocking the action buttons to work in frontend UI, please do not review
         (function () {
             var dropdown = $('.js-actions-menu .dropdown-menu');
             var actionsSelect = $('.actions select[name="action"]');
