@@ -56,7 +56,7 @@
                                 {% endif %}
                             </td>
                             <td class="column-action">
-                                {% if subfolder.file_type == 'Folder' %}
+                                {% if subfolder.file_type == "Folder" %}
                                     <a href="{% url 'admin:filer_folder_change' subfolder.id %}" title="{% trans 'Change folder details' %}" class="icon fa fa-pencil"></a>
                                     <a href="#" class="icon fa fa-trash-o" title="{% trans 'Remove folder' %}"></a>
                                 {% endif %}

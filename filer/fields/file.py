@@ -82,8 +82,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
 
     class Media:
         js = (
-            static('filer/js/popup_handling.js'),
-            static('filer/js/widget.js'),
+            static('filer/js/addons/popup_handling.js'),
+            static('filer/js/addons/widget.js'),
         )
 
 
