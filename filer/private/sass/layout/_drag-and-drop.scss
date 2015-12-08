@@ -81,7 +81,8 @@
             }
 
         }
-        &.dz-image-preview {
+        &.dz-image-preview,
+        &.dz-file-preview {
            background-color: transparent;
         }
         .dz-progress {
