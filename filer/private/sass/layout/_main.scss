@@ -70,13 +70,13 @@ body {
             }
             dt {
                 float: left;
-                font-size: 13px;
                 color: #808080;
+                font-size: 13px;
                 font-weight: normal;
             }
             dd {
-                font-size: 13px;
                 color: $gray;
+                font-size: 13px;
                 padding-left: 80px;
             }
             .text {
@@ -87,8 +87,8 @@ body {
                 }
             }
             li {
-                font-size: 13px !important;
                 color: $gray;
+                font-size: 13px !important;
                 font-weight: normal !important;
                 padding: 1px 0 !important;
                 border: 0 !important;
@@ -98,15 +98,15 @@ body {
             }
         }
         .image-info-title {
+            overflow: hidden;
+            color: $gray;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding: 0 0 5px;
             .icon {
                 float: left;
                 margin-right: 5px;
             }
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: $gray;
-            padding: 0 0 5px;
         }
         .image-preview-container {
             text-align: left;
@@ -215,17 +215,67 @@ body {
     }
 }
 
+@media screen and (max-width: 768px) {
+    .image-info {
+        float: none;
+        width: 100%;
+        margin-top: 60px;
+    }
+}
+
+.filter-files-container {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    .dropdown-container {
+        position: absolute;
+        top: 0;
+        right: 42px;
+        > a {
+            &,
+            &:visited,
+            &:link:visited,
+            &:link {
+                display: inline-block;
+                line-height: 42px;
+                text-align: center;
+                width: 42px;
+                height: 42px;
+            }
+        }
+    }
+}
 .filter-files {
     color: #333;
-    font-size: $font-size-normal;
+    font-size: 14px;
+    line-height: 42px;
     box-sizing: border-box;
     width: 100%;
+    height: 42px;
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 0 30px 0 10px;
     border: 1px solid #ddd;
     outline: none;
 
     appearance: none;
+}
+.filter-files-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    line-height: 42px !important;
+    text-align: center;
+    width: 42px !important;
+    height: 42px;
+    margin: 0;
+    padding: 0 !important;
+    .icon {
+        position: relative;
+        top: 14px;
+        vertical-align: top;
+    }
 }
 
 .navigator-table {
@@ -246,7 +296,7 @@ body {
         text-align: center;
         width: 70px;
         a {
-            font-size: 18px !important;
+            font-size: 16px !important;
             margin: 0 5px;
             &:first-child {
                 margin-left: 0;
@@ -254,6 +304,9 @@ body {
             &:last-child {
                 margin-right: 0;
             }
+        }
+        .icon {
+            width: 20px;
         }
     }
 }
@@ -283,7 +336,7 @@ body {
         overflow: hidden;
         width: 1px;
         height: 26px;
-        margin: 0 10px;
+        margin: 0 5px;
         background-color: #555;
     }
 }
@@ -291,19 +344,31 @@ body {
     margin-top: 10px;
 }
 .navigator-button {
-    display: inline-block;
-    position: relative;
-    top: -3px;
-    color: #555;
-    line-height: 30px;
-    vertical-align: top;
-    text-transform: uppercase;
-    box-sizing: border-box;
-    height: 30px;
-    padding: 0 20px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    background-color: #fff;
+    margin-left: 10px;
+    &,
+    &:visited,
+    &:link:visited,
+    &:link {
+        display: inline-block;
+        position: relative;
+        top: -3px;
+        color: #555;
+        line-height: 30px;
+        vertical-align: top;
+        box-sizing: border-box;
+        height: 30px;
+        padding: 0 20px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        background-color: #fff;
+    }
+    .icon {
+        position: relative;
+        margin-right: 5px;
+    }
+    .fa-folder {
+        top: 0;
+    }
 }
 .navigator-button + .dropdown-menu {
     margin-top: -2px;
@@ -317,11 +382,16 @@ body {
         display: none;
         right: 0;
         left: auto;
-        .icon {
+        label {
+            display: block;
+            text-transform: none;
+            padding: 0 10px;
+        }
+        input {
             position: relative;
-            top: 2px;
-            font-size: 20px;
-            margin-right: 10px;
+            top: 4px;
+            vertical-align: top;
+            margin-right: 5px;
         }
     }
     &.open .dropdown-menu {
@@ -375,4 +445,7 @@ body {
             }
         }
     }
+}
+#id_upload_button:before {
+    display: none;
 }

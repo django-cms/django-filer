@@ -96,55 +96,36 @@
 
         {% block object-tools %}
             <div class="navigator-tools pull-right">
-                <a href="#" class="nav-button">
-                    <span class="fa fa-list hidden"></span>
-                    <span class="fa fa-th-large"></span>
-                </a>
-                <a href="#" class="nav-button nav-button-filter">
-                    <span class="fa fa-filter"></span>
-                </a>
                 <span class="separator"></span>
-                <div class="dropdown-container">
+                <div class="dropdown-container js-actions-menu">
                     <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
                         <span class="fa fa-ellipsis-v"></span>
                     </a>
                     <ul class="create-menu-dropdown dropdown-menu">
-                        <li><a href="#">{% trans "Delete selected files and/or folders" %}</a></li>
-                        <li><a href="#">{% trans "Move selected files and/or folders" %}</a></li>
-                        <li><a href="#">{% trans "Copy selected files and/or folders" %}</a></li>
-                        <li><a href="#">{% trans "Resize selected images" %}</a></li>
-                        <li><a href="#">{% trans "Rename files" %}</a></li>
-                        <li><a href="#">{% trans "Disable permissions for selected files" %}</a></li>
-                        <li><a href="#">{% trans "Enable permissions for selected files" %}</a></li>
+                        <!-- Actions will go here -->
                     </ul>
                 </div>
                 <span class="separator"></span>
-                <div class="dropdown-container">
-                    <a href="#" data-toggle="dropdown" aria-expanded="false" class="navigator-button">Create</a>
-                    <ul class="dropdown-menu">
-                        {% block object-tools-items %}
-                            {% if folder.can_have_subfolders and can_make_folder %}
-                                <li>
-                                    <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" title="{% trans 'Adds a new Folder' %}">
-                                        <span class="icon fa fa-folder"></span> {% trans "New Folder" %}
-                                    </a>
-                                </li>
-                            {% endif %}
-                            <li>
-                                <a href="#" title="{% trans 'Upload files' %}">
-                                    <span class="icon fa fa-file"></span>
-                                    {% trans "Upload files" %}
-                                </a>
-                            </li>
-                        {% endblock %}
-                    </ul>
-                </div>
+                {% block object-tools-items %}
+                    {% if folder.can_have_subfolders and can_make_folder %}
+                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" title="{% trans 'Adds a new Folder' %}" class="navigator-button">
+                            <span class="icon fa fa-folder"></span>
+                            {% trans "New Folder" %}
+                        </a>
+                    {% endif %}
+                    {% if permissions.has_add_children_permission and not folder.is_root %}
+                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload">
+                            <span class="icon fa fa-file"></span>
+                            {% trans "Upload Files" %}
+                        </a>
+                        {% include 'admin/filer/tools/upload_button_js.html' %}
+                    {% endif %}
+                {% endblock %}
             </div>
         {% endblock %}
     </div>
     <div id="content-main">
-        <input type="text" placeholder="Filter files" class="filter-files">
-
+        {% include "admin/filer/tools/search_form.html" %}
         <div class="js-navigator navigator{% if not actions_on_top and not actions_on_bottom %}navigator-no-actions{% endif %}">
             <form class="js-navigator-form" method="post">
                 {% csrf_token %}
@@ -161,4 +142,5 @@
             </form>
         </div>
     </div>
+    {% include "admin/filer/tools/clipboard/clipboard.html" with detail=True %}
 {% endblock %}
