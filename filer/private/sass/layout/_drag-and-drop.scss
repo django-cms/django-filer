@@ -39,7 +39,9 @@
         }
         .dz-remove {
             @include icon(trash-o);
-            float: right;
+            position: absolute;
+            right: 25px;
+            top: 7px;
             display: inline-block;
             font: 0/0 a;
             &:before {
