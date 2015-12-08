@@ -1,5 +1,6 @@
 .dz-success-mark,
-.dz-error-mark {
+.dz-error-mark,
+.dz-remove {
     &:before {
          @extend %icon;
          font-size: $font-size-large;

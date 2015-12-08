@@ -38,8 +38,14 @@
             }
         }
         .dz-remove {
+            @include icon(trash-o);
             float: right;
             display: inline-block;
+            font: 0/0 a;
+            &:before {
+                color: $gray;
+                font-size: 18px;
+            }
         }
         .dz-error-message {
             top: 65px;

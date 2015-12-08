@@ -33,6 +33,9 @@
     @if $filename == remove {
         $char: "E002";
     }
+    @if $filename == trash-o {
+        $char: "E003";
+    }
 
     @return $char;
 }
@@ -57,4 +60,8 @@
 
 .cms-icon-remove {
     @include icon(remove);
+}
+
+.cms-icon-trash-o {
+    @include icon(trash-o);
 }
