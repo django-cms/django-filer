@@ -1,0 +1,9 @@
+.dz-success-mark,
+.dz-error-mark {
+    &:before {
+         @extend %icon;
+         font-size: $font-size-large;
+         vertical-align: middle;
+         margin-right: 5px;
+    }
+}

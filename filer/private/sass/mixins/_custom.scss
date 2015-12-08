@@ -13,7 +13,14 @@
         clear: both;
     }
 }
-
+// taken from bootstrap with adaptations
+@function important($important) {
+    @if($important == true) {
+        @return !important;
+    } @else {
+        @return true;
+    }
+}
 @mixin button-variant($color, $background, $border, $important: false) {
     background-image: none important($important);
     margin-bottom: 0; // For input.btn
