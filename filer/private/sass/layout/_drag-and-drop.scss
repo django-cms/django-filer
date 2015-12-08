@@ -1,0 +1,36 @@
+.dropzone {
+    border-radius: $border-radius-base;
+    border: solid 1px $gray-lighter;
+    background-color: $gray-lightest;
+    &.dz-drag-hover {
+        border: solid 1px $color-primary !important;
+    }
+    .dz-message {
+        color: $gray;
+        float: right;
+        width: 85%;
+        margin: 40px 0 0;
+    }
+    .icon {
+        color: $gray;
+        margin-right: 10px;
+    }
+    .fileUpload {
+        position: relative;
+        overflow: hidden;
+        margin: 40px 0 0;
+        &.fileUpload-btn {
+            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+        }
+    }
+    .fileUpload input.upload {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0;
+    }
+}
