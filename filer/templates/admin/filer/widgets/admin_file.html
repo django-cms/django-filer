@@ -3,9 +3,24 @@
 {% spaceless %}
     <script src="{% static 'filer/js/libs/dropzone.min.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
-    <form action="/file-upload" class="dropzone" id="my-awesome-dropzone">
-        <input type="file" name="file" />
-    </form>
+
+    <div class="js-dropzone dropzone">
+        <div class="dz-default dz-message">
+            <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your images here" %}</span>
+        </div>
+        <div class="fileUpload fileUpload-btn">
+            <span>{% trans "Add Image" %}</span>
+            <input type="file" class="upload" />
+        </div>
+    </div>
+    <script>
+        var myDropzone = new Dropzone('.js-dropzone', { url: '/file/post'});
+        Dropzone.autoDiscover = false;
+        Dropzone.options.jsDropzone = {
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 2 // MB
+        };
+    </script>
     <!--<span class="filerFile">-->
         <!--{% if object %}-->
             <!--{% if object.icons.32 %}-->

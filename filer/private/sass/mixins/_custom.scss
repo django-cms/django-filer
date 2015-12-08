@@ -1,0 +1,74 @@
+// #############################################################################
+// OTHER
+
+// add clearfix which doesnt add overflow:hidden
+@mixin clearfix() {
+    *zoom: 1;
+    &:before,
+    &:after {
+        content: " ";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+@mixin button-variant($color, $background, $border, $important: false) {
+    background-image: none important($important);
+    margin-bottom: 0; // For input.btn
+    padding: 6px 20px important($important);
+    border-radius: $btn-border-radius-base important($important);
+    color: $color important($important);
+    font-size: $font-size-small important($important);
+    line-height: $font-size-small;
+    font-weight: normal;
+    text-transform: none important($important);
+    letter-spacing: normal important($important);
+    background-color: $background important($important);
+    border: 1px solid $border important($important);
+    appearance: none;
+    &:focus {
+        color: $color important($important);
+        background-color: darken($background, 5%) important($important);
+        border-color: darken($border, 5%) important($important);
+        text-decoration: none important($important);
+    }
+    &:hover {
+        color: $color important($important);
+        background-color: darken($background, 5%) important($important);
+        border-color: darken($border, 5%) important($important);
+        text-decoration: none important($important);
+    }
+    &:active {
+        color: $color important($important);
+        background-color: darken($background, 10%) important($important);
+        border-color: darken($border, 10%) important($important);
+        box-shadow: $btn-active-shadow important($important);
+
+        &:hover,
+        &:focus {
+            color: $color important($important);
+            background-color: darken($background, 17%) important($important);
+            border-color: darken($border, 25%) important($important);
+        }
+    }
+    &:active {
+        background-image: none important($important);
+    }
+    &[disabled] {
+        &,
+        &:hover,
+        &:focus
+        &:active {
+            background-color: rgba($background, 0.4) important($important);
+            border-color: rgba($border, 0.4) important($important);
+            color: rgba($color, 0.8) important(1);
+            cursor: not-allowed;
+            box-shadow: none important($important);
+            &:before {
+                color: rgba($color, 0.4) important(1);
+            }
+        }
+    }
+}
