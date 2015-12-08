@@ -37,8 +37,12 @@
                 }
             }
         }
+        .dz-remove {
+            float: right;
+            display: inline-block;
+        }
         .dz-error-message {
-            top: 45px;
+            top: 65px;
             left: 0;
             width: 100%;
         }
@@ -57,9 +61,17 @@
         }
         .dz-success-mark {
             @include icon(check);
+            &:before {
+                color: $color-success;
+            }
+
         }
         .dz-error-mark {
             @include icon(remove);
+            &:before {
+                color: $color-danger;
+            }
+
         }
         &.dz-image-preview {
            background-color: transparent;
