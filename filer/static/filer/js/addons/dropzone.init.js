@@ -1,9 +1,19 @@
 // #DROPZONE#
 // This script implements the dropzone settings
+'use strict';
 
-var myDropzone = new Dropzone('.js-dropzone', { url: '/file/post'});
-Dropzone.autoDiscover = false;
-Dropzone.options.jsDropzone = {
-    paramName: "file", // The name that will be used to transfer the file
-    maxFilesize: 2 // MB
-};
+/* global Dropzone */
+(function ($) {
+    $(function () {
+        var dropzoneSelector = '.js-dropzone';
+
+        if ($(dropzoneSelector).length && Dropzone) {
+            Dropzone.autoDiscover = false;
+            new Dropzone(dropzoneSelector, {
+                url: '/file/post',
+                paramName: 'file', // The name that will be used to transfer the file
+                maxFilesize: 2 // MB
+            });
+        }
+    });
+})(jQuery);
