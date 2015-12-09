@@ -1,14 +1,13 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
-    <div class="js-dropzone dropzone" data-action="{% url 'admin:filer-ajax_upload' %}">
+    <div class="js-dropzone dropzone" data-url="{% url 'admin:filer-ajax_upload' %}">
         <div class="dz-default dz-message">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your images here" %}</span>
         </div>
-        <div class="fileUpload fileUpload-btn">
-            <span>{% trans "Add Image" %}</span>
-            <input type="file" class="upload" />
-        </div>
+        <a href="{{ lookup_url }}" class="fileUpload fileUpload-btn" onclick="return showRelatedObjectLookupPopup(this);">
+            {% trans "Add Image" %}
+        </a>
     </div>
 
 {% endspaceless %}
