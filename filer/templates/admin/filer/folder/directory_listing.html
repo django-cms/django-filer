@@ -96,19 +96,21 @@
 
         {% block object-tools %}
             <div class="navigator-tools pull-right">
-                <span class="separator"></span>
-                <div class="dropdown-container js-actions-menu">
-                    <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
-                        <span class="fa fa-ellipsis-v"></span>
-                    </a>
-                    <ul class="create-menu-dropdown dropdown-menu">
-                        <!-- Actions will go here -->
-                    </ul>
-                </div>
-                <span class="separator"></span>
+                {% if paginated_items.object_list|length %}
+                    <span class="separator"></span>
+                    <div class="dropdown-container js-actions-menu">
+                        <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
+                            <span class="fa fa-ellipsis-v"></span>
+                        </a>
+                        <ul class="create-menu-dropdown dropdown-menu">
+                            <!-- Actions will go here -->
+                        </ul>
+                    </div>
+                    <span class="separator"></span>
+                {% endif %}
                 {% block object-tools-items %}
                     {% if folder.can_have_subfolders and can_make_folder %}
-                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" title="{% trans 'Adds a new Folder' %}" class="navigator-button">
+                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" title="{% trans 'Adds a new Folder' %}" class="navigator-button" onclick="return showAddAnotherPopup(this);">
                             <span class="icon fa fa-folder"></span>
                             {% trans "New Folder" %}
                         </a>

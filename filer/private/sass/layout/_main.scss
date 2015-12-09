@@ -1,5 +1,11 @@
 // #MAIN LAYOUT#
 
+html,
+body {
+    height: 100%;
+    position: relative;
+}
+
 body {
     overflow-x: auto;
     min-width: 320px;
