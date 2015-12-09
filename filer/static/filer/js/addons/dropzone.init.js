@@ -11,7 +11,7 @@
 
         if (dropzone.length && Dropzone) {
             Dropzone.autoDiscover = false;
-            new Dropzone('.js-dropzone', {
+            new Dropzone(dropzoneSelector, {
                 url: dropzoneUrl,
                 paramName: 'file', // The name that will be used to transfer the file
                 maxFilesize: 2, // MB
