@@ -23,9 +23,10 @@
                     this.removeAllFiles();
                     this.addFile(file);
                 },
-                drop: function () {
+                drop: function (element) {
                     filerFile.hide();
                     $('.filerClearer').click();
+                    dropzone.removeClass('dz-drag-hover');
                 },
                 init: function () {
                     this.on('removedfile', function () {
