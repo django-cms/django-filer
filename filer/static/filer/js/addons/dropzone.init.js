@@ -15,7 +15,7 @@
                 maxFilesize: 2, // MB
                 addRemoveLinks: true,
                 maxFiles: 1,
-                maxfilesexceeded: function(file) {
+                maxfilesexceeded: function (file) {
                     this.removeAllFiles();
                     this.addFile(file);
                 }
