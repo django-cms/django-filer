@@ -1,20 +1,21 @@
 'use strict';
 /* global django */
 
-(function ($) {
-    var filer_clear = function () {
-        var clearer = $(this);
-        var hidden_input = clearer.closest('.filerFile').find('input.vForeignKeyRawIdAdminField');
-        var base_id = '#' + hidden_input.attr('id');
-        var thumbnail = $(base_id + '_thumbnail_img');
-        var description = $(base_id + '_description_txt');
-        var static_prefix = clearer.attr('src').replace('admin/img/icon_deletelink.gif', 'filer/');
+var filer_clear = function () {
+    var clearer = $(this);
+    var hidden_input = clearer.closest('.filerFile').find('input.vForeignKeyRawIdAdminField');
+    var base_id = '#' + hidden_input.attr('id');
+    var thumbnail = $(base_id + '_thumbnail_img');
+    var description = $(base_id + '_description_txt');
+    var static_prefix = clearer.attr('src').replace('admin/img/icon_deletelink.gif', 'filer/');
 
-        clearer.hide();
-        hidden_input.removeAttr('value');
-        thumbnail.attr('src', static_prefix + 'icons/nofile_48x48.png');
-        description.empty();
-    };
+    clearer.hide();
+    hidden_input.removeAttr('value');
+    thumbnail.attr('src', static_prefix + 'icons/nofile_48x48.png');
+    description.empty();
+};
+
+(function ($) {
 
     $(document).ready(function () {
         $('.filerFile .vForeignKeyRawIdAdminField').attr('type', 'hidden');

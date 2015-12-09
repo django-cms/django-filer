@@ -1,138 +1,151 @@
-.dropzone {
-    border-radius: $border-radius-base;
-    border: solid 1px $gray-lighter;
-    background-color: $gray-lightest;
-    &.dz-drag-hover {
-        border: solid 1px $color-primary !important;
-    }
-    &.dz-started {
-        .fileUpload {
-            display: none;
+form .form-row {
+   .dropzone {
+        position: relative;
+        border-radius: $border-radius-base;
+        border: solid 1px $gray-lighter;
+        background-color: $gray-lightest;
+        &.dz-drag-hover {
+            border: solid 1px $color-primary !important;
         }
-    }
-    .dz-preview {
-        min-height: auto;
-        width: 100%;
-        padding-bottom: 10px;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 0;
-        border-bottom: solid 1px $gray-lighter;
-        &.dz-error {
-            position: relative;
-            .dz-error-message {
+        &.dz-started {
+            .fileUpload {
                 display: none;
             }
-            &:hover {
-                .dz-error-message {
-                    display: block;
-                }
-            }
         }
-        .dz-details {
-            min-width: calc(100% - 80px);
-            max-width: calc(100% - 80px);
-            padding: 0;
-            margin-left: 40px;
-            margin-top: 7px;
-            opacity: 1;
-            .dz-filename,
-            .dz-filename:hover,
-            .dz-size {
-                float: left;
-                text-align: left;
-                span {
-                    color: $gray;
-                    border: 0 !important;
-                    background-color: transparent !important;
-                }
-            }
-        }
-        .dz-remove {
-            @include icon(trash-o);
-            position: absolute;
-            right: 25px;
-            top: 7px;
-            display: inline-block;
-            font: 0/0 a;
-            &:before {
-                color: $gray;
-                font-size: 18px;
-            }
-        }
-        .dz-error-message {
-            top: 65px;
-            left: 0;
+        .dz-preview {
+            min-height: auto;
             width: 100%;
-        }
-        .dz-success-mark,
-        .dz-error-mark {
-            top: 5px;
-            left: auto;
-            right: 0;
-            margin-top: 0;
-            &:before {
-                color: $gray;
+            padding-bottom: 10px;
+            margin-left: 0;
+            margin-right: 0;
+            margin-bottom: 0;
+            border-bottom: solid 1px $gray-lighter;
+            &.dz-error {
+                position: relative;
+                .dz-error-message {
+                    display: none;
+                }
+                &:hover {
+                    .dz-error-message {
+                        display: block;
+                    }
+                }
             }
-            svg {
+            .dz-details {
+                min-width: calc(100% - 80px);
+                max-width: calc(100% - 80px);
+                padding: 0;
+                margin-left: 40px;
+                margin-top: 7px;
+                opacity: 1;
+                .dz-filename,
+                .dz-filename:hover,
+                .dz-size {
+                    float: left;
+                    text-align: left;
+                    span {
+                        color: $gray;
+                        border: 0 !important;
+                        background-color: transparent !important;
+                    }
+                }
+            }
+            .dz-remove {
+                @include icon(trash-o);
+                position: absolute;
+                right: 25px;
+                top: 7px;
+                display: inline-block;
+                font: 0/0 a;
+                &:before {
+                    color: $gray;
+                    font-size: 18px;
+                }
+            }
+            .dz-error-message {
+                top: 65px;
+                left: 0;
+                width: 100%;
+            }
+            .dz-success-mark,
+            .dz-error-mark {
+                top: 5px;
+                left: auto;
+                right: 0;
+                margin-top: 0;
+                &:before {
+                    color: $gray;
+                }
+                svg {
+                    display: none;
+                }
+            }
+            .dz-success-mark {
+                @include icon(check);
+                &:before {
+                    color: $color-success;
+                }
+
+            }
+            .dz-error-mark {
+                @include icon(remove);
+                &:before {
+                    color: $color-danger;
+                }
+
+            }
+            &.dz-image-preview,
+            &.dz-file-preview {
+                background-color: transparent;
+                .dz-image {
+                    overflow: hidden;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 0;
+                    border: solid 1px $gray-lighter;
+                    img {
+                        width: 100%;
+                        height: auto;
+                    }
+                }
+            }
+            .dz-progress {
+                top: 18px;
+                left: 0;
+                height: 10px;
+                width: calc(100% - 40px);
+                margin-left: 40px;
+            }
+        }
+        .dz-message {
+            color: $gray;
+            float: right;
+            width: 100%;
+            margin: 48px 0 0;
+        }
+        .icon {
+            color: $gray;
+            margin-right: 10px;
+        }
+        .related-lookup {
+            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+            overflow: hidden;
+            width: auto !important;
+            height: auto !important;
+            padding: 10px 20px !important;
+            cursor: pointer;
+            &:before {
                 display: none;
             }
         }
-        .dz-success-mark {
-            @include icon(check);
-            &:before {
-                color: $color-success;
-            }
-
-        }
-        .dz-error-mark {
-            @include icon(remove);
-            &:before {
-                color: $color-danger;
-            }
-
-        }
-        &.dz-image-preview,
-        &.dz-file-preview {
-            background-color: transparent;
-            .dz-image {
-                overflow: hidden;
-                width: 36px;
-                height: 36px;
-                border-radius: 0;
-                border: solid 1px $gray-lighter;
-                img {
-                    width: 100%;
-                    height: auto;
-                }
-            }
-        }
-        .dz-progress {
-            top: 18px;
-            left: 0;
-            height: 10px;
-            width: calc(100% - 40px);
-            margin-left: 40px;
-        }
-    }
-    .dz-message {
-        color: $gray;
-        float: right;
-        width: 100%;
-        margin: 48px 0 0;
-    }
-    .icon {
-        color: $gray;
-        margin-right: 10px;
-    }
-    .fileUpload {
-        position: absolute;
-        overflow: hidden;
-        margin: 40px 0 0;
-        cursor: pointer;
-        &.fileUpload-btn {
-            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
-            padding: 10px 20px !important;
-        }
+       .filerFile {
+           position: absolute;
+           top: 62px;
+           width: calc(100% - 40px);
+           img[src*=nofile] {
+               background-color: $white;
+           }
+       }
     }
 }
+

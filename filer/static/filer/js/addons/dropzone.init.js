@@ -8,6 +8,7 @@
         var dropzoneSelector = '.js-dropzone';
         var dropzone = $(dropzoneSelector);
         var dropzoneUrl = dropzone.data('url');
+        var filerFile = $('.filerFile');
 
         if (dropzone.length && Dropzone) {
             Dropzone.autoDiscover = false;
@@ -17,9 +18,19 @@
                 maxFilesize: 2, // MB
                 addRemoveLinks: true,
                 maxFiles: 1,
+                clickable: false,
                 maxfilesexceeded: function (file) {
                     this.removeAllFiles();
                     this.addFile(file);
+                },
+                drop: function () {
+                    filerFile.hide();
+                },
+                init: function() {
+                    this.on('removedfile', function(file) {
+                        filerFile.show();
+                        this.removeAllFiles();
+                    });
                 }
             });
         }
