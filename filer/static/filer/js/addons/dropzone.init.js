@@ -5,12 +5,12 @@
 /* global Dropzone */
 (function ($) {
     $(function () {
-        var dropzoneSelector = '.js-dropzone';
-        var dataAction = $(dropzoneSelector).data('action');
+        var dropzoneSelector = $(dropzoneSelector);
+        var dataAction = dropzoneSelectordata('action');
 
-        if ($(dropzoneSelector).length && Dropzone) {
+        if (dropzoneSelector.length && Dropzone) {
             Dropzone.autoDiscover = false;
-            new Dropzone(dropzoneSelector, {
+            new Dropzone('.js-dropzone', {
                 url: dataAction,
                 paramName: 'file', // The name that will be used to transfer the file
                 maxFilesize: 2, // MB
