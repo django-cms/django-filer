@@ -1,7 +1,7 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
-    <div class="js-dropzone dropzone">
+    <div class="js-dropzone dropzone" data-action="{% url 'admin:filer-ajax_upload' %}">
         <div class="dz-default dz-message">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your images here" %}</span>
         </div>
