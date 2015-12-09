@@ -25,6 +25,7 @@
                 },
                 drop: function () {
                     filerFile.hide();
+                    $('.filerClearer').click();
                 },
                 init: function () {
                     this.on('removedfile', function () {
