@@ -131,7 +131,7 @@
         margin: 40px 0 0;
         &.fileUpload-btn {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
-            font-size: 16px;
+            padding: 10px 20px !important;
         }
     }
 }
