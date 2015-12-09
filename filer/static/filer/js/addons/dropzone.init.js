@@ -12,7 +12,13 @@
             new Dropzone(dropzoneSelector, {
                 url: '/file/post',
                 paramName: 'file', // The name that will be used to transfer the file
-                maxFilesize: 2 // MB
+                maxFilesize: 2, // MB
+                addRemoveLinks: true,
+                maxFiles: 1,
+                maxfilesexceeded: function (file) {
+                    this.removeAllFiles();
+                    this.addFile(file);
+                }
             });
         }
     });
