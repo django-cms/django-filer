@@ -26,8 +26,8 @@
                 drop: function () {
                     filerFile.hide();
                 },
-                init: function() {
-                    this.on('removedfile', function(file) {
+                init: function () {
+                    this.on('removedfile', function () {
                         filerFile.show();
                         this.removeAllFiles();
                     });
