@@ -5,7 +5,7 @@
 /* global Dropzone */
 (function ($) {
     $(function () {
-        var dropzoneSelector = $(dropzoneSelector);
+        var dropzoneSelector = $('.js-dropzone');
         var dataAction = dropzoneSelectordata('action');
 
         if (dropzoneSelector.length && Dropzone) {
