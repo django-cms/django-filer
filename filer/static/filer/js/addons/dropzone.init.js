@@ -23,7 +23,7 @@
                     this.removeAllFiles();
                     this.addFile(file);
                 },
-                drop: function (element) {
+                drop: function () {
                     filerFile.hide();
                     $('.filerClearer').click();
                     dropzone.removeClass('dz-drag-hover');
