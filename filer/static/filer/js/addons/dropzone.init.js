@@ -6,11 +6,13 @@
 (function ($) {
     $(function () {
         var dropzoneSelector = '.js-dropzone';
+        var dropzone = $(dropzoneSelector);
+        var dropzoneUrl = dropzone.data('url');
 
-        if ($(dropzoneSelector).length && Dropzone) {
+        if (dropzone.length && Dropzone) {
             Dropzone.autoDiscover = false;
             new Dropzone(dropzoneSelector, {
-                url: '/file/post',
+                url: dropzoneUrl,
                 paramName: 'file', // The name that will be used to transfer the file
                 maxFilesize: 2, // MB
                 addRemoveLinks: true,

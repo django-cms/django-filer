@@ -118,7 +118,7 @@
     .dz-message {
         color: $gray;
         float: right;
-        width: 85%;
+        width: 100%;
         margin: 48px 0 0;
     }
     .icon {
@@ -126,21 +126,13 @@
         margin-right: 10px;
     }
     .fileUpload {
-        position: relative;
+        position: absolute;
         overflow: hidden;
         margin: 40px 0 0;
+        cursor: pointer;
         &.fileUpload-btn {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+            padding: 10px 20px !important;
         }
-    }
-    .fileUpload input.upload {
-        position: absolute;
-        top: 0;
-        right: 0;
-        margin: 0;
-        padding: 0;
-        font-size: 20px;
-        cursor: pointer;
-        opacity: 0;
     }
 }
