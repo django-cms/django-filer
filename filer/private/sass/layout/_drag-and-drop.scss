@@ -129,6 +129,7 @@
         position: absolute;
         overflow: hidden;
         margin: 40px 0 0;
+        cursor: pointer;
         &.fileUpload-btn {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
             padding: 10px 20px !important;
