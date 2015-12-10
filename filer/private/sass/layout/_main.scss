@@ -1,5 +1,10 @@
 // #MAIN LAYOUT#
 
+html,
+body {
+    height: 100%;
+}
+
 body {
     overflow-x: auto;
     min-width: 320px;
@@ -279,6 +284,12 @@ body {
 }
 
 .navigator-table {
+    tbody td {
+        padding: 5px 10px !important;
+    }
+    .unfiled td {
+        background-color: #EEE !important;
+    }
     .column-checkbox {
         text-align: center;
         width: 20px;
