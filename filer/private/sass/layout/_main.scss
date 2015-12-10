@@ -2,7 +2,7 @@
 
 html,
 body {
-    height: 100%;
+    height: 100% !important;
 }
 
 body {
@@ -161,10 +161,15 @@ body {
             display: block;
         }
     }
-    .image-preview-circle {
+    .image-preview-field {
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: 0;
+        left: 0;
+        bottom: -15px;
+        right: -15px;
+    }
+    .image-preview-circle {
+        position: relative;
         z-index: 1;
         width: 26px;
         height: 26px;
@@ -259,7 +264,6 @@ body {
     box-sizing: border-box;
     width: 100%;
     height: 42px;
-    margin-bottom: 10px;
     padding: 0 30px 0 10px;
     border: 1px solid #ddd;
     outline: none;
@@ -288,7 +292,7 @@ body {
         padding: 5px 10px !important;
     }
     .unfiled td {
-        background-color: #EEE !important;
+        background-color: #f7f7f7 !important;
     }
     .column-checkbox {
         text-align: center;
@@ -298,9 +302,9 @@ body {
         }
     }
     .column-icon {
-        width: 32px;
+        width: 25px;
         img {
-            width: 32px;
+            width: 25px;
         }
     }
     .column-action {
@@ -318,15 +322,18 @@ body {
         }
         .icon {
             width: 20px;
+            position: relative;
+            top: 2px;
         }
     }
 }
 
 .navigator-top-nav {
     clear: both;
-    padding: 10px 0;
-    .nav-button,
-    .separator {
+    padding: 5px 0;
+    background: #f7f7f7;
+    min-height: 50px;
+    .nav-button {
         display: inline-block;
         color: #555;
         font-size: 26px;
@@ -339,20 +346,29 @@ body {
     }
     .nav-button-dots {
         margin: 0;
-        padding: 0 10px;
+        padding: 0 15px;
     }
     .separator {
+        display: inline-block;
+        vertical-align: top;
         position: relative;
-        top: -1px;
-        overflow: hidden;
         width: 1px;
-        height: 26px;
         margin: 0 5px;
-        background-color: #555;
+        height: 34px;
+        &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 1px;
+            overflow: hidden;
+            top: -14px;
+            bottom: -11px;
+            background-color: #CCC;
+        }
     }
 }
 .navigator-tools {
-    margin-top: 10px;
+    margin: 10px 10px 0 0;
 }
 .navigator-button {
     margin-left: 10px;
@@ -361,17 +377,9 @@ body {
     &:link:visited,
     &:link {
         display: inline-block;
-        position: relative;
-        top: -3px;
-        color: #555;
-        line-height: 30px;
         vertical-align: top;
-        box-sizing: border-box;
-        height: 30px;
-        padding: 0 20px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        background-color: #fff;
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+        padding: 10px 20px !important;
     }
     .icon {
         position: relative;
@@ -379,6 +387,13 @@ body {
     }
     .fa-folder {
         top: 0;
+    }
+}
+.navigator-button-upload {
+    &,
+    &:visited,
+    &:link:visited,
+    &:link {
     }
 }
 .navigator-button + .dropdown-menu {
@@ -389,6 +404,7 @@ body {
     display: inline-block;
     position: relative;
     vertical-align: top;
+    top: 6px;
     .dropdown-menu {
         display: none;
         right: 0;
@@ -415,10 +431,9 @@ body {
     }
 }
 .dropdown-container-down {
-    top: 9px;
-    margin-left: 10px;
+    top: -5px;
     > a, > a:link, > a:visited, > a:link:visited {
-        color: #555;
+        color: #999;
         font-size: 20px;
         line-height: 30px;
         height: 30px;
@@ -426,6 +441,8 @@ body {
     }
     .dropdown-menu {
         margin-top: -3px;
+        left: 0;
+        right: auto;
     }
 }
 
@@ -459,4 +476,37 @@ body {
 }
 #id_upload_button:before {
     display: none;
+}
+
+.app-filer #container .breadcrumbs {
+    position: relative;
+}
+
+.app-filer #content {
+    margin-top: 20px !important;
+}
+
+.filebrowser h1.folder_header {
+    position: relative;
+    top: 6px;
+}
+
+.filebrowser #container #content {
+    margin-top: 90px !important;
+}
+.popup.filebrowser #container #content {
+    margin-top: 10px !important;
+}
+
+.navigator-breadcrumbs {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 17px 0 0 10px;
+    > a {
+        color: #333 !important;
+    }
+    .icon {
+        color: #999;
+        margin: 0 5px;
+    }
 }

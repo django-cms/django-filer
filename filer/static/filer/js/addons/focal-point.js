@@ -77,12 +77,7 @@ var Cl = window.Cl || {};
             });
 
             this.circle.draggable({
-                containment: [
-                    this.containerOffset.left,
-                    this.containerOffset.top,
-                    this.containerOffset.left + imageWidth,
-                    this.containerOffset.top + imageHeight
-                ],
+                containment: 'parent',
                 drag: function (event, ui) {
                     that._updateLocationValue(ui.position.left, ui.position.top);
                 }

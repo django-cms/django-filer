@@ -18,7 +18,7 @@
         </thead>
         <tbody>
             {% for item, item_perms in paginated_items.object_list %}
-                {% if item.file_type == 'Folder' or item.file_type == 'DummyFolder' %}
+                {% if item.file_type == "Folder" %}
                     {% with item as subfolder %}
                         <tr>
                             <td class="column-checkbox">
@@ -30,7 +30,7 @@
                             </td>
                             <td class="column-icon">
                                 <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    <img src="{{ subfolder.icons.48 }}" alt="{% trans 'Folder Icon' %}" width="32" height="32">
+                                    <img src="{{ subfolder.icons.48 }}" alt="{% trans 'Folder Icon' %}" width="25" height="25">
                                 </a>
                             </td>
                             <td class="column-name">
@@ -63,6 +63,22 @@
                             </td>
                         </tr>
                     {% endwith %}
+                {% elif item.file_type == "DummyFolder" %}
+                    <tr class="unfiled">
+                        <td class="column-checkbox">&nbsp;</td>
+                        <td class="column-icon">
+                            <a href="{{ item.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
+                                <img src="{{ item.icons.48 }}" alt="{% trans 'Folder Icon' %}" width="25" height="25">
+                            </a>
+                        </td>
+                        <td class="column-name" colspan="4">
+                            <div>
+                                <a href="{{ item.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
+                                    {{ item.name }}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
                 {% else %}
                     {% with item as file %}
                         <tr>
@@ -77,7 +93,7 @@
                                 {% if item_perms.change %}
                                     <a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                 {% endif %}
-                                <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="32" height="32">
+                                <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="25" height="25">
                                 {% if item_perms.change %}
                                     </a>
                                 {% endif %}
