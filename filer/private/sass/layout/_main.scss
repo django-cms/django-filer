@@ -3,7 +3,6 @@
 html,
 body {
     height: 100%;
-    position: relative;
 }
 
 body {
@@ -285,6 +284,12 @@ body {
 }
 
 .navigator-table {
+    tbody td {
+        padding: 5px 10px !important;
+    }
+    .unfiled td {
+        background-color: #EEE !important;
+    }
     .column-checkbox {
         text-align: center;
         width: 20px;
