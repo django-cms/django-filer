@@ -444,12 +444,17 @@ body {
 }
 .dropdown-container-down {
     top: -5px;
-    > a, > a:link, > a:visited, > a:link:visited {
-        color: $gray-light;
-        font-size: 20px;
-        line-height: 30px;
-        height: 30px;
-        padding: 0 10px;
+    > a {
+        &,
+        &:link,
+        &:visited,
+        &:link:visited {
+            color: $gray-light;
+            font-size: 20px;
+            line-height: 30px;
+            height: 30px;
+            padding: 0 10px;
+        }
     }
     .dropdown-menu {
         right: auto;
