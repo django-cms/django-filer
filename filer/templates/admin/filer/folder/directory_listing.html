@@ -129,9 +129,6 @@
                         </div>
                     {% endif %}
                 {% elif folder.is_smart_folder %}
-                    <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">
-                        Filer
-                    </a>
                     <span class="icon fa fa-chevron-right"></span>
                     {{ folder.name }}
                 {% endif %}
