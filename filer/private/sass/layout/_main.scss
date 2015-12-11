@@ -258,7 +258,7 @@ body {
     }
 }
 .filter-files {
-    color: #333;
+    color: $gray-darkest;
     font-size: 14px;
     line-height: 42px;
     box-sizing: border-box;
@@ -292,7 +292,7 @@ body {
         padding: 5px 10px !important;
     }
     .unfiled td {
-        background-color: #f7f7f7 !important;
+        background-color: $gray-table !important;
     }
     .column-checkbox {
         text-align: center;
@@ -332,13 +332,13 @@ body {
     clear: both;
     min-height: 50px;
     padding: 5px 0;
-    background: #f7f7f7;
+    background: $gray-table;
     .breadcrumbs-container {
         float: left;
     }
     .nav-button {
         display: inline-block;
-        color: #555;
+        color: $btn-default-color;
         font-size: 26px;
         vertical-align: top;
         margin: 0 10px;
@@ -445,7 +445,7 @@ body {
 .dropdown-container-down {
     top: -5px;
     > a, > a:link, > a:visited, > a:link:visited {
-        color: #999;
+        color: $gray-light;
         font-size: 20px;
         line-height: 30px;
         height: 30px;
@@ -515,10 +515,10 @@ body {
     font-weight: bold;
     padding: 17px 0 0 10px;
     > a {
-        color: #333 !important;
+        color: $gray-darkest !important;
     }
     .icon {
-        color: #999;
+        color: $gray-light;
         margin: 0 5px;
     }
 }
