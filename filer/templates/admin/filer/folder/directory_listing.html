@@ -46,26 +46,50 @@
 
 {% block content %}
     <div class="navigator-top-nav clearfix">
-        <div class="pull-left">
+        <div class="breadcrumbs-container">
             {% for ancestor_folder in instance.logical_path %}
                 {{ ancestor_folder }}
             {% endfor %}
 
             {% if not is_popup %}
                 <div class="breadcrumbs">
-                    <a href="{% url 'admin:index' %}" title="{% trans 'Go back to admin homepage' %}">{% trans "Home" %}</a>
-                    &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}"> {% trans "Filer" %}</a>
+                    <a href="{% url 'admin:index' %}" title="{% trans 'Go back to admin homepage' %}">
+                        {% trans "Home" %}
+                    </a>
+                    &rsaquo;
+                    <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}">
+                        {% trans "Filer" %}
+                    </a>
                     {% if not instance.is_root and instance.is_smart_folder %}
-                        &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
+                        &rsaquo;
+                        <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
                     {% endif %}
                     {% for ancestor_folder in instance.logical_path %}
-                        &rsaquo; <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}</a>
+                        &rsaquo;
+                        <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}"
+                            title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                            {% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}
+                        </a>
                     {% endfor %}
                     {% if breadcrumbs_action %}
-                        &rsaquo; <a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a>
-                        &rsaquo; {{ breadcrumbs_action }}
+                        &rsaquo;
+                        <a href="{{ instance.get_admin_directory_listing_url_path }}"
+                            title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                            {% if instance.label %}
+                                {{ instance.label }}
+                            {% else %}
+                                {{ instance.name }}
+                            {% endif %}
+                        </a>
+                        &rsaquo;
+                        {{ breadcrumbs_action }}
                     {% else %}
-                        &rsaquo; {% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}
+                        &rsaquo;
+                        {% if instance.label %}
+                            {{ instance.label }}
+                        {% else %}
+                            {{ instance.name }}
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endif %}
@@ -73,7 +97,10 @@
             {% if not folder.is_root or folder.is_smart_folder %}
                 <div class="navigator-breadcrumbs">
                     {% if not folder.is_root %}
-                        <a class="" href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">Filer</a>
+                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                            title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
+                            Filer
+                        </a>
 
                         {% if folder.parent.parent %}
                             <span class="icon fa fa-chevron-right"></span>
@@ -82,7 +109,10 @@
 
                         {% if folder.parent %}
                             <span class="icon fa fa-chevron-right"></span>
-                            <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% trans 'Go back to the parent folder' %}">{{ folder.parent.name }}</a>
+                            <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                                title="{% trans 'Go back to the parent folder' %}">
+                                {{ folder.parent.name }}
+                            </a>
                         {% endif %}
 
                         <span class="icon fa fa-chevron-right"></span>
@@ -101,7 +131,9 @@
                             </div>
                         {% endif %}
                     {% elif folder.is_smart_folder %}
-                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">Filer</a>
+                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">
+                            Filer
+                        </a>
                         <span class="icon fa fa-chevron-right"></span>
                         {{ folder.name }}
                     {% endif %}
@@ -110,7 +142,7 @@
         </div>
 
         {% block object-tools %}
-            <div class="navigator-tools pull-right">
+            <div class="navigator-tools">
                 {% if paginated_items.object_list|length and not is_popup %}
                     <span class="separator"></span>
                     <div class="dropdown-container js-actions-menu">
@@ -125,10 +157,17 @@
                 {% endif %}
                 {% block object-tools-items %}
                     {% if folder.can_have_subfolders and can_make_folder %}
-                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" title="{% trans 'Adds a new Folder' %}" class="navigator-button" onclick="return showAddAnotherPopup(this);">{% trans "New Folder" %}</a>
+                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}"
+                            title="{% trans 'Adds a new Folder' %}"
+                            class="navigator-button"
+                            onclick="return showAddAnotherPopup(this);">
+                        {% trans "New Folder" %}
+                        </a>
                     {% endif %}
                     {% if permissions.has_add_children_permission and not folder.is_root %}
-                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload">{% trans "Upload Files" %}</a>
+                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload">
+                            {% trans "Upload Files" %}
+                        </a>
                         {% include "admin/filer/tools/upload_button_js.html" %}
                     {% endif %}
                 {% endblock %}

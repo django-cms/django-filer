@@ -7,7 +7,7 @@ body {
 
 body {
     overflow-x: auto;
-    min-width: 320px;
+    min-width: 400px !important;
 }
 .text-left {
     text-align: left;
@@ -164,9 +164,9 @@ body {
     .image-preview-field {
         position: absolute;
         top: 0;
-        left: 0;
-        bottom: -15px;
         right: -15px;
+        bottom: -15px;
+        left: 0;
     }
     .image-preview-circle {
         position: relative;
@@ -321,18 +321,21 @@ body {
             }
         }
         .icon {
-            width: 20px;
             position: relative;
             top: 2px;
+            width: 20px;
         }
     }
 }
 
 .navigator-top-nav {
     clear: both;
+    min-height: 50px;
     padding: 5px 0;
     background: #f7f7f7;
-    min-height: 50px;
+    .breadcrumbs-container {
+        float: left;
+    }
     .nav-button {
         display: inline-block;
         color: #555;
@@ -350,25 +353,40 @@ body {
     }
     .separator {
         display: inline-block;
-        vertical-align: top;
         position: relative;
+        vertical-align: top;
         width: 1px;
-        margin: 0 5px;
         height: 34px;
+        margin: 0 5px;
         &:before {
-            content: '';
+            content: "";
             display: block;
             position: absolute;
-            width: 1px;
-            overflow: hidden;
             top: -14px;
             bottom: -11px;
-            background-color: #CCC;
+            overflow: hidden;
+            width: 1px;
+            background-color: #ccc;
         }
     }
 }
 .navigator-tools {
+    float: right;
     margin: 10px 10px 0 0;
+}
+@media screen and (max-width: $screen-tablet) {
+    .navigator-top-nav {
+        .breadcrumbs-container {
+            float: none;
+        }
+        .navigator-tools {
+            float: none;
+            .separator:before {
+                top: 0;
+                bottom: 0;
+            }
+        }
+    }
 }
 .navigator-button {
     margin-left: 10px;
@@ -376,9 +394,9 @@ body {
     &:visited,
     &:link:visited,
     &:link {
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
         display: inline-block;
         vertical-align: top;
-        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
         padding: 10px 20px !important;
     }
     .icon {
@@ -389,13 +407,7 @@ body {
         top: 0;
     }
 }
-.navigator-button-upload {
-    &,
-    &:visited,
-    &:link:visited,
-    &:link {
-    }
-}
+
 .navigator-button + .dropdown-menu {
     margin-top: -2px;
 }
@@ -403,8 +415,8 @@ body {
 .dropdown-container {
     display: inline-block;
     position: relative;
-    vertical-align: top;
     top: 6px;
+    vertical-align: top;
     .dropdown-menu {
         display: none;
         right: 0;
@@ -440,9 +452,9 @@ body {
         padding: 0 10px;
     }
     .dropdown-menu {
-        margin-top: -3px;
-        left: 0;
         right: auto;
+        left: 0;
+        margin-top: -3px;
     }
 }
 
