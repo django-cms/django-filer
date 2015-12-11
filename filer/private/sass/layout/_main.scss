@@ -272,8 +272,6 @@ body {
     appearance: none;
 }
 .filter-files-button {
-    border-radius: 0 !important;
-    border-right: 0 !important;
     position: absolute;
     top: 0;
     right: 0;
@@ -283,6 +281,8 @@ body {
     height: 42px;
     margin: 0;
     padding: 0 !important;
+    border-right: 0 !important;
+    border-radius: 0 !important;
     .icon {
         position: relative;
         top: 14px;
@@ -385,16 +385,16 @@ body {
             float: none;
         }
         .navigator-tools {
-            margin-left: 17px;
             float: none;
+            margin-left: 17px;
             .separator:before {
                 top: 0;
                 bottom: 0;
             }
         }
         .dropdown-container .dropdown-menu {
-            left: 0;
             right: auto;
+            left: 0;
         }
     }
 }
@@ -433,9 +433,9 @@ body {
         left: auto;
         label {
             display: block;
+            white-space: nowrap;
             text-transform: none;
             padding: 0 10px;
-            white-space: nowrap;
         }
         input {
             position: relative;
@@ -444,8 +444,8 @@ body {
             margin-right: 5px;
         }
         &.dropdown-menu-checkboxes {
-            left: auto;
             right: 0;
+            left: auto;
         }
     }
     &.open .dropdown-menu {
@@ -490,8 +490,8 @@ body {
 
 .nav-pages {
     position: relative;
-    background: #FFF;
     padding: 10px 15px;
+    background: #fff;
 }
 
 @media screen and (max-width: $screen-tablet) {
