@@ -13,7 +13,9 @@
                 {% else %}
                     <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
                         <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-focal-point-image">
-                        <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                        <div class="image-preview-field">
+                            <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                        </div>
                     </div>
                 {% endif %}
                 <div class="text-left">
@@ -76,7 +78,9 @@
         <div class="image-preview-container">
             <div class="image-preview js-focal-point">
                 <img src="http://lorempixel.com/210/266" data-ratio="4.638095" width="210" height="266" class="js-focal-point-image">
-                <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                <div class="image-preview-field">
+                    <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                </div>
                 <input type="hidden" class="js-focal-point-location">
             </div>
 

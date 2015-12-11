@@ -36,11 +36,7 @@
     {% endif %}
 {% endblock %}
 
-{% block breadcrumbs %}
-    {% with folder as instance %}
-        {% include "admin/filer/breadcrumbs.html" %}
-    {% endwith %}
-{% endblock %}
+{% block breadcrumbs %}{% endblock %}
 
 {% block sidebar %}{% endblock %}
 
@@ -50,53 +46,104 @@
 
 {% block content %}
     <div class="navigator-top-nav clearfix">
-        <div class="pull-left">
-            {% if not folder.is_root %}
-                <h1 class="folder_header">
-                    {% if folder.parent %}
-                        <a class="backtoroot" href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% trans 'Go back to the parent folder' %}">&uarr;</a>
-                    {% else %}
-                        <a class="backtoroot" href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">&uarr;</a>
-                    {% endif %}
-                    <img src="{{ folder.icons.32 }}" alt="">
-                    {{ folder.name }}
-                    <span class="small quiet">
-                        ({% blocktrans count folder.children_count as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %}, {% blocktrans count folder.file_count as counter %}{{ counter }} file{% plural %}{{ counter }} files{% endblocktrans %})
-                    </span>
-                </h1>
+        <div class="breadcrumbs-container">
+            {% for ancestor_folder in instance.logical_path %}
+                {{ ancestor_folder }}
+            {% endfor %}
 
-                <div class="dropdown-container dropdown-container-down">
-                    <a href="#" data-toggle="dropdown" aria-expanded="false">
-                        <span class="fa fa-caret-down"></span>
+            {% if not is_popup %}
+                <div class="breadcrumbs">
+                    <a href="{% url 'admin:index' %}" title="{% trans 'Go back to admin homepage' %}">
+                        {% trans "Home" %}
                     </a>
-                    <ul class="dropdown-menu">
-                        {% if is_popup %}
-                            {% if select_folder and folder.file_type == 'Folder' %}
-                                <li>
-                                    <a href="#">&nbsp;</a>
-                                </li>
+                    &rsaquo;
+                    <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}">
+                        {% trans "Filer" %}
+                    </a>
+                    {% if not instance.is_root and instance.is_smart_folder %}
+                        &rsaquo;
+                        <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
+                    {% endif %}
+                    {% for ancestor_folder in instance.logical_path %}
+                        &rsaquo;
+                        <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}"
+                            title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                            {% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}
+                        </a>
+                    {% endfor %}
+                    {% if breadcrumbs_action %}
+                        &rsaquo;
+                        <a href="{{ instance.get_admin_directory_listing_url_path }}"
+                            title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                            {% if instance.label %}
+                                {{ instance.label }}
+                            {% else %}
+                                {{ instance.name }}
                             {% endif %}
+                        </a>
+                        &rsaquo;
+                        {{ breadcrumbs_action }}
+                    {% else %}
+                        &rsaquo;
+                        {% if instance.label %}
+                            {{ instance.label }}
                         {% else %}
-                            {% if permissions.has_edit_permission %}
-                                <li>
-                                    <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
-                                </li>
-                            {% endif %}
+                            {{ instance.name }}
                         {% endif %}
-                    </ul>
+                    {% endif %}
                 </div>
-            {% else %}
-                {% if folder.is_smart_folder %}
-                    <h1 class="folder_header"><a class="backtoroot" href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">&uarr;</a>
-                        <img src="{{ folder.icons.32 }}" alt=""> {{ folder.name }}
-                    </h1>
-                {% endif %}
+            {% endif %}
+
+            {% if not folder.is_root or folder.is_smart_folder %}
+                <div class="navigator-breadcrumbs">
+                    {% if not folder.is_root %}
+                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                            title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
+                            Filer
+                        </a>
+
+                        {% if folder.parent.parent %}
+                            <span class="icon fa fa-chevron-right"></span>
+                            ...
+                        {% endif %}
+
+                        {% if folder.parent %}
+                            <span class="icon fa fa-chevron-right"></span>
+                            <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                                title="{% trans 'Go back to the parent folder' %}">
+                                {{ folder.parent.name }}
+                            </a>
+                        {% endif %}
+
+                        <span class="icon fa fa-chevron-right"></span>
+                        {{ folder.name }}
+
+                        {% if not is_popup and not select_folder and folder.file_type == 'Folder' and permissions.has_edit_permission %}
+                            <div class="dropdown-container dropdown-container-down">
+                                <a href="#" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="fa fa-caret-down"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% elif folder.is_smart_folder %}
+                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">
+                            Filer
+                        </a>
+                        <span class="icon fa fa-chevron-right"></span>
+                        {{ folder.name }}
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
 
         {% block object-tools %}
-            <div class="navigator-tools pull-right">
-                {% if paginated_items.object_list|length %}
+            <div class="navigator-tools">
+                {% if paginated_items.object_list|length and not is_popup %}
                     <span class="separator"></span>
                     <div class="dropdown-container js-actions-menu">
                         <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
@@ -110,14 +157,15 @@
                 {% endif %}
                 {% block object-tools-items %}
                     {% if folder.can_have_subfolders and can_make_folder %}
-                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}" title="{% trans 'Adds a new Folder' %}" class="navigator-button" onclick="return showAddAnotherPopup(this);">
-                            <span class="icon fa fa-folder"></span>
-                            {% trans "New Folder" %}
+                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}"
+                            title="{% trans 'Adds a new Folder' %}"
+                            class="navigator-button"
+                            onclick="return showAddAnotherPopup(this);">
+                        {% trans "New Folder" %}
                         </a>
                     {% endif %}
                     {% if permissions.has_add_children_permission and not folder.is_root %}
                         <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload">
-                            <span class="icon fa fa-file"></span>
                             {% trans "Upload Files" %}
                         </a>
                         {% include "admin/filer/tools/upload_button_js.html" %}
