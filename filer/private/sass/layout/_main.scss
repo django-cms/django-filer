@@ -264,13 +264,16 @@ body {
     box-sizing: border-box;
     width: 100%;
     height: 42px;
-    padding: 0 30px 0 10px;
-    border: 1px solid #ddd;
+    padding: 0 30px 0 20px !important;
+    border-left: 0 !important;
+    border-radius: 0;
     outline: none;
 
     appearance: none;
 }
 .filter-files-button {
+    border-radius: 0 !important;
+    border-right: 0 !important;
     position: absolute;
     top: 0;
     right: 0;
@@ -297,6 +300,7 @@ body {
     .column-checkbox {
         text-align: center;
         width: 20px;
+        padding-left: 20px !important;
         input {
             margin: 0;
         }
@@ -310,6 +314,7 @@ body {
     .column-action {
         text-align: center;
         width: 70px;
+        padding-right: 20px !important;
         a {
             font-size: 16px !important;
             margin: 0 5px;
@@ -372,7 +377,7 @@ body {
 }
 .navigator-tools {
     float: right;
-    margin: 10px 10px 0 0;
+    margin: 10px 20px 0 0;
 }
 @media screen and (max-width: $screen-tablet) {
     .navigator-top-nav {
@@ -380,11 +385,16 @@ body {
             float: none;
         }
         .navigator-tools {
+            margin-left: 17px;
             float: none;
             .separator:before {
                 top: 0;
                 bottom: 0;
             }
+        }
+        .dropdown-container .dropdown-menu {
+            left: 0;
+            right: auto;
         }
     }
 }
@@ -425,12 +435,17 @@ body {
             display: block;
             text-transform: none;
             padding: 0 10px;
+            white-space: nowrap;
         }
         input {
             position: relative;
             top: 4px;
             vertical-align: top;
             margin-right: 5px;
+        }
+        &.dropdown-menu-checkboxes {
+            left: auto;
+            right: 0;
         }
     }
     &.open .dropdown-menu {
@@ -474,6 +489,8 @@ body {
 }
 
 .nav-pages {
+    position: relative;
+    background: #FFF;
     padding: 10px 15px;
 }
 
@@ -503,6 +520,15 @@ body {
     margin-top: 20px !important;
 }
 
+.filebrowser {
+    &.popup #content {
+        box-shadow: none;
+    }
+    #content {
+        box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+    }
+}
+
 .filebrowser h1.folder_header {
     position: relative;
     top: 6px;
@@ -518,7 +544,7 @@ body {
 .navigator-breadcrumbs {
     font-size: 16px;
     font-weight: bold;
-    padding: 17px 0 0 10px;
+    padding: 17px 0 0 20px;
     > a {
         color: $gray-darkest !important;
     }
