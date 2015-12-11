@@ -94,51 +94,48 @@
                 </div>
             {% endif %}
 
-            {% if not folder.is_root or folder.is_smart_folder %}
-                <div class="navigator-breadcrumbs">
-                    {% if not folder.is_root %}
-                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
-                            title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
-                            Filer
-                        </a>
-
-                        {% if folder.parent.parent %}
-                            <span class="icon fa fa-chevron-right"></span>
-                            ...
-                        {% endif %}
-
-                        {% if folder.parent %}
-                            <span class="icon fa fa-chevron-right"></span>
-                            <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
-                                title="{% trans 'Go back to the parent folder' %}">
-                                {{ folder.parent.name }}
-                            </a>
-                        {% endif %}
-
+            <div class="navigator-breadcrumbs">
+                <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                    title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
+                    Root
+                </a>
+                {% if not folder.is_root %}
+                    {% if folder.parent.parent %}
                         <span class="icon fa fa-chevron-right"></span>
-                        {{ folder.name }}
-
-                        {% if not is_popup and not select_folder and folder.file_type == 'Folder' and permissions.has_edit_permission %}
-                            <div class="dropdown-container dropdown-container-down">
-                                <a href="#" data-toggle="dropdown" aria-expanded="false">
-                                    <span class="fa fa-caret-down"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        {% endif %}
-                    {% elif folder.is_smart_folder %}
-                        <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">
-                            Filer
-                        </a>
-                        <span class="icon fa fa-chevron-right"></span>
-                        {{ folder.name }}
+                        ...
                     {% endif %}
-                </div>
-            {% endif %}
+
+                    {% if folder.parent %}
+                        <span class="icon fa fa-chevron-right"></span>
+                        <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                            title="{% trans 'Go back to the parent folder' %}">
+                            {{ folder.parent.name }}
+                        </a>
+                    {% endif %}
+
+                    <span class="icon fa fa-chevron-right"></span>
+                    {{ folder.name }}
+
+                    {% if not is_popup and not select_folder and folder.file_type == 'Folder' and permissions.has_edit_permission %}
+                        <div class="dropdown-container dropdown-container-down">
+                            <a href="#" data-toggle="dropdown" aria-expanded="false">
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% elif folder.is_smart_folder %}
+                    <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">
+                        Filer
+                    </a>
+                    <span class="icon fa fa-chevron-right"></span>
+                    {{ folder.name }}
+                {% endif %}
+            </div>
         </div>
 
         {% block object-tools %}

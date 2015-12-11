@@ -25,6 +25,15 @@ var Cl = window.Cl || {};
             clickEvent.stopPropagation();
         });
 
+        // Focus on the search field on page load
+        (function () {
+            var filter = $('.js-filter-files');
+
+            if (filter.length) {
+                filter.focus();
+            }
+        }());
+
         // mocking the action buttons to work in frontend UI, please do not review
         (function () {
             var dropdown = $('.js-actions-menu .dropdown-menu');
