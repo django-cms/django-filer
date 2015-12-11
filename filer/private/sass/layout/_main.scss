@@ -553,3 +553,9 @@ body {
         margin: 0 5px;
     }
 }
+
+.field-file,
+.field-sha1 {
+    word-wrap: break-word;
+    word-break: break-all;
+}
