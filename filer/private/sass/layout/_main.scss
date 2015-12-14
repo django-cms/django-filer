@@ -336,6 +336,7 @@ body {
 }
 
 .navigator-top-nav {
+    position: relative;
     clear: both;
     min-height: 50px;
     padding: 5px 0;
@@ -511,6 +512,11 @@ body {
 }
 #id_upload_button:before {
     display: none;
+}
+#container .breadcrumbs-container .breadcrumbs {
+    top: -91px;
+    left: 0;
+    right: 0;
 }
 
 .app-filer #container .breadcrumbs {
