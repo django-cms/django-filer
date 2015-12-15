@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from filer import settings as filer_settings
-from filer.models import Clipboard, ClipboardItem
+from filer.models import Folder, Clipboard, ClipboardItem
 from filer.utils.compatibility import DJANGO_1_4
 from filer.utils.files import handle_upload, UploadException
 from filer.utils.loader import load_object
@@ -42,7 +42,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 name='filer-delete_clipboard'),
             # upload does it's own permission stuff (because of the stupid
             # flash missing cookie stuff)
-            url(r'^operations/upload/$',
+            url(r'^operations/upload/(?P<folder_id>\d)/$',
                 self.ajax_upload,
                 name='filer-ajax_upload'),
         )
@@ -59,9 +59,11 @@ class ClipboardAdmin(admin.ModelAdmin):
         response_params = {content_type_key: mimetype}
         try:
             upload, filename, is_raw = handle_upload(request)
-
+            # Get folder
+            folder = Folder.objects.get(pk=folder_id)
+            # TODO: Deprecated/refactor
             # Get clipboad
-            clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
+            # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
 
             # find the file type
             for filer_class in filer_settings.FILER_FILE_MODELS:
@@ -80,10 +82,12 @@ class ClipboardAdmin(admin.ModelAdmin):
                 file_obj = uploadform.save(commit=False)
                 # Enforce the FILER_IS_PUBLIC_DEFAULT
                 file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+                file_obj.folder = folder
                 file_obj.save()
-                clipboard_item = ClipboardItem(
-                    clipboard=clipboard, file=file_obj)
-                clipboard_item.save()
+                # TODO: Deprecated/refactor
+                # clipboard_item = ClipboardItem(
+                #     clipboard=clipboard, file=file_obj)
+                # clipboard_item.save()
                 json_response = {
                     'thumbnail': file_obj.icons['32'],
                     'alt_text': '',

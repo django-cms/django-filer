@@ -63,7 +63,7 @@
                             <td class="column-action">
                                 {% if subfolder.file_type == "Folder" %}
                                     <a href="{% url 'admin:filer_folder_change' subfolder.id %}" title="{% trans 'Change folder details' %}" class="icon fa fa-pencil"></a>
-                                    <a href="#" class="icon fa fa-trash-o" title="{% trans 'Remove folder' %}"></a>
+                                    <a href="{{ subfolder.get_admin_delete_url }}" class="icon fa fa-trash-o" title="{% trans 'Remove folder' %}"></a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -139,7 +139,7 @@
                             <td class="column-action">
                                 <a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                     title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="icon fa fa-pencil"></a>
-                                <a href="#" class="icon fa fa-trash-o" title="{% trans 'Remove file' %}"></a>
+                                <a href="{{ file.get_admin_delete_url }}" class="icon fa fa-trash-o" title="{% trans 'Remove file' %}"></a>
                             </td>
                         </tr>
                     {% endwith %}

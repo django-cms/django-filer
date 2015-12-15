@@ -5,7 +5,7 @@
     (function($) {
         $(function() {
             var uploader = new qq.FileUploaderBasic({
-                action: '{% url "admin:filer-ajax_upload" %}',
+                action: '{% url "admin:filer-ajax_upload" folder_id=folder.id %}',
                 button: document.getElementById('id_upload_button'),
                 onSubmit: function(id, fileName){
                     $('#fileInputQueue .noItemsRow').hide();
@@ -47,7 +47,7 @@
                             '<td class="buttons"></td>';
 
                             // Temporary stuff here, please do not review
-                            $('.pastelink').trigger('click');
+                            //$('.pastelink').trigger('click');
                     }
                     $('#fileUpload-' + id).html(html);
                 },

@@ -230,6 +230,17 @@ class File(PolymorphicModel, mixins.IconsMixin):
             args=(self.pk,)
         )
 
+    def get_admin_delete_url(self):
+        try:
+            # Django <=1.6
+            model_name = self._meta.module_name
+        except AttributeError:
+            # Django >1.6
+            model_name = self._meta.model_name
+        return urlresolvers.reverse(
+            'admin:{0}_{1}_delete'.format(self._meta.app_label, model_name,),
+            args=(self.pk,))
+
     @property
     def url(self):
         """
