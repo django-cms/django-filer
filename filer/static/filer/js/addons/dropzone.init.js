@@ -19,7 +19,7 @@
                 maxFilesize: 2, // MB
                 addRemoveLinks: true,
                 maxFiles: 1,
-                previewTemplate: $('.js-dz-template').html(),
+                // previewTemplate: $('.js-dz-template').html(),
                 clickable: false,
                 maxfilesexceeded: function (file) {
                     this.removeAllFiles();
