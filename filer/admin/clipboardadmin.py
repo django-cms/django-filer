@@ -7,11 +7,16 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from filer import settings as filer_settings
-from filer.models import Folder, Clipboard, ClipboardItem
+from filer.models import Folder, Clipboard, ClipboardItem, UnfiledImages
 from filer.utils.compatibility import DJANGO_1_4
 from filer.utils.files import handle_upload, UploadException
 from filer.utils.loader import load_object
 
+
+NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
+NO_PERMISSIONS_FOR_FOLDER = (
+    "Can't use this folder, Permission Denied. Please select another folder."
+)
 
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
@@ -45,6 +50,9 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/(?P<folder_id>\d)/$',
                 self.ajax_upload,
                 name='filer-ajax_upload'),
+            url(r'^operations/upload/no_folder/$',
+                self.ajax_upload,
+                name='filer-ajax_upload'),
         )
         url_patterns.extend(urls)
         return url_patterns
@@ -57,10 +65,22 @@ class ClipboardAdmin(admin.ModelAdmin):
         mimetype = "application/json" if request.is_ajax() else "text/html"
         content_type_key = 'mimetype' if DJANGO_1_4 else 'content_type'
         response_params = {content_type_key: mimetype}
+        folder = None
+        if folder_id:
+            try:
+                # Get folder
+                folder = Folder.objects.get(pk=folder_id)
+            except Folder.DoesNotExist:
+                return HttpResponse(json.dumps({'error': NO_FOLDER_ERROR}),
+                                    **response_params)
+
+        # check permissions
+        if folder and not folder.has_add_children_permission(request):
+            return HttpResponse(
+                json.dumps({'error': NO_PERMISSIONS_FOR_FOLDER}),
+                **response_params)
         try:
             upload, filename, is_raw = handle_upload(request)
-            # Get folder
-            folder = Folder.objects.get(pk=folder_id)
             # TODO: Deprecated/refactor
             # Get clipboad
             # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
