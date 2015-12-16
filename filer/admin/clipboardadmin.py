@@ -9,7 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Folder, Clipboard, ClipboardItem, Image
 from filer.utils.compatibility import DJANGO_1_4
-from filer.utils.files import handle_upload, UploadException
+from filer.utils.files import (
+    handle_upload, handle_request_files_upload, UploadException,
+)
 from filer.utils.loader import load_object
 
 
@@ -80,7 +82,12 @@ class ClipboardAdmin(admin.ModelAdmin):
                 json.dumps({'error': NO_PERMISSIONS_FOR_FOLDER}),
                 **response_params)
         try:
-            upload, filename, is_raw = handle_upload(request)
+            if len(request.FILES) == 1:
+                # dont check if request is ajax or not, just grab the file
+                upload, filename, is_raw = handle_request_files_upload(request)
+            else:
+                # else process the request as usual
+                upload, filename, is_raw = handle_upload(request)
             # TODO: Deprecated/refactor
             # Get clipboad
             # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]

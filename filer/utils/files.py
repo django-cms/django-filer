@@ -91,16 +91,26 @@ def handle_upload(request):
                 break
     else:
         if len(request.FILES) == 1:
-            # FILES is a dictionary in Django but Ajax Upload gives the uploaded file an
-            # ID based on a random number, so it cannot be guessed here in the code.
-            # Rather than editing Ajax Upload to pass the ID in the querystring, note that
-            # each upload is a separate request so FILES should only have one entry.
-            # Thus, we can just grab the first (and only) value in the dict.
-            is_raw = False
-            upload = list(request.FILES.values())[0]
-            filename = upload.name
+            upload, filename, is_raw = handle_request_files_upload(request)
         else:
             raise UploadException("AJAX request not valid: Bad Upload")
+    return upload, filename, is_raw
+
+
+def handle_request_files_upload(request):
+    """
+    Handle request.FILES if len(request.FILES) == 1.
+    Returns tuple(upload, filename, is_raw) where upload is file itself.
+    """
+    # FILES is a dictionary in Django but Ajax Upload gives the uploaded file
+    # an ID based on a random number, so it cannot be guessed here in the code.
+    # Rather than editing Ajax Upload to pass the ID in the querystring,
+    # note that each upload is a separate request so FILES should only
+    # have one entry.
+    # Thus, we can just grab the first (and only) value in the dict.
+    is_raw = False
+    upload = list(request.FILES.values())[0]
+    filename = upload.name
     return upload, filename, is_raw
 
 
