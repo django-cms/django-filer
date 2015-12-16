@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from filer import settings as filer_settings
-from filer.models import Folder, Clipboard, ClipboardItem, UnfiledImages
+from filer.models import Folder, Clipboard, ClipboardItem, Image
 from filer.utils.compatibility import DJANGO_1_4
 from filer.utils.files import handle_upload, UploadException
 from filer.utils.loader import load_object
@@ -112,7 +112,18 @@ class ClipboardAdmin(admin.ModelAdmin):
                     'thumbnail': file_obj.icons['32'],
                     'alt_text': '',
                     'label': str(file_obj),
+                    'file_id': file_obj.pk,
                 }
+                # prepare preview thumbnail
+                if type(file_obj) == Image:
+                    thumbnail_180_options = {
+                        'size': (180, 180),
+                        'crop': True,
+                        'upscale': True,
+                    }
+                    thumbnail_180 = file_obj.file.get_thumbnail(
+                        thumbnail_180_options)
+                    json_response['thumbnail_180'] = thumbnail_180.url
                 return HttpResponse(json.dumps(json_response),
                                     **response_params)
             else:
