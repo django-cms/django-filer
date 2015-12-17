@@ -17,6 +17,8 @@
         document.getElementById(img_name).src = chosenThumbnailUrl;
         document.getElementById(txt_name).innerHTML = chosenDescriptionTxt;
         document.getElementById(clear_name).style.display = 'inline';
+        document.getElementById('lookup_id_file').className += ' hidden';
+        document.getElementById('dropzone-message').className += ' hidden';
         if (old_id !== chosenId) {
             $(elem).trigger('change');
         }

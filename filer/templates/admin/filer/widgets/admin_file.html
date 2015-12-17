@@ -1,12 +1,20 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
-    <div class="js-dropzone dropzone" data-url="{% url 'admin:filer-ajax_upload' %}">
+    <div class="dz-preview dz-file-preview hidden js-dropzone-template">
+        <span class="filerFile">
+            <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
+            <span data-dz-name class="dz-name"></span>
+            <img class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" data-dz-remove>
+            <div class="dz-progress js-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+        </span>
+    </div>
 
-        <div class="dz-default dz-message">
+    <div class="js-dropzone dropzone" data-url="{% url 'admin:filer-ajax_upload' %}">
+        <div class="dz-default dz-message js-dropzone-message{% if object %} hidden{% endif %}" id="dropzone-message">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>
-        <span class="filerFile">
+        <span class="filerFile js-file-selector">
             {% if object %}
                 {% if object.icons.32 %}
                     <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}" /></a>
@@ -20,7 +28,7 @@
                 &nbsp;<span id="{{ span_id }}"></span>
             {% endif %}
 
-            <a href="{{ lookup_url }}" class="related-lookup" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="lookup_id_{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
                 {% trans 'Add File' %}
             </a>
 

@@ -566,3 +566,46 @@ body {
     word-wrap: break-word;
     word-break: break-all;
 }
+
+#content #content-main {
+    margin-top: 0;
+}
+.related-lookup.hidden {
+    display: none !important;
+}
+.well.img-preview {
+    display: none;
+    margin-top: 0;
+}
+.img-wrapper {
+    width: 180px;
+    height: 180px;
+}
+.dz-upload {
+    height: 5px;
+    background-color: #0bf;
+}
+.dz-name {
+    max-width: calc(100% - 100px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.dz-thumbnail {
+    width: 36px;
+    height: 36px;
+    overflow: hidden;
+    background: #FFF url('/static/filer/icons/nofile_48x48.png');
+    background-size: cover;
+    border: solid 1px #ddd;
+    border-radius: 3px;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: top;
+    img[src=''],
+    img:not([src]) {
+        width: 104%;
+        height: 104%;
+        margin: -2%;
+    }
+}

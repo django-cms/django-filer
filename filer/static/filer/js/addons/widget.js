@@ -8,11 +8,17 @@
         var base_id = '#' + hidden_input.attr('id');
         var thumbnail = $(base_id + '_thumbnail_img');
         var description = $(base_id + '_description_txt');
+        var addImageButton = $('.js-related-lookup');
+        var dropzoneMessage = $('.js-dropzone-message');
+        var hiddenClass = 'hidden';
         var static_prefix = clearer.attr('src').replace('admin/img/icon_deletelink.gif', 'filer/');
 
         clearer.hide();
         hidden_input.removeAttr('value');
         thumbnail.attr('src', static_prefix + 'icons/nofile_48x48.png');
+        thumbnail.parent('a').removeAttr('href');
+        addImageButton.removeClass(hiddenClass);
+        dropzoneMessage.removeClass(hiddenClass);
         description.empty();
     };
 
