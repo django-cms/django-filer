@@ -206,6 +206,17 @@ class Folder(models.Model, mixins.IconsMixin):
         return urlresolvers.reverse('admin:filer-directory_listing',
                                     args=(self.id,))
 
+    def get_admin_delete_url(self):
+        try:
+            # Django <=1.6
+            model_name = self._meta.module_name
+        except AttributeError:
+            # Django >1.6
+            model_name = self._meta.model_name
+        return urlresolvers.reverse(
+            'admin:{0}_{1}_delete'.format(self._meta.app_label, model_name,),
+            args=(self.pk,))
+
     def __str__(self):
         return "%s" % (self.name,)
 
