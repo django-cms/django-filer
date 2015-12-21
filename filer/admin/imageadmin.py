@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext as _
 
 from filer.admin.fileadmin import FileAdmin
@@ -34,8 +33,8 @@ class ImageAdminForm(forms.ModelForm):
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
         js = (
-            static('filer/js/raphael.js'),
-            static('filer/js/focal_point.js'),
+            'filer/js/raphael.js',
+            'filer/js/focal_point.js',
         )
 
 
