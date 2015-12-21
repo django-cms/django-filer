@@ -1,0 +1,5 @@
+django<1.7
+django-mptt>0.6, <0.8
+south
+
+-r base.txt
