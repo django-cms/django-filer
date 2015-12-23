@@ -159,7 +159,7 @@
                         </a>
                     {% endif %}
                     {% if permissions.has_add_children_permission and not folder.is_root %}
-                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload">
+                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button">
                             {% trans "Upload Files" %}
                         </a>
                         {% include "admin/filer/tools/upload_button_js.html" %}
@@ -186,5 +186,4 @@
             </form>
         </div>
     </div>
-    {% include "admin/filer/tools/clipboard/clipboard.html" with detail=True %}
 {% endblock %}

@@ -2,7 +2,7 @@
 // This script implements the dropzone settings
 'use strict';
 
-/* global Dropzone */
+/* globals Dropzone */
 (function ($) {
     $(function () {
         var dropzoneSelector = '.js-dropzone';
@@ -18,6 +18,7 @@
         var dragHoverClass = 'dz-drag-hover';
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
+        var hasErrors = false;
 
         if (dropzones.length && Dropzone) {
             Dropzone.autoDiscover = false;
@@ -27,7 +28,7 @@
                 new Dropzone(this, {
                     url: dropzoneUrl,
                     paramName: 'file',
-                    maxFiles: 10,
+                    maxFiles: 100,
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
@@ -72,7 +73,17 @@
                     queuecomplete: function () {
                         uploadInfo.addClass(hiddenClass);
                         uploadSuccess.removeClass(hiddenClass);
-                        window.location.reload();
+                        if (hasErrors) {
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 3000);
+                        } else {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (file) {
+                        hasErrors = true;
+                        window.showError(file.name + ': ' + file.xhr.statusText);
                     }
                 });
             });

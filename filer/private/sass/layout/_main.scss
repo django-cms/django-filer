@@ -607,14 +607,24 @@ body {
     border-radius: 3px;
     background: #fff url("/static/filer/icons/nofile_48x48.png");
     background-size: cover;
-    img[src=""],
-    img:not([src]) {
-        width: 104%;
-        height: 104%;
-        margin: -2%;
+    img {
+        background: #FFF;
+        &[src=""],
+        &:not([src]) {
+            width: 104%;
+            height: 104%;
+            margin: -2%;
+        }
     }
 }
-
+.popup {
+    .dropzone {
+        padding: 15px 20px 20px;
+    }
+    form .form-row .dropzone .filerFile {
+        top: 58px;
+    }
+}
 .dropzone-info-message {
     position: fixed;
     top: 50%;
