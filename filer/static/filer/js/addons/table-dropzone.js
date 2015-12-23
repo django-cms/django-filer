@@ -5,6 +5,8 @@
 /* globals Dropzone */
 (function ($) {
     $(function () {
+        var submitNum = 0;
+        var maxSubmitNum = 1;
         var dropzoneSelector = '.js-dropzone';
         var dropzones = $(dropzoneSelector);
         var infoMessageClass = 'js-dropzone-info-message';
@@ -12,6 +14,7 @@
         var folderName = $('.js-dropzone-folder-name');
         var uploadInfo = $('.js-dropzone-upload-info');
         var uploadWelcome = $('.js-dropzone-upload-welcome');
+        var uploadNumber = $('.js-dropzone-upload-number');
         var uploadFileName = $('.js-dropzone-file-name');
         var uploadProgress = $('.js-dropzone-progress');
         var uploadSuccess = $('.js-dropzone-upload-success');
@@ -32,6 +35,13 @@
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
+                    addedfile: function () {
+                        submitNum++;
+
+                        if (maxSubmitNum < submitNum) {
+                            maxSubmitNum = submitNum;
+                        }
+                    },
                     maxfilesexceeded: function (file) {
                         this.removeAllFiles();
                         this.addFile(file);
@@ -69,8 +79,14 @@
                     },
                     uploadprogress: function (file, progress) {
                         uploadProgress.width(progress + '%');
+                        uploadNumber.text(maxSubmitNum - submitNum + 1 + '/' + maxSubmitNum);
+                    },
+                    complete: function () {
+                        submitNum--;
                     },
                     queuecomplete: function () {
+                        maxSubmitNum = 1;
+
                         uploadInfo.addClass(hiddenClass);
                         uploadSuccess.removeClass(hiddenClass);
                         if (hasErrors) {
