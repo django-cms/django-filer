@@ -8,6 +8,15 @@ var Cl = window.Cl || {};
 
 (function ($) {
     $(function () {
+        window.showError = function (message) {
+            var messages = $('.messagelist');
+            var header = $('#header');
+            var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
+            var msg = tpl.replace('{msg}', message);
+
+            messages.length ? messages.replaceWith(msg) : header.after(msg);
+        };
+
         // mediator init
         Cl.mediator = new Mediator();
 
