@@ -38,7 +38,7 @@ describe('Cl.FocalPoint', function () {
         image.trigger('load');
         expect(circle).not.toHaveClass('hidden');
 
-        expect(location.val()).toBe('');
+        expect(location.val()).toBe('100,200');
     });
 
     it('sets the location value to center and updates ' +
