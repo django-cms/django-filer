@@ -83,7 +83,7 @@ var Cl = window.Cl || {};
                 }
             });
 
-            this._updateLocationValue();
+            this._updateLocationValue(x, y);
         },
         _getLocation: function () {
             var newLocationSelector = this.container.data(this.options.dataLocation);
