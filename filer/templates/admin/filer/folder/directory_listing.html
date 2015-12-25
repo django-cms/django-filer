@@ -159,10 +159,9 @@
                         </a>
                     {% endif %}
                     {% if permissions.has_add_children_permission and not folder.is_root %}
-                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button">
+                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}">
                             {% trans "Upload Files" %}
                         </a>
-                        {% include "admin/filer/tools/upload_button_js.html" %}
                     {% endif %}
                 {% endblock %}
             </div>
