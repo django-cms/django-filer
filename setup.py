@@ -28,7 +28,7 @@ setup(
         'Django>=1.5,<1.9',
         'easy-thumbnails>=1.0,<2.4',
         'django-mptt>=0.6,<0.9',
-        'django_polymorphic>=0.7,<0.8',
+        'django_polymorphic>=0.7,<0.9',
         'Unidecode>=0.04,<0.05',
     ),
     include_package_data=True,
