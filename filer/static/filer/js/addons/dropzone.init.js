@@ -18,8 +18,8 @@
         var fileIdInputSelector = '.vForeignKeyRawIdAdminField';
         var hiddenClass = 'hidden';
 
-        if (dropzones.length && Dropzone && !window.initEnabled) {
-            window.initEnabled = true;
+        if (dropzones.length && Dropzone && !window.filerDropzoneInitialized) {
+            window.filerDropzoneInitialized = true;
             Dropzone.autoDiscover = false;
             dropzones.each(function () {
                 var dropzone = $(this);
@@ -62,7 +62,9 @@
                             }
                             if (response.thumbnail_180) {
                                 if (isImage) {
-                                    $(previewImageSelector).css({'background-image': 'url(' + response.thumbnail_180 + ')'});
+                                    $(previewImageSelector).css({
+                                        'background-image': 'url(' + response.thumbnail_180 + ')'
+                                    });
                                     $(previewImageWrapperSelector).removeClass(hiddenClass);
                                 }
                             }
