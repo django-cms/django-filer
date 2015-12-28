@@ -54,15 +54,15 @@
                         message.addClass(hiddenClass);
                         dropzone.removeClass('dz-drag-hover');
                     },
-                    success: function (file, responce) {
+                    success: function (file, response) {
                         $(progressSelector).addClass(hiddenClass);
-                        if (file && file.status === 'success' && responce) {
-                            if (responce.file_id) {
-                                inputId.val(responce.file_id);
+                        if (file && file.status === 'success' && response) {
+                            if (response.file_id) {
+                                inputId.val(response.file_id);
                             }
-                            if (responce.thumbnail_180) {
+                            if (response.thumbnail_180) {
                                 if (isImage) {
-                                    $(previewImageSelector).css({'background-image': 'url(' + responce.thumbnail_180 + ')'});
+                                    $(previewImageSelector).css({'background-image': 'url(' + response.thumbnail_180 + ')'});
                                     $(previewImageWrapperSelector).removeClass(hiddenClass);
                                 }
                             }
