@@ -9,60 +9,75 @@
         var previewImageSelector = '.js-img-preview';
         var dropzoneSelector = '.js-dropzone';
         var messageSelector = '.js-dropzone-message';
-        var lookupSelector = '.js-related-lookup';
+        var lookupButtonSelector = '.js-related-lookup';
         var progressSelector = '.js-dropzone-progress';
         var previewImageWrapperSelector = '.js-img-wrapper';
         var filerClearerSelector = '.filerClearer';
-        var dropzone = $(dropzoneSelector);
-        var dropzoneUrl = dropzone.data('url');
+        var dropzones = $(dropzoneSelector);
         var fileSelector = $('.js-file-selector');
-        var fileIdInputSelector = $('#id_file');
+        var fileIdInputSelector = '.vForeignKeyRawIdAdminField';
         var hiddenClass = 'hidden';
 
-        if (dropzone.length && Dropzone) {
+        if (dropzones.length && Dropzone && !window.initEnabled) {
+            window.initEnabled = true;
             Dropzone.autoDiscover = false;
-            new Dropzone(dropzoneSelector, {
-                url: dropzoneUrl,
-                paramName: 'file',
-                maxFiles: 1,
-                previewTemplate: $(dropzoneTemplateSelector).html(),
-                clickable: false,
-                addRemoveLinks: false,
-                init: function () {
-                    this.on('removedfile', function () {
-                        fileSelector.show();
+            dropzones.each(function () {
+                var dropzone = $(this);
+                var dropzoneUrl = dropzone.data('url');
+                var inputId = dropzone.find(fileIdInputSelector);
+                var isImage = inputId.is('[name="image"]');
+                var lookupButton = dropzone.find(lookupButtonSelector);
+                var message = dropzone.find(messageSelector);
+                var clearButton = dropzone.find(filerClearerSelector);
+
+                new Dropzone(this, {
+                    url: dropzoneUrl,
+                    paramName: 'file',
+                    maxFiles: 1,
+                    previewTemplate: $(dropzoneTemplateSelector).html(),
+                    clickable: false,
+                    addRemoveLinks: false,
+                    init: function () {
+                        this.on('removedfile', function () {
+                            fileSelector.show();
+                            this.removeAllFiles();
+                        });
+                    },
+                    maxfilesexceeded: function (file) {
                         this.removeAllFiles();
-                    });
-                },
-                maxfilesexceeded: function (file) {
-                    this.removeAllFiles();
-                    this.addFile(file);
-                },
-                drop: function () {
-                    $(filerClearerSelector).click();
-                    fileSelector.hide();
-                    $(lookupSelector).addClass(hiddenClass);
-                    $(messageSelector).addClass(hiddenClass);
-                    dropzone.removeClass('dz-drag-hover');
-                },
-                success: function (file, responce) {
-                    $(progressSelector).addClass(hiddenClass);
-                    if (file && file.status === 'success' && responce) {
-                        if (responce.file_id) {
-                            $(fileIdInputSelector).val(responce.file_id);
+                        this.addFile(file);
+                    },
+                    drop: function () {
+                        clearButton.click();
+                        fileSelector.hide();
+                        lookupButton.addClass(hiddenClass);
+                        message.addClass(hiddenClass);
+                        dropzone.removeClass('dz-drag-hover');
+                    },
+                    success: function (file, responce) {
+                        $(progressSelector).addClass(hiddenClass);
+                        if (file && file.status === 'success' && responce) {
+                            if (responce.file_id) {
+                                inputId.val(responce.file_id);
+                            }
+                            if (responce.thumbnail_180) {
+                                if (isImage) {
+                                    $(previewImageSelector).css({'background-image': 'url(' + responce.thumbnail_180 + ')'});
+                                    $(previewImageWrapperSelector).removeClass(hiddenClass);
+                                }
+                            }
                         }
-                        if (responce.thumbnail_180) {
-                            $(previewImageSelector).css({'background-image': 'url(' + responce.thumbnail_180 + ')'});
-                            $(previewImageWrapperSelector).removeClass(hiddenClass);
+                    },
+                    reset: function () {
+                        if (isImage) {
+                            $(previewImageWrapperSelector).addClass(hiddenClass);
+                            $(previewImageSelector).css({'background-image': 'none'});
                         }
+                        inputId.val('');
+                        lookupButton.removeClass(hiddenClass);
+                        message.removeClass(hiddenClass);
                     }
-                },
-                reset: function () {
-                    $(previewImageWrapperSelector).addClass(hiddenClass);
-                    $(fileIdInputSelector).val('');
-                    $(lookupSelector).removeClass(hiddenClass);
-                    $(messageSelector).removeClass(hiddenClass);
-                }
+                });
             });
         }
     });
