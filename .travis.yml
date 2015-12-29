@@ -61,7 +61,6 @@ after_success:
 
 matrix:
   allow_failures:
-    - env: TOX_ENV=flake8
     - env: TOX_ENV=py34-django_master-thumbs2x
     - env: TOX_ENV=py33-django_master-thumbs2x
     - env: TOX_ENV=py27-django_master-thumbs2x
