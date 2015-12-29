@@ -305,7 +305,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def duplicates(self):
         return File.objects.find_duplicates(self)
 
-    class Meta:
+    class Meta(object):
         app_label = 'filer'
         verbose_name = _('file')
         verbose_name_plural = _('files')

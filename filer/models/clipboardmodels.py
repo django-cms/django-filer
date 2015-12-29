@@ -30,7 +30,7 @@ class Clipboard(models.Model):
     def __str__(self):
         return "Clipboard %s of %s" % (self.id, self.user)
 
-    class Meta:
+    class Meta(object):
         app_label = 'filer'
         verbose_name = _('clipboard')
         verbose_name_plural = _('clipboards')
@@ -40,7 +40,7 @@ class ClipboardItem(models.Model):
     file = models.ForeignKey('File', verbose_name=_('file'))
     clipboard = models.ForeignKey(Clipboard, verbose_name=_('clipboard'))
 
-    class Meta:
+    class Meta(object):
         app_label = 'filer'
         verbose_name = _('clipboard item')
         verbose_name_plural = _('clipboard items')
