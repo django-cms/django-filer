@@ -5,6 +5,13 @@ Changelog for django-filer
 next
 ----
 
+1.0.5 (2015-12-29)
+------------------
+
+* Pin django-polymorphic version.
+* Use specific django-mptt versions in tox.ini for different Django versions.
+
+
 1.0.4 (2015-11-14)
 ------------------
 
