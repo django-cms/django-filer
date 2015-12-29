@@ -11,7 +11,12 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from polymorphic import PolymorphicModel, PolymorphicManager
+try:
+    from polymorphic.models import PolymorphicModel
+    from polymorphic.managers import PolymorphicManager
+except ImportError:
+    # django-polymorphic < 0.8
+    from polymorphic import PolymorphicModel, PolymorphicManager
 
 from filer import settings as filer_settings
 from filer.fields.multistorage_file import MultiStorageFileField
