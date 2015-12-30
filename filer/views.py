@@ -14,7 +14,7 @@ from . import settings as filer_settings
 
 
 class NewFolderForm(forms.ModelForm):
-    class Meta:
+    class Meta(object):
         model = Folder
         fields = ('name',)
         widgets = {
@@ -134,7 +134,7 @@ def make_folder(request, folder_id=None):
 
 
 class UploadFileForm(forms.ModelForm):
-    class Meta:
+    class Meta(object):
         model = Image
         exclude = ()
 

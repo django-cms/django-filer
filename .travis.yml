@@ -1,61 +1,66 @@
 language: python
 
-python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
+sudo: true
 
-sudo: false
+before_install:
+  - if [[ $FRONTEND == "true" ]]; then npm install; fi;
+  - if [[ $FRONTEND == "true" ]]; then sudo apt-get update; fi;
+  - if [[ $FRONTEND == "true" ]]; then sudo apt-get install nodejs npm; fi;
 
 install:
-  - ./.travis_setup
+  - pip install tox coveralls
 
+# Explicit environments list here is a complete list of environments from tox.
+# It is intentionally shortened.
+# Django 1.9 and master branch builds are disabled as they are not supported yet.
 env:
-  - DJANGO="Django>=1.5,<1.6" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
-  - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>=1.4,<2.0"
-  - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0"
-  - DJANGO="Django>=1.6,<1.7" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-  - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
-  - DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-  - DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
-  - DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-  - DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
+# enable when front-end tests will be merged
+#  - FRONTEND=true
+  - TOX_ENV=flake8
+#  - TOX_ENV=py34-django19-thumbs2x
+  - TOX_ENV=py34-django18-thumbs2x
+  - TOX_ENV=py34-django17-thumbs2x
+#  - TOX_ENV=py33-django19-thumbs2x
+  - TOX_ENV=py33-django18-thumbs2x
+  - TOX_ENV=py33-django17-thumbs2x
+#  - TOX_ENV=py27-django19-thumbs2x
+  - TOX_ENV=py27-django18-thumbs2x
+  - TOX_ENV=py27-django17-thumbs2x
+#  - TOX_ENV=py34-django19-custom_image-thumbs2x
+  - TOX_ENV=py34-django18-custom_image-thumbs2x
+  - TOX_ENV=py34-django17-custom_image-thumbs2x
+  - TOX_ENV=py34-django16-custom_image-thumbs2x
+#  - TOX_ENV=py33-django19-custom_image-thumbs2x
+  - TOX_ENV=py33-django18-custom_image-thumbs2x
+  - TOX_ENV=py33-django17-custom_image-thumbs2x
+  - TOX_ENV=py33-django16-custom_image-thumbs2x
+#  - TOX_ENV=py27-django19-custom_image-thumbs2x
+  - TOX_ENV=py27-django18-custom_image-thumbs2x
+  - TOX_ENV=py27-django17-custom_image-thumbs2x
+  - TOX_ENV=py27-django16-custom_image-thumbs2x
+  - TOX_ENV=py34-django16-thumbs1x
+  - TOX_ENV=py34-django15-thumbs1x
+  - TOX_ENV=py33-django16-thumbs1x
+  - TOX_ENV=py33-django15-thumbs1x
+  - TOX_ENV=py27-django16-thumbs1x
+  - TOX_ENV=py27-django15-thumbs1x
+  - TOX_ENV=py26-django16-thumbs1x
+  - TOX_ENV=py26-django15-thumbs1x
+#  - TOX_ENV=py34-django_master-thumbs2x
+#  - TOX_ENV=py33-django_master-thumbs2x
+#  - TOX_ENV=py27-django_master-thumbs2x
 
-script: coverage run --rcfile=coverage.rc test_settings.py
+script:
+  - tox -e $TOX_ENV
+# replace it with when front-end tests will be merged
+#  - if [[ $TRAVIS_PYTHON_VERSION = "2.7" && $FRONTEND = "true" ]]; then gulp ci; else tox -e $TOX_ENV; fi;
 
 after_success:
   - coveralls --config_file=coverage.rc
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
 
 matrix:
-  exclude:
-    - python: 2.6
-      env: DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 2.6
-      env: DJANGO="Django>=1.7,<1.8" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-    - python: 2.6
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 2.6
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-    - python: 2.6
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
   allow_failures:
-    - python: 2.7
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 3.3
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 3.4
-      env: DJANGO="https://github.com/django/django/archive/master.zip" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 2.7
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 3.3
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 3.4
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0"
-    - python: 2.7
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-    - python: 3.3
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
-    - python: 3.4
-      env: DJANGO="Django>=1.8,<1.9" EASY_THUMBNAILS="easy-thumbnails>2.0" CUSTOM_IMAGE="filer.test_utils.custom_image.models.Image"
+    - env: TOX_ENV=py34-django_master-thumbs2x
+    - env: TOX_ENV=py33-django_master-thumbs2x
+    - env: TOX_ENV=py27-django_master-thumbs2x

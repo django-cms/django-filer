@@ -80,7 +80,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media:
+    class Media(object):
         js = (
             static('filer/js/popup_handling.js'),
             static('filer/js/widget.js'),

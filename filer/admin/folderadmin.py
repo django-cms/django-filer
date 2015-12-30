@@ -50,7 +50,7 @@ from filer.views import (popup_status, popup_param, selectfolder_status,
 class AddFolderPopupForm(forms.ModelForm):
     folder = forms.HiddenInput()
 
-    class Meta:
+    class Meta(object):
         model = Folder
         fields = ('name',)
 

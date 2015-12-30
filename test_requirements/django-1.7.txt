@@ -1,0 +1,5 @@
+django>=1.7,<1.8
+django-mptt>0.6,<0.8
+djangocms-helper>=0.9.2,<0.10
+
+-r base.txt
