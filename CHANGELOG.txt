@@ -1,11 +1,26 @@
 CHANGELOG
 =========
 
-1.0.5 (UNRELEASED)
+x.x.x (UNRELEASED)
 ------------------
 
-* Move project to divio/django-filer
-* Adapt documentation links
+* Move project to divio/django-filer.
+* Adapt documentation links.
+
+1.0.6 (2015-12-30)
+------------------
+
+* Fix imports for django-polymorphic>=0.8.
+* Limit dependencies versions in setup.py.
+* Simplify tox setup.
+* Refactor Travis setup to use tox environments list.
+
+
+1.0.5 (2015-12-29)
+------------------
+
+* Pin django-polymorphic version.
+* Use specific django-mptt versions in tox.ini for different Django versions.
 
 
 1.0.4 (2015-11-14)

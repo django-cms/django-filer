@@ -227,7 +227,7 @@ class Folder(models.Model, mixins.IconsMixin):
         except Folder.DoesNotExist:
             return False
 
-    class Meta:
+    class Meta(object):
         unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
@@ -317,7 +317,7 @@ class FolderPermission(models.Model):
         if not self.user and not self.group and not self.everybody:
             raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('folder permission')
         verbose_name_plural = _('folder permissions')
         app_label = 'filer'

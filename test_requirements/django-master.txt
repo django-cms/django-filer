@@ -1,0 +1,5 @@
+git+git://github.com/django/django.git@master#egg=Django
+django-mptt>=0.7,<0.9
+djangocms-helper>=0.9.2,<0.10
+
+-r base.txt

@@ -25,11 +25,11 @@ class ImageAdminForm(forms.ModelForm):
         else:
             return ''
 
-    class Meta:
+    class Meta(object):
         model = Image
         exclude = ()
 
-    class Media:
+    class Media(object):
         css = {
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }

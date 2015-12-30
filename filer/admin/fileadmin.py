@@ -14,7 +14,7 @@ from filer.views import (popup_param, selectfolder_param, popup_status,
 
 
 class FileAdminChangeFrom(forms.ModelForm):
-    class Meta:
+    class Meta(object):
         model = File
         exclude = ()
 

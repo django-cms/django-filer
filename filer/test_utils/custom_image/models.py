@@ -7,5 +7,5 @@ from filer.models.abstract import BaseImage
 class Image(BaseImage):
     extra_description = models.TextField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'custom_image'

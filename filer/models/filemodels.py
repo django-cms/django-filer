@@ -11,7 +11,12 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from polymorphic import PolymorphicModel, PolymorphicManager
+try:
+    from polymorphic.models import PolymorphicModel
+    from polymorphic.managers import PolymorphicManager
+except ImportError:
+    # django-polymorphic < 0.8
+    from polymorphic import PolymorphicModel, PolymorphicManager
 
 from filer import settings as filer_settings
 from filer.fields.multistorage_file import MultiStorageFileField
@@ -311,7 +316,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def duplicates(self):
         return File.objects.find_duplicates(self)
 
-    class Meta:
+    class Meta(object):
         app_label = 'filer'
         verbose_name = _('file')
         verbose_name_plural = _('files')

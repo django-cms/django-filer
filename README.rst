@@ -22,16 +22,21 @@ Dependencies
 ------------
 
 * `Django`_ >= 1.5
-* `django-mptt`_ >=0.5.1
+* `django-mptt`_ >=0.6
 * `easy_thumbnails`_ >= 1.0
-* `django-polymorphic`_ >= 0.2
-* `Pillow`_ 2.3.0 (with JPEG and ZLIB support, `PIL`_ 1.1.7 is supported but not recommended)
+* `django-polymorphic`_ >= 0.7
+* `Pillow`_ >=2.3.0 (with JPEG and ZLIB support, `PIL`_ 1.1.7 is supported but not recommended)
 
 ``django.contrib.staticfiles`` is required.
 
-**Django >= 1.6** is supported together with `django-polymorphic`_ >= 0.5.4
+Please note, there are some compatibility constraints that we can not enforce
+through the `setup.py`. Here are the most important of them::
 
-**Django >= 1.7** is supported together with `django-polymorphic`_ >= 0.5.6
+    Django | django-polymorphic | django-mptt
+    ------ | ------------------ | -----------
+    1.6    | >=0.5.4,           | >=0.6,<0.8
+    1.7    | >=0.5.6            | >=0.6,<0.8
+    1.8    | >=0.7              | >=0.7
 
 Installation
 ------------

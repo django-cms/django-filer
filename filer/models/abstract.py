@@ -168,7 +168,7 @@ class BaseImage(File):
             thumbnail_basedir=self.file.thumbnail_basedir)
         return tn
 
-    class Meta:
+    class Meta(object):
         app_label = 'filer'
         verbose_name = _('image')
         verbose_name_plural = _('images')
