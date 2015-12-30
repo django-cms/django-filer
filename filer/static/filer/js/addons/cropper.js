@@ -9,11 +9,10 @@ var Cl = window.Cl || {};
         options: {
             containerSelector: '.js-cropper',
             imageSelector: '.js-cropper-image',
-            circleSelector: '.js-cropper-circle',
             locationSelector: '.js-cropper-location',
-            draggableClass: 'ui-draggable',
-            hiddenClass: 'hidden',
-            dataLocation: 'location-selector'
+            previewSelector: '.js-cropper-preview',
+            dataLocation: 'location-selector',
+            hiddenClass: 'hidden'
         },
         _init: function (container) {
             var cropperInstance = new Cl.CropperConstructor(container, this.options);
@@ -43,6 +42,24 @@ var Cl = window.Cl || {};
     });
 
     Cl.CropperConstructor = new Class({
+        _setLocationValue: function () {
+            var that = this;
+            var currentLocation;
+
+            if (!this.location || !this.location.length || that.ratio === 0) {
+                return;
+            }
+
+            currentLocation = $.parseJSON(this.location.val());
+
+            if (currentLocation) {
+                $.each(currentLocation, function (index, value) {
+                    currentLocation[index] = Math.floor(value / that.ratio);
+                });
+
+                this.image.cropper('setCropBoxData', currentLocation);
+            }
+        },
         _updateLocationValue: function () {
             var that = this;
             var cropData = this.image.cropper('getCropBoxData');
@@ -57,13 +74,15 @@ var Cl = window.Cl || {};
             var that = this;
 
             this._updateLocationValue = $.proxy(this._updateLocationValue, this);
+            this._setLocationValue = $.proxy(this._setLocationValue, this);
 
             this.image.cropper({
                 viewMode: 2,
                 dragMode: 'crop',
                 autoCropArea: 1,
-                crop: that._updateLocationValue,
-                preview: that.container.find('.js-cropper-preview')
+                preview: that.container.find(this.options.previewSelector),
+                built: that._setLocationValue,
+                crop: that._updateLocationValue
             });
         },
         _getLocation: function () {
