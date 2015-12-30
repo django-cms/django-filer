@@ -112,6 +112,7 @@ var Cl = window.Cl || {};
         destroy: function () {
             this.image.off('load', this._onImageLoaded);
             this.image.cropper('destroy');
+            this.image.off('load', this._onImageLoaded);
 
             this.options = null;
 
