@@ -30,6 +30,11 @@ var Cl = window.Cl || {};
             new Cl.Toggler();
         }
 
+        // Cropper init
+        if (Cl.Cropper) {
+            new Cl.Cropper();
+        }
+
         $(document).on('click', '.dropdown-menu-checkboxes', function (clickEvent) {
             clickEvent.stopPropagation();
         });
