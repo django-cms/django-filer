@@ -91,16 +91,16 @@ var Cl = window.Cl || {};
             }
         },
         destroy: function () {
-            if (this.circle.hasClass(this.options.draggableClass)) {
-                this.circle.draggable('disable');
-            }
+            this.image.cropper('destroy');
 
             this.options = null;
 
             this.container = null;
             this.image = null;
-            this.location = null;
             this.ratio = null;
+            this.location = null;
+
+            this.image.off('load', this._onImageLoaded);
         }
     });
 })(jQuery);
