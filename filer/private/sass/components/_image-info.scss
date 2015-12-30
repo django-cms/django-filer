@@ -50,7 +50,6 @@
         }
         .image-details-right {
             float: left;
-            margin-left: 50px;
         }
         .icon {
             font-size: 18px;
@@ -152,33 +151,18 @@
     margin: 10px 0;
     padding: 0 10px;
     .image-preview {
-        display: inline-block;
         position: relative;
+        float: left;
+        margin: 0 15px 0 0;
         margin-bottom: 15px;
-        outline: 1px solid #e3e3e3;
-        background-image: url("data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7");
-        img {
-            display: block;
-        }
     }
-    .image-preview-field {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-    }
-    .image-preview-circle {
-        position: relative;
-        z-index: 1;
-        width: 26px;
-        height: 26px;
-        // makes sure that circle is positioned correctly and centered #684
-        margin-top: -15px;
-        margin-left: -15px;
-        border: solid 2px #f00;
-        border-radius: 30px;
-        cursor: move;
-        background: rgba(255, 255, 255, 0.5);
-    }
+}
+.cropper-container {
+    float: left;
+}
+.cropper-dashed, .cropper-modal {
+    opacity: 0.2;
+}
+.full-size {
+    clear: both;
 }
