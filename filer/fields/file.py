@@ -5,7 +5,6 @@ import warnings
 from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
@@ -82,8 +81,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
 
     class Media:
         js = (
-            static('filer/js/popup_handling.js'),
-            static('filer/js/widget.js'),
+            'filer/js/popup_handling.js',
+            'filer/js/widget.js',
         )
 
 
