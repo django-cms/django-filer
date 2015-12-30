@@ -110,6 +110,7 @@ var Cl = window.Cl || {};
             }
         },
         destroy: function () {
+            this.image.off('load', this._onImageLoaded);
             this.image.cropper('destroy');
 
             this.options = null;
@@ -118,8 +119,6 @@ var Cl = window.Cl || {};
             this.image = null;
             this.ratio = null;
             this.location = null;
-
-            this.image.off('load', this._onImageLoaded);
         }
     });
 })(jQuery);
