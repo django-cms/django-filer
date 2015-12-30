@@ -2,8 +2,8 @@ Changelog for django-filer
 ==========================
 
 
-next
-----
+1.0.6 (2015-12-30)
+------------------
 
 * Fix imports for django-polymorphic>=0.8.
 * Limit dependencies versions in setup.py.
