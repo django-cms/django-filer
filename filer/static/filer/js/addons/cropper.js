@@ -10,7 +10,6 @@ var Cl = window.Cl || {};
             containerSelector: '.js-cropper',
             imageSelector: '.js-cropper-image',
             locationSelector: '.js-cropper-location',
-            previewSelector: '.js-cropper-preview',
             dataLocation: 'location-selector',
             hiddenClass: 'hidden'
         },
@@ -23,6 +22,7 @@ var Cl = window.Cl || {};
 
             this.options = $.extend({}, this.options, options);
             this.cropperInstances = [];
+            this._init = $.proxy(this._init, this);
 
             $(this.options.containerSelector).each(function () {
                 that._init(this);
@@ -42,23 +42,34 @@ var Cl = window.Cl || {};
     });
 
     Cl.CropperConstructor = new Class({
-        _setLocationValue: function () {
+        _getLocationValue: function () {
             var that = this;
             var currentLocation;
 
-            if (!this.location || !this.location.length || that.ratio === 0) {
-                return;
+            if (that.ratio === 0) {
+                throw new Error('cropper: no aspect ratio specified');
             }
 
-            currentLocation = $.parseJSON(this.location.val());
+            if (!this.location || !this.location.length) {
+                return false;
+            }
+
+            currentLocation = this.location.val();
 
             if (currentLocation) {
+                currentLocation = $.parseJSON(currentLocation);
+
                 $.each(currentLocation, function (index, value) {
                     currentLocation[index] = Math.floor(value / that.ratio);
                 });
 
-                this.image.cropper('setCropBoxData', currentLocation);
+                currentLocation.x = currentLocation.left;
+                currentLocation.y = currentLocation.top;
+
+                return currentLocation;
             }
+
+            return false;
         },
         _updateLocationValue: function () {
             var that = this;
@@ -74,14 +85,13 @@ var Cl = window.Cl || {};
             var that = this;
 
             this._updateLocationValue = $.proxy(this._updateLocationValue, this);
-            this._setLocationValue = $.proxy(this._setLocationValue, this);
+            this._getLocationValue = $.proxy(this._getLocationValue, this);
 
             this.image.cropper({
                 viewMode: 2,
                 dragMode: 'crop',
-                autoCropArea: 1,
-                preview: that.container.find(this.options.previewSelector),
-                built: that._setLocationValue,
+                autoCropArea: 0.1,
+                data: that._getLocationValue,
                 crop: that._updateLocationValue
             });
         },
@@ -110,7 +120,9 @@ var Cl = window.Cl || {};
             }
         },
         destroy: function () {
+            this.image.off('load', this._onImageLoaded);
             this.image.cropper('destroy');
+            this.image.off('load', this._onImageLoaded);
 
             this.options = null;
 
@@ -118,8 +130,6 @@ var Cl = window.Cl || {};
             this.image = null;
             this.ratio = null;
             this.location = null;
-
-            this.image.off('load', this._onImageLoaded);
         }
     });
 })(jQuery);
