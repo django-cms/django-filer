@@ -3,9 +3,7 @@ language: python
 sudo: true
 
 before_install:
-  - if [[ $FRONTEND == "true" ]]; then npm install; fi;
-  - if [[ $FRONTEND == "true" ]]; then sudo apt-get update; fi;
-  - if [[ $FRONTEND == "true" ]]; then sudo apt-get install nodejs npm; fi;
+  - if [[ $TOX_ENV == "frontend" ]]; then sudo apt-get update && sudo apt-get install nodejs npm; fi;
 
 install:
   - pip install tox coveralls
@@ -47,10 +45,10 @@ env:
 #  - TOX_ENV=py34-django_master-thumbs2x
 #  - TOX_ENV=py33-django_master-thumbs2x
 #  - TOX_ENV=py27-django_master-thumbs2x
-  - FRONTEND=true
+  - TOX_ENV=frontend
 
 script:
-  - if [[ $FRONTEND = "true" ]]; then gulp ci; else tox -e $TOX_ENV; fi;
+  - tox -e $TOX_ENV
 
 after_success:
   - coveralls --config_file=coverage.rc
