@@ -150,8 +150,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
 
     def test_deleting_files(self):
-        self._test_deleting_file_does_not_delete_file_from_filesystem_if_other_references_exist()
-        # Note: this second test case fails deep inside
+        # Note: this first test case fails deep inside
         # easy-thumbnails thumbnail generation with a segmentation fault
         # (which probably indicates a fail inside C extension or reaching
         # CPython stack limits) under certain conditions:
@@ -165,6 +164,7 @@ class FilerApiTests(TestCase):
         # real test case. We do not care for setUp() or tearDown() between the
         # two since there are enough asserts in the code.
         self._test_deleting_image_deletes_file_from_filesystem()
+        self._test_deleting_file_does_not_delete_file_from_filesystem_if_other_references_exist()
 
     def _test_deleting_image_deletes_file_from_filesystem(self):
         file_1 = self.create_filer_image()
