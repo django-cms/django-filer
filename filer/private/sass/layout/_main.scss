@@ -300,6 +300,8 @@ body {
         background-color: $gray-table !important;
     }
     .column-checkbox {
+        // makes sure that checkbox is vertical aligned #664
+        vertical-align: middle;
         text-align: center;
         width: 20px;
         padding-left: 20px !important;
