@@ -6,4 +6,11 @@
         box-shadow: none;
         border-bottom: solid 1px $gray-lighter;
     }
+    &.change-list.filebrowser {
+        #result_list tbody th,
+        #result_list tbody td {
+            // makes sure that changelist columns has correct height on modal window #665
+            height: auto;
+        }
+    }
 }
