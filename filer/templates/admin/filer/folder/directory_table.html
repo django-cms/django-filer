@@ -173,7 +173,7 @@
         </div>
     </div>
 
-    <div class="nav-pages">
+    <div class="nav-pages paginator">
         {% if paginated_items.has_previous %}
             <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q }}{% endif %}{% if is_popup %}&amp;_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">
                 {% trans "previous" %}
