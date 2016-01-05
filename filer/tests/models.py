@@ -149,7 +149,24 @@ class FilerApiTests(TestCase):
         self.assertTrue(image.file.path.startswith(filer_settings.FILER_PRIVATEMEDIA_STORAGE.location))
         self.assertEqual(len(image.icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
 
-    def test_deleting_image_deletes_file_from_filesystem(self):
+    def test_deleting_files(self):
+        # Note: this first test case fails deep inside
+        # easy-thumbnails thumbnail generation with a segmentation fault
+        # (which probably indicates a fail inside C extension or reaching
+        # CPython stack limits) under certain conditions:
+        #  - if the previous test case had the create_filer_image() call
+        #  - under python 3.x
+        #  - once out of 3-4 runs
+        # It happens on completely different systems (locally and on Travis).
+        # Current tearDown() does not help, nor does cleaning up temp directory
+        # nor django cache.
+        # So the workaround for now is to run them in a defined order like one
+        # real test case. We do not care for setUp() or tearDown() between the
+        # two since there are enough asserts in the code.
+        self._test_deleting_image_deletes_file_from_filesystem()
+        self._test_deleting_file_does_not_delete_file_from_filesystem_if_other_references_exist()
+
+    def _test_deleting_image_deletes_file_from_filesystem(self):
         file_1 = self.create_filer_image()
         self.assertTrue(file_1.file.storage.exists(file_1.file.name))
 
@@ -171,7 +188,7 @@ class FilerApiTests(TestCase):
         for tn in thumbnails:
             self.assertFalse(tn.storage.exists(tn.name))
 
-    def test_deleting_file_does_not_delete_file_from_filesystem_if_other_references_exist(self):
+    def _test_deleting_file_does_not_delete_file_from_filesystem_if_other_references_exist(self):
         file_1 = self.create_filer_image()
         # create another file that references the same physical file
         file_2 = File.objects.get(pk=file_1.pk)
