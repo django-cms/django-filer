@@ -11,6 +11,10 @@
         #result_list tbody td {
             // makes sure that changelist columns has correct height on modal window #665
             height: auto;
+            &.column-icon {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+            }
         }
     }
 }
