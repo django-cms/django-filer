@@ -526,9 +526,13 @@ body {
 
 .app-filer #container .breadcrumbs {
     position: relative;
+    // makes sure that breadcrumb has the correct width to avoid horizontal scrollbar #
+    width: 94%;
 }
 
-.app-filer #content {
+.app-filer #content,
+// cms-admin-sideframe selector is needed to have correct content margin top on side frame #
+.cms-admin-sideframe.app-filer #content {
     margin-top: 20px !important;
 }
 
