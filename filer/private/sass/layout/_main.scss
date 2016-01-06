@@ -5,10 +5,6 @@ body {
     height: 100% !important;
 }
 
-body {
-    overflow-x: auto;
-    min-width: 400px !important;
-}
 .text-left {
     text-align: left;
 }
@@ -540,18 +536,6 @@ body {
     top: -91px;
     right: 0;
     left: 0;
-}
-
-.app-filer #container .breadcrumbs {
-    position: relative;
-    // makes sure that breadcrumb has the correct width to avoid horizontal scrollbar #662
-    width: 94%;
-}
-
-.app-filer #content,
-// cms-admin-sideframe selector is needed to have correct content margin top on side frame #662
-.cms-admin-sideframe.app-filer #content {
-    margin-top: 20px !important;
 }
 
 .filebrowser {
