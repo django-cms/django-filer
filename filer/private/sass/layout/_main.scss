@@ -3,10 +3,13 @@
 body {
     height: 100% !important;
 }
-
 body {
     overflow-x: auto;
     min-width: 400px !important;
+}
+#container {
+    // make sure that paginator is not cropped #667
+    margin-bottom: 5px;
 }
 .text-left {
     text-align: left;
@@ -547,10 +550,6 @@ body {
     }
     #content {
         box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
-    }
-    #container {
-        // make sure that paginator is not cropped #667
-        margin-bottom: 5px;
     }
 }
 
