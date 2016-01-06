@@ -138,14 +138,19 @@ form .form-row {
                 display: none;
             }
         }
-       .filerFile {
+       // makes sure that filer clear button has correct size #669
+        .filerClearer {
+           height: 36px !important;
+           width: 36px !important;
+        }
+        .filerFile {
            position: absolute;
            top: 62px;
            width: calc(100% - 40px);
            img[src*=nofile] {
                background-color: $white;
            }
-       }
+        }
     }
 }
 
