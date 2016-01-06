@@ -23,6 +23,7 @@ var Cl = window.Cl || {};
 
             this.options = $.extend({}, this.options, options);
             this.cropperInstances = [];
+            this._init = $.proxy(this._init, this);
 
             $(this.options.containerSelector).each(function () {
                 that._init(this);
@@ -50,9 +51,11 @@ var Cl = window.Cl || {};
                 return;
             }
 
-            currentLocation = $.parseJSON(this.location.val());
+            currentLocation = this.location.val();
 
-            if (currentLocation) {
+            if (currentLocation && currentLocation) {
+                currentLocation = $.parseJSON(currentLocation);
+
                 $.each(currentLocation, function (index, value) {
                     currentLocation[index] = Math.floor(value / that.ratio);
                 });
