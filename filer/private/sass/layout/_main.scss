@@ -155,13 +155,6 @@ body {
         float: left;
         margin: 0 15px 0 0;
         margin-bottom: 15px;
-        outline: 1px solid #e3e3e3;
-        background-image: url("data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7");
-        img {
-            display: block;
-            width: 300px;
-            height: 300px;
-        }
     }
 }
 .cropper-container {
@@ -170,7 +163,6 @@ body {
 .cropper-preview-container {
     float: left;
     width: 300px;
-    height: 300px;
 }
 .cropper-preview {
     float: left;
@@ -181,20 +173,23 @@ body {
     }
 }
 .cropper-preview-lg {
-    width: 263px;
-    height: 148px;
+    width: 180px;
+    height: 100px;
 }
 .cropper-preview-md {
-    width: 139px;
-    height: 78px;
+    width: 100px;
+    height: 50px;
 }
 .cropper-preview-sm {
-    width: 69px;
-    height: 39px;
+    width: 50px;
+    height: 30px;
 }
 .cropper-preview-xs {
-    width: 35px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
+}
+.full-size {
+    clear: both;
 }
 .actions-list-dropdown {
     a {
