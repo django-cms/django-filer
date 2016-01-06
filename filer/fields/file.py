@@ -11,7 +11,7 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from filer.utils.compatibility import truncate_words
+from filer.utils.compatibility import truncate_words, LTE_DJANGO_1_8
 from filer.utils.model_label import get_model_label
 from filer.models import File
 from filer import settings as filer_settings
@@ -64,6 +64,10 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'lookup_name': name,
             'clear_id': '%s_clear' % css_id,
             'id': css_id,
+            'admin_icon_delete': (
+                'admin/img/icon_deletelink.gif' if LTE_DJANGO_1_8
+                else 'admin/img/icon-deletelink.svg'
+            ),
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
