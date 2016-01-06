@@ -1,6 +1,5 @@
 // #MAIN LAYOUT#
 
-html,
 body {
     height: 100% !important;
 }
@@ -529,24 +528,15 @@ body {
     left: 0;
 }
 
-.app-filer #container .breadcrumbs {
-    position: relative;
-    // makes sure that breadcrumb has the correct width to avoid horizontal scrollbar #662
-    width: 94%;
-}
-
-.app-filer #content,
-// cms-admin-sideframe selector is needed to have correct content margin top on side frame #662
-.cms-admin-sideframe.app-filer #content {
-    margin-top: 20px !important;
-}
-
 .filebrowser {
     &.popup #content {
         box-shadow: none;
     }
     #content {
         box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+    }
+    #container {
+        margin-bottom: 5px;
     }
 }
 
