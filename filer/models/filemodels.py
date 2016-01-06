@@ -22,7 +22,7 @@ from filer import settings as filer_settings
 from filer.fields.multistorage_file import MultiStorageFileField
 from filer.models import mixins
 from filer.models.foldermodels import Folder
-from filer.utils.compatibility import python_2_unicode_compatible, DJANGO_1_7
+from filer.utils.compatibility import python_2_unicode_compatible, LTE_DJANGO_1_7
 
 
 class FileManager(PolymorphicManager):
@@ -225,7 +225,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_url_path(self):
-        if DJANGO_1_7:
+        if LTE_DJANGO_1_7:
             model_name = self._meta.module_name
         else:
             model_name = self._meta.model_name

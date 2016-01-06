@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from filer import settings
 from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
 from filer.models import File, Image
-from filer.utils.compatibility import DJANGO_1_5, unquote
+from filer.utils.compatibility import LTE_DJANGO_1_5, unquote
 from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status)
 
@@ -35,7 +35,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     form = FileAdminChangeFrom
 
     def get_queryset(self, request):
-        if DJANGO_1_5:
+        if LTE_DJANGO_1_5:
             return super(FileAdmin, self).queryset(request)
         return super(FileAdmin, self).get_queryset(request)
 
