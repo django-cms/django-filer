@@ -20,7 +20,7 @@ body {
     display: table;
     clear: both;
 }
-
+// make sure that tiny styles like on size info has correct font size and color #666
 .tiny {
     font-size: $font-size-small !important;
     color: $gray-light !important;
@@ -508,11 +508,13 @@ body {
 
 .nav-pages {
     position: relative;
+    // make sure that paginator has correct font size and color #666
     font-size: $font-size-small;
     color: $gray-light !important;
     padding: 10px 15px;
     background: #fff;
     span {
+        // make sure that paginator has correct font size and color #666
         font-size: $font-size-small;
         color: $gray-light !important;
     }
