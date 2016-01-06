@@ -11,11 +11,10 @@
         var addImageButton = $(base_id + '_lookup');
         var dropzoneMessage = $(base_id + '_dropzone_message');
         var hiddenClass = 'hidden';
-        var static_prefix = clearer.attr('src').replace('admin/img/icon_deletelink.gif', 'filer/');
 
         clearer.hide();
         hidden_input.removeAttr('value');
-        thumbnail.attr('src', static_prefix + 'icons/nofile_48x48.png');
+        thumbnail.attr('src', clearer.data('no-icon-file'));
         thumbnail.parent('a').removeAttr('href');
         addImageButton.removeClass(hiddenClass);
         dropzoneMessage.removeClass(hiddenClass);

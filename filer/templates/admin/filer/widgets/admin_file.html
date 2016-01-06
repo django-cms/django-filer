@@ -5,7 +5,8 @@
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <img class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" data-dz-remove>
+            <img class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
+                 data-dz-remove data-no-icon-file="{% static 'filer/icon/nofile_48x48.png' %}">
             <div class="dz-progress js-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
     </div>
@@ -33,7 +34,8 @@
                 {% trans 'Add File' %}
             </a>
 
-            <img id="{{ clear_id }}" class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
+            <img id="{{ clear_id }}" class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
+                 {% if not object %} style="display: none;"{% endif %} data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
 
             <br>
 
