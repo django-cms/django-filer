@@ -64,7 +64,6 @@ body {
         }
         .image-details-right {
             float: left;
-            margin-left: 50px;
         }
         .icon {
             font-size: 18px;
@@ -157,33 +156,50 @@ body {
     margin: 10px 0;
     padding: 0 10px;
     .image-preview {
-        display: inline-block;
         position: relative;
+        float: left;
+        margin: 0 15px 0 0;
         margin-bottom: 15px;
         outline: 1px solid #e3e3e3;
         background-image: url("data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7");
         img {
             display: block;
+            width: 300px;
+            height: 300px;
         }
     }
-    .image-preview-field {
-        position: absolute;
-        top: 0;
-        right: -15px;
-        bottom: -15px;
-        left: 0;
+}
+.cropper-container {
+    float: left;
+}
+.cropper-preview-container {
+    float: left;
+    width: 300px;
+    height: 300px;
+}
+.cropper-preview {
+    float: left;
+    overflow: hidden;
+    margin: 0 10px 10px 0;
+    img {
+        max-width: 100%;
     }
-    .image-preview-circle {
-        position: relative;
-        z-index: 1;
-        width: 26px;
-        height: 26px;
-        margin: -15px 0 0 -15px;
-        border: solid 2px #f00;
-        border-radius: 30px;
-        cursor: move;
-        background: rgba(255, 255, 255, 0.5);
-    }
+}
+.cropper-preview-lg {
+    width: 263px;
+    height: 148px;
+}
+.cropper-preview-md {
+    width: 139px;
+    height: 78px;
+}
+.cropper-preview-sm {
+    width: 69px;
+    height: 39px;
+}
+.cropper-preview-xs {
+    width: 35px;
+    height: 20px;
 }
 .actions-list-dropdown {
     a {
@@ -630,7 +646,7 @@ body {
     background: #fff url("/static/filer/icons/nofile_48x48.png");
     background-size: cover;
     img {
-        background: #FFF;
+        background: #fff;
         &[src=""],
         &:not([src]) {
             width: 104%;
