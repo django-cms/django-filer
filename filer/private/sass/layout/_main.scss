@@ -21,6 +21,11 @@ body {
     clear: both;
 }
 
+.tiny {
+    font-size: $font-size-small !important;
+    color: $gray-light !important;
+}
+
 .image-info {
     position: relative;
     float: right;
@@ -503,8 +508,14 @@ body {
 
 .nav-pages {
     position: relative;
+    font-size: $font-size-small;
+    color: $gray-light !important;
     padding: 10px 15px;
     background: #fff;
+    span {
+        font-size: $font-size-small;
+        color: $gray-light !important;
+    }
 }
 
 @media screen and (max-width: $screen-tablet) {
