@@ -130,6 +130,8 @@ form .form-row {
         .related-lookup {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
             overflow: hidden;
+            // makes true that button has correct height #668
+            line-height: $font-size-normal;
             width: auto !important;
             height: auto !important;
             padding: 10px 20px !important;
