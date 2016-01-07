@@ -30,6 +30,8 @@
                 var message = dropzone.find(messageSelector);
                 var clearButton = dropzone.find(filerClearerSelector);
 
+                console.log(dropzoneUrl);
+
                 new Dropzone(this, {
                     url: dropzoneUrl,
                     paramName: 'file',

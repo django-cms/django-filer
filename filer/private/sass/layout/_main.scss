@@ -16,6 +16,10 @@ body {
     display: table;
     clear: both;
 }
+.related-widget-wrapper {
+    float: none !important;
+}
+
 // make sure that tiny styles like on size info has correct font size and color #666
 .tiny {
     font-size: $font-size-small !important;
@@ -78,12 +82,20 @@ body {
                 float: left;
                 color: #808080;
                 font-size: 13px;
+                // required for django CMS <= 3.1 #673
+                line-height: $font-size-large !important;
                 font-weight: normal;
+                // required for django CMS <= 3.1 #673
+                margin-top: 0;
             }
             dd {
                 color: $gray;
                 font-size: 13px;
+                // required for django CMS <= 3.1 #673
+                line-height: $font-size-large !important;
                 padding-left: 80px;
+                // required for django CMS <= 3.1 #673
+                margin-bottom: 5px;
             }
             .text {
                 font-size: 13px;
