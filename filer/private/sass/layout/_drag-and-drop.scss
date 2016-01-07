@@ -156,6 +156,7 @@ form .form-row {
         .filerFile {
             position: absolute;
             top: 62px;
+            // required for django CMS <= 3.1 #673
             left: 20px;
             width: calc(100% - 40px);
             img[src*=nofile] {
