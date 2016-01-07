@@ -165,8 +165,8 @@ body {
     .image-preview-field {
         position: absolute;
         top: 0;
-        right: -15px;
-        bottom: -15px;
+        right: 0;
+        bottom: 0;
         left: 0;
     }
     .image-preview-circle {
@@ -174,7 +174,6 @@ body {
         z-index: 1;
         width: 26px;
         height: 26px;
-        margin: -15px 0 0 -15px;
         border: solid 2px #f00;
         border-radius: 30px;
         cursor: move;
