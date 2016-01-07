@@ -82,19 +82,19 @@ body {
                 float: left;
                 color: #808080;
                 font-size: 13px;
-                // required for django CMS <= 3.1 #673
+                // required for django CMS without admin styles #673
                 line-height: $font-size-large !important;
                 font-weight: normal;
-                // required for django CMS <= 3.1 #673
+                // required for django CMS without admin styles #673
                 margin-top: 0;
             }
             dd {
                 color: $gray;
                 font-size: 13px;
-                // required for django CMS <= 3.1 #673
+                // required for django CMS without admin styles #673
                 line-height: $font-size-large !important;
                 padding-left: 80px;
-                // required for django CMS <= 3.1 #673
+                // required for django CMS without admin styles #673
                 margin-bottom: 5px;
             }
             .text {
