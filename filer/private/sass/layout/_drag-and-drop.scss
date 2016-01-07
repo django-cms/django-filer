@@ -122,6 +122,11 @@ form .form-row {
             float: right;
             width: 100%;
             margin: 48px 0 0;
+            // make sure that drag and drop widget looks nice on mobile #670
+            @media screen and (max-width: $screen-tablet) {
+                text-align: left;
+                margin-top: 10px;
+            }
         }
         .icon {
             color: $gray;
@@ -140,14 +145,26 @@ form .form-row {
                 display: none;
             }
         }
-       .filerFile {
-           position: absolute;
-           top: 62px;
-           width: calc(100% - 40px);
-           img[src*=nofile] {
+        // makes sure that filer clear button has correct size #669
+        .filerClearer {
+           height: 36px !important;
+           width: 36px !important;
+        }
+        .filerFile {
+            position: absolute;
+            top: 62px;
+            width: calc(100% - 40px);
+            img[src*=nofile] {
                background-color: $white;
-           }
-       }
+            }
+            // make sure that text crops if there is not enough space #670
+            span:not(:empty) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: calc(100% - 100px);
+            }
+        }
     }
 }
 
