@@ -156,6 +156,7 @@ form .form-row {
         .filerFile {
             position: absolute;
             top: 62px;
+            left: 20px;
             width: calc(100% - 40px);
             img[src*=nofile] {
                background-color: $white;
@@ -166,6 +167,66 @@ form .form-row {
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: calc(100% - 100px);
+            }
+            // required for django CMS <= 3.1 #673
+            img {
+                width: 36px;
+                height: 36px;
+                margin-right: 10px;
+                &[src*="nofile"] {
+                    margin-right: 0;
+                    border: solid 1px $gray-lighter;
+                    border-radius: $border-radius-base;
+                    box-sizing: border-box;
+                }
+            }
+            // required for django CMS <= 3.1 #673
+            img,
+            .related-lookup {
+                display: inline-block;
+                vertical-align: top;
+                text-align: center !important;
+            }
+            // required for django CMS <= 3.1 #673
+            .related-lookup {
+                float: right !important;
+            }
+            // required for django CMS <= 3.1
+            a {
+                box-sizing: border-box;
+                padding-top: 10px !important;
+            }
+            // required for django CMS <= 3.1 #673
+            span {
+                display: inline-block;
+                color: $gray;
+                font-weight: normal;
+                margin-top: 6px;
+                margin-bottom: 6px;
+                &:empty + .related-lookup {
+                    float: none !important;
+                    margin-left: 0 !important;
+                }
+            }
+            // required for django CMS <= 3.1 #673
+            .filerClearer {
+                @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
+                float: right;
+                margin: 0 0 0 5px !important;
+                &:before {
+                    color: $gray-light !important;
+                    margin: 0;
+                    vertical-align: middle;
+                }
+            }
+            .filerClearer {
+                // make sure that clear button has correct size #272
+                width: 10px;
+                height: 10px;
+                padding: 12px !important;
+                border: solid 1px $gray-lighter;
+                border-radius: $border-radius-base;
+                cursor: pointer;
             }
         }
     }
