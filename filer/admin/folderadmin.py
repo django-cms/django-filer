@@ -399,6 +399,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'search_string': ' '.join(search_terms),
             'q': urlquote(q),
             'show_result_count': show_result_count,
+            'folder_children': folder_children,
+            'folder_files': folder_files,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'select_folder': selectfolder_status(request),
