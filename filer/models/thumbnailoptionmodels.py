@@ -17,6 +17,7 @@ class ThumbnailOption(models.Model):
     upscale = models.BooleanField(_("upscale"), default=True)
 
     class Meta:
+        app_label = 'filer'
         ordering = ('width', 'height')
         verbose_name = _("thumbnail option")
         verbose_name_plural = _("thumbnail options")
