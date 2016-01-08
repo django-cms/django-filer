@@ -675,7 +675,6 @@ body {
 }
 .dropzone-upload-info {
     margin-top: 10px;
-    // make sure that file name on upload progress is cut #675
     .dropzone-file-name {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -686,4 +685,9 @@ body {
     height: 5px;
     margin-top: 5px;
     background-color: #0bf;
+}
+.dropzone-upload-welcome .folder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
