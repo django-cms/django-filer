@@ -17,7 +17,7 @@ django.jQuery(function ($) {
         var progressSelector = '.js-dropzone-progress';
         var previewImageWrapperSelector = '.js-img-wrapper';
         var filerClearerSelector = '.filerClearer';
-        var fileSelector = $('.js-file-selector');
+        var fileChooseSelector = '.js-file-selector';
         var fileIdInputSelector = '.vForeignKeyRawIdAdminField';
         var hiddenClass = 'hidden';
 
@@ -29,6 +29,7 @@ django.jQuery(function ($) {
             var lookupButton = dropzone.find(lookupButtonSelector);
             var message = dropzone.find(messageSelector);
             var clearButton = dropzone.find(filerClearerSelector);
+            var fileChoose = dropzone.find(fileChooseSelector);
 
             new Dropzone(this, {
                 url: dropzoneUrl,
@@ -39,7 +40,7 @@ django.jQuery(function ($) {
                 addRemoveLinks: false,
                 init: function () {
                     this.on('removedfile', function () {
-                        fileSelector.show();
+                        fileChoose.show();
                         this.removeAllFiles();
                     });
                 },
@@ -49,13 +50,13 @@ django.jQuery(function ($) {
                 },
                 drop: function () {
                     clearButton.click();
-                    fileSelector.hide();
+                    fileChoose.hide();
                     lookupButton.addClass(hiddenClass);
                     message.addClass(hiddenClass);
                     dropzone.removeClass('dz-drag-hover');
                 },
                 success: function (file, response) {
-                    $(progressSelector).addClass(hiddenClass);
+                    dropzone.find(progressSelector).addClass(hiddenClass);
                     if (file && file.status === 'success' && response) {
                         if (response.file_id) {
                             inputId.val(response.file_id);
