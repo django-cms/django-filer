@@ -47,23 +47,34 @@
                         this.addFile(file);
                     },
                     dragover: function (dragEvent) {
+                        var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
+
                         uploadSuccess.addClass(hiddenClass);
-                        infoMessage.removeClass(hiddenClass);
+                        if (folderTitle === 'root') {
+                            infoMessage.addClass(hiddenClass);
+                        } else {
+                            infoMessage.removeClass(hiddenClass);
+                        }
                         dropzone.addClass(dragHoverClass);
 
-                        folderName.text($(dragEvent.target).parents(dropzoneSelector).data('folder-name'));
+                        folderName.text(folderTitle);
                     },
                     dragleave: function (dragEvent) {
                         var target = $(dragEvent.target);
+                        var folderTitle = target.closest(dropzoneSelector).data('folder-name');
 
                         clearTimeout(hideMessageTimeout);
-                        if (!target.hasClass(infoMessageClass) && target.parents('.' + infoMessageClass).length === 0) {
+                        if (!target.hasClass(infoMessageClass) && target.closest('.' + infoMessageClass).length === 0) {
                             clearTimeout(hideMessageTimeout);
                             hideMessageTimeout = setTimeout(function () {
                                 infoMessage.addClass(hiddenClass);
                             }, 1000);
                         }
-                        infoMessage.removeClass(hiddenClass);
+                        if (folderTitle === 'root') {
+                            infoMessage.addClass(hiddenClass);
+                        } else {
+                            infoMessage.removeClass(hiddenClass);
+                        }
                         dropzones.removeClass(dragHoverClass);
                     },
                     drop: function () {
