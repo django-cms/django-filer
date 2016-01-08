@@ -1,7 +1,7 @@
 {% load i18n l10n admin_list filer_tags staticfiles %}
 
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-    <table class="{% if permissions.has_add_children_permission and not folder.is_root %} js-dropzone{% endif %} navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name %}{{ folder.name }}{% else %}Root{% endif %}">
+    <table class="js-dropzone js-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}">
         <thead>
             <tr>
                 <th class="column-checkbox">
@@ -154,7 +154,7 @@
         </tbody>
     </table>
 
-    <div class="dropzone-info-message js-dropzone js-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name %}{{ folder.name }}{% else %}Root{% endif %}">
+    <div class="dropzone-info-message js-dropzone js-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}">
         <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
         <div class="dropzone-upload-welcome js-dropzone-upload-welcome">
