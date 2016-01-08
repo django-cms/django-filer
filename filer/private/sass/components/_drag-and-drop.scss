@@ -1,5 +1,8 @@
+//##############################################################################
+// DRAG AND DROP
+
 form .form-row {
-   .dropzone {
+    .dropzone {
         position: relative;
         border-radius: $border-radius-base;
         border: solid 1px $gray-lighter;
@@ -233,3 +236,74 @@ form .form-row {
     }
 }
 
+.dz-upload {
+    height: 5px;
+    background-color: #0bf;
+}
+.dz-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 100px);
+}
+.dz-thumbnail {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    border: solid 1px #ddd;
+    border-radius: 3px;
+    background: #fff url("/static/filer/icons/nofile_48x48.png");
+    background-size: cover;
+    img {
+        background: #FFF;
+        &[src=""],
+        &:not([src]) {
+            width: 104%;
+            height: 104%;
+            margin: -2%;
+        }
+    }
+}
+
+.dropzone-info-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    overflow: hidden;
+    z-index: 2;
+    text-align: center;
+    width: 270px;
+    margin: -50px 0 0 -150px;
+    padding: 15px;
+    border: solid 1px $color-primary;
+    background: $white;
+    .icon {
+        font-size: 30px;
+    }
+    .text {
+        margin: 15px 0 10px 0;
+    }
+}
+.dropzone-upload-info {
+    margin-top: 10px;
+    // make sure that file name on upload progress is cut #675
+    .dropzone-file-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+.dropzone-progress {
+    height: 5px;
+    margin-top: 5px;
+    background-color: #0bf;
+}
+
+.dropzone-upload-welcome .folder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

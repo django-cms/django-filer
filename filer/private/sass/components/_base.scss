@@ -1,0 +1,96 @@
+//##############################################################################
+// BASE
+
+html,
+body {
+    height: 100% !important;
+}
+
+.text-left {
+    text-align: left;
+}
+.text-right {
+    text-align: right;
+}
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.related-widget-wrapper {
+    float: none !important;
+}
+.related-lookup.hidden {
+    display: none !important;
+}
+
+// make sure that tiny styles like on size info has correct font size and color #666
+.tiny {
+    font-size: $font-size-small !important;
+    color: $gray-light !important;
+}
+
+.nav-pages {
+    position: relative;
+    // make sure that paginator has correct font size and color #666
+    font-size: $font-size-small;
+    color: $gray-light !important;
+    padding: 10px 15px;
+    background: #fff;
+    span {
+        // make sure that paginator has correct font size and color #666
+        font-size: $font-size-small;
+        color: $gray-light !important;
+    }
+}
+
+#id_upload_button:before {
+    display: none;
+}
+#content #content-main {
+    margin-top: 0;
+}
+#container .breadcrumbs-container .breadcrumbs {
+    // required for django CMS <= 3.1 #673
+    position: absolute;
+    top: -91px;
+    right: 0;
+    left: 0;
+    // required for django CMS <= 3.1 #673
+    margin-top: 48px;
+}
+
+.filebrowser {
+    &.popup #content {
+        box-shadow: none;
+    }
+    #container #content {
+        margin-top: 90px !important;
+    }
+    #content {
+        box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+    }
+    h1.folder_header {
+        position: relative;
+        top: 6px;
+    }
+    // required for django CMS <= 3.1 #673
+    h2 {
+        display: none;
+    }
+}
+
+.field-file,
+.field-sha1 {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.well.img-preview {
+    display: none;
+    margin-top: 0;
+}
+.img-wrapper {
+    width: 180px;
+    height: 180px;
+}

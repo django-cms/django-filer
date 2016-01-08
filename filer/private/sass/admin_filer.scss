@@ -1,7 +1,27 @@
-@charset "utf-8";
+/*!
+ * @copyright: https://github.com/divio/django-filer
+ */
 
-// #IMPORTS#
+//##############################################################################
+// IMPORT SETTINGS
 @import "settings/all";
 @import "mixins/all";
-@import "libs/all";
-@import "layout/all";
+
+//##############################################################################
+// IMPORT COMPONENTS
+@import "components/iconography";
+@import "components/icons";
+@import "components/old";
+@import "components/base";
+@import "components/image-info";
+@import "components/action-list";
+@import "components/filter-files";
+@import "components/navigator";
+@import "components/modal";
+@import "components/drag-and-drop";
+
+//##############################################################################
+// IMPORT LIBS
+@import "libs/bootstrap.custom.min";
+@import "libs/font-awesome.min";
+@import "libs/dropzone";
