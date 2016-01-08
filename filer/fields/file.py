@@ -11,7 +11,7 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from filer.utils.compatibility import truncate_words, LTE_DJANGO_1_8
+from filer.utils.compatibility import truncate_words, LTE_DJANGO_1_8, LTE_DJANGO_1_7
 from filer.utils.model_label import get_model_label
 from filer.models import File
 from filer import settings as filer_settings
@@ -26,8 +26,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     def render(self, name, value, attrs=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
-        css_id_thumbnail_img = "%s_thumbnail_img" % css_id
-        css_id_description_txt = "%s_description_txt" % css_id
         related_url = None
         if value:
             try:
@@ -58,16 +56,14 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         context = {
             'hidden_input': hidden_input,
             'lookup_url': '%s%s' % (related_url, lookup_url),
-            'thumb_id': css_id_thumbnail_img,
-            'span_id': css_id_description_txt,
             'object': obj,
             'lookup_name': name,
-            'clear_id': '%s_clear' % css_id,
             'id': css_id,
             'admin_icon_delete': (
                 'admin/img/icon_deletelink.gif' if LTE_DJANGO_1_8
                 else 'admin/img/icon-deletelink.svg'
             ),
+            'LTE_DJANGO_1_7': LTE_DJANGO_1_7,
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
