@@ -675,6 +675,11 @@ body {
 }
 .dropzone-upload-info {
     margin-top: 10px;
+    .dropzone-file-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 .dropzone-progress {
     height: 5px;
