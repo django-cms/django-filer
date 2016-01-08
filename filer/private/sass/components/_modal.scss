@@ -1,3 +1,6 @@
+//##############################################################################
+// MODAL
+
 .popup {
     .image-info-detail {
         padding: 0;
@@ -12,5 +15,14 @@
             // makes sure that changelist columns has correct height on modal window #665
             height: auto;
         }
+    }
+    .dropzone {
+        padding: 15px 20px 20px;
+    }
+    form .form-row .dropzone .filerFile {
+        top: 58px;
+    }
+    &.filebrowser #container #content {
+        margin-top: 10px !important;
     }
 }
