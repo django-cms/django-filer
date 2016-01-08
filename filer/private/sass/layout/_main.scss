@@ -701,3 +701,8 @@ body {
     margin-top: 5px;
     background-color: #0bf;
 }
+.dropzone-upload-welcome .folder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

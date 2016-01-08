@@ -157,7 +157,7 @@
     <div class="dropzone-info-message js-dropzone js-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name %}{{ folder.name }}{% else %}Root{% endif %}">
         <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
-        <div class="js-dropzone-upload-welcome">
+        <div class="dropzone-upload-welcome js-dropzone-upload-welcome">
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
             <div class="folder"><span class="fa fa-folder"></span> <span class="js-dropzone-folder-name"></span></div>
         </div>
