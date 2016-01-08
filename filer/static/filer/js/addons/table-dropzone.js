@@ -23,12 +23,14 @@
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
         var hasErrors = false;
+        var baseUrl;
+        var baseFolderTitle;
 
         if (dropzoneBase && dropzoneBase.length) {
-            var baseUrl = dropzoneBase.data('url');
-            var folderTitile = dropzoneBase.data('folder-name');
+            baseUrl = dropzoneBase.data('url');
+            baseFolderTitle = dropzoneBase.data('folder-name');
 
-            $('body').data('url', baseUrl).data('folder-name', folderTitile).addClass('js-dropzone');
+            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-dropzone');
         }
 
         dropzones = $(dropzoneSelector);
