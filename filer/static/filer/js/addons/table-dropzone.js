@@ -7,8 +7,9 @@
     $(function () {
         var submitNum = 0;
         var maxSubmitNum = 1;
+        var dropzoneBase = $('.js-dropzone-base');
         var dropzoneSelector = '.js-dropzone';
-        var dropzones = $(dropzoneSelector);
+        var dropzones;
         var infoMessageClass = 'js-dropzone-info-message';
         var infoMessage = $('.' + infoMessageClass);
         var folderName = $('.js-dropzone-folder-name');
@@ -22,6 +23,17 @@
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
         var hasErrors = false;
+        var baseUrl;
+        var baseFolderTitle;
+
+        if (dropzoneBase && dropzoneBase.length) {
+            baseUrl = dropzoneBase.data('url');
+            baseFolderTitle = dropzoneBase.data('folder-name');
+
+            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-dropzone');
+        }
+
+        dropzones = $(dropzoneSelector);
 
         if (dropzones.length && Dropzone) {
             Dropzone.autoDiscover = false;
@@ -50,31 +62,18 @@
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
 
                         uploadSuccess.addClass(hiddenClass);
-                        if (folderTitle === 'root') {
-                            infoMessage.addClass(hiddenClass);
-                        } else {
-                            infoMessage.removeClass(hiddenClass);
-                        }
+                        infoMessage.removeClass(hiddenClass);
                         dropzone.addClass(dragHoverClass);
 
                         folderName.text(folderTitle);
                     },
-                    dragleave: function (dragEvent) {
-                        var target = $(dragEvent.target);
-                        var folderTitle = target.closest(dropzoneSelector).data('folder-name');
-
+                    dragleave: function () {
                         clearTimeout(hideMessageTimeout);
-                        if (!target.hasClass(infoMessageClass) && target.closest('.' + infoMessageClass).length === 0) {
-                            clearTimeout(hideMessageTimeout);
-                            hideMessageTimeout = setTimeout(function () {
-                                infoMessage.addClass(hiddenClass);
-                            }, 1000);
-                        }
-                        if (folderTitle === 'root') {
+                        hideMessageTimeout = setTimeout(function () {
                             infoMessage.addClass(hiddenClass);
-                        } else {
-                            infoMessage.removeClass(hiddenClass);
-                        }
+                        }, 1000);
+
+                        infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                     },
                     drop: function () {
