@@ -405,7 +405,7 @@ body {
 }
 .navigator-tools {
     float: right;
-    margin: 10px 20px 0 0;
+    margin: 10px 10px 0 0;
 }
 @media screen and (max-width: $screen-tablet) {
     .navigator-top-nav {
@@ -426,8 +426,19 @@ body {
         }
     }
 }
+// make sure that buttons break to new line on mobile view #
+.navigator-button-wrapper {
+    display: inline-block;
+    @media screen and (max-width: $screen-tablet) {
+        display: block;
+        margin-bottom: 10px;
+        .navigator-button {
+            margin-top: 10px;
+        }
+    }
+}
 .navigator-button {
-    margin-left: 10px;
+    margin-right: 10px;
     &,
     &:visited,
     &:link:visited,
@@ -483,6 +494,9 @@ body {
             padding: 0;
             list-style-type: none;
         }
+    }
+    + .separator {
+        margin-right: 10px;
     }
 }
 .dropdown-container-down {
