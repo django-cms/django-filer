@@ -150,19 +150,21 @@
                     <span class="separator"></span>
                 {% endif %}
                 {% block object-tools-items %}
-                    {% if folder.can_have_subfolders and can_make_folder %}
-                        <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}"
-                            title="{% trans 'Adds a new Folder' %}"
-                            class="navigator-button"
-                            onclick="return showAddAnotherPopup(this);">
-                        {% trans "New Folder" %}
-                        </a>
-                    {% endif %}
-                    {% if permissions.has_add_children_permission and not folder.is_root %}
-                        <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}">
-                            {% trans "Upload Files" %}
-                        </a>
-                    {% endif %}
+                    <div class="navigator-button-wrapper">
+                        {% if folder.can_have_subfolders and can_make_folder %}
+                            <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}"
+                                title="{% trans 'Adds a new Folder' %}"
+                                class="navigator-button"
+                                onclick="return showAddAnotherPopup(this);">
+                            {% trans "New Folder" %}
+                            </a>
+                        {% endif %}
+                        {% if permissions.has_add_children_permission and not folder.is_root %}
+                            <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}">
+                                {% trans "Upload Files" %}
+                            </a>
+                        {% endif %}
+                    </div>
                 {% endblock %}
             </div>
         {% endblock %}
