@@ -9,12 +9,12 @@
     window.dismissRelatedImageLookupPopup = function (win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt) {
         var id = window.windowname_to_id(win.name);
         var $lookup = $('#' + id);
-        var $container = $lookup.closest(".filerFile");
-        var $img = $container.find(".thumbnail_img");
-        var $txt = $container.find(".description_txt");
-        var $clearer = $container.find(".filerClearer");
-        var $dropzoneMessage = $container.siblings(".dz-message");
-        var $elem = $container.find(":input");
+        var $container = $lookup.closest('.filerFile');
+        var $img = $container.find('.thumbnail_img');
+        var $txt = $container.find('.description_txt');
+        var $clearer = $container.find('.filerClearer');
+        var $dropzoneMessage = $container.siblings('.dz-message');
+        var $elem = $container.find(':input');
         var oldId = $elem.value;
 
         $elem.val(chosenId);

@@ -4,7 +4,7 @@
 django.jQuery(function ($) {
     var filer_clear = function () {
         var $clearer = $(this);
-        var $container = $clearer.closest(".filerFile");
+        var $container = $clearer.closest('.filerFile');
         var $input = $container.find(':input');
         var $thumbnail = $container.find('.thumbnail_img');
         var $description = $container.find('.description_txt');
