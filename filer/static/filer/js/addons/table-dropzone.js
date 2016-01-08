@@ -47,7 +47,7 @@
                         this.addFile(file);
                     },
                     dragover: function (dragEvent) {
-                        var folderTitle = $(dragEvent.target).parents(dropzoneSelector).data('folder-name');
+                        var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
 
                         uploadSuccess.addClass(hiddenClass);
                         if (folderTitle === 'root') {
@@ -61,10 +61,10 @@
                     },
                     dragleave: function (dragEvent) {
                         var target = $(dragEvent.target);
-                        var folderTitle = target.parents(dropzoneSelector).data('folder-name');
+                        var folderTitle = target.closest(dropzoneSelector).data('folder-name');
 
                         clearTimeout(hideMessageTimeout);
-                        if (!target.hasClass(infoMessageClass) && target.parents('.' + infoMessageClass).length === 0) {
+                        if (!target.hasClass(infoMessageClass) && target.closest('.' + infoMessageClass).length === 0) {
                             clearTimeout(hideMessageTimeout);
                             hideMessageTimeout = setTimeout(function () {
                                 infoMessage.addClass(hiddenClass);
