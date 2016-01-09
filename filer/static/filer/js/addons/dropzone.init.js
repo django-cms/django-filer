@@ -8,6 +8,7 @@ if (Dropzone) {
 
 
 /* global Dropzone */
+/* global django */
 django.jQuery(function ($) {
         var dropzoneTemplateSelector = '.js-dropzone-template';
         var previewImageSelector = '.js-img-preview';
