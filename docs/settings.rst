@@ -141,3 +141,17 @@ Defines the path element common to all canonical file URLs.
 
 Defaults to ``'canonical/'``
 
+
+``FILER_UPLOADER_CONNECTIONS``
+------------------------------
+
+Number of simultaneous AJAX uploads. Defaults to 3.
+
+
+``FILER_NO_CONCURRENT_UPLOADS_ON_SQLITE``
+-----------------------------------------
+
+If set to ``True`` (which is the default) and your database backend is SQLite
+``FILER_UPLOADER_CONNECTIONS`` would be set to 1. This allows to avoid
+``database is locked`` errors on SQLite during multiple simultaneous file
+uploads.

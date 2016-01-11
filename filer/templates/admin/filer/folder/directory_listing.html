@@ -160,7 +160,7 @@
                             </a>
                         {% endif %}
                         {% if permissions.has_add_children_permission and not folder.is_root %}
-                            <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}" data-max-uploader-connections="3">
+                            <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}" data-max-uploader-connections="{{ uploader_connections }}">
                                 {% trans "Upload Files" %}
                             </a>
                         {% endif %}
