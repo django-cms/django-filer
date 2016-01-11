@@ -147,11 +147,6 @@ Defaults to ``'canonical/'``
 
 Number of simultaneous AJAX uploads. Defaults to 3.
 
-
-``FILER_NO_CONCURRENT_UPLOADS_ON_SQLITE``
------------------------------------------
-
-If set to ``True`` (which is the default) and your database backend is SQLite
-``FILER_UPLOADER_CONNECTIONS`` would be set to 1. This allows to avoid
-``database is locked`` errors on SQLite during multiple simultaneous file
-uploads.
+If your database backend is SQLite it would be set to 1 by default. This allows
+to avoid ``database is locked`` errors on SQLite during multiple simultaneous
+file uploads.
