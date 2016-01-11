@@ -392,6 +392,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             ).distinct(),
             'paginator': paginator,
             'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),
             'current_url': request.path,
