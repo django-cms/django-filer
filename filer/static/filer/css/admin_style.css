@@ -152,7 +152,10 @@ ul.custom-bullets li:before {
 }
 #search-container {
         float: right;
-        margin-top: -10px;
+        margin-bottom: 10px;
+}
+#search-container .with-search-results {
+        width: 55%;
 }
 #searchbar {
         margin: 10px 0px 0px 0px;
