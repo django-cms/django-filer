@@ -17,11 +17,13 @@
         var uploadNumber = $('.js-dropzone-upload-number');
         var infoMessage = $('.js-dropzone-info-message');
         var hiddenClass = 'hidden';
+        var maxUploaderConnections = uploadButton.data('max-uploader-connections') || 3;
         var hasErrors = false;
 
         new qq.FileUploaderBasic({
             action: uploadUrl,
             button: uploadButton[0],
+            maxConnections: maxUploaderConnections,
             onSubmit: function () {
                 submitNum++;
 
