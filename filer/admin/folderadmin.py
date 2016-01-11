@@ -268,6 +268,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             search_terms = []
             q = ''
+        # Limit search results to current folder.
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
 
@@ -275,7 +276,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if folder and limit_search_to_folder and not folder.is_root:
                 # Do not include current folder itself in search results.
                 folder_qs = folder.get_descendants(include_self=False)
-                # Include current folder files in search results.
+                # Limit search results to files in the current folder or any
+                # nested folder.
                 file_qs = File.objects.filter(
                     folder__in=folder.get_descendants(include_self=True))
             else:
