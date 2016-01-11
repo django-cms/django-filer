@@ -146,11 +146,38 @@ ul.custom-bullets li:before {
 	margin-top: -5px;
 }
 .cancel-search {
-	margin-left: 20px;
-	margin-top: 10px;
+	margin-left: 10px;
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+#search-container {
+        float: right;
+        margin-top: -10px;
+}
+#searchbar {
+        margin: 10px 0px 0px 0px;
+}
+#search-button {
+        margin: 10px 0px 0px 4px;
+}
+#search-folder-label {
+        margin: 0px;
+}
+#search-results {
+        float: left;
+        width: 45%;
+        margin-top: 10px;
+}
+#search-results h4 {
+        text-align: justify;
+        margin: 0px 0px 5px 0px;
 }
 #changelist-search {
 	position: static;
+}
+.changelist-search-expanded {
+        width: 100%;
+        padding: 0px 15px;
 }
 .special-info {
 	position: absolute;
