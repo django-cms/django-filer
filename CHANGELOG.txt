@@ -5,6 +5,8 @@ x.x.x (UNRELEASED)
 ------------------
 
 * Search result fixes for current folder search
+* Workaround for SQLite problems on simultaneous file uploads
+* Add missing search results counters
 * Move project to divio/django-filer.
 * Adapt documentation links.
 
