@@ -278,8 +278,9 @@ form .form-row {
     width: 270px;
     margin: -50px 0 0 -150px;
     padding: 15px;
-    border: solid 1px $color-primary;
+    border-radius: $border-radius-base;
     background: $white;
+    box-shadow: $base-box-shadow;
     .icon {
         font-size: 30px;
     }
