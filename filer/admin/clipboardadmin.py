@@ -159,6 +159,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                     thumbnail_180 = file_obj.file.get_thumbnail(
                         thumbnail_180_options)
                     json_response['thumbnail_180'] = thumbnail_180.url
+                    json_response['original_image'] = file_obj.url
                 return HttpResponse(json.dumps(json_response),
                                     **response_params)
             else:
