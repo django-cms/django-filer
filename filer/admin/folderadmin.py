@@ -1152,7 +1152,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         thumbnailer = FilerActionThumbnailer(file=image.file.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
         # This should overwrite the original image
         new_image = thumbnailer.get_thumbnail({
-            'size': (form_data['width'], form_data['height']),
+            'size': tuple(int(form_data[d] or 0) for d in ('width', 'height')),
             'crop': form_data['crop'],
             'upscale': form_data['upscale'],
             'subject_location': image.subject_location,
