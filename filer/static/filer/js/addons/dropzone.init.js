@@ -2,7 +2,7 @@
 // This script implements the dropzone settings
 'use strict';
 
-/* global Dropzone, django */
+/* global Dropzone */
 (function ($) {
     $(function () {
         var dropzoneTemplateSelector = '.js-dropzone-template';
