@@ -21,11 +21,7 @@
         var objectAttachedClass = 'js-object-attached';
         var minWidth = 500;
         var checkMinWidth = function () {
-            if (this.width() < minWidth) {
-                this.addClass(mobileClass);
-            } else {
-                this.removeClass(mobileClass);
-            }
+            this.toggleClass(mobileClass, this.width() < minWidth);
         };
 
         if (dropzones.length && Dropzone && !window.filerDropzoneInitialized) {
