@@ -4,6 +4,7 @@ CHANGELOG
 x.x.x (UNRELEASED)
 ------------------
 
+* Search result fixes for current folder search
 * Move project to divio/django-filer.
 * Adapt documentation links.
 
