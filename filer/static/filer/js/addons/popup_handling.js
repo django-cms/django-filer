@@ -19,6 +19,7 @@
         var oldId = elem.value;
 
         elem.val(chosenId);
+        elem.closest('.js-dropzone').addClass('js-object-attached');
         img.attr('src', chosenThumbnailUrl);
         txt.text(chosenDescriptionTxt);
         clear.removeClass('hidden').removeAttr('style');
@@ -33,6 +34,7 @@
     window.dismissRelatedFolderLookupPopup = function (win, chosenId, chosenName) {
         var id = window.windowname_to_id(win.name);
         $('#' + id).val(chosenId);
+        $('#' + id).closest('.js-dropzone').addClass('js-object-attached');
         $('#' + id + '_description_txt').text(chosenName);
         win.close();
     };
