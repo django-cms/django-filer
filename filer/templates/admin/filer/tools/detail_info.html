@@ -11,14 +11,13 @@
                 {% if file %}
                     <img src="{% if original.icons.48 %}{{ original.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}">
                 {% else %}
-                    <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
-                        <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-focal-point-image">
-                        <div class="image-preview-field">
-                            <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                    <div class="js-cropper cropper-container" data-location-selector="#id_subject_location">
+                        <div class="image-preview">
+                            <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-cropper-image">
                         </div>
                     </div>
                 {% endif %}
-                <div class="text-left">
+                <div class="text-left full-size">
                     <a href="{{ original.url }}" target="_blank" class="btn">
                         {% if file %}
                             {% trans "Open file" %}
@@ -75,18 +74,27 @@
             <a href="#" class="fa fa-pencil"></a>
         </div>
 
-        <div class="image-preview-container">
-            <div class="image-preview js-focal-point">
-                <img src="http://lorempixel.com/210/266" data-ratio="4.638095" width="210" height="266" class="js-focal-point-image">
-                <div class="image-preview-field">
-                    <div class="js-focal-point-circle image-preview-circle hidden"></div>
-                </div>
-                <input type="hidden" class="js-focal-point-location">
+        <div class="js-cropper cropper-container" data-location-selector="#id_subject_location">
+            <div class="image-preview">
+                <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-cropper-image">
             </div>
 
-            <div class="text-right">
-                <a href="http://lorempixel.com/210/266" target="_blank" class="btn">{% trans "Full size preview" %}</a>
+            <div class="cropper-preview-container">
+                <div class="js-cropper-preview cropper-preview cropper-preview-lg"></div>
+                <div class="js-cropper-preview cropper-preview cropper-preview-md"></div>
+                <div class="js-cropper-preview cropper-preview cropper-preview-sm"></div>
+                <div class="js-cropper-preview cropper-preview cropper-preview-xs"></div>
             </div>
+        </div>
+
+        <div class="text-left">
+            <a href="{{ original.url }}" target="_blank" class="btn">
+                {% if file %}
+                    {% trans "Open file" %}
+                {% else %}
+                    {% trans "Full size preview" %}
+                {% endif %}
+            </a>
         </div>
 
         <ul class="image-details">
