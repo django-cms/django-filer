@@ -32,6 +32,7 @@
     window.dismissRelatedFolderLookupPopup = function (win, chosenId, chosenName) {
         var id = window.windowname_to_id(win.name);
         $('#' + id).val(chosenId);
+        $('#' + id).closest('.js-dropzone').addClass('js-object-attached');
         $('#' + id + '_description_txt').text(chosenName);
         win.close();
     };

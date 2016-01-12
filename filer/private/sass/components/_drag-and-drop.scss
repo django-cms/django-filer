@@ -125,14 +125,6 @@ form .form-row {
             float: right;
             width: 100%;
             margin: 48px 0 0;
-            // make sure that drag and drop widget looks nice on mobile #670
-            @media screen and (max-width: $screen-tablet) {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                text-align: left;
-                margin-top: 10px;
-            }
         }
         .icon {
             color: $gray;
@@ -177,6 +169,8 @@ form .form-row {
                 width: 36px;
                 height: 36px;
                 margin-right: 10px;
+                border-radius: $border-radius-base;
+                border: solid 1px $gray-lighter;
                 &[src*="nofile"] {
                     margin-right: 0;
                     border: solid 1px $gray-lighter;
@@ -233,6 +227,38 @@ form .form-row {
                 cursor: pointer;
             }
         }
+        &.dropzone-mobile {
+            .filerFile {
+                top: 40px;
+                text-align: center;
+            }
+            .dz-message {
+                // make sure that drag and drop widget looks nice on mobile #670
+                margin-top: 75px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            &.js-object-attached .filerFile {
+                top: 62px;
+            }
+        }
+        @media screen and (max-width: $screen-tablet) {
+            .filerFile {
+                top: 40px !important;
+                text-align: center;
+            }
+            .dz-message {
+                // make sure that drag and drop widget looks nice on mobile #670
+                margin-top: 75px !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            &.js-object-attached .filerFile {
+                top: 62px !important;
+            }
+        }
     }
 }
 
@@ -278,8 +304,9 @@ form .form-row {
     width: 270px;
     margin: -50px 0 0 -150px;
     padding: 15px;
-    border: solid 1px $color-primary;
+    border-radius: $border-radius-base;
     background: $white;
+    box-shadow: $base-box-shadow;
     .icon {
         font-size: 30px;
     }

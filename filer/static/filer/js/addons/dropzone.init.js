@@ -7,8 +7,7 @@ if (Dropzone) {
 }
 
 
-/* global Dropzone */
-/* global django */
+/* global Dropzone, django */
 django.jQuery(function ($) {
     var dropzoneTemplateSelector = '.js-dropzone-template';
     var previewImageSelector = '.js-img-preview';
@@ -21,6 +20,13 @@ django.jQuery(function ($) {
     var fileChooseSelector = '.js-file-selector';
     var fileIdInputSelector = '.vForeignKeyRawIdAdminField';
     var hiddenClass = 'hidden';
+    var mobileClass = 'dropzone-mobile';
+    var objectAttachedClass = 'js-object-attached';
+    var minWidth = 500;
+    var checkMinWidth = function () {
+        this.toggleClass(mobileClass, this.width() < minWidth);
+    };
+
 
     var create_dropzone = function () {
         var dropzone = $(this);
@@ -32,6 +38,10 @@ django.jQuery(function ($) {
         var clearButton = dropzone.find(filerClearerSelector);
         var fileChoose = dropzone.find(fileChooseSelector);
 
+        checkMinWidth = $.proxy(checkMinWidth, dropzone);
+
+        $(window).on('resize', checkMinWidth);
+
         new Dropzone(this, {
             url: dropzoneUrl,
             paramName: 'file',
@@ -40,21 +50,31 @@ django.jQuery(function ($) {
             clickable: false,
             addRemoveLinks: false,
             init: function () {
+                checkMinWidth();
                 this.on('removedfile', function () {
                     fileChoose.show();
-                    this.removeAllFiles();
+                    dropzone.removeClass(objectAttachedClass);
+                    this.removeAllFiles(true);
+                    clearButton.trigger('click');
+                });
+                $('img', this.element).on('dragstart', function (event) {
+                    event.preventDefault();
+                });
+                clearButton.on('click', function () {
+                    dropzone.removeClass(objectAttachedClass);
                 });
             },
             maxfilesexceeded: function (file) {
-                this.removeAllFiles();
+                this.removeAllFiles(true);
                 this.addFile(file);
             },
             drop: function () {
-                clearButton.click();
+                this.removeAllFiles(true);
                 fileChoose.hide();
                 lookupButton.addClass(hiddenClass);
                 message.addClass(hiddenClass);
                 dropzone.removeClass('dz-drag-hover');
+                dropzone.addClass(objectAttachedClass);
             },
             success: function (file, response) {
                 dropzone.find(progressSelector).addClass(hiddenClass);
@@ -71,12 +91,16 @@ django.jQuery(function ($) {
                         }
                     }
                 }
+                $('img', this.element).on('dragstart', function (event) {
+                    event.preventDefault();
+                });
             },
             reset: function () {
                 if (isImage) {
                     $(previewImageWrapperSelector).addClass(hiddenClass);
                     $(previewImageSelector).css({'background-image': 'none'});
                 }
+                dropzone.removeClass(objectAttachedClass);
                 inputId.val('');
                 lookupButton.removeClass(hiddenClass);
                 message.removeClass(hiddenClass);

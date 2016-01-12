@@ -11,8 +11,8 @@
         </span>
     </div>
 
-    <div class="js-dropzone dropzone" data-url="{% url 'admin:filer-ajax_upload' %}">
-        <div class="dz-default dz-message js-dropzone-message{% if object %} hidden{% endif %}">
+    <div class="js-dropzone dropzone {% if object %}js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}">
+        <div class="dz-default dz-message js-dropzone-message {% if object %}hidden{% endif %}">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>
 
@@ -57,5 +57,6 @@
 {% endspaceless %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+<script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
 <script src="{% static 'filer/js/libs/dropzone.min.js' %}"></script>
 <script src="{% static 'filer/js/addons/dropzone.init.js' %}"></script>
