@@ -68,8 +68,6 @@
                         folderName.text(folderTitle);
                     },
                     dragleave: function (e) {
-
-                        e.currentTarget.offsetWidth;
                         clearTimeout(hideMessageTimeout);
                         hideMessageTimeout = setTimeout(function () {
                             infoMessage.addClass(hiddenClass);
