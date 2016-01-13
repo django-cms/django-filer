@@ -40,7 +40,7 @@
     outline: none;
 
     appearance: none;
-    // disable clear X on IE #
+    // disable clear X on IE #690
     &::-ms-clear {
         display: none;
     }
