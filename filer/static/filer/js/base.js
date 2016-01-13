@@ -68,6 +68,26 @@ var Cl = window.Cl || {};
             var actionsGo = $('.actions button[type="submit"]');
             var html = '';
             var i = 0;
+            var actionDelete = $('.js-action-delete');
+            var actionCopy = $('.js-action-copy');
+            var actionMove = $('.js-action-move');
+
+
+            function actionsButton (optionValue, actionButton) {
+
+                actionButton.show();
+
+                actionButton.on('click', function (e) {
+                    e.preventDefault();
+                    actionsSelect.val(optionValue).attr('selected', 'selected');
+                    actionsGo.trigger('click');
+                });
+            }
+
+            actionsButton('delete_files_or_folders', actionDelete);
+            actionsButton('copy_files_and_folders', actionCopy);
+            actionsButton('move_files_and_folders', actionMove);
+
 
             $.each(actionsSelectOptions, function () {
                 if (i !== 0) {
