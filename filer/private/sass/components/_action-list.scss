@@ -45,3 +45,18 @@
         }
     }
 }
+.actions-separated-list {
+    position: relative;
+    top: 6px;
+    display: inline-block;
+    margin: 0;
+    li {
+        display: inline-block;
+        list-style: none;
+        padding: 0 10px;
+        vertical-align: middle;
+    }
+    span:before {
+        font-size: 16px;
+    }
+}

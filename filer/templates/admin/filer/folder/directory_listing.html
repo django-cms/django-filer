@@ -137,17 +137,37 @@
 
         {% block object-tools %}
             <div class="navigator-tools">
+                {% if actions_selection_counter %}
+                    <script type="text/javascript">var _actions_icnt="{{ paginated_items.object_list|length|default:"0" }}";</script>
+                    <span class="action-counter">{{ selection_note }}</span>
+                    {% if paginator.count != paginated_items.object_list|length %}
+                    <span class="all">{{ selection_note_all }}</span>
+                    <span class="question">
+                        <a href="javascript:;" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }} files and/or folders{% endblocktrans %}</a>
+                    </span>
+                    <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
+                    {% endif %}
+                {% endif %}
+                <ul class="actions-separated-list">
+                    <li>
+                        <span class="fa fa-trash-o"></span>
+                    </li>
+                    <li>
+                        <span class="fa fa-copy"></span>
+                    </li>
+                    <li>
+                        <span class="fa fa-cut"></span>
+                    </li>
+                </ul>
                 {% if paginated_items.object_list|length and not is_popup %}
-                    <span class="separator"></span>
                     <div class="dropdown-container js-actions-menu">
                         <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
-                            <span class="fa fa-ellipsis-v"></span>
+                            <span class="fa fa-ellipsis-h"></span>
                         </a>
                         <ul class="create-menu-dropdown dropdown-menu">
                             <!-- Actions will go here -->
                         </ul>
                     </div>
-                    <span class="separator"></span>
                 {% endif %}
                 {% block object-tools-items %}
                     <div class="navigator-button-wrapper">

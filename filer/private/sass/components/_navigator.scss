@@ -110,6 +110,19 @@
 .navigator-tools {
     float: right;
     margin: 10px 10px 0 0;
+    .action-counter {
+        position: relative;
+        top: 6px;
+        color: $gray-light;
+        font-size: $font-size-small;
+        margin-right: 30px;
+    }
+    .dropdown-container {
+        margin-right: 20px;
+        margin-left: 10px;
+        padding-left: 10px;
+        border-left: solid 1px $gray-lighter;
+    }
 }
 @media screen and (max-width: $screen-tablet) {
     .navigator-top-nav {
