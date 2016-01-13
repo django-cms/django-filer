@@ -150,13 +150,13 @@
                 {% endif %}
                 <ul class="actions-separated-list">
                     <li>
-                        <span class="fa fa-trash-o"></span>
+                        <a href="#" class="js-action-delete"><span class="fa fa-trash-o"></span></a>
                     </li>
                     <li>
-                        <span class="fa fa-copy"></span>
+                        <a href="#" class="js-action-copy"><span class="fa fa-copy"></span></a>
                     </li>
                     <li>
-                        <span class="fa fa-cut"></span>
+                        <a href="#" class="js-action-move"><span class="fa fa-cut"></span></a>
                     </li>
                 </ul>
                 {% if paginated_items.object_list|length and not is_popup %}

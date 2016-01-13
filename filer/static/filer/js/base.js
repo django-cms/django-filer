@@ -43,6 +43,23 @@ var Cl = window.Cl || {};
             }
         }());
 
+        // show counter if file is selected
+        (function () {
+            var table = $('.navigator-table').find('tr');
+            var actionCounter = $('.action-counter');
+            var actionSelect = $('.action-select, .column-checkbox');
+
+            actionSelect.each(function () {
+                $(this).on('click', function () {
+                    if (table.hasClass('selected')) {
+                        actionCounter.addClass('action-selected');
+                    } else {
+                        actionCounter.removeClass('action-selected');
+                    }
+                });
+            });
+        }());
+
         // mocking the action buttons to work in frontend UI, please do not review
         (function () {
             var dropdown = $('.js-actions-menu .dropdown-menu');

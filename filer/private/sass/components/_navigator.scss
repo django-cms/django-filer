@@ -116,6 +116,10 @@
         color: $gray-light;
         font-size: $font-size-small;
         margin-right: 30px;
+        visibility: hidden;
+        &.action-selected {
+            visibility: visible;
+        }
     }
     .dropdown-container {
         margin-right: 20px;
