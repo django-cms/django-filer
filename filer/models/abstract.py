@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
-
 import os
+
+from django.db import models
+from django.utils import six
+from django.utils.translation import ugettext_lazy as _
+
+from filer import settings as filer_settings
+from filer.models.filemodels import File
+from filer.utils.filer_easy_thumbnails import FilerThumbnailer
+from filer.utils.pil_exif import get_exif_for_file
+
 try:
     from PIL import Image as PILImage
 except ImportError:
@@ -11,15 +20,6 @@ except ImportError:
 
 import logging
 logger = logging.getLogger(__name__)
-
-from django.db import models
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
-
-from filer import settings as filer_settings
-from filer.models.filemodels import File
-from filer.utils.filer_easy_thumbnails import FilerThumbnailer
-from filer.utils.pil_exif import get_exif_for_file
 
 
 class BaseImage(File):
