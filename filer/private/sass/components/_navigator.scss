@@ -5,8 +5,10 @@
     // required for django CMS <= 3.1 #673
     width: 100%;
     margin: 0;
-    tbody td {
-        padding: 5px 10px !important;
+    tbody {
+        td {
+            padding: 5px 10px !important;
+        }
     }
     .unfiled td {
         background-color: $gray-table !important;
@@ -53,6 +55,12 @@
     .dz-drag-hover,
     &.dz-drag-hover {
         background: $hover-bg;
+        tr.unfiled td {
+            background: $hover-bg !important;
+        }
+    }
+    .reset-hover {
+        background-color: $white !important;
     }
 }
 

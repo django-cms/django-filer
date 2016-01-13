@@ -23,8 +23,8 @@ django.jQuery(function ($) {
     var mobileClass = 'dropzone-mobile';
     var objectAttachedClass = 'js-object-attached';
     var minWidth = 500;
-    var checkMinWidth = function () {
-        this.toggleClass(mobileClass, this.width() < minWidth);
+    var checkMinWidth = function (element) {
+        element.toggleClass(mobileClass, this.width() < minWidth);
     };
 
 
@@ -38,9 +38,9 @@ django.jQuery(function ($) {
         var clearButton = dropzone.find(filerClearerSelector);
         var fileChoose = dropzone.find(fileChooseSelector);
 
-        checkMinWidth = $.proxy(checkMinWidth, dropzone);
-
-        $(window).on('resize', checkMinWidth);
+        $(window).on('resize', function () {
+            checkMinWidth(dropzone);
+        });
 
         new Dropzone(this, {
             url: dropzoneUrl,
@@ -50,7 +50,7 @@ django.jQuery(function ($) {
             clickable: false,
             addRemoveLinks: false,
             init: function () {
-                checkMinWidth();
+                checkMinWidth(dropzone);
                 this.on('removedfile', function () {
                     fileChoose.show();
                     dropzone.removeClass(objectAttachedClass);

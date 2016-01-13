@@ -60,10 +60,10 @@
                     },
                     dragover: function (dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
-
+                        $(dropzones).addClass('reset-hover');
                         uploadSuccess.addClass(hiddenClass);
                         infoMessage.removeClass(hiddenClass);
-                        dropzone.addClass(dragHoverClass);
+                        dropzone.addClass(dragHoverClass).removeClass('reset-hover');
 
                         folderName.text(folderTitle);
                     },
@@ -77,6 +77,7 @@
                         dropzones.removeClass(dragHoverClass);
                     },
                     drop: function () {
+                        dropzones.removeClass('reset-hover');
                         clearTimeout(hideMessageTimeout);
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
