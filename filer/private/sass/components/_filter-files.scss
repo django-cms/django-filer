@@ -40,6 +40,10 @@
     outline: none;
 
     appearance: none;
+    // disable clear X on IE #690
+    &::-ms-clear {
+        display: none;
+    }
 }
 .filter-files-button {
     position: absolute;
