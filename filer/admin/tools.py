@@ -2,13 +2,13 @@
 
 from django.core.exceptions import PermissionDenied
 
-from filer.utils.compatibility import DJANGO_1_7, DJANGO_1_6
+from filer.utils.compatibility import LTE_DJANGO_1_7, LTE_DJANGO_1_6
 
 
-if DJANGO_1_6:
+if LTE_DJANGO_1_6:
     def admin_each_context(admin_site, request):
         return {}
-elif DJANGO_1_7:
+elif LTE_DJANGO_1_7:
     def admin_each_context(admin_site, request):
         return admin_site.each_context()
 else:
