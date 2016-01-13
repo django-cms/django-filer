@@ -33,9 +33,15 @@
     };
     window.dismissRelatedFolderLookupPopup = function (win, chosenId, chosenName) {
         var id = window.windowname_to_id(win.name);
-        $('#' + id).val(chosenId);
-        $('#' + id).closest('.js-dropzone').addClass('js-object-attached');
-        $('#' + id + '_description_txt').text(chosenName);
+        var clearButton = $('#id_' + id + '_clear');
+        var input = $('#id_' + id);
+        var folderName = $('#id_' + id + '_description_txt');
+        var addFolderButton = $('#' + id);
+
+        input.val(chosenId);
+        folderName.text(chosenName);
+        clearButton.removeClass('hidden');
+        addFolderButton.addClass('hidden');
         win.close();
     };
 })(django.jQuery);
