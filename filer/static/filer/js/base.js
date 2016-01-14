@@ -74,7 +74,7 @@ var Cl = window.Cl || {};
             var valueMove = 'move_files_and_folders';
 
             // triggers delete copy and move actions on separate buttons
-            function actionsButton (optionValue, actionButton) {
+            function actionsButton(optionValue, actionButton) {
                 actionsSelectOptions.each(function () {
                     if (this.value === optionValue) {
                         actionButton.show();
@@ -97,9 +97,9 @@ var Cl = window.Cl || {};
                 var className = '';
                 if (index !== 0) {
                     if (this.value === valueDelete || this.value === valueCopy || this.value === valueMove) {
-                        className = 'class="hidden"'
+                        className = 'class="hidden"';
                     }
-                    html += '<li><a href="#" '+ className + '>' + $(this).text() + '</a></li>';
+                    html += '<li><a href="#"' + className + '>' + $(this).text() + '</a></li>';
 
                 }
             });
