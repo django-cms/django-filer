@@ -47,12 +47,10 @@ var Cl = window.Cl || {};
         (function () {
             var table = $('.navigator-table').find('tr');
             var actionCounter = $('.action-counter');
-            var actionSelect = $('.action-select, .column-checkbox');
+            var actionSelect = $('.action-select, #action-toggle');
 
-            actionSelect.each(function () {
-                actionSelect.on('click change', function () {
-                    actionCounter.toggleClass('action-selected', table.hasClass('selected'));
-                });
+            actionSelect.on('change', function () {
+                actionCounter.toggleClass('action-selected', table.hasClass('selected'));
             });
         }());
 
