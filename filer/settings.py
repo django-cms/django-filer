@@ -32,9 +32,10 @@ FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES", (
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
-FILER_FILE_MODELS = getattr(settings, 'FILER_FILE_MODELS', (
-    FILER_IMAGE_MODEL if FILER_IMAGE_MODEL else 'filer.models.imagemodels.Image',
-        'filer.models.filemodels.File',))
+FILER_FILE_MODELS = getattr(
+    settings, 'FILER_FILE_MODELS',
+    (FILER_IMAGE_MODEL if FILER_IMAGE_MODEL else 'filer.models.imagemodels.Image',
+     'filer.models.filemodels.File'))
 
 DEFAULT_FILE_STORAGE = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
 
