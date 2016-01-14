@@ -60,49 +60,57 @@ var Cl = window.Cl || {};
             });
         }());
 
-        // mocking the action buttons to work in frontend UI, please do not review
         (function () {
             var dropdown = $('.js-actions-menu .dropdown-menu');
             var actionsSelect = $('.actions select[name="action"]');
             var actionsSelectOptions = actionsSelect.find('option');
             var actionsGo = $('.actions button[type="submit"]');
             var html = '';
-            var i = 0;
             var actionDelete = $('.js-action-delete');
             var actionCopy = $('.js-action-copy');
             var actionMove = $('.js-action-move');
+            var valueDelete = 'delete_files_or_folders';
+            var valueCopy = 'copy_files_and_folders';
+            var valueMove = 'move_files_and_folders';
 
-
+            // triggers delete copy and move actions on separate buttons
             function actionsButton (optionValue, actionButton) {
+                actionsSelectOptions.each(function () {
+                    if (this.value === optionValue) {
+                        actionButton.show();
 
-                actionButton.show();
-
-                actionButton.on('click', function (e) {
-                    e.preventDefault();
-                    actionsSelect.val(optionValue).attr('selected', 'selected');
-                    actionsGo.trigger('click');
+                        actionButton.on('click', function (e) {
+                            e.preventDefault();
+                            actionsSelect.val(optionValue).prop('selected', true);
+                            actionsGo.trigger('click');
+                        });
+                    }
                 });
             }
 
-            actionsButton('delete_files_or_folders', actionDelete);
-            actionsButton('copy_files_and_folders', actionCopy);
-            actionsButton('move_files_and_folders', actionMove);
+            actionsButton(valueDelete, actionDelete);
+            actionsButton(valueCopy, actionCopy);
+            actionsButton(valueMove, actionMove);
 
+            // mocking the action buttons to work in frontend UI
+            actionsSelectOptions.each(function (index) {
+                var className = '';
+                if (index !== 0) {
+                    if (this.value === valueDelete || this.value === valueCopy || this.value === valueMove) {
+                        className = 'class="hidden"'
+                    }
+                    html += '<li><a href="#" '+ className + '>' + $(this).text() + '</a></li>';
 
-            $.each(actionsSelectOptions, function () {
-                if (i !== 0) {
-                    html += '<li><a href="#">' + $(this).text() + '</a></li>';
                 }
-                i++;
             });
             dropdown.append(html);
 
-            dropdown.on('click', function (clickEvent) {
-                var targetIndex = $(clickEvent.target).closest('li').index() + 1;
+            dropdown.on('click', 'a', function (clickEvent) {
+                var targetIndex = $(this).closest('li').index() + 1;
 
                 clickEvent.preventDefault();
 
-                actionsSelect.find('option').eq(targetIndex).attr('selected', 'selected');
+                actionsSelect.find('option').eq(targetIndex).prop('selected', true);
                 actionsGo.trigger('click');
             });
         }());
