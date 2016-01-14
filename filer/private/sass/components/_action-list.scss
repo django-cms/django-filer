@@ -46,8 +46,6 @@
     }
 }
 .actions-separated-list {
-    position: relative;
-    top: 6px;
     display: inline-block;
     margin: 0;
     @media screen and (max-width: $screen-tablet) {
@@ -56,8 +54,12 @@
     li {
         display: inline-block;
         list-style: none;
+        line-height: 34px;
         padding: 0 10px;
         vertical-align: middle;
+        span {
+            vertical-align: middle;
+        }
         a {
             color: $gray-darker !important;
         }

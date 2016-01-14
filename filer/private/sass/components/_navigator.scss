@@ -77,8 +77,12 @@
         display: inline-block;
         color: $btn-default-color;
         font-size: 26px;
+        line-height: 34px;
         vertical-align: top;
         margin: 0 10px;
+        span {
+            vertical-align: middle;
+        }
     }
     .nav-button-filter {
         position: relative;
@@ -159,9 +163,10 @@
 }
 // make sure that buttons break to new line on mobile view #677
 .navigator-button-wrapper {
-    display: inline-block;
+    float: right;
     @media screen and (max-width: $screen-tablet) {
         display: block;
+        float: none;
         margin-bottom: 10px;
         .navigator-button {
             margin-top: 10px;
@@ -219,7 +224,6 @@
 .dropdown-container {
     display: inline-block;
     position: relative;
-    top: 6px;
     vertical-align: top;
     .dropdown-menu {
         display: none;
