@@ -26,9 +26,10 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
-FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES", (
-    '16', '32', '48', '64',
+_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', (
+    16, 32, 48, 64,
 ))
+FILER_ADMIN_ICON_SIZES = sorted([int(s) for s in _ICON_SIZES])
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
