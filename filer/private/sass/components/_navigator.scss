@@ -110,6 +110,13 @@
 .navigator-tools {
     float: right;
     margin: 10px 10px 0 0;
+    .actions-wrapper {
+        display: inline-block;
+        @media screen and (max-width: $screen-tablet) {
+            @include clearfix();
+            margin-bottom: 10px;
+        }
+    }
     .action-counter {
         position: relative;
         top: 6px;
@@ -126,6 +133,9 @@
         margin-left: 10px;
         padding-left: 10px;
         border-left: solid 1px $gray-lighter;
+        @media screen and (max-width: $screen-tablet) {
+            float:left;
+        }
     }
 }
 @media screen and (max-width: $screen-tablet) {
@@ -143,7 +153,7 @@
         }
         .dropdown-container .dropdown-menu {
             right: auto;
-            left: 0;
+            left: -130px;
         }
     }
 }

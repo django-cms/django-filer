@@ -50,6 +50,9 @@
     top: 6px;
     display: inline-block;
     margin: 0;
+    @media screen and (max-width: $screen-tablet) {
+        float:left;
+    }
     li {
         display: inline-block;
         list-style: none;
