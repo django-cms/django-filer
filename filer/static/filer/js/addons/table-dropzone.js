@@ -6,6 +6,7 @@
 (function ($) {
     $(function () {
         var submitNum = 0;
+        var maxSubmitNum = 1;
         var dropzoneBase = $('.js-filer-dropzone-base');
         var dropzoneSelector = '.js-filer-dropzone';
         var dropzones;
@@ -28,8 +29,8 @@
         var hasErrors = false;
         var baseUrl;
         var baseFolderTitle;
-        var updateUploadNumber = function (files) {
-            uploadNumber.text(files.length - submitNum + '/' + files.length);
+        var updateUploadNumber = function () {
+            uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
         };
 
         if (dropzoneBase && dropzoneBase.length) {
@@ -56,6 +57,10 @@
                     parallelUploads: dropzone.data(dataUploaderConnections) || 3,
                     addedfile: function () {
                         submitNum++;
+
+                        if (submitNum > maxSubmitNum) {
+                            maxSubmitNum = submitNum;
+                        }
 
                         cancelUpload.removeClass(hiddenClass);
                         updateUploadNumber(this.files);
@@ -104,10 +109,15 @@
                         updateUploadNumber(this.files);
                     },
                     queuecomplete: function () {
+                        if (submitNum !== 0) {
+                            return;
+                        }
+
                         updateUploadNumber(this.files);
 
                         cancelUpload.addClass(hiddenClass);
                         uploadInfo.addClass(hiddenClass);
+
                         if (hasErrors) {
                             uploadNumber.addClass(hiddenClass);
                             setTimeout(function () {
