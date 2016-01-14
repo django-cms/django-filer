@@ -23,6 +23,15 @@
         var checkMinWidth = function (element) {
             element.toggleClass(mobileClass, element.width() < minWidth);
         };
+        var showError = function (message) {
+            try {
+                window.parent.CMS.API.Messages.open({
+                    message: message
+                });
+            } catch (errorText) {
+                console.log(errorText);
+            }
+        };
 
         if (dropzones.length && Dropzone && !window.filerDropzoneInitialized) {
             window.filerDropzoneInitialized = true;
@@ -63,9 +72,8 @@
                             dropzone.removeClass(objectAttachedClass);
                         });
                     },
-                    maxfilesexceeded: function (file) {
+                    maxfilesexceeded: function () {
                         this.removeAllFiles(true);
-                        this.addFile(file);
                     },
                     drop: function () {
                         this.removeAllFiles(true);
@@ -77,6 +85,7 @@
                     },
                     success: function (file, response) {
                         dropzone.find(progressSelector).addClass(hiddenClass);
+
                         if (file && file.status === 'success' && response) {
                             if (response.file_id) {
                                 inputId.val(response.file_id);
@@ -89,10 +98,20 @@
                                     $(previewImageWrapperSelector).removeClass(hiddenClass);
                                 }
                             }
+                        } else {
+                            if (response && response.error) {
+                                window.showError(file.name + ': ' + response.error);
+                            }
+                            this.removeAllFiles(true);
                         }
+
                         $('img', this.element).on('dragstart', function (event) {
                             event.preventDefault();
                         });
+                    },
+                    error: function (file, errorMessage) {
+                        showError(file.name + ': ' + errorMessage);
+                        this.removeAllFiles(true);
                     },
                     reset: function () {
                         if (isImage) {
