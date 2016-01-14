@@ -4,7 +4,11 @@
 'use strict';
 
 var Cl = window.Cl || {};
+
 /* global Mediator */
+
+// mediator init
+Cl.mediator = new Mediator();
 
 (function ($) {
     $(function () {
@@ -16,9 +20,6 @@ var Cl = window.Cl || {};
 
             messages.length ? messages.replaceWith(msg) : header.after(msg);
         };
-
-        // mediator init
-        Cl.mediator = new Mediator();
 
         // Focal point logic init
         if (Cl.FocalPoint) {

@@ -2,7 +2,7 @@
 // This script implements the upload button logic
 'use strict';
 
-/* globals qq */
+/* globals qq, Cl */
 (function ($) {
     $(function () {
         var submitNum = 0;
@@ -25,12 +25,19 @@
         var updateUploadNumber = function () {
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
         };
+        var removeButton = function () {
+            uploadButton.remove();
+        };
+
+        Cl.mediator.subscribe('filer-upload-in-progress', removeButton);
 
         new qq.FileUploaderBasic({
             action: uploadUrl,
             button: uploadButton[0],
             maxConnections: maxUploaderConnections,
             onSubmit: function (id) {
+                Cl.mediator.remove('filer-upload-in-progress', removeButton);
+                Cl.mediator.publish('filer-upload-in-progress');
                 submitNum++;
 
                 maxSubmitNum = id + 1;
