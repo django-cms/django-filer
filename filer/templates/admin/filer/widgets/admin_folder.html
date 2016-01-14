@@ -12,7 +12,7 @@
                 {% endif %}
             </span>
             <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                {% trans 'Add Folder' %}
+                {% trans "Add Folder" %}
             </a>
 
             <img id="{{ clear_id }}" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" class="filerClearer{% if not object %} hidden{% endif %}">
