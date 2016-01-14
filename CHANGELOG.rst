@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Revision 3f84a76 (14.01.2016, 14:46 UTC)
+----------------------------------------
+
+* LUN-2689
+
+  * Handle case when request body is missing.
+
+* Misc commits
+
+  * master_pbs Pin django-mptt to last working version.
+
 Revision 8cd8cf3 (18.11.2015, 08:15 UTC)
 ----------------------------------------
 
