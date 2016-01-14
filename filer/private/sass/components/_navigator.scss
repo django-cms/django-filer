@@ -115,25 +115,46 @@
     float: right;
     margin: 10px 10px 0 0;
     .actions-wrapper {
-        display: inline-block;
+        float: right;
+        margin-bottom: 10px;
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
+            float: none;
+        }
+    }
+    .actions {
+        float: right;
+        display: none;
+        @media screen and (max-width: $screen-tablet) {
+            @include clearfix();
+            float: none;
             margin-bottom: 10px;
         }
-    }
-    .action-counter {
-        color: $gray-light;
-        font-size: $font-size-small;
-        line-height: 34px;
-        margin-right: 30px;
-        visibility: hidden;
-        vertical-align: middle;
+        .all,
+        .question,
+        .clear,
+        .action-counter {
+            font-size: $font-size-small;
+            line-height: 34px;
+            vertical-align: middle;
+        }
+        .action-counter,
+        .all {
+            color: $gray-light;
+            margin-right: 20px;
+        }
+        .clear,
+        .question,
+        .all {
+            font-size: 11px;
+            margin-right: 20px;
+        }
         &.action-selected {
-            visibility: visible;
+            display: block;
         }
     }
+
     .dropdown-container {
-        margin-right: 20px;
         margin-left: 10px;
         padding-left: 10px;
         border-left: solid 1px $gray-lighter;
@@ -163,14 +184,16 @@
 }
 // make sure that buttons break to new line on mobile view #677
 .navigator-button-wrapper {
-    float: right;
+    text-align: right;
+    margin-bottom: 10px;
     @media screen and (max-width: $screen-tablet) {
         display: block;
-        float: none;
-        margin-bottom: 10px;
-        .navigator-button {
-            margin-top: 10px;
-        }
+        text-align: left;
+        margin-bottom: 20px;
+    }
+    @media screen and (min-width: $screen-desktop) {
+        float: right;
+        margin-left: 10px;
     }
 }
 .navigator-button {
