@@ -1,7 +1,7 @@
 {% load i18n l10n admin_list filer_tags staticfiles %}
 
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-    <table class="js-dropzone js-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}">
+    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}">
         <thead>
             <tr>
                 <th class="column-checkbox">
@@ -20,7 +20,7 @@
             {% for item, item_perms in paginated_items.object_list %}
                 {% if item.file_type == "Folder" %}
                     {% with item as subfolder %}
-                        <tr class="js-dropzone" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}">
+                        <tr class="js-filer-dropzone" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}">
                             <td class="column-checkbox">
                                 {% if select_folder and item.file_type == 'Folder' %}
                                     <a class="insertlink insertlinkButton"
@@ -154,21 +154,21 @@
         </tbody>
     </table>
 
-    <div class="dropzone-info-message js-dropzone js-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}">
+    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}">
         <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
-        <div class="dropzone-upload-welcome js-dropzone-upload-welcome">
+        <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
-            <div class="folder"><span class="fa fa-folder"></span> <span class="js-dropzone-folder-name"></span></div>
+            <div class="folder"><span class="fa fa-folder"></span> <span class="js-filer-dropzone-folder-name"></span></div>
         </div>
 
-        <div class="dropzone-upload-info js-dropzone-upload-info hidden">
-            <div class="js-dropzone-upload-number"></div>
-            <div class="js-dropzone-file-name dropzone-file-name"></div>
-            <div class="dropzone-progress js-dropzone-progress"></div>
+        <div class="filer-dropzone-upload-info js-filer-dropzone-upload-info hidden">
+            <div class="js-filer-dropzone-upload-number"></div>
+            <div class="js-filer-dropzone-file-name filer-dropzone-file-name"></div>
+            <div class="filer-dropzone-progress js-filer-dropzone-progress"></div>
         </div>
 
-        <div class="js-dropzone-upload-success hidden">
+        <div class="js-filer-dropzone-upload-success hidden">
             {% trans "Upload success!" %}
         </div>
     </div>

@@ -5,19 +5,19 @@
 /* global Dropzone */
 (function ($) {
     $(function () {
-        var dropzoneTemplateSelector = '.js-dropzone-template';
+        var dropzoneTemplateSelector = '.js-filer-dropzone-template';
         var previewImageSelector = '.js-img-preview';
-        var dropzoneSelector = '.js-dropzone';
-        var messageSelector = '.js-dropzone-message';
+        var dropzoneSelector = '.js-filer-dropzone';
+        var messageSelector = '.js-filer-dropzone-message';
         var lookupButtonSelector = '.js-related-lookup';
-        var progressSelector = '.js-dropzone-progress';
+        var progressSelector = '.js-filer-dropzone-progress';
         var previewImageWrapperSelector = '.js-img-wrapper';
         var filerClearerSelector = '.filerClearer';
         var fileChooseSelector = '.js-file-selector';
         var dropzones = $(dropzoneSelector);
         var fileIdInputSelector = '.vForeignKeyRawIdAdminField';
         var hiddenClass = 'hidden';
-        var mobileClass = 'dropzone-mobile';
+        var mobileClass = 'filer-dropzone-mobile';
         var objectAttachedClass = 'js-object-attached';
         var minWidth = 500;
         var checkMinWidth = function (element) {

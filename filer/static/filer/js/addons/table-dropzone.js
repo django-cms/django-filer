@@ -7,18 +7,18 @@
     $(function () {
         var submitNum = 0;
         var maxSubmitNum = 1;
-        var dropzoneBase = $('.js-dropzone-base');
-        var dropzoneSelector = '.js-dropzone';
+        var dropzoneBase = $('.js-filer-dropzone-base');
+        var dropzoneSelector = '.js-filer-dropzone';
         var dropzones;
-        var infoMessageClass = 'js-dropzone-info-message';
+        var infoMessageClass = 'js-filer-dropzone-info-message';
         var infoMessage = $('.' + infoMessageClass);
-        var folderName = $('.js-dropzone-folder-name');
-        var uploadInfo = $('.js-dropzone-upload-info');
-        var uploadWelcome = $('.js-dropzone-upload-welcome');
-        var uploadNumber = $('.js-dropzone-upload-number');
-        var uploadFileName = $('.js-dropzone-file-name');
-        var uploadProgress = $('.js-dropzone-progress');
-        var uploadSuccess = $('.js-dropzone-upload-success');
+        var folderName = $('.js-filer-dropzone-folder-name');
+        var uploadInfo = $('.js-filer-dropzone-upload-info');
+        var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
+        var uploadNumber = $('.js-filer-dropzone-upload-number');
+        var uploadFileName = $('.js-filer-dropzone-file-name');
+        var uploadProgress = $('.js-filer-dropzone-progress');
+        var uploadSuccess = $('.js-filer-dropzone-upload-success');
         var dragHoverClass = 'dz-drag-hover';
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
@@ -30,7 +30,7 @@
             baseUrl = dropzoneBase.data('url');
             baseFolderTitle = dropzoneBase.data('folder-name');
 
-            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-dropzone');
+            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-filer-dropzone');
         }
 
         dropzones = $(dropzoneSelector);
