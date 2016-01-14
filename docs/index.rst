@@ -36,17 +36,9 @@ Filer picker widget:
 | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/filer/static/preview_images/file_picker_3.png |                                                                                                                       |
 +-----------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
 
-   Directory list view with clipboard. New uploads are added to the clipboard 
-   and can then be filed into folders.
-
 Custom model fields are provided for use in 3rd party apps as a replacement for 
 the default ``FileField`` from django. Behind the scenes a ``ForeignKey`` to the 
 File model is used.
-
-.. figure:: _static/default_admin_file_widget.png
-   :alt: admin widget screenshot
-
-   Default admin widget for file fields
        
 Getting help
 ------------
