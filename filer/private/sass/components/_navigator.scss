@@ -122,12 +122,12 @@
         }
     }
     .action-counter {
-        position: relative;
-        top: 6px;
         color: $gray-light;
         font-size: $font-size-small;
+        line-height: 34px;
         margin-right: 30px;
         visibility: hidden;
+        vertical-align: middle;
         &.action-selected {
             visibility: visible;
         }
