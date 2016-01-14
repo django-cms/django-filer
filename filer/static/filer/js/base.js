@@ -50,7 +50,7 @@ var Cl = window.Cl || {};
             var actionSelect = $('.action-select, .column-checkbox');
 
             actionSelect.each(function () {
-                $(this).on('click', function () {
+                actionSelect.on('click change', function () {
                     actionCounter.toggleClass('action-selected', table.hasClass('selected'));
                 });
             });
