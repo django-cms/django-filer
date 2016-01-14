@@ -57,6 +57,11 @@
         line-height: 34px;
         padding: 0 10px;
         vertical-align: middle;
+        @media screen and (max-width: $screen-tablet) {
+            &:first-child {
+                padding-left: 0;
+            }
+        }
         span {
             vertical-align: middle;
         }
