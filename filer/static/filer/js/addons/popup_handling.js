@@ -14,12 +14,12 @@
         var txt = $('#' + id + '_description_txt');
         var clear = $('#' + id + '_clear');
         var lookup = $('#' + id + '_lookup');
-        var dropzoneMessage = $('#' + id + '_dropzone_message');
+        var dropzoneMessage = $('#' + id + '_filer_dropzone_message');
         var elem = $('#' + id);
         var oldId = elem.value;
 
         elem.val(chosenId);
-        elem.closest('.js-dropzone').addClass('js-object-attached');
+        elem.closest('.js-filer-dropzone').addClass('js-object-attached');
         img.attr('src', chosenThumbnailUrl);
         txt.text(chosenDescriptionTxt);
         clear.removeClass('hidden').removeAttr('style');

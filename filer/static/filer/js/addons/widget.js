@@ -9,7 +9,7 @@
         var thumbnail = $(base_id + '_thumbnail_img');
         var description = $(base_id + '_description_txt');
         var addImageButton = $(base_id + '_lookup');
-        var dropzoneMessage = $(base_id + '_dropzone_message');
+        var dropzoneMessage = $(base_id + '_filer_dropzone_message');
         var hiddenClass = 'hidden';
         var static_prefix = clearer.attr('src').replace('admin/img/icon_deletelink.gif', 'filer/');
 
