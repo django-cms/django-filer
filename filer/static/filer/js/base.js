@@ -51,11 +51,7 @@ var Cl = window.Cl || {};
 
             actionSelect.each(function () {
                 $(this).on('click', function () {
-                    if (table.hasClass('selected')) {
-                        actionCounter.addClass('action-selected');
-                    } else {
-                        actionCounter.removeClass('action-selected');
-                    }
+                    actionCounter.toggleClass('action-selected', table.hasClass('selected'));
                 });
             });
         }());
