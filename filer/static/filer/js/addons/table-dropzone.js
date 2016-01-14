@@ -2,11 +2,12 @@
 // This script implements the dropzone settings
 'use strict';
 
-/* globals Dropzone */
+/* globals Dropzone, Cl */
 (function ($) {
     $(function () {
         var submitNum = 0;
         var maxSubmitNum = 1;
+        var dropzoneInstances = [];
         var dropzoneBase = $('.js-filer-dropzone-base');
         var dropzoneSelector = '.js-filer-dropzone';
         var dropzones;
@@ -32,6 +33,11 @@
         var updateUploadNumber = function () {
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
         };
+        var destroyDropzones = function () {
+            $.each(dropzoneInstances, function (index) {
+                dropzoneInstances[index].destroy();
+            });
+        };
 
         if (dropzoneBase && dropzoneBase.length) {
             baseUrl = dropzoneBase.data('url');
@@ -39,6 +45,8 @@
 
             $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-filer-dropzone');
         }
+
+        Cl.mediator.subscribe('filer-upload-in-progress', destroyDropzones);
 
         dropzones = $(dropzoneSelector);
 
@@ -56,6 +64,8 @@
                     addRemoveLinks: false,
                     parallelUploads: dropzone.data(dataUploaderConnections) || 3,
                     addedfile: function () {
+                        Cl.mediator.remove('filer-upload-in-progress', destroyDropzones);
+                        Cl.mediator.publish('filer-upload-in-progress');
                         submitNum++;
 
                         if (submitNum > maxSubmitNum) {
@@ -139,6 +149,7 @@
                     uploadCanceled.removeClass(hiddenClass);
                     dropzoneInstance.removeAllFiles(true);
                 });
+                dropzoneInstances.push(dropzoneInstance);
             });
         }
     });
