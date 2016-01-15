@@ -48,9 +48,9 @@ Cl.mediator = new Mediator();
         (function () {
             var table = $('.navigator-table').find('tr');
             var actionCounter = $('.actions');
-            var actionSelect = $('.action-select, #action-toggle');
+            var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
-            actionSelect.on('change', function () {
+            actionSelect.on('change click', function () {
                 actionCounter.toggleClass('action-selected', table.hasClass('selected'));
             });
         }());
