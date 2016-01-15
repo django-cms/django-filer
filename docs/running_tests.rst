@@ -21,7 +21,9 @@ done for you. Tox will setup multiple virtual environments with different python
     # run a specific testcase in specific environment
     tox -e py27-django18-thumbs2x -- test filer.tests.models.FilerApiTests.test_create_folder_structure
 
-``--verbosity=3`` and ``--failfast`` are also supported.
+Other test runner options are also supported, see
+`djangocms-helper <http://djangocms-helper.readthedocs.org/en/develop/>`_
+documentation for details.
 
 To speed things up a bit use `detox <http://pypi.python.org/pypi/detox/>`_. ``detox`` runs each testsuite in a
 separate process in parallel.
