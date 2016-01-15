@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import get_storage_class
 from filer.utils.loader import load_object
 from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
@@ -29,6 +30,8 @@ FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 _ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', (
     16, 32, 48, 64,
 ))
+if not _ICON_SIZES:
+    raise ImproperlyConfigured('Please, configure FILER_ADMIN_ICON_SIZES')
 FILER_ADMIN_ICON_SIZES = sorted([int(s) for s in _ICON_SIZES])
 
 # This is an ordered iterable that describes a list of

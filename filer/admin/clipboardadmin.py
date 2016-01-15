@@ -128,12 +128,12 @@ class ClipboardAdmin(admin.ModelAdmin):
                     # if FILER_ENABLE_LOGGING is on.
                     return HttpResponse(
                         json.dumps(
-                            {'error': 'Failed to process the file.'}),
+                            {'error': 'failed to generate icons for file'}),
                         status=500,
                         **response_params)
 
                 thumbnail = None
-                # Backwards compatibility: try to get specific icon size (32)
+                # Backwards compatibility: try to get specific icon size (32px)
                 # first. Then try medium icon size (they are already sorted),
                 # fallback to the first (smallest) configured icon.
                 for size in ([32] +
@@ -143,11 +143,6 @@ class ClipboardAdmin(admin.ModelAdmin):
                         break
                     except KeyError:
                         continue
-                if not thumbnail:
-                    # This should not happen with non-empty file_obj.icons dict
-                    # but raise it just in case.
-                    raise ImproperlyConfigured(
-                        'Please, configure FILER_ADMIN_ICON_SIZES')
 
                 json_response = {
                     'thumbnail': thumbnail,
