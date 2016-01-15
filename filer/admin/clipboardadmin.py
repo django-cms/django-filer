@@ -116,8 +116,35 @@ class ClipboardAdmin(admin.ModelAdmin):
                 # clipboard_item = ClipboardItem(
                 #     clipboard=clipboard, file=file_obj)
                 # clipboard_item.save()
+
+                # Try to generate thumbnails.
+                if not file_obj.icons:
+                    # There is no point to continue, as we can't generate
+                    # thumbnails for this file. Usual reasons: bad format or
+                    # filename.
+                    file_obj.delete()
+                    # This would be logged in BaseImage._generate_thumbnails()
+                    # if FILER_ENABLE_LOGGING is on.
+                    return HttpResponse(
+                        json.dumps(
+                            {'error': 'failed to generate icons for file'}),
+                        status=500,
+                        **response_params)
+
+                thumbnail = None
+                # Backwards compatibility: try to get specific icon size (32px)
+                # first. Then try medium icon size (they are already sorted),
+                # fallback to the first (smallest) configured icon.
+                for size in ([32] +
+                             filer_settings.FILER_ADMIN_ICON_SIZES[1::-1]):
+                    try:
+                        thumbnail = file_obj.icons[size]
+                        break
+                    except KeyError:
+                        continue
+
                 json_response = {
-                    'thumbnail': file_obj.icons['32'],
+                    'thumbnail': thumbnail,
                     'alt_text': '',
                     'label': str(file_obj),
                     'file_id': file_obj.pk,
