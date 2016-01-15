@@ -109,8 +109,8 @@
                             event.preventDefault();
                         });
                     },
-                    error: function (file, errorMessage) {
-                        showError(file.name + ': ' + errorMessage);
+                    error: function (file, response) {
+                        showError(file.name + ': ' + response.error);
                         this.removeAllFiles(true);
                     },
                     reset: function () {
