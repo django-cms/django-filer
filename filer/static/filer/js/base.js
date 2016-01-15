@@ -46,7 +46,7 @@ var Cl = window.Cl || {};
         // show counter if file is selected
         (function () {
             var table = $('.navigator-table').find('tr');
-            var actionCounter = $('.action-counter');
+            var actionCounter = $('.actions');
             var actionSelect = $('.action-select, #action-toggle');
 
             actionSelect.on('change', function () {
