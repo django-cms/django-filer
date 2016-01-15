@@ -61,6 +61,10 @@ var Cl = window.Cl || {};
             var imageWidth = this.image.width();
             var imageHeight = this.image.height();
 
+            if (this.image[0].naturalWidth === 0) {
+                return;
+            }
+
             this.circle.removeClass(this.options.hiddenClass);
 
             if (locationValue.length) {
