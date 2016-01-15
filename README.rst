@@ -43,6 +43,7 @@ through the `setup.py`. Here are the most important of them::
 
     Django | django-polymorphic | django-mptt
     ------ | ------------------ | -----------
+    1.5    | >=0.4.1            | >=0.6,<0.8
     1.6    | >=0.5.4,           | >=0.6,<0.8
     1.7    | >=0.5.6            | >=0.6,<0.8
     1.8    | >=0.7              | >=0.7
@@ -71,19 +72,14 @@ See the docs for advanced configuration:
 Django <1.7 and South
 ---------------------
 
-Django 1.7 is supported together with the new migrations. For Django<1.7 South
+Django 1.7+ is supported together with the new migrations. For Django<1.7 South
 is still supported, you need at least South>=1.0 for South to find them though.
 
 
 Testsuite
 ---------
 
-The easiest way to run the testsuite is to checkout the code, make sure you have ``PIL`` installed, and run::
-
-    python setup.py test
-
-
-For serious testing ``tox`` is recommended. See documentation for details.
+For testing ``tox`` is required. See documentation for details.
 
 
 Development front-end

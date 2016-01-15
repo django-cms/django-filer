@@ -25,7 +25,7 @@ setup(
     author_email='stefan@foulis.ch',
     packages=find_packages(),
     install_requires=(
-        'Django>=1.5,<1.9',
+        'Django>=1.5,<1.8.99',  # Django is known to use rc versions
         'easy-thumbnails>=1.0,<2.4',
         'django-mptt>=0.6,<0.9',  # the exact version depends on Django
         'django_polymorphic>=0.7,<0.9',
@@ -52,9 +52,4 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
-    test_suite='cms_helper.run',
-    tests_require=(
-        'argparse',  # needed on python 2.6
-        'south',
-    ),
 )
