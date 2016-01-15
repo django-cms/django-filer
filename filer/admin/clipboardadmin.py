@@ -3,7 +3,6 @@
 import json
 from django.forms.models import modelform_factory
 from django.contrib import admin
-from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
