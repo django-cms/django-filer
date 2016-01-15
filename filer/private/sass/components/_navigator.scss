@@ -76,7 +76,7 @@
     .nav-button {
         display: inline-block;
         color: $btn-default-color;
-        font-size: 26px;
+        font-size: 22px;
         line-height: 34px;
         vertical-align: top;
         margin: 0 10px;
@@ -136,18 +136,17 @@
         .action-counter {
             font-size: $font-size-small;
             line-height: 34px;
-            vertical-align: middle;
+            vertical-align: text-top;
         }
         .action-counter,
         .all {
             color: $gray-light;
-            margin-right: 20px;
         }
-        .clear,
         .question,
-        .all {
-            font-size: 11px;
-            margin-right: 20px;
+        .clear {
+            border-left: solid 1px $gray-lighter;
+            padding-left: 10px;
+            margin-left: 10px;
         }
         &.action-selected {
             display: block;
@@ -155,9 +154,6 @@
     }
 
     .dropdown-container {
-        margin-left: 10px;
-        padding-left: 10px;
-        border-left: solid 1px $gray-lighter;
         @media screen and (max-width: $screen-tablet) {
             float: left;
         }
@@ -193,7 +189,7 @@
     }
     @media screen and (min-width: $screen-desktop) {
         float: right;
-        margin-left: 10px;
+        margin-left: 25px;
     }
 }
 .navigator-button {
