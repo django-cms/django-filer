@@ -10,7 +10,7 @@
         </span>
     </div>
 
-    <div class="js-filer-dropzone dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}">
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}">
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}" id="{{ id }}_filer_dropzone_message">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>

@@ -200,6 +200,7 @@ form .form-row {
                 font-weight: normal;
                 margin-top: 6px;
                 margin-bottom: 6px;
+                text-align: left;
                 &:empty + .related-lookup {
                     float: none !important;
                     margin-left: 0 !important;
@@ -238,6 +239,10 @@ form .form-row {
             }
             &.js-object-attached .filerFile {
                 top: 62px;
+                text-align: left;
+                &.js-file-selector span, .dz-name {
+                    width: calc(100% - 100px);
+                }
             }
         }
         @media screen and (max-width: $screen-tablet) {
@@ -298,7 +303,7 @@ form .form-row {
 
 .filer-dropzone-info-message {
     position: fixed;
-    top: 50%;
+    top: 30%;
     left: 50%;
     overflow: hidden;
     z-index: 2;
@@ -335,4 +340,8 @@ form .form-row {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.filer-dropzone-cancel {
+    margin-top: 15px;
 }
