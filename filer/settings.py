@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -6,6 +7,8 @@ from django.core.files.storage import get_storage_class
 from filer.utils.loader import load_object
 from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 import os
+
+logger = logging.getLogger(__name__)
 
 FILER_IMAGE_MODEL = getattr(settings, 'FILER_IMAGE_MODEL', False)
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False)  # When True makes
@@ -27,12 +30,18 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
-_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', (
-    16, 32, 48, 64,
-))
+_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', (16, 32, 48, 64))
 if not _ICON_SIZES:
     raise ImproperlyConfigured('Please, configure FILER_ADMIN_ICON_SIZES')
 FILER_ADMIN_ICON_SIZES = sorted([int(s) for s in _ICON_SIZES])
+
+# Filer admin templates have specific icon sizes hardcoded: 32 and 48.
+_ESSENTIAL_ICON_SIZES = (32, 48)
+if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
+    logger.warn(
+        "FILER_ADMIN_ICON_SIZES has not all of the essential icon sizes "
+        "listed: {}. Some icons might be missing in admin templates.".format(
+            _ESSENTIAL_ICON_SIZES))
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
