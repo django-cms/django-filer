@@ -46,15 +46,14 @@ Getting help
 * google group: http://groups.google.com/group/django-filer
 * IRC: #django-filer on freenode.net
 
-.. _contributing:
 
 Contributing
 ------------
 
 The code is hosted on github at http://github.com/divio/django-filer/
 and is fully open source. We hope you choose to help us on the project! More 
-about `how to contribute <https://github.com/divio/django-filer/wiki/Contributing>`_
-can be found on `the wiki <https://github.com/divio/django-filer/wiki/>`_.
+information on how to contribute can be found in `contributing`_.
+
 
 Contents
 ========
@@ -68,7 +67,10 @@ Contents
    permissions
    secure_downloads
    settings
+   development
    extending_filer
    running_tests
    dump_payload
 
+
+.. _`contributing`: development/#contributing
