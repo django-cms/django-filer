@@ -3,6 +3,10 @@
 Upgrading
 =========
 
+Usually upgrade procedure is straightforward: update the package and run migrations. Some versions
+require special attention from the developer and here we provide upgrade instructions for such cases.
+
+
 from 0.9.1 to 0.9.2
 -------------------
 
@@ -10,6 +14,7 @@ From 0.9.2 ``File.name`` field is ``null=False``.
 
 .. warning::
     Data migration in 0.9.2 changes existing null values to empty string.
+
 
 from 0.8.7 to 0.9
 -----------------
@@ -23,6 +28,7 @@ so they should be moved.
 .. note:: **Quick and Dirty**: set ``FILER_0_8_COMPATIBILITY_MODE=True``. It will pick up the old style settings and
           configure storage backends the way they were in 0.8. This setting is only meant to easy migration and is
           not intended to be used long-term.
+
 
 Manually (SQL)
 ..............
@@ -56,13 +62,13 @@ After running the script you can delete the ``FILER_0_8_COMPATIBILITY_MODE`` set
 downloads see :ref:`secure_downloads`.
 
 
-
 from pre-0.9a3 develop to 0.9
 -----------------------------
 
 In develop pre-0.9a3 file path was written in the database as relative path inside `filer` directory; since 0.9a3
 this is no longer the case so file must be migrate to the new paths.
 Same disclaimer as 0.8x migration applies: SQL migration is much faster for large datasets.
+
 
 Manually (SQL)
 ..............
@@ -75,6 +81,7 @@ Example::
 
 Then you will have to move by hand the files from the `MEDIA_ROOT/filer` directory to the new public and private storage
 directories
+
 
 Automatic (Django)
 ..................
