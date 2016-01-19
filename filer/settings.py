@@ -30,13 +30,15 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
-_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', (16, 32, 48, 64))
+_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', ('16', '32', '48', '64'))
 if not _ICON_SIZES:
     raise ImproperlyConfigured('Please, configure FILER_ADMIN_ICON_SIZES')
-FILER_ADMIN_ICON_SIZES = sorted([int(s) for s in _ICON_SIZES])
+# Reliably sort by integer value, but keep icon size as string.
+# (There is some code in the wild that depends on this being strings.)
+FILER_ADMIN_ICON_SIZES = [str(i) for i in sorted([int(s) for s in _ICON_SIZES])]
 
 # Filer admin templates have specific icon sizes hardcoded: 32 and 48.
-_ESSENTIAL_ICON_SIZES = (32, 48)
+_ESSENTIAL_ICON_SIZES = ('32', '48')
 if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
     logger.warn(
         "FILER_ADMIN_ICON_SIZES has not all of the essential icon sizes "
