@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-2.0.0 (2016-01-19)
+1.1.0 (2016-01-19)
 ------------------
 
 * Allow to provide single dimension for resizing images.
