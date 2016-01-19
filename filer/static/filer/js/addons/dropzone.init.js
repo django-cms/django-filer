@@ -19,6 +19,7 @@
         var hiddenClass = 'hidden';
         var mobileClass = 'filer-dropzone-mobile';
         var objectAttachedClass = 'js-object-attached';
+        var dataMaxFileSize = 'max-file-size';
         var minWidth = 500;
         var checkMinWidth = function (element) {
             element.toggleClass(mobileClass, element.width() < minWidth);
@@ -54,6 +55,8 @@
                     url: dropzoneUrl,
                     paramName: 'file',
                     maxFiles: 1,
+                    // for now disabled as we don't have the correct file size limit
+                    // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
                     previewTemplate: $(dropzoneTemplateSelector).html(),
                     clickable: false,
                     addRemoveLinks: false,

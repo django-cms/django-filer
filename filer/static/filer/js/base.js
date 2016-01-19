@@ -12,13 +12,24 @@ Cl.mediator = new Mediator();
 
 (function ($) {
     $(function () {
+        var showErrorTimeout;
+
         window.showError = function (message) {
             var messages = $('.messagelist');
             var header = $('#header');
-            var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
+            var filerErrorClass = 'js-filer-error';
+            var tpl = '<ul class="messagelist"><li class="error ' + filerErrorClass + '">{msg}</li></ul>';
             var msg = tpl.replace('{msg}', message);
 
             messages.length ? messages.replaceWith(msg) : header.after(msg);
+
+            if (showErrorTimeout) {
+                clearTimeout(showErrorTimeout);
+            }
+
+            showErrorTimeout = setTimeout(function () {
+                $('.' + filerErrorClass).remove();
+            }, 3000);
         };
 
         // Focal point logic init
