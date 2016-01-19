@@ -19,7 +19,7 @@
         var hiddenClass = 'hidden';
         var mobileClass = 'filer-dropzone-mobile';
         var objectAttachedClass = 'js-object-attached';
-        var dataMaxFileSize = 'max-file-size';
+        // var dataMaxFileSize = 'max-file-size';
         var minWidth = 500;
         var checkMinWidth = function (element) {
             element.toggleClass(mobileClass, element.width() < minWidth);

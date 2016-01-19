@@ -25,7 +25,7 @@
         var cancelUpload = $('.js-filer-dropzone-cancel');
         var dragHoverClass = 'dz-drag-hover';
         var dataUploaderConnections = 'max-uploader-connections';
-        var dataMaxFileSize = 'max-file-size';
+        // var dataMaxFileSize = 'max-file-size';
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
         var hasErrors = false;
