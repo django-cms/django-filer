@@ -12,6 +12,7 @@ CHANGELOG
 * Adapt documentation links.
 * Cleanup frontend code and adapt to guidelines.
 * Added drag & drop capabilities.
+* Redesign of the User Interface
 
 
 1.0.6 (2015-12-30)
