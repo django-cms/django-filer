@@ -55,7 +55,8 @@
                     url: dropzoneUrl,
                     paramName: 'file',
                     maxFiles: 1,
-                    maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+                    // for now disabled as we don't have the correct file size limit
+                    // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
                     previewTemplate: $(dropzoneTemplateSelector).html(),
                     clickable: false,
                     addRemoveLinks: false,
