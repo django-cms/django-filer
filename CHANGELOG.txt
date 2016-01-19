@@ -10,7 +10,9 @@ CHANGELOG
 * Add missing search results counters.
 * Move project to divio/django-filer.
 * Adapt documentation links.
+* Cleanup frontend code and adapt to guidelines.
 * Added drag & drop capabilities.
+
 
 1.0.6 (2015-12-30)
 ------------------
