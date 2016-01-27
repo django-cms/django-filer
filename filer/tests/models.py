@@ -6,7 +6,12 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
-from django.utils.unittest import skipIf, skipUnless
+
+try:
+    from unittest import skipIf, skipUnless
+except ImportError:
+    # Django<1.9
+    from django.utils.unittest import skipIf, skipUnless
 
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
