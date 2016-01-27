@@ -15,7 +15,6 @@ env:
   - TOX_ENV=py34-django19-thumbs2x
   - TOX_ENV=py34-django18-thumbs2x
   - TOX_ENV=py34-django17-thumbs2x
-  - TOX_ENV=py33-django19-thumbs2x
   - TOX_ENV=py33-django18-thumbs2x
   - TOX_ENV=py33-django17-thumbs2x
   - TOX_ENV=py27-django19-thumbs2x
@@ -25,7 +24,6 @@ env:
   - TOX_ENV=py34-django18-custom_image-thumbs2x
   - TOX_ENV=py34-django17-custom_image-thumbs2x
   - TOX_ENV=py34-django16-custom_image-thumbs2x
-  - TOX_ENV=py33-django19-custom_image-thumbs2x
   - TOX_ENV=py33-django18-custom_image-thumbs2x
   - TOX_ENV=py33-django17-custom_image-thumbs2x
   - TOX_ENV=py33-django16-custom_image-thumbs2x
