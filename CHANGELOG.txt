@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.1.1 (2016-01-27)
+------------------
+
+* Fixes tests and configuration to run under Django 1.9
+* Allow Django 1.9.x in setup requirements
+
+
 1.1.0 (2016-01-19)
 ------------------
 
