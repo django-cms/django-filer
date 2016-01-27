@@ -112,9 +112,8 @@ class FilerFolderAdminUrlsTests(TestCase):
                 "_popup": 1})
         self.assertEqual(Folder.objects.count(), 2)
         bar = Folder.objects.get(name="bar")
-        response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
-                "name": "foo",
-                "_popup": 1})
+        admin_url = reverse("admin:filer_folder_change", args=(bar.pk, ))
+        response = self.client.post(admin_url, {"name": "foo", "_popup": 1})
         self.assertContains(response, 'Folder with this name already exists')
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
@@ -124,11 +123,12 @@ class FilerFolderAdminUrlsTests(TestCase):
         folder = Folder.objects.create(name='foobar')
         another_superuser = User.objects.create_superuser(
             'gigi', 'admin@ignore.com', 'secret')
-        response = self.client.post('/admin/filer/folder/%d/' % folder.pk, {
+        admin_url = reverse("admin:filer_folder_change", args=(folder.pk, ))
+        response = self.client.post(admin_url, {
                 'owner': another_superuser.pk,
                 'name': 'foobar',
                 '_continue': 'Save and continue editing'})
-        # succesfful POST returns a redirect
+        # successful POST returns a redirect
         self.assertEqual(response.status_code, 302)
         folder = Folder.objects.get(pk=folder.pk)
         self.assertEqual(folder.owner.pk, another_superuser.pk)
