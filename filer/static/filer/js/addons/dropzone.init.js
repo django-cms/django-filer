@@ -34,10 +34,15 @@
             }
         };
 
-        if (dropzones.length && Dropzone && !window.filerDropzoneInitialized) {
-            window.filerDropzoneInitialized = true;
-            Dropzone.autoDiscover = false;
-            dropzones.each(function () {
+        if (dropzones.length && Dropzone) {
+            if (!window.filerDropzoneInitialized) {
+                window.filerDropzoneInitialized = true;
+                Dropzone.autoDiscover = false;
+            }
+
+            dropzones.filter(function () {
+                return !this.dropzone;
+            }).each(function () {
                 var dropzone = $(this);
                 var dropzoneUrl = dropzone.data('url');
                 var inputId = dropzone.find(fileIdInputSelector);
