@@ -37,5 +37,5 @@ class ThumbnailOption(models.Model):
             thumbnailer = filerimage.easy_thumbnails_thumbnailer
             thumb_image = thumbnailer.get_thumbnail(option_dict)
         """
-        return {"size":(self.width,self.height), "width":self.width,
-                "height":self.height,"crop":self.crop,"upscale":self.upscale}
+        return {"size": (self.width, self.height), "width": self.width,
+                "height": self.height, "crop": self.crop, "upscale": self.upscale}
