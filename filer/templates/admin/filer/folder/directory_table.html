@@ -81,7 +81,11 @@
                             <div>
                                 <a href="{{ item.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                     title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    {{ item.name }}
+                                    {% if item.name != "unfiled files" %}
+                                        {{ item.name }}
+                                    {% else %}
+                                        {% trans "Unsorted Uploads" %}
+                                    {% endif %}
                                 </a>
                             </div>
                         </td>

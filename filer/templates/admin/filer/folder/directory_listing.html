@@ -130,7 +130,12 @@
                     {% endif %}
                 {% elif folder.is_smart_folder %}
                     <span class="icon fa fa-chevron-right"></span>
-                    {{ folder.name }}
+
+                    {% if folder.name != "unfiled files" %}
+                        {{ folder.name }}
+                    {% else %}
+                        {% trans "Unsorted Uploads" %}
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
