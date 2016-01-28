@@ -8,6 +8,7 @@ import re
 
 from django import forms
 from django.conf import settings as django_settings
+from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -214,9 +215,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
-        urls = super(FolderAdmin, self).get_urls()
-        url_patterns = patterns('',
+        return [
             # we override the default list view with our own directory listing
             # of the root directories
             url(r'^$',
@@ -248,9 +247,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
                 name='filer-directory_listing-unfiled_images'),
-        )
-        url_patterns.extend(urls)
-        return url_patterns
+        ] + super(FolderAdmin, self).get_urls()
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
