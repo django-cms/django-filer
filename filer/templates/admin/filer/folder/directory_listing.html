@@ -130,7 +130,12 @@
                     {% endif %}
                 {% elif folder.is_smart_folder %}
                     <span class="icon fa fa-chevron-right"></span>
-                    {{ folder.name }}
+
+                    {% if folder.name != "unfiled files" %}
+                        {{ folder.name }}
+                    {% else %}
+                        {% trans "Unsorted Uploads" %}
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -147,8 +152,18 @@
                             {% trans "New Folder" %}
                             </a>
                         {% endif %}
+
                         {% if permissions.has_add_children_permission and not folder.is_root %}
                             <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}" data-max-uploader-connections="{{ uploader_connections }}">
+                                {% trans "Upload Files" %}
+                            </a>
+                        {% elif folder.name == "unfiled files" %}
+                            <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-uploader-connections="{{ uploader_connections }}">
+                                {% trans "Upload Files" %}
+                            </a>
+                        {% endif %}
+                        {% if folder.is_root and folder.name != "unfiled files" %}
+                            <a href="#" title="{% trans 'You can&#39;t upload to the root' %}" class="navigator-button navigator-button-upload" disabled>
                                 {% trans "Upload Files" %}
                             </a>
                         {% endif %}
