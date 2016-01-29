@@ -145,7 +145,7 @@
                 {% block object-tools-items %}
                     <div class="navigator-button-wrapper">
                         {% if folder.can_have_subfolders and can_make_folder %}
-                            <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}"
+                            <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}{% if is_popup %}&amp;_popup=1{% endif %}"
                                 title="{% trans 'Adds a new Folder' %}"
                                 class="navigator-button"
                                 onclick="return showAddAnotherPopup(this);">
