@@ -5,7 +5,6 @@ import warnings
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
@@ -79,7 +78,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media(object):
-        js = (static('filer/js/addons/popup_handling.js'), )
+        js = ('filer/js/addons/popup_handling.js',)
 
 
 class AdminFolderFormField(forms.ModelChoiceField):
