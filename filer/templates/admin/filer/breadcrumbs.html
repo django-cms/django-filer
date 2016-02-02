@@ -20,7 +20,9 @@
         </a>
     {% endfor %}
     {% if breadcrumbs_action %}
-        &rsaquo; <a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a>
+        {% if instance.label or instance.name %}
+            &rsaquo; <a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a>
+        {% endif %}
         &rsaquo; {{ breadcrumbs_action }}
     {% else %}
         &rsaquo; {% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}
