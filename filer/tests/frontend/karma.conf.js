@@ -24,21 +24,27 @@ module.exports = function (config) {
             // dependency loading is not handled yet
             '../static/filer/js/libs/jquery.min.js',
             '../static/filer/js/libs/!(jquery.min)*.js',
-            '../static/filer/js/addons/mediator.min.js',
 
             'frontend/unit/mocks.js',
             'frontend/unit/mock-ajax.min.js',
 
-            '../static/filer/js/addons/!(mediator.min)*.js',
+            '../static/filer/js/addons/*.js',
 
             // tests themselves
             'frontend/unit/*.js',
 
             // fixture patterns
             {
-                pattern: 'frontend/fixtures/**/*'
+                pattern: 'frontend/fixtures/**/*',
+            },
+            {
+                pattern: 'frontend/img/*', watched: false, included: false, served: true, nocache: false
             }
         ],
+        proxies: {
+            '/img/': 'http://localhost:9876/base/frontend/img/'
+        },
+
 
         // list of files to exclude
         exclude: [],

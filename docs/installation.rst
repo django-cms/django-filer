@@ -3,7 +3,6 @@
 Installation and Configuration
 ==============================
 
-
 .. note:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
 
 
@@ -14,42 +13,53 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
 
     $ pip install django-filer
 
-If you are feeling adventurous you can get
-`the latest sourcecode from github <https://github.com/divio/django-filer/>`_ or add
-http://divio.github.com/django-filer/unstable_releases/ to ``find-links`` for the latest
-alpha and beta releases.
 
 Dependencies
 ------------
 
-* `Django`_ >= 1.4
-* `django-mptt`_ >=0.5.1
+* `Django`_ >= 1.5
+* `django-mptt`_ >=0.6
 * `easy_thumbnails`_ >= 1.0
-* `django-polymorphic`_ >= 0.2
-* `Pillow`_ 2.3.0 (with JPEG and ZLIB support, `PIL`_ 1.1.7 is supported but not recommended)
+* `django-polymorphic`_ >= 0.7
+* `Pillow`_ >=2.3.0 (with JPEG and ZLIB support, `PIL`_ 1.1.7 is supported but not recommended)
 
 ``django.contrib.staticfiles`` is required.
 
-**Django >= 1.6** is supported together with `django-polymorphic`_ >= 0.5.4
+Please note, there are some compatibility constraints that we can not enforce
+through the `setup.py`. Here are the most important of them::
+
+    Django | django-polymorphic | django-mptt
+    ------ | ------------------ | -----------
+    1.5    | >=0.4.1            | >=0.6,<0.8
+    1.6    | >=0.5.4,           | >=0.6,<0.8
+    1.7    | >=0.5.6            | >=0.6,<0.8
+    1.8    | >=0.7              | >=0.7
 
 Please make sure you install `Pillow`_ with JPEG and  ZLIB support installed;
 for further information on Pillow installation and its binary dependencies,
 check `Pillow doc`_.
 
+
+Django <1.7 and South
+.....................
+
+Django 1.7+ is supported together with the new migrations. For Django<1.7 South
+is still supported, you need at least South>=1.0 for South to find them though.
+
+
 Configuration
 -------------
 
 Add ``"filer"`` and related apps to your project's ``INSTALLED_APPS`` setting and run ``manage.py syncdb``
-(or ``manage.py migrate`` if you're using `South`_).::
+(or ``manage.py migrate`` if you're using `South`_ or Django migrations).::
 
     INSTALLED_APPS = [
         ...
-        'filer',
         'easy_thumbnails',
+        'filer',
+        'mptt',
         ...
     ]
-
-
 
 Note that `easy_thumbnails`_ also has database tables and needs a ``syncdb`` or
 ``migrate``.
@@ -61,6 +71,7 @@ For `easy_thumbnails`_ to support retina displays (recent MacBooks, iOS) add to 
 If you forget this, you may not see thumbnails for your uploaded files. Adding this line and 
 refreshing the admin page will create the missing thumbnails.
 
+
 Static media
 ............
 
@@ -69,7 +80,7 @@ please see `staticfiles documentation`_ to know how to deploy filer static files
 in your environment.
 
 
-subject location aware cropping
+Subject location aware cropping
 ...............................
 
 It is possible to define the *important* part of an image (the
@@ -96,19 +107,22 @@ To crop an image and respect the subject location::
     {% load thumbnail %}
     {% thumbnail obj.img 200x300 crop upscale subject_location=obj.img.subject_location %}
 
-permissions
+
+Permissions
 ...........
 
 .. WARNING:: File permissions are an experimental feature. The api may change at any time.
 
 See :ref:`permissions` section.
 
-secure downloads
+
+Secure downloads
 ................
 
 .. WARNING:: File download permissions are an experimental feature. The api may change at any time.
 
 See :ref:`secure_downloads` section.
+
 
 Canonical URLs
 ..............
@@ -138,7 +152,7 @@ changed with the setting ``FILER_CANONICAL_URL``, which defaults to ``'canonical
     FILER_CANONICAL_URL = 'sharing/'
 
 
-debugging and logging
+Debugging and logging
 .....................
 
 While by default ``django-filer`` usually silently skips icon/thumbnail
@@ -161,5 +175,6 @@ generation errors,  two options are provided to help when working with ``django-
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
 .. _Pillow doc: http://pillow.readthedocs.org/en/latest/installation.html
+.. _PIL: http://www.pythonware.com/products/pil/
 .. _pip: http://pypi.python.org/pypi/pip
 .. _South: http://south.aeracode.org/

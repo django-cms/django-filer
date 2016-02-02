@@ -1,0 +1,184 @@
+//##############################################################################
+// IMAGE INFO
+
+.image-info {
+    position: relative;
+    float: right;
+    box-sizing: border-box;
+    width: 28%;
+    margin-top: 0;
+    border: 0;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+    @media screen and (max-width: $screen-tablet) {
+        float: none;
+        width: 100%;
+        &.image-info-detail {
+            .image-details-left,
+            .image-details-right {
+                float: none;
+                margin-left: 0;
+            }
+        }
+    }
+    .image-details,
+    .actions-list {
+        margin: 0;
+        padding: 0;
+        &.image-details {
+            margin: 10px 0;
+            padding: 0 10px;
+        }
+        li {
+            list-style-type: none;
+        }
+        a {
+            cursor: pointer;
+        }
+    }
+    &.image-info-detail {
+        @include clearfix();
+        position: static;
+        float: none;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 25px;
+        border-radius: 0;
+        .image-details-left {
+            float: left;
+        }
+        .image-details-right {
+            float: left;
+            margin-left: 50px;
+        }
+        .icon {
+            font-size: 18px;
+        }
+        .image-details,
+        .actions-list {
+            margin-top: 0;
+            border: 0 !important;
+            &.image-details {
+                margin-top: 20px;
+                margin-bottom: 15px;
+                padding: 0;
+            }
+            dt {
+                float: left;
+                color: #808080;
+                font-size: 13px;
+                // required for django CMS without admin styles #673
+                line-height: $font-size-large !important;
+                font-weight: normal;
+                // required for django CMS without admin styles #673
+                margin-top: 0;
+            }
+            dd {
+                color: $gray;
+                font-size: 13px;
+                // required for django CMS without admin styles #673
+                line-height: $font-size-large !important;
+                padding-left: 80px;
+                // required for django CMS without admin styles #673
+                margin-bottom: 5px;
+            }
+            .text {
+                font-size: 13px;
+                margin-right: 15px;
+                strong {
+                    font-size: 13px;
+                }
+            }
+            li {
+                color: $gray;
+                font-size: 13px !important;
+                font-weight: normal !important;
+                padding: 1px 0 !important;
+                border: 0 !important;
+            }
+            a {
+                padding: 0;
+            }
+        }
+        .image-info-title {
+            overflow: hidden;
+            color: $gray;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding: 0 0 5px;
+            .icon {
+                float: left;
+                margin-right: 5px;
+            }
+        }
+        .image-preview-container {
+            text-align: left;
+            margin: 20px 0 0;
+            padding: 0;
+            > img {
+                margin-bottom: 15px;
+            }
+        }
+        .actions-list {
+            .icon {
+                font-size: 16px;
+                &:last-child {
+                    float: none;
+                }
+            }
+        }
+    }
+}
+
+.image-info-close {
+    position: absolute;
+    top: -10px;
+    right: -7px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.image-info-title {
+    padding: 5px 10px;
+    border-bottom: solid 1px $gray-lighter;
+    a {
+        margin-left: 5px;
+    }
+}
+
+.image-preview-container {
+    text-align: center;
+    margin: 10px 0;
+    padding: 0 10px;
+    .image-preview {
+        display: inline-block;
+        position: relative;
+        margin-bottom: 15px;
+        outline: 1px solid #e3e3e3;
+        background-image: url("data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7");
+        img {
+            display: block;
+        }
+    }
+    .image-preview-field {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    .image-preview-circle {
+        position: relative;
+        z-index: 1;
+        width: 26px;
+        height: 26px;
+        // makes sure that circle is positioned correctly and centered #684
+        margin-top: -15px;
+        margin-left: -15px;
+        border: solid 2px #f00;
+        border-radius: 30px;
+        cursor: move;
+        background: rgba(255, 255, 255, 0.5);
+    }
+}

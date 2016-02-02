@@ -1,7 +1,7 @@
 {% load i18n l10n admin_list filer_tags staticfiles %}
 
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-    <table class="{% if permissions.has_add_children_permission and not folder.is_root %} js-dropzone{% endif %} navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name %}{{ folder.name }}{% else %}Root{% endif %}">
+    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
         <thead>
             <tr>
                 <th class="column-checkbox">
@@ -20,7 +20,7 @@
             {% for item, item_perms in paginated_items.object_list %}
                 {% if item.file_type == "Folder" %}
                     {% with item as subfolder %}
-                        <tr class="js-dropzone" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}">
+                        <tr class="js-filer-dropzone" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
                             <td class="column-checkbox">
                                 {% if select_folder and item.file_type == 'Folder' %}
                                     <a class="insertlink insertlinkButton"
@@ -34,7 +34,7 @@
                             <td class="column-icon">
                                 <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                     title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    <img src="{{ subfolder.icons.48 }}" alt="{% trans 'Folder Icon' %}" width="25" height="25">
+                                    <img src="{% static 'icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                 </a>
                             </td>
                             <td class="column-name">
@@ -74,14 +74,18 @@
                         <td class="column-icon">
                             <a href="{{ item.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                 title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                <img src="{{ item.icons.48 }}" alt="{% trans 'Folder Icon' %}" width="25" height="25">
+                                <img src="{% static 'icons/unfiled_folder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                             </a>
                         </td>
                         <td class="column-name" colspan="4">
                             <div>
                                 <a href="{{ item.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                     title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    {{ item.name }}
+                                    {% if item.name != "unfiled files" %}
+                                        {{ item.name }}
+                                    {% else %}
+                                        {% trans "Unsorted Uploads" %}
+                                    {% endif %}
                                 </a>
                             </div>
                         </td>
@@ -105,7 +109,7 @@
                                     <a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                             title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                 {% endif %}
-                                    <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="25" height="25">
+                                    <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
                                 {% if item_perms.change or is_popup and not select_folder %}
                                     </a>
                                 {% endif %}
@@ -139,7 +143,7 @@
                             <td class="column-action">
                                 <a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                     title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="icon fa fa-pencil"></a>
-                                <a href="{{ file.get_admin_delete_url }}" class="icon fa fa-trash-o" title="{% trans 'Remove file' %}"></a>
+                                <a href="{{ file.get_admin_delete_url }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" class="icon fa fa-trash-o" title="{% trans 'Remove file' %}"></a>
                             </td>
                         </tr>
                     {% endwith %}
@@ -154,22 +158,32 @@
         </tbody>
     </table>
 
-    <div class="dropzone-info-message js-dropzone js-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name %}{{ folder.name }}{% else %}Root{% endif %}">
+    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
         <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
-        <div class="js-dropzone-upload-welcome">
+        <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
-            <div class="folder"><span class="fa fa-folder"></span> <span class="js-dropzone-folder-name"></span></div>
+            <div class="folder"><span class="fa fa-folder"></span> <span class="js-filer-dropzone-folder-name"></span></div>
         </div>
 
-        <div class="dropzone-upload-info js-dropzone-upload-info hidden">
-            <div class="js-dropzone-upload-number"></div>
-            <div class="js-dropzone-file-name"></div>
-            <div class="dropzone-progress js-dropzone-progress"></div>
+        <div class="filer-dropzone-upload-info js-filer-dropzone-upload-info-container">
+            <div class="js-filer-dropzone-upload-number"></div>
+            <div class="js-filer-dropzone-upload-info filer-dropzone-upload-info hidden">
+                <div class="js-filer-dropzone-file-name filer-dropzone-file-name"></div>
+                <div class="js-filer-dropzone-progress filer-dropzone-progress"></div>
+            </div>
         </div>
 
-        <div class="js-dropzone-upload-success hidden">
+        <div class="js-filer-dropzone-cancel filer-dropzone-cancel hidden">
+            <a href="#"><span class="fa fa-times"></span> Cancel upload</a>
+        </div>
+
+        <div class="js-filer-dropzone-upload-success hidden">
             {% trans "Upload success!" %}
+        </div>
+
+        <div class="js-filer-dropzone-upload-canceled hidden">
+            {% trans "Upload canceled!" %}
         </div>
     </div>
 

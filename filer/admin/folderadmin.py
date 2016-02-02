@@ -268,14 +268,18 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             search_terms = []
             q = ''
+        # Limit search results to current folder.
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
-                folder_qs = folder.get_descendants()
+                # Do not include current folder itself in search results.
+                folder_qs = folder.get_descendants(include_self=False)
+                # Limit search results to files in the current folder or any
+                # nested folder.
                 file_qs = File.objects.filter(
-                    folder__in=folder.get_descendants())
+                    folder__in=folder.get_descendants(include_self=True))
             else:
                 folder_qs = Folder.objects.all()
                 file_qs = File.objects.all()
@@ -392,6 +396,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             ).distinct(),
             'paginator': paginator,
             'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),
             'current_url': request.path,
@@ -399,6 +404,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'search_string': ' '.join(search_terms),
             'q': urlquote(q),
             'show_result_count': show_result_count,
+            'folder_children': folder_children,
+            'folder_files': folder_files,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'select_folder': selectfolder_status(request),
@@ -1145,7 +1152,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         thumbnailer = FilerActionThumbnailer(file=image.file.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
         # This should overwrite the original image
         new_image = thumbnailer.get_thumbnail({
-            'size': (form_data['width'], form_data['height']),
+            'size': tuple(int(form_data[d] or 0) for d in ('width', 'height')),
             'crop': form_data['crop'],
             'upscale': form_data['upscale'],
             'subject_location': image.subject_location,

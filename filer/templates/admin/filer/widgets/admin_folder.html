@@ -1,28 +1,43 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
-    {% trans "Folder" %}:
-    {% if object %}
-        <span id="{{ span_id }}">{{ object.pretty_logical_path }}</span>
-    {% else %}
-        <span id="{{ span_id }}">{% trans "none selected" %}</span>
-    {% endif %}
-    {% render_filer_lookup_button %}
-    <img id="{{ clear_id }}" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
-    <br>
-    {{ hidden_input }}
+    <div class="filer-dropzone filer-dropzone-folder">
+        <span class="filerFile">
+            <span id="{{ span_id }}">
+                {% trans "Folder" %}:
+                {% if object %}
+                    {{ object.pretty_logical_path }}
+                {% else %}
+                    {% trans "none selected" %}
+                {% endif %}
+            </span>
+            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+                {% trans "Add Folder" %}
+            </a>
+
+            <img id="{{ clear_id }}" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" class="filerClearer{% if not object %} hidden{% endif %}">
+            {{ hidden_input }}
+        </span>
+    </div>
     <script type="text/javascript">
-        django.jQuery('#{{ id }}').hide();
-        django.jQuery('#{{ id }}_clear').click(function(){
-            django.jQuery('#{{ id }}').removeAttr('value');
-            django.jQuery('#{{ foldid }}').attr('src', '{% static noimg %}');
-            django.jQuery('#{{ descid }}').empty();
-        });
-        django.jQuery(document).ready(function(){
-            var plus = django.jQuery('#add_{{ id }}');
-            if (plus.length){
-                plus.remove();
-            }
-        });
+        'use strict';
+        /* globals django */
+
+        (function ($) {
+            var clearButton = $('#{{ clear_id }}');
+            var input = $('#{{ id }}');
+            var folderName = $('#{{ descid }}');
+            var addFolderButton = $('#{{ lookup_name }}');
+
+            clearButton.on('click', function () {
+                folderName.text('{% trans "Folder" %}: {% trans "none selected" %}');
+                input.removeAttr('value');
+
+                clearButton.addClass('hidden');
+                addFolderButton.removeClass('hidden');
+            });
+        }(django.jQuery));
     </script>
 {% endspaceless %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">

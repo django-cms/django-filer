@@ -1,17 +1,17 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
-    <div class="dz-preview dz-file-preview hidden js-dropzone-template">
+    <div class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
             <img class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" data-dz-remove>
-            <div class="dz-progress js-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+            <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
     </div>
 
-    <div class="js-dropzone dropzone" data-url="{% url 'admin:filer-ajax_upload' %}">
-        <div class="dz-default dz-message js-dropzone-message{% if object %} hidden{% endif %}" id="{{ id }}_dropzone_message">
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
+        <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}" id="{{ id }}_filer_dropzone_message">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>
 
@@ -53,5 +53,6 @@
 {% endspaceless %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+<script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
 <script src="{% static 'filer/js/libs/dropzone.min.js' %}"></script>
 <script src="{% static 'filer/js/addons/dropzone.init.js' %}"></script>

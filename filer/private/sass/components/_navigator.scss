@@ -1,0 +1,302 @@
+//##############################################################################
+// NAVIGATOR
+
+.navigator-table {
+    // required for django CMS <= 3.1 #673
+    width: 100%;
+    margin: 0;
+    tbody {
+        td {
+            padding: 5px 10px !important;
+        }
+    }
+    .unfiled td {
+        background-color: $gray-table !important;
+    }
+    .column-checkbox {
+        text-align: center;
+        width: 20px;
+        padding-left: 20px !important;
+        input {
+            // makes sure that checkbox is vertical aligned #664
+            vertical-align: middle;
+            margin: 0;
+        }
+    }
+    .column-icon {
+        width: 25px;
+        // removes padding to make sure that column has correct height #664
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        img {
+            width: 25px;
+        }
+    }
+    .column-action {
+        text-align: center;
+        width: 70px;
+        padding-right: 20px !important;
+        a {
+            font-size: 16px !important;
+            margin: 0 5px;
+            &:first-child {
+                margin-left: 0;
+            }
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+        .icon {
+            position: relative;
+            top: 2px;
+            width: 20px;
+        }
+    }
+    .dz-drag-hover,
+    &.dz-drag-hover {
+        background: $hover-bg;
+        tr.unfiled td {
+            background: $hover-bg !important;
+        }
+    }
+    .reset-hover {
+        background-color: $white !important;
+    }
+}
+
+.navigator-top-nav {
+    position: relative;
+    clear: both;
+    min-height: 50px;
+    padding: 5px 0;
+    background: $gray-table;
+    .breadcrumbs-container {
+        float: left;
+    }
+    .nav-button {
+        display: inline-block;
+        color: $btn-default-color;
+        font-size: 22px;
+        line-height: 34px;
+        vertical-align: top;
+        margin: 0 10px;
+        span {
+            vertical-align: middle;
+        }
+    }
+    .nav-button-filter {
+        position: relative;
+        top: -1px;
+    }
+    .nav-button-dots {
+        margin: 0;
+        padding: 0 15px;
+    }
+    .separator {
+        display: inline-block;
+        position: relative;
+        vertical-align: top;
+        width: 1px;
+        height: 34px;
+        margin: 0 5px;
+        &:before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: -14px;
+            bottom: -11px;
+            overflow: hidden;
+            width: 1px;
+            background-color: #ccc;
+        }
+    }
+}
+.navigator-tools {
+    float: right;
+    margin: 10px 10px 0 0;
+    .actions-wrapper {
+        float: right;
+        margin-bottom: 10px;
+        @media screen and (max-width: $screen-tablet) {
+            @include clearfix();
+            float: none;
+        }
+    }
+    .actions {
+        float: right;
+        display: none;
+        @media screen and (max-width: $screen-tablet) {
+            @include clearfix();
+            float: none;
+            margin-bottom: 10px;
+        }
+        .all,
+        .question,
+        .clear,
+        .action-counter {
+            font-size: $font-size-small;
+            line-height: 34px;
+            vertical-align: text-top;
+        }
+        .action-counter,
+        .all {
+            color: $gray-light;
+        }
+        .question,
+        .clear {
+            border-left: solid 1px $gray-lighter;
+            padding-left: 10px;
+            margin-left: 10px;
+        }
+        &.action-selected {
+            display: block;
+        }
+    }
+
+    .dropdown-container {
+        @media screen and (max-width: $screen-tablet) {
+            float: left;
+        }
+    }
+}
+@media screen and (max-width: $screen-tablet) {
+    .navigator-top-nav {
+        .breadcrumbs-container {
+            float: none;
+        }
+        .navigator-tools {
+            float: none;
+            margin-left: 17px;
+            .separator:before {
+                top: 0;
+                bottom: 0;
+            }
+        }
+        .dropdown-container .dropdown-menu {
+            right: auto;
+            left: -130px;
+        }
+    }
+}
+// make sure that buttons break to new line on mobile view #677
+.navigator-button-wrapper {
+    text-align: right;
+    margin-bottom: 10px;
+    @media screen and (max-width: $screen-tablet) {
+        display: block;
+        text-align: left;
+        margin-bottom: 20px;
+    }
+    @media screen and (min-width: $screen-desktop) {
+        float: right;
+        margin-left: 25px;
+    }
+}
+.navigator-button {
+    margin-right: 10px;
+    &,
+    &:visited,
+    &:link:visited,
+    &:link {
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+        display: inline-block;
+        vertical-align: top;
+        padding: 10px 20px !important;
+    }
+    .icon {
+        position: relative;
+        margin-right: 5px;
+    }
+    .fa-folder {
+        top: 0;
+    }
+}
+
+.navigator-button + .dropdown-menu {
+    margin-top: -2px;
+}
+
+.navigator {
+    position: relative;
+    overflow-x: auto;
+    width: 100%;
+    form {
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+}
+
+.navigator-breadcrumbs {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 17px 0 0 20px;
+    > a {
+        color: $gray-darkest !important;
+    }
+    .icon {
+        color: $gray-light;
+        margin: 0 5px;
+    }
+}
+
+.dropdown-container {
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    .dropdown-menu {
+        display: none;
+        right: 0;
+        left: auto;
+        label {
+            display: block;
+            line-height: 20px !important;
+            white-space: nowrap;
+            text-transform: none;
+            padding: 0 10px !important;
+            margin: 0 !important;
+        }
+        input {
+            position: relative;
+            top: 4px;
+            vertical-align: top;
+            margin-right: 5px;
+        }
+        &.dropdown-menu-checkboxes {
+            right: 0;
+            left: auto;
+        }
+    }
+    &.open .dropdown-menu {
+        display: block;
+        li {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+    }
+    + .separator {
+        margin-right: 10px;
+    }
+}
+.dropdown-container-down {
+    top: -5px;
+    > a {
+        &,
+        &:link,
+        &:visited,
+        &:link:visited {
+            color: $gray-light;
+            font-size: 20px;
+            line-height: 30px;
+            height: 30px;
+            padding: 0 10px;
+        }
+    }
+    .dropdown-menu {
+        right: auto;
+        left: 0;
+        margin-top: -10px;
+        margin-right: 10px;
+    }
+}

@@ -10,27 +10,24 @@ install:
 
 # Explicit environments list here is a complete list of environments from tox.
 # It is intentionally shortened.
-# Django 1.9 and master branch builds are disabled as they are not supported yet.
 env:
   - TOX_ENV=flake8
-#  - TOX_ENV=py34-django19-thumbs2x
+  - TOX_ENV=py34-django19-thumbs2x
   - TOX_ENV=py34-django18-thumbs2x
   - TOX_ENV=py34-django17-thumbs2x
-#  - TOX_ENV=py33-django19-thumbs2x
   - TOX_ENV=py33-django18-thumbs2x
   - TOX_ENV=py33-django17-thumbs2x
-#  - TOX_ENV=py27-django19-thumbs2x
+  - TOX_ENV=py27-django19-thumbs2x
   - TOX_ENV=py27-django18-thumbs2x
   - TOX_ENV=py27-django17-thumbs2x
-#  - TOX_ENV=py34-django19-custom_image-thumbs2x
+  - TOX_ENV=py34-django19-custom_image-thumbs2x
   - TOX_ENV=py34-django18-custom_image-thumbs2x
   - TOX_ENV=py34-django17-custom_image-thumbs2x
   - TOX_ENV=py34-django16-custom_image-thumbs2x
-#  - TOX_ENV=py33-django19-custom_image-thumbs2x
   - TOX_ENV=py33-django18-custom_image-thumbs2x
   - TOX_ENV=py33-django17-custom_image-thumbs2x
   - TOX_ENV=py33-django16-custom_image-thumbs2x
-#  - TOX_ENV=py27-django19-custom_image-thumbs2x
+  - TOX_ENV=py27-django19-custom_image-thumbs2x
   - TOX_ENV=py27-django18-custom_image-thumbs2x
   - TOX_ENV=py27-django17-custom_image-thumbs2x
   - TOX_ENV=py27-django16-custom_image-thumbs2x

@@ -1,0 +1,348 @@
+//##############################################################################
+// DRAG AND DROP
+
+form .form-row {
+    .filer-dropzone {
+        position: relative;
+        min-width: 215px;
+        border: solid 1px $gray-lighter;
+        border-radius: $border-radius-base;
+        background-color: $gray-lightest;
+        &.dz-drag-hover {
+            border: solid 1px $color-primary !important;
+        }
+        &.dz-started {
+            .fileUpload {
+                display: none;
+            }
+        }
+        .dz-preview {
+            width: 100%;
+            min-height: auto;
+            margin-right: 0;
+            margin-bottom: 0;
+            margin-left: 0;
+            padding-bottom: 10px;
+            border-bottom: solid 1px $gray-lighter;
+            &.dz-error {
+                position: relative;
+                .dz-error-message {
+                    display: none;
+                }
+                &:hover {
+                    .dz-error-message {
+                        display: block;
+                    }
+                }
+            }
+            .dz-details {
+                min-width: calc(100% - 80px);
+                max-width: calc(100% - 80px);
+                margin-top: 7px;
+                margin-left: 40px;
+                padding: 0;
+                opacity: 1;
+                .dz-filename,
+                .dz-filename:hover,
+                .dz-size {
+                    float: left;
+                    text-align: left;
+                    span {
+                        color: $gray;
+                        border: 0 !important;
+                        background-color: transparent !important;
+                    }
+                }
+            }
+            .dz-remove {
+                @include icon(trash-o);
+                display: inline-block;
+                position: absolute;
+                top: 7px;
+                right: 25px;
+                font: 0/0 a;
+                &:before {
+                    color: $gray;
+                    font-size: 18px;
+                }
+            }
+            .dz-error-message {
+                top: 65px;
+                left: 0;
+                width: 100%;
+            }
+            .dz-success-mark,
+            .dz-error-mark {
+                top: 5px;
+                right: 0;
+                left: auto;
+                margin-top: 0;
+                &:before {
+                    color: $gray;
+                }
+                svg {
+                    display: none;
+                }
+            }
+            .dz-success-mark {
+                @include icon(check);
+                &:before {
+                    color: $color-success;
+                }
+            }
+            .dz-error-mark {
+                @include icon(remove);
+                &:before {
+                    color: $color-danger;
+                }
+            }
+            &.dz-image-preview,
+            &.dz-file-preview {
+                background-color: transparent;
+                .dz-image {
+                    overflow: hidden;
+                    width: 36px;
+                    height: 36px;
+                    border: solid 1px $gray-lighter;
+                    border-radius: 0;
+                    img {
+                        width: 100%;
+                        height: auto;
+                    }
+                }
+            }
+            .dz-progress {
+                top: 18px;
+                left: 0;
+                width: calc(100% - 40px);
+                height: 10px;
+                margin-left: 40px;
+            }
+        }
+        .dz-message {
+            float: right;
+            color: $gray;
+            width: 100%;
+            margin: 48px 0 0;
+        }
+        .icon {
+            color: $gray;
+            margin-right: 10px;
+        }
+        .related-lookup {
+            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+            overflow: hidden;
+            // makes true that button has correct height #668
+            line-height: $font-size-normal;
+            width: auto !important;
+            height: auto !important;
+            padding: 10px 20px !important;
+            cursor: pointer;
+            &:before {
+                display: none;
+            }
+        }
+        // makes sure that filer clear button has correct size #669
+        .filerClearer {
+            width: 36px !important;
+            height: 36px !important;
+        }
+        .filerFile {
+            position: absolute;
+            top: 62px;
+            // required for django CMS <= 3.1 #673
+            left: 20px;
+            width: calc(100% - 40px);
+            img[src*=nofile] {
+                background-color: $white;
+            }
+            // make sure that text crops if there is not enough space #670
+            span:not(:empty) {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: calc(100% - 150px);
+            }
+            // required for django CMS <= 3.1 #673
+            img {
+                width: 36px;
+                height: 36px;
+                margin-right: 10px;
+                border: solid 1px $gray-lighter;
+                border-radius: $border-radius-base;
+                &[src*="nofile"] {
+                    box-sizing: border-box;
+                    margin-right: 0;
+                    border: solid 1px $gray-lighter;
+                    border-radius: $border-radius-base;
+                }
+            }
+            // required for django CMS <= 3.1 #673
+            img,
+            .related-lookup {
+                display: inline-block;
+                text-align: center !important;
+                vertical-align: top;
+            }
+            // required for django CMS <= 3.1 #673
+            .related-lookup {
+                float: right !important;
+            }
+            // required for django CMS <= 3.1
+            a {
+                box-sizing: border-box;
+                padding-top: 10px !important;
+            }
+            // required for django CMS <= 3.1 #673
+            span {
+                display: inline-block;
+                color: $gray;
+                font-weight: normal;
+                margin-top: 6px;
+                margin-bottom: 6px;
+                text-align: left;
+                &:empty + .related-lookup {
+                    float: none !important;
+                    margin-left: 0 !important;
+                }
+            }
+            // required for django CMS <= 3.1 #673
+            .filerClearer {
+                @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
+                float: right;
+                // make sure that clear button has correct size #272
+                width: 10px;
+                height: 10px;
+                margin: 0 0 0 5px !important;
+                padding: 12px !important;
+                border: solid 1px $gray-lighter;
+                border-radius: $border-radius-base;
+                cursor: pointer;
+                &:before {
+                    color: $gray-light !important;
+                    vertical-align: middle;
+                    margin: 0;
+                }
+            }
+        }
+        &.filer-dropzone-mobile {
+            .filerFile {
+                top: 40px;
+                text-align: center;
+            }
+            .dz-message {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                // make sure that drag and drop widget looks nice on mobile #670
+                margin-top: 75px;
+            }
+            &.js-object-attached .filerFile {
+                top: 62px;
+                text-align: left;
+                &.js-file-selector span, .dz-name {
+                    width: calc(100% - 100px);
+                }
+            }
+        }
+        @media screen and (max-width: $screen-tablet) {
+            .filerFile {
+                top: 40px !important;
+                text-align: center;
+            }
+            .dz-message {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                // make sure that drag and drop widget looks nice on mobile #670
+                margin-top: 75px !important;
+            }
+            &.js-object-attached .filerFile {
+                top: 62px !important;
+            }
+        }
+        &.filer-dropzone-folder .filerFile {
+            top: 62px !important;
+        }
+    }
+}
+
+.filer-dropzone {
+    .dz-upload {
+        height: 5px;
+        background-color: #0bf;
+    }
+    .dz-name {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 100px);
+    }
+    .dz-thumbnail {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: top;
+        width: 36px;
+        height: 36px;
+        margin-right: 10px;
+        border: solid 1px #ddd;
+        border-radius: 3px;
+        background: #fff url("/static/filer/icons/nofile_48x48.png");
+        background-size: cover;
+        img {
+            background: #fff;
+            &[src=""],
+            &:not([src]) {
+                width: 104%;
+                height: 104%;
+                margin: -2%;
+            }
+        }
+    }
+}
+
+.filer-dropzone-info-message {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    z-index: 2;
+    text-align: center;
+    width: 270px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: -50px 0 0 -150px;
+    padding: 15px;
+    border-radius: $border-radius-base;
+    background: $white;
+    box-shadow: $base-box-shadow;
+    .icon {
+        font-size: 30px;
+    }
+    .text {
+        margin: 15px 0 10px 0;
+    }
+}
+.filer-dropzone-upload-info {
+    margin-top: 10px;
+    // make sure that file name on upload progress is cut #675
+    .filer-dropzone-file-name {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+.filer-dropzone-progress {
+    height: 5px;
+    margin-top: 5px;
+    background-color: #0bf;
+}
+
+.filer-dropzone-upload-welcome .folder {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.filer-dropzone-cancel {
+    margin-top: 15px;
+}

@@ -2,105 +2,183 @@
 // This script implements the dropzone settings
 'use strict';
 
-/* globals Dropzone */
+/* globals Dropzone, Cl */
 (function ($) {
     $(function () {
         var submitNum = 0;
-        var maxSubmitNum = 1;
-        var dropzoneSelector = '.js-dropzone';
-        var dropzones = $(dropzoneSelector);
-        var infoMessageClass = 'js-dropzone-info-message';
+        var maxSubmitNum = 0;
+        var dropzoneInstances = [];
+        var dropzoneBase = $('.js-filer-dropzone-base');
+        var dropzoneSelector = '.js-filer-dropzone';
+        var dropzones;
+        var infoMessageClass = 'js-filer-dropzone-info-message';
         var infoMessage = $('.' + infoMessageClass);
-        var folderName = $('.js-dropzone-folder-name');
-        var uploadInfo = $('.js-dropzone-upload-info');
-        var uploadWelcome = $('.js-dropzone-upload-welcome');
-        var uploadNumber = $('.js-dropzone-upload-number');
-        var uploadFileName = $('.js-dropzone-file-name');
-        var uploadProgress = $('.js-dropzone-progress');
-        var uploadSuccess = $('.js-dropzone-upload-success');
+        var folderName = $('.js-filer-dropzone-folder-name');
+        var uploadInfoContainer = $('.js-filer-dropzone-upload-info-container');
+        var uploadInfo = $('.js-filer-dropzone-upload-info');
+        var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
+        var uploadNumber = $('.js-filer-dropzone-upload-number');
+        var uploadFileNameSelector = '.js-filer-dropzone-file-name';
+        var uploadProgressSelector = '.js-filer-dropzone-progress';
+        var uploadSuccess = $('.js-filer-dropzone-upload-success');
+        var uploadCanceled = $('.js-filer-dropzone-upload-canceled');
+        var cancelUpload = $('.js-filer-dropzone-cancel');
         var dragHoverClass = 'dz-drag-hover';
+        var dataUploaderConnections = 'max-uploader-connections';
+        // var dataMaxFileSize = 'max-file-size';
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
         var hasErrors = false;
+        var baseUrl;
+        var baseFolderTitle;
+        var updateUploadNumber = function () {
+            uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
+        };
+        var destroyDropzones = function () {
+            $.each(dropzoneInstances, function (index) {
+                dropzoneInstances[index].destroy();
+            });
+        };
+        var getElementByFile = function (file, url) {
+            return $(document.getElementById(
+                'file-' +
+                encodeURIComponent(file.name) +
+                file.size +
+                file.lastModified +
+                url
+            ));
+        };
+
+        if (dropzoneBase && dropzoneBase.length) {
+            baseUrl = dropzoneBase.data('url');
+            baseFolderTitle = dropzoneBase.data('folder-name');
+
+            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-filer-dropzone');
+        }
+
+        Cl.mediator.subscribe('filer-upload-in-progress', destroyDropzones);
+
+        dropzones = $(dropzoneSelector);
 
         if (dropzones.length && Dropzone) {
             Dropzone.autoDiscover = false;
             dropzones.each(function () {
                 var dropzone = $(this);
                 var dropzoneUrl = $(this).data('url');
-                new Dropzone(this, {
+                var dropzoneInstance = new Dropzone(this, {
                     url: dropzoneUrl,
                     paramName: 'file',
                     maxFiles: 100,
+                    // for now disabled as we don't have the correct file size limit
+                    // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
-                    addedfile: function () {
-                        submitNum++;
+                    parallelUploads: dropzone.data(dataUploaderConnections) || 3,
+                    accept: function (file, done) {
+                        var uploadInfoClone;
 
-                        if (maxSubmitNum < submitNum) {
-                            maxSubmitNum = submitNum;
-                        }
-                    },
-                    maxfilesexceeded: function (file) {
-                        this.removeAllFiles();
-                        this.addFile(file);
-                    },
-                    dragover: function (dragEvent) {
-                        uploadSuccess.addClass(hiddenClass);
-                        infoMessage.removeClass(hiddenClass);
-                        dropzone.addClass(dragHoverClass);
-
-                        folderName.text($(dragEvent.target).parents(dropzoneSelector).data('folder-name'));
-                    },
-                    dragleave: function (dragEvent) {
-                        var target = $(dragEvent.target);
+                        Cl.mediator.remove('filer-upload-in-progress', destroyDropzones);
+                        Cl.mediator.publish('filer-upload-in-progress');
 
                         clearTimeout(hideMessageTimeout);
-                        if (!target.hasClass(infoMessageClass) && target.parents('.' + infoMessageClass).length === 0) {
-                            clearTimeout(hideMessageTimeout);
-                            hideMessageTimeout = setTimeout(function () {
-                                infoMessage.addClass(hiddenClass);
-                            }, 1000);
+                        uploadWelcome.addClass(hiddenClass);
+                        cancelUpload.removeClass(hiddenClass);
+
+                        if (getElementByFile(file, dropzoneUrl).length) {
+                            done('duplicate');
+                        } else {
+                            uploadInfoClone = uploadInfo.clone();
+
+                            uploadInfoClone.find(uploadFileNameSelector).text(file.name);
+                            uploadInfoClone.find(uploadProgressSelector).width(0);
+                            uploadInfoClone
+                                .attr(
+                                    'id',
+                                    'file-' +
+                                        encodeURIComponent(file.name) +
+                                        file.size +
+                                        file.lastModified +
+                                        dropzoneUrl
+                                )
+                                .appendTo(uploadInfoContainer);
+
+                            submitNum++;
+                            maxSubmitNum++;
+                            updateUploadNumber();
+                            done();
                         }
+
+                        dropzones.removeClass('reset-hover');
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                     },
-                    drop: function () {
+                    dragover: function (dragEvent) {
+                        var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
+                        $(dropzones).addClass('reset-hover');
+                        uploadSuccess.addClass(hiddenClass);
+                        infoMessage.removeClass(hiddenClass);
+                        dropzone.addClass(dragHoverClass).removeClass('reset-hover');
+
+                        folderName.text(folderTitle);
+                    },
+                    dragleave: function () {
                         clearTimeout(hideMessageTimeout);
+                        hideMessageTimeout = setTimeout(function () {
+                            infoMessage.addClass(hiddenClass);
+                        }, 1000);
+
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                     },
                     sending: function (file) {
-                        uploadWelcome.addClass(hiddenClass);
-                        uploadFileName.text(file.name);
-                        uploadProgress.width(0);
-                        uploadInfo.removeClass(hiddenClass);
+                        getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);
                     },
                     uploadprogress: function (file, progress) {
-                        uploadProgress.width(progress + '%');
-                        uploadNumber.text(maxSubmitNum - submitNum + 1 + '/' + maxSubmitNum);
+                        getElementByFile(file, dropzoneUrl).find(uploadProgressSelector).width(progress + '%');
                     },
-                    complete: function () {
+                    success: function (file) {
                         submitNum--;
+                        updateUploadNumber();
+                        getElementByFile(file, dropzoneUrl).remove();
                     },
                     queuecomplete: function () {
-                        maxSubmitNum = 1;
+                        if (submitNum !== 0) {
+                            return;
+                        }
 
+                        updateUploadNumber();
+
+                        cancelUpload.addClass(hiddenClass);
                         uploadInfo.addClass(hiddenClass);
-                        uploadSuccess.removeClass(hiddenClass);
+
                         if (hasErrors) {
+                            uploadNumber.addClass(hiddenClass);
                             setTimeout(function () {
                                 window.location.reload();
-                            }, 3000);
+                            }, 1000);
                         } else {
+                            uploadSuccess.removeClass(hiddenClass);
                             window.location.reload();
                         }
                     },
-                    error: function (file) {
+                    error: function (file, errorText) {
+                        updateUploadNumber();
+                        if (errorText === 'duplicate') {
+                            return;
+                        }
                         hasErrors = true;
-                        window.showError(file.name + ': ' + file.xhr.statusText);
+                        if (window.showError) {
+                            window.showError(file.name + ': ' + errorText);
+                        }
                     }
+                });
+                dropzoneInstances.push(dropzoneInstance);
+                cancelUpload.on('click', function (clickEvent) {
+                    clickEvent.preventDefault();
+                    cancelUpload.addClass(hiddenClass);
+                    uploadCanceled.removeClass(hiddenClass);
+                    dropzoneInstance.removeAllFiles(true);
                 });
             });
         }

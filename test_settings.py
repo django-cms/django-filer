@@ -2,7 +2,8 @@
 import os
 from tempfile import mkdtemp
 
-gettext = lambda s: s  # flake8: noqa
+def gettext(s):
+    return s
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

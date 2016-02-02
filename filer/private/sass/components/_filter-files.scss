@@ -1,0 +1,68 @@
+//##############################################################################
+// FILTER FILES
+
+.filter-files-container {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    .dropdown-container {
+        position: absolute;
+        top: 0;
+        right: 42px;
+        > a {
+            &,
+            &:visited,
+            &:link:visited,
+            &:link {
+                display: inline-block;
+                line-height: 42px;
+                text-align: center;
+                width: 42px;
+                height: 42px;
+            }
+        }
+    }
+}
+.filter-files {
+    color: $gray-darkest;
+    font-size: 14px;
+    line-height: 42px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 42px;
+    padding: 0 30px 0 20px !important;
+    // required for django CMS <= 3.1 #673
+    margin: 0;
+    border-left: 0 !important;
+    border-radius: 0;
+    outline: none;
+
+    appearance: none;
+    // disable clear X on IE #690
+    &::-ms-clear {
+        display: none;
+    }
+}
+.filter-files-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    line-height: 42px !important;
+    text-align: center;
+    width: 42px !important;
+    height: 42px;
+    margin: 0;
+    padding: 0 !important;
+    border-right: 0 !important;
+    border-radius: 0 !important;
+    .icon {
+        position: relative;
+        top: 14px;
+        vertical-align: top;
+    }
+}
+.filter-files-cancel {
+    margin: 5px 20px;
+}
