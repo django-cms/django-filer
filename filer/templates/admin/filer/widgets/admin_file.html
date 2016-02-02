@@ -25,12 +25,12 @@
                     &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
                 {% endif %}
             {% else %}
-                <img id="{{ thumb_id }}" src="{% static 'filer/icons/nofile_48x48.png' %}" class="quiet" alt="{% trans 'no file selected' %}">
+                <img id="{{ thumb_id }}" class="quiet hidden" alt="">
                 &nbsp;<span id="{{ span_id }}"></span>
             {% endif %}
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                {% trans 'Add File' %}
+                {% trans 'Choose File' %}
             </a>
 
             <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>

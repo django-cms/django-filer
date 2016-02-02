@@ -126,7 +126,10 @@ form .form-row {
             margin: 48px 0 0;
         }
         .icon {
+            position: relative;
+            top: 3px;
             color: $gray;
+            font-size: 24px;
             margin-right: 10px;
         }
         .related-lookup {
