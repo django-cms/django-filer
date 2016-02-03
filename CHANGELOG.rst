@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Revision 8776bb3 (03.02.2016, 07:35 UTC)
+----------------------------------------
+
+* LUN-2622
+
+  * Fix indenting.
+  * Fix search pop-up header margins.
+  * Fix filer search pop-up for minimum resolution.
+
+No other commits.
+
 Revision 3f84a76 (14.01.2016, 14:46 UTC)
 ----------------------------------------
 
