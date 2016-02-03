@@ -2,6 +2,7 @@
 import os
 from tempfile import mkdtemp
 
+
 def gettext(s):
     return s
 
