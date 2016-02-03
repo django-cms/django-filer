@@ -20,7 +20,7 @@
 
         elem.val(chosenId);
         elem.closest('.js-filer-dropzone').addClass('js-object-attached');
-        img.attr('src', chosenThumbnailUrl);
+        img.attr('src', chosenThumbnailUrl).removeClass('hidden');
         txt.text(chosenDescriptionTxt);
         clear.removeClass('hidden').removeAttr('style');
         lookup.addClass('hidden');
