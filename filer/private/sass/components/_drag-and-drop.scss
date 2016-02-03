@@ -8,13 +8,33 @@ form .form-row {
         border: solid 1px $gray-lighter;
         border-radius: $border-radius-base;
         background-color: $gray-lightest;
-        &.dz-drag-hover {
-            border: solid 1px $color-primary !important;
+        .z-index-fix {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
         }
-        &.dz-started {
-            .fileUpload {
+        &.dz-drag-hover {
+            padding-top: 14px;
+            border: solid 2px $color-primary !important;
+            .z-index-fix {
+                z-index: 1;
+            }
+            .dz-message {
+                opacity: 1;
+                display: block !important;
+                visibility: visible;
+            }
+            .filerFile {
                 display: none;
             }
+            .dz-message, .dz-message .icon {
+                color: $color-primary !important;
+            }
+        }
+        &.dz-started .fileUpload {
+            display: none;
         }
         .dz-preview {
             width: 100%;
@@ -29,10 +49,8 @@ form .form-row {
                 .dz-error-message {
                     display: none;
                 }
-                &:hover {
-                    .dz-error-message {
-                        display: block;
-                    }
+                &:hover .dz-error-message {
+                    display: block;
                 }
             }
             .dz-details {

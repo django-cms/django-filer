@@ -16,6 +16,7 @@
         var fileChooseSelector = '.js-file-selector';
         var dropzones = $(dropzoneSelector);
         var fileIdInputSelector = '.vForeignKeyRawIdAdminField';
+        var dragHoverClass = 'dz-drag-hover';
         var hiddenClass = 'hidden';
         var mobileClass = 'filer-dropzone-mobile';
         var objectAttachedClass = 'js-object-attached';
@@ -88,7 +89,7 @@
                         fileChoose.hide();
                         lookupButton.addClass(hiddenClass);
                         message.addClass(hiddenClass);
-                        dropzone.removeClass('dz-drag-hover');
+                        dropzone.removeClass(dragHoverClass);
                         dropzone.addClass(objectAttachedClass);
                     },
                     success: function (file, response) {
