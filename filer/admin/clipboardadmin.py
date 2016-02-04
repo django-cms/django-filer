@@ -3,13 +3,12 @@
 import json
 from django.forms.models import modelform_factory
 from django.contrib import admin
-from django.db.models import get_model
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from filer import settings as filer_settings
 from filer.models import Folder, Clipboard, ClipboardItem, Image
-from filer.utils.compatibility import DJANGO_1_4
+from filer.utils.compatibility import DJANGO_1_4, get_model
 from filer.utils.files import (
     handle_upload, handle_request_files_upload, UploadException,
 )

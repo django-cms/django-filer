@@ -18,4 +18,4 @@ class AdminImageFormField(AdminFileFormField):
 class FilerImageField(FilerFileField):
     default_form_class = AdminImageFormField
     default_model_class = Image
-    default_validators = [validate_images,]
+    default_validators = [validate_images, ]

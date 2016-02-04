@@ -233,7 +233,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         from filer.utils.folders import get_default_folder_getter
         folder = get_default_folder_getter().get(folder_key, request)
         return self.directory_listing(request, folder.pk)
-    
+
     def directory_listing(self, request, folder_id=None, viewtype=None):
         clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':

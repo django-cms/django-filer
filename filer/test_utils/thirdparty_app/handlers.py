@@ -1,7 +1,7 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-from filer.models import Folder
 from filer.utils.folders import DefaultFolderGetter
+
 
 class CustomFolderGetter(DefaultFolderGetter):
 
@@ -10,8 +10,9 @@ class CustomFolderGetter(DefaultFolderGetter):
         user = request.user
         if not user.is_authenticated():
             return None
-        return cls._get_or_create(name=user.username, owner=user, parent_kwargs={
-            'name': 'users_files', 'parent':None})
+        return cls._get_or_create(name=user.username,
+                                  owner=user,
+                                  parent_kwargs={'name': 'users_files', 'parent': None})
 
     @classmethod
     def IMAGES(cls, request):

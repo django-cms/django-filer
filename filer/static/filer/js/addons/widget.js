@@ -21,8 +21,8 @@
         description.empty();
     };
 
-    $(document).ready(function(){
-        $('.filerFile').each(function(){
+    $(document).ready(function () {
+        $('.filerFile').each(function () {
             $(this).find('.vForeignKeyRawIdAdminField').hide();
             $('#add_' + $(this).data('id')).remove();
         });

@@ -83,16 +83,22 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'file_lookup_enabled': self.file_lookup_enabled,
             'direct_upload_enabled': self.direct_upload_enabled,
         }
-        related_field = '%s.%s.%s' % (
-            self.rel.field.model._meta.app_label,
-            self.rel.field.model.__name__,
-            self.rel.field.name,
-        )
-        direct_upload_url = reverse('admin:filer-ajax_upload',
-                                    kwargs={'related_field': related_field,
-                                            'folder_key': self.folder_key})
+        if hasattr(self.rel, 'field'):
+            related_field = '%s.%s.%s' % (
+                self.rel.field.model._meta.app_label,
+                self.rel.field.model.__name__,
+                self.rel.field.name,
+            )
+            direct_upload_url = reverse('admin:filer-ajax_upload',
+                                        kwargs={'related_field': related_field,
+                                                'folder_key': self.folder_key})
+
+            context['direct_upload_related_field'] = related_field
+        else:
+            direct_upload_url = reverse('admin:filer-ajax_upload',
+                                        kwargs={'folder_key': self.folder_key})
+
         context.update({
-            'direct_upload_related_field': related_field,
             'folder_key': self.folder_key or 'no_folder',
             'direct_upload_url': direct_upload_url,
         })
@@ -158,7 +164,7 @@ class AdminFileFormField(forms.ModelChoiceField):
             *args, **kwargs
         )
 
-        if not self.help_text:
+        if not self.help_text and hasattr(self.rel, 'field'):
             validators = self.validators + self.rel.field.validators
             for validator in validators:
                 if isinstance(validator, FileMimetypeValidator):

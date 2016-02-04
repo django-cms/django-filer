@@ -26,7 +26,7 @@
             element.toggleClass(mobileClass, element.width() < minWidth);
         };
         var showError = function (message) {
-            if(window.parent && window.parent.CMS){
+            if (window.parent && window.parent.CMS) {
                 try {
                     window.parent.CMS.API.Messages.open({
                         message: message
@@ -34,7 +34,7 @@
                 } catch (errorText) {
                     console.log(errorText);
                 }
-            }else{
+            } else {
                 alert(message);
             }
         };
