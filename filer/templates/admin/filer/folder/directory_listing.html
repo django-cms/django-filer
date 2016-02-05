@@ -104,17 +104,11 @@
                         <li>
                             <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                 title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
+                                <img src="{% static 'filer/icons/root_28x28.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                 Root
                             </a>
                         </li>
-                        {% if folder.parent %}
-                            <li>
-                                <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
-                                    title="{% trans 'Go back to the parent folder' %}">
-                                    {{ folder.parent.name }}
-                                </a>
-                            </li>
-                        {% endif %}
+                        {% include "admin/filer/folder/folders_recursice.html" %}
                     </ul>
                 </div>
 
