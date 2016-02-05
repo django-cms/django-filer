@@ -42,7 +42,10 @@
                             </select>
                         </p>
                         {{ copy_form.as_p_with_help }}
-                        <p><input type="submit" value="{% trans 'Copy' %}"></p>
+
+                        <div class="text-right clearfix">
+                            <input type="submit" value="{% trans 'Copy' %}" class="default">
+                        </div>
                     </div>
                 </form>
             {% endif %}

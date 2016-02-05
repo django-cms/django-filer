@@ -36,7 +36,10 @@
                     {% endif %}
                     {{ resize_form.as_p_with_help }}
                     <p>{% blocktrans %}Warning: Images will be resized in-place and originals will be lost. Maybe first make a copy of them to retain the originals.{% endblocktrans %}</p>
-                    <p><input type="submit" value="{% trans 'Resize' %}"></p>
+
+                    <div class="text-right clearfix">
+                        <input type="submit" value="{% trans 'Resize' %}" class="default">
+                    </div>
                 </div>
             </form>
         {% endif %}
