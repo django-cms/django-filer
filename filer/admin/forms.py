@@ -7,11 +7,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _
 
+from filer.models import ThumbnailOption
 from filer.utils.files import get_valid_filename
-
-
-if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
-    from cmsplugin_filer_image.models import ThumbnailOption
 
 
 class AsPWithHelpMixin(object):

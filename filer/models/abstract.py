@@ -19,6 +19,7 @@ except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
