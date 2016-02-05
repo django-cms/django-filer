@@ -283,6 +283,26 @@
     top: -5px;
     float: left;
     margin: 0 7px 0 0;
+    .navigator-breadcrumbs-dropdown {
+        left: -22px;
+        padding: 0;
+        > li {
+            padding: 0;
+            > a {
+                padding: 15px 20px 5px;
+                border-bottom: solid 1px #e1e1e1;
+            }
+            &:last-child > a {
+                border-bottom: none;
+            }
+        }
+        img {
+            position: relative;
+            top: -4px;
+            vertical-align: top;
+            margin: 0 10px 0 0;
+        }
+    }
 }
 
 .dropdown-container {
