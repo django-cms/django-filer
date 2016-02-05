@@ -46,6 +46,16 @@ Cl.mediator = new Mediator();
             clickEvent.stopPropagation();
         });
 
+        $('.js-filter-files').on('focus blur', function (event) {
+            var container = $(this).closest('.js-filter-files-container');
+
+            if (event.type === 'focus') {
+                container.addClass('is-focused');
+            } else {
+                container.removeClass('is-focused');
+            }
+        });
+
         // Focus on the search field on page load
         (function () {
             var filter = $('.js-filter-files');

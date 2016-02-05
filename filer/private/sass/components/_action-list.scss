@@ -34,6 +34,7 @@
         display: block;
         padding: 5px 10px;
         border-bottom: solid 1px $gray-lighter;
+        font-size: 20px;
     }
     .icon {
         &:first-child {
@@ -68,7 +69,7 @@
             vertical-align: middle;
         }
         a {
-            color: $gray-darker !important;
+            color: $gray-darker;
         }
     }
     span:before {

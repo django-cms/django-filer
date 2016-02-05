@@ -3,7 +3,7 @@ language: python
 sudo: true
 
 before_install:
-  - if [[ $TOX_ENV == "frontend" ]]; then sudo apt-get update && sudo apt-get install nodejs npm; fi;
+  - if [[ $TOX_ENV == "frontend" ]]; then sudo chown -R $USER:$USER ~/.npm && sudo apt-get update && sudo apt-get install nodejs npm; fi;
 
 install:
   - pip install tox coveralls
