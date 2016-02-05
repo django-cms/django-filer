@@ -95,26 +95,39 @@
             {% endif %}
 
             <div class="navigator-breadcrumbs">
-                <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
-                    title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
-                    Root
-                </a>
-                {% if not folder.is_root %}
-                    {% if folder.parent.parent %}
-                        <span class="icon fa fa-chevron-right"></span>
-                        ...
-                    {% endif %}
+                <div class="navigator-breadcrumbs-dropdown-container">
+                    <a href="#" data-toggle="dropdown" aria-expanded="false">
+                        <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
+                    </a>
 
-                    {% if folder.parent %}
-                        <span class="icon fa fa-chevron-right"></span>
-                        <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
-                            title="{% trans 'Go back to the parent folder' %}">
-                            {{ folder.parent.name }}
-                        </a>
-                    {% endif %}
+                    <ul class="dropdown-menu navigator-breadcrumbs-dropdown">
+                        <li>
+                            <a href="{% url 'admin:filer-directory_listing-root' %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                                title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
+                                Root
+                            </a>
+                        </li>
+                        {% if folder.parent %}
+                            <li>
+                                <a href="{% url 'admin:filer-directory_listing' folder.parent.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
+                                    title="{% trans 'Go back to the parent folder' %}">
+                                    {{ folder.parent.name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
 
+                {% if not folder.is_root or folder.is_smart_folder %}
                     <span class="icon fa fa-chevron-right"></span>
-                    {{ folder.name }}
+
+                    <span class="navigator-breadcrumbs-folder-name">
+                        {% if folder.name != "unfiled files" %}
+                            {{ folder.name }}
+                        {% else %}
+                            {% trans "Unsorted Uploads" %}
+                        {% endif %}
+                    </span>
 
                     {% if not is_popup and not select_folder and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                         <div class="dropdown-container dropdown-container-down">
@@ -128,17 +141,29 @@
                             </ul>
                         </div>
                     {% endif %}
-                {% elif folder.is_smart_folder %}
-                    <span class="icon fa fa-chevron-right"></span>
-
-                    {% if folder.name != "unfiled files" %}
-                        {{ folder.name }}
-                    {% else %}
-                        {% trans "Unsorted Uploads" %}
-                    {% endif %}
                 {% endif %}
             </div>
         </div>
+
+        <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
+            {% if is_popup %}
+                <input type="hidden" name="_popup" value="1" />
+                {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+            {% endif %}
+            <input type="text" placeholder="Search Files..." class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+            <div class="dropdown-container dropdown-container-down">
+                <a href="#" data-toggle="dropdown" aria-expanded="false">
+                    <span class="fa fa-caret-down"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-checkboxes">
+                    <li>
+                        <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> limit the search to current folder</label>
+                    </li>
+                </ul>
+            </div>
+
+            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
+        </form>
 
         {% block object-tools %}
             <div class="navigator-tools">
