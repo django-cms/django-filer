@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 
 import os
-import sys
 
+from dango.utils.encoding import force_text
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify as slugify_django
 from django.http.multipartparser import (
@@ -114,12 +114,8 @@ def handle_request_files_upload(request):
     return upload, filename, is_raw
 
 
-if sys.version_info < (3, ):
-    def slugify(string):
-        return slugify_django(unidecode(unicode(string)))
-else:
-    def slugify(string):
-        return slugify_django(unidecode(string))
+def slugify(string):
+    return slugify_django(unidecode(force_text(string)))
 
 
 def get_valid_filename(s):
