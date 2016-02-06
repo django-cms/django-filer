@@ -1,9 +1,14 @@
 language: python
 
-sudo: true
+sudo: false
 
-before_install:
-  - if [[ $TOX_ENV == "frontend" ]]; then sudo apt-get update && sudo apt-get install nodejs npm; fi;
+python: 3.5
+
+addons:
+  apt:
+    packages:
+    - nodejs
+    - npm
 
 install:
   - pip install tox coveralls
