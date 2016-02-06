@@ -12,23 +12,27 @@ install:
 # It is intentionally shortened.
 env:
   - TOX_ENV=flake8
-  - TOX_ENV=py34-django19-thumbs2x
+#  - TOX_ENV=py35-django19-thumbs2x
+#  - TOX_ENV=py34-django19-thumbs2x
+#  - TOX_ENV=py27-django19-thumbs2x
+  - TOX_ENV=py35-django18-thumbs2x
   - TOX_ENV=py34-django18-thumbs2x
-  - TOX_ENV=py34-django17-thumbs2x
   - TOX_ENV=py33-django18-thumbs2x
-  - TOX_ENV=py33-django17-thumbs2x
-  - TOX_ENV=py27-django19-thumbs2x
   - TOX_ENV=py27-django18-thumbs2x
+  - TOX_ENV=py34-django17-thumbs2x
+  - TOX_ENV=py33-django17-thumbs2x
   - TOX_ENV=py27-django17-thumbs2x
-  - TOX_ENV=py34-django19-custom_image-thumbs2x
+#  - TOX_ENV=py35-django19-custom_image-thumbs2x
+#  - TOX_ENV=py34-django19-custom_image-thumbs2x
+#  - TOX_ENV=py27-django19-custom_image-thumbs2x
+  - TOX_ENV=py35-django18-custom_image-thumbs2x
   - TOX_ENV=py34-django18-custom_image-thumbs2x
+  - TOX_ENV=py33-django18-custom_image-thumbs2x
+  - TOX_ENV=py27-django18-custom_image-thumbs2x
   - TOX_ENV=py34-django17-custom_image-thumbs2x
   - TOX_ENV=py34-django16-custom_image-thumbs2x
-  - TOX_ENV=py33-django18-custom_image-thumbs2x
   - TOX_ENV=py33-django17-custom_image-thumbs2x
   - TOX_ENV=py33-django16-custom_image-thumbs2x
-  - TOX_ENV=py27-django19-custom_image-thumbs2x
-  - TOX_ENV=py27-django18-custom_image-thumbs2x
   - TOX_ENV=py27-django17-custom_image-thumbs2x
   - TOX_ENV=py27-django16-custom_image-thumbs2x
   - TOX_ENV=py34-django16-thumbs1x
@@ -39,9 +43,9 @@ env:
   - TOX_ENV=py27-django15-thumbs1x
   - TOX_ENV=py26-django16-thumbs1x
   - TOX_ENV=py26-django15-thumbs1x
-#  - TOX_ENV=py34-django_master-thumbs2x
-#  - TOX_ENV=py33-django_master-thumbs2x
-#  - TOX_ENV=py27-django_master-thumbs2x
+  - TOX_ENV=py35-django_master-thumbs2x
+  - TOX_ENV=py34-django_master-thumbs2x
+  - TOX_ENV=py27-django_master-thumbs2x
   - TOX_ENV=frontend
 
 script:
@@ -53,6 +57,6 @@ after_success:
 
 matrix:
   allow_failures:
+    - env: TOX_ENV=py35-django_master-thumbs2x
     - env: TOX_ENV=py34-django_master-thumbs2x
-    - env: TOX_ENV=py33-django_master-thumbs2x
     - env: TOX_ENV=py27-django_master-thumbs2x
