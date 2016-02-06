@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import os
 
-from dango.utils.encoding import force_text
+from django.utils.encoding import force_text
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify as slugify_django
 from django.http.multipartparser import (
