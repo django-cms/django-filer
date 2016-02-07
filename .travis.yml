@@ -57,7 +57,7 @@ script:
   - tox -e $TOX_ENV
 
 after_success:
-  - coveralls --config_file=coverage.rc
+  - coveralls --config_file=.coveragerc
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
 
 matrix:
