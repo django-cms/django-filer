@@ -144,14 +144,14 @@
                 <input type="hidden" name="_popup" value="1" />
                 {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
             {% endif %}
-            <input type="text" placeholder="Search Files..." class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+            <input type="text" placeholder="{% trans 'Search Files...' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
             <div class="dropdown-container dropdown-container-down">
                 <a href="#" data-toggle="dropdown" aria-expanded="false">
                     <span class="fa fa-caret-down"></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-checkboxes">
                     <li>
-                        <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> limit the search to current folder</label>
+                        <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> {% trans "limit the search to current folder" %}</label>
                     </li>
                 </ul>
             </div>
