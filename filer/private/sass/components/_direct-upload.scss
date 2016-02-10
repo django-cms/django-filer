@@ -1,0 +1,19 @@
+.fileUploading {
+    .filerProgress{
+        display: inline-block !important;
+        margin: 2px 5px;
+    }
+}
+.filerUploader {
+    span{
+        display:inline-block;
+    }
+    > span{
+        position:relative;
+    }
+}
+.filerUploader > span input[type=file],
+.fileSelected .filerFilename,
+.fileUploading .filerChoose{
+    display:none;
+}

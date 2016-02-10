@@ -1,6 +1,8 @@
 {% load i18n filer_admin_tags staticfiles %}
 
 {% spaceless %}
+
+{% if direct_upload_enabled %}
     <div class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
@@ -10,13 +12,18 @@
         </span>
     </div>
 
-    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{{ direct_upload_url }}" data-max-file-size="20">
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}" id="{{ id }}_filer_dropzone_message">
-            <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
+            <span class="icon fa fa-arrow-down"></span>
+            {% if file_lookup_enabled %}
+                <span>{% trans "or drop your file here" %}</span>
+            {% else %}
+                <span>{% trans "drop your file here" %}</span>
+            {% endif %}
         </div>
-
-        <span class="filerFile js-file-selector">
+{% endif %}
+        <span class="filerFile js-file-selector" data-id="{{ id }}">
             {% if object %}
                 {% if object.icons.32 %}
                     <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
@@ -30,30 +37,21 @@
                 &nbsp;<span id="{{ span_id }}"></span>
             {% endif %}
 
-            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                {% trans 'Choose File' %}
-            </a>
+            {% if file_lookup_enabled %}
+                <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+                    {% trans 'Choose File' %}
+                </a>
+            {% endif %}
 
             <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
 
             <br>
 
             {{ hidden_input }}
-            <script type="text/javascript" id="{{id}}_javascript">
-                django.jQuery(document).ready(function(){
-                    var plus = django.jQuery('#add_{{ id }}');
-                    if (plus.length){
-                        plus.remove();
-                    }
-                    // Delete this javascript once loaded to avoid the "add new" link duplicates it
-                    django.jQuery('#{{id}}_javascript').remove();
-                });
-            </script>
         </span>
-    </div>
-{% endspaceless %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
-<script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
-<script src="{% static 'filer/js/libs/dropzone.min.js' %}"></script>
-<script src="{% static 'filer/js/addons/dropzone.init.js' %}"></script>
+{% if direct_upload_enabled %}
+    </div>
+{% endif %}
+
+{% endspaceless %}
