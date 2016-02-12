@@ -20,9 +20,7 @@ def is_valid_destination(request, folder):
     return False
 
 
-def _filter_available_sites(request):
-    current_site = request.REQUEST.get('current_site', None)
-    user = request.user
+def _filter_available_sites(current_site, user):
     available_sites = get_sites_for_user(user)
     if current_site:
         current_site = float(current_site)
@@ -33,7 +31,7 @@ def _filter_available_sites(request):
     return available_sites
 
 
-def folders_available(request, folders_qs):
+def folders_available(current_site, user, folders_qs):
     """
     Returns a queryset with folders that current user can see
         * core folders
@@ -45,13 +43,10 @@ def folders_available(request, folders_qs):
         will restrict visible files/folder for the ones that belong to that
         site for all users, even superusers
     """
-    user = request.user
-    current_site = request.REQUEST.get('current_site', None)
-
     if user.is_superuser and not current_site:
         return folders_qs.distinct()
 
-    available_sites = _filter_available_sites(request)
+    available_sites = _filter_available_sites(current_site, user)
 
     sites_q = Q(Q(folder_type=Folder.CORE_FOLDER) |
                 Q(site__in=available_sites) |
@@ -63,7 +58,7 @@ def folders_available(request, folders_qs):
     return folders_qs.filter(sites_q).distinct()
 
 
-def files_available(request, files_qs):
+def files_available(current_site, user, files_qs):
     """
     Returns a queryset with files that current user can see:
         * core folder files
@@ -76,9 +71,6 @@ def files_available(request, files_qs):
         will restrict visible files/folder for the ones that belong to that
         site for all users, even superusers
     """
-    user = request.user
-    current_site = request.REQUEST.get('current_site', None)
-
     # never show unfiled files from other users clipboard
     unfiled_in_clipboard = Q(Q(folder__isnull=True) &
                              ~Q(clipboarditem__isnull=True))
@@ -86,7 +78,7 @@ def files_available(request, files_qs):
     if user.is_superuser and not current_site:
         return files_qs.exclude(unfiled_in_clipboard).distinct()
 
-    available_sites = _filter_available_sites(request)
+    available_sites = _filter_available_sites(current_site, user)
 
     sites_q = Q(Q(folder__folder_type=Folder.CORE_FOLDER) |
                 Q(folder__site__in=available_sites) |

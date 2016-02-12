@@ -2374,21 +2374,21 @@ class TestAdminTools(TestCase):
 
     def test_current_site_filtering(self):
         request = HttpRequest()
-        request.REQUEST = {}
-        request.REQUEST['current_site'] = '1'
+        request.GET = {}
+        request.GET['current_site'] = '1'
         request.user = self.user
         from filer.admin.tools import _filter_available_sites, files_available
-        self.assertItemsEqual([1L], _filter_available_sites(request))
-        request.REQUEST['current_site'] = 1
-        self.assertItemsEqual([1L], _filter_available_sites(request))
-        request.REQUEST['current_site'] = 1L
-        self.assertItemsEqual([1L], _filter_available_sites(request))
-        request.REQUEST['current_site'] = '2'
-        self.assertEqual([], _filter_available_sites(request))
+        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = 1
+        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = 1L
+        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = '2'
+        self.assertEqual([], _filter_available_sites('2', request.user))
         f1 = File.objects.create(original_filename='foo_file')
-        request.REQUEST['current_site'] = '1'
+        request.GET['current_site'] = '1'
         self.assertEqual(
-            len(files_available(request, File.objects.filter(id=f1.id))), 0)
+            len(files_available('1', request.user, File.objects.filter(id=f1.id))), 0)
 
     def test_multi_files_perms_for_restricted_descendants(self):
         f1 = Folder.objects.create(name='1')

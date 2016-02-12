@@ -9,7 +9,8 @@ from filer.admin.tools import (has_admin_role, has_role_on_site,
                                can_restrict_on_site,
                                has_multi_file_action_permission)
 from filer.views import (popup_param, selectfolder_param, popup_status,
-                         selectfolder_status, current_site_param)
+                         selectfolder_status, current_site_param,
+                         get_param_from_request)
 
 class CommonModelAdmin(admin.ModelAdmin):
     save_as = False
@@ -90,7 +91,7 @@ class CommonModelAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
         context.update({
-            'current_site': request.REQUEST.get('current_site', None),
+            'current_site': get_param_from_request(request, 'current_site'),
             'show_delete': True,
             'is_popup': popup_status(request),
             'select_folder': selectfolder_status(request),
@@ -122,7 +123,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         if not current_view == 'filer-directory_listing-make_root_folder':
             return False
 
-        folder_id = request.REQUEST.get('parent_id', None)
+        folder_id = get_param_from_request(request, 'parent_id')
         if not folder_id:
             # only site admins and superusers can add root folders
             if has_admin_role(request.user):

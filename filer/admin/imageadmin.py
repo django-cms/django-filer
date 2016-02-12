@@ -53,9 +53,9 @@ class ImageAdmin(FileAdmin):
             raise Http404
 
         return render_to_response(
-            'admin/filer/image/full_size_preview.html',{
+            'admin/filer/image/full_size_preview.html', {
                 'image': image,
-                'current_site': request.REQUEST.get('current_site', None),
+                'current_site': request.GET.get('current_site', None),
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
                 },

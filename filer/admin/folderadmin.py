@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import json
+import os
+from functools import partial
+
 from django import template
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import quote, unquote, capfirst
@@ -24,7 +28,8 @@ from django.utils.translation import ungettext, ugettext_lazy
 from filer.admin.forms import CopyFilesAndFoldersForm
 from filer.admin.common_admin import FolderPermissionModelAdmin
 from filer.views import (popup_status, popup_param, selectfolder_status,
-                         selectfolder_param, current_site_param)
+                         selectfolder_param, current_site_param,
+                         get_param_from_request)
 from filer.admin.tools import (folders_available, files_available,
                                get_admin_sites_for_user,
                                has_multi_file_action_permission,
@@ -34,8 +39,6 @@ from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           Archive)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
-import json
-import os
 
 
 class FolderAdmin(FolderPermissionModelAdmin):
@@ -119,7 +122,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             is_core_folder = obj.is_core()
         else:
             # add view
-            parent_id = request.REQUEST.get('parent_id', None) or None
+            parent_id = get_param_from_request(request, 'parent_id')
             folder_form.base_fields.pop('restricted', None)
 
         # shouldn't show site field if has parent or is core folder
@@ -272,17 +275,18 @@ class FolderAdmin(FolderPermissionModelAdmin):
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
 
+        current_site = request.GET.get('current_site', None)
+        _filter_folders = partial(folders_available, current_site, request.user)
+        _filter_files = partial(files_available, current_site, request.user)
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
                 descendants = folder.get_descendants(
                     include_self=True).filter(deleted_at__isnull=True)
-                folder_qs = folders_available(
-                    request, descendants.exclude(id=folder.id))
-                file_qs = files_available(
-                    request, File.objects.filter(folder__in=descendants))
+                folder_qs = _filter_folders(descendants.exclude(id=folder.id))
+                file_qs = _filter_files(File.objects.filter(folder__in=descendants))
             else:
-                folder_qs = folders_available(request, Folder.objects.all())
-                file_qs = files_available(request, File.objects.all())
+                folder_qs = _filter_folders(Folder.objects.all())
+                file_qs = _filter_files(File.objects.all())
 
             def folder_search_qs(qs, terms=[]):
                 for term in terms:
@@ -306,8 +310,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
             file_qs = file_search_qs(file_qs, search_terms)
             show_result_count = True
         else:
-            folder_qs = folders_available(request, folder.children.all())
-            file_qs = files_available(request, folder.files.all())
+            folder_qs = _filter_folders(folder.children.all())
+            file_qs = _filter_files(folder.files.all())
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
@@ -385,7 +389,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 'folder': folder,
                 'user_clipboard': clipboard,
                 'clipboard_files': clipboard.files.distinct(),
-                'current_site': request.REQUEST.get('current_site', None),
+                'current_site': get_param_from_request(request, 'current_site'),
                 'paginator': paginator,
                 'paginated_items': paginated_items,
                 'current_url': request.path,
@@ -773,7 +777,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         def _valid_candidates(request, candidates_qs, selected):
             # exclude orphaned/core/shared/restricted or any selected folders
-            return folders_available(request, candidates_qs) \
+            current_site = request.GET.get('current_site', None)
+            return folders_available(current_site, request.user, candidates_qs) \
                 .valid_destinations(request.user) \
                 .unrestricted(request.user) \
                 .exclude(id__in=selected)
