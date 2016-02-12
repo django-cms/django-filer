@@ -2651,7 +2651,11 @@ class TestImageChangeForm(TestCase):
                               args=(orig_img.pk, ))
             response = self.client.post(img_url, {
                 'name': 'new_two.jpg',
+                '_save': '',
             })
+            folder_url = reverse(
+                'admin:filer-directory_listing', kwargs={'folder_id': foo.id})
+            self.assertRedirects(response, folder_url)
             orig_img = File.objects.get(id=orig_img.id)
             self.assertEqual(orig_img.file.name, 'foo/new_two.jpg')
 

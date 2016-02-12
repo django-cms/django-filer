@@ -104,12 +104,12 @@ class CommonModelAdmin(admin.ModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        expected_urls = ['../']
         parent_folder = self._get_parent_for_view(obj)
         if IS_POPUP_VAR in request.POST:
             # In popup we always want to see the parent after changes
             return self._make_redirect_to_parent(request, parent_folder)
         response = super(CommonModelAdmin, self).response_change(request, obj)
+        expected_urls = ['../', reverse('admin:index')]
         return self._redirect_to_directory_listing(
             request, response, expected_urls, parent_folder, obj)
 
