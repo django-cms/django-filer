@@ -2679,6 +2679,28 @@ class TestImageChangeForm(TestCase):
                 self.assertNotEqual(sha1_before, orig_img.sha1)
             os.remove(another_img_path)
 
+    def test_image_change_name_in_popup(self):
+        """
+        Use case: open a popup, save image changes and then select the image
+        """
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            foo = Folder.objects.create(name='foo')
+            orig_img = self.create_filer_image(
+                'four.jpg', folder=foo, owner=self.user)
+            img_url = reverse('admin:filer_image_change', args=(orig_img.pk, ))
+            response = self.client.post(img_url, {
+                'name': 'new_four.jpg',
+                '_save': '', '_popup': '1',
+            })
+            folder_url = "{}{}".format(
+                reverse('admin:filer-directory_listing', kwargs={'folder_id': foo.id}),
+                "?_popup=1")
+            self.assertRedirects(response, folder_url)
+            orig_img = File.objects.get(id=orig_img.id)
+            self.assertEqual(orig_img.file.name, 'foo/new_four.jpg')
+
 
 class TrashAdminTests(TestCase):
 

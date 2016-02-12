@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.contrib import admin
 from django.contrib.admin.utils import unquote
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect
 from filer.models import Folder, File
@@ -46,17 +47,20 @@ class CommonModelAdmin(admin.ModelAdmin):
         """
         url = response.get("Location", None)
         if url in expected_urls or url == self._get_post_url(current_obj):
-            if parent:
-                url = reverse('admin:filer-directory_listing',
-                    kwargs={'folder_id': parent.id})
-            else:
-                url = reverse('admin:filer-directory_listing-root')
-
-            url = "%s%s%s%s" % (url, popup_param(request),
-                                selectfolder_param(request, "&"),
-                                current_site_param(request),)
-            return HttpResponseRedirect(url)
+            return self._make_redirect_to_parent(request, parent)
         return response
+
+    def _make_redirect_to_parent(self, request, parent):
+        if parent:
+            url = reverse('admin:filer-directory_listing', kwargs={'folder_id': parent.id})
+        else:
+            url = reverse('admin:filer-directory_listing-root')
+
+        url = "%s%s%s%s" % (url, popup_param(request),
+                            selectfolder_param(request, "&"),
+                            current_site_param(request),)
+        return HttpResponseRedirect(url)
+
 
     def delete_view(self, request, object_id, extra_context=None):
         """
@@ -100,9 +104,12 @@ class CommonModelAdmin(admin.ModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        response = super(CommonModelAdmin, self).response_change(request, obj)
         expected_urls = ['../']
         parent_folder = self._get_parent_for_view(obj)
+        if IS_POPUP_VAR in request.POST:
+            # In popup we always want to see the parent after changes
+            return self._make_redirect_to_parent(request, parent_folder)
+        response = super(CommonModelAdmin, self).response_change(request, obj)
         return self._redirect_to_directory_listing(
             request, response, expected_urls, parent_folder, obj)
 
