@@ -81,8 +81,8 @@ class CommonModelAdmin(admin.ModelAdmin):
         expected_urls = ["../../../../", "../../"]
 
         response = super(CommonModelAdmin, self).delete_view(
-                    request=request, object_id=object_id,
-                    extra_context=extra_context)
+            request=request, object_id=object_id,
+            extra_context=extra_context)
 
         return self._redirect_to_directory_listing(
             request, response, expected_urls, parent_folder, obj)
@@ -97,8 +97,8 @@ class CommonModelAdmin(admin.ModelAdmin):
             'select_folder': selectfolder_status(request),
         })
         return super(CommonModelAdmin, self).render_change_form(
-                        request=request, context=context, add=False,
-                        change=change, form_url=form_url, obj=obj)
+            request=request, context=context, add=False,
+            change=change, form_url=form_url, obj=obj)
 
     def response_change(self, request, obj):
         """

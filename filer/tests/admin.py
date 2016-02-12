@@ -105,7 +105,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertIn('folder name is already in use',
                       response.content)
 
-    def test_validate_no_duplcate_folders_on_rename(self):
+    def test_validate_no_duplicate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
         post_data = {"name": "foo", "_popup": 1}
         response = self.client.post(
