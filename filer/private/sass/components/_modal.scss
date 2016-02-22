@@ -3,6 +3,7 @@
 
 .popup {
     &.delete-confirmation .colM ul {
+        // makes sure that between list and button is a space #744
         margin-bottom: 25px !important;
     }
     .image-info-detail {

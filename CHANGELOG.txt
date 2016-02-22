@@ -8,6 +8,7 @@ CHANGELOG
 * Allow Django 1.9.x in setup requirements
 * Fixes an issue where only the first drop-zone will be active
 * Fixes an issue with Python 3 for the import_files command
+* Fixes button space on delete confirmation modal
 
 
 1.1.0 (2016-01-19)
