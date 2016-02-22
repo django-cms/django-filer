@@ -2,6 +2,9 @@
 // MODAL
 
 .popup {
+    &.delete-confirmation .colM ul {
+        margin-bottom: 25px !important;
+    }
     .image-info-detail {
         padding: 0;
         padding-bottom: 25px;
