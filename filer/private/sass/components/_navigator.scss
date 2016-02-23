@@ -239,7 +239,9 @@
         padding: 10px 20px !important;
     }
 }
-
+.upload-button-disabled {
+    display: inline-block;
+}
 .navigator-button + .dropdown-menu {
     margin-top: -2px;
 }

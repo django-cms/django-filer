@@ -1,0 +1,21 @@
+.tooltip {
+    opacity: 1 !important;
+    .tooltip-inner {
+        color: #555;
+        font-size: $font-size-small;
+        background-color: $white;
+        box-shadow: 0 0 10px rgba(0,0,0,.25);
+    }
+    &.top .tooltip-arrow {
+        border-top-color: $white !important;
+    }
+    &.right .tooltip-arrow {
+        border-right-color: $white !important;
+    }
+    &.bottom .tooltip-arrow {
+        border-bottom-color: $white !important;
+    }
+    &.left .tooltip-arrow {
+        border-left-color: $white !important;
+    }
+}
