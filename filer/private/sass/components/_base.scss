@@ -3,6 +3,7 @@
 
 html,
 body {
+    min-width: 320px;
     height: 100% !important;
 }
 
@@ -93,4 +94,9 @@ body {
 .img-wrapper {
     width: 180px;
     height: 180px;
+}
+
+.file-duplicates {
+    clear: both;
+    padding: 20px 0 0;
 }

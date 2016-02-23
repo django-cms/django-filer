@@ -32,6 +32,7 @@
     }
     a {
         display: block;
+        font-size: 20px;
         padding: 5px 10px;
         border-bottom: solid 1px $gray-lighter;
     }
@@ -50,15 +51,15 @@
     margin: 0;
     margin-left: 30px;
     @media screen and (max-width: $screen-tablet) {
-        float:left;
+        float: left;
         margin-left: 0;
     }
     li {
         display: inline-block;
-        list-style: none;
         line-height: 34px;
-        padding: 0 10px;
         vertical-align: middle;
+        padding: 0 10px;
+        list-style: none;
         @media screen and (max-width: $screen-tablet) {
             &:first-child {
                 padding-left: 0;
@@ -68,7 +69,7 @@
             vertical-align: middle;
         }
         a {
-            color: $gray-darker !important;
+            color: $gray-darker;
         }
     }
     span:before {

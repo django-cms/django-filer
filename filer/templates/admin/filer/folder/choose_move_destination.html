@@ -38,9 +38,10 @@
                                 <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}>{{ name_and_enabled.0 }}</option>
                             {% endfor %}
                         </select></p>
-                        <p>
-                            <input type="submit" value="{% trans 'Move' %}">
-                        </p>
+
+                        <div class="text-right clearfix">
+                            <input type="submit" value="{% trans 'Move' %}" class="default">
+                        </div>
                     </div>
                 </form>
             {% endif %}
