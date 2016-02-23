@@ -63,7 +63,7 @@ Cl.mediator = new Mediator();
 
             if (filter.length) {
                 filter.focus().closest(container).removeClass('is-focused');
-                filter.on('keyDown', function (){
+                filter.on('keydown', function (){
                     $(this).closest(container).addClass('is-focused');
                 });
             }
