@@ -61,7 +61,10 @@ Cl.mediator = new Mediator();
             var filter = $('.js-filter-files');
 
             if (filter.length) {
-                filter.focus();
+                filter.focus().closest('.js-filter-files-container').removeClass('is-focused');
+                filter.on('keydown', function (){
+                    $(this).closest('.js-filter-files-container').addClass('is-focused');
+                });
             }
         }());
 
