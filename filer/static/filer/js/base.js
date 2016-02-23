@@ -59,9 +59,14 @@ Cl.mediator = new Mediator();
         // Focus on the search field on page load
         (function () {
             var filter = $('.js-filter-files');
+            var containerSelector = '.js-filter-files-container';
 
             if (filter.length) {
-                filter.focus();
+                filter.focus().closest(containerSelector)
+                    .removeClass('is-focused');
+                filter.on('keydown', function () {
+                    $(this).closest(containerSelector).addClass('is-focused');
+                });
             }
         }());
 
