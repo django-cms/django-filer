@@ -153,16 +153,24 @@
                             {% endif %}
 
                             {% if permissions.has_add_children_permission and not folder.is_root %}
-                                <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}" data-max-uploader-connections="{{ uploader_connections }}">
+                                <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
+                                   class="navigator-button navigator-button-upload js-upload-button"
+                                   data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}"
+                                   data-max-uploader-connections="{{ uploader_connections }}">
                                     {% trans "Upload Files" %}
                                 </a>
                             {% elif folder.name == "unfiled files" %}
-                                <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-uploader-connections="{{ uploader_connections }}">
+                                <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
+                                   class="navigator-button navigator-button-upload js-upload-button"
+                                   data-url="{% url 'admin:filer-ajax_upload' %}"
+                                   data-max-uploader-connections="{{ uploader_connections }}">
                                     {% trans "Upload Files" %}
                                 </a>
                             {% endif %}
                             {% if folder.is_root and folder.name != "unfiled files" %}
-                                <span class="js-upload-button-disabled upload-button-disabled" data-toggle="tooltip" data-placement="bottom" title="{% trans 'You have to select a folder first' %}">
+                                <span class="js-upload-button-disabled upload-button-disabled"
+                                      data-toggle="tooltip" data-placement="bottom"
+                                      title="{% trans 'You have to select a folder first' %}">
                                     <a href="#" class="navigator-button navigator-button-upload" disabled>
                                         {% trans "Upload Files" %}
                                     </a>
@@ -211,7 +219,7 @@
                         <div class="filter-search-wrapper">
                             {% if is_popup %}
                                 <input type="hidden" name="_popup" value="1" />
-                                {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+                                {% if select_folder %}<input type="hidden" name="select_folder" value="1">{% endif %}
                             {% endif %}
                             <input type="text" placeholder="{% trans 'Search Files...' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
                             <div class="dropdown-container dropdown-container-down">
