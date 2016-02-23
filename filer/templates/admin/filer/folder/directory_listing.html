@@ -182,9 +182,11 @@
                             </a>
                         {% endif %}
                         {% if folder.is_root and folder.name != "unfiled files" %}
-                            <a href="#" data-toggle="tooltip" data-placement="left" title="{% trans 'bottomYou can&#39;t upload to the root' %}" class="js-upload-button-disabled navigator-button navigator-button-upload" disabled>
-                                {% trans "Upload Files" %}
-                            </a>
+                            <span class="js-upload-button-disabled upload-button-disabled" data-toggle="tooltip" data-placement="bottom" title="{% trans 'You can&#39;t upload to the root' %}">
+                                <a href="#" title="{% trans 'You can&#39;t upload to the root' %}" class="navigator-button navigator-button-upload" disabled>
+                                    {% trans "Upload Files" %}
+                                </a>
+                            </span>
                         {% endif %}
                     </div>
                 {% endblock %}

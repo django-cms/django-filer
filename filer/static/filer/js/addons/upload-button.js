@@ -114,7 +114,7 @@
             }, 1000);
         });
 
-        if (uploadButtonDisabled) {
+        if (uploadButtonDisabled.length) {
             uploadButtonDisabled.tooltip();
         }
     });
