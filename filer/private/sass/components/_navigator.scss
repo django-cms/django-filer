@@ -74,7 +74,6 @@
         background-color: $white !important;
     }
 }
-
 .navigator-top-nav {
     position: relative;
     clear: both;
@@ -83,13 +82,17 @@
     background: $gray-table;
     .breadcrumbs-container {
         float: left;
-        width: calc(100% - 615px);
-        @media screen and (max-width: $screen-desktop) {
-            width: calc(100% - 480px);
-        }
+        width: 20%;
         @media screen and (max-width: $screen-tablet) {
             width: auto;
             margin-right: 20px;
+        }
+    }
+    .tools-container {
+        float: left;
+        width: 80%;
+        @media screen and (max-width: $screen-tablet) {
+            width: 100%;
         }
     }
     .nav-button {
@@ -131,6 +134,7 @@
     }
 }
 .navigator-tools {
+    @include clearfix;
     float: right;
     margin: 10px 10px 0 0;
     .actions-wrapper {
@@ -170,6 +174,7 @@
         }
         &.action-selected {
             display: block;
+            margin-bottom: 10px;
         }
     }
     .dropdown-container {
@@ -262,6 +267,7 @@
     position: relative;
     font-size: 16px;
     font-weight: bold;
+    white-space: nowrap;
     padding: 18px 0 0 20px;
     .navigator-breadcrumbs-folder-name {
         display: inline-block;

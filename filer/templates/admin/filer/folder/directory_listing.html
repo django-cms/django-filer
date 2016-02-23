@@ -138,96 +138,97 @@
                 {% endif %}
             </div>
         </div>
+        <div class="tools-container">
+            {% block object-tools %}
+                <div class="navigator-tools">
+                    {% block object-tools-items %}
+                        <div class="navigator-button-wrapper">
+                            {% if folder.can_have_subfolders and can_make_folder %}
+                                <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}{% if is_popup %}&amp;_popup=1{% endif %}"
+                                    title="{% trans 'Adds a new Folder' %}"
+                                    class="navigator-button"
+                                    onclick="return showAddAnotherPopup(this);">
+                                {% trans "New Folder" %}
+                                </a>
+                            {% endif %}
 
-        <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
-            {% if is_popup %}
-                <input type="hidden" name="_popup" value="1" />
-                {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
-            {% endif %}
-            <input type="text" placeholder="{% trans 'Search Files...' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
-            <div class="dropdown-container dropdown-container-down">
-                <a href="#" data-toggle="dropdown" aria-expanded="false">
-                    <span class="fa fa-caret-down"></span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-checkboxes">
-                    <li>
-                        <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> {% trans "limit the search to current folder" %}</label>
-                    </li>
-                </ul>
-            </div>
-
-            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
-        </form>
-
-        {% block object-tools %}
-            <div class="navigator-tools">
-                {% block object-tools-items %}
-                    <div class="navigator-button-wrapper">
-                        {% if folder.can_have_subfolders and can_make_folder %}
-                            <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.id }}{% if is_popup %}&amp;_popup=1{% endif %}"
-                                title="{% trans 'Adds a new Folder' %}"
-                                class="navigator-button"
-                                onclick="return showAddAnotherPopup(this);">
-                            {% trans "New Folder" %}
-                            </a>
-                        {% endif %}
-
-                        {% if permissions.has_add_children_permission and not folder.is_root %}
-                            <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}" data-max-uploader-connections="{{ uploader_connections }}">
-                                {% trans "Upload Files" %}
-                            </a>
-                        {% elif folder.name == "unfiled files" %}
-                            <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-uploader-connections="{{ uploader_connections }}">
-                                {% trans "Upload Files" %}
-                            </a>
-                        {% endif %}
-                        {% if folder.is_root and folder.name != "unfiled files" %}
-                            <span class="js-upload-button-disabled upload-button-disabled" data-toggle="tooltip" data-placement="bottom" title="{% trans 'You have to select a folder first' %}">
-                                <a href="#" class="navigator-button navigator-button-upload" disabled>
+                            {% if permissions.has_add_children_permission and not folder.is_root %}
+                                <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}" data-max-uploader-connections="{{ uploader_connections }}">
                                     {% trans "Upload Files" %}
                                 </a>
-                            </span>
-                        {% endif %}
-                    </div>
-                {% endblock %}
-                {% if paginated_items.object_list|length and not is_popup %}
-                    <div class="actions-wrapper">
-                        <ul class="actions-separated-list">
-                            <li>
-                                <a href="#" class="js-action-delete"><span class="fa fa-trash-o"></span></a>
-                            </li>
-                            <li>
-                                <a href="#" class="js-action-copy"><span class="fa fa-copy"></span></a>
-                            </li>
-                            <li>
-                                <a href="#" class="js-action-move"><span class="fa fa-cut"></span></a>
-                            </li>
-                        </ul>
-                        <div class="dropdown-container js-actions-menu">
-                            <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
-                                <span class="fa fa-ellipsis-h"></span>
-                            </a>
-                            <ul class="create-menu-dropdown dropdown-menu">
-                                <!-- Actions will go here -->
-                            </ul>
+                            {% elif folder.name == "unfiled files" %}
+                                <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}" class="navigator-button navigator-button-upload js-upload-button" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-uploader-connections="{{ uploader_connections }}">
+                                    {% trans "Upload Files" %}
+                                </a>
+                            {% endif %}
+                            {% if folder.is_root and folder.name != "unfiled files" %}
+                                <span class="js-upload-button-disabled upload-button-disabled" data-toggle="tooltip" data-placement="bottom" title="{% trans 'You have to select a folder first' %}">
+                                    <a href="#" class="navigator-button navigator-button-upload" disabled>
+                                        {% trans "Upload Files" %}
+                                    </a>
+                                </span>
+                            {% endif %}
                         </div>
-                    </div>
-                {% endif %}
-                <div class="actions">
-                    {% if actions_selection_counter %}
-                        <script type="text/javascript">var _actions_icnt="{{ paginated_items.object_list|length|default:"0" }}";</script>
-                        <span class="action-counter">{{ selection_note }}</span>
-                        {% if paginator.count != paginated_items.object_list|length %}
-                            <span class="all">{{ selection_note_all }}</span>
-                            <span class="question">
-                                <a href="javascript:;" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }}{% endblocktrans %}</a>
-                            </span>
-                            <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
-                        {% endif %}
+                    {% endblock %}
+                    {% if paginated_items.object_list|length and not is_popup %}
+                        <div class="actions-wrapper">
+                            <ul class="actions-separated-list">
+                                <li>
+                                    <a href="#" class="js-action-delete"><span class="fa fa-trash-o"></span></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="js-action-copy"><span class="fa fa-copy"></span></a>
+                                </li>
+                                <li>
+                                    <a href="#" class="js-action-move"><span class="fa fa-cut"></span></a>
+                                </li>
+                            </ul>
+                            <div class="dropdown-container js-actions-menu">
+                                <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
+                                    <span class="fa fa-ellipsis-h"></span>
+                                </a>
+                                <ul class="create-menu-dropdown dropdown-menu">
+                                    <!-- Actions will go here -->
+                                </ul>
+                            </div>
+                        </div>
                     {% endif %}
+                    <div class="actions">
+                        {% if actions_selection_counter %}
+                            <script type="text/javascript">var _actions_icnt="{{ paginated_items.object_list|length|default:"0" }}";</script>
+                            <span class="action-counter">{{ selection_note }}</span>
+                            {% if paginator.count != paginated_items.object_list|length %}
+                                <span class="all">{{ selection_note_all }}</span>
+                                <span class="question">
+                                    <a href="javascript:;" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }}{% endblocktrans %}</a>
+                                </span>
+                                <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
+                        <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
+                        <div class="filter-search-wrapper">
+                            {% if is_popup %}
+                                <input type="hidden" name="_popup" value="1" />
+                                {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+                            {% endif %}
+                            <input type="text" placeholder="{% trans 'Search Files...' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+                            <div class="dropdown-container dropdown-container-down">
+                                <a href="#" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="fa fa-caret-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-checkboxes">
+                                    <li>
+                                        <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> {% trans "limit the search to current folder" %}</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        {% endblock %}
+            {% endblock %}
+        </div>
     </div>
     <div id="content-main">
         {% include "admin/filer/tools/search_form.html" %}
