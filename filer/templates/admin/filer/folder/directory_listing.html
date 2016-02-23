@@ -218,7 +218,7 @@
                         <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
                         <div class="filter-search-wrapper">
                             {% if is_popup %}
-                                <input type="hidden" name="_popup" value="1" />
+                                <input type="hidden" name="_popup" value="1">
                                 {% if select_folder %}<input type="hidden" name="select_folder" value="1">{% endif %}
                             {% endif %}
                             <input type="text" placeholder="{% trans 'Search Files...' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
