@@ -228,7 +228,13 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-checkboxes">
                                     <li>
-                                        <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> {% trans "limit the search to current folder" %}</label>
+                                        <label>
+                                            <input type="checkbox" id="limit_search_to_folder"
+                                               name="limit_search_to_folder"
+                                               {% if limit_search_to_folder %}checked="checked"{% endif %}
+                                               title="{% trans 'Check it to limit the search to current folder' %}">
+                                            {% trans "limit the search to current folder" %}
+                                        </label>
                                     </li>
                                 </ul>
                             </div>
