@@ -41,7 +41,7 @@
         @include clearfix();
         position: static;
         float: none;
-        width: 100%;
+        width: calc(100% - 50px);
         margin-bottom: 20px;
         padding: 25px;
         border-radius: 0;

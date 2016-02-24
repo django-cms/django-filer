@@ -4,7 +4,8 @@
 *:before, *:after {
   box-sizing: inherit !important;
 }
-.filebrowser #content {
+.filebrowser #content,
+.popup #content {
     *,
     *:before, *:after {
       box-sizing: border-box !important;
