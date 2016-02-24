@@ -6,10 +6,14 @@
     width: 100%;
     margin: 0;
     border-top: solid 1px $gray-lighter !important;
-    tbody {
-        td {
-            padding: 5px 10px !important;
-        }
+    thead th,
+    tbody td {
+        text-align: left;
+        vertical-align: middle;
+        padding: 5px 10px!important;
+        border-left: 0!important;
+        border-bottom: 1px solid $gray-lighter;
+        background: 0 0!important;
     }
     .unfiled td {
         background-color: $gray-table !important;
@@ -35,6 +39,7 @@
     }
     .column-action {
         text-align: center;
+        white-space: nowrap;
         width: 70px;
         padding-right: 20px !important;
         a {
@@ -143,7 +148,7 @@
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
             float: none;
-            margin-left: 10px;
+            margin-left: 2px;
         }
     }
     .actions {
@@ -175,6 +180,10 @@
         &.action-selected {
             display: block;
             margin-bottom: 10px;
+            margin-left: 20px;
+            @media screen and (max-width: $screen-tablet) {
+                margin-left: 0;
+            }
         }
     }
     .dropdown-container {
