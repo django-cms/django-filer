@@ -1,5 +1,15 @@
 //##############################################################################
 // BASE
+*,
+*:before, *:after {
+  box-sizing: inherit !important;
+}
+.filebrowser #content {
+    *,
+    *:before, *:after {
+      box-sizing: border-box !important;
+    }
+}
 
 html,
 body {
@@ -65,13 +75,15 @@ body {
     &.popup #content {
         box-shadow: none;
     }
-    #container #content {
-        margin-top: 90px !important;
+    #container {
+        min-width: auto;
+        #content {
+            margin-top: 90px !important;
+            padding: 0;
+            box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+        }
     }
-    #content {
-        box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
-    }
-    h1.folder_header {
+        h1.folder_header {
         position: relative;
         top: 6px;
     }
