@@ -2,18 +2,34 @@
 // FILTER FILES
 
 .filter-files-container {
-    position: absolute;
-    top: 15px;
-    right: 430px;
-    z-index: 1;
-    margin: 0;
+    @include clearfix;
+    position: relative;
+    float: right;
+    margin: 0 10px 10px 0;
     padding: 0;
     background: none;
     box-shadow: none;
+    @media screen and (max-width: $screen-tablet) {
+        float: none;
+        margin-top: 0;
+    }
+    &.is-focused {
+        .filter-files-field {
+            width: 100% !important;
+        }
+        @media screen and (max-width: $screen-tablet) {
+            .filter-search-wrapper {
+                width: calc(100% - 50px);
+            }
+            .filter-files-button {
+                float: right;
+            }
+        }
+    }
     .dropdown-container {
         position: absolute;
         top: 0;
-        right: 44px;
+        right: 0;
         > a {
             &,
             &:visited,
@@ -28,10 +44,16 @@
             }
         }
     }
+    .filter-search-wrapper {
+        position: relative;
+        float: right;
+        margin-right: 5px;
+        @media screen and (max-width: $screen-tablet) {
+            float: left;
+        }
+    }
     .filter-files-button {
-        position: absolute;
-        top: 0;
-        right: 0;
+        float: right;
         text-align: center;
         margin: 0;
         padding: 8px !important;
@@ -41,11 +63,11 @@
             font-size: 16px !important;
             vertical-align: top;
         }
+        @media screen and (max-width: $screen-tablet) {
+            float: none;
+        }
     }
     .filter-files-field {
-        position: absolute;
-        top: 0;
-        right: 43px;
         color: $gray-darkest;
         font-size: 14px !important;
         line-height: 34px;
@@ -67,31 +89,10 @@
         margin-top: 0 !important;
         margin-right: -1px !important;
     }
-    &.is-focused {
-        left: 55px;
-        .filter-files-field {
-            right: 60px !important;
-            left: 0;
-            width: calc(100% - 43px) !important;
-        }
-    }
-    @media screen and (max-width: $screen-desktop) {
-        right: 260px !important;
-    }
     @media screen and (max-width: $screen-tablet) {
         &,
         &.is-focused {
-            position: relative;
-            top: auto !important;
-            right: auto !important;
-            left: auto !important;
-            height: 34px;
-            margin: 0 20px 0 16px;
-            .filter-files-field {
-                right: 60px !important;
-                left: 0;
-                width: calc(100% - 43px) !important;
-            }
+            margin: 0 10px 10px 0;
         }
     }
 }
