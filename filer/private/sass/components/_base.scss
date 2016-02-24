@@ -1,6 +1,21 @@
 //##############################################################################
 // BASE
 
+// resets box-sizing on every element and adds it explicitly on elements in filebrowser and popup content
+*,
+*:before, *:after {
+    box-sizing: inherit !important;
+}
+.filebrowser,
+.popup {
+    #content {
+        *,
+        *:before, *:after {
+            box-sizing: border-box !important;
+        }
+    }
+}
+
 html,
 body {
     min-width: 320px;
@@ -65,11 +80,13 @@ body {
     &.popup #content {
         box-shadow: none;
     }
-    #container #content {
-        margin-top: 90px !important;
-    }
-    #content {
-        box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+    #container {
+        min-width: auto;
+        #content {
+            margin-top: 90px !important;
+            padding: 0;
+            box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+        }
     }
     h1.folder_header {
         position: relative;

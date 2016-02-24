@@ -17,6 +17,7 @@ form .form-row {
         }
         &.dz-drag-hover {
             padding-top: 14px;
+            background-color: $color-primary-light;
             border: solid 2px $color-primary !important;
             .z-index-fix {
                 z-index: 1;
