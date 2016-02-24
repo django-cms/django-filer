@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from filer.utils.compatibility import DJANGO_1_7
+from filer.utils.compatibility import LTE_DJANGO_1_7
 
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
@@ -33,7 +33,7 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
         """
         # Code from django ModelAdmin to determine changelist on the fly
         opts = obj._meta
-        if DJANGO_1_7:
+        if LTE_DJANGO_1_7:
             model_name = opts.module_name
         else:
             model_name = opts.model_name

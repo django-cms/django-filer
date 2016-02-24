@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-
-import django
 from django.template import Library
+
+from filer.utils.compatibility import LTE_DJANGO_1_8, LTE_DJANGO_1_7
 
 
 register = Library()
@@ -20,7 +19,5 @@ filer_actions = register.inclusion_tag("admin/filer/actions.html", takes_context
 
 @register.inclusion_tag('admin/filer/widgets/lookup.html', takes_context=True)
 def render_filer_lookup_button(context):
-    version = LooseVersion(django.get_version())
-    is_18_and_up = version >= LooseVersion('1.8')
-    context['IS_DJANGO_18'] = is_18_and_up and version < LooseVersion('1.9')
+    context['IS_DJANGO_18'] = LTE_DJANGO_1_8 and not LTE_DJANGO_1_7
     return context
