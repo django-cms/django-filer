@@ -1,5 +1,7 @@
 //##############################################################################
 // BASE
+
+// resets box-sizing on every element and adds it explicitly on elements in filebrowser and popup content
 *,
 *:before, *:after {
     box-sizing: inherit !important;
