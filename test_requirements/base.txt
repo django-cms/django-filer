@@ -1,2 +1,1 @@
 Pillow>3.0
-coverage
