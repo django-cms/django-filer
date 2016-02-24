@@ -4,11 +4,13 @@
 *:before, *:after {
     box-sizing: inherit !important;
 }
-.filebrowser #content,
-.popup #content {
-    *,
-    *:before, *:after {
-      box-sizing: border-box !important;
+.filebrowser,
+.popup {
+    #content {
+        *,
+        *:before, *:after {
+            box-sizing: border-box !important;
+        }
     }
 }
 
