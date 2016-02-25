@@ -2,6 +2,8 @@
 // This script implements the dropzone settings
 'use strict';
 
+var Dropzone;
+
 if (Dropzone) {
     Dropzone.autoDiscover = false;
 }
@@ -12,6 +14,7 @@ django.jQuery(function ($) {
     var dropzoneTemplateSelector = '.js-filer-dropzone-template';
     var previewImageSelector = '.js-img-preview';
     var dropzoneSelector = '.js-filer-dropzone';
+    var dropzones = $(dropzoneSelector);
     var messageSelector = '.js-filer-dropzone-message';
     var lookupButtonSelector = '.js-related-lookup';
     var progressSelector = '.js-filer-dropzone-progress';
@@ -39,9 +42,6 @@ django.jQuery(function ($) {
     };
 
     var createDropzone = function () {
-        if (this.dropzone) {
-            return;
-        }
         var dropzone = $(this);
         var dropzoneUrl = dropzone.data('url');
         var inputId = dropzone.find(fileIdInputSelector);
@@ -50,6 +50,10 @@ django.jQuery(function ($) {
         var message = dropzone.find(messageSelector);
         var clearButton = dropzone.find(filerClearerSelector);
         var fileChoose = dropzone.find(fileChooseSelector);
+
+        if (this.dropzone) {
+            return;
+        }
 
         $(window).on('resize', function () {
             checkMinWidth(dropzone);
@@ -106,7 +110,7 @@ django.jQuery(function ($) {
                     }
                 } else {
                     if (response && response.error) {
-                      window.showError(file.name + ': ' + response.error);
+                        window.showError(file.name + ': ' + response.error);
                     }
                     this.removeAllFiles(true);
                 }
@@ -132,7 +136,6 @@ django.jQuery(function ($) {
         });
     };
 
-    var dropzones = $(dropzoneSelector);
     if (dropzones.length && Dropzone) {
         if (!window.filerDropzoneInitialized) {
             window.filerDropzoneInitialized = true;
