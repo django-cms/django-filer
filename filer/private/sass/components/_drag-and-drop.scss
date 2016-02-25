@@ -8,6 +8,7 @@ form .form-row {
         border: solid 1px $gray-lighter;
         border-radius: $border-radius-base;
         background-color: $gray-lightest;
+        box-sizing: border-box !important;
         .z-index-fix {
             position: absolute;
             top: 0;
