@@ -1,13 +1,11 @@
 // #DROPZONE#
 // This script implements the dropzone settings
+/* global Dropzone */
 'use strict';
-
-var Dropzone;
 
 if (Dropzone) {
     Dropzone.autoDiscover = false;
 }
-
 
 /* global Dropzone, django */
 django.jQuery(function ($) {
