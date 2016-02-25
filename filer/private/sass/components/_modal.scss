@@ -29,4 +29,24 @@
     &.filebrowser #container #content {
         margin-top: 10px !important;
     }
+    .navigator-button-wrapper {
+        float: right;
+        @media screen and (max-width: $screen-tablet) {
+            float: none;
+        }
+    }
+    .navigator-top-nav {
+        .tools-container {
+            width: 70%;
+        }
+        .breadcrumbs-container {
+            width: 30%;
+        }
+        .tools-container,
+        .breadcrumbs-container {
+            @media screen and (max-width: $screen-tablet) {
+                width: 100%;
+            }
+        }
+    }
 }
