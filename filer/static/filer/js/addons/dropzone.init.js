@@ -39,7 +39,9 @@ django.jQuery(function ($) {
     };
 
     var createDropzone = function () {
-        if (this.dropzone) return;
+        if (this.dropzone) {
+            return;
+        }
         var dropzone = $(this);
         var dropzoneUrl = dropzone.data('url');
         var inputId = dropzone.find(fileIdInputSelector);
@@ -50,7 +52,7 @@ django.jQuery(function ($) {
         var fileChoose = dropzone.find(fileChooseSelector);
 
         $(window).on('resize', function () {
-          checkMinWidth(dropzone);
+            checkMinWidth(dropzone);
         });
 
         new Dropzone(this, {
@@ -71,13 +73,13 @@ django.jQuery(function ($) {
                     clearButton.trigger('click');
                 });
                 $('img', this.element).on('dragstart', function (event) {
-                  event.preventDefault();
+                    event.preventDefault();
                 });
                 clearButton.on('click', function () {
-                  dropzone.removeClass(objectAttachedClass);
+                    dropzone.removeClass(objectAttachedClass);
                 });
             },
-            maxfilesexceeded: function (file) {
+            maxfilesexceeded: function () {
                 this.removeAllFiles(true);
             },
             drop: function () {
@@ -114,9 +116,8 @@ django.jQuery(function ($) {
                 });
             },
             error: function (file, response) {
-
-              showError(file.name + ': ' + response.error);
-              this.removeAllFiles(true);
+                showError(file.name + ': ' + response.error);
+                this.removeAllFiles(true);
             },
             reset: function () {
                 if (isImage) {
@@ -139,8 +140,8 @@ django.jQuery(function ($) {
         }
         dropzones.each(createDropzone);
         $(document).on('formset:added', function (ev, row) {
-          var dropzones = $(row).find(dropzoneSelector);
-          dropzones.each(createDropzone);
+            var dropzones = $(row).find(dropzoneSelector);
+            dropzones.each(createDropzone);
         });
     }
 });

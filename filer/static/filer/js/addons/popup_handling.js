@@ -8,25 +8,25 @@
     };
     window.dismissRelatedImageLookupPopup = function (win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt) {
         var id = window.windowname_to_id(win.name);
-        var $lookup = $('#' + id);
-        var $container = $lookup.closest(".filerFile");
-        var $img = $container.find(".thumbnail_img");
-        var $txt = $container.find(".description_txt");
-        var $clearer = $container.find(".filerClearer");
-        var $dropzoneMessage = $container.siblings(".dz-message");
-        var $elem = $container.find(":input");
-        var oldId = $elem.value;
+        var lookup = $('#' + id);
+        var container = lookup.closest('.filerFile');
+        var image = container.find('.thumbnail_img');
+        var descriptionText = container.find('.description_text');
+        var clearer = container.find('.filerClearer');
+        var dropzoneMessage = container.siblings('.dz-message');
+        var element = container.find(':input');
+        var oldId = element.value;
 
-        $elem.val(chosenId);
-        $elem.closest('.js-filer-dropzone').addClass('js-object-attached');
-        $img.attr('src', chosenThumbnailUrl).removeClass('hidden');
-        $txt.text(chosenDescriptionTxt);
-        $clearer.removeClass('hidden');
-        $lookup.addClass('hidden');
-        $dropzoneMessage.addClass('hidden');
+        element.val(chosenId);
+        element.closest('.js-filer-dropzone').addClass('js-object-attached');
+        image.attr('src', chosenThumbnailUrl).removeClass('hidden');
+        descriptionText.text(chosenDescriptionTxt);
+        clearer.removeClass('hidden');
+        lookup.addClass('hidden');
+        dropzoneMessage.addClass('hidden');
 
         if (oldId !== chosenId) {
-            $elem.trigger('change');
+            element.trigger('change');
         }
         win.close();
     };
