@@ -5,7 +5,6 @@ import warnings
 from django import forms
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
@@ -83,15 +82,15 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     class Media(object):
         css = {
             'all': [
-                static('filer/css/admin_filer.css')
+                'filer/css/admin_filer.css',
             ]
         }
         js = (
-            static('filer/js/libs/jquery.min.js'),
-            static('filer/js/libs/dropzone.min.js'),
-            static('filer/js/addons/dropzone.init.js'),
-            static('filer/js/addons/popup_handling.js'),
-            static('filer/js/addons/widget.js'),
+            'filer/js/libs/jquery.min.js',
+            'filer/js/libs/dropzone.min.js',
+            'filer/js/addons/dropzone.init.js',
+            'filer/js/addons/popup_handling.js',
+            'filer/js/addons/widget.js',
         )
 
 
