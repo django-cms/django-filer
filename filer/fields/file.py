@@ -81,7 +81,15 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media(object):
+        css = {
+            'all': [
+                static('filer/css/admin_filer.css')
+            ]
+        }
         js = (
+            static('filer/js/libs/jquery.min.js'),
+            static('filer/js/libs/dropzone.min.js'),
+            static('filer/js/addons/dropzone.init.js'),
             static('filer/js/addons/popup_handling.js'),
             static('filer/js/addons/widget.js'),
         )

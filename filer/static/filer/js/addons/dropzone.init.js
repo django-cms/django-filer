@@ -1,17 +1,18 @@
 // #DROPZONE#
 // This script implements the dropzone settings
+/* global Dropzone */
 'use strict';
 
 if (Dropzone) {
     Dropzone.autoDiscover = false;
 }
 
-
 /* global Dropzone, django */
 django.jQuery(function ($) {
     var dropzoneTemplateSelector = '.js-filer-dropzone-template';
     var previewImageSelector = '.js-img-preview';
     var dropzoneSelector = '.js-filer-dropzone';
+    var dropzones = $(dropzoneSelector);
     var messageSelector = '.js-filer-dropzone-message';
     var lookupButtonSelector = '.js-related-lookup';
     var progressSelector = '.js-filer-dropzone-progress';
@@ -39,7 +40,6 @@ django.jQuery(function ($) {
     };
 
     var createDropzone = function () {
-        if (this.dropzone) return;
         var dropzone = $(this);
         var dropzoneUrl = dropzone.data('url');
         var inputId = dropzone.find(fileIdInputSelector);
@@ -49,8 +49,12 @@ django.jQuery(function ($) {
         var clearButton = dropzone.find(filerClearerSelector);
         var fileChoose = dropzone.find(fileChooseSelector);
 
+        if (this.dropzone) {
+            return;
+        }
+
         $(window).on('resize', function () {
-          checkMinWidth(dropzone);
+            checkMinWidth(dropzone);
         });
 
         new Dropzone(this, {
@@ -71,13 +75,13 @@ django.jQuery(function ($) {
                     clearButton.trigger('click');
                 });
                 $('img', this.element).on('dragstart', function (event) {
-                  event.preventDefault();
+                    event.preventDefault();
                 });
                 clearButton.on('click', function () {
-                  dropzone.removeClass(objectAttachedClass);
+                    dropzone.removeClass(objectAttachedClass);
                 });
             },
-            maxfilesexceeded: function (file) {
+            maxfilesexceeded: function () {
                 this.removeAllFiles(true);
             },
             drop: function () {
@@ -104,7 +108,7 @@ django.jQuery(function ($) {
                     }
                 } else {
                     if (response && response.error) {
-                      window.showError(file.name + ': ' + response.error);
+                        window.showError(file.name + ': ' + response.error);
                     }
                     this.removeAllFiles(true);
                 }
@@ -114,9 +118,8 @@ django.jQuery(function ($) {
                 });
             },
             error: function (file, response) {
-
-              showError(file.name + ': ' + response.error);
-              this.removeAllFiles(true);
+                showError(file.name + ': ' + response.error);
+                this.removeAllFiles(true);
             },
             reset: function () {
                 if (isImage) {
@@ -131,7 +134,6 @@ django.jQuery(function ($) {
         });
     };
 
-    var dropzones = $(dropzoneSelector);
     if (dropzones.length && Dropzone) {
         if (!window.filerDropzoneInitialized) {
             window.filerDropzoneInitialized = true;
@@ -139,8 +141,8 @@ django.jQuery(function ($) {
         }
         dropzones.each(createDropzone);
         $(document).on('formset:added', function (ev, row) {
-          var dropzones = $(row).find(dropzoneSelector);
-          dropzones.each(createDropzone);
+            var dropzones = $(row).find(dropzoneSelector);
+            dropzones.each(createDropzone);
         });
     }
 });
