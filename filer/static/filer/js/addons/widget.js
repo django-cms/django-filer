@@ -9,7 +9,7 @@ django.jQuery(function ($) {
         var thumbnail = container.find('.thumbnail_img');
         var description = container.find('.description_text');
         var addImageButton = container.find('.lookup');
-        var $dropzoneMessage = container.siblings('.dz-message');
+        var dropzoneMessage = container.siblings('.dz-message');
         var hiddenClass = 'hidden';
 
         clearer.addClass(hiddenClass);
@@ -17,7 +17,7 @@ django.jQuery(function ($) {
         thumbnail.addClass(hiddenClass);
         thumbnail.parent('a').removeAttr('href');
         addImageButton.removeClass(hiddenClass);
-        $dropzoneMessage.removeClass(hiddenClass);
+        dropzoneMessage.removeClass(hiddenClass);
         description.empty();
     };
 
