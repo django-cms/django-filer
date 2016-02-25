@@ -245,15 +245,7 @@
         top: 0;
     }
 }
-.popup .navigator-tools .navigator-button {
-    &,
-    &:visited,
-    &:link:visited,
-    &:link {
-        @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
-        padding: 10px 20px !important;
-    }
-}
+
 .upload-button-disabled {
     display: inline-block;
 }
