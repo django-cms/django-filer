@@ -9,6 +9,7 @@ CHANGELOG
 * Fixes an issue where only the first drop-zone will be active
 * Fixes an issue with Python 3 for the import_files command
 * Fixes button space on delete confirmation modal
+* Updates Filer image plugin form fields
 * Removed folder content space in admin, side frame and modal
 
 
