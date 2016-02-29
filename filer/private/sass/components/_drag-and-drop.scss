@@ -343,7 +343,7 @@ form .form-row {
         color: $color-primary;
     }
     .text {
-        margin: 5px 0 10px 0;
+        margin: 5px 0 10px;
     }
 }
 .filer-dropzone-upload-info {
@@ -382,11 +382,14 @@ form .form-row {
 }
 
 .filer-dropzone-cancel {
-    font-size: $font-size-small;
-    color: $gray;
     padding-top: 10px;
     border-top: solid 1px $gray-lighter;
     margin: 15px -15px 10px;
+    a {
+        font-size: $font-size-small;
+        color: $gray !important;
+        cursor: pointer;
+    }
 }
 .filer-dropzone-upload-success,
 .filer-dropzone-upload-canceled {
