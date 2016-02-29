@@ -18,7 +18,7 @@
         var uploadInfo = $('.js-filer-dropzone-upload-info');
         var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
         var uploadNumber = $('.js-filer-dropzone-upload-number');
-        var uploadText= $('.js-filer-upload-text');
+        var uploadText = $('.js-filer-upload-text');
         var uploadFileNameSelector = '.js-filer-dropzone-file-name';
         var uploadProgressSelector = '.js-filer-dropzone-progress';
         var uploadSuccess = $('.js-filer-dropzone-upload-success');
@@ -33,8 +33,9 @@
         var baseUrl;
         var baseFolderTitle;
         var updateUploadNumber = function () {
-            uploadText.removeClass('hidden');
+            uploadText.addClass('hidden');
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
+            uploadText.removeClass('hidden');
         };
         var destroyDropzones = function () {
             $.each(dropzoneInstances, function (index) {
