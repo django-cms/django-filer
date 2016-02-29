@@ -73,8 +73,10 @@
     .dz-drag-hover,
     &.dz-drag-hover {
         background: $hover-bg;
+        border: solid 2px $color-primary !important;
         tr.unfiled td {
             background: $hover-bg !important;
+            border: 0;
         }
     }
     .reset-hover {

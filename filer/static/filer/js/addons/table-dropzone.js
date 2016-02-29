@@ -33,7 +33,6 @@
         var baseUrl;
         var baseFolderTitle;
         var updateUploadNumber = function () {
-            uploadText.addClass('hidden');
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
             uploadText.removeClass('hidden');
         };
