@@ -84,9 +84,14 @@ body {
         min-width: auto;
         #content {
             margin-top: 90px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
             padding: 0;
             box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
         }
+    }
+    .breadcrumbs {
+        margin-left: 15px;
     }
     h1.folder_header {
         position: relative;
