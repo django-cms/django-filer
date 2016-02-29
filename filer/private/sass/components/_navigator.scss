@@ -72,15 +72,19 @@
     }
     .dz-drag-hover,
     &.dz-drag-hover {
-        background: $hover-bg;
-        border: solid 2px $color-primary !important;
-        tr.unfiled td {
+        td {
             background: $hover-bg !important;
-            border: 0;
+            border-top: solid 2px $color-primary !important;
+            border-bottom: solid 2px $color-primary !important;
+            box-sizing: border-box !important;
         }
     }
     .reset-hover {
-        background-color: $white !important;
+        td {
+            background-color: $white !important;
+            border-top: 0 !important;
+            border-bottom: solid 1px $gray-lighter !important;
+        }
     }
 }
 .navigator-top-nav {
