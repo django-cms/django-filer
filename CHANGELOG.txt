@@ -10,7 +10,8 @@ CHANGELOG
 * Fixes an issue with Python 3 for the import_files command
 * Fixes button space on delete confirmation modal
 * Updates Filer image plugin form fields
-* Removed folder content space in admin, side frame and modal
+* Removes folder content space in admin, side frame and modal
+* Updates drag and drop modal window
 
 
 1.1.0 (2016-01-19)

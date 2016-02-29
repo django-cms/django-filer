@@ -334,15 +334,16 @@ form .form-row {
     max-height: 300px;
     overflow-y: auto;
     margin: -50px 0 0 -150px;
-    padding: 15px;
+    padding: 15px 15px 0;
     border-radius: $border-radius-base;
     background: $white;
     box-shadow: $base-box-shadow;
     .icon {
-        font-size: 30px;
+        font-size: 35px;
+        color: $color-primary;
     }
     .text {
-        margin: 15px 0 10px 0;
+        margin: 5px 0 10px;
     }
 }
 .filer-dropzone-upload-info {
@@ -353,6 +354,9 @@ form .form-row {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    &:empty {
+        margin-top: 0;
+    }
 }
 .filer-dropzone-progress {
     height: 5px;
@@ -362,10 +366,33 @@ form .form-row {
 
 .filer-dropzone-upload-welcome .folder {
     overflow: hidden;
+    color: $color-primary;
     white-space: nowrap;
     text-overflow: ellipsis;
+    padding: 10px 0 0;
+    margin: 0 -15px;
+    border-top: solid 1px $gray-lighter;
+    img,
+    span {
+        vertical-align: middle;
+    }
+    img {
+        margin-right: 5px;
+    }
 }
 
 .filer-dropzone-cancel {
-    margin-top: 15px;
+    padding-top: 10px;
+    border-top: solid 1px $gray-lighter;
+    margin: 15px -15px 10px;
+    a {
+        font-size: $font-size-small;
+        color: $gray !important;
+    }
+}
+.filer-dropzone-upload-success,
+.filer-dropzone-upload-canceled {
+    padding-top: 10px;
+    margin: 15px -15px 10px;
+    border-top: solid 1px $gray-lighter;
 }
