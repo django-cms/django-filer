@@ -167,7 +167,10 @@
         </div>
 
         <div class="filer-dropzone-upload-info js-filer-dropzone-upload-info-container">
-            <div class="js-filer-dropzone-upload-number"></div>
+            <div>
+                <span class="js-filer-upload-text hidden">{% trans "Upload" %}</span>
+                <span class="js-filer-dropzone-upload-number"></span>
+            </div>
             <div class="js-filer-dropzone-upload-info filer-dropzone-upload-info hidden">
                 <div class="js-filer-dropzone-file-name filer-dropzone-file-name"></div>
                 <div class="js-filer-dropzone-progress filer-dropzone-progress"></div>
@@ -175,14 +178,14 @@
         </div>
 
         <div class="js-filer-dropzone-cancel filer-dropzone-cancel hidden">
-            <a href="#"></span>Cancel upload</a>
+            <a href="#"></span>{% trans "Cancel upload" %}</a>
         </div>
 
-        <div class="js-filer-dropzone-upload-success hidden">
+        <div class="js-filer-dropzone-upload-success filer-dropzone-upload-success hidden">
             {% trans "Upload success!" %}
         </div>
 
-        <div class="js-filer-dropzone-upload-canceled hidden">
+        <div class="js-filer-dropzone-upload-canceled filer-dropzone-upload-canceled hidden">
             {% trans "Upload canceled!" %}
         </div>
     </div>

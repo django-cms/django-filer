@@ -354,6 +354,9 @@ form .form-row {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    &:empty {
+        margin-top: 0;
+    }
 }
 .filer-dropzone-progress {
     height: 5px;
@@ -383,5 +386,11 @@ form .form-row {
     color: $gray;
     padding-top: 10px;
     border-top: solid 1px $gray-lighter;
-    margin: 15px -15px;
+    margin: 15px -15px 10px;
+}
+.filer-dropzone-upload-success,
+.filer-dropzone-upload-canceled {
+    padding-top: 10px;
+    margin: 15px -15px 10px;
+    border-top: solid 1px $gray-lighter;
 }
