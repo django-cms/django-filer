@@ -2,6 +2,28 @@
 // MODAL
 
 .popup {
+    &.app-cmsplugin_filer_image {
+        .form-row.field-image .field-box,
+        .field-box.field-free_link,
+        .field-box.field-page_link,
+        .field-box.field-file_link {
+            float: none !important;
+            margin-right: 0 !important;
+            margin-top: 20px !important;
+            &:first-child {
+                margin-top: 0 !important
+            }
+            input {
+                width: 100% !important;
+            }
+        }
+        .form-row .field-box {
+            &.field-crop,
+            &.field-upscale {
+                margin-top: 30px;
+            }
+        }
+    }
     &.delete-confirmation .colM ul {
         // makes sure that between list and button is a space #744
         margin-bottom: 25px !important;
