@@ -3,12 +3,15 @@
 
 .popup {
     &.app-cmsplugin_filer_image {
-        .form-row.field-image .field-box {
+        .form-row.field-image .field-box,
+        .field-box.field-free_link,
+        .field-box.field-page_link,
+        .field-box.field-file_link {
             float: none !important;
             margin-right: 0 !important;
             margin-top: 20px !important;
             &:first-child {
-                margin-top: 0 !important;
+                margin-top: 0 !important
             }
             input {
                 width: 100% !important;
