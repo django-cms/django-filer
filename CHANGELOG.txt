@@ -12,6 +12,7 @@ CHANGELOG
 * Updates Filer image plugin form fields
 * Removes folder content space in admin, side frame and modal
 * Updates drag and drop modal window
+* Updates drag and drop widget styles
 
 
 1.1.0 (2016-01-19)

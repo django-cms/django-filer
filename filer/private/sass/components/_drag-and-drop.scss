@@ -17,7 +17,7 @@ form .form-row {
             left: 0;
         }
         &.dz-drag-hover {
-            padding-top: 14px;
+            padding-top: 19px;
             background-color: $color-primary-light;
             border: solid 2px $color-primary !important;
             .z-index-fix {
@@ -141,18 +141,18 @@ form .form-row {
         }
         .dz-message {
             float: right;
-            color: $gray;
+            color: $gray-dropzone;
             width: 100%;
-            margin: 48px 0 0;
+            margin: 15px 0 0;
         }
         .icon {
             position: relative;
             top: 3px;
-            color: $gray;
+            color: $gray-dropzone;
             font-size: 24px;
             margin-right: 10px;
         }
-        .related-lookup {
+        .filerFile .related-lookup {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
             overflow: hidden;
             // makes true that button has correct height #668
@@ -161,6 +161,12 @@ form .form-row {
             height: auto !important;
             padding: 10px 20px !important;
             cursor: pointer;
+            .fa {
+                color: white;
+                font-size: 17px;
+                margin: 0 10px 0 0 !important;
+                vertical-align: middle;
+            }
             &:before {
                 display: none;
             }
@@ -172,7 +178,7 @@ form .form-row {
         }
         .filerFile {
             position: absolute;
-            top: 62px;
+            top: 32px;
             // required for django CMS <= 3.1 #673
             left: 20px;
             width: calc(100% - 40px);
@@ -268,7 +274,7 @@ form .form-row {
                 }
             }
         }
-        @media screen and (max-width: $screen-tablet) {
+        @media screen and (max-width: $screen-tablet-filer) {
             .filerFile {
                 top: 40px !important;
                 text-align: center;
@@ -291,6 +297,10 @@ form .form-row {
 }
 
 .filer-dropzone {
+    min-height: 100px !important;
+    @media screen and (max-width: $screen-tablet-filer) {
+        min-height: 150px !important;
+    }
     .dz-upload {
         height: 5px;
         background-color: #0bf;
