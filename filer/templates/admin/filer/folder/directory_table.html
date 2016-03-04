@@ -62,8 +62,8 @@
                             </td>
                             <td class="column-action">
                                 {% if subfolder.file_type == "Folder" %}
-                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}" title="{% trans 'Change folder details' %}" class="icon fa fa-pencil"></a>
-                                    <a href="{{ subfolder.get_admin_delete_url }}" class="icon fa fa-trash-o" title="{% trans 'Remove folder' %}"></a>
+                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" title="{% trans 'Change folder details' %}" class="icon fa fa-pencil"></a>
+                                    <a href="{{ subfolder.get_admin_delete_url }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}" class="icon fa fa-trash-o" title="{% trans 'Remove folder' %}"></a>
                                 {% endif %}
                             </td>
                         </tr>
