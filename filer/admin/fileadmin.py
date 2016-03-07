@@ -118,8 +118,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         # Account for custom Image model
         image_change_list_url_name = 'admin:{0}_{1}_changelist'.format(
             Image._meta.app_label, Image._meta.model_name)
-        # Check against filer_file_changelist as file deletion is always made by
-        # the base class
+        # Check against filer_file_changelist as file deletion is always made
+        # by the base class
         if (url in ["../../../../", "../../"] or
                 url == reverse("admin:filer_file_changelist") or
                 url == reverse(image_change_list_url_name)):

@@ -169,6 +169,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         r = super(FolderAdmin, self).delete_view(
             request=request, object_id=object_id,
             extra_context=extra_context)
+
         url = r.get("Location", None)
         if url in ["../../../../", "../../"] or url == self._get_post_url(obj):
             if parent_folder:
