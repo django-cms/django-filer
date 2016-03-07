@@ -29,7 +29,7 @@
             uploadButton.remove();
         };
         // utility
-        var updateQuery = function(uri, key, value) {
+        var updateQuery = function (uri, key, value) {
             var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
             var separator = uri.indexOf('?') !== -1 ? '&' : '?';
             if (uri.match(re)) {
@@ -37,11 +37,11 @@
             } else {
                 return uri + separator + key + '=' + value;
             }
-        }
-        var reloadOrdered = function() {
+        };
+        var reloadOrdered = function () {
             var uri = window.location.toString();
             window.location.replace(updateQuery(uri, 'order_by', '-modified_at'));
-        }
+        };
 
         Cl.mediator.subscribe('filer-upload-in-progress', removeButton);
 
