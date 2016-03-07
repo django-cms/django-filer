@@ -29,6 +29,20 @@
         var removeButton = function () {
             uploadButton.remove();
         };
+        // utility
+        var updateQuery = function (uri, key, value) {
+            var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
+            var separator = uri.indexOf('?') !== -1 ? '&' : '?';
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + '=' + value + '$2');
+            } else {
+                return uri + separator + key + '=' + value;
+            }
+        };
+        var reloadOrdered = function () {
+            var uri = window.location.toString();
+            window.location.replace(updateQuery(uri, 'order_by', '-modified_at'));
+        };
 
         Cl.mediator.subscribe('filer-upload-in-progress', removeButton);
 
@@ -92,11 +106,9 @@
                     uploadSuccess.removeClass(hiddenClass);
 
                     if (hasErrors) {
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1000);
+                        setTimeout(reloadOrdered, 1000);
                     } else {
-                        window.location.reload();
+                        reloadOrdered();
                     }
                 }
             }
