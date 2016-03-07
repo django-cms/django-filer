@@ -13,6 +13,7 @@ CHANGELOG
 * Removes folder content space in admin, side frame and modal
 * Updates drag and drop modal window
 * Updates drag and drop widget styles
+* Fixes empty folder alignment
 
 
 1.1.0 (2016-01-19)
