@@ -18,9 +18,7 @@ from django.conf import settings
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.imagemodels import Image
-from filer.models.clipboardmodels import Clipboard
 from filer.models.virtualitems import FolderRoot
-from filer.models import tools
 from filer.admin.folderadmin import FolderAdmin
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, SettingsOverride)
@@ -74,12 +72,12 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertTrue(isinstance(get_last_folder().context['folder'], FolderRoot))
 
     def test_filer_directory_listing_root_empty_get(self):
-        response = self.client.post(reverse('admin:filer-directory_listing-root'))
+        response = self.client.get(reverse('admin:filer-directory_listing-root'))
         self.assertEqual(response.status_code, 200)
 
     def test_filer_directory_listing_root_get(self):
         create_folder_structure(depth=3, sibling=2, parent=None)
-        response = self.client.post(reverse('admin:filer-directory_listing-root'))
+        response = self.client.get(reverse('admin:filer-directory_listing-root'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
@@ -112,9 +110,8 @@ class FilerFolderAdminUrlsTests(TestCase):
                 "_popup": 1})
         self.assertEqual(Folder.objects.count(), 2)
         bar = Folder.objects.get(name="bar")
-        response = self.client.post("/admin/filer/folder/%d/" % bar.pk, {
-                "name": "foo",
-                "_popup": 1})
+        admin_url = reverse("admin:filer_folder_change", args=(bar.pk, ))
+        response = self.client.post(admin_url, {"name": "foo", "_popup": 1})
         self.assertContains(response, 'Folder with this name already exists')
         # refresh from db and validate that it's name didn't change
         bar = Folder.objects.get(pk=bar.pk)
@@ -124,11 +121,12 @@ class FilerFolderAdminUrlsTests(TestCase):
         folder = Folder.objects.create(name='foobar')
         another_superuser = User.objects.create_superuser(
             'gigi', 'admin@ignore.com', 'secret')
-        response = self.client.post('/admin/filer/folder/%d/' % folder.pk, {
+        admin_url = reverse("admin:filer_folder_change", args=(folder.pk, ))
+        response = self.client.post(admin_url, {
                 'owner': another_superuser.pk,
                 'name': 'foobar',
                 '_continue': 'Save and continue editing'})
-        # succesfful POST returns a redirect
+        # successful POST returns a redirect
         self.assertEqual(response.status_code, 302)
         folder = Folder.objects.get(pk=folder.pk)
         self.assertEqual(folder.owner.pk, another_superuser.pk)

@@ -101,7 +101,7 @@ class FileImporter(object):
                 folder_names = [root_folder_name] + rel_folders
             folder = self.get_or_create_folder(folder_names)
             for file_obj in files:
-                dj_file = DjangoFile(open(os.path.join(root, file_obj)),
+                dj_file = DjangoFile(open(os.path.join(root, file_obj), mode='rb'),
                                      name=file_obj)
                 self.import_file(file_obj=dj_file, folder=folder)
         if self.verbosity >= 1:

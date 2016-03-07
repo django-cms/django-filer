@@ -9,6 +9,7 @@ $black: #000;
 $hover-bg: #f1faff;
 
 $color-primary: #00bbff;
+$color-primary-light: #f1faff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
@@ -23,6 +24,7 @@ $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
 
 $gray-table: #f7f7f7;
+$gray-dropzone: #808080;
 
 
 //##############################################################################
@@ -45,6 +47,8 @@ $padding-large: 20px;
 $screen-mobile: 320px;
 $screen-tablet: 720px;
 $screen-desktop: 975px;
+
+$screen-tablet-filer: 810px;
 
 //##############################################################################
 // BUTTONS

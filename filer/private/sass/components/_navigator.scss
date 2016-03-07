@@ -5,12 +5,18 @@
     // required for django CMS <= 3.1 #673
     width: 100%;
     margin: 0;
-    tbody {
-        td {
-            padding: 5px 10px !important;
-        }
+    border-top: solid 1px $gray-lighter !important;
+    thead th,
+    tbody td {
+        text-align: left;
+        vertical-align: middle;
+        padding: 5px 10px !important;
+        border-left: 0 !important;
+        border-bottom: 1px solid $gray-lighter;
+        background: none !important;
     }
     .unfiled td {
+        padding: 10px !important;
         background-color: $gray-table !important;
     }
     .column-checkbox {
@@ -30,10 +36,12 @@
         padding-bottom: 0 !important;
         img {
             width: 25px;
+            height: auto;
         }
     }
     .column-action {
         text-align: center;
+        white-space: nowrap;
         width: 70px;
         padding-right: 20px !important;
         a {
@@ -47,23 +55,38 @@
             }
         }
         .icon {
-            position: relative;
-            top: 2px;
-            width: 20px;
+            color: $btn-default-color;
+            line-height: 33px;
+            text-align: center;
+            width: 33px;
+            height: 33px;
+            border: solid 1px #ccc;
+            border-radius: 2px;
+            &:hover {
+                border-color: $color-primary;
+            }
         }
+    }
+    .no-files {
+        padding: 10px 20px !important;
     }
     .dz-drag-hover,
     &.dz-drag-hover {
-        background: $hover-bg;
-        tr.unfiled td {
+        td {
             background: $hover-bg !important;
+            border-top: solid 2px $color-primary !important;
+            border-bottom: solid 2px $color-primary !important;
+            box-sizing: border-box !important;
         }
     }
     .reset-hover {
-        background-color: $white !important;
+        td {
+            background-color: $white !important;
+            border-top: 0 !important;
+            border-bottom: solid 1px $gray-lighter !important;
+        }
     }
 }
-
 .navigator-top-nav {
     position: relative;
     clear: both;
@@ -72,6 +95,18 @@
     background: $gray-table;
     .breadcrumbs-container {
         float: left;
+        width: 20%;
+        @media screen and (max-width: $screen-tablet) {
+            width: auto;
+            margin-right: 20px;
+        }
+    }
+    .tools-container {
+        float: left;
+        width: 80%;
+        @media screen and (max-width: $screen-tablet) {
+            width: 100%;
+        }
     }
     .nav-button {
         display: inline-block;
@@ -112,6 +147,7 @@
     }
 }
 .navigator-tools {
+    @include clearfix;
     float: right;
     margin: 10px 10px 0 0;
     .actions-wrapper {
@@ -120,11 +156,12 @@
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
             float: none;
+            margin-left: 2px;
         }
     }
     .actions {
-        float: right;
         display: none;
+        float: right;
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
             float: none;
@@ -144,15 +181,19 @@
         }
         .question,
         .clear {
-            border-left: solid 1px $gray-lighter;
-            padding-left: 10px;
             margin-left: 10px;
+            padding-left: 10px;
+            border-left: solid 1px $gray-lighter;
         }
         &.action-selected {
             display: block;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            @media screen and (max-width: $screen-tablet) {
+                margin-left: 0;
+            }
         }
     }
-
     .dropdown-container {
         @media screen and (max-width: $screen-tablet) {
             float: left;
@@ -185,11 +226,11 @@
     @media screen and (max-width: $screen-tablet) {
         display: block;
         text-align: left;
-        margin-bottom: 20px;
+        margin-top: 10px;
     }
     @media screen and (min-width: $screen-desktop) {
         float: right;
-        margin-left: 25px;
+        margin-left: 10px;
     }
 }
 .navigator-button {
@@ -212,6 +253,9 @@
     }
 }
 
+.upload-button-disabled {
+    display: inline-block;
+}
 .navigator-button + .dropdown-menu {
     margin-top: -2px;
 }
@@ -228,15 +272,56 @@
 }
 
 .navigator-breadcrumbs {
+    @include clearfix;
+    position: relative;
     font-size: 16px;
     font-weight: bold;
-    padding: 17px 0 0 20px;
+    white-space: nowrap;
+    padding: 18px 0 0 20px;
+    .navigator-breadcrumbs-folder-name {
+        display: inline-block;
+        overflow: hidden;
+        font-size: 16px;
+        vertical-align: top;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 100px);
+    }
     > a {
         color: $gray-darkest !important;
     }
     .icon {
         color: $gray-light;
         margin: 0 5px;
+    }
+    li {
+        list-style-type: none;
+    }
+}
+.navigator-breadcrumbs-dropdown-container {
+    position: relative;
+    top: -5px;
+    float: left;
+    margin: 0 7px 0 0;
+    .navigator-breadcrumbs-dropdown {
+        left: -22px;
+        padding: 0;
+        > li {
+            padding: 0;
+            > a {
+                padding: 15px 20px 5px;
+                border-bottom: solid 1px #e1e1e1;
+            }
+            &:last-child > a {
+                border-bottom: none;
+            }
+        }
+        img {
+            position: relative;
+            top: -4px;
+            vertical-align: top;
+            margin: 0 10px 0 0;
+        }
     }
 }
 
@@ -253,8 +338,8 @@
             line-height: 20px !important;
             white-space: nowrap;
             text-transform: none;
-            padding: 0 10px !important;
             margin: 0 !important;
+            padding: 0 10px !important;
         }
         input {
             position: relative;
@@ -265,6 +350,9 @@
         &.dropdown-menu-checkboxes {
             right: 0;
             left: auto;
+        }
+        a:hover {
+            background: $gray-lightest !important;
         }
     }
     &.open .dropdown-menu {

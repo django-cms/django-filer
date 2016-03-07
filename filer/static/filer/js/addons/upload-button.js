@@ -8,6 +8,7 @@
         var submitNum = 0;
         var maxSubmitNum = 1;
         var uploadButton = $('.js-upload-button');
+        var uploadButtonDisabled = $('.js-upload-button-disabled');
         var uploadUrl = uploadButton.data('url');
         var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
         var uploadInfoContainer = $('.js-filer-dropzone-upload-info-container');
@@ -124,5 +125,9 @@
                 window.location.reload();
             }, 1000);
         });
+
+        if (uploadButtonDisabled.length) {
+            uploadButtonDisabled.tooltip();
+        }
     });
 })(jQuery);
