@@ -34,7 +34,7 @@
                             <td class="column-icon">
                                 <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                     title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    <img src="{% static 'icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                    <img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                 </a>
                             </td>
                             <td class="column-name">
@@ -74,7 +74,7 @@
                         <td class="column-icon">
                             <a href="{{ item.get_admin_directory_listing_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                 title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                <img src="{% static 'icons/unfiled_folder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                <img src="{% static 'filer/icons/unfiled_folder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                             </a>
                         </td>
                         <td class="column-name" colspan="4">
@@ -109,7 +109,7 @@
                                     <a href="{{ file.get_admin_url_path }}{% if is_popup %}?_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}"
                                             title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                 {% endif %}
-                                    <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
+                                    <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
                                 {% if item_perms.change or is_popup and not select_folder %}
                                     </a>
                                 {% endif %}
@@ -163,7 +163,7 @@
 
         <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
-            <div class="folder"><img src="{% static 'icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18"> <span class="js-filer-dropzone-folder-name"></span></div>
+            <div class="folder"><img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18"> <span class="js-filer-dropzone-folder-name"></span></div>
         </div>
 
         <div class="filer-dropzone-upload-info js-filer-dropzone-upload-info-container">
