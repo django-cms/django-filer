@@ -30,7 +30,7 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
 
-_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', ('16', '32', '48', '64'))
+_ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', ('32', '48', '64'))
 if not _ICON_SIZES:
     raise ImproperlyConfigured('Please, configure FILER_ADMIN_ICON_SIZES')
 # Reliably sort by integer value, but keep icon size as string.
