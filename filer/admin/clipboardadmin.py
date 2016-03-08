@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 import json
 from django.forms.models import modelform_factory
@@ -6,13 +7,14 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from filer import settings as filer_settings
-from filer.models import Folder, Clipboard, ClipboardItem, Image
-from filer.utils.compatibility import LTE_DJANGO_1_4
-from filer.utils.files import (
+from .. import settings as filer_settings
+from ..models import Folder, Clipboard, ClipboardItem, Image
+from ..utils.compatibility import LTE_DJANGO_1_4
+from ..utils.files import (
     handle_upload, handle_request_files_upload, UploadException,
 )
-from filer.utils.loader import load_object
+from ..utils.loader import load_object
+from . import views
 
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
@@ -37,7 +39,6 @@ class ClipboardAdmin(admin.ModelAdmin):
     def get_urls(self):
         from django.conf.urls import patterns, url
         urls = super(ClipboardAdmin, self).get_urls()
-        from filer import views
         url_patterns = patterns('',
             url(r'^operations/paste_clipboard_to_folder/$',
                 self.admin_site.admin_view(views.paste_clipboard_to_folder),

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
 
 import os
@@ -9,11 +8,11 @@ from django.core.management.base import BaseCommand, NoArgsCommand
 
 from optparse import make_option
 
-from filer.models.filemodels import File
-from filer.models.foldermodels import Folder
-from filer.models.imagemodels import Image
-from filer.settings import FILER_IS_PUBLIC_DEFAULT
-from filer.utils.compatibility import upath
+from ...models.filemodels import File
+from ...models.foldermodels import Folder
+from ...models.imagemodels import Image
+from ...settings import FILER_IS_PUBLIC_DEFAULT
+from ...utils.compatibility import upath
 
 
 class FileImporter(object):

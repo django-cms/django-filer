@@ -15,8 +15,8 @@ except ImportError:
         return Truncator(s).words(num, truncate=truncate)
     truncate_words = allow_lazy(truncate_words, six.text_type)
 
-LTE_DJANGO_1_4 = django.VERSION < (1, 5)
-LTE_DJANGO_1_5 = django.VERSION < (1, 6)
+LTE_DJANGO_1_4 = django.VERSION < (1, 5)  # not supported!
+LTE_DJANGO_1_5 = django.VERSION < (1, 6)  # not supported!
 LTE_DJANGO_1_6 = django.VERSION < (1, 7)
 LTE_DJANGO_1_7 = django.VERSION < (1, 8)
 LTE_DJANGO_1_8 = django.VERSION < (1, 9)
@@ -76,3 +76,19 @@ try:
 except ImportError:
     # python < 2.7
     from django.utils.importlib import import_module  # flake8: noqa
+
+
+try:
+    from urllib import urlencode  # flake8: noqa
+except:
+    # python 3
+    from urllib.parse import urlencode  # flake8: noqa
+
+
+try:
+    from PIL import Image as PILImage
+except ImportError:
+    try:
+        import Image as PILImage
+    except ImportError:
+        raise ImportError("The Python Imaging Library was not found.")

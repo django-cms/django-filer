@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import os
 
 from django.db import models
@@ -9,14 +11,8 @@ from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
+from ..utils.compatibility import PILImage
 
-try:
-    from PIL import Image as PILImage
-except ImportError:
-    try:
-        import Image as PILImage
-    except ImportError:
-        raise ImportError("The Python Imaging Library was not found.")
 
 import logging
 

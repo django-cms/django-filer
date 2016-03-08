@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.template import Library
+from __future__ import absolute_import
 
-from filer.utils.compatibility import LTE_DJANGO_1_8, LTE_DJANGO_1_7
+from django.template import Library
+from django.utils.html import mark_safe
+from ..admin.tools import admin_url_params, admin_url_params_encoded
 
 
 register = Library()
@@ -14,10 +16,21 @@ def filer_actions(context):
     """
     context['action_index'] = context.get('action_index', -1) + 1
     return context
-filer_actions = register.inclusion_tag("admin/filer/actions.html", takes_context=True)(filer_actions)
+filer_actions = register.inclusion_tag(
+    "admin/filer/actions.html", takes_context=True)(filer_actions)
 
 
-@register.inclusion_tag('admin/filer/widgets/lookup.html', takes_context=True)
-def render_filer_lookup_button(context):
-    context['IS_DJANGO_18'] = LTE_DJANGO_1_8 and not LTE_DJANGO_1_7
-    return context
+@register.simple_tag(takes_context=True)
+def filer_admin_context_url_params(context, first_separator='?'):
+    return admin_url_params_encoded(
+        context['request'], first_separator=first_separator)
+
+
+@register.simple_tag(takes_context=True)
+def filer_admin_context_hidden_formfields(context):
+    request = context.get('request')
+    fields = [
+        '<input type="hidden" name="{}" value="{}">'.format(fieldname, value)
+        for fieldname, value in admin_url_params(request).items()
+    ]
+    return mark_safe('\n'.join(fields))

@@ -23,7 +23,7 @@ setup(
     long_description = read('README.rst'),
     author='Stefan Foulis',
     author_email='stefan@foulis.ch',
-    packages=find_packages(),
+    packages=find_packages(include=('filer',)),
     install_requires=(
         'Django>=1.5,<1.9.999',  # Django is known to use rc versions
         'easy-thumbnails>=1.0,<2.4',

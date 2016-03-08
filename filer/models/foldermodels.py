@@ -198,7 +198,7 @@ class Folder(models.Model, mixins.IconsMixin):
                     self.permission_cache[permission_type] = self.id in permission
             return self.permission_cache[permission_type]
 
-    def get_admin_url_path(self):
+    def get_admin_change_url(self):
         return urlresolvers.reverse('admin:filer_folder_change',
                                     args=(self.id,))
 

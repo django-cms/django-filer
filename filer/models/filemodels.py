@@ -224,7 +224,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             text = "%s" % (self.name,)
         return text
 
-    def get_admin_url_path(self):
+    def get_admin_change_url(self):
         if LTE_DJANGO_1_7:
             model_name = self._meta.module_name
         else:

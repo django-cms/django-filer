@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 from django.core.exceptions import PermissionDenied
+from django.contrib.admin.options import IS_POPUP_VAR
+from ..utils.compatibility import (
+    LTE_DJANGO_1_7, LTE_DJANGO_1_6, urlencode)
 
-from filer.utils.compatibility import LTE_DJANGO_1_7, LTE_DJANGO_1_6
+
+ALLOWED_PICK_TYPES = ('folder', 'file')
 
 
 if LTE_DJANGO_1_6:
@@ -54,3 +59,55 @@ def userperms_for_request(item, request):
             if x:
                 r.append(p)
     return r
+
+
+def popup_status(request):
+    return (IS_POPUP_VAR in request.GET or 'pop' in request.GET or
+            IS_POPUP_VAR in request.POST or 'pop' in request.POST)
+
+
+def popup_pick_type(request):
+    # very important to limit the pick_types because the result is marked safe.
+    # (injection attacks)
+    pick_type = request.GET.get('_pick', request.POST.get('_pick', None))
+    if pick_type in ALLOWED_PICK_TYPES:
+        return pick_type
+    return None
+
+
+def admin_url_params(request):
+    """
+    given a request, looks at GET and POST values to determine which params
+    should be added. Is used to keep the context of popup and picker mode.
+    """
+    # FIXME: put this code in a better location
+    params = {}
+    if popup_status(request):
+        params[IS_POPUP_VAR] = '1'
+    pick_type = popup_pick_type(request)
+    if pick_type:
+        params['_pick'] = pick_type
+    return params
+
+
+def admin_url_params_encoded(request, first_separator='?'):
+    # sorted to make testing easier
+    params = urlencode(sorted(admin_url_params(request).items()))
+    if not params:
+        return ''
+    return '{}{}'.format(first_separator, params)
+
+
+class AdminUrlParams(dict):
+    def __init__(self, request):
+        super(AdminUrlParams, self).__init__()
+        self.request = request
+        self.update(admin_url_params(request))
+        extra = dict()
+        extra['popup'] = self.get(IS_POPUP_VAR, False) == '1'
+        extra['pick'] = self.get('_pick', '')
+        for pick_type in ALLOWED_PICK_TYPES:
+            extra['pick_{}'.format(pick_type)] = extra['pick'] == pick_type
+        for key, value in extra.items():
+            setattr(self, key, value)
+        self.update(extra)

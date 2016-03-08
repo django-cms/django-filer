@@ -14,6 +14,7 @@ from django.contrib.admin import helpers
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.forms.models import model_to_dict as model_to_dict_django
 
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
@@ -23,6 +24,12 @@ from filer.admin.folderadmin import FolderAdmin
 from filer.tests.helpers import (create_superuser, create_folder_structure,
                                  create_image, SettingsOverride)
 from filer import settings as filer_settings
+
+
+def model_to_dict(instance, **kwargs):
+    if kwargs.pop('all'):
+        kwargs['fields'] = [field.name for field in instance._meta.fields]
+    return model_to_dict_django(instance, **kwargs)
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -130,7 +137,6 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         folder = Folder.objects.get(pk=folder.pk)
         self.assertEqual(folder.owner.pk, another_superuser.pk)
-
 
     @skipIf(django.get_version() < '1.7',
             'admin context not supported in django < 1.7')
@@ -521,6 +527,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         dst_image_obj = self.dst_folder.files[0]
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
+
 class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
     def test_delete_files_or_folders_action(self):
         self.assertNotEqual(File.objects.count(), 0)
@@ -708,3 +715,173 @@ class FolderListingTest(TestCase):
 
         folder_qs = folderadmin.filter_folder(Folder.objects.all(), ['joe@mata.com'])
         self.assertEqual(len(folder_qs), 0)
+
+
+class FilerAdminContextTests(TestCase, BulkOperationsMixin):
+    def setUp(self):
+        BulkOperationsMixin.setUp(self)
+        self.client.login(username='admin', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_pick_mode_folder_delete(self):
+        folder = Folder.objects.create(name='foo')
+        base_url = reverse('admin:filer_folder_delete', args=[folder.id])
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(pick_url, data={'_popup': '1', 'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-root'
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_folder_with_parent_delete(self):
+        parent_folder = Folder.objects.create(name='parent')
+        folder = Folder.objects.create(name='foo', parent=parent_folder)
+        base_url = reverse('admin:filer_folder_delete', args=[folder.id])
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(pick_url, data={'_popup': '1', 'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_image_delete(self):
+        image = self.create_image(folder=None)
+        base_url = image.get_admin_delete_url()
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(pick_url, data={'_popup': '1', 'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-unfiled_images') + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_image_with_folder_delete(self):
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_delete_url()
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(pick_url,
+                                    data={'_popup': '1', 'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_image_save(self):
+        image = self.create_image(folder=None)
+        base_url = image.get_admin_change_url()
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<input type="hidden" name="_pick" value="file"')
+        self.assertContains(response, '<input type="hidden" name="_popup" value="1"')
+        data = {'_popup': '1'}
+        data.update(model_to_dict(image, all=True))
+        response = self.client.post(pick_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-unfiled_images'
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_image_with_folder_save(self):
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_change_url()
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+                            '<input type="hidden" name="_pick" value="file"')
+        self.assertContains(response,
+                            '<input type="hidden" name="_popup" value="1"')
+        data = {'_popup': '1'}
+        data.update(model_to_dict(image, all=True))
+        response = self.client.post(pick_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_folder_save(self):
+        folder = Folder.objects.create(name='foo')
+        base_url = reverse('admin:filer_folder_change', args=[folder.id])
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+                            '<input type="hidden" name="_pick" value="file"')
+        self.assertContains(response,
+                            '<input type="hidden" name="_popup" value="1"')
+        data = {
+            '_popup': '1',
+            'name': 'foobar',
+        }
+        response = self.client.post(pick_url, data=data)
+        if response.status_code == 200:
+            from pprint import pprint;
+            pprint(response.content)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-root'
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_pick_mode_folder_with_parent_save(self):
+        parent_folder = Folder.objects.create(name='parent')
+        folder = Folder.objects.create(name='foo', parent=parent_folder)
+        base_url = reverse('admin:filer_folder_change', args=[folder.id])
+        pick_url = base_url + '?_pick=file&_popup=1'
+
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+                            '<input type="hidden" name="_pick" value="file"')
+        self.assertContains(response,
+                            '<input type="hidden" name="_popup" value="1"')
+        data = {
+            '_popup': '1',
+            'name': 'foobar',
+        }
+        response = self.client.post(pick_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            ) + '?_pick=file&_popup=1'
+        )

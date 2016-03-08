@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify staticfiles %}
+{% load i18n admin_modify staticfiles filer_admin_tags %}
 
 {% block breadcrumbs %}
     <div class="breadcrumbs">
@@ -27,7 +27,7 @@
 {% endblock %}
 
 {% block after_field_sets %}
-    {% if is_popup and select_folder %}<input type="hidden" name="select_folder" value="1">{% endif %}
+    {% filer_admin_context_hidden_formfields %}
 {% endblock %}
 
 {% block sidebar %}

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import absolute_import
 from django import forms
 from django.utils.translation import ugettext as _
 
-from filer.admin.fileadmin import FileAdmin
-from filer.models import Image
+from .fileadmin import FileAdmin
+from ..models import Image
 
 
 class ImageAdminForm(forms.ModelForm):

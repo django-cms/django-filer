@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 import warnings
 
@@ -10,9 +11,9 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from filer.models import Folder
-from filer.utils.compatibility import truncate_words
-from filer.utils.model_label import get_model_label
+from ..models import Folder
+from ..utils.compatibility import truncate_words, LTE_DJANGO_1_7
+from ..utils.model_label import get_model_label
 
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):
@@ -37,7 +38,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         if not related_url:
             related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()
-        params['select_folder'] = 1
+        params['_pick'] = 'folder'
         if params:
             url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
@@ -61,6 +62,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             'noimg': 'filer/icons/nofile_32x32.png',
             'foldid': css_id_folder,
             'id': css_id,
+            'LTE_DJANGO_1_7': LTE_DJANGO_1_7,
         }
         html = render_to_string('admin/filer/widgets/admin_folder.html', context)
         return mark_safe(html)
