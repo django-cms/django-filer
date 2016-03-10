@@ -32,7 +32,7 @@
             {% endif %}
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}hidden{% endif %} lookup" id="{{ id }}_lookup"
-               title="{% trans 'Lookup' %}" {% if LTE_DJANGO_1_7 %}onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+               title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
                 <span class="fa fa-picture-o"></span>{% trans 'Upload File' %}
             </a>
 
