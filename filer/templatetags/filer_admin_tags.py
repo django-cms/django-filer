@@ -30,7 +30,7 @@ def filer_admin_context_url_params(context, first_separator='?'):
 def filer_admin_context_hidden_formfields(context):
     request = context.get('request')
     fields = [
-        '<input type="hidden" name="{}" value="{}">'.format(fieldname, value)
+        '<input type="hidden" name="{0}" value="{1}">'.format(fieldname, value)
         for fieldname, value in admin_url_params(request).items()
     ]
     return mark_safe('\n'.join(fields))
