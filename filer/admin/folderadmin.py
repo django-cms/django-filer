@@ -147,7 +147,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': obj.parent.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "{}{}".format(
+            url = "{0}{1}".format(
                 url,
                 admin_url_params_encoded(request),
             )
@@ -195,7 +195,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "{}{}".format(
+            url = "{0}{1}".format(
                 url,
                 admin_url_params_encoded(request),
             )

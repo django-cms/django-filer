@@ -88,7 +88,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 url = reverse(
                     'admin:filer-directory_listing-unfiled_images')
-            url = "{}{}".format(
+            url = "{0}{1}".format(
                 url,
                 admin_url_params_encoded(request),
             )
@@ -137,7 +137,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-unfiled_images')
-            url = "{}{}".format(
+            url = "{0}{1}".format(
                 url,
                 admin_url_params_encoded(request)
             )

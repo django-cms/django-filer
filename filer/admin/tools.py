@@ -95,7 +95,7 @@ def admin_url_params_encoded(request, first_separator='?'):
     params = urlencode(sorted(admin_url_params(request).items()))
     if not params:
         return ''
-    return '{}{}'.format(first_separator, params)
+    return '{0}{1}'.format(first_separator, params)
 
 
 class AdminUrlParams(dict):
@@ -107,7 +107,7 @@ class AdminUrlParams(dict):
         extra['popup'] = self.get(IS_POPUP_VAR, False) == '1'
         extra['pick'] = self.get('_pick', '')
         for pick_type in ALLOWED_PICK_TYPES:
-            extra['pick_{}'.format(pick_type)] = extra['pick'] == pick_type
+            extra['pick_{0}'.format(pick_type)] = extra['pick'] == pick_type
         for key, value in extra.items():
             setattr(self, key, value)
         self.update(extra)
