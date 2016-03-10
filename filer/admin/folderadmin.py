@@ -57,7 +57,7 @@ from ..models import (
 from ..settings import FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import (
-    get_delete_permission, quote, unquote, capfirst)
+    get_delete_permission, quote, unquote, capfirst, LTE_DJANGO_1_6)
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 
 
@@ -178,7 +178,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             parent_folder = obj.parent
         except self.model.DoesNotExist:
             parent_folder = None
+
         admin_url_params = AdminContext(request)
+        if LTE_DJANGO_1_6:
+            extra_context = extra_context or {}
+            extra_context.update({'is_popup': admin_url_params.popup})
         if (
             request.POST and
             admin_url_params.popup and

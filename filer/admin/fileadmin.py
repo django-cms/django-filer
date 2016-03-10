@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from .. import settings
 from .permissions import PrimitivePermissionAwareModelAdmin
 from ..models import File
-from ..utils.compatibility import LTE_DJANGO_1_5, unquote
+from ..utils.compatibility import LTE_DJANGO_1_5, LTE_DJANGO_1_6, unquote
 from .tools import popup_status, AdminContext, admin_url_params_encoded
 
 
@@ -121,6 +121,9 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             parent_folder = None
 
         admin_url_params = AdminContext(request)
+        if LTE_DJANGO_1_6:
+            extra_context = extra_context or {}
+            extra_context.update({'is_popup': admin_url_params.popup})
         if (
             request.POST and
             admin_url_params.popup and
