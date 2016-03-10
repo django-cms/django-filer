@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
 from ..models import Folder, Clipboard, tools, FolderRoot
-from .tools import admin_url_params_encoded, popup_status, AdminUrlParams
+from .tools import admin_url_params_encoded, popup_status, AdminContext
 
 
 class NewFolderForm(forms.ModelForm):
@@ -62,7 +62,7 @@ def make_folder(request, folder_id=None):
         'opts': Folder._meta,
         'new_folder_form': new_folder_form,
         'is_popup': popup_status(request),
-        'filer_admin_context': AdminUrlParams(request),
+        'filer_admin_context': AdminContext(request),
     })
 
 

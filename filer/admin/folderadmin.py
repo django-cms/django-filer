@@ -42,7 +42,7 @@ from .tools import (
     admin_each_context,
 )
 from .tools import (popup_status, admin_url_params_encoded,
-                    AdminUrlParams)
+                    AdminContext)
 from . import views
 from ..models import (
     FolderRoot,
@@ -135,7 +135,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        admin_url_params = AdminUrlParams(request)
+        admin_url_params = AdminContext(request)
         if (
             request.POST and
             admin_url_params.popup and
@@ -158,7 +158,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                            form_url='', obj=None):
         extra_context = {'show_delete': True,
                          'is_popup': popup_status(request),
-                         'filer_admin_context': AdminUrlParams(request), }
+                         'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
         return super(FolderAdmin, self).render_change_form(
             request=request, context=context, add=False,
@@ -178,7 +178,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             parent_folder = obj.parent
         except self.model.DoesNotExist:
             parent_folder = None
-        admin_url_params = AdminUrlParams(request)
+        admin_url_params = AdminContext(request)
         if (
             request.POST and
             admin_url_params.popup and
@@ -430,7 +430,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'folder_files': folder_files,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
-            'filer_admin_context': AdminUrlParams(request),
+            'filer_admin_context': AdminContext(request),
             # needed in the admin/base.html template for logout links
             'root_path': reverse('admin:index'),
             'action_form': action_form,
@@ -768,7 +768,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "protected": all_protected,
             "opts": opts,
             'is_popup': popup_status(request),
-            'filer_admin_context': AdminUrlParams(request),
+            'filer_admin_context': AdminContext(request),
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,

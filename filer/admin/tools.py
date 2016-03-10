@@ -80,7 +80,6 @@ def admin_url_params(request):
     given a request, looks at GET and POST values to determine which params
     should be added. Is used to keep the context of popup and picker mode.
     """
-    # FIXME: put this code in a better location
     params = {}
     if popup_status(request):
         params[IS_POPUP_VAR] = '1'
@@ -98,9 +97,9 @@ def admin_url_params_encoded(request, first_separator='?'):
     return '{0}{1}'.format(first_separator, params)
 
 
-class AdminUrlParams(dict):
+class AdminContext(dict):
     def __init__(self, request):
-        super(AdminUrlParams, self).__init__()
+        super(AdminContext, self).__init__()
         self.request = request
         self.update(admin_url_params(request))
         extra = dict()

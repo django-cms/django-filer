@@ -10,7 +10,7 @@ from .. import settings
 from .permissions import PrimitivePermissionAwareModelAdmin
 from ..models import File
 from ..utils.compatibility import LTE_DJANGO_1_5, unquote
-from .tools import popup_status, AdminUrlParams, admin_url_params_encoded
+from .tools import popup_status, AdminContext, admin_url_params_encoded
 
 
 class FileAdminChangeFrom(forms.ModelForm):
@@ -72,7 +72,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        admin_url_params = AdminUrlParams(request)
+        admin_url_params = AdminContext(request)
         if (
             request.POST and
             admin_url_params.popup and
@@ -99,7 +99,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                            form_url='', obj=None):
         extra_context = {'show_delete': True,
                          'is_popup': popup_status(request),
-                         'filer_admin_context': AdminUrlParams(request), }
+                         'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
         return super(FileAdmin, self).render_change_form(
             request=request, context=context, add=False, change=False,
@@ -120,7 +120,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             parent_folder = None
 
-        admin_url_params = AdminUrlParams(request)
+        admin_url_params = AdminContext(request)
         if (
             request.POST and
             admin_url_params.popup and
