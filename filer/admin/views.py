@@ -26,9 +26,9 @@ class NewFolderForm(forms.ModelForm):
 @login_required
 def make_folder(request, folder_id=None):
     if not folder_id:
-        folder_id = request.GET.get('parent_id', None)
+        folder_id = request.GET.get('parent_id')
     if not folder_id:
-        folder_id = request.POST.get('parent_id', None)
+        folder_id = request.POST.get('parent_id')
     if folder_id:
         folder = Folder.objects.get(id=folder_id)
     else:

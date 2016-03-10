@@ -230,8 +230,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             model_name = self._meta.model_name
         return urlresolvers.reverse(
-            'admin:%s_%s_change' % (self._meta.app_label,
-                                    model_name,),
+            'admin:{0}_{1}_change'.format(self._meta.app_label, model_name),
             args=(self.pk,)
         )
 

@@ -69,7 +69,7 @@ def popup_status(request):
 def popup_pick_type(request):
     # very important to limit the pick_types because the result is marked safe.
     # (injection attacks)
-    pick_type = request.GET.get('_pick', request.POST.get('_pick', None))
+    pick_type = request.GET.get('_pick', request.POST.get('_pick'))
     if pick_type in ALLOWED_PICK_TYPES:
         return pick_type
     return None
