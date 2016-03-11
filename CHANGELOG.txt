@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+<next> (20xx-xx-xx)
+------------------
+
+* Drop Django 1.5 support
+* Drop Python 3.3 support (now 3.4+)
+* Testrunner cleanup
+* Fix many regressions and bugs in Django 1.8/1.9
+* Admin UI enhancements
+
+
 1.1.1 (2016-01-27)
 ------------------
 
