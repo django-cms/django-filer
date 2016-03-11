@@ -119,10 +119,10 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             parent_folder = None
 
-        admin_url_params = AdminContext(request)
+        admin_context = AdminContext(request)
         if LTE_DJANGO_1_6:
             extra_context = extra_context or {}
-            extra_context.update({'is_popup': admin_url_params.popup})
+            extra_context.update({'is_popup': admin_context.popup})
         if request.POST:
             # Return to folder listing, since there is no usable file listing.
             super(FileAdmin, self).delete_view(

@@ -178,10 +178,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             parent_folder = None
 
-        admin_url_params = AdminUrlParams(request)
+        admin_context = AdminContext(request)
         if LTE_DJANGO_1_6:
             extra_context = extra_context or {}
-            extra_context.update({'is_popup': admin_url_params.popup})
+            extra_context.update({'is_popup': admin_context.popup})
         if request.POST:
             # Popup in pick mode. Call super delete view so the objects
             # actually get deleted. All possible failures in delete_view cause
