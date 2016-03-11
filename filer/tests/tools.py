@@ -11,6 +11,7 @@ from filer.models.imagemodels import Image
 from filer.tests.helpers import create_superuser, create_image
 import os
 
+
 class ToolsTestCase(TestCase):
     def setUp(self):
         self.superuser = create_superuser()

@@ -49,8 +49,6 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/delete_clipboard/$',
                 self.admin_site.admin_view(views.delete_clipboard),
                 name='filer-delete_clipboard'),
-            # upload does it's own permission stuff (because of the stupid
-            # flash missing cookie stuff)
             url(r'^operations/upload/(?P<folder_id>[0-9]+)/$',
                 ajax_upload,
                 name='filer-ajax_upload'),

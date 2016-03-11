@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.admin.options import IS_POPUP_VAR
-from ..utils.compatibility import (
-    LTE_DJANGO_1_7, LTE_DJANGO_1_6, urlencode)
+from django.utils.http import urlencode
+from ..utils.compatibility import LTE_DJANGO_1_7, LTE_DJANGO_1_6
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
@@ -75,12 +75,12 @@ def popup_pick_type(request):
     return None
 
 
-def admin_url_params(request):
+def admin_url_params(request, params=None):
     """
     given a request, looks at GET and POST values to determine which params
     should be added. Is used to keep the context of popup and picker mode.
     """
-    params = {}
+    params = params or {}
     if popup_status(request):
         params[IS_POPUP_VAR] = '1'
     pick_type = popup_pick_type(request)
@@ -89,9 +89,11 @@ def admin_url_params(request):
     return params
 
 
-def admin_url_params_encoded(request, first_separator='?'):
+def admin_url_params_encoded(request, first_separator='?', params=None):
     # sorted to make testing easier
-    params = urlencode(sorted(admin_url_params(request).items()))
+    params = urlencode(
+        sorted(admin_url_params(request, params=params).items())
+    )
     if not params:
         return ''
     return '{0}{1}'.format(first_separator, params)

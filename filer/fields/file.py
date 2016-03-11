@@ -10,8 +10,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 
-from ..utils.compatibility import truncate_words, LTE_DJANGO_1_8, LTE_DJANGO_1_7
+from ..utils.compatibility import (
+    truncate_words, LTE_DJANGO_1_8, LTE_DJANGO_1_7)
 from ..utils.model_label import get_model_label
 from ..models import File
 from .. import settings as filer_settings
@@ -44,10 +46,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         params = self.url_parameters()
         params['_pick'] = 'file'
         if params:
-            lookup_url = '?' + '&amp;'.join([
-                '%s=%s' % (k, v)
-                for k, v in list(params.items())
-            ])
+            lookup_url = '?' + urlencode(sorted(params.items()))
         else:
             lookup_url = ''
         if 'class' not in attrs:

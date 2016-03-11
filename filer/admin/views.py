@@ -32,7 +32,10 @@ def make_folder(request, folder_id=None):
     if not folder_id:
         folder_id = request.POST.get('parent_id')
     if folder_id:
-        folder = Folder.objects.get(id=folder_id)
+        try:
+            folder = Folder.objects.get(id=folder_id)
+        except Folder.DoesNotExist:
+            raise PermissionDenied
     else:
         folder = None
 

@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 
 from ..models import Folder
 from ..utils.compatibility import truncate_words, LTE_DJANGO_1_7
@@ -40,7 +41,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         params = self.url_parameters()
         params['_pick'] = 'folder'
         if params:
-            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in list(params.items())])
+            url = '?' + urlencode(sorted(params.items()))
         else:
             url = ''
         if 'class' not in attrs:

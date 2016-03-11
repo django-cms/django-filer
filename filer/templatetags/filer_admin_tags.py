@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.template import Library
-from django.utils.html import mark_safe
+from django.utils.html import mark_safe, format_html_join
 from ..admin.tools import admin_url_params, admin_url_params_encoded
 
 
@@ -29,8 +29,8 @@ def filer_admin_context_url_params(context, first_separator='?'):
 @register.simple_tag(takes_context=True)
 def filer_admin_context_hidden_formfields(context):
     request = context.get('request')
-    fields = [
-        '<input type="hidden" name="{0}" value="{1}">'.format(fieldname, value)
-        for fieldname, value in admin_url_params(request).items()
-    ]
-    return mark_safe('\n'.join(fields))
+    return format_html_join(
+        '\n',
+        '<input type="hidden" name="{0}" value="{1}">',
+        admin_url_params(request).items(),
+    )

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import sys
 
 import django
@@ -10,10 +12,12 @@ except ImportError:
     # django >=1.5
     from django.utils.text import Truncator
     from django.utils.functional import allow_lazy
+
     def truncate_words(s, num, end_text='...'):
         truncate = end_text and ' %s' % end_text or ''
         return Truncator(s).words(num, truncate=truncate)
     truncate_words = allow_lazy(truncate_words, six.text_type)
+
 
 LTE_DJANGO_1_4 = django.VERSION < (1, 5)  # not supported!
 LTE_DJANGO_1_5 = django.VERSION < (1, 6)  # not supported!
@@ -79,16 +83,12 @@ except ImportError:
 
 
 try:
-    from urllib import urlencode  # flake8: noqa
-except:
-    # python 3
-    from urllib.parse import urlencode  # flake8: noqa
-
-
-try:
-    from PIL import Image as PILImage
+    from Pillow import Image as PILImage
 except ImportError:
     try:
-        import Image as PILImage
+        from PIL import Image as PILImage
     except ImportError:
-        raise ImportError("The Python Imaging Library was not found.")
+        try:
+            import Image as PILImage
+        except ImportError:
+            raise ImportError("The Python Imaging Library was not found.")
