@@ -72,16 +72,15 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        admin_url_params = AdminContext(request)
         if (
             request.POST and
-            admin_url_params.popup and
-            admin_url_params.pick and
-            '_continue' not in request.POST
+            '_continue' not in request.POST and
+            '_saveasnew' not in request.POST and
+            '_addanother' not in request.POST
         ):
-            # popup in pick mode. response_change only gets called if the
-            # operation was successful. In pick mode we just want to go
-            # back to the folder list view and keep the params.
+            # Popup in pick mode or normal mode. In both cases we want to go
+            # back to the folder list view after save. And not the useless file
+            # list view.
             if obj.folder:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': obj.folder.id})
@@ -124,14 +123,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         if LTE_DJANGO_1_6:
             extra_context = extra_context or {}
             extra_context.update({'is_popup': admin_url_params.popup})
-        if (
-            request.POST and
-            admin_url_params.popup and
-            admin_url_params.pick
-        ):
-            # Popup in pick mode. Call super delete view so the objects
-            # actually get deleted. All possible failures in delete_view cause
-            # exceptions, so it is safe to ignore the return value though.
+        if request.POST:
+            # Return to folder listing, since there is no usable file listing.
             super(FileAdmin, self).delete_view(
                 request=request, object_id=object_id,
                 extra_context=extra_context)

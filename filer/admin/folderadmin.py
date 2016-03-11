@@ -135,12 +135,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        admin_url_params = AdminContext(request)
         if (
             request.POST and
-            admin_url_params.popup and
-            admin_url_params.pick and
-            '_continue' not in request.POST
+            '_continue' not in request.POST and
+            '_saveasnew' not in request.POST and
+            '_addanother' not in request.POST
         ):
             if obj.parent:
                 url = reverse('admin:filer-directory_listing',
@@ -179,15 +178,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             parent_folder = None
 
-        admin_url_params = AdminContext(request)
+        admin_url_params = AdminUrlParams(request)
         if LTE_DJANGO_1_6:
             extra_context = extra_context or {}
             extra_context.update({'is_popup': admin_url_params.popup})
-        if (
-            request.POST and
-            admin_url_params.popup and
-            admin_url_params.pick
-        ):
+        if request.POST:
             # Popup in pick mode. Call super delete view so the objects
             # actually get deleted. All possible failures in delete_view cause
             # exceptions, so it is safe to ignore the return value though.
