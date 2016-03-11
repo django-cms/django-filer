@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
+from django.http.response import HttpResponseBadRequest
+
 from django import forms
 from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
@@ -68,6 +70,10 @@ def make_folder(request, folder_id=None):
 
 @login_required
 def paste_clipboard_to_folder(request):
+    if True:
+        # TODO: cleanly remove Clipboard code if it is no longer needed
+        return HttpResponseBadRequest('not implemented anymore')
+
     if request.method == 'POST':
         folder = Folder.objects.get(id=request.POST.get('folder_id'))
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
@@ -89,6 +95,10 @@ def paste_clipboard_to_folder(request):
 
 @login_required
 def discard_clipboard(request):
+    if True:
+        # TODO: cleanly remove Clipboard code if it is no longer needed
+        return HttpResponseBadRequest('not implemented anymore')
+
     if request.method == 'POST':
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.discard_clipboard(clipboard)
@@ -102,6 +112,10 @@ def discard_clipboard(request):
 
 @login_required
 def delete_clipboard(request):
+    if True:
+        # TODO: cleanly remove Clipboard code if it is no longer needed
+        return HttpResponseBadRequest('not implemented anymore')
+
     if request.method == 'POST':
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.delete_clipboard(clipboard)
