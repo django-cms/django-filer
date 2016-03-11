@@ -741,6 +741,21 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             ) + '?_pick=file&_popup=1'
         )
 
+    def test_regular_mode_folder_delete(self):
+        folder = Folder.objects.create(name='foo')
+        base_url = reverse('admin:filer_folder_delete', args=[folder.id])
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(base_url, data={'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-root'
+            )
+        )
+
     def test_pick_mode_folder_with_parent_delete(self):
         parent_folder = Folder.objects.create(name='parent')
         folder = Folder.objects.create(name='foo', parent=parent_folder)
@@ -759,6 +774,23 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             ) + '?_pick=file&_popup=1'
         )
 
+    def test_regular_mode_folder_with_parent_delete(self):
+        parent_folder = Folder.objects.create(name='parent')
+        folder = Folder.objects.create(name='foo', parent=parent_folder)
+        base_url = reverse('admin:filer_folder_delete', args=[folder.id])
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(base_url, data={'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            )
+        )
+
     def test_pick_mode_image_delete(self):
         image = self.create_image(folder=None)
         base_url = image.get_admin_delete_url()
@@ -767,11 +799,27 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         response = self.client.get(pick_url)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(pick_url, data={'_popup': '1', 'post': 'yes'})
+        response = self.client.post(pick_url, data={
+            '_popup': '1', 'post': 'yes'})
         self.assertRedirects(
             response=response,
             expected_url=reverse(
-                'admin:filer-directory_listing-unfiled_images') + '?_pick=file&_popup=1'
+                'admin:filer-directory_listing-unfiled_images'''
+            ) + '?_pick=file&_popup=1'
+        )
+
+    def test_regular_mode_image_delete(self):
+        image = self.create_image(folder=None)
+        base_url = image.get_admin_delete_url()
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(base_url, data={'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-unfiled_images')
         )
 
     def test_pick_mode_image_with_folder_delete(self):
@@ -793,6 +841,23 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             ) + '?_pick=file&_popup=1'
         )
 
+    def test_regular_mode_image_with_folder_delete(self):
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_delete_url()
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(base_url, data={'post': 'yes'})
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            )
+        )
+
     def test_pick_mode_image_save(self):
         image = self.create_image(folder=None)
         base_url = image.get_admin_change_url()
@@ -810,6 +875,21 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             expected_url=reverse(
                 'admin:filer-directory_listing-unfiled_images'
             ) + '?_pick=file&_popup=1'
+        )
+
+    def test_regular_mode_image_save(self):
+        image = self.create_image(folder=None)
+        base_url = image.get_admin_change_url()
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+        data = model_to_dict(image, all=True)
+        response = self.client.post(base_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-unfiled_images'
+            )
         )
 
     def test_pick_mode_image_with_folder_save(self):
@@ -833,6 +913,24 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 'admin:filer-directory_listing',
                 args=[parent_folder.id]
             ) + '?_pick=file&_popup=1'
+        )
+
+    def test_regular_mode_image_with_folder_save(self):
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_change_url()
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+
+        data = model_to_dict(image, all=True)
+        response = self.client.post(base_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            )
         )
 
     def test_pick_mode_folder_save(self):
@@ -861,6 +959,26 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             ) + '?_pick=file&_popup=1'
         )
 
+    def test_regular_mode_folder_save(self):
+        folder = Folder.objects.create(name='foo')
+        base_url = reverse('admin:filer_folder_change', args=[folder.id])
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+        data = {
+            'name': 'foobar',
+        }
+        response = self.client.post(base_url, data=data)
+        if response.status_code == 200:
+            from pprint import pprint;
+            pprint(response.content)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-root'
+            )
+        )
+
     def test_pick_mode_folder_with_parent_save(self):
         parent_folder = Folder.objects.create(name='parent')
         folder = Folder.objects.create(name='foo', parent=parent_folder)
@@ -884,4 +1002,24 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 'admin:filer-directory_listing',
                 args=[parent_folder.id]
             ) + '?_pick=file&_popup=1'
+        )
+
+    def test_regular_mode_folder_with_parent_save(self):
+        parent_folder = Folder.objects.create(name='parent')
+        folder = Folder.objects.create(name='foo', parent=parent_folder)
+        base_url = reverse('admin:filer_folder_change', args=[folder.id])
+
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+
+        data = {
+            'name': 'foobar',
+        }
+        response = self.client.post(base_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            )
         )
