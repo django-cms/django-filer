@@ -7,10 +7,10 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
 from .. import settings
-from .permissions import PrimitivePermissionAwareModelAdmin
 from ..models import File
 from ..utils.compatibility import LTE_DJANGO_1_5, LTE_DJANGO_1_6, unquote
-from .tools import popup_status, AdminContext, admin_url_params_encoded
+from .permissions import PrimitivePermissionAwareModelAdmin
+from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class FileAdminChangeFrom(forms.ModelForm):

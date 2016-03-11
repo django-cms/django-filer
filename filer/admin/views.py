@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-
-from django.http.response import HttpResponseBadRequest
+from __future__ import absolute_import, unicode_literals
 
 from django import forms
 from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
-from ..models import Folder, Clipboard, tools, FolderRoot
-from .tools import admin_url_params_encoded, popup_status, AdminContext
+from ..models import Clipboard, Folder, FolderRoot, tools
+from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class NewFolderForm(forms.ModelForm):

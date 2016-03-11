@@ -9,11 +9,11 @@ from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 
 from ..models import Folder
-from ..utils.compatibility import truncate_words, LTE_DJANGO_1_7
+from ..utils.compatibility import LTE_DJANGO_1_7, truncate_words
 from ..utils.model_label import get_model_label
 
 

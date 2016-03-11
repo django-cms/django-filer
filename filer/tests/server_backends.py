@@ -1,18 +1,22 @@
 #-*- coding: utf-8 -*-
-import time
-import shutil
+from __future__ import absolute_import
+
 import os
+import shutil
+import time
+
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import HttpResponseNotModified, Http404
+from django.http import Http404, HttpResponseNotModified
 from django.test import TestCase
 from django.utils.http import http_date
-from filer import settings as filer_settings
-from filer.models import File
-from filer.server.backends.default import DefaultServer
-from filer.server.backends.nginx import NginxXAccelRedirectServer
-from filer.server.backends.xsendfile import ApacheXSendfileServer
-from filer.tests.helpers import create_image
-from filer.tests.utils import Mock
+
+from .. import settings as filer_settings
+from ..models import File
+from ..server.backends.default import DefaultServer
+from ..server.backends.nginx import NginxXAccelRedirectServer
+from ..server.backends.xsendfile import ApacheXSendfileServer
+from .helpers import create_image
+from .utils import Mock
 
 
 class BaseServerBackendTestCase(TestCase):

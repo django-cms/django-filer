@@ -1,12 +1,17 @@
 #-*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+import os
+from zipfile import ZipFile
+
+from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
-from django.conf import settings
-from filer.tests.helpers import create_image
-from filer.utils.loader import load
-from filer.utils.zip import unzip
-from zipfile import ZipFile
-import os
+
+from ..utils.loader import load_object as load
+from ..utils.zip import unzip
+from .helpers import create_image
+
 
 #===============================================================================
 # Some target classes for the classloading tests
@@ -14,8 +19,10 @@ import os
 class TestTargetSuperClass(object):
     pass
 
+
 class TestTargetClass(TestTargetSuperClass):
     pass
+
 
 #===============================================================================
 # Testing the classloader
@@ -36,10 +43,10 @@ class ClassLoaderTestCase(TestCase):
         result = load(TestTargetClass, TestTargetSuperClass)
         self.assertEqual(result.__class__, TestTargetClass)
 
+
 #===============================================================================
 # Testing the zipping/unzipping of files
 #===============================================================================
-
 class ZippingTestCase(TestCase):
 
     def setUp(self):

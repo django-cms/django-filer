@@ -2,20 +2,22 @@
 from __future__ import absolute_import
 
 import json
-from django.forms.models import modelform_factory
+
 from django.contrib import admin
+from django.forms.models import modelform_factory
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from . import views
 from .. import settings as filer_settings
-from ..models import Folder, Clipboard, ClipboardItem, Image
+from ..models import Clipboard, ClipboardItem, Folder, Image
 from ..utils.compatibility import LTE_DJANGO_1_4
 from ..utils.files import (
-    handle_upload, handle_request_files_upload, UploadException,
+    UploadException,
+    handle_request_files_upload,
+    handle_upload,
 )
 from ..utils.loader import load_object
-from . import views
-
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import itertools
 import os
@@ -10,55 +10,55 @@ from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.core.exceptions import PermissionDenied
-from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
-from django.db import router, models
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, get_object_or_404
-
+from django.db import models, router
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext, ugettext_lazy
+from django.utils.translation import ugettext_lazy, ungettext
 
-from .. import settings
-from .forms import (
-    CopyFilesAndFoldersForm,
-    ResizeImagesForm,
-    RenameFilesForm,
-)
-from .permissions import PrimitivePermissionAwareModelAdmin
-from .patched.admin_utils import get_deleted_objects
-from .tools import (
-    userperms_for_request,
-    check_folder_edit_permissions,
-    check_files_edit_permissions,
-    check_files_read_permissions,
-    check_folder_read_permissions,
-    admin_each_context,
-)
-from .tools import (popup_status, admin_url_params_encoded,
-                    AdminContext)
 from . import views
+from .. import settings
 from ..models import (
+    File,
+    Folder,
+    FolderPermission,
     FolderRoot,
+    Image,
     ImagesWithMissingData,
     UnfiledImages,
-    Folder,
-    File,
-    Image,
-    FolderPermission,
     tools,
 )
 from ..settings import FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import (
-    get_delete_permission, quote, unquote, capfirst, LTE_DJANGO_1_6)
+    LTE_DJANGO_1_6,
+    capfirst,
+    get_delete_permission,
+    quote,
+    unquote,
+)
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
+from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
+from .patched.admin_utils import get_deleted_objects
+from .permissions import PrimitivePermissionAwareModelAdmin
+from .tools import (
+    AdminContext,
+    admin_each_context,
+    admin_url_params_encoded,
+    check_files_edit_permissions,
+    check_files_read_permissions,
+    check_folder_edit_permissions,
+    check_folder_read_permissions,
+    popup_status,
+    userperms_for_request,
+)
 
 
 class AddFolderPopupForm(forms.ModelForm):

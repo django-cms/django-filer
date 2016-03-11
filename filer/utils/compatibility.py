@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import sys
 
@@ -83,12 +83,13 @@ except ImportError:
 
 
 try:
-    from Pillow import Image as PILImage
+    from PIL import Image as PILImage
+    from PIL import ImageDraw as PILImageDraw
+    from PIL import ExifTags as PILExifTags
 except ImportError:
     try:
-        from PIL import Image as PILImage
+        import Image as PILImage
+        import ImageDraw as PILImageDraw
+        import ExifTags as PILExifTags
     except ImportError:
-        try:
-            import Image as PILImage
-        except ImportError:
-            raise ImportError("The Python Imaging Library was not found.")
+        raise ImportError("The Python Imaging Library was not found.")

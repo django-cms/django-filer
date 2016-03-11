@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import logging
+import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import get_storage_class
-from filer.utils.loader import load_object
-from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
-import os
+
+from .utils.loader import load_object
+from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 
 logger = logging.getLogger(__name__)
 

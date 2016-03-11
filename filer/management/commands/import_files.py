@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
+from optparse import make_option
 
 from django.core.files import File as DjangoFile
 from django.core.management.base import BaseCommand, NoArgsCommand
-
-from optparse import make_option
 
 from ...models.filemodels import File
 from ...models.foldermodels import Folder

@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
-
-try:
-    from PIL import Image
-    from PIL import ExifTags
-except ImportError:
-    try:
-        import Image
-        import ExifTags
-    except ImportError:
-        raise ImportError("The Python Imaging Library was not found.")
+from __future__ import absolute_import
 
 from django.core.files.storage import default_storage as storage
+
+from ..utils.compatibility import PILExifTags, PILImage
 
 
 def get_exif(im):
@@ -20,13 +13,13 @@ def get_exif(im):
         return {}
     ret = {}
     for tag, value in list(exif_raw.items()):
-        decoded = ExifTags.TAGS.get(tag, tag)
+        decoded = PILExifTags.TAGS.get(tag, tag)
         ret[decoded] = value
     return ret
 
 
 def get_exif_for_file(file_obj):
-    im = Image.open(storage.open(file_obj.name), 'r')
+    im = PILImage.open(storage.open(file_obj.name), 'r')
     return get_exif(im)
 
 

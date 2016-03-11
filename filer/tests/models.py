@@ -1,11 +1,25 @@
 #-*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
+
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
+
+from .. import settings as filer_settings
+from ..models.clipboardmodels import Clipboard
+from ..models.filemodels import File
+from ..models.foldermodels import Folder
+from ..models.imagemodels import Image
+from ..test_utils import ET_2
+from .helpers import (
+    create_clipboard_item,
+    create_folder_structure,
+    create_image,
+    create_superuser,
+)
 
 try:
     from unittest import skipIf, skipUnless
@@ -13,14 +27,6 @@ except ImportError:
     # Django<1.9
     from django.utils.unittest import skipIf, skipUnless
 
-from filer.models.foldermodels import Folder
-from filer.models.imagemodels import Image
-from filer.models.filemodels import File
-from filer.models.clipboardmodels import Clipboard
-from filer.test_utils import ET_2
-from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, create_clipboard_item)
-from filer import settings as filer_settings
 
 
 class FilerApiTests(TestCase):
@@ -288,4 +294,3 @@ class FilerApiTests(TestCase):
         image.save()
         canonical = image.canonical_url
         self.assertTrue(canonical.startswith('/filer/test-path/'))
-

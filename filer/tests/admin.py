@@ -1,29 +1,37 @@
 #-*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import os
+
+import django
+import django.core.files
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.admin import helpers
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict as model_to_dict_django
+from django.test import TestCase
+
+from .. import settings as filer_settings
+from ..admin.folderadmin import FolderAdmin
+from ..models.filemodels import File
+from ..models.foldermodels import Folder, FolderPermission
+from ..models.imagemodels import Image
+from ..models.virtualitems import FolderRoot
+from ..tests.helpers import (
+    SettingsOverride,
+    create_folder_structure,
+    create_image,
+    create_superuser,
+)
 
 try:
     from unittest import skipIf
-except ImportError: # for python 2.6
+except ImportError:  # for python 2.6
     from unittest2 import skipIf
 
-import django
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-import django.core.files
-from django.contrib.admin import helpers
-from django.contrib import admin
-from django.contrib.auth.models import User
-from django.conf import settings
-from django.forms.models import model_to_dict as model_to_dict_django
 
-from filer.models.filemodels import File
-from filer.models.foldermodels import Folder, FolderPermission
-from filer.models.imagemodels import Image
-from filer.models.virtualitems import FolderRoot
-from filer.admin.folderadmin import FolderAdmin
-from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, SettingsOverride)
-from filer import settings as filer_settings
 
 
 def model_to_dict(instance, **kwargs):
@@ -248,7 +256,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             'jsessionid': self.client.session.session_key
         }
         response = self.client.post(url, post_data, **extra_headers)
-        from filer.admin.clipboardadmin import NO_FOLDER_ERROR
+        from ..admin.clipboardadmin import NO_FOLDER_ERROR
         self.assertContains(response, NO_FOLDER_ERROR)
         self.assertEqual(Image.objects.count(), 0)
 
@@ -267,7 +275,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             content_type='application/octet-stream',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
-        from filer.admin.clipboardadmin import NO_FOLDER_ERROR
+        from ..admin.clipboardadmin import NO_FOLDER_ERROR
         self.assertContains(response, NO_FOLDER_ERROR)
         self.assertEqual(Image.objects.count(), 0)
 
@@ -301,7 +309,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             }
             response = self.client.post(url, post_data, **extra_headers)
 
-        from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
+        from ..admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
         self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
         self.assertEqual(Image.objects.count(), 0)
 
@@ -337,7 +345,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 content_type='application/octet-stream',
                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
             )
-        from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
+        from ..admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
         self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
         self.assertEqual(Image.objects.count(), 0)
 

@@ -1,22 +1,26 @@
 #-*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from filer.models import Folder
+import json
 import os
 import tempfile
-import json
 
-from django.test import TestCase
-from django.core.files import File as DjangoFile
 from django.conf import settings
+from django.core.files import File as DjangoFile
 from django.core.management import call_command
+from django.test import TestCase
 from django.utils.six import StringIO
 
-from filer.models.imagemodels import Image
-from filer.models.filemodels import File
-from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, SettingsOverride)
-from filer import settings as filer_settings
+from .. import settings as filer_settings
+from ..models import Folder
+from ..models.filemodels import File
+from ..models.imagemodels import Image
+from ..tests.helpers import (
+    SettingsOverride,
+    create_folder_structure,
+    create_image,
+    create_superuser,
+)
 
 
 class DumpDataTests(TestCase):

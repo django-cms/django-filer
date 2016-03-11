@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import unicode_literals
+import os
+
+from django.utils.timezone import now
+
+from .files import get_valid_filename
 
 try:
     from django.utils.encoding import force_text
 except ImportError:
     # Django < 1.5
     from django.utils.encoding import force_unicode as force_text
-from django.utils.timezone import now
-from filer.utils.files import get_valid_filename
-import os
 
 
 def by_date(instance, filename):

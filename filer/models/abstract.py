@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+import logging
 import os
 
 from django.db import models
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
-from filer import settings as filer_settings
-from filer.models.filemodels import File
-from filer.utils.filer_easy_thumbnails import FilerThumbnailer
-from filer.utils.pil_exif import get_exif_for_file
+from .. import settings as filer_settings
 from ..utils.compatibility import PILImage
-
-
-import logging
+from ..utils.filer_easy_thumbnails import FilerThumbnailer
+from ..utils.pil_exif import get_exif_for_file
+from .filemodels import File
 
 logger = logging.getLogger(__name__)
 

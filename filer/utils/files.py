@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
 
+from django.http.multipartparser import (
+    ChunkIter,
+    SkipFile,
+    StopFutureHandlers,
+    StopUpload,
+    exhaust,
+)
+from django.template.defaultfilters import slugify as slugify_django
 from django.utils.encoding import force_text
 from django.utils.text import get_valid_filename as get_valid_filename_django
-from django.template.defaultfilters import slugify as slugify_django
-from django.http.multipartparser import (
-    ChunkIter, exhaust, StopFutureHandlers, SkipFile, StopUpload)
 from unidecode import unidecode
 
 

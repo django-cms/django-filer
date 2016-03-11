@@ -3,8 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 from django.template import Library
 from django.utils.html import format_html_join
-from ..admin.tools import admin_url_params, admin_url_params_encoded
 
+from ..admin.tools import admin_url_params, admin_url_params_encoded
 
 register = Library()
 

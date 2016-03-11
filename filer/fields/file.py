@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+import logging
 import warnings
 
 from django import forms
-from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
+from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 
-from ..utils.compatibility import (
-    truncate_words, LTE_DJANGO_1_8, LTE_DJANGO_1_7)
-from ..utils.model_label import get_model_label
-from ..models import File
 from .. import settings as filer_settings
+from ..models import File
+from ..utils.compatibility import (
+    LTE_DJANGO_1_7,
+    LTE_DJANGO_1_8,
+    truncate_words,
+)
+from ..utils.model_label import get_model_label
 
-import logging
 logger = logging.getLogger(__name__)
 
 
