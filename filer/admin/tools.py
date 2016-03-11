@@ -100,13 +100,25 @@ def admin_url_params_encoded(request, first_separator='?'):
 class AdminContext(dict):
     def __init__(self, request):
         super(AdminContext, self).__init__()
-        self.request = request
         self.update(admin_url_params(request))
-        extra = dict()
-        extra['popup'] = self.get(IS_POPUP_VAR, False) == '1'
-        extra['pick'] = self.get('_pick', '')
-        for pick_type in ALLOWED_PICK_TYPES:
-            extra['pick_{0}'.format(pick_type)] = extra['pick'] == pick_type
-        for key, value in extra.items():
-            setattr(self, key, value)
-        self.update(extra)
+
+    def __missing__(self, key):
+        """
+        Always allow accessing the keys 'popup', 'pick', 'pick_file' and
+        'pick_folder' as keys.
+        """
+        if key == 'popup':
+            return self.get(IS_POPUP_VAR, False) == '1'
+        elif key == 'pick':
+            return self.get('_pick', '')
+        elif key.startswith('pick_'):
+            return self.get('_pick', '') == key.split('pick_')[1]
+
+    def __getattr__(self, name):
+        """
+        Always allow accessing 'popup', 'pick', 'pick_file' and 'pick_folder'
+        as attributes.
+        """
+        if name in ('popup', 'pick') or name.startswith('pick_'):
+            return self.get(name)
+        raise AttributeError
