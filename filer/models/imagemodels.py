@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+from __future__ import absolute_import
+
 import logging
+from datetime import datetime
 
 from django.conf import settings
 from django.db import models
-from django.utils.timezone import now, make_aware, get_current_timezone
+from django.utils.timezone import get_current_timezone, make_aware, now
 from django.utils.translation import ugettext_lazy as _
 
-from filer import settings as filer_settings
-from filer.models.abstract import BaseImage
-from filer.utils.loader import load_object
+from .. import settings as filer_settings
+from ..utils.loader import load_object
+from .abstract import BaseImage
 
 logger = logging.getLogger("filer")
 

@@ -1,4 +1,4 @@
-{% load i18n staticfiles %}
+{% load i18n staticfiles filer_admin_tags %}
 
 {% if show_result_count %}
     <div class="small quiet filter-files-cancel">
@@ -6,6 +6,6 @@
         {% blocktrans count folder_files|length as counter %}
             {{ counter }} file{% plural %}{{ counter }} files
         {% endblocktrans %})
-        <a href="?{% if is_popup %}_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">{% trans "cancel search" %}</a>
+        <a href="{% filer_admin_context_url_params %}">{% trans "cancel search" %}</a>
     </div>
 {% endif %}

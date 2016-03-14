@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
-from filer.settings import FILER_ADMIN_ICON_SIZES
+from ..settings import FILER_ADMIN_ICON_SIZES
 
 
 class IconsMixin(object):

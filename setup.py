@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from setuptools import setup, find_packages
 import os
+
+from setuptools import find_packages, setup
 
 version = __import__('filer').__version__
 
@@ -23,7 +24,7 @@ setup(
     long_description = read('README.rst'),
     author='Stefan Foulis',
     author_email='stefan@foulis.ch',
-    packages=find_packages(),
+    packages=find_packages(include=('filer',)),
     install_requires=(
         'Django>=1.5,<1.9.999',  # Django is known to use rc versions
         'easy-thumbnails>=1.0,<2.4',
@@ -47,9 +48,10 @@ setup(
         'Framework :: Django :: 1.6',
         'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
 )

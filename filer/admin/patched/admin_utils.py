@@ -8,20 +8,20 @@ This code has been copied from Django 1.4.
 
 At all locations where something has been changed, there are inline comments in the code.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
+
+from ...utils.compatibility import NestedObjects, get_delete_permission, quote
+
 try:
     from django.utils.encoding import force_text
 except ImportError:
     # Django < 1.5
     from django.utils.encoding import force_unicode as force_text
-
-from filer.utils.compatibility import (get_delete_permission, NestedObjects,
-                                       quote)
 
 
 def get_deleted_objects(objs, opts, user, admin_site, using):

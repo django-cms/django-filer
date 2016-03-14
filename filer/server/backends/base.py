@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.utils.encoding import smart_str
 import mimetypes
 import os
+
+from django.utils.encoding import smart_str
 
 
 class ServerBase(object):

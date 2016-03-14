@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 import json
-from django.forms.models import modelform_factory
+
 from django.contrib import admin
+from django.forms.models import modelform_factory
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from filer import settings as filer_settings
-from filer.models import Folder, Clipboard, ClipboardItem, Image
-from filer.utils.compatibility import LTE_DJANGO_1_4
-from filer.utils.files import (
-    handle_upload, handle_request_files_upload, UploadException,
+from . import views
+from .. import settings as filer_settings
+from ..models import Clipboard, ClipboardItem, Folder, Image
+from ..utils.compatibility import LTE_DJANGO_1_4
+from ..utils.files import (
+    UploadException,
+    handle_request_files_upload,
+    handle_upload,
 )
-from filer.utils.loader import load_object
-
+from ..utils.loader import load_object
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
@@ -37,7 +41,6 @@ class ClipboardAdmin(admin.ModelAdmin):
     def get_urls(self):
         from django.conf.urls import patterns, url
         urls = super(ClipboardAdmin, self).get_urls()
-        from filer import views
         url_patterns = patterns('',
             url(r'^operations/paste_clipboard_to_folder/$',
                 self.admin_site.admin_view(views.paste_clipboard_to_folder),
@@ -48,8 +51,6 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/delete_clipboard/$',
                 self.admin_site.admin_view(views.delete_clipboard),
                 name='filer-delete_clipboard'),
-            # upload does it's own permission stuff (because of the stupid
-            # flash missing cookie stuff)
             url(r'^operations/upload/(?P<folder_id>[0-9]+)/$',
                 ajax_upload,
                 name='filer-ajax_upload'),

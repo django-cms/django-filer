@@ -1,21 +1,27 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
+import logging
 import warnings
 
 from django import forms
-from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.admin.sites import site
+from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
-from filer.utils.compatibility import truncate_words, LTE_DJANGO_1_8, LTE_DJANGO_1_7
-from filer.utils.model_label import get_model_label
-from filer.models import File
-from filer import settings as filer_settings
+from .. import settings as filer_settings
+from ..models import File
+from ..utils.compatibility import (
+    LTE_DJANGO_1_7,
+    LTE_DJANGO_1_8,
+    truncate_words,
+)
+from ..utils.model_label import get_model_label
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -41,8 +47,9 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         if not related_url:
             related_url = reverse('admin:filer-directory_listing-last')
         params = self.url_parameters()
+        params['_pick'] = 'file'
         if params:
-            lookup_url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in list(params.items())])
+            lookup_url = '?' + urlencode(sorted(params.items()))
         else:
             lookup_url = ''
         if 'class' not in attrs:

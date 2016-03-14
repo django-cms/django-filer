@@ -11,7 +11,7 @@
                     {% trans "none selected" %}
                 {% endif %}
             </span>
-            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
                 {% trans "Add Folder" %}
             </a>
 

@@ -1,8 +1,10 @@
 #-*- coding: utf-8 -*-
-from filer.tests.admin import *
-from filer.tests.dump import *
-from filer.tests.models import *
-from filer.tests.permissions import *
-from filer.tests.server_backends import *
-from filer.tests.tools import *
-from filer.tests.utils import *
+from __future__ import absolute_import
+
+from .admin import *
+from .dump import *
+from .models import *
+from .permissions import *
+from .server_backends import *
+from .tools import *
+from .utils import *

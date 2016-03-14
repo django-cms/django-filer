@@ -32,3 +32,4 @@ share/
 .tox
 testenv1
 node_modules/
+.python-version

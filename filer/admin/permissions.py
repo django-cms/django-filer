@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from filer.utils.compatibility import LTE_DJANGO_1_7
+from ..utils.compatibility import LTE_DJANGO_1_7
 
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):

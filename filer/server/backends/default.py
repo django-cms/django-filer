@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import os
 import stat
+
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.utils.http import http_date
 from django.views.static import was_modified_since
-from filer.utils.compatibility import LTE_DJANGO_1_4
-from filer.server.backends.base import ServerBase
+
+from ...utils.compatibility import LTE_DJANGO_1_4
+from .base import ServerBase
 
 
 class DefaultServer(ServerBase):

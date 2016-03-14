@@ -24,6 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from __future__ import absolute_import
+
 from django.utils import six
 
 __author__ = 'jannis@itisme.org (Jannis Andrija Schnitzer)'
