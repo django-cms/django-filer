@@ -38,7 +38,6 @@ from ..models import (
 from ..settings import FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import (
-    LTE_DJANGO_1_6,
     capfirst,
     get_delete_permission,
     quote,
@@ -171,6 +170,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         we need to fetch the object and find out who the parent is
         before super, because super will delete the object and make it
         impossible to find out the parent folder to redirect to.
+
+        The delete_view breaks with polymorphic models if the cascade will
+        try delete objects that are of different polymorphic types
+        (AttributeError: 'File' object has no attribute 'file_ptr').
+        The default implementation of the delete_view is hard to override
+        without just copying the whole big thing. Since we've already done
+        the overriding work on the delete_files_or_folders admin action, we
+        can re-use that here instead.
         """
         try:
             obj = self.get_queryset(request).get(pk=unquote(object_id))
@@ -178,17 +185,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             parent_folder = None
 
-        admin_context = AdminContext(request)
-        if LTE_DJANGO_1_6:
-            extra_context = extra_context or {}
-            extra_context.update({'is_popup': admin_context.popup})
         if request.POST:
-            # Popup in pick mode. Call super delete view so the objects
-            # actually get deleted. All possible failures in delete_view cause
-            # exceptions, so it is safe to ignore the return value though.
-            super(FolderAdmin, self).delete_view(
-                request=request, object_id=object_id,
-                extra_context=extra_context)
+            self.delete_files_or_folders(
+                request,
+                files_queryset=File.objects.none(),
+                folders_queryset=Folder.objects.filter(id=object_id)
+            )
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': parent_folder.id})
@@ -199,9 +201,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 admin_url_params_encoded(request),
             )
             return HttpResponseRedirect(url)
-        return super(FolderAdmin, self).delete_view(
-            request=request, object_id=object_id,
-            extra_context=extra_context)
+
+        return self.delete_files_or_folders(
+            request,
+            files_queryset=File.objects.none(),
+            folders_queryset=Folder.objects.filter(id=object_id)
+        )
 
     def icon_img(self, xs):
         return mark_safe(('<img src="%simg/icons/plainfolder_32x32.png" '
@@ -711,8 +716,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # permissions.
         # TODO: Check if permissions are really verified
         using = router.db_for_write(self.model)
-        deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
-        deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
+        deletable_files, model_count_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
+        deletable_folders, model_count_folder, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
         all_protected.extend(protected_files)
         all_protected.extend(protected_folders)
 

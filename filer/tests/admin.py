@@ -545,6 +545,13 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         folders = []
         for folder in FolderRoot().children.all():
             folders.append('folder-%d' % (folder.id,))
+        # this returns the confirmation for the admin action
+        response = self.client.post(url, {
+            'action': 'delete_files_or_folders',
+            'post': 'no',
+            helpers.ACTION_CHECKBOX_NAME: folders,
+        })
+        # this does the actual deleting
         response = self.client.post(url, {
             'action': 'delete_files_or_folders',
             'post': 'yes',
@@ -558,6 +565,7 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         self.create_file(folder=self.src_folder)
         self.create_image(folder=self.src_folder)
         self.create_file(folder=self.src_folder)
+        self.create_image(folder=self.src_folder)
 
         self.assertNotEqual(File.objects.count(), 0)
         self.assertNotEqual(Image.objects.count(), 0)
@@ -1031,3 +1039,33 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 args=[parent_folder.id]
             )
         )
+
+
+class PolymorphicDeleteViewTests(BulkOperationsMixin, TestCase):
+    def test_can_delete_mixed_file_and_image_items(self):
+        """
+        we need to use a patched version of the get_deleted_objects so it works
+        with polymorphic models.
+        see filer.admin.patched.admin_utils.get_deleted_objects
+        """
+        folder = Folder.objects.create(name='a folder with files and images inside')
+        self.create_image(folder=folder, filename="i-am-a-image.jpg")
+        self.create_file(folder=folder, filename="i-am-a-file.bin")
+        self.assertEqual(Folder.objects.filter(id=folder.id).count(), 1)
+
+        response = self.client.get(folder.get_admin_delete_url())
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.post(
+            folder.get_admin_delete_url(),
+            {
+                'post': 'yes',
+            }
+        )
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-root'
+            )
+        )
+        self.assertEqual(Folder.objects.filter(id=folder.id).count(), 0)
