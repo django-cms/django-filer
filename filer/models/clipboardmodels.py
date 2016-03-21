@@ -6,7 +6,9 @@ from filer.models import filemodels
 
 
 class Clipboard(models.Model):
-    user = models.ForeignKey(auth_models.User, verbose_name=_('user'), related_name="filer_clipboards")
+    user = models.OneToOneField(
+        auth_models.User, verbose_name=_('user'), related_name="filer_clipboard",
+    )
     files = models.ManyToManyField(
         'File', verbose_name=_('files'), related_name="in_clipboards",
         through='ClipboardItem')
