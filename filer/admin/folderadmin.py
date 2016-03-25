@@ -946,7 +946,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'current_filename': file_obj.name or "",
             'current_basename': current_basename,
             'current_extension': current_extension,
-            'current_folder': file_obj.folder.name,
+            'current_folder': getattr(file_obj.folder, 'name', ''),
             'counter': counter + 1,  # 1-based
             'global_counter': global_counter + 1,  # 1-based
         }

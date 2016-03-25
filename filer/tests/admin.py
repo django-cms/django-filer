@@ -536,6 +536,59 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
 
+    def _do_test_rename(self, url, new_name, file_obj=None, folder_obj=None):
+        """
+        Helper to submit rename form and check renaming result.
+
+        'new_name' should be a plain string, no formatting supported.
+        """
+        if file_obj is not None:
+            checkbox_name = 'file-{}'.format(file_obj.id)
+            files = [file_obj]
+        elif folder_obj is not None:
+            checkbox_name = 'folder-{}'.format(folder_obj.id)
+            # files inside this folder, non-recursive
+            files = File.objects.filter(folder=folder_obj)
+        else:
+            raise(ValueError('file_obj or folder_obj is required'))
+
+        response = self.client.post(url, {
+            'action': 'rename_files',
+            'post': 'yes',
+            'rename_format': new_name,
+            helpers.ACTION_CHECKBOX_NAME: checkbox_name,
+        })
+        self.assertEquals(response.status_code, 302)
+
+        for f in files:
+            f = f._meta.model.objects.get(pk=f.pk)
+            self.assertEqual(f.name, new_name)
+
+    def test_action_rename_files(self):
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.image_obj.folder.id,
+        })
+        self._do_test_rename(
+            url=url, new_name='New Name', file_obj=self.image_obj)
+
+    def test_action_rename_files_in_folder(self):
+        self.assertEqual(
+            File.objects.filter(folder=self.sub_folder2).count(), 2)
+
+        url = reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.folder.id,
+        })
+
+        self._do_test_rename(
+            url=url, new_name='New Name', folder_obj=self.sub_folder2)
+
+    def test_rename_files_without_a_folder(self):
+        url = reverse('admin:filer-directory_listing-unfiled_images')
+        file_obj = self.create_file(folder=None)
+        self._do_test_rename(url=url, new_name='New Name',
+                             file_obj=file_obj)
+
+
 class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
     def test_delete_files_or_folders_action(self):
         self.assertNotEqual(File.objects.count(), 0)
