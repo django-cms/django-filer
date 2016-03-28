@@ -973,6 +973,29 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             )
         )
 
+    def test_image_subject_location(self):
+        def do_test_image_subject_location(subject_location=None,
+                                           should_redirect=True):
+            image = self.create_image(folder=None)
+            base_url = image.get_admin_change_url()
+            data = model_to_dict(image, all=True)
+            if subject_location is not None:
+                data.update(dict(subject_location=subject_location))
+            response = self.client.post(base_url, data=data)
+            if should_redirect:
+                self.assertRedirects(
+                    response=response,
+                    expected_url=reverse(
+                        'admin:filer-directory_listing-unfiled_images'))
+            else:
+                self.assertEqual(response.status_code, 200)
+
+        for subject_location in '', '10,10', '0,100000':
+            do_test_image_subject_location(subject_location=subject_location)
+
+        do_test_image_subject_location(subject_location='-1,1',
+                                       should_redirect=False)
+
     def test_pick_mode_image_with_folder_save(self):
         parent_folder = Folder.objects.create(name='parent')
         image = self.create_image(folder=parent_folder)

@@ -36,8 +36,8 @@ class BaseImage(File):
     default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
     default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
 
-    subject_location = models.CharField(_('subject location'), max_length=64, null=True, blank=True,
-                                        default=None)
+    subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
+                                        default='')
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
