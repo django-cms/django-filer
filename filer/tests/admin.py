@@ -529,6 +529,18 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
             'destination': self.dst_folder.id,
             helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
         })
+        self.assertEqual(response.status_code, 302)
+
+        # check if copying to the same folder gives 403
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': 'test',
+            'destination': self.src_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+        })
+        self.assertEqual(response.status_code, 403)
+
         self.assertEqual(self.src_folder.files.count(), 1)
         self.assertEqual(self.dst_folder.files.count(), 1)
         self.assertEqual(self.src_folder.files[0].id, self.image_obj.id)
