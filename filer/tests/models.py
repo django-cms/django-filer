@@ -13,6 +13,7 @@ from ..models.clipboardmodels import Clipboard
 from ..models.filemodels import File
 from ..models.foldermodels import Folder
 from ..models.imagemodels import Image
+from ..models.mixins import IconsMixin
 from ..test_utils import ET_2
 from .helpers import (
     create_clipboard_item,
@@ -106,6 +107,19 @@ class FilerApiTests(TestCase):
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
                              file_basename + '__%sx%s_q85_crop_subsampling-2_upscale.jpg' % (size, size))
+
+    def test_access_icons_property(self):
+        """Test IconsMixin that calls static on a non-existent file"""
+
+        class CustomObj(IconsMixin, object):
+            _icon = 'custom'
+
+        custom_obj = CustomObj()
+        try:
+            icons = custom_obj.icons
+        except Exception as e:
+            self.fail("'.icons' access raised Exception {0} unexpectedly!".format(e))
+        self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
 
     def test_file_upload_public_destination(self):
         """
