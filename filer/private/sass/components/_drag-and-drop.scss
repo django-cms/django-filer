@@ -2,6 +2,14 @@
 // DRAG AND DROP
 
 form .form-row {
+    &[class*="file"],
+    &[class*="img"],
+    &[class*="image"],
+    &[class*="visual"] {
+        .related-widget-wrapper-link {
+            display: none;
+        }
+    }
     .filer-dropzone {
         position: relative;
         min-width: 215px;
