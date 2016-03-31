@@ -68,7 +68,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 request, clipboard, folder)
             tools.discard_clipboard_files(clipboard, files_moved)
         return HttpResponseRedirect('%s%s%s%s' % (
-            request.REQUEST.get('redirect_to', ''),
+            request.POST.get('redirect_to', ''),
             popup_param(request),
             selectfolder_param(request),
             current_site_param(request)))
@@ -78,7 +78,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             clipboard = self.get_clipboard(request)
             tools.discard_clipboard(clipboard)
         return HttpResponseRedirect('%s%s%s%s' % (
-            request.REQUEST.get('redirect_to', ''),
+            request.POST.get('redirect_to', ''),
             popup_param(request),
             selectfolder_param(request),
             current_site_param(request)))
@@ -87,7 +87,7 @@ class ClipboardAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             tools.delete_clipboard(self.get_clipboard(request))
         return HttpResponseRedirect('%s%s%s%s' % (
-            request.REQUEST.get('redirect_to', ''),
+            request.POST.get('redirect_to', ''),
             popup_param(request),
             selectfolder_param(request),
             current_site_param(request)))
@@ -103,7 +103,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             tools.clone_files_from_clipboard_to_folder(
                 self.get_clipboard(request), folder)
         return HttpResponseRedirect('%s%s%s%s' % (
-            request.REQUEST.get('redirect_to', ''),
+            request.POST.get('redirect_to', ''),
             popup_param(request),
             selectfolder_param(request),
             current_site_param(request)))

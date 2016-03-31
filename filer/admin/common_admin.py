@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.contrib import admin
 from django.contrib.admin.utils import unquote
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect
 from filer.models import Folder, File
@@ -8,7 +9,8 @@ from filer.admin.tools import (has_admin_role, has_role_on_site,
                                can_restrict_on_site,
                                has_multi_file_action_permission)
 from filer.views import (popup_param, selectfolder_param, popup_status,
-                         selectfolder_status, current_site_param)
+                         selectfolder_status, current_site_param,
+                         get_param_from_request)
 
 class CommonModelAdmin(admin.ModelAdmin):
     save_as = False
@@ -46,17 +48,20 @@ class CommonModelAdmin(admin.ModelAdmin):
         """
         url = response.get("Location", None)
         if url in expected_urls or url == self._get_post_url(current_obj):
-            if parent:
-                url = reverse('admin:filer-directory_listing',
-                    kwargs={'folder_id': parent.id})
-            else:
-                url = reverse('admin:filer-directory_listing-root')
-
-            url = "%s%s%s%s" % (url, popup_param(request),
-                                selectfolder_param(request, "&"),
-                                current_site_param(request),)
-            return HttpResponseRedirect(url)
+            return self._make_redirect_to_parent(request, parent)
         return response
+
+    def _make_redirect_to_parent(self, request, parent):
+        if parent:
+            url = reverse('admin:filer-directory_listing', kwargs={'folder_id': parent.id})
+        else:
+            url = reverse('admin:filer-directory_listing-root')
+
+        url = "%s%s%s%s" % (url, popup_param(request),
+                            selectfolder_param(request, "&"),
+                            current_site_param(request),)
+        return HttpResponseRedirect(url)
+
 
     def delete_view(self, request, object_id, extra_context=None):
         """
@@ -76,8 +81,8 @@ class CommonModelAdmin(admin.ModelAdmin):
         expected_urls = ["../../../../", "../../"]
 
         response = super(CommonModelAdmin, self).delete_view(
-                    request=request, object_id=object_id,
-                    extra_context=extra_context)
+            request=request, object_id=object_id,
+            extra_context=extra_context)
 
         return self._redirect_to_directory_listing(
             request, response, expected_urls, parent_folder, obj)
@@ -86,23 +91,26 @@ class CommonModelAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
         context.update({
-            'current_site': request.REQUEST.get('current_site', None),
+            'current_site': get_param_from_request(request, 'current_site'),
             'show_delete': True,
             'is_popup': popup_status(request),
             'select_folder': selectfolder_status(request),
         })
         return super(CommonModelAdmin, self).render_change_form(
-                        request=request, context=context, add=False,
-                        change=change, form_url=form_url, obj=obj)
+            request=request, context=context, add=False,
+            change=change, form_url=form_url, obj=obj)
 
     def response_change(self, request, obj):
         """
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        response = super(CommonModelAdmin, self).response_change(request, obj)
-        expected_urls = ['../']
         parent_folder = self._get_parent_for_view(obj)
+        if IS_POPUP_VAR in request.POST:
+            # In popup we always want to see the parent after changes
+            return self._make_redirect_to_parent(request, parent_folder)
+        response = super(CommonModelAdmin, self).response_change(request, obj)
+        expected_urls = ['../', reverse('admin:index')]
         return self._redirect_to_directory_listing(
             request, response, expected_urls, parent_folder, obj)
 
@@ -115,7 +123,7 @@ class FolderPermissionModelAdmin(CommonModelAdmin):
         if not current_view == 'filer-directory_listing-make_root_folder':
             return False
 
-        folder_id = request.REQUEST.get('parent_id', None)
+        folder_id = get_param_from_request(request, 'parent_id')
         if not folder_id:
             # only site admins and superusers can add root folders
             if has_admin_role(request.user):

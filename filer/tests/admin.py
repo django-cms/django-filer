@@ -105,7 +105,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertIn('folder name is already in use',
                       response.content)
 
-    def test_validate_no_duplcate_folders_on_rename(self):
+    def test_validate_no_duplicate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
         post_data = {"name": "foo", "_popup": 1}
         response = self.client.post(
@@ -2374,21 +2374,21 @@ class TestAdminTools(TestCase):
 
     def test_current_site_filtering(self):
         request = HttpRequest()
-        request.REQUEST = {}
-        request.REQUEST['current_site'] = '1'
+        request.GET = {}
+        request.GET['current_site'] = '1'
         request.user = self.user
         from filer.admin.tools import _filter_available_sites, files_available
-        self.assertItemsEqual([1L], _filter_available_sites(request))
-        request.REQUEST['current_site'] = 1
-        self.assertItemsEqual([1L], _filter_available_sites(request))
-        request.REQUEST['current_site'] = 1L
-        self.assertItemsEqual([1L], _filter_available_sites(request))
-        request.REQUEST['current_site'] = '2'
-        self.assertEqual([], _filter_available_sites(request))
+        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = 1
+        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = 1L
+        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = '2'
+        self.assertEqual([], _filter_available_sites('2', request.user))
         f1 = File.objects.create(original_filename='foo_file')
-        request.REQUEST['current_site'] = '1'
+        request.GET['current_site'] = '1'
         self.assertEqual(
-            len(files_available(request, File.objects.filter(id=f1.id))), 0)
+            len(files_available('1', request.user, File.objects.filter(id=f1.id))), 0)
 
     def test_multi_files_perms_for_restricted_descendants(self):
         f1 = Folder.objects.create(name='1')
@@ -2651,7 +2651,11 @@ class TestImageChangeForm(TestCase):
                               args=(orig_img.pk, ))
             response = self.client.post(img_url, {
                 'name': 'new_two.jpg',
+                '_save': '',
             })
+            folder_url = reverse(
+                'admin:filer-directory_listing', kwargs={'folder_id': foo.id})
+            self.assertRedirects(response, folder_url)
             orig_img = File.objects.get(id=orig_img.id)
             self.assertEqual(orig_img.file.name, 'foo/new_two.jpg')
 
@@ -2678,6 +2682,28 @@ class TestImageChangeForm(TestCase):
                 orig_img = File.objects.get(id=orig_img.id)
                 self.assertNotEqual(sha1_before, orig_img.sha1)
             os.remove(another_img_path)
+
+    def test_image_change_name_in_popup(self):
+        """
+        Use case: open a popup, save image changes and then select the image
+        """
+        with SettingsOverride(filer_settings,
+                              FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                              FOLDER_AFFECTS_URL=True):
+            foo = Folder.objects.create(name='foo')
+            orig_img = self.create_filer_image(
+                'four.jpg', folder=foo, owner=self.user)
+            img_url = reverse('admin:filer_image_change', args=(orig_img.pk, ))
+            response = self.client.post(img_url, {
+                'name': 'new_four.jpg',
+                '_save': '', '_popup': '1',
+            })
+            folder_url = "{}{}".format(
+                reverse('admin:filer-directory_listing', kwargs={'folder_id': foo.id}),
+                "?_popup=1")
+            self.assertRedirects(response, folder_url)
+            orig_img = File.objects.get(id=orig_img.id)
+            self.assertEqual(orig_img.file.name, 'foo/new_four.jpg')
 
 
 class TrashAdminTests(TestCase):
