@@ -43,6 +43,7 @@
                 {% endif %}
                 <input type="hidden" name="action" value="delete_files_or_folders">
                 <input type="hidden" name="post" value="yes">
+                <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
                 <input type="submit" value="{% trans 'Yes, I&#39;m sure' %}">
             </div>
         </form>
