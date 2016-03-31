@@ -25,6 +25,7 @@ from ..tests.helpers import (
     create_image,
     create_superuser,
 )
+from ..thumbnail_processors import normalize_subject_location
 
 try:
     from unittest import skipIf
@@ -648,26 +649,100 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
-    def test_resize_images_action(self):
-        # TODO: Test recursive (files and folders tree) processing
-
-        self.assertEqual(self.image_obj.width, 800)
-        self.assertEqual(self.image_obj.height, 600)
+    # TODO: Test recursive (files and folders tree) processing.
+    # The image object we test on has resolution of 800x600 with
+    # subject location at (100, 200).
+    def _test_resize_image(self, crop,
+                           target_width, target_height,
+                           expected_width, expected_height,
+                           expected_subj_x, expected_subj_y):
+        image_obj = self.create_image(self.src_folder)
+        self.assertEqual(image_obj.width, 800)
+        self.assertEqual(image_obj.height, 600)
+        image_obj.subject_location = '100,200'
+        image_obj.save()
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
         response = self.client.post(url, {
             'action': 'resize_images',
             'post': 'yes',
-            'width': 42,
-            'height': 42,
-            'crop': True,
+            'width': target_width,
+            'height': target_height,
+            'crop': crop,
             'upscale': False,
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (image_obj.id,),
         })
-        self.image_obj = Image.objects.get(id=self.image_obj.id)
-        self.assertEqual(self.image_obj.width, 42)
-        self.assertEqual(self.image_obj.height, 42)
+        self.assertEqual(response.status_code, 302)
+        image_obj = Image.objects.get(id=image_obj.id)
+        self.assertEqual(image_obj.width, expected_width)
+        self.assertEqual(image_obj.height, expected_height)
+        self.assertEqual(
+            normalize_subject_location(image_obj.subject_location),
+            (expected_subj_x, expected_subj_y))
+
+    def test_resize_images_no_custom_processors(self):
+        """Test bulk image resize action without custom template processors"""
+        with SettingsOverride(settings,
+                              THUMBNAIL_PROCESSORS=(
+                                  'easy_thumbnails.processors.colorspace',
+                                  'easy_thumbnails.processors.autocrop',
+                                  'easy_thumbnails.processors.scale_and_crop',
+                                  'easy_thumbnails.processors.filters',
+                              )):
+            # without crop
+            self._test_resize_image(
+                crop=False,
+                target_width=400, target_height=60,
+                expected_width=80, expected_height=60,   # height scale is used
+                expected_subj_x=40, expected_subj_y=30,  # at the center
+            )
+            self._test_resize_image(
+                crop=False,
+                target_width=40, target_height=300,
+                expected_width=40, expected_height=30,   # width scale is used
+                expected_subj_x=20, expected_subj_y=15,  # at the center
+            )
+
+            # with crop
+            self._test_resize_image(
+                crop=True,
+                target_width=40, target_height=300,
+                expected_width=40, expected_height=300,
+                expected_subj_x=20, expected_subj_y=150,  # at the center
+            )
+
+    def test_resize_images_subject_location_processor(self):
+        """Test bulk image resize action without custom template processors"""
+        with SettingsOverride(settings,
+                              THUMBNAIL_PROCESSORS=(
+                                  'easy_thumbnails.processors.colorspace',
+                                  'easy_thumbnails.processors.autocrop',
+                                  'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+                                  'easy_thumbnails.processors.filters',
+                              )):
+            # without crop
+            self._test_resize_image(
+                crop=False,
+                target_width=400, target_height=60,
+                expected_width=80, expected_height=60,   # height scale is used
+                expected_subj_x=10, expected_subj_y=20,  # scale * original position
+            )
+
+            self._test_resize_image(
+                crop=False,
+                target_width=80, target_height=300,
+                expected_width=80, expected_height=60,   # width scale is used
+                expected_subj_x=10, expected_subj_y=20,  # scale * original position
+            )
+
+            # with crop
+            self._test_resize_image(
+                crop=True,
+                target_width=40, target_height=30,
+                expected_width=40, expected_height=30,
+                expected_subj_x=20, expected_subj_y=15,  # at the center
+            )
 
 
 class PermissionAdminTest(TestCase):
