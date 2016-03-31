@@ -1172,13 +1172,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # TODO: We could probably do even better, but this method knows nothing
         # about actual thumbnailing algorithm details.
         # It's better to reset subject location to the central point of the new
-        # image if any of these two conditions are met:
-        # - 'scale_and_crop_with_subject_location' thumbnail processor is
-        # disabled. Resizing would not respect subject location.
-        # - The image was cropped. The originally specified subject location
-        # is either near the new center (if subject location was respected) or
-        # could be outside of the new image.
-        if crop or 'filer.thumbnail_processors.scale_and_crop_with_subject_location' not in django_settings.THUMBNAIL_PROCESSORS:
+        # image if the image is being cropped. The originally specified subject
+        # location could be outside of the new image.
+        if crop:
             return int(new_width / 2), int(new_height / 2)
         else:
             # Calculate scaling factor of the new image compared to old.

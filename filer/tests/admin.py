@@ -683,66 +683,37 @@ class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
 
     def test_resize_images_no_custom_processors(self):
         """Test bulk image resize action without custom template processors"""
-        with SettingsOverride(settings,
-                              THUMBNAIL_PROCESSORS=(
-                                  'easy_thumbnails.processors.colorspace',
-                                  'easy_thumbnails.processors.autocrop',
-                                  'easy_thumbnails.processors.scale_and_crop',
-                                  'easy_thumbnails.processors.filters',
-                              )):
-            # without crop
-            self._test_resize_image(
-                crop=False,
-                target_width=400, target_height=60,
-                expected_width=80, expected_height=60,   # height scale is used
-                expected_subj_x=40, expected_subj_y=30,  # at the center
-            )
-            self._test_resize_image(
-                crop=False,
-                target_width=40, target_height=300,
-                expected_width=40, expected_height=30,   # width scale is used
-                expected_subj_x=20, expected_subj_y=15,  # at the center
-            )
+        for thumbnail_processor in (
+                'easy_thumbnails.processors.scale_and_crop',
+                'filer.thumbnail_processors.scale_and_crop_with_subject_location'):
+            with SettingsOverride(settings,
+                                  THUMBNAIL_PROCESSORS=(
+                                      'easy_thumbnails.processors.colorspace',
+                                      'easy_thumbnails.processors.autocrop',
+                                      thumbnail_processor,
+                                      'easy_thumbnails.processors.filters',
+                                  )):
+                # without crop
+                self._test_resize_image(
+                    crop=False,
+                    target_width=400, target_height=60,
+                    expected_width=80, expected_height=60,   # height scale (0.1) is used
+                    expected_subj_x=10, expected_subj_y=20,  # scale * original position
+                )
+                self._test_resize_image(
+                    crop=False,
+                    target_width=40, target_height=300,
+                    expected_width=40, expected_height=30,   # width scale (0.05) is used
+                    expected_subj_x=5, expected_subj_y=10,   # scale * original position
+                )
 
-            # with crop
-            self._test_resize_image(
-                crop=True,
-                target_width=40, target_height=300,
-                expected_width=40, expected_height=300,
-                expected_subj_x=20, expected_subj_y=150,  # at the center
-            )
-
-    def test_resize_images_subject_location_processor(self):
-        """Test bulk image resize action without custom template processors"""
-        with SettingsOverride(settings,
-                              THUMBNAIL_PROCESSORS=(
-                                  'easy_thumbnails.processors.colorspace',
-                                  'easy_thumbnails.processors.autocrop',
-                                  'filer.thumbnail_processors.scale_and_crop_with_subject_location',
-                                  'easy_thumbnails.processors.filters',
-                              )):
-            # without crop
-            self._test_resize_image(
-                crop=False,
-                target_width=400, target_height=60,
-                expected_width=80, expected_height=60,   # height scale is used
-                expected_subj_x=10, expected_subj_y=20,  # scale * original position
-            )
-
-            self._test_resize_image(
-                crop=False,
-                target_width=80, target_height=300,
-                expected_width=80, expected_height=60,   # width scale is used
-                expected_subj_x=10, expected_subj_y=20,  # scale * original position
-            )
-
-            # with crop
-            self._test_resize_image(
-                crop=True,
-                target_width=40, target_height=30,
-                expected_width=40, expected_height=30,
-                expected_subj_x=20, expected_subj_y=15,  # at the center
-            )
+                # with crop
+                self._test_resize_image(
+                    crop=True,
+                    target_width=40, target_height=300,
+                    expected_width=40, expected_height=300,
+                    expected_subj_x=20, expected_subj_y=150,  # at the center
+                )
 
 
 class PermissionAdminTest(TestCase):
