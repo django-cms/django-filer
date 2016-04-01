@@ -32,11 +32,20 @@ class ImageAdminForm(forms.ModelForm):
         if not subject_location:
             # if supplied subject location is empty, do not check it
             return subject_location
+
         # use thumbnail's helper function to check the format
-        if not normalize_subject_location(subject_location):
+        coordinates = normalize_subject_location(subject_location)
+        if not coordinates:
             raise forms.ValidationError(
                 _('Invalid subject location format'),
                 code='invalid_subject_format')
+
+        if (coordinates[0] > self.instance.image.width or
+                coordinates[1] > self.instance.image.height):
+            raise forms.ValidationError(
+                _('Subject location is outside of the image'),
+                code='subject_out_of_bounds')
+
         return subject_location
 
     class Meta(object):
