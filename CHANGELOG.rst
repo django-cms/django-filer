@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+Revision 8611055 (01.04.2016, 07:22 UTC)
+----------------------------------------
+
+* LUN-2853
+
+  * PEP8
+  * Remove deprecated request.REQUEST.
+  * Redirect files/folder '_save' changes to parent directory.
+  * Always redirect popup POST change requests to parent view.
+
+* LUN-2940
+
+  * Add unique constraint for user-clipboard.
+  * Whitespace.
+
+* Misc commits
+
+  * Fix test.
+
 Revision 8776bb3 (03.02.2016, 07:35 UTC)
 ----------------------------------------
 
