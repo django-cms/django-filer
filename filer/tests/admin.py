@@ -260,7 +260,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
         def paste(uploaded_image):
             # current user should have one clipboard created
-            clipboard = self.superuser.filer_clipboards.all()[0]
+            clipboard = self.superuser.filer_clipboard
             response = self.client.post(
                 reverse('admin:filer-paste_clipboard_to_folder'),
                 {'folder_id': first_folder.pk,
@@ -273,7 +273,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         second_upload = upload()
         # second paste failed due to name conflict
         second_pasted_image = paste(second_upload)
-        clipboard = self.superuser.filer_clipboards.all()[0]
+        clipboard = self.superuser.filer_clipboard
         # file should remain in clipboard and should not be located in
         #   destination folder
         self.assertEqual(clipboard.files.count(), 1)
