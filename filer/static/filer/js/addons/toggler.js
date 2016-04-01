@@ -80,4 +80,4 @@ var Cl = window.Cl || {};
             this.link = null;
         }
     });
-})(jQuery);
+})(django.jQuery);

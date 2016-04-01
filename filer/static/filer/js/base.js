@@ -136,4 +136,4 @@ Cl.mediator = new Mediator();
             });
         }());
     });
-})(jQuery);
+})(django.jQuery);

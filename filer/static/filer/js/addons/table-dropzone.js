@@ -185,4 +185,4 @@
             });
         }
     });
-})(jQuery);
+})(django.jQuery);

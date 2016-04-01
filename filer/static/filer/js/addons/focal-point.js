@@ -131,4 +131,4 @@ var Cl = window.Cl || {};
             this.ratio = null;
         }
     });
-})(jQuery);
+})(django.jQuery);

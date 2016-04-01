@@ -130,4 +130,4 @@
             uploadButtonDisabled.tooltip();
         }
     });
-})(jQuery);
+})(django.jQuery);
