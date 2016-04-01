@@ -77,6 +77,9 @@ body {
     }
     #container {
         min-width: auto;
+        .breadcrumbs + #content {
+            margin-left: 0 !important;
+        }
         #content {
             margin-left: 0 !important;
             margin-right: 0 !important;
@@ -85,6 +88,7 @@ body {
         }
     }
     .breadcrumbs {
+        left: 0 !important;
         padding-left: 20px !important;
     }
     h1.folder_header {
