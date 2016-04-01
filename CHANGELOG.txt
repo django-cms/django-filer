@@ -9,9 +9,11 @@ CHANGELOG
 * Testrunner cleanup
 * Fix many regressions and bugs in Django 1.8/1.9
 * Admin UI enhancements
+* Fix issues with non-default STATICFILES_STORAGE
 * Hide related widget wrapper links
 * Fix cancel link in delete confirmation
 * Make BaseImage.subject_location field non-nullable
+* Adds icon sizes
 
 
 1.1.1 (2016-01-27)
