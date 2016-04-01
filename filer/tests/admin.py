@@ -25,6 +25,7 @@ from ..tests.helpers import (
     create_image,
     create_superuser,
 )
+from ..thumbnail_processors import normalize_subject_location
 
 try:
     from unittest import skipIf
@@ -648,26 +649,71 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
 
 
 class FilerResizeOperationTests(BulkOperationsMixin, TestCase):
-    def test_resize_images_action(self):
-        # TODO: Test recursive (files and folders tree) processing
-
-        self.assertEqual(self.image_obj.width, 800)
-        self.assertEqual(self.image_obj.height, 600)
+    # TODO: Test recursive (files and folders tree) processing.
+    # The image object we test on has resolution of 800x600 with
+    # subject location at (100, 200).
+    def _test_resize_image(self, crop,
+                           target_width, target_height,
+                           expected_width, expected_height,
+                           expected_subj_x, expected_subj_y):
+        image_obj = self.create_image(self.src_folder)
+        self.assertEqual(image_obj.width, 800)
+        self.assertEqual(image_obj.height, 600)
+        image_obj.subject_location = '100,200'
+        image_obj.save()
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
         response = self.client.post(url, {
             'action': 'resize_images',
             'post': 'yes',
-            'width': 42,
-            'height': 42,
-            'crop': True,
+            'width': target_width,
+            'height': target_height,
+            'crop': crop,
             'upscale': False,
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (image_obj.id,),
         })
-        self.image_obj = Image.objects.get(id=self.image_obj.id)
-        self.assertEqual(self.image_obj.width, 42)
-        self.assertEqual(self.image_obj.height, 42)
+        self.assertEqual(response.status_code, 302)
+        image_obj = Image.objects.get(id=image_obj.id)
+        self.assertEqual(image_obj.width, expected_width)
+        self.assertEqual(image_obj.height, expected_height)
+        self.assertEqual(
+            normalize_subject_location(image_obj.subject_location),
+            (expected_subj_x, expected_subj_y))
+
+    def test_resize_images_no_custom_processors(self):
+        """Test bulk image resize action without custom template processors"""
+        for thumbnail_processor in (
+                'easy_thumbnails.processors.scale_and_crop',
+                'filer.thumbnail_processors.scale_and_crop_with_subject_location'):
+            with SettingsOverride(settings,
+                                  THUMBNAIL_PROCESSORS=(
+                                      'easy_thumbnails.processors.colorspace',
+                                      'easy_thumbnails.processors.autocrop',
+                                      thumbnail_processor,
+                                      'easy_thumbnails.processors.filters',
+                                  )):
+                # without crop
+                self._test_resize_image(
+                    crop=False,
+                    target_width=400, target_height=60,
+                    expected_width=80, expected_height=60,   # height scale (0.1) is used
+                    expected_subj_x=10, expected_subj_y=20,  # scale * original position
+                )
+                self._test_resize_image(
+                    crop=False,
+                    target_width=40, target_height=300,
+                    expected_width=40, expected_height=30,   # width scale (0.05) is used
+                    expected_subj_x=5, expected_subj_y=10,   # scale * original position
+                )
+
+                # with crop
+                self._test_resize_image(
+                    crop=True,
+                    target_width=40, target_height=300,
+                    expected_width=40, expected_height=300,
+                    expected_subj_x=20, expected_subj_y=150,  # at the center
+                )
 
 
 class PermissionAdminTest(TestCase):
@@ -972,6 +1018,29 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 'admin:filer-directory_listing-unfiled_images'
             )
         )
+
+    def test_image_subject_location(self):
+        def do_test_image_subject_location(subject_location=None,
+                                           should_redirect=True):
+            image = self.create_image(folder=None)
+            base_url = image.get_admin_change_url()
+            data = model_to_dict(image, all=True)
+            if subject_location is not None:
+                data.update(dict(subject_location=subject_location))
+            response = self.client.post(base_url, data=data)
+            if should_redirect:
+                self.assertRedirects(
+                    response=response,
+                    expected_url=reverse(
+                        'admin:filer-directory_listing-unfiled_images'))
+            else:
+                self.assertEqual(response.status_code, 200)
+
+        for subject_location in '', '10,10', '0,100000':
+            do_test_image_subject_location(subject_location=subject_location)
+
+        do_test_image_subject_location(subject_location='-1,1',
+                                       should_redirect=False)
 
     def test_pick_mode_image_with_folder_save(self):
         parent_folder = Folder.objects.create(name='parent')
