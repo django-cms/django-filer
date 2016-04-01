@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import itertools
 import os
@@ -1169,8 +1169,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return to_resize
 
     def _new_subject_location(self, original_width, original_height, new_width, new_height, x, y, crop):
-        # TODO: We could probably do better
-        return (round(new_width / 2), round(new_height / 2))
+        # TODO: We could probably do even better, but this method knows nothing
+        # about actual thumbnailing algorithm details.
+        # It's better to reset subject location to the central point of the new
+        # image if the image is being cropped. The originally specified subject
+        # location could be outside of the new image.
+        if crop:
+            return int(new_width / 2), int(new_height / 2)
+        else:
+            # Calculate scaling factor of the new image compared to old.
+            scale = min(new_width / original_width, new_height / original_height)
+            return int(scale * x), int(scale * y)
 
     def _resize_image(self, image, form_data):
         original_width = float(image.width)

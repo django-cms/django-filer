@@ -5,6 +5,8 @@ from django import forms
 from django.utils.translation import ugettext as _
 
 from ..models import Image
+from ..thumbnail_processors import normalize_subject_location
+
 from .fileadmin import FileAdmin
 
 
@@ -24,6 +26,18 @@ class ImageAdminForm(forms.ModelForm):
             return '%.6F' % self.instance.sidebar_image_ratio()
         else:
             return ''
+
+    def clean_subject_location(self):
+        subject_location = self.cleaned_data['subject_location']
+        if not subject_location:
+            # if supplied subject location is empty, do not check it
+            return subject_location
+        # use thumbnail's helper function to check the format
+        if not normalize_subject_location(subject_location):
+            raise forms.ValidationError(
+                _('Invalid subject location format'),
+                code='invalid_subject_format')
+        return subject_location
 
     class Meta(object):
         model = Image
