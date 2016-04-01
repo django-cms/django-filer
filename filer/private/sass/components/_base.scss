@@ -3,7 +3,11 @@
 
 // resets box-sizing on every element and adds it explicitly on elements in filebrowser and popup content
 .filebrowser,
-.popup {
+.popup,
+.app-filer {
+    #header {
+        box-sizing: content-box !important;
+    }
     *,
     *:before, *:after {
         box-sizing: inherit !important;
@@ -66,15 +70,6 @@ body {
 #content #content-main {
     margin-top: 0;
 }
-#container .breadcrumbs-container .breadcrumbs {
-    // required for django CMS <= 3.1 #673
-    position: absolute;
-    top: -91px;
-    right: 0;
-    left: 0;
-    // required for django CMS <= 3.1 #673
-    margin-top: 48px;
-}
 
 .filebrowser {
     &.popup #content {
@@ -83,7 +78,6 @@ body {
     #container {
         min-width: auto;
         #content {
-            margin-top: 90px !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
             padding: 0;
@@ -91,7 +85,7 @@ body {
         }
     }
     .breadcrumbs {
-        margin-left: 15px;
+        padding-left: 20px !important;
     }
     h1.folder_header {
         position: relative;
