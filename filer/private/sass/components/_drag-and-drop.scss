@@ -282,6 +282,12 @@ form .form-row {
                 }
             }
         }
+        &.filer-dropzone-folder .filerFile {
+            top: 32px !important;
+            #id_folder_description_txt {
+                float: left;
+            }
+        }
         @media screen and (max-width: $screen-tablet-filer) {
             .filerFile {
                 top: 40px !important;
@@ -297,9 +303,9 @@ form .form-row {
             &.js-object-attached .filerFile {
                 top: 62px !important;
             }
-        }
-        &.filer-dropzone-folder .filerFile {
-            top: 62px !important;
+            &.filer-dropzone-folder .filerFile {
+                top: 62px !important;
+            }
         }
     }
 }
