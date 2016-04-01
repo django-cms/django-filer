@@ -5,7 +5,7 @@
 
 var Cl = window.Cl || {};
 
-/* global Mediator */
+/* globals Mediator, django */
 
 // mediator init
 Cl.mediator = new Mediator();

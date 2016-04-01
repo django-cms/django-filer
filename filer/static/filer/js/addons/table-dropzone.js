@@ -2,7 +2,7 @@
 // This script implements the dropzone settings
 'use strict';
 
-/* globals Dropzone, Cl */
+/* globals Dropzone, Cl, django */
 (function ($) {
     $(function () {
         var submitNum = 0;
