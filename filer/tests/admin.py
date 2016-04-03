@@ -97,7 +97,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
 
-    def test_validate_no_duplcate_folders(self):
+    def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
         response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
@@ -113,7 +113,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(Folder.objects.count(), 1)
         self.assertContains(response, 'Folder with this name already exists')
 
-    def test_validate_no_duplcate_folders_on_rename(self):
+    def test_validate_no_duplicate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
         response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
                 "name": "foo",
