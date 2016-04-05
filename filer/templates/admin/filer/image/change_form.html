@@ -5,6 +5,9 @@
     {{ block.super }}
 
     {# upload stuff #}
+    <script type="text/javascript">
+        var jQuery = django.jQuery;
+    </script>
     <script src="{% static 'filer/js/libs/class.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/jquery-ui.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/jquery.cookie.min.js' %}"></script>
@@ -16,6 +19,9 @@
     <script src="{% static 'filer/js/addons/focal-point.js' %}"></script>
     <script src="{% static 'filer/js/addons/toggler.js' %}"></script>
     <script src="{% static 'filer/js/base.js' %}"></script>
+    <script type="text/javascript">
+        jQuery = undefined;
+    </script>
 {% endblock %}
 
 {% block object-tools %}
