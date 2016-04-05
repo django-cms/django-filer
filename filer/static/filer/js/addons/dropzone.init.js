@@ -1,13 +1,13 @@
 // #DROPZONE#
 // This script implements the dropzone settings
-/* global Dropzone */
+/* globals Dropzone, django */
 'use strict';
 
 if (Dropzone) {
     Dropzone.autoDiscover = false;
 }
 
-/* global Dropzone, django */
+/* globals Dropzone, django */
 django.jQuery(function ($) {
     var dropzoneTemplateSelector = '.js-filer-dropzone-template';
     var previewImageSelector = '.js-img-preview';

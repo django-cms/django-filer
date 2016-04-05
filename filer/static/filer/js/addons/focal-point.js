@@ -3,7 +3,7 @@
 'use strict';
 
 var Cl = window.Cl || {};
-/* global Class */
+/* globals Class, django */
 (function ($) {
     Cl.FocalPoint = new Class({
         options: {
@@ -131,4 +131,4 @@ var Cl = window.Cl || {};
             this.ratio = null;
         }
     });
-})(jQuery);
+})(django.jQuery);
