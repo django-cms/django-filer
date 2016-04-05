@@ -49,7 +49,7 @@ var Cl = window.Cl || {};
             if (isNaN(x) && isNaN(y)) {
                 locationValue = '';
             } else {
-                locationValue = parseInt(x * this.ratio) + ',' + parseInt(y * this.ratio);
+                locationValue = Math.round(x * this.ratio) + ',' + Math.round(y * this.ratio);
             }
             this.location.val(locationValue);
         },

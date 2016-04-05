@@ -76,7 +76,8 @@ body {
 .filebrowser {
     &.cms-admin-sideframe {
         #container {
-            .breadcrumbs + #content {
+            .breadcrumbs + #content,
+            .breadcrumbs + .messagelist + #content {
                 margin-left: 0 !important;
             }
             .breadcrumbs {
@@ -89,7 +90,8 @@ body {
     }
     #container {
         min-width: auto;
-        .breadcrumbs + #content {
+        .breadcrumbs + #content,
+        .breadcrumbs + .messagelist + #content {
             margin-left: 0 !important;
         }
         #content {
