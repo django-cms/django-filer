@@ -46,8 +46,6 @@ var Cl = window.Cl || {};
         _updateLocationValue: function (x, y) {
             var locationValue;
 
-            console.log(x ,y);
-
             if (isNaN(x) && isNaN(y)) {
                 locationValue = '';
             } else {
