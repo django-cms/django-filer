@@ -45,6 +45,9 @@ var Cl = window.Cl || {};
     Cl.FocalPointConstructor = new Class({
         _updateLocationValue: function (x, y) {
             var locationValue;
+            var circleSelectorSize = $(this.options.circleSelector).outerWidth();
+            x = x + (circleSelectorSize / 2);
+            y = y + (circleSelectorSize / 2);
 
             if (isNaN(x) && isNaN(y)) {
                 locationValue = '';
@@ -55,6 +58,7 @@ var Cl = window.Cl || {};
         },
         _onImageLoaded: function () {
             var that = this;
+            var circleSelectorSize = $(that.options.circleSelector).outerWidth();
             var x = null;
             var y = null;
             var locationValue = this.location.val();
@@ -68,16 +72,16 @@ var Cl = window.Cl || {};
             this.circle.removeClass(this.options.hiddenClass);
 
             if (locationValue.length) {
-                x = parseInt(parseInt(locationValue.split(',')[0]) / this.ratio);
-                y = parseInt(parseInt(locationValue.split(',')[1]) / this.ratio);
+                x = Math.round(locationValue.split(',')[0] / this.ratio);
+                y = Math.round(locationValue.split(',')[1] / this.ratio);
             } else {
                 y = imageHeight / 2;
                 x = imageWidth / 2;
             }
 
             this.circle.css({
-                'top': y,
-                'left': x
+                'top': y - (circleSelectorSize / 2),
+                'left': x - (circleSelectorSize / 2)
             });
 
             this.circle.draggable({
