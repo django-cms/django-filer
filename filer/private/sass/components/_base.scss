@@ -17,6 +17,9 @@
         *:before, *:after {
             box-sizing: border-box !important;
         }
+        .field-owner .related-lookup {
+            box-sizing: initial !important;
+        }
     }
 }
 
