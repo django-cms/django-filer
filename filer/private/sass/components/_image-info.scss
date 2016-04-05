@@ -171,10 +171,8 @@
     .image-preview-circle {
         position: relative;
         z-index: 1;
-        width: 30px;
-        height: 30px;
-        // makes sure that circle is positioned correctly and centered #684
-        margin: -15px;
+        width: 26px;
+        height: 26px;
         border: solid 2px #f00;
         border-radius: 30px;
         cursor: move;
