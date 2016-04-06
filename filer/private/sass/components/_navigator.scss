@@ -333,12 +333,16 @@
         display: none;
         right: 0;
         left: auto;
+        padding: 0;
+        > li > a {
+            padding: 5px 20px;
+        }
         label {
             display: block;
             line-height: 20px !important;
             white-space: nowrap;
             text-transform: none;
-            margin: 0 !important;
+            margin: 5px 0 !important;
             padding: 0 10px !important;
         }
         input {
