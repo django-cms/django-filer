@@ -1,7 +1,7 @@
 //##############################################################################
 // NAVIGATOR
 
-.navigator-table {
+.filebrowser .navigator-table {
     // required for django CMS <= 3.1 #673
     width: 100%;
     margin: 0;
@@ -15,9 +15,19 @@
         border-bottom: 1px solid $gray-lighter;
         background: none !important;
     }
+    tbody tr.selected {
+        .icon {
+            color: $gray-darkest !important;
+            background-color: white;
+        }
+    }
     .unfiled td {
-        padding: 10px !important;
+        padding: 12px !important;
         background-color: $gray-table !important;
+        a,
+        a:hover {
+            color: $gray !important;
+        }
     }
     .column-checkbox {
         text-align: center;
@@ -55,7 +65,7 @@
             }
         }
         .icon {
-            color: $btn-default-color;
+            color: $gray-darkest;
             line-height: 33px;
             text-align: center;
             width: 33px;
@@ -77,6 +87,9 @@
             border-top: solid 2px $color-primary !important;
             border-bottom: solid 2px $color-primary !important;
             box-sizing: border-box !important;
+            a {
+                color: $color-primary !important;
+            }
         }
     }
     .reset-hover {
@@ -90,8 +103,8 @@
 .navigator-top-nav {
     position: relative;
     clear: both;
-    min-height: 50px;
-    padding: 5px 0;
+    min-height: 60px;
+    padding: 3px 0;
     background: $gray-table;
     .breadcrumbs-container {
         float: left;
@@ -191,6 +204,9 @@
             margin-left: 20px;
             @media screen and (max-width: $screen-tablet) {
                 margin-left: 0;
+            }
+            @media screen and (min-width: $screen-tablet) {
+                margin-bottom: 0;
             }
         }
     }
@@ -303,13 +319,38 @@
     top: -5px;
     float: left;
     margin: 0 7px 0 0;
+    .navigator-dropdown-arrow-up {
+        position: relative;
+        left: 20px;
+        overflow: hidden;
+        width: 20px;
+        height: 20px;
+        margin-top: -20px;
+        z-index: 1001;
+        &:after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px rgba(0,0,0,.25);
+        }
+    }
     .navigator-breadcrumbs-dropdown {
-        left: -22px;
+        left: -15px;
+        min-width: 200px;
         padding: 0;
+        margin-top: 0;
+        border: 0;
+        box-shadow: 0 0 10px rgba(0,0,0,.25);
         > li {
             padding: 0;
             > a {
-                padding: 15px 20px 5px;
+                color: $color-primary;
+                padding: 10px 20px 0;
                 border-bottom: solid 1px #e1e1e1;
             }
             &:last-child > a {
@@ -318,7 +359,7 @@
         }
         img {
             position: relative;
-            top: -4px;
+            top: -5px;
             vertical-align: top;
             margin: 0 10px 0 0;
         }
