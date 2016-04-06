@@ -1,4 +1,8 @@
 'use strict';
+/*
+    This functionality is used in folder/choose_copy_destination.html template
+    to disable submit if there is only one folder to copy
+*/
 
 jQuery(function ($) {
     var destinationOptions = $('#destination').find('option');
