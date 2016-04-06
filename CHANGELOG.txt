@@ -15,6 +15,7 @@ CHANGELOG
 * Make BaseImage.subject_location field non-nullable
 * Adds icon sizes
 * Fixes owner search icon on detail view
+* Disable submit button if only one folder to copy file
 
 
 1.1.1 (2016-01-27)
