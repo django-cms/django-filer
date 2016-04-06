@@ -333,6 +333,10 @@
         display: none;
         right: 0;
         left: auto;
+        padding: 0;
+        > li > a {
+            padding: 5px 20px;
+        }
         label {
             display: block;
             line-height: 20px !important;
