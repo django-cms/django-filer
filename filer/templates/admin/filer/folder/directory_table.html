@@ -166,11 +166,12 @@
             <div class="folder"><img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18"> <span class="js-filer-dropzone-folder-name"></span></div>
         </div>
 
+        <div class="js-filer-upload-count filer-dropzone-upload-count hidden">
+            <span class="js-filer-upload-text hidden">{% trans "Upload" %}</span>
+            <span class="js-filer-dropzone-upload-number"></span>
+        </div>
+
         <div class="filer-dropzone-upload-info js-filer-dropzone-upload-info-container">
-            <div>
-                <span class="js-filer-upload-text hidden">{% trans "Upload" %}</span>
-                <span class="js-filer-dropzone-upload-number"></span>
-            </div>
             <div class="js-filer-dropzone-upload-info filer-dropzone-upload-info hidden">
                 <div class="js-filer-dropzone-file-name filer-dropzone-file-name"></div>
                 <div class="js-filer-dropzone-progress filer-dropzone-progress"></div>
