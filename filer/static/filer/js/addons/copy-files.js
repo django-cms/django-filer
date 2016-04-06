@@ -1,10 +1,12 @@
 'use strict';
+/* global django */
+
 /*
     This functionality is used in folder/choose_copy_destination.html template
     to disable submit if there is only one folder to copy
 */
 
-jQuery(function ($) {
+django.jQuery(function ($) {
     var destinationOptions = $('#destination').find('option');
     var destinationOptionLength = destinationOptions.length;
     var submit = $('.js-submit-copy');
