@@ -10,6 +10,13 @@
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
 {% endblock %}
 
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/jquery.js' %}"></script>
+    <script src="{% static 'admin/js/jquery.init.js' %}"></script>
+    <script src="{% static 'filer/js/addons/copy-files.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     {% if perms_lacking %}
         <p>{% blocktrans %}Your account doesn't have permissions to copy all of the selected files and/or folders.{% endblocktrans %}</p>
@@ -44,7 +51,7 @@
                         {{ copy_form.as_p_with_help }}
 
                         <div class="text-right clearfix">
-                            <input type="submit" value="{% trans 'Copy' %}" class="default">
+                            <input type="submit" value="{% trans 'Copy' %}" class="default js-submit-copy">
                         </div>
                     </div>
                 </form>
