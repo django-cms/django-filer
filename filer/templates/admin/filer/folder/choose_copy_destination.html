@@ -60,8 +60,11 @@
 
                         <div class="text-right clearfix">
                             <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
-                            <span class="js-disabled-btn-tooltip" data-tooltip-text="{% trans 'It is not allowed to copy file into same folder' %}">
-                                <input type="submit" value="{% trans 'Copy' %}" class="default js-submit-copy">
+                            <input type="submit" value="{% trans 'Copy' %}" class="default js-submit-copy">
+                            <span class="js-disabled-btn-tooltip disabled-btn-tooltip"
+                                data-toggle="tooltip" data-placement="bottom"
+                                title="{% trans 'It is not allowed to copy file into same folder' %}" tabindex="-1">
+                                <a class="default navigator-button js-submit-copy-disabled" disabled>{% trans 'Copy' %}</a>
                             </span>
                         </div>
                     </div>
