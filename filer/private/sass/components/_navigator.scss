@@ -350,7 +350,7 @@
             padding: 0;
             > a {
                 color: $color-primary;
-                padding: 10px 20px 0;
+                padding: 12px 20px 3px;
                 border-bottom: solid 1px #e1e1e1;
             }
             &:last-child > a {
@@ -393,8 +393,33 @@
             margin-right: 5px;
         }
         &.dropdown-menu-checkboxes {
-            right: 0;
+            top: 40px;
+            right: -85px;
             left: auto;
+            height: 80px;
+            padding: 15px;
+            border: 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.25);
+            @media screen and (min-width: $screen-tablet) {
+                right: 0;
+            }
+            .fa-close {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                color: $gray-darker;
+                cursor: pointer;
+            }
+            p {
+                color: $gray-light !important;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }
+            label {
+                color: $gray !important;
+                padding: 0 !important;
+                margin-top: 0 !important;
+            }
         }
         a:hover {
             background: $gray-lightest !important;

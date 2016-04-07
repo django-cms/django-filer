@@ -232,13 +232,15 @@
                                     <span class="fa fa-caret-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-checkboxes">
+                                    <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
                                     <li>
+                                        <p>Limit</p>
                                         <label>
                                             <input type="checkbox" id="limit_search_to_folder"
                                                name="limit_search_to_folder"
                                                {% if limit_search_to_folder %}checked="checked"{% endif %}
                                                title="{% trans 'Check it to limit the search to current folder' %}">
-                                            {% trans "limit the search to current folder" %}
+                                            {% trans "Limit the search to current folder" %}
                                         </label>
                                     </li>
                                 </ul>
