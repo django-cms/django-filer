@@ -17,7 +17,5 @@ django.jQuery(function ($) {
         tooltip.show();
     }
 
-    tooltip.tooltip({
-        trigger: 'hover focus'
-    });
+    tooltip.tooltip();
 });
