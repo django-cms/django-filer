@@ -14,7 +14,7 @@ django.jQuery(function ($) {
 
     if (destinationOptionLength === 1 && destinationOptions.prop('disabled')) {
         submit.hide();
-        tooltip.show();
+        tooltip.show().css('display', 'inline-block');
     }
 
     tooltip.tooltip();
