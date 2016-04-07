@@ -10,8 +10,12 @@ django.jQuery(function ($) {
     var destinationOptions = $('#destination').find('option');
     var destinationOptionLength = destinationOptions.length;
     var submit = $('.js-submit-copy');
+    var tooltip = $('.js-disabled-btn-tooltip');
 
     if (destinationOptionLength === 1 && destinationOptions.prop('disabled')) {
-        submit.prop('disabled', true);
+        submit.hide();
+        tooltip.show().css('display', 'inline-block');
     }
+
+    tooltip.tooltip();
 });
