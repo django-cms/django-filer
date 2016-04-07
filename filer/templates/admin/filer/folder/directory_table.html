@@ -152,7 +152,7 @@
 
             {% if not folder.is_root and folder.item_count == 0 %}
                 <tr>
-                    <td colspan="6" class="no-files">{% trans "there are no files or subfolders" %}</td>
+                    <td colspan="6" class="no-files"><span class="fa fa-arrow-down"></span>{% trans 'Drop files here or use the "Upload Files" button' %}</td>
                 </tr>
             {% endif %}
         </tbody>
