@@ -99,15 +99,8 @@
                     <a href="#" data-toggle="dropdown" aria-expanded="false">
                         <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
                     </a>
-
                     <ul class="dropdown-menu navigator-breadcrumbs-dropdown">
-                        <li>
-                            <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}"
-                                title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
-                                <img src="{% static 'filer/icons/root_28x28.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
-                                Root
-                            </a>
-                        </li>
+                        <div class="navigator-dropdown-arrow-up"></div>
                         {% for folder in folder.logical_path %}
                             <li>
                                 <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
@@ -117,6 +110,13 @@
                                 </a>
                             </li>
                         {% endfor %}
+                        <li>
+                            <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}"
+                                title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
+                                <img src="{% static 'filer/icons/root_28x28.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                Root
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
