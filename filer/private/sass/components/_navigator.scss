@@ -78,8 +78,18 @@
         }
     }
     .no-files {
-        padding: 10px 15px !important;
+        color: $gray;
+        font-size: $font-size-small;
+        text-align: center;
+        padding: 40px 0 !important;
         background-color: $gray-lightest !important;
+        span {
+            font-size: 20px;
+            margin-right: 10px;
+            &:before {
+                vertical-align: sub;
+            }
+        }
     }
     .dz-drag-hover,
     &.dz-drag-hover {
