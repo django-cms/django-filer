@@ -8,13 +8,21 @@
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
 {% endblock %}
 
 {% block extrahead %}
     {{ block.super }}
     <script src="{% static 'admin/js/jquery.js' %}"></script>
     <script src="{% static 'admin/js/jquery.init.js' %}"></script>
+    <script type="text/javascript">
+        var jQuery = django.jQuery;
+    </script>
+    <script src="{% static 'filer/js/libs/bootstrap.custom.min.js' %}"></script>
     <script src="{% static 'filer/js/addons/copy-files.js' %}"></script>
+    <script type="text/javascript">
+        jQuery = undefined;
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -51,7 +59,13 @@
                         {{ copy_form.as_p_with_help }}
 
                         <div class="text-right clearfix">
+                            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
                             <input type="submit" value="{% trans 'Copy' %}" class="default js-submit-copy">
+                            <span class="js-disabled-btn-tooltip disabled-btn-tooltip"
+                                data-toggle="tooltip" data-placement="bottom"
+                                title="{% trans 'It is not allowed to copy file into same folder' %}" tabindex="-1">
+                                <a class="default navigator-button js-submit-copy-disabled" disabled>{% trans 'Copy' %}</a>
+                            </span>
                         </div>
                     </div>
                 </form>
