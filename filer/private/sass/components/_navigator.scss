@@ -393,7 +393,6 @@
             margin-right: 5px;
         }
         &.dropdown-menu-checkboxes {
-            top: 40px;
             right: -85px;
             left: auto;
             height: 80px;
@@ -402,6 +401,7 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.25);
             @media screen and (min-width: $screen-tablet) {
                 right: 0;
+                width: 334px;
             }
             .fa-close {
                 position: absolute;
