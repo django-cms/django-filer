@@ -42,10 +42,6 @@ Cl.mediator = new Mediator();
             new Cl.Toggler();
         }
 
-        $(document).on('click', '.dropdown-menu-checkboxes', function (clickEvent) {
-            clickEvent.stopPropagation();
-        });
-
         $('.js-filter-files').on('focus blur', function (event) {
             var container = $(this).closest('.js-filter-files-container');
 
