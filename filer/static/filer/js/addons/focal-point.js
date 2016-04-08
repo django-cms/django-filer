@@ -47,7 +47,7 @@ var Cl = window.Cl || {};
             var locationValue;
 
             locationValue = Math.round(x * this.ratio) + ',' + Math.round(y * this.ratio);
-            
+
             this.location.val(locationValue);
         },
         _onImageLoaded: function () {
