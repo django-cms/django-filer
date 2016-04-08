@@ -77,8 +77,8 @@ var Cl = window.Cl || {};
             }
 
             this.circle.css({
-                'top': y,
-                'left': x
+                top: y,
+                left: x
             });
 
             this.circle.draggable({
