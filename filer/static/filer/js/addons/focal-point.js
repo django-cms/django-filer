@@ -45,20 +45,13 @@ var Cl = window.Cl || {};
     Cl.FocalPointConstructor = new Class({
         _updateLocationValue: function (x, y) {
             var locationValue;
-            var circleSelectorSize = $(this.options.circleSelector).outerWidth();
-            x = x + (circleSelectorSize / 2);
-            y = y + (circleSelectorSize / 2);
 
-            if (isNaN(x) && isNaN(y)) {
-                locationValue = '';
-            } else {
-                locationValue = Math.round(x * this.ratio) + ',' + Math.round(y * this.ratio);
-            }
+            locationValue = Math.round(x * this.ratio) + ',' + Math.round(y * this.ratio);
+
             this.location.val(locationValue);
         },
         _onImageLoaded: function () {
             var that = this;
-            var circleSelectorSize = $(that.options.circleSelector).outerWidth();
             var x = null;
             var y = null;
             var locationValue = this.location.val();
@@ -72,16 +65,20 @@ var Cl = window.Cl || {};
             this.circle.removeClass(this.options.hiddenClass);
 
             if (locationValue.length) {
-                x = Math.round(locationValue.split(',')[0] / this.ratio);
-                y = Math.round(locationValue.split(',')[1] / this.ratio);
+                x = Math.round(Number(locationValue.split(',')[0]) / this.ratio);
+                y = Math.round(Number(locationValue.split(',')[1]) / this.ratio);
             } else {
                 y = imageHeight / 2;
                 x = imageWidth / 2;
             }
 
+            if (isNaN(x) || isNaN(y)) {
+                return;
+            }
+
             this.circle.css({
-                'top': y - (circleSelectorSize / 2),
-                'left': x - (circleSelectorSize / 2)
+                top: y,
+                left: x
             });
 
             this.circle.draggable({
