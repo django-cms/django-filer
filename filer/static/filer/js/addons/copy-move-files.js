@@ -9,7 +9,7 @@
 django.jQuery(function ($) {
     var destinationOptions = $('#destination').find('option');
     var destinationOptionLength = destinationOptions.length;
-    var submit = $('.js-submit-copy');
+    var submit = $('.js-submit-copy-move');
     var tooltip = $('.js-disabled-btn-tooltip');
 
     if (destinationOptionLength === 1 && destinationOptions.prop('disabled')) {
