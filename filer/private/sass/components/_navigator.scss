@@ -13,6 +13,7 @@
         padding: 5px !important;
         border-left: 0 !important;
         border-bottom: 1px solid $gray-lighter;
+        border-top: 1px solid transparent;
         background: none !important;
     }
     tbody tr.selected {
@@ -89,18 +90,21 @@
     &.dz-drag-hover {
         td {
             background: $hover-bg !important;
-            border-top: solid 2px $color-primary !important;
-            border-bottom: solid 2px $color-primary !important;
+            border-top: solid 1px $color-primary !important;
+            border-bottom: solid 1px $color-primary !important;
             box-sizing: border-box !important;
             a {
                 color: $color-primary !important;
             }
         }
     }
+    .remove-border td {
+        border-bottom: solid 1px transparent !important;
+    }
     .reset-hover {
         td {
             background-color: $white !important;
-            border-top: 0 !important;
+            border-top: solid 1px transparent !important;
             border-bottom: solid 1px $gray-lighter !important;
         }
     }

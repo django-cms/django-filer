@@ -120,6 +120,7 @@
                     dragover: function (dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
                         $(dropzones).addClass('reset-hover');
+                        $(dropzones).prev('tr').addClass('remove-border');
                         uploadSuccess.addClass(hiddenClass);
                         infoMessage.removeClass(hiddenClass);
                         dropzone.addClass(dragHoverClass).removeClass('reset-hover');
@@ -134,6 +135,7 @@
 
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
+                        $(dropzones).prev('tr').removeClass('remove-border');
                     },
                     sending: function (file) {
                         getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);
