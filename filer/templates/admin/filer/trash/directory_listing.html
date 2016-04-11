@@ -23,14 +23,16 @@
     <div class="module" id="changelist">
         <div id="toolbar" class="dataTables_wrapper">
             <div class="row">
-                <form id="changelist-search" action="." method="get" class="col-xs-5 pull-right text-right">
-                    {% csrf_token %}
+                <form id="changelist-search" action="." method="get" class="text-right changelist-search-expanded">
+                  {% csrf_token %}
+                  <div id="search-container">
                      <div class="search-wrapper">
                         <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}"/>
-                        <button title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}" class="btn btn-sm btn-primary pull-right"><i class="fa fa-search"></i></button>
-                    </div>
+                        <button id="search-button" title="{% trans "Click here to" %} {% trans "run search for entered phrase" %}" class="btn btn-sm btn-primary pull-right"><i class="fa fa-search"></i></button>
+                     </div>
+                  </div>
                     {% if search_string %}
-                        <div class="special-info">
+                        <div id="search-results">
                             <h4 class="smaller pull-left">Search results for: <span class="blue">{{ search_string }}</span></h4>
                             <a href="?{% get_popup_params '&' %}" class="pull-left cancel-search btn btn-xs btn-white btn-default btn-round"><i class="ace-icon fa fa-times red2"></i>{% trans "Cancel search" %}</a>
                         </div>
