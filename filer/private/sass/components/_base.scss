@@ -17,7 +17,9 @@
         *:before, *:after {
             box-sizing: border-box !important;
         }
-        .field-owner .related-lookup {
+        .field-owner .related-lookup,
+        .calendar-shortcuts a,
+        span.datetimeshortcuts a {
             box-sizing: initial !important;
         }
     }
