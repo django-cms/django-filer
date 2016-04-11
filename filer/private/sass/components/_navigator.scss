@@ -324,33 +324,13 @@
     top: -5px;
     float: left;
     margin: 0 7px 0 0;
-    .navigator-dropdown-arrow-up {
-        position: relative;
-        left: 20px;
-        overflow: hidden;
-        width: 20px;
-        height: 20px;
-        margin-top: -20px;
-        z-index: 1001;
-        &:after {
-            content: "";
-            position: absolute;
-            top: 15px;
-            left: 5px;
-            width: 10px;
-            height: 10px;
-            background: white;
-            transform: rotate(45deg);
-            box-shadow: 0 0 10px rgba(0,0,0,.25);
-        }
-    }
     .navigator-breadcrumbs-dropdown {
         left: -15px;
         min-width: 200px;
         padding: 0;
         margin-top: 0;
         border: 0;
-        box-shadow: 0 0 10px rgba(0,0,0,.25);
+        box-shadow: $dropdown-shadow;
         > li {
             padding: 0;
             > a {
@@ -380,8 +360,10 @@
         right: 0;
         left: auto;
         padding: 0;
+        border: 0;
+        box-shadow: $dropdown-shadow;
         > li > a {
-            padding: 5px 20px;
+            padding: 12px 20px;
         }
         label {
             display: block;
@@ -403,7 +385,7 @@
             height: 80px;
             padding: 15px;
             border: 0;
-            box-shadow: 0 0 10px rgba(0,0,0,0.25);
+            box-shadow: $dropdown-shadow;
             @media screen and (min-width: $screen-tablet) {
                 right: 0;
                 width: 334px;
@@ -428,6 +410,7 @@
         }
         a:hover {
             background: $gray-lightest !important;
+            border-radius: 4px;
         }
     }
     &.open .dropdown-menu {
@@ -458,8 +441,28 @@
     }
     .dropdown-menu {
         right: auto;
-        left: 0;
-        margin-top: -10px;
+        left: -14px;
         margin-right: 10px;
+    }
+}
+
+.navigator-dropdown-arrow-up {
+    position: relative;
+    left: 20px;
+    overflow: hidden;
+    width: 20px;
+    height: 20px;
+    margin-top: -20px;
+    z-index: 1001;
+    &:after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 5px;
+        width: 10px;
+        height: 10px;
+        background: white;
+        transform: rotate(45deg);
+        box-shadow: $dropdown-shadow;
     }
 }
