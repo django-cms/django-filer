@@ -5,7 +5,7 @@ def popup_status(request):
 
 
 def selectfolder_status(request):
-    return' select_folder' in request.GET or 'select_folder' in request.POST
+    return 'select_folder' in request.GET or 'select_folder' in request.POST
 
 
 def popup_param(request, separator="?"):
