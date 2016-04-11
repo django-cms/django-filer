@@ -416,9 +416,7 @@ form .form-row {
 }
 .filer-dropzone-upload-success,
 .filer-dropzone-upload-canceled {
-    padding-top: 10px;
-    margin: 15px -15px 10px;
-    border-top: solid 1px $gray-lighter;
+    margin: 0 -15px 10px;
 }
 
 .filer-dropzone-upload-count {
