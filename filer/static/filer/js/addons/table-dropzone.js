@@ -113,6 +113,7 @@
                             done();
                         }
 
+                        dropzones.removeClass('remove-border');
                         dropzones.removeClass('reset-hover');
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
@@ -135,7 +136,6 @@
 
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
-                        $(dropzones).prev('tr').removeClass('remove-border');
                     },
                     sending: function (file) {
                         getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);

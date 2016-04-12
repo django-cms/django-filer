@@ -104,7 +104,7 @@
     .reset-hover {
         td {
             background-color: $white !important;
-            border-top: solid 1px transparent !important;
+            border-top: solid 1px $gray-lighter !important;
             border-bottom: solid 1px $gray-lighter !important;
         }
     }
