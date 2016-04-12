@@ -48,7 +48,9 @@ Cl.mediator = new Mediator();
             if (event.type === 'focus') {
                 container.addClass('is-focused');
             } else {
-                container.removeClass('is-focused');
+                if (event.relatedTarget == undefined) {
+                    container.removeClass('is-focused');
+                }
             }
         });
 
