@@ -355,7 +355,8 @@
     display: inline-block;
     position: relative;
     vertical-align: top;
-    .dropdown-menu {
+    .dropdown-menu,
+    + .dropdown-menu {
         display: none;
         right: 0;
         left: auto;
@@ -380,14 +381,13 @@
             margin-right: 5px;
         }
         &.dropdown-menu-checkboxes {
-            right: -85px;
-            left: auto;
             height: 80px;
             padding: 15px;
             border: 0;
             box-shadow: $dropdown-shadow;
-            @media screen and (min-width: $screen-tablet) {
-                right: 0;
+            @media screen and (max-width: $screen-tablet) {
+                left: 0;
+                right: auto;
                 width: 334px;
             }
             .fa-close {
