@@ -17,7 +17,6 @@ body {
 }
 .drag-hover-border {
     position: fixed;
-    display: none;
     border-top: solid 2px $color-primary;
     border-bottom: solid 2px $color-primary;
     pointer-events: none;

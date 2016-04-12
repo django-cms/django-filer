@@ -132,7 +132,7 @@
                         uploadSuccess.addClass(hiddenClass);
                         infoMessage.removeClass(hiddenClass);
                         dropzone.addClass(dragHoverClass).removeClass('reset-hover');
-                        $('.drag-hover-border').show().css(dropzonePosition);
+                        $('.drag-hover-border').css(dropzonePosition);
 
                         folderName.text(folderTitle);
                     },
