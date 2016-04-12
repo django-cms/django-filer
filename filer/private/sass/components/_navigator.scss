@@ -1,6 +1,28 @@
 //##############################################################################
 // NAVIGATOR
 
+body {
+    &.dz-drag-hover {
+        .drag-hover-border {
+            display: none !important;
+        }
+        .navigator-table tbody td,
+        .navigator-table tbody .unfiled td {
+            background-color: $hover-bg !important;
+        }
+    }
+    &.reset-hover td {
+        background-color: white !important;
+    }
+}
+.drag-hover-border {
+    position: fixed;
+    display: none;
+    border-top: solid 2px $color-primary;
+    border-bottom: solid 2px $color-primary;
+    pointer-events: none;
+    z-index: 100;
+}
 .filebrowser .navigator-table {
     // required for django CMS <= 3.1 #673
     width: 100%;
@@ -87,29 +109,26 @@
             }
         }
     }
-    .dz-drag-hover,
-    &.dz-drag-hover {
+    .dz-drag-hover {
         td {
+            position: relative;
             background: $hover-bg !important;
-            border-top: solid 1px $color-primary !important;
-            border-bottom: solid 1px $color-primary !important;
             box-sizing: border-box !important;
             a {
                 color: $color-primary !important;
             }
         }
     }
-    .remove-border td {
-        border-bottom: solid 1px $color-primary !important;
-    }
-    &.reset-hover thead td {
-        border-bottom: solid 1px $color-primary !important;
+    &.dz-drag-hover {
+        position: relative;
+        td {
+            background: $hover-bg !important;
+            box-sizing: border-box !important;
+        }
     }
     .reset-hover {
         td {
             background-color: $white !important;
-            border-top: solid 1px $gray-lighter !important;
-            border-bottom: solid 1px $color-primary !important;
         }
     }
 }
