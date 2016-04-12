@@ -6,6 +6,7 @@
     width: 100%;
     margin: 0;
     border-top: solid 1px $gray-lighter !important;
+    border-collapse: collapse !important;
     thead th,
     tbody td {
         text-align: left;
@@ -99,13 +100,16 @@
         }
     }
     .remove-border td {
-        border-bottom: solid 1px transparent !important;
+        border-bottom: solid 1px $color-primary !important;
+    }
+    &.reset-hover thead td {
+        border-bottom: solid 1px $color-primary !important;
     }
     .reset-hover {
         td {
             background-color: $white !important;
             border-top: solid 1px $gray-lighter !important;
-            border-bottom: solid 1px $gray-lighter !important;
+            border-bottom: solid 1px $color-primary !important;
         }
     }
 }

@@ -113,7 +113,6 @@
                             done();
                         }
 
-                        dropzones.removeClass('remove-border');
                         dropzones.removeClass('reset-hover');
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
@@ -121,7 +120,6 @@
                     dragover: function (dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
                         $(dropzones).addClass('reset-hover');
-                        $(dropzones).prev('tr').addClass('remove-border');
                         uploadSuccess.addClass(hiddenClass);
                         infoMessage.removeClass(hiddenClass);
                         dropzone.addClass(dragHoverClass).removeClass('reset-hover');
