@@ -44,11 +44,12 @@ Cl.mediator = new Mediator();
 
         $('.js-filter-files').on('focus blur', function (event) {
             var container = $(this).closest('.js-filter-files-container');
+            var dropdownTrigger = container.find('.dropdown-container');
 
             if (event.type === 'focus') {
                 container.addClass('is-focused');
             } else {
-                if (event.relatedTarget == undefined) {
+                if (event.relatedTarget === dropdownTrigger) {
                     container.removeClass('is-focused');
                 }
             }
