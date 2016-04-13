@@ -143,7 +143,6 @@
                         }, 1000);
 
                         infoMessage.removeClass(hiddenClass);
-                        $('.drag-hover-border').hide();
                         dropzones.removeClass(dragHoverClass);
 
                     },
