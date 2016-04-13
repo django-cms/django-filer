@@ -27,8 +27,21 @@ class ImageAdminForm(forms.ModelForm):
         else:
             return ''
 
+    def _set_previous_subject_location(self, cleaned_data):
+        subject_location = self.instance.subject_location
+        cleaned_data['subject_location'] = subject_location
+        self.data['subject_location'] = subject_location
+
     def clean_subject_location(self):
-        subject_location = self.cleaned_data['subject_location']
+        """
+        Validate subject_location preserving last saved value.
+
+        Last valid value of the subject_location field is shown to the user
+        for subject location widget to receive valid coordinates on field
+        validation errors.
+        """
+        cleaned_data = super(ImageAdminForm, self).clean()
+        subject_location = cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it
             return subject_location
@@ -36,12 +49,14 @@ class ImageAdminForm(forms.ModelForm):
         # use thumbnail's helper function to check the format
         coordinates = normalize_subject_location(subject_location)
         if not coordinates:
+            self._set_previous_subject_location(cleaned_data)
             raise forms.ValidationError(
                 _('Invalid subject location format'),
                 code='invalid_subject_format')
 
         if (coordinates[0] > self.instance.image.width or
                 coordinates[1] > self.instance.image.height):
+            self._set_previous_subject_location(cleaned_data)
             raise forms.ValidationError(
                 _('Subject location is outside of the image'),
                 code='subject_out_of_bounds')
