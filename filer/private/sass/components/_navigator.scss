@@ -114,6 +114,10 @@ body {
             background: $hover-bg !important;
             box-sizing: border-box !important;
             a {
+                &.icon {
+                    color: $gray-darker !important;
+                    background-color: white !important;
+                }
                 color: $color-primary !important;
             }
         }
