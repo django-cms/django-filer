@@ -119,10 +119,20 @@
                     },
                     dragover: function (dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
+                        var dropzoneBoundingRect = dropzone[0].getBoundingClientRect();
+
+                        var dropzonePosition = {
+                            top: dropzoneBoundingRect.top,
+                            bottom: dropzoneBoundingRect.bottom,
+                            width: dropzoneBoundingRect.width,
+                            height: dropzoneBoundingRect.height
+                        };
+
                         $(dropzones).addClass('reset-hover');
                         uploadSuccess.addClass(hiddenClass);
                         infoMessage.removeClass(hiddenClass);
                         dropzone.addClass(dragHoverClass).removeClass('reset-hover');
+                        $('.drag-hover-border').css(dropzonePosition);
 
                         folderName.text(folderTitle);
                     },
@@ -133,7 +143,9 @@
                         }, 1000);
 
                         infoMessage.removeClass(hiddenClass);
+                        $('.drag-hover-border').hide();
                         dropzones.removeClass(dragHoverClass);
+
                     },
                     sending: function (file) {
                         getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);
