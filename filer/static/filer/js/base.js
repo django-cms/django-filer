@@ -78,11 +78,11 @@ Cl.mediator = new Mediator();
         // show counter if file is selected
         (function () {
             var table = $('.navigator-table').find('tr');
-            var actionCounter = $('.actions');
+            var actionList = $('.actions-separated-list');
             var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
             actionSelect.on('change click', function () {
-                actionCounter.toggleClass('action-selected', table.hasClass('selected'));
+                actionList.toggleClass('action-selected', table.hasClass('selected'));
             });
         }());
 

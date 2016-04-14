@@ -245,17 +245,6 @@ body {
             padding-left: 10px;
             border-left: solid 1px $gray-lighter;
         }
-        &.action-selected {
-            display: block;
-            margin-bottom: 10px;
-            margin-left: 20px;
-            @media screen and (max-width: $screen-tablet) {
-                margin-left: 0;
-            }
-            @media screen and (min-width: $screen-tablet) {
-                margin-bottom: 0;
-            }
-        }
     }
 }
 @media screen and (max-width: $screen-tablet) {
@@ -426,11 +415,6 @@ body {
             padding: 15px;
             border: 0;
             box-shadow: $dropdown-shadow;
-            @media screen and (max-width: $screen-tablet) {
-                left: 0;
-                right: auto;
-                width: 334px;
-            }
             .fa-close {
                 position: absolute;
                 top: 10px;
