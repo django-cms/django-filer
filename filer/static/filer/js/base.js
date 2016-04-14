@@ -71,7 +71,7 @@ Cl.mediator = new Mediator();
                     $(containerSelector).addClass('is-focused');
                 }).on('hide.bs.dropdown', function () {
                     $(containerSelector).removeClass('is-focused');
-                })
+                });
             }
         }());
 
