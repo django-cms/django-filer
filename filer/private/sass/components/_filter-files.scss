@@ -9,15 +9,16 @@
     padding: 0;
     background: none;
     box-shadow: none;
+    @media screen and (max-width: $screen-tablet) {
+        float: none;
+        .filter-files-button {
+            float: none;
+        }
+    }
     &.is-focused {
         .filter-files-field {
             @media screen and (min-width: $screen-tablet) {
                   width: 336px !important;
-            }
-        }
-        @media screen and (max-width: $screen-tablet) {
-            .filter-files-button {
-                float: right;
             }
         }
     }
@@ -93,12 +94,6 @@
     .dropdown-menu {
         margin-top: 0 !important;
         margin-right: -1px !important;
-    }
-    @media screen and (max-width: $screen-tablet) {
-        &,
-        &.is-focused {
-            margin: 0 10px 10px 0;
-        }
     }
 }
 .filter-files-cancel {

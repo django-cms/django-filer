@@ -162,8 +162,7 @@ body {
         }
     }
     .tools-container {
-        float: left;
-        width: 80%;
+        float: right;
         margin-top: 2px;
         @media screen and (max-width: $screen-tablet) {
             width: 100%;
@@ -211,12 +210,21 @@ body {
     @include clearfix;
     float: right;
     .actions-wrapper {
-        float: right;
+        float: left;
         margin-bottom: 0;
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
-            float: none;
+            float: right;
             margin-left: 2px;
+            margin-top: 10px;
+        }
+        &.action-selected {
+            @media screen and (max-width: $screen-tablet) {
+               float: left;
+            }
+            .actions-separated-list {
+                display: inline-block;
+            }
         }
     }
     .actions {
@@ -267,12 +275,16 @@ body {
 }
 // make sure that buttons break to new line on mobile view #677
 .navigator-button-wrapper {
+    float: right;
     text-align: right;
     margin-bottom: 0;
+    margin-left: 10px;
     @media screen and (max-width: $screen-tablet) {
         display: block;
+        float: left;
         text-align: left;
         margin-top: 10px;
+        margin-left: 0;
     }
     @media screen and (min-width: $screen-desktop) {
         float: right;

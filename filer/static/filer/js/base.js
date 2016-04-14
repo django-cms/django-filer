@@ -78,7 +78,7 @@ Cl.mediator = new Mediator();
         // show counter if file is selected
         (function () {
             var table = $('.navigator-table').find('tr');
-            var actionList = $('.actions-separated-list');
+            var actionList = $('.actions-wrapper');
             var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
             actionSelect.on('change click', function () {

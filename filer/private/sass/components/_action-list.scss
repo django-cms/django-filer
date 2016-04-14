@@ -50,9 +50,6 @@
     display: none;
     margin: 0;
     padding-left: 0;
-    &.action-selected {
-        display: inline-block;
-    }
     @media screen and (max-width: $screen-tablet) {
         float: left;
         margin-left: 0;
