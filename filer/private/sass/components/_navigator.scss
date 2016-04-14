@@ -35,9 +35,6 @@ body {
     margin: 0;
     border-top: solid 1px $gray-lighter !important;
     border-collapse: collapse !important;
-    thead th {
-        border-bottom: 0 !important;
-    }
     thead th,
     tbody td {
         text-align: left;
