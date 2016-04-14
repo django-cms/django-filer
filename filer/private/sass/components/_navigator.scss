@@ -257,11 +257,6 @@ body {
             }
         }
     }
-    .dropdown-container {
-        @media screen and (max-width: $screen-tablet) {
-            float: left;
-        }
-    }
 }
 @media screen and (max-width: $screen-tablet) {
     .navigator-top-nav {
@@ -270,7 +265,6 @@ body {
         }
         .navigator-tools {
             float: none;
-            margin-left: 17px;
             .separator:before {
                 top: 0;
                 bottom: 0;
@@ -401,7 +395,6 @@ body {
     vertical-align: top;
     .fa-caret-down {
         font-size: 16px;
-        color: $gray;
     }
     .dropdown-menu,
     + .dropdown-menu {
@@ -417,7 +410,6 @@ body {
         label {
             display: block;
             line-height: 20px !important;
-            white-space: nowrap;
             text-transform: none;
             margin: 5px 0 !important;
             padding: 0 10px !important;
@@ -429,6 +421,7 @@ body {
             margin-right: 5px;
         }
         &.dropdown-menu-checkboxes {
+            width: 0;
             height: 80px;
             padding: 15px;
             border: 0;
@@ -480,7 +473,7 @@ body {
         &:link,
         &:visited,
         &:link:visited {
-            color: $gray-light;
+            color: $gray;
             font-size: 20px;
             line-height: 30px;
             height: 30px;

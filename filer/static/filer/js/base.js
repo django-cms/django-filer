@@ -42,19 +42,6 @@ Cl.mediator = new Mediator();
             new Cl.Toggler();
         }
 
-        // set and show box shadow on table header
-        (function () {
-            var tableHeadBoundingRect = $('.navigator-table').find('thead')[0].getBoundingClientRect();
-            var tableHeadPosition = {
-                top: tableHeadBoundingRect.top,
-                bottom: tableHeadBoundingRect.bottom,
-                width: tableHeadBoundingRect.width,
-                height: tableHeadBoundingRect.height
-            };
-
-            $('.table-head-shadow').css(tableHeadPosition);
-        }());
-
         $('.js-filter-files').on('focus blur', function (event) {
             var container = $(this).closest('.js-filter-files-container');
             var dropdownTrigger = container.find('.dropdown-container a');
@@ -79,6 +66,12 @@ Cl.mediator = new Mediator();
                 filter.on('keydown', function () {
                     $(this).closest(containerSelector).addClass('is-focused');
                 });
+
+                $(containerSelector).find('.dropdown-container').on('show.bs.dropdown', function () {
+                    $(containerSelector).addClass('is-focused');
+                }).on('hide.bs.dropdown', function () {
+                    $(containerSelector).removeClass('is-focused');
+                })
             }
         }());
 
