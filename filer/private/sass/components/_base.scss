@@ -67,6 +67,9 @@ body {
         font-size: $font-size-small;
         color: $gray-light !important;
     }
+    .actions {
+        float: right;
+    }
 }
 
 #id_upload_button:before {

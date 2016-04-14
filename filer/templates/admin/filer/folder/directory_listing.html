@@ -210,24 +210,11 @@
                             </div>
                         </div>
                     {% endif %}
-                    <div class="actions">
-                        {% if actions_selection_counter %}
-                            <script type="text/javascript">var _actions_icnt="{{ paginated_items.object_list|length|default:"0" }}";</script>
-                            <span class="action-counter">{{ selection_note }}</span>
-                            {% if paginator.count != paginated_items.object_list|length %}
-                                <span class="all">{{ selection_note_all }}</span>
-                                <span class="question">
-                                    <a href="javascript:;" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }}{% endblocktrans %}</a>
-                                </span>
-                                <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
                     <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
                         <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
                         <div class="filter-search-wrapper">
                             {% filer_admin_context_hidden_formfields %}
-                            <input type="text" placeholder="{% trans 'Search Files...' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+                            <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
                             <div class="dropdown-container dropdown-container-down">
                                 <a href="#" data-toggle="dropdown" aria-expanded="false">
                                     <span class="fa fa-caret-down"></span>

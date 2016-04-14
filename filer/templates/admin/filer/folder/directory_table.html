@@ -1,5 +1,6 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags staticfiles %}
 <div class="drag-hover-border"></div>
+<div class="table-head-shadow"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
     <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
         <thead>
@@ -209,5 +210,18 @@
                 {% trans "next" %}
             </a>
         {% endif %}
+        <div class="actions">
+            {% if actions_selection_counter %}
+                <script type="text/javascript">var _actions_icnt="{{ paginated_items.object_list|length|default:"0" }}";</script>
+                <span class="action-counter">{{ selection_note }}</span>
+                {% if paginator.count != paginated_items.object_list|length %}
+                    <span class="all">{{ selection_note_all }}</span>
+                    <span class="question">
+                        <a href="javascript:;" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }}{% endblocktrans %}</a>
+                    </span>
+                    <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
+                {% endif %}
+            {% endif %}
+        </div>
     </div>
 </section>

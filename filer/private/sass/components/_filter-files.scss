@@ -5,7 +5,7 @@
     @include clearfix;
     position: relative;
     float: right;
-    margin: 0 10px 10px 0;
+    margin: 0 10px 0 0;
     padding: 0;
     background: none;
     box-shadow: none;
@@ -80,7 +80,7 @@
     }
     .filter-files-field {
         color: $gray-darkest;
-        font-size: 14px !important;
+        font-size: 12px !important;
         line-height: 34px;
         box-sizing: border-box;
         width: 168px !important;
@@ -89,8 +89,8 @@
         margin: 0;
         padding: 0 35px 0 10px !important;
         outline: none;
-
         appearance: none;
+        transition: width .2s;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;
