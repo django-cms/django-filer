@@ -430,8 +430,11 @@ body {
                 position: absolute;
                 top: 10px;
                 right: 10px;
-                color: $gray-darker;
+                color: $gray;
                 cursor: pointer;
+                &:hover {
+                    color: $color-primary;
+                }
             }
             p {
                 color: $gray-light !important;
