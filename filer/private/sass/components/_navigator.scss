@@ -267,10 +267,6 @@ body {
                 bottom: 0;
             }
         }
-        .dropdown-container .dropdown-menu {
-            right: auto;
-            left: -130px;
-        }
     }
 }
 // make sure that buttons break to new line on mobile view #677
@@ -427,6 +423,9 @@ body {
             padding: 15px;
             border: 0;
             box-shadow: $dropdown-shadow;
+            &:before {
+                display: none;
+            }
             .fa-close {
                 position: absolute;
                 top: 10px;
@@ -480,6 +479,26 @@ body {
         right: auto;
         left: -14px;
         margin-right: 10px;
+    }
+}
+
+.dropdown-menu {
+    margin-top: 0 !important;
+    &:before {
+        position: absolute;
+        top: -5px;
+        left: 30px;
+        z-index: -1;
+        content: '';
+        width: 10px;
+        height: 10px;
+        margin-left: -5px;
+        transform: rotate(45deg);
+        background-color: #fff;
+    }
+    &.create-menu-dropdown:before {
+        left: auto;
+        right: 17px;
     }
 }
 

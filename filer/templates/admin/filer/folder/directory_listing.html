@@ -100,7 +100,6 @@
                         <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
                     </a>
                     <ul class="dropdown-menu navigator-breadcrumbs-dropdown">
-                        <div class="navigator-dropdown-arrow-up"></div>
                         {% for folder in folder.logical_path %}
                             <li>
                                 <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
@@ -137,7 +136,6 @@
                                 <span class="fa fa-caret-down"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <div class="navigator-dropdown-arrow-up"></div>
                                 <li>
                                     <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
                                 </li>
