@@ -18,6 +18,7 @@ CHANGELOG
 * Disable submit button if only one folder to copy file
 * Design improvements
 * Empty folder design
+* Removes disabled action button border
 
 
 1.1.1 (2016-01-27)
