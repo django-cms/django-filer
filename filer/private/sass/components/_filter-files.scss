@@ -42,7 +42,7 @@
         &.open + .dropdown-menu-checkboxes {
             display: block;
             width: 100%;
-            transition: width .2s;
+            transition: width $speed-base;
             li {
                 margin: 0;
                 padding: 0;
@@ -85,7 +85,7 @@
         padding: 0 35px 0 10px !important;
         outline: none;
         appearance: none;
-        transition: width .2s;
+        transition: width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;

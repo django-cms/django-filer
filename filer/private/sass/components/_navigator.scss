@@ -25,7 +25,7 @@ body {
 .table-head-shadow {
     position: fixed;
     clip: rect(0,99999px,99999px,-2px);
-    box-shadow: 0 2px 5px -2px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px -2px rgba(black,0.2);
     pointer-events: none;
     z-index: 100;
 }
