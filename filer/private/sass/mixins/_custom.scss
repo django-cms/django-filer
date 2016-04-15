@@ -34,6 +34,7 @@
     letter-spacing: normal important($important);
     background-color: $background important($important);
     border: 1px solid $border important($important);
+    background-clip: padding-box;
     appearance: none;
     &:focus {
         color: $color important($important);
@@ -73,7 +74,6 @@
             color: rgba($color, 0.8) important(1);
             cursor: not-allowed;
             box-shadow: none important($important);
-            background-clip: padding-box;
             &:before {
                 color: rgba($color, 0.4) important(1);
             }
