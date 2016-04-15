@@ -4,29 +4,22 @@
 .filter-files-container {
     @include clearfix;
     position: relative;
-    float: right;
-    margin: 0 10px 10px 0;
+    float: left;
+    margin: 0 10px 0 0;
     padding: 0;
     background: none;
     box-shadow: none;
     @media screen and (max-width: $screen-tablet) {
         float: none;
-        margin-top: 0;
+        .filter-files-button {
+            float: none;
+        }
     }
     &.is-focused {
         .filter-files-field {
-            width: 100% !important;
-        }
-        @media screen and (max-width: $screen-tablet) {
-            .filter-search-wrapper {
-                width: calc(100% - 50px);
+            @media screen and (min-width: $screen-tablet) {
+                  width: 336px !important;
             }
-            .filter-files-button {
-                float: right;
-            }
-        }
-        .dropdown-menu-checkboxes {
-            width: 334px;
         }
     }
     .dropdown-container {
@@ -48,6 +41,8 @@
         }
         &.open + .dropdown-menu-checkboxes {
             display: block;
+            width: 100%;
+            transition: width $speed-base;
             li {
                 margin: 0;
                 padding: 0;
@@ -57,7 +52,7 @@
     }
     .filter-search-wrapper {
         position: relative;
-        float: right;
+        float: left;
         margin-right: 5px;
         @media screen and (max-width: $screen-tablet) {
             float: left;
@@ -80,7 +75,7 @@
     }
     .filter-files-field {
         color: $gray-darkest;
-        font-size: 14px !important;
+        font-size: 12px !important;
         line-height: 34px;
         box-sizing: border-box;
         width: 168px !important;
@@ -89,8 +84,8 @@
         margin: 0;
         padding: 0 35px 0 10px !important;
         outline: none;
-
         appearance: none;
+        transition: width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;
@@ -99,12 +94,6 @@
     .dropdown-menu {
         margin-top: 0 !important;
         margin-right: -1px !important;
-    }
-    @media screen and (max-width: $screen-tablet) {
-        &,
-        &.is-focused {
-            margin: 0 10px 10px 0;
-        }
     }
 }
 .filter-files-cancel {

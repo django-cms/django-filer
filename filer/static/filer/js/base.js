@@ -66,17 +66,23 @@ Cl.mediator = new Mediator();
                 filter.on('keydown', function () {
                     $(this).closest(containerSelector).addClass('is-focused');
                 });
+
+                $(containerSelector).find('.dropdown-container').on('show.bs.dropdown', function () {
+                    $(containerSelector).addClass('is-focused');
+                }).on('hide.bs.dropdown', function () {
+                    $(containerSelector).removeClass('is-focused');
+                });
             }
         }());
 
         // show counter if file is selected
         (function () {
             var table = $('.navigator-table').find('tr');
-            var actionCounter = $('.actions');
+            var actionList = $('.actions-wrapper');
             var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
             actionSelect.on('change click', function () {
-                actionCounter.toggleClass('action-selected', table.hasClass('selected'));
+                actionList.toggleClass('action-selected', table.hasClass('selected'));
             });
         }());
 

@@ -22,6 +22,13 @@ body {
     pointer-events: none;
     z-index: 100;
 }
+.table-head-shadow {
+    position: fixed;
+    clip: rect(0,99999px,99999px,-2px);
+    box-shadow: 0 2px 5px -2px rgba(black,0.2);
+    pointer-events: none;
+    z-index: 100;
+}
 .filebrowser .navigator-table {
     // required for django CMS <= 3.1 #673
     width: 100%;
@@ -40,8 +47,7 @@ body {
     }
     tbody tr.selected {
         .icon {
-            color: $gray-darkest !important;
-            background-color: white;
+            color: $gray !important;
         }
     }
     .unfiled td {
@@ -82,13 +88,14 @@ body {
             margin: 0;
         }
         .icon {
-            color: $gray-darkest;
+            color: $gray;
             line-height: 33px;
             text-align: center;
             width: 33px;
             height: 33px;
             border: solid 1px #ccc;
             border-radius: 2px;
+            background-color: white;
             &:hover {
                 border-color: $color-primary;
             }
@@ -138,28 +145,30 @@ body {
 .navigator-top-nav {
     position: relative;
     clear: both;
-    min-height: 60px;
-    padding: 3px 0;
+    min-height: 34px;
+    padding: 15px 20px 11px;
     background: $gray-table;
+    border-bottom: $gray-lighter solid 1px;
     .breadcrumbs-container {
         float: left;
         width: 20%;
+        margin-top: 6px;
         @media screen and (max-width: $screen-tablet) {
             width: auto;
             margin-right: 20px;
         }
     }
     .tools-container {
-        float: left;
-        width: 80%;
+        float: right;
+        margin-top: 2px;
         @media screen and (max-width: $screen-tablet) {
             width: 100%;
         }
     }
     .nav-button {
         display: inline-block;
-        color: $btn-default-color;
-        font-size: 22px;
+        color: $gray;
+        font-size: 20px;
         line-height: 34px;
         vertical-align: top;
         margin: 0 10px;
@@ -197,14 +206,22 @@ body {
 .navigator-tools {
     @include clearfix;
     float: right;
-    margin: 10px 10px 0 0;
     .actions-wrapper {
-        float: right;
-        margin-bottom: 10px;
+        float: left;
+        margin-bottom: 0;
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
-            float: none;
+            float: right;
             margin-left: 2px;
+            margin-top: 10px;
+        }
+        &.action-selected {
+            @media screen and (max-width: $screen-tablet) {
+               float: left;
+            }
+            .actions-separated-list {
+                display: inline-block;
+            }
         }
     }
     .actions {
@@ -233,22 +250,6 @@ body {
             padding-left: 10px;
             border-left: solid 1px $gray-lighter;
         }
-        &.action-selected {
-            display: block;
-            margin-bottom: 10px;
-            margin-left: 20px;
-            @media screen and (max-width: $screen-tablet) {
-                margin-left: 0;
-            }
-            @media screen and (min-width: $screen-tablet) {
-                margin-bottom: 0;
-            }
-        }
-    }
-    .dropdown-container {
-        @media screen and (max-width: $screen-tablet) {
-            float: left;
-        }
     }
 }
 @media screen and (max-width: $screen-tablet) {
@@ -258,26 +259,25 @@ body {
         }
         .navigator-tools {
             float: none;
-            margin-left: 17px;
             .separator:before {
                 top: 0;
                 bottom: 0;
             }
         }
-        .dropdown-container .dropdown-menu {
-            right: auto;
-            left: -130px;
-        }
     }
 }
 // make sure that buttons break to new line on mobile view #677
 .navigator-button-wrapper {
+    float: right;
     text-align: right;
-    margin-bottom: 10px;
+    margin-bottom: 0;
+    margin-left: 10px;
     @media screen and (max-width: $screen-tablet) {
         display: block;
+        float: left;
         text-align: left;
         margin-top: 10px;
+        margin-left: 0;
     }
     @media screen and (min-width: $screen-desktop) {
         float: right;
@@ -301,6 +301,9 @@ body {
     }
     .fa-folder {
         top: 0;
+    }
+    &.navigator-button-upload {
+        margin-right: 0;
     }
 }
 
@@ -328,7 +331,6 @@ body {
     font-size: 16px;
     font-weight: bold;
     white-space: nowrap;
-    padding: 18px 0 0 20px;
     .navigator-breadcrumbs-folder-name {
         display: inline-block;
         overflow: hidden;
@@ -385,6 +387,9 @@ body {
     display: inline-block;
     position: relative;
     vertical-align: top;
+    .fa-caret-down {
+        font-size: 16px;
+    }
     .dropdown-menu,
     + .dropdown-menu {
         display: none;
@@ -399,7 +404,6 @@ body {
         label {
             display: block;
             line-height: 20px !important;
-            white-space: nowrap;
             text-transform: none;
             margin: 5px 0 !important;
             padding: 0 10px !important;
@@ -411,21 +415,23 @@ body {
             margin-right: 5px;
         }
         &.dropdown-menu-checkboxes {
-            height: 80px;
+            width: 0;
+            min-height: 80px;
             padding: 15px;
             border: 0;
             box-shadow: $dropdown-shadow;
-            @media screen and (max-width: $screen-tablet) {
-                left: 0;
-                right: auto;
-                width: 334px;
+            &:before {
+                display: none;
             }
             .fa-close {
                 position: absolute;
                 top: 10px;
                 right: 10px;
-                color: $gray-darker;
+                color: $gray;
                 cursor: pointer;
+                &:hover {
+                    color: $color-primary;
+                }
             }
             p {
                 color: $gray-light !important;
@@ -462,7 +468,7 @@ body {
         &:link,
         &:visited,
         &:link:visited {
-            color: $gray-light;
+            color: $gray;
             font-size: 20px;
             line-height: 30px;
             height: 30px;
@@ -473,6 +479,26 @@ body {
         right: auto;
         left: -14px;
         margin-right: 10px;
+    }
+}
+
+.dropdown-menu {
+    margin-top: 0 !important;
+    &:before {
+        position: absolute;
+        top: -5px;
+        left: 30px;
+        z-index: -1;
+        content: '';
+        width: 10px;
+        height: 10px;
+        margin-left: -5px;
+        transform: rotate(45deg);
+        background-color: #fff;
+    }
+    &.create-menu-dropdown:before {
+        left: auto;
+        right: 17px;
     }
 }
 

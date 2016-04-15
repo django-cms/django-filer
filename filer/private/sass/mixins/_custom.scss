@@ -34,6 +34,7 @@
     letter-spacing: normal important($important);
     background-color: $background important($important);
     border: 1px solid $border important($important);
+    background-clip: padding-box;
     appearance: none;
     &:focus {
         color: $color important($important);

@@ -67,6 +67,9 @@ body {
         font-size: $font-size-small;
         color: $gray-light !important;
     }
+    .actions {
+        float: right;
+    }
 }
 
 #id_upload_button:before {
@@ -81,31 +84,24 @@ body {
             .breadcrumbs + #content,
             .breadcrumbs + .messagelist + #content {
                 margin-left: 0 !important;
+                margin-right: 0 !important;
             }
             .breadcrumbs {
+                left: 0 !important;
                 padding-left: 20px !important;
             }
         }
     }
-    &.popup #content {
-        box-shadow: none;
-    }
     #container {
         min-width: auto;
-        .breadcrumbs + #content,
-        .breadcrumbs + .messagelist + #content {
-            margin-left: 0 !important;
-        }
         #content {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
             padding: 0;
             box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
         }
-    }
-    .breadcrumbs {
-        left: 0 !important;
-        padding-left: 20px !important;
+        .breadcrumbs + #content,
+        .breadcrumbs + .messagelist + #content {
+            margin-left: 3% !important;
+        }
     }
     h1.folder_header {
         position: relative;
