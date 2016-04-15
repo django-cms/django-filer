@@ -69,10 +69,11 @@
         &:focus
         &:active {
             background-color: rgba($background, 0.4) important($important);
-            border-color: rgba($border, 0) important($important);
+            border-color: rgba($border, 0.4) important($important);
             color: rgba($color, 0.8) important(1);
             cursor: not-allowed;
             box-shadow: none important($important);
+            background-clip: padding-box;
             &:before {
                 color: rgba($color, 0.4) important(1);
             }
