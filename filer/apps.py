@@ -7,4 +7,4 @@ from django.utils.translation import ugettext_lazy as _
 
 class FilerConfig(AppConfig):
     name = 'filer'
-    verbose_name = _("django filer")
+    verbose_name = _("Filer")
