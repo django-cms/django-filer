@@ -206,13 +206,9 @@ body {
     .actions-wrapper {
         float: left;
         margin-bottom: 0;
-        li,
-        .dropdown-container {
+        a, a:hover {
+            color: $gray-light !important;
             cursor: not-allowed;
-        }
-        a {
-            color: $gray-light;
-            pointer-events: none;
         }
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
@@ -221,13 +217,9 @@ body {
             margin-top: 10px;
         }
         &.action-selected {
-            li,
-            .dropdown-container {
-                cursor: pointer;
-            }
             a {
-                color: $gray;
-                pointer-events: auto;
+                color: $gray !important;
+                cursor: pointer;
             }
             @media screen and (max-width: $screen-tablet) {
                float: left;

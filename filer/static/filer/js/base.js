@@ -87,7 +87,8 @@ Cl.mediator = new Mediator();
         }());
 
         (function () {
-            var dropdown = $('.js-actions-menu .dropdown-menu');
+            var actionsMenu = $('.js-actions-menu');
+            var dropdown = actionsMenu.find('.dropdown-menu');
             var actionsSelect = $('.actions select[name="action"]');
             var actionsSelectOptions = actionsSelect.find('option');
             var actionsGo = $('.actions button[type="submit"]');
@@ -107,13 +108,14 @@ Cl.mediator = new Mediator();
 
                         actionButton.on('click', function (e) {
                             e.preventDefault();
-                            actionsSelect.val(optionValue).prop('selected', true);
-                            actionsGo.trigger('click');
+                            if ($('.navigator-table').find('tr').hasClass('selected')) {
+                                actionsSelect.val(optionValue).prop('selected', true);
+                                actionsGo.trigger('click');
+                            }
                         });
                     }
                 });
             }
-
             actionsButton(valueDelete, actionDelete);
             actionsButton(valueCopy, actionCopy);
             actionsButton(valueMove, actionMove);
@@ -138,6 +140,13 @@ Cl.mediator = new Mediator();
 
                 actionsSelect.find('option').eq(targetIndex).prop('selected', true);
                 actionsGo.trigger('click');
+            });
+
+            actionsMenu.on('click', function (e) {
+                if (!$('.navigator-table').find('tr').hasClass('selected')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             });
         }());
     });
