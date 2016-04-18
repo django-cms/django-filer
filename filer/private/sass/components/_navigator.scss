@@ -39,9 +39,12 @@ body {
         border-top: 1px solid transparent;
         background: none !important;
     }
+    tbody td {
+        padding: 11px 5px !important;
+    }
     tbody tr.selected {
-        .icon {
-            color: $gray !important;
+        .action-button span {
+            color: $gray-darker !important;
         }
     }
     .unfiled td {
@@ -81,17 +84,14 @@ body {
             font-size: 16px !important;
             margin: 0;
         }
-        .icon {
-            color: $gray;
-            line-height: 33px;
-            text-align: center;
-            width: 33px;
-            height: 33px;
-            border: solid 1px #ccc;
-            border-radius: 2px;
-            background-color: white;
-            &:hover {
-                border-color: $color-primary;
+        .action-button {
+            @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
+            padding: 9px !important;
+            span {
+                font-size: 16px;
+                &:before {
+                    vertical-align: middle;
+                }
             }
         }
     }
