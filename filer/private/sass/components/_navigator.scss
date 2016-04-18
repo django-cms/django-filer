@@ -49,8 +49,8 @@ body {
         padding: 11px 5px !important;
     }
     tbody tr.selected {
-        .icon {
-            color: $gray !important;
+        .action-button span {
+            color: $gray-dark !important;
         }
     }
     .unfiled td {
