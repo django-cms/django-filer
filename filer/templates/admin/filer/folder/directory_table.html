@@ -62,8 +62,8 @@
                             </td>
                             <td class="column-action">
                                 {% if subfolder.file_type == "Folder" %}
-                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% filer_admin_context_url_params %}" title="{% trans 'Change folder details' %}" class="icon fa fa-pencil"></a>
-                                    <a href="{{ subfolder.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="icon fa fa-trash" title="{% trans 'Remove folder' %}"></a>
+                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% filer_admin_context_url_params %}" title="{% trans 'Change folder details' %}" class="action-button"><span class="fa fa-pencil"></span></a>
+                                    <a href="{{ subfolder.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="action-button" title="{% trans 'Remove folder' %}"><span class="fa fa-trash"></span></a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -142,8 +142,8 @@
                             </td>
                             <td class="column-action">
                                 <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
-                                    title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="icon fa fa-pencil"></a>
-                                <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="icon fa fa-trash" title="{% trans 'Remove file' %}"></a>
+                                    title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil"></span></a>
+                                <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash"></span></a>
                             </td>
                         </tr>
                     {% endwith %}
