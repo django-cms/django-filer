@@ -87,7 +87,8 @@ Cl.mediator = new Mediator();
         }());
 
         (function () {
-            var dropdown = $('.js-actions-menu .dropdown-menu');
+            var actionsMenu = $('.js-actions-menu');
+            var dropdown = actionsMenu.find('.dropdown-menu');
             var actionsSelect = $('.actions select[name="action"]');
             var actionsSelectOptions = actionsSelect.find('option');
             var actionsGo = $('.actions button[type="submit"]');
@@ -98,22 +99,23 @@ Cl.mediator = new Mediator();
             var valueDelete = 'delete_files_or_folders';
             var valueCopy = 'copy_files_and_folders';
             var valueMove = 'move_files_and_folders';
+            var navigatorTable = $('.navigator-table').find('tr');
 
             // triggers delete copy and move actions on separate buttons
             function actionsButton(optionValue, actionButton) {
                 actionsSelectOptions.each(function () {
                     if (this.value === optionValue) {
                         actionButton.show();
-
                         actionButton.on('click', function (e) {
                             e.preventDefault();
-                            actionsSelect.val(optionValue).prop('selected', true);
-                            actionsGo.trigger('click');
+                            if (navigatorTable.hasClass('selected')) {
+                                actionsSelect.val(optionValue).prop('selected', true);
+                                actionsGo.trigger('click');
+                            }
                         });
                     }
                 });
             }
-
             actionsButton(valueDelete, actionDelete);
             actionsButton(valueCopy, actionCopy);
             actionsButton(valueMove, actionMove);
@@ -138,6 +140,13 @@ Cl.mediator = new Mediator();
 
                 actionsSelect.find('option').eq(targetIndex).prop('selected', true);
                 actionsGo.trigger('click');
+            });
+
+            actionsMenu.on('click', function (e) {
+                if (!navigatorTable.hasClass('selected')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             });
         }());
     });

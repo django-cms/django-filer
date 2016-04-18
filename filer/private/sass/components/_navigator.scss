@@ -206,6 +206,10 @@ body {
     .actions-wrapper {
         float: left;
         margin-bottom: 0;
+        a, a:hover {
+            color: $gray-light !important;
+            cursor: not-allowed;
+        }
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
             float: right;
@@ -213,6 +217,10 @@ body {
             margin-top: 10px;
         }
         &.action-selected {
+            a {
+                color: $gray !important;
+                cursor: pointer;
+            }
             @media screen and (max-width: $screen-tablet) {
                float: left;
             }
