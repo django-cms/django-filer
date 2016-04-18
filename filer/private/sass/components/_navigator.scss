@@ -366,6 +366,10 @@ body {
                 color: $color-primary;
                 padding: 12px 20px 3px;
                 border-bottom: solid 1px #e1e1e1;
+                &:hover {
+                    color: white !important;
+                    background: $color-primary !important;
+                }
             }
             &:last-child > a {
                 border-bottom: none;
@@ -442,8 +446,8 @@ body {
             }
         }
         a:hover {
-            background: $gray-lightest !important;
-            border-radius: 4px;
+            color: white !important;
+            background: $color-primary !important;
         }
     }
     &.open .dropdown-menu {
