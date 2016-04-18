@@ -99,17 +99,16 @@ Cl.mediator = new Mediator();
             var valueDelete = 'delete_files_or_folders';
             var valueCopy = 'copy_files_and_folders';
             var valueMove = 'move_files_and_folders';
-            var navigatorTableSelected = $('.navigator-table').find('tr').hasClass('selected');
+            var navigatorTableSelected = $('.navigator-table').find('tr');
 
             // triggers delete copy and move actions on separate buttons
             function actionsButton(optionValue, actionButton) {
                 actionsSelectOptions.each(function () {
                     if (this.value === optionValue) {
                         actionButton.show();
-
                         actionButton.on('click', function (e) {
                             e.preventDefault();
-                            if (navigatorTableSelected) {
+                            if (navigatorTableSelected.hasClass('selected')) {
                                 actionsSelect.val(optionValue).prop('selected', true);
                                 actionsGo.trigger('click');
                             }
@@ -144,7 +143,7 @@ Cl.mediator = new Mediator();
             });
 
             actionsMenu.on('click', function (e) {
-                if (!navigatorTableSelected) {
+                if (!navigatorTableSelected.hasClass('selected')) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
