@@ -22,13 +22,7 @@ body {
     pointer-events: none;
     z-index: 100;
 }
-.table-head-shadow {
-    position: fixed;
-    clip: rect(0,99999px,99999px,-2px);
-    box-shadow: 0 2px 5px -2px rgba(black,0.2);
-    pointer-events: none;
-    z-index: 100;
-}
+
 .filebrowser .navigator-table {
     // required for django CMS <= 3.1 #673
     width: 100%;
@@ -131,6 +125,9 @@ body {
     }
     &.dz-drag-hover {
         position: relative;
+        .drag-hover-border {
+            display: none !important;
+        }
         td {
             background: $hover-bg !important;
             box-sizing: border-box !important;
