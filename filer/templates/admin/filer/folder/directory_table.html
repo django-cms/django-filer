@@ -148,13 +148,11 @@
                         </tr>
                     {% endwith %}
                 {% endif %}
-            {% endfor %}
-
-            {% if not folder.is_root and folder.item_count == 0 %}
+            {% empty %}
                 <tr>
                     <td colspan="6" class="no-files"><span class="fa fa-arrow-down"></span>{% trans 'Drop files here or use the "Upload Files" button' %}</td>
                 </tr>
-            {% endif %}
+            {% endfor %}
         </tbody>
     </table>
 
