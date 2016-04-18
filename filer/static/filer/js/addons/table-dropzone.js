@@ -147,7 +147,7 @@
 
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
-                        dragHoverBorder.css({ top: '', bottom: '', width: '', height: ''});
+                        dragHoverBorder.css({ top: '0', bottom: '0', width: '0', height: '0' });
 
                     },
                     sending: function (file) {
