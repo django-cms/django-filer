@@ -47,7 +47,7 @@
     }
 }
 .actions-separated-list {
-    display: none;
+    display: inline-block;
     margin: 0;
     padding-left: 0;
     @media screen and (max-width: $screen-tablet) {
