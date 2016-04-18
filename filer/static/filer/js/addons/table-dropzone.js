@@ -27,6 +27,7 @@
         var cancelUpload = $('.js-filer-dropzone-cancel');
         var dragHoverClass = 'dz-drag-hover';
         var dataUploaderConnections = 'max-uploader-connections';
+        var dragHoverBorder = $('.drag-hover-border');
         // var dataMaxFileSize = 'max-file-size';
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
@@ -128,7 +129,7 @@
                             height: dropzoneBoundingRect.height
                         };
                         if (dropzoneFolder) {
-                            $('.drag-hover-border').css(dropzonePosition);
+                            dragHoverBorder.css(dropzonePosition);
                         }
 
                         $(dropzones).addClass('reset-hover');
@@ -146,8 +147,7 @@
 
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
-
-                        $('.drag-hover-border').css({top: '',bottom: '', width: '',height: ''});
+                        dragHoverBorder.css({ top: '', bottom: '', width: '', height: ''});
 
                     },
                     sending: function (file) {
