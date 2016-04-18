@@ -67,11 +67,11 @@ Cl.mediator = new Mediator();
                     $(this).closest(containerSelector).addClass('is-focused');
                 });
 
-                $(containerSelector).find('.dropdown-container').on('show.bs.dropdown', function () {
+                if ($(containerSelector).find('.dropdown-container').hasClass('open')) {
                     $(containerSelector).addClass('is-focused');
-                }).on('hide.bs.dropdown', function () {
-                    $(containerSelector).removeClass('is-focused');
-                });
+                } else {
+                   $(containerSelector).removeClass('is-focused');
+                }
             }
         }());
 
