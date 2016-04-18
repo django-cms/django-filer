@@ -96,10 +96,10 @@
 
             <div class="navigator-breadcrumbs">
                 <div class="navigator-breadcrumbs-dropdown-container">
-                    <a href="#" data-toggle="dropdown" aria-expanded="false">
+                    <a href="#" class="js-filer-dropdown-menu">
                         <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
                     </a>
-                    <ul class="dropdown-menu navigator-breadcrumbs-dropdown">
+                    <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
                         {% for folder in folder.logical_path %}
                             <li>
                                 <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
@@ -132,10 +132,10 @@
 
                     {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                         <div class="dropdown-container dropdown-container-down">
-                            <a href="#" data-toggle="dropdown" aria-expanded="false">
+                            <a href="#" class="js-filer-dropdown-menu">
                                 <span class="fa fa-caret-down"></span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="filer-dropdown-menu">
                                 <li>
                                     <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
                                 </li>
@@ -154,11 +154,11 @@
                             {% filer_admin_context_hidden_formfields %}
                             <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
                             <div class="dropdown-container dropdown-container-down">
-                                <a href="#" data-toggle="dropdown" aria-expanded="false">
+                                <a href="#" class="js-filer-dropdown-menu">
                                     <span class="fa fa-caret-down"></span>
                                 </a>
                             </div>
-                            <ul class="dropdown-menu dropdown-menu-checkboxes">
+                            <ul class="filer-dropdown-menu dropdown-menu-checkboxes">
                                 <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
                                 <li>
                                     <p>{% trans "Limit" %}</p>
@@ -187,10 +187,10 @@
                                 </li>
                             </ul>
                             <div class="dropdown-container js-actions-menu">
-                                <a href="#" data-toggle="dropdown" aria-expanded="false" class="nav-button nav-button-dots">
+                                <a href="#" class="js-filer-dropdown-menu nav-button nav-button-dots">
                                     <span class="fa fa-ellipsis-h"></span>
                                 </a>
-                                <ul class="create-menu-dropdown dropdown-menu">
+                                <ul class="create-menu-dropdown filer-dropdown-menu">
                                     <!-- Actions will go here -->
                                 </ul>
                             </div>

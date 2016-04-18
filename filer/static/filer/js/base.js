@@ -88,7 +88,7 @@ Cl.mediator = new Mediator();
 
         (function () {
             var actionsMenu = $('.js-actions-menu');
-            var dropdown = actionsMenu.find('.dropdown-menu');
+            var dropdown = actionsMenu.find('.filer-dropdown-menu');
             var actionsSelect = $('.actions select[name="action"]');
             var actionsSelectOptions = actionsSelect.find('option');
             var actionsGo = $('.actions button[type="submit"]');
