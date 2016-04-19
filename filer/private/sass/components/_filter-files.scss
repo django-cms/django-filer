@@ -4,13 +4,13 @@
 .filter-files-container {
     @include clearfix;
     position: relative;
-    float: left;
+    float: right;
     margin: 0 10px 0 0;
     padding: 0;
     background: none;
     box-shadow: none;
     @media screen and (max-width: $screen-tablet) {
-        float: none;
+        float: left;
         .filter-files-button {
             float: none;
         }
@@ -18,7 +18,7 @@
     &.is-focused {
         .filter-files-field {
             @media screen and (min-width: $screen-tablet) {
-                  width: 336px !important;
+                  width: 100% !important;
             }
         }
     }
@@ -52,11 +52,8 @@
     }
     .filter-search-wrapper {
         position: relative;
-        float: left;
+        float: right;
         margin-right: 5px;
-        @media screen and (max-width: $screen-tablet) {
-            float: left;
-        }
     }
     .filter-files-button {
         float: right;
@@ -68,9 +65,6 @@
             left: 2px;
             font-size: 16px !important;
             vertical-align: top;
-        }
-        @media screen and (max-width: $screen-tablet) {
-            float: none;
         }
     }
     .filter-files-field {

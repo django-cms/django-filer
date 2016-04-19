@@ -141,13 +141,6 @@ Cl.mediator = new Mediator();
                 actionsSelect.find('option').eq(targetIndex).prop('selected', true);
                 actionsGo.trigger('click');
             });
-
-            actionsMenu.on('click', function (e) {
-                if (!navigatorTable.hasClass('selected')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
         }());
     });
 })(django.jQuery);

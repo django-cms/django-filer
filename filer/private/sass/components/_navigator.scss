@@ -147,18 +147,19 @@ body {
     background: $gray-table;
     border-bottom: $gray-lighter solid 1px;
     .breadcrumbs-container {
-        float: left;
-        width: 20%;
         margin-top: 6px;
         @media screen and (max-width: $screen-tablet) {
-            width: auto;
             margin-right: 20px;
         }
     }
     .tools-container {
-        float: right;
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        left: 15px;
         margin-top: 2px;
         @media screen and (max-width: $screen-tablet) {
+            position: static;
             width: 100%;
         }
     }
@@ -202,9 +203,8 @@ body {
 }
 .navigator-tools {
     @include clearfix;
-    float: right;
     .actions-wrapper {
-        float: left;
+        float: right;
         margin-bottom: 0;
         a, a:hover {
             color: $gray-light !important;
@@ -212,9 +212,10 @@ body {
         }
         @media screen and (max-width: $screen-tablet) {
             @include clearfix();
-            float: right;
-            margin-left: 2px;
+            float: none;
+            margin-left: 0;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
         &.action-selected {
             a {
@@ -279,9 +280,9 @@ body {
     margin-left: 10px;
     @media screen and (max-width: $screen-tablet) {
         display: block;
-        float: left;
+        float: none;
         text-align: left;
-        margin-top: 10px;
+        margin-top: 0;
         margin-left: 0;
     }
     @media screen and (min-width: $screen-desktop) {
@@ -330,68 +331,6 @@ body {
     }
 }
 
-.navigator-breadcrumbs {
-    @include clearfix;
-    position: relative;
-    font-size: 16px;
-    font-weight: bold;
-    white-space: nowrap;
-    .navigator-breadcrumbs-folder-name {
-        display: inline-block;
-        overflow: hidden;
-        font-size: 16px;
-        vertical-align: top;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        max-width: calc(100% - 100px);
-    }
-    > a {
-        color: $gray-darkest !important;
-    }
-    .icon {
-        color: $gray-light;
-        margin: 0 5px;
-    }
-    li {
-        list-style-type: none;
-    }
-}
-.navigator-breadcrumbs-dropdown-container {
-    position: relative;
-    top: -5px;
-    float: left;
-    margin: 0 7px 0 0;
-    .navigator-breadcrumbs-dropdown {
-        left: -15px;
-        min-width: 200px;
-        padding: 0;
-        margin-top: 0;
-        border: 0;
-        box-shadow: $dropdown-shadow;
-        > li {
-            padding: 0;
-            > a {
-                color: $color-primary;
-                padding: 12px 20px 3px;
-                border-bottom: solid 1px #e1e1e1;
-                &:hover {
-                    color: white !important;
-                    background: $color-primary !important;
-                }
-            }
-            &:last-child > a {
-                border-bottom: none;
-            }
-        }
-        img {
-            position: relative;
-            top: -5px;
-            vertical-align: top;
-            margin: 0 10px 0 0;
-        }
-    }
-}
-
 .dropdown-container {
     display: inline-block;
     position: relative;
@@ -404,11 +343,15 @@ body {
         display: none;
         right: 0;
         left: auto;
-        padding: 0;
         border: 0;
         box-shadow: $dropdown-shadow;
         > li > a {
-            padding: 12px 20px;
+            display: block;
+            white-space: normal;
+            padding: 12px 20px !important;
+            @media screen and (min-width: $screen-tablet) {
+                white-space: nowrap;
+            }
         }
         label {
             display: block;
@@ -498,7 +441,6 @@ body {
     display: none;
     float: left;
     min-width: 160px;
-    padding: 5px 0;
     margin: 2px 0 0;
     margin-top: 0 !important;
     list-style: none;
@@ -522,6 +464,66 @@ body {
     &.create-menu-dropdown:before {
         left: auto;
         right: 17px;
+    }
+}
+
+.navigator-breadcrumbs {
+    @include clearfix;
+    position: relative;
+    font-size: 16px;
+    white-space: nowrap;
+    .navigator-breadcrumbs-folder-name {
+        display: inline-block;
+        overflow: hidden;
+        font-size: 16px;
+        font-weight: bold;
+        vertical-align: top;
+        white-space: nowrap;
+    }
+    > a {
+        color: $gray-darkest !important;
+    }
+    .icon {
+        color: $gray-light;
+        margin: 0 5px;
+    }
+    li {
+        list-style-type: none;
+    }
+}
+.navigator-breadcrumbs-dropdown-container {
+    position: relative;
+    top: -5px;
+    float: left;
+    margin: 0 7px 0 0;
+    .navigator-breadcrumbs-dropdown {
+        left: -15px !important;
+        min-width: 200px;
+        padding: 0;
+        margin-top: 0;
+        border: 0;
+        box-shadow: $dropdown-shadow;
+        > li {
+            padding: 0;
+            > a {
+                color: $color-primary;
+                padding: 12px 20px 3px !important;
+                border-bottom: solid 1px #e1e1e1;
+                &:hover {
+                    color: white !important;
+                    background: $color-primary !important;
+                }
+            }
+            &:last-child > a {
+                border-bottom: none;
+            }
+        }
+        img {
+            position: relative;
+            top: -5px;
+            vertical-align: top;
+            margin: 0 10px 0 0;
+        }
     }
 }
 
