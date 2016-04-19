@@ -46,7 +46,7 @@
         }
         &.open + .dropdown-menu-checkboxes {
             display: block;
-            width: 100%;
+            width: calc(100% - 30px);
             transition: width $speed-base;
             li {
                 margin: 0;
