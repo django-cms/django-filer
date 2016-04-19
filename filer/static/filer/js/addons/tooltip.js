@@ -1,5 +1,5 @@
 'use strict';
-/* global django */
+/* global filerTooltip */
 
 var filerTooltip = function ($) {
     var tooltipSelector = '.js-filer-tooltip';
@@ -8,9 +8,7 @@ var filerTooltip = function ($) {
         var title = $(this).attr('title');
 
         $(this).data('tipText', title).removeAttr('title');
-        $('<p class="filer-tooltip"></p>')
-        .text(title)
-        .appendTo(tooltipSelector);
+        $('<p class="filer-tooltip"></p>').text(title).appendTo(tooltipSelector);
 
     }, function() {
         // Hover out code

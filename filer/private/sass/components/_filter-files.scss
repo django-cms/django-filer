@@ -16,7 +16,7 @@
     @media screen and (max-width: $screen-tablet) {
         float: left;
         width: auto;
-        margin-right :0;
+        margin-right: 0;
         .filter-files-button {
             float: none;
         }
@@ -44,7 +44,7 @@
                 padding: 0;
             }
         }
-        &.open + .dropdown-menu-checkboxes {
+        &.open + .filer-dropdown-menu-checkboxes {
             display: block;
             width: calc(100% - 30px);
             transition: width $speed-base;
