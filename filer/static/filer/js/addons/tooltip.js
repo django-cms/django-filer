@@ -3,16 +3,17 @@
 
 var filerTooltip = function ($) {
     var tooltipSelector = '.js-filer-tooltip';
+    var that = $(this);
 
-    $(tooltipSelector).hover(function(){
-        var title = $(this).attr('title');
+    $(tooltipSelector).on('hover', function () {
+        var title = that.attr('title');
 
-        $(this).data('tipText', title).removeAttr('title');
+        that.data('tipText', title).removeAttr('title');
         $('<p class="filer-tooltip"></p>').text(title).appendTo(tooltipSelector);
 
-    }, function() {
+    }, function () {
         // Hover out code
-        $(this).attr('title', $(this).data('tipText'));
+        that.attr('title', that.data('tipText'));
         $('.filer-tooltip').remove();
     });
 };

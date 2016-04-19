@@ -333,7 +333,7 @@ body {
     }
 }
 
-.dropdown-container {
+.filer-dropdown-container {
     display: inline-block;
     position: relative;
     vertical-align: top;
@@ -415,7 +415,7 @@ body {
         margin-right: 10px;
     }
 }
-.dropdown-container-down {
+.filer-dropdown-container-down {
     top: -5px;
     > a {
         &,
@@ -494,7 +494,7 @@ body {
         list-style-type: none;
     }
 }
-.navigator-breadcrumbs-dropdown-container {
+.filer-navigator-breadcrumbs-dropdown-container {
     position: relative;
     top: -5px;
     float: left;

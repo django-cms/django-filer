@@ -6,7 +6,7 @@ django.jQuery(function ($) {
     var containerSelector = $('.js-filter-files-container');
     var closeDropdown = $('.js-close-dropdown-menu-checkboxes');
     var navigatorTable = $('.navigator-table').find('tr');
-    var dropdownContainer = '.dropdown-container';
+    var dropdownContainer = '.filer-dropdown-container';
 
     dropdownMenus.on('click', function () {
         dropdownMenus.not(this).parent(dropdownContainer).removeClass('open');

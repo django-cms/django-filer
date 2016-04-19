@@ -44,7 +44,7 @@ Cl.mediator = new Mediator();
 
         $('.js-filter-files').on('focus blur', function (event) {
             var container = $(this).closest('.js-filter-files-container');
-            var dropdownTrigger = container.find('.dropdown-container a');
+            var dropdownTrigger = container.find('.filer-dropdown-container a');
 
             if (event.type === 'focus') {
                 container.addClass('is-focused');
@@ -67,7 +67,7 @@ Cl.mediator = new Mediator();
                     $(this).closest(containerSelector).addClass('is-focused');
                 });
 
-                if ($(containerSelector).find('.dropdown-container').hasClass('open')) {
+                if ($(containerSelector).find('.filer-dropdown-container').hasClass('open')) {
                     $(containerSelector).addClass('is-focused');
                 } else {
                    $(containerSelector).removeClass('is-focused');
