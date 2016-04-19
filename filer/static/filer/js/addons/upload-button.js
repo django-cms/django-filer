@@ -2,7 +2,7 @@
 // This script implements the upload button logic
 'use strict';
 
-/* globals qq, Cl, django */
+/* globals qq, Cl, django, filerTooltip */
 (function ($) {
     $(function () {
         var submitNum = 0;
