@@ -147,8 +147,10 @@ body {
     background: $gray-table;
     border-bottom: $gray-lighter solid 1px;
     .breadcrumbs-container {
+        float: left;
         margin-top: 6px;
         @media screen and (max-width: $screen-tablet) {
+            float: none;
             margin-right: 20px;
         }
     }
@@ -472,6 +474,7 @@ body {
     position: relative;
     font-size: 16px;
     white-space: nowrap;
+    z-index: 50;
     .navigator-breadcrumbs-folder-name {
         display: inline-block;
         overflow: hidden;

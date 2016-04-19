@@ -5,22 +5,23 @@
     @include clearfix;
     position: relative;
     float: right;
+    width: calc(60% - 420px);
     margin: 0 10px 0 0;
     padding: 0;
     background: none;
     box-shadow: none;
+    transition: width $speed-base;
+    z-index: 100;
     @media screen and (max-width: $screen-tablet) {
         float: left;
+        width: auto;
+        margin-right :0;
         .filter-files-button {
             float: none;
         }
     }
     &.is-focused {
-        .filter-files-field {
-            @media screen and (min-width: $screen-tablet) {
-                  width: 100% !important;
-            }
-        }
+        width: calc(100% - 420px);
     }
     .dropdown-container {
         position: absolute;
@@ -53,7 +54,11 @@
     .filter-search-wrapper {
         position: relative;
         float: right;
+        width: calc(100% - 43px);
         margin-right: 5px;
+        @media screen and (max-width: $screen-tablet) {
+            float: left;
+        }
     }
     .filter-files-button {
         float: right;
@@ -68,18 +73,18 @@
         }
     }
     .filter-files-field {
+        float: right;
         color: $gray-darkest;
         font-size: 12px !important;
         line-height: 34px;
         box-sizing: border-box;
-        width: 168px !important;
+        width: 100% !important;
         height: 34px;
         // required for django CMS <= 3.1 #673
         margin: 0;
         padding: 0 35px 0 10px !important;
         outline: none;
         appearance: none;
-        transition: width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;
