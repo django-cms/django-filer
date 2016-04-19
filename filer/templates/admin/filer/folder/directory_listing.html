@@ -175,8 +175,7 @@
                                 </a>
                             {% endif %}
                             {% if folder.is_root and folder.name != "unfiled files" %}
-                                <span class="js-upload-button-disabled upload-button-disabled"
-                                      data-toggle="tooltip" data-placement="bottom"
+                                <span class="js-upload-button-disabled upload-button-disabled js-filer-tooltip filer-tooltip-wrapper"
                                       title="{% trans 'You have to select a folder first' %}">
                                     <a href="#" class="navigator-button navigator-button-upload" disabled>
                                         {% trans "Upload Files" %}

@@ -26,7 +26,4 @@ django.jQuery(function ($) {
         $(containerSelector).find(dropdownContainer).removeClass('open');
         $(containerSelector).removeClass('is-focused');
     });
-
-
-
 });

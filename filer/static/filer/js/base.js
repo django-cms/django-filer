@@ -81,6 +81,13 @@ Cl.mediator = new Mediator();
             var actionList = $('.actions-wrapper');
             var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
+            // timeout is needed to wait until table row has class selected.
+            setTimeout(function () {
+                if (table.hasClass('selected')) {
+                    actionList.toggleClass('action-selected', table.hasClass('selected'));
+                }
+            }, 500);
+
             actionSelect.on('change click', function () {
                 actionList.toggleClass('action-selected', table.hasClass('selected'));
             });

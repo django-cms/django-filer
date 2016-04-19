@@ -17,5 +17,5 @@ django.jQuery(function ($) {
         tooltip.show().css('display', 'inline-block');
     }
 
-    tooltip.tooltip();
+    filerTooltip($);
 });
