@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.2.3 (unreleased)
+------------------
+
+* Added test for extended models
+* Added toolbar menu for django-cms projects
+
 1.2.2 (2016-06-23)
 ------------------
 

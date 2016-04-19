@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 
+from filer.test_utils.extended_app.models import Video, ExtImage
 from .. import settings as filer_settings
 from ..admin.folderadmin import FolderAdmin
 from ..models.filemodels import File
@@ -173,22 +174,25 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.client.login(username='admin', password='secret')
         self.img = create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR,
-                                     self.image_name)
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
+        self.video = create_image()
+        self.video_name = 'test_file.mov'
+        self.video_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.video_name)
+        self.video.save(self.video_filename, 'JPEG')
+        super(FilerClipboardAdminUrlsTests, self).setUp()
 
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
-        for img in Image.objects.all():
-            img.delete()
+        os.remove(self.video_filename)
+        super(FilerClipboardAdminUrlsTests, self).tearDown()
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
         file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse('admin:filer-ajax_upload',
-                      kwargs={'folder_id': folder.pk})
+        url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
         post_data = {
             'Filename': self.image_name,
             'Filedata': file_obj,
@@ -198,6 +202,46 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
+
+    def test_filer_upload_video(self, extra_headers={}):
+        with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
+            'filer.test_utils.extended_app.models.ExtImage',
+            'filer.test_utils.extended_app.models.Video',
+            'filer.models.imagemodels.Image',
+            'filer.models.filemodels.File'
+        )):
+            self.assertEqual(Video.objects.count(), 0)
+            folder = Folder.objects.create(name='foo')
+            file_obj = django.core.files.File(open(self.video_filename, 'rb'))
+            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            post_data = {
+                'Filename': self.video_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            response = self.client.post(url, post_data, **extra_headers)
+            self.assertEqual(Video.objects.count(), 1)
+            self.assertEqual(Video.objects.all()[0].original_filename, self.video_name)
+
+    def test_filer_upload_extimage(self, extra_headers={}):
+        with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
+            'filer.test_utils.extended_app.models.ExtImage',
+            'filer.test_utils.extended_app.models.Video',
+            'filer.models.imagemodels.Image',
+            'filer.models.filemodels.File'
+        )):
+            self.assertEqual(ExtImage.objects.count(), 0)
+            folder = Folder.objects.create(name='foo')
+            file_obj = django.core.files.File(open(self.filename, 'rb'))
+            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            post_data = {
+                'Filename': self.image_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            response = self.client.post(url, post_data, **extra_headers)
+            self.assertEqual(ExtImage.objects.count(), 1)
+            self.assertEqual(ExtImage.objects.all()[0].original_filename, self.image_name)
 
     def test_filer_upload_file_no_folder(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
