@@ -67,7 +67,7 @@ Cl.mediator = new Mediator();
                     $(this).closest(containerSelector).addClass('search-is-focused');
                 });
 
-                $(containerSelector).find('.filer-dropdown-container-down').on('show.bs.filer-dropdown', function () {
+                $(containerSelector).find('.filter-search-wrapper').find('.filer-dropdown-container').on('show.bs.filer-dropdown', function () {
                     $(containerSelector).addClass('search-is-focused');
                 }).on('hide.bs.filer-dropdown', function () {
                     $(containerSelector).removeClass('search-is-focused');
@@ -79,7 +79,7 @@ Cl.mediator = new Mediator();
         (function () {
             var navigatorTable = $('.navigator-table').find('tr');
             var actionList = $('.actions-wrapper');
-            var actionSelect = $('.action-select');
+            var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
@@ -88,12 +88,16 @@ Cl.mediator = new Mediator();
                 }
             }, 100);
 
-            actionSelect.on('click', function () {
-                if (!navigatorTable.hasClass('selected')) {
-                    actionList.addClass('action-selected');
-                } else {
-                    actionList.removeClass('action-selected');
-                }
+            actionSelect.on('change', function () {
+                // setTimeout makes sure that change event fires before click event which is reliable to admin
+                setTimeout(function () {
+                    if (navigatorTable.hasClass('selected')) {
+                        actionList.addClass('action-selected');
+                    } else {
+                        actionList.removeClass('action-selected');
+                    }
+                }, 0)
+
             });
         }());
 
@@ -165,24 +169,38 @@ Cl.mediator = new Mediator();
         (function () {
             var breadcrumbName = $('.navigator-breadcrumbs-folder-name-wrapper');
             var breadcrumbWidth = breadcrumbName.width();
-            var MIN_BREADCRUMB_WIDTH = 80;
-            var DEBOUNCE = 50
+            var minBreadcrumbWidth = 80;
             var header = $('.navigator-top-nav');
 
-            var getBreadcrumbWidth = function () {
-                if (breadcrumbWidth <= MIN_BREADCRUMB_WIDTH) {
-                    header.addClass('breadcrumb-min-width');
+            var breadcrumbContainer = $('.breadcrumbs-container');
+            var breadcrumbFolderWidth = breadcrumbContainer.find('.navigator-breadcrumbs').outerWidth();
+            var breadcrumbDropdownWidth = breadcrumbContainer.find('.filer-dropdown-container').outerWidth();
+            var searchWidth = $('.filter-files-container').outerWidth();
+            var actionsWidth = $('.actions-wrapper').outerWidth();
+            var buttonsWidth = $('.navigator-button-wrapper').outerWidth();
+            var headerPadding = 40;
+
+            var headerWidth = header.outerWidth();
+            var fullHeaderWidth = minBreadcrumbWidth + breadcrumbFolderWidth +
+                breadcrumbDropdownWidth + searchWidth + actionsWidth + buttonsWidth + headerPadding;
+
+            var breadcrumbSizeHandlerClassName = 'breadcrumb-min-width';
+
+            var breadcrumbSizeHandler = function () {
+
+                if (headerWidth < fullHeaderWidth) {
+                    header.addClass(breadcrumbSizeHandlerClassName);
                 } else {
-                    header.removeClass('breadcrumb-min-width');
+                    header.removeClass(breadcrumbSizeHandlerClassName);
                 }
             };
 
-            getBreadcrumbWidth();
+            breadcrumbSizeHandler();
 
-            $(window).on('resize', _.throttle(function () {
-                breadcrumbWidth = breadcrumbName.width();
-                getBreadcrumbWidth();
-            }, DEBOUNCE));
+            $(window).on('resize', function () {
+                headerWidth = header.outerWidth();
+                breadcrumbSizeHandler();
+            });
 
         }());
     });

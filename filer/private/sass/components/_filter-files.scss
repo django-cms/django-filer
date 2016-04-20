@@ -2,14 +2,22 @@
 // FILTER FILES
 
 .search-is-focused {
-    .breadcrumbs-container {
-        z-index: 999;
-    }
     .filter-files-container {
-        z-index: 1001;
-        .filter-files-field {
-            width: 100% !important;
+        position: static;
+    }
+    .filter-filers-container-inner {
+        position: absolute;
+        left: 0;
+        right: 0;
+        @media screen and (max-width: $screen-tablet) {
+            position: static;
         }
+    }
+    .breadcrumbs-container {
+        position: relative;
+    }
+    &.breadcrumb-min-width .filter-filers-container-inner {
+        position: static;
     }
 }
 
@@ -22,7 +30,6 @@
     padding: 0;
     background: none;
     box-shadow: none;
-    transition: width $speed-base;
     z-index: 1000;
     @media screen and (max-width: $screen-tablet) {
         display: block;
@@ -95,7 +102,7 @@
         padding: 0 35px 0 10px !important;
         outline: none;
         appearance: none;
-        transition: width $speed-base;
+        transition: max-width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;

@@ -126,7 +126,7 @@
                     </div>
                     {% if not folder.is_root or folder.is_smart_folder %}
 
-                        <span class="navigator-breadcrumbs-folder-name-wrapper">
+                        <div class="navigator-breadcrumbs-folder-name-wrapper">
                             <span class="navigator-breadcrumbs-folder-name">
                                 <span class="navigator-breadcrumbs-folder-name-inner">
                                     {% if folder.name != "unfiled files" %}
@@ -136,7 +136,7 @@
                                     {% endif %}
                                 </span>
                             </span>
-                        </span>
+                        </div>
 
                         {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                             <div class="filer-dropdown-container filer-dropdown-container-down">
@@ -152,36 +152,38 @@
                         {% endif %}
                     {% endif %}
                     <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
-                    <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
-                    <div class="filter-search-wrapper">
-                        {% filer_admin_context_hidden_formfields %}
-                        <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
-                        <div class="filer-dropdown-container filer-dropdown-container-down">
-                            <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                <span class="fa fa-caret-down"></span>
-                            </a>
+                        <div class="filter-filers-container-inner">
+                            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
+                            <div class="filter-search-wrapper">
+                                {% filer_admin_context_hidden_formfields %}
+                                <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+                                <div class="filer-dropdown-container filer-dropdown-container-down">
+                                    <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
+                                        <span class="fa fa-caret-down"></span>
+                                    </a>
+                                </div>
+                                <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
+                                    <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
+                                    <li>
+                                        <p>{% trans "Limit" %}</p>
+                                        <label>
+                                            <input type="checkbox" id="limit_search_to_folder"
+                                               name="limit_search_to_folder"
+                                               {% if limit_search_to_folder %}checked="checked"{% endif %}
+                                               title="{% trans 'Check it to limit the search to current folder' %}">
+                                            {% trans "Limit the search to current folder" %}
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
-                            <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
-                            <li>
-                                <p>{% trans "Limit" %}</p>
-                                <label>
-                                    <input type="checkbox" id="limit_search_to_folder"
-                                       name="limit_search_to_folder"
-                                       {% if limit_search_to_folder %}checked="checked"{% endif %}
-                                       title="{% trans 'Check it to limit the search to current folder' %}">
-                                    {% trans "Limit the search to current folder" %}
-                                </label>
-                            </li>
-                        </ul>
-                    </div>
                 </form>
                 </div>
             </div>
             <div class="tools-container">
                 {% block object-tools %}
                     <div class="navigator-tools">
-                        {% if paginated_items.object_list|length and not is_popup %}
+                        {% if not is_popup %}
                             <div class="actions-wrapper">
                                 <ul class="actions-separated-list">
                                     <li>

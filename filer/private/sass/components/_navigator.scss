@@ -156,6 +156,7 @@ body {
     .breadcrumbs-container-inner {
         display: table;
         table-layout: fixed;
+        width: 100%;
         @media screen and (max-width: $screen-tablet) {
             display: block;
         }
@@ -167,7 +168,6 @@ body {
     }
     .breadcrumbs-container {
         display: table-cell;
-        margin-top: 6px;
         @media screen and (max-width: $screen-tablet) {
             position: static;
             margin-right: 20px;
@@ -226,7 +226,8 @@ body {
     .breadcrumbs-container,
     .tools-container,
     .breadcrumbs-container-inner,
-    .filter-files-container {
+    .filter-files-container,
+    .navigator-button-wrapper {
         display: block;
         text-align: left;
         .actions-wrapper {
@@ -236,8 +237,12 @@ body {
             }
         }
     }
+    .navigator-button-wrapper {
+        margin: 10px 0 0;
+    }
     .filter-files-container {
         margin: 10px 0;
+        width: 245px;
     }
 }
 .navigator-tools {
@@ -258,8 +263,6 @@ body {
             @include clearfix();
             float: none;
             margin-left: 0;
-            margin-top: 10px;
-            margin-bottom: 10px;
         }
         &.action-selected {
             a {
