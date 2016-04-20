@@ -44,7 +44,7 @@ Cl.mediator = new Mediator();
 
         $('.js-filter-files').on('focus blur', function (event) {
             var container = $(this).closest('.js-filter-files-container');
-            var dropdownTrigger = container.find('.filer-dropdown-container a');
+            var dropdownTrigger = container.find('.dropdown-container a');
 
             if (event.type === 'focus') {
                 container.addClass('is-focused');
@@ -67,11 +67,11 @@ Cl.mediator = new Mediator();
                     $(this).closest(containerSelector).addClass('is-focused');
                 });
 
-                if ($(containerSelector).find('.filer-dropdown-container').hasClass('open')) {
+                $(containerSelector).find('.filer-dropdown-container').on('show.bs.filer-dropdown', function () {
                     $(containerSelector).addClass('is-focused');
-                } else {
-                   $(containerSelector).removeClass('is-focused');
-                }
+                }).on('hide.bs.filer-dropdown', function () {
+                    $(containerSelector).removeClass('is-focused');
+                });
             }
         }());
 
@@ -84,12 +84,15 @@ Cl.mediator = new Mediator();
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
                 if (table.hasClass('selected')) {
+                    console-log('selected')
                     actionList.toggleClass('action-selected', table.hasClass('selected'));
                 }
             }, 500);
 
             actionSelect.on('change click', function () {
-                actionList.toggleClass('action-selected', table.hasClass('selected'));
+                setTimeout(function () {
+                    actionList.toggleClass('action-selected', table.hasClass('selected'));
+                }, 500);
             });
         }());
 
@@ -147,6 +150,13 @@ Cl.mediator = new Mediator();
 
                 actionsSelect.find('option').eq(targetIndex).prop('selected', true);
                 actionsGo.trigger('click');
+            });
+
+            actionsMenu.on('click', function (e) {
+                if (!navigatorTable.hasClass('selected')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             });
         }());
     });

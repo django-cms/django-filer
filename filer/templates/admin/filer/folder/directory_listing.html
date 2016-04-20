@@ -96,7 +96,7 @@
 
             <div class="navigator-breadcrumbs">
                 <div class="filer-navigator-breadcrumbs-dropdown-container filer-dropdown-container">
-                    <a href="#" class="js-filer-dropdown-menu">
+                    <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
                         <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
                     </a>
                     <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
@@ -132,7 +132,7 @@
 
                     {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                         <div class="filer-dropdown-container filer-dropdown-container-down">
-                            <a href="#" class="js-filer-dropdown-menu">
+                            <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
                                 <span class="fa fa-caret-down"></span>
                             </a>
                             <ul class="filer-dropdown-menu">
@@ -198,11 +198,11 @@
                                 </li>
                             </ul>
                             <div class="filer-dropdown-container js-actions-menu">
-                                <a href="#" class="js-filer-dropdown-menu nav-button nav-button-dots">
+                                <a href="#" data-toggle="filer-dropdown" aria-expanded="false" class="nav-button nav-button-dots">
                                     <span class="fa fa-ellipsis-h"></span>
                                 </a>
                                 <ul class="create-menu-dropdown filer-dropdown-menu">
-                                    <!-- Actions will go here -->
+                                    {# This list is populated in javascript #}
                                 </ul>
                             </div>
                         </div>
@@ -213,7 +213,7 @@
                             {% filer_admin_context_hidden_formfields %}
                             <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
                             <div class="filer-dropdown-container filer-dropdown-container-down">
-                                <a href="#" class="js-filer-dropdown-menu">
+                                <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
                                     <span class="fa fa-caret-down"></span>
                                 </a>
                             </div>
