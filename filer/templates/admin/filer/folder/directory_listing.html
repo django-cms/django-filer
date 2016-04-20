@@ -124,33 +124,36 @@
                             <span class="icon fa fa-chevron-right"></span>
                         {% endif %}
                     </div>
-                    {% if not folder.is_root or folder.is_smart_folder %}
+                    <div class="navigator-breadcrumbs-name-dropdown-wrapper">
+                        {% if not folder.is_root or folder.is_smart_folder %}
 
-                        <div class="navigator-breadcrumbs-folder-name-wrapper">
-                            <span class="navigator-breadcrumbs-folder-name">
-                                <span class="navigator-breadcrumbs-folder-name-inner">
-                                    {% if folder.name != "unfiled files" %}
-                                        {{ folder.name }}
-                                    {% else %}
-                                        {% trans "Unsorted Uploads" %}
-                                    {% endif %}
+                            <div class="navigator-breadcrumbs-folder-name-wrapper">
+                                <span class="navigator-breadcrumbs-folder-name">
+                                    <span class="navigator-breadcrumbs-folder-name-inner">
+                                        {% if folder.name != "unfiled files" %}
+                                            {{ folder.name }}
+                                        {% else %}
+                                            {% trans "Unsorted Uploads" %}
+                                        {% endif %}
+                                    </span>
                                 </span>
-                            </span>
-                        </div>
-
-                        {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
-                            <div class="filer-dropdown-container filer-dropdown-container-down">
-                                <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                    <span class="fa fa-caret-down"></span>
-                                </a>
-                                <ul class="filer-dropdown-menu">
-                                    <li>
-                                        <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
-                                    </li>
-                                </ul>
                             </div>
+
+                            {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
+                                <div class="filer-dropdown-container filer-dropdown-container-down">
+                                    <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
+                                        <span class="fa fa-caret-down"></span>
+                                    </a>
+                                    <ul class="filer-dropdown-menu">
+                                        <li>
+                                            <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
+                        <div class="empty-filer-header-cell"></div>
+                    </div>
                     <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
                         <div class="filter-filers-container-inner">
                             <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>

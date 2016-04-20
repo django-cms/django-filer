@@ -610,3 +610,11 @@ body {
         box-shadow: $dropdown-shadow;
     }
 }
+
+.navigator-breadcrumbs-name-dropdown-wrapper {
+    display: table;
+}
+
+.empty-filer-header-cell {
+    display: table-cell;
+}
