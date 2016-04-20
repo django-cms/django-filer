@@ -86,12 +86,10 @@ Cl.mediator = new Mediator();
                 if (table.hasClass('selected')) {
                     actionList.toggleClass('action-selected', table.hasClass('selected'));
                 }
-            }, 500);
+            }, 100);
 
             actionSelect.on('change click', function () {
-                setTimeout(function () {
-                    actionList.toggleClass('action-selected', table.hasClass('selected'));
-                }, 500);
+                actionList.toggleClass('action-selected', table.hasClass('selected'));
             });
         }());
 
