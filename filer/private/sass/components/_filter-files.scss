@@ -1,29 +1,36 @@
 //##############################################################################
 // FILTER FILES
 
+.search-is-focused {
+    .breadcrumbs-container {
+        z-index: 999;
+    }
+    .filter-files-container {
+        z-index: 1001;
+        .filter-files-field {
+            width: 100% !important;
+        }
+    }
+}
+
 .filter-files-container {
     @include clearfix;
+    display: table-cell;
     position: relative;
-    float: right;
-    width: 200px;
+    width: 245px;
     margin: 0;
     padding: 0;
     background: none;
     box-shadow: none;
     transition: width $speed-base;
-    z-index: 100;
+    z-index: 1000;
     @media screen and (max-width: $screen-tablet) {
-        float: left;
+        display: block;
         width: auto;
         margin-right: 0;
+        margin-top: 10px;
         .filter-files-button {
             float: none;
-        }
-    }
-    &.is-focused {
-        width: 50%;
-        @media screen and (max-width: $screen-tablet) {
-            width: auto;
         }
     }
     .filer-dropdown-container {
@@ -46,7 +53,6 @@
         &.open + .filer-dropdown-menu-checkboxes {
             display: block;
             width: calc(100% - 30px);
-            transition: width $speed-base;
             li {
                 margin: 0;
                 padding: 0;
@@ -56,7 +62,8 @@
     }
     .filter-search-wrapper {
         position: relative;
-        float: right;
+        float: left;
+        text-align: right;
         width: calc(100% - 43px);
         margin-right: 5px;
         @media screen and (max-width: $screen-tablet) {
@@ -66,6 +73,7 @@
     .filter-files-button {
         float: right;
         text-align: center;
+        white-space: nowrap;
         margin: 0;
         padding: 8px !important;
         .icon {
@@ -76,18 +84,18 @@
         }
     }
     .filter-files-field {
-        float: right;
         color: $gray-darkest;
         font-size: 12px !important;
         line-height: 34px;
         box-sizing: border-box;
-        width: 100% !important;
+        min-width: 200px !important;
         height: 34px;
         // required for django CMS <= 3.1 #673
         margin: 0;
         padding: 0 35px 0 10px !important;
         outline: none;
         appearance: none;
+        transition: width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;

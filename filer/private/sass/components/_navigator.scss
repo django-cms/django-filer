@@ -143,11 +143,30 @@ body {
     position: relative;
     clear: both;
     min-height: 34px;
-    padding: 15px 20px 11px;
+    padding: 15px 20px;
     background: $gray-table;
     border-bottom: $gray-lighter solid 1px;
+    .breadcrumbs-container-wrapper {
+        display: table;
+        width: 100%;
+        @media screen and (max-width: $screen-tablet) {
+            display: block;
+        }
+    }
+    .breadcrumbs-container-inner {
+        display: table;
+        table-layout: fixed;
+        @media screen and (max-width: $screen-tablet) {
+            display: block;
+        }
+        .filer-dropdown-container {
+            display: table-cell;
+            width: 30px;
+            vertical-align: middle;
+        }
+    }
     .breadcrumbs-container {
-        position: absolute;
+        display: table-cell;
         margin-top: 6px;
         @media screen and (max-width: $screen-tablet) {
             position: static;
@@ -156,11 +175,12 @@ body {
     }
     .tools-container {
         @include clearfix;
-        position: relative;
+        display: table-cell;
+        text-align: right;
         margin-top: 2px;
         @media screen and (max-width: $screen-tablet) {
-            position: static;
-            width: 100%;
+            display: inline;
+            text-align: left;
         }
     }
     .nav-button {
@@ -201,17 +221,35 @@ body {
         }
     }
 }
+.breadcrumb-min-width {
+    .breadcrumbs-container-wrapper,
+    .breadcrumbs-container,
+    .tools-container,
+    .breadcrumbs-container-inner,
+    .filter-files-container {
+        display: block;
+        text-align: left;
+        .actions-wrapper {
+            margin-left: 0;
+            li:first-child {
+                padding-left: 0;
+            }
+        }
+    }
+    .filter-files-container {
+        margin: 10px 0;
+    }
+}
 .navigator-tools {
     @include clearfix;
-    float: right;
-    width: 50%;
+    white-space: nowrap;
     @media screen and (max-width: $screen-tablet) {
-        float: none;
-        width: auto;
+        display: inline;
     }
     .actions-wrapper {
-        float: right;
+        display: inline-block;
         margin-bottom: 0;
+        margin-left: 10px;
         a, a:hover {
             color: $gray-light !important;
             cursor: not-allowed;
@@ -280,7 +318,8 @@ body {
 }
 // make sure that buttons break to new line on mobile view #677
 .navigator-button-wrapper {
-    float: right;
+    display: inline-block;
+    vertical-align: top;
     text-align: right;
     margin-bottom: 0;
     margin-left: 10px;
@@ -290,10 +329,6 @@ body {
         text-align: left;
         margin-top: 0;
         margin-left: 0;
-    }
-    @media screen and (min-width: $screen-desktop) {
-        float: right;
-        margin-left: 10px;
     }
 }
 .navigator-button {
@@ -420,7 +455,6 @@ body {
     }
 }
 .filer-dropdown-container-down {
-    top: -5px;
     > a {
         &,
         &:link,
@@ -475,34 +509,53 @@ body {
 
 .navigator-breadcrumbs {
     @include clearfix;
-    position: relative;
+    display: table-cell;
     font-size: 16px;
     white-space: nowrap;
-    z-index: 50;
-    .navigator-breadcrumbs-folder-name {
-        display: inline-block;
-        overflow: hidden;
-        font-size: 16px;
-        font-weight: bold;
-        vertical-align: top;
-        white-space: nowrap;
-    }
+    width: 60px;
     > a {
         color: $gray-darkest !important;
     }
     .icon {
         color: $gray-light;
         margin: 0 5px;
+        vertical-align: sub;
+        &:before {
+            vertical-align: sub;
+        }
     }
     li {
         list-style-type: none;
     }
 }
+.navigator-breadcrumbs-folder-name-wrapper {
+    display: table-cell;
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.navigator-breadcrumbs-folder-name {
+    display: block;
+    overflow: hidden;
+    white-space: normal;
+    line-height: 18px;
+    width: 100%;
+    height: 18px;
+}
+.navigator-breadcrumbs-folder-name-inner {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    text-overflow: ellipsis;
+}
 .filer-navigator-breadcrumbs-dropdown-container {
     position: relative;
-    top: -5px;
     float: left;
-    margin: 0 7px 0 0;
+    vertical-align: middle;
+    margin: 2px 7px 0 0;
     .navigator-breadcrumbs-dropdown {
         left: -15px !important;
         min-width: 200px;

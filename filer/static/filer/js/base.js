@@ -43,14 +43,14 @@ Cl.mediator = new Mediator();
         }
 
         $('.js-filter-files').on('focus blur', function (event) {
-            var container = $(this).closest('.js-filter-files-container');
+            var container = $(this).closest('.navigator-top-nav');
             var dropdownTrigger = container.find('.dropdown-container a');
 
             if (event.type === 'focus') {
-                container.addClass('is-focused');
+                container.addClass('search-is-focused');
             } else {
                 if (!dropdownTrigger.is(event.relatedTarget)) {
-                    container.removeClass('is-focused');
+                    container.removeClass('search-is-focused');
                 }
             }
         });
@@ -58,19 +58,19 @@ Cl.mediator = new Mediator();
         // Focus on the search field on page load
         (function () {
             var filter = $('.js-filter-files');
-            var containerSelector = '.js-filter-files-container';
+            var containerSelector = '.navigator-top-nav';
 
             if (filter.length) {
                 filter.focus().closest(containerSelector)
-                    .removeClass('is-focused');
+                    .removeClass('search-is-focused');
                 filter.on('keydown', function () {
-                    $(this).closest(containerSelector).addClass('is-focused');
+                    $(this).closest(containerSelector).addClass('search-is-focused');
                 });
 
-                $(containerSelector).find('.filer-dropdown-container').on('show.bs.filer-dropdown', function () {
-                    $(containerSelector).addClass('is-focused');
+                $(containerSelector).find('.filer-dropdown-container-down').on('show.bs.filer-dropdown', function () {
+                    $(containerSelector).addClass('search-is-focused');
                 }).on('hide.bs.filer-dropdown', function () {
-                    $(containerSelector).removeClass('is-focused');
+                    $(containerSelector).removeClass('search-is-focused');
                 });
             }
         }());
@@ -159,6 +159,31 @@ Cl.mediator = new Mediator();
                     e.stopPropagation();
                 }
             });
+        }());
+
+        // breaks header if breadcrumbs name reaches a width of 80px
+        (function () {
+            var breadcrumbName = $('.navigator-breadcrumbs-folder-name-wrapper');
+            var breadcrumbWidth = breadcrumbName.width();
+            var MIN_BREADCRUMB_WIDTH = 80;
+            var DEBOUNCE = 50
+            var header = $('.navigator-top-nav');
+
+            var getBreadcrumbWidth = function () {
+                if (breadcrumbWidth <= MIN_BREADCRUMB_WIDTH) {
+                    header.addClass('breadcrumb-min-width');
+                } else {
+                    header.removeClass('breadcrumb-min-width');
+                }
+            };
+
+            getBreadcrumbWidth();
+
+            $(window).on('resize', _.throttle(function () {
+                breadcrumbWidth = breadcrumbName.width();
+                getBreadcrumbWidth();
+            }, DEBOUNCE));
+
         }());
     });
 })(django.jQuery);

@@ -173,12 +173,12 @@
     // ===================================
 
     $(document)
-    .on('click.bs.filer-dropdown.data-api', clearMenus)
-    .on('click.bs.filer-dropdown.data-api', '.filer-dropdown form', function (e) {
-            e.stopPropagation();
-        })
-    .on('click.bs.filer-dropdown.data-api', toggle, Dropdown.prototype.toggle)
-    .on('keydown.bs.filer-dropdown.data-api', toggle, Dropdown.prototype.keydown)
-    .on('keydown.bs.filer-dropdown.data-api', '.filer-dropdown-menu', Dropdown.prototype.keydown);
+        .on('click.bs.filer-dropdown.data-api', clearMenus)
+        .on('click.bs.filer-dropdown.data-api', '.filer-dropdown form', function (e) {
+                e.stopPropagation();
+            })
+        .on('click.bs.filer-dropdown.data-api', toggle, Dropdown.prototype.toggle)
+        .on('keydown.bs.filer-dropdown.data-api', toggle, Dropdown.prototype.keydown)
+        .on('keydown.bs.filer-dropdown.data-api', '.filer-dropdown-menu', Dropdown.prototype.keydown);
 
 })(django.jQuery);
