@@ -77,19 +77,23 @@ Cl.mediator = new Mediator();
 
         // show counter if file is selected
         (function () {
-            var table = $('.navigator-table').find('tr');
+            var navigatorTable = $('.navigator-table').find('tr');
             var actionList = $('.actions-wrapper');
-            var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
+            var actionSelect = $('.action-select');
 
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
-                if (table.hasClass('selected')) {
-                    actionList.toggleClass('action-selected', table.hasClass('selected'));
+                if (navigatorTable.hasClass('selected')) {
+                    actionList.addClass('action-selected');
                 }
             }, 100);
 
-            actionSelect.on('change click', function () {
-                actionList.toggleClass('action-selected', table.hasClass('selected'));
+            actionSelect.on('click', function () {
+                if (!navigatorTable.hasClass('selected')) {
+                    actionList.addClass('action-selected');
+                } else {
+                    actionList.removeClass('action-selected');
+                }
             });
         }());
 
