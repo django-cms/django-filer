@@ -84,7 +84,6 @@ Cl.mediator = new Mediator();
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
                 if (table.hasClass('selected')) {
-                    console-log('selected')
                     actionList.toggleClass('action-selected', table.hasClass('selected'));
                 }
             }, 500);

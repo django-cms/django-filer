@@ -1,5 +1,5 @@
 'use strict';
-/* global django */
+/* global django, Cl */
 
 /*
     This functionality is used in folder/choose_copy_destination.html template
