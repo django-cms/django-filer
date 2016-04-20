@@ -11,7 +11,8 @@ class Migration(SchemaMigration):
 
         # we are about to turn subject_location to not nullable. So any
         # existing entries with Null need to be converted to empty strings.
-        orm.Image.objects.filter(subject_location__isnull=True).update(subject_location='')
+        if not db.dry_run:
+            orm.Image.objects.filter(subject_location__isnull=True).update(subject_location='')
         db.alter_column('filer_image', 'subject_location', self.gf('django.db.models.fields.CharField')(max_length=64))
 
     def backwards(self, orm):
