@@ -102,3 +102,24 @@ class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
 
 class FilerActionThumbnailer(ActionThumbnailerMixin, Thumbnailer):
     pass
+
+
+def load_aliases():
+    """
+    Load ThumbnailOption as easy-thumbnails aliases
+    """
+    from easy_thumbnails.alias import aliases
+
+    def _load_aliases():
+        from filer.models import ThumbnailOption
+        thumbs = ThumbnailOption.objects.all()
+        for thumb in thumbs:
+            if not aliases.get(thumb.name):
+                aliases.set(thumb.name, thumb.as_dict)
+
+    try:
+        if not aliases.filer_loaded:
+            _load_aliases()
+    except AttributeError:
+        _load_aliases()
+    aliases.filer_loaded = True
