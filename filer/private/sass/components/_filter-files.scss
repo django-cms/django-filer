@@ -5,9 +5,8 @@
     @include clearfix;
     position: relative;
     float: right;
-    width: calc(60% - 420px);
-    min-width: 170px;
-    margin: 0 10px 0 0;
+    width: 200px;
+    margin: 0;
     padding: 0;
     background: none;
     box-shadow: none;
@@ -22,7 +21,7 @@
         }
     }
     &.is-focused {
-        width: calc(100% - 420px);
+        width: 50%;
         @media screen and (max-width: $screen-tablet) {
             width: auto;
         }

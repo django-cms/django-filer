@@ -207,32 +207,32 @@
                             </div>
                         </div>
                     {% endif %}
-                    <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
-                        <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
-                        <div class="filter-search-wrapper">
-                            {% filer_admin_context_hidden_formfields %}
-                            <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
-                            <div class="filer-dropdown-container filer-dropdown-container-down">
-                                <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                    <span class="fa fa-caret-down"></span>
-                                </a>
-                            </div>
-                            <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
-                                <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
-                                <li>
-                                    <p>{% trans "Limit" %}</p>
-                                    <label>
-                                        <input type="checkbox" id="limit_search_to_folder"
-                                           name="limit_search_to_folder"
-                                           {% if limit_search_to_folder %}checked="checked"{% endif %}
-                                           title="{% trans 'Check it to limit the search to current folder' %}">
-                                        {% trans "Limit the search to current folder" %}
-                                    </label>
-                                </li>
-                            </ul>
-                        </div>
-                    </form>
                 </div>
+                <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
+                    <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
+                    <div class="filter-search-wrapper">
+                        {% filer_admin_context_hidden_formfields %}
+                        <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+                        <div class="filer-dropdown-container filer-dropdown-container-down">
+                            <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                        </div>
+                        <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
+                            <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
+                            <li>
+                                <p>{% trans "Limit" %}</p>
+                                <label>
+                                    <input type="checkbox" id="limit_search_to_folder"
+                                       name="limit_search_to_folder"
+                                       {% if limit_search_to_folder %}checked="checked"{% endif %}
+                                       title="{% trans 'Check it to limit the search to current folder' %}">
+                                    {% trans "Limit the search to current folder" %}
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
             {% endblock %}
         </div>
     </div>
