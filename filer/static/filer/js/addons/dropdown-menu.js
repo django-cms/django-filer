@@ -1,5 +1,3 @@
-'use strict';
-/* global django */
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -7,8 +5,9 @@
  * Copyright 2011-2016 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
+'use strict';
 
-
+/* global django */
 (function ($) {
 
     // DROPDOWN CLASS DEFINITION
