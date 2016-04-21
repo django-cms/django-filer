@@ -7,6 +7,7 @@
     }
     .filter-filers-container-inner {
         position: absolute;
+        top: 0;
         left: 0;
         right: 0;
         @media screen and (max-width: $screen-tablet) {
