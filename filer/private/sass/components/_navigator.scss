@@ -636,6 +636,14 @@ body {
 
 .navigator-breadcrumbs-name-dropdown-wrapper {
     display: table;
+    .filer-dropdown-menu {
+        left: auto;
+        right: -14px;
+        &:before {
+            right: 15px;
+            left: auto;
+        }
+    }
 }
 
 .empty-filer-header-cell {
