@@ -119,8 +119,13 @@ body {
             background: $hover-bg !important;
             box-sizing: border-box !important;
             a {
+                &.action-button {
+                    border-color: $gray-lighter !important;
+                    color: $gray-lighter !important;
+                    background-color: white !important;
+                }
                 &.icon {
-                    color: $gray-darker !important;
+                    color: $gray-lighter !important;
                     background-color: white !important;
                 }
                 color: $color-primary !important;
@@ -137,9 +142,15 @@ body {
             box-sizing: border-box !important;
         }
     }
-    .reset-hover {
+    .reset-hover,
+    &.reset-hover {
         td {
             background-color: $white !important;
+        }
+        .dz-drag-hover {
+            td {
+                background: $hover-bg !important;
+            }
         }
     }
 }
