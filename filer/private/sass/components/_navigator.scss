@@ -429,6 +429,7 @@ body {
             display: block;
             line-height: 20px !important;
             text-transform: none;
+            width: auto;
             margin: 5px 0 !important;
             padding: 0 10px !important;
         }
@@ -459,13 +460,18 @@ body {
             }
             p {
                 color: $gray-light !important;
+                font-weight: normal;
                 text-transform: uppercase;
                 margin-bottom: 5px;
             }
             label {
                 color: $gray !important;
+                font-weight: normal;
                 padding: 0 !important;
                 margin-top: 0 !important;
+                input {
+                    margin-left: 0;
+                }
             }
         }
         a:hover {
