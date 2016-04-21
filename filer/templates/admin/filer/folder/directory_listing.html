@@ -139,8 +139,8 @@
                                 </span>
                             </div>
 
-                            {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
-                                <div class="filer-dropdown-container filer-dropdown-container-down">
+                            <div class="filer-dropdown-container filer-dropdown-container-down">
+                                {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
                                         <span class="fa fa-caret-down"></span>
                                     </a>
@@ -149,8 +149,8 @@
                                             <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
                                         </li>
                                     </ul>
-                                </div>
-                            {% endif %}
+                                {% endif %}
+                            </div>
                         {% endif %}
                         <div class="empty-filer-header-cell"></div>
                     </div>

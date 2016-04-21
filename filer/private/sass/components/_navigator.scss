@@ -255,6 +255,12 @@ body {
             }
         }
     }
+    .navigator-breadcrumbs-name-dropdown-wrapper {
+        min-height: inherit;
+        .filer-dropdown-container .fa-caret-down {
+            vertical-align: text-top;
+        }
+    }
     .breadcrumbs-container-inner .filer-dropdown-container {
        display: inline-block !important;
     }
@@ -264,6 +270,7 @@ body {
     .filter-files-container {
         width: 100%;
         margin-top: 10px;
+        margin-bottom: 10px;
         z-index: auto;
     }
     .breadcrumbs-container {
@@ -275,9 +282,6 @@ body {
     .navigator-breadcrumbs-folder-name-wrapper {
         float: left;
         width: calc(100% - 30px);
-    }
-    .navigator-breadcrumbs-folder-name {
-        margin-top: 5px;
     }
     .filer-navigator-breadcrumbs-dropdown-container {
         margin-top: 0;
@@ -660,6 +664,7 @@ body {
 
 .navigator-breadcrumbs-name-dropdown-wrapper {
     display: table;
+    min-height: 35px;
     .filer-dropdown-menu {
         left: auto;
         right: -14px;
