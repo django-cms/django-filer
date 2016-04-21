@@ -9,6 +9,11 @@ body {
         .navigator-table tbody td,
         .navigator-table tbody .unfiled td {
             background-color: $hover-bg !important;
+            a.action-button {
+                border-color: $gray-lighter !important;
+                color: $gray-lighter !important;
+                background-color: white !important;
+            }
         }
     }
     &.reset-hover td {
@@ -140,6 +145,11 @@ body {
         td {
             background: $hover-bg !important;
             box-sizing: border-box !important;
+            a.action-button {
+                border-color: $gray-lighter !important;
+                color: $gray-lighter !important;
+                background-color: white !important;
+            }
         }
     }
     .reset-hover,
