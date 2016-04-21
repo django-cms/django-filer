@@ -24,6 +24,7 @@
 .filter-files-container {
     @include clearfix;
     display: table-cell;
+    vertical-align: middle;
     position: relative;
     width: 245px;
     margin: 0;

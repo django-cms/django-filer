@@ -180,6 +180,7 @@ body {
     }
     .breadcrumbs-container {
         display: table-cell;
+        vertical-align: middle;
         @media screen and (max-width: $screen-tablet) {
             position: static;
             margin-right: 20px;
@@ -671,4 +672,5 @@ body {
 
 .empty-filer-header-cell {
     display: table-cell;
+    vertical-align: middle;
 }
