@@ -10,6 +10,7 @@ A file management application for django that makes handling of files and images
 
 .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/filer_1.png
 .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/filer_2.png
+.. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/filer_3.png
 
 
 Filer detail view:
