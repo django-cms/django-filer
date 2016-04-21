@@ -1,28 +1,46 @@
 //##############################################################################
 // FILTER FILES
 
+.search-is-focused {
+    .filter-files-container {
+        position: static;
+    }
+    .filter-filers-container-inner {
+        position: absolute;
+        left: 0;
+        right: 0;
+        @media screen and (max-width: $screen-tablet) {
+            position: static;
+        }
+    }
+    .breadcrumbs-container {
+        position: relative;
+    }
+    &.breadcrumb-min-width .filter-filers-container-inner {
+        position: static;
+    }
+}
+
 .filter-files-container {
     @include clearfix;
+    display: table-cell;
     position: relative;
-    float: left;
-    margin: 0 10px 0 0;
+    width: 245px;
+    margin: 0;
     padding: 0;
     background: none;
     box-shadow: none;
+    z-index: 1000;
     @media screen and (max-width: $screen-tablet) {
-        float: none;
+        display: block;
+        width: auto;
+        margin-right: 0;
+        margin-top: 10px;
         .filter-files-button {
             float: none;
         }
     }
-    &.is-focused {
-        .filter-files-field {
-            @media screen and (min-width: $screen-tablet) {
-                  width: 336px !important;
-            }
-        }
-    }
-    .dropdown-container {
+    .filer-dropdown-container {
         position: absolute;
         top: 0;
         right: 0;
@@ -39,10 +57,9 @@
                 padding: 0;
             }
         }
-        &.open + .dropdown-menu-checkboxes {
+        &.open + .filer-dropdown-menu-checkboxes {
             display: block;
-            width: 100%;
-            transition: width $speed-base;
+            width: calc(100% - 30px);
             li {
                 margin: 0;
                 padding: 0;
@@ -53,6 +70,8 @@
     .filter-search-wrapper {
         position: relative;
         float: left;
+        text-align: right;
+        width: calc(100% - 43px);
         margin-right: 5px;
         @media screen and (max-width: $screen-tablet) {
             float: left;
@@ -61,6 +80,8 @@
     .filter-files-button {
         float: right;
         text-align: center;
+        white-space: nowrap;
+        height: 34px;
         margin: 0;
         padding: 8px !important;
         .icon {
@@ -69,29 +90,27 @@
             font-size: 16px !important;
             vertical-align: top;
         }
-        @media screen and (max-width: $screen-tablet) {
-            float: none;
-        }
     }
     .filter-files-field {
         color: $gray-darkest;
         font-size: 12px !important;
         line-height: 34px;
+        font-weight: normal;
         box-sizing: border-box;
-        width: 168px !important;
+        min-width: 200px !important;
         height: 34px;
         // required for django CMS <= 3.1 #673
         margin: 0;
         padding: 0 35px 0 10px !important;
         outline: none;
         appearance: none;
-        transition: width $speed-base;
+        transition: max-width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;
         }
     }
-    .dropdown-menu {
+    .filer-dropdown-menu {
         margin-top: 0 !important;
         margin-right: -1px !important;
     }

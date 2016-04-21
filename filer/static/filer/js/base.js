@@ -43,14 +43,14 @@ Cl.mediator = new Mediator();
         }
 
         $('.js-filter-files').on('focus blur', function (event) {
-            var container = $(this).closest('.js-filter-files-container');
+            var container = $(this).closest('.navigator-top-nav');
             var dropdownTrigger = container.find('.dropdown-container a');
 
             if (event.type === 'focus') {
-                container.addClass('is-focused');
+                container.addClass('search-is-focused');
             } else {
                 if (!dropdownTrigger.is(event.relatedTarget)) {
-                    container.removeClass('is-focused');
+                    container.removeClass('search-is-focused');
                 }
             }
         });
@@ -58,37 +58,51 @@ Cl.mediator = new Mediator();
         // Focus on the search field on page load
         (function () {
             var filter = $('.js-filter-files');
-            var containerSelector = '.js-filter-files-container';
+            var containerSelector = '.navigator-top-nav';
+            var searchDropdown = $(containerSelector).find('.filter-search-wrapper').find('.filer-dropdown-container');
 
             if (filter.length) {
-                filter.focus().closest(containerSelector)
-                    .removeClass('is-focused');
                 filter.on('keydown', function () {
-                    $(this).closest(containerSelector).addClass('is-focused');
+                    $(this).closest(containerSelector).addClass('search-is-focused');
                 });
 
-                $(containerSelector).find('.dropdown-container').on('show.bs.dropdown', function () {
-                    $(containerSelector).addClass('is-focused');
-                }).on('hide.bs.dropdown', function () {
-                    $(containerSelector).removeClass('is-focused');
+                searchDropdown.on('show.bs.filer-dropdown', function () {
+                    $(containerSelector).addClass('search-is-focused');
+                }).on('hide.bs.filer-dropdown', function () {
+                    $(containerSelector).removeClass('search-is-focused');
                 });
             }
         }());
 
         // show counter if file is selected
         (function () {
-            var table = $('.navigator-table').find('tr');
+            var navigatorTable = $('.navigator-table').find('tr');
             var actionList = $('.actions-wrapper');
             var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
 
-            actionSelect.on('change click', function () {
-                actionList.toggleClass('action-selected', table.hasClass('selected'));
+            // timeout is needed to wait until table row has class selected.
+            setTimeout(function () {
+                if (navigatorTable.hasClass('selected')) {
+                    actionList.addClass('action-selected');
+                }
+            }, 100);
+
+            actionSelect.on('change', function () {
+                // setTimeout makes sure that change event fires before click event which is reliable to admin
+                setTimeout(function () {
+                    if (navigatorTable.hasClass('selected')) {
+                        actionList.addClass('action-selected');
+                    } else {
+                        actionList.removeClass('action-selected');
+                    }
+                }, 0);
+
             });
         }());
 
         (function () {
             var actionsMenu = $('.js-actions-menu');
-            var dropdown = actionsMenu.find('.dropdown-menu');
+            var dropdown = actionsMenu.find('.filer-dropdown-menu');
             var actionsSelect = $('.actions select[name="action"]');
             var actionsSelectOptions = actionsSelect.find('option');
             var actionsGo = $('.actions button[type="submit"]');
@@ -148,6 +162,42 @@ Cl.mediator = new Mediator();
                     e.stopPropagation();
                 }
             });
+        }());
+
+        // breaks header if breadcrumbs name reaches a width of 80px
+        (function () {
+            var minBreadcrumbWidth = 80;
+            var header = $('.navigator-top-nav');
+
+            var breadcrumbContainer = $('.breadcrumbs-container');
+            var breadcrumbFolderWidth = breadcrumbContainer.find('.navigator-breadcrumbs').outerWidth();
+            var breadcrumbDropdownWidth = breadcrumbContainer.find('.filer-dropdown-container').outerWidth();
+            var searchWidth = $('.filter-files-container').outerWidth();
+            var actionsWidth = $('.actions-wrapper').outerWidth();
+            var buttonsWidth = $('.navigator-button-wrapper').outerWidth();
+            var headerPadding = parseInt(header.css('padding-left'), 10) + parseInt(header.css('padding-right'), 10);
+
+            var headerWidth = header.outerWidth();
+            var fullHeaderWidth = minBreadcrumbWidth + breadcrumbFolderWidth +
+                breadcrumbDropdownWidth + searchWidth + actionsWidth + buttonsWidth + headerPadding;
+
+            var breadcrumbSizeHandlerClassName = 'breadcrumb-min-width';
+
+            var breadcrumbSizeHandler = function () {
+                if (headerWidth < fullHeaderWidth) {
+                    header.addClass(breadcrumbSizeHandlerClassName);
+                } else {
+                    header.removeClass(breadcrumbSizeHandlerClassName);
+                }
+            };
+
+            breadcrumbSizeHandler();
+
+            $(window).on('resize', function () {
+                headerWidth = header.outerWidth();
+                breadcrumbSizeHandler();
+            });
+
         }());
     });
 })(django.jQuery);

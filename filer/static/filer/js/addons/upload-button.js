@@ -127,7 +127,7 @@
         });
 
         if (uploadButtonDisabled.length) {
-            uploadButtonDisabled.tooltip();
+            Cl.filerTooltip($);
         }
     });
 })(django.jQuery);
