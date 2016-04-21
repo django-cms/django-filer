@@ -573,10 +573,10 @@ body {
     }
     .icon {
         color: $gray-light;
+        line-height: 30px;
         margin: 0 5px;
-        vertical-align: sub;
         &:before {
-            vertical-align: sub;
+            vertical-align: middle;
         }
     }
     li {
