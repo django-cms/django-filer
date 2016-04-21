@@ -32,6 +32,7 @@ body {
     thead th,
     tbody td {
         text-align: left;
+        font-weight: normal;
         vertical-align: middle;
         padding: 5px !important;
         border-left: 0 !important;
@@ -64,6 +65,9 @@ body {
             vertical-align: middle;
             margin: 0;
         }
+    }
+    .column-name a {
+        color: $color-primary;
     }
     .column-icon {
         width: 25px;
@@ -413,6 +417,8 @@ body {
         box-shadow: $dropdown-shadow;
         > li > a {
             display: block;
+            color: $color-primary;
+            font-weight: normal;
             white-space: normal;
             padding: 12px 20px !important;
             @media screen and (min-width: $screen-tablet) {
