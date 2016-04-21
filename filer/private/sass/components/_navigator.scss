@@ -173,6 +173,7 @@ body {
     .tools-container {
         @include clearfix;
         display: table-cell;
+        vertical-align: middle;
         text-align: right;
         margin-top: 2px;
         @media screen and (max-width: $screen-tablet) {
@@ -534,6 +535,7 @@ body {
 .navigator-breadcrumbs {
     @include clearfix;
     display: table-cell;
+    vertical-align: middle;
     font-size: 16px;
     white-space: nowrap;
     width: 60px;
