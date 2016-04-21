@@ -168,7 +168,6 @@ Cl.mediator = new Mediator();
         // breaks header if breadcrumbs name reaches a width of 80px
         (function () {
             var breadcrumbName = $('.navigator-breadcrumbs-folder-name-wrapper');
-            var breadcrumbWidth = breadcrumbName.width();
             var minBreadcrumbWidth = 80;
             var header = $('.navigator-top-nav');
 
@@ -178,7 +177,7 @@ Cl.mediator = new Mediator();
             var searchWidth = $('.filter-files-container').outerWidth();
             var actionsWidth = $('.actions-wrapper').outerWidth();
             var buttonsWidth = $('.navigator-button-wrapper').outerWidth();
-            var headerPadding = 40;
+            var headerPadding = parseInt(header.css('padding-left'), 10) + parseInt(header.css('padding-right'), 10);
 
             var headerWidth = header.outerWidth();
             var fullHeaderWidth = minBreadcrumbWidth + breadcrumbFolderWidth +
@@ -187,7 +186,6 @@ Cl.mediator = new Mediator();
             var breadcrumbSizeHandlerClassName = 'breadcrumb-min-width';
 
             var breadcrumbSizeHandler = function () {
-
                 if (headerWidth < fullHeaderWidth) {
                     header.addClass(breadcrumbSizeHandlerClassName);
                 } else {
