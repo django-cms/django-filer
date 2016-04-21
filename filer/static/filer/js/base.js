@@ -61,8 +61,6 @@ Cl.mediator = new Mediator();
             var containerSelector = '.navigator-top-nav';
 
             if (filter.length) {
-                filter.focus().closest(containerSelector)
-                    .removeClass('search-is-focused');
                 filter.on('keydown', function () {
                     $(this).closest(containerSelector).addClass('search-is-focused');
                 });

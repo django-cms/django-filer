@@ -157,9 +157,6 @@ body {
         display: table;
         table-layout: fixed;
         width: 100%;
-        @media screen and (max-width: $screen-tablet) {
-            display: block;
-        }
         .filer-dropdown-container {
             display: table-cell;
             width: 30px;
@@ -222,27 +219,51 @@ body {
     }
 }
 .breadcrumb-min-width {
+    .filer-navigator-breadcrumbs-dropdown-container,
+    .navigator-breadcrumbs-name-dropdown-wrapper,
+    .navigator-breadcrumbs-folder-name-wrapper,
     .breadcrumbs-container-wrapper,
     .breadcrumbs-container,
     .tools-container,
-    .breadcrumbs-container-inner,
     .filter-files-container,
+    .navigator-breadcrumbs,
     .navigator-button-wrapper {
-        display: block;
+        display: inline-block;
         text-align: left;
         .actions-wrapper {
             margin-left: 0;
+            margin-bottom: 10px;
             li:first-child {
                 padding-left: 0;
             }
         }
     }
-    .navigator-button-wrapper {
-        margin: 10px 0 0;
+    .breadcrumbs-container-inner .filer-dropdown-container {
+       display: inline-block !important;
+    }
+    .navigator-tools {
+        white-space: normal;
     }
     .filter-files-container {
-        margin: 10px 0;
-        width: 245px;
+        width: 100%;
+        margin-top: 10px;
+        z-index: 0;
+    }
+    .breadcrumbs-container {
+        margin-right: 0;
+    }
+    .navigator-breadcrumbs .icon {
+        vertical-align: middle;
+    }
+    .navigator-breadcrumbs-folder-name-wrapper {
+        float: left;
+        width: calc(100% - 30px);
+    }
+    .navigator-breadcrumbs-folder-name {
+        margin-top: 5px;
+    }
+    .filer-navigator-breadcrumbs-dropdown-container {
+        margin-top: 0;
     }
 }
 .navigator-tools {
