@@ -59,13 +59,14 @@ Cl.mediator = new Mediator();
         (function () {
             var filter = $('.js-filter-files');
             var containerSelector = '.navigator-top-nav';
+            var searchDropdown = $(containerSelector).find('.filter-search-wrapper').find('.filer-dropdown-container');
 
             if (filter.length) {
                 filter.on('keydown', function () {
                     $(this).closest(containerSelector).addClass('search-is-focused');
                 });
 
-                $(containerSelector).find('.filter-search-wrapper').find('.filer-dropdown-container').on('show.bs.filer-dropdown', function () {
+                searchDropdown.on('show.bs.filer-dropdown', function () {
                     $(containerSelector).addClass('search-is-focused');
                 }).on('hide.bs.filer-dropdown', function () {
                     $(containerSelector).removeClass('search-is-focused');
@@ -94,7 +95,7 @@ Cl.mediator = new Mediator();
                     } else {
                         actionList.removeClass('action-selected');
                     }
-                }, 0)
+                }, 0);
 
             });
         }());
@@ -165,7 +166,6 @@ Cl.mediator = new Mediator();
 
         // breaks header if breadcrumbs name reaches a width of 80px
         (function () {
-            var breadcrumbName = $('.navigator-breadcrumbs-folder-name-wrapper');
             var minBreadcrumbWidth = 80;
             var header = $('.navigator-top-nav');
 
