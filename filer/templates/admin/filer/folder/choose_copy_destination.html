@@ -16,12 +16,18 @@
     <script src="{% static 'admin/js/jquery.js' %}"></script>
     <script src="{% static 'admin/js/jquery.init.js' %}"></script>
     <script type="text/javascript">
-        var jQuery = django.jQuery;
+        var __jQuery = django.jQuery;
+        window.jQuery = (__jQuery) ? __jQuery : window.jQuery || undefined;
+        window.$ = window.jQuery;
     </script>
     <script src="{% static 'filer/js/addons/tooltip.js' %}"></script>
     <script src="{% static 'filer/js/addons/copy-move-files.js' %}"></script>
     <script type="text/javascript">
-        jQuery = undefined;
+        var __jQuery;
+        var __$;
+        // reassign jQuery if jQuery is already loaded
+        __jQuery = (window.jQuery) ? window.jQuery.noConflict(true) : undefined;
+        __$ = __jQuery;
     </script>
 {% endblock %}
 
