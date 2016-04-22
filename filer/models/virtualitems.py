@@ -46,7 +46,7 @@ class DummyFolder(mixins.IconsMixin):
         return []
 
 
-class UnfiledImages(DummyFolder):
+class UnsortedImages(DummyFolder):
     name = _("Unsorted Uploads")
     is_root = True
     is_unsorted_uploads = True
@@ -83,7 +83,7 @@ class FolderRoot(DummyFolder):
 
     @property
     def virtual_folders(self):
-        return [UnfiledImages()]
+        return [UnsortedImages()]
 
     @property
     def children(self):

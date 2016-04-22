@@ -32,7 +32,7 @@ from ..models import (
     FolderRoot,
     Image,
     ImagesWithMissingData,
-    UnfiledImages,
+    UnsortedImages,
     tools,
 )
 from ..settings import FILER_PAGINATE_BY
@@ -258,7 +258,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
         elif viewtype == 'unfiled_images':
-            folder = UnfiledImages()
+            folder = UnsortedImages()
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
