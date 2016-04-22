@@ -181,7 +181,13 @@ body {
         .filer-dropdown-container {
             display: table-cell;
             width: 30px;
+            height: 30px;
             vertical-align: middle;
+            span {
+                line-height: 30px;
+                height: 30px;
+                vertical-align: middle;
+            }
         }
     }
     .breadcrumbs-container {
@@ -601,14 +607,16 @@ body {
     display: block;
     overflow: hidden;
     white-space: normal;
-    line-height: 18px;
+    line-height: 30px;
     width: 100%;
-    height: 18px;
+    height: 30px;
 }
 .navigator-breadcrumbs-folder-name-inner {
     display: block;
     position: relative;
     overflow: hidden;
+    line-height: 30px;
+    height: 30px;
     width: 100%;
     text-overflow: ellipsis;
 }
@@ -674,9 +682,9 @@ body {
     min-height: 35px;
     .filer-dropdown-menu {
         left: auto;
-        right: -14px;
+        right: -80px;
         &:before {
-            right: 15px;
+            right: 80px;
             left: auto;
         }
     }
