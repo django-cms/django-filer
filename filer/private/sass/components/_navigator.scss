@@ -95,7 +95,7 @@ body {
         }
         .action-button {
             @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
-            padding: 9px !important;
+            padding: 10px 9px 8px !important;
             span {
                 font-size: 16px;
             }
