@@ -298,9 +298,6 @@ body {
         float: left;
         width: calc(100% - 30px);
     }
-    .filer-navigator-breadcrumbs-dropdown-container {
-        margin-top: 0;
-    }
 }
 .navigator-tools {
     @include clearfix;
@@ -626,7 +623,7 @@ body {
     position: relative;
     float: left;
     vertical-align: middle;
-    margin: 2px 7px 0 0;
+    margin: 0 7px 0 0;
     .navigator-breadcrumbs-dropdown {
         left: -15px !important;
         min-width: 200px;
