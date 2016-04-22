@@ -130,11 +130,7 @@
                             <div class="navigator-breadcrumbs-folder-name-wrapper">
                                 <span class="navigator-breadcrumbs-folder-name">
                                     <span class="navigator-breadcrumbs-folder-name-inner">
-                                        {% if not folder.is_unsorted_uploads %}
-                                            {{ folder.name }}
-                                        {% else %}
-                                            {% trans "Unsorted Uploads" %}
-                                        {% endif %}
+                                        {{ folder.name }}
                                     </span>
                                 </span>
                             </div>
