@@ -45,9 +45,6 @@ body {
         border-top: 1px solid transparent;
         background: none !important;
     }
-    tbody td {
-        padding: 11px 5px !important;
-    }
     tbody tr.selected {
         .action-button span {
             color: $gray-darker !important;
@@ -95,9 +92,11 @@ body {
         }
         .action-button {
             @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
-            padding: 10px 9px 8px !important;
+            padding: 9px !important;
             span {
                 font-size: 16px;
+                line-height: 33px;
+                vertical-align: middle;
             }
         }
     }
