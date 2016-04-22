@@ -81,7 +81,7 @@
                             <div>
                                 <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                                     title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    {% if not folder.is_unsorted_uploads %}
+                                    {% if not item.is_unsorted_uploads %}
                                         {{ item.name }}
                                     {% else %}
                                         {% trans "Unsorted Uploads" %}
