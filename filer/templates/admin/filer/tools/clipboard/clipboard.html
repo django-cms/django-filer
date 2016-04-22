@@ -24,7 +24,7 @@
                             <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}">
                             <input type="hidden" name="redirect_to" value="{{ current_url }}">
                             {% filer_admin_context_hidden_formfields %}
-                            <button class="deletelink" type="submit" title="{% trans 'Move all clipboard files to' %} &#39;{% trans 'unfiled files' %}&#39; {% trans 'folder' %}"><span>{% trans "Empty Clipboard" %}</span></button>
+                            <button class="deletelink" type="submit" title="{% trans 'Move all clipboard files to' %} &#39;{% trans 'Unsorted Uploads' %}&#39; {% trans 'folder' %}"><span>{% trans "Empty Clipboard" %}</span></button>
                         </form>
                         {% comment %}
                         <form action="{% url 'admin:filer-delete_clipboard' %}" method="post" style="display: inline;">{% csrf_token %}

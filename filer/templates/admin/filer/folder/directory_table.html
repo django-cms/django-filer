@@ -1,7 +1,7 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags staticfiles %}
 <div class="drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}Unsorted Uploads{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
         <thead>
             <tr>
                 <th class="column-checkbox">
@@ -81,7 +81,7 @@
                             <div>
                                 <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                                     title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    {% if item.name != "unfiled files" %}
+                                    {% if item.name != "Unsorted Uploads" %}
                                         {{ item.name }}
                                     {% else %}
                                         {% trans "Unsorted Uploads" %}
@@ -156,7 +156,7 @@
         </tbody>
     </table>
 
-    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}unfiled files{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.name and not folder.name == 'root' %}{{ folder.name }}{% else %}Unsorted Uploads{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
         <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
         <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">

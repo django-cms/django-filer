@@ -130,7 +130,7 @@
                             <div class="navigator-breadcrumbs-folder-name-wrapper">
                                 <span class="navigator-breadcrumbs-folder-name">
                                     <span class="navigator-breadcrumbs-folder-name-inner">
-                                        {% if folder.name != "unfiled files" %}
+                                        {% if folder.name != "Unsorted Uploads" %}
                                             {{ folder.name }}
                                         {% else %}
                                             {% trans "Unsorted Uploads" %}
@@ -227,7 +227,7 @@
                                        data-max-uploader-connections="{{ uploader_connections }}">
                                         {% trans "Upload Files" %}
                                     </a>
-                                {% elif folder.name == "unfiled files" %}
+                                {% elif folder.name == "Unsorted Uploads" %}
                                     <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
                                        class="navigator-button navigator-button-upload js-upload-button"
                                        data-url="{% url 'admin:filer-ajax_upload' %}"
@@ -235,7 +235,7 @@
                                         {% trans "Upload Files" %}
                                     </a>
                                 {% endif %}
-                                {% if folder.is_root and folder.name != "unfiled files" %}
+                                {% if folder.is_root and folder.name != "Unsorted Uploads" %}
                                     <span class="js-upload-button-disabled upload-button-disabled js-filer-tooltip filer-tooltip-wrapper"
                                           title="{% trans 'You have to select a folder first' %}">
                                         <a href="#" class="navigator-button navigator-button-upload" disabled>

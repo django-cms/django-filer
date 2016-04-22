@@ -47,7 +47,7 @@ class DummyFolder(mixins.IconsMixin):
 
 
 class UnfiledImages(DummyFolder):
-    name = _("unfiled files")
+    name = _("Unsorted Uploads")
     is_root = True
     _icon = "unfiled_folder"
 
