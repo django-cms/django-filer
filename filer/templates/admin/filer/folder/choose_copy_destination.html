@@ -16,12 +16,18 @@
     <script src="{% static 'admin/js/jquery.js' %}"></script>
     <script src="{% static 'admin/js/jquery.init.js' %}"></script>
     <script type="text/javascript">
-        var jQuery = django.jQuery;
+        var __jQuery = django.jQuery;
+        window.jQuery = (__jQuery) ? __jQuery : window.jQuery || undefined;
+        window.$ = window.jQuery;
     </script>
-    <script src="{% static 'filer/js/libs/bootstrap.custom.min.js' %}"></script>
+    <script src="{% static 'filer/js/addons/tooltip.js' %}"></script>
     <script src="{% static 'filer/js/addons/copy-move-files.js' %}"></script>
     <script type="text/javascript">
-        jQuery = undefined;
+        var __jQuery;
+        var __$;
+        // reassign jQuery if jQuery is already loaded
+        __jQuery = (window.jQuery) ? window.jQuery.noConflict(true) : undefined;
+        __$ = __jQuery;
     </script>
 {% endblock %}
 
@@ -70,8 +76,7 @@
                         <div class="text-right clearfix">
                             <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
                             <input type="submit" value="{% trans 'Copy' %}" class="default js-submit-copy-move">
-                            <span class="js-disabled-btn-tooltip disabled-btn-tooltip"
-                                data-toggle="tooltip" data-placement="bottom"
+                            <span class="js-disabled-btn-tooltip disabled-btn-tooltip js-filer-tooltip filer-tooltip-wrapper"
                                 title="{% trans 'It is not allowed to copy files into same folder' %}" tabindex="-1">
                                 <a class="default navigator-button" disabled>{% trans 'Copy' %}</a>
                             </span>

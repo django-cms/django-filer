@@ -1,30 +1,6 @@
 //##############################################################################
 // BASE
 
-// resets box-sizing on every element and adds it explicitly on elements in filebrowser and popup content
-.filebrowser,
-.popup,
-.app-filer {
-    #header {
-        box-sizing: content-box !important;
-    }
-    *,
-    *:before, *:after {
-        box-sizing: inherit !important;
-    }
-    #content {
-        *,
-        *:before, *:after {
-            box-sizing: border-box !important;
-        }
-        .field-owner .related-lookup,
-        .calendar-shortcuts a,
-        span.datetimeshortcuts a {
-            box-sizing: initial !important;
-        }
-    }
-}
-
 html,
 body {
     min-width: 320px;
@@ -136,4 +112,19 @@ body {
 .delete-confirmation form .cancel-link {
     height: auto !important;
     line-height: inherit !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.hidden {
+    display: none !important;
 }
