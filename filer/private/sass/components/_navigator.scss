@@ -262,11 +262,14 @@ body {
         .actions-wrapper {
             white-space: nowrap;
             margin-left: 0;
-            margin-bottom: 10px;
+            margin-top: 10px;
             li:first-child {
                 padding-left: 0;
             }
         }
+    }
+    .navigator-button-wrapper {
+        margin-top: 10px;
     }
     .navigator-breadcrumbs-name-dropdown-wrapper {
         min-height: inherit;
@@ -283,7 +286,6 @@ body {
     .filter-files-container {
         width: 100%;
         margin-top: 10px;
-        margin-bottom: 10px;
         z-index: auto;
     }
     .breadcrumbs-container {
