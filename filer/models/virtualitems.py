@@ -49,8 +49,8 @@ class DummyFolder(mixins.IconsMixin):
 class UnfiledImages(DummyFolder):
     name = _("Unsorted Uploads")
     is_root = True
-    _icon = "unfiled_folder"
     is_unsorted_uploads = True
+    _icon = "unfiled_folder"
 
     def _files(self):
         return File.objects.filter(folder__isnull=True)
