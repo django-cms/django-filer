@@ -11,7 +11,7 @@
             {% if ancestor_folder.label %}
                 {{ ancestor_folder.label }}
             {% else %}
-                {% if ancestor_folder.name != "Unsorted Uploads" %}
+                {% if ancestor_folder.name != _("Unsorted Uploads") %}
                     {{ ancestor_folder.name }}
                 {% else %}
                     {% trans "Unsorted Uploads" %}
