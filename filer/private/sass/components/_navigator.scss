@@ -323,9 +323,6 @@ body {
                 color: $gray !important;
                 cursor: pointer;
             }
-            @media screen and (max-width: $screen-tablet) {
-               float: left;
-            }
             .actions-separated-list {
                 display: inline-block;
             }
