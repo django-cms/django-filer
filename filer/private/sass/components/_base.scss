@@ -87,6 +87,9 @@ body {
     h2 {
         display: none;
     }
+    #content-main {
+        background-color: white;
+    }
 }
 
 .field-file,
@@ -127,4 +130,12 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+.filer-info-bar {
+    min-height: 15px;
+    margin: 0 0 2px !important;
+    padding: 15px 20px;
+    box-shadow: 0 0 10px -2px rgba(0,0,0,0.2);
+    background-color: white;
 }
