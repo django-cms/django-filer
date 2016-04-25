@@ -122,11 +122,12 @@
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
                         var dropzoneFolder = dropzone.hasClass('js-filer-dropzone-folder');
                         var dropzoneBoundingRect = dropzone[0].getBoundingClientRect();
+                        var borderSize = $('.drag-hover-border').css('border-top-width');
                         var dropzonePosition = {
                             top: dropzoneBoundingRect.top,
                             bottom: dropzoneBoundingRect.bottom,
                             width: dropzoneBoundingRect.width,
-                            height: dropzoneBoundingRect.height
+                            height: dropzoneBoundingRect.height - (parseInt(borderSize, 10) * 2)
                         };
                         if (dropzoneFolder) {
                             dragHoverBorder.css(dropzonePosition);
