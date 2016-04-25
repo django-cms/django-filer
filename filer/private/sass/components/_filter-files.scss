@@ -78,12 +78,16 @@
         @media screen and (max-width: $screen-tablet) {
             float: left;
         }
+        .filer-dropdown-container span {
+            line-height: 34px !important;
+            height: 34px !important;
+        }
     }
     .filter-files-button {
         float: right;
         text-align: center;
         white-space: nowrap;
-        height: 34px;
+        height: 35px;
         margin: 0;
         padding: 8px !important;
         .icon {
@@ -96,11 +100,11 @@
     .filter-files-field {
         color: $gray-darkest;
         font-size: 12px !important;
-        line-height: 34px;
+        line-height: 35px;
         font-weight: normal;
         box-sizing: border-box;
         min-width: 200px !important;
-        height: 34px;
+        height: 35px;
         // required for django CMS <= 3.1 #673
         margin: 0;
         padding: 0 35px 0 10px !important;

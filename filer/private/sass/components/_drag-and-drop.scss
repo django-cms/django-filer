@@ -389,10 +389,7 @@ form .form-row {
 }
 
 .filer-dropzone-upload-welcome .folder {
-    overflow: hidden;
     color: $color-primary;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     padding: 10px 0 0;
     margin: 0 -15px;
     border-top: solid 1px $gray-lighter;
@@ -402,6 +399,12 @@ form .form-row {
     }
     img {
         margin-right: 5px;
+    }
+    .folder-inner {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 0 10px;
     }
 }
 
