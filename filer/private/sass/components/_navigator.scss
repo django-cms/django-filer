@@ -166,7 +166,13 @@ body {
         .filer-dropdown-container {
             display: table-cell;
             width: 30px;
+            height: 30px;
             vertical-align: middle;
+            span {
+                line-height: 30px;
+                height: 30px;
+                vertical-align: middle;
+            }
         }
     }
     .breadcrumbs-container {
@@ -241,11 +247,14 @@ body {
         .actions-wrapper {
             white-space: nowrap;
             margin-left: 0;
-            margin-bottom: 10px;
+            margin-top: 10px;
             li:first-child {
                 padding-left: 0;
             }
         }
+    }
+    .navigator-button-wrapper {
+        margin-top: 10px;
     }
     .navigator-breadcrumbs-name-dropdown-wrapper {
         min-height: inherit;
@@ -262,7 +271,6 @@ body {
     .filter-files-container {
         width: 100%;
         margin-top: 10px;
-        margin-bottom: 10px;
         z-index: auto;
     }
     .breadcrumbs-container {
@@ -274,9 +282,6 @@ body {
     .navigator-breadcrumbs-folder-name-wrapper {
         float: left;
         width: calc(100% - 30px);
-    }
-    .filer-navigator-breadcrumbs-dropdown-container {
-        margin-top: 0;
     }
 }
 .navigator-tools {
@@ -302,9 +307,6 @@ body {
             a {
                 color: $gray !important;
                 cursor: pointer;
-            }
-            @media screen and (max-width: $screen-tablet) {
-               float: left;
             }
             .actions-separated-list {
                 display: inline-block;
@@ -586,14 +588,16 @@ body {
     display: block;
     overflow: hidden;
     white-space: normal;
-    line-height: 18px;
+    line-height: 30px;
     width: 100%;
-    height: 18px;
+    height: 30px;
 }
 .navigator-breadcrumbs-folder-name-inner {
     display: block;
     position: relative;
     overflow: hidden;
+    line-height: 30px;
+    height: 30px;
     width: 100%;
     text-overflow: ellipsis;
 }
@@ -601,7 +605,7 @@ body {
     position: relative;
     float: left;
     vertical-align: middle;
-    margin: 2px 7px 0 0;
+    margin: 0 7px 0 0;
     .navigator-breadcrumbs-dropdown {
         left: -15px !important;
         min-width: 200px;
@@ -659,9 +663,9 @@ body {
     min-height: 35px;
     .filer-dropdown-menu {
         left: auto;
-        right: -14px;
+        right: -80px;
         &:before {
-            right: 15px;
+            right: 80px;
             left: auto;
         }
     }

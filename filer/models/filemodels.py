@@ -294,8 +294,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         Folder object
         """
         if not self.folder:
-            from .virtualitems import UnfiledImages
-            return UnfiledImages()
+            from .virtualitems import UnsortedImages
+            return UnsortedImages()
         else:
             return self.folder
 
