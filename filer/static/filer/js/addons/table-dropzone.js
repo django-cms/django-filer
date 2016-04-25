@@ -139,6 +139,16 @@
 
                         folderName.text(folderTitle);
                     },
+                    dragend: function () {
+                        clearTimeout(hideMessageTimeout);
+                        hideMessageTimeout = setTimeout(function () {
+                            infoMessage.addClass(hiddenClass);
+                        }, 1000);
+
+                        infoMessage.removeClass(hiddenClass);
+                        dropzones.removeClass(dragHoverClass);
+                        dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
+                    },
                     dragleave: function () {
                         clearTimeout(hideMessageTimeout);
                         hideMessageTimeout = setTimeout(function () {

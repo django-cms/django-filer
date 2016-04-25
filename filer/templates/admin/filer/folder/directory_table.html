@@ -157,7 +157,12 @@
 
         <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
-            <div class="folder"><img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18"> <span class="js-filer-dropzone-folder-name"></span></div>
+            <div class="folder">
+                <div class="folder-inner">
+                    <img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18">
+                    <span class="js-filer-dropzone-folder-name"></span>
+                </div>
+            </div>
         </div>
 
         <div class="js-filer-upload-count filer-dropzone-upload-count hidden">
