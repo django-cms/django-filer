@@ -291,9 +291,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
+            search_mode = True
         else:
             search_terms = []
             q = ''
+            search_mode = False
         # Limit search results to current folder.
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
@@ -329,8 +331,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         folder_children = []
         folder_files = []
-        if folder.is_root:
-            folder_children += folder.virtual_folders
+        if folder.is_root and not search_mode:
+            virtual_items = folder.virtual_folders
+        else:
+            virtual_items = []
 
         perms = FolderPermission.objects.get_read_id_list(request.user)
         root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
@@ -422,6 +426,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             ).distinct(),
             'paginator': paginator,
             'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'virtual_items': virtual_items,
             'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),

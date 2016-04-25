@@ -17,6 +17,25 @@
             </tr>
         </thead>
         <tbody>
+            {% for item in virtual_items %}
+                <tr class="unfiled">
+                    <td class="column-checkbox">&nbsp;</td>
+                    <td class="column-icon">
+                        <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
+                            title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
+                            <img src="{% static 'filer/icons/unfiled_folder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                        </a>
+                    </td>
+                    <td class="column-name" colspan="4">
+                        <div>
+                            <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
+                                title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
+                                {{ item.name }}
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
             {% for item, item_perms in paginated_items.object_list %}
                 {% if item.file_type == "Folder" %}
                     {% with item as subfolder %}
@@ -68,24 +87,6 @@
                             </td>
                         </tr>
                     {% endwith %}
-                {% elif item.file_type == "DummyFolder" %}
-                    <tr class="unfiled">
-                        <td class="column-checkbox">&nbsp;</td>
-                        <td class="column-icon">
-                            <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
-                                title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                <img src="{% static 'filer/icons/unfiled_folder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
-                            </a>
-                        </td>
-                        <td class="column-name" colspan="4">
-                            <div>
-                                <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
-                                    title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    {{ item.name }}
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
                 {% else %}
                     {% with item as file %}
                         <tr>
