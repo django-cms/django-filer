@@ -21,6 +21,7 @@ CHANGELOG
 * Removes disabled action button border
 * Adds unsorted uploads empty view
 * Fix issues with subject location being off on images smaller than 210px
+* Ignores unsorted uploads from search and count
 
 
 1.1.1 (2016-01-27)
