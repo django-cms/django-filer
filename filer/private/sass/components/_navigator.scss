@@ -47,7 +47,7 @@ body {
     }
     .unfiled td {
         padding: 12px 5px !important;
-        background-color: $gray-table !important;
+        background-color: $gray-super-light !important;
         a,
         a:hover {
             color: $gray !important;
@@ -150,7 +150,7 @@ body {
     clear: both;
     min-height: 35px;
     padding: 15px 20px;
-    background: $gray-table;
+    background: $gray-super-light;
     border-bottom: $gray-lighter solid 1px;
     .breadcrumbs-container-wrapper {
         display: table;
