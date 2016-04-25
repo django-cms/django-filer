@@ -56,7 +56,7 @@ $screen-tablet-filer: 810px;
 $btn-border-radius-base: $border-radius-base;
 $btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
 
-$btn-default-color: #555;
+$btn-default-color: $gray-darker;
 $btn-default-bgcolor: $white;
 $btn-default-border: $gray-lighter;
 
