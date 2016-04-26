@@ -3,6 +3,7 @@
 
 html,
 body {
+    min-width: 320px;
     height: 100% !important;
 }
 
@@ -42,6 +43,9 @@ body {
         font-size: $font-size-small;
         color: $gray-light !important;
     }
+    .actions {
+        float: right;
+    }
 }
 
 #id_upload_button:before {
@@ -50,25 +54,30 @@ body {
 #content #content-main {
     margin-top: 0;
 }
-#container .breadcrumbs-container .breadcrumbs {
-    // required for django CMS <= 3.1 #673
-    position: absolute;
-    top: -91px;
-    right: 0;
-    left: 0;
-    // required for django CMS <= 3.1 #673
-    margin-top: 48px;
-}
-
 .filebrowser {
-    &.popup #content {
-        box-shadow: none;
+    &.cms-admin-sideframe {
+        #container {
+            .breadcrumbs + #content,
+            .breadcrumbs + .messagelist + #content {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            .breadcrumbs {
+                left: 0 !important;
+                padding-left: 20px !important;
+            }
+        }
     }
-    #container #content {
-        margin-top: 90px !important;
-    }
-    #content {
-        box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+    #container {
+        min-width: auto;
+        #content {
+            padding: 0;
+            box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+        }
+        .breadcrumbs + #content,
+        .breadcrumbs + .messagelist + #content {
+            margin-left: 3% !important;
+        }
     }
     h1.folder_header {
         position: relative;
@@ -77,6 +86,9 @@ body {
     // required for django CMS <= 3.1 #673
     h2 {
         display: none;
+    }
+    #content-main {
+        background-color: white;
     }
 }
 
@@ -93,4 +105,37 @@ body {
 .img-wrapper {
     width: 180px;
     height: 180px;
+}
+
+.file-duplicates {
+    clear: both;
+    padding: 20px 0 0;
+}
+
+.delete-confirmation form .cancel-link {
+    height: auto !important;
+    line-height: inherit !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.filer-info-bar {
+    min-height: 15px;
+    margin: 0 0 2px !important;
+    padding: 15px 20px;
+    box-shadow: 0 0 10px -2px rgba(black, 0.2);
+    background-color: white;
 }

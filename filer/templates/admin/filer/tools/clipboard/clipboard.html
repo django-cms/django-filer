@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n filer_admin_tags %}
 
 {% for clipboard in user.filer_clipboards.all %}
     <div class="clipboard hidden">
@@ -17,20 +17,14 @@
                             <input type="hidden" name="folder_id" value="{{ folder.id }}">
                             <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}">
                             <input type="hidden" name="redirect_to" value="{{ current_url }}">
-                            {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
-                            {% if select_folder %}<input type="hidden" name="select_folder" value="1">{% endif %}
+                            {% filer_admin_context_hidden_formfields %}
                             <button class="pastelink" type="submit" {% if folder.is_root or not permissions.has_add_children_permission %} disabled="disabled" style="color: gray;"{% endif %} title="{% trans 'Paste all items here' %}"><span>&lArr;</span>&nbsp;Paste</button>
                         </form>
                         <form action="{% url 'admin:filer-discard_clipboard' %}" method="post" style="display: inline;">{% csrf_token %}
                             <input type="hidden" name="clipboard_id" value="{{ clipboard.id }}">
                             <input type="hidden" name="redirect_to" value="{{ current_url }}">
-                            {% if is_popup %}
-                                <input type="hidden" name="_popup" value="1">
-                            {% endif %}
-                            {% if select_folder %}
-                                <input type="hidden" name="select_folder" value="1">
-                            {% endif %}
-                            <button class="deletelink" type="submit" title="{% trans 'Move all clipboard files to' %} &#39;{% trans 'unfiled files' %}&#39; {% trans 'folder' %}"><span>{% trans "Empty Clipboard" %}</span></button>
+                            {% filer_admin_context_hidden_formfields %}
+                            <button class="deletelink" type="submit" title="{% trans 'Move all clipboard files to' %} &#39;{% trans 'Unsorted Uploads' %}&#39; {% trans 'folder' %}"><span>{% trans "Empty Clipboard" %}</span></button>
                         </form>
                         {% comment %}
                         <form action="{% url 'admin:filer-delete_clipboard' %}" method="post" style="display: inline;">{% csrf_token %}

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from easy_thumbnails.files import Thumbnailer
 import os
 import re
+
+from easy_thumbnails.files import Thumbnailer
 
 # match the source filename using `__` as the seperator. ``opts_and_ext`` is non
 # greedy so it should match the last occurence of `__`.

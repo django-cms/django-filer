@@ -3,7 +3,7 @@
 'use strict';
 
 var Cl = window.Cl || {};
-/* global Class */
+/* globals Class, django */
 (function ($) {
     Cl.FocalPoint = new Class({
         options: {
@@ -46,11 +46,8 @@ var Cl = window.Cl || {};
         _updateLocationValue: function (x, y) {
             var locationValue;
 
-            if (isNaN(x) && isNaN(y)) {
-                locationValue = '';
-            } else {
-                locationValue = parseInt(x * this.ratio) + ',' + parseInt(y * this.ratio);
-            }
+            locationValue = Math.round(x * this.ratio) + ',' + Math.round(y * this.ratio);
+
             this.location.val(locationValue);
         },
         _onImageLoaded: function () {
@@ -68,16 +65,20 @@ var Cl = window.Cl || {};
             this.circle.removeClass(this.options.hiddenClass);
 
             if (locationValue.length) {
-                x = parseInt(parseInt(locationValue.split(',')[0]) / this.ratio);
-                y = parseInt(parseInt(locationValue.split(',')[1]) / this.ratio);
+                x = Math.round(Number(locationValue.split(',')[0]) / this.ratio);
+                y = Math.round(Number(locationValue.split(',')[1]) / this.ratio);
             } else {
                 y = imageHeight / 2;
                 x = imageWidth / 2;
             }
 
+            if (isNaN(x) || isNaN(y)) {
+                return;
+            }
+
             this.circle.css({
-                'top': y,
-                'left': x
+                top: y,
+                left: x
             });
 
             this.circle.draggable({
@@ -131,4 +132,4 @@ var Cl = window.Cl || {};
             this.ratio = null;
         }
     });
-})(jQuery);
+})(django.jQuery);

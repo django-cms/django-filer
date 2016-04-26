@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 import base64
 import hashlib
@@ -7,13 +8,11 @@ from io import BytesIO
 
 from django.core.files.base import ContentFile
 from django.utils import six
+from easy_thumbnails import fields as easy_thumbnails_fields
+from easy_thumbnails import files as easy_thumbnails_files
 
-from easy_thumbnails import (fields as easy_thumbnails_fields,
-                             files as easy_thumbnails_files)
-
-from filer import settings as filer_settings
-from filer.utils.filer_easy_thumbnails import ThumbnailerNameMixin
-
+from .. import settings as filer_settings
+from ..utils.filer_easy_thumbnails import ThumbnailerNameMixin
 
 STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,

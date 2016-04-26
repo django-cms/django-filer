@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
+import re
+
 from django.template import Library
 from django.utils import six
-import re
 
 register = Library()
 

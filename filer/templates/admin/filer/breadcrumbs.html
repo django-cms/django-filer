@@ -7,10 +7,18 @@
         &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
     {% endif %}
     {% for ancestor_folder in instance.logical_path %}
-        &rsaquo; <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}</a>
+        &rsaquo; <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+            {% if ancestor_folder.label %}
+                {{ ancestor_folder.label }}
+            {% else %}
+                {{ ancestor_folder.name }}
+            {% endif %}
+        </a>
     {% endfor %}
     {% if breadcrumbs_action %}
-        &rsaquo; <a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a>
+        {% if instance.label or instance.name %}
+            &rsaquo; <a href="{{ instance.get_admin_directory_listing_url_path }}" title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a>
+        {% endif %}
         &rsaquo; {{ breadcrumbs_action }}
     {% else %}
         &rsaquo; {% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}

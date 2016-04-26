@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import itertools
 import os
@@ -10,41 +10,54 @@ from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.core.exceptions import PermissionDenied
-from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.urlresolvers import reverse
-from django.db import router, models
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, get_object_or_404
-
+from django.db import models, router
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext, ugettext_lazy
+from django.utils.translation import ugettext_lazy, ungettext
 
-from filer import settings
-from filer.admin.forms import (CopyFilesAndFoldersForm, ResizeImagesForm,
-                               RenameFilesForm)
-from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.admin.patched.admin_utils import get_deleted_objects
-from filer.admin.tools import (userperms_for_request,
-                               check_folder_edit_permissions,
-                               check_files_edit_permissions,
-                               check_files_read_permissions,
-                               check_folder_read_permissions,
-                               admin_each_context)
-from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
-                          ImagesWithMissingData, FolderPermission, Image)
-from filer.settings import FILER_PAGINATE_BY
-from filer.thumbnail_processors import normalize_subject_location
-from filer.utils.compatibility import (
-    get_delete_permission, quote, unquote, capfirst)
-from filer.utils.filer_easy_thumbnails import FilerActionThumbnailer
-from filer.views import (popup_status, popup_param, selectfolder_status,
-                         selectfolder_param)
+from . import views
+from .. import settings
+from ..models import (
+    File,
+    Folder,
+    FolderPermission,
+    FolderRoot,
+    Image,
+    ImagesWithMissingData,
+    UnsortedImages,
+    tools,
+)
+from ..settings import FILER_PAGINATE_BY
+from ..thumbnail_processors import normalize_subject_location
+from ..utils.compatibility import (
+    capfirst,
+    get_delete_permission,
+    quote,
+    unquote,
+)
+from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
+from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
+from .patched.admin_utils import get_deleted_objects
+from .permissions import PrimitivePermissionAwareModelAdmin
+from .tools import (
+    AdminContext,
+    admin_each_context,
+    admin_url_params_encoded,
+    check_files_edit_permissions,
+    check_files_read_permissions,
+    check_folder_edit_permissions,
+    check_folder_read_permissions,
+    popup_status,
+    userperms_for_request,
+)
 
 
 class AddFolderPopupForm(forms.ModelForm):
@@ -121,30 +134,29 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        r = super(FolderAdmin, self).response_change(request, obj)
-        # Code from django ModelAdmin to determine changelist on the fly
-        if 'Location' in r and r['Location']:
-            # it was a successful save
-            if (r['Location'] in ['../'] or
-                    r['Location'] == self._get_post_url(obj)):
-                if obj.parent:
-                    url = reverse('admin:filer-directory_listing',
-                                  kwargs={'folder_id': obj.parent.id})
-                else:
-                    url = reverse('admin:filer-directory_listing-root')
-                url = "%s%s%s" % (url, popup_param(request),
-                                  selectfolder_param(request, "&"))
-                return HttpResponseRedirect(url)
+        if (
+            request.POST and
+            '_continue' not in request.POST and
+            '_saveasnew' not in request.POST and
+            '_addanother' not in request.POST
+        ):
+            if obj.parent:
+                url = reverse('admin:filer-directory_listing',
+                              kwargs={'folder_id': obj.parent.id})
             else:
-                # this means it probably was a save_and_continue_editing
-                pass
-        return r
+                url = reverse('admin:filer-directory_listing-root')
+            url = "{0}{1}".format(
+                url,
+                admin_url_params_encoded(request),
+            )
+            return HttpResponseRedirect(url)
+        return super(FolderAdmin, self).response_change(request, obj)
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
         extra_context = {'show_delete': True,
                          'is_popup': popup_status(request),
-                         'select_folder': selectfolder_status(request), }
+                         'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
         return super(FolderAdmin, self).render_change_form(
             request=request, context=context, add=False,
@@ -158,28 +170,43 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         we need to fetch the object and find out who the parent is
         before super, because super will delete the object and make it
         impossible to find out the parent folder to redirect to.
+
+        The delete_view breaks with polymorphic models if the cascade will
+        try delete objects that are of different polymorphic types
+        (AttributeError: 'File' object has no attribute 'file_ptr').
+        The default implementation of the delete_view is hard to override
+        without just copying the whole big thing. Since we've already done
+        the overriding work on the delete_files_or_folders admin action, we
+        can re-use that here instead.
         """
-        parent_folder = None
         try:
             obj = self.get_queryset(request).get(pk=unquote(object_id))
             parent_folder = obj.parent
         except self.model.DoesNotExist:
-            obj = None
+            parent_folder = None
 
-        r = super(FolderAdmin, self).delete_view(
-            request=request, object_id=object_id,
-            extra_context=extra_context)
-        url = r.get("Location", None)
-        if url in ["../../../../", "../../"] or url == self._get_post_url(obj):
+        if request.POST:
+            self.delete_files_or_folders(
+                request,
+                files_queryset=File.objects.none(),
+                folders_queryset=Folder.objects.filter(id=object_id)
+            )
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "%s%s%s" % (url, popup_param(request),
-                              selectfolder_param(request, "&"))
+            url = "{0}{1}".format(
+                url,
+                admin_url_params_encoded(request),
+            )
             return HttpResponseRedirect(url)
-        return r
+
+        return self.delete_files_or_folders(
+            request,
+            files_queryset=File.objects.none(),
+            folders_queryset=Folder.objects.filter(id=object_id)
+        )
 
     def icon_img(self, xs):
         return mark_safe(('<img src="%simg/icons/plainfolder_32x32.png" '
@@ -189,7 +216,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def get_urls(self):
         from django.conf.urls import patterns, url
         urls = super(FolderAdmin, self).get_urls()
-        from filer import views
         url_patterns = patterns('',
             # we override the default list view with our own directory listing
             # of the root directories
@@ -232,17 +258,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
         elif viewtype == 'unfiled_images':
-            folder = UnfiledImages()
+            folder = UnsortedImages()
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
                 Folder.objects.get(id=last_folder_id)
             except Folder.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
-                url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request, "&"))
+                url = "%s%s" % (url, admin_url_params_encoded(request))
             else:
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
-                url = "%s%s%s" % (url, popup_param(request), selectfolder_param(request, "&"))
+                url = "%s%s" % (url, admin_url_params_encoded(request))
             return HttpResponseRedirect(url)
         elif folder_id is None:
             folder = FolderRoot()
@@ -265,9 +291,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         q = request.GET.get('q', None)
         if q:
             search_terms = unquote(q).split(" ")
+            search_mode = True
         else:
             search_terms = []
             q = ''
+            search_mode = False
         # Limit search results to current folder.
         limit_search_to_folder = request.GET.get('limit_search_to_folder',
                                                  False) in (True, 'on')
@@ -303,8 +331,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         folder_children = []
         folder_files = []
-        if folder.is_root:
-            folder_children += folder.virtual_folders
+        if folder.is_root and not search_mode:
+            virtual_items = folder.virtual_folders
+        else:
+            virtual_items = []
 
         perms = FolderPermission.objects.get_read_id_list(request.user)
         root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
@@ -396,6 +426,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             ).distinct(),
             'paginator': paginator,
             'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'virtual_items': virtual_items,
             'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),
@@ -408,7 +439,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'folder_files': folder_files,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
-            'select_folder': selectfolder_status(request),
+            'filer_admin_context': AdminContext(request),
             # needed in the admin/base.html template for logout links
             'root_path': reverse('admin:index'),
             'action_form': action_form,
@@ -690,8 +721,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # permissions.
         # TODO: Check if permissions are really verified
         using = router.db_for_write(self.model)
-        deletable_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
-        deletable_folders, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
+        deletable_files, model_count_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
+        deletable_folders, model_count_folder, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
         all_protected.extend(protected_files)
         all_protected.extend(protected_folders)
 
@@ -746,7 +777,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "protected": all_protected,
             "opts": opts,
             'is_popup': popup_status(request),
-            'select_folder': selectfolder_status(request),
+            'filer_admin_context': AdminContext(request),
             "root_path": reverse('admin:index'),
             "app_label": app_label,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
@@ -920,7 +951,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'current_filename': file_obj.name or "",
             'current_basename': current_basename,
             'current_extension': current_extension,
-            'current_folder': file_obj.folder.name,
+            'current_folder': getattr(file_obj.folder, 'name', ''),
             'counter': counter + 1,  # 1-based
             'global_counter': global_counter + 1,  # 1-based
         }
@@ -1143,8 +1174,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return to_resize
 
     def _new_subject_location(self, original_width, original_height, new_width, new_height, x, y, crop):
-        # TODO: We could probably do better
-        return (round(new_width / 2), round(new_height / 2))
+        # TODO: We could probably do even better, but this method knows nothing
+        # about actual thumbnailing algorithm details.
+        # It's better to reset subject location to the central point of the new
+        # image if the image is being cropped. The originally specified subject
+        # location could be outside of the new image.
+        if crop:
+            return int(new_width / 2), int(new_height / 2)
+        else:
+            # Calculate scaling factor of the new image compared to old.
+            scale = min(new_width / original_width, new_height / original_height)
+            return int(scale * x), int(scale * y)
 
     def _resize_image(self, image, form_data):
         original_width = float(image.width)

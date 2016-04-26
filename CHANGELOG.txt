@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+1.2.0 (2016-04-26)
+------------------
+
+* Drop Django 1.5 support
+* Drop Python 3.3 support (now 3.4+)
+* Testrunner cleanup
+* Fix many regressions and bugs in Django 1.8/1.9
+* Admin UI enhancements
+* Fix issues with non-default STATICFILES_STORAGE
+* Hide related widget wrapper links
+* Fix cancel link in delete confirmation
+* Make BaseImage.subject_location field non-nullable
+* Adds icon sizes
+* Fixes owner search icon on detail view
+* Disable submit button if only one folder to copy file
+* Design improvements
+* Empty folder design
+* Removes disabled action button border
+* Adds unsorted uploads empty view
+* Fix issues with subject location being off on images smaller than 210px
+* Ignores unsorted uploads from search and count
+
+
 1.1.1 (2016-01-27)
 ------------------
 
@@ -8,6 +31,12 @@ CHANGELOG
 * Allow Django 1.9.x in setup requirements
 * Fixes an issue where only the first drop-zone will be active
 * Fixes an issue with Python 3 for the import_files command
+* Fixes button space on delete confirmation modal
+* Updates Filer image plugin form fields
+* Removes folder content space in admin, side frame and modal
+* Updates drag and drop modal window
+* Updates drag and drop widget styles
+* Fixes empty folder alignment
 
 
 1.1.0 (2016-01-19)

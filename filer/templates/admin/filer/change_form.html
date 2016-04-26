@@ -1,38 +1,35 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_modify staticfiles %}
-
-{% block extrahead %}{{ block.super }}
-{% endblock %}
+{% load i18n admin_modify staticfiles filer_admin_tags %}
 
 {% block breadcrumbs %}
-{% with original as instance %}
-{% include "admin/filer/breadcrumbs.html" %}
-{% endwith %}
+    {% with original as instance %}
+        {% include "admin/filer/breadcrumbs.html" %}
+    {% endwith %}
 {% endblock %}
 
 {% block extrastyle %}
-	{{ block.super }}
-	<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
 {% endblock %}
 
 
 {% block after_field_sets %}
-    {% if is_popup and select_folder %}
-    	<input type="hidden" name="select_folder" value="1">
-    {% endif %}
+    {% filer_admin_context_hidden_formfields %}
 {% endblock %}
 
 {% block sidebar %}
-	{% block file_sidebar %}
-		{% with original.duplicates as duplicates %}
-			{% if duplicates %}
-				<h3>{% trans "duplicates" %}</h3>
-				<ul>
-					{% for duplicate in duplicates %}
-						<li><a href="{{ duplicate.get_admin_url_path }}">{{ duplicate }}</a></li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		{% endwith %}
-	{% endblock %}
+    {% block file_sidebar %}
+        {% with original.duplicates as duplicates %}
+            {% if duplicates %}
+                <div class="file-duplicates">
+                    <h3>{% trans "Duplicates" %}</h3>
+                    <ul>
+                        {% for duplicate in duplicates %}
+                            <li><a href="{{ duplicate.get_admin_change_url }}">{{ duplicate }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endblock %}
 {% endblock %}

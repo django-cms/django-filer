@@ -8,17 +8,47 @@
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/jquery.js' %}"></script>
+    <script src="{% static 'admin/js/jquery.init.js' %}"></script>
+    <script type="text/javascript">
+        var __jQuery = django.jQuery;
+        window.jQuery = (__jQuery) ? __jQuery : window.jQuery || undefined;
+        window.$ = window.jQuery;
+    </script>
+    <script src="{% static 'filer/js/addons/tooltip.js' %}"></script>
+    <script src="{% static 'filer/js/addons/copy-move-files.js' %}"></script>
+    <script type="text/javascript">
+        var __jQuery;
+        var __$;
+        // reassign jQuery if jQuery is already loaded
+        __jQuery = (window.jQuery) ? window.jQuery.noConflict(true) : undefined;
+        __$ = __jQuery;
+    </script>
 {% endblock %}
 
 {% block content %}
     {% if perms_lacking %}
         <p>{% blocktrans %}Your account doesn't have permissions to copy all of the selected files and/or folders.{% endblocktrans %}</p>
+        <div class="text-right clearfix">
+            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Take me back" %}</a>
+        </div>
     {% else %}
         {% if not destination_folders %}
             <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
+            <div class="text-right clearfix">
+                <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Take me back" %}</a>
+            </div>
         {% else %}
             {% if not to_copy %}
                 <p>{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}</p>
+                <div class="text-right clearfix">
+                    <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Take me back" %}</a>
+                </div>
             {% else %}
                 <p>{% blocktrans %}The following files and/or folders will be copied to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
                 <ul>{{ to_copy|unordered_list }}</ul>
@@ -42,7 +72,15 @@
                             </select>
                         </p>
                         {{ copy_form.as_p_with_help }}
-                        <p><input type="submit" value="{% trans 'Copy' %}"></p>
+
+                        <div class="text-right clearfix">
+                            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
+                            <input type="submit" value="{% trans 'Copy' %}" class="default js-submit-copy-move">
+                            <span class="js-disabled-btn-tooltip disabled-btn-tooltip js-filer-tooltip filer-tooltip-wrapper"
+                                title="{% trans 'It is not allowed to copy files into same folder' %}" tabindex="-1">
+                                <a class="default navigator-button" disabled>{% trans 'Copy' %}</a>
+                            </span>
+                        </div>
                     </div>
                 </form>
             {% endif %}

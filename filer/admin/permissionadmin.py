@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 from django.contrib import admin
 
-from filer import settings
-from filer.fields import folder
+from .. import settings
+from ..fields import folder
 
 
 class PermissionAdmin(admin.ModelAdmin):

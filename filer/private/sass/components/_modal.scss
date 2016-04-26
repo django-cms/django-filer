@@ -2,6 +2,32 @@
 // MODAL
 
 .popup {
+    &.app-cmsplugin_filer_image {
+        .form-row.field-image .field-box,
+        .field-box.field-free_link,
+        .field-box.field-page_link,
+        .field-box.field-file_link {
+            float: none !important;
+            margin-right: 0 !important;
+            margin-top: 20px !important;
+            &:first-child {
+                margin-top: 0 !important
+            }
+            input {
+                width: 100% !important;
+            }
+        }
+        .form-row .field-box {
+            &.field-crop,
+            &.field-upscale {
+                margin-top: 30px;
+            }
+        }
+    }
+    &.delete-confirmation .colM ul {
+        // makes sure that between list and button is a space #744
+        margin-bottom: 25px !important;
+    }
     .image-info-detail {
         padding: 0;
         padding-bottom: 25px;
@@ -17,12 +43,32 @@
         }
     }
     .filer-dropzone {
-        padding: 15px 20px 20px;
+        padding: 20px;
     }
     form .form-row .filer-dropzone .filerFile {
-        top: 58px;
+        top: 32px;
     }
     &.filebrowser #container #content {
-        margin-top: 10px !important;
+        margin: 0 !important;
+    }
+    .navigator-button-wrapper {
+        float: right;
+        @media screen and (max-width: $screen-tablet) {
+            float: none;
+        }
+    }
+    .navigator-top-nav {
+        .tools-container {
+            width: 70%;
+        }
+        .breadcrumbs-container {
+            width: 30%;
+        }
+        .tools-container,
+        .breadcrumbs-container {
+            @media screen and (max-width: $screen-tablet) {
+                width: 100%;
+            }
+        }
     }
 }

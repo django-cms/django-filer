@@ -10,18 +10,7 @@
     border: 0;
     border-radius: 3px;
     background: #fff;
-    box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
-    @media screen and (max-width: $screen-tablet) {
-        float: none;
-        width: 100%;
-        &.image-info-detail {
-            .image-details-left,
-            .image-details-right {
-                float: none;
-                margin-left: 0;
-            }
-        }
-    }
+    box-shadow: 0 0 5px 0 rgba(black,0.2);
     .image-details,
     .actions-list {
         margin: 0;
@@ -129,6 +118,17 @@
             }
         }
     }
+    @media screen and (max-width: $screen-tablet) {
+        float: none;
+        width: 100%;
+        &.image-info-detail {
+            .image-details-left,
+            .image-details-right {
+                float: none;
+                margin-left: 0;
+            }
+        }
+    }
 }
 
 .image-info-close {
@@ -167,16 +167,15 @@
         right: 0;
         bottom: 0;
         left: 0;
+        overflow: hidden;
     }
     .image-preview-circle {
         position: relative;
         z-index: 1;
         width: 26px;
         height: 26px;
-        // makes sure that circle is positioned correctly and centered #684
-        margin-top: -15px;
-        margin-left: -15px;
         border: solid 2px #f00;
+        margin: -13px;
         border-radius: 30px;
         cursor: move;
         background: rgba(255, 255, 255, 0.5);

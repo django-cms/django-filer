@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 import sys
 
 import django
@@ -10,16 +12,19 @@ except ImportError:
     # django >=1.5
     from django.utils.text import Truncator
     from django.utils.functional import allow_lazy
+
     def truncate_words(s, num, end_text='...'):
         truncate = end_text and ' %s' % end_text or ''
         return Truncator(s).words(num, truncate=truncate)
     truncate_words = allow_lazy(truncate_words, six.text_type)
 
-DJANGO_1_4 = django.VERSION < (1, 5)
-DJANGO_1_5 = django.VERSION < (1, 6)
-DJANGO_1_6 = django.VERSION < (1, 7)
-DJANGO_1_7 = django.VERSION < (1, 8)
-DJANGO_1_8 = django.VERSION < (1, 9)
+
+LTE_DJANGO_1_4 = django.VERSION < (1, 5)  # not supported!
+LTE_DJANGO_1_5 = django.VERSION < (1, 6)  # not supported!
+LTE_DJANGO_1_6 = django.VERSION < (1, 7)
+LTE_DJANGO_1_7 = django.VERSION < (1, 8)
+LTE_DJANGO_1_8 = django.VERSION < (1, 9)
+LTE_DJANGO_1_9 = django.VERSION < (1, 10)
 
 
 if not six.PY3:
@@ -75,3 +80,16 @@ try:
 except ImportError:
     # python < 2.7
     from django.utils.importlib import import_module  # flake8: noqa
+
+
+try:
+    from PIL import Image as PILImage
+    from PIL import ImageDraw as PILImageDraw
+    from PIL import ExifTags as PILExifTags
+except ImportError:
+    try:
+        import Image as PILImage
+        import ImageDraw as PILImageDraw
+        import ExifTags as PILExifTags
+    except ImportError:
+        raise ImportError("The Python Imaging Library was not found.")

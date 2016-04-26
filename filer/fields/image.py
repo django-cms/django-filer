@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
-from filer.fields.file import (
-    AdminFileWidget, AdminFileFormField, FilerFileField
-)
-from filer.models import Image
+from ..models import Image
+from .file import AdminFileFormField, AdminFileWidget, FilerFileField
 
 
 class AdminImageWidget(AdminFileWidget):

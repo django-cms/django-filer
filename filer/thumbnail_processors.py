@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import re
+
+from django.utils import six
+from easy_thumbnails import processors
+
+from .settings import (
+    FILER_SUBJECT_LOCATION_IMAGE_DEBUG,
+    FILER_WHITESPACE_COLOR,
+)
+
 try:
     from PIL import Image
     from PIL import ImageDraw
@@ -9,12 +20,6 @@ except ImportError:
         import ImageDraw
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
-from django.utils import six
-from easy_thumbnails import processors
-from filer.settings import (
-    FILER_SUBJECT_LOCATION_IMAGE_DEBUG,
-    FILER_WHITESPACE_COLOR,
-)
 
 RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 

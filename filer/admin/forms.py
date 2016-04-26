@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 from django import forms
 from django.conf import settings
@@ -7,11 +8,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from filer.utils.files import get_valid_filename
-
-
-if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
-    from cmsplugin_filer_image.models import ThumbnailOption
+from ..models import ThumbnailOption
+from ..utils.files import get_valid_filename
 
 
 class AsPWithHelpMixin(object):

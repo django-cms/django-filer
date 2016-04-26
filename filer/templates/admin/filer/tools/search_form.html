@@ -1,27 +1,7 @@
-{% load i18n staticfiles %}
-
-<form class="filter-files-container" action="." method="get">
-    {% if is_popup %}
-        <input type="hidden" name="_popup" value="1" />
-        {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
-    {% endif %}
-    <input type="text" placeholder="Filter files" class="filter-files js-filter-files" value="{{ search_string }}" size="40" name="q">
-    <div class="dropdown-container dropdown-container-down">
-        <a href="#" data-toggle="dropdown" aria-expanded="false">
-            <span class="fa fa-caret-down"></span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-checkboxes">
-            <li>
-                <label><input type="checkbox" id="limit_search_to_folder" name="limit_search_to_folder" {% if limit_search_to_folder %}checked="checked"{% endif %} title="{% trans 'Check it to limit the search to current folder' %}"> limit the search to current folder</label>
-            </li>
-        </ul>
-    </div>
-
-    <button class="filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
-</form>
+{% load i18n staticfiles filer_admin_tags %}
 
 {% if show_result_count %}
-    <div class="small quiet filter-files-cancel">
+    <div class="small quiet filter-files-cancel filer-info-bar">
         ({% trans "found" %} {% blocktrans count folder_children|length as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
         {% blocktrans count folder_files|length as counter %}
             {{ counter }} file{% plural %}{{ counter }} files

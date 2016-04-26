@@ -5,35 +5,40 @@
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <img class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" data-dz-remove>
+            <img class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
+                 data-dz-remove data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
     </div>
 
     <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
-        <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}" id="{{ id }}_filer_dropzone_message">
+        <div class="z-index-fix"></div>
+        <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>
 
         <span class="filerFile js-file-selector">
             {% if object %}
                 {% if object.icons.32 %}
-                    <a href="{{ object.url }}" target="_blank"><img id="{{ thumb_id }}" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
-                    &nbsp;<span id="{{ span_id }}">{{ object.label }}</span>
+                    <a href="{{ object.url }}" target="_blank"><img class="thumbnail_img" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
+                    &nbsp;<span class="description_text">{{ object.label }}</span>
                 {% else %}
-                    <img id="{{ thumb_id }}" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
-                    &nbsp;<span id="{{ span_id }}">{% trans 'file missing' %}</span>
+                    <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
+                    &nbsp;<span class="description_text">{% trans 'file missing' %}</span>
                 {% endif %}
             {% else %}
-                <img id="{{ thumb_id }}" src="{% static 'filer/icons/nofile_48x48.png' %}" class="quiet" alt="{% trans 'no file selected' %}">
-                &nbsp;<span id="{{ span_id }}"></span>
+                <img class="thumbnail_img hidden quiet" alt="{% trans 'no file selected' %}">
+                &nbsp;<span class="description_text"></span>
             {% endif %}
 
-            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup{% if object %} hidden{% endif %}" id="{{ id }}_lookup" data-id="{{ id }}" title="{% trans 'Lookup' %}"{% if not IS_DJANGO_18 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                {% trans 'Add File' %}
+            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}hidden{% endif %} lookup" id="{{ id }}_lookup"
+               title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+                <span class="fa fa-picture-o"></span>{% trans 'Upload File' %}
             </a>
 
-            <img id="{{ clear_id }}" class="filerClearer" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"{% if not object %} style="display: none;"{% endif %}>
+            <img class="filerClearer {% if not object %}hidden{% endif %}" src="{% static admin_icon_delete %}"
+                 width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
+                 data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
 
             <br>
 
@@ -51,8 +56,3 @@
         </span>
     </div>
 {% endspaceless %}
-
-<link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
-<script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
-<script src="{% static 'filer/js/libs/dropzone.min.js' %}"></script>
-<script src="{% static 'filer/js/addons/dropzone.init.js' %}"></script>

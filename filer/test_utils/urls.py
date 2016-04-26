@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 from django.contrib import admin
 
 admin.autodiscover()

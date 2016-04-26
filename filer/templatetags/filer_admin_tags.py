@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
+from __future__ import absolute_import, unicode_literals
 
-import django
 from django.template import Library
+from django.utils.html import format_html_join
 
+from ..admin.tools import admin_url_params, admin_url_params_encoded
 
 register = Library()
 
@@ -15,12 +16,21 @@ def filer_actions(context):
     """
     context['action_index'] = context.get('action_index', -1) + 1
     return context
-filer_actions = register.inclusion_tag("admin/filer/actions.html", takes_context=True)(filer_actions)
+filer_actions = register.inclusion_tag(
+    "admin/filer/actions.html", takes_context=True)(filer_actions)
 
 
-@register.inclusion_tag('admin/filer/widgets/lookup.html', takes_context=True)
-def render_filer_lookup_button(context):
-    version = LooseVersion(django.get_version())
-    is_18_and_up = version >= LooseVersion('1.8')
-    context['IS_DJANGO_18'] = is_18_and_up and version < LooseVersion('1.9')
-    return context
+@register.simple_tag(takes_context=True)
+def filer_admin_context_url_params(context, first_separator='?'):
+    return admin_url_params_encoded(
+        context['request'], first_separator=first_separator)
+
+
+@register.simple_tag(takes_context=True)
+def filer_admin_context_hidden_formfields(context):
+    request = context.get('request')
+    return format_html_join(
+        '\n',
+        '<input type="hidden" name="{0}" value="{1}">',
+        admin_url_params(request).items(),
+    )

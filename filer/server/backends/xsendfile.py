@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 from django.http import HttpResponse
-from filer.server.backends.base import ServerBase
+
+from .base import ServerBase
 
 
 class ApacheXSendfileServer(ServerBase):

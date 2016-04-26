@@ -1,759 +1,953 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Mitja Martini <mitja.martini@t-online.de>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Mitja Martini <mitja.martini@t-online.de>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/django-filer/language/de/)\n"
+"POT-Creation-Date: 2016-04-26 14:02+0200\n"
+"PO-Revision-Date: 2015-07-24 18:03+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"Language-Team: German (http://www.transifex.com/divio/django-filer/language/"
+"de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:103
-msgid "Folder with this name already exists."
-msgstr "Dieser Ordnername wird bereits verwendet."
-
-#: admin/fileadmin.py:41
+#: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
 msgid "Advanced"
 msgstr "Fortgeschritten"
 
-#: admin/folderadmin.py:324 admin/folderadmin.py:427
+#: admin/fileadmin.py:163
+msgid "canonical URL"
+msgstr ""
+
+#: admin/folderadmin.py:390 admin/folderadmin.py:557
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Einträge müssen ausgewählt werden, um Aktionen darauf auszuführen. Keine Einträge wurden geändert."
+msgstr ""
+"Einträge müssen ausgewählt werden, um Aktionen darauf auszuführen. Keine "
+"Einträge wurden geändert."
 
-#: admin/folderadmin.py:344
+#: admin/folderadmin.py:410
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s ausgewählt"
 msgstr[1] "Alle %(total_count)s ausgewählt"
 
-#: admin/folderadmin.py:377
+#: admin/folderadmin.py:449
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 von %(cnt)s ausgewählt"
 
-#: admin/folderadmin.py:456
+#: admin/folderadmin.py:587
 msgid "No action selected."
 msgstr "Keine Aktion ausgewählt."
 
-#: admin/folderadmin.py:497
+#: admin/folderadmin.py:632
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "%(count)d Dateien wurden erfolgreich in die Zwischenablage gelegt."
 
-#: admin/folderadmin.py:503
+#: admin/folderadmin.py:638
 msgid "Move selected files to clipboard"
 msgstr "Ausgewählte Dateien in die Zwischenablage legen"
 
-#: admin/folderadmin.py:537
+#: admin/folderadmin.py:676
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Berechtigungen für %(count)d Dateien erfolgreich deaktiviert."
 
-#: admin/folderadmin.py:541
+#: admin/folderadmin.py:678
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Berechtigungen für %(count)d Dateien erfolgreich aktiviert."
 
-#: admin/folderadmin.py:550
+#: admin/folderadmin.py:687
 msgid "Enable permissions for selected files"
 msgstr "Berechtigungen für ausgewählte Dateien aktivieren"
 
-#: admin/folderadmin.py:555
+#: admin/folderadmin.py:694
 msgid "Disable permissions for selected files"
 msgstr "Berechtigungen für ausgewählte Dateien deaktivieren"
 
-#: admin/folderadmin.py:623
+#: admin/folderadmin.py:759
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "%(count)d Dateien und/oder Ordner wurden erfolgreich gelöscht."
 
-#: admin/folderadmin.py:630
+#: admin/folderadmin.py:764
 msgid "Cannot delete files and/or folders"
 msgstr "Dateien und/oder Ordner können nicht gelöscht werden"
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:766
 msgid "Are you sure?"
 msgstr "Bist Du sicher?"
 
-#: admin/folderadmin.py:637
+#: admin/folderadmin.py:772
 msgid "Delete files and/or folders"
 msgstr "Lösche Dateien und/oder Ordner"
 
-#: admin/folderadmin.py:656
+#: admin/folderadmin.py:794
 msgid "Delete selected files and/or folders"
 msgstr "Lösche ausgewählte Dateien und/oder Ordner"
 
-#: admin/folderadmin.py:771
+#: admin/folderadmin.py:909
+#, python-format
+msgid "Folders with names %s already exist at the selected destination"
+msgstr ""
+
+#: admin/folderadmin.py:913
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d Dateien und/oder Ordner wurden erfolgreich in den Ordner '%(destination)s' verschoben."
+msgstr ""
+"%(count)d Dateien und/oder Ordner wurden erfolgreich in den Ordner "
+"'%(destination)s' verschoben."
 
-#: admin/folderadmin.py:778 admin/folderadmin.py:780
+#: admin/folderadmin.py:921 admin/folderadmin.py:923
 msgid "Move files and/or folders"
 msgstr "Verschiebe Dateien und/oder Ordner"
 
-#: admin/folderadmin.py:797
+#: admin/folderadmin.py:938
 msgid "Move selected files and/or folders"
 msgstr "Ausgewählte Dateien und/oder Ordner verschieben"
 
-#: admin/folderadmin.py:854
+#: admin/folderadmin.py:995
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "%(count)d Dateien wurden erfolgreich umbenannt."
 
-#: admin/folderadmin.py:862 admin/folderadmin.py:864 admin/folderadmin.py:881
+#: admin/folderadmin.py:1004 admin/folderadmin.py:1006
+#: admin/folderadmin.py:1021
 msgid "Rename files"
 msgstr "Dateien umbenennen"
 
-#: admin/folderadmin.py:975
+#: admin/folderadmin.py:1115
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d Dateien und/oder Ordner wurden erfolgreich in den Ordner '%(destination)s' kopiert."
+msgstr ""
+"%(count)d Dateien und/oder Ordner wurden erfolgreich in den Ordner "
+"'%(destination)s' kopiert."
 
-#: admin/folderadmin.py:989 admin/folderadmin.py:991
+#: admin/folderadmin.py:1133 admin/folderadmin.py:1135
 msgid "Copy files and/or folders"
 msgstr "Kopiere Dateien und/oder Ordner"
 
-#: admin/folderadmin.py:1010
+#: admin/folderadmin.py:1152
 msgid "Copy selected files and/or folders"
 msgstr "Ausgewählte Dateien und/oder Ordner kopieren"
 
-#: admin/folderadmin.py:1105
+#: admin/folderadmin.py:1255
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Die Bildgröße von %(count)d Bildern wurde erfolgreich geändert."
 
-#: admin/folderadmin.py:1113 admin/folderadmin.py:1115
+#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
 msgid "Resize images"
 msgstr "Bildgrößen verändern"
 
-#: admin/folderadmin.py:1133
+#: admin/folderadmin.py:1280
 msgid "Resize selected images"
 msgstr "Die Bildgrößen der ausgewählten Bilder verändern"
 
-#: admin/forms.py:26
+#: admin/forms.py:27
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr "Die Dateiendung, welche an die Dateinamen der kopierten Dateien angehängt wird."
+msgstr ""
+"Die Dateiendung, welche an die Dateinamen der kopierten Dateien angehängt "
+"wird."
 
-#: admin/forms.py:33
+#: admin/forms.py:34
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Die Dateiendung sollte ein gültiger, einfacher und kleingeschriebener Teil eines Dateinamens sein, wie zum Beispiel  \"%(valid)s\"."
+msgstr ""
+"Die Dateiendung sollte ein gültiger, einfacher und kleingeschriebener Teil "
+"eines Dateinamens sein, wie zum Beispiel  \"%(valid)s\"."
 
-#: admin/forms.py:54
+#: admin/forms.py:55
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "Unbekannter Schlüssel für das Umbenennungs-Format: %(key)s."
 
-#: admin/forms.py:56
+#: admin/forms.py:57
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Ungültiges Umbenennungs-Format: %(error)s."
 
-#: admin/forms.py:62
+#: admin/forms.py:63 models/thumbnailoptionmodels.py:23
 msgid "thumbnail option"
 msgstr "Vorschaubild Optionen"
 
-#: admin/forms.py:63
+#: admin/forms.py:64 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "Breite"
 
-#: admin/forms.py:64
+#: admin/forms.py:65 models/thumbnailoptionmodels.py:16
 msgid "height"
 msgstr "Höhe"
 
-#: admin/forms.py:65
+#: admin/forms.py:66 models/thumbnailoptionmodels.py:17
 msgid "crop"
 msgstr "beschneiden"
 
-#: admin/forms.py:66
+#: admin/forms.py:67 models/thumbnailoptionmodels.py:18
 msgid "upscale"
 msgstr "vergrößern"
 
-#: admin/forms.py:71
+#: admin/forms.py:72
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Vorschaubild Optionen oder Parameter zur Größenänderung müssen ausgewählt werden."
+msgstr ""
+"Vorschaubild Optionen oder Parameter zur Größenänderung müssen ausgewählt "
+"werden."
 
-#: admin/forms.py:73
+#: admin/forms.py:74
 msgid "Resize parameters must be choosen."
 msgstr "Parameter zur Größenänderung müssen ausgewählt werden."
 
-#: admin/imageadmin.py:12
+#: admin/imageadmin.py:16
 msgid "Subject location"
 msgstr "Ort des Hauptinhalts"
 
-#: admin/imageadmin.py:13
-msgid "Location of the main subject of the scene."
+#: admin/imageadmin.py:17
+#, fuzzy
+#| msgid "Location of the main subject of the scene."
+msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr "Ort des Hauptinhalts des Bildes"
 
-#: models/clipboardmodels.py:9 models/foldermodels.py:236
-msgid "user"
-msgstr "Benutzer"
+#: admin/imageadmin.py:54
+#, fuzzy
+#| msgid "subject location"
+msgid "Invalid subject location format. "
+msgstr "Ort des Hauptinhalts"
 
-#: models/clipboardmodels.py:11 models/filemodels.py:287
-msgid "files"
-msgstr "Dateien"
+#: admin/imageadmin.py:60
+msgid "Subject location is outside of the image. "
+msgstr ""
 
-#: models/clipboardmodels.py:34 models/clipboardmodels.py:40
-msgid "clipboard"
-msgstr "Zwischenablage"
+#: admin/imageadmin.py:69
+#, fuzzy, python-brace-format
+#| msgid "subject location"
+msgid "Your input: \"{subject_location}\". "
+msgstr "Ort des Hauptinhalts"
 
-#: models/clipboardmodels.py:35
-msgid "clipboards"
-msgstr "Zwischenablagen"
+#: admin/views.py:57
+msgid "Folder with this name already exists."
+msgstr "Dieser Ordnername wird bereits verwendet."
 
-#: models/clipboardmodels.py:39 models/filemodels.py:35
-#: models/filemodels.py:286
-msgid "file"
-msgstr "Datei"
+#: apps.py:10 templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/directory_listing.html:47
+msgid "Filer"
+msgstr "Filer"
 
-#: models/clipboardmodels.py:44
-msgid "clipboard item"
-msgstr "Eintrag der Zwischenablage"
-
-#: models/clipboardmodels.py:45
-msgid "clipboard items"
-msgstr "Einträge der Zwischenablage"
-
-#: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/admin/filer/folder/new_folder_form.html:4
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
-msgid "folder"
-msgstr "Ordner"
-
-#: models/filemodels.py:36
-msgid "file size"
-msgstr "Dateigröße"
-
-#: models/filemodels.py:38
-msgid "sha1"
-msgstr "sha1"
-
-#: models/filemodels.py:40
-msgid "has all mandatory data"
-msgstr "hat alle Pflichtinhalte"
-
-#: models/filemodels.py:42
-msgid "original filename"
-msgstr "ursprünglicher Dateiname"
-
-#: models/filemodels.py:44 models/foldermodels.py:99
-msgid "name"
-msgstr "Name"
-
-#: models/filemodels.py:46
-msgid "description"
-msgstr "Beschreibung"
-
-#: models/filemodels.py:50
-msgid "owner"
-msgstr "Besitzer"
-
-#: models/filemodels.py:52 models/foldermodels.py:105
-msgid "uploaded at"
-msgstr "Hochgeladen am"
-
-#: models/filemodels.py:53 models/foldermodels.py:108
-msgid "modified at"
-msgstr "Verändert am"
-
-#: models/filemodels.py:57
-msgid "Permissions disabled"
-msgstr "Berechtigungen deaktiviert"
-
-#: models/filemodels.py:58
-msgid "Disable any permission checking for this "
-msgstr "Alle Berechtigungsprüfungen hierfür deaktivieren"
-
-#: models/foldermodels.py:107
-msgid "created at"
-msgstr "Angelegt am"
-
-#: models/foldermodels.py:211
-#: templates/admin/filer/widgets/admin_folder.html:3
-#: templates/admin/filer/widgets/admin_folder.html:5
-msgid "Folder"
-msgstr "Ordner"
-
-#: models/foldermodels.py:212
-msgid "Folders"
-msgstr "Ordner"
-
-#: models/foldermodels.py:227
-msgid "all items"
-msgstr "alle Einträge"
-
-#: models/foldermodels.py:228
-msgid "this item only"
-msgstr "nur dieser Eintrag"
-
-#: models/foldermodels.py:229
-msgid "this item and all children"
-msgstr "dieser Eintrag und alle darunter liegenden Einträge"
-
-#: models/foldermodels.py:233
-msgid "type"
-msgstr "Typ"
-
-#: models/foldermodels.py:239
-msgid "group"
-msgstr "Gruppe"
-
-#: models/foldermodels.py:240
-msgid "everybody"
-msgstr "Jeder"
-
-#: models/foldermodels.py:242
-msgid "can edit"
-msgstr "kann ändern"
-
-#: models/foldermodels.py:243
-msgid "can read"
-msgstr "kann lesen"
-
-#: models/foldermodels.py:244
-msgid "can add children"
-msgstr "kann Kinder hinzufügen"
-
-#: models/foldermodels.py:273
-msgid "folder permission"
-msgstr "Ordnerberechtigung"
-
-#: models/foldermodels.py:274
-msgid "folder permissions"
-msgstr "Ordnerberechtigungen"
-
-#: models/imagemodels.py:39
-msgid "date taken"
-msgstr "Aufgenommen am"
-
-#: models/imagemodels.py:42
+#: models/abstract.py:36
 msgid "default alt text"
 msgstr "Standard Alt-Text"
 
-#: models/imagemodels.py:43
+#: models/abstract.py:37
 msgid "default caption"
 msgstr "Standard Bildlegende"
 
-#: models/imagemodels.py:45 templates/image_filer/image.html:6
-msgid "author"
-msgstr "Autor"
-
-#: models/imagemodels.py:47
-msgid "must always publish author credit"
-msgstr "Nennung des Autoren ist Pflicht"
-
-#: models/imagemodels.py:48
-msgid "must always publish copyright"
-msgstr "Veröffentlichung des Copyright ist Pflicht"
-
-#: models/imagemodels.py:50
+#: models/abstract.py:39
 msgid "subject location"
 msgstr "Ort des Hauptinhalts"
 
-#: models/imagemodels.py:200
+#: models/abstract.py:168
 msgid "image"
 msgstr "Bild"
 
-#: models/imagemodels.py:201
+#: models/abstract.py:169
 msgid "images"
 msgstr "Bilder"
 
-#: models/virtualitems.py:45
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
-msgid "unfiled files"
-msgstr "nicht abgelegte Dateien"
+#: models/clipboardmodels.py:15 models/foldermodels.py:270
+msgid "user"
+msgstr "Benutzer"
 
-#: models/virtualitems.py:59
+#: models/clipboardmodels.py:17 models/filemodels.py:321
+msgid "files"
+msgstr "Dateien"
+
+#: models/clipboardmodels.py:35 models/clipboardmodels.py:41
+msgid "clipboard"
+msgstr "Zwischenablage"
+
+#: models/clipboardmodels.py:36
+msgid "clipboards"
+msgstr "Zwischenablagen"
+
+#: models/clipboardmodels.py:40 models/filemodels.py:48
+#: models/filemodels.py:320
+msgid "file"
+msgstr "Datei"
+
+#: models/clipboardmodels.py:45
+msgid "clipboard item"
+msgstr "Eintrag der Zwischenablage"
+
+#: models/clipboardmodels.py:46
+msgid "clipboard items"
+msgstr "Einträge der Zwischenablage"
+
+#: models/filemodels.py:46 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:116
+#: templates/admin/filer/folder/new_folder_form.html:5
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
+msgid "folder"
+msgstr "Ordner"
+
+#: models/filemodels.py:49
+msgid "file size"
+msgstr "Dateigröße"
+
+#: models/filemodels.py:51
+msgid "sha1"
+msgstr "sha1"
+
+#: models/filemodels.py:53
+msgid "has all mandatory data"
+msgstr "hat alle Pflichtinhalte"
+
+#: models/filemodels.py:55
+msgid "original filename"
+msgstr "ursprünglicher Dateiname"
+
+#: models/filemodels.py:57 models/foldermodels.py:104
+#: models/thumbnailoptionmodels.py:14
+msgid "name"
+msgstr "Name"
+
+#: models/filemodels.py:59
+msgid "description"
+msgstr "Beschreibung"
+
+#: models/filemodels.py:63
+msgid "owner"
+msgstr "Besitzer"
+
+#: models/filemodels.py:65 models/foldermodels.py:110
+msgid "uploaded at"
+msgstr "Hochgeladen am"
+
+#: models/filemodels.py:66 models/foldermodels.py:113
+msgid "modified at"
+msgstr "Verändert am"
+
+#: models/filemodels.py:70
+msgid "Permissions disabled"
+msgstr "Berechtigungen deaktiviert"
+
+#: models/filemodels.py:71
+msgid ""
+"Disable any permission checking for this file. File will be publicly "
+"accessible to anyone."
+msgstr ""
+
+#: models/foldermodels.py:112
+msgid "created at"
+msgstr "Angelegt am"
+
+#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
+#: templates/admin/filer/widgets/admin_folder.html:33
+msgid "Folder"
+msgstr "Ordner"
+
+#: models/foldermodels.py:236
+msgid "Folders"
+msgstr "Ordner"
+
+#: models/foldermodels.py:255
+msgid "all items"
+msgstr "alle Einträge"
+
+#: models/foldermodels.py:256
+msgid "this item only"
+msgstr "nur dieser Eintrag"
+
+#: models/foldermodels.py:257
+msgid "this item and all children"
+msgstr "dieser Eintrag und alle darunter liegenden Einträge"
+
+#: models/foldermodels.py:261
+msgid "allow"
+msgstr ""
+
+#: models/foldermodels.py:262
+msgid "deny"
+msgstr ""
+
+#: models/foldermodels.py:267
+msgid "type"
+msgstr "Typ"
+
+#: models/foldermodels.py:273
+msgid "group"
+msgstr "Gruppe"
+
+#: models/foldermodels.py:274
+msgid "everybody"
+msgstr "Jeder"
+
+#: models/foldermodels.py:276
+msgid "can edit"
+msgstr "kann ändern"
+
+#: models/foldermodels.py:277
+msgid "can read"
+msgstr "kann lesen"
+
+#: models/foldermodels.py:278
+msgid "can add children"
+msgstr "kann Kinder hinzufügen"
+
+#: models/foldermodels.py:320
+msgid "folder permission"
+msgstr "Ordnerberechtigung"
+
+#: models/foldermodels.py:321
+msgid "folder permissions"
+msgstr "Ordnerberechtigungen"
+
+#: models/imagemodels.py:23
+msgid "date taken"
+msgstr "Aufgenommen am"
+
+#: models/imagemodels.py:26
+msgid "author"
+msgstr "Autor"
+
+#: models/imagemodels.py:28
+msgid "must always publish author credit"
+msgstr "Nennung des Autoren ist Pflicht"
+
+#: models/imagemodels.py:29
+msgid "must always publish copyright"
+msgstr "Veröffentlichung des Copyright ist Pflicht"
+
+#: models/thumbnailoptionmodels.py:15
+msgid "width in pixel."
+msgstr ""
+
+#: models/thumbnailoptionmodels.py:16
+msgid "height in pixel."
+msgstr ""
+
+#: models/thumbnailoptionmodels.py:24
+#, fuzzy
+#| msgid "thumbnail option"
+msgid "thumbnail options"
+msgstr "Vorschaubild Optionen"
+
+#: models/virtualitems.py:50
+#: templates/admin/filer/folder/directory_table.html:4
+#: templates/admin/filer/folder/directory_table.html:152
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
+msgid "Unsorted Uploads"
+msgstr ""
+
+#: models/virtualitems.py:65
 msgid "files with missing metadata"
 msgstr "Dateien mit fehlenden Metadaten"
 
-#: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/image_filer/image_export_form.html:10
+#: models/virtualitems.py:79 templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:51
+#: templates/admin/filer/folder/directory_listing.html:116
 msgid "root"
 msgstr "Root"
 
-#: templates/admin/filer/actions.html:4
+#: templates/admin/filer/actions.html:5
 msgid "Run the selected action"
 msgstr "Die ausgewählte Aktion ausführen"
 
-#: templates/admin/filer/actions.html:4
+#: templates/admin/filer/actions.html:5
 msgid "Go"
 msgstr "Los"
 
-#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/actions.html:14
+#: templates/admin/filer/folder/directory_table.html:213
 msgid "Click here to select the objects across all pages"
 msgstr "Hier klicken, um die Objekte über alle Seiten hinweg auszuwählen"
 
-#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/actions.html:14
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
 msgstr "Alle %(total_count)s Dateien und/oder Ordner auswählen"
 
-#: templates/admin/filer/actions.html:13
+#: templates/admin/filer/actions.html:16
+#: templates/admin/filer/folder/directory_table.html:215
 msgid "Clear selection"
 msgstr "Auswahl aufheben"
 
 #: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/directory_listing.html:42
 msgid "Go back to admin homepage"
 msgstr "Zur Admin Startseite zurück gehen"
 
 #: templates/admin/filer/breadcrumbs.html:4
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/directory_listing.html:43
 msgid "Home"
 msgstr "Startseite"
 
 #: templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/directory_listing.html:46
 msgid "Go back to Filer app"
 msgstr "Zur Filer App zurück gehen"
 
-#: templates/admin/filer/breadcrumbs.html:5
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/image_filer/image_export_form.html:8
-msgid "Filer"
-msgstr "Filer"
-
-#: templates/admin/filer/breadcrumbs.html:6
-#: templates/image_filer/image_export_form.html:10
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/directory_listing.html:51
 msgid "Go back to root folder"
 msgstr "Zum Root Ordner zurück gehen"
 
-#: templates/admin/filer/breadcrumbs.html:8
-#: templates/admin/filer/breadcrumbs.html:11
-#: templates/admin/filer/folder/change_form.html:11
-#: templates/image_filer/image_export_form.html:12
-#: templates/image_filer/image_export_form.html:14
+#: templates/admin/filer/breadcrumbs.html:10
+#: templates/admin/filer/breadcrumbs.html:20
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:63
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Zum Ordner '%(folder_name)s' zurück gehen"
 
-#: templates/admin/filer/change_form.html:28
-msgid "duplicates"
+#: templates/admin/filer/change_form.html:25
+#, fuzzy
+#| msgid "duplicates"
+msgid "Duplicates"
 msgstr "Duplikate"
-
-#: templates/admin/filer/delete_confirmation.html:13
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr "Das Löschen von %(object_name)s '%(escaped_object)s' würde auch verknüpfte Objekte löschen. Dein Benutzerkonto hat jedoch nicht die erforderlichen Berechtigungen, um folgende Objekttypen zu löschen:"
-
-#: templates/admin/filer/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
-" following protected related objects:"
-msgstr "Das Löschen von %(object_name)s '%(escaped_object)s' würde folgende geschützte verknüpfte Objekte mit löschen:"
-
-#: templates/admin/filer/delete_confirmation.html:29
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr "Willst Du %(object_name)s \"%(escaped_object)s\" wirklich löschen? Dabei werden die folgenden verknüpften Objekte mitgelöscht:"
-
-#: templates/admin/filer/delete_confirmation.html:34
-#: templates/admin/filer/delete_selected_files_confirmation.html:45
-msgid "Yes, I'm sure"
-msgstr "Ja, ich bin sicher"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Beim Löschen der ausgewählten Dateien und/oder Ordner, würden verbundene Objekte mitgelöscht. Dein Benutzerkonto hat jedoch nicht die erforderlichen Berechtigungen, um die folgenden Objekttypen zu löschen:"
+msgstr ""
+"Beim Löschen der ausgewählten Dateien und/oder Ordner, würden verbundene "
+"Objekte mitgelöscht. Dein Benutzerkonto hat jedoch nicht die erforderlichen "
+"Berechtigungen, um die folgenden Objekttypen zu löschen:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Das Löschen der folgenden ausgewählten Dateien und/oder Ordner würde das Löschen der folgenden geschützten verknüpften Objekte erfordern:"
+msgstr ""
+"Das Löschen der folgenden ausgewählten Dateien und/oder Ordner würde das "
+"Löschen der folgenden geschützten verknüpften Objekte erfordern:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Bist Du sicher, dass Du die ausgewählten Dateien und/oder Ordner löschen willst? Alle der folgenden Objekte und ihre verbundenen Einträge werden gelöscht:"
+msgstr ""
+"Bist Du sicher, dass Du die ausgewählten Dateien und/oder Ordner löschen "
+"willst? Alle der folgenden Objekte und ihre verbundenen Einträge werden "
+"gelöscht:"
 
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/image_filer/image_export_form.html:7
-#: templates/image_filer/image_export_form.html:8
-#: templates/image_filer/image_export_form.html:16
-msgid "Go back to"
-msgstr "Gehe zurück zu"
+#: templates/admin/filer/delete_selected_files_confirmation.html:46
+#: templates/admin/filer/folder/choose_copy_destination.html:77
+#: templates/admin/filer/folder/choose_move_destination.html:73
+msgid "No, take me back"
+msgstr ""
 
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
-msgid "admin homepage"
-msgstr "Admin Startseite"
+#: templates/admin/filer/delete_selected_files_confirmation.html:47
+#, fuzzy
+#| msgid "Yes, I'm sure"
+msgid "Yes, I&#39;m sure"
+msgstr "Ja, ich bin sicher"
 
-#: templates/admin/filer/folder/change_form.html:22
-#: templates/admin/filer/image/change_form.html:9
+#: templates/admin/filer/file/change_form.html:36
+#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/image/change_form.html:36
 msgid "History"
 msgstr "Historie"
 
+#: templates/admin/filer/file/change_form.html:38
 #: templates/admin/filer/folder/change_form.html:23
-#: templates/admin/filer/image/change_form.html:10
+#: templates/admin/filer/image/change_form.html:38
 msgid "View on site"
 msgstr "Auf der Website ansehen"
 
-#: templates/admin/filer/folder/change_form.html:35
-#: templates/admin/filer/folder/directory_listing.html:75
-#: templates/admin/filer/folder/directory_listing.html:85
-#: templates/admin/filer/folder/directory_table.html:23
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:116
+msgid "Go back to"
+msgstr "Gehe zurück zu"
+
+#: templates/admin/filer/folder/change_form.html:6
+msgid "admin homepage"
+msgstr "Admin Startseite"
+
+#: templates/admin/filer/folder/change_form.html:37
+#: templates/admin/filer/folder/directory_listing.html:109
+#: templates/admin/filer/folder/directory_listing.html:117
+#: templates/admin/filer/folder/directory_table.html:26
+#: templates/admin/filer/folder/directory_table.html:56
+#: templates/admin/filer/folder/directory_table.html:159
 msgid "Folder Icon"
 msgstr "Ordner Icon"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:12
+#: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Dein Benutzerkonto hat nicht die Berechtigungen, um alle der ausgewählten Dateien und/oder Ordner zu kopieren."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Dein Benutzerkonto hat nicht die Berechtigungen, um alle der ausgewählten "
+"Dateien und/oder Ordner zu kopieren."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:15
-#: templates/admin/filer/folder/choose_move_destination.html:15
+#: templates/admin/filer/folder/choose_copy_destination.html:38
+#: templates/admin/filer/folder/choose_copy_destination.html:44
+#: templates/admin/filer/folder/choose_copy_destination.html:50
+#: templates/admin/filer/folder/choose_move_destination.html:38
+#: templates/admin/filer/folder/choose_move_destination.html:44
+#: templates/admin/filer/folder/choose_move_destination.html:50
+msgid "Take me back"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_copy_destination.html:42
+#: templates/admin/filer/folder/choose_move_destination.html:42
 msgid "There are no destination folders available."
 msgstr "Es gibt keine verwendbaren Zielordner."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:18
+#: templates/admin/filer/folder/choose_copy_destination.html:48
 msgid "There are no files and/or folders available to copy."
 msgstr "Es gibt keine Dateien und/oder Ordner zum Kopieren."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:20
+#: templates/admin/filer/folder/choose_copy_destination.html:53
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "Die folgenden Dateien und/oder Ordner werden in einen Zielordner kopiert (unter Beibehaltung ihrer Ordnerstruktur):"
+msgstr ""
+"Die folgenden Dateien und/oder Ordner werden in einen Zielordner kopiert "
+"(unter Beibehaltung ihrer Ordnerstruktur):"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:32
-#: templates/admin/filer/folder/choose_move_destination.html:32
+#: templates/admin/filer/folder/choose_copy_destination.html:67
+#: templates/admin/filer/folder/choose_move_destination.html:65
 msgid "Destination folder:"
 msgstr "zielordner"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:39
+#: templates/admin/filer/folder/choose_copy_destination.html:78
+#: templates/admin/filer/folder/choose_copy_destination.html:81
 msgid "Copy"
 msgstr "Kopieren"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:12
-msgid ""
-"Your account doesn't have permissions to resize all of the selected images."
-msgstr "Dein Benutzerkonto hat nicht die erforderlichen Berechtigungen, um die Größe jedes der ausgewählten Bilder zu verändern."
+#: templates/admin/filer/folder/choose_copy_destination.html:80
+msgid "It is not allowed to copy files into same folder"
+msgstr ""
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
+msgid ""
+"Your account doesn't have permissions to resize all of the selected images."
+msgstr ""
+"Dein Benutzerkonto hat nicht die erforderlichen Berechtigungen, um die Größe "
+"jedes der ausgewählten Bilder zu verändern."
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
 msgstr "Es gibt keine Bilder auf denen die Größenänderung anwendbar ist."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:17
+#: templates/admin/filer/folder/choose_images_resize_options.html:20
 msgid "The following images will be resized:"
 msgstr "Die Größe der folgenden Bilder wird verändert:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:30
+#: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Wähle eine vorhandene Vorschaubild Option aus oder gib die Parameter für die Bildgrößenänderung an:"
+msgstr ""
+"Wähle eine vorhandene Vorschaubild Option aus oder gib die Parameter für die "
+"Bildgrößenänderung an:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:32
+#: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
 msgstr "Wähle die Parameter für die Bildgrößenänderung:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:35
+#: templates/admin/filer/folder/choose_images_resize_options.html:38
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Warnung: Die Bilder werden in-place verändert. Die Originale gehen dabei verloren. Lege bei Bedarf eine Kopie der Originale an."
+msgstr ""
+"Warnung: Die Bilder werden in-place verändert. Die Originale gehen dabei "
+"verloren. Lege bei Bedarf eine Kopie der Originale an."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:36
+#: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
 msgstr "Bildgröße verändern"
 
-#: templates/admin/filer/folder/choose_move_destination.html:12
+#: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Dein Benutzerkonto hat nicht die erforderlichen Berechtigungen, um alle ausgewählten Dateien und/oder Ordner zu verschieben."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Dein Benutzerkonto hat nicht die erforderlichen Berechtigungen, um alle "
+"ausgewählten Dateien und/oder Ordner zu verschieben."
 
-#: templates/admin/filer/folder/choose_move_destination.html:18
+#: templates/admin/filer/folder/choose_move_destination.html:48
 msgid "There are no files and/or folders available to move."
 msgstr "Es gibt keine verschiebbaren Dateien und/oder Ordner."
 
-#: templates/admin/filer/folder/choose_move_destination.html:20
+#: templates/admin/filer/folder/choose_move_destination.html:53
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "Die folgenden Dateien und/oder Ordner werden in ein Zielordner verschoben (unter Beibehaltung ihrer Ordnerstruktur):"
+msgstr ""
+"Die folgenden Dateien und/oder Ordner werden in ein Zielordner verschoben "
+"(unter Beibehaltung ihrer Ordnerstruktur):"
 
-#: templates/admin/filer/folder/choose_move_destination.html:38
+#: templates/admin/filer/folder/choose_move_destination.html:74
+#: templates/admin/filer/folder/choose_move_destination.html:77
+#: templates/admin/filer/folder/directory_listing.html:195
 msgid "Move"
 msgstr "Verschieben"
 
-#: templates/admin/filer/folder/choose_rename_format.html:12
-msgid ""
-"Your account doesn't have permissions to rename all of the selected files."
-msgstr "Dein Benutzerkonto hat nicht die erforderlichen Berechtigungen, um alle ausgewählten Dateien umzubenennen."
+#: templates/admin/filer/folder/choose_move_destination.html:76
+msgid "It is not allowed to move files into same folder"
+msgstr ""
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
+msgid ""
+"Your account doesn't have permissions to rename all of the selected files."
+msgstr ""
+"Dein Benutzerkonto hat nicht die erforderlichen Berechtigungen, um alle "
+"ausgewählten Dateien umzubenennen."
+
+#: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
 msgstr "Es sind keine Dateien, die umbenannt werden können."
 
-#: templates/admin/filer/folder/choose_rename_format.html:17
+#: templates/admin/filer/folder/choose_rename_format.html:20
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "Die folgenden Dateien werden umbenannt (sie bleiben in ihren Ordnern und behalten ihren originalen Dateinamen, nur dier angezeigte Dateiname wird geändert):"
+msgstr ""
+"Die folgenden Dateien werden umbenannt (sie bleiben in ihren Ordnern und "
+"behalten ihren originalen Dateinamen, nur dier angezeigte Dateiname wird "
+"geändert):"
 
-#: templates/admin/filer/folder/choose_rename_format.html:54
+#: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: templates/admin/filer/folder/directory_listing.html:66
-msgid "Adds a new Folder"
-msgstr "Fügt einen neuen Ordner hinzu"
-
-#: templates/admin/filer/folder/directory_listing.html:66
-#: templates/image_filer/include/export_dialog.html:34
-msgid "New Folder"
-msgstr "Neuer Ordner"
-
-#: templates/admin/filer/folder/directory_listing.html:67
-msgid "upload files"
-msgstr "Dateien hochladen"
-
-#: templates/admin/filer/folder/directory_listing.html:67
-msgid "Upload"
-msgstr "Hochladen"
-
-#: templates/admin/filer/folder/directory_listing.html:74
+#: templates/admin/filer/folder/directory_listing.html:108
 msgid "Go back to the parent folder"
 msgstr "Gehe zurück zum übergeordneten Ordner"
 
-#: templates/admin/filer/folder/directory_listing.html:76
-#: templates/admin/filer/folder/directory_table.html:29
-#: templates/admin/filer/tools/search_form.html:18
-#, python-format
-msgid "1 folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] "Ein Ordner"
-msgstr[1] "%(counter)s Ordner"
-
-#: templates/admin/filer/folder/directory_listing.html:76
-#: templates/admin/filer/folder/directory_table.html:29
-#: templates/admin/filer/tools/search_form.html:19
-#, python-format
-msgid "1 file"
-msgid_plural "%(counter)s files"
-msgstr[0] "Eine Datei"
-msgstr[1] "%(counter)s Dateien"
-
-#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_listing.html:145
 msgid "Change current folder details"
 msgstr "Details des aktuellen Ordners ändern"
 
-#: templates/admin/filer/folder/directory_listing.html:80
-#: templates/admin/filer/folder/directory_table.html:27
-#: templates/admin/filer/folder/directory_table.html:43
+#: templates/admin/filer/folder/directory_listing.html:145
 msgid "Change"
 msgstr "Ändern"
+
+#: templates/admin/filer/folder/directory_listing.html:155
+#, fuzzy
+#| msgid "run search for entered phrase"
+msgid "Click here to run search for entered phrase"
+msgstr "nach dem Begriff zu sichen"
+
+#: templates/admin/filer/folder/directory_listing.html:158
+msgid "Search"
+msgstr "Suchen"
+
+#: templates/admin/filer/folder/directory_listing.html:165
+msgid "Close"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:167
+msgid "Limit"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:172
+#, fuzzy
+#| msgid "limit the search to current folder"
+msgid "Check it to limit the search to current folder"
+msgstr "die Suche auf den aktuellen Ordner zu begrenzen"
+
+#: templates/admin/filer/folder/directory_listing.html:173
+#, fuzzy
+#| msgid "limit the search to current folder"
+msgid "Limit the search to current folder"
+msgstr "die Suche auf den aktuellen Ordner zu begrenzen"
+
+#: templates/admin/filer/folder/directory_listing.html:189
+#: templates/admin/filer/tools/detail_info.html:215
+msgid "Delete"
+msgstr "Löschen"
+
+#: templates/admin/filer/folder/directory_listing.html:212
+msgid "Adds a new Folder"
+msgstr "Fügt einen neuen Ordner hinzu"
+
+#: templates/admin/filer/folder/directory_listing.html:215
+msgid "New Folder"
+msgstr "Neuer Ordner"
+
+#: templates/admin/filer/folder/directory_listing.html:220
+#: templates/admin/filer/folder/directory_listing.html:224
+#: templates/admin/filer/folder/directory_listing.html:227
+#: templates/admin/filer/folder/directory_listing.html:231
+#: templates/admin/filer/folder/directory_listing.html:238
+#, fuzzy
+#| msgid "upload files"
+msgid "Upload Files"
+msgstr "Dateien hochladen"
+
+#: templates/admin/filer/folder/directory_listing.html:236
+msgid "You have to select a folder first"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
 msgstr "Name"
 
-#: templates/admin/filer/folder/directory_table.html:23
-#: templates/admin/filer/folder/directory_table.html:27
-#: templates/admin/filer/folder/directory_table.html:29
+#: templates/admin/filer/folder/directory_table.html:14
+#: templates/admin/filer/tools/detail_info.html:61
+#: templates/admin/filer/tools/detail_info.html:152
+msgid "Owner"
+msgstr "Besitzer"
+
+#: templates/admin/filer/folder/directory_table.html:15
+#: templates/admin/filer/tools/detail_info.html:40
+#: templates/admin/filer/tools/detail_info.html:104
+msgid "Size"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:16
+msgid "Action"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:25
+#: templates/admin/filer/folder/directory_table.html:32
+#: templates/admin/filer/folder/directory_table.html:55
+#: templates/admin/filer/folder/directory_table.html:62
 #, python-format
 msgid "Change '%(item_label)s' folder details"
 msgstr "Ändere Details des Ordners '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:30
-#: templates/admin/filer/folder/directory_table.html:45
-msgid "Owner"
-msgstr "Besitzer"
+#: templates/admin/filer/folder/directory_table.html:73
+#: templates/admin/filer/tools/search_form.html:5
+#, python-format
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] ""
+msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_table.html:37
+#: templates/admin/filer/folder/directory_table.html:74
+#, fuzzy, python-format
+#| msgid "%(total_count)s selected"
+#| msgid_plural "All %(total_count)s selected"
+msgid "%(counter)s file"
+msgid_plural "%(counter)s files"
+msgstr[0] "%(total_count)s ausgewählt"
+msgstr[1] "Alle %(total_count)s ausgewählt"
+
+#: templates/admin/filer/folder/directory_table.html:80
+#, fuzzy
+#| msgid "Change current folder details"
+msgid "Change folder details"
+msgstr "Details des aktuellen Ordners ändern"
+
+#: templates/admin/filer/folder/directory_table.html:81
+#, fuzzy
+#| msgid "folder"
+msgid "Remove folder"
+msgstr "Ordner"
+
+#: templates/admin/filer/folder/directory_table.html:92
+#: templates/admin/filer/folder/directory_table.html:100
+#: templates/admin/filer/folder/directory_table.html:115
 msgid "Select this file"
 msgstr "Diese Datei auswählen"
 
-#: templates/admin/filer/folder/directory_table.html:39
-#: templates/admin/filer/folder/directory_table.html:43
-#: templates/admin/filer/folder/directory_table.html:44
+#: templates/admin/filer/folder/directory_table.html:103
+#: templates/admin/filer/folder/directory_table.html:118
+#: templates/admin/filer/folder/directory_table.html:138
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Ändere Details von '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:42
-#, python-format
-msgid "Delete '%(item_label)s'"
-msgstr "Löche '%(item_label)s'"
-
-#: templates/admin/filer/folder/directory_table.html:42
-msgid "Delete"
-msgstr "Löschen"
-
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "Permissions"
 msgstr "Berechtigungen"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "disabled"
 msgstr "deaktiviert"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "enabled"
 msgstr "aktiviert"
 
-#: templates/admin/filer/folder/directory_table.html:50
-msgid "Move to clipboard"
-msgstr "In die Zwischenablage legen"
+#: templates/admin/filer/folder/directory_table.html:139
+#, fuzzy
+#| msgid "Rename files"
+msgid "Remove file"
+msgstr "Dateien umbenennen"
 
-#: templates/admin/filer/folder/directory_table.html:58
-msgid "there are no files or subfolders"
-msgstr "es gibt keine Dateien oder Unterordner"
+#: templates/admin/filer/folder/directory_table.html:146
+msgid "Drop files here or use the \"Upload Files\" button"
+msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:65
+#: templates/admin/filer/folder/directory_table.html:156
+msgid "Drop your file to upload into:"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:166
+msgid "Upload"
+msgstr "Hochladen"
+
+#: templates/admin/filer/folder/directory_table.html:178
+#, fuzzy
+#| msgid "cancel search"
+msgid "cancel"
+msgstr "Suche abbrechen"
+
+#: templates/admin/filer/folder/directory_table.html:182
+msgid "Upload success!"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:186
+#, fuzzy
+#| msgid "upload failed"
+msgid "Upload canceled!"
+msgstr "das Hochladen schlug fehl"
+
+#: templates/admin/filer/folder/directory_table.html:193
 msgid "previous"
 msgstr "vorige"
 
-#: templates/admin/filer/folder/directory_table.html:69
-#, python-format
-msgid ""
+#: templates/admin/filer/folder/directory_table.html:198
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "            Page %(number)s of %(num_pages)s.\n"
+#| "            "
+msgid "Page %(number)s of %(num_pages)s."
+msgstr ""
 "\n"
-"            Page %(number)s of %(num_pages)s.\n"
-"            "
-msgstr "\nSeite %(number)s von %(num_pages)s."
+"Seite %(number)s von %(num_pages)s."
 
-#: templates/admin/filer/folder/directory_table.html:75
+#: templates/admin/filer/folder/directory_table.html:203
 msgid "next"
 msgstr "nächste"
 
-#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/folder/directory_table.html:213
+#, fuzzy, python-format
+#| msgid "Select all %(total_count)s files and/or folders"
+msgid "Select all %(total_count)s"
+msgstr "Alle %(total_count)s Dateien und/oder Ordner auswählen"
+
+#: templates/admin/filer/folder/new_folder_form.html:5
 msgid "Add new"
 msgstr "Hinzufügen"
 
@@ -767,119 +961,185 @@ msgstr[1] "Bitte korrigiere die unten genannten Fehler."
 msgid "Save"
 msgstr "Sichern"
 
-#: templates/admin/filer/image/change_form.html:21
-msgid "Full size preview"
-msgstr "Vollbild-Vorschau"
-
-#: templates/admin/filer/tools/search_form.html:8
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Search"
-msgstr "Suchen"
-
-#: templates/admin/filer/tools/search_form.html:13
-msgid "Enter your search phrase here"
-msgstr "Gib Deinen Suchbegriff hier ein"
-
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Click here to"
-msgstr "Klicke hier, um"
-
-#: templates/admin/filer/tools/search_form.html:14
-msgid "run search for entered phrase"
-msgstr "nach dem Begriff zu sichen"
-
-#: templates/admin/filer/tools/search_form.html:15
-msgid "Check it to"
-msgstr "Wähle es aus, um"
-
-#: templates/admin/filer/tools/search_form.html:15
-#: templates/admin/filer/tools/search_form.html:16
-msgid "limit the search to current folder"
-msgstr "die Suche auf den aktuellen Ordner zu begrenzen"
-
-#: templates/admin/filer/tools/search_form.html:18
-msgid "found"
-msgstr "gefunden"
-
-#: templates/admin/filer/tools/search_form.html:18
-msgid "and"
-msgstr "und"
-
-#: templates/admin/filer/tools/search_form.html:19
-msgid "cancel search"
-msgstr "Suche abbrechen"
-
-#: templates/admin/filer/tools/upload_button_js.html:24
-#: templates/admin/filer/widgets/admin_file.html:7
-#: templates/admin/filer/widgets/admin_file.html:8
-msgid "file missing"
-msgstr "Datei fehlt"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:7
+#: templates/admin/filer/tools/clipboard/clipboard.html:9
 msgid "Clipboard"
 msgstr "Zwischenablage"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:19
+#: templates/admin/filer/tools/clipboard/clipboard.html:21
 msgid "Paste all items here"
 msgstr "Alle Einträge hier einfügen"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
-msgid "discard"
-msgstr "verwerfen"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Move all clipboard files to"
 msgstr "Bewege alle Dateien in der Zwischenablage nach"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:43
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#, fuzzy
+#| msgid "Clipboard"
+msgid "Empty Clipboard"
+msgstr "Zwischenablage"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:50
 msgid "the clipboard is empty"
 msgstr "die Zwischenablage ist leer"
 
-#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
+#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:16
 msgid "upload failed"
 msgstr "das Hochladen schlug fehl"
 
-#: templates/admin/filer/widgets/admin_file.html:11
-msgid "no file selected"
-msgstr "keine Datei ausgewählt"
+#: templates/admin/filer/tools/detail_info.html:24
+#, fuzzy
+#| msgid "Rename files"
+msgid "Open file"
+msgstr "Dateien umbenennen"
 
-#: templates/admin/filer/widgets/admin_file.html:14
-#: templates/admin/filer/widgets/admin_file.html:15
-#: templates/admin/filer/widgets/admin_folder.html:7
-#: templates/admin/filer/widgets/admin_folder.html:8
-msgid "Lookup"
-msgstr "Nachschlagen"
+#: templates/admin/filer/tools/detail_info.html:26
+#: templates/admin/filer/tools/detail_info.html:88
+msgid "Full size preview"
+msgstr "Vollbild-Vorschau"
 
-#: templates/admin/filer/widgets/admin_file.html:17
-#: templates/admin/filer/widgets/admin_folder.html:10
+#: templates/admin/filer/tools/detail_info.html:36
+#: templates/admin/filer/tools/detail_info.html:95
+msgid "Type"
+msgstr ""
+
+#: templates/admin/filer/tools/detail_info.html:44
+#: templates/admin/filer/tools/detail_info.html:113
+#, fuzzy
+#| msgid "file size"
+msgid "File-size"
+msgstr "Dateigröße"
+
+#: templates/admin/filer/tools/detail_info.html:48
+#: templates/admin/filer/tools/detail_info.html:122
+#, fuzzy
+#| msgid "modified at"
+msgid "Modified"
+msgstr "Verändert am"
+
+#: templates/admin/filer/tools/detail_info.html:52
+#: templates/admin/filer/tools/detail_info.html:131
+#, fuzzy
+#| msgid "created at"
+msgid "Created"
+msgstr "Angelegt am"
+
+#: templates/admin/filer/tools/detail_info.html:160
+#, fuzzy
+#| msgid "description"
+msgid "Add Description"
+msgstr "Beschreibung"
+
+#: templates/admin/filer/tools/detail_info.html:178
+#, fuzzy
+#| msgid "author"
+msgid "Author"
+msgstr "Autor"
+
+#: templates/admin/filer/tools/detail_info.html:185
+msgid "Add Alt-Text"
+msgstr ""
+
+#: templates/admin/filer/tools/detail_info.html:192
+#, fuzzy
+#| msgid "default caption"
+msgid "Add caption"
+msgstr "Standard Bildlegende"
+
+#: templates/admin/filer/tools/detail_info.html:199
+msgid "Add Tags"
+msgstr ""
+
+#: templates/admin/filer/tools/detail_info.html:206
+#, fuzzy
+#| msgid "Change"
+msgid "Change File"
+msgstr "Ändern"
+
+#: templates/admin/filer/tools/search_form.html:5
+msgid "found"
+msgstr "gefunden"
+
+#: templates/admin/filer/tools/search_form.html:5
+msgid "and"
+msgstr "und"
+
+#: templates/admin/filer/tools/search_form.html:6
+#, python-format
+msgid ""
+"\n"
+"            %(counter)s file"
+msgid_plural ""
+"%(counter)s files\n"
+"        "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/filer/tools/search_form.html:9
+msgid "cancel search"
+msgstr "Suche abbrechen"
+
+#: templates/admin/filer/widgets/admin_file.html:8
+#: templates/admin/filer/widgets/admin_file.html:40
+#: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr "Zurücksetzen"
 
-#: templates/admin/filer/widgets/admin_folder.html:5
+#: templates/admin/filer/widgets/admin_file.html:17
+msgid "or drop your file here"
+msgstr ""
+
+#: templates/admin/filer/widgets/admin_file.html:26
+#: templates/admin/filer/widgets/admin_file.html:27
+msgid "file missing"
+msgstr "Datei fehlt"
+
+#: templates/admin/filer/widgets/admin_file.html:30
+msgid "no file selected"
+msgstr "keine Datei ausgewählt"
+
+#: templates/admin/filer/widgets/admin_file.html:35
+#: templates/admin/filer/widgets/admin_folder.html:14
+msgid "Lookup"
+msgstr "Nachschlagen"
+
+#: templates/admin/filer/widgets/admin_file.html:36
+#, fuzzy
+#| msgid "upload files"
+msgid "Upload File"
+msgstr "Dateien hochladen"
+
+#: templates/admin/filer/widgets/admin_folder.html:11
+#: templates/admin/filer/widgets/admin_folder.html:33
 msgid "none selected"
 msgstr "nichts ausgewählt"
 
-#: templates/image_filer/folder.html:3
-#, python-format
-msgid "Folder '%(folder_label)s' files"
-msgstr "Dateien des Ordners '%(folder_label)s' "
+#: templates/admin/filer/widgets/admin_folder.html:15
+#, fuzzy
+#| msgid "Folder"
+msgid "Add Folder"
+msgstr "Ordner"
 
-#: templates/image_filer/folder.html:6
-msgid "File name"
-msgstr "Dateiname"
+#~ msgid "unfiled files"
+#~ msgstr "nicht abgelegte Dateien"
 
-#: templates/image_filer/image_export_form.html:17
-msgid "export"
-msgstr "exportieren"
+#~ msgid "Delete '%(item_label)s'"
+#~ msgstr "Löche '%(item_label)s'"
 
-#: templates/image_filer/image_export_form.html:27
-msgid "download image"
-msgstr "Bild herunter laden"
+#~ msgid "Move to clipboard"
+#~ msgstr "In die Zwischenablage legen"
 
-#: templates/image_filer/include/export_dialog.html:13
-msgid "Folder name already taken."
-msgstr "Ordnername wird bereits verwendet."
+#~ msgid "there are no files or subfolders"
+#~ msgstr "es gibt keine Dateien oder Unterordner"
 
-#: templates/image_filer/include/export_dialog.html:15
-msgid "Submit"
-msgstr "Senden"
+#~ msgid "discard"
+#~ msgstr "verwerfen"
+
+#~ msgid "Enter your search phrase here"
+#~ msgstr "Gib Deinen Suchbegriff hier ein"
+
+#~ msgid "Click here to"
+#~ msgstr "Klicke hier, um"
+
+#~ msgid "Check it to"
+#~ msgstr "Wähle es aus, um"

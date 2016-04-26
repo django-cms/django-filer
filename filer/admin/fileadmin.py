@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 from django import forms
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
-from filer import settings
-from filer.admin.permissions import PrimitivePermissionAwareModelAdmin
-from filer.models import File, Image
-from filer.utils.compatibility import DJANGO_1_5, unquote
-from filer.views import (popup_param, selectfolder_param, popup_status,
-                         selectfolder_status)
+from .. import settings
+from ..models import File
+from ..utils.compatibility import LTE_DJANGO_1_5, LTE_DJANGO_1_6, unquote
+from .permissions import PrimitivePermissionAwareModelAdmin
+from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class FileAdminChangeFrom(forms.ModelForm):
@@ -35,7 +35,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     form = FileAdminChangeFrom
 
     def get_queryset(self, request):
-        if DJANGO_1_5:
+        if LTE_DJANGO_1_5:
             return super(FileAdmin, self).queryset(request)
         return super(FileAdmin, self).get_queryset(request)
 
@@ -44,10 +44,18 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                         extra_fieldsets=()):
         fieldsets = (
             (None, {
-                'fields': ('name', 'owner', 'description', ) + extra_main_fields,  # flake8: noqa
+                'fields': (
+                    'name',
+                    'owner',
+                    'description',
+                ) + extra_main_fields,
             }),
             (_('Advanced'), {
-                'fields': ('file', 'sha1', 'display_canonical', ) + extra_advanced_fields,  # flake8: noqa
+                'fields': (
+                    'file',
+                    'sha1',
+                    'display_canonical',
+                ) + extra_advanced_fields,
                 'classes': ('collapse',),
             }),
         ) + extra_fieldsets
@@ -64,31 +72,33 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         Overrides the default to be able to forward to the directory listing
         instead of the default change_list_view
         """
-        r = super(FileAdmin, self).response_change(request, obj)
-        if 'Location' in r and r['Location']:
-            # it was a successful save
-            if (r['Location'] in ['../'] or
-                    r['Location'] == self._get_post_url(obj)):
-                # this means it was a save: redirect to the directory view
-                if obj.folder:
-                    url = reverse('admin:filer-directory_listing',
-                                  kwargs={'folder_id': obj.folder.id})
-                else:
-                    url = reverse(
-                        'admin:filer-directory_listing-unfiled_images')
-                url = "%s%s%s" % (url, popup_param(request),
-                                  selectfolder_param(request, "&"))
-                return HttpResponseRedirect(url)
+        if (
+            request.POST and
+            '_continue' not in request.POST and
+            '_saveasnew' not in request.POST and
+            '_addanother' not in request.POST
+        ):
+            # Popup in pick mode or normal mode. In both cases we want to go
+            # back to the folder list view after save. And not the useless file
+            # list view.
+            if obj.folder:
+                url = reverse('admin:filer-directory_listing',
+                              kwargs={'folder_id': obj.folder.id})
             else:
-                # this means it probably was a save_and_continue_editing
-                pass
-        return r
+                url = reverse(
+                    'admin:filer-directory_listing-unfiled_images')
+            url = "{0}{1}".format(
+                url,
+                admin_url_params_encoded(request),
+            )
+            return HttpResponseRedirect(url)
+        return super(FileAdmin, self).response_change(request, obj)
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
         extra_context = {'show_delete': True,
                          'is_popup': popup_status(request),
-                         'select_folder': selectfolder_status(request), }
+                         'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
         return super(FileAdmin, self).render_change_form(
             request=request, context=context, add=False, change=False,
@@ -103,35 +113,35 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         before super, because super will delete the object and make it
         impossible to find out the parent folder to redirect to.
         """
-        parent_folder = None
         try:
             obj = self.get_queryset(request).get(pk=unquote(object_id))
             parent_folder = obj.folder
         except self.model.DoesNotExist:
-            obj = None
+            parent_folder = None
 
-        r = super(FileAdmin, self).delete_view(
-            request=request, object_id=object_id,
-            extra_context=extra_context)
-
-        url = r.get("Location", None)
-        # Account for custom Image model
-        image_change_list_url_name = 'admin:{0}_{1}_changelist'.format(
-            Image._meta.app_label, Image._meta.model_name)
-        # Check against filer_file_changelist as file deletion is always made by
-        # the base class
-        if (url in ["../../../../", "../../"] or
-                url == reverse("admin:filer_file_changelist") or
-                url == reverse(image_change_list_url_name)):
+        admin_context = AdminContext(request)
+        if LTE_DJANGO_1_6:
+            extra_context = extra_context or {}
+            extra_context.update({'is_popup': admin_context.popup})
+        if request.POST:
+            # Return to folder listing, since there is no usable file listing.
+            super(FileAdmin, self).delete_view(
+                request=request, object_id=object_id,
+                extra_context=extra_context)
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-unfiled_images')
-            url = "%s%s%s" % (url, popup_param(request),
-                              selectfolder_param(request, "&"))
+            url = "{0}{1}".format(
+                url,
+                admin_url_params_encoded(request)
+            )
             return HttpResponseRedirect(url)
-        return r
+
+        return super(FileAdmin, self).delete_view(
+            request=request, object_id=object_id,
+            extra_context=extra_context)
 
     def get_model_perms(self, request):
         """

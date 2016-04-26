@@ -1,8 +1,10 @@
 #-*- coding: utf-8 -*-
-from PIL import Image, ImageChops, ImageDraw
+from __future__ import absolute_import
 
-from filer.models.foldermodels import Folder
-from filer.models.clipboardmodels import Clipboard, ClipboardItem
+from ..models.clipboardmodels import Clipboard, ClipboardItem
+from ..models.foldermodels import Folder
+from ..utils.compatibility import PILImage, PILImageDraw
+
 
 def create_superuser():
     try:
@@ -14,6 +16,7 @@ def create_superuser():
                                               'admin@free.fr',
                                               'secret')
     return superuser
+
 
 def create_folder_structure(depth=2, sibling=2, parent=None):
     """
@@ -33,14 +36,16 @@ def create_folder_structure(depth=2, sibling=2, parent=None):
                 folder.save()
                 create_folder_structure(depth=d-1, sibling=sibling, parent=folder)
 
+
 def create_clipboard_item(user, file_obj):
     clipboard, was_clipboard_created = Clipboard.objects.get_or_create(user=user)
     clipboard_item = ClipboardItem(clipboard=clipboard, file=file_obj)
     return clipboard_item
 
+
 def create_image(mode='RGB', size=(800, 600)):
-    image = Image.new(mode, size)
-    draw = ImageDraw.Draw(image)
+    image = PILImage.new(mode, size)
+    draw = PILImageDraw.Draw(image)
     x_bit, y_bit = size[0] // 10, size[1] // 10
     draw.rectangle((x_bit, y_bit * 2, x_bit * 7, y_bit * 3), 'red')
     draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), 'red')

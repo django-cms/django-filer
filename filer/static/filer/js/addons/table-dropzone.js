@@ -2,7 +2,7 @@
 // This script implements the dropzone settings
 'use strict';
 
-/* globals Dropzone, Cl */
+/* globals Dropzone, Cl, django */
 (function ($) {
     $(function () {
         var submitNum = 0;
@@ -18,6 +18,8 @@
         var uploadInfo = $('.js-filer-dropzone-upload-info');
         var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
         var uploadNumber = $('.js-filer-dropzone-upload-number');
+        var uploadCount = $('.js-filer-upload-count');
+        var uploadText = $('.js-filer-upload-text');
         var uploadFileNameSelector = '.js-filer-dropzone-file-name';
         var uploadProgressSelector = '.js-filer-dropzone-progress';
         var uploadSuccess = $('.js-filer-dropzone-upload-success');
@@ -25,6 +27,7 @@
         var cancelUpload = $('.js-filer-dropzone-cancel');
         var dragHoverClass = 'dz-drag-hover';
         var dataUploaderConnections = 'max-uploader-connections';
+        var dragHoverBorder = $('.drag-hover-border');
         // var dataMaxFileSize = 'max-file-size';
         var hiddenClass = 'hidden';
         var hideMessageTimeout;
@@ -33,6 +36,8 @@
         var baseFolderTitle;
         var updateUploadNumber = function () {
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
+            uploadText.removeClass('hidden');
+            uploadCount.removeClass('hidden');
         };
         var destroyDropzones = function () {
             $.each(dropzoneInstances, function (index) {
@@ -115,12 +120,35 @@
                     },
                     dragover: function (dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
+                        var dropzoneFolder = dropzone.hasClass('js-filer-dropzone-folder');
+                        var dropzoneBoundingRect = dropzone[0].getBoundingClientRect();
+                        var borderSize = $('.drag-hover-border').css('border-top-width');
+                        var dropzonePosition = {
+                            top: dropzoneBoundingRect.top,
+                            bottom: dropzoneBoundingRect.bottom,
+                            width: dropzoneBoundingRect.width,
+                            height: dropzoneBoundingRect.height - (parseInt(borderSize, 10) * 2)
+                        };
+                        if (dropzoneFolder) {
+                            dragHoverBorder.css(dropzonePosition);
+                        }
+
                         $(dropzones).addClass('reset-hover');
                         uploadSuccess.addClass(hiddenClass);
                         infoMessage.removeClass(hiddenClass);
                         dropzone.addClass(dragHoverClass).removeClass('reset-hover');
 
                         folderName.text(folderTitle);
+                    },
+                    dragend: function () {
+                        clearTimeout(hideMessageTimeout);
+                        hideMessageTimeout = setTimeout(function () {
+                            infoMessage.addClass(hiddenClass);
+                        }, 1000);
+
+                        infoMessage.removeClass(hiddenClass);
+                        dropzones.removeClass(dragHoverClass);
+                        dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
                     },
                     dragleave: function () {
                         clearTimeout(hideMessageTimeout);
@@ -130,6 +158,8 @@
 
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
+                        dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
+
                     },
                     sending: function (file) {
                         getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);
@@ -183,4 +213,4 @@
             });
         }
     });
-})(jQuery);
+})(django.jQuery);

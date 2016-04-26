@@ -1,0 +1,37 @@
+.filer-tooltip-wrapper {
+    position: relative;
+}
+
+.filer-tooltip {
+    position: absolute;
+    left: -30px;
+    right: -30px;
+    color: $gray;
+    text-align: center;
+    font-size: $font-size-small !important;
+    line-height: 15px !important;
+    white-space: normal;
+    margin-top: 5px;
+    padding: 10px;
+    background-color: $white;
+    box-shadow: 0 0 10px rgba(black,.25);
+    border-radius: 5px;
+    z-index: 10;
+    &:before {
+        position: absolute;
+        top: -3px;
+        left: 50%;
+        z-index: -1;
+        content: '';
+        width: 9px;
+        height: 9px;
+        margin-left: -5px;
+        transform: rotate(45deg);
+        background-color: #fff;
+    }
+}
+
+.disabled-btn-tooltip {
+    display: none;
+    outline: none;
+}
