@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Pablo, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
@@ -10,16 +11,16 @@ msgstr ""
 "POT-Creation-Date: 2015-07-24 20:03+0200\n"
 "PO-Revision-Date: 2015-07-24 18:03+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Slovak (http://www.transifex.com/divio/django-filer/language/sk/)\n"
+"Language-Team: Galician (http://www.transifex.com/divio/django-filer/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/fileadmin.py:47
 msgid "Advanced"
-msgstr ""
+msgstr "Avanzado"
 
 #: admin/folderadmin.py:355 admin/folderadmin.py:506
 msgid ""
@@ -31,27 +32,26 @@ msgstr ""
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(total_count)s seleccionados"
+msgstr[1] "Os %(total_count)s seleccionados"
 
 #: admin/folderadmin.py:411
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 de %(cnt)s seleccionados"
 
 #: admin/folderadmin.py:535
 msgid "No action selected."
-msgstr ""
+msgstr "Ningunha acción seleccionada."
 
 #: admin/folderadmin.py:576
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
-msgstr ""
+msgstr "Movéronse correctamente %(count)d arquivos ao portapapeis."
 
 #: admin/folderadmin.py:582
 msgid "Move selected files to clipboard"
-msgstr ""
+msgstr "Mover arquivos seleccionados ao portapapeis."
 
 #: admin/folderadmin.py:616
 #, python-format
@@ -78,15 +78,15 @@ msgstr ""
 
 #: admin/folderadmin.py:702
 msgid "Cannot delete files and/or folders"
-msgstr ""
+msgstr "Non se poden borrar arquivos e/ou carpetas"
 
 #: admin/folderadmin.py:704
 msgid "Are you sure?"
-msgstr ""
+msgstr "Estás seguro?"
 
 #: admin/folderadmin.py:709
 msgid "Delete files and/or folders"
-msgstr ""
+msgstr "Borrar arquivos e/ou carpetas"
 
 #: admin/folderadmin.py:726
 msgid "Delete selected files and/or folders"
@@ -106,11 +106,11 @@ msgstr ""
 
 #: admin/folderadmin.py:853 admin/folderadmin.py:855
 msgid "Move files and/or folders"
-msgstr ""
+msgstr "Mover alquivos e/ou carpetas"
 
 #: admin/folderadmin.py:870
 msgid "Move selected files and/or folders"
-msgstr ""
+msgstr "Mover arquivos e/ou carpetas seleccionados"
 
 #: admin/folderadmin.py:927
 #, python-format
@@ -130,11 +130,11 @@ msgstr ""
 
 #: admin/folderadmin.py:1062 admin/folderadmin.py:1064
 msgid "Copy files and/or folders"
-msgstr ""
+msgstr "Copiar arquivos e/ou carpetas"
 
 #: admin/folderadmin.py:1081
 msgid "Copy selected files and/or folders"
-msgstr ""
+msgstr "Copiar arquivos e/ou carpetas seleccionados"
 
 #: admin/folderadmin.py:1175
 #, python-format
@@ -143,11 +143,11 @@ msgstr ""
 
 #: admin/folderadmin.py:1183 admin/folderadmin.py:1185
 msgid "Resize images"
-msgstr ""
+msgstr "Cambiar o tamaño das imaxes"
 
 #: admin/folderadmin.py:1201
 msgid "Resize selected images"
-msgstr ""
+msgstr "Cambiar o tamaño das imaxes seleccionadas"
 
 #: admin/forms.py:26
 msgid "Suffix which will be appended to filenames of copied files."
@@ -168,27 +168,27 @@ msgstr ""
 #: admin/forms.py:56
 #, python-format
 msgid "Invalid rename format: %(error)s."
-msgstr ""
+msgstr "Formato para o cambio de nome non válido: %(error)s."
 
 #: admin/forms.py:62
 msgid "thumbnail option"
-msgstr ""
+msgstr "opción da miniatura"
 
 #: admin/forms.py:63
 msgid "width"
-msgstr ""
+msgstr "ancho"
 
 #: admin/forms.py:64
 msgid "height"
-msgstr ""
+msgstr "alto"
 
 #: admin/forms.py:65
 msgid "crop"
-msgstr ""
+msgstr "recortar"
 
 #: admin/forms.py:66
 msgid "upscale"
-msgstr ""
+msgstr "ampliar"
 
 #: admin/forms.py:71
 msgid "Thumbnail option or resize parameters must be choosen."
@@ -212,11 +212,11 @@ msgstr ""
 
 #: models/abstract.py:40
 msgid "default alt text"
-msgstr ""
+msgstr "texto alternativo por defecto"
 
 #: models/abstract.py:41
 msgid "default caption"
-msgstr ""
+msgstr "lenda por defecto"
 
 #: models/abstract.py:43
 msgid "subject location"
@@ -224,87 +224,87 @@ msgstr ""
 
 #: models/abstract.py:172
 msgid "image"
-msgstr ""
+msgstr "imaxe"
 
 #: models/abstract.py:173
 msgid "images"
-msgstr ""
+msgstr "imaxes"
 
 #: models/clipboardmodels.py:13 models/foldermodels.py:258
 msgid "user"
-msgstr ""
+msgstr "usuario"
 
 #: models/clipboardmodels.py:15 models/filemodels.py:292
 msgid "files"
-msgstr ""
+msgstr "arquivos"
 
 #: models/clipboardmodels.py:33 models/clipboardmodels.py:39
 msgid "clipboard"
-msgstr ""
+msgstr "portapapeis"
 
 #: models/clipboardmodels.py:34
 msgid "clipboards"
-msgstr ""
+msgstr "portapapeis"
 
 #: models/clipboardmodels.py:38 models/filemodels.py:42
 #: models/filemodels.py:291
 msgid "file"
-msgstr ""
+msgstr "arquivo"
 
 #: models/clipboardmodels.py:43
 msgid "clipboard item"
-msgstr ""
+msgstr "elemento do portapapeis"
 
 #: models/clipboardmodels.py:44
 msgid "clipboard items"
-msgstr ""
+msgstr "elementos do portapapeis"
 
 #: models/filemodels.py:40 templates/admin/filer/folder/change_form.html:9
 #: templates/admin/filer/folder/directory_listing.html:78
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
-msgstr ""
+msgstr "carpeta"
 
 #: models/filemodels.py:43
 msgid "file size"
-msgstr ""
+msgstr "tamaño do arquivo"
 
 #: models/filemodels.py:45
 msgid "sha1"
-msgstr ""
+msgstr "sha1"
 
 #: models/filemodels.py:47
 msgid "has all mandatory data"
-msgstr ""
+msgstr "ten todos os datos obrigatorios"
 
 #: models/filemodels.py:49
 msgid "original filename"
-msgstr ""
+msgstr "nome do arquivo orixinal"
 
 #: models/filemodels.py:51 models/foldermodels.py:103
 msgid "name"
-msgstr ""
+msgstr "nome"
 
 #: models/filemodels.py:53
 msgid "description"
-msgstr ""
+msgstr "descrición"
 
 #: models/filemodels.py:57
 msgid "owner"
-msgstr ""
+msgstr "propietario"
 
 #: models/filemodels.py:59 models/foldermodels.py:109
 msgid "uploaded at"
-msgstr ""
+msgstr "subido a"
 
 #: models/filemodels.py:60 models/foldermodels.py:112
 msgid "modified at"
-msgstr ""
+msgstr "modificado o"
 
 #: models/filemodels.py:64
 msgid "Permissions disabled"
-msgstr ""
+msgstr "Permisos desactivados"
 
 #: models/filemodels.py:65
 msgid ""
@@ -314,29 +314,29 @@ msgstr ""
 
 #: models/foldermodels.py:111
 msgid "created at"
-msgstr ""
+msgstr "creado o"
 
 #: models/foldermodels.py:223
 #: templates/admin/filer/widgets/admin_folder.html:3
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "Folder"
-msgstr ""
+msgstr "Carpeta"
 
 #: models/foldermodels.py:224
 msgid "Folders"
-msgstr ""
+msgstr "Carpetas"
 
 #: models/foldermodels.py:243
 msgid "all items"
-msgstr ""
+msgstr "todos os elementos"
 
 #: models/foldermodels.py:244
 msgid "this item only"
-msgstr ""
+msgstr "só este elemento"
 
 #: models/foldermodels.py:245
 msgid "this item and all children"
-msgstr ""
+msgstr "este elemento e todos os fillos"
 
 #: models/foldermodels.py:249
 msgid "allow"
@@ -348,43 +348,43 @@ msgstr ""
 
 #: models/foldermodels.py:255
 msgid "type"
-msgstr ""
+msgstr "tipo"
 
 #: models/foldermodels.py:261
 msgid "group"
-msgstr ""
+msgstr "grupo"
 
 #: models/foldermodels.py:262
 msgid "everybody"
-msgstr ""
+msgstr "todos"
 
 #: models/foldermodels.py:264
 msgid "can edit"
-msgstr ""
+msgstr "pode editar"
 
 #: models/foldermodels.py:265
 msgid "can read"
-msgstr ""
+msgstr "pode ler"
 
 #: models/foldermodels.py:266
 msgid "can add children"
-msgstr ""
+msgstr "pode engadir fillos"
 
 #: models/foldermodels.py:308
 msgid "folder permission"
-msgstr ""
+msgstr "permiso da carpeta"
 
 #: models/foldermodels.py:309
 msgid "folder permissions"
-msgstr ""
+msgstr "permisos da carpeta"
 
 #: models/imagemodels.py:27
 msgid "date taken"
-msgstr ""
+msgstr "data"
 
 #: models/imagemodels.py:30
 msgid "author"
-msgstr ""
+msgstr "autor"
 
 #: models/imagemodels.py:32
 msgid "must always publish author credit"
@@ -397,7 +397,7 @@ msgstr ""
 #: models/virtualitems.py:46
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "unfiled files"
-msgstr ""
+msgstr "arquivos non clasificados"
 
 #: models/virtualitems.py:60
 msgid "files with missing metadata"
@@ -642,7 +642,6 @@ msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:29
@@ -652,7 +651,6 @@ msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: templates/admin/filer/folder/directory_listing.html:84
 msgid "Change current folder details"
@@ -745,7 +743,6 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"
@@ -807,11 +804,11 @@ msgstr ""
 
 #: templates/admin/filer/tools/search_form.html:17
 msgid "found"
-msgstr ""
+msgstr "atopado"
 
 #: templates/admin/filer/tools/search_form.html:17
 msgid "and"
-msgstr ""
+msgstr "e"
 
 #: templates/admin/filer/tools/search_form.html:18
 msgid "cancel search"

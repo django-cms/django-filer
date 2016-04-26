@@ -8,143 +8,144 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Rivo Zängov <eraser@eraser.ee>\n"
-"Language-Team: Estonian (http://www.transifex.com/projects/p/django-filer/language/et/)\n"
+"POT-Creation-Date: 2015-07-24 20:03+0200\n"
+"PO-Revision-Date: 2015-07-24 18:03+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"Language-Team: Estonian (http://www.transifex.com/divio/django-filer/language/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:103
-msgid "Folder with this name already exists."
-msgstr ""
-
-#: admin/fileadmin.py:41
+#: admin/fileadmin.py:47
 msgid "Advanced"
 msgstr ""
 
-#: admin/folderadmin.py:324 admin/folderadmin.py:427
+#: admin/folderadmin.py:355 admin/folderadmin.py:506
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: admin/folderadmin.py:344
+#: admin/folderadmin.py:375
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/folderadmin.py:377
+#: admin/folderadmin.py:411
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: admin/folderadmin.py:456
+#: admin/folderadmin.py:535
 msgid "No action selected."
 msgstr "Ühtegi tegevust pole valitud."
 
-#: admin/folderadmin.py:497
+#: admin/folderadmin.py:576
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr ""
 
-#: admin/folderadmin.py:503
+#: admin/folderadmin.py:582
 msgid "Move selected files to clipboard"
 msgstr ""
 
-#: admin/folderadmin.py:537
+#: admin/folderadmin.py:616
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr ""
 
-#: admin/folderadmin.py:541
+#: admin/folderadmin.py:620
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr ""
 
-#: admin/folderadmin.py:550
+#: admin/folderadmin.py:629
 msgid "Enable permissions for selected files"
 msgstr ""
 
-#: admin/folderadmin.py:555
+#: admin/folderadmin.py:634
 msgid "Disable permissions for selected files"
 msgstr ""
 
-#: admin/folderadmin.py:623
+#: admin/folderadmin.py:695
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr ""
 
-#: admin/folderadmin.py:630
+#: admin/folderadmin.py:702
 msgid "Cannot delete files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:704
 msgid "Are you sure?"
 msgstr "Oled sa kindel?"
 
-#: admin/folderadmin.py:637
+#: admin/folderadmin.py:709
 msgid "Delete files and/or folders"
 msgstr "Kustuta failid ja/või kaustad"
 
-#: admin/folderadmin.py:656
+#: admin/folderadmin.py:726
 msgid "Delete selected files and/or folders"
 msgstr "Kustuta valitud failid ja/või kaustad"
 
-#: admin/folderadmin.py:771
+#: admin/folderadmin.py:842
+#, python-format
+msgid "Folders with names %s already exist at the selected destination"
+msgstr ""
+
+#: admin/folderadmin.py:846
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr ""
 
-#: admin/folderadmin.py:778 admin/folderadmin.py:780
+#: admin/folderadmin.py:853 admin/folderadmin.py:855
 msgid "Move files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:797
+#: admin/folderadmin.py:870
 msgid "Move selected files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:854
+#: admin/folderadmin.py:927
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr ""
 
-#: admin/folderadmin.py:862 admin/folderadmin.py:864 admin/folderadmin.py:881
+#: admin/folderadmin.py:935 admin/folderadmin.py:937 admin/folderadmin.py:952
 msgid "Rename files"
 msgstr "Nimeta failid ümber"
 
-#: admin/folderadmin.py:975
+#: admin/folderadmin.py:1046
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr ""
 
-#: admin/folderadmin.py:989 admin/folderadmin.py:991
+#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
 msgid "Copy files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1010
+#: admin/folderadmin.py:1081
 msgid "Copy selected files and/or folders"
 msgstr ""
 
-#: admin/folderadmin.py:1105
+#: admin/folderadmin.py:1175
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr ""
 
-#: admin/folderadmin.py:1113 admin/folderadmin.py:1115
+#: admin/folderadmin.py:1183 admin/folderadmin.py:1185
 msgid "Resize images"
 msgstr ""
 
-#: admin/folderadmin.py:1133
+#: admin/folderadmin.py:1201
 msgid "Resize selected images"
 msgstr ""
 
@@ -205,193 +206,206 @@ msgstr ""
 msgid "Location of the main subject of the scene."
 msgstr ""
 
-#: models/clipboardmodels.py:9 models/foldermodels.py:236
+#: apps.py:7
+msgid "django filer"
+msgstr ""
+
+#: models/abstract.py:40
+msgid "default alt text"
+msgstr ""
+
+#: models/abstract.py:41
+msgid "default caption"
+msgstr ""
+
+#: models/abstract.py:43
+msgid "subject location"
+msgstr ""
+
+#: models/abstract.py:172
+msgid "image"
+msgstr "pilt"
+
+#: models/abstract.py:173
+msgid "images"
+msgstr "pildid"
+
+#: models/clipboardmodels.py:13 models/foldermodels.py:258
 msgid "user"
 msgstr "kasutaja"
 
-#: models/clipboardmodels.py:11 models/filemodels.py:287
+#: models/clipboardmodels.py:15 models/filemodels.py:292
 msgid "files"
 msgstr "failid"
 
-#: models/clipboardmodels.py:34 models/clipboardmodels.py:40
+#: models/clipboardmodels.py:33 models/clipboardmodels.py:39
 msgid "clipboard"
 msgstr "lõikalaud"
 
-#: models/clipboardmodels.py:35
+#: models/clipboardmodels.py:34
 msgid "clipboards"
 msgstr "lõikelauad"
 
-#: models/clipboardmodels.py:39 models/filemodels.py:35
-#: models/filemodels.py:286
+#: models/clipboardmodels.py:38 models/filemodels.py:42
+#: models/filemodels.py:291
 msgid "file"
 msgstr "fail"
 
-#: models/clipboardmodels.py:44
+#: models/clipboardmodels.py:43
 msgid "clipboard item"
 msgstr "lõikelaua kirje"
 
-#: models/clipboardmodels.py:45
+#: models/clipboardmodels.py:44
 msgid "clipboard items"
 msgstr "lõikelaua kirjed"
 
-#: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
+#: models/filemodels.py:40 templates/admin/filer/folder/change_form.html:9
+#: templates/admin/filer/folder/directory_listing.html:78
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
 msgstr "kaust"
 
-#: models/filemodels.py:36
+#: models/filemodels.py:43
 msgid "file size"
 msgstr "failisuurus"
 
-#: models/filemodels.py:38
+#: models/filemodels.py:45
 msgid "sha1"
 msgstr "sha1"
 
-#: models/filemodels.py:40
+#: models/filemodels.py:47
 msgid "has all mandatory data"
 msgstr ""
 
-#: models/filemodels.py:42
+#: models/filemodels.py:49
 msgid "original filename"
 msgstr ""
 
-#: models/filemodels.py:44 models/foldermodels.py:99
+#: models/filemodels.py:51 models/foldermodels.py:103
 msgid "name"
 msgstr "nimi"
 
-#: models/filemodels.py:46
+#: models/filemodels.py:53
 msgid "description"
 msgstr "kirjeldus"
 
-#: models/filemodels.py:50
+#: models/filemodels.py:57
 msgid "owner"
 msgstr "omanik"
 
-#: models/filemodels.py:52 models/foldermodels.py:105
+#: models/filemodels.py:59 models/foldermodels.py:109
 msgid "uploaded at"
 msgstr "üles laaditud"
 
-#: models/filemodels.py:53 models/foldermodels.py:108
+#: models/filemodels.py:60 models/foldermodels.py:112
 msgid "modified at"
 msgstr "muudetud"
 
-#: models/filemodels.py:57
+#: models/filemodels.py:64
 msgid "Permissions disabled"
 msgstr ""
 
-#: models/filemodels.py:58
-msgid "Disable any permission checking for this "
+#: models/filemodels.py:65
+msgid ""
+"Disable any permission checking for this file. File will be publicly "
+"accessible to anyone."
 msgstr ""
 
-#: models/foldermodels.py:107
+#: models/foldermodels.py:111
 msgid "created at"
 msgstr "loodud"
 
-#: models/foldermodels.py:211
+#: models/foldermodels.py:223
 #: templates/admin/filer/widgets/admin_folder.html:3
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "Folder"
 msgstr "Kaust"
 
-#: models/foldermodels.py:212
+#: models/foldermodels.py:224
 msgid "Folders"
 msgstr "Kaustad"
 
-#: models/foldermodels.py:227
+#: models/foldermodels.py:243
 msgid "all items"
 msgstr "kõik kirjed"
 
-#: models/foldermodels.py:228
+#: models/foldermodels.py:244
 msgid "this item only"
 msgstr "ainult see kirje"
 
-#: models/foldermodels.py:229
+#: models/foldermodels.py:245
 msgid "this item and all children"
 msgstr "see kirje ja kõik alamkirjed"
 
-#: models/foldermodels.py:233
+#: models/foldermodels.py:249
+msgid "allow"
+msgstr ""
+
+#: models/foldermodels.py:250
+msgid "deny"
+msgstr ""
+
+#: models/foldermodels.py:255
 msgid "type"
 msgstr "tüüp"
 
-#: models/foldermodels.py:239
+#: models/foldermodels.py:261
 msgid "group"
 msgstr "grupp"
 
-#: models/foldermodels.py:240
+#: models/foldermodels.py:262
 msgid "everybody"
 msgstr "kõik"
 
-#: models/foldermodels.py:242
+#: models/foldermodels.py:264
 msgid "can edit"
 msgstr "saab mutua"
 
-#: models/foldermodels.py:243
+#: models/foldermodels.py:265
 msgid "can read"
 msgstr "saab lugeda"
 
-#: models/foldermodels.py:244
+#: models/foldermodels.py:266
 msgid "can add children"
 msgstr ""
 
-#: models/foldermodels.py:273
+#: models/foldermodels.py:308
 msgid "folder permission"
 msgstr "kausta õigus"
 
-#: models/foldermodels.py:274
+#: models/foldermodels.py:309
 msgid "folder permissions"
 msgstr "kausta õigused"
 
-#: models/imagemodels.py:39
+#: models/imagemodels.py:27
 msgid "date taken"
 msgstr ""
 
-#: models/imagemodels.py:42
-msgid "default alt text"
-msgstr ""
-
-#: models/imagemodels.py:43
-msgid "default caption"
-msgstr ""
-
-#: models/imagemodels.py:45 templates/image_filer/image.html:6
+#: models/imagemodels.py:30
 msgid "author"
 msgstr "autor"
 
-#: models/imagemodels.py:47
+#: models/imagemodels.py:32
 msgid "must always publish author credit"
 msgstr ""
 
-#: models/imagemodels.py:48
+#: models/imagemodels.py:33
 msgid "must always publish copyright"
 msgstr ""
 
-#: models/imagemodels.py:50
-msgid "subject location"
-msgstr ""
-
-#: models/imagemodels.py:200
-msgid "image"
-msgstr "pilt"
-
-#: models/imagemodels.py:201
-msgid "images"
-msgstr "pildid"
-
-#: models/virtualitems.py:45
+#: models/virtualitems.py:46
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "unfiled files"
 msgstr ""
 
-#: models/virtualitems.py:59
+#: models/virtualitems.py:60
 msgid "files with missing metadata"
 msgstr ""
 
-#: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:6
+#: models/virtualitems.py:74 templates/admin/filer/breadcrumbs.html:6
 #: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/image_filer/image_export_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:78
 msgid "root"
 msgstr ""
 
@@ -422,7 +436,6 @@ msgstr ""
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
 msgid "Home"
 msgstr "Koduleht"
 
@@ -432,20 +445,16 @@ msgstr ""
 
 #: templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/image_filer/image_export_form.html:8
 msgid "Filer"
 msgstr "Filer"
 
 #: templates/admin/filer/breadcrumbs.html:6
-#: templates/image_filer/image_export_form.html:10
 msgid "Go back to root folder"
 msgstr "Tagasi peakausta"
 
 #: templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:11
 #: templates/admin/filer/folder/change_form.html:11
-#: templates/image_filer/image_export_form.html:12
-#: templates/image_filer/image_export_form.html:14
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr ""
@@ -453,33 +462,6 @@ msgstr ""
 #: templates/admin/filer/change_form.html:28
 msgid "duplicates"
 msgstr ""
-
-#: templates/admin/filer/delete_confirmation.html:13
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-
-#: templates/admin/filer/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
-" following protected related objects:"
-msgstr ""
-
-#: templates/admin/filer/delete_confirmation.html:29
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-
-#: templates/admin/filer/delete_confirmation.html:34
-#: templates/admin/filer/delete_selected_files_confirmation.html:45
-msgid "Yes, I'm sure"
-msgstr "Jah, olen kindel"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
@@ -500,18 +482,18 @@ msgid ""
 "the following objects and their related items will be deleted:"
 msgstr ""
 
+#: templates/admin/filer/delete_selected_files_confirmation.html:45
+msgid "Yes, I'm sure"
+msgstr "Jah, olen kindel"
+
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/image_filer/image_export_form.html:7
-#: templates/image_filer/image_export_form.html:8
-#: templates/image_filer/image_export_form.html:16
+#: templates/admin/filer/folder/directory_listing.html:78
 msgid "Go back to"
 msgstr "Mine tagasi"
 
 #: templates/admin/filer/folder/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
 msgid "admin homepage"
 msgstr "admini koduleht"
 
@@ -526,8 +508,8 @@ msgid "View on site"
 msgstr "Vaata saidil"
 
 #: templates/admin/filer/folder/change_form.html:35
-#: templates/admin/filer/folder/directory_listing.html:75
-#: templates/admin/filer/folder/directory_listing.html:85
+#: templates/admin/filer/folder/directory_listing.html:79
+#: templates/admin/filer/folder/directory_listing.html:89
 #: templates/admin/filer/folder/directory_table.html:23
 msgid "Folder Icon"
 msgstr "Kausta ikoon"
@@ -632,50 +614,49 @@ msgstr ""
 msgid "Rename"
 msgstr "Nimeta ümber"
 
-#: templates/admin/filer/folder/directory_listing.html:66
+#: templates/admin/filer/folder/directory_listing.html:68
 msgid "Adds a new Folder"
 msgstr "Lisab uue kausta"
 
-#: templates/admin/filer/folder/directory_listing.html:66
-#: templates/image_filer/include/export_dialog.html:34
+#: templates/admin/filer/folder/directory_listing.html:68
 msgid "New Folder"
 msgstr "Uus kaust"
 
-#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:69
 msgid "upload files"
 msgstr "laadi failid üles"
 
-#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:69
 msgid "Upload"
 msgstr "Laadi üles"
 
-#: templates/admin/filer/folder/directory_listing.html:74
+#: templates/admin/filer/folder/directory_listing.html:78
 msgid "Go back to the parent folder"
 msgstr "Mine tagasi peamisesse kausta"
 
-#: templates/admin/filer/folder/directory_listing.html:76
+#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_table.html:29
+#: templates/admin/filer/tools/search_form.html:17
+#, python-format
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:29
 #: templates/admin/filer/tools/search_form.html:18
 #, python-format
-msgid "1 folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] "1 kaust"
-msgstr[1] "%(counter)s kausta"
-
-#: templates/admin/filer/folder/directory_listing.html:76
-#: templates/admin/filer/folder/directory_table.html:29
-#: templates/admin/filer/tools/search_form.html:19
-#, python-format
-msgid "1 file"
+msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] "1 fail"
-msgstr[1] "%(counter)s faili"
+msgstr[0] ""
+msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_listing.html:84
 msgid "Change current folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_listing.html:84
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:43
 msgid "Change"
@@ -693,17 +674,17 @@ msgid "Change '%(item_label)s' folder details"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:30
-#: templates/admin/filer/folder/directory_table.html:45
+#: templates/admin/filer/folder/directory_table.html:46
 msgid "Owner"
 msgstr "Omanik"
 
-#: templates/admin/filer/folder/directory_table.html:37
+#: templates/admin/filer/folder/directory_table.html:36
 msgid "Select this file"
 msgstr "Vali see fail"
 
-#: templates/admin/filer/folder/directory_table.html:39
+#: templates/admin/filer/folder/directory_table.html:38
 #: templates/admin/filer/folder/directory_table.html:43
-#: templates/admin/filer/folder/directory_table.html:44
+#: templates/admin/filer/folder/directory_table.html:45
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr ""
@@ -717,31 +698,31 @@ msgstr "Kustuta '%(item_label)s'"
 msgid "Delete"
 msgstr "Kustuta"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:47
 msgid "Permissions"
 msgstr "Õigused"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:47
 msgid "disabled"
 msgstr "välja lülitatud"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:47
 msgid "enabled"
 msgstr "sisse lülitatud"
 
-#: templates/admin/filer/folder/directory_table.html:50
+#: templates/admin/filer/folder/directory_table.html:51
 msgid "Move to clipboard"
 msgstr "Liiguta lõikelauale"
 
-#: templates/admin/filer/folder/directory_table.html:58
+#: templates/admin/filer/folder/directory_table.html:59
 msgid "there are no files or subfolders"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:65
+#: templates/admin/filer/folder/directory_table.html:66
 msgid "previous"
 msgstr "eelmine"
 
-#: templates/admin/filer/folder/directory_table.html:69
+#: templates/admin/filer/folder/directory_table.html:70
 #, python-format
 msgid ""
 "\n"
@@ -749,7 +730,7 @@ msgid ""
 "            "
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:75
+#: templates/admin/filer/folder/directory_table.html:76
 msgid "next"
 msgstr "järgmine"
 
@@ -770,50 +751,6 @@ msgstr "Salvesat"
 #: templates/admin/filer/image/change_form.html:21
 msgid "Full size preview"
 msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:8
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Search"
-msgstr "Otsi"
-
-#: templates/admin/filer/tools/search_form.html:13
-msgid "Enter your search phrase here"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Click here to"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:14
-msgid "run search for entered phrase"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:15
-msgid "Check it to"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:15
-#: templates/admin/filer/tools/search_form.html:16
-msgid "limit the search to current folder"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:18
-msgid "found"
-msgstr "leitud"
-
-#: templates/admin/filer/tools/search_form.html:18
-msgid "and"
-msgstr "ja"
-
-#: templates/admin/filer/tools/search_form.html:19
-msgid "cancel search"
-msgstr "tühista otsing"
-
-#: templates/admin/filer/tools/upload_button_js.html:24
-#: templates/admin/filer/widgets/admin_file.html:7
-#: templates/admin/filer/widgets/admin_file.html:8
-msgid "file missing"
-msgstr "fail puudub"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:7
 msgid "Clipboard"
@@ -839,18 +776,62 @@ msgstr ""
 msgid "upload failed"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:11
+#: templates/admin/filer/tools/search_form.html:7
+#: templates/admin/filer/tools/search_form.html:13
+msgid "Search"
+msgstr "Otsi"
+
+#: templates/admin/filer/tools/search_form.html:12
+msgid "Enter your search phrase here"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:13
+msgid "Click here to"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:13
+msgid "run search for entered phrase"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:14
+msgid "Check it to"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:14
+#: templates/admin/filer/tools/search_form.html:15
+msgid "limit the search to current folder"
+msgstr ""
+
+#: templates/admin/filer/tools/search_form.html:17
+msgid "found"
+msgstr "leitud"
+
+#: templates/admin/filer/tools/search_form.html:17
+msgid "and"
+msgstr "ja"
+
+#: templates/admin/filer/tools/search_form.html:18
+msgid "cancel search"
+msgstr "tühista otsing"
+
+#: templates/admin/filer/tools/upload_button_js.html:25
+#: templates/admin/filer/widgets/admin_file.html:8
+#: templates/admin/filer/widgets/admin_file.html:9
+msgid "file missing"
+msgstr "fail puudub"
+
+#: templates/admin/filer/widgets/admin_file.html:12
 msgid "no file selected"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
+#: templates/admin/filer/widgets/admin_file.html:16
 #: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:8
 msgid "Lookup"
 msgstr ""
 
-#: templates/admin/filer/widgets/admin_file.html:17
+#: templates/admin/filer/widgets/admin_file.html:18
 #: templates/admin/filer/widgets/admin_folder.html:10
 msgid "Clear"
 msgstr "Tühjenda"
@@ -859,27 +840,6 @@ msgstr "Tühjenda"
 msgid "none selected"
 msgstr "midagi pole valitud"
 
-#: templates/image_filer/folder.html:3
-#, python-format
-msgid "Folder '%(folder_label)s' files"
+#: views.py:108
+msgid "Folder with this name already exists."
 msgstr ""
-
-#: templates/image_filer/folder.html:6
-msgid "File name"
-msgstr "Failinimi"
-
-#: templates/image_filer/image_export_form.html:17
-msgid "export"
-msgstr "ekspordi"
-
-#: templates/image_filer/image_export_form.html:27
-msgid "download image"
-msgstr "laadi pilt alla"
-
-#: templates/image_filer/include/export_dialog.html:13
-msgid "Folder name already taken."
-msgstr "Kausta nimi on juba võetud."
-
-#: templates/image_filer/include/export_dialog.html:15
-msgid "Submit"
-msgstr "Saada"

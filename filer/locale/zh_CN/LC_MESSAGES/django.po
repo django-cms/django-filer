@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-24 20:03+0200\n"
-"PO-Revision-Date: 2015-07-24 18:03+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Slovak (http://www.transifex.com/divio/django-filer/language/sk/)\n"
+"PO-Revision-Date: 2012-07-13 15:50+0000\n"
+"Last-Translator: Stefan Foulis <stefan@foulis.ch>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/divio/django-filer/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin/fileadmin.py:47
 msgid "Advanced"
@@ -32,8 +32,6 @@ msgstr ""
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 #: admin/folderadmin.py:411
 #, python-format
@@ -641,8 +639,6 @@ msgstr ""
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
 msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 #: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:29
@@ -651,8 +647,6 @@ msgstr[2] ""
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
 msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 #: templates/admin/filer/folder/directory_listing.html:84
 msgid "Change current folder details"
@@ -744,8 +738,6 @@ msgstr ""
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"

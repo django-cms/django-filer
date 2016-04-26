@@ -10,143 +10,144 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 19:10+0200\n"
-"PO-Revision-Date: 2013-11-20 10:35+0000\n"
-"Last-Translator: Maikel Wever\n"
-"Language-Team: Dutch (Netherlands) (http://www.transifex.com/projects/p/django-filer/language/nl_NL/)\n"
+"POT-Creation-Date: 2015-07-24 20:03+0200\n"
+"PO-Revision-Date: 2015-07-24 18:03+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"Language-Team: Dutch (Netherlands) (http://www.transifex.com/divio/django-filer/language/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:103
-msgid "Folder with this name already exists."
-msgstr "Er bestaat al een map met deze naam."
-
-#: admin/fileadmin.py:41
+#: admin/fileadmin.py:47
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: admin/folderadmin.py:324 admin/folderadmin.py:427
+#: admin/folderadmin.py:355 admin/folderadmin.py:506
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "De actie kan niet worden uitgevoerd omdat er zijn geen items geselecteerd."
 
-#: admin/folderadmin.py:344
+#: admin/folderadmin.py:375
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s geselecteerd"
 msgstr[1] "Alle %(total_count)s geselecteerd"
 
-#: admin/folderadmin.py:377
+#: admin/folderadmin.py:411
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 van %(cnt)s geselecteerd"
 
-#: admin/folderadmin.py:456
+#: admin/folderadmin.py:535
 msgid "No action selected."
 msgstr "Geen actie geselecteerd."
 
-#: admin/folderadmin.py:497
+#: admin/folderadmin.py:576
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "%(count)d bestanden zijn succesvol verplaatst naar het klembord."
 
-#: admin/folderadmin.py:503
+#: admin/folderadmin.py:582
 msgid "Move selected files to clipboard"
 msgstr "Verplaats geselecteerde bestanden naar het klembord"
 
-#: admin/folderadmin.py:537
+#: admin/folderadmin.py:616
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Toegangsrechten succesvol uitgeschakeld voor %(count)d bestanden."
 
-#: admin/folderadmin.py:541
+#: admin/folderadmin.py:620
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Toegangsrechten succesvol ingeschakeld voor %(count)d bestanden."
 
-#: admin/folderadmin.py:550
+#: admin/folderadmin.py:629
 msgid "Enable permissions for selected files"
 msgstr "Schakel toegangsrechten in voor geselecteerde bestanden"
 
-#: admin/folderadmin.py:555
+#: admin/folderadmin.py:634
 msgid "Disable permissions for selected files"
 msgstr "Schakel toegangsrechten uit voor geselecteerde bestanden"
 
-#: admin/folderadmin.py:623
+#: admin/folderadmin.py:695
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "%(count)d bestanden en/of mappen zijn succesvol verwijderd."
 
-#: admin/folderadmin.py:630
+#: admin/folderadmin.py:702
 msgid "Cannot delete files and/or folders"
 msgstr "Bestanden en/of mappen kunnen niet worden verwijderd"
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:704
 msgid "Are you sure?"
 msgstr "Weet je het zeker?"
 
-#: admin/folderadmin.py:637
+#: admin/folderadmin.py:709
 msgid "Delete files and/or folders"
 msgstr "Verwijder bestanden en/of mappen"
 
-#: admin/folderadmin.py:656
+#: admin/folderadmin.py:726
 msgid "Delete selected files and/or folders"
 msgstr "Verwijder geselecteerde bestanden en/of mappen"
 
-#: admin/folderadmin.py:771
+#: admin/folderadmin.py:842
+#, python-format
+msgid "Folders with names %s already exist at the selected destination"
+msgstr ""
+
+#: admin/folderadmin.py:846
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "%(count)d bestanden en of mappen zijn succesvol verplaatst naar map '%(destination)s'."
 
-#: admin/folderadmin.py:778 admin/folderadmin.py:780
+#: admin/folderadmin.py:853 admin/folderadmin.py:855
 msgid "Move files and/or folders"
 msgstr "Verplaats bestanden en/of mappen"
 
-#: admin/folderadmin.py:797
+#: admin/folderadmin.py:870
 msgid "Move selected files and/or folders"
 msgstr "Verplaats geselecteerde bestanden en/of mappen"
 
-#: admin/folderadmin.py:854
+#: admin/folderadmin.py:927
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "%(count)d bestanden zijn succesvol hernoemd."
 
-#: admin/folderadmin.py:862 admin/folderadmin.py:864 admin/folderadmin.py:881
+#: admin/folderadmin.py:935 admin/folderadmin.py:937 admin/folderadmin.py:952
 msgid "Rename files"
 msgstr "Hernoem bestanden"
 
-#: admin/folderadmin.py:975
+#: admin/folderadmin.py:1046
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "%(count)d bestanden en/of mappen zijn succesvol gekopieerd naar map '%(destination)s'."
 
-#: admin/folderadmin.py:989 admin/folderadmin.py:991
+#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
 msgid "Copy files and/or folders"
 msgstr "Kopieer bestanden en/of mappen"
 
-#: admin/folderadmin.py:1010
+#: admin/folderadmin.py:1081
 msgid "Copy selected files and/or folders"
 msgstr "Kopieer geselecteerde bestanden en/of mappen"
 
-#: admin/folderadmin.py:1105
+#: admin/folderadmin.py:1175
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Afmetingen van %(count)d afbeeldingen zijn succesvol aangepast."
 
-#: admin/folderadmin.py:1113 admin/folderadmin.py:1115
+#: admin/folderadmin.py:1183 admin/folderadmin.py:1185
 msgid "Resize images"
 msgstr "Afmetingen aanpassen"
 
-#: admin/folderadmin.py:1133
+#: admin/folderadmin.py:1201
 msgid "Resize selected images"
 msgstr "Afmetingen aanpassen van geselecteerde afbeeldingen"
 
@@ -207,193 +208,206 @@ msgstr "Locatie van onderwerp"
 msgid "Location of the main subject of the scene."
 msgstr "Locatie van het belangrijkste onderwerp in de afbeelding"
 
-#: models/clipboardmodels.py:9 models/foldermodels.py:236
+#: apps.py:7
+msgid "django filer"
+msgstr ""
+
+#: models/abstract.py:40
+msgid "default alt text"
+msgstr "standaard alt. tekst"
+
+#: models/abstract.py:41
+msgid "default caption"
+msgstr "standaard titel"
+
+#: models/abstract.py:43
+msgid "subject location"
+msgstr "locatie van onderwerp"
+
+#: models/abstract.py:172
+msgid "image"
+msgstr "afbeelding"
+
+#: models/abstract.py:173
+msgid "images"
+msgstr "afbeeldingen"
+
+#: models/clipboardmodels.py:13 models/foldermodels.py:258
 msgid "user"
 msgstr "gebruiker"
 
-#: models/clipboardmodels.py:11 models/filemodels.py:287
+#: models/clipboardmodels.py:15 models/filemodels.py:292
 msgid "files"
 msgstr "bestanden"
 
-#: models/clipboardmodels.py:34 models/clipboardmodels.py:40
+#: models/clipboardmodels.py:33 models/clipboardmodels.py:39
 msgid "clipboard"
 msgstr "klembord"
 
-#: models/clipboardmodels.py:35
+#: models/clipboardmodels.py:34
 msgid "clipboards"
 msgstr "klemborden"
 
-#: models/clipboardmodels.py:39 models/filemodels.py:35
-#: models/filemodels.py:286
+#: models/clipboardmodels.py:38 models/filemodels.py:42
+#: models/filemodels.py:291
 msgid "file"
 msgstr "bestand"
 
-#: models/clipboardmodels.py:44
+#: models/clipboardmodels.py:43
 msgid "clipboard item"
 msgstr "klembord item"
 
-#: models/clipboardmodels.py:45
+#: models/clipboardmodels.py:44
 msgid "clipboard items"
 msgstr "klembord items"
 
-#: models/filemodels.py:33 templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
+#: models/filemodels.py:40 templates/admin/filer/folder/change_form.html:9
+#: templates/admin/filer/folder/directory_listing.html:78
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "folder"
 msgstr "map"
 
-#: models/filemodels.py:36
+#: models/filemodels.py:43
 msgid "file size"
 msgstr "bestandsgrootte"
 
-#: models/filemodels.py:38
+#: models/filemodels.py:45
 msgid "sha1"
 msgstr "sha1"
 
-#: models/filemodels.py:40
+#: models/filemodels.py:47
 msgid "has all mandatory data"
 msgstr "heeft allen verplichte eigenschappen"
 
-#: models/filemodels.py:42
+#: models/filemodels.py:49
 msgid "original filename"
 msgstr "oorspronkelijke bestandsnaam"
 
-#: models/filemodels.py:44 models/foldermodels.py:99
+#: models/filemodels.py:51 models/foldermodels.py:103
 msgid "name"
 msgstr "naam"
 
-#: models/filemodels.py:46
+#: models/filemodels.py:53
 msgid "description"
 msgstr "omschrijving"
 
-#: models/filemodels.py:50
+#: models/filemodels.py:57
 msgid "owner"
 msgstr "eigenaar"
 
-#: models/filemodels.py:52 models/foldermodels.py:105
+#: models/filemodels.py:59 models/foldermodels.py:109
 msgid "uploaded at"
 msgstr "geüpload op"
 
-#: models/filemodels.py:53 models/foldermodels.py:108
+#: models/filemodels.py:60 models/foldermodels.py:112
 msgid "modified at"
 msgstr "gewijzigd op"
 
-#: models/filemodels.py:57
+#: models/filemodels.py:64
 msgid "Permissions disabled"
 msgstr "Toegangsrechten uitgeschakeld"
 
-#: models/filemodels.py:58
-msgid "Disable any permission checking for this "
-msgstr "Schakel controle op toegangsrechten uit voor dit"
+#: models/filemodels.py:65
+msgid ""
+"Disable any permission checking for this file. File will be publicly "
+"accessible to anyone."
+msgstr ""
 
-#: models/foldermodels.py:107
+#: models/foldermodels.py:111
 msgid "created at"
 msgstr "aangemaakt op"
 
-#: models/foldermodels.py:211
+#: models/foldermodels.py:223
 #: templates/admin/filer/widgets/admin_folder.html:3
 #: templates/admin/filer/widgets/admin_folder.html:5
 msgid "Folder"
 msgstr "Map"
 
-#: models/foldermodels.py:212
+#: models/foldermodels.py:224
 msgid "Folders"
 msgstr "Mappen"
 
-#: models/foldermodels.py:227
+#: models/foldermodels.py:243
 msgid "all items"
 msgstr "alle items"
 
-#: models/foldermodels.py:228
+#: models/foldermodels.py:244
 msgid "this item only"
 msgstr "alleen dit item"
 
-#: models/foldermodels.py:229
+#: models/foldermodels.py:245
 msgid "this item and all children"
 msgstr "dit item en alle onderliggende items"
 
-#: models/foldermodels.py:233
+#: models/foldermodels.py:249
+msgid "allow"
+msgstr ""
+
+#: models/foldermodels.py:250
+msgid "deny"
+msgstr ""
+
+#: models/foldermodels.py:255
 msgid "type"
 msgstr "type"
 
-#: models/foldermodels.py:239
+#: models/foldermodels.py:261
 msgid "group"
 msgstr "groep"
 
-#: models/foldermodels.py:240
+#: models/foldermodels.py:262
 msgid "everybody"
 msgstr "iedereen"
 
-#: models/foldermodels.py:242
+#: models/foldermodels.py:264
 msgid "can edit"
 msgstr "mag wijzigen"
 
-#: models/foldermodels.py:243
+#: models/foldermodels.py:265
 msgid "can read"
 msgstr "mag lezen"
 
-#: models/foldermodels.py:244
+#: models/foldermodels.py:266
 msgid "can add children"
 msgstr "mag onderliggende items toevoegen"
 
-#: models/foldermodels.py:273
+#: models/foldermodels.py:308
 msgid "folder permission"
 msgstr "toegangsrecht folder"
 
-#: models/foldermodels.py:274
+#: models/foldermodels.py:309
 msgid "folder permissions"
 msgstr "toegangsrechten folder"
 
-#: models/imagemodels.py:39
+#: models/imagemodels.py:27
 msgid "date taken"
 msgstr "datum"
 
-#: models/imagemodels.py:42
-msgid "default alt text"
-msgstr "standaard alt. tekst"
-
-#: models/imagemodels.py:43
-msgid "default caption"
-msgstr "standaard titel"
-
-#: models/imagemodels.py:45 templates/image_filer/image.html:6
+#: models/imagemodels.py:30
 msgid "author"
 msgstr "auteur"
 
-#: models/imagemodels.py:47
+#: models/imagemodels.py:32
 msgid "must always publish author credit"
 msgstr "naam auteur altijd publiceren"
 
-#: models/imagemodels.py:48
+#: models/imagemodels.py:33
 msgid "must always publish copyright"
 msgstr "auteursrechten altijd publiceren"
 
-#: models/imagemodels.py:50
-msgid "subject location"
-msgstr "locatie van onderwerp"
-
-#: models/imagemodels.py:200
-msgid "image"
-msgstr "afbeelding"
-
-#: models/imagemodels.py:201
-msgid "images"
-msgstr "afbeeldingen"
-
-#: models/virtualitems.py:45
+#: models/virtualitems.py:46
 #: templates/admin/filer/tools/clipboard/clipboard.html:26
 msgid "unfiled files"
 msgstr "niet gecategoriseerde bestanden"
 
-#: models/virtualitems.py:59
+#: models/virtualitems.py:60
 msgid "files with missing metadata"
 msgstr "bestanden met ontbrekende meta gegevens"
 
-#: models/virtualitems.py:73 templates/admin/filer/breadcrumbs.html:6
+#: models/virtualitems.py:74 templates/admin/filer/breadcrumbs.html:6
 #: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/image_filer/image_export_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:78
 msgid "root"
 msgstr "hoofdmap"
 
@@ -424,7 +438,6 @@ msgstr "Ga terug naar admin homepage"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
 msgid "Home"
 msgstr "Home"
 
@@ -434,20 +447,16 @@ msgstr "Ga terug naar Bestandsbeheer"
 
 #: templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/image_filer/image_export_form.html:8
 msgid "Filer"
 msgstr "Bestandsbeheer"
 
 #: templates/admin/filer/breadcrumbs.html:6
-#: templates/image_filer/image_export_form.html:10
 msgid "Go back to root folder"
 msgstr "Ga terug naar de hoofdmap"
 
 #: templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:11
 #: templates/admin/filer/folder/change_form.html:11
-#: templates/image_filer/image_export_form.html:12
-#: templates/image_filer/image_export_form.html:14
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Ga terug naar map '%(folder_name)s'"
@@ -455,33 +464,6 @@ msgstr "Ga terug naar map '%(folder_name)s'"
 #: templates/admin/filer/change_form.html:28
 msgid "duplicates"
 msgstr "duplicaten"
-
-#: templates/admin/filer/delete_confirmation.html:13
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr "Het verwijderen van %(object_name)s '%(escaped_object)s' resulteert in het verwijderen van gerelateerde objecten. Je hebt echter geen toegangsrechten voor het verwijderen van de volgende objecttypes:"
-
-#: templates/admin/filer/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the"
-" following protected related objects:"
-msgstr "Het verwijderen van %(object_name)s '%(escaped_object)s' leidt tot het verwijderen van:"
-
-#: templates/admin/filer/delete_confirmation.html:29
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr "Weet je zeker dat je %(object_name)s \"%(escaped_object)s\" wilt verwijderen? Alle volgende gerelateerde items zullen ook worden verwijderd:"
-
-#: templates/admin/filer/delete_confirmation.html:34
-#: templates/admin/filer/delete_selected_files_confirmation.html:45
-msgid "Yes, I'm sure"
-msgstr "Ja, ik weet het zeker"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
@@ -502,18 +484,18 @@ msgid ""
 "the following objects and their related items will be deleted:"
 msgstr "Weet je zeker dat je de geselecteerde bestanden en/of folders wilt verwijderen? Alle volgende objecten en gerelateerde items zullen worden verwijderd: "
 
+#: templates/admin/filer/delete_selected_files_confirmation.html:45
+msgid "Yes, I'm sure"
+msgstr "Ja, ik weet het zeker"
+
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:74
-#: templates/image_filer/image_export_form.html:7
-#: templates/image_filer/image_export_form.html:8
-#: templates/image_filer/image_export_form.html:16
+#: templates/admin/filer/folder/directory_listing.html:78
 msgid "Go back to"
 msgstr "Ga terug naar"
 
 #: templates/admin/filer/folder/change_form.html:7
-#: templates/image_filer/image_export_form.html:7
 msgid "admin homepage"
 msgstr "admin homepage"
 
@@ -528,8 +510,8 @@ msgid "View on site"
 msgstr "Bekijk op site"
 
 #: templates/admin/filer/folder/change_form.html:35
-#: templates/admin/filer/folder/directory_listing.html:75
-#: templates/admin/filer/folder/directory_listing.html:85
+#: templates/admin/filer/folder/directory_listing.html:79
+#: templates/admin/filer/folder/directory_listing.html:89
 #: templates/admin/filer/folder/directory_table.html:23
 msgid "Folder Icon"
 msgstr "Map icoon"
@@ -634,50 +616,49 @@ msgstr "De volgende bestanden zullen worden hernoemd (de oorspronkelijke mapstru
 msgid "Rename"
 msgstr "Hernoemen"
 
-#: templates/admin/filer/folder/directory_listing.html:66
+#: templates/admin/filer/folder/directory_listing.html:68
 msgid "Adds a new Folder"
 msgstr "Voegt een nieuwe map toe"
 
-#: templates/admin/filer/folder/directory_listing.html:66
-#: templates/image_filer/include/export_dialog.html:34
+#: templates/admin/filer/folder/directory_listing.html:68
 msgid "New Folder"
 msgstr "Nieuwe map"
 
-#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:69
 msgid "upload files"
 msgstr "Bestanden uploaden"
 
-#: templates/admin/filer/folder/directory_listing.html:67
+#: templates/admin/filer/folder/directory_listing.html:69
 msgid "Upload"
 msgstr "Uploaden"
 
-#: templates/admin/filer/folder/directory_listing.html:74
+#: templates/admin/filer/folder/directory_listing.html:78
 msgid "Go back to the parent folder"
 msgstr "Ga terug naar de bovenliggende folder"
 
-#: templates/admin/filer/folder/directory_listing.html:76
+#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_table.html:29
+#: templates/admin/filer/tools/search_form.html:17
+#, python-format
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/filer/folder/directory_listing.html:80
 #: templates/admin/filer/folder/directory_table.html:29
 #: templates/admin/filer/tools/search_form.html:18
 #, python-format
-msgid "1 folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] "1 map"
-msgstr[1] "%(counter)s mappen"
-
-#: templates/admin/filer/folder/directory_listing.html:76
-#: templates/admin/filer/folder/directory_table.html:29
-#: templates/admin/filer/tools/search_form.html:19
-#, python-format
-msgid "1 file"
+msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] "1 bestand"
-msgstr[1] "%(counter)s bestanden"
+msgstr[0] ""
+msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_listing.html:84
 msgid "Change current folder details"
 msgstr "Wijzig eigenschappen van huidige map"
 
-#: templates/admin/filer/folder/directory_listing.html:80
+#: templates/admin/filer/folder/directory_listing.html:84
 #: templates/admin/filer/folder/directory_table.html:27
 #: templates/admin/filer/folder/directory_table.html:43
 msgid "Change"
@@ -695,17 +676,17 @@ msgid "Change '%(item_label)s' folder details"
 msgstr "Wijzig eigenschappen map '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:30
-#: templates/admin/filer/folder/directory_table.html:45
+#: templates/admin/filer/folder/directory_table.html:46
 msgid "Owner"
 msgstr "Eigenaar"
 
-#: templates/admin/filer/folder/directory_table.html:37
+#: templates/admin/filer/folder/directory_table.html:36
 msgid "Select this file"
 msgstr "Selecteer dit bestand"
 
-#: templates/admin/filer/folder/directory_table.html:39
+#: templates/admin/filer/folder/directory_table.html:38
 #: templates/admin/filer/folder/directory_table.html:43
-#: templates/admin/filer/folder/directory_table.html:44
+#: templates/admin/filer/folder/directory_table.html:45
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Wijzig eigenschappen '%(item_label)s'"
@@ -719,31 +700,31 @@ msgstr "Verwijder '%(item_label)s'"
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:47
 msgid "Permissions"
 msgstr "Toegangsrechten"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:47
 msgid "disabled"
 msgstr "uitgeschakeld"
 
-#: templates/admin/filer/folder/directory_table.html:46
+#: templates/admin/filer/folder/directory_table.html:47
 msgid "enabled"
 msgstr "ingeschakeld"
 
-#: templates/admin/filer/folder/directory_table.html:50
+#: templates/admin/filer/folder/directory_table.html:51
 msgid "Move to clipboard"
 msgstr "Verplaatsen naar klembord"
 
-#: templates/admin/filer/folder/directory_table.html:58
+#: templates/admin/filer/folder/directory_table.html:59
 msgid "there are no files or subfolders"
 msgstr "er zijn geen bestanden of onderliggende mappen"
 
-#: templates/admin/filer/folder/directory_table.html:65
+#: templates/admin/filer/folder/directory_table.html:66
 msgid "previous"
 msgstr "vorige"
 
-#: templates/admin/filer/folder/directory_table.html:69
+#: templates/admin/filer/folder/directory_table.html:70
 #, python-format
 msgid ""
 "\n"
@@ -751,7 +732,7 @@ msgid ""
 "            "
 msgstr "\nPagina %(number)s van %(num_pages)s.\n "
 
-#: templates/admin/filer/folder/directory_table.html:75
+#: templates/admin/filer/folder/directory_table.html:76
 msgid "next"
 msgstr "volgende"
 
@@ -772,50 +753,6 @@ msgstr "Opslaan"
 #: templates/admin/filer/image/change_form.html:21
 msgid "Full size preview"
 msgstr "Voorbeeld in volledig scherm"
-
-#: templates/admin/filer/tools/search_form.html:8
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Search"
-msgstr "Zoeken"
-
-#: templates/admin/filer/tools/search_form.html:13
-msgid "Enter your search phrase here"
-msgstr "Voer hier je zoekopdracht in"
-
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Click here to"
-msgstr "Klik hier om"
-
-#: templates/admin/filer/tools/search_form.html:14
-msgid "run search for entered phrase"
-msgstr "een zoekopdracht te doen voor de ingevoerde woorden"
-
-#: templates/admin/filer/tools/search_form.html:15
-msgid "Check it to"
-msgstr "Aanvinken om"
-
-#: templates/admin/filer/tools/search_form.html:15
-#: templates/admin/filer/tools/search_form.html:16
-msgid "limit the search to current folder"
-msgstr "zoekopdracht te beperken tot huidige map"
-
-#: templates/admin/filer/tools/search_form.html:18
-msgid "found"
-msgstr "gevonden"
-
-#: templates/admin/filer/tools/search_form.html:18
-msgid "and"
-msgstr "en"
-
-#: templates/admin/filer/tools/search_form.html:19
-msgid "cancel search"
-msgstr "annuleer zoekopdracht"
-
-#: templates/admin/filer/tools/upload_button_js.html:24
-#: templates/admin/filer/widgets/admin_file.html:7
-#: templates/admin/filer/widgets/admin_file.html:8
-msgid "file missing"
-msgstr "bestand ontbreekt"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:7
 msgid "Clipboard"
@@ -841,18 +778,62 @@ msgstr "het klembord is leeg"
 msgid "upload failed"
 msgstr "upload mislukt"
 
-#: templates/admin/filer/widgets/admin_file.html:11
+#: templates/admin/filer/tools/search_form.html:7
+#: templates/admin/filer/tools/search_form.html:13
+msgid "Search"
+msgstr "Zoeken"
+
+#: templates/admin/filer/tools/search_form.html:12
+msgid "Enter your search phrase here"
+msgstr "Voer hier je zoekopdracht in"
+
+#: templates/admin/filer/tools/search_form.html:13
+msgid "Click here to"
+msgstr "Klik hier om"
+
+#: templates/admin/filer/tools/search_form.html:13
+msgid "run search for entered phrase"
+msgstr "een zoekopdracht te doen voor de ingevoerde woorden"
+
+#: templates/admin/filer/tools/search_form.html:14
+msgid "Check it to"
+msgstr "Aanvinken om"
+
+#: templates/admin/filer/tools/search_form.html:14
+#: templates/admin/filer/tools/search_form.html:15
+msgid "limit the search to current folder"
+msgstr "zoekopdracht te beperken tot huidige map"
+
+#: templates/admin/filer/tools/search_form.html:17
+msgid "found"
+msgstr "gevonden"
+
+#: templates/admin/filer/tools/search_form.html:17
+msgid "and"
+msgstr "en"
+
+#: templates/admin/filer/tools/search_form.html:18
+msgid "cancel search"
+msgstr "annuleer zoekopdracht"
+
+#: templates/admin/filer/tools/upload_button_js.html:25
+#: templates/admin/filer/widgets/admin_file.html:8
+#: templates/admin/filer/widgets/admin_file.html:9
+msgid "file missing"
+msgstr "bestand ontbreekt"
+
+#: templates/admin/filer/widgets/admin_file.html:12
 msgid "no file selected"
 msgstr "geen bestand geselecteerd"
 
-#: templates/admin/filer/widgets/admin_file.html:14
 #: templates/admin/filer/widgets/admin_file.html:15
+#: templates/admin/filer/widgets/admin_file.html:16
 #: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:8
 msgid "Lookup"
 msgstr "Opzoeken"
 
-#: templates/admin/filer/widgets/admin_file.html:17
+#: templates/admin/filer/widgets/admin_file.html:18
 #: templates/admin/filer/widgets/admin_folder.html:10
 msgid "Clear"
 msgstr "Wissen"
@@ -861,27 +842,6 @@ msgstr "Wissen"
 msgid "none selected"
 msgstr "geen selectie gemaakt"
 
-#: templates/image_filer/folder.html:3
-#, python-format
-msgid "Folder '%(folder_label)s' files"
-msgstr "Bestanden in map '%(folder_label)s'"
-
-#: templates/image_filer/folder.html:6
-msgid "File name"
-msgstr "Bestandsnaam"
-
-#: templates/image_filer/image_export_form.html:17
-msgid "export"
-msgstr "exporteren"
-
-#: templates/image_filer/image_export_form.html:27
-msgid "download image"
-msgstr "afbeelding downloaden"
-
-#: templates/image_filer/include/export_dialog.html:13
-msgid "Folder name already taken."
-msgstr "Mapnaam is al in gebruik"
-
-#: templates/image_filer/include/export_dialog.html:15
-msgid "Submit"
-msgstr "Verzenden"
+#: views.py:108
+msgid "Folder with this name already exists."
+msgstr "Er bestaat al een map met deze naam."
