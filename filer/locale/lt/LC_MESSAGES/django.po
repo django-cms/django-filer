@@ -1,34 +1,42 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Matas Dailyda <matas@dailyda.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-24 20:03+0200\n"
+"POT-Creation-Date: 2016-04-26 13:37+0200\n"
 "PO-Revision-Date: 2015-07-27 09:52+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
-"Language-Team: Lithuanian (http://www.transifex.com/divio/django-filer/language/lt/)\n"
+"Language-Team: Lithuanian (http://www.transifex.com/divio/django-filer/"
+"language/lt/)\n"
+"Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: admin/fileadmin.py:47
+#: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
 msgid "Advanced"
 msgstr "Išplėstinės funkcijos"
 
-#: admin/folderadmin.py:355 admin/folderadmin.py:506
+#: admin/fileadmin.py:163
+msgid "canonical URL"
+msgstr ""
+
+#: admin/folderadmin.py:390 admin/folderadmin.py:557
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Objektai turi būti pasirinkti, kad su jais būtų galima atlikti veiksmus. Jokie objektai nebuvo pakeisti."
+msgstr ""
+"Objektai turi būti pasirinkti, kad su jais būtų galima atlikti veiksmus. "
+"Jokie objektai nebuvo pakeisti."
 
-#: admin/folderadmin.py:375
+#: admin/folderadmin.py:410
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -36,432 +44,489 @@ msgstr[0] "pasirinkta %(total_count)s"
 msgstr[1] "pasirinkta %(total_count)s"
 msgstr[2] "pasirinkta %(total_count)s"
 
-#: admin/folderadmin.py:411
+#: admin/folderadmin.py:449
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 iš %(cnt)s pasirinkta"
 
-#: admin/folderadmin.py:535
+#: admin/folderadmin.py:587
 msgid "No action selected."
 msgstr "Nepasirinktas joks veiksmas."
 
-#: admin/folderadmin.py:576
+#: admin/folderadmin.py:632
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Sėkmingai perkelta %(count)d failai į iškarpinę."
 
-#: admin/folderadmin.py:582
+#: admin/folderadmin.py:638
 msgid "Move selected files to clipboard"
 msgstr "Perkelti pažymėtus failus į iškarpinę"
 
-#: admin/folderadmin.py:616
+#: admin/folderadmin.py:676
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Sėkmingai išjungti leidimai %(count)d failams."
 
-#: admin/folderadmin.py:620
+#: admin/folderadmin.py:678
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Sėkmingai įjungti leidimai %(count)d failams."
 
-#: admin/folderadmin.py:629
+#: admin/folderadmin.py:687
 msgid "Enable permissions for selected files"
 msgstr "Įjungti leidimus pasirinktiems failams"
 
-#: admin/folderadmin.py:634
+#: admin/folderadmin.py:694
 msgid "Disable permissions for selected files"
 msgstr "Išjungti leidimus pasirinktiems failams"
 
-#: admin/folderadmin.py:695
+#: admin/folderadmin.py:759
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Sėkmingai pašalino %(count)d failus ir / ar aplankus."
 
-#: admin/folderadmin.py:702
+#: admin/folderadmin.py:764
 msgid "Cannot delete files and/or folders"
 msgstr "Negalima pašalinti failų ir / ar aplankų"
 
-#: admin/folderadmin.py:704
+#: admin/folderadmin.py:766
 msgid "Are you sure?"
 msgstr "Ar jūs esate tikri?"
 
-#: admin/folderadmin.py:709
+#: admin/folderadmin.py:772
 msgid "Delete files and/or folders"
 msgstr "Pašalinti failus ir / ar aplankus"
 
-#: admin/folderadmin.py:726
+#: admin/folderadmin.py:794
 msgid "Delete selected files and/or folders"
 msgstr "Pašalinti pasirinktus failus ir / ar aplankus"
 
-#: admin/folderadmin.py:842
+#: admin/folderadmin.py:909
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
-msgstr "Aplankai su %s pavadinimais jau egzistuoja pasirinktoje paskirties vietoje."
+msgstr ""
+"Aplankai su %s pavadinimais jau egzistuoja pasirinktoje paskirties vietoje."
 
-#: admin/folderadmin.py:846
+#: admin/folderadmin.py:913
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Sėkmingai perkelti %(count)d failai ir / ar aplankai į aplanką '%(destination)s'."
+msgstr ""
+"Sėkmingai perkelti %(count)d failai ir / ar aplankai į aplanką "
+"'%(destination)s'."
 
-#: admin/folderadmin.py:853 admin/folderadmin.py:855
+#: admin/folderadmin.py:921 admin/folderadmin.py:923
 msgid "Move files and/or folders"
 msgstr "Perkelti failus ir / ar aplankus"
 
-#: admin/folderadmin.py:870
+#: admin/folderadmin.py:938
 msgid "Move selected files and/or folders"
 msgstr "Perkelti pasirinktus failus ir / ar aplankus"
 
-#: admin/folderadmin.py:927
+#: admin/folderadmin.py:995
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Sėkmingai pervardinti %(count)d failai."
 
-#: admin/folderadmin.py:935 admin/folderadmin.py:937 admin/folderadmin.py:952
+#: admin/folderadmin.py:1004 admin/folderadmin.py:1006
+#: admin/folderadmin.py:1021
 msgid "Rename files"
 msgstr "Pervardinti failus"
 
-#: admin/folderadmin.py:1046
+#: admin/folderadmin.py:1115
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Sėkmingai nukopijuoti %(count)d failai ir / ar aplankai į aplanką '%(destination)s'."
+msgstr ""
+"Sėkmingai nukopijuoti %(count)d failai ir / ar aplankai į aplanką "
+"'%(destination)s'."
 
-#: admin/folderadmin.py:1062 admin/folderadmin.py:1064
+#: admin/folderadmin.py:1133 admin/folderadmin.py:1135
 msgid "Copy files and/or folders"
 msgstr "Kopijuoti failus ir / ar aplankus"
 
-#: admin/folderadmin.py:1081
+#: admin/folderadmin.py:1152
 msgid "Copy selected files and/or folders"
 msgstr "Kopijuoti pasirinktus failus ir / ar aplankus"
 
-#: admin/folderadmin.py:1175
+#: admin/folderadmin.py:1255
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Sėkmingai pakeistas %(count)d paveikslėlių dydis."
 
-#: admin/folderadmin.py:1183 admin/folderadmin.py:1185
+#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
 msgid "Resize images"
 msgstr "Pakeisti paveikslėlių dydžius"
 
-#: admin/folderadmin.py:1201
+#: admin/folderadmin.py:1280
 msgid "Resize selected images"
 msgstr "Pakeisti pasirinktų paveikslėlių dydžius"
 
-#: admin/forms.py:26
+#: admin/forms.py:27
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "Priesaga kuri bus pridėta prie nukopijuotų failų pavadinimų."
 
-#: admin/forms.py:33
+#: admin/forms.py:34
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Priesaga turi būti paprasta ir taisyklinga bylos pavadinimo dalis pvz.  \"%(valid)s\"."
+msgstr ""
+"Priesaga turi būti paprasta ir taisyklinga bylos pavadinimo dalis pvz.  "
+"\"%(valid)s\"."
 
-#: admin/forms.py:54
+#: admin/forms.py:55
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "Nežinomas pervardinimo formato reikšmės raktažodis \"%(key)s\"."
 
-#: admin/forms.py:56
+#: admin/forms.py:57
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Negalimas pervardinimo formatas: %(error)s."
 
-#: admin/forms.py:62
+#: admin/forms.py:63 models/thumbnailoptionmodels.py:23
 msgid "thumbnail option"
 msgstr "miniatiūros nustatymas"
 
-#: admin/forms.py:63
+#: admin/forms.py:64 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "plotis"
 
-#: admin/forms.py:64
+#: admin/forms.py:65 models/thumbnailoptionmodels.py:16
 msgid "height"
 msgstr "aukštis"
 
-#: admin/forms.py:65
+#: admin/forms.py:66 models/thumbnailoptionmodels.py:17
 msgid "crop"
 msgstr "apkirpti"
 
-#: admin/forms.py:66
+#: admin/forms.py:67 models/thumbnailoptionmodels.py:18
 msgid "upscale"
 msgstr "išdidinti"
 
-#: admin/forms.py:71
+#: admin/forms.py:72
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Miniatiūros nustatymas arba dydžio keitimo parametrai turi būti pasirinkti."
+msgstr ""
+"Miniatiūros nustatymas arba dydžio keitimo parametrai turi būti pasirinkti."
 
-#: admin/forms.py:73
+#: admin/forms.py:74
 msgid "Resize parameters must be choosen."
 msgstr "Turi būti pasirinkti dydžio keitimo parametrai."
 
-#: admin/imageadmin.py:12
+#: admin/imageadmin.py:16
 msgid "Subject location"
 msgstr "Subjekto vieta"
 
-#: admin/imageadmin.py:13
-msgid "Location of the main subject of the scene."
+#: admin/imageadmin.py:17
+#, fuzzy
+#| msgid "Location of the main subject of the scene."
+msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr "Vaizdo pagrindinio subjekto vieta."
 
-#: apps.py:7
-msgid "django filer"
-msgstr "django filer"
+#: admin/imageadmin.py:54
+#, fuzzy
+#| msgid "subject location"
+msgid "Invalid subject location format. "
+msgstr "subjekto vieta"
 
-#: models/abstract.py:40
+#: admin/imageadmin.py:60
+msgid "Subject location is outside of the image. "
+msgstr ""
+
+#: admin/imageadmin.py:69
+#, fuzzy, python-brace-format
+#| msgid "subject location"
+msgid "Your input: \"{subject_location}\". "
+msgstr "subjekto vieta"
+
+#: admin/views.py:57
+msgid "Folder with this name already exists."
+msgstr "Aplankas su tokiu pavadinimu jau egzistuoja."
+
+#: apps.py:10 templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/directory_listing.html:47
+msgid "Filer"
+msgstr "Filer'is"
+
+#: models/abstract.py:36
 msgid "default alt text"
 msgstr "numatytasis alternatyvus tekstas"
 
-#: models/abstract.py:41
+#: models/abstract.py:37
 msgid "default caption"
 msgstr "numatytoji antraštė"
 
-#: models/abstract.py:43
+#: models/abstract.py:39
 msgid "subject location"
 msgstr "subjekto vieta"
 
-#: models/abstract.py:172
+#: models/abstract.py:168
 msgid "image"
 msgstr "paveikslėlis"
 
-#: models/abstract.py:173
+#: models/abstract.py:169
 msgid "images"
 msgstr "paveikslėliai"
 
-#: models/clipboardmodels.py:13 models/foldermodels.py:258
+#: models/clipboardmodels.py:15 models/foldermodels.py:270
 msgid "user"
 msgstr "vartotojas"
 
-#: models/clipboardmodels.py:15 models/filemodels.py:292
+#: models/clipboardmodels.py:17 models/filemodels.py:321
 msgid "files"
 msgstr "failai"
 
-#: models/clipboardmodels.py:33 models/clipboardmodels.py:39
+#: models/clipboardmodels.py:35 models/clipboardmodels.py:41
 msgid "clipboard"
 msgstr "iškarpinė"
 
-#: models/clipboardmodels.py:34
+#: models/clipboardmodels.py:36
 msgid "clipboards"
 msgstr "iškarpinės"
 
-#: models/clipboardmodels.py:38 models/filemodels.py:42
-#: models/filemodels.py:291
+#: models/clipboardmodels.py:40 models/filemodels.py:48
+#: models/filemodels.py:320
 msgid "file"
 msgstr "failas"
 
-#: models/clipboardmodels.py:43
+#: models/clipboardmodels.py:45
 msgid "clipboard item"
 msgstr "iškarpinės objektas"
 
-#: models/clipboardmodels.py:44
+#: models/clipboardmodels.py:46
 msgid "clipboard items"
 msgstr "iškarpinės objektai"
 
-#: models/filemodels.py:40 templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:78
-#: templates/admin/filer/folder/new_folder_form.html:4
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: models/filemodels.py:46 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:116
+#: templates/admin/filer/folder/new_folder_form.html:5
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
 msgstr "aplankas"
 
-#: models/filemodels.py:43
+#: models/filemodels.py:49
 msgid "file size"
 msgstr "failo dydis"
 
-#: models/filemodels.py:45
+#: models/filemodels.py:51
 msgid "sha1"
 msgstr "sha1"
 
-#: models/filemodels.py:47
+#: models/filemodels.py:53
 msgid "has all mandatory data"
 msgstr "turi visus privalomus duomenis"
 
-#: models/filemodels.py:49
+#: models/filemodels.py:55
 msgid "original filename"
 msgstr "originalus failo pavadinimas"
 
-#: models/filemodels.py:51 models/foldermodels.py:103
+#: models/filemodels.py:57 models/foldermodels.py:104
+#: models/thumbnailoptionmodels.py:14
 msgid "name"
 msgstr "pavadinimas"
 
-#: models/filemodels.py:53
+#: models/filemodels.py:59
 msgid "description"
 msgstr "apibūdinimas"
 
-#: models/filemodels.py:57
+#: models/filemodels.py:63
 msgid "owner"
 msgstr "savininkas"
 
-#: models/filemodels.py:59 models/foldermodels.py:109
+#: models/filemodels.py:65 models/foldermodels.py:110
 msgid "uploaded at"
 msgstr "įkelta"
 
-#: models/filemodels.py:60 models/foldermodels.py:112
+#: models/filemodels.py:66 models/foldermodels.py:113
 msgid "modified at"
 msgstr "pakeista"
 
-#: models/filemodels.py:64
+#: models/filemodels.py:70
 msgid "Permissions disabled"
 msgstr "Leidimai išjungti"
 
-#: models/filemodels.py:65
+#: models/filemodels.py:71
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr "Įšjungti bet kokius leidimų tikrinimus šiai bylai. Byla bus viešai pasiekiama bet kam."
+msgstr ""
+"Įšjungti bet kokius leidimų tikrinimus šiai bylai. Byla bus viešai "
+"pasiekiama bet kam."
 
-#: models/foldermodels.py:111
+#: models/foldermodels.py:112
 msgid "created at"
 msgstr "sukurta"
 
-#: models/foldermodels.py:223
-#: templates/admin/filer/widgets/admin_folder.html:3
-#: templates/admin/filer/widgets/admin_folder.html:5
+#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
+#: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
 msgstr "Aplankas"
 
-#: models/foldermodels.py:224
+#: models/foldermodels.py:236
 msgid "Folders"
 msgstr "Aplankai"
 
-#: models/foldermodels.py:243
+#: models/foldermodels.py:255
 msgid "all items"
 msgstr "visi objektai"
 
-#: models/foldermodels.py:244
+#: models/foldermodels.py:256
 msgid "this item only"
 msgstr "tik šį objektą"
 
-#: models/foldermodels.py:245
+#: models/foldermodels.py:257
 msgid "this item and all children"
 msgstr "šį objektą ir visus vidinius"
 
-#: models/foldermodels.py:249
+#: models/foldermodels.py:261
 msgid "allow"
 msgstr "leisti"
 
-#: models/foldermodels.py:250
+#: models/foldermodels.py:262
 msgid "deny"
 msgstr "neleisti"
 
-#: models/foldermodels.py:255
+#: models/foldermodels.py:267
 msgid "type"
 msgstr "tipas"
 
-#: models/foldermodels.py:261
+#: models/foldermodels.py:273
 msgid "group"
 msgstr "grupė"
 
-#: models/foldermodels.py:262
+#: models/foldermodels.py:274
 msgid "everybody"
 msgstr "visi"
 
-#: models/foldermodels.py:264
+#: models/foldermodels.py:276
 msgid "can edit"
 msgstr "gali redaguoti"
 
-#: models/foldermodels.py:265
+#: models/foldermodels.py:277
 msgid "can read"
 msgstr "gali skaityti"
 
-#: models/foldermodels.py:266
+#: models/foldermodels.py:278
 msgid "can add children"
 msgstr "gali pridėti vidinius"
 
-#: models/foldermodels.py:308
+#: models/foldermodels.py:320
 msgid "folder permission"
 msgstr "aplanko leidimas"
 
-#: models/foldermodels.py:309
+#: models/foldermodels.py:321
 msgid "folder permissions"
 msgstr "aplanko leidimai"
 
-#: models/imagemodels.py:27
+#: models/imagemodels.py:23
 msgid "date taken"
 msgstr "paimta data"
 
-#: models/imagemodels.py:30
+#: models/imagemodels.py:26
 msgid "author"
 msgstr "autorius"
 
-#: models/imagemodels.py:32
+#: models/imagemodels.py:28
 msgid "must always publish author credit"
 msgstr "visada turi publikuoti autorystę"
 
-#: models/imagemodels.py:33
+#: models/imagemodels.py:29
 msgid "must always publish copyright"
 msgstr "visada turi publikuoti autorių teises"
 
-#: models/virtualitems.py:46
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
-msgid "unfiled files"
-msgstr "neklasifikuoti failai"
+#: models/thumbnailoptionmodels.py:15
+msgid "width in pixel."
+msgstr ""
 
-#: models/virtualitems.py:60
+#: models/thumbnailoptionmodels.py:16
+msgid "height in pixel."
+msgstr ""
+
+#: models/thumbnailoptionmodels.py:24
+#, fuzzy
+#| msgid "thumbnail option"
+msgid "thumbnail options"
+msgstr "miniatiūros nustatymas"
+
+#: models/virtualitems.py:50
+#: templates/admin/filer/folder/directory_table.html:4
+#: templates/admin/filer/folder/directory_table.html:156
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
+msgid "Unsorted Uploads"
+msgstr ""
+
+#: models/virtualitems.py:65
 msgid "files with missing metadata"
 msgstr "failai su trūkstamais meta duomenimis"
 
-#: models/virtualitems.py:74 templates/admin/filer/breadcrumbs.html:6
-#: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:78
+#: models/virtualitems.py:79 templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:51
+#: templates/admin/filer/folder/directory_listing.html:116
 msgid "root"
 msgstr "pradinis"
 
-#: templates/admin/filer/actions.html:4
+#: templates/admin/filer/actions.html:5
 msgid "Run the selected action"
 msgstr "Vykdyti pasirinktą veiksmą"
 
-#: templates/admin/filer/actions.html:4
+#: templates/admin/filer/actions.html:5
 msgid "Go"
 msgstr "Eiti"
 
-#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/actions.html:14
+#: templates/admin/filer/folder/directory_table.html:219
 msgid "Click here to select the objects across all pages"
 msgstr "Spauskite čia kad pasirinktumete objektus per visus puslapius"
 
-#: templates/admin/filer/actions.html:11
+#: templates/admin/filer/actions.html:14
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
 msgstr "Pasirinkti visus %(total_count)s failus ir / ar aplankus"
 
-#: templates/admin/filer/actions.html:13
+#: templates/admin/filer/actions.html:16
+#: templates/admin/filer/folder/directory_table.html:221
 msgid "Clear selection"
 msgstr "Išvalyti pasirinkimus"
 
 #: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/directory_listing.html:42
 msgid "Go back to admin homepage"
 msgstr "Grįžti į pradinį administravimo puslapį"
 
 #: templates/admin/filer/breadcrumbs.html:4
-#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/directory_listing.html:43
 msgid "Home"
 msgstr "Pradinis"
 
 #: templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/directory_listing.html:46
 msgid "Go back to Filer app"
 msgstr "Grįžti į Failer'io apklikaciją"
 
-#: templates/admin/filer/breadcrumbs.html:5
-#: templates/admin/filer/folder/change_form.html:8
-msgid "Filer"
-msgstr "Filer'is"
-
-#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/directory_listing.html:51
 msgid "Go back to root folder"
 msgstr "Grįžti į pradinį aplanką"
 
-#: templates/admin/filer/breadcrumbs.html:8
-#: templates/admin/filer/breadcrumbs.html:11
-#: templates/admin/filer/folder/change_form.html:11
+#: templates/admin/filer/breadcrumbs.html:10
+#: templates/admin/filer/breadcrumbs.html:20
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:63
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Grįžti į '%(folder_name)s' aplanką"
 
-#: templates/admin/filer/change_form.html:28
-msgid "duplicates"
+#: templates/admin/filer/change_form.html:25
+#, fuzzy
+#| msgid "duplicates"
+msgid "Duplicates"
 msgstr "dublikatai"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
@@ -469,275 +534,428 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Pasirintų failų ir / ar aplankų šalinimas pašalintų susijusius objektus, tačiau jūsų vartotojas neturi leidimo šalinti šių objektų tipų:"
+msgstr ""
+"Pasirintų failų ir / ar aplankų šalinimas pašalintų susijusius objektus, "
+"tačiau jūsų vartotojas neturi leidimo šalinti šių objektų tipų:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Pasirinktų failų ir / ar aplankų šalinimas reikalautų pašalinti šiuos apsaugotus susijusius objektus:"
+msgstr ""
+"Pasirinktų failų ir / ar aplankų šalinimas reikalautų pašalinti šiuos "
+"apsaugotus susijusius objektus:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Ar tikrai norite pašalinti pasirinktus failus ir / ar aplankus? Visi susiję objektai bus pašalinti:"
+msgstr ""
+"Ar tikrai norite pašalinti pasirinktus failus ir / ar aplankus? Visi susiję "
+"objektai bus pašalinti:"
 
-#: templates/admin/filer/delete_selected_files_confirmation.html:45
-msgid "Yes, I'm sure"
+#: templates/admin/filer/delete_selected_files_confirmation.html:46
+#: templates/admin/filer/folder/choose_copy_destination.html:77
+#: templates/admin/filer/folder/choose_move_destination.html:73
+msgid "No, take me back"
+msgstr ""
+
+#: templates/admin/filer/delete_selected_files_confirmation.html:47
+#, fuzzy
+#| msgid "Yes, I'm sure"
+msgid "Yes, I&#39;m sure"
 msgstr "Taip, esu tikras"
 
-#: templates/admin/filer/folder/change_form.html:7
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/change_form.html:9
-#: templates/admin/filer/folder/directory_listing.html:78
-msgid "Go back to"
-msgstr "Grįžti į"
-
-#: templates/admin/filer/folder/change_form.html:7
-msgid "admin homepage"
-msgstr "administravimo pradinis puslapis"
-
-#: templates/admin/filer/folder/change_form.html:22
-#: templates/admin/filer/image/change_form.html:9
+#: templates/admin/filer/file/change_form.html:36
+#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/image/change_form.html:36
 msgid "History"
 msgstr "Istorija"
 
+#: templates/admin/filer/file/change_form.html:38
 #: templates/admin/filer/folder/change_form.html:23
-#: templates/admin/filer/image/change_form.html:10
+#: templates/admin/filer/image/change_form.html:38
 msgid "View on site"
 msgstr "Žiūrėti puslapyje"
 
-#: templates/admin/filer/folder/change_form.html:35
-#: templates/admin/filer/folder/directory_listing.html:79
-#: templates/admin/filer/folder/directory_listing.html:89
-#: templates/admin/filer/folder/directory_table.html:23
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:116
+msgid "Go back to"
+msgstr "Grįžti į"
+
+#: templates/admin/filer/folder/change_form.html:6
+msgid "admin homepage"
+msgstr "administravimo pradinis puslapis"
+
+#: templates/admin/filer/folder/change_form.html:37
+#: templates/admin/filer/folder/directory_listing.html:109
+#: templates/admin/filer/folder/directory_listing.html:117
+#: templates/admin/filer/folder/directory_table.html:26
+#: templates/admin/filer/folder/directory_table.html:56
+#: templates/admin/filer/folder/directory_table.html:163
 msgid "Folder Icon"
 msgstr "Aplanko piktograma"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:12
+#: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Jūsų vartotojas neturi leidimų kopijuoti visus pasirinktus failus ir / ar aplankus."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Jūsų vartotojas neturi leidimų kopijuoti visus pasirinktus failus ir / ar "
+"aplankus."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:15
-#: templates/admin/filer/folder/choose_move_destination.html:15
+#: templates/admin/filer/folder/choose_copy_destination.html:38
+#: templates/admin/filer/folder/choose_copy_destination.html:44
+#: templates/admin/filer/folder/choose_copy_destination.html:50
+#: templates/admin/filer/folder/choose_move_destination.html:38
+#: templates/admin/filer/folder/choose_move_destination.html:44
+#: templates/admin/filer/folder/choose_move_destination.html:50
+msgid "Take me back"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_copy_destination.html:42
+#: templates/admin/filer/folder/choose_move_destination.html:42
 msgid "There are no destination folders available."
 msgstr "Nėra jokių paskyrimo aplankų."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:18
+#: templates/admin/filer/folder/choose_copy_destination.html:48
 msgid "There are no files and/or folders available to copy."
 msgstr "Nėra jokiu failų ir / ar aplankų kopijavimui."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:20
+#: templates/admin/filer/folder/choose_copy_destination.html:53
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "Šie failai ir / ar aplankai bus nukopijuoti į paskirtą aplanką (išlaikant jų medžio struktūrą):"
+msgstr ""
+"Šie failai ir / ar aplankai bus nukopijuoti į paskirtą aplanką (išlaikant jų "
+"medžio struktūrą):"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:32
-#: templates/admin/filer/folder/choose_move_destination.html:32
+#: templates/admin/filer/folder/choose_copy_destination.html:67
+#: templates/admin/filer/folder/choose_move_destination.html:65
 msgid "Destination folder:"
 msgstr "Paskyrimo aplankas:"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:39
+#: templates/admin/filer/folder/choose_copy_destination.html:78
+#: templates/admin/filer/folder/choose_copy_destination.html:81
 msgid "Copy"
 msgstr "Kopijuoti"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:12
-msgid ""
-"Your account doesn't have permissions to resize all of the selected images."
-msgstr "Jūsų vartotojas neturi leidimų keisti dydžius visiems pasirinktiems paveikslėliams."
+#: templates/admin/filer/folder/choose_copy_destination.html:80
+msgid "It is not allowed to copy files into same folder"
+msgstr ""
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
+msgid ""
+"Your account doesn't have permissions to resize all of the selected images."
+msgstr ""
+"Jūsų vartotojas neturi leidimų keisti dydžius visiems pasirinktiems "
+"paveikslėliams."
+
+#: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
 msgstr "Nėra jokiu paveikslėlių dydžio keitimui."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:17
+#: templates/admin/filer/folder/choose_images_resize_options.html:20
 msgid "The following images will be resized:"
 msgstr "Šių paveikslėlių dydis bus pakeistas:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:30
+#: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Pasirinkite esamą miniatiūros nustatymą, arba įveskite dydžio keitimo parametrus:"
+msgstr ""
+"Pasirinkite esamą miniatiūros nustatymą, arba įveskite dydžio keitimo "
+"parametrus:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:32
+#: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
 msgstr "Pasirinkite dydžio keitimo parametrus:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:35
+#: templates/admin/filer/folder/choose_images_resize_options.html:38
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Įspėjimas: Paveikslėlių dydžiai bus pakeisti vietoje, ir originalas bus pašalintas. Patartina atsikopijuoti paveikslėlį, kad nedingtų originalas."
+msgstr ""
+"Įspėjimas: Paveikslėlių dydžiai bus pakeisti vietoje, ir originalas bus "
+"pašalintas. Patartina atsikopijuoti paveikslėlį, kad nedingtų originalas."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:36
+#: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
 msgstr "Pakeisti dydį"
 
-#: templates/admin/filer/folder/choose_move_destination.html:12
+#: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Jūsų vartotojas neturi leidimų perkelti visus pasirinktus failus ir / ar aplankus."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Jūsų vartotojas neturi leidimų perkelti visus pasirinktus failus ir / ar "
+"aplankus."
 
-#: templates/admin/filer/folder/choose_move_destination.html:18
+#: templates/admin/filer/folder/choose_move_destination.html:48
 msgid "There are no files and/or folders available to move."
 msgstr "Nėra jokiu failų ir / ar aplankų perkelimui."
 
-#: templates/admin/filer/folder/choose_move_destination.html:20
+#: templates/admin/filer/folder/choose_move_destination.html:53
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "Šie failai ir / ar aplankai bus perkelti į paskirtą aplanką (išlaikant jų medžio struktūrą):"
+msgstr ""
+"Šie failai ir / ar aplankai bus perkelti į paskirtą aplanką (išlaikant jų "
+"medžio struktūrą):"
 
-#: templates/admin/filer/folder/choose_move_destination.html:38
+#: templates/admin/filer/folder/choose_move_destination.html:74
+#: templates/admin/filer/folder/choose_move_destination.html:77
+#: templates/admin/filer/folder/directory_listing.html:195
 msgid "Move"
 msgstr "Perkelti"
 
-#: templates/admin/filer/folder/choose_rename_format.html:12
+#: templates/admin/filer/folder/choose_move_destination.html:76
+msgid "It is not allowed to move files into same folder"
+msgstr ""
+
+#: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
 msgstr "Jūsų vartotojas neturi leidimų pervardinti visus pasirinktus failus."
 
-#: templates/admin/filer/folder/choose_rename_format.html:15
+#: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
 msgstr "Nėra jokių failų pervardinimui."
 
-#: templates/admin/filer/folder/choose_rename_format.html:17
+#: templates/admin/filer/folder/choose_rename_format.html:20
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "Šie failai bus pervardinti (jie liks savo aplankuose ir pasiliks savo originalius pavadinimus, pasikeis tik atvaizduojamas failo pavadinimas):"
+msgstr ""
+"Šie failai bus pervardinti (jie liks savo aplankuose ir pasiliks savo "
+"originalius pavadinimus, pasikeis tik atvaizduojamas failo pavadinimas):"
 
-#: templates/admin/filer/folder/choose_rename_format.html:54
+#: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
 msgstr "Pervardinti"
 
-#: templates/admin/filer/folder/directory_listing.html:68
-msgid "Adds a new Folder"
-msgstr "Sukuria naują aplanką"
-
-#: templates/admin/filer/folder/directory_listing.html:68
-msgid "New Folder"
-msgstr "Naujas aplankas"
-
-#: templates/admin/filer/folder/directory_listing.html:69
-msgid "upload files"
-msgstr "įkelti failus"
-
-#: templates/admin/filer/folder/directory_listing.html:69
-msgid "Upload"
-msgstr "Įkelti"
-
-#: templates/admin/filer/folder/directory_listing.html:78
+#: templates/admin/filer/folder/directory_listing.html:108
 msgid "Go back to the parent folder"
 msgstr "Grįžti į pirminį aplanką"
 
-#: templates/admin/filer/folder/directory_listing.html:80
-#: templates/admin/filer/folder/directory_table.html:29
-#: templates/admin/filer/tools/search_form.html:17
-#, python-format
-msgid "%(counter)s folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] "%(counter)s aplankas"
-msgstr[1] "%(counter)s aplankai"
-msgstr[2] "%(counter)s aplankų"
-
-#: templates/admin/filer/folder/directory_listing.html:80
-#: templates/admin/filer/folder/directory_table.html:29
-#: templates/admin/filer/tools/search_form.html:18
-#, python-format
-msgid "%(counter)s file"
-msgid_plural "%(counter)s files"
-msgstr[0] "%(counter)s byla"
-msgstr[1] "%(counter)s bylos"
-msgstr[2] "%(counter)s bylų"
-
-#: templates/admin/filer/folder/directory_listing.html:84
+#: templates/admin/filer/folder/directory_listing.html:145
 msgid "Change current folder details"
 msgstr "Keisti dabartinio aplanko detales"
 
-#: templates/admin/filer/folder/directory_listing.html:84
-#: templates/admin/filer/folder/directory_table.html:27
-#: templates/admin/filer/folder/directory_table.html:43
+#: templates/admin/filer/folder/directory_listing.html:145
 msgid "Change"
 msgstr "Keisti"
+
+#: templates/admin/filer/folder/directory_listing.html:155
+#, fuzzy
+#| msgid "run search for entered phrase"
+msgid "Click here to run search for entered phrase"
+msgstr "vykdyti paiešką įvestai frazei"
+
+#: templates/admin/filer/folder/directory_listing.html:158
+msgid "Search"
+msgstr "Ieškoti"
+
+#: templates/admin/filer/folder/directory_listing.html:165
+msgid "Close"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:167
+msgid "Limit"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_listing.html:172
+#, fuzzy
+#| msgid "limit the search to current folder"
+msgid "Check it to limit the search to current folder"
+msgstr "ieškoti tik dabartiniame aplanke"
+
+#: templates/admin/filer/folder/directory_listing.html:173
+#, fuzzy
+#| msgid "limit the search to current folder"
+msgid "Limit the search to current folder"
+msgstr "ieškoti tik dabartiniame aplanke"
+
+#: templates/admin/filer/folder/directory_listing.html:189
+#: templates/admin/filer/tools/detail_info.html:215
+msgid "Delete"
+msgstr "Pašalinti"
+
+#: templates/admin/filer/folder/directory_listing.html:212
+msgid "Adds a new Folder"
+msgstr "Sukuria naują aplanką"
+
+#: templates/admin/filer/folder/directory_listing.html:215
+msgid "New Folder"
+msgstr "Naujas aplankas"
+
+#: templates/admin/filer/folder/directory_listing.html:220
+#: templates/admin/filer/folder/directory_listing.html:224
+#: templates/admin/filer/folder/directory_listing.html:227
+#: templates/admin/filer/folder/directory_listing.html:231
+#: templates/admin/filer/folder/directory_listing.html:238
+#, fuzzy
+#| msgid "upload files"
+msgid "Upload Files"
+msgstr "įkelti failus"
+
+#: templates/admin/filer/folder/directory_listing.html:236
+msgid "You have to select a folder first"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
 msgstr "Pavadinimas"
 
-#: templates/admin/filer/folder/directory_table.html:23
-#: templates/admin/filer/folder/directory_table.html:27
-#: templates/admin/filer/folder/directory_table.html:29
+#: templates/admin/filer/folder/directory_table.html:14
+#: templates/admin/filer/tools/detail_info.html:61
+#: templates/admin/filer/tools/detail_info.html:152
+msgid "Owner"
+msgstr "Savininkas"
+
+#: templates/admin/filer/folder/directory_table.html:15
+#: templates/admin/filer/tools/detail_info.html:40
+#: templates/admin/filer/tools/detail_info.html:104
+msgid "Size"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:16
+msgid "Action"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:25
+#: templates/admin/filer/folder/directory_table.html:32
+#: templates/admin/filer/folder/directory_table.html:55
+#: templates/admin/filer/folder/directory_table.html:62
 #, python-format
 msgid "Change '%(item_label)s' folder details"
 msgstr "Keisti '%(item_label)s' aplanko detales"
 
-#: templates/admin/filer/folder/directory_table.html:30
-#: templates/admin/filer/folder/directory_table.html:46
-msgid "Owner"
-msgstr "Savininkas"
+#: templates/admin/filer/folder/directory_table.html:73
+#, python-format
+msgid ""
+"\n"
+"                                            %(counter)s folder"
+msgid_plural ""
+"%(counter)s folders\n"
+"                                        "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
-#: templates/admin/filer/folder/directory_table.html:36
+#: templates/admin/filer/folder/directory_table.html:76
+#, python-format
+msgid ""
+"\n"
+"                                            %(counter)s file"
+msgid_plural ""
+"%(counter)s files\n"
+"                                        "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: templates/admin/filer/folder/directory_table.html:84
+#, fuzzy
+#| msgid "Change current folder details"
+msgid "Change folder details"
+msgstr "Keisti dabartinio aplanko detales"
+
+#: templates/admin/filer/folder/directory_table.html:85
+#, fuzzy
+#| msgid "folder"
+msgid "Remove folder"
+msgstr "aplankas"
+
+#: templates/admin/filer/folder/directory_table.html:96
+#: templates/admin/filer/folder/directory_table.html:104
+#: templates/admin/filer/folder/directory_table.html:119
 msgid "Select this file"
 msgstr "Pasirinkti šį failą"
 
-#: templates/admin/filer/folder/directory_table.html:38
-#: templates/admin/filer/folder/directory_table.html:43
-#: templates/admin/filer/folder/directory_table.html:45
+#: templates/admin/filer/folder/directory_table.html:107
+#: templates/admin/filer/folder/directory_table.html:122
+#: templates/admin/filer/folder/directory_table.html:142
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Keisti '%(item_label)s' detales"
 
-#: templates/admin/filer/folder/directory_table.html:42
-#, python-format
-msgid "Delete '%(item_label)s'"
-msgstr "Pašalinti '%(item_label)s'"
-
-#: templates/admin/filer/folder/directory_table.html:42
-msgid "Delete"
-msgstr "Pašalinti"
-
-#: templates/admin/filer/folder/directory_table.html:47
+#: templates/admin/filer/folder/directory_table.html:131
 msgid "Permissions"
 msgstr "Leidimai"
 
-#: templates/admin/filer/folder/directory_table.html:47
+#: templates/admin/filer/folder/directory_table.html:131
 msgid "disabled"
 msgstr "išjungta"
 
-#: templates/admin/filer/folder/directory_table.html:47
+#: templates/admin/filer/folder/directory_table.html:131
 msgid "enabled"
 msgstr "įjungta"
 
-#: templates/admin/filer/folder/directory_table.html:51
-msgid "Move to clipboard"
-msgstr "Perkelti į iškarpinę"
+#: templates/admin/filer/folder/directory_table.html:143
+#, fuzzy
+#| msgid "Rename files"
+msgid "Remove file"
+msgstr "Pervardinti failus"
 
-#: templates/admin/filer/folder/directory_table.html:59
-msgid "there are no files or subfolders"
-msgstr "nėra jokių failų ar aplankų"
+#: templates/admin/filer/folder/directory_table.html:150
+msgid "Drop files here or use the \"Upload Files\" button"
+msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:66
+#: templates/admin/filer/folder/directory_table.html:160
+msgid "Drop your file to upload into:"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:170
+msgid "Upload"
+msgstr "Įkelti"
+
+#: templates/admin/filer/folder/directory_table.html:182
+#, fuzzy
+#| msgid "cancel search"
+msgid "cancel"
+msgstr "atšaukti paiešką"
+
+#: templates/admin/filer/folder/directory_table.html:186
+msgid "Upload success!"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:190
+#, fuzzy
+#| msgid "upload failed"
+msgid "Upload canceled!"
+msgstr "įkelimas nepavyko"
+
+#: templates/admin/filer/folder/directory_table.html:197
 msgid "previous"
 msgstr "buvęs"
 
-#: templates/admin/filer/folder/directory_table.html:70
-#, python-format
+#: templates/admin/filer/folder/directory_table.html:202
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "            Page %(number)s of %(num_pages)s.\n"
+#| "            "
 msgid ""
 "\n"
-"            Page %(number)s of %(num_pages)s.\n"
+"                Page %(number)s of %(num_pages)s.\n"
 "            "
-msgstr "\n            Puslapis %(number)s iš %(num_pages)s.\n            "
+msgstr ""
+"\n"
+"            Puslapis %(number)s iš %(num_pages)s.\n"
+"            "
 
-#: templates/admin/filer/folder/directory_table.html:76
+#: templates/admin/filer/folder/directory_table.html:209
 msgid "next"
 msgstr "kitas"
 
-#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/folder/directory_table.html:219
+#, fuzzy, python-format
+#| msgid "Select all %(total_count)s files and/or folders"
+msgid "Select all %(total_count)s"
+msgstr "Pasirinkti visus %(total_count)s failus ir / ar aplankus"
+
+#: templates/admin/filer/folder/new_folder_form.html:5
 msgid "Add new"
 msgstr "Pridėti naują"
 
@@ -752,98 +970,199 @@ msgstr[2] "Ištaisykite žemiau esančias klaidas."
 msgid "Save"
 msgstr "Išsaugoti"
 
-#: templates/admin/filer/image/change_form.html:21
-msgid "Full size preview"
-msgstr "Pilno dydžio peržiūra"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:7
+#: templates/admin/filer/tools/clipboard/clipboard.html:9
 msgid "Clipboard"
 msgstr "Iškarpinė"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:19
+#: templates/admin/filer/tools/clipboard/clipboard.html:21
 msgid "Paste all items here"
 msgstr "Įkopijuoti visus objektus čia"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
-msgid "discard"
-msgstr "atmesti"
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:26
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Move all clipboard files to"
 msgstr "Perkelti visus iškarpinėje esančius failus į"
 
-#: templates/admin/filer/tools/clipboard/clipboard.html:43
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
+#, fuzzy
+#| msgid "Clipboard"
+msgid "Empty Clipboard"
+msgstr "Iškarpinė"
+
+#: templates/admin/filer/tools/clipboard/clipboard.html:50
 msgid "the clipboard is empty"
 msgstr "iškarpinė tuščia"
 
-#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:11
+#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:16
 msgid "upload failed"
 msgstr "įkelimas nepavyko"
 
-#: templates/admin/filer/tools/search_form.html:7
-#: templates/admin/filer/tools/search_form.html:13
-msgid "Search"
-msgstr "Ieškoti"
+#: templates/admin/filer/tools/detail_info.html:24
+#, fuzzy
+#| msgid "Rename files"
+msgid "Open file"
+msgstr "Pervardinti failus"
 
-#: templates/admin/filer/tools/search_form.html:12
-msgid "Enter your search phrase here"
-msgstr "Įveskite savo paieškos frazę čia"
+#: templates/admin/filer/tools/detail_info.html:26
+#: templates/admin/filer/tools/detail_info.html:88
+msgid "Full size preview"
+msgstr "Pilno dydžio peržiūra"
 
-#: templates/admin/filer/tools/search_form.html:13
-msgid "Click here to"
-msgstr "Spausti čia kad"
+#: templates/admin/filer/tools/detail_info.html:36
+#: templates/admin/filer/tools/detail_info.html:95
+msgid "Type"
+msgstr ""
 
-#: templates/admin/filer/tools/search_form.html:13
-msgid "run search for entered phrase"
-msgstr "vykdyti paiešką įvestai frazei"
+#: templates/admin/filer/tools/detail_info.html:44
+#: templates/admin/filer/tools/detail_info.html:113
+#, fuzzy
+#| msgid "file size"
+msgid "File-size"
+msgstr "failo dydis"
 
-#: templates/admin/filer/tools/search_form.html:14
-msgid "Check it to"
-msgstr "Pažymėti kad"
+#: templates/admin/filer/tools/detail_info.html:48
+#: templates/admin/filer/tools/detail_info.html:122
+#, fuzzy
+#| msgid "modified at"
+msgid "Modified"
+msgstr "pakeista"
 
-#: templates/admin/filer/tools/search_form.html:14
-#: templates/admin/filer/tools/search_form.html:15
-msgid "limit the search to current folder"
-msgstr "ieškoti tik dabartiniame aplanke"
+#: templates/admin/filer/tools/detail_info.html:52
+#: templates/admin/filer/tools/detail_info.html:131
+#, fuzzy
+#| msgid "created at"
+msgid "Created"
+msgstr "sukurta"
 
-#: templates/admin/filer/tools/search_form.html:17
+#: templates/admin/filer/tools/detail_info.html:160
+#, fuzzy
+#| msgid "description"
+msgid "Add Description"
+msgstr "apibūdinimas"
+
+#: templates/admin/filer/tools/detail_info.html:178
+#, fuzzy
+#| msgid "author"
+msgid "Author"
+msgstr "autorius"
+
+#: templates/admin/filer/tools/detail_info.html:185
+msgid "Add Alt-Text"
+msgstr ""
+
+#: templates/admin/filer/tools/detail_info.html:192
+#, fuzzy
+#| msgid "default caption"
+msgid "Add caption"
+msgstr "numatytoji antraštė"
+
+#: templates/admin/filer/tools/detail_info.html:199
+msgid "Add Tags"
+msgstr ""
+
+#: templates/admin/filer/tools/detail_info.html:206
+#, fuzzy
+#| msgid "Change"
+msgid "Change File"
+msgstr "Keisti"
+
+#: templates/admin/filer/tools/search_form.html:5
 msgid "found"
 msgstr "rasta"
 
-#: templates/admin/filer/tools/search_form.html:17
+#: templates/admin/filer/tools/search_form.html:5
+#, python-format
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] "%(counter)s aplankas"
+msgstr[1] "%(counter)s aplankai"
+msgstr[2] "%(counter)s aplankų"
+
+#: templates/admin/filer/tools/search_form.html:5
 msgid "and"
 msgstr "ir"
 
-#: templates/admin/filer/tools/search_form.html:18
+#: templates/admin/filer/tools/search_form.html:6
+#, fuzzy, python-format
+#| msgid "%(counter)s file"
+#| msgid_plural "%(counter)s files"
+msgid ""
+"\n"
+"            %(counter)s file"
+msgid_plural ""
+"%(counter)s files\n"
+"        "
+msgstr[0] "%(counter)s byla"
+msgstr[1] "%(counter)s bylos"
+msgstr[2] "%(counter)s bylų"
+
+#: templates/admin/filer/tools/search_form.html:9
 msgid "cancel search"
 msgstr "atšaukti paiešką"
 
-#: templates/admin/filer/tools/upload_button_js.html:25
 #: templates/admin/filer/widgets/admin_file.html:8
-#: templates/admin/filer/widgets/admin_file.html:9
-msgid "file missing"
-msgstr "failo nėra"
-
-#: templates/admin/filer/widgets/admin_file.html:12
-msgid "no file selected"
-msgstr "joks failas nepasirinktas"
-
-#: templates/admin/filer/widgets/admin_file.html:15
-#: templates/admin/filer/widgets/admin_file.html:16
-#: templates/admin/filer/widgets/admin_folder.html:7
-#: templates/admin/filer/widgets/admin_folder.html:8
-msgid "Lookup"
-msgstr "Informacijos ieškojimas"
-
-#: templates/admin/filer/widgets/admin_file.html:18
-#: templates/admin/filer/widgets/admin_folder.html:10
+#: templates/admin/filer/widgets/admin_file.html:40
+#: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr "Išvalyti"
 
-#: templates/admin/filer/widgets/admin_folder.html:5
+#: templates/admin/filer/widgets/admin_file.html:17
+msgid "or drop your file here"
+msgstr ""
+
+#: templates/admin/filer/widgets/admin_file.html:26
+#: templates/admin/filer/widgets/admin_file.html:27
+msgid "file missing"
+msgstr "failo nėra"
+
+#: templates/admin/filer/widgets/admin_file.html:30
+msgid "no file selected"
+msgstr "joks failas nepasirinktas"
+
+#: templates/admin/filer/widgets/admin_file.html:35
+#: templates/admin/filer/widgets/admin_folder.html:14
+msgid "Lookup"
+msgstr "Informacijos ieškojimas"
+
+#: templates/admin/filer/widgets/admin_file.html:36
+#, fuzzy
+#| msgid "upload files"
+msgid "Upload File"
+msgstr "įkelti failus"
+
+#: templates/admin/filer/widgets/admin_folder.html:11
+#: templates/admin/filer/widgets/admin_folder.html:33
 msgid "none selected"
 msgstr "nei vienas nepasirinktas"
 
-#: views.py:108
-msgid "Folder with this name already exists."
-msgstr "Aplankas su tokiu pavadinimu jau egzistuoja."
+#: templates/admin/filer/widgets/admin_folder.html:15
+#, fuzzy
+#| msgid "Folder"
+msgid "Add Folder"
+msgstr "Aplankas"
+
+#~ msgid "django filer"
+#~ msgstr "django filer"
+
+#~ msgid "unfiled files"
+#~ msgstr "neklasifikuoti failai"
+
+#~ msgid "Delete '%(item_label)s'"
+#~ msgstr "Pašalinti '%(item_label)s'"
+
+#~ msgid "Move to clipboard"
+#~ msgstr "Perkelti į iškarpinę"
+
+#~ msgid "there are no files or subfolders"
+#~ msgstr "nėra jokių failų ar aplankų"
+
+#~ msgid "discard"
+#~ msgstr "atmesti"
+
+#~ msgid "Enter your search phrase here"
+#~ msgstr "Įveskite savo paieškos frazę čia"
+
+#~ msgid "Click here to"
+#~ msgstr "Spausti čia kad"
+
+#~ msgid "Check it to"
+#~ msgstr "Pažymėti kad"
