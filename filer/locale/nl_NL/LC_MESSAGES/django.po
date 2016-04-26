@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-26 13:37+0200\n"
+"POT-Creation-Date: 2016-04-26 14:02+0200\n"
 "PO-Revision-Date: 2015-07-24 18:03+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Dutch (Netherlands) (http://www.transifex.com/divio/django-"
@@ -450,7 +450,7 @@ msgstr "thumbnail optie"
 
 #: models/virtualitems.py:50
 #: templates/admin/filer/folder/directory_table.html:4
-#: templates/admin/filer/folder/directory_table.html:156
+#: templates/admin/filer/folder/directory_table.html:152
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
 msgstr ""
@@ -475,7 +475,7 @@ msgid "Go"
 msgstr "Uitvoeren"
 
 #: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table.html:219
+#: templates/admin/filer/folder/directory_table.html:213
 msgid "Click here to select the objects across all pages"
 msgstr "Klik hier om objecten over alle pagina's te selecteren"
 
@@ -485,7 +485,7 @@ msgid "Select all %(total_count)s files and/or folders"
 msgstr "Selecteer alle %(total_count)s bestanden en/of mappen"
 
 #: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table.html:221
+#: templates/admin/filer/folder/directory_table.html:215
 msgid "Clear selection"
 msgstr "Selectie wissen"
 
@@ -592,7 +592,7 @@ msgstr "admin homepage"
 #: templates/admin/filer/folder/directory_listing.html:117
 #: templates/admin/filer/folder/directory_table.html:26
 #: templates/admin/filer/folder/directory_table.html:56
-#: templates/admin/filer/folder/directory_table.html:163
+#: templates/admin/filer/folder/directory_table.html:159
 msgid "Folder Icon"
 msgstr "Map icoon"
 
@@ -833,122 +833,114 @@ msgid "Change '%(item_label)s' folder details"
 msgstr "Wijzig eigenschappen map '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:73
+#: templates/admin/filer/tools/search_form.html:5
 #, python-format
-msgid ""
-"\n"
-"                                            %(counter)s folder"
-msgid_plural ""
-"%(counter)s folders\n"
-"                                        "
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/filer/folder/directory_table.html:76
-#, python-format
-msgid ""
-"\n"
-"                                            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"                                        "
-msgstr[0] ""
-msgstr[1] ""
+#: templates/admin/filer/folder/directory_table.html:74
+#, fuzzy, python-format
+#| msgid "%(total_count)s selected"
+#| msgid_plural "All %(total_count)s selected"
+msgid "%(counter)s file"
+msgid_plural "%(counter)s files"
+msgstr[0] "%(total_count)s geselecteerd"
+msgstr[1] "Alle %(total_count)s geselecteerd"
 
-#: templates/admin/filer/folder/directory_table.html:84
+#: templates/admin/filer/folder/directory_table.html:80
 #, fuzzy
 #| msgid "Change current folder details"
 msgid "Change folder details"
 msgstr "Wijzig eigenschappen van huidige map"
 
-#: templates/admin/filer/folder/directory_table.html:85
+#: templates/admin/filer/folder/directory_table.html:81
 #, fuzzy
 #| msgid "folder"
 msgid "Remove folder"
 msgstr "map"
 
-#: templates/admin/filer/folder/directory_table.html:96
-#: templates/admin/filer/folder/directory_table.html:104
-#: templates/admin/filer/folder/directory_table.html:119
+#: templates/admin/filer/folder/directory_table.html:92
+#: templates/admin/filer/folder/directory_table.html:100
+#: templates/admin/filer/folder/directory_table.html:115
 msgid "Select this file"
 msgstr "Selecteer dit bestand"
 
-#: templates/admin/filer/folder/directory_table.html:107
-#: templates/admin/filer/folder/directory_table.html:122
-#: templates/admin/filer/folder/directory_table.html:142
+#: templates/admin/filer/folder/directory_table.html:103
+#: templates/admin/filer/folder/directory_table.html:118
+#: templates/admin/filer/folder/directory_table.html:138
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Wijzig eigenschappen '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:131
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "Permissions"
 msgstr "Toegangsrechten"
 
-#: templates/admin/filer/folder/directory_table.html:131
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "disabled"
 msgstr "uitgeschakeld"
 
-#: templates/admin/filer/folder/directory_table.html:131
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "enabled"
 msgstr "ingeschakeld"
 
-#: templates/admin/filer/folder/directory_table.html:143
+#: templates/admin/filer/folder/directory_table.html:139
 #, fuzzy
 #| msgid "Rename files"
 msgid "Remove file"
 msgstr "Hernoem bestanden"
 
-#: templates/admin/filer/folder/directory_table.html:150
+#: templates/admin/filer/folder/directory_table.html:146
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:160
+#: templates/admin/filer/folder/directory_table.html:156
 msgid "Drop your file to upload into:"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:170
+#: templates/admin/filer/folder/directory_table.html:166
 msgid "Upload"
 msgstr "Uploaden"
 
-#: templates/admin/filer/folder/directory_table.html:182
+#: templates/admin/filer/folder/directory_table.html:178
 #, fuzzy
 #| msgid "cancel search"
 msgid "cancel"
 msgstr "annuleer zoekopdracht"
 
-#: templates/admin/filer/folder/directory_table.html:186
+#: templates/admin/filer/folder/directory_table.html:182
 msgid "Upload success!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:190
+#: templates/admin/filer/folder/directory_table.html:186
 #, fuzzy
 #| msgid "upload failed"
 msgid "Upload canceled!"
 msgstr "upload mislukt"
 
-#: templates/admin/filer/folder/directory_table.html:197
+#: templates/admin/filer/folder/directory_table.html:193
 msgid "previous"
 msgstr "vorige"
 
-#: templates/admin/filer/folder/directory_table.html:202
+#: templates/admin/filer/folder/directory_table.html:198
 #, fuzzy, python-format
 #| msgid ""
 #| "\n"
 #| "            Page %(number)s of %(num_pages)s.\n"
 #| "            "
-msgid ""
-"\n"
-"                Page %(number)s of %(num_pages)s.\n"
-"            "
+msgid "Page %(number)s of %(num_pages)s."
 msgstr ""
 "\n"
 "Pagina %(number)s van %(num_pages)s.\n"
 " "
 
-#: templates/admin/filer/folder/directory_table.html:209
+#: templates/admin/filer/folder/directory_table.html:203
 msgid "next"
 msgstr "volgende"
 
-#: templates/admin/filer/folder/directory_table.html:219
+#: templates/admin/filer/folder/directory_table.html:213
 #, fuzzy, python-format
 #| msgid "Select all %(total_count)s files and/or folders"
 msgid "Select all %(total_count)s"
@@ -1066,13 +1058,6 @@ msgstr "Wijzigen"
 #: templates/admin/filer/tools/search_form.html:5
 msgid "found"
 msgstr "gevonden"
-
-#: templates/admin/filer/tools/search_form.html:5
-#, python-format
-msgid "%(counter)s folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/filer/tools/search_form.html:5
 msgid "and"
