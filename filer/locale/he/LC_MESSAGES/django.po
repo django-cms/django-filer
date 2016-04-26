@@ -806,14 +806,6 @@ msgstr ""
 msgid "Change '%(item_label)s' folder details"
 msgstr "שנה פרטי תיקיה של '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:73
-#: templates/admin/filer/tools/search_form.html:5
-#, python-format
-msgid "%(counter)s folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
-
 #: templates/admin/filer/folder/directory_table.html:74
 #, fuzzy, python-format
 #| msgid "%(total_count)s selected"
@@ -1036,17 +1028,6 @@ msgstr "נמצא"
 #: templates/admin/filer/tools/search_form.html:5
 msgid "and"
 msgstr "וגם"
-
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/filer/tools/search_form.html:9
 msgid "cancel search"

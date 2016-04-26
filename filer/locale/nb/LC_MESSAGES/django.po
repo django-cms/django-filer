@@ -824,13 +824,6 @@ msgstr ""
 msgid "Change '%(item_label)s' folder details"
 msgstr "Endre detaljer for mappen \"%(item_label)s\""
 
-#: templates/admin/filer/folder/directory_table.html:73
-#: templates/admin/filer/tools/search_form.html:5
-#, python-format
-msgid "%(counter)s folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/filer/folder/directory_table.html:74
 #, fuzzy, python-format
@@ -1055,16 +1048,6 @@ msgstr "funnet"
 msgid "and"
 msgstr "og"
 
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/filer/tools/search_form.html:9
 msgid "cancel search"

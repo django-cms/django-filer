@@ -30,12 +30,6 @@ msgid ""
 "been changed."
 msgstr ""
 
-#: admin/folderadmin.py:410
-#, python-format
-msgid "%(total_count)s selected"
-msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
 
 #: admin/folderadmin.py:449
 #, python-format
@@ -773,21 +767,6 @@ msgstr ""
 msgid "Change '%(item_label)s' folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:73
-#: templates/admin/filer/tools/search_form.html:5
-#, python-format
-msgid "%(counter)s folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/admin/filer/folder/directory_table.html:74
-#, python-format
-msgid "%(counter)s file"
-msgid_plural "%(counter)s files"
-msgstr[0] ""
-msgstr[1] ""
-
 #: templates/admin/filer/folder/directory_table.html:80
 msgid "Change folder details"
 msgstr ""
@@ -870,12 +849,6 @@ msgstr ""
 #: templates/admin/filer/folder/new_folder_form.html:5
 msgid "Add new"
 msgstr ""
-
-#: templates/admin/filer/folder/new_folder_form.html:13
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"
@@ -965,17 +938,6 @@ msgstr ""
 #: templates/admin/filer/tools/search_form.html:5
 msgid "and"
 msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/filer/tools/search_form.html:9
 msgid "cancel search"

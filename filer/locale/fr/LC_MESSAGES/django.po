@@ -1064,17 +1064,6 @@ msgstr "trouvé :"
 msgid "and"
 msgstr "et"
 
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] ""
-msgstr[1] ""
-
 #: templates/admin/filer/tools/search_form.html:9
 msgid "cancel search"
 msgstr "annuler la recherche"
