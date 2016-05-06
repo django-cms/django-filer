@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+Revision e0c4870 (06.05.2016, 15:22 UTC)
+----------------------------------------
+
+* LUN-2622
+
+  * LUN-2960: Apply styling from LUN-2622 to trash change list view.
+
+* LUN-2960
+
+  * Apply styling from LUN-2622 to trash change list view.
+
+No other commits.
+
 Revision 9084219 (13.04.2016, 10:56 UTC)
 ----------------------------------------
 
