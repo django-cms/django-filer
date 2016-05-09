@@ -110,6 +110,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         folder_form = super(FolderAdmin, self).get_form(
             request, obj=obj, **kwargs)
+
+        folder_form.base_fields['site'].widget.can_add_related = False
+        folder_form.base_fields['site'].widget.can_delete_related = False
+        folder_form.base_fields['site'].widget.can_change_related = False
+        folder_form.base_fields['shared'].widget.can_add_related = False
+
         # do show share sites field only for superusers
         if not request.user.is_superuser:
             folder_form.base_fields.pop('shared', None)
