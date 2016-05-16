@@ -3,9 +3,7 @@
 {% if show_result_count %}
     <div class="small quiet filter-files-cancel filer-info-bar">
         ({% trans "found" %} {% blocktrans count folder_children|length as counter %}{{ counter }} folder{% plural %}{{ counter }} folders{% endblocktrans %} {% trans "and" %}
-        {% blocktrans count folder_files|length as counter %}
-            {{ counter }} file{% plural %}{{ counter }} files
-        {% endblocktrans %})
+        {% blocktrans count folder_files|length as counter %}{{ counter }} file{% plural %}{{ counter }} files{% endblocktrans %})
         <a href="?{% if is_popup %}_popup=1{% if select_folder %}&amp;select_folder=1{% endif %}{% endif %}">{% trans "cancel search" %}</a>
     </div>
 {% endif %}
