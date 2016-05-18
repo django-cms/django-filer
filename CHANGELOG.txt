@@ -4,7 +4,7 @@ CHANGELOG
 next (20xx-xx-xx)
 -----------------
 
-* ...
+* Adds missing @2x icon files
 
 1.2.0 (2016-04-26)
 ------------------
