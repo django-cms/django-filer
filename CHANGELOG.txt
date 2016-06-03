@@ -6,6 +6,7 @@ next (20xx-xx-xx)
 
 * Rename filer picker widget upload button
 * Adds missing @2x icon files
+* Added missing migration #854
 
 1.2.0 (2016-04-26)
 ------------------
