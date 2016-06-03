@@ -12,15 +12,18 @@ from .. import settings as filer_settings
 from ..models.clipboardmodels import Clipboard
 from ..models.filemodels import File
 from ..models.foldermodels import Folder
-from ..models.imagemodels import Image
 from ..models.mixins import IconsMixin
+from ..settings import FILER_IMAGE_MODEL
 from ..test_utils import ET_2
+from ..utils.loader import load_model
 from .helpers import (
     create_clipboard_item,
     create_folder_structure,
     create_image,
     create_superuser,
 )
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 try:
     from unittest import skipIf, skipUnless
@@ -249,7 +252,7 @@ class FilerApiTests(TestCase):
         Check that the correct model is loaded and save / reload data
         """
         image = self.create_filer_image()
-        if settings.FILER_IMAGE_MODEL:
+        if getattr(settings, 'FILER_IMAGE_MODEL', False):
             self.assertTrue(hasattr(image, 'extra_description'))
             self.assertFalse(hasattr(image, 'author'))
             image.extra_description = 'Extra'
