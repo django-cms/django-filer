@@ -7,6 +7,7 @@ next (20xx-xx-xx)
 * Rename filer picker widget upload button
 * Adds missing @2x icon files
 * Added missing migration #854
+* Adds a check for FILER_IMAGE_MODEL setting before altering image model in migrations
 
 1.2.0 (2016-04-26)
 ------------------
