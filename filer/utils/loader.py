@@ -41,6 +41,18 @@ def load_object(import_path):
     return getattr(module, object_name)
 
 
+def load_model(model_name):
+    from django import VERSION as django_version
+
+    model_name_tuple = model_name.split('.')
+
+    if django_version[:2] < (1, 7):
+        from django.db.models import get_model
+        return get_model(*model_name_tuple)
+    from django.apps import apps
+    return apps.get_model(*model_name_tuple)
+
+
 def storage_factory(klass, location, base_url):
     """
     This factory returns an instance of the storage class provided.

@@ -31,12 +31,11 @@ from ..models import (
     Folder,
     FolderPermission,
     FolderRoot,
-    Image,
     ImagesWithMissingData,
     UnsortedImages,
     tools,
 )
-from ..settings import FILER_PAGINATE_BY
+from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import (
     capfirst,
@@ -45,6 +44,7 @@ from ..utils.compatibility import (
     unquote,
 )
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
+from ..utils.loader import load_model
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
@@ -59,6 +59,8 @@ from .tools import (
     popup_status,
     userperms_for_request,
 )
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 class AddFolderPopupForm(forms.ModelForm):
