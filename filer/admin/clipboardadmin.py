@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import json
 
+from django.conf.urls import url
 from django.contrib import admin
 from django.forms.models import modelform_factory
 from django.http import HttpResponse
@@ -39,9 +40,7 @@ class ClipboardAdmin(admin.ModelAdmin):
     verbose_name_plural = "DEBUG Clipboards"
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
-        urls = super(ClipboardAdmin, self).get_urls()
-        url_patterns = patterns('',
+        return [
             url(r'^operations/paste_clipboard_to_folder/$',
                 self.admin_site.admin_view(views.paste_clipboard_to_folder),
                 name='filer-paste_clipboard_to_folder'),
@@ -57,9 +56,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/no_folder/$',
                 ajax_upload,
                 name='filer-ajax_upload'),
-        )
-        url_patterns.extend(urls)
-        return url_patterns
+        ] + super(ClipboardAdmin, self).get_urls()
 
     def get_model_perms(self, *args, **kwargs):
         """
