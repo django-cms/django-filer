@@ -2,8 +2,8 @@
 
 from __future__ import absolute_import
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('filer.server.views',
-    url(r'^(?P<path>.*)$', 'serve_protected_thumbnail',),
-)
+urlpatterns = [
+    url(r'^(?P<path>.*)$', 'filer.server.views.serve_protected_thumbnail',),
+]

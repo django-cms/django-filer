@@ -214,9 +214,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
-        urls = super(FolderAdmin, self).get_urls()
-        url_patterns = patterns('',
+        from django.conf.urls import url
+        url_patterns = [
             # we override the default list view with our own directory listing
             # of the root directories
             url(r'^$',
@@ -248,8 +247,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
                 name='filer-directory_listing-unfiled_images'),
+        ]
+        url_patterns.extend(
+            super(FolderAdmin, self).get_urls()
         )
-        url_patterns.extend(urls)
         return url_patterns
 
     # custom views
