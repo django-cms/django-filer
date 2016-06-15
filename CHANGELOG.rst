@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+Revision 7095511 (15.06.2016, 14:37 UTC)
+----------------------------------------
+
+* LUN-2784
+
+  * Be graceful about base_fields lookup.
+  * Remove FolderAdmin related field actions
+
+No other commits.
+
 Revision e0c4870 (06.05.2016, 15:22 UTC)
 ----------------------------------------
 
