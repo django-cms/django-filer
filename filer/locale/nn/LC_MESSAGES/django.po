@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # Eirik Krogstad <eirikkr@gmail.com>, 2013
 # Eirik Krogstad <eirikkr@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-26 14:02+0200\n"
-"PO-Revision-Date: 2016-04-26 12:16+0000\n"
-"Last-Translator: Stefan Foulis <stefan.foulis@gmail.com>\n"
+"POT-Creation-Date: 2016-06-17 16:13+0200\n"
+"PO-Revision-Date: 2016-06-17 14:16+0000\n"
+"Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/divio/django-filer/language/nn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,131 +28,131 @@ msgstr "Avansert"
 msgid "canonical URL"
 msgstr ""
 
-#: admin/folderadmin.py:390 admin/folderadmin.py:557
+#: admin/folderadmin.py:387 admin/folderadmin.py:554
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "Element må vere vald for å utføre handlingar på dei. Ingen element vart endra."
 
-#: admin/folderadmin.py:410
+#: admin/folderadmin.py:407
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s vald"
 msgstr[1] "Alle %(total_count)s vald"
 
-#: admin/folderadmin.py:449
+#: admin/folderadmin.py:446
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 av %(cnt)s vald"
 
-#: admin/folderadmin.py:587
+#: admin/folderadmin.py:584
 msgid "No action selected."
 msgstr "Ingen handling vald."
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:629
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Flytta %(count)d filer til utklippstavla."
 
-#: admin/folderadmin.py:638
+#: admin/folderadmin.py:635
 msgid "Move selected files to clipboard"
 msgstr "Flytt valde filer til utklippstavla"
 
-#: admin/folderadmin.py:676
+#: admin/folderadmin.py:673
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Fjerna løyve for %(count)d filer."
 
-#: admin/folderadmin.py:678
+#: admin/folderadmin.py:675
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Satte løyve for %(count)d filer."
 
-#: admin/folderadmin.py:687
+#: admin/folderadmin.py:684
 msgid "Enable permissions for selected files"
 msgstr "Sett løyve for valde filer"
 
-#: admin/folderadmin.py:694
+#: admin/folderadmin.py:691
 msgid "Disable permissions for selected files"
 msgstr "Fjern løyve for valde filer"
 
-#: admin/folderadmin.py:759
+#: admin/folderadmin.py:756
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Sletta %(count)d filer og/eller mapper."
 
-#: admin/folderadmin.py:764
+#: admin/folderadmin.py:761
 msgid "Cannot delete files and/or folders"
 msgstr "Kan ikkje slette filer og/eller mapper"
 
-#: admin/folderadmin.py:766
+#: admin/folderadmin.py:763
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: admin/folderadmin.py:772
+#: admin/folderadmin.py:769
 msgid "Delete files and/or folders"
 msgstr "Slett filer og/eller mapper"
 
-#: admin/folderadmin.py:794
+#: admin/folderadmin.py:791
 msgid "Delete selected files and/or folders"
 msgstr "Slett valde filer og/eller mapper"
 
-#: admin/folderadmin.py:909
+#: admin/folderadmin.py:906
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr ""
 
-#: admin/folderadmin.py:913
+#: admin/folderadmin.py:910
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Flytta %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
 
-#: admin/folderadmin.py:921 admin/folderadmin.py:923
+#: admin/folderadmin.py:918 admin/folderadmin.py:920
 msgid "Move files and/or folders"
 msgstr "Flytt filer og/eller mapper"
 
-#: admin/folderadmin.py:938
+#: admin/folderadmin.py:935
 msgid "Move selected files and/or folders"
 msgstr "Flytt valde filer og/eller mapper"
 
-#: admin/folderadmin.py:995
+#: admin/folderadmin.py:992
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Endra namn på %(count)d filer."
 
-#: admin/folderadmin.py:1004 admin/folderadmin.py:1006
-#: admin/folderadmin.py:1021
+#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
+#: admin/folderadmin.py:1018
 msgid "Rename files"
 msgstr "Endre namn på filer"
 
-#: admin/folderadmin.py:1115
+#: admin/folderadmin.py:1112
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Kopierte %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
 
-#: admin/folderadmin.py:1133 admin/folderadmin.py:1135
+#: admin/folderadmin.py:1130 admin/folderadmin.py:1132
 msgid "Copy files and/or folders"
 msgstr "Kopier filer og/eller mapper"
 
-#: admin/folderadmin.py:1152
+#: admin/folderadmin.py:1149
 msgid "Copy selected files and/or folders"
 msgstr "Kopier valde filer og/eller mapper"
 
-#: admin/folderadmin.py:1255
+#: admin/folderadmin.py:1252
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Endra storleik på %(count)d bilete."
 
-#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
+#: admin/folderadmin.py:1259 admin/folderadmin.py:1261
 msgid "Resize images"
 msgstr "Endre storleik på bilete"
 
-#: admin/folderadmin.py:1280
+#: admin/folderadmin.py:1277
 msgid "Resize selected images"
 msgstr "Endre storleik på valde bilete"
 
@@ -605,6 +606,7 @@ msgstr "Målmappe:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:78
 #: templates/admin/filer/folder/choose_copy_destination.html:81
+#: templates/admin/filer/folder/directory_listing.html:192
 msgid "Copy"
 msgstr "Kopier"
 
@@ -786,6 +788,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/admin/filer/folder/directory_table.html:74
+#: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
@@ -970,18 +973,7 @@ msgstr "funne"
 msgid "and"
 msgstr "og"
 
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/admin/filer/tools/search_form.html:9
+#: templates/admin/filer/tools/search_form.html:7
 msgid "cancel search"
 msgstr "avbryt søk"
 
@@ -1010,7 +1002,8 @@ msgid "Lookup"
 msgstr "Slå opp"
 
 #: templates/admin/filer/widgets/admin_file.html:36
-msgid "Upload File"
+#| msgid "Change File"
+msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:11
@@ -1021,3 +1014,15 @@ msgstr "ingen vald"
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
 msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "            %(counter)s file"
+#~ msgid_plural ""
+#~ "%(counter)s files\n"
+#~ "        "
+#~ msgstr[0] "15c0f2d28d6dab1af1f6d94906beb627_pl_0"
+#~ msgstr[1] "15c0f2d28d6dab1af1f6d94906beb627_pl_1"
+
+#~ msgid "Upload File"
+#~ msgstr "Upload File"

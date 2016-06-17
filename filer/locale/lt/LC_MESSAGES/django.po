@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Translators:
 # Matas Dailyda <matas@dailyda.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-26 14:02+0200\n"
-"PO-Revision-Date: 2016-05-05 08:52+0000\n"
-"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
+"POT-Creation-Date: 2016-06-17 16:13+0200\n"
+"PO-Revision-Date: 2016-06-17 14:16+0000\n"
+"Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/divio/django-filer/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,13 +27,13 @@ msgstr "Išplėstinės funkcijos"
 msgid "canonical URL"
 msgstr "kanoninis URL"
 
-#: admin/folderadmin.py:390 admin/folderadmin.py:557
+#: admin/folderadmin.py:387 admin/folderadmin.py:554
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "Objektai turi būti pasirinkti, kad su jais būtų galima atlikti veiksmus. Jokie objektai nebuvo pakeisti."
 
-#: admin/folderadmin.py:410
+#: admin/folderadmin.py:407
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -40,118 +41,118 @@ msgstr[0] "pasirinkta %(total_count)s"
 msgstr[1] "pasirinkta %(total_count)s"
 msgstr[2] "pasirinkta %(total_count)s"
 
-#: admin/folderadmin.py:449
+#: admin/folderadmin.py:446
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 iš %(cnt)s pasirinkta"
 
-#: admin/folderadmin.py:587
+#: admin/folderadmin.py:584
 msgid "No action selected."
 msgstr "Nepasirinktas joks veiksmas."
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:629
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Sėkmingai perkelta %(count)d failai į iškarpinę."
 
-#: admin/folderadmin.py:638
+#: admin/folderadmin.py:635
 msgid "Move selected files to clipboard"
 msgstr "Perkelti pažymėtus failus į iškarpinę"
 
-#: admin/folderadmin.py:676
+#: admin/folderadmin.py:673
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Sėkmingai išjungti leidimai %(count)d failams."
 
-#: admin/folderadmin.py:678
+#: admin/folderadmin.py:675
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Sėkmingai įjungti leidimai %(count)d failams."
 
-#: admin/folderadmin.py:687
+#: admin/folderadmin.py:684
 msgid "Enable permissions for selected files"
 msgstr "Įjungti leidimus pasirinktiems failams"
 
-#: admin/folderadmin.py:694
+#: admin/folderadmin.py:691
 msgid "Disable permissions for selected files"
 msgstr "Išjungti leidimus pasirinktiems failams"
 
-#: admin/folderadmin.py:759
+#: admin/folderadmin.py:756
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Sėkmingai pašalino %(count)d failus ir / ar aplankus."
 
-#: admin/folderadmin.py:764
+#: admin/folderadmin.py:761
 msgid "Cannot delete files and/or folders"
 msgstr "Negalima pašalinti failų ir / ar aplankų"
 
-#: admin/folderadmin.py:766
+#: admin/folderadmin.py:763
 msgid "Are you sure?"
 msgstr "Ar jūs esate tikri?"
 
-#: admin/folderadmin.py:772
+#: admin/folderadmin.py:769
 msgid "Delete files and/or folders"
 msgstr "Pašalinti failus ir / ar aplankus"
 
-#: admin/folderadmin.py:794
+#: admin/folderadmin.py:791
 msgid "Delete selected files and/or folders"
 msgstr "Pašalinti pasirinktus failus ir / ar aplankus"
 
-#: admin/folderadmin.py:909
+#: admin/folderadmin.py:906
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Aplankai su %s pavadinimais jau egzistuoja pasirinktoje paskirties vietoje."
 
-#: admin/folderadmin.py:913
+#: admin/folderadmin.py:910
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Sėkmingai perkelti %(count)d failai ir / ar aplankai į aplanką '%(destination)s'."
 
-#: admin/folderadmin.py:921 admin/folderadmin.py:923
+#: admin/folderadmin.py:918 admin/folderadmin.py:920
 msgid "Move files and/or folders"
 msgstr "Perkelti failus ir / ar aplankus"
 
-#: admin/folderadmin.py:938
+#: admin/folderadmin.py:935
 msgid "Move selected files and/or folders"
 msgstr "Perkelti pasirinktus failus ir / ar aplankus"
 
-#: admin/folderadmin.py:995
+#: admin/folderadmin.py:992
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Sėkmingai pervardinti %(count)d failai."
 
-#: admin/folderadmin.py:1004 admin/folderadmin.py:1006
-#: admin/folderadmin.py:1021
+#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
+#: admin/folderadmin.py:1018
 msgid "Rename files"
 msgstr "Pervardinti failus"
 
-#: admin/folderadmin.py:1115
+#: admin/folderadmin.py:1112
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Sėkmingai nukopijuoti %(count)d failai ir / ar aplankai į aplanką '%(destination)s'."
 
-#: admin/folderadmin.py:1133 admin/folderadmin.py:1135
+#: admin/folderadmin.py:1130 admin/folderadmin.py:1132
 msgid "Copy files and/or folders"
 msgstr "Kopijuoti failus ir / ar aplankus"
 
-#: admin/folderadmin.py:1152
+#: admin/folderadmin.py:1149
 msgid "Copy selected files and/or folders"
 msgstr "Kopijuoti pasirinktus failus ir / ar aplankus"
 
-#: admin/folderadmin.py:1255
+#: admin/folderadmin.py:1252
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Sėkmingai pakeistas %(count)d paveikslėlių dydis."
 
-#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
+#: admin/folderadmin.py:1259 admin/folderadmin.py:1261
 msgid "Resize images"
 msgstr "Pakeisti paveikslėlių dydžius"
 
-#: admin/folderadmin.py:1280
+#: admin/folderadmin.py:1277
 msgid "Resize selected images"
 msgstr "Pakeisti pasirinktų paveikslėlių dydžius"
 
@@ -605,6 +606,7 @@ msgstr "Paskyrimo aplankas:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:78
 #: templates/admin/filer/folder/choose_copy_destination.html:81
+#: templates/admin/filer/folder/directory_listing.html:192
 msgid "Copy"
 msgstr "Kopijuoti"
 
@@ -787,6 +789,7 @@ msgstr[1] "%(counter)s aplankai"
 msgstr[2] "%(counter)s aplankų"
 
 #: templates/admin/filer/folder/directory_table.html:74
+#: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
@@ -973,19 +976,7 @@ msgstr "rasta"
 msgid "and"
 msgstr "ir"
 
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] "\n%(counter)s byla"
-msgstr[1] ""
-msgstr[2] ""
-
-#: templates/admin/filer/tools/search_form.html:9
+#: templates/admin/filer/tools/search_form.html:7
 msgid "cancel search"
 msgstr "atšaukti paiešką"
 
@@ -1014,8 +1005,9 @@ msgid "Lookup"
 msgstr "Informacijos ieškojimas"
 
 #: templates/admin/filer/widgets/admin_file.html:36
-msgid "Upload File"
-msgstr "Įkelti bylą"
+#| msgid "Change File"
+msgid "Choose File"
+msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:11
 #: templates/admin/filer/widgets/admin_folder.html:33
@@ -1025,3 +1017,16 @@ msgstr "nei vienas nepasirinktas"
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
 msgstr "Pridėti aplanką"
+
+#~ msgid ""
+#~ "\n"
+#~ "            %(counter)s file"
+#~ msgid_plural ""
+#~ "%(counter)s files\n"
+#~ "        "
+#~ msgstr[0] "15c0f2d28d6dab1af1f6d94906beb627_pl_0"
+#~ msgstr[1] "15c0f2d28d6dab1af1f6d94906beb627_pl_1"
+#~ msgstr[2] "15c0f2d28d6dab1af1f6d94906beb627_pl_2"
+
+#~ msgid "Upload File"
+#~ msgstr "Upload File"
