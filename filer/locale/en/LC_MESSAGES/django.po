@@ -1,20 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-26 14:02+0200\n"
+"POT-Creation-Date: 2016-06-17 16:13+0200\n"
 "PO-Revision-Date: 2016-04-26 12:17+0000\n"
 "Last-Translator: Stefan Foulis <stefan.foulis@gmail.com>\n"
-"Language-Team: English (http://www.transifex.com/divio/django-filer/language/en/)\n"
+"Language-Team: English (http://www.transifex.com/divio/django-filer/language/"
+"en/)\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
@@ -25,131 +26,137 @@ msgstr "Advanced"
 msgid "canonical URL"
 msgstr "canonical URL"
 
-#: admin/folderadmin.py:390 admin/folderadmin.py:557
+#: admin/folderadmin.py:387 admin/folderadmin.py:554
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Items must be selected in order to perform actions on them. No items have been changed."
+msgstr ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
 
-#: admin/folderadmin.py:410
+#: admin/folderadmin.py:407
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selected"
 msgstr[1] "All %(total_count)s selected"
 
-#: admin/folderadmin.py:449
+#: admin/folderadmin.py:446
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 of %(cnt)s selected"
 
-#: admin/folderadmin.py:587
+#: admin/folderadmin.py:584
 msgid "No action selected."
 msgstr "No action selected."
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:629
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Successfully moved %(count)d files to clipboard."
 
-#: admin/folderadmin.py:638
+#: admin/folderadmin.py:635
 msgid "Move selected files to clipboard"
 msgstr "Move selected files to clipboard"
 
-#: admin/folderadmin.py:676
+#: admin/folderadmin.py:673
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Successfully disabled permissions for %(count)d files."
 
-#: admin/folderadmin.py:678
+#: admin/folderadmin.py:675
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Successfully enabled permissions for %(count)d files."
 
-#: admin/folderadmin.py:687
+#: admin/folderadmin.py:684
 msgid "Enable permissions for selected files"
 msgstr "Enable permissions for selected files"
 
-#: admin/folderadmin.py:694
+#: admin/folderadmin.py:691
 msgid "Disable permissions for selected files"
 msgstr "Disable permissions for selected files"
 
-#: admin/folderadmin.py:759
+#: admin/folderadmin.py:756
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Successfully deleted %(count)d files and/or folders."
 
-#: admin/folderadmin.py:764
+#: admin/folderadmin.py:761
 msgid "Cannot delete files and/or folders"
 msgstr "Cannot delete files and/or folders"
 
-#: admin/folderadmin.py:766
+#: admin/folderadmin.py:763
 msgid "Are you sure?"
 msgstr "Are you sure?"
 
-#: admin/folderadmin.py:772
+#: admin/folderadmin.py:769
 msgid "Delete files and/or folders"
 msgstr "Delete files and/or folders"
 
-#: admin/folderadmin.py:794
+#: admin/folderadmin.py:791
 msgid "Delete selected files and/or folders"
 msgstr "Delete selected files and/or folders"
 
-#: admin/folderadmin.py:909
+#: admin/folderadmin.py:906
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Folders with names %s already exist at the selected destination"
 
-#: admin/folderadmin.py:913
+#: admin/folderadmin.py:910
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Successfully moved %(count)d files and/or folders to folder '%(destination)s'."
+msgstr ""
+"Successfully moved %(count)d files and/or folders to folder "
+"'%(destination)s'."
 
-#: admin/folderadmin.py:921 admin/folderadmin.py:923
+#: admin/folderadmin.py:918 admin/folderadmin.py:920
 msgid "Move files and/or folders"
 msgstr "Move files and/or folders"
 
-#: admin/folderadmin.py:938
+#: admin/folderadmin.py:935
 msgid "Move selected files and/or folders"
 msgstr "Move selected files and/or folders"
 
-#: admin/folderadmin.py:995
+#: admin/folderadmin.py:992
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Successfully renamed %(count)d files."
 
-#: admin/folderadmin.py:1004 admin/folderadmin.py:1006
-#: admin/folderadmin.py:1021
+#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
+#: admin/folderadmin.py:1018
 msgid "Rename files"
 msgstr "Rename files"
 
-#: admin/folderadmin.py:1115
+#: admin/folderadmin.py:1112
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Successfully copied %(count)d files and/or folders to folder '%(destination)s'."
+msgstr ""
+"Successfully copied %(count)d files and/or folders to folder "
+"'%(destination)s'."
 
-#: admin/folderadmin.py:1133 admin/folderadmin.py:1135
+#: admin/folderadmin.py:1130 admin/folderadmin.py:1132
 msgid "Copy files and/or folders"
 msgstr "Copy files and/or folders"
 
-#: admin/folderadmin.py:1152
+#: admin/folderadmin.py:1149
 msgid "Copy selected files and/or folders"
 msgstr "Copy selected files and/or folders"
 
-#: admin/folderadmin.py:1255
+#: admin/folderadmin.py:1252
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Successfully resized %(count)d images."
 
-#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
+#: admin/folderadmin.py:1259 admin/folderadmin.py:1261
 msgid "Resize images"
 msgstr "Resize images"
 
-#: admin/folderadmin.py:1280
+#: admin/folderadmin.py:1277
 msgid "Resize selected images"
 msgstr "Resize selected images"
 
@@ -162,7 +169,9 @@ msgstr "Suffix which will be appended to filenames of copied files."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Suffix should be a valid, simple and lowercase filename part, like \"%(valid)s\"."
+msgstr ""
+"Suffix should be a valid, simple and lowercase filename part, like "
+"\"%(valid)s\"."
 
 #: admin/forms.py:55
 #, python-format
@@ -334,14 +343,15 @@ msgstr "Permissions disabled"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr "Disable any permission checking for this file. File will be publicly accessible to anyone."
+msgstr ""
+"Disable any permission checking for this file. File will be publicly "
+"accessible to anyone."
 
 #: models/foldermodels.py:112
 msgid "created at"
 msgstr "created at"
 
-#: models/foldermodels.py:235
-#: templates/admin/filer/widgets/admin_folder.html:7
+#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
 msgstr "Folder"
@@ -510,19 +520,26 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Deleting the selected files and/or folders would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr ""
+"Deleting the selected files and/or folders would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Deleting the selected files and/or folders would require deleting the following protected related objects:"
+msgstr ""
+"Deleting the selected files and/or folders would require deleting the "
+"following protected related objects:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Are you sure you want to delete the selected files and/or folders? All of the following objects and their related items will be deleted:"
+msgstr ""
+"Are you sure you want to delete the selected files and/or folders? All of "
+"the following objects and their related items will be deleted:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:77
@@ -568,9 +585,11 @@ msgstr "Folder Icon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Your account doesn't have permissions to copy all of the selected files and/or folders."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:38
 #: templates/admin/filer/folder/choose_copy_destination.html:44
@@ -594,7 +613,9 @@ msgstr "There are no files and/or folders available to copy."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "The following files and/or folders will be copied to a destination folder (retaining their tree structure):"
+msgstr ""
+"The following files and/or folders will be copied to a destination folder "
+"(retaining their tree structure):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
 #: templates/admin/filer/folder/choose_move_destination.html:65
@@ -603,6 +624,7 @@ msgstr "Destination folder:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:78
 #: templates/admin/filer/folder/choose_copy_destination.html:81
+#: templates/admin/filer/folder/directory_listing.html:192
 msgid "Copy"
 msgstr "Copy"
 
@@ -613,7 +635,8 @@ msgstr "It is not allowed to copy files into same folder"
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Your account doesn't have permissions to resize all of the selected images."
+msgstr ""
+"Your account doesn't have permissions to resize all of the selected images."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -635,7 +658,9 @@ msgstr "Choose resize parameters:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Warning: Images will be resized in-place and originals will be lost. Maybe first make a copy of them to retain the originals."
+msgstr ""
+"Warning: Images will be resized in-place and originals will be lost. Maybe "
+"first make a copy of them to retain the originals."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -643,9 +668,11 @@ msgstr "Resize"
 
 #: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Your account doesn't have permissions to move all of the selected files and/or folders."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
 
 #: templates/admin/filer/folder/choose_move_destination.html:48
 msgid "There are no files and/or folders available to move."
@@ -655,7 +682,9 @@ msgstr "There are no files and/or folders available to move."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "The following files and/or folders will be moved to a destination folder (retaining their tree structure):"
+msgstr ""
+"The following files and/or folders will be moved to a destination folder "
+"(retaining their tree structure):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:74
 #: templates/admin/filer/folder/choose_move_destination.html:77
@@ -670,7 +699,8 @@ msgstr "It is not allowed to move files into same folder"
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "Your account doesn't have permissions to rename all of the selected files."
+msgstr ""
+"Your account doesn't have permissions to rename all of the selected files."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
@@ -680,7 +710,9 @@ msgstr "There are no files available to rename."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "The following files will be renamed (they will stay in their folders and keep original filename, only displayed filename will be changed):"
+msgstr ""
+"The following files will be renamed (they will stay in their folders and "
+"keep original filename, only displayed filename will be changed):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -784,6 +816,7 @@ msgstr[0] "%(counter)s folder"
 msgstr[1] "%(counter)s folders"
 
 #: templates/admin/filer/folder/directory_table.html:74
+#: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
@@ -968,18 +1001,7 @@ msgstr "found"
 msgid "and"
 msgstr "and"
 
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid ""
-"\n"
-"            %(counter)s file"
-msgid_plural ""
-"%(counter)s files\n"
-"        "
-msgstr[0] "\n            %(counter)s file"
-msgstr[1] "%(counter)s files\n        "
-
-#: templates/admin/filer/tools/search_form.html:9
+#: templates/admin/filer/tools/search_form.html:7
 msgid "cancel search"
 msgstr "cancel search"
 
@@ -1008,8 +1030,10 @@ msgid "Lookup"
 msgstr "Lookup"
 
 #: templates/admin/filer/widgets/admin_file.html:36
-msgid "Upload File"
-msgstr "Upload File"
+#, fuzzy
+#| msgid "Change File"
+msgid "Choose File"
+msgstr "Change File"
 
 #: templates/admin/filer/widgets/admin_folder.html:11
 #: templates/admin/filer/widgets/admin_folder.html:33
@@ -1019,3 +1043,19 @@ msgstr "none selected"
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
 msgstr "Add Folder"
+
+#~ msgid ""
+#~ "\n"
+#~ "            %(counter)s file"
+#~ msgid_plural ""
+#~ "%(counter)s files\n"
+#~ "        "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "            %(counter)s file"
+#~ msgstr[1] ""
+#~ "%(counter)s files\n"
+#~ "        "
+
+#~ msgid "Upload File"
+#~ msgstr "Upload File"
