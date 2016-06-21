@@ -1,23 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
 # Translators:
 # Eirik Krogstad <eirikkr@gmail.com>, 2013
 # Eirik Krogstad <eirikkr@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: django-filer\n"
+"Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-26 14:02+0200\n"
-"PO-Revision-Date: 2015-07-24 18:03+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Norwegian Nynorsk (http://www.transifex.com/divio/django-"
-"filer/language/nn/)\n"
-"Language: nn\n"
+"POT-Creation-Date: 2016-06-17 16:13+0200\n"
+"PO-Revision-Date: 2016-06-17 14:16+0000\n"
+"Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
+"Language-Team: Norwegian Nynorsk (http://www.transifex.com/divio/django-filer/language/nn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
@@ -28,134 +28,131 @@ msgstr "Avansert"
 msgid "canonical URL"
 msgstr ""
 
-#: admin/folderadmin.py:390 admin/folderadmin.py:557
+#: admin/folderadmin.py:387 admin/folderadmin.py:554
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Element må vere vald for å utføre handlingar på dei. Ingen element vart "
-"endra."
+msgstr "Element må vere vald for å utføre handlingar på dei. Ingen element vart endra."
 
-#: admin/folderadmin.py:410
+#: admin/folderadmin.py:407
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s vald"
 msgstr[1] "Alle %(total_count)s vald"
 
-#: admin/folderadmin.py:449
+#: admin/folderadmin.py:446
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 av %(cnt)s vald"
 
-#: admin/folderadmin.py:587
+#: admin/folderadmin.py:584
 msgid "No action selected."
 msgstr "Ingen handling vald."
 
-#: admin/folderadmin.py:632
+#: admin/folderadmin.py:629
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Flytta %(count)d filer til utklippstavla."
 
-#: admin/folderadmin.py:638
+#: admin/folderadmin.py:635
 msgid "Move selected files to clipboard"
 msgstr "Flytt valde filer til utklippstavla"
 
-#: admin/folderadmin.py:676
+#: admin/folderadmin.py:673
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Fjerna løyve for %(count)d filer."
 
-#: admin/folderadmin.py:678
+#: admin/folderadmin.py:675
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Satte løyve for %(count)d filer."
 
-#: admin/folderadmin.py:687
+#: admin/folderadmin.py:684
 msgid "Enable permissions for selected files"
 msgstr "Sett løyve for valde filer"
 
-#: admin/folderadmin.py:694
+#: admin/folderadmin.py:691
 msgid "Disable permissions for selected files"
 msgstr "Fjern løyve for valde filer"
 
-#: admin/folderadmin.py:759
+#: admin/folderadmin.py:756
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Sletta %(count)d filer og/eller mapper."
 
-#: admin/folderadmin.py:764
+#: admin/folderadmin.py:761
 msgid "Cannot delete files and/or folders"
 msgstr "Kan ikkje slette filer og/eller mapper"
 
-#: admin/folderadmin.py:766
+#: admin/folderadmin.py:763
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: admin/folderadmin.py:772
+#: admin/folderadmin.py:769
 msgid "Delete files and/or folders"
 msgstr "Slett filer og/eller mapper"
 
-#: admin/folderadmin.py:794
+#: admin/folderadmin.py:791
 msgid "Delete selected files and/or folders"
 msgstr "Slett valde filer og/eller mapper"
 
-#: admin/folderadmin.py:909
+#: admin/folderadmin.py:906
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr ""
 
-#: admin/folderadmin.py:913
+#: admin/folderadmin.py:910
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "Flytta %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
 
-#: admin/folderadmin.py:921 admin/folderadmin.py:923
+#: admin/folderadmin.py:918 admin/folderadmin.py:920
 msgid "Move files and/or folders"
 msgstr "Flytt filer og/eller mapper"
 
-#: admin/folderadmin.py:938
+#: admin/folderadmin.py:935
 msgid "Move selected files and/or folders"
 msgstr "Flytt valde filer og/eller mapper"
 
-#: admin/folderadmin.py:995
+#: admin/folderadmin.py:992
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Endra namn på %(count)d filer."
 
-#: admin/folderadmin.py:1004 admin/folderadmin.py:1006
-#: admin/folderadmin.py:1021
+#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
+#: admin/folderadmin.py:1018
 msgid "Rename files"
 msgstr "Endre namn på filer"
 
-#: admin/folderadmin.py:1115
+#: admin/folderadmin.py:1112
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Kopierte %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
+msgstr "Kopierte %(count)d filer og/eller mapper til mappa \"%(destination)s\"."
 
-#: admin/folderadmin.py:1133 admin/folderadmin.py:1135
+#: admin/folderadmin.py:1130 admin/folderadmin.py:1132
 msgid "Copy files and/or folders"
 msgstr "Kopier filer og/eller mapper"
 
-#: admin/folderadmin.py:1152
+#: admin/folderadmin.py:1149
 msgid "Copy selected files and/or folders"
 msgstr "Kopier valde filer og/eller mapper"
 
-#: admin/folderadmin.py:1255
+#: admin/folderadmin.py:1252
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Endra storleik på %(count)d bilete."
 
-#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
+#: admin/folderadmin.py:1259 admin/folderadmin.py:1261
 msgid "Resize images"
 msgstr "Endre storleik på bilete"
 
-#: admin/folderadmin.py:1280
+#: admin/folderadmin.py:1277
 msgid "Resize selected images"
 msgstr "Endre storleik på valde bilete"
 
@@ -168,9 +165,7 @@ msgstr "Ending som vert tilføyd filnamn på kopierte filer."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Ending bør vere ein gyldig, enkel del av filnamnet med små bokstavar, som "
-"\"%(valid)s\"."
+msgstr "Ending bør vere ein gyldig, enkel del av filnamnet med små bokstavar, som \"%(valid)s\"."
 
 #: admin/forms.py:55
 #, python-format
@@ -215,26 +210,21 @@ msgid "Subject location"
 msgstr "Fokuseringsområde"
 
 #: admin/imageadmin.py:17
-#, fuzzy
-#| msgid "Location of the main subject of the scene."
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
-msgstr "Område for viktigste innhald i biletet."
+msgstr ""
 
 #: admin/imageadmin.py:54
-#, fuzzy
-#| msgid "subject location"
 msgid "Invalid subject location format. "
-msgstr "fokuseringsområde"
+msgstr ""
 
 #: admin/imageadmin.py:60
 msgid "Subject location is outside of the image. "
 msgstr ""
 
 #: admin/imageadmin.py:69
-#, fuzzy, python-brace-format
-#| msgid "subject location"
+#, python-brace-format
 msgid "Your input: \"{subject_location}\". "
-msgstr "fokuseringsområde"
+msgstr ""
 
 #: admin/views.py:57
 msgid "Folder with this name already exists."
@@ -353,7 +343,8 @@ msgstr ""
 msgid "created at"
 msgstr "oppretta"
 
-#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
+#: models/foldermodels.py:235
+#: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
 msgstr "Mappe"
@@ -439,10 +430,8 @@ msgid "height in pixel."
 msgstr ""
 
 #: models/thumbnailoptionmodels.py:24
-#, fuzzy
-#| msgid "thumbnail option"
 msgid "thumbnail options"
-msgstr "miniatyrbileteval"
+msgstr ""
 
 #: models/virtualitems.py:50
 #: templates/admin/filer/folder/directory_table.html:4
@@ -516,36 +505,27 @@ msgid "Go back to '%(folder_name)s' folder"
 msgstr "Gå tilbake til mappa \"%(folder_name)s\""
 
 #: templates/admin/filer/change_form.html:25
-#, fuzzy
-#| msgid "duplicates"
 msgid "Duplicates"
-msgstr "duplikat"
+msgstr ""
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Å slette dei valde filene og/eller mappene ville resultere i sletting av "
-"relaterte objekt, men din konto har ikkje løyve til å slette objekt av "
-"følgjande typer:"
+msgstr "Å slette dei valde filene og/eller mappene ville resultere i sletting av relaterte objekt, men din konto har ikkje løyve til å slette objekt av følgjande typer:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Å slette dei valde filene og/eller mappene ville kreve å slette følgjande "
-"beskytta relaterte objekt:"
+msgstr "Å slette dei valde filene og/eller mappene ville kreve å slette følgjande beskytta relaterte objekt:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Er du sikker på at du vil slette dei valde filene og/eller mappene? Alle dei "
-"følgjande objekta og deira relaterte element vil verte sletta:"
+msgstr "Er du sikker på at du vil slette dei valde filene og/eller mappene? Alle dei følgjande objekta og deira relaterte element vil verte sletta:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:77
@@ -554,10 +534,8 @@ msgid "No, take me back"
 msgstr ""
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:47
-#, fuzzy
-#| msgid "Yes, I'm sure"
 msgid "Yes, I&#39;m sure"
-msgstr "Ja, eg er sikker"
+msgstr ""
 
 #: templates/admin/filer/file/change_form.html:36
 #: templates/admin/filer/folder/change_form.html:21
@@ -593,11 +571,9 @@ msgstr "Mappeikon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
-msgstr ""
-"Din konto har ikkje løyve til å kopiere alle dei valde filene og/eller "
-"mappene."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
+msgstr "Din konto har ikkje løyve til å kopiere alle dei valde filene og/eller mappene."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:38
 #: templates/admin/filer/folder/choose_copy_destination.html:44
@@ -621,9 +597,7 @@ msgstr "Det er ingen filer og/eller mapper å kopiere."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Dei følgjande filene og/eller mappene vil verte kopiert til ein målmappe "
-"(mappestruktur vil behaldes):"
+msgstr "Dei følgjande filene og/eller mappene vil verte kopiert til ein målmappe (mappestruktur vil behaldes):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
 #: templates/admin/filer/folder/choose_move_destination.html:65
@@ -632,6 +606,7 @@ msgstr "Målmappe:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:78
 #: templates/admin/filer/folder/choose_copy_destination.html:81
+#: templates/admin/filer/folder/directory_listing.html:192
 msgid "Copy"
 msgstr "Kopier"
 
@@ -654,9 +629,7 @@ msgstr "Dei følgjande bileta vil få endra storleik:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Vel eit eksisterande miniatyrbileteval eller skriv inn parametrar for "
-"endring av storleik:"
+msgstr "Vel eit eksisterande miniatyrbileteval eller skriv inn parametrar for endring av storleik:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
@@ -666,9 +639,7 @@ msgstr "Vel parametrar for endring av storleik:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Åtvaring: Bileta vil få sin storleik endra, og originalane vil gå tapt. Det "
-"kan være ønskjeleg å først gjere ein kopi for å behalde originalane."
+msgstr "Åtvaring: Bileta vil få sin storleik endra, og originalane vil gå tapt. Det kan være ønskjeleg å først gjere ein kopi for å behalde originalane."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -676,10 +647,9 @@ msgstr "Endre storleik"
 
 #: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"Din konto har ikke løyve til å flytte alle dei valde filene og/eller mappene."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "Din konto har ikke løyve til å flytte alle dei valde filene og/eller mappene."
 
 #: templates/admin/filer/folder/choose_move_destination.html:48
 msgid "There are no files and/or folders available to move."
@@ -689,9 +659,7 @@ msgstr "Det er ingen filer og/eller mapper å flytte."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Dei følgjande filene og/eller mappene vil verte flytta til ein målmappe "
-"(mappestruktur vil behaldes):"
+msgstr "Dei følgjande filene og/eller mappene vil verte flytta til ein målmappe (mappestruktur vil behaldes):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:74
 #: templates/admin/filer/folder/choose_move_destination.html:77
@@ -716,9 +684,7 @@ msgstr "Det er ingen filer å endre namn på."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"Dei følgjande filene vil få endra namn (dei vil framleis vere på samme stad "
-"og behalde originalt filnamn, berre visningsnamn vil verte endra):"
+msgstr "Dei følgjande filene vil få endra namn (dei vil framleis vere på samme stad og behalde originalt filnamn, berre visningsnamn vil verte endra):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -737,10 +703,8 @@ msgid "Change"
 msgstr "Endre"
 
 #: templates/admin/filer/folder/directory_listing.html:155
-#, fuzzy
-#| msgid "run search for entered phrase"
 msgid "Click here to run search for entered phrase"
-msgstr "søk med valde søkjeord"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_listing.html:158
 msgid "Search"
@@ -755,16 +719,12 @@ msgid "Limit"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_listing.html:172
-#, fuzzy
-#| msgid "limit the search to current folder"
 msgid "Check it to limit the search to current folder"
-msgstr "avgrens søk til gjeldande mappe"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_listing.html:173
-#, fuzzy
-#| msgid "limit the search to current folder"
 msgid "Limit the search to current folder"
-msgstr "avgrens søk til gjeldande mappe"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_listing.html:189
 #: templates/admin/filer/tools/detail_info.html:215
@@ -784,10 +744,8 @@ msgstr "Ny mappe"
 #: templates/admin/filer/folder/directory_listing.html:227
 #: templates/admin/filer/folder/directory_listing.html:231
 #: templates/admin/filer/folder/directory_listing.html:238
-#, fuzzy
-#| msgid "upload files"
 msgid "Upload Files"
-msgstr "last opp filer"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_listing.html:236
 msgid "You have to select a folder first"
@@ -821,26 +779,29 @@ msgstr ""
 msgid "Change '%(item_label)s' folder details"
 msgstr "Endre detaljar for mappen \"%(item_label)s\""
 
+#: templates/admin/filer/folder/directory_table.html:73
+#: templates/admin/filer/tools/search_form.html:5
+#, python-format
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] ""
+msgstr[1] ""
+
 #: templates/admin/filer/folder/directory_table.html:74
-#, fuzzy, python-format
-#| msgid "%(total_count)s selected"
-#| msgid_plural "All %(total_count)s selected"
+#: templates/admin/filer/tools/search_form.html:6
+#, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] "%(total_count)s vald"
-msgstr[1] "Alle %(total_count)s vald"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/admin/filer/folder/directory_table.html:80
-#, fuzzy
-#| msgid "Change current folder details"
 msgid "Change folder details"
-msgstr "Endre detaljar for gjeldande mappe"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:81
-#, fuzzy
-#| msgid "folder"
 msgid "Remove folder"
-msgstr "mappe"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:92
 #: templates/admin/filer/folder/directory_table.html:100
@@ -868,10 +829,8 @@ msgid "enabled"
 msgstr "aktivert"
 
 #: templates/admin/filer/folder/directory_table.html:139
-#, fuzzy
-#| msgid "Rename files"
 msgid "Remove file"
-msgstr "Endre namn på filer"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:146
 msgid "Drop files here or use the \"Upload Files\" button"
@@ -886,46 +845,34 @@ msgid "Upload"
 msgstr "Last opp"
 
 #: templates/admin/filer/folder/directory_table.html:178
-#, fuzzy
-#| msgid "cancel search"
 msgid "cancel"
-msgstr "avbryt søk"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:182
 msgid "Upload success!"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:186
-#, fuzzy
-#| msgid "upload failed"
 msgid "Upload canceled!"
-msgstr "feil ved opplasting"
+msgstr ""
 
 #: templates/admin/filer/folder/directory_table.html:193
 msgid "previous"
 msgstr "førre"
 
 #: templates/admin/filer/folder/directory_table.html:198
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "            Page %(number)s of %(num_pages)s.\n"
-#| "            "
+#, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr ""
-"\n"
-"            Side %(number)s av %(num_pages)s.\n"
-"            "
 
 #: templates/admin/filer/folder/directory_table.html:203
 msgid "next"
 msgstr "neste"
 
 #: templates/admin/filer/folder/directory_table.html:213
-#, fuzzy, python-format
-#| msgid "Select all %(total_count)s files and/or folders"
+#, python-format
 msgid "Select all %(total_count)s"
-msgstr "Vel alle %(total_count)s filer og/eller mapper"
+msgstr ""
 
 #: templates/admin/filer/folder/new_folder_form.html:5
 msgid "Add new"
@@ -954,10 +901,8 @@ msgid "Move all clipboard files to"
 msgstr "Flytt alle filer på utklippstavla til"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
-#, fuzzy
-#| msgid "Clipboard"
 msgid "Empty Clipboard"
-msgstr "Utklippstavle"
+msgstr ""
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:50
 msgid "the clipboard is empty"
@@ -968,10 +913,8 @@ msgid "upload failed"
 msgstr "feil ved opplasting"
 
 #: templates/admin/filer/tools/detail_info.html:24
-#, fuzzy
-#| msgid "Rename files"
 msgid "Open file"
-msgstr "Endre namn på filer"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:26
 #: templates/admin/filer/tools/detail_info.html:88
@@ -985,56 +928,42 @@ msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:44
 #: templates/admin/filer/tools/detail_info.html:113
-#, fuzzy
-#| msgid "file size"
 msgid "File-size"
-msgstr "filstorleik"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:48
 #: templates/admin/filer/tools/detail_info.html:122
-#, fuzzy
-#| msgid "modified at"
 msgid "Modified"
-msgstr "endra"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:52
 #: templates/admin/filer/tools/detail_info.html:131
-#, fuzzy
-#| msgid "created at"
 msgid "Created"
-msgstr "oppretta"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:160
-#, fuzzy
-#| msgid "description"
 msgid "Add Description"
-msgstr "beskriving"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:178
-#, fuzzy
-#| msgid "author"
 msgid "Author"
-msgstr "opphavsperson"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:185
 msgid "Add Alt-Text"
 msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:192
-#, fuzzy
-#| msgid "default caption"
 msgid "Add caption"
-msgstr "standard undertekst"
+msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:199
 msgid "Add Tags"
 msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:206
-#, fuzzy
-#| msgid "Change"
 msgid "Change File"
-msgstr "Endre"
+msgstr ""
 
 #: templates/admin/filer/tools/search_form.html:5
 msgid "found"
@@ -1044,7 +973,7 @@ msgstr "funne"
 msgid "and"
 msgstr "og"
 
-#: templates/admin/filer/tools/search_form.html:9
+#: templates/admin/filer/tools/search_form.html:7
 msgid "cancel search"
 msgstr "avbryt søk"
 
@@ -1073,10 +1002,9 @@ msgid "Lookup"
 msgstr "Slå opp"
 
 #: templates/admin/filer/widgets/admin_file.html:36
-#, fuzzy
-#| msgid "upload files"
-msgid "Upload File"
-msgstr "last opp filer"
+#| msgid "Change File"
+msgid "Choose File"
+msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:11
 #: templates/admin/filer/widgets/admin_folder.html:33
@@ -1084,31 +1012,17 @@ msgid "none selected"
 msgstr "ingen vald"
 
 #: templates/admin/filer/widgets/admin_folder.html:15
-#, fuzzy
-#| msgid "Folder"
 msgid "Add Folder"
-msgstr "Mappe"
+msgstr ""
 
-#~ msgid "unfiled files"
-#~ msgstr "ukategoriserte filer"
+#~ msgid ""
+#~ "\n"
+#~ "            %(counter)s file"
+#~ msgid_plural ""
+#~ "%(counter)s files\n"
+#~ "        "
+#~ msgstr[0] "15c0f2d28d6dab1af1f6d94906beb627_pl_0"
+#~ msgstr[1] "15c0f2d28d6dab1af1f6d94906beb627_pl_1"
 
-#~ msgid "Delete '%(item_label)s'"
-#~ msgstr "Slett \"%(item_label)s\""
-
-#~ msgid "Move to clipboard"
-#~ msgstr "Flytt til utklippstavle"
-
-#~ msgid "there are no files or subfolders"
-#~ msgstr "det er ingen filer eller undermapper"
-
-#~ msgid "discard"
-#~ msgstr "forkast"
-
-#~ msgid "Enter your search phrase here"
-#~ msgstr "Skriv søkjeord her"
-
-#~ msgid "Click here to"
-#~ msgstr "Klikk her for å"
-
-#~ msgid "Check it to"
-#~ msgstr "Vel for å"
+#~ msgid "Upload File"
+#~ msgstr "Upload File"
