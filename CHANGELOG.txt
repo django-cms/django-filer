@@ -1,13 +1,14 @@
 CHANGELOG
 =========
 
-next (20xx-xx-xx)
------------------
+1.2.1 (2016-06-21)
+------------------
 
 * Rename filer picker widget upload button
 * Adds missing @2x icon files
 * Added missing migration #854
 * Updated translations
+* Fixed an issue with hashes in URLs in the wrong place
 
 1.2.0 (2016-04-26)
 ------------------
