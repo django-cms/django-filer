@@ -20,7 +20,7 @@ class ImageAdminForm(forms.ModelForm):
     def sidebar_image_ratio(self):
         if self.instance:
             # this is very important. It forces the value to be returned as a
-            # string and always with a "." as seperator. If the conversion
+            # string and always with a "." as separator. If the conversion
             # from float to string is done in the template, the locale will
             # be used and in some cases there would be a "," instead of ".".
             # javascript would parse that to an integer.
@@ -54,8 +54,8 @@ class ImageAdminForm(forms.ModelForm):
             err_msg = ugettext_lazy('Invalid subject location format. ')
             err_code = 'invalid_subject_format'
 
-        elif (coordinates[0] > self.instance.image.width or
-                coordinates[1] > self.instance.image.height):
+        elif (coordinates[0] > self.instance.width or
+                coordinates[1] > self.instance.height):
             err_msg = ugettext_lazy(
                 'Subject location is outside of the image. ')
             err_code = 'subject_out_of_bounds'
