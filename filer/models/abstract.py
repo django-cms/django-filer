@@ -27,6 +27,7 @@ class BaseImage(File):
                                          'crop': True, 'upscale': True},
         'admin_tiny_icon': {'size': (32, 32), 'crop': True, 'upscale': True},
     }
+    file_ptr = models.OneToOneField(to='filer.File', related_name='+')
     file_type = 'Image'
     _icon = "image"
 
