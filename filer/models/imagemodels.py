@@ -27,6 +27,7 @@ if not filer_settings.FILER_IMAGE_MODEL:
         must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
 
         class Meta:
+            app_label = 'filer'
             verbose_name = _('image')
             verbose_name_plural = _('images')
 
