@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.2.2 (2016-06-23)
+------------------
+
+* Fixed an issue with `file_ptr` on Django 1.9+ installations
+
+
 1.2.1 (2016-06-23)
 ------------------
 
