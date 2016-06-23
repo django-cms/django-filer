@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
     ]
 
     if not FILER_IMAGE_MODEL:
+        # Only attempt to alter the Image field if we're actually using it.
         operations = [
             migrations.AlterField(
                 model_name='image',
