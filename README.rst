@@ -28,4 +28,4 @@ Filer picker widget:
 Please head over to `documentation`_ for all the details on how to install,
 configure and use django-filer.
 
-.. _documentation: http://django-filer.readthedocs.org/en/latest/index.html
+.. _documentation: https://django-filer.readthedocs.io/en/latest/index.html

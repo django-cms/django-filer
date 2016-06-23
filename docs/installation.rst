@@ -174,7 +174,7 @@ generation errors,  two options are provided to help when working with ``django-
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
 .. _django-mptt: https://github.com/django-mptt/django-mptt/
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
-.. _Pillow doc: http://pillow.readthedocs.org/en/latest/installation.html
+.. _Pillow doc: https://pillow.readthedocs.io/en/latest/installation.html
 .. _PIL: http://www.pythonware.com/products/pil/
 .. _pip: http://pypi.python.org/pypi/pip
 .. _South: http://south.aeracode.org/

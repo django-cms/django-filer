@@ -22,11 +22,14 @@ if not filer_settings.FILER_IMAGE_MODEL:
     class Image(BaseImage):
         date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
                                           editable=False)
-
         author = models.CharField(_('author'), max_length=255, null=True, blank=True)
-
         must_always_publish_author_credit = models.BooleanField(_('must always publish author credit'), default=False)
         must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
+
+        class Meta(object):
+            app_label = 'filer'
+            verbose_name = _('image')
+            verbose_name_plural = _('images')
 
         def save(self, *args, **kwargs):
             if self.date_taken is None:
@@ -50,6 +53,7 @@ if not filer_settings.FILER_IMAGE_MODEL:
             if self.date_taken is None:
                 self.date_taken = now()
             super(Image, self).save(*args, **kwargs)
+
 else:
     # This is just an alias for the real model defined elsewhere
     # to let imports works transparently

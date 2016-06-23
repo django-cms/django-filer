@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+1.2.1 (2016-06-23)
+------------------
+
+* Rename filer picker widget upload button
+* Adds missing @2x icon files
+* Added missing migration #854
+* Updated translations
+* Fixed an issue with hashes in URLs in the wrong place
+* Fixed issue where deleting a user from a project would delete their assets
+
+
 1.2.0 (2016-04-26)
 ------------------
 

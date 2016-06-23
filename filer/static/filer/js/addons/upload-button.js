@@ -33,10 +33,12 @@
         var updateQuery = function (uri, key, value) {
             var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
             var separator = uri.indexOf('?') !== -1 ? '&' : '?';
+            var hash = window.location.hash;
+            uri = uri.replace(/#.*$/, '');
             if (uri.match(re)) {
-                return uri.replace(re, '$1' + key + '=' + value + '$2');
+                return uri.replace(re, '$1' + key + '=' + value + '$2') + hash;
             } else {
-                return uri + separator + key + '=' + value;
+                return uri + separator + key + '=' + value + hash;
             }
         };
         var reloadOrdered = function () {

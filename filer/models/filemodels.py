@@ -59,7 +59,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         verbose_name=_('description'))
 
     owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
-        related_name='owned_%(class)ss',
+        related_name='owned_%(class)ss', on_delete=models.SET_NULL,
         null=True, blank=True, verbose_name=_('owner'))
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
