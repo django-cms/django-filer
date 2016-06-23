@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 DJANGO_GTE_19 = LooseVersion(get_version()) >= LooseVersion('1.9.0')
 
+
 class BaseImage(File):
     SIDEBAR_IMAGE_WIDTH = 210
     DEFAULT_THUMBNAILS = {
