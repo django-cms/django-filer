@@ -44,11 +44,11 @@ class FilerToolbar(CMSToolbar):
         return end.index
 
     def populate(self):
-        admin_menu = self.toolbar.get_or_create_menu(
-            ADMIN_MENU_IDENTIFIER)
+        media_library = _('Media library')
+
+        admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         admin_menu.add_sideframe_item(
-            _('Media library'),
+            media_library,
             url=reverse('admin:filer_folder_changelist'),
-            position=self.get_insert_position(
-                admin_menu, _('Media library'))
+            position=self.get_insert_position(admin_menu, media_library)
         )
