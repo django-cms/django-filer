@@ -54,8 +54,7 @@ if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
 # classes that I should check for when adding files
 FILER_FILE_MODELS = getattr(
     settings, 'FILER_FILE_MODELS',
-    # FIXME: the default is broken ATM because FILER_IMAGE_MODEL is a content type (not full python path)
-    (FILER_IMAGE_MODEL, 'filer.models.filemodels.File'))
+    (FILER_IMAGE_MODEL, 'filer.File'))
 
 DEFAULT_FILE_STORAGE = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
 
