@@ -31,8 +31,6 @@ from ..utils.loader import load_model
 
 Image = load_model(FILER_IMAGE_MODEL)
 
-from filer.settings import FILER_IMAGE_MODEL
-
 try:
     from unittest import skipIf
 except ImportError:  # for python 2.6
