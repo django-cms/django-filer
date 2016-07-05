@@ -1,16 +1,20 @@
 CHANGELOG
 =========
 
-1.2.3 (unreleased)
+1.2.3 (2016-07-05)
 ------------------
 
-* Added test for extended models
-* Added toolbar menu for django-cms projects
+* Added a menu into django CMS projects via filer.contrib.django_cms
+* Added tests for extended models
+* Updated file_ptr to use string-replacement strategy for newer Djangos
+
 
 1.2.2 (2016-06-23)
 ------------------
 
 * Fixed an issue with `file_ptr` on Django 1.9+ installations
+* Addressed file_ptr issue
+* Updated translation strings
 
 
 1.2.1 (2016-06-23)
