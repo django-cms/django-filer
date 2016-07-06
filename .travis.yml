@@ -4,12 +4,6 @@ sudo: false
 
 python: 3.5
 
-addons:
-  apt:
-    packages:
-    - nodejs
-    - npm
-
 install:
   - pip install tox coveralls
 
@@ -45,7 +39,14 @@ env:
   - TOX_ENV=py34-djmaster-thumbs2x
   - TOX_ENV=py35-djmaster-thumbs2x
 
-  - TOX_ENV=frontend
+  - TOX_ENV=frontend FE=1
+
+before_script:
+  - if [ "$FE" == 1 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+  - if [ "$FE" == 1 ]; then npm config set spin false; fi
+  - if [ "$FE" == 1 ]; then npm install -g npm@2; fi
+  - if [ "$FE" == 1 ]; then npm install -g gulp@3.9.0; fi
+  - if [ "$FE" == 1 ]; then npm install; fi
 
 script:
   - tox -e $TOX_ENV
