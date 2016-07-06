@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+
+1.2.4 (2016-07-06)
+------------------
+
+* Fixed add/change arguments in FileAdmin.render_change_form
+* Fixed minor issues which results in spurious migration generation
+
+
 1.2.3 (2016-07-05)
 ------------------
 

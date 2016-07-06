@@ -43,7 +43,8 @@ class BaseImage(File):
     subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
                                         default='')
     if DJANGO_GTE_17:
-        file_ptr = models.OneToOneField(to='filer.File', related_name='%(app_label)s_%(class)s_file')
+        file_ptr = models.OneToOneField(to='filer.File', related_name='%(app_label)s_%(class)s_file',
+                                        on_delete=models.CASCADE)
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
