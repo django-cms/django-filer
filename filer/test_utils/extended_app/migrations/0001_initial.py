@@ -18,12 +18,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ExtImage',
             fields=[
-                ('file_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='filer.File')),
+                ('file_ptr', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='extended_app_extimage_file', serialize=False, to='filer.File')),
                 ('_height', models.IntegerField(blank=True, null=True)),
                 ('_width', models.IntegerField(blank=True, null=True)),
                 ('default_alt_text', models.CharField(blank=True, max_length=255, null=True, verbose_name='default alt text')),
                 ('default_caption', models.CharField(blank=True, max_length=255, null=True, verbose_name='default caption')),
-                ('subject_location', models.CharField(blank=True, default=b'', max_length=64, verbose_name='subject location')),
+                ('subject_location', models.CharField(blank=True, default='', max_length=64, verbose_name='subject location')),
             ],
             bases=('filer.file',),
         ),
