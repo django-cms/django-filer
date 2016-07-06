@@ -101,7 +101,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                          'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
         return super(FileAdmin, self).render_change_form(
-            request=request, context=context, add=False, change=False,
+            request=request, context=context, add=add, change=change,
             form_url=form_url, obj=obj)
 
     def delete_view(self, request, object_id, extra_context=None):
