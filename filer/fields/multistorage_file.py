@@ -62,7 +62,7 @@ class MultiStorageFileDescriptor(FileDescriptor):
         # To prevent recalculating upon reassignment of the same file, update only if value is
         # different than the previous one.
         if prev_assigned and value != previous_file:
-            callback_attr = '%s_data_changed' % self.field.name
+            callback_attr = '{}_data_changed'.format(self.field.name)
             if hasattr(instance, callback_attr):
                 getattr(instance, callback_attr)()
 
