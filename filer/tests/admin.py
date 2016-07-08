@@ -206,10 +206,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_video(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
-            'filer.test_utils.extended_app.models.ExtImage',
-            'filer.test_utils.extended_app.models.Video',
-            'filer.models.imagemodels.Image',
-            'filer.models.filemodels.File'
+            'extended_app.ExtImage',
+            'extended_app.Video',
+            'filer.Image',
+            'filer.File'
         )):
             self.assertEqual(Video.objects.count(), 0)
             folder = Folder.objects.create(name='foo')
@@ -226,10 +226,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_extimage(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
-            'filer.test_utils.extended_app.models.ExtImage',
-            'filer.test_utils.extended_app.models.Video',
-            'filer.models.imagemodels.Image',
-            'filer.models.filemodels.File'
+            'extended_app.ExtImage',
+            'extended_app.Video',
+            'filer.Image',
+            'filer.File'
         )):
             self.assertEqual(ExtImage.objects.count(), 0)
             folder = Folder.objects.create(name='foo')

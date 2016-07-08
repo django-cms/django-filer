@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
-from filer.settings import FILER_IMAGE_MODEL
-
 
 class Migration(migrations.Migration):
 
@@ -13,12 +11,10 @@ class Migration(migrations.Migration):
         ('filer', '0003_thumbnailoption'),
     ]
 
-    if not FILER_IMAGE_MODEL:
-        # Only attempt to alter the Image field if we're actually using it.
-        operations = [
-            migrations.AlterField(
-                model_name='image',
-                name='subject_location',
-                field=models.CharField(blank=True, default='', max_length=64, verbose_name='subject location'),
-            ),
-        ]
+    operations = [
+        migrations.AlterField(
+            model_name='image',
+            name='subject_location',
+            field=models.CharField(blank=True, default='', max_length=64, verbose_name='subject location'),
+        ),
+    ]
