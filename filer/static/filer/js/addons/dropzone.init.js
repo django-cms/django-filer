@@ -79,6 +79,7 @@ django.jQuery(function ($) {
                 });
                 clearButton.on('click', function () {
                     dropzone.removeClass(objectAttachedClass);
+                    inputId.trigger('change');
                 });
             },
             maxfilesexceeded: function () {
@@ -97,6 +98,7 @@ django.jQuery(function ($) {
                 if (file && file.status === 'success' && response) {
                     if (response.file_id) {
                         inputId.val(response.file_id);
+                        inputId.trigger('change');
                     }
                     if (response.thumbnail_180) {
                         if (isImage) {
@@ -130,6 +132,7 @@ django.jQuery(function ($) {
                 inputId.val('');
                 lookupButton.removeClass(hiddenClass);
                 message.removeClass(hiddenClass);
+                inputId.trigger('change');
             }
         });
     };
