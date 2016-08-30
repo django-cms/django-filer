@@ -4,7 +4,6 @@
         "filer",
         "easy_thumbnails",
         "mptt",
-        "polymorphic",
-        "easy_thumbnails"
+        "polymorphic"
     ]
 }
