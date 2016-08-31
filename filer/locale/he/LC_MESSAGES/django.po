@@ -1,22 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
+# Translators:
 # Translators:
 # Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-23 15:22-0400\n"
-"PO-Revision-Date: 2016-06-17 14:16+0000\n"
-"Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
-"Language-Team: Hebrew (http://www.transifex.com/divio/django-filer/language/"
-"he/)\n"
-"Language: he\n"
+"POT-Creation-Date: 2016-08-30 20:28-0400\n"
+"PO-Revision-Date: 2016-08-31 00:29+0000\n"
+"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"Language-Team: Hebrew (http://www.transifex.com/divio/django-filer/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
@@ -235,23 +235,27 @@ msgstr "תיקיה בשם זה כבר קיימת."
 msgid "Filer"
 msgstr "Filer"
 
-#: models/abstract.py:36
+#: contrib/django_cms/cms_toolbars.py:47
+msgid "Media library"
+msgstr ""
+
+#: models/abstract.py:40
 msgid "default alt text"
 msgstr "טקסט חלופי ברירת מחדל"
 
-#: models/abstract.py:37
+#: models/abstract.py:41
 msgid "default caption"
 msgstr "כותרת ברירת מחדל"
 
-#: models/abstract.py:39
+#: models/abstract.py:43
 msgid "subject location"
 msgstr "מיקום נושא"
 
-#: models/abstract.py:168 models/imagemodels.py:31
+#: models/abstract.py:175 models/imagemodels.py:31
 msgid "image"
 msgstr "תמונה"
 
-#: models/abstract.py:169 models/imagemodels.py:32
+#: models/abstract.py:176 models/imagemodels.py:32
 msgid "images"
 msgstr "תמונות"
 
@@ -342,7 +346,8 @@ msgstr ""
 msgid "created at"
 msgstr "נוצר ב-"
 
-#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
+#: models/foldermodels.py:235
+#: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
 msgstr "תיקיה"
@@ -511,25 +516,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק אובייקטים מקושרים, אך "
-"לחשבונך אין הרשאות למחוק אובייקטים מהסוגים הבאים:"
+msgstr "עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק אובייקטים מקושרים, אך לחשבונך אין הרשאות למחוק אובייקטים מהסוגים הבאים:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק את האובייקטים המוגנים "
-"הבאים:"
+msgstr "עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק את האובייקטים המוגנים הבאים:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"האם את/ה בטוח/ה שברצונך למחוק את הקבצים ו/או התיקיות הבחורים? כל הפריטים "
-"המקושרים יימחקו:"
+msgstr "האם את/ה בטוח/ה שברצונך למחוק את הקבצים ו/או התיקיות הבחורים? כל הפריטים המקושרים יימחקו:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:77
@@ -575,8 +574,8 @@ msgstr "צלמית תיקייה"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr "לחשבונך אין רשות להעתיק את כל הקבצים ו/או התיקיות הבחורים."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:38
@@ -601,8 +600,7 @@ msgstr "אין קבצים ו/או תיקיות זמינים להעתקה."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"הקבצים ו/או התיקיות הבאים יועתקו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
+msgstr "הקבצים ו/או התיקיות הבאים יועתקו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
 #: templates/admin/filer/folder/choose_move_destination.html:65
@@ -644,9 +642,7 @@ msgstr "בחר פרמטרי שינוי גודל:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"הזהרה: התמונות ישונה גודלן במקום והמקוריות יאבדו. אולי ראשית עשה/י העתק שלהם "
-"כדי לשמור על המקויות."
+msgstr "הזהרה: התמונות ישונה גודלן במקום והמקוריות יאבדו. אולי ראשית עשה/י העתק שלהם כדי לשמור על המקויות."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -654,8 +650,8 @@ msgstr "שנה גודל"
 
 #: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
 msgstr "לחשבונך אין רשות להעביר את כל הקבצים ו/או התיקיות הבחורים."
 
 #: templates/admin/filer/folder/choose_move_destination.html:48
@@ -666,8 +662,7 @@ msgstr "אין קבצים ו/או תיקיות זמינים להעברה."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"הקבצים ו/או התיקיות הבאים יועברו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
+msgstr "הקבצים ו/או התיקיות הבאים יועברו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:74
 #: templates/admin/filer/folder/choose_move_destination.html:77
@@ -692,9 +687,7 @@ msgstr "אין קבצים זמינים לשינוי שמם."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"הקבצים הבאים ישונו שמותיהם (הם יישארו בתיקיות הנוכחיות שלהם ושמם המקורי "
-"יישאר - רק שמות התצוגה שלהם ישונו):"
+msgstr "הקבצים הבאים ישונו שמותיהם (הם יישארו בתיקיות הנוכחיות שלהם ושמם המקורי יישאר - רק שמות התצוגה שלהם ישונו):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"

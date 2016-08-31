@@ -1,496 +1,502 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
+# Translators:
+# listeng <aosp@163.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-23 15:22-0400\n"
-"PO-Revision-Date: 2016-06-17 14:16+0000\n"
-"Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
-"Language-Team: Chinese Simplified (http://www.transifex.com/divio/django-"
-"filer/language/zh-Hans/)\n"
-"Language: zh-Hans\n"
+"POT-Creation-Date: 2016-08-30 20:28-0400\n"
+"PO-Revision-Date: 2016-08-31 00:29+0000\n"
+"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"Language-Team: Chinese Simplified (http://www.transifex.com/divio/django-filer/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh-Hans\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
 msgid "Advanced"
-msgstr ""
+msgstr "高级"
 
 #: admin/fileadmin.py:163
 msgid "canonical URL"
-msgstr ""
+msgstr "权威URL"
 
 #: admin/folderadmin.py:387 admin/folderadmin.py:554
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
+msgstr "要对执行此操作，必须选择项目。没有项目被更改。"
 
 #: admin/folderadmin.py:407
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
+msgstr[0] "选择了 %(total_count)s 个"
 
 #: admin/folderadmin.py:446
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "选择了 %(cnt)s 中的 0 个"
 
 #: admin/folderadmin.py:584
 msgid "No action selected."
-msgstr ""
+msgstr "没有选择任何动作。"
 
 #: admin/folderadmin.py:629
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
-msgstr ""
+msgstr "成功将 %(count)d 个文件移动到剪贴板。"
 
 #: admin/folderadmin.py:635
 msgid "Move selected files to clipboard"
-msgstr ""
+msgstr "移动所选文件到剪贴板"
 
 #: admin/folderadmin.py:673
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
-msgstr ""
+msgstr "成功禁用了权限设置（%(count)d 个文件）。"
 
 #: admin/folderadmin.py:675
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
-msgstr ""
+msgstr "成功启用了权限设置（%(count)d 个文件）。"
 
 #: admin/folderadmin.py:684
 msgid "Enable permissions for selected files"
-msgstr ""
+msgstr "对于所选文件，启用权限设置"
 
 #: admin/folderadmin.py:691
 msgid "Disable permissions for selected files"
-msgstr ""
+msgstr "对于所选文件，禁用权限设置"
 
 #: admin/folderadmin.py:756
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
-msgstr ""
+msgstr "成功删除了 %(count)d 个文件或目录"
 
 #: admin/folderadmin.py:761
 msgid "Cannot delete files and/or folders"
-msgstr ""
+msgstr "目录或文件删除失败"
 
 #: admin/folderadmin.py:763
 msgid "Are you sure?"
-msgstr ""
+msgstr "确定吗？"
 
 #: admin/folderadmin.py:769
 msgid "Delete files and/or folders"
-msgstr ""
+msgstr "删除文件或目录"
 
 #: admin/folderadmin.py:791
 msgid "Delete selected files and/or folders"
-msgstr ""
+msgstr "删除所选的文件或目录"
 
 #: admin/folderadmin.py:906
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
-msgstr ""
+msgstr "所选的位置已存在名为 %s 的目录"
 
 #: admin/folderadmin.py:910
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
+msgstr "成功移动 %(count)d 个文件或目录到 '%(destination)s'。"
 
 #: admin/folderadmin.py:918 admin/folderadmin.py:920
 msgid "Move files and/or folders"
-msgstr ""
+msgstr "移动目录或文件"
 
 #: admin/folderadmin.py:935
 msgid "Move selected files and/or folders"
-msgstr ""
+msgstr "移动所选的目录或文件"
 
 #: admin/folderadmin.py:992
 #, python-format
 msgid "Successfully renamed %(count)d files."
-msgstr ""
+msgstr "成功重命名 %(count)d 个文件。"
 
 #: admin/folderadmin.py:1001 admin/folderadmin.py:1003
 #: admin/folderadmin.py:1018
 msgid "Rename files"
-msgstr ""
+msgstr "重命名文件"
 
 #: admin/folderadmin.py:1112
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
+msgstr "成功将 %(count)d 个文件或目录复制到 '%(destination)s'。"
 
 #: admin/folderadmin.py:1130 admin/folderadmin.py:1132
 msgid "Copy files and/or folders"
-msgstr ""
+msgstr "复制文件或目录"
 
 #: admin/folderadmin.py:1149
 msgid "Copy selected files and/or folders"
-msgstr ""
+msgstr "复制所选的文件或目录"
 
 #: admin/folderadmin.py:1252
 #, python-format
 msgid "Successfully resized %(count)d images."
-msgstr ""
+msgstr "成功缩放 %(count)d 个图片。"
 
 #: admin/folderadmin.py:1259 admin/folderadmin.py:1261
 msgid "Resize images"
-msgstr ""
+msgstr "缩放图片"
 
 #: admin/folderadmin.py:1277
 msgid "Resize selected images"
-msgstr ""
+msgstr "缩放所选的图片"
 
 #: admin/forms.py:27
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr ""
+msgstr "所复制文件的文件名将会加上后缀。"
 
 #: admin/forms.py:34
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
+msgstr "后缀应该类似 \"%(valid)s\"，是简单、小写的部分文件名称"
 
 #: admin/forms.py:55
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
-msgstr ""
+msgstr "未知重命名格式： \"%(key)s\"."
 
 #: admin/forms.py:57
 #, python-format
 msgid "Invalid rename format: %(error)s."
-msgstr ""
+msgstr "无效的重命名格式：%(error)s 。"
 
 #: admin/forms.py:63 models/thumbnailoptionmodels.py:23
 msgid "thumbnail option"
-msgstr ""
+msgstr "缩略图选项"
 
 #: admin/forms.py:64 models/thumbnailoptionmodels.py:15
 msgid "width"
-msgstr ""
+msgstr "宽"
 
 #: admin/forms.py:65 models/thumbnailoptionmodels.py:16
 msgid "height"
-msgstr ""
+msgstr "高"
 
 #: admin/forms.py:66 models/thumbnailoptionmodels.py:17
 msgid "crop"
-msgstr ""
+msgstr "裁剪"
 
 #: admin/forms.py:67 models/thumbnailoptionmodels.py:18
 msgid "upscale"
-msgstr ""
+msgstr "修改分辨率"
 
 #: admin/forms.py:72
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr ""
+msgstr "必须选择缩略图选项或缩放参数。"
 
 #: admin/forms.py:74
 msgid "Resize parameters must be choosen."
-msgstr ""
+msgstr "必须选择缩放参数。"
 
 #: admin/imageadmin.py:16
 msgid "Subject location"
-msgstr ""
+msgstr "主题位置"
 
 #: admin/imageadmin.py:17
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
-msgstr ""
+msgstr "场景中的主题位置。格式：“x,y”。"
 
 #: admin/imageadmin.py:54
 msgid "Invalid subject location format. "
-msgstr ""
+msgstr "错误的主题位置格式"
 
 #: admin/imageadmin.py:60
 msgid "Subject location is outside of the image. "
-msgstr ""
+msgstr "主题位置超出了图片范围"
 
 #: admin/imageadmin.py:69
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
-msgstr ""
+msgstr "你输入的：\"{subject_location}\"。"
 
 #: admin/views.py:57
 msgid "Folder with this name already exists."
-msgstr ""
+msgstr "这个名称的目录已经存在。"
 
 #: apps.py:10 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/directory_listing.html:47
 msgid "Filer"
+msgstr "文件管理器"
+
+#: contrib/django_cms/cms_toolbars.py:47
+msgid "Media library"
 msgstr ""
 
-#: models/abstract.py:36
+#: models/abstract.py:40
 msgid "default alt text"
-msgstr ""
+msgstr "默认提示文本"
 
-#: models/abstract.py:37
+#: models/abstract.py:41
 msgid "default caption"
-msgstr ""
+msgstr "默认标题"
 
-#: models/abstract.py:39
+#: models/abstract.py:43
 msgid "subject location"
-msgstr ""
+msgstr "主题位置"
 
-#: models/abstract.py:168 models/imagemodels.py:31
+#: models/abstract.py:175 models/imagemodels.py:31
 msgid "image"
-msgstr ""
+msgstr "图片"
 
-#: models/abstract.py:169 models/imagemodels.py:32
+#: models/abstract.py:176 models/imagemodels.py:32
 msgid "images"
-msgstr ""
+msgstr "图片"
 
 #: models/clipboardmodels.py:17 models/foldermodels.py:270
 msgid "user"
-msgstr ""
+msgstr "用户"
 
 #: models/clipboardmodels.py:19 models/filemodels.py:321
 msgid "files"
-msgstr ""
+msgstr "文件"
 
 #: models/clipboardmodels.py:37 models/clipboardmodels.py:43
 msgid "clipboard"
-msgstr ""
+msgstr "剪贴板"
 
 #: models/clipboardmodels.py:38
 msgid "clipboards"
-msgstr ""
+msgstr "剪贴板"
 
 #: models/clipboardmodels.py:42 models/filemodels.py:48
 #: models/filemodels.py:320
 msgid "file"
-msgstr ""
+msgstr "文件"
 
 #: models/clipboardmodels.py:47
 msgid "clipboard item"
-msgstr ""
+msgstr "剪贴板对象"
 
 #: models/clipboardmodels.py:48
 msgid "clipboard items"
-msgstr ""
+msgstr "剪贴板对象"
 
 #: models/filemodels.py:46 templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:116
 #: templates/admin/filer/folder/new_folder_form.html:5
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
-msgstr ""
+msgstr "目录"
 
 #: models/filemodels.py:49
 msgid "file size"
-msgstr ""
+msgstr "文件大小"
 
 #: models/filemodels.py:51
 msgid "sha1"
-msgstr ""
+msgstr "SHA1"
 
 #: models/filemodels.py:53
 msgid "has all mandatory data"
-msgstr ""
+msgstr "存在强制性数据"
 
 #: models/filemodels.py:55
 msgid "original filename"
-msgstr ""
+msgstr "原始文件名"
 
 #: models/filemodels.py:57 models/foldermodels.py:104
 #: models/thumbnailoptionmodels.py:14
 msgid "name"
-msgstr ""
+msgstr "名称"
 
 #: models/filemodels.py:59
 msgid "description"
-msgstr ""
+msgstr "描述"
 
 #: models/filemodels.py:63
 msgid "owner"
-msgstr ""
+msgstr "所有者"
 
 #: models/filemodels.py:65 models/foldermodels.py:110
 msgid "uploaded at"
-msgstr ""
+msgstr "上传于"
 
 #: models/filemodels.py:66 models/foldermodels.py:113
 msgid "modified at"
-msgstr ""
+msgstr "修改于"
 
 #: models/filemodels.py:70
 msgid "Permissions disabled"
-msgstr ""
+msgstr "已禁用权限设置"
 
 #: models/filemodels.py:71
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
+msgstr "对此文件禁用所有权限设置。此文件将可以被任何人公开访问。"
 
 #: models/foldermodels.py:112
 msgid "created at"
-msgstr ""
+msgstr "创建于"
 
-#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
+#: models/foldermodels.py:235
+#: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
-msgstr ""
+msgstr "目录"
 
 #: models/foldermodels.py:236
 msgid "Folders"
-msgstr ""
+msgstr "目录"
 
 #: models/foldermodels.py:255
 msgid "all items"
-msgstr ""
+msgstr "所有项目"
 
 #: models/foldermodels.py:256
 msgid "this item only"
-msgstr ""
+msgstr "仅此项目"
 
 #: models/foldermodels.py:257
 msgid "this item and all children"
-msgstr ""
+msgstr "此项目和所有子项目"
 
 #: models/foldermodels.py:261
 msgid "allow"
-msgstr ""
+msgstr "允许"
 
 #: models/foldermodels.py:262
 msgid "deny"
-msgstr ""
+msgstr "拒绝"
 
 #: models/foldermodels.py:267
 msgid "type"
-msgstr ""
+msgstr "类型"
 
 #: models/foldermodels.py:273
 msgid "group"
-msgstr ""
+msgstr "组"
 
 #: models/foldermodels.py:274
 msgid "everybody"
-msgstr ""
+msgstr "所有人"
 
 #: models/foldermodels.py:276
 msgid "can edit"
-msgstr ""
+msgstr "可编辑"
 
 #: models/foldermodels.py:277
 msgid "can read"
-msgstr ""
+msgstr "可读"
 
 #: models/foldermodels.py:278
 msgid "can add children"
-msgstr ""
+msgstr "可增加子项目"
 
 #: models/foldermodels.py:320
 msgid "folder permission"
-msgstr ""
+msgstr "目录权限"
 
 #: models/foldermodels.py:321
 msgid "folder permissions"
-msgstr ""
+msgstr "目录权限"
 
 #: models/imagemodels.py:23
 msgid "date taken"
-msgstr ""
+msgstr "日期令牌"
 
 #: models/imagemodels.py:25
 msgid "author"
-msgstr ""
+msgstr "作者"
 
 #: models/imagemodels.py:26
 msgid "must always publish author credit"
-msgstr ""
+msgstr "必须发布作者信息"
 
 #: models/imagemodels.py:27
 msgid "must always publish copyright"
-msgstr ""
+msgstr "必须发布版权"
 
 #: models/thumbnailoptionmodels.py:15
 msgid "width in pixel."
-msgstr ""
+msgstr "像素宽度"
 
 #: models/thumbnailoptionmodels.py:16
 msgid "height in pixel."
-msgstr ""
+msgstr "像素高度"
 
 #: models/thumbnailoptionmodels.py:24
 msgid "thumbnail options"
-msgstr ""
+msgstr "缩略图选项"
 
 #: models/virtualitems.py:50
 #: templates/admin/filer/folder/directory_table.html:4
 #: templates/admin/filer/folder/directory_table.html:152
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
-msgstr ""
+msgstr "未分类的上传"
 
 #: models/virtualitems.py:65
 msgid "files with missing metadata"
-msgstr ""
+msgstr "确实元数据的文件"
 
 #: models/virtualitems.py:79 templates/admin/filer/breadcrumbs.html:7
 #: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:51
 #: templates/admin/filer/folder/directory_listing.html:116
 msgid "root"
-msgstr ""
+msgstr "根目录"
 
 #: templates/admin/filer/actions.html:5
 msgid "Run the selected action"
-msgstr ""
+msgstr "运行所选的动作"
 
 #: templates/admin/filer/actions.html:5
 msgid "Go"
-msgstr ""
+msgstr "开始"
 
 #: templates/admin/filer/actions.html:14
 #: templates/admin/filer/folder/directory_table.html:213
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "选择所有页面的对象"
 
 #: templates/admin/filer/actions.html:14
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
-msgstr ""
+msgstr "选择 %(total_count)s 个文件或目录"
 
 #: templates/admin/filer/actions.html:16
 #: templates/admin/filer/folder/directory_table.html:215
 msgid "Clear selection"
-msgstr ""
+msgstr "清空选择"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/directory_listing.html:42
 msgid "Go back to admin homepage"
-msgstr ""
+msgstr "回到管理首页"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/directory_listing.html:43
 msgid "Home"
-msgstr ""
+msgstr "首页"
 
 #: templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/directory_listing.html:46
 msgid "Go back to Filer app"
-msgstr ""
+msgstr "回到文件管理器首页"
 
 #: templates/admin/filer/breadcrumbs.html:7
 #: templates/admin/filer/folder/directory_listing.html:51
 msgid "Go back to root folder"
-msgstr ""
+msgstr "回到根目录"
 
 #: templates/admin/filer/breadcrumbs.html:10
 #: templates/admin/filer/breadcrumbs.html:20
@@ -499,63 +505,63 @@ msgstr ""
 #: templates/admin/filer/folder/directory_listing.html:63
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
-msgstr ""
+msgstr "回到 '%(folder_name)s' 目录"
 
 #: templates/admin/filer/change_form.html:25
 msgid "Duplicates"
-msgstr ""
+msgstr "重复"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
+msgstr "删除所选的文件或目录会将相关的对象同时删除，但是你的账号没有删除下面这些类型对象的权限："
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
+msgstr "删除所选的文件或目录会将询问是否删除以下保护对象："
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
+msgstr "确认删除所选的文件或目录吗？以下所有相关的对象都会删除："
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:77
 #: templates/admin/filer/folder/choose_move_destination.html:73
 msgid "No, take me back"
-msgstr ""
+msgstr "不，返回"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:47
 msgid "Yes, I&#39;m sure"
-msgstr ""
+msgstr "是的，我确定"
 
 #: templates/admin/filer/file/change_form.html:36
 #: templates/admin/filer/folder/change_form.html:21
 #: templates/admin/filer/image/change_form.html:36
 msgid "History"
-msgstr ""
+msgstr "历史"
 
 #: templates/admin/filer/file/change_form.html:38
 #: templates/admin/filer/folder/change_form.html:23
 #: templates/admin/filer/image/change_form.html:38
 msgid "View on site"
-msgstr ""
+msgstr "查看站点"
 
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:116
 msgid "Go back to"
-msgstr ""
+msgstr "后退到"
 
 #: templates/admin/filer/folder/change_form.html:6
 msgid "admin homepage"
-msgstr ""
+msgstr "管理首页"
 
 #: templates/admin/filer/folder/change_form.html:37
 #: templates/admin/filer/folder/directory_listing.html:109
@@ -564,13 +570,13 @@ msgstr ""
 #: templates/admin/filer/folder/directory_table.html:56
 #: templates/admin/filer/folder/directory_table.html:159
 msgid "Folder Icon"
-msgstr ""
+msgstr "目录图标"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
-msgstr ""
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
+msgstr "你的账户没有权限复制所有所选的目录或文件。"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:38
 #: templates/admin/filer/folder/choose_copy_destination.html:44
@@ -579,162 +585,162 @@ msgstr ""
 #: templates/admin/filer/folder/choose_move_destination.html:44
 #: templates/admin/filer/folder/choose_move_destination.html:50
 msgid "Take me back"
-msgstr ""
+msgstr "返回"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:42
 #: templates/admin/filer/folder/choose_move_destination.html:42
 msgid "There are no destination folders available."
-msgstr ""
+msgstr "目标目录无效"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:48
 msgid "There are no files and/or folders available to copy."
-msgstr ""
+msgstr "没有文件或目录可以复制"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:53
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
+msgstr "以下的文件将复制到目标目录（包含它们的树结构）："
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
 #: templates/admin/filer/folder/choose_move_destination.html:65
 msgid "Destination folder:"
-msgstr ""
+msgstr "目标目录："
 
 #: templates/admin/filer/folder/choose_copy_destination.html:78
 #: templates/admin/filer/folder/choose_copy_destination.html:81
 #: templates/admin/filer/folder/directory_listing.html:192
 msgid "Copy"
-msgstr ""
+msgstr "复制"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:80
 msgid "It is not allowed to copy files into same folder"
-msgstr ""
+msgstr "不允许将文件复制到相同目录"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
+msgstr "你的账号没有权限缩放所有所选的图片。"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
-msgstr ""
+msgstr "没有图片可缩放。"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:20
 msgid "The following images will be resized:"
-msgstr ""
+msgstr "以下图片将被缩放："
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
+msgstr "选择一个缩略图选项或输入缩放参数："
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
-msgstr ""
+msgstr "缩放参数："
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:38
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
+msgstr "警告：图片将被缩放，并且源文件将被覆盖。你应该先将它们做个备份。"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
-msgstr ""
+msgstr "缩放"
 
 #: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "你的账号没有移动所有所选文件或目录的权限。"
 
 #: templates/admin/filer/folder/choose_move_destination.html:48
 msgid "There are no files and/or folders available to move."
-msgstr ""
+msgstr "没有文件或目录可移动。"
 
 #: templates/admin/filer/folder/choose_move_destination.html:53
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
+msgstr "以下的文件将移动到目标目录(包含它们的树结构)："
 
 #: templates/admin/filer/folder/choose_move_destination.html:74
 #: templates/admin/filer/folder/choose_move_destination.html:77
 #: templates/admin/filer/folder/directory_listing.html:195
 msgid "Move"
-msgstr ""
+msgstr "移动"
 
 #: templates/admin/filer/folder/choose_move_destination.html:76
 msgid "It is not allowed to move files into same folder"
-msgstr ""
+msgstr "不允许将文件移动到相同目录。"
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr ""
+msgstr "你的账号没有重命名所有所选文件的权限。"
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
-msgstr ""
+msgstr "没有文件可重命名。"
 
 #: templates/admin/filer/folder/choose_rename_format.html:20
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
+msgstr "以下文件将被重命名(源文件不变，只是显示名称被修改而已)："
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
-msgstr ""
+msgstr "重命名"
 
 #: templates/admin/filer/folder/directory_listing.html:108
 msgid "Go back to the parent folder"
-msgstr ""
+msgstr "回到父目录"
 
 #: templates/admin/filer/folder/directory_listing.html:145
 msgid "Change current folder details"
-msgstr ""
+msgstr "修改当前目录属性"
 
 #: templates/admin/filer/folder/directory_listing.html:145
 msgid "Change"
-msgstr ""
+msgstr "修改"
 
 #: templates/admin/filer/folder/directory_listing.html:155
 msgid "Click here to run search for entered phrase"
-msgstr ""
+msgstr "点击开始搜索"
 
 #: templates/admin/filer/folder/directory_listing.html:158
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: templates/admin/filer/folder/directory_listing.html:165
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: templates/admin/filer/folder/directory_listing.html:167
 msgid "Limit"
-msgstr ""
+msgstr "限定"
 
 #: templates/admin/filer/folder/directory_listing.html:172
 msgid "Check it to limit the search to current folder"
-msgstr ""
+msgstr "将搜索限定在当前目录"
 
 #: templates/admin/filer/folder/directory_listing.html:173
 msgid "Limit the search to current folder"
-msgstr ""
+msgstr "将搜索限定在当前目录"
 
 #: templates/admin/filer/folder/directory_listing.html:189
 #: templates/admin/filer/tools/detail_info.html:215
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: templates/admin/filer/folder/directory_listing.html:212
 msgid "Adds a new Folder"
-msgstr ""
+msgstr "新增一个目录"
 
 #: templates/admin/filer/folder/directory_listing.html:215
 msgid "New Folder"
-msgstr ""
+msgstr "新增目录"
 
 #: templates/admin/filer/folder/directory_listing.html:220
 #: templates/admin/filer/folder/directory_listing.html:224
@@ -742,31 +748,31 @@ msgstr ""
 #: templates/admin/filer/folder/directory_listing.html:231
 #: templates/admin/filer/folder/directory_listing.html:238
 msgid "Upload Files"
-msgstr ""
+msgstr "上传文件"
 
 #: templates/admin/filer/folder/directory_listing.html:236
 msgid "You have to select a folder first"
-msgstr ""
+msgstr "必须先选择一个目录"
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #: templates/admin/filer/folder/directory_table.html:14
 #: templates/admin/filer/tools/detail_info.html:61
 #: templates/admin/filer/tools/detail_info.html:152
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: templates/admin/filer/folder/directory_table.html:15
 #: templates/admin/filer/tools/detail_info.html:40
 #: templates/admin/filer/tools/detail_info.html:104
 msgid "Size"
-msgstr ""
+msgstr "大小"
 
 #: templates/admin/filer/folder/directory_table.html:16
 msgid "Action"
-msgstr ""
+msgstr "动作"
 
 #: templates/admin/filer/folder/directory_table.html:25
 #: templates/admin/filer/folder/directory_table.html:32
@@ -774,239 +780,239 @@ msgstr ""
 #: templates/admin/filer/folder/directory_table.html:62
 #, python-format
 msgid "Change '%(item_label)s' folder details"
-msgstr ""
+msgstr "修改 '%(item_label)s' 目录的属性"
 
 #: templates/admin/filer/folder/directory_table.html:73
 #: templates/admin/filer/tools/search_form.html:5
 #, python-format
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] ""
+msgstr[0] "%(counter)s 个目录"
 
 #: templates/admin/filer/folder/directory_table.html:74
 #: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] ""
+msgstr[0] "%(counter)s 个文件"
 
 #: templates/admin/filer/folder/directory_table.html:80
 msgid "Change folder details"
-msgstr ""
+msgstr "修改目录属性"
 
 #: templates/admin/filer/folder/directory_table.html:81
 msgid "Remove folder"
-msgstr ""
+msgstr "删除目录"
 
 #: templates/admin/filer/folder/directory_table.html:92
 #: templates/admin/filer/folder/directory_table.html:100
 #: templates/admin/filer/folder/directory_table.html:115
 msgid "Select this file"
-msgstr ""
+msgstr "选择这个文件"
 
 #: templates/admin/filer/folder/directory_table.html:103
 #: templates/admin/filer/folder/directory_table.html:118
 #: templates/admin/filer/folder/directory_table.html:138
 #, python-format
 msgid "Change '%(item_label)s' details"
-msgstr ""
+msgstr "修改 '%(item_label)s' 的属性"
 
 #: templates/admin/filer/folder/directory_table.html:127
 msgid "Permissions"
-msgstr ""
+msgstr "权限"
 
 #: templates/admin/filer/folder/directory_table.html:127
 msgid "disabled"
-msgstr ""
+msgstr "禁用"
 
 #: templates/admin/filer/folder/directory_table.html:127
 msgid "enabled"
-msgstr ""
+msgstr "激活"
 
 #: templates/admin/filer/folder/directory_table.html:139
 msgid "Remove file"
-msgstr ""
+msgstr "删除文件"
 
 #: templates/admin/filer/folder/directory_table.html:146
 msgid "Drop files here or use the \"Upload Files\" button"
-msgstr ""
+msgstr "拖放文件到这里或使用“上传文件”按钮"
 
 #: templates/admin/filer/folder/directory_table.html:156
 msgid "Drop your file to upload into:"
-msgstr ""
+msgstr "拖放文件到："
 
 #: templates/admin/filer/folder/directory_table.html:166
 msgid "Upload"
-msgstr ""
+msgstr "上传"
 
 #: templates/admin/filer/folder/directory_table.html:178
 msgid "cancel"
-msgstr ""
+msgstr "取消"
 
 #: templates/admin/filer/folder/directory_table.html:182
 msgid "Upload success!"
-msgstr ""
+msgstr "上传成功！"
 
 #: templates/admin/filer/folder/directory_table.html:186
 msgid "Upload canceled!"
-msgstr ""
+msgstr "取消上传！"
 
 #: templates/admin/filer/folder/directory_table.html:193
 msgid "previous"
-msgstr ""
+msgstr "上一个"
 
 #: templates/admin/filer/folder/directory_table.html:198
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
-msgstr ""
+msgstr "第 %(number)s 页，共 %(num_pages)s 页"
 
 #: templates/admin/filer/folder/directory_table.html:203
 msgid "next"
-msgstr ""
+msgstr "下一个"
 
 #: templates/admin/filer/folder/directory_table.html:213
 #, python-format
 msgid "Select all %(total_count)s"
-msgstr ""
+msgstr "选择了 %(total_count)s 个"
 
 #: templates/admin/filer/folder/new_folder_form.html:5
 msgid "Add new"
-msgstr ""
+msgstr "新增"
 
 #: templates/admin/filer/folder/new_folder_form.html:13
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr[0] "请更正下面的错误。"
 
 #: templates/admin/filer/folder/new_folder_form.html:28
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:9
 msgid "Clipboard"
-msgstr ""
+msgstr "剪贴板"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:21
 msgid "Paste all items here"
-msgstr ""
+msgstr "粘贴所有对象到这里"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Move all clipboard files to"
-msgstr ""
+msgstr "移动所有剪贴板文件到"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Empty Clipboard"
-msgstr ""
+msgstr "清空剪贴板"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:50
 msgid "the clipboard is empty"
-msgstr ""
+msgstr "剪贴板是空的"
 
 #: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:16
 msgid "upload failed"
-msgstr ""
+msgstr "上传失败"
 
 #: templates/admin/filer/tools/detail_info.html:24
 msgid "Open file"
-msgstr ""
+msgstr "打开文件"
 
 #: templates/admin/filer/tools/detail_info.html:26
 #: templates/admin/filer/tools/detail_info.html:88
 msgid "Full size preview"
-msgstr ""
+msgstr "全尺寸预览"
 
 #: templates/admin/filer/tools/detail_info.html:36
 #: templates/admin/filer/tools/detail_info.html:95
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: templates/admin/filer/tools/detail_info.html:44
 #: templates/admin/filer/tools/detail_info.html:113
 msgid "File-size"
-msgstr ""
+msgstr "文件大小"
 
 #: templates/admin/filer/tools/detail_info.html:48
 #: templates/admin/filer/tools/detail_info.html:122
 msgid "Modified"
-msgstr ""
+msgstr "修改时间"
 
 #: templates/admin/filer/tools/detail_info.html:52
 #: templates/admin/filer/tools/detail_info.html:131
 msgid "Created"
-msgstr ""
+msgstr "创建时间"
 
 #: templates/admin/filer/tools/detail_info.html:160
 msgid "Add Description"
-msgstr ""
+msgstr "增加描述"
 
 #: templates/admin/filer/tools/detail_info.html:178
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: templates/admin/filer/tools/detail_info.html:185
 msgid "Add Alt-Text"
-msgstr ""
+msgstr "增加提示文本"
 
 #: templates/admin/filer/tools/detail_info.html:192
 msgid "Add caption"
-msgstr ""
+msgstr "增加标题"
 
 #: templates/admin/filer/tools/detail_info.html:199
 msgid "Add Tags"
-msgstr ""
+msgstr "增加标签"
 
 #: templates/admin/filer/tools/detail_info.html:206
 msgid "Change File"
-msgstr ""
+msgstr "修改文件"
 
 #: templates/admin/filer/tools/search_form.html:5
 msgid "found"
-msgstr ""
+msgstr "已找到"
 
 #: templates/admin/filer/tools/search_form.html:5
 msgid "and"
-msgstr ""
+msgstr "与"
 
 #: templates/admin/filer/tools/search_form.html:7
 msgid "cancel search"
-msgstr ""
+msgstr "取消搜索"
 
 #: templates/admin/filer/widgets/admin_file.html:8
 #: templates/admin/filer/widgets/admin_file.html:40
 #: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
-msgstr ""
+msgstr "清空"
 
 #: templates/admin/filer/widgets/admin_file.html:17
 msgid "or drop your file here"
-msgstr ""
+msgstr "或在此放入你的文件"
 
 #: templates/admin/filer/widgets/admin_file.html:26
 #: templates/admin/filer/widgets/admin_file.html:27
 msgid "file missing"
-msgstr ""
+msgstr "文件没找到"
 
 #: templates/admin/filer/widgets/admin_file.html:30
 msgid "no file selected"
-msgstr ""
+msgstr "没选择文件"
 
 #: templates/admin/filer/widgets/admin_file.html:35
 #: templates/admin/filer/widgets/admin_folder.html:14
 msgid "Lookup"
-msgstr ""
+msgstr "查找"
 
 #: templates/admin/filer/widgets/admin_file.html:36
 msgid "Choose File"
-msgstr ""
+msgstr "选择文件"
 
 #: templates/admin/filer/widgets/admin_folder.html:11
 #: templates/admin/filer/widgets/admin_folder.html:33
 msgid "none selected"
-msgstr ""
+msgstr "没有选择"
 
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
-msgstr ""
+msgstr "增加目录"
 
 #~ msgid ""
 #~ "\n"
