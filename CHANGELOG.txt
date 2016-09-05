@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 
-1.2.5 (unreleased)
+1.2.5 (2016-09-05)
 ------------------
 
 * Dropping or uploading an image will now fire a js change event
