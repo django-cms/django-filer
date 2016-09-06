@@ -23,16 +23,19 @@ env:
   - TOX_ENV=py27-dj17-thumbs2x
   - TOX_ENV=py27-dj18-thumbs2x
   - TOX_ENV=py27-dj19-thumbs2x
+  - TOX_ENV=py27-dj110-thumbs2x
 
 # python 3.4
   - TOX_ENV=py34-dj16-thumbs2x
   - TOX_ENV=py34-dj17-thumbs2x
   - TOX_ENV=py34-dj18-thumbs2x
   - TOX_ENV=py34-dj19-thumbs2x
+  - TOX_ENV=py34-dj110-thumbs2x
 
 # python 3.5
   - TOX_ENV=py35-dj18-thumbs2x
   - TOX_ENV=py35-dj19-thumbs2x
+  - TOX_ENV=py35-dj110-thumbs2x
 
 # next Django release
   - TOX_ENV=py27-djmaster-thumbs2x
