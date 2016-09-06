@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision b0041d1 (06.09.2016, 08:55 UTC)
+----------------------------------------
+
+* LUN-3211
+
+  * add filer popup callback support for iframes
+
+No other commits.
+
 Revision 7095511 (15.06.2016, 14:37 UTC)
 ----------------------------------------
 
