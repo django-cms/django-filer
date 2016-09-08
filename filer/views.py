@@ -27,6 +27,12 @@ def current_site_param(request, separator="&"):
         return '%scurrent_site=%s' % (separator, current_site)
     return ""
 
+def file_type_param(request, separator="&"):
+    param = get_param_from_request(request, 'file_type')
+    if param:
+        return '%sfile_type=%s' % (separator, param)
+    return ""
+
 
 def get_param_from_request(request, param, default=None):
     return request.POST.get(param) or request.GET.get(param) or default

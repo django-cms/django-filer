@@ -36,7 +36,7 @@ from filer.admin.tools import (folders_available, files_available,
                                is_valid_destination,)
 from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           ImagesWithMissingData,
-                          Archive)
+                          Archive, Image, DummyFolder)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 
@@ -243,12 +243,16 @@ class FolderAdmin(FolderPermissionModelAdmin):
     def directory_listing(self, request, folder_id=None, viewtype=None):
         user = request.user
         clipboard = tools.get_user_clipboard(user)
+        file_type = request.GET.get('file_type', None)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
+            folder_file_qs = folder.files
         elif viewtype == 'unfiled_images':
             folder = UnfiledImages()
+            folder_file_qs = folder.files
         elif folder_id is None:
             folder = FolderRoot()
+            folder_file_qs = File.objects.none()
         else:
             try:
                 folder = Folder.objects.get(id=folder_id)
@@ -256,6 +260,15 @@ class FolderAdmin(FolderPermissionModelAdmin):
                     raise PermissionDenied
             except Folder.DoesNotExist:
                 raise Http404
+            if file_type == 'image':
+                folder_file_qs = Image.objects.filter(folder=folder)
+            else:
+                folder_file_qs = File.objects.filter(folder=folder)
+
+        if file_type == 'image':
+            all_file_qs = Image.objects
+        else:
+            all_file_qs = File.objects
 
         setattr(request, 'current_dir_list_folder', folder)
         # search
@@ -292,10 +305,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 descendants = folder.get_descendants(
                     include_self=True).filter(deleted_at__isnull=True)
                 folder_qs = _filter_folders(descendants.exclude(id=folder.id))
-                file_qs = _filter_files(File.objects.filter(folder__in=descendants))
+                file_qs = _filter_files(all_file_qs.filter(folder__in=descendants))
             else:
                 folder_qs = _filter_folders(Folder.objects.all())
-                file_qs = _filter_files(File.objects.all())
+                file_qs = _filter_files(all_file_qs)
 
             def folder_search_qs(qs, terms=[]):
                 for term in terms:
@@ -320,7 +333,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             show_result_count = True
         else:
             folder_qs = _filter_folders(folder.children.all())
-            file_qs = _filter_files(folder.files.all())
+            file_qs = _filter_files(folder_file_qs)
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
@@ -420,6 +433,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 'selection_note_all': selection_note_all % {
                     'total_count': paginator.count},
                 'media': self.media,
+                'file_type': file_type,
             }, context_instance=context)
         return response
 
