@@ -71,6 +71,7 @@ def get_popup_params(context, sep='?'):
     is_popup = context.get('is_popup', False)
     select_folder = context.get('select_folder', False)
     current_site = context.get('current_site', False)
+    file_type = context.get('file_type', None)
     params = ''
     if is_popup:
         params += '%s_popup=1' % sep
@@ -78,6 +79,9 @@ def get_popup_params(context, sep='?'):
             params += '&select_folder=1'
         if current_site:
             params += '&current_site=%s' % current_site
+        if file_type:
+            params += '&file_type=%s' % file_type
+
     return params
 
 

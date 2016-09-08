@@ -10,6 +10,7 @@
                     {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
                 {% endif %}
                 {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
+                {% if file_type %}<input type="hidden" name="file_type" value="{{ file_type }}" />{% endif %}
                 <div id="search-container" {% if show_result_count %}class="with-search-results"{%endif%}>
                     <div class="search-wrapper">
                         <input type="text" size="40" name="q" value="{{ search_string }}" id="searchbar" title="{% trans "Enter your search phrase here" %}"/>

@@ -18,6 +18,7 @@
                             {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
                             {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
                             {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
+                            {% if file_type %}<input type="hidden" name="file_type" value="{{ file_type}}" />{% endif %}
                             <button {% if folder.is_root or folder|is_restricted_for_user:user %} disabled="disabled" {% endif %} title="{% trans "Paste all items here" %}" class="btn btn-sm btn-default"><i class="fa fa-angle-double-left bold bigger-125"></i></button>
                         </form>
                         {% comment %}
@@ -27,6 +28,7 @@
                             {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
                             {% if select_folder %}<input type="hidden" name="select_folder" value="1" />{% endif %}
                             {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
+                            {% if file_type %}<input type="hidden" name="file_type" value="{{ file_type}}" />{% endif %}
                             <input type="submit" value="{% trans "discard" %}" title="{% trans "Move all clipboard files to" %} '{% trans "unfiled files" %}' {% trans "folder" %}"/>
                         </form>{% endcomment %}
                         <form action="{% url 'admin:filer-delete_clipboard' %}" method="post" class='avoid-multiple-submissions pull-left'>{% csrf_token %}
@@ -34,6 +36,7 @@
                             <input type="hidden" name="redirect_to" value="{{ current_url }}" />
                             {% if current_site %}<input type="hidden" name="current_site" value="{{current_site}}" />{% endif %}
                             {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+                            {% if file_type %}<input type="hidden" name="file_type" value="{{ file_type}}" />{% endif %}
                             <button title="{% trans "Delete all files in the clipboard" %}" class="btn btn-danger btn-sm"><i class="ace-icon fa fa-trash-o"></i>{% trans "Delete files" %}</button>
                         </form>
                     </div>
