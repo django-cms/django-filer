@@ -174,4 +174,5 @@ class BaseImage(File):
         app_label = 'filer'
         verbose_name = _('image')
         verbose_name_plural = _('images')
+        default_manager_name = 'objects'
         abstract = True

@@ -30,6 +30,7 @@ if not filer_settings.FILER_IMAGE_MODEL:
             app_label = 'filer'
             verbose_name = _('image')
             verbose_name_plural = _('images')
+            default_manager_name = 'objects'
 
         def save(self, *args, **kwargs):
             if self.date_taken is None:
