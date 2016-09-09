@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 
 import os
+
 from django.conf import settings
+from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext_lazy as _
-from django.core.files.storage import DefaultStorage
+
 from filer.settings import DEFAULT_FILER_STORAGES
 
 
