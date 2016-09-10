@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import os
 
-from django.conf import settings
 from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext_lazy as _
@@ -47,4 +46,4 @@ class Command(BaseCommand):
             for child in child_dirs:
                 walk(os.path.join(absdir, child), os.path.join(reldir, child))
 
-        walk(os.path.join(settings.MEDIA_ROOT, self.prefix), self.prefix)
+        walk(os.path.join(self.storage.location, self.prefix), self.prefix)
