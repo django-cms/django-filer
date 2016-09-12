@@ -2769,3 +2769,45 @@ class TrashAdminTests(TestCase):
                                        args=(filer_model, filer_obj_id,))
             response = self.client.post(restore_item_url, {'post': 'yes'})
             self.assertEqual(response.status_code, 403)
+
+
+def get_listed_objects(client, folder, data={}):
+    response = client.get(get_dir_listing_url(folder), data)
+    try:
+        items = response.context['paginator'].object_list
+    except:
+        items = []
+    return response, items
+
+
+class TestImageFiltering(TestCase):
+
+    def setUp(self):
+        username = 'login_using_foo'
+        password = 'secret'
+        user = User.objects.create_user(username=username, password=password)
+        user.is_staff = user.is_superuser = user.is_active = True
+        user.save()
+        self.client.login(username=username, password=password)
+        self.user = user
+        # create file storage image
+        self.img = create_image()
+        self.image_name = 'foo_file.jpg'
+        self.filename = os.path.join(
+            os.path.dirname(__file__), self.image_name)
+        self.img.save(self.filename, 'JPEG')
+        self.site = Site.objects.first()
+        self.foo = Folder.objects.create(
+            name='foo', site=self.site, restricted=True)
+        file_obj= DjangoFile(open(self.filename), name=self.image_name)
+        self.foo_image = Image.objects.create(original_filename=self.image_name,
+                                              file=file_obj, folder=self.foo)
+        self.foo_file = File.objects.create(original_filename=self.image_name,
+                                            file=file_obj, folder=self.foo)
+
+    def test_get_images(self):
+        self.client.login(username='jack', password='secret')
+        _, items = get_listed_objects(self.client, self.foo, {'file_type': 'image'})
+        assert {self.foo_image} == set(items)
+        _, items = get_listed_objects(self.client, self.foo)
+        assert {self.foo_image, self.foo_file} == set(items)
