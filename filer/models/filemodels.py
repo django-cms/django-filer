@@ -511,19 +511,12 @@ class File(polymorphic.PolymorphicModel,
 
     @property
     def actual_name(self):
-        clean_name = self.clean_actual_name
         if not self.sha1:
             try:
                 self.generate_sha1()
             except Exception:
-                return clean_name
-        suffix = self.sha1[:10]
-        if '.' not in clean_name:
-            return '{}.{}'.format(clean_name, suffix)
-        tokens = self.clean_actual_name.split('.')
-        tokens.insert(len(tokens)-1, self.sha1[:10])
-        actual_name = '.'.join(tokens)
-        return actual_name
+                return self.clean_actual_name
+        return '{}_{}'.format(self.sha1[:10], self.clean_actual_name)
 
     @property
     def upload_to_name(self):

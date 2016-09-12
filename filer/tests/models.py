@@ -148,12 +148,12 @@ class FilerApiTests(TestCase):
             file_obj = DjangoFile(open(self.filename))
             afile = File(name='testfile', folder=folder, file=file_obj)
             afile.save()
-            self.assertIn('foo/testfile', afile.url)
+            self.assertIn('foo/{}'.format(afile.actual_name), afile.url)
             folder.name = 'bar'
             folder.save()
             # refetch from db
             afile = File.objects.get(pk=afile.pk)
-            self.assertIn('bar/testfile', afile.url)
+            self.assertIn('bar/{}'.format(afile.actual_name), afile.url)
 
     def test_file_change_upload_to_destination(self):
         """
@@ -549,8 +549,8 @@ class TrashableModelTestCase(TestCase):
         foo = Folder.objects.create(name='foo')
         foo_img = self.create_filer_image('foo.jpg', folder=foo)
         storage = foo_img.file.storage
-        alive_path = 'foo/foo.%s.jpg' % foo_img.sha1[:10]
-        trashed_path = '_trash/%s/%s' % (foo_img.pk, alive_path)
+        alive_path = 'foo/{}_foo.jpg'.format(foo_img.sha1[:10])
+        trashed_path = '_trash/{}/{}'.format(foo_img.pk, alive_path)
         self.assertEqual(foo_img.file.name, alive_path)
         self.assertTrue(storage.exists(alive_path))
         self.assertFalse(storage.exists(trashed_path))
@@ -649,9 +649,9 @@ class TrashableModelTestCase(TestCase):
         bar_img_duplicate = self.create_filer_image('bar.jpg', folder=bar)
         File.trash.get(id=bar_img.id).restore()
         self.assertEqual(File.objects.get(id=bar_img_duplicate.id).file.name,
-                         'foo/bar/bar.{}.jpg'.format(bar_img_duplicate.sha1[:10]))
+                         'foo/bar/{}_bar.jpg'.format(bar_img_duplicate.sha1[:10]))
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo/bar/bar_1.{}.jpg'.format(bar_img_duplicate.sha1[:10]))
+                         'foo/bar/{}_bar_1.jpg'.format(bar_img_duplicate.sha1[:10]))
 
     def test_restore_file_where_file_path_location_not_available(self):
         foo = Folder.objects.create(name='foo')
@@ -894,17 +894,17 @@ class TestFileModel(TestCase):
         self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
         file1.sha1 = 'randomdatastring'
         self.assertEqual(file1.clean_actual_name, 'original.txt')
-        self.assertEqual(file1.actual_name, 'original.randomdata.txt')
+        self.assertEqual(file1.actual_name, 'randomdata_original.txt')
         self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
         file1.name = 'name.txt'
         self.assertEqual(file1.clean_actual_name, 'name.txt')
-        self.assertEqual(file1.actual_name, 'name.randomdata.txt')
+        self.assertEqual(file1.actual_name, 'randomdata_name.txt')
         self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
         file1.name = 'name'
         self.assertEqual(file1.clean_actual_name, 'name')
-        self.assertEqual(file1.actual_name, 'name.randomdata')
+        self.assertEqual(file1.actual_name, 'randomdata_name')
         self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
         file1.folder = Folder()
         self.assertEqual(file1.clean_actual_name, 'name')
-        self.assertEqual(file1.actual_name, 'name.randomdata')
+        self.assertEqual(file1.actual_name, 'randomdata_name')
         self.assertEqual(file1.upload_to_name, file1.actual_name)

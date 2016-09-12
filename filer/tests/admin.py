@@ -204,7 +204,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         img_obj = Image.objects.all()[0]
         self.assertEqual(img_obj.actual_name,
-                         '{}.{}.jpeg'.format(img_name, img_obj.sha1[:10]))
+                         '{}_{}.jpeg'.format(img_obj.sha1[:10], img_name))
         os.remove(image_path)
 
     def test_filer_upload_file(self, extra_headers={}):
@@ -2624,7 +2624,7 @@ class TestImageChangeForm(TestCase):
                 'one.jpg', folder=foo, owner=self.user)
             sha1_before = orig_img.sha1
             self.assertEqual(orig_img.file.name,
-                             'foo/one.{}.jpg'.format(sha1_before[:10]))
+                             'foo/{}_one.jpg'.format(sha1_before[:10]))
 
             another_img_name = 'new_one.jpg'
             another_img_path = os.path.join(os.path.dirname(__file__),
@@ -2641,7 +2641,7 @@ class TestImageChangeForm(TestCase):
                 })
                 orig_img = File.objects.get(id=orig_img.id)
                 self.assertEqual(orig_img.file.name,
-                                 'foo/new_one.{}.jpg'.format(orig_img.sha1[:10]))
+                                 'foo/{}_new_one.jpg'.format(orig_img.sha1[:10]))
                 self.assertNotEqual(sha1_before, orig_img.sha1)
             os.remove(another_img_path)
 
@@ -2663,7 +2663,7 @@ class TestImageChangeForm(TestCase):
             self.assertRedirects(response, folder_url)
             orig_img = File.objects.get(id=orig_img.id)
             self.assertEqual(orig_img.file.name,
-                             'foo/new_two.{}.jpg'.format(orig_img.sha1[:10]))
+                             'foo/{}_new_two.jpg'.format(orig_img.sha1[:10]))
 
     def test_image_change_data_only(self):
         with SettingsOverride(filer_settings,
@@ -2710,7 +2710,7 @@ class TestImageChangeForm(TestCase):
             self.assertRedirects(response, folder_url)
             orig_img = File.objects.get(id=orig_img.id)
             self.assertEqual(orig_img.file.name,
-                             'foo/new_four.{}.jpg'.format(orig_img.sha1[:10]))
+                             'foo/{}_new_four.jpg'.format(orig_img.sha1[:10]))
 
 
 class TrashAdminTests(TestCase):
