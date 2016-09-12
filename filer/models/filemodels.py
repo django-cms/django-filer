@@ -292,7 +292,7 @@ class File(polymorphic.PolymorphicModel,
         # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
         try:
             self.generate_sha1()
-        except Exception, e:
+        except (IOError, TypeError, ValueError) as e:
             pass
         if filer_settings.FOLDER_AFFECTS_URL and self._is_path_changed():
             self._force_commit = True
@@ -432,7 +432,7 @@ class File(polymorphic.PolymorphicModel,
         super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
-    def _generate_valid_name_for_restore(self):
+    def _set_valid_name_for_restore(self):
         """
         Generates the first available name so this file
             can be restored in the folder.
@@ -474,7 +474,7 @@ class File(polymorphic.PolymorphicModel,
             self.folder = filer.models.Folder.objects.get(id=self.folder_id)
 
         old_location, new_location = self.file.name, None
-        self._generate_valid_name_for_restore()
+        self._set_valid_name_for_restore()
         destination = self.file.field.upload_to(self, self.upload_to_name)
         try:
             new_location = self._copy_file(destination)
@@ -514,7 +514,7 @@ class File(polymorphic.PolymorphicModel,
         if not self.sha1:
             try:
                 self.generate_sha1()
-            except Exception:
+            except (IOError, TypeError, ValueError):
                 return self.clean_actual_name
         return '{}_{}'.format(self.sha1[:10], self.clean_actual_name)
 

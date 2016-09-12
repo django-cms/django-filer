@@ -796,28 +796,28 @@ class TestFileModel(TestCase):
                 file_obj.actual_name,
                 file_obj.file.name)
 
-    def test_generate_names_for_restore_folder(self):
+    def test_set_names_for_restore_folder(self):
         img_name = 'foo.jpg'
         foo = Folder.objects.create(name='foo')
         foo_img = self.create_filer_image(img_name, folder=foo)
         test_file = File(name="bar.jpg", folder=foo, original_filename='test.jpg')
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, "bar.jpg")
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.name = img_name
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, "foo_1.jpg")
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.name = None
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, None)
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.original_filename = img_name
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, None)
         self.assertEqual(test_file.original_filename, "foo_1.jpg")
 
-    def test_generate_names_for_restore_clipboard(self):
+    def test_set_names_for_restore_clipboard(self):
         img_name = 'foo.jpg'
         foo = Folder.objects.create(name='foo')
         foo_img = self.create_filer_image(img_name, folder=foo)
@@ -826,42 +826,42 @@ class TestFileModel(TestCase):
                          folder=None,
                          original_filename='test.jpg',
                          owner=self.superuser)
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, "bar.jpg")
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.name = img_name
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, "foo_1.jpg")
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.name = None
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, None)
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.original_filename = img_name
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, None)
         self.assertEqual(test_file.original_filename, "foo_1.jpg")
 
-    def test_generate_names_for_restore_unfiled(self):
+    def test_set_names_for_restore_unfiled(self):
         img_name = 'foo.jpg'
         foo_img = self.create_filer_image(img_name)
         test_file = File(name="bar.jpg",
                          folder=None,
                          original_filename='test.jpg',
                          owner=None)
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, "bar.jpg")
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.name = img_name
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, "foo_1.jpg")
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.name = None
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, None)
         self.assertEqual(test_file.original_filename, "test.jpg")
         test_file.original_filename = img_name
-        test_file._generate_valid_name_for_restore()
+        test_file._set_valid_name_for_restore()
         self.assertEqual(test_file.name, None)
         self.assertEqual(test_file.original_filename, "foo_1.jpg")
 
