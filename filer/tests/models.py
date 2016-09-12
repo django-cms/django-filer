@@ -8,13 +8,13 @@ import time
 from django.forms.models import modelform_factory
 from django.db.models import Q
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.core.files import File as DjangoFile
-from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.contrib.admin import helpers
 from django.core import files as dj_files
-from django.contrib.sites.models import Site
 
+from filer import settings as filer_settings
 from filer.models.foldermodels import Folder
 from filer.models.imagemodels import Image
 from filer.models.filemodels import File
@@ -24,10 +24,21 @@ from filer.tests.helpers import (
     get_dir_listing_url, create_superuser, create_folder_structure,
     create_image, create_clipboard_item, SettingsOverride,
     filer_obj_as_checkox)
-from django.test.utils import override_settings
-from filer import settings as filer_settings
 from filer.utils.generate_filename import by_path
 
+
+def create_filer_image_obj(image_name, size=(800, 600), **kwargs):
+    image = create_image()
+    image_path = os.path.join(os.path.dirname(__file__), image_name)
+    image.save(image_path, 'JPEG')
+    file_obj = DjangoFile(open(image_path), name=image_name)
+    kwargs.update({
+        'original_filename': image_name,
+        'file': file_obj
+    })
+    image = Image.objects.create(**kwargs)
+    os.remove(image_path)
+    return image
 
 
 class FilerApiTests(TestCase):
@@ -38,7 +49,7 @@ class FilerApiTests(TestCase):
         self.img = create_image()
         self.image_name = 'test_file.jpg'
         self.filename = os.path.join(os.path.dirname(__file__),
-                                 self.image_name)
+                                     self.image_name)
         self.img.save(self.filename, 'JPEG')
 
     def tearDown(self):
@@ -48,7 +59,7 @@ class FilerApiTests(TestCase):
             f.delete(to_trash=False)
 
     def create_filer_image(self):
-        file_obj= DjangoFile(open(self.filename), name=self.image_name)
+        file_obj = DjangoFile(open(self.filename), name=self.image_name)
         image = Image.objects.create(owner=self.superuser,
                                      original_filename=self.image_name,
                                      file=file_obj)
@@ -72,8 +83,8 @@ class FilerApiTests(TestCase):
         file_obj = DjangoFile(open(self.filename), name=self.image_name)
         ImageUploadForm = modelform_factory(Image, fields=('original_filename', 'owner', 'file'))
         upoad_image_form = ImageUploadForm({'original_filename':self.image_name,
-                                                'owner': self.superuser.pk},
-                                                {'file':file_obj})
+                                            'owner': self.superuser.pk},
+                                           {'file':file_obj})
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()
         self.assertEqual(Image.objects.count(), 1)
@@ -83,7 +94,7 @@ class FilerApiTests(TestCase):
         image.save()
         # Get the clipboard of the current user
         clipboard_item = create_clipboard_item(user=self.superuser,
-            file_obj=image)
+                                               file_obj=image)
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
 
@@ -190,12 +201,12 @@ class FilerApiTests(TestCase):
         })
 
         self.assertTrue(storage.exists('_trash/%s/to_delete2/%s' % (
-            file_1.pk, self.image_name)))
+            file_1.pk, file_1.actual_name)))
         self.assertFalse(storage.exists(name))
         folder.delete(to_trash=False)
         self.assertFalse(storage.exists(name))
         self.assertFalse(storage.exists('_trash/%s/to_delete2/%s' % (
-            file_1.pk, self.image_name)))
+            file_1.pk, file_1.actual_name)))
 
     def test_deleting_image_deletes_file_from_filesystem(self):
         file_1 = self.create_filer_image()
@@ -427,20 +438,10 @@ class TrashableModelTestCase(TestCase):
         self.assertTrue(File.trash.filter(pk=file_foo.pk).exists())
         self.assertFalse(File.objects.filter(pk=file_foo.pk).exists())
         self.assertEqual(File.trash.get(pk=file_foo.pk).file.name,
-                         '_trash/%s/file.txt' % file_foo.pk)
+                         '_trash/%s/%s' % (file_foo.pk, file_foo.actual_name))
 
     def create_filer_image(self, image_name, **kwargs):
-        image = create_image()
-        image_path = os.path.join(os.path.dirname(__file__), image_name)
-        image.save(image_path, 'JPEG')
-        file_obj = DjangoFile(open(image_path), name=image_name)
-        kwargs.update({
-            'original_filename': image_name,
-            'file': file_obj
-            })
-        image = Image.objects.create(**kwargs)
-        os.remove(image_path)
-        return image
+        return create_filer_image_obj(image_name, **kwargs)
 
     def test_trashed_files_dont_update_paths_if_tree_changes(self):
         img = self.create_filer_image('foo_image.jpg')
@@ -449,7 +450,7 @@ class TrashableModelTestCase(TestCase):
         img.save()
         Image.objects.get(id=img.id).delete()
         img = Image.trash.get(original_filename='foo_image.jpg')
-        self.assertEqual(img.file.name, '_trash/%s/foo/foo_image.jpg' % img.pk)
+        self.assertEqual(img.file.name, '_trash/%s/foo/%s' % (img.pk, img.actual_name))
         # rename folder
         folder.name = 'bar'
         # change metadata
@@ -460,7 +461,7 @@ class TrashableModelTestCase(TestCase):
         folder.save()
         # trashed items should preserve metdata but should not change paths
         img = Image.trash.get(original_filename='foo_image.jpg')
-        self.assertEqual(img.file.name, '_trash/%s/foo/foo_image.jpg'% img.pk)
+        self.assertEqual(img.file.name, '_trash/%s/foo/%s'% (img.pk, img.actual_name))
         self.assertTrue(img.restricted)
         self.assertTrue(img.is_core())
 
@@ -476,7 +477,7 @@ class TrashableModelTestCase(TestCase):
         img1 = Image.objects.get(original_filename='foo_image.jpg')
         self.assertTrue(img1.file.storage.exists(img1.file.name))
         img2 = Image.trash.get(original_filename='foo_image.jpg')
-        self.assertEqual(img2.file.name, '_trash/%s/foo_image.jpg'% img2.pk)
+        self.assertEqual(img2.file.name, '_trash/%s/%s'% (img2.pk, img2.actual_name))
 
     def test_file_soft_del_works_if_file_missing_from_storage(self):
         img = self.create_filer_image('foo_image.jpg')
@@ -486,7 +487,7 @@ class TrashableModelTestCase(TestCase):
         img.delete()
         img = Image.trash.get(original_filename='foo_image.jpg')
         self.assertFalse(img.file.storage.exists(img.file.name))
-        self.assertEqual(img.file.name, '_trash/%s/foo_image.jpg'% img.pk)
+        self.assertEqual(img.file.name, '_trash/%s/%s' % (img.pk, img.actual_name))
 
     def test_thumbnails_removed_when_source_is_soft_deleted(self):
         img = self.create_filer_image('foo_image.jpg')
@@ -529,7 +530,7 @@ class TrashableModelTestCase(TestCase):
         self.assertFalse(File.objects.filter(pk=file_foo_pk).exists())
         self.assertFalse(Folder.objects.filter(pk=foo_pk).exists())
         self.assertEqual(File.trash.get(pk=file_foo_pk).file.name,
-                         '_trash/%s/foo/image.jpg' % file_foo_pk)
+                         '_trash/%s/foo/%s' % (file_foo_pk, file_foo.actual_name))
 
     def test_restore_clipboard_file_missing_user(self):
         from filer.models.tools import get_user_clipboard, delete_clipboard
@@ -541,14 +542,15 @@ class TrashableModelTestCase(TestCase):
         user.delete()
         File.trash.get(id=foo.id).restore()
         foo = File.objects.get(id=foo.id)
-        self.assertEqual(foo.file.name, '_clipboard/_missing_owner/foo.jpg')
+        self.assertEqual(foo.file.name,
+                         '_clipboard/_missing_owner/{}'.format(foo.clean_actual_name))
 
     def test_file_restore_moves_file_on_storage(self):
         foo = Folder.objects.create(name='foo')
         foo_img = self.create_filer_image('foo.jpg', folder=foo)
         storage = foo_img.file.storage
-        alive_path = 'foo/foo.jpg'
-        trashed_path = '_trash/%s/foo/foo.jpg' % foo_img.pk
+        alive_path = 'foo/foo.%s.jpg' % foo_img.sha1[:10]
+        trashed_path = '_trash/%s/%s' % (foo_img.pk, alive_path)
         self.assertEqual(foo_img.file.name, alive_path)
         self.assertTrue(storage.exists(alive_path))
         self.assertFalse(storage.exists(trashed_path))
@@ -579,7 +581,7 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(clipboard.files.count(), 1)
         foo = File.objects.get(id=foo.id)
         self.assertEqual(foo.file.name,
-                         '_clipboard/%s/foo.jpg' % user.username)
+                         '_clipboard/%s/%s' % (user.username, foo.clean_actual_name))
 
     def test_restore_file_with_trashed_folder(self):
         foo = Folder.objects.create(name='foo')
@@ -595,7 +597,7 @@ class TrashableModelTestCase(TestCase):
         #   bar file were restored
         File.trash.get(id=foo_img.id)
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo/bar/bar.jpg')
+                         'foo/bar/{}'.format(bar_img.actual_name))
 
     def test_restore_file_with_alive_folder(self):
         foo = Folder.objects.create(name='foo')
@@ -603,15 +605,16 @@ class TrashableModelTestCase(TestCase):
         foo_img = self.create_filer_image('foo.jpg', folder=foo)
         bar_img = self.create_filer_image('bar.jpg', folder=bar)
         self.assertEqual(Folder.trash.count() + File.trash.count(), 0)
+        bar_img = File.objects.get(id=bar_img.id)
         bar_img.delete()
         self.assertEqual(File.trash.get(id=bar_img.id).file.name,
-                         '_trash/%s/foo/bar/bar.jpg' % bar_img.id)
+                         '_trash/%s/foo/bar/%s' % (bar_img.id, bar_img.actual_name))
         self.assertEqual(Folder.trash.count() + File.trash.count(), 1)
         File.trash.get(id=bar_img.id).restore()
         self.assertEqual(File.objects.get(id=foo_img.id).file.name,
-                         'foo/foo.jpg')
+                         'foo/{}'.format(foo_img.actual_name))
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo/bar/bar.jpg')
+                         'foo/bar/{}'.format(bar_img.actual_name))
 
     def test_restore_clipboard_file_where_location_not_available(self):
         from filer.models.tools import get_user_clipboard, delete_clipboard
@@ -646,9 +649,9 @@ class TrashableModelTestCase(TestCase):
         bar_img_duplicate = self.create_filer_image('bar.jpg', folder=bar)
         File.trash.get(id=bar_img.id).restore()
         self.assertEqual(File.objects.get(id=bar_img_duplicate.id).file.name,
-                         'foo/bar/bar.jpg')
+                         'foo/bar/bar.{}.jpg'.format(bar_img_duplicate.sha1[:10]))
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo/bar/bar_1.jpg')
+                         'foo/bar/bar_1.{}.jpg'.format(bar_img_duplicate.sha1[:10]))
 
     def test_restore_file_where_file_path_location_not_available(self):
         foo = Folder.objects.create(name='foo')
@@ -661,7 +664,7 @@ class TrashableModelTestCase(TestCase):
         bar_duplicate = Folder.objects.create(name='bar', parent=foo_duplicate)
         File.trash.get(id=bar_img.id).restore()
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo_1/bar/bar.jpg')
+                         'foo_1/bar/{}'.format(bar_img.actual_name))
         self.assertEqual(Folder.trash.count() + File.trash.count(), 1)
         self.assertEqual(Folder.objects.count(), 4)
 
@@ -676,15 +679,16 @@ class TrashableModelTestCase(TestCase):
         Folder.trash.get(id=foo.id).restore()
         self.assertEqual(Folder.objects.count(), 3)
         bar_img = File.objects.get(id=bar_img.id)
-        self.assertEqual(bar_img.file.name, 'foo/bar/bar.jpg')
+        self.assertEqual(bar_img.file.name, 'foo/bar/{}'.format(bar_img.actual_name))
         # add file/folder to the empty folder make sure it works after restore
         foo_img = self.create_filer_image('foo.jpg', folder=foo)
-        self.assertEqual(foo_img.file.name, 'foo/foo.jpg')
+        self.assertEqual(foo_img.file.name, 'foo/{}'.format(foo_img.actual_name))
         baz_img = self.create_filer_image('baz.jpg', folder=baz)
-        self.assertEqual(baz_img.file.name, 'foo/baz/baz.jpg')
+        self.assertEqual(baz_img.file.name, 'foo/baz/{}'.format(baz_img.actual_name))
         baz_child = Folder.objects.create(name='baz', parent=baz)
         baz_child_img = self.create_filer_image('baz.jpg', folder=baz_child)
-        self.assertEqual(baz_child_img.file.name, 'foo/baz/baz/baz.jpg')
+        self.assertEqual(baz_child_img.file.name,
+                         'foo/baz/baz/{}'.format(baz_child_img.actual_name))
 
     def test_restore_folder_at_unavailable_location(self):
         foo = Folder.objects.create(name='foo')
@@ -717,17 +721,17 @@ class TrashableModelTestCase(TestCase):
         foo = Folder.objects.get(id=foo.id)
         self.assertEqual(foo.get_descendants(include_self=True).count(), 3)
         self.assertEqual(File.objects.get(id=foo_img.id).file.name,
-                         'foo/foo.jpg')
+                         'foo/{}'.format(foo_img.actual_name))
         self.assertEqual(File.objects.get(id=foo_img1.id).file.name,
-                         'foo/foo1.jpg')
+                         'foo/{}'.format(foo_img1.actual_name))
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo/bar/bar.jpg')
+                         'foo/bar/{}'.format(bar_img.actual_name))
         self.assertEqual(File.objects.get(id=bar_img1.id).file.name,
-                         'foo/bar/bar1.jpg')
+                         'foo/bar/{}'.format(bar_img1.actual_name))
         self.assertEqual(File.objects.get(id=baz_img.id).file.name,
-                         'foo/bar/baz/baz.jpg')
+                         'foo/bar/baz/{}'.format(baz_img.actual_name))
         self.assertEqual(File.objects.get(id=baz_img1.id).file.name,
-                         'foo/bar/baz/baz1.jpg')
+                         'foo/bar/baz/{}'.format(baz_img1.actual_name))
 
     def test_restore_folder_with_duplicated_children(self):
         foo = Folder.objects.create(name='foo')
@@ -747,11 +751,11 @@ class TrashableModelTestCase(TestCase):
         self.assertEqual(len(bar_folder_names), 2)
         self.assertEqual(sorted(['bar', 'bar_1']), sorted(bar_folder_names))
         self.assertEqual(File.objects.get(id=foo_img.id).file.name,
-                         'foo/foo.jpg')
+                         'foo/{}'.format(foo_img.actual_name))
         self.assertEqual(File.objects.get(id=bar_img.id).file.name,
-                         'foo/bar/bar.jpg')
+                         'foo/bar/{}'.format(bar_img.actual_name))
         self.assertEqual(File.objects.get(id=new_bar_img.id).file.name,
-                         'foo/bar_1/bar.jpg')
+                         'foo/bar_1/{}'.format(new_bar_img.actual_name))
 
     def test_folder_save_with_trashed_subfolder(self):
         foo = Folder.objects.create(name='foo')
@@ -761,3 +765,146 @@ class TrashableModelTestCase(TestCase):
         foo.shared.add(1)
         foo.restricted = True
         foo.save()
+
+
+@SettingsOverride(filer_settings,
+                  FILER_PUBLICMEDIA_UPLOAD_TO=by_path,
+                  FOLDER_AFFECTS_URL=True)
+class TestFileModel(TestCase):
+
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.img_width = 400
+
+    def tearDown(self):
+        for filer_file in File.all_objects.all():
+            filer_file.delete(to_trash=False)
+
+    def create_filer_image(self, image_name, **kwargs):
+        self.img_width += 100
+        return create_filer_image_obj(image_name,
+                                      size=(self.img_width, 400),
+                                      **kwargs)
+
+    def store_file_data(self, file_obj, clean_actual_name=None, db_reload=True):
+        if db_reload:
+            file_obj = File.all_objects.get(id=file_obj.id)
+        return (file_obj.name,
+                file_obj.folder,
+                file_obj.original_filename,
+                clean_actual_name or file_obj.clean_actual_name,
+                file_obj.actual_name,
+                file_obj.file.name)
+
+    def test_generate_names_for_restore_folder(self):
+        img_name = 'foo.jpg'
+        foo = Folder.objects.create(name='foo')
+        foo_img = self.create_filer_image(img_name, folder=foo)
+        test_file = File(name="bar.jpg", folder=foo, original_filename='test.jpg')
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, "bar.jpg")
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.name = img_name
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, "foo_1.jpg")
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.name = None
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, None)
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.original_filename = img_name
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, None)
+        self.assertEqual(test_file.original_filename, "foo_1.jpg")
+
+    def test_generate_names_for_restore_clipboard(self):
+        img_name = 'foo.jpg'
+        foo = Folder.objects.create(name='foo')
+        foo_img = self.create_filer_image(img_name, folder=foo)
+        create_clipboard_item(user=self.superuser, file_obj=foo_img).save()
+        test_file = File(name="bar.jpg",
+                         folder=None,
+                         original_filename='test.jpg',
+                         owner=self.superuser)
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, "bar.jpg")
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.name = img_name
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, "foo_1.jpg")
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.name = None
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, None)
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.original_filename = img_name
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, None)
+        self.assertEqual(test_file.original_filename, "foo_1.jpg")
+
+    def test_generate_names_for_restore_unfiled(self):
+        img_name = 'foo.jpg'
+        foo_img = self.create_filer_image(img_name)
+        test_file = File(name="bar.jpg",
+                         folder=None,
+                         original_filename='test.jpg',
+                         owner=None)
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, "bar.jpg")
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.name = img_name
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, "foo_1.jpg")
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.name = None
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, None)
+        self.assertEqual(test_file.original_filename, "test.jpg")
+        test_file.original_filename = img_name
+        test_file._generate_valid_name_for_restore()
+        self.assertEqual(test_file.name, None)
+        self.assertEqual(test_file.original_filename, "foo_1.jpg")
+
+    def test_restore_with_hash_names(self):
+        img_name = 'foo.jpg'
+        foo = Folder.objects.create(name='foo')
+        foo_img = self.create_filer_image(img_name, folder=foo)
+        initial = self.store_file_data(foo)
+        foo_img = File.objects.get(id=foo_img.id) # necessary before delete
+        foo_img.delete()
+        self.create_filer_image('bar.jpg', folder=foo)
+        self.assertNotEqual(self.store_file_data(foo_img), initial)
+        foo_img.restore()
+        self.assertEqual(self.store_file_data(foo_img), initial)
+        foo_img.delete()
+        foo2_img = self.create_filer_image(img_name, folder=foo)
+        self.assertEqual(foo2_img.clean_actual_name, img_name)
+        self.assertEqual(foo2_img.clean_actual_name, img_name)
+        self.assertEqual(foo2_img.actual_name, foo_img.actual_name)
+        foo_img.restore()
+        self.assertEqual(File.objects.get(id=foo_img.id).clean_actual_name, 'foo_1.jpg')
+        self.assertNotEqual(foo2_img.actual_name, foo_img.actual_name)
+
+    def test_filename_properties(self):
+        file1 = File(name='',
+                     folder=None,
+                     original_filename='original.txt')
+        self.assertEqual(file1.clean_actual_name, 'original.txt')
+        self.assertEqual(file1.actual_name, 'original.txt')
+        self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
+        file1.sha1 = 'randomdatastring'
+        self.assertEqual(file1.clean_actual_name, 'original.txt')
+        self.assertEqual(file1.actual_name, 'original.randomdata.txt')
+        self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
+        file1.name = 'name.txt'
+        self.assertEqual(file1.clean_actual_name, 'name.txt')
+        self.assertEqual(file1.actual_name, 'name.randomdata.txt')
+        self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
+        file1.name = 'name'
+        self.assertEqual(file1.clean_actual_name, 'name')
+        self.assertEqual(file1.actual_name, 'name.randomdata')
+        self.assertEqual(file1.upload_to_name, file1.clean_actual_name)
+        file1.folder = Folder()
+        self.assertEqual(file1.clean_actual_name, 'name')
+        self.assertEqual(file1.actual_name, 'name.randomdata')
+        self.assertEqual(file1.upload_to_name, file1.actual_name)

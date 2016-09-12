@@ -930,7 +930,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             is_valid = filer_file.is_valid()
             if not is_valid:
                 error_format = u"{} is not a valid zip file"
-                message = error_format.format(filer_file.actual_name)
+                message = error_format.format(filer_file.clean_actual_name)
                 messages.error(request, _(message))
             return is_valid
 
@@ -940,7 +940,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 error_format = u"Files/Folders from {archive} with names:"
                 error_format += u"{names} already exist."
                 names = u", ".join(collisions)
-                archive = filer_file.actual_name
+                archive = filer_file.clean_actual_name
                 message = error_format.format(
                     archive=archive,
                     names=names,
