@@ -292,7 +292,7 @@ class File(polymorphic.PolymorphicModel,
         # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
         try:
             self.generate_sha1()
-        except Exception, e:
+        except (IOError, TypeError, ValueError) as e:
             pass
         if filer_settings.FOLDER_AFFECTS_URL and self._is_path_changed():
             self._force_commit = True
@@ -432,24 +432,29 @@ class File(polymorphic.PolymorphicModel,
         super(File, self).delete_restorable(*args, **kwargs)
     delete.alters_data = True
 
-    def _generate_valid_location_for_restore(self):
+    def _set_valid_name_for_restore(self):
         """
-        Returns the first available destination path where this file
-            will be restored to.
+        Generates the first available name so this file
+            can be restored in the folder.
         """
-        basename, extension = os.path.splitext(self.actual_name)
-        destination = self.file.field.upload_to(self, self.actual_name)
+        basename, extension = os.path.splitext(self.clean_actual_name)
+        if self.folder:
+            files = self.folder.files
+        elif self.owner:
+            files = filer.models.tools.get_user_clipboard(self.owner).files.all()
+        else:
+            from filer.models.virtualitems import UnfiledImages
+            files = UnfiledImages().files
+        existing_file_names = [f.clean_actual_name for f in files]
         i = 1
-        while File.objects.filter(file=destination).exists():
+        while self.clean_actual_name in existing_file_names:
             filename = "%s_%s%s" % (basename, i, extension)
             # set actual name
             if self.name in ('', None):
                 self.original_filename = filename
             else:
                 self.name = filename
-            destination = self.file.field.upload_to(self, self.actual_name)
             i += 1
-        return destination
 
     def restore(self):
         """
@@ -469,8 +474,8 @@ class File(polymorphic.PolymorphicModel,
             self.folder = filer.models.Folder.objects.get(id=self.folder_id)
 
         old_location, new_location = self.file.name, None
-        destination = self._generate_valid_location_for_restore()
-
+        self._set_valid_name_for_restore()
+        destination = self.file.field.upload_to(self, self.upload_to_name)
         try:
             new_location = self._copy_file(destination)
         except Exception as e:
@@ -506,16 +511,36 @@ class File(polymorphic.PolymorphicModel,
 
     @property
     def actual_name(self):
+        if not self.sha1:
+            try:
+                self.generate_sha1()
+            except (IOError, TypeError, ValueError):
+                return self.clean_actual_name
+        return '{}_{}'.format(self.sha1[:10], self.clean_actual_name)
+
+    @property
+    def upload_to_name(self):
+        """
+        For normal files this is the actual name with the hash but clipboard
+        file upload locations are the clean names.
+        """
+        if self.folder:
+            return self.actual_name
+        else:
+            return self.clean_actual_name
+
+    @property
+    def clean_actual_name(self):
         """The name displayed to the user.
         Uses self.name if set, otherwise it falls back on self.original_filename.
 
-        This property is used for enforcing unique filenames within the same fodler.
+        This property is used for enforcing unique filenames within the same folder.
         """
         if self.name in ('', None):
-            actual_name = u"%s" % (self.original_filename,)
+            name = u"%s" % (self.original_filename,)
         else:
-            actual_name = u"%s" % (self.name,)
-        return actual_name
+            name = u"%s" % (self.name,)
+        return name
 
     @property
     def pretty_logical_path(self):

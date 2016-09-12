@@ -189,6 +189,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             img.delete(to_trash=False)
 
     def test_filer_upload_image_no_extension(self):
+        img_name = 'image_name'
         image = create_image()
         image_path = os.path.join(os.path.dirname(__file__), 'image_name')
         image.save(image_path, 'JPEG')
@@ -196,12 +197,14 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
         response = self.client.post(
             reverse('admin:filer-ajax_upload'), {
-            'Filename': 'image_name',
+            'Filename': img_name,
             'Filedata': file_obj,
             'jsessionid': self.client.session.session_key, },
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].actual_name, 'image_name.jpeg')
+        img_obj = Image.objects.all()[0]
+        self.assertEqual(img_obj.actual_name,
+                         '{}_{}.jpeg'.format(img_obj.sha1[:10], img_name))
         os.remove(image_path)
 
     def test_filer_upload_file(self, extra_headers={}):
@@ -2619,8 +2622,9 @@ class TestImageChangeForm(TestCase):
             foo = Folder.objects.create(name='foo')
             orig_img = self.create_filer_image(
                 'one.jpg', folder=foo, owner=self.user)
-            self.assertEqual(orig_img.file.name, 'foo/one.jpg')
             sha1_before = orig_img.sha1
+            self.assertEqual(orig_img.file.name,
+                             'foo/{}_one.jpg'.format(sha1_before[:10]))
 
             another_img_name = 'new_one.jpg'
             another_img_path = os.path.join(os.path.dirname(__file__),
@@ -2636,7 +2640,8 @@ class TestImageChangeForm(TestCase):
                     'file': SimpleUploadedFile(new_img.name, new_img.read())
                 })
                 orig_img = File.objects.get(id=orig_img.id)
-                self.assertEqual(orig_img.file.name, 'foo/new_one.jpg')
+                self.assertEqual(orig_img.file.name,
+                                 'foo/{}_new_one.jpg'.format(orig_img.sha1[:10]))
                 self.assertNotEqual(sha1_before, orig_img.sha1)
             os.remove(another_img_path)
 
@@ -2657,7 +2662,8 @@ class TestImageChangeForm(TestCase):
                 'admin:filer-directory_listing', kwargs={'folder_id': foo.id})
             self.assertRedirects(response, folder_url)
             orig_img = File.objects.get(id=orig_img.id)
-            self.assertEqual(orig_img.file.name, 'foo/new_two.jpg')
+            self.assertEqual(orig_img.file.name,
+                             'foo/{}_new_two.jpg'.format(orig_img.sha1[:10]))
 
     def test_image_change_data_only(self):
         with SettingsOverride(filer_settings,
@@ -2703,7 +2709,8 @@ class TestImageChangeForm(TestCase):
                 "?_popup=1")
             self.assertRedirects(response, folder_url)
             orig_img = File.objects.get(id=orig_img.id)
-            self.assertEqual(orig_img.file.name, 'foo/new_four.jpg')
+            self.assertEqual(orig_img.file.name,
+                             'foo/{}_new_four.jpg'.format(orig_img.sha1[:10]))
 
 
 class TrashAdminTests(TestCase):
