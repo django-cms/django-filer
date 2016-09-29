@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+Revision 23058b6 (29.09.2016, 12:07 UTC)
+----------------------------------------
+
+* LUN-3217
+
+  * Add option to filter files by type.
+
+* LUN-3221
+
+  * Set specific exceptions for sha1 generation.
+  * Review fixes.
+  * Add content hash to filenames so CDN urls are automatically invalidated.
+
+No other commits.
+
 Revision b0041d1 (06.09.2016, 08:55 UTC)
 ----------------------------------------
 
