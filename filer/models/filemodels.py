@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 #-*- coding: utf-8 -*-
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
