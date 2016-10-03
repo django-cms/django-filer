@@ -12,6 +12,7 @@ class Video(File):
 
     class Meta:
         app_label = 'extended_app'
+        default_manager_name = 'objects'
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -25,3 +26,4 @@ class ExtImage(BaseImage):
 
     class Meta:
         app_label = 'extended_app'
+        default_manager_name = 'objects'
