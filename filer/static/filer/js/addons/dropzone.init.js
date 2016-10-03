@@ -34,8 +34,12 @@ django.jQuery(function ($) {
             window.parent.CMS.API.Messages.open({
                 message: message
             });
-        } catch (errorText) {
-            console.log(errorText);
+        } catch (e) {
+            if (window.filerShowError) {
+                window.filerShowError(message);
+            } else {
+                alert(message);
+            }
         }
     };
 
@@ -110,7 +114,7 @@ django.jQuery(function ($) {
                     }
                 } else {
                     if (response && response.error) {
-                        window.showError(file.name + ': ' + response.error);
+                        showError(file.name + ': ' + response.error);
                     }
                     this.removeAllFiles(true);
                 }
