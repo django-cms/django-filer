@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-Created on May 31, 2016
-
-@author: jakob
-'''
 
 from django.core.management.base import BaseCommand
 from filer.models.imagemodels import Image
@@ -12,6 +7,11 @@ from filer.models.imagemodels import Image
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        """
+        Generates image thumbnails
+        
+        NOTE: To keep memory consumption stable avoid iteration over the Image queryset
+        """
         pks = Image.objects.all().values_list('id', flat=True)
         total = len(pks)
         for idx, pk in enumerate(pks):
