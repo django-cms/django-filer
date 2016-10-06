@@ -9,7 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         Generates image thumbnails
-        
+
         NOTE: To keep memory consumption stable avoid iteration over the Image queryset
         """
         pks = Image.objects.all().values_list('id', flat=True)
