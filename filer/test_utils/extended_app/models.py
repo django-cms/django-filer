@@ -5,6 +5,7 @@ import os.path
 
 from filer.models import BaseImage
 from filer.models.filemodels import File
+from filer.utils.compatibility import GTE_DJANGO_1_10
 
 
 class Video(File):
@@ -12,7 +13,8 @@ class Video(File):
 
     class Meta:
         app_label = 'extended_app'
-        default_manager_name = 'objects'
+        if GTE_DJANGO_1_10:
+            default_manager_name = 'objects'
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -26,4 +28,5 @@ class ExtImage(BaseImage):
 
     class Meta:
         app_label = 'extended_app'
-        default_manager_name = 'objects'
+        if GTE_DJANGO_1_10:
+            default_manager_name = 'objects'

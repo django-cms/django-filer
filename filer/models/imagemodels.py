@@ -11,6 +11,7 @@ from django.utils.timezone import get_current_timezone, make_aware, now
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
+from ..utils.compatibility import GTE_DJANGO_1_10
 from ..utils.loader import load_object
 from .abstract import BaseImage
 
@@ -30,7 +31,8 @@ if not filer_settings.FILER_IMAGE_MODEL:
             app_label = 'filer'
             verbose_name = _('image')
             verbose_name_plural = _('images')
-            default_manager_name = 'objects'
+            if GTE_DJANGO_1_10:
+                default_manager_name = 'objects'
 
         def save(self, *args, **kwargs):
             if self.date_taken is None:

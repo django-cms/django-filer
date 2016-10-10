@@ -11,7 +11,7 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
-from ..utils.compatibility import PILImage
+from ..utils.compatibility import PILImage, GTE_DJANGO_1_10
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
 from .filemodels import File
@@ -176,3 +176,5 @@ class BaseImage(File):
         verbose_name_plural = _('images')
         default_manager_name = 'objects'
         abstract = True
+        if GTE_DJANGO_1_10:
+            default_manager_name = 'objects'
