@@ -174,7 +174,6 @@ class BaseImage(File):
         app_label = 'filer'
         verbose_name = _('image')
         verbose_name_plural = _('images')
-        default_manager_name = 'objects'
         abstract = True
         if GTE_DJANGO_1_10:
             default_manager_name = 'objects'
