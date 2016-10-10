@@ -3,15 +3,15 @@ from __future__ import absolute_import
 
 import logging
 import os
-
 from distutils.version import LooseVersion
+
 from django import get_version
 from django.db import models
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
-from ..utils.compatibility import PILImage, GTE_DJANGO_1_10
+from ..utils.compatibility import GTE_DJANGO_1_10, PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
 from .filemodels import File
