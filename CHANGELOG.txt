@@ -6,6 +6,7 @@ CHANGELOG
 
 * Fixed markup issue with editing file in admin
 * Fixed error message not always showing up properly
+* Added generate thumbnails management command
 
 
 1.2.5 (2016-09-05)
