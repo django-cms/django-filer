@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision b5b4b34 (10.10.2016, 08:26 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * Handle unicode in filemodels.
+
 Revision 23058b6 (29.09.2016, 12:07 UTC)
 ----------------------------------------
 
