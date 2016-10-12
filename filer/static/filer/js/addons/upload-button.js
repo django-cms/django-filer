@@ -92,7 +92,7 @@
 
                 if (file.error) {
                     hasErrors = true;
-                    window.showError(fileName + ': ' + file.error);
+                    window.filerShowError(fileName + ': ' + file.error);
                 }
 
                 submitNum--;

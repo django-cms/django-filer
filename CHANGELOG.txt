@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+1.2.6 (unreleased)
+------------------
+
+* Fixed markup issue with editing file in admin
+* Fixed error message not always showing up properly
+* Added generate thumbnails management command
+* Fixed dropzone styles on smaller widths
+* Fixed dropzones in inlines not initializing in Django < 1.9
+* Added an action button to the directory listings to download files
+
 
 1.2.5 (2016-09-05)
 ------------------

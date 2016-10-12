@@ -71,6 +71,7 @@ Contents
    extending_filer
    running_tests
    dump_payload
+   management_commands
 
 
 .. _`contributing`: development/#contributing

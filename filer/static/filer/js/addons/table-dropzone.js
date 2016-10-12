@@ -198,8 +198,8 @@
                             return;
                         }
                         hasErrors = true;
-                        if (window.showError) {
-                            window.showError(file.name + ': ' + errorText);
+                        if (window.filerShowError) {
+                            window.filerShowError(file.name + ': ' + errorText);
                         }
                     }
                 });
