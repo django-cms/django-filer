@@ -134,6 +134,8 @@
                                 <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
                             </td>
                             <td class="column-action">
+                                <a href="{{ file.url }}"
+                                    title="{% blocktrans with file.label as item_label %}Download '{{ item_label }}'{% endblocktrans %}" class="action-button"><span class="fa fa-download"></span></a>
                                 <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                     title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil"></span></a>
                                 <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash"></span></a>
