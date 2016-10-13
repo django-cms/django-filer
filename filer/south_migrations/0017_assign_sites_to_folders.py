@@ -8,14 +8,9 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import Group, User
 from filer.utils.cms_roles import get_sites_for_user
 from filer.utils.checktrees import TreeChecker
-from cmsroles.models import Role
 
 
 class Migration(DataMigration):
-
-    depends_on = (
-        ("cmsroles", "0003_rename_site_group"),
-    )
 
     core_folders = ['media', '_bento_media']
     fallback_site = 'lunchbox.pbs.org'

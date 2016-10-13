@@ -1,11 +1,13 @@
 #-*- coding: utf-8 -*-
+from zipfile import ZipFile
+import os
+
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 from filer.tests.helpers import create_image
+
 from filer.utils.loader import load
 from filer.utils.zip import unzip
-from zipfile import ZipFile
-import os
 
 #===============================================================================
 # Some target classes for the classloading tests

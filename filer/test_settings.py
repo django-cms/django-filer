@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
+
 import filer
+
+
 DEBUG = True
 PACKAGE_ROOT = os.path.abspath(os.path.join(
     os.path.dirname(filer.__file__), '..'))
@@ -73,7 +76,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
             ),
             'loaders': (
-                'cmsroles.tests.utils.MockLoader',
+                'filer.tests.utils.MockLoader',
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
             ),
@@ -81,3 +84,23 @@ TEMPLATES = [
         },
     },
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(module)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'root': {
+        'handlers': ['console', ],
+        'level': 'WARNING',
+    },
+}
