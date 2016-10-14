@@ -2,8 +2,10 @@
 from django.contrib import admin
 from django.contrib.admin.utils import unquote
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.auth import get_permission_codename
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect
+
 from filer.models import Folder, File
 from filer.admin.tools import (has_admin_role, has_role_on_site,
                                can_restrict_on_site,
@@ -12,12 +14,14 @@ from filer.views import (popup_param, selectfolder_param, popup_status,
                          selectfolder_status, current_site_param,
                          get_param_from_request)
 
+
 class CommonModelAdmin(admin.ModelAdmin):
     save_as = False
 
     def _make_restricted_field_readonly(self, user, obj=None):
-        if not user.has_perm('filer.can_restrict_operations') or (
-                obj and not obj.can_change_restricted(user)):
+        perm = 'filer.can_restrict_operations'
+        can_restrict = user.has_perm(perm, obj) or user.has_perm(perm)
+        if not can_restrict or (obj and not obj.can_change_restricted(user)):
             if 'restricted' not in self.readonly_fields:
                 self.readonly_fields += ['restricted']
         else:
@@ -87,6 +91,32 @@ class CommonModelAdmin(admin.ModelAdmin):
         return self._redirect_to_directory_listing(
             request, response, expected_urls, parent_folder, obj)
 
+    def has_change_permission(self, request, obj=None):
+        """
+        Implemented to allow auth backends to handle object permissions.
+        """
+        opts = self.opts
+        if opts.auto_created:
+            # The model was auto-created as intermediary for a
+            # ManyToMany-relationship, find the target model
+            for field in opts.fields:
+                if field.rel and field.rel.to != self.parent_model:
+                    opts = field.rel.to._meta
+                    break
+        codename = get_permission_codename('change', opts)
+        perm_name, user = "{}.{}".format(opts.app_label, codename), request.user
+        return user.has_perm(perm_name, obj) or user.has_perm(perm_name)
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Implemented to allow auth backends to handle object permissions.
+        """
+        if self.opts.auto_created:
+            # For link objects
+            return self.has_change_permission(request, obj)
+        codename = get_permission_codename('delete', self.opts)
+        perm_name, user = "{}.{}".format(self.opts.app_label, codename), request.user
+        return user.has_perm(perm_name, obj) or user.has_perm(perm_name)
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):

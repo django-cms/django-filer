@@ -635,15 +635,17 @@ class File(polymorphic.PolymorphicModel,
         return False
 
     def is_restricted_for_user(self, user):
+        perm = 'filer.can_restrict_operations'
         return (self.restricted and (
-                    not user.has_perm('filer.can_restrict_operations') or
-                    not can_restrict_on_site(user, self.folder.site)))
+            not (user.has_perm(perm, self) or user.has_perm(perm)) or
+            not can_restrict_on_site(user, self.folder.site)))
 
     def can_change_restricted(self, user):
         """
         Checks if restriction operation is available for this file.
         """
-        if not user.has_perm('filer.can_restrict_operations'):
+        perm = 'filer.can_restrict_operations'
+        if not user.has_perm(perm, self) and not user.has_perm(perm):
             return False
         if not self.folder:
             # cannot restrict unfiled files
@@ -672,32 +674,34 @@ class File(polymorphic.PolymorphicModel,
             # nobody can change core folder
             # leaving these on True based on the fact that core folders are
             # displayed as readonly fields
-             return True
+            return True
 
         # only admins can change site folders with no site owner
         if not self.folder.site and has_admin_role(user):
             return True
 
         if self.folder.site:
-            return (user.has_perm('filer.change_file') and
-                    has_role_on_site(user, self.folder.site))
+            can_change_file = (user.has_perm('filer.change_file', self) or
+                               user.has_perm('filer.change_file'))
+            return can_change_file and has_role_on_site(user, self.folder.site)
 
         return False
 
     def has_delete_permission(self, user):
         if not self.folder:
              # clipboard and unfiled files
-             return True
+            return True
         # nobody can delete core files
         if self.is_readonly_for_user(user):
-             return False
+            return False
         # only admins can delete site files with no site owner
         if not self.folder.site and has_admin_role(user):
-             return True
+            return True
 
         if self.folder.site:
-            return (user.has_perm('filer.delete_file') and
-                    has_role_on_site(user, self.folder.site))
+            can_delete_file = (user.has_perm('filer.delete_file', self) or
+                               user.has_perm('filer.delete_file'))
+            return can_delete_file and has_role_on_site(user, self.folder.site)
         return False
 
     class Meta:

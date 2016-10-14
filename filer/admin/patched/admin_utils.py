@@ -52,7 +52,8 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
             p = '%s.%s' % (opts.app_label,
                            get_permission_codename('delete', opts))
-            if not user.has_perm(p):
+            # Additional change: also check for individual object permission
+            if not user.has_perm(p, obj) and not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
             return format_html('{}: <a href="{}">{}</a>',

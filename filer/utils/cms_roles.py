@@ -1,8 +1,25 @@
-from django.contrib.sites.models import Site
-from cmsroles.siteadmin import (is_site_admin, get_user_roles_on_sites_ids,
-                                get_administered_sites)
-from django.contrib.auth.models import Permission
 from functools import wraps
+
+from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_string
+
+from filer.settings import FILER_ROLES_MANAGER
+
+
+def get_roles_manager():
+    if hasattr(get_roles_manager, '_cache'):
+        return get_roles_manager._cache
+    try:
+        if callable(FILER_ROLES_MANAGER):
+            manager = FILER_ROLES_MANAGER()
+        manager = import_string(FILER_ROLES_MANAGER)()
+    except ImportError:
+        err_msg = ("Cannot import {}! This should be a manager for permissions."
+                   "Please consult documentation.".format(FILER_ROLES_MANAGER))
+        raise ImproperlyConfigured(err_msg)
+    get_roles_manager._cache = manager
+    return manager
 
 
 def get_or_fetch(fetch_func):
@@ -20,14 +37,10 @@ def get_or_fetch(fetch_func):
         return getattr(user, attr_name)
     return wrapper
 
+
 @get_or_fetch
 def has_admin_role(user):
-    return is_site_admin(user)
-
-
-@get_or_fetch
-def get_roles_on_sites(user):
-    return get_user_roles_on_sites_ids(user)
+    return get_roles_manager().is_site_admin(user)
 
 
 def can_restrict_on_site(user, site):
@@ -36,13 +49,8 @@ def can_restrict_on_site(user, site):
         site_id = getattr(site, 'id', None)
 
     def _fetch_perm_existance():
-        roles_on_site = [role
-            for role, site_ids in get_roles_on_sites(user).items()
-            if site_id in site_ids]
-        return Permission.objects.filter(
-            content_type__app_label='filer',
-            codename='can_restrict_operations',
-            group__role__in=roles_on_site).exists()
+        manager = get_roles_manager()
+        return manager.has_perm_on_site(user, site_id, 'filer.can_restrict_operations')
 
     if user.is_superuser or (site_id is None and has_admin_role(user)):
         return True
@@ -65,8 +73,7 @@ def get_sites_without_restriction_perm(user):
 
 @get_or_fetch
 def get_admin_sites_for_user(user):
-    admin_sites = get_administered_sites(user)
-    return admin_sites
+    return get_roles_manager().get_administered_sites(user)
 
 
 def has_role_on_site(user, site):
@@ -85,7 +92,4 @@ def get_sites_for_user(user):
     """
     if user.is_superuser:
         return set(Site.objects.values_list('id', flat=True))
-    available_sites = set()
-    for sites in get_roles_on_sites(user).values():
-        available_sites |= sites
-    return available_sites
+    return get_roles_manager().get_accessible_sites(user)

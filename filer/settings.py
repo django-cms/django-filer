@@ -1,9 +1,11 @@
 #-*- coding: utf-8 -*-
+import os
+
 from django.conf import settings
 from django.core.files.storage import get_storage_class
+
 from filer.utils.loader import load_object
 from filer.utils.recursive_dictionary import RecursiveDictionaryWithExcludes
-import os
 
 
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False) # When True makes
@@ -13,7 +15,7 @@ FILER_0_8_COMPATIBILITY_MODE = getattr(settings, 'FILER_0_8_COMPATIBILITY_MODE',
 
 FILER_ENABLE_LOGGING = getattr(settings, 'FILER_ENABLE_LOGGING', False)
 if FILER_ENABLE_LOGGING:
-    FILER_ENABLE_LOGGING = (FILER_ENABLE_LOGGING and (getattr(settings,'LOGGING') and
+    FILER_ENABLE_LOGGING = (FILER_ENABLE_LOGGING and (getattr(settings, 'LOGGING') and
                                                       ('' in settings.LOGGING['loggers'] or
                                                        'filer' in settings.LOGGING['loggers'])))
 
@@ -25,7 +27,7 @@ FILER_STATICMEDIA_PREFIX = getattr(settings, 'FILER_STATICMEDIA_PREFIX', None)
 if not FILER_STATICMEDIA_PREFIX:
     FILER_STATICMEDIA_PREFIX = (getattr(settings, 'STATIC_URL', None) or settings.MEDIA_URL) + 'filer/'
 
-FILER_ADMIN_ICON_SIZES = getattr(settings,"FILER_ADMIN_ICON_SIZES",('32',))
+FILER_ADMIN_ICON_SIZES = getattr(settings, "FILER_ADMIN_ICON_SIZES", ('32',))
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
@@ -221,3 +223,41 @@ CDN_INVALIDATION_TIME = getattr(settings, 'FILER_CDN_INVALIDATION_TIME', 0)
 FILER_TRASH_PREFIX = getattr(settings, 'FILER_TRASH_PREFIX', '_trash')
 # defaults to one day
 FILER_TRASH_CLEAN_INTERVAL = getattr(settings, 'FILER_TRASH_CLEAN_INTERVAL', 60 * 60 * 24)
+
+
+# Roles Manager that controles how the filer checks permissions
+# Must be a callable or a the absolute path of the callable as a string.
+# Calling this manager should return an object that must define these functions:
+#
+# def is_site_admin(user):
+#     """
+#     :param user: django.contrib.auth.models.User to check permissions for
+#     :return: True if the user is an admin on any site, False otherwise
+#     """
+#     pass
+
+# def has_perm_on_site(user, site_id, perm):
+#     """
+#     :param user: django.contrib.auth.models.User to check permissions for
+#     :param site_id: id of django.contrib.sites.models.Site
+#                     on which the user must have the permission
+#     :param perm: full name (<app_label>.<permission>) of the permission, ex: filer.add_file
+#     :return: True if the user has the permission on that site, False otherwise
+#     """
+#     pass
+
+# def get_accessible_sites(user):
+#     """
+#     :return: list of django.contrib.sites.models.Site IDs on which the user has access.
+#     """
+#     pass
+
+# def get_administered_sites(user):
+#     """
+#     :return: list of django.contrib.sites.models.Site objects on which the user has admin access.
+#     """
+#     pass
+
+FILER_ROLES_MANAGER = getattr(settings,
+                              'FILER_ROLES_MANAGER',
+                              'cmsroles.siteadmin.FilerRolesManager')

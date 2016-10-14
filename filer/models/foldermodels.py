@@ -522,15 +522,17 @@ class Folder(models.Model, mixins.IconsMixin):
             self.shared.filter(id__in=get_sites_for_user(user)).exists())
 
     def is_restricted_for_user(self, user):
+        perm = 'filer.can_restrict_operations'
         return (self.restricted and (
-                    not user.has_perm('filer.can_restrict_operations') or
-                    not can_restrict_on_site(user, self.site)))
+            not (user.has_perm(perm, self) or user.has_perm(perm)) or
+            not can_restrict_on_site(user, self.site)))
 
     def can_change_restricted(self, user):
         """
         Checks if restriction operation is available for this folder.
         """
-        if (not user.has_perm('filer.can_restrict_operations') or
+        perm = 'filer.can_restrict_operations'
+        if (not (user.has_perm(perm, self) or user.has_perm(perm)) or
                 not can_restrict_on_site(user, self.site)):
             return False
         if not self.parent:
@@ -556,9 +558,10 @@ class Folder(models.Model, mixins.IconsMixin):
             return True
         # regular users need to have permissions to add folders and
         #   need to have a role over the site owner of the folder
-        if (self.site and user.has_perm('filer.add_folder')
-                and has_role_on_site(user, self.site)):
-            return True
+        if not self.site or not has_role_on_site(user, self.site):
+            return False
+        perm = 'filer.add_folder'
+        return user.has_perm(perm, self.site) or user.has_perm(perm)
 
     def has_change_permission(self, user):
         # nobody can change core folder
@@ -569,13 +572,14 @@ class Folder(models.Model, mixins.IconsMixin):
         if not self.site and has_admin_role(user):
             return True
 
-        if self.site:
-            if not self.parent:
-                # only site admins can change root site folders
-                return has_admin_role_on_site(user, self.site)
-            return (user.has_perm('filer.change_folder') and
-                    has_role_on_site(user, self.site))
-        return False
+        if not self.site:
+            return False
+        if not self.parent:
+            # only site admins can change root site folders
+            return has_admin_role_on_site(user, self.site)
+        perm = 'filer.change_folder'
+        return ((user.has_perm(perm, self.site) or user.has_perm(perm)) and
+                has_role_on_site(user, self.site))
 
     def has_delete_permission(self, user):
         if (self.is_readonly_for_user(user) or
@@ -586,14 +590,14 @@ class Folder(models.Model, mixins.IconsMixin):
         if not self.site and user.is_superuser:
             return True
 
-        if self.site:
-            if not self.parent:
-                # only site admins can delete root site folders
-                return has_admin_role_on_site(user, self.site)
-            return (user.has_perm('filer.delete_folder') and
-                    has_role_on_site(user, self.site))
-
-        return False
+        if not self.site:
+            return False
+        if not self.parent:
+            # only site admins can delete root site folders
+            return has_admin_role_on_site(user, self.site)
+        perm = 'filer.delete_folder'
+        return ((user.has_perm(perm, self.site) or user.has_perm(perm)) and
+                has_role_on_site(user, self.site))
 
     class Meta:
         ordering = ('name',)
