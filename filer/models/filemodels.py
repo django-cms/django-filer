@@ -4,6 +4,8 @@ from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
+import pytz
+from datetime import datetime
 
 from django.conf import settings
 from django.core import urlresolvers
@@ -262,7 +264,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self.file and self.is_public:
             try:
                 url = urlresolvers.reverse('canonical', kwargs={
-                    'uploaded_at': self.uploaded_at.strftime('%s'),
+                    'uploaded_at': int((self.uploaded_at - datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds()),
                     'file_id': self.id
                 })
             except urlresolvers.NoReverseMatch:
