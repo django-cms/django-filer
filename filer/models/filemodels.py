@@ -4,13 +4,13 @@ from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
-import pytz
 from datetime import datetime
 
 from django.conf import settings
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from . import mixins
@@ -259,12 +259,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return r
 
     @property
+    def canonical_time(self):
+        return int((self.uploaded_at - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds())
+
+    @property
     def canonical_url(self):
         url = ''
         if self.file and self.is_public:
             try:
                 url = urlresolvers.reverse('canonical', kwargs={
-                    'uploaded_at': int((self.uploaded_at - datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds()),
+                    'uploaded_at': self.canonical_time,
                     'file_id': self.id
                 })
             except urlresolvers.NoReverseMatch:
