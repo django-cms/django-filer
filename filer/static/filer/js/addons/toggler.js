@@ -3,7 +3,7 @@
 'use strict';
 
 var Cl = window.Cl || {};
-/* global Class */
+/* global Class, django */
 
 (function ($) {
     Cl.Toggler = new Class({
@@ -80,4 +80,4 @@ var Cl = window.Cl || {};
             this.link = null;
         }
     });
-})(jQuery);
+})(django.jQuery);

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.core.files.uploadedfile import SimpleUploadedFile
+from __future__ import absolute_import
+
 from zipfile import ZipFile
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 def unzip(file_obj):

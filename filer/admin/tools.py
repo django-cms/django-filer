@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
+from django.utils.http import urlencode
 
-from filer.utils.compatibility import DJANGO_1_7, DJANGO_1_6
+from ..utils.compatibility import LTE_DJANGO_1_6, LTE_DJANGO_1_7
+
+ALLOWED_PICK_TYPES = ('folder', 'file')
 
 
-if DJANGO_1_6:
+if LTE_DJANGO_1_6:
     def admin_each_context(admin_site, request):
         return {}
-elif DJANGO_1_7:
+elif LTE_DJANGO_1_7:
     def admin_each_context(admin_site, request):
         return admin_site.each_context()
 else:
@@ -54,3 +59,68 @@ def userperms_for_request(item, request):
             if x:
                 r.append(p)
     return r
+
+
+def popup_status(request):
+    return (IS_POPUP_VAR in request.GET or 'pop' in request.GET or
+            IS_POPUP_VAR in request.POST or 'pop' in request.POST)
+
+
+def popup_pick_type(request):
+    # very important to limit the pick_types because the result is marked safe.
+    # (injection attacks)
+    pick_type = request.GET.get('_pick', request.POST.get('_pick'))
+    if pick_type in ALLOWED_PICK_TYPES:
+        return pick_type
+    return None
+
+
+def admin_url_params(request, params=None):
+    """
+    given a request, looks at GET and POST values to determine which params
+    should be added. Is used to keep the context of popup and picker mode.
+    """
+    params = params or {}
+    if popup_status(request):
+        params[IS_POPUP_VAR] = '1'
+    pick_type = popup_pick_type(request)
+    if pick_type:
+        params['_pick'] = pick_type
+    return params
+
+
+def admin_url_params_encoded(request, first_separator='?', params=None):
+    # sorted to make testing easier
+    params = urlencode(
+        sorted(admin_url_params(request, params=params).items())
+    )
+    if not params:
+        return ''
+    return '{0}{1}'.format(first_separator, params)
+
+
+class AdminContext(dict):
+    def __init__(self, request):
+        super(AdminContext, self).__init__()
+        self.update(admin_url_params(request))
+
+    def __missing__(self, key):
+        """
+        Always allow accessing the keys 'popup', 'pick', 'pick_file' and
+        'pick_folder' as keys.
+        """
+        if key == 'popup':
+            return self.get(IS_POPUP_VAR, False) == '1'
+        elif key == 'pick':
+            return self.get('_pick', '')
+        elif key.startswith('pick_'):
+            return self.get('_pick', '') == key.split('pick_')[1]
+
+    def __getattr__(self, name):
+        """
+        Always allow accessing 'popup', 'pick', 'pick_file' and 'pick_folder'
+        as attributes.
+        """
+        if name in ('popup', 'pick') or name.startswith('pick_'):
+            return self.get(name)
+        raise AttributeError

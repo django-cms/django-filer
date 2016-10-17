@@ -8,9 +8,11 @@ local changes:
   or method.
 
 """
+from __future__ import absolute_import
 
 from django.utils import six
-from filer.utils.compatibility import import_module
+
+from .compatibility import import_module
 
 
 def load_object(import_path):

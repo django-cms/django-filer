@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import os
 from tempfile import mkdtemp
 
@@ -18,6 +20,7 @@ HELPER_SETTINGS = {
         'mptt',
         'filer',
         'filer.test_utils.test_app',
+        'filer.test_utils.extended_app',
     ],
     'LANGUAGE_CODE': 'en',
     'LANGUAGES': (
@@ -55,10 +58,8 @@ HELPER_SETTINGS = {
     ),
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'FILER_IMAGE_MODEL': False,
-    'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer',
-                                   'test_utils', 'templates'),),
+    'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'test_utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
-
 }
 if os.environ.get('CUSTOM_IMAGE', False):
     HELPER_SETTINGS['FILER_IMAGE_MODEL'] = os.environ.get('CUSTOM_IMAGE', False)

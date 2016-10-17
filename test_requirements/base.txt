@@ -1,2 +1,1 @@
-Pillow>=2.3,<3.0
-coverage
+Pillow>3.0

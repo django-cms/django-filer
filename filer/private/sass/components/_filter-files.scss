@@ -1,19 +1,51 @@
 //##############################################################################
 // FILTER FILES
 
+.search-is-focused {
+    .filter-files-container {
+        position: static;
+    }
+    .filter-filers-container-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        @media screen and (max-width: $screen-tablet) {
+            position: static;
+        }
+    }
+    .breadcrumbs-container {
+        position: relative;
+    }
+    &.breadcrumb-min-width .filter-filers-container-inner {
+        position: static;
+    }
+}
+
 .filter-files-container {
-    position: absolute;
-    top: 15px;
-    right: 430px;
-    z-index: 1;
+    @include clearfix;
+    display: table-cell;
+    vertical-align: middle;
+    position: relative;
+    width: 245px;
     margin: 0;
     padding: 0;
     background: none;
     box-shadow: none;
-    .dropdown-container {
+    z-index: 1000;
+    @media screen and (max-width: $screen-tablet) {
+        display: block;
+        width: auto;
+        margin-right: 0;
+        margin-top: 10px;
+        .filter-files-button {
+            float: none;
+        }
+    }
+    .filer-dropdown-container {
         position: absolute;
         top: 0;
-        right: 44px;
+        right: 0;
         > a {
             &,
             &:visited,
@@ -27,12 +59,35 @@
                 padding: 0;
             }
         }
+        &.open + .filer-dropdown-menu-checkboxes {
+            display: block;
+            width: calc(100% - 30px);
+            li {
+                margin: 0;
+                padding: 0;
+                list-style-type: none;
+            }
+        }
+    }
+    .filter-search-wrapper {
+        position: relative;
+        float: left;
+        text-align: right;
+        width: calc(100% - 43px);
+        margin-right: 5px;
+        @media screen and (max-width: $screen-tablet) {
+            float: left;
+        }
+        .filer-dropdown-container span {
+            line-height: 34px !important;
+            height: 34px !important;
+        }
     }
     .filter-files-button {
-        position: absolute;
-        top: 0;
-        right: 0;
+        float: right;
         text-align: center;
+        white-space: nowrap;
+        height: 35px;
         margin: 0;
         padding: 8px !important;
         .icon {
@@ -43,60 +98,28 @@
         }
     }
     .filter-files-field {
-        position: absolute;
-        top: 0;
-        right: 43px;
         color: $gray-darkest;
-        font-size: 14px !important;
-        line-height: 34px;
+        font-size: 12px !important;
+        line-height: 35px;
+        font-weight: normal;
         box-sizing: border-box;
-        width: 168px !important;
-        height: 34px;
+        min-width: 200px !important;
+        height: 35px;
         // required for django CMS <= 3.1 #673
         margin: 0;
         padding: 0 35px 0 10px !important;
         outline: none;
-
         appearance: none;
+        transition: max-width $speed-base;
         // disable clear X on IE #690
         &::-ms-clear {
             display: none;
         }
     }
-    .dropdown-menu {
+    .filer-dropdown-menu {
         margin-top: 0 !important;
         margin-right: -1px !important;
     }
-    &.is-focused {
-        left: 55px;
-        .filter-files-field {
-            right: 60px !important;
-            left: 0;
-            width: calc(100% - 43px) !important;
-        }
-    }
-    @media screen and (max-width: $screen-desktop) {
-        right: 260px !important;
-    }
-    @media screen and (max-width: $screen-tablet) {
-        &,
-        &.is-focused {
-            position: relative;
-            top: auto !important;
-            right: auto !important;
-            left: auto !important;
-            height: 34px;
-            margin: 0 20px 0 16px;
-            .filter-files-field {
-                right: 60px !important;
-                left: 0;
-                width: calc(100% - 43px) !important;
-            }
-        }
-    }
-}
-.popup .filter-files-container {
-    right: 260px;
 }
 .filter-files-cancel {
     margin: 5px 20px;

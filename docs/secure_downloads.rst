@@ -23,9 +23,9 @@ that would bypass the permission checks.
 To hook up the view ``filer.server.urls`` needs to be included in the root
 ``urls.py``::
 
-    urlpatterns += patterns('',
+    urlpatterns += [
         url(r'^', include('filer.server.urls')),
-    )
+    ]
 
 Files with restricted permissions need to be placed in a secure storage backend.
 Configure a secure storage backend in :ref:`FILER_STORAGES` or use the default.

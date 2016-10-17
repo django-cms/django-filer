@@ -11,11 +11,7 @@
             {% if ancestor_folder.label %}
                 {{ ancestor_folder.label }}
             {% else %}
-                {% if ancestor_folder.name != "unfiled files" %}
-                    {{ ancestor_folder.name }}
-                {% else %}
-                    {% trans "Unsorted Uploads" %}
-                {% endif %}
+                {{ ancestor_folder.name }}
             {% endif %}
         </a>
     {% endfor %}

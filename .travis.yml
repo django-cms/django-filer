@@ -1,58 +1,65 @@
 language: python
 
-sudo: true
+sudo: false
 
-before_install:
-  - if [[ $TOX_ENV == "frontend" ]]; then sudo chown -R $USER:$USER ~/.npm && sudo apt-get update && sudo apt-get install nodejs npm; fi;
+python: 3.5
 
 install:
   - pip install tox coveralls
+
+branches:
+  only:
+    - master
+    - develop
 
 # Explicit environments list here is a complete list of environments from tox.
 # It is intentionally shortened.
 env:
   - TOX_ENV=flake8
-  - TOX_ENV=py34-django19-thumbs2x
-  - TOX_ENV=py34-django18-thumbs2x
-  - TOX_ENV=py34-django17-thumbs2x
-  - TOX_ENV=py33-django18-thumbs2x
-  - TOX_ENV=py33-django17-thumbs2x
-  - TOX_ENV=py27-django19-thumbs2x
-  - TOX_ENV=py27-django18-thumbs2x
-  - TOX_ENV=py27-django17-thumbs2x
-  - TOX_ENV=py34-django19-custom_image-thumbs2x
-  - TOX_ENV=py34-django18-custom_image-thumbs2x
-  - TOX_ENV=py34-django17-custom_image-thumbs2x
-  - TOX_ENV=py34-django16-custom_image-thumbs2x
-  - TOX_ENV=py33-django18-custom_image-thumbs2x
-  - TOX_ENV=py33-django17-custom_image-thumbs2x
-  - TOX_ENV=py33-django16-custom_image-thumbs2x
-  - TOX_ENV=py27-django19-custom_image-thumbs2x
-  - TOX_ENV=py27-django18-custom_image-thumbs2x
-  - TOX_ENV=py27-django17-custom_image-thumbs2x
-  - TOX_ENV=py27-django16-custom_image-thumbs2x
-  - TOX_ENV=py34-django16-thumbs1x
-  - TOX_ENV=py34-django15-thumbs1x
-  - TOX_ENV=py33-django16-thumbs1x
-  - TOX_ENV=py33-django15-thumbs1x
-  - TOX_ENV=py27-django16-thumbs1x
-  - TOX_ENV=py27-django15-thumbs1x
-  - TOX_ENV=py26-django16-thumbs1x
-  - TOX_ENV=py26-django15-thumbs1x
-#  - TOX_ENV=py34-django_master-thumbs2x
-#  - TOX_ENV=py33-django_master-thumbs2x
-#  - TOX_ENV=py27-django_master-thumbs2x
-  - TOX_ENV=frontend
+
+# python 2.7
+  - TOX_ENV=py27-dj16-thumbs1x
+  - TOX_ENV=py27-dj16-thumbs2x
+  - TOX_ENV=py27-dj17-thumbs2x
+  - TOX_ENV=py27-dj18-thumbs2x
+  - TOX_ENV=py27-dj19-thumbs2x
+  - TOX_ENV=py27-dj110-thumbs2x
+
+# python 3.4
+  - TOX_ENV=py34-dj16-thumbs2x
+  - TOX_ENV=py34-dj17-thumbs2x
+  - TOX_ENV=py34-dj18-thumbs2x
+  - TOX_ENV=py34-dj19-thumbs2x
+  - TOX_ENV=py34-dj110-thumbs2x
+
+# python 3.5
+  - TOX_ENV=py35-dj18-thumbs2x
+  - TOX_ENV=py35-dj19-thumbs2x
+  - TOX_ENV=py35-dj110-thumbs2x
+
+# next Django release
+  - TOX_ENV=py27-djmaster-thumbs2x
+  - TOX_ENV=py34-djmaster-thumbs2x
+  - TOX_ENV=py35-djmaster-thumbs2x
+
+  - TOX_ENV=frontend FE=1
+
+before_script:
+  - if [ "$FE" == 1 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+  - if [ "$FE" == 1 ]; then npm config set spin false; fi
+  - if [ "$FE" == 1 ]; then npm install -g npm@2; fi
+  - if [ "$FE" == 1 ]; then npm install -g gulp@3.9.0; fi
+  - if [ "$FE" == 1 ]; then npm install; fi
 
 script:
   - tox -e $TOX_ENV
 
 after_success:
-  - coveralls --config_file=coverage.rc
+  - coveralls --config_file=.coveragerc
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
 
 matrix:
   allow_failures:
-    - env: TOX_ENV=py34-django_master-thumbs2x
-    - env: TOX_ENV=py33-django_master-thumbs2x
-    - env: TOX_ENV=py27-django_master-thumbs2x
+    - env: TOX_ENV=py27-djmaster-thumbs2x
+    - env: TOX_ENV=py34-djmaster-thumbs2x
+    - env: TOX_ENV=py35-djmaster-thumbs2x

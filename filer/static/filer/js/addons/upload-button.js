@@ -2,12 +2,13 @@
 // This script implements the upload button logic
 'use strict';
 
-/* globals qq, Cl */
+/* globals qq, Cl, django */
 (function ($) {
     $(function () {
         var submitNum = 0;
         var maxSubmitNum = 1;
         var uploadButton = $('.js-upload-button');
+        var uploadButtonDisabled = $('.js-upload-button-disabled');
         var uploadUrl = uploadButton.data('url');
         var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
         var uploadInfoContainer = $('.js-filer-dropzone-upload-info-container');
@@ -27,6 +28,22 @@
         };
         var removeButton = function () {
             uploadButton.remove();
+        };
+        // utility
+        var updateQuery = function (uri, key, value) {
+            var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
+            var separator = uri.indexOf('?') !== -1 ? '&' : '?';
+            var hash = window.location.hash;
+            uri = uri.replace(/#.*$/, '');
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + '=' + value + '$2') + hash;
+            } else {
+                return uri + separator + key + '=' + value + hash;
+            }
+        };
+        var reloadOrdered = function () {
+            var uri = window.location.toString();
+            window.location.replace(updateQuery(uri, 'order_by', '-modified_at'));
         };
 
         Cl.mediator.subscribe('filer-upload-in-progress', removeButton);
@@ -75,7 +92,7 @@
 
                 if (file.error) {
                     hasErrors = true;
-                    window.showError(fileName + ': ' + file.error);
+                    window.filerShowError(fileName + ': ' + file.error);
                 }
 
                 submitNum--;
@@ -91,11 +108,9 @@
                     uploadSuccess.removeClass(hiddenClass);
 
                     if (hasErrors) {
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1000);
+                        setTimeout(reloadOrdered, 1000);
                     } else {
-                        window.location.reload();
+                        reloadOrdered();
                     }
                 }
             }
@@ -112,5 +127,9 @@
                 window.location.reload();
             }, 1000);
         });
+
+        if (uploadButtonDisabled.length) {
+            Cl.filerTooltip($);
+        }
     });
-})(jQuery);
+})(django.jQuery);

@@ -2,12 +2,22 @@
 // DRAG AND DROP
 
 form .form-row {
+    &[class*="file"],
+    &[class*="img"],
+    &[class*="image"],
+    &[class*="visual"] {
+        .related-widget-wrapper-link {
+            display: none;
+        }
+    }
     .filer-dropzone {
+        @include clearfix;
         position: relative;
         min-width: 215px;
         border: solid 1px $gray-lighter;
         border-radius: $border-radius-base;
         background-color: $gray-lightest;
+        box-sizing: border-box !important;
         .z-index-fix {
             position: absolute;
             top: 0;
@@ -16,7 +26,8 @@ form .form-row {
             left: 0;
         }
         &.dz-drag-hover {
-            padding-top: 14px;
+            padding-top: 19px;
+            background-color: $color-primary-light;
             border: solid 2px $color-primary !important;
             .z-index-fix {
                 z-index: 1;
@@ -139,18 +150,18 @@ form .form-row {
         }
         .dz-message {
             float: right;
-            color: $gray;
+            color: $gray-dropzone;
             width: 100%;
-            margin: 48px 0 0;
+            margin: 15px 0 0;
         }
         .icon {
             position: relative;
             top: 3px;
-            color: $gray;
+            color: $gray-dropzone;
             font-size: 24px;
             margin-right: 10px;
         }
-        .related-lookup {
+        .filerFile .related-lookup {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
             overflow: hidden;
             // makes true that button has correct height #668
@@ -159,6 +170,12 @@ form .form-row {
             height: auto !important;
             padding: 10px 20px !important;
             cursor: pointer;
+            .fa {
+                color: white;
+                font-size: 17px;
+                margin: 0 10px 0 0 !important;
+                vertical-align: middle;
+            }
             &:before {
                 display: none;
             }
@@ -170,7 +187,7 @@ form .form-row {
         }
         .filerFile {
             position: absolute;
-            top: 62px;
+            top: 32px;
             // required for django CMS <= 3.1 #673
             left: 20px;
             width: calc(100% - 40px);
@@ -259,14 +276,20 @@ form .form-row {
                 margin-top: 75px;
             }
             &.js-object-attached .filerFile {
-                top: 62px;
+                top: 32px;
                 text-align: left;
                 &.js-file-selector span, .dz-name {
                     width: calc(100% - 100px);
                 }
             }
         }
-        @media screen and (max-width: $screen-tablet) {
+        &.filer-dropzone-folder .filerFile {
+            top: 32px !important;
+            #id_folder_description_txt {
+                float: left;
+            }
+        }
+        @media screen and (max-width: $screen-tablet-filer) {
             .filerFile {
                 top: 40px !important;
                 text-align: center;
@@ -281,14 +304,18 @@ form .form-row {
             &.js-object-attached .filerFile {
                 top: 62px !important;
             }
-        }
-        &.filer-dropzone-folder .filerFile {
-            top: 62px !important;
+            &.filer-dropzone-folder .filerFile {
+                top: 62px !important;
+            }
         }
     }
 }
 
 .filer-dropzone {
+    min-height: 100px !important;
+    @media screen and (max-width: $screen-tablet-filer) {
+        min-height: 150px !important;
+    }
     .dz-upload {
         height: 5px;
         background-color: #0bf;
@@ -308,7 +335,7 @@ form .form-row {
         margin-right: 10px;
         border: solid 1px #ddd;
         border-radius: 3px;
-        background: #fff url("/static/filer/icons/nofile_48x48.png");
+        background: #fff url("../icons/nofile_48x48.png");
         background-size: cover;
         img {
             background: #fff;
@@ -324,7 +351,7 @@ form .form-row {
 
 .filer-dropzone-info-message {
     position: fixed;
-    top: 30%;
+    bottom: 35px;
     left: 50%;
     z-index: 2;
     text-align: center;
@@ -332,15 +359,16 @@ form .form-row {
     max-height: 300px;
     overflow-y: auto;
     margin: -50px 0 0 -150px;
-    padding: 15px;
+    padding: 15px 15px 0;
     border-radius: $border-radius-base;
     background: $white;
     box-shadow: $base-box-shadow;
     .icon {
-        font-size: 30px;
+        font-size: 35px;
+        color: $color-primary;
     }
     .text {
-        margin: 15px 0 10px 0;
+        margin: 5px 0 10px;
     }
 }
 .filer-dropzone-upload-info {
@@ -351,6 +379,9 @@ form .form-row {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    &:empty {
+        margin-top: 0;
+    }
 }
 .filer-dropzone-progress {
     height: 5px;
@@ -359,11 +390,41 @@ form .form-row {
 }
 
 .filer-dropzone-upload-welcome .folder {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    color: $color-primary;
+    padding: 10px 0 0;
+    margin: 0 -15px;
+    border-top: solid 1px $gray-lighter;
+    img,
+    span {
+        vertical-align: middle;
+    }
+    img {
+        margin-right: 5px;
+    }
+    .folder-inner {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 0 10px;
+    }
 }
 
 .filer-dropzone-cancel {
-    margin-top: 15px;
+    padding-top: 10px;
+    border-top: solid 1px $gray-lighter;
+    margin: 15px -15px 10px;
+    a {
+        font-size: $font-size-small;
+        color: $gray !important;
+    }
+}
+.filer-dropzone-upload-success,
+.filer-dropzone-upload-canceled {
+    margin: 0 -15px 10px;
+}
+
+.filer-dropzone-upload-count {
+    padding-bottom: 10px;
+    margin: 10px -15px;
+    border-bottom: solid 1px $gray-lighter;
 }

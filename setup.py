@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from setuptools import setup, find_packages
 import os
+
+from setuptools import find_packages, setup
 
 version = __import__('filer').__version__
 
@@ -25,10 +26,10 @@ setup(
     author_email='stefan@foulis.ch',
     packages=find_packages(),
     install_requires=(
-        'Django>=1.5,<1.9.999',  # Django is known to use rc versions
+        'Django>=1.5,<1.10.999',  # Django is known to use rc versions
         'easy-thumbnails>=1.0,<2.4',
         'django-mptt>=0.6,<0.9',  # the exact version depends on Django
-        'django_polymorphic>=0.7,<0.9',
+        'django_polymorphic>=0.7,<1.1',
         'Unidecode>=0.04,<0.05',
     ),
     include_package_data=True,
@@ -47,9 +48,10 @@ setup(
         'Framework :: Django :: 1.6',
         'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
 )

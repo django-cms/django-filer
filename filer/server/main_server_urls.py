@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls import patterns, url
+from __future__ import absolute_import
+
+from django.conf.urls import url
+
+from . import views
 
 
-urlpatterns = patterns('filer.server.views',
-    url(r'^(?P<path>.*)$', 'serve_protected_file', ),
-)
+urlpatterns = [
+    url(r'^(?P<path>.*)$', views.serve_protected_file),
+]

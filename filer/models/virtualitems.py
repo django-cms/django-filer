@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
 
-from filer import settings as filer_settings
-from filer.models import mixins
-from filer.models.filemodels import File
-from filer.models.foldermodels import Folder
+from . import mixins
+from .. import settings as filer_settings
+from .filemodels import File
+from .foldermodels import Folder
 
 
 class DummyFolder(mixins.IconsMixin):
@@ -44,9 +46,10 @@ class DummyFolder(mixins.IconsMixin):
         return []
 
 
-class UnfiledImages(DummyFolder):
-    name = _("unfiled files")
+class UnsortedImages(DummyFolder):
+    name = _("Unsorted Uploads")
     is_root = True
+    is_unsorted_uploads = True
     _icon = "unfiled_folder"
 
     def _files(self):
@@ -80,7 +83,7 @@ class FolderRoot(DummyFolder):
 
     @property
     def virtual_folders(self):
-        return [UnfiledImages()]
+        return [UnsortedImages()]
 
     @property
     def children(self):

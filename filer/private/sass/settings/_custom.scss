@@ -9,6 +9,7 @@ $black: #000;
 $hover-bg: #f1faff;
 
 $color-primary: #00bbff;
+$color-primary-light: #f1faff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
@@ -22,7 +23,8 @@ $gray-light:      lighten($gray, 20%); // #999
 $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
 
-$gray-table: #f7f7f7;
+$gray-super-light: #f7f7f7;
+$gray-dropzone: #808080;
 
 
 //##############################################################################
@@ -46,13 +48,15 @@ $screen-mobile: 320px;
 $screen-tablet: 720px;
 $screen-desktop: 975px;
 
+$screen-tablet-filer: 810px;
+
 //##############################################################################
 // BUTTONS
 
 $btn-border-radius-base: $border-radius-base;
 $btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
 
-$btn-default-color: #555;
+$btn-default-color: $gray-darker;
 $btn-default-bgcolor: $white;
 $btn-default-border: $gray-lighter;
 
@@ -64,3 +68,4 @@ $btn-action-border: $color-primary;
 // #SHADOW
 
 $base-box-shadow: 0 0 5px 0 rgba($black, 0.2);
+$dropdown-shadow: 0 1px 10px rgba($black, 0.25);

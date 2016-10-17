@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
-import os
+from __future__ import absolute_import
 
+import logging
+import os
+from distutils.version import LooseVersion
+
+from django import get_version
 from django.db import models
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
-from filer import settings as filer_settings
-from filer.models.filemodels import File
-from filer.utils.filer_easy_thumbnails import FilerThumbnailer
-from filer.utils.pil_exif import get_exif_for_file
-
-try:
-    from PIL import Image as PILImage
-except ImportError:
-    try:
-        import Image as PILImage
-    except ImportError:
-        raise ImportError("The Python Imaging Library was not found.")
-
-import logging
+from .. import settings as filer_settings
+from ..utils.compatibility import GTE_DJANGO_1_10, PILImage
+from ..utils.filer_easy_thumbnails import FilerThumbnailer
+from ..utils.pil_exif import get_exif_for_file
+from .filemodels import File
 
 logger = logging.getLogger(__name__)
+
+DJANGO_GTE_17 = LooseVersion(get_version()) >= LooseVersion('1.7.0')
 
 
 class BaseImage(File):
@@ -28,7 +26,7 @@ class BaseImage(File):
     DEFAULT_THUMBNAILS = {
         'admin_clipboard_icon': {'size': (32, 32), 'crop': True,
                                  'upscale': True},
-        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH, 10000)},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH, 10000), 'upscale': True},
         'admin_directory_listing_icon': {'size': (48, 48),
                                          'crop': True, 'upscale': True},
         'admin_tiny_icon': {'size': (32, 32), 'crop': True, 'upscale': True},
@@ -42,8 +40,11 @@ class BaseImage(File):
     default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
     default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
 
-    subject_location = models.CharField(_('subject location'), max_length=64, null=True, blank=True,
-                                        default=None)
+    subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
+                                        default='')
+    if DJANGO_GTE_17:
+        file_ptr = models.OneToOneField(to='filer.File', related_name='%(app_label)s_%(class)s_file',
+                                        on_delete=models.CASCADE)
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -174,3 +175,5 @@ class BaseImage(File):
         verbose_name = _('image')
         verbose_name_plural = _('images')
         abstract = True
+        if GTE_DJANGO_1_10:
+            default_manager_name = 'objects'

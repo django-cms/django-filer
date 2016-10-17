@@ -5,8 +5,12 @@
     {{ block.super }}
 
     {# upload stuff #}
+    <script type="text/javascript">
+        var __jQuery = django.jQuery;
+        window.jQuery = (__jQuery) ? __jQuery : window.jQuery || undefined;
+        window.$ = window.jQuery;
+    </script>
     <script src="{% static 'filer/js/libs/class.min.js' %}"></script>
-    <script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/jquery-ui.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/jquery.cookie.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/fileuploader.min.js' %}"></script>
@@ -17,21 +21,24 @@
     <script src="{% static 'filer/js/addons/focal-point.js' %}"></script>
     <script src="{% static 'filer/js/addons/toggler.js' %}"></script>
     <script src="{% static 'filer/js/base.js' %}"></script>
+    <script type="text/javascript">
+        var __jQuery;
+        var __$;
+        // reassign jQuery if jQuery is already loaded
+        __jQuery = (window.jQuery) ? window.jQuery.noConflict(true) : undefined;
+        __$ = __jQuery;
+    </script>
 {% endblock %}
+
 
 {% block object-tools %}
-  {% if change and not is_popup %}
-    <ul class="object-tools">
-        <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-        {% if has_absolute_url %}
-            <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
-        {% endif%}
-    </ul>
-  {% endif %}
-{% endblock %}
-
-{% block content %}
+    {% if change and not is_popup %}
+        <ul class="object-tools">
+            <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+            {% if has_absolute_url %}
+                <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
+            {% endif%}
+        </ul>
+    {% endif %}
     {% include "admin/filer/tools/detail_info.html" with detail=True file=True %}
-    {{ block.super }}
 {% endblock %}
-

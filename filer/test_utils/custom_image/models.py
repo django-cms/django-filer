@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 from django.db import models
 
-from filer.models.abstract import BaseImage
+from ...models.abstract import BaseImage
 
 
 class Image(BaseImage):

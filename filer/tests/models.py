@@ -1,11 +1,26 @@
 #-*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
+
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
+
+from .. import settings as filer_settings
+from ..models.clipboardmodels import Clipboard
+from ..models.filemodels import File
+from ..models.foldermodels import Folder
+from ..models.imagemodels import Image
+from ..models.mixins import IconsMixin
+from ..test_utils import ET_2
+from .helpers import (
+    create_clipboard_item,
+    create_folder_structure,
+    create_image,
+    create_superuser,
+)
 
 try:
     from unittest import skipIf, skipUnless
@@ -13,14 +28,6 @@ except ImportError:
     # Django<1.9
     from django.utils.unittest import skipIf, skipUnless
 
-from filer.models.foldermodels import Folder
-from filer.models.imagemodels import Image
-from filer.models.filemodels import File
-from filer.models.clipboardmodels import Clipboard
-from filer.test_utils import ET_2
-from filer.tests.helpers import (create_superuser, create_folder_structure,
-                                 create_image, create_clipboard_item)
-from filer import settings as filer_settings
 
 
 class FilerApiTests(TestCase):
@@ -100,6 +107,19 @@ class FilerApiTests(TestCase):
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
                              file_basename + '__%sx%s_q85_crop_subsampling-2_upscale.jpg' % (size, size))
+
+    def test_access_icons_property(self):
+        """Test IconsMixin that calls static on a non-existent file"""
+
+        class CustomObj(IconsMixin, object):
+            _icon = 'custom'
+
+        custom_obj = CustomObj()
+        try:
+            icons = custom_obj.icons
+        except Exception as e:
+            self.fail("'.icons' access raised Exception {0} unexpectedly!".format(e))
+        self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
 
     def test_file_upload_public_destination(self):
         """
@@ -288,4 +308,3 @@ class FilerApiTests(TestCase):
         image.save()
         canonical = image.canonical_url
         self.assertTrue(canonical.startswith('/filer/test-path/'))
-

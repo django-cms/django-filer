@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
+from datetime import datetime
 
-from django.core import urlresolvers
 from django.conf import settings
+from django.core import urlresolvers
 from django.core.files.base import ContentFile
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+from . import mixins
+from .. import settings as filer_settings
+from ..fields.multistorage_file import MultiStorageFileField
+from ..utils.compatibility import LTE_DJANGO_1_7, python_2_unicode_compatible
+from .foldermodels import Folder
 
 try:
     from polymorphic.models import PolymorphicModel
@@ -17,12 +25,6 @@ try:
 except ImportError:
     # django-polymorphic < 0.8
     from polymorphic import PolymorphicModel, PolymorphicManager
-
-from filer import settings as filer_settings
-from filer.fields.multistorage_file import MultiStorageFileField
-from filer.models import mixins
-from filer.models.foldermodels import Folder
-from filer.utils.compatibility import python_2_unicode_compatible, DJANGO_1_7
 
 
 class FileManager(PolymorphicManager):
@@ -59,7 +61,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         verbose_name=_('description'))
 
     owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
-        related_name='owned_%(class)ss',
+        related_name='owned_%(class)ss', on_delete=models.SET_NULL,
         null=True, blank=True, verbose_name=_('owner'))
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
@@ -224,14 +226,13 @@ class File(PolymorphicModel, mixins.IconsMixin):
             text = "%s" % (self.name,)
         return text
 
-    def get_admin_url_path(self):
-        if DJANGO_1_7:
+    def get_admin_change_url(self):
+        if LTE_DJANGO_1_7:
             model_name = self._meta.module_name
         else:
             model_name = self._meta.model_name
         return urlresolvers.reverse(
-            'admin:%s_%s_change' % (self._meta.app_label,
-                                    model_name,),
+            'admin:{0}_{1}_change'.format(self._meta.app_label, model_name),
             args=(self.pk,)
         )
 
@@ -258,12 +259,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return r
 
     @property
+    def canonical_time(self):
+        return int((self.uploaded_at - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds())
+
+    @property
     def canonical_url(self):
         url = ''
         if self.file and self.is_public:
             try:
                 url = urlresolvers.reverse('canonical', kwargs={
-                    'uploaded_at': self.uploaded_at.strftime('%s'),
+                    'uploaded_at': self.canonical_time,
                     'file_id': self.id
                 })
             except urlresolvers.NoReverseMatch:
@@ -295,8 +300,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         Folder object
         """
         if not self.folder:
-            from filer.models.virtualitems import UnfiledImages
-            return UnfiledImages()
+            from .virtualitems import UnsortedImages
+            return UnsortedImages()
         else:
             return self.folder
 

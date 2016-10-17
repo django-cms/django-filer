@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
+import mptt
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
@@ -11,11 +12,9 @@ from django.db.models import Q
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
-from filer.models import mixins
-from filer import settings as filer_settings
-from filer.utils.compatibility import python_2_unicode_compatible
-
-import mptt
+from . import mixins
+from .. import settings as filer_settings
+from ..utils.compatibility import python_2_unicode_compatible
 
 
 class FolderManager(models.Manager):
@@ -105,7 +104,7 @@ class Folder(models.Model, mixins.IconsMixin):
     name = models.CharField(_('name'), max_length=255)
 
     owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=('owner'),
-                              related_name='filer_owned_folders',
+                              related_name='filer_owned_folders', on_delete=models.SET_NULL,
                               null=True, blank=True)
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
@@ -198,7 +197,7 @@ class Folder(models.Model, mixins.IconsMixin):
                     self.permission_cache[permission_type] = self.id in permission
             return self.permission_cache[permission_type]
 
-    def get_admin_url_path(self):
+    def get_admin_change_url(self):
         return urlresolvers.reverse('admin:filer_folder_change',
                                     args=(self.id,))
 
@@ -267,7 +266,7 @@ class FolderPermission(models.Model):
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
-                             related_name="filer_folder_permissions",
+                             related_name="filer_folder_permissions", on_delete=models.SET_NULL,
                              verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(auth_models.Group,
                               related_name="filer_folder_permissions",
