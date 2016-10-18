@@ -360,8 +360,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder_files.sort()
 
         items = folder_children + folder_files
-        items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
-        paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
+        paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:

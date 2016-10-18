@@ -36,7 +36,7 @@
                     </td>
                 </tr>
             {% endfor %}
-            {% for item, item_perms in paginated_items.object_list %}
+            {% for item in paginated_items.object_list %}
                 {% if item.file_type == "Folder" %}
                     {% with item as subfolder %}
                         <tr class="js-filer-dropzone js-filer-dropzone-folder" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
@@ -85,6 +85,7 @@
                     {% endwith %}
                 {% else %}
                     {% with item as file %}
+                        {% filer_has_permission item 'edit' as has_change_permission %}
                         <tr>
                             <td class="column-checkbox">
                                 {% if is_popup and filer_admin_context.pick_file %}
@@ -98,12 +99,12 @@
                                 {% if is_popup and filer_admin_context.pick_file %}
                                     <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"
                                         title="{% trans 'Select this file' %}">
-                                {% elif item_perms.change %}
+                                {% elif has_change_permission %}
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                             title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                 {% endif %}
                                     <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
-                                {% if item_perms.change or is_popup and filer_admin_context.pick_file %}
+                                {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                     </a>
                                 {% endif %}
                             </td>
@@ -113,12 +114,12 @@
                                         {% if is_popup and filer_admin_context.pick_file %}
                                             <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"
                                                 title="{% trans 'Select this file' %}">
-                                        {% elif item_perms.change %}
+                                        {% elif has_change_permission %}
                                             <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                                 title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                         {% endif %}
                                         {{ file.label }}
-                                        {% if item_perms.change or is_popup and filer_admin_context.pick_file %}
+                                        {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                             </a>
                                         {% endif %}
                                     </strong>
