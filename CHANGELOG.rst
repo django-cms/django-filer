@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Revision df5e50f (18.10.2016, 07:43 UTC)
+----------------------------------------
+
+* LUN-3289
+
+  * Rework permission checking to work with multiple managers.
+
+No other commits.
+
 Revision b5b4b34 (10.10.2016, 08:26 UTC)
 ----------------------------------------
 
