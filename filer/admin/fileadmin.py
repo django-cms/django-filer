@@ -96,7 +96,9 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
+        info = self.model._meta.app_label, self.model._meta.model_name
         extra_context = {'show_delete': True,
+                         'history_url': 'admin:%s_%s_history' % info,
                          'is_popup': popup_status(request),
                          'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
