@@ -264,6 +264,7 @@ form .form-row {
             }
         }
         &.filer-dropzone-mobile {
+            @include clearfix;
             .filerFile {
                 top: 40px;
                 text-align: center;
