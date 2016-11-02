@@ -43,6 +43,8 @@ class FileManager(PolymorphicManager):
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
+    _file_data_changed_hint = None
+
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
         null=True, blank=True)
     file = MultiStorageFileField(_('file'), null=True, blank=True, max_length=255)
@@ -90,9 +92,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
         field value is changed.
         Returns True if data related attributes were updated, False otherwise.
         """
-        if hasattr(self, '_file_data_changed_hint'):
-            data_changed_hint = getattr(self, '_file_data_changed_hint')
-            delattr(self, '_file_data_changed_hint')
+        if self._file_data_changed_hint is not None:
+            data_changed_hint = self._file_data_changed_hint
+            self._file_data_changed_hint = None
             if not data_changed_hint:
                 return False
         if post_init and self._file_size and self.sha1:
