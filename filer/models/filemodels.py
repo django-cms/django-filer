@@ -45,6 +45,8 @@ class FileManager(PolymorphicManager):
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
+    _file_data_changed_hint = None
+
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
         null=True, blank=True)
     file = MultiStorageFileField(_('file'), null=True, blank=True, max_length=255)
@@ -83,6 +85,35 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self._old_is_public = self.is_public
+        self.file_data_changed(post_init=True)
+
+    def file_data_changed(self, post_init=False):
+        """
+        This is called whenever self.file changes (including initial set in __init__).
+        MultiStorageFileField has a custom descriptor which calls this function when
+        field value is changed.
+        Returns True if data related attributes were updated, False otherwise.
+        """
+        if self._file_data_changed_hint is not None:
+            data_changed_hint = self._file_data_changed_hint
+            self._file_data_changed_hint = None
+            if not data_changed_hint:
+                return False
+        if post_init and self._file_size and self.sha1:
+            # When called from __init__, only update if values are empty.
+            # This makes sure that nothing is done when instantiated from db.
+            return False
+        # cache the file size
+        try:
+            self._file_size = self.file.size
+        except:
+            self._file_size = None
+        # generate SHA1 hash
+        try:
+            self.generate_sha1()
+        except Exception:
+            self.sha1 = ''
+        return True
 
     def _move_file(self):
         """
@@ -109,6 +140,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # open the file.
         src_file = src_storage.open(src_file_name)
         src_file.open()
+        # hint file_data_changed callback that data is actually unchanged
+        self._file_data_changed_hint = False
         self.file = dst_storage.save(dst_file_name,
             ContentFile(src_file.read()))
         src_storage.delete(src_file_name)
@@ -155,21 +188,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
             pass
         elif issubclass(self.__class__, File):
             self._file_type_plugin_name = self.__class__.__name__
-        # cache the file size
-        # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
-        try:
-            self._file_size = self.file.size
-        except:
-            pass
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
-        # generate SHA1 hash
-        # TODO: only do this if needed (depending on the storage backend the whole file will be downloaded)
-        try:
-            self.generate_sha1()
-        except Exception:
-            pass
         super(File, self).save(*args, **kwargs)
     save.alters_data = True
 

@@ -56,15 +56,21 @@ class BaseImage(File):
         iext = os.path.splitext(iname)[1].lower()
         return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
+    def file_data_changed(self, post_init=False):
+        attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
+        if attrs_updated:
+            # update image dimensions
+            try:
+                self.file.seek(0)
+                self._width, self._height = PILImage.open(self.file).size
+                self.file.seek(0)
+            except Exception:
+                # probably the image is missing. nevermind.
+                self._width, self._height = None, None
+        return attrs_updated
+
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        try:
-            # do this more efficient somehow?
-            self.file.seek(0)
-            self._width, self._height = PILImage.open(self.file).size
-        except Exception:
-            # probably the image is missing. nevermind.
-            pass
         super(BaseImage, self).save(*args, **kwargs)
 
     def _check_validity(self):
