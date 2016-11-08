@@ -21,10 +21,10 @@
             {% if object %}
                 {% if object.icons.32 %}
                     <a href="{{ object.url }}" target="_blank"><img class="thumbnail_img" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
-                    &nbsp;<span class="description_text">{{ object.label }}</span>
+                    &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
                 {% else %}
                     <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
-                    &nbsp;<span class="description_text">{% trans 'file missing' %}</span>
+                    &nbsp;<span class="description_text" title="{% trans 'file missing' %}">{% trans 'file missing' %}</span>
                 {% endif %}
             {% else %}
                 <img class="thumbnail_img hidden quiet" alt="{% trans 'no file selected' %}">
