@@ -11,6 +11,7 @@ CHANGELOG
 * Fixed dropzones in inlines not initializing in Django < 1.9
 * Added an action button to the directory listings to download files
 * Added support for Django 1.10
+* Fixed an issue whereas the CSS was compiled incorrectly
 
 
 1.2.5 (2016-09-05)
