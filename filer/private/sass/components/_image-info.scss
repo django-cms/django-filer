@@ -34,9 +34,14 @@
         margin-bottom: 20px;
         padding: 25px;
         border-radius: 0;
-        // fixes object tools placement on image detail page
+        // removes background color and shadow from object tools and fixes placement on image detail page
         + #content-main .object-tools {
-            top: -310px;
+            margin-top: 20px;
+            margin-right: 20px;
+            background-color: transparent;
+            &:before {
+                display: none;
+            }
         }
         .image-details-left {
             float: left;
