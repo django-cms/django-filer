@@ -36,11 +36,6 @@
                 <span class="fa fa-picture-o"></span>{% trans 'Choose File' %}
             </a>
 
-             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if not object %}hidden{% endif %} lookup" id="{{ id }}_lookup_edit"
-               title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                <span class="fa fa-edit"></span>{% trans 'Change File' %}
-            </a>
-
             <img class="filerClearer {% if not object %}hidden{% endif %}" src="{% static admin_icon_delete %}"
                  width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
                  data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
