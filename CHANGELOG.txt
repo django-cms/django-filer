@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.2.6 (xxxx-xx-xx)
+------------------
+
+* Fixes object tools placement on image detail page and removed background color and shadow
+
 
 1.2.5 (2016-09-05)
 ------------------
