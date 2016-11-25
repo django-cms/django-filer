@@ -14,6 +14,7 @@ CHANGELOG
 * Added title attribute to the file name
 * Fixed an issue whereas the CSS was compiled incorrectly
 * Fixed an issue where links failed to open from django CMS sideframe
+* Fixes object tools placement on image detail page and removed background color and shadow
 * Added edit button to image widget
 
 
