@@ -1,9 +1,19 @@
 CHANGELOG
 =========
 
-1.2.6 (xxxx-xx-xx)
+1.2.6 (unreleased)
 ------------------
 
+* Fixed markup issue with editing file in admin
+* Fixed error message not always showing up properly
+* Added generate thumbnails management command
+* Fixed dropzone styles on smaller widths
+* Fixed dropzones in inlines not initializing in Django < 1.9
+* Added an action button to the directory listings to download files
+* Added support for Django 1.10
+* Added title attribute to the file name
+* Fixed an issue whereas the CSS was compiled incorrectly
+* Fixed an issue where links failed to open from django CMS sideframe
 * Fixes object tools placement on image detail page and removed background color and shadow
 
 
