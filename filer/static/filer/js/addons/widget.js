@@ -16,7 +16,7 @@ django.jQuery(function ($) {
         input.val('');
         thumbnail.addClass(hiddenClass);
         thumbnail.parent('a').removeAttr('href');
-        addImageButton.removeClass(hiddenClass);
+        addImageButton.removeClass('related-lookup-change');
         dropzoneMessage.removeClass(hiddenClass);
         description.empty();
     };
