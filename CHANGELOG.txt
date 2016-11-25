@@ -16,6 +16,7 @@ CHANGELOG
 * Fixed an issue where links failed to open from django CMS sideframe
 * Fixes object tools placement on image detail page and removed background color and shadow
 * Added edit button to image widget
+* Removed arrow in breadcrumbs if no folder or name follows
 
 
 1.2.5 (2016-09-05)
