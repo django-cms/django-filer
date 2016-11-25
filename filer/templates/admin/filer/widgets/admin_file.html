@@ -31,14 +31,15 @@
                 &nbsp;<span class="description_text"></span>
             {% endif %}
 
-            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}hidden{% endif %} lookup" id="{{ id }}_lookup"
-               title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
-                <span class="fa fa-picture-o"></span>{% trans 'Choose File' %}
-            </a>
-
             <img class="filerClearer {% if not object %}hidden{% endif %}" src="{% static admin_icon_delete %}"
                  width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
                  data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
+
+            <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
+               title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+                <span class="choose-file"><span class="fa fa-picture-o"></span>{% trans 'Choose File' %}</span>
+                <span class="edit-file"><span class="fa fa-pencil"></span></span>
+            </a>
 
             <br>
 
