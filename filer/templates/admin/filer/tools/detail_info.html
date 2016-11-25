@@ -1,11 +1,9 @@
 {% load i18n staticfiles %}
 {% if detail %}
     <section class="image-info image-info-detail">
-        {% if original.original_filename %}
-            <div class="image-info-title">
-                <span class="icon fa {% if file %}fa-file{% else %}fa-file-image-o{% endif %}"></span> {{ original.original_filename }}
-            </div>
-        {% endif %}
+        <div class="image-info-title">
+            <span class="icon fa {% if file %}fa-file{% else %}fa-file-image-o{% endif %}"></span> {{ original }}
+        </div>
         <div class="image-details-left">
             <div class="image-preview-container">
                 {% if file %}

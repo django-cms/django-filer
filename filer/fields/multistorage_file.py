@@ -7,6 +7,7 @@ import warnings
 from io import BytesIO
 
 from django.core.files.base import ContentFile
+from django.db.models.fields.files import FileDescriptor
 from django.utils import six
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
@@ -38,6 +39,32 @@ def generate_filename_multistorage(instance, filename):
         return upload_to(instance, filename)
     else:
         return upload_to
+
+
+class MultiStorageFileDescriptor(FileDescriptor):
+    """
+    This is rather similar to Django's ImageFileDescriptor.
+    It calls <field name>_data_changed on model instance when new
+    value is set. The callback is suposed to update fields which
+    are related to file data (like size, checksum, etc.).
+    When this is called from model __init__ (prev_assigned=False),
+    it does nothing because related fields might not have values yet.
+    In such case data_changed callback should be called at the end of model __init__
+    (File.__init__ in this case).
+    """
+    def __set__(self, instance, value):
+        prev_assigned = self.field.name in instance.__dict__
+        previous_file = instance.__dict__.get(self.field.name)
+        super(MultiStorageFileDescriptor, self).__set__(instance, value)
+
+        # To prevent recalculating file data related attributes when we are instantiating
+        # an object from the database, update only if the field had a value before this assignment.
+        # To prevent recalculating upon reassignment of the same file, update only if value is
+        # different than the previous one.
+        if prev_assigned and value != previous_file:
+            callback_attr = '{}_data_changed'.format(self.field.name)
+            if hasattr(instance, callback_attr):
+                getattr(instance, callback_attr)()
 
 
 class MultiStorageFieldFile(ThumbnailerNameMixin,
@@ -97,6 +124,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
+    descriptor_class = MultiStorageFileDescriptor
 
     def __init__(self, verbose_name=None, name=None,
                  storages=None, thumbnail_storages=None, thumbnail_options=None, **kwargs):
