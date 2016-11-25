@@ -14,6 +14,7 @@ CHANGELOG
 * Added title attribute to the file name
 * Fixed an issue whereas the CSS was compiled incorrectly
 * Fixed an issue where links failed to open from django CMS sideframe
+* Added edit button to image widget
 
 
 1.2.5 (2016-09-05)
