@@ -15,6 +15,7 @@ CHANGELOG
 * Fixed an issue whereas the CSS was compiled incorrectly
 * Fixed an issue where links failed to open from django CMS sideframe
 * Fixes object tools placement on image detail page and removed background color and shadow
+* Added edit button to image widget
 
 
 1.2.5 (2016-09-05)

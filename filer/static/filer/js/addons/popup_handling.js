@@ -22,7 +22,7 @@
         image.attr('src', chosenThumbnailUrl).removeClass('hidden');
         descriptionText.text(chosenDescriptionTxt);
         clearer.removeClass('hidden');
-        lookup.addClass('hidden');
+        lookup.addClass('related-lookup-change');
         dropzoneMessage.addClass('hidden');
 
         if (oldId !== chosenId) {
