@@ -191,8 +191,7 @@ form .form-row {
             &.related-lookup-change {
                 @include button-variant($btn-default-color, white, $btn-default-border, true);
                 float: right !important;
-                padding-right: 0 !important;
-                padding-left: 0 !important;
+                padding: 5px 0 !important;
                 width: 36px !important;
                 height: 36px !important;
                 &:focus {
