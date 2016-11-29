@@ -19,7 +19,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_text
 from django.utils.html import escape
-from django.utils.http import urlquote
+from django.utils.http import urlquote, urlunquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy, ungettext
@@ -287,7 +287,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # search
         q = request.GET.get('q', None)
         if q:
-            search_terms = unquote(q).split(" ")
+            search_terms = urlunquote(q).split(" ")
             search_mode = True
         else:
             search_terms = []
