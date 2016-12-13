@@ -141,9 +141,9 @@ class FilerFileField(models.ForeignKey):
     default_form_class = AdminFileFormField
     default_model_class = File
 
-    def __init__(self, **kwargs):
+    def __init__(self, to=None, *args, **kwargs):
         kwargs['to'] = get_model_label(self.default_model_class)
-        super(FilerFileField, self).__init__(**kwargs)
+        super(FilerFileField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
