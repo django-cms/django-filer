@@ -887,6 +887,29 @@ class FolderListingTest(TestCase):
         folder_qs = folderadmin.filter_folder(Folder.objects.all(), ['joe@mata.com'])
         self.assertEqual(len(folder_qs), 0)
 
+    def test_search_special_characters(self):
+        """ 
+        Regression test for https://github.com/divio/django-filer/pull/945.
+        Because of a wrong unquoting function being used, searches with 
+        some "_XX" sequences got unquoted as unicode characters.
+        For example, "_ec" gets unquoted as u'ì'.
+        """
+        url = reverse('admin:filer-directory_listing',
+                      kwargs={'folder_id': self.parent.id})
+
+        # Create a file with a problematic filename
+        problematic_file = django.core.files.base.ContentFile('some data')
+        filename = u'christopher_eccleston'
+        problematic_file.name = filename
+        self.spam_file = File.objects.create(
+            owner=self.staff_user, original_filename=filename,
+            file=problematic_file, folder=self.parent)
+
+        # Valid search for the filename, should have one result
+        response = self.client.get(url, {'q': filename})
+        item_list = response.context['paginated_items'].object_list
+        self.assertEqual(len(item_list), 1)
+
 
 class FilerAdminContextTests(TestCase, BulkOperationsMixin):
     def setUp(self):
