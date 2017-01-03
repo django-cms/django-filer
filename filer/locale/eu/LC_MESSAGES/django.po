@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-30 20:28-0400\n"
-"PO-Revision-Date: 2016-08-31 00:28+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2017-01-03 16:08+0100\n"
+"PO-Revision-Date: 2017-01-03 15:08+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Basque (http://www.transifex.com/divio/django-filer/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,111 +20,111 @@ msgstr ""
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:168
+#: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:166
 msgid "Advanced"
 msgstr "Aurreratua"
 
-#: admin/fileadmin.py:163
+#: admin/fileadmin.py:165
 msgid "canonical URL"
 msgstr ""
 
-#: admin/folderadmin.py:387 admin/folderadmin.py:554
+#: admin/folderadmin.py:386 admin/folderadmin.py:553
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "Elementuak hautatu behar dira beraiekin zeozer egiteko. Ez da elementurik aldatu."
 
-#: admin/folderadmin.py:407
+#: admin/folderadmin.py:406
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "bat haututa"
 msgstr[1] "%(total_count)s hautatuta"
 
-#: admin/folderadmin.py:446
+#: admin/folderadmin.py:445
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s-(e)tik 0 hautatuta"
 
-#: admin/folderadmin.py:584
+#: admin/folderadmin.py:583
 msgid "No action selected."
 msgstr "Ez da ekintzarik hautatu"
 
-#: admin/folderadmin.py:629
+#: admin/folderadmin.py:628
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "%(count)d fitxategi arbelera mugituta."
 
-#: admin/folderadmin.py:635
+#: admin/folderadmin.py:634
 msgid "Move selected files to clipboard"
 msgstr "Hautatutako fitxategiak arbelara mugitu"
 
-#: admin/folderadmin.py:673
+#: admin/folderadmin.py:672
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "%(count)d fitxategientzako baimenak ezgaituta."
 
-#: admin/folderadmin.py:675
+#: admin/folderadmin.py:674
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "%(count)d fitxategientzako baimenak gaituta."
 
-#: admin/folderadmin.py:684
+#: admin/folderadmin.py:683
 msgid "Enable permissions for selected files"
 msgstr "Hautatutako fitxategientzako baimenak gaitu"
 
-#: admin/folderadmin.py:691
+#: admin/folderadmin.py:690
 msgid "Disable permissions for selected files"
 msgstr "Hautatutako fitxategientzako baimenak ezgaitu"
 
-#: admin/folderadmin.py:756
+#: admin/folderadmin.py:755
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "%(count)d fitxategi eta/edo karpeta ezabatuta."
 
-#: admin/folderadmin.py:761
+#: admin/folderadmin.py:760
 msgid "Cannot delete files and/or folders"
 msgstr "Ezin dira fitxategia eta/edo karpetak ezabatu"
 
-#: admin/folderadmin.py:763
+#: admin/folderadmin.py:762
 msgid "Are you sure?"
 msgstr "Ziur zaude?"
 
-#: admin/folderadmin.py:769
+#: admin/folderadmin.py:768
 msgid "Delete files and/or folders"
 msgstr "Ezabatu fitxategi eta/edo karpetak"
 
-#: admin/folderadmin.py:791
+#: admin/folderadmin.py:790
 msgid "Delete selected files and/or folders"
 msgstr "Ezabatu hautatutako fitxategi eta/edo karpetak"
 
-#: admin/folderadmin.py:906
+#: admin/folderadmin.py:905
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr ""
 
-#: admin/folderadmin.py:910
+#: admin/folderadmin.py:909
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "%(count)d fitxategi eta/edo karpeta '%(destination)s' karpetara mugituta."
 
-#: admin/folderadmin.py:918 admin/folderadmin.py:920
+#: admin/folderadmin.py:917 admin/folderadmin.py:919
 msgid "Move files and/or folders"
 msgstr "Fitxategi eta/edo karpetak mugitu"
 
-#: admin/folderadmin.py:935
+#: admin/folderadmin.py:934
 msgid "Move selected files and/or folders"
 msgstr "Hautatutako fitxategi eta/edo karpetak mugitu"
 
-#: admin/folderadmin.py:992
+#: admin/folderadmin.py:991
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "%(count)d fitxategi berrizendatuta."
 
-#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
-#: admin/folderadmin.py:1018
+#: admin/folderadmin.py:1000 admin/folderadmin.py:1002
+#: admin/folderadmin.py:1017
 msgid "Rename files"
 msgstr "Fitxategiak berrizendatu"
 
@@ -143,16 +143,16 @@ msgstr "Fitxategi eta/edo karpetak kopiatu"
 msgid "Copy selected files and/or folders"
 msgstr "Hautatutako fitxategi eta/edo karpetak kopiatu"
 
-#: admin/folderadmin.py:1252
+#: admin/folderadmin.py:1254
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "%(count)d irudien tamaina aldatuta."
 
-#: admin/folderadmin.py:1259 admin/folderadmin.py:1261
+#: admin/folderadmin.py:1261 admin/folderadmin.py:1263
 msgid "Resize images"
 msgstr "Irudien tamaina aldatu"
 
-#: admin/folderadmin.py:1277
+#: admin/folderadmin.py:1279
 msgid "Resize selected images"
 msgstr "Hautatutako irudien tamaina aldatu"
 
@@ -205,7 +205,7 @@ msgstr "Argazkitxo aukerak edo tamaina aldatzeko parametroak zehaztu behar dira.
 msgid "Resize parameters must be choosen."
 msgstr "Tamaina aldatzeko parametroak zehaztu behar dira."
 
-#: admin/imageadmin.py:16
+#: admin/imageadmin.py:16 admin/imageadmin.py:94
 msgid "Subject location"
 msgstr "Subjektuaren kokapena"
 
@@ -252,11 +252,11 @@ msgstr "defektuzko epigrafea"
 msgid "subject location"
 msgstr "subjektuaren kokapena"
 
-#: models/abstract.py:175 models/imagemodels.py:31
+#: models/abstract.py:181 models/imagemodels.py:32
 msgid "image"
 msgstr "irudia"
 
-#: models/abstract.py:176 models/imagemodels.py:32
+#: models/abstract.py:182 models/imagemodels.py:33
 msgid "images"
 msgstr "irudiak"
 
@@ -264,7 +264,7 @@ msgstr "irudiak"
 msgid "user"
 msgstr "erabiltzailea"
 
-#: models/clipboardmodels.py:19 models/filemodels.py:321
+#: models/clipboardmodels.py:19 models/filemodels.py:351
 msgid "files"
 msgstr "fitxategiak"
 
@@ -276,8 +276,8 @@ msgstr "arbela"
 msgid "clipboards"
 msgstr "arbelak"
 
-#: models/clipboardmodels.py:42 models/filemodels.py:48
-#: models/filemodels.py:320
+#: models/clipboardmodels.py:42 models/filemodels.py:52
+#: models/filemodels.py:350
 msgid "file"
 msgstr "fitxategia"
 
@@ -289,55 +289,55 @@ msgstr "arbeleko elementua"
 msgid "clipboard items"
 msgstr "arbeleko elementuak"
 
-#: models/filemodels.py:46 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:116
+#: models/filemodels.py:50 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:118
 #: templates/admin/filer/folder/new_folder_form.html:5
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
 msgstr "karpeta"
 
-#: models/filemodels.py:49
+#: models/filemodels.py:53
 msgid "file size"
 msgstr "fitxategi tamaina"
 
-#: models/filemodels.py:51
+#: models/filemodels.py:55
 msgid "sha1"
 msgstr "sha1"
 
-#: models/filemodels.py:53
+#: models/filemodels.py:57
 msgid "has all mandatory data"
 msgstr "beharrezko datu guztiak ditu"
 
-#: models/filemodels.py:55
+#: models/filemodels.py:59
 msgid "original filename"
 msgstr "jatorrizko fitxategi izena"
 
-#: models/filemodels.py:57 models/foldermodels.py:104
+#: models/filemodels.py:61 models/foldermodels.py:104
 #: models/thumbnailoptionmodels.py:14
 msgid "name"
 msgstr "izena"
 
-#: models/filemodels.py:59
+#: models/filemodels.py:63
 msgid "description"
 msgstr "deskribapena"
 
-#: models/filemodels.py:63
+#: models/filemodels.py:67
 msgid "owner"
 msgstr "jaea"
 
-#: models/filemodels.py:65 models/foldermodels.py:110
+#: models/filemodels.py:69 models/foldermodels.py:110
 msgid "uploaded at"
 msgstr "noiz igota"
 
-#: models/filemodels.py:66 models/foldermodels.py:113
+#: models/filemodels.py:70 models/foldermodels.py:113
 msgid "modified at"
 msgstr "noiz aldatua"
 
-#: models/filemodels.py:70
+#: models/filemodels.py:74
 msgid "Permissions disabled"
 msgstr "Baimenak ezgaituta"
 
-#: models/filemodels.py:71
+#: models/filemodels.py:75
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
@@ -409,19 +409,19 @@ msgstr "karpeta baimena"
 msgid "folder permissions"
 msgstr "karpeta baimenak"
 
-#: models/imagemodels.py:23
+#: models/imagemodels.py:24
 msgid "date taken"
 msgstr "sortze data"
 
-#: models/imagemodels.py:25
+#: models/imagemodels.py:26
 msgid "author"
 msgstr "egilea"
 
-#: models/imagemodels.py:26
+#: models/imagemodels.py:27
 msgid "must always publish author credit"
 msgstr "egilearen kredituak beti argitaratu behar dira"
 
-#: models/imagemodels.py:27
+#: models/imagemodels.py:28
 msgid "must always publish copyright"
 msgstr "copyright-a beti argitaratu behar da"
 
@@ -439,7 +439,7 @@ msgstr ""
 
 #: models/virtualitems.py:50
 #: templates/admin/filer/folder/directory_table.html:4
-#: templates/admin/filer/folder/directory_table.html:152
+#: templates/admin/filer/folder/directory_table.html:157
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
 msgstr ""
@@ -451,7 +451,7 @@ msgstr "metadatuak faltan dituzten fitxategiak"
 #: models/virtualitems.py:79 templates/admin/filer/breadcrumbs.html:7
 #: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:51
-#: templates/admin/filer/folder/directory_listing.html:116
+#: templates/admin/filer/folder/directory_listing.html:118
 msgid "root"
 msgstr "erroa"
 
@@ -464,7 +464,7 @@ msgid "Go"
 msgstr "Joan"
 
 #: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table.html:213
+#: templates/admin/filer/folder/directory_table.html:218
 msgid "Click here to select the objects across all pages"
 msgstr "Hemen klikatu orri guztietako objektuak hautatzeko"
 
@@ -474,7 +474,7 @@ msgid "Select all %(total_count)s files and/or folders"
 msgstr "Hautatu %(total_count)s fitxategi eta/edo karpeta guztiak"
 
 #: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table.html:215
+#: templates/admin/filer/folder/directory_table.html:220
 msgid "Clear selection"
 msgstr "Hautapena hustu"
 
@@ -541,13 +541,13 @@ msgstr ""
 msgid "Yes, I&#39;m sure"
 msgstr ""
 
-#: templates/admin/filer/file/change_form.html:36
+#: templates/admin/filer/file/change_form.html:37
 #: templates/admin/filer/folder/change_form.html:21
 #: templates/admin/filer/image/change_form.html:36
 msgid "History"
 msgstr "Aurrekoak"
 
-#: templates/admin/filer/file/change_form.html:38
+#: templates/admin/filer/file/change_form.html:39
 #: templates/admin/filer/folder/change_form.html:23
 #: templates/admin/filer/image/change_form.html:38
 msgid "View on site"
@@ -556,7 +556,7 @@ msgstr "Webgunean ikusi"
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:116
+#: templates/admin/filer/folder/directory_listing.html:118
 msgid "Go back to"
 msgstr "Itzuli hona:"
 
@@ -565,11 +565,11 @@ msgid "admin homepage"
 msgstr "kudeaketa hasiera"
 
 #: templates/admin/filer/folder/change_form.html:37
-#: templates/admin/filer/folder/directory_listing.html:109
-#: templates/admin/filer/folder/directory_listing.html:117
+#: templates/admin/filer/folder/directory_listing.html:111
+#: templates/admin/filer/folder/directory_listing.html:119
 #: templates/admin/filer/folder/directory_table.html:26
 #: templates/admin/filer/folder/directory_table.html:56
-#: templates/admin/filer/folder/directory_table.html:159
+#: templates/admin/filer/folder/directory_table.html:164
 msgid "Folder Icon"
 msgstr "Karpeta ikonoa"
 
@@ -610,7 +610,7 @@ msgstr "Helburuko karpeta:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:78
 #: templates/admin/filer/folder/choose_copy_destination.html:81
-#: templates/admin/filer/folder/directory_listing.html:192
+#: templates/admin/filer/folder/directory_listing.html:194
 msgid "Copy"
 msgstr "Kopiatu"
 
@@ -667,7 +667,7 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:74
 #: templates/admin/filer/folder/choose_move_destination.html:77
-#: templates/admin/filer/folder/directory_listing.html:195
+#: templates/admin/filer/folder/directory_listing.html:197
 msgid "Move"
 msgstr "Mugitu"
 
@@ -694,64 +694,64 @@ msgstr ""
 msgid "Rename"
 msgstr "Berrizendatu"
 
-#: templates/admin/filer/folder/directory_listing.html:108
+#: templates/admin/filer/folder/directory_listing.html:110
 msgid "Go back to the parent folder"
 msgstr "Karpeta gurasora joan"
 
-#: templates/admin/filer/folder/directory_listing.html:145
+#: templates/admin/filer/folder/directory_listing.html:147
 msgid "Change current folder details"
 msgstr "Uneko karpetaren xehetasunak aldatu"
 
-#: templates/admin/filer/folder/directory_listing.html:145
+#: templates/admin/filer/folder/directory_listing.html:147
 msgid "Change"
 msgstr "Aldatu"
 
-#: templates/admin/filer/folder/directory_listing.html:155
+#: templates/admin/filer/folder/directory_listing.html:157
 msgid "Click here to run search for entered phrase"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:158
+#: templates/admin/filer/folder/directory_listing.html:160
 msgid "Search"
 msgstr "Bilatu"
 
-#: templates/admin/filer/folder/directory_listing.html:165
+#: templates/admin/filer/folder/directory_listing.html:167
 msgid "Close"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:167
+#: templates/admin/filer/folder/directory_listing.html:169
 msgid "Limit"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:172
+#: templates/admin/filer/folder/directory_listing.html:174
 msgid "Check it to limit the search to current folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:173
+#: templates/admin/filer/folder/directory_listing.html:175
 msgid "Limit the search to current folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:189
-#: templates/admin/filer/tools/detail_info.html:215
+#: templates/admin/filer/folder/directory_listing.html:191
+#: templates/admin/filer/tools/detail_info.html:213
 msgid "Delete"
 msgstr "Ezabatu"
 
-#: templates/admin/filer/folder/directory_listing.html:212
+#: templates/admin/filer/folder/directory_listing.html:214
 msgid "Adds a new Folder"
 msgstr "Karpeta berri bat sortzen du"
 
-#: templates/admin/filer/folder/directory_listing.html:215
+#: templates/admin/filer/folder/directory_listing.html:217
 msgid "New Folder"
 msgstr "Karpeta berria"
 
-#: templates/admin/filer/folder/directory_listing.html:220
-#: templates/admin/filer/folder/directory_listing.html:224
-#: templates/admin/filer/folder/directory_listing.html:227
-#: templates/admin/filer/folder/directory_listing.html:231
-#: templates/admin/filer/folder/directory_listing.html:238
+#: templates/admin/filer/folder/directory_listing.html:222
+#: templates/admin/filer/folder/directory_listing.html:226
+#: templates/admin/filer/folder/directory_listing.html:229
+#: templates/admin/filer/folder/directory_listing.html:233
+#: templates/admin/filer/folder/directory_listing.html:240
 msgid "Upload Files"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_listing.html:236
+#: templates/admin/filer/folder/directory_listing.html:238
 msgid "You have to select a folder first"
 msgstr ""
 
@@ -760,14 +760,14 @@ msgid "Name"
 msgstr "Izena"
 
 #: templates/admin/filer/folder/directory_table.html:14
-#: templates/admin/filer/tools/detail_info.html:61
-#: templates/admin/filer/tools/detail_info.html:152
+#: templates/admin/filer/tools/detail_info.html:59
+#: templates/admin/filer/tools/detail_info.html:150
 msgid "Owner"
 msgstr "Jabea"
 
 #: templates/admin/filer/folder/directory_table.html:15
-#: templates/admin/filer/tools/detail_info.html:40
-#: templates/admin/filer/tools/detail_info.html:104
+#: templates/admin/filer/tools/detail_info.html:38
+#: templates/admin/filer/tools/detail_info.html:102
 msgid "Size"
 msgstr ""
 
@@ -807,73 +807,85 @@ msgstr ""
 msgid "Remove folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:92
-#: templates/admin/filer/folder/directory_table.html:100
-#: templates/admin/filer/folder/directory_table.html:115
+#: templates/admin/filer/folder/directory_table.html:93
+#: templates/admin/filer/folder/directory_table.html:101
+#: templates/admin/filer/folder/directory_table.html:116
 msgid "Select this file"
 msgstr "Fitxategi hau aukeratu"
 
-#: templates/admin/filer/folder/directory_table.html:103
-#: templates/admin/filer/folder/directory_table.html:118
-#: templates/admin/filer/folder/directory_table.html:138
+#: templates/admin/filer/folder/directory_table.html:104
+#: templates/admin/filer/folder/directory_table.html:119
+#: templates/admin/filer/folder/directory_table.html:143
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "'%(item_label)s'(r)en xehetasunak aldatu"
 
-#: templates/admin/filer/folder/directory_table.html:127
+#: templates/admin/filer/folder/directory_table.html:128
 msgid "Permissions"
 msgstr "Baimenak"
 
-#: templates/admin/filer/folder/directory_table.html:127
+#: templates/admin/filer/folder/directory_table.html:128
 msgid "disabled"
 msgstr "ezgaituta"
 
-#: templates/admin/filer/folder/directory_table.html:127
+#: templates/admin/filer/folder/directory_table.html:128
 msgid "enabled"
 msgstr "gaituta"
 
 #: templates/admin/filer/folder/directory_table.html:139
+#, python-format
+#| msgid "Change '%(item_label)s' details"
+msgid "Canonical url '%(item_label)s'"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:141
+#, python-format
+#| msgid "Change '%(item_label)s' details"
+msgid "Download '%(item_label)s'"
+msgstr ""
+
+#: templates/admin/filer/folder/directory_table.html:144
 msgid "Remove file"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:146
+#: templates/admin/filer/folder/directory_table.html:151
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:156
+#: templates/admin/filer/folder/directory_table.html:161
 msgid "Drop your file to upload into:"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:166
+#: templates/admin/filer/folder/directory_table.html:171
 msgid "Upload"
 msgstr "Igo"
 
-#: templates/admin/filer/folder/directory_table.html:178
+#: templates/admin/filer/folder/directory_table.html:183
 msgid "cancel"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:182
+#: templates/admin/filer/folder/directory_table.html:187
 msgid "Upload success!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:186
+#: templates/admin/filer/folder/directory_table.html:191
 msgid "Upload canceled!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:193
+#: templates/admin/filer/folder/directory_table.html:198
 msgid "previous"
 msgstr "aurrekoa"
 
-#: templates/admin/filer/folder/directory_table.html:198
+#: templates/admin/filer/folder/directory_table.html:203
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:203
+#: templates/admin/filer/folder/directory_table.html:208
 msgid "next"
 msgstr "hurrengoa"
 
-#: templates/admin/filer/folder/directory_table.html:213
+#: templates/admin/filer/folder/directory_table.html:218
 #, python-format
 msgid "Select all %(total_count)s"
 msgstr ""
@@ -916,56 +928,56 @@ msgstr "arbela hutsik dago"
 msgid "upload failed"
 msgstr "igotzean errorea"
 
-#: templates/admin/filer/tools/detail_info.html:24
+#: templates/admin/filer/tools/detail_info.html:22
 msgid "Open file"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:26
-#: templates/admin/filer/tools/detail_info.html:88
+#: templates/admin/filer/tools/detail_info.html:24
+#: templates/admin/filer/tools/detail_info.html:86
 msgid "Full size preview"
 msgstr "Pantaila osoko aurrebista"
 
-#: templates/admin/filer/tools/detail_info.html:36
-#: templates/admin/filer/tools/detail_info.html:95
+#: templates/admin/filer/tools/detail_info.html:34
+#: templates/admin/filer/tools/detail_info.html:93
 msgid "Type"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:44
-#: templates/admin/filer/tools/detail_info.html:113
+#: templates/admin/filer/tools/detail_info.html:42
+#: templates/admin/filer/tools/detail_info.html:111
 msgid "File-size"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:48
-#: templates/admin/filer/tools/detail_info.html:122
+#: templates/admin/filer/tools/detail_info.html:46
+#: templates/admin/filer/tools/detail_info.html:120
 msgid "Modified"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:52
-#: templates/admin/filer/tools/detail_info.html:131
+#: templates/admin/filer/tools/detail_info.html:50
+#: templates/admin/filer/tools/detail_info.html:129
 msgid "Created"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:160
+#: templates/admin/filer/tools/detail_info.html:158
 msgid "Add Description"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:178
+#: templates/admin/filer/tools/detail_info.html:176
 msgid "Author"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:185
+#: templates/admin/filer/tools/detail_info.html:183
 msgid "Add Alt-Text"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:192
+#: templates/admin/filer/tools/detail_info.html:190
 msgid "Add caption"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:199
+#: templates/admin/filer/tools/detail_info.html:197
 msgid "Add Tags"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:206
+#: templates/admin/filer/tools/detail_info.html:204
 msgid "Change File"
 msgstr ""
 
@@ -982,7 +994,7 @@ msgid "cancel search"
 msgstr "bilaketa ezeztatu"
 
 #: templates/admin/filer/widgets/admin_file.html:8
-#: templates/admin/filer/widgets/admin_file.html:40
+#: templates/admin/filer/widgets/admin_file.html:35
 #: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr "Garbitu"
@@ -1000,12 +1012,12 @@ msgstr "fitxategia falta da"
 msgid "no file selected"
 msgstr "hautatutako fitxategirik ez"
 
-#: templates/admin/filer/widgets/admin_file.html:35
+#: templates/admin/filer/widgets/admin_file.html:39
 #: templates/admin/filer/widgets/admin_folder.html:14
 msgid "Lookup"
 msgstr "Bilatu"
 
-#: templates/admin/filer/widgets/admin_file.html:36
+#: templates/admin/filer/widgets/admin_file.html:40
 msgid "Choose File"
 msgstr ""
 
@@ -1017,6 +1029,9 @@ msgstr "hautapenik ez"
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
 msgstr ""
+
+#~ msgid "Subject Location"
+#~ msgstr "Subject location"
 
 #~ msgid ""
 #~ "\n"
