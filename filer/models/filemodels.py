@@ -517,7 +517,18 @@ class File(polymorphic.PolymorphicModel,
                 self.generate_sha1()
             except (IOError, TypeError, ValueError):
                 return self.clean_actual_name
-        return '{}_{}'.format(self.sha1[:10], self.clean_actual_name)
+        try:
+            folder = self.folder.get_ancestors().first()
+            root_folder = getattr(folder, 'name', None)
+        except:
+            root_folder = None
+        if root_folder in filer_settings.FILER_NOHASH_ROOTFOLDERS:
+            name_fmt = '{actual_name}'
+        else:
+            name_fmt = '{hashcode}_{actual_name}'
+        name = name_fmt.format(hashcode=self.sha1[:10],
+                               actual_name=self.clean_actual_name)
+        return name
 
     @property
     def upload_to_name(self):
