@@ -19,6 +19,7 @@ if FILER_ENABLE_LOGGING:
                                                       ('' in settings.LOGGING['loggers'] or
                                                        'filer' in settings.LOGGING['loggers'])))
 
+FILER_NOHASH_ROOTFOLDERS = getattr(settings, 'FILER_NOHASH_ROOTFOLDERS', [])
 FILER_ENABLE_PERMISSIONS = getattr(settings, 'FILER_ENABLE_PERMISSIONS', False)
 FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
