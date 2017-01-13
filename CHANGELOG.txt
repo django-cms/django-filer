@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-1.2.6 (unreleased)
+1.2.6 (2017-01-13)
 ------------------
 
 * Fixed markup issue with editing file in admin
@@ -17,6 +17,9 @@ CHANGELOG
 * Fixes object tools placement on image detail page and removed background color and shadow
 * Added edit button to image widget
 * Removed arrow in breadcrumbs if no folder or name follows
+* Fixed jQuery loading on file move/copy page with Django 1.9
+* Fixed localization for fieldsets of ImageAdmin
+* Fixed unquoting in files search
 
 
 1.2.5 (2016-09-05)
