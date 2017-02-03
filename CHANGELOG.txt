@@ -4,7 +4,7 @@ CHANGELOG
 1.2.7 (unreleased)
 ------------------
 
-* 
+* Added 'get_css_position' template filter for background images 
 
 
 1.2.6 (2017-01-13)
