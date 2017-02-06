@@ -191,6 +191,13 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
+        # Delete old file(s) when updating the file via: admin > advanced > replace file
+        try:
+            this = File.objects.get(id=self.id)
+            if this.file != self.file:
+                this.file.delete(save=False)
+        except:
+            pass
         super(File, self).save(*args, **kwargs)
     save.alters_data = True
 
