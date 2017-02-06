@@ -12,6 +12,10 @@ register = Library()
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')
 
 
+def percentage(part, whole):
+    return 100 * float(part) / float(whole)
+
+
 def _recalculate_size(size, index, divisor=0, padding=0,
                       keep_aspect_ratio=False):
     new_one = size[index]
@@ -105,3 +109,19 @@ def divide_xy_by(original_size, divisor):
     size = divide_y_by(size, divisor=divisor)
     return size
 divide_xy_by = register.filter(divide_xy_by)
+
+
+def get_css_position(image):
+    if not image.subject_location:
+        return '50% 50%'
+
+    x, y = image.subject_location.split(',')
+    width = image.width
+    height = image.height
+
+    coords = '{}% {}%'.format(
+        percentage(x, width),
+        percentage(y, height)
+    )
+    return coords
+get_css_position = register.filter(get_css_position)
