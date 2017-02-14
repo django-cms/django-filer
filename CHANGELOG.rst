@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+Revision f62676c (14.02.2017, 12:16 UTC)
+----------------------------------------
+
+* LUN-3465
+
+  * Allow positional parameters.
+
+* LUN-3545
+
+  * Add exlude name hashing rules for rootfolders.
+
+No other commits.
+
 Revision df5e50f (18.10.2016, 07:43 UTC)
 ----------------------------------------
 
