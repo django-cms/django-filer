@@ -421,7 +421,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 in_clipboards__clipboarditem__clipboard__user=request.user
             ).distinct(),
             'paginator': paginator,
-            'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'paginated_items': paginated_items,
             'virtual_items': virtual_items,
             'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
             'permissions': permissions,
