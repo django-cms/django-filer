@@ -42,9 +42,9 @@ Simple example ``models.py``::
     class Company(models.Model):
         name = models.CharField(max_length=255)
         logo = FilerImageField(null=True, blank=True,
-                               related_name="company_logo")
+                               related_name="logo_company")
         disclaimer = FilerFileField(null=True, blank=True,
-                                    related_name="company_disclaimer")
+                                    related_name="disclaimer_company")
 
 multiple file fields on the same model::
 
