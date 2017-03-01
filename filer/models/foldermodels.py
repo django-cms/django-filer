@@ -103,7 +103,7 @@ class Folder(models.Model, mixins.IconsMixin):
                                related_name='children')
     name = models.CharField(_('name'), max_length=255)
 
-    owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=('owner'),
+    owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=_('owner'),
                               related_name='filer_owned_folders', on_delete=models.SET_NULL,
                               null=True, blank=True)
 

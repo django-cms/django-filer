@@ -5,14 +5,14 @@
 # Translators:
 # Translators:
 # Translators:
-# Matas Dailyda <matas@dailyda.com>, 2015-2016
+# Matas Dailyda <matas@dailyda.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 16:08+0100\n"
-"PO-Revision-Date: 2017-01-03 15:08+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"POT-Creation-Date: 2017-03-01 14:41-0500\n"
+"PO-Revision-Date: 2017-01-30 13:16+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/divio/django-filer/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -239,7 +239,7 @@ msgstr "Filer'is"
 
 #: contrib/django_cms/cms_toolbars.py:47
 msgid "Media library"
-msgstr ""
+msgstr "Medijos biblioteka"
 
 #: models/abstract.py:40
 msgid "default alt text"
@@ -322,7 +322,7 @@ msgstr "pavadinimas"
 msgid "description"
 msgstr "apibūdinimas"
 
-#: models/filemodels.py:67
+#: models/filemodels.py:67 models/foldermodels.py:106
 msgid "owner"
 msgstr "savininkas"
 
@@ -839,13 +839,13 @@ msgstr "įjungta"
 #, python-format
 #| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
-msgstr ""
+msgstr "Kanoninis url '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:141
 #, python-format
 #| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
-msgstr ""
+msgstr "Parsisiųsti '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:144
 msgid "Remove file"

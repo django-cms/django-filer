@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 16:08+0100\n"
+"POT-Creation-Date: 2017-03-01 14:41-0500\n"
 "PO-Revision-Date: 2017-01-03 15:08+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/divio/django-filer/language/nn/)\n"
@@ -322,7 +322,7 @@ msgstr "namn"
 msgid "description"
 msgstr "beskriving"
 
-#: models/filemodels.py:67
+#: models/filemodels.py:67 models/foldermodels.py:106
 msgid "owner"
 msgstr "eigar"
 
