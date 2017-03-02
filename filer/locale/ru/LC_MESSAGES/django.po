@@ -5,15 +5,16 @@
 # Translators:
 # Translators:
 # Translators:
+# Oleg Fish <okfish@yandex.ru>, 2017
 # Pavel <neoascetic@gmail.com>, 2012
 # Pavel <neoascetic@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 16:08+0100\n"
-"PO-Revision-Date: 2017-01-03 15:08+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"POT-Creation-Date: 2017-03-01 14:41-0500\n"
+"PO-Revision-Date: 2017-02-07 18:30+0000\n"
+"Last-Translator: Oleg Fish <okfish@yandex.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-filer/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,7 +28,7 @@ msgstr "Дополнительно"
 
 #: admin/fileadmin.py:165
 msgid "canonical URL"
-msgstr ""
+msgstr "канонический URL"
 
 #: admin/folderadmin.py:386 admin/folderadmin.py:553
 msgid ""
@@ -104,7 +105,7 @@ msgstr "Удалить выбранные файлы/папки"
 #: admin/folderadmin.py:905
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
-msgstr ""
+msgstr "Папки с именами %s уже существуют в указанном месте"
 
 #: admin/folderadmin.py:909
 #, python-format
@@ -214,20 +215,20 @@ msgstr "Расположение объекта"
 
 #: admin/imageadmin.py:17
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
-msgstr ""
+msgstr "Расположение главного объекта сцены. Формат: \"x,y\"."
 
 #: admin/imageadmin.py:54
 msgid "Invalid subject location format. "
-msgstr ""
+msgstr "Неверный формат расположения объекта."
 
 #: admin/imageadmin.py:60
 msgid "Subject location is outside of the image. "
-msgstr ""
+msgstr "Расположение объекта указано за пределами изображения."
 
 #: admin/imageadmin.py:69
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
-msgstr ""
+msgstr "Вы ввели: \"{subject_location}\". "
 
 #: admin/views.py:57
 msgid "Folder with this name already exists."
@@ -241,7 +242,7 @@ msgstr "Filer"
 
 #: contrib/django_cms/cms_toolbars.py:47
 msgid "Media library"
-msgstr ""
+msgstr "Медиа-библиотека"
 
 #: models/abstract.py:40
 msgid "default alt text"
@@ -324,7 +325,7 @@ msgstr "имя"
 msgid "description"
 msgstr "описание"
 
-#: models/filemodels.py:67
+#: models/filemodels.py:67 models/foldermodels.py:106
 msgid "owner"
 msgstr "владелец"
 
@@ -344,7 +345,7 @@ msgstr "Разрешения отключены"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
+msgstr "Отменить все проверки разрешений для этого файла. Файл будет доступен публично для каждого."
 
 #: models/foldermodels.py:112
 msgid "created at"
@@ -374,11 +375,11 @@ msgstr "этот элемент и потомки"
 
 #: models/foldermodels.py:261
 msgid "allow"
-msgstr ""
+msgstr "разрешить"
 
 #: models/foldermodels.py:262
 msgid "deny"
-msgstr ""
+msgstr "запретить"
 
 #: models/foldermodels.py:267
 msgid "type"
@@ -430,22 +431,22 @@ msgstr "необходимо всегда указывать copyright"
 
 #: models/thumbnailoptionmodels.py:15
 msgid "width in pixel."
-msgstr ""
+msgstr "ширина в пикселях."
 
 #: models/thumbnailoptionmodels.py:16
 msgid "height in pixel."
-msgstr ""
+msgstr "высота в пикселях."
 
 #: models/thumbnailoptionmodels.py:24
 msgid "thumbnail options"
-msgstr ""
+msgstr "опции миниатюры"
 
 #: models/virtualitems.py:50
 #: templates/admin/filer/folder/directory_table.html:4
 #: templates/admin/filer/folder/directory_table.html:157
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
-msgstr ""
+msgstr "Несортированные загрузки"
 
 #: models/virtualitems.py:65
 msgid "files with missing metadata"
@@ -513,7 +514,7 @@ msgstr "Вернуться в папку \"%(folder_name)s\""
 
 #: templates/admin/filer/change_form.html:25
 msgid "Duplicates"
-msgstr ""
+msgstr "Дубликаты"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
@@ -538,11 +539,11 @@ msgstr "Вы уверены, что хотите удалить выбранны
 #: templates/admin/filer/folder/choose_copy_destination.html:77
 #: templates/admin/filer/folder/choose_move_destination.html:73
 msgid "No, take me back"
-msgstr ""
+msgstr "Нет, пустите меня обратно"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:47
 msgid "Yes, I&#39;m sure"
-msgstr ""
+msgstr "Да, я уверен"
 
 #: templates/admin/filer/file/change_form.html:37
 #: templates/admin/filer/folder/change_form.html:21
@@ -589,7 +590,7 @@ msgstr "У вас нет прав на копирование выбранных
 #: templates/admin/filer/folder/choose_move_destination.html:44
 #: templates/admin/filer/folder/choose_move_destination.html:50
 msgid "Take me back"
-msgstr ""
+msgstr "Пустите меня обратно"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:42
 #: templates/admin/filer/folder/choose_move_destination.html:42
@@ -619,7 +620,7 @@ msgstr "Копировать"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:80
 msgid "It is not allowed to copy files into same folder"
-msgstr ""
+msgstr "Копирование файлов в ту же самую папку запрещено"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
@@ -676,7 +677,7 @@ msgstr "Переместить"
 
 #: templates/admin/filer/folder/choose_move_destination.html:76
 msgid "It is not allowed to move files into same folder"
-msgstr ""
+msgstr "Перемещение файлов в ту же самую папку запрещено"
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
@@ -711,7 +712,7 @@ msgstr "Изменить"
 
 #: templates/admin/filer/folder/directory_listing.html:157
 msgid "Click here to run search for entered phrase"
-msgstr ""
+msgstr "Нажмите здесь для поиска по введенной фразе"
 
 #: templates/admin/filer/folder/directory_listing.html:160
 msgid "Search"
@@ -719,19 +720,19 @@ msgstr "Поиск"
 
 #: templates/admin/filer/folder/directory_listing.html:167
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
 #: templates/admin/filer/folder/directory_listing.html:169
 msgid "Limit"
-msgstr ""
+msgstr "Ограничить"
 
 #: templates/admin/filer/folder/directory_listing.html:174
 msgid "Check it to limit the search to current folder"
-msgstr ""
+msgstr "Отметьте, чтобы ограничить поиск текущей папкой"
 
 #: templates/admin/filer/folder/directory_listing.html:175
 msgid "Limit the search to current folder"
-msgstr ""
+msgstr "Ограничить поиск текущей папкой"
 
 #: templates/admin/filer/folder/directory_listing.html:191
 #: templates/admin/filer/tools/detail_info.html:213
@@ -752,11 +753,11 @@ msgstr "Новая папка"
 #: templates/admin/filer/folder/directory_listing.html:233
 #: templates/admin/filer/folder/directory_listing.html:240
 msgid "Upload Files"
-msgstr ""
+msgstr "Загрузить файлы"
 
 #: templates/admin/filer/folder/directory_listing.html:238
 msgid "You have to select a folder first"
-msgstr ""
+msgstr "Сначала надо выбрать папку"
 
 #: templates/admin/filer/folder/directory_table.html:13
 msgid "Name"
@@ -772,11 +773,11 @@ msgstr "Владелец"
 #: templates/admin/filer/tools/detail_info.html:38
 #: templates/admin/filer/tools/detail_info.html:102
 msgid "Size"
-msgstr ""
+msgstr "Размер"
 
 #: templates/admin/filer/folder/directory_table.html:16
 msgid "Action"
-msgstr ""
+msgstr "Действие"
 
 #: templates/admin/filer/folder/directory_table.html:25
 #: templates/admin/filer/folder/directory_table.html:32
@@ -791,28 +792,28 @@ msgstr "Изменить данные папки \"%(item_label)s\""
 #, python-format
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(counter)s папка"
+msgstr[1] "%(counter)s папки"
+msgstr[2] "%(counter)s папок"
+msgstr[3] "%(counter)s папок"
 
 #: templates/admin/filer/folder/directory_table.html:74
 #: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(counter)s файл"
+msgstr[1] "%(counter)s файла"
+msgstr[2] "%(counter)s файлов"
+msgstr[3] "%(counter)s файлов"
 
 #: templates/admin/filer/folder/directory_table.html:80
 msgid "Change folder details"
-msgstr ""
+msgstr "Изменить свойства папки"
 
 #: templates/admin/filer/folder/directory_table.html:81
 msgid "Remove folder"
-msgstr ""
+msgstr "Удалить папку"
 
 #: templates/admin/filer/folder/directory_table.html:93
 #: templates/admin/filer/folder/directory_table.html:101
@@ -843,25 +844,25 @@ msgstr "включены"
 #, python-format
 #| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
-msgstr ""
+msgstr "Канонический URL '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:141
 #, python-format
 #| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
-msgstr ""
+msgstr "Скачать '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table.html:144
 msgid "Remove file"
-msgstr ""
+msgstr "Удалить файл"
 
 #: templates/admin/filer/folder/directory_table.html:151
 msgid "Drop files here or use the \"Upload Files\" button"
-msgstr ""
+msgstr "\"Скиньте\" сюда файлы или используйте кнопку \"Загрузить файлы\""
 
 #: templates/admin/filer/folder/directory_table.html:161
 msgid "Drop your file to upload into:"
-msgstr ""
+msgstr "\"Скиньте\" ваши файлы сюда для загрузки в:"
 
 #: templates/admin/filer/folder/directory_table.html:171
 msgid "Upload"
@@ -869,15 +870,15 @@ msgstr "Загрузить"
 
 #: templates/admin/filer/folder/directory_table.html:183
 msgid "cancel"
-msgstr ""
+msgstr "отмена"
 
 #: templates/admin/filer/folder/directory_table.html:187
 msgid "Upload success!"
-msgstr ""
+msgstr "Загрузка успешно завершена!"
 
 #: templates/admin/filer/folder/directory_table.html:191
 msgid "Upload canceled!"
-msgstr ""
+msgstr "Загрузка отменена!"
 
 #: templates/admin/filer/folder/directory_table.html:198
 msgid "previous"
@@ -886,7 +887,7 @@ msgstr "предыдущая"
 #: templates/admin/filer/folder/directory_table.html:203
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
-msgstr ""
+msgstr "Страница %(number)s из %(num_pages)s."
 
 #: templates/admin/filer/folder/directory_table.html:208
 msgid "next"
@@ -895,7 +896,7 @@ msgstr "следующая"
 #: templates/admin/filer/folder/directory_table.html:218
 #, python-format
 msgid "Select all %(total_count)s"
-msgstr ""
+msgstr "Выбрать все %(total_count)s"
 
 #: templates/admin/filer/folder/new_folder_form.html:5
 msgid "Add new"
@@ -927,7 +928,7 @@ msgstr "Переместить элементы буфера обмена в"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Empty Clipboard"
-msgstr ""
+msgstr "Пустой буфер обмена"
 
 #: templates/admin/filer/tools/clipboard/clipboard.html:50
 msgid "the clipboard is empty"
@@ -939,7 +940,7 @@ msgstr "загрузка не удалась"
 
 #: templates/admin/filer/tools/detail_info.html:22
 msgid "Open file"
-msgstr ""
+msgstr "Открыть файл"
 
 #: templates/admin/filer/tools/detail_info.html:24
 #: templates/admin/filer/tools/detail_info.html:86
@@ -949,46 +950,46 @@ msgstr "Посмотреть в полном размере"
 #: templates/admin/filer/tools/detail_info.html:34
 #: templates/admin/filer/tools/detail_info.html:93
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: templates/admin/filer/tools/detail_info.html:42
 #: templates/admin/filer/tools/detail_info.html:111
 msgid "File-size"
-msgstr ""
+msgstr "Размер файла"
 
 #: templates/admin/filer/tools/detail_info.html:46
 #: templates/admin/filer/tools/detail_info.html:120
 msgid "Modified"
-msgstr ""
+msgstr "Изменен"
 
 #: templates/admin/filer/tools/detail_info.html:50
 #: templates/admin/filer/tools/detail_info.html:129
 msgid "Created"
-msgstr ""
+msgstr "Создан"
 
 #: templates/admin/filer/tools/detail_info.html:158
 msgid "Add Description"
-msgstr ""
+msgstr "Добавить описание"
 
 #: templates/admin/filer/tools/detail_info.html:176
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 #: templates/admin/filer/tools/detail_info.html:183
 msgid "Add Alt-Text"
-msgstr ""
+msgstr "Добавить альтернативный текст"
 
 #: templates/admin/filer/tools/detail_info.html:190
 msgid "Add caption"
-msgstr ""
+msgstr "Добавить заглавие"
 
 #: templates/admin/filer/tools/detail_info.html:197
 msgid "Add Tags"
-msgstr ""
+msgstr "Добавить теги"
 
 #: templates/admin/filer/tools/detail_info.html:204
 msgid "Change File"
-msgstr ""
+msgstr "Изменить файл"
 
 #: templates/admin/filer/tools/search_form.html:5
 msgid "found"
@@ -1010,7 +1011,7 @@ msgstr "Очистить"
 
 #: templates/admin/filer/widgets/admin_file.html:17
 msgid "or drop your file here"
-msgstr ""
+msgstr "или \"скиньте\" ваш файл сюда"
 
 #: templates/admin/filer/widgets/admin_file.html:26
 #: templates/admin/filer/widgets/admin_file.html:27
@@ -1028,7 +1029,7 @@ msgstr "Выбрать"
 
 #: templates/admin/filer/widgets/admin_file.html:40
 msgid "Choose File"
-msgstr ""
+msgstr "Выбрать файл"
 
 #: templates/admin/filer/widgets/admin_folder.html:11
 #: templates/admin/filer/widgets/admin_folder.html:33
@@ -1037,7 +1038,7 @@ msgstr "ничего не выбрано"
 
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
-msgstr ""
+msgstr "Добавить папку"
 
 #~ msgid "Subject Location"
 #~ msgstr "Subject location"
