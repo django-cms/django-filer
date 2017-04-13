@@ -59,11 +59,13 @@ class BaseImage(File):
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
         if self.has_all_mandatory_data:
+            # update image dimensions
             try:
                 self.file.seek(0)
                 self._width, self._height = PILImage.open(self.file).size
                 self.file.seek(0)
             except Exception:
+                # probably the image is missing. nevermind.
                 self._width, self._height = None, None
         super(BaseImage, self).save(*args, **kwargs)
 
