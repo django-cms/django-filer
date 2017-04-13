@@ -64,6 +64,7 @@ class BaseImage(File):
                 self._width, self._height = PILImage.open(self.file).size
                 self.file.seek(0)
             except Exception:
+                # probably the image is missing. nevermind.
                 self._width, self._height = None, None
         super(BaseImage, self).save(*args, **kwargs)
 
