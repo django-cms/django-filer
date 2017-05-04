@@ -59,13 +59,15 @@ class BaseImage(File):
     def file_data_changed(self, post_init=False):
         attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
         if attrs_updated:
-            # update image dimensions
             try:
-                self.file.seek(0)
-                self._width, self._height = PILImage.open(self.file).size
-                self.file.seek(0)
+                try:
+                    imgfile = self.file.file
+                except ValueError:
+                    imgfile = self.file_ptr.file
+                imgfile.seek(0)
+                self._width, self._height = PILImage.open(imgfile).size
+                imgfile.seek(0)
             except Exception:
-                # probably the image is missing. nevermind.
                 self._width, self._height = None, None
         return attrs_updated
 
