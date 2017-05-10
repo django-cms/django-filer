@@ -269,6 +269,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
             args=(self.pk,))
 
     @property
+    def file_ptr(self):
+        """
+        Evil hack to get around the cascade delete problem with django_polymorphic.
+        Prevents ``AttributeError: 'File' object has no attribute 'file_ptr'``.
+        This is only a workaround for one level of subclassing. The hierarchy of
+        object in the admin delete view is wrong, but at least it works.
+        """
+        return self
+
+    @property
     def url(self):
         """
         to make the model behave like a file field
