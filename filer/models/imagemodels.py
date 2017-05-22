@@ -7,8 +7,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
 from django.utils.timezone import get_current_timezone, make_aware, now
 from django.utils.translation import ugettext_lazy as _
+from easy_thumbnails.signals import saved_file
 
 from .. import settings as filer_settings
 from ..utils.compatibility import GTE_DJANGO_1_10
@@ -61,3 +63,10 @@ else:
     # This is just an alias for the real model defined elsewhere
     # to let imports works transparently
     Image = load_object(filer_settings.FILER_IMAGE_MODEL)
+
+
+@receiver(saved_file)
+def generate_thumbnails_async(sender, fieldfile, **kwargs):
+    if filer_settings.FILER_USE_CELERY:
+        from filer.tasks import generate_thumbnails
+        generate_thumbnails.delay(model=sender, pk=fieldfile.instance.pk, field=fieldfile.field.name)
