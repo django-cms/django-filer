@@ -32,6 +32,7 @@ from cmsroles.models import Role
 from cmsroles.tests.tests import HelpersMixin
 from cmsroles.siteadmin import get_site_admin_required_permission
 import json
+from filer.admin import ClipboardAdmin
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -248,7 +249,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )
         self.assertEqual(Image.objects.count(), 1)
         self.assertIn('error', response.content)
-        self.assertIn('already exists in the clipboard', response.content)
+        errormsg = ClipboardAdmin.messages['already-exists'].format(self.image_name)
+        self.assertIn(errormsg, response.content)
         self.assertEqual(clip.files.count(), 1)
 
     def test_paste_from_clipboard_no_duplicate_files(self):
