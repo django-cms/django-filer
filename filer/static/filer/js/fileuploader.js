@@ -376,12 +376,6 @@ qq.FileUploaderBasic.prototype = {
     },
     _onComplete: function(id, fileName, result){
         this._filesInProgress--;
-        // the error is shown already in clipboard list
-        // and for multiple uploads, there are just as many pop-ups
-        // and that becomes annoying
-        // if (result.error) {
-        //     this._options.showMessage(result.error);
-        // }
     },
     _onCancel: function(id, fileName){
         this._filesInProgress--;        
