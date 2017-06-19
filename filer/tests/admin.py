@@ -234,6 +234,9 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
+        self.assertEqual(Clipboard.objects.count(), 1)
+        clip = Clipboard.objects.get(id=1) # there is(or should be) just one clipboard
+        self.assertEqual(clip.files.count(), 1)
         # upload the same file again. This must fail since the
         # clipboard can't contain two files with the same name
         response = self.client.post(
@@ -245,6 +248,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )
         self.assertEqual(Image.objects.count(), 1)
         self.assertIn('error', response.content)
+        self.assertIn('already exists in the clipboard', response.content)
+        self.assertEqual(clip.files.count(), 1)
 
     def test_paste_from_clipboard_no_duplicate_files(self):
         first_folder = Folder.objects.create(
