@@ -123,7 +123,7 @@ class ClipboardAdmin(admin.ModelAdmin):
 
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
-            if any(f for f in clipboard.files.all() if f.actual_name == filename):
+            if any(f for f in clipboard.files.all() if f.original_filename == filename):
                 raise UploadException(
                     _(u"A file named %s already exists in the clipboard") % filename)
             matched_file_types = matching_file_subtypes(filename, upload, request)
