@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+Revision 108e8d0 (20.06.2017, 07:59 UTC)
+----------------------------------------
+
+* LUN-3517
+
+  * Put error messages in a dictionary
+  * removed commented code
+  * update unit-tests for clipboardadmin after changes
+  * do not show popup when same file uploaded
+  * fix detection of duplicate files
+
+No other commits.
+
 Revision f62676c (14.02.2017, 12:16 UTC)
 ----------------------------------------
 
