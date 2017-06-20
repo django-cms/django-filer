@@ -31,6 +31,10 @@ class ClipboardAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     verbose_name = "DEBUG Clipboard"
     verbose_name_plural = "DEBUG Clipboards"
+    messages = {
+        'already-exists': 'A file named {} already exists in the clipboard',
+        'request-invalid': "AJAX request not valid: form invalid '{}'"
+    }
 
     def get_urls(self):
         from django.conf.urls import patterns, url
@@ -123,9 +127,8 @@ class ClipboardAdmin(admin.ModelAdmin):
 
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
-            if any(f for f in clipboard.files.all() if f.actual_name == filename):
-                raise UploadException(
-                    _(u"A file named %s already exists in the clipboard") % filename)
+            if any(f for f in clipboard.files.all() if f.original_filename == filename):
+                raise UploadException(self.messages['already-exists'].format(filename))
             matched_file_types = matching_file_subtypes(filename, upload, request)
             FileForm = modelform_factory(
                 model=matched_file_types[0],
@@ -154,7 +157,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                     field,
                     ', '.join(errors)) for field, errors in uploadform.errors.items()
                 ])
-                raise UploadException("AJAX request not valid: form invalid '%s'" % (form_errors,))
+                raise UploadException(self.messages['request-invalid'].format(form_errors))
         except UploadException, e:
             return HttpResponse(json.dumps({'error': unicode(e)}),
                                 content_type=mimetype)
