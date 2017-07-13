@@ -5,8 +5,18 @@ from django.template import Library
 from django.utils.html import format_html_join
 
 from ..admin.tools import admin_url_params, admin_url_params_encoded
+from ..vendor.publisher.templatetags.djangocms_publisher_admin_tags import djangocms_publisher_submit_row
 
 register = Library()
+
+
+__all__ = [
+    'filer_actions',
+    'filer_admin_context_url_params',
+    'filer_admin_context_hidden_formfields',
+    'filer_has_permission',
+    'filer_admin_submit_row',
+]
 
 
 def filer_actions(context):
@@ -51,3 +61,8 @@ def filer_has_permission(context, item, action):
     # Call the permission method.
     # This amounts to calling `item.has_X_permission(request)`
     return permission_method(request)
+
+
+@register.inclusion_tag('admin/filer/tools/submit_line.html', takes_context=True)
+def filer_admin_submit_row(context):
+    return djangocms_publisher_submit_row(context)

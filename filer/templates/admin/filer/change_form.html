@@ -16,20 +16,3 @@
 {% block after_field_sets %}
     {% filer_admin_context_hidden_formfields %}
 {% endblock %}
-
-{% block sidebar %}
-    {% block file_sidebar %}
-        {% with original.duplicates as duplicates %}
-            {% if duplicates %}
-                <div class="file-duplicates">
-                    <h3>{% trans "Duplicates" %}</h3>
-                    <ul>
-                        {% for duplicate in duplicates %}
-                            <li><a href="{{ duplicate.get_admin_change_url }}">{{ duplicate }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        {% endwith %}
-    {% endblock %}
-{% endblock %}

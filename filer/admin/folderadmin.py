@@ -344,15 +344,20 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_qs = folder_qs.exclude(**root_exclude_kw)
 
+        # Prevent duplicates for draft/live versions.
+        # TODO: select_related('publisher_draft_version').
+        #       Currently that throws an error though.
+        file_qs = file_qs.publisher_draft_or_published_only_prefer_published()
+
         folder_children += folder_qs
         folder_files += file_qs
 
         try:
             permissions = {
-                'has_edit_permission': folder.has_edit_permission(request),
-                'has_read_permission': folder.has_read_permission(request),
+                'has_edit_permission': folder.user_can_change(request.user),
+                'has_read_permission': folder.user_can_view(request.user),
                 'has_add_children_permission':
-                    folder.has_add_children_permission(request),
+                    folder.user_can_add_children(request.user),
             }
         except:
             permissions = {}
@@ -369,7 +374,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             for f in folder_files:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
                     clipboard = tools.get_user_clipboard(request.user)
-                    if f.has_edit_permission(request):
+                    if f.user_can_change(request.user):
                         tools.move_file_to_clipboard([f], clipboard)
                         return HttpResponseRedirect(request.get_full_path())
                     else:
@@ -859,11 +864,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # We do not allow moving to selected folders or their descendants
                 continue
 
-            if not fo.has_read_permission(request):
+            if not fo.user_can_view(request.user):
                 continue
 
             # We do not allow copying/moving back to the folder itself
-            enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
+            enabled = (allow_self or fo != current_folder) and fo.user_can_add_children(request.user)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_text(fo)), enabled))
             for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
                 yield c
@@ -875,6 +880,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         for f in files_queryset:
             f.folder = destination
+            if f.is_live and f.has_pending_changes:
+                f.draft.folder = destination
+                f.draft.save()
             f.save()
         for f in folders_queryset:
             f.move_to(destination, 'last-child')
@@ -1029,6 +1037,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # We are assuming here that we are operating on an already saved database objects with current database state available
 
         filename = self._generate_new_filename(file_obj.file.name, suffix)
+
+        # If we're copying a live version, remove the potential connection to a
+        # draft version.
+        if file_obj.is_live:
+            file_obj.live = None
 
         # Due to how inheritance works, we have to set both pk and id to None
         file_obj.pk = None

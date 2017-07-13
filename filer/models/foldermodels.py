@@ -2,6 +2,8 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import warnings
+
 import mptt
 from django.conf import settings
 from django.contrib.auth import models as auth_models
@@ -154,6 +156,48 @@ class Folder(models.Model, mixins.IconsMixin):
     def quoted_logical_path(self):
         return urlquote(self.pretty_logical_path)
 
+    def user_generic_permission(self, user, perm):
+        """
+        Return true if the current user has permission on this
+        folder. Return the string 'ALL' if the user has all rights.
+        """
+        if not user.is_authenticated():
+            return False
+        elif user.is_superuser:
+            return True
+        elif user == self.owner:
+            return True
+        else:
+            if not hasattr(self, "permission_cache") or\
+               perm not in self.permission_cache or \
+               user.pk != self.permission_cache['user'].pk:
+                if not hasattr(self, "permission_cache") or user.pk != self.permission_cache['user'].pk:
+                    self.permission_cache = {'user': user}
+
+                # This calls methods on the manager i.e. get_read_id_list()
+                func = getattr(FolderPermission.objects,
+                               "get_%s_id_list" % perm)
+                permission = func(user)
+                if permission == "All":
+                    self.permission_cache[perm] = True
+                    self.permission_cache['read'] = True
+                    self.permission_cache['edit'] = True
+                    self.permission_cache['add_children'] = True
+                else:
+                    self.permission_cache[perm] = self.id in permission
+            return self.permission_cache[perm]
+
+    def user_can_change(self, user):
+        # TODO: Migrate from 'edit' to 'change' at db level.
+        return self.user_generic_permission(user, 'edit')
+
+    def user_can_view(self, user):
+        # TODO: Migrate from 'read' to 'view' at db level.
+        return self.user_generic_permission(user, 'read')
+
+    def user_can_add_children(self, user):
+        return self.user_generic_permission(user, 'add_children')
+
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
 
@@ -168,34 +212,13 @@ class Folder(models.Model, mixins.IconsMixin):
         Return true if the current user has permission on this
         folder. Return the string 'ALL' if the user has all rights.
         """
+        warnings.warn(
+            "The has_<perm>_permission(request, permission_type) methods are "
+            "deprecated in favor of the user_can_<perm>(user) methods.",
+            DeprecationWarning,
+        )
         user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        else:
-            if not hasattr(self, "permission_cache") or\
-               permission_type not in self.permission_cache or \
-               request.user.pk != self.permission_cache['user'].pk:
-                if not hasattr(self, "permission_cache") or request.user.pk != self.permission_cache['user'].pk:
-                    self.permission_cache = {
-                        'user': request.user,
-                    }
-
-                # This calls methods on the manager i.e. get_read_id_list()
-                func = getattr(FolderPermission.objects,
-                               "get_%s_id_list" % permission_type)
-                permission = func(user)
-                if permission == "All":
-                    self.permission_cache[permission_type] = True
-                    self.permission_cache['read'] = True
-                    self.permission_cache['edit'] = True
-                    self.permission_cache['add_children'] = True
-                else:
-                    self.permission_cache[permission_type] = self.id in permission
-            return self.permission_cache[permission_type]
+        return self.user_generic_permission(user, permission_type)
 
     def get_admin_change_url(self):
         return urlresolvers.reverse('admin:filer_folder_change',

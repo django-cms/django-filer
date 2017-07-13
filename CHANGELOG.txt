@@ -1,9 +1,14 @@
 CHANGELOG
 =========
 
-1.2.9 (unreleased)
+1.3.0 (unreleased)
 ------------------
 
+* Optional draft/published support
+* Removed FileAdmin.build_fieldsets classmethod in favor of now natively
+  supported FileAdmin.get_fieldsets() (available since Django 1.7)
+* Admin templates cleanup
+* Bugfixes
 
 
 1.2.8 (2017-07-20)
