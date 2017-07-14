@@ -287,9 +287,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
     @property
     def canonical_time(self):
         if settings.USE_TZ:
-            return int((self.uploaded_at - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds())
+            return int((self.uploaded_at - datetime(1970, 1, 1, 1, tzinfo=timezone.utc)).total_seconds())
         else:
-            return int((self.uploaded_at - datetime(1970, 1, 1)).total_seconds())
+            return int((self.uploaded_at - datetime(1970, 1, 1, 1)).total_seconds())
 
     @property
     def canonical_url(self):
