@@ -1,10 +1,16 @@
 CHANGELOG
 =========
 
+1.2.8 (2017-07-20)
+------------------
+
+* Fixed a regression with loading and dumping fixtures (#965)
+
+
 1.2.7 (2017-03-02)
 ------------------
 
-* Added 'get_css_position' template filter for background images 
+* Added 'get_css_position' template filter for background images
 * Updated translations
 
 
