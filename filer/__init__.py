@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
 # version string following pep-0396 and pep-0386
-__version__ = '1.2.8'  # pragma: nocover
+__version__ = '1.2.9.dev'  # pragma: nocover
 
 default_app_config = 'filer.apps.FilerConfig'
