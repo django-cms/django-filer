@@ -50,7 +50,6 @@ from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
     AdminContext,
-    admin_each_context,
     admin_url_params_encoded,
     check_files_edit_permissions,
     check_files_read_permissions,
@@ -414,7 +413,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
 
-        context = admin_each_context(self.admin_site, request)
+        context = self.admin_site.each_context(request)
         context.update({
             'folder': folder,
             'clipboard_files': File.objects.filter(
@@ -761,7 +760,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             title = _("Are you sure?")
 
-        context = admin_each_context(self.admin_site, request)
+        context = self.admin_site.each_context(request)
         context.update({
             "title": title,
             "instance": current_folder,
@@ -912,7 +911,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 })
             return None
 
-        context = admin_each_context(self.admin_site, request)
+        context = self.admin_site.each_context(request)
         context.update({
             "title": _("Move files and/or folders"),
             "instance": current_folder,
@@ -995,7 +994,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             form = RenameFilesForm()
 
-        context = admin_each_context(self.admin_site, request)
+        context = self.admin_site.each_context(request)
         context.update({
             "title": _("Rename files"),
             "instance": current_folder,
@@ -1125,7 +1124,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 selected_destination_folder = 0
 
-        context = admin_each_context(self.admin_site, request)
+        context = self.admin_site.each_context(request)
         context.update({
             "title": _("Copy files and/or folders"),
             "instance": current_folder,
@@ -1256,7 +1255,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             form = ResizeImagesForm()
 
-        context = admin_each_context(self.admin_site, request)
+        context = self.admin_site.each_context(request)
         context.update({
             "title": _("Resize images"),
             "instance": current_folder,

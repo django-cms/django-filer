@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 from . import views
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder, Image
-from ..utils.compatibility import LTE_DJANGO_1_4
 from ..utils.files import (
     UploadException,
     handle_request_files_upload,
@@ -75,16 +74,17 @@ def ajax_upload(request, folder_id=None):
     Receives an upload from the uploader. Receives only one file at a time.
     """
     mimetype = "application/json" if request.is_ajax() else "text/html"
-    content_type_key = 'mimetype' if LTE_DJANGO_1_4 else 'content_type'
-    response_params = {content_type_key: mimetype}
+    response_params = {'content_type': mimetype}
     folder = None
     if folder_id:
         try:
             # Get folder
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
-            return HttpResponse(json.dumps({'error': NO_FOLDER_ERROR}),
-                                **response_params)
+            return HttpResponse(
+                json.dumps({'error': NO_FOLDER_ERROR}),
+                **response_params
+            )
 
     # check permissions
     if folder and not folder.has_add_children_permission(request):

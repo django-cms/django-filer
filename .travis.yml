@@ -18,30 +18,36 @@ env:
   - TOX_ENV=flake8
 
 # python 2.7
-  - TOX_ENV=py27-dj16-thumbs1x
-  - TOX_ENV=py27-dj16-thumbs2x
-  - TOX_ENV=py27-dj17-thumbs2x
-  - TOX_ENV=py27-dj18-thumbs2x
-  - TOX_ENV=py27-dj19-thumbs2x
-  - TOX_ENV=py27-dj110-thumbs2x
+  - TOX_ENV=py27-dj18
+  - TOX_ENV=py27-dj19
+  - TOX_ENV=py27-dj110
+  - TOX_ENV=py27-dj111
 
 # python 3.4
-  - TOX_ENV=py34-dj16-thumbs2x
-  - TOX_ENV=py34-dj17-thumbs2x
-  - TOX_ENV=py34-dj18-thumbs2x
-  - TOX_ENV=py34-dj19-thumbs2x
-  - TOX_ENV=py34-dj110-thumbs2x
+  - TOX_ENV=py34-dj18
+  - TOX_ENV=py34-dj19
+  - TOX_ENV=py34-dj110
+  - TOX_ENV=py34-dj111
 
 # python 3.5
-  - TOX_ENV=py35-dj18-thumbs2x
-  - TOX_ENV=py35-dj19-thumbs2x
-  - TOX_ENV=py35-dj110-thumbs2x
+  - TOX_ENV=py35-dj18
+  - TOX_ENV=py35-dj19
+  - TOX_ENV=py35-dj110
+  - TOX_ENV=py35-dj111
+
+# python 3.6
+  - TOX_ENV=py36-dj18
+  - TOX_ENV=py36-dj19
+  - TOX_ENV=py36-dj110
+  - TOX_ENV=py36-dj111
 
 # next Django release
-  - TOX_ENV=py27-djmaster-thumbs2x
-  - TOX_ENV=py34-djmaster-thumbs2x
-  - TOX_ENV=py35-djmaster-thumbs2x
+  - TOX_ENV=py27-djmaster
+  - TOX_ENV=py34-djmaster
+  - TOX_ENV=py35-djmaster
+  - TOX_ENV=py36-djmaster
 
+# frontend tests
   - TOX_ENV=frontend FE=1
 
 before_script:
@@ -60,6 +66,7 @@ after_success:
 
 matrix:
   allow_failures:
-    - env: TOX_ENV=py27-djmaster-thumbs2x
-    - env: TOX_ENV=py34-djmaster-thumbs2x
-    - env: TOX_ENV=py35-djmaster-thumbs2x
+    - env: TOX_ENV=py27-djmaster
+    - env: TOX_ENV=py34-djmaster
+    - env: TOX_ENV=py35-djmaster
+    - env: TOX_ENV=py36-djmaster
