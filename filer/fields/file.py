@@ -16,7 +16,6 @@ from django.utils.safestring import mark_safe
 from .. import settings as filer_settings
 from ..models import File
 from ..utils.compatibility import (
-    LTE_DJANGO_1_7,
     LTE_DJANGO_1_8,
     truncate_words,
 )
@@ -69,7 +68,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 'admin/img/icon_deletelink.gif' if LTE_DJANGO_1_8
                 else 'admin/img/icon-deletelink.svg'
             ),
-            'LTE_DJANGO_1_7': LTE_DJANGO_1_7,
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)

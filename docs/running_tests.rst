@@ -15,15 +15,15 @@ done for you. Tox will setup multiple virtual environments with different python
     # run all tests in all default environments
     tox
     # run tests on particular versions
-    tox -e py27-django18-thumbs2x,py34-django_master-thumbs2x
+    tox -e py27-dj18,py34-dj_master
     # run a test class in specific environment
-    tox -e py27-django18-thumbs2x -- test filer.tests.models.FilerApiTests
+    tox -e py27-dj18 -- test filer.tests.models.FilerApiTests
     # run a specific testcase in specific environment
-    tox -e py27-django18-thumbs2x -- test filer.tests.models.FilerApiTests.test_create_folder_structure
+    tox -e py27-dj18 -- test filer.tests.models.FilerApiTests.test_create_folder_structure
 
 Other test runner options are also supported, see
 `djangocms-helper <https://djangocms-helper.readthedocs.io/en/develop/>`_
 documentation for details.
 
 To speed things up a bit use `detox <http://pypi.python.org/pypi/detox/>`_. ``detox`` runs each testsuite in a
-separate process in parallel.
+separate process in parallel. Detox also supports using ``pyenv`` to install multiple python versions.
