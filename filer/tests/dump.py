@@ -148,4 +148,3 @@ class DumpDataTests(TestCase):
             complete = os.path.join(fileobj.file.storage.location, fileobj.path)
             # Filesystem data too!
             self.assertTrue(os.path.exists(complete))
-

@@ -5,9 +5,8 @@ import sys
 
 import django
 from django.utils import six
-
-from django.utils.text import Truncator
 from django.utils.functional import allow_lazy
+from django.utils.text import Truncator
 
 
 def truncate_words(s, num, end_text='...'):
