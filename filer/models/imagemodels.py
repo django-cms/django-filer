@@ -26,6 +26,8 @@ class Image(BaseImage):
 
     class Meta(BaseImage.Meta):
         swappable = 'FILER_IMAGE_MODEL'
+        if GTE_DJANGO_1_10:
+            default_manager_name = 'objects'
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
