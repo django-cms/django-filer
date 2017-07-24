@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.timezone import get_current_timezone, make_aware, now
 from django.utils.translation import ugettext_lazy as _
 
+from ..utils.compatibility import GTE_DJANGO_1_10
 from .abstract import BaseImage
 
 logger = logging.getLogger("filer")
@@ -25,6 +26,8 @@ class Image(BaseImage):
 
     class Meta(BaseImage.Meta):
         swappable = 'FILER_IMAGE_MODEL'
+        if GTE_DJANGO_1_10:
+            default_manager_name = 'objects'
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
