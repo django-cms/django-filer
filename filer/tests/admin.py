@@ -18,8 +18,8 @@ from .. import settings as filer_settings
 from ..admin.folderadmin import FolderAdmin
 from ..models.filemodels import File
 from ..models.foldermodels import Folder, FolderPermission
-from ..models.imagemodels import Image
 from ..models.virtualitems import FolderRoot
+from ..settings import FILER_IMAGE_MODEL
 from ..tests.helpers import (
     SettingsOverride,
     create_folder_structure,
@@ -27,8 +27,9 @@ from ..tests.helpers import (
     create_superuser,
 )
 from ..thumbnail_processors import normalize_subject_location
+from ..utils.loader import load_model
 
-from filer.settings import FILER_IMAGE_MODEL
+Image = load_model(FILER_IMAGE_MODEL)
 
 try:
     from unittest import skipIf
@@ -205,10 +206,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_video(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
-            'filer.test_utils.extended_app.models.ExtImage',
-            'filer.test_utils.extended_app.models.Video',
-            'filer.models.imagemodels.Image',
-            'filer.models.filemodels.File'
+            'extended_app.ExtImage',
+            'extended_app.Video',
+            'filer.Image',
+            'filer.File'
         )):
             self.assertEqual(Video.objects.count(), 0)
             folder = Folder.objects.create(name='foo')
@@ -225,10 +226,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_upload_extimage(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(
-            'filer.test_utils.extended_app.models.ExtImage',
-            'filer.test_utils.extended_app.models.Video',
-            'filer.models.imagemodels.Image',
-            'filer.models.filemodels.File'
+            'extended_app.ExtImage',
+            'extended_app.Video',
+            'filer.Image',
+            'filer.File'
         )):
             self.assertEqual(ExtImage.objects.count(), 0)
             folder = Folder.objects.create(name='foo')

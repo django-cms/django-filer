@@ -18,7 +18,7 @@ from ..utils.files import (
     handle_request_files_upload,
     handle_upload,
 )
-from ..utils.loader import load_object
+from ..utils.loader import load_model
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
@@ -104,7 +104,7 @@ def ajax_upload(request, folder_id=None):
 
         # find the file type
         for filer_class in filer_settings.FILER_FILE_MODELS:
-            FileSubClass = load_object(filer_class)
+            FileSubClass = load_model(filer_class)
             # TODO: What if there are more than one that qualify?
             if FileSubClass.matches_file_type(filename, upload, request):
                 FileForm = modelform_factory(
