@@ -12,8 +12,9 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
+from filer.settings import FILER_IMAGE_MODEL
+from filer.test_utils.extended_app.models import ExtImage, Video
 
-from filer.test_utils.extended_app.models import Video, ExtImage
 from .. import settings as filer_settings
 from ..admin.folderadmin import FolderAdmin
 from ..models.filemodels import File
@@ -27,8 +28,6 @@ from ..tests.helpers import (
     create_superuser,
 )
 from ..thumbnail_processors import normalize_subject_location
-
-from filer.settings import FILER_IMAGE_MODEL
 
 try:
     from unittest import skipIf
