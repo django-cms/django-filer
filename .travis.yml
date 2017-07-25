@@ -148,3 +148,12 @@ matrix:
     - os: linux
       python: "3.6"
       env: DJANGO="1.11" SWAP="yes"
+
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.10" SWAP="yes"
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.11" SWAP="yes"
