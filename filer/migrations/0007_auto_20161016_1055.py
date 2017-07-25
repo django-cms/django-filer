@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations
 from filer.utils.compatibility import GTE_DJANGO_1_10
 
+from filer.settings import FILER_IMAGE_MODEL
 
 
 class Migration(migrations.Migration):
@@ -13,7 +14,7 @@ class Migration(migrations.Migration):
         ('filer', '0006_auto_20160623_1627'),
     ]
 
-    if GTE_DJANGO_1_10:
+    if not FILER_IMAGE_MODEL and GTE_DJANGO_1_10:
         # This migrations is required in Django 1.10, but will error on Django 1.9 and below
         # As the migration below does not alter the database schema it's safe to skip it
         # on 1.9 and below
