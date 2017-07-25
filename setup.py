@@ -26,10 +26,10 @@ setup(
     author_email='stefan@foulis.ch',
     packages=find_packages(),
     install_requires=(
-        'Django>=1.8,<1.10.999',  # Django is known to use rc versions
-        'easy-thumbnails>=2,<2.4',
-        'django-mptt>=0.6,<0.9',  # the exact version depends on Django
-        'django_polymorphic>=0.7,<1.1',
+        'Django>=1.8,<1.12',  # Not limiting to <2, because of rc/alpha releases
+        'easy-thumbnails>=2,<3',
+        'django-mptt>=0.7,<0.9',  # the exact version depends on Django
+        'django_polymorphic>=0.7,<1.3',
         'Unidecode>=0.04,<0.05',
     ),
     include_package_data=True,
