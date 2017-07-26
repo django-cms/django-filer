@@ -252,7 +252,7 @@ class FilerApiTests(TestCase):
         Check that the correct model is loaded and save / reload data
         """
         image = self.create_filer_image()
-        if getattr(settings, 'FILER_IMAGE_MODEL', False):
+        if Image._meta.swapped:
             self.assertTrue(hasattr(image, 'extra_description'))
             self.assertFalse(hasattr(image, 'author'))
             image.extra_description = 'Extra'
