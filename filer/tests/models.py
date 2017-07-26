@@ -12,6 +12,7 @@ from .. import settings as filer_settings
 from ..models.clipboardmodels import Clipboard
 from ..models.filemodels import File
 from ..models.foldermodels import Folder
+from ..models.imagemodels import Image as DefaultImage
 from ..models.mixins import IconsMixin
 from ..settings import FILER_IMAGE_MODEL
 from ..test_utils import ET_2
@@ -252,7 +253,7 @@ class FilerApiTests(TestCase):
         Check that the correct model is loaded and save / reload data
         """
         image = self.create_filer_image()
-        if Image._meta.swapped:
+        if DefaultImage._meta.swapped:
             self.assertTrue(hasattr(image, 'extra_description'))
             self.assertFalse(hasattr(image, 'author'))
             image.extra_description = 'Extra'
