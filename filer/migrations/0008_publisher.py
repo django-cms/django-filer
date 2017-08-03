@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import filer.migrations
+import filer.settings
 
 
 class Migration(migrations.Migration):
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='publisher_is_published_version',
-            field=models.BooleanField(default=filer.migrations.new_file_is_published_status, db_index=True, editable=False),
+            field=models.BooleanField(default=filer.settings.new_file_is_published_status, db_index=True, editable=False),
         ),
         migrations.AddField(
             model_name='file',

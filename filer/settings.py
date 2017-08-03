@@ -256,3 +256,7 @@ FILER_ENABLE_PUBLISHER = getattr(settings, 'FILER_ENABLE_PUBLISHER', False)
 # If publisher is enabled, new files are drafts.
 new_file_is_published_default = not FILER_ENABLE_PUBLISHER
 FILER_PUBLISHER_NEW_FILE_IS_PUBLISHED_STATUS = getattr(settings, 'FILER_PUBLISHER_NEW_FILE_IS_PUBLISHED_STATUS', new_file_is_published_default)
+
+
+def new_file_is_published_status():
+    return FILER_PUBLISHER_NEW_FILE_IS_PUBLISHED_STATUS

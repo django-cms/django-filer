@@ -18,7 +18,6 @@ from polymorphic.query import PolymorphicQuerySet
 from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
-from ..migrations import new_file_is_published_status
 from ..utils.compatibility import python_2_unicode_compatible
 from ..vendor.publisher.models import (
     PublisherModelMixin,
@@ -390,6 +389,3 @@ class File(PolymorphicModel, PublisherModelMixin, mixins.IconsMixin):
         permissions = (
             ("can_publish", "Can publish"),
         )
-
-
-File._meta.get_field('publisher_is_published_version').default = new_file_is_published_status
