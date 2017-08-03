@@ -66,7 +66,7 @@ class PublisherAdminMixinBase(object):
             ):
                 return True
             return False
-        elif obj and obj.pk and obj.publisher_is_draft_version and obj.publisher_has_pending_changes:
+        elif obj and obj.pk and obj.publisher_is_draft_version and obj.publisher_has_published_version:
             return False
         return (
             super(PublisherAdminMixinBase, self)
@@ -128,6 +128,7 @@ class PublisherAdminMixinBase(object):
                 obj=obj,
                 defaults=defaults,
                 has_publish_permission=has_publish_permission,
+                has_delete_permission=has_delete_permission,
                 request=request,
             )
         for button in buttons.values():
@@ -149,7 +150,7 @@ class PublisherAdminMixinBase(object):
         if has_delete_permission:
             buttons['delete'] = copy(defaults['delete'])
 
-    def _publisher_get_buttons_edit(self, buttons, defaults, obj, has_publish_permission, request):
+    def _publisher_get_buttons_edit(self, buttons, defaults, obj, has_publish_permission, has_delete_permission, request):
         for action in obj.publisher_available_actions(request.user).values():
             action_name = action['name']
             buttons[action_name] = copy(defaults[action_name])
@@ -191,6 +192,8 @@ class PublisherAdminMixinBase(object):
             if has_publish_permission:
                 buttons.pop('publish_deletion', None)
                 buttons['delete'] = copy(defaults['delete'])
+        if has_delete_permission:
+            buttons['delete'] = copy(defaults['delete'])
         if obj.publisher_is_published_version:
             buttons['cancel'] = copy(defaults['cancel'])
             buttons['cancel']['url'] = self.publisher_get_admin_changelist_url(obj)
@@ -254,9 +257,9 @@ def get_all_button_defaults():
     defaults['show_live'] = {'label': _('View published version')}
     defaults['discard_draft'] = {'label': _('Discard changes'), 'class': 'danger'}
     defaults['publish'] = {'label': _('Publish'), 'class': 'default'}
-    defaults['request_deletion'] = {'label': _('Request deletion')}
+    defaults['request_deletion'] = {'label': _('Request deletion'), 'deletelink_button': True}
     defaults['discard_requested_deletion'] = {'label': _('Discard deletion request')}
-    defaults['publish_deletion'] = {'label': _('Delete'), 'class': 'danger'}
+    defaults['publish_deletion'] = {'label': _('Delete'), 'class': 'danger', 'deletelink_button': True}
 
     # TODO: Support for "save as new" and "save and add another"
     defaults['save'] = {
