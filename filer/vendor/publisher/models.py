@@ -8,10 +8,8 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
-from djangocms_publisher.utils.copying import DEFAULT_COPY_EXCLUDE_FIELDS
-
 from .utils.compat import PARLER_IS_INSTALLED
-from .utils.copying import copy_object
+from .utils.copying import DEFAULT_COPY_EXCLUDE_FIELDS, copy_object
 from .utils.relations import ignore_stuff_to_dict, update_relations
 
 
