@@ -1,0 +1,21 @@
+diff --git a/models.py b/models.py
+index 11cf043..336b937 100644
+--- a/models.py
++++ b/models.py
+@@ -12,6 +12,7 @@ from .utils.compat import PARLER_IS_INSTALLED
+ from .utils.copying import DEFAULT_COPY_EXCLUDE_FIELDS, copy_object
+ from .utils.relations import ignore_stuff_to_dict, update_relations
+ 
++from ... import settings
+ 
+ class PublisherQuerySetMixin(object):
+     def publisher_published(self):
+@@ -82,7 +83,7 @@ class PublisherQuerySet(PublisherQuerySetMixin, models.QuerySet):
+ 
+ class PublisherModelMixin(models.Model):
+     publisher_is_published_version = models.BooleanField(
+-        default=False,
++        default=settings.new_file_is_published_status,
+         editable=False,
+         db_index=True,
+     )

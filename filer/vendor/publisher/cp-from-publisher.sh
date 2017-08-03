@@ -5,6 +5,10 @@ set -x
 set -e
 export DJANGOCMS_PUBLISHER_DIR="../../../../djangocms-publisher"
 cp $DJANGOCMS_PUBLISHER_DIR/djangocms_publisher/models.py ./
+# To create a new version of the patch edit the default for the field in
+# models.py and run:
+# git diff --relative > is_published-default.patch
+patch models.py is_published-default.patch
 cp $DJANGOCMS_PUBLISHER_DIR/djangocms_publisher/admin.py ./
 cp $DJANGOCMS_PUBLISHER_DIR/djangocms_publisher/templates/admin/djangocms_publisher/tools/submit_line.html ../../templates/admin/filer/tools/
 mkdir -p utils
