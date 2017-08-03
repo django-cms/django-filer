@@ -880,9 +880,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         for f in files_queryset:
             f.folder = destination
-            if f.is_live and f.has_pending_changes:
-                f.draft.folder = destination
-                f.draft.save()
+            if f.publisher_is_published_version and f.publisher_has_pending_changes:
+                f.publisher_draft_version.folder = destination
+                f.publisher_draft_version.save()
             f.save()
         for f in folders_queryset:
             f.move_to(destination, 'last-child')
@@ -1040,8 +1040,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # If we're copying a live version, remove the potential connection to a
         # draft version.
-        if file_obj.is_live:
-            file_obj.live = None
+        if file_obj.publisher_is_published_version:
+            file_obj.publisher_published_version = None
 
         # Due to how inheritance works, we have to set both pk and id to None
         file_obj.pk = None
