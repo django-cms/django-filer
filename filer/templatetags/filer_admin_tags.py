@@ -5,7 +5,9 @@ from django.template import Library
 from django.utils.html import format_html_join
 
 from ..admin.tools import admin_url_params, admin_url_params_encoded
-from ..vendor.publisher.templatetags.djangocms_publisher_admin_tags import djangocms_publisher_submit_row
+from ..vendor.publisher.templatetags.djangocms_publisher_admin_tags import (
+    djangocms_publisher_submit_row,
+)
 
 register = Library()
 

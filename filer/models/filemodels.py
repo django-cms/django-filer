@@ -17,9 +17,13 @@ from polymorphic.query import PolymorphicQuerySet
 
 from . import mixins
 from .. import settings as filer_settings
-from ..vendor.publisher.models import PublisherQuerySetMixin, PublisherModelMixin
 from ..fields.multistorage_file import MultiStorageFileField
+from ..migrations import new_file_is_published_status
 from ..utils.compatibility import python_2_unicode_compatible
+from ..vendor.publisher.models import (
+    PublisherModelMixin,
+    PublisherQuerySetMixin,
+)
 from .foldermodels import Folder
 
 try:
@@ -388,5 +392,4 @@ class File(PolymorphicModel, PublisherModelMixin, mixins.IconsMixin):
         )
 
 
-from ..migrations import new_file_is_published_status
 File._meta.get_field('publisher_is_published_version').default = new_file_is_published_status

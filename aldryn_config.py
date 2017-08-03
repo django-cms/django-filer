@@ -34,7 +34,7 @@ class Form(forms.BaseForm):
                 'Cache-Control': 'public, max-age={}'.format(86400 * 365),
             },
         ))
-        
+
         settings['FILER_ENABLE_PUBLISHER'] = data['enable_publisher']
 
         # easy-thumbnails

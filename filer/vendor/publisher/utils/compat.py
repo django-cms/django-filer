@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
 
 from django.conf import settings
-
 
 __all__ = ['CMS_IS_INSTALLED', 'PARLER_IS_INSTALLED']
 

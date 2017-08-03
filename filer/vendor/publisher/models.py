@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
@@ -7,11 +7,12 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+
 from djangocms_publisher.utils.copying import DEFAULT_COPY_EXCLUDE_FIELDS
 
-from .utils.relations import update_relations, ignore_stuff_to_dict
-from .utils.copying import copy_object
 from .utils.compat import PARLER_IS_INSTALLED
+from .utils.copying import copy_object
+from .utils.relations import ignore_stuff_to_dict, update_relations
 
 
 class PublisherQuerySetMixin(object):
@@ -388,4 +389,3 @@ class PublisherModelMixin(models.Model):
             return False
         from parler.models import TranslatableModel
         return isinstance(self, TranslatableModel)
-

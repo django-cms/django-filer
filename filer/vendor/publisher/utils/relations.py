@@ -43,10 +43,7 @@ def update_one_to_many_relation(old_obj, new_obj, field, exclude):
             return 0
         for q in q_list:
             queryset = queryset.exclude(q)
-    try:
-        count = queryset.update(**{field_name: new_obj})
-    except Exception as exc:
-        raise
+    count = queryset.update(**{field_name: new_obj})
     return count
 
 
@@ -59,7 +56,7 @@ def update_many_to_many_relation(old_obj, new_obj, field, exclude):
     # A ManyToMany pointing to this model.
     model = field.through
     field_name = field.field.name
-
+    queryset = model.objects.all()
     if model in exclude and field_name in exclude[model]:
         q_list = exclude[model][field_name]
         if q_list is True:

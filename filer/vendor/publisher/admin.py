@@ -9,7 +9,6 @@ from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 
-
 from .utils.compat import PARLER_IS_INSTALLED
 
 

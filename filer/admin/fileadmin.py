@@ -9,9 +9,9 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 
 from .. import settings
-from ..vendor.publisher.admin import PublisherAdminMixin
 from ..models import File
 from ..utils.compatibility import unquote
+from ..vendor.publisher.admin import PublisherAdminMixin
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
