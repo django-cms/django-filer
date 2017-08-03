@@ -8,11 +8,11 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
+from ... import settings
 from .utils.compat import PARLER_IS_INSTALLED
 from .utils.copying import DEFAULT_COPY_EXCLUDE_FIELDS, copy_object
 from .utils.relations import ignore_stuff_to_dict, update_relations
 
-from ... import settings
 
 class PublisherQuerySetMixin(object):
     def publisher_published(self):
