@@ -8,24 +8,18 @@
         <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}{% filer_admin_context_url_params %}" class="deletelink">{% trans "Delete" %}</a></p>
     {% elif button.url %}
         <a href="{{ button.url }}{% filer_admin_context_url_params %}" class="btn">{{ button.label }}</a>
-    {% elif button.fake_delete_link %}
-        <p class="deletelink-box">
-            <button
-                type="submit"
-                name="{{ button.field_name }}"
-                {% if button.class %}class="{{ button.class }}"{% endif %}
-                {% if not button.has_permission %}disabled="disabled"{% endif %}
-            >
-                {{ button.label }}
-            </button>
-        </p>
     {% else %}
         <input
             type="submit"
             value="{{ button.label }}"
             name="{{ button.field_name }}"
             {% if button.class %}class="{{ button.class }}"{% endif %}
-            {% if not button.has_permission %}disabled="disabled"{% endif %}
+            {% if not button.has_permission %}
+                disabled="disabled"
+                {% if button.disabled_message %}
+                    title="{{ button.disabled_message }}"
+                {% endif %}
+            {% endif %}
         />
     {% endif %}
 {% endfor %}

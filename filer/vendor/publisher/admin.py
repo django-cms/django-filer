@@ -130,6 +130,9 @@ class PublisherAdminMixinBase(object):
                 has_publish_permission=has_publish_permission,
                 request=request,
             )
+        for button in buttons.values():
+            if button.get('has_permission') is False and 'disabled_message' not in button:
+                button['disabled_message'] = _('Permissions required')
         ordered_buttons = OrderedDict()
         for key in defaults.keys():
             if key not in buttons:
@@ -174,6 +177,7 @@ class PublisherAdminMixinBase(object):
                 buttons[action_name]['url'] = self.publisher_get_detail_admin_url(obj.publisher_published_version)
             else:
                 buttons[action_name]['has_permission'] = False
+                buttons[action_name]['disabled_message'] = _('There is no published version yet.')
         elif obj.publisher_is_draft_version and not obj.publisher_has_published_version:
             # Add a link to go back to live
             action_name = 'show_live'
