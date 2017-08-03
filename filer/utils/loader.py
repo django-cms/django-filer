@@ -42,14 +42,9 @@ def load_object(import_path):
 
 
 def load_model(model_name):
-    from django import VERSION as django_version
+    from django.apps import apps
 
     model_name_tuple = model_name.split('.')
-
-    if django_version[:2] < (1, 7):
-        from django.db.models import get_model
-        return get_model(*model_name_tuple)
-    from django.apps import apps
     return apps.get_model(*model_name_tuple)
 
 
