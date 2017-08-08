@@ -22,7 +22,7 @@ import json
 # even though the CharField is limited at 255 characters, the filename is used in
 # thumbnail creation, which remembers the path and also post-fixes the name with
 # '__32x32_q85_crop_subsampling-2_upscale.jpg'-like strings
-FILENAME_LIMIT = 100
+FILENAME_LIMIT = 100 # larger values cause DataError
 
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
@@ -172,11 +172,9 @@ class ClipboardAdmin(admin.ModelAdmin):
         except Exception as error: # no matter the error, we don't return a 500 code
             # an error occurred trying to build the file obj and the clipboard item
             # since they are interconnected, we'll delete both to cleanup
-            if file_obj and file_obj.file:
-                file_obj.file.close()
-                file_obj.delete()
-                file_obj = None # so finally clause doesn't try to close the file again
             if clipboard_item:
+                clipboard_item.file.file.close()
+                clipboard_item.file.file.delete()
                 clipboard_item.delete()
             return HttpResponse(json.dumps({'error': unicode(error)}),
                                 content_type=mimetype)
