@@ -19,6 +19,11 @@ import imghdr
 import os
 import json
 
+# even though the CharField is limited at 255 characters, the filename is used in
+# thumbnail creation, which remembers the path and also post-fixes the name with
+# '__32x32_q85_crop_subsampling-2_upscale.jpg'-like strings
+FILENAME_LIMIT = 100
+
 # ModelAdmins
 class ClipboardItemInline(admin.TabularInline):
     model = ClipboardItem
@@ -113,11 +118,14 @@ class ClipboardAdmin(admin.ModelAdmin):
         receives an upload from the uploader. Receives only one file at the time.
         """
         mimetype = "application/json" if request.is_ajax() else "text/html"
-        upload, file_obj = None ,None
+        upload, file_obj = None, None
         try:
             upload, filename, is_raw = handle_upload(request)
 
-            extension = os.path.splitext(filename)[1]
+            title, extension = os.path.splitext(filename)
+            title = title[:FILENAME_LIMIT]
+            upload.name = title # the upload raw has also the title saved in a CharField
+            filename = title + extension
             if not extension:
                 # try to guess if it's an image and append extension
                 # imghdr will detect file is a '.jpeg', '.png' or '.gif' image
@@ -143,7 +151,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
                 file_obj.save()
                 clipboard_item = ClipboardItem(
-                                    clipboard=clipboard, file=file_obj)
+                    clipboard=clipboard, file=file_obj)
                 clipboard_item.save()
                 json_response = {
                     'thumbnail': file_obj.icons['32'],
@@ -158,8 +166,19 @@ class ClipboardAdmin(admin.ModelAdmin):
                     ', '.join(errors)) for field, errors in uploadform.errors.items()
                 ])
                 raise UploadException(self.messages['request-invalid'].format(form_errors))
-        except UploadException, e:
-            return HttpResponse(json.dumps({'error': unicode(e)}),
+        except UploadException, exception:
+            return HttpResponse(json.dumps({'error': unicode(exception)}),
+                                content_type=mimetype)
+        except Exception as error: # no matter the error, we don't return a 500 code
+            # an error occurred trying to build the file obj and the clipboard item
+            # since they are interconnected, we'll delete both to cleanup
+            if file_obj and file_obj.file:
+                file_obj.file.close()
+                file_obj.delete()
+                file_obj = None # so finally clause doesn't try to close the file again
+            if clipboard_item:
+                clipboard_item.delete()
+            return HttpResponse(json.dumps({'error': unicode(error)}),
                                 content_type=mimetype)
         finally:
             if upload:
