@@ -302,6 +302,35 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
 
+    def test_filer_ajax_upload_long_filename(self):
+        # additional setup
+        # create an image with a long filename
+        long_image_name = 'test' * 26 + '.jpg' # length of 104 title + 4 extension
+        filename = os.path.join(os.path.dirname(__file__), long_image_name)
+        long_name_img = create_image()
+        long_name_img.save(filename, 'JPEG')
+
+        # preconditions: before upload
+        self.assertEqual(Image.objects.count(), 0)
+
+        # try to upload
+        file_obj = dj_files.File(open(filename))
+        response = self.client.post(reverse('admin:filer-ajax_upload') +
+                                    '?filename=%s' % long_image_name,
+                                    data=file_obj.read(),
+                                    content_type='application/octet-stream',
+                                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                                   )
+        # upload succedes
+        self.assertEqual(Image.objects.count(), 1)
+        # but title is not the long one
+        self.assertTrue(Image.objects.first().original_filename != long_image_name)
+        # it is first 100 characters
+        self.assertTrue(Image.objects.first().original_filename == 'test' * 25 + '.jpg')
+
+        # additional tear down
+        os.remove(filename)
+
 
 class BulkOperationsMixin(object):
 
