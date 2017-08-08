@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Revision e86cfa2 (08.08.2017, 15:01 UTC)
+----------------------------------------
+
+* LUN-3798
+
+  * Implement review findings
+  * Add unit-tests and bump version
+  * No 500 error at uploading long filename
+
+No other commits.
+
 Revision 108e8d0 (20.06.2017, 07:59 UTC)
 ----------------------------------------
 
