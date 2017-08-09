@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
+import warnings
 from datetime import datetime
 
 from django.conf import settings
@@ -12,11 +13,16 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from polymorphic.query import PolymorphicQuerySet
 
 from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from ..utils.compatibility import python_2_unicode_compatible
+from ..vendor.publisher.models import (
+    PublisherModelMixin,
+    PublisherQuerySetMixin,
+)
 from .foldermodels import Folder
 
 try:
@@ -41,11 +47,18 @@ class FileManager(PolymorphicManager):
         return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
 
 
+class FileQuerySet(PublisherQuerySetMixin, PolymorphicQuerySet):
+    pass
+
+
 @python_2_unicode_compatible
-class File(PolymorphicModel, mixins.IconsMixin):
+class File(PolymorphicModel, PublisherModelMixin, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
     _file_data_changed_hint = None
+    ignore_copy_fields = (
+        'file_ptr',
+    )
 
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
         null=True, blank=True)
@@ -76,7 +89,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
                     'file. File will be publicly accessible '
                     'to anyone.'))
 
-    objects = FileManager()
+    objects = FileManager.from_queryset(FileQuerySet)()
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -211,8 +224,41 @@ class File(PolymorphicModel, mixins.IconsMixin):
         text = "%s" % (text,)
         return text
 
+    @property
+    def label_with_status(self):
+        return self.publisher_add_status_label(self.label)
+
     def __lt__(self, other):
         return self.label.lower() < other.label.lower()
+
+    def user_can_view(self, user):
+        # TODO: Migrate from 'read' to 'view' at db level.
+        return self.user_generic_permission(user, 'read')
+
+    def user_can_change(self, user):
+        # TODO: Migrate from 'edit' to 'change' at db level.
+        return self.user_generic_permission(user, 'edit')
+
+    def user_can_add_children(self, user):
+        return self.user_has_generic_permission(user, 'add_children')
+
+    def user_can_publish(self, user):
+        if filer_settings.FILER_ENABLE_PUBLISHER:
+            return user.has_perm('filer.can_publish')
+        else:
+            return user.has_perm('filer.can_change_file')
+
+    def user_generic_permission(self, user, perm):
+        if not user.is_authenticated():
+            return False
+        elif user.is_superuser:
+            return True
+        elif user == self.owner:
+            return True
+        elif self.folder:
+            return self.folder.user_generic_permission(user, perm)
+        else:
+            return False
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
@@ -228,24 +274,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
         Return true if the current user has permission on this
         image. Return the string 'ALL' if the user has all rights.
         """
+        warnings.warn(
+            "The has_<perm>_permission(request, permission_type) methods are "
+            "deprecated in favor of the user_can_<perm>(user) methods.",
+            DeprecationWarning,
+        )
         user = request.user
-        if not user.is_authenticated():
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
+        return self.user_generic_permission(user, permission_type)
 
     def __str__(self):
-        if self.name in ('', None):
-            text = "%s" % (self.original_filename,)
-        else:
-            text = "%s" % (self.name,)
-        return text
+        return self.label_with_status
 
     def get_admin_change_url(self):
         return urlresolvers.reverse(
@@ -348,3 +386,6 @@ class File(PolymorphicModel, mixins.IconsMixin):
         app_label = 'filer'
         verbose_name = _('file')
         verbose_name_plural = _('files')
+        permissions = (
+            ("can_publish", "Can publish"),
+        )

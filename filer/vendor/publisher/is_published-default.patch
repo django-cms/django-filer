@@ -1,0 +1,19 @@
+--- ../../../../djangocms-publisher/djangocms_publisher/models.py	2017-08-03 11:53:01.000000000 +0200
++++ ./models.py	2017-08-03 11:52:07.000000000 +0200
+@@ -8,6 +8,7 @@
+ from django.utils.functional import cached_property
+ from django.utils.translation import ugettext_lazy as _
+ 
++from ... import settings
+ from .utils.compat import PARLER_IS_INSTALLED
+ from .utils.copying import DEFAULT_COPY_EXCLUDE_FIELDS, copy_object
+ from .utils.relations import ignore_stuff_to_dict, update_relations
+@@ -82,7 +83,7 @@
+ 
+ class PublisherModelMixin(models.Model):
+     publisher_is_published_version = models.BooleanField(
+-        default=False,
++        default=settings.new_file_is_published_status,
+         editable=False,
+         db_index=True,
+     )

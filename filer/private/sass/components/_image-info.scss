@@ -1,16 +1,13 @@
 //##############################################################################
 // IMAGE INFO
 
+.filer-file-info > .field-file_info > div > label {
+    // Hide the empty label for the image info (without this there would be a
+    // stray ":" on the page)
+    display: none;
+}
+
 .image-info {
-    position: relative;
-    float: right;
-    box-sizing: border-box;
-    width: 28%;
-    margin-top: 0;
-    border: 0;
-    border-radius: 3px;
-    background: #fff;
-    box-shadow: 0 0 5px 0 rgba(black,0.2);
     .image-details,
     .actions-list {
         margin: 0;
@@ -28,21 +25,6 @@
     }
     &.image-info-detail {
         @include clearfix();
-        position: static;
-        float: none;
-        width: 100%;
-        margin-bottom: 20px;
-        padding: 25px;
-        border-radius: 0;
-        // removes background color and shadow from object tools and fixes placement on image detail page
-        + #content-main .object-tools {
-            margin-top: 20px;
-            margin-right: 20px;
-            background-color: transparent;
-            &:before {
-                display: none;
-            }
-        }
         .image-details-left {
             float: left;
         }
@@ -149,10 +131,18 @@
 }
 
 .image-info-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     padding: 5px 10px;
     border-bottom: solid 1px $gray-lighter;
     a {
         margin-left: 5px;
+    }
+
+    button,
+    .btn {
+        margin-left: 10px;
     }
 }
 

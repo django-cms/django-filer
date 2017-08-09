@@ -80,7 +80,7 @@ def ajax_upload(request, folder_id=None):
             return JsonResponse({'error': NO_FOLDER_ERROR})
 
     # check permissions
-    if folder and not folder.has_add_children_permission(request):
+    if folder and not folder.user_can_add_children(request.user):
         return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
     try:
         if len(request.FILES) == 1:

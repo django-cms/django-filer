@@ -1,9 +1,8 @@
 {% extends "admin/filer/change_form.html" %}
-{% load i18n admin_modify staticfiles %}
+{% load i18n admin_urls admin_modify staticfiles filer_admin_tags %}
 
 {% block extrahead %}
     {{ block.super }}
-
     {# upload stuff #}
     <script type="text/javascript">
         var __jQuery = django.jQuery;
@@ -30,15 +29,22 @@
     </script>
 {% endblock %}
 
+{% block submit_buttons_top %}{% filer_admin_submit_row %}{% endblock %}
+{% block submit_buttons_bottom %}{% filer_admin_submit_row %}{% endblock %}
 
-{% block object-tools %}
-    {% if change and not is_popup %}
-        <ul class="object-tools">
-            <li><a href="{% url history_url object_id %}" class="historylink">{% trans "History" %}</a></li>
-            {% if has_absolute_url %}
-                <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
-            {% endif%}
-        </ul>
-    {% endif %}
-    {% include "admin/filer/tools/detail_info.html" with detail=True file=True %}
+{% block sidebar %}
+    {% block file_sidebar %}
+        {% with original.duplicates as duplicates %}
+            {% if duplicates %}
+                <div class="file-duplicates">
+                    <h3>{% trans "Duplicates" %}</h3>
+                    <ul>
+                        {% for duplicate in duplicates %}
+                            <li><a href="{{ duplicate.get_admin_change_url }}">{{ duplicate }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endblock %}
 {% endblock %}
