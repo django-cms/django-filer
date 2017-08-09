@@ -4,6 +4,7 @@ CHANGELOG
 1.2.9 (unreleased)
 ------------------
 
+* Fixed `get_css_position` filter breaking when there is no image
 
 
 1.2.8 (2017-07-20)
