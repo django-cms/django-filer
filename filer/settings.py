@@ -235,12 +235,14 @@ FILER_PRIVATEMEDIA_SERVER = load_object(FILER_SERVERS['private']['main']['ENGINE
 FILER_PRIVATEMEDIA_THUMBNAIL_SERVER = load_object(FILER_SERVERS['private']['thumbnails']['ENGINE'])(**FILER_SERVERS['private']['thumbnails']['OPTIONS'])
 
 # By default limit number of simultaneous uploads if we are using SQLite
-if settings.DATABASES['default']['ENGINE'].endswith('sqlite3'):
-    _uploader_connections = 1
-else:
-    _uploader_connections = 3
 FILER_UPLOADER_CONNECTIONS = getattr(
-    settings, 'FILER_UPLOADER_CONNECTIONS', _uploader_connections)
+    settings, 'FILER_UPLOADER_CONNECTIONS', None)
+
+if FILER_UPLOADER_CONNECTIONS is None:
+    if settings.DATABASES and settings.DATABASES['default']['ENGINE'].endswith('sqlite3'):
+        FILER_UPLOADER_CONNECTIONS = 1
+    else:
+        FILER_UPLOADER_CONNECTIONS = 3
 
 FILER_DUMP_PAYLOAD = getattr(settings, 'FILER_DUMP_PAYLOAD', False)  # Whether the filer shall dump the files payload
 
