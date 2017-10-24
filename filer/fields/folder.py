@@ -13,7 +13,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from ..models import Folder
-from ..utils.compatibility import LTE_DJANGO_1_7, truncate_words
+from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
 
@@ -63,7 +63,6 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             'noimg': 'filer/icons/nofile_32x32.png',
             'foldid': css_id_folder,
             'id': css_id,
-            'LTE_DJANGO_1_7': LTE_DJANGO_1_7,
         }
         html = render_to_string('admin/filer/widgets/admin_folder.html', context)
         return mark_safe(html)

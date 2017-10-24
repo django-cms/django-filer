@@ -78,7 +78,7 @@ private (with permission checks) storages. Defaults to ``'filer.utils.generate_f
 
 
 ``FILER_SERVERS``
-------------------
+-----------------
 
 .. warning:: Server Backends are experimental and the API may change at any time.
 

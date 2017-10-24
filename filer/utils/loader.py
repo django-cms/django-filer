@@ -41,6 +41,13 @@ def load_object(import_path):
     return getattr(module, object_name)
 
 
+def load_model(model_name):
+    from django.apps import apps
+
+    model_name_tuple = model_name.split('.')
+    return apps.get_model(*model_name_tuple)
+
+
 def storage_factory(klass, location, base_url):
     """
     This factory returns an instance of the storage class provided.
