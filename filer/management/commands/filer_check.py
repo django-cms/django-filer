@@ -90,8 +90,10 @@ class Command(BaseCommand):
                     msg = _("Delete missing file reference '{}/{}' from database.")
                 else:
                     msg = _("Referenced file '{}/{}' is missing in media folder.")
-                if options['verbosity']:
+                if options['verbosity'] > 2:
                     self.stdout.write(msg.format(str(file.folder), str(file)))
+                elif options['verbosity']:
+                    self.stdout.write(os.path.join(str(file.folder), str(file)))
 
     def verify_storages(self, options):
         from filer.models.filemodels import File
@@ -106,8 +108,10 @@ class Command(BaseCommand):
                         msg = _("Deleted orphanded file '{}'")
                     else:
                         msg = _("Found orphanded file '{}'")
-                    if options['verbosity']:
+                    if options['verbosity'] > 2:
                         self.stdout.write(msg.format(relfilename))
+                    elif options['verbosity']:
+                        self.stdout.write(relfilename)
 
             for child in child_dirs:
                 walk(os.path.join(prefix, child))

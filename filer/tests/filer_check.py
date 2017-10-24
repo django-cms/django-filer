@@ -22,7 +22,7 @@ class FilerCheckTestCase(BaseServerBackendTestCase):
 
         os.remove(self.filer_file.file.path)
         call_command('filer_check', stdout=out, missing=True)
-        self.assertEqual("Referenced file 'None/testimage.jpg' is missing in media folder.\n", out.getvalue())
+        self.assertEqual("None/testimage.jpg\n", out.getvalue())
         self.assertIsInstance(File.objects.get(id=file_pk), File)
 
         call_command('filer_check', delete_missing=True, interactive=False, verbosity=0)
@@ -45,7 +45,7 @@ class FilerCheckTestCase(BaseServerBackendTestCase):
         with open(orphan_file, 'w') as fh:
             fh.write("I don't belong here!")
         call_command('filer_check', stdout=out, orphans=True)
-        self.assertEqual("Found orphanded file 'filer_public/hello.txt'\n", out.getvalue())
+        self.assertEqual("filer_public/hello.txt\n", out.getvalue())
         self.assertTrue(os.path.exists(orphan_file))
 
         call_command('filer_check', delete_orphans=True, interactive=False, verbosity=0)
