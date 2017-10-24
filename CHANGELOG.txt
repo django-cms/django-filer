@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.3.x
+-----
+
+* Added management command ``filer_check`` to check the integrity of the
+  database against the file system, and vice versa.
+
+
 1.2.8 (2017-07-20)
 ------------------
 
