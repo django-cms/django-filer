@@ -1,11 +1,17 @@
 CHANGELOG
 =========
 
-1.3.x
------
+Next Version
+------------
 
 * Added management command ``filer_check`` to check the integrity of the
   database against the file system, and vice versa.
+
+
+1.2.9 (unreleased)
+------------------
+
+* Fixed `get_css_position` filter breaking when there is no image
 
 
 1.2.8 (2017-07-20)

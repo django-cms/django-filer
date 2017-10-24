@@ -38,7 +38,7 @@ In your own application, you need to create a Video model. This model has to inh
         pass # for now...
     
 
-When a file is uploaded, :py:meth:`filer.admin.clipboardadmin.ClipboardAdmin.ajax_upload` loops over the different classes in ``filer.settings.FILER_FILE_MODELS`` and calls its ``matches_file_type()`` to see if the file matches a known filename extension.
+When a file is uploaded, :py:meth:`filer.admin.clipboardadmin.ClipboardAdmin.ajax_upload` loops over the different models in ``filer.settings.FILER_FILE_MODELS`` and calls its ``matches_file_type()`` to see if the file matches a known filename extension.
 
 When a match is found, the filer will create an instance of that class for the file.
 

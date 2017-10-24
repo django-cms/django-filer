@@ -10,8 +10,11 @@ from django.test.testcases import TestCase
 from ..models import tools
 from ..models.clipboardmodels import Clipboard
 from ..models.foldermodels import Folder
-from ..models.imagemodels import Image
+from ..settings import FILER_IMAGE_MODEL
+from ..utils.loader import load_model
 from .helpers import create_image, create_superuser
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 class ToolsTestCase(TestCase):

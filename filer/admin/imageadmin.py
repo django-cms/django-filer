@@ -5,9 +5,12 @@ from django import forms
 from django.utils.translation import ugettext as _
 from django.utils.translation import string_concat, ugettext_lazy
 
-from ..models import Image
+from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
+from ..utils.loader import load_model
 from .fileadmin import FileAdmin
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 class ImageAdminForm(forms.ModelForm):
