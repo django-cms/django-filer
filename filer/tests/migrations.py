@@ -6,7 +6,7 @@ from unittest import skipIf
 import django
 from django.core.management import call_command
 from django.test import TestCase
-from six import StringIO
+from django.utils.six import StringIO
 
 
 class MigrationsTests(TestCase):

@@ -34,8 +34,12 @@ django.jQuery(function ($) {
             window.parent.CMS.API.Messages.open({
                 message: message
             });
-        } catch (errorText) {
-            console.log(errorText);
+        } catch (e) {
+            if (window.filerShowError) {
+                window.filerShowError(message);
+            } else {
+                alert(message);
+            }
         }
     };
 
@@ -88,7 +92,7 @@ django.jQuery(function ($) {
             drop: function () {
                 this.removeAllFiles(true);
                 fileChoose.hide();
-                lookupButton.addClass(hiddenClass);
+                lookupButton.addClass('related-lookup-change');
                 message.addClass(hiddenClass);
                 dropzone.removeClass(dragHoverClass);
                 dropzone.addClass(objectAttachedClass);
@@ -110,7 +114,7 @@ django.jQuery(function ($) {
                     }
                 } else {
                     if (response && response.error) {
-                        window.showError(file.name + ': ' + response.error);
+                        showError(file.name + ': ' + response.error);
                     }
                     this.removeAllFiles(true);
                 }
@@ -130,7 +134,7 @@ django.jQuery(function ($) {
                 }
                 dropzone.removeClass(objectAttachedClass);
                 inputId.val('');
-                lookupButton.removeClass(hiddenClass);
+                lookupButton.removeClass('related-lookup-change');
                 message.removeClass(hiddenClass);
                 inputId.trigger('change');
             }
@@ -143,8 +147,8 @@ django.jQuery(function ($) {
             Dropzone.autoDiscover = false;
         }
         dropzones.each(createDropzone);
-        $(document).on('formset:added', function (ev, row) {
-            var dropzones = $(row).find(dropzoneSelector);
+        $('.add-row a').on('click', function () {
+            var dropzones = $(dropzoneSelector);
             dropzones.each(createDropzone);
         });
     }

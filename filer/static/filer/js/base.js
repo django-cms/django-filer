@@ -14,7 +14,7 @@ Cl.mediator = new Mediator();
     $(function () {
         var showErrorTimeout;
 
-        window.showError = function (message) {
+        window.filerShowError = function (message) {
             var messages = $('.messagelist');
             var header = $('#header');
             var filerErrorClass = 'js-filer-error';

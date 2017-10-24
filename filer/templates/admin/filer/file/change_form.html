@@ -30,19 +30,15 @@
     </script>
 {% endblock %}
 
+
 {% block object-tools %}
-  {% if change and not is_popup %}
-    <ul class="object-tools">
-        <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-        {% if has_absolute_url %}
-            <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
-        {% endif%}
-    </ul>
-  {% endif %}
-{% endblock %}
-
-{% block content %}
+    {% if change and not is_popup %}
+        <ul class="object-tools">
+            <li><a href="{% url history_url object_id %}" class="historylink">{% trans "History" %}</a></li>
+            {% if has_absolute_url %}
+                <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
+            {% endif%}
+        </ul>
+    {% endif %}
     {% include "admin/filer/tools/detail_info.html" with detail=True file=True %}
-    {{ block.super }}
 {% endblock %}
-

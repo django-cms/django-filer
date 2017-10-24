@@ -11,6 +11,7 @@ form .form-row {
         }
     }
     .filer-dropzone {
+        @include clearfix;
         position: relative;
         min-width: 215px;
         border: solid 1px $gray-lighter;
@@ -162,6 +163,7 @@ form .form-row {
         }
         .filerFile .related-lookup {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+            float: left !important;
             overflow: hidden;
             // makes true that button has correct height #668
             line-height: $font-size-normal;
@@ -177,6 +179,38 @@ form .form-row {
             }
             &:before {
                 display: none;
+            }
+            .choose-file,
+            .edit-file {
+                color: white;
+                margin: 0;
+            }
+            .edit-file {
+                display: none;
+            }
+            &.related-lookup-change {
+                @include button-variant($btn-default-color, white, $btn-default-border, true);
+                float: right !important;
+                padding: 5px 0 !important;
+                width: 36px !important;
+                height: 36px !important;
+                &:focus {
+                    background-color: white !important;
+                }
+                span {
+                    text-align: center;
+                    line-height: 24px;
+                }
+                .fa {
+                    color: #999;
+                    margin-right: 0 !important;
+                }
+                .choose-file {
+                    display: none;
+                }
+                .edit-file {
+                    display: block;
+                }
             }
         }
         // makes sure that filer clear button has correct size #669
@@ -194,7 +228,7 @@ form .form-row {
                 background-color: $white;
             }
             // make sure that text crops if there is not enough space #670
-            span:not(:empty) {
+            span:not(:empty):not('.choose-file'):not('.edit-file') {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
@@ -220,10 +254,6 @@ form .form-row {
                 display: inline-block;
                 text-align: center !important;
                 vertical-align: top;
-            }
-            // required for django CMS <= 3.1 #673
-            .related-lookup {
-                float: right !important;
             }
             // required for django CMS <= 3.1
             a {
@@ -275,10 +305,20 @@ form .form-row {
                 margin-top: 75px;
             }
             &.js-object-attached .filerFile {
-                top: 62px;
+                top: 32px;
                 text-align: left;
-                &.js-file-selector span, .dz-name {
-                    width: calc(100% - 100px);
+                &.js-file-selector {
+                    @media screen and (max-width: $screen-tablet-filer) {
+                        .description_text {
+                            text-overflow: ellipsis;
+                            width: calc(100% - 150px);
+                            overflow: hidden;
+                            height: 20px;
+                        }
+                    }
+                    span:not('.choose-file'):not('.edit-file'), .dz-name {
+                        width: calc(100% - 145px);
+                    }
                 }
             }
         }
@@ -323,7 +363,7 @@ form .form-row {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        max-width: calc(100% - 100px);
+        max-width: calc(100% - 145px);
     }
     .dz-thumbnail {
         display: inline-block;

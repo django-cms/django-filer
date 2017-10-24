@@ -19,7 +19,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_text
 from django.utils.html import escape
-from django.utils.http import urlquote
+from django.utils.http import urlquote, urlunquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy, ungettext
@@ -287,7 +287,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # search
         q = request.GET.get('q', None)
         if q:
-            search_terms = unquote(q).split(" ")
+            search_terms = urlunquote(q).split(" ")
             search_mode = True
         else:
             search_terms = []
@@ -360,8 +360,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder_files.sort()
 
         items = folder_children + folder_files
-        items_permissions = [(item, {'change': self.has_change_permission(request, item)}) for item in items]
-        paginator = Paginator(items_permissions, FILER_PAGINATE_BY)
+        paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
@@ -422,7 +421,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 in_clipboards__clipboarditem__clipboard__user=request.user
             ).distinct(),
             'paginator': paginator,
-            'paginated_items': paginated_items,  # [(item, item_perms), ]
+            'paginated_items': paginated_items,
             'virtual_items': virtual_items,
             'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
             'permissions': permissions,
@@ -1035,6 +1034,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         file_obj.id = None
         file_obj.save()
         file_obj.folder = destination
+        file_obj._file_data_changed_hint = False  # no need to update size, sha1, etc.
         file_obj.file = file_obj._copy_file(filename)
         file_obj.original_filename = self._generate_new_filename(file_obj.original_filename, suffix)
         file_obj.save()
@@ -1186,7 +1186,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _resize_image(self, image, form_data):
         original_width = float(image.width)
         original_height = float(image.height)
-        thumbnailer = FilerActionThumbnailer(file=image.file.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
+        thumbnailer = FilerActionThumbnailer(file=image.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
         # This should overwrite the original image
         new_image = thumbnailer.get_thumbnail({
             'size': tuple(int(form_data[d] or 0) for d in ('width', 'height')),
@@ -1195,8 +1195,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'subject_location': image.subject_location,
         })
         image.file.file = new_image.file
-        image.generate_sha1()
-        image.save()  # Also gets new width and height
+        # Since only file data was changed, there is no way for file field to know about the change.
+        # To update size, sha1, width and height fields let's call file_data_changed callback directly.
+        image.file_data_changed()
+        image.save()
 
         subject_location = normalize_subject_location(image.subject_location)
         if subject_location:

@@ -805,7 +805,7 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items: FOO, BAR, BAZ, SAMP
             self.assertEquals(
-                set(folder.pk for folder, folder_perms in item_list),
+                set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
 
@@ -819,7 +819,7 @@ class FolderListingTest(TestCase):
             # he doesn't see BAR, BAZ and SPAM because he doesn't own them
             # and no permission has been given
             self.assertEquals(
-                set(folder.pk for folder, folder_perms in item_list),
+                set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk]))
 
     def test_with_permission_given_to_folder(self):
@@ -838,7 +838,7 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
             self.assertEquals(
-                set(folder.pk for folder, folder_perms in item_list),
+                set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk]))
 
     def test_with_permission_given_to_parent_folder(self):
@@ -856,7 +856,7 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items because he has permissions on the parent folder
             self.assertEquals(
-                set(folder.pk for folder, folder_perms in item_list),
+                set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
 
@@ -886,6 +886,29 @@ class FolderListingTest(TestCase):
 
         folder_qs = folderadmin.filter_folder(Folder.objects.all(), ['joe@mata.com'])
         self.assertEqual(len(folder_qs), 0)
+
+    def test_search_special_characters(self):
+        """ 
+        Regression test for https://github.com/divio/django-filer/pull/945.
+        Because of a wrong unquoting function being used, searches with 
+        some "_XX" sequences got unquoted as unicode characters.
+        For example, "_ec" gets unquoted as u'ì'.
+        """
+        url = reverse('admin:filer-directory_listing',
+                      kwargs={'folder_id': self.parent.id})
+
+        # Create a file with a problematic filename
+        problematic_file = django.core.files.base.ContentFile('some data')
+        filename = u'christopher_eccleston'
+        problematic_file.name = filename
+        self.spam_file = File.objects.create(
+            owner=self.staff_user, original_filename=filename,
+            file=problematic_file, folder=self.parent)
+
+        # Valid search for the filename, should have one result
+        response = self.client.get(url, {'q': filename})
+        item_list = response.context['paginated_items'].object_list
+        self.assertEqual(len(item_list), 1)
 
 
 class FilerAdminContextTests(TestCase, BulkOperationsMixin):

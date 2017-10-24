@@ -70,7 +70,9 @@
                 &rsaquo;
                 {{ breadcrumbs_action }}
             {% else %}
-                &rsaquo;
+                {% if not instance.is_root and instance.is_smart_folder %}
+                    &rsaquo;
+                {% endif %}
                 {% if instance.label %}
                     {{ instance.label }}
                 {% else %}
