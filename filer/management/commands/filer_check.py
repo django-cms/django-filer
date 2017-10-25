@@ -11,9 +11,9 @@ from django.utils.translation import ugettext_lazy as _
 from filer.settings import DEFAULT_FILER_STORAGES
 
 try:
-   input = raw_input
+    input = raw_input
 except NameError:
-   pass
+    pass
 
 
 class Command(BaseCommand):
