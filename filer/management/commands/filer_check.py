@@ -8,7 +8,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 from django.utils.six.moves import input
 from django.utils.translation import ugettext_lazy as _
-
 from filer.settings import DEFAULT_FILER_STORAGES
 
 
