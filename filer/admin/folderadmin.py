@@ -428,7 +428,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),
             'current_url': request.path,
-            'title': 'Directory listing for %s' % folder.name,
+            'title': _('Directory listing for %(folder_name)s') % {'folder_name': folder.name},
             'search_string': ' '.join(search_terms),
             'q': urlquote(q),
             'show_result_count': show_result_count,
