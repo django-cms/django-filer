@@ -146,7 +146,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Image',
             fields=[
-                ('file_ptr', models.OneToOneField(serialize=False, auto_created=True, to='filer.File', primary_key=True, parent_link=True)),
+                ('file_ptr', models.OneToOneField(serialize=False, auto_created=True, to='filer.File', primary_key=True, parent_link=True,on_delete=models.CASCADE)),
                 ('_height', models.IntegerField(null=True, blank=True)),
                 ('_width', models.IntegerField(null=True, blank=True)),
                 ('date_taken', models.DateTimeField(verbose_name='date taken', null=True, editable=False, blank=True)),
