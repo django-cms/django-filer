@@ -100,7 +100,7 @@ class Folder(models.Model, mixins.IconsMixin):
     _icon = 'plainfolder'
 
     parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
-                               related_name='children')
+                               related_name='children', on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=255)
 
     owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=_('owner'),
@@ -262,14 +262,15 @@ class FolderPermission(models.Model):
         (DENY, _('deny')),
     )
 
-    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
+    folder = models.ForeignKey(Folder, verbose_name=('folder'),
+                               null=True, blank=True, on_delete=models.CASCADE)
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
                              related_name="filer_folder_permissions", on_delete=models.SET_NULL,
                              verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(auth_models.Group,
-                              related_name="filer_folder_permissions",
+                              related_name="filer_folder_permissions", on_delete=models.CASCADE,
                               verbose_name=_("group"), blank=True, null=True)
     everybody = models.BooleanField(_("everybody"), default=False)
 
