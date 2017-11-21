@@ -266,7 +266,9 @@ class FolderPermission(models.Model):
         (DENY, _('deny')),
     )
 
-    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True, on_delete=models.CASCADE)
+    folder = models.ForeignKey(
+        Folder, verbose_name=('folder'), null=True, blank=True, on_delete=models.CASCADE
+    )
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),

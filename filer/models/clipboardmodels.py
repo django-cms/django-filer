@@ -42,8 +42,12 @@ class Clipboard(models.Model):
 
 
 class ClipboardItem(models.Model):
-    file = models.ForeignKey('File', verbose_name=_('file'), on_delete=models.CASCADE)
-    clipboard = models.ForeignKey(Clipboard, verbose_name=_('clipboard'), on_delete=models.CASCADE)
+    file = models.ForeignKey(
+        'File', verbose_name=_('file'), on_delete=models.CASCADE
+    )
+    clipboard = models.ForeignKey(
+        Clipboard, verbose_name=_('clipboard'), on_delete=models.CASCADE
+    )
 
     class Meta(object):
         app_label = 'filer'
