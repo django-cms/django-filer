@@ -43,7 +43,7 @@
 
             <br>
 
-            {{ hidden_input }}
+            <div class="hidden">{{ hidden_input }}</div>
             <script type="text/javascript" id="{{id}}_javascript">
                 django.jQuery(document).ready(function(){
                     var plus = django.jQuery('#add_{{ id }}');
