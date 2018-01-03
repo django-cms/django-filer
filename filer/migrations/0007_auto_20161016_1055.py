@@ -6,7 +6,6 @@ from django.db import migrations
 from filer.utils.compatibility import GTE_DJANGO_1_10
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
