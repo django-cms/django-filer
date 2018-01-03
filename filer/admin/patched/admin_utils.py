@@ -24,7 +24,6 @@ from django.utils.text import capfirst
 
 from ...utils.compatibility import quote
 
-
 try:
     from django.urls import reverse, NoReverseMatch
 except ImportError:

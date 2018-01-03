@@ -11,7 +11,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 
 try:
-    from django.urls import revers
+    from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
 
