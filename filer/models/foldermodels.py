@@ -21,7 +21,6 @@ except ImportError:
     from django.core.urlresolvers import reverse
 
 
-
 class FolderManager(models.Manager):
     def with_bad_metadata(self):
         return self.get_query_set().filter(has_all_mandatory_data=False)
