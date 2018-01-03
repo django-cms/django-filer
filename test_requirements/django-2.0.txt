@@ -1,6 +1,5 @@
-git+git://github.com/django/django.git@master#egg=Django
+django>=2.0,<2.1
 django-mptt>=0.7,<0.9
-django_polymorphic>=2.0,<2.1
 https://github.com/nephila/djangocms-helper/archive/develop.zip
 coverage
 
