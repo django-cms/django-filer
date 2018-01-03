@@ -6,7 +6,6 @@ import warnings
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
@@ -15,6 +14,11 @@ from django.utils.safestring import mark_safe
 from ..models import Folder
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 
 class AdminFolderWidget(ForeignKeyRawIdWidget):

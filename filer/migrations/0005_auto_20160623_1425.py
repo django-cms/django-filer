@@ -29,4 +29,9 @@ class Migration(migrations.Migration):
             name='user',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='filer_folder_permissions', to=settings.AUTH_USER_MODEL, verbose_name='user'),
         ),
+        migrations.AlterField(
+            model_name='folderpermission',
+            name='user',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='filer_folder_permissions', to=settings.AUTH_USER_MODEL, verbose_name='user'),
+        ),
     ]
