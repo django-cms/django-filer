@@ -18,7 +18,7 @@ In order to activate this feature, add::
 
 to the projects ``settings.py`` file.
 
-If the content has been dumped together with to payload, the files are restored when using
+If the content has been dumped together with the payload, the files are restored when using
 ``manage.py loaddata``. If the payload is missing, only the meta-data is restored. This is the
 default behavior.
 
