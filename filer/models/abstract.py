@@ -68,7 +68,8 @@ class BaseImage(File):
                 self._width, self._height = PILImage.open(imgfile).size
                 imgfile.seek(0)
             except Exception:
-                self._width, self._height = None, None
+                if post_init is False:
+                    self._width, self._height = None, None
         return attrs_updated
 
     def save(self, *args, **kwargs):
