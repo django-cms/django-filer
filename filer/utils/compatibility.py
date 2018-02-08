@@ -5,7 +5,10 @@ import sys
 
 import django
 from django.utils import six
-from django.utils.functional import allow_lazy
+try:
+    from django.utils.functional import keep_lazy as allow_lazy
+except ImportError:
+    from django.utils.functional import allow_lazy
 from django.utils.text import Truncator
 
 
