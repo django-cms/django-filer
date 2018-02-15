@@ -25,9 +25,9 @@ class Migration(migrations.Migration):
             name='MyModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('folder', filer.fields.folder.FilerFolderField(related_name='test_folder', to='filer.Folder')),
-                ('general', filer.fields.file.FilerFileField(related_name='test_file', to='filer.File')),
-                ('image', filer.fields.image.FilerImageField(related_name='test_image', to=FILER_IMAGE_MODEL)),
+                ('folder', filer.fields.folder.FilerFolderField(related_name='test_folder', to='filer.Folder', on_delete=models.CASCADE)),
+                ('general', filer.fields.file.FilerFileField(related_name='test_file', to='filer.File', on_delete=models.CASCADE)),
+                ('image', filer.fields.image.FilerImageField(related_name='test_image', to=FILER_IMAGE_MODEL, on_delete=models.CASCADE)),
             ],
             options={
             },

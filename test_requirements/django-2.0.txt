@@ -1,5 +1,5 @@
 django>=2.0,<2.1
-django-mptt>=0.7,<0.9
+django-mptt>=0.9
 https://github.com/nephila/djangocms-helper/archive/develop.zip
 coverage
 
