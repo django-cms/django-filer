@@ -173,7 +173,11 @@ class Folder(models.Model, mixins.IconsMixin):
         folder. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated():
+        try:
+            is_authenticated = user.is_authenticated() # Django<1.10
+        except TypeError:
+            is_authenticated = user.is_authenticated # Django 1.10 - 2.x
+        if not is_authenticated:
             return False
         elif user.is_superuser:
             return True

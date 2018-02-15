@@ -121,7 +121,7 @@ class FilerFileField(models.ForeignKey):
     default_form_class = AdminFileFormField
     default_model_class = File
 
-    def __init__(self, **kwargs):
+    def __init__(self, on_delete=models.CASCADE, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
         dfl = get_model_label(self.default_model_class)
         if "to" in kwargs.keys():  # pragma: no cover
@@ -132,14 +132,14 @@ class FilerFileField(models.ForeignKey):
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
-        super(FilerFileField, self).__init__(**kwargs)
+        super(FilerFileField, self).__init__(on_delete=on_delete, **kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
         # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
-            'rel': self.rel,
+            'rel': self.remote_field,
         }
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)

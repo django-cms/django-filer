@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='image',
             name='file_ptr',
-            field=models.OneToOneField(serialize=False, related_name='filer_image_file', parent_link=True, to='filer.File', primary_key=True),
+            field=models.OneToOneField(serialize=False, related_name='filer_image_file', parent_link=True, to='filer.File', primary_key=True, on_delete=models.CASCADE),
         ),
     ]
