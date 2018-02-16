@@ -16,19 +16,18 @@ from __future__ import absolute_import, unicode_literals
 from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
 from django.db.models.deletion import Collector
+from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
 
 from ...utils.compatibility import quote
 
 try:
-    from django.utils.encoding import force_text
+    from django.urls import reverse, NoReverseMatch
 except ImportError:
-    # Django < 1.5
-    from django.utils.encoding import force_unicode as force_text
+    from django.core.urlresolvers import reverse, NoReverseMatch
 
 
 def get_deleted_objects(objs, opts, user, admin_site, using):

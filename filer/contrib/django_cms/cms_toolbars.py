@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,6 +9,12 @@ from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.toolbar.items import Break
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 
 SHORTCUTS_BREAK = 'Shortcuts Break'
 

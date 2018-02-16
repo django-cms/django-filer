@@ -13,7 +13,6 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.core.urlresolvers import reverse
 from django.db import models, router
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -58,6 +57,12 @@ from .tools import (
     popup_status,
     userperms_for_request,
 )
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 

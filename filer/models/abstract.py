@@ -39,7 +39,7 @@ class BaseImage(File):
     subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
                                         default='')
     file_ptr = models.OneToOneField(
-        to='filer.File',
+        to='filer.File', parent_link=True,
         related_name='%(app_label)s_%(class)s_file',
         on_delete=models.CASCADE,
     )
@@ -110,7 +110,11 @@ class BaseImage(File):
         image. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated():
+        try:
+            is_authenticated = user.is_authenticated() # Django<1.10
+        except TypeError:
+            is_authenticated = user.is_authenticated # Django 1.10 - 2.x
+        if not is_authenticated:
             return False
         elif user.is_superuser:
             return True

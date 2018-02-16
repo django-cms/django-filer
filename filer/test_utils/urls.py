@@ -6,13 +6,14 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.static import serve
+import django
 
 admin.autodiscover()
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve,
         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls) if django.VERSION <= (2,0) else admin.site.urls),
     url(r'^', include('filer.server.urls')),
     url(r'^filer/', include('filer.urls')),
 ]
