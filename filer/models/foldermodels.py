@@ -235,6 +235,7 @@ class Folder(models.Model, mixins.IconsMixin):
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
 
+
 # MPTT registration
 try:
     mptt.register(Folder)

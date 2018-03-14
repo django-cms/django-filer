@@ -155,4 +155,5 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
 
+
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()
