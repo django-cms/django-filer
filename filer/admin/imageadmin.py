@@ -10,6 +10,7 @@ from ..thumbnail_processors import normalize_subject_location
 from ..utils.loader import load_model
 from .fileadmin import FileAdmin
 
+
 Image = load_model(FILER_IMAGE_MODEL)
 
 

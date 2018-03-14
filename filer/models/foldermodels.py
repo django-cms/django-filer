@@ -27,6 +27,7 @@ class FolderPermissionManager(models.Manager):
     Theses methods are called by introspection from "has_generic_permisison" on
     the folder model.
     """
+
     def get_read_id_list(self, user):
         """
         Give a list of a Folders where the user has read rights or the string
@@ -46,7 +47,7 @@ class FolderPermissionManager(models.Manager):
         allow_list = set()
         deny_list = set()
         group_ids = user.groups.all().values_list('id', flat=True)
-        q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
+        q = Q(user=user) | Q(groups__in=group_ids) | Q(everybody=True)
         perms = self.filter(q).order_by('folder__tree_id', 'folder__level',
                                         'folder__lft')
         for perm in perms:
@@ -60,9 +61,11 @@ class FolderPermissionManager(models.Manager):
                 assert perm.type == FolderPermission.ALL
 
                 if p == FolderPermission.ALLOW:
-                    allow_list.update(Folder.objects.all().values_list('id', flat=True))
+                    allow_list.update(
+                        Folder.objects.all().values_list('id', flat=True))
                 else:
-                    deny_list.update(Folder.objects.all().values_list('id', flat=True))
+                    deny_list.update(
+                        Folder.objects.all().values_list('id', flat=True))
 
                 continue
 
@@ -75,9 +78,11 @@ class FolderPermissionManager(models.Manager):
 
             if perm.type == FolderPermission.CHILDREN:
                 if p == FolderPermission.ALLOW:
-                    allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                    allow_list.update(
+                        perm.folder.get_descendants().values_list('id', flat=True))
                 else:
-                    deny_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                    deny_list.update(
+                        perm.folder.get_descendants().values_list('id', flat=True))
 
         # Deny has precedence over allow
         return allow_list - deny_list
@@ -263,7 +268,8 @@ class FolderPermission(models.Model):
         (DENY, _('deny')),
     )
 
-    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
+    folder = models.ForeignKey(
+        Folder, verbose_name=_('folder'), null=True, blank=True)
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -272,11 +278,18 @@ class FolderPermission(models.Model):
     group = models.ForeignKey(auth_models.Group,
                               related_name="filer_folder_permissions",
                               verbose_name=_("group"), blank=True, null=True)
+    groups = models.ManyToManyField(auth_models.Group,
+                                    related_name='filer_folder_permission_groups',
+                                    verbose_name=_("groups"),
+                                    blank=True)
     everybody = models.BooleanField(_("everybody"), default=False)
 
-    can_edit = models.SmallIntegerField(_("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)
-    can_read = models.SmallIntegerField(_("can read"), choices=PERMISIONS, blank=True, null=True, default=None)
-    can_add_children = models.SmallIntegerField(_("can add children"), choices=PERMISIONS, blank=True, null=True, default=None)
+    can_edit = models.SmallIntegerField(
+        _("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)
+    can_read = models.SmallIntegerField(
+        _("can read"), choices=PERMISIONS, blank=True, null=True, default=None)
+    can_add_children = models.SmallIntegerField(
+        _("can add children"), choices=PERMISIONS, blank=True, null=True, default=None)
 
     objects = FolderPermissionManager()
 
@@ -284,16 +297,13 @@ class FolderPermission(models.Model):
         if self.folder:
             name = '%s' % self.folder
         else:
-            name = 'All Folders'
+            name = _('All Folders')
 
         ug = []
-        if self.everybody:
-            ug.append('Everybody')
-        else:
-            if self.group:
-                ug.append("Group: %s" % self.group)
-            if self.user:
-                ug.append("User: %s" % self.user)
+        groups_name_list = self.groups.values_list('name', flat=True)
+        ug.append(_("groups") + ": %s" % ", ".join(groups_name_list))
+        if self.user:
+            ug.append(_("User") + ": %s" % self.user)
         usergroup = " ".join(ug)
         perms = []
         for s in ['can_edit', 'can_read', 'can_add_children']:
@@ -303,19 +313,17 @@ class FolderPermission(models.Model):
             elif perm == self.DENY:
                 perms.append('!%s' % s)
         perms = ', '.join(perms)
-        return "Folder: '%s'->%s [%s] [%s]" % (
+        return _("Folder") + ": '%s'->%s [%s] [%s]" % (
             name, self.get_type_display(),
             perms, usergroup)
 
     def clean(self):
         if self.type == self.ALL and self.folder:
-            raise ValidationError('Folder cannot be selected with type "all items".')
+            raise ValidationError(
+                _('Folder cannot be selected with type "all items".'))
         if self.type != self.ALL and not self.folder:
-            raise ValidationError('Folder has to be selected when type is not "all items".')
-        if self.everybody and (self.user or self.group):
-            raise ValidationError('User or group cannot be selected together with "everybody".')
-        if not self.user and not self.group and not self.everybody:
-            raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
+            raise ValidationError(
+                _('Folder has to be selected when type is not "all items".'))
 
     class Meta(object):
         verbose_name = _('folder permission')
