@@ -280,7 +280,8 @@ class FolderPermission(models.Model):
                               verbose_name=_("group"), blank=True, null=True)
     groups = models.ManyToManyField(auth_models.Group,
                                     related_name='filer_folder_permission_groups',
-                                    verbose_name=_("groups"))
+                                    verbose_name=_("groups"),
+                                    blank=True)
     everybody = models.BooleanField(_("everybody"), default=False)
 
     can_edit = models.SmallIntegerField(
