@@ -53,51 +53,43 @@ matrix:
       language: generic
       python: "2.7"
       env: DJANGO="1.8" SWAP="no"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.9" SWAP="no"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.10" SWAP="no"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.11" SWAP="no"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
 
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.8" SWAP="yes"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.9" SWAP="yes"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.10" SWAP="yes"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.11" SWAP="yes"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
 
     - os: linux
       python: "3.4"
@@ -169,11 +161,9 @@ matrix:
       language: generic
       python: "2.7"
       env: DJANGO="1.10" SWAP="yes"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.11" SWAP="yes"
-      install:
-        - pip2 install tox-travis coveralls
+      osx_image: xcode7.3
