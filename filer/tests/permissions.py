@@ -39,9 +39,13 @@ class FolderPermissionsTestCase(TestCase):
 
         self.group1 = Group.objects.create(name='name1')
         self.group2 = Group.objects.create(name='name2')
+        self.group3 = Group.objects.create(name='name3')
+        self.group4 = Group.objects.create(name='name4')
 
         self.test_user1.groups.add(self.group1)
-        self.test_user2.groups.add(self.group2)
+        self.test_user1.groups.add(self.group2)
+        self.test_user2.groups.add(self.group3)
+        self.test_user2.groups.add(self.group4)
 
         self.img = create_image()
         self.image_name = 'test_file.jpg'
@@ -115,8 +119,10 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group1, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
-            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group2, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
+            fp1 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
+            fp2 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
+            fp1.groups.add(self.group1, self.group2)
+            fp2.groups.add(self.group2, self.group3)
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
@@ -126,10 +132,9 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_read_permission(request2), False)
-            self.assertEqual(self.folder_perm.has_read_permission(request1), False)
+            self.assertEqual(self.folder_perm.has_read_permission(request1), True)
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
 
-            self.test_user1.groups.add(self.group2)
             self.test_user2.groups.add(self.group1)
 
             # We have to invalidate cache
@@ -159,8 +164,10 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group1, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group2, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            fp1 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
+            fp2 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            fp1.groups.add(self.group1)
+            fp2.groups.add(self.group3)
 
             self.assertEqual(FolderPermission.objects.count(), 2)
 
@@ -173,11 +180,11 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_edit_permission(request1), False)
 
-            self.assertEqual(self.test_user1.groups.count(), 1)
-
-            self.test_user1.groups.add(self.group2)
-
             self.assertEqual(self.test_user1.groups.count(), 2)
+
+            self.test_user1.groups.add(self.group3)
+
+            self.assertEqual(self.test_user1.groups.count(), 3)
 
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
@@ -204,25 +211,26 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
-            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group2, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
-            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group1, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
-
+            fp1 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=FolderPermission.DENY, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.DENY)
+            fp2 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            fp1.groups.add(self.group4)
+            fp2.groups.add(self.group1)
             self.assertEqual(FolderPermission.objects.count(), 2)
 
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
 
-            self.assertEqual(self.test_user2.groups.filter(pk=self.group2.pk).exists(), True)
+            self.assertEqual(self.test_user2.groups.filter(pk=self.group4.pk).exists(), True)
             self.assertEqual(self.test_user2.groups.filter(pk=self.group1.pk).exists(), False)
 
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
             self.assertEqual(self.folder_perm.has_edit_permission(request2), False)
 
-            self.assertEqual(self.test_user2.groups.count(), 1)
+            self.assertEqual(self.test_user2.groups.count(), 2)
 
             self.test_user2.groups.add(self.group1)
 
-            self.assertEqual(self.test_user2.groups.count(), 2)
+            self.assertEqual(self.test_user2.groups.count(), 3)
 
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
@@ -248,25 +256,26 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group1, can_edit=None, can_read=FolderPermission.ALLOW, can_add_children=None)
-            FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, group=self.group2, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
-
+            fp1 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=None, can_read=FolderPermission.ALLOW, can_add_children=None)
+            fp2 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            fp1.groups.add(self.group1)
+            fp1.groups.add(self.group3)
             self.assertEqual(FolderPermission.objects.count(), 2)
 
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
 
             self.assertEqual(self.test_user1.groups.filter(pk=self.group1.pk).exists(), True)
-            self.assertEqual(self.test_user1.groups.filter(pk=self.group2.pk).exists(), False)
+            self.assertEqual(self.test_user1.groups.filter(pk=self.group3.pk).exists(), False)
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_edit_permission(request1), False)
 
-            self.assertEqual(self.test_user1.groups.count(), 1)
-
-            self.test_user1.groups.add(self.group2)
-
             self.assertEqual(self.test_user1.groups.count(), 2)
+
+            self.test_user1.groups.add(self.group3)
+
+            self.assertEqual(self.test_user1.groups.count(), 3)
 
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
@@ -293,25 +302,26 @@ class FolderPermissionsTestCase(TestCase):
 
             self.assertEqual(FolderPermission.objects.count(), 0)
 
-            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group2, can_edit=None, can_read=FolderPermission.ALLOW, can_add_children=None)
-            FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, group=self.group1, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
-
+            fp1 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=None, can_read=FolderPermission.ALLOW, can_add_children=None)
+            fp2 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
+            fp1.groups.add(self.group3)
+            fp1.groups.add(self.group1)
             self.assertEqual(FolderPermission.objects.count(), 2)
 
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
 
-            self.assertEqual(self.test_user2.groups.filter(pk=self.group2.pk).exists(), True)
+            self.assertEqual(self.test_user2.groups.filter(pk=self.group3.pk).exists(), True)
             self.assertEqual(self.test_user2.groups.filter(pk=self.group1.pk).exists(), False)
 
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
             self.assertEqual(self.folder_perm.has_edit_permission(request2), False)
 
-            self.assertEqual(self.test_user2.groups.count(), 1)
+            self.assertEqual(self.test_user2.groups.count(), 2)
 
             self.test_user2.groups.add(self.group1)
 
-            self.assertEqual(self.test_user2.groups.count(), 2)
+            self.assertEqual(self.test_user2.groups.count(), 3)
 
             # We have to invalidate cache
             delattr(self.folder_perm, 'permission_cache')
