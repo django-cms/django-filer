@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-03-01 14:41-0500\n"
-"PO-Revision-Date: 2018-03-12 14:52-0300\n"
+"PO-Revision-Date: 2018-03-14 10:02-0300\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-filer/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "URL canônica"
 
 #: admin/folderadmin.py:386 admin/folderadmin.py:553
 msgid "Items must be selected in order to perform actions on them. No items have been changed."
-msgstr "itens precisam ser selecionar para que a ação seja executada. Nenhuma alteração foi efetuada."
+msgstr "Itens precisam ser selecionar para que a ação seja executada. Nenhuma alteração foi efetuada."
 
 #: admin/folderadmin.py:406
 #, python-format
@@ -120,7 +120,8 @@ msgstr "Mover arquivo(s) e/ou pasta(s) selecionados"
 msgid "Successfully renamed %(count)d files."
 msgstr "%(count)d arquivo(s) foram renomeados com sucesso."
 
-#: admin/folderadmin.py:1000 admin/folderadmin.py:1002 admin/folderadmin.py:1017
+#: admin/folderadmin.py:1000 admin/folderadmin.py:1002
+#: admin/folderadmin.py:1017
 msgid "Rename files"
 msgstr "Renomear arquivos"
 
@@ -152,7 +153,7 @@ msgstr "Redimensionar imagens selecionadas"
 
 #: admin/forms.py:27
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr "Sufixo que será anexado aos nomes dos arquivos copiados"
+msgstr "Sufixo que será anexado aos nomes dos arquivos copiados."
 
 #: admin/forms.py:34
 #, python-format
@@ -195,7 +196,7 @@ msgstr "Escolher entre as opções de miniaturas ou parâmetros de redimensionam
 
 #: admin/forms.py:74
 msgid "Resize parameters must be choosen."
-msgstr "Os parâmetros de redimensionamento precisam ser escolhidos"
+msgstr "Os parâmetros de redimensionamento precisam ser escolhidos."
 
 #: admin/imageadmin.py:16 admin/imageadmin.py:94
 msgid "Subject location"
@@ -211,7 +212,7 @@ msgstr "Formato da localização do sujeito inválido."
 
 #: admin/imageadmin.py:60
 msgid "Subject location is outside of the image. "
-msgstr "Localização do sujeito está fora da imagem"
+msgstr "Localização do sujeito está fora da imagem. "
 
 #: admin/imageadmin.py:69
 #, python-brace-format
@@ -222,7 +223,9 @@ msgstr "Valor informado: ”{subject_location}”. "
 msgid "Folder with this name already exists."
 msgstr "Já existe uma pasta com esse nome."
 
-#: apps.py:10 templates/admin/filer/breadcrumbs.html:5 templates/admin/filer/folder/change_form.html:7 templates/admin/filer/folder/directory_listing.html:47
+#: apps.py:10 templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/directory_listing.html:47
 msgid "Filer"
 msgstr "Filer"
 
@@ -260,13 +263,14 @@ msgstr "arquivos"
 
 #: models/clipboardmodels.py:37 models/clipboardmodels.py:43
 msgid "clipboard"
-msgstr "Área de transferência"
+msgstr "área de transferência"
 
 #: models/clipboardmodels.py:38
 msgid "clipboards"
 msgstr "áreas de transferência"
 
-#: models/clipboardmodels.py:42 models/filemodels.py:52 models/filemodels.py:350
+#: models/clipboardmodels.py:42 models/filemodels.py:52
+#: models/filemodels.py:350
 msgid "file"
 msgstr "arquivo"
 
@@ -278,8 +282,10 @@ msgstr "item da área de transferência"
 msgid "clipboard items"
 msgstr "itens da área de transferência"
 
-#: models/filemodels.py:50 templates/admin/filer/folder/change_form.html:8 templates/admin/filer/folder/directory_listing.html:118
-#: templates/admin/filer/folder/new_folder_form.html:5 templates/admin/filer/tools/clipboard/clipboard.html:27
+#: models/filemodels.py:50 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:118
+#: templates/admin/filer/folder/new_folder_form.html:5
+#: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
 msgstr "pasta"
 
@@ -299,7 +305,8 @@ msgstr "possui todos os dados necessários"
 msgid "original filename"
 msgstr "nome original do arquivo"
 
-#: models/filemodels.py:61 models/foldermodels.py:104 models/thumbnailoptionmodels.py:14
+#: models/filemodels.py:61 models/foldermodels.py:104
+#: models/thumbnailoptionmodels.py:14
 msgid "name"
 msgstr "nome"
 
@@ -309,7 +316,7 @@ msgstr "descrição"
 
 #: models/filemodels.py:67 models/foldermodels.py:106
 msgid "owner"
-msgstr "Proprietário"
+msgstr "proprietário"
 
 #: models/filemodels.py:69 models/foldermodels.py:110
 msgid "uploaded at"
@@ -331,7 +338,8 @@ msgstr "Desativar qualquer checagem de permissão para este arquivo. O arquivo p
 msgid "created at"
 msgstr "criado em"
 
-#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7 templates/admin/filer/widgets/admin_folder.html:33
+#: models/foldermodels.py:235 templates/admin/filer/widgets/admin_folder.html:7
+#: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
 msgstr "Pasta"
 
@@ -419,7 +427,9 @@ msgstr "altura em pixel."
 msgid "thumbnail options"
 msgstr "opções de miniatura"
 
-#: models/virtualitems.py:50 templates/admin/filer/folder/directory_table.html:4 templates/admin/filer/folder/directory_table.html:157
+#: models/virtualitems.py:50
+#: templates/admin/filer/folder/directory_table.html:4
+#: templates/admin/filer/folder/directory_table.html:157
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
 msgstr "Uploads Não Classificados"
@@ -428,7 +438,9 @@ msgstr "Uploads Não Classificados"
 msgid "files with missing metadata"
 msgstr "arquivos com falta de metadados"
 
-#: models/virtualitems.py:79 templates/admin/filer/breadcrumbs.html:7 templates/admin/filer/folder/change_form.html:8 templates/admin/filer/folder/directory_listing.html:51
+#: models/virtualitems.py:79 templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:51
 #: templates/admin/filer/folder/directory_listing.html:118
 msgid "root"
 msgstr "raiz"
@@ -441,7 +453,8 @@ msgstr "Executar a ação selecionada"
 msgid "Go"
 msgstr "Avançar"
 
-#: templates/admin/filer/actions.html:14 templates/admin/filer/folder/directory_table.html:218
+#: templates/admin/filer/actions.html:14
+#: templates/admin/filer/folder/directory_table.html:218
 msgid "Click here to select the objects across all pages"
 msgstr "Clique aqui para selecionar os objetos em todas as páginas"
 
@@ -450,31 +463,40 @@ msgstr "Clique aqui para selecionar os objetos em todas as páginas"
 msgid "Select all %(total_count)s files and/or folders"
 msgstr "Selecionar todos os %(total_count)s arquivo(s) e/ou pasta(s)"
 
-#: templates/admin/filer/actions.html:16 templates/admin/filer/folder/directory_table.html:220
+#: templates/admin/filer/actions.html:16
+#: templates/admin/filer/folder/directory_table.html:220
 msgid "Clear selection"
 msgstr "Limpar a seleção"
 
-#: templates/admin/filer/breadcrumbs.html:4 templates/admin/filer/folder/directory_listing.html:42
+#: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/directory_listing.html:42
 msgid "Go back to admin homepage"
 msgstr "Voltar à página inicial de administração"
 
-#: templates/admin/filer/breadcrumbs.html:4 templates/admin/filer/folder/change_form.html:6 templates/admin/filer/folder/directory_listing.html:43
+#: templates/admin/filer/breadcrumbs.html:4
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/directory_listing.html:43
 msgid "Home"
 msgstr "Início"
 
-#: templates/admin/filer/breadcrumbs.html:5 templates/admin/filer/folder/directory_listing.html:46
+#: templates/admin/filer/breadcrumbs.html:5
+#: templates/admin/filer/folder/directory_listing.html:46
 msgid "Go back to Filer app"
 msgstr "Voltar para Filer app"
 
-#: templates/admin/filer/breadcrumbs.html:7 templates/admin/filer/folder/directory_listing.html:51
+#: templates/admin/filer/breadcrumbs.html:7
+#: templates/admin/filer/folder/directory_listing.html:51
 msgid "Go back to root folder"
 msgstr "Volte à pasta raiz"
 
-#: templates/admin/filer/breadcrumbs.html:10 templates/admin/filer/breadcrumbs.html:20 templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:56 templates/admin/filer/folder/directory_listing.html:63
+#: templates/admin/filer/breadcrumbs.html:10
+#: templates/admin/filer/breadcrumbs.html:20
+#: templates/admin/filer/folder/change_form.html:10
+#: templates/admin/filer/folder/directory_listing.html:56
+#: templates/admin/filer/folder/directory_listing.html:63
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
-msgstr "Volte para a pasta '%(folder_name)s'"
+msgstr "Volte para a pasta '%(folder_name)s’"
 
 #: templates/admin/filer/change_form.html:25
 msgid "Duplicates"
@@ -490,9 +512,10 @@ msgstr "Remover os arquivo(s) e/ou pasta(s) selecionados, requer remover os segu
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid "Are you sure you want to delete the selected files and/or folders? All of the following objects and their related items will be deleted:"
-msgstr "Você tem certeza que deseja remover os arquivo(s) e/ou pasta(s) selecionados? Todos os seguintes objetos e itens relacionados serão removidos: "
+msgstr "Você tem certeza que deseja remover os arquivo(s) e/ou pasta(s) selecionados? Todos os seguintes objetos e itens relacionados serão removidos:"
 
-#: templates/admin/filer/delete_selected_files_confirmation.html:46 templates/admin/filer/folder/choose_copy_destination.html:77
+#: templates/admin/filer/delete_selected_files_confirmation.html:46
+#: templates/admin/filer/folder/choose_copy_destination.html:77
 #: templates/admin/filer/folder/choose_move_destination.html:73
 msgid "No, take me back"
 msgstr "Não, voltar à página anterior"
@@ -501,15 +524,21 @@ msgstr "Não, voltar à página anterior"
 msgid "Yes, I&#39;m sure"
 msgstr "Sim, tenho certeza"
 
-#: templates/admin/filer/file/change_form.html:37 templates/admin/filer/folder/change_form.html:21 templates/admin/filer/image/change_form.html:36
+#: templates/admin/filer/file/change_form.html:37
+#: templates/admin/filer/folder/change_form.html:21
+#: templates/admin/filer/image/change_form.html:36
 msgid "History"
 msgstr "História"
 
-#: templates/admin/filer/file/change_form.html:39 templates/admin/filer/folder/change_form.html:23 templates/admin/filer/image/change_form.html:38
+#: templates/admin/filer/file/change_form.html:39
+#: templates/admin/filer/folder/change_form.html:23
+#: templates/admin/filer/image/change_form.html:38
 msgid "View on site"
 msgstr "Ver no site"
 
-#: templates/admin/filer/folder/change_form.html:6 templates/admin/filer/folder/change_form.html:7 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/change_form.html:6
+#: templates/admin/filer/folder/change_form.html:7
+#: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:118
 msgid "Go back to"
 msgstr "Voltar para"
@@ -518,8 +547,12 @@ msgstr "Voltar para"
 msgid "admin homepage"
 msgstr "página inicial de administração"
 
-#: templates/admin/filer/folder/change_form.html:37 templates/admin/filer/folder/directory_listing.html:111 templates/admin/filer/folder/directory_listing.html:119
-#: templates/admin/filer/folder/directory_table.html:26 templates/admin/filer/folder/directory_table.html:56 templates/admin/filer/folder/directory_table.html:164
+#: templates/admin/filer/folder/change_form.html:37
+#: templates/admin/filer/folder/directory_listing.html:111
+#: templates/admin/filer/folder/directory_listing.html:119
+#: templates/admin/filer/folder/directory_table.html:26
+#: templates/admin/filer/folder/directory_table.html:56
+#: templates/admin/filer/folder/directory_table.html:164
 msgid "Folder Icon"
 msgstr "Ícone da Pasta"
 
@@ -527,13 +560,17 @@ msgstr "Ícone da Pasta"
 msgid "Your account doesn't have permissions to copy all of the selected files and/or folders."
 msgstr "Sua conta não possui permissão para copiar todos os arquivo(s) e/ou pasta(s) selecionados."
 
-#: templates/admin/filer/folder/choose_copy_destination.html:38 templates/admin/filer/folder/choose_copy_destination.html:44
-#: templates/admin/filer/folder/choose_copy_destination.html:50 templates/admin/filer/folder/choose_move_destination.html:38
-#: templates/admin/filer/folder/choose_move_destination.html:44 templates/admin/filer/folder/choose_move_destination.html:50
+#: templates/admin/filer/folder/choose_copy_destination.html:38
+#: templates/admin/filer/folder/choose_copy_destination.html:44
+#: templates/admin/filer/folder/choose_copy_destination.html:50
+#: templates/admin/filer/folder/choose_move_destination.html:38
+#: templates/admin/filer/folder/choose_move_destination.html:44
+#: templates/admin/filer/folder/choose_move_destination.html:50
 msgid "Take me back"
 msgstr "Voltar à página anterior"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:42 templates/admin/filer/folder/choose_move_destination.html:42
+#: templates/admin/filer/folder/choose_copy_destination.html:42
+#: templates/admin/filer/folder/choose_move_destination.html:42
 msgid "There are no destination folders available."
 msgstr "Não existe pasta de destino disponível."
 
@@ -545,11 +582,13 @@ msgstr "Não existem arquivo(s) e/ou pasta(s) disponíveis para copiar."
 msgid "The following files and/or folders will be copied to a destination folder (retaining their tree structure):"
 msgstr "Os arquivo(s) e/ou pasta(s) serão copiados para a pasta de destino (mantendo a estrutura de diretórios):"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:67 templates/admin/filer/folder/choose_move_destination.html:65
+#: templates/admin/filer/folder/choose_copy_destination.html:67
+#: templates/admin/filer/folder/choose_move_destination.html:65
 msgid "Destination folder:"
 msgstr "Pasta de destino:"
 
-#: templates/admin/filer/folder/choose_copy_destination.html:78 templates/admin/filer/folder/choose_copy_destination.html:81
+#: templates/admin/filer/folder/choose_copy_destination.html:78
+#: templates/admin/filer/folder/choose_copy_destination.html:81
 #: templates/admin/filer/folder/directory_listing.html:194
 msgid "Copy"
 msgstr "Copiar"
@@ -598,14 +637,15 @@ msgstr "Não existem arquivo(s) e/ou pasta(s) disponíveis para mover."
 msgid "The following files and/or folders will be moved to a destination folder (retaining their tree structure):"
 msgstr "Os arquivo(s) e/ou pasta(s) serão movidos para a pasta de destino (mantendo a estrutura de diretórios):"
 
-#: templates/admin/filer/folder/choose_move_destination.html:74 templates/admin/filer/folder/choose_move_destination.html:77
+#: templates/admin/filer/folder/choose_move_destination.html:74
+#: templates/admin/filer/folder/choose_move_destination.html:77
 #: templates/admin/filer/folder/directory_listing.html:197
 msgid "Move"
 msgstr "Mover"
 
 #: templates/admin/filer/folder/choose_move_destination.html:76
 msgid "It is not allowed to move files into same folder"
-msgstr "Não é permitido mover arquivos para a mesma pasta."
+msgstr "Não é permitido mover arquivos para a mesma pasta"
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid "Your account doesn't have permissions to rename all of the selected files."
@@ -659,7 +699,8 @@ msgstr "Marque para limitar a busca à pasta atual"
 msgid "Limit the search to current folder"
 msgstr "Limite a busca à página atual"
 
-#: templates/admin/filer/folder/directory_listing.html:191 templates/admin/filer/tools/detail_info.html:213
+#: templates/admin/filer/folder/directory_listing.html:191
+#: templates/admin/filer/tools/detail_info.html:213
 msgid "Delete"
 msgstr "Remover"
 
@@ -671,8 +712,11 @@ msgstr "Adiciona uma nova pasta"
 msgid "New Folder"
 msgstr "Nova Pasta"
 
-#: templates/admin/filer/folder/directory_listing.html:222 templates/admin/filer/folder/directory_listing.html:226 templates/admin/filer/folder/directory_listing.html:229
-#: templates/admin/filer/folder/directory_listing.html:233 templates/admin/filer/folder/directory_listing.html:240
+#: templates/admin/filer/folder/directory_listing.html:222
+#: templates/admin/filer/folder/directory_listing.html:226
+#: templates/admin/filer/folder/directory_listing.html:229
+#: templates/admin/filer/folder/directory_listing.html:233
+#: templates/admin/filer/folder/directory_listing.html:240
 msgid "Upload Files"
 msgstr "Enviar Arquivos"
 
@@ -684,11 +728,15 @@ msgstr "Você precisa selecionar uma pasta primeiro"
 msgid "Name"
 msgstr "Nome"
 
-#: templates/admin/filer/folder/directory_table.html:14 templates/admin/filer/tools/detail_info.html:59 templates/admin/filer/tools/detail_info.html:150
+#: templates/admin/filer/folder/directory_table.html:14
+#: templates/admin/filer/tools/detail_info.html:59
+#: templates/admin/filer/tools/detail_info.html:150
 msgid "Owner"
 msgstr "Proprietário"
 
-#: templates/admin/filer/folder/directory_table.html:15 templates/admin/filer/tools/detail_info.html:38 templates/admin/filer/tools/detail_info.html:102
+#: templates/admin/filer/folder/directory_table.html:15
+#: templates/admin/filer/tools/detail_info.html:38
+#: templates/admin/filer/tools/detail_info.html:102
 msgid "Size"
 msgstr "Tamanho"
 
@@ -696,25 +744,29 @@ msgstr "Tamanho"
 msgid "Action"
 msgstr "Ação"
 
-#: templates/admin/filer/folder/directory_table.html:25 templates/admin/filer/folder/directory_table.html:32 templates/admin/filer/folder/directory_table.html:55
+#: templates/admin/filer/folder/directory_table.html:25
+#: templates/admin/filer/folder/directory_table.html:32
+#: templates/admin/filer/folder/directory_table.html:55
 #: templates/admin/filer/folder/directory_table.html:62
 #, python-format
 msgid "Change '%(item_label)s' folder details"
 msgstr "Alterar os detalhes da pasta '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:73 templates/admin/filer/tools/search_form.html:5
+#: templates/admin/filer/folder/directory_table.html:73
+#: templates/admin/filer/tools/search_form.html:5
 #, python-format
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
 msgstr[0] "%(counter)s pasta"
 msgstr[1] "%(counter)s pastas"
 
-#: templates/admin/filer/folder/directory_table.html:74 templates/admin/filer/tools/search_form.html:6
+#: templates/admin/filer/folder/directory_table.html:74
+#: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
 msgstr[0] "%(counter)s arquivo"
-msgstr[1] "%(counter)s files"
+msgstr[1] "%(counter)s arquivos"
 
 #: templates/admin/filer/folder/directory_table.html:80
 msgid "Change folder details"
@@ -724,11 +776,15 @@ msgstr "Alterar detalhes da pasta"
 msgid "Remove folder"
 msgstr "Remover pasta"
 
-#: templates/admin/filer/folder/directory_table.html:93 templates/admin/filer/folder/directory_table.html:101 templates/admin/filer/folder/directory_table.html:116
+#: templates/admin/filer/folder/directory_table.html:93
+#: templates/admin/filer/folder/directory_table.html:101
+#: templates/admin/filer/folder/directory_table.html:116
 msgid "Select this file"
 msgstr "Selecionar este arquivo"
 
-#: templates/admin/filer/folder/directory_table.html:104 templates/admin/filer/folder/directory_table.html:119 templates/admin/filer/folder/directory_table.html:143
+#: templates/admin/filer/folder/directory_table.html:104
+#: templates/admin/filer/folder/directory_table.html:119
+#: templates/admin/filer/folder/directory_table.html:143
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Alterar os detalhes de '%(item_label)s'"
@@ -839,29 +895,34 @@ msgstr "a área de transferência está vazia"
 
 #: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:16
 msgid "upload failed"
-msgstr "Falha no upload"
+msgstr "falha no upload"
 
 #: templates/admin/filer/tools/detail_info.html:22
 msgid "Open file"
 msgstr "Abrir arquivo"
 
-#: templates/admin/filer/tools/detail_info.html:24 templates/admin/filer/tools/detail_info.html:86
+#: templates/admin/filer/tools/detail_info.html:24
+#: templates/admin/filer/tools/detail_info.html:86
 msgid "Full size preview"
-msgstr "visualização de tamanho total"
+msgstr "Visualização de tamanho total"
 
-#: templates/admin/filer/tools/detail_info.html:34 templates/admin/filer/tools/detail_info.html:93
+#: templates/admin/filer/tools/detail_info.html:34
+#: templates/admin/filer/tools/detail_info.html:93
 msgid "Type"
 msgstr "Tipo"
 
-#: templates/admin/filer/tools/detail_info.html:42 templates/admin/filer/tools/detail_info.html:111
+#: templates/admin/filer/tools/detail_info.html:42
+#: templates/admin/filer/tools/detail_info.html:111
 msgid "File-size"
 msgstr "Tamanho do arquivo"
 
-#: templates/admin/filer/tools/detail_info.html:46 templates/admin/filer/tools/detail_info.html:120
+#: templates/admin/filer/tools/detail_info.html:46
+#: templates/admin/filer/tools/detail_info.html:120
 msgid "Modified"
 msgstr "Modificado"
 
-#: templates/admin/filer/tools/detail_info.html:50 templates/admin/filer/tools/detail_info.html:129
+#: templates/admin/filer/tools/detail_info.html:50
+#: templates/admin/filer/tools/detail_info.html:129
 msgid "Created"
 msgstr "Criado"
 
@@ -901,7 +962,9 @@ msgstr "e"
 msgid "cancel search"
 msgstr "cancelar a busca de"
 
-#: templates/admin/filer/widgets/admin_file.html:8 templates/admin/filer/widgets/admin_file.html:35 templates/admin/filer/widgets/admin_folder.html:18
+#: templates/admin/filer/widgets/admin_file.html:8
+#: templates/admin/filer/widgets/admin_file.html:35
+#: templates/admin/filer/widgets/admin_folder.html:18
 msgid "Clear"
 msgstr "Limpar"
 
@@ -909,7 +972,8 @@ msgstr "Limpar"
 msgid "or drop your file here"
 msgstr "ou arraste seu arquivo aqui"
 
-#: templates/admin/filer/widgets/admin_file.html:26 templates/admin/filer/widgets/admin_file.html:27
+#: templates/admin/filer/widgets/admin_file.html:26
+#: templates/admin/filer/widgets/admin_file.html:27
 msgid "file missing"
 msgstr "arquivo faltando"
 
@@ -917,7 +981,8 @@ msgstr "arquivo faltando"
 msgid "no file selected"
 msgstr "nenhum arquivo selecionado"
 
-#: templates/admin/filer/widgets/admin_file.html:39 templates/admin/filer/widgets/admin_folder.html:14
+#: templates/admin/filer/widgets/admin_file.html:39
+#: templates/admin/filer/widgets/admin_folder.html:14
 msgid "Lookup"
 msgstr "Pesquisar"
 
@@ -925,9 +990,10 @@ msgstr "Pesquisar"
 msgid "Choose File"
 msgstr "Escolher Arquivo"
 
-#: templates/admin/filer/widgets/admin_folder.html:11 templates/admin/filer/widgets/admin_folder.html:33
+#: templates/admin/filer/widgets/admin_folder.html:11
+#: templates/admin/filer/widgets/admin_folder.html:33
 msgid "none selected"
-msgstr "nada selecionado"
+msgstr "nenhuma selecionada"
 
 #: templates/admin/filer/widgets/admin_folder.html:15
 msgid "Add Folder"
