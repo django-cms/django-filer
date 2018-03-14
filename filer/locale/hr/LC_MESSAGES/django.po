@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Translators:
@@ -10,31 +10,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-01 14:41-0500\n"
+"POT-Creation-Date: 2018-03-14 12:04-0300\n"
 "PO-Revision-Date: 2017-01-03 15:08+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Croatian (http://www.transifex.com/divio/django-filer/language/hr/)\n"
+"Language-Team: Croatian (http://www.transifex.com/divio/django-filer/"
+"language/hr/)\n"
+"Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: admin/fileadmin.py:53 templates/admin/filer/tools/detail_info.html:166
+#: admin/fileadmin.py:48 templates/admin/filer/tools/detail_info.html:166
 msgid "Advanced"
 msgstr "Napredno"
 
-#: admin/fileadmin.py:165
+#: admin/fileadmin.py:156
 msgid "canonical URL"
 msgstr ""
 
-#: admin/folderadmin.py:386 admin/folderadmin.py:553
+#: admin/folderadmin.py:387 admin/folderadmin.py:554
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Stavke moraju biti odabrane kako bi se obavila akcija. Nijedna stavka nije promijenjena."
+msgstr ""
+"Stavke moraju biti odabrane kako bi se obavila akcija. Nijedna stavka nije "
+"promijenjena."
 
-#: admin/folderadmin.py:406
+#: admin/folderadmin.py:407
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -42,118 +46,122 @@ msgstr[0] "%(total_count)s odabrana"
 msgstr[1] "%(total_count)s odabrano"
 msgstr[2] "Svih %(total_count)s odabrano"
 
-#: admin/folderadmin.py:445
+#: admin/folderadmin.py:446
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 od %(cnt)s odabrano"
 
-#: admin/folderadmin.py:583
+#: admin/folderadmin.py:584
 msgid "No action selected."
 msgstr "Nije izabrana akcija."
 
-#: admin/folderadmin.py:628
+#: admin/folderadmin.py:629
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Uspješno premješteno %(count)d datoteka u spremnik."
 
-#: admin/folderadmin.py:634
+#: admin/folderadmin.py:635
 msgid "Move selected files to clipboard"
 msgstr "Premjesti odabrane datoteke u spremnik"
 
-#: admin/folderadmin.py:672
+#: admin/folderadmin.py:673
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Uspješno onemogućene ovlasti za %(count)d datoteka."
 
-#: admin/folderadmin.py:674
+#: admin/folderadmin.py:675
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Uspješno omogućene ovlasti za %(count)d datoteka."
 
-#: admin/folderadmin.py:683
+#: admin/folderadmin.py:684
 msgid "Enable permissions for selected files"
 msgstr "Omogući ovlasti za odabrane datoteke"
 
-#: admin/folderadmin.py:690
+#: admin/folderadmin.py:691
 msgid "Disable permissions for selected files"
 msgstr "Onemogući ovlasti za odabrane datoteke"
 
-#: admin/folderadmin.py:755
+#: admin/folderadmin.py:756
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Uspješno obrisano %(count)d datoteka i/ili direktorija."
 
-#: admin/folderadmin.py:760
+#: admin/folderadmin.py:761
 msgid "Cannot delete files and/or folders"
 msgstr "Nije moguće obrisati datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:762
+#: admin/folderadmin.py:763
 msgid "Are you sure?"
 msgstr "Jeste li sigurni?"
 
-#: admin/folderadmin.py:768
+#: admin/folderadmin.py:769
 msgid "Delete files and/or folders"
 msgstr "Obriši datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:790
+#: admin/folderadmin.py:791
 msgid "Delete selected files and/or folders"
 msgstr "Obriši odabrane datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:905
+#: admin/folderadmin.py:906
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr ""
 
-#: admin/folderadmin.py:909
+#: admin/folderadmin.py:910
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Uspješno premješteno %(count)d datoteka i/ili direktorija u direktorij '%(destination)s'."
+msgstr ""
+"Uspješno premješteno %(count)d datoteka i/ili direktorija u direktorij "
+"'%(destination)s'."
 
-#: admin/folderadmin.py:917 admin/folderadmin.py:919
+#: admin/folderadmin.py:918 admin/folderadmin.py:920
 msgid "Move files and/or folders"
 msgstr "Premjesti datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:934
+#: admin/folderadmin.py:935
 msgid "Move selected files and/or folders"
 msgstr "Premjesti odabrane datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:991
+#: admin/folderadmin.py:992
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Uspješno preimenovano %(count)d datoteka."
 
-#: admin/folderadmin.py:1000 admin/folderadmin.py:1002
-#: admin/folderadmin.py:1017
+#: admin/folderadmin.py:1001 admin/folderadmin.py:1003
+#: admin/folderadmin.py:1018
 msgid "Rename files"
 msgstr "Preimenuj datoteke"
 
-#: admin/folderadmin.py:1112
+#: admin/folderadmin.py:1113
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Uspješno kopirano %(count)d datoteka i/ili direktorija u direktorij '%(destination)s'."
+msgstr ""
+"Uspješno kopirano %(count)d datoteka i/ili direktorija u direktorij "
+"'%(destination)s'."
 
-#: admin/folderadmin.py:1130 admin/folderadmin.py:1132
+#: admin/folderadmin.py:1131 admin/folderadmin.py:1133
 msgid "Copy files and/or folders"
 msgstr "Kopiraj datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:1149
+#: admin/folderadmin.py:1150
 msgid "Copy selected files and/or folders"
 msgstr "Kopiraj odabrane datoteke i/ili direktorije"
 
-#: admin/folderadmin.py:1254
+#: admin/folderadmin.py:1255
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Uspješno promijenjena veličina za %(count)d slika."
 
-#: admin/folderadmin.py:1261 admin/folderadmin.py:1263
+#: admin/folderadmin.py:1262 admin/folderadmin.py:1264
 msgid "Resize images"
 msgstr "Promijeni veličinu slika"
 
-#: admin/folderadmin.py:1279
+#: admin/folderadmin.py:1280
 msgid "Resize selected images"
 msgstr "Promijeni veličinu odabranih slika"
 
@@ -166,7 +174,8 @@ msgstr "Sufiks koji će biti dodan imenima kopiranih datoteka."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Sufiks treba biti jednostavan i upisan malim slovima poput \"%(valid)s\"."
+msgstr ""
+"Sufiks treba biti jednostavan i upisan malim slovima poput \"%(valid)s\"."
 
 #: admin/forms.py:55
 #, python-format
@@ -200,29 +209,30 @@ msgstr "povećaj veličinu"
 
 #: admin/forms.py:72
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Opcija sličica ili parametri za promjenu veličine moraju biti izabrani."
+msgstr ""
+"Opcija sličica ili parametri za promjenu veličine moraju biti izabrani."
 
 #: admin/forms.py:74
 msgid "Resize parameters must be choosen."
 msgstr "Parametri za promjenu veličine moraju biti izabrani."
 
-#: admin/imageadmin.py:16 admin/imageadmin.py:94
+#: admin/imageadmin.py:19 admin/imageadmin.py:97
 msgid "Subject location"
 msgstr "Lokacija subjekta"
 
-#: admin/imageadmin.py:17
+#: admin/imageadmin.py:20
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr ""
 
-#: admin/imageadmin.py:54
+#: admin/imageadmin.py:57
 msgid "Invalid subject location format. "
 msgstr ""
 
-#: admin/imageadmin.py:60
+#: admin/imageadmin.py:63
 msgid "Subject location is outside of the image. "
 msgstr ""
 
-#: admin/imageadmin.py:69
+#: admin/imageadmin.py:72
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
 msgstr ""
@@ -241,31 +251,31 @@ msgstr "Filer"
 msgid "Media library"
 msgstr ""
 
-#: models/abstract.py:40
+#: models/abstract.py:36
 msgid "default alt text"
 msgstr "predefinirani alt tekst"
 
-#: models/abstract.py:41
+#: models/abstract.py:37
 msgid "default caption"
 msgstr "predefinirani opis slike"
 
-#: models/abstract.py:43
+#: models/abstract.py:39
 msgid "subject location"
 msgstr "lokacija subjekta"
 
-#: models/abstract.py:181 models/imagemodels.py:32
+#: models/abstract.py:181
 msgid "image"
 msgstr "slika"
 
-#: models/abstract.py:182 models/imagemodels.py:33
+#: models/abstract.py:182
 msgid "images"
 msgstr "slike"
 
-#: models/clipboardmodels.py:17 models/foldermodels.py:270
+#: models/clipboardmodels.py:17 models/foldermodels.py:277
 msgid "user"
 msgstr "korisnik"
 
-#: models/clipboardmodels.py:19 models/filemodels.py:351
+#: models/clipboardmodels.py:19 models/filemodels.py:350
 msgid "files"
 msgstr "datoteke"
 
@@ -278,7 +288,8 @@ msgid "clipboards"
 msgstr "spremnici"
 
 #: models/clipboardmodels.py:42 models/filemodels.py:52
-#: models/filemodels.py:350
+#: models/filemodels.py:349
+#: templates/admin/filer/folder/directory_table.html:73
 msgid "file"
 msgstr "datoteka"
 
@@ -290,9 +301,12 @@ msgstr "stavka spremnika"
 msgid "clipboard items"
 msgstr "stavke spremnika"
 
-#: models/filemodels.py:50 templates/admin/filer/folder/change_form.html:8
+#: models/filemodels.py:50 models/foldermodels.py:272
+#: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:118
-#: templates/admin/filer/folder/new_folder_form.html:5
+#: templates/admin/filer/folder/directory_table.html:73
+#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/folder/new_folder_form.html:7
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
 msgstr "direktorij"
@@ -313,7 +327,7 @@ msgstr "sadrži sve obavezne podatke"
 msgid "original filename"
 msgstr "originalno ime datoteke"
 
-#: models/filemodels.py:61 models/foldermodels.py:104
+#: models/filemodels.py:61 models/foldermodels.py:109
 #: models/thumbnailoptionmodels.py:14
 msgid "name"
 msgstr "ime"
@@ -322,15 +336,15 @@ msgstr "ime"
 msgid "description"
 msgstr "opis"
 
-#: models/filemodels.py:67 models/foldermodels.py:106
+#: models/filemodels.py:67 models/foldermodels.py:111
 msgid "owner"
 msgstr "vlasnik"
 
-#: models/filemodels.py:69 models/foldermodels.py:110
+#: models/filemodels.py:69 models/foldermodels.py:115
 msgid "uploaded at"
 msgstr "postavljeno"
 
-#: models/filemodels.py:70 models/foldermodels.py:113
+#: models/filemodels.py:70 models/foldermodels.py:118
 msgid "modified at"
 msgstr "modificirano"
 
@@ -344,85 +358,109 @@ msgid ""
 "accessible to anyone."
 msgstr ""
 
-#: models/foldermodels.py:112
+#: models/foldermodels.py:117
 msgid "created at"
 msgstr "kerirano"
 
-#: models/foldermodels.py:235
+#: models/foldermodels.py:240 models/foldermodels.py:315
 #: templates/admin/filer/widgets/admin_folder.html:7
 #: templates/admin/filer/widgets/admin_folder.html:33
 msgid "Folder"
 msgstr "Direktorij"
 
-#: models/foldermodels.py:236
+#: models/foldermodels.py:241
 msgid "Folders"
 msgstr "Direktoriji"
 
-#: models/foldermodels.py:255
+#: models/foldermodels.py:261
 msgid "all items"
 msgstr "sve stavke"
 
-#: models/foldermodels.py:256
+#: models/foldermodels.py:262
 msgid "this item only"
 msgstr "samo ova stavka"
 
-#: models/foldermodels.py:257
+#: models/foldermodels.py:263
 msgid "this item and all children"
 msgstr "ova stavka i sva djeca"
 
-#: models/foldermodels.py:261
+#: models/foldermodels.py:267
 msgid "allow"
 msgstr ""
 
-#: models/foldermodels.py:262
+#: models/foldermodels.py:268
 msgid "deny"
 msgstr ""
 
-#: models/foldermodels.py:267
+#: models/foldermodels.py:274
 msgid "type"
 msgstr "tip"
 
-#: models/foldermodels.py:273
+#: models/foldermodels.py:280
 msgid "group"
 msgstr "grupa"
 
-#: models/foldermodels.py:274
+#: models/foldermodels.py:283 models/foldermodels.py:303
+#, fuzzy
+#| msgid "group"
+msgid "groups"
+msgstr "grupa"
+
+#: models/foldermodels.py:284
 msgid "everybody"
 msgstr "svi"
 
-#: models/foldermodels.py:276
+#: models/foldermodels.py:287
 msgid "can edit"
 msgstr "mogu uređivati"
 
-#: models/foldermodels.py:277
+#: models/foldermodels.py:289
 msgid "can read"
 msgstr "mogu čitati"
 
-#: models/foldermodels.py:278
+#: models/foldermodels.py:291
 msgid "can add children"
 msgstr "mogu dodavati djecu"
 
-#: models/foldermodels.py:320
+#: models/foldermodels.py:299
+#, fuzzy
+#| msgid "Folders"
+msgid "All Folders"
+msgstr "Direktoriji"
+
+#: models/foldermodels.py:305
+msgid "User"
+msgstr ""
+
+#: models/foldermodels.py:322
+msgid "Folder cannot be selected with type \"all items\"."
+msgstr ""
+
+#: models/foldermodels.py:325
+msgid "Folder has to be selected when type is not \"all items\"."
+msgstr ""
+
+#: models/foldermodels.py:328
 msgid "folder permission"
 msgstr "ovlast direktorija"
 
-#: models/foldermodels.py:321
+#: models/foldermodels.py:329
 msgid "folder permissions"
 msgstr "ovlasti direktorija"
 
-#: models/imagemodels.py:24
+#: models/imagemodels.py:21
 msgid "date taken"
 msgstr "datum nastanka"
 
-#: models/imagemodels.py:26
+#: models/imagemodels.py:23
 msgid "author"
 msgstr "autor"
 
-#: models/imagemodels.py:27
+#: models/imagemodels.py:24
 msgid "must always publish author credit"
 msgstr "zahtijeva se objavljivanje zasluga autora"
 
-#: models/imagemodels.py:28
+#: models/imagemodels.py:25
 msgid "must always publish copyright"
 msgstr "zahtjeva se objavljivanje autorskih prava"
 
@@ -440,7 +478,7 @@ msgstr ""
 
 #: models/virtualitems.py:50
 #: templates/admin/filer/folder/directory_table.html:4
-#: templates/admin/filer/folder/directory_table.html:157
+#: templates/admin/filer/folder/directory_table.html:156
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
 msgstr ""
@@ -465,7 +503,7 @@ msgid "Go"
 msgstr "Idi"
 
 #: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table.html:218
+#: templates/admin/filer/folder/directory_table.html:217
 msgid "Click here to select the objects across all pages"
 msgstr "Kliknite ovdje za odabir objekata kroz sve stranice"
 
@@ -475,7 +513,7 @@ msgid "Select all %(total_count)s files and/or folders"
 msgstr "Odaberite sve %(total_count)s datoteke i/ili direktorije"
 
 #: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table.html:220
+#: templates/admin/filer/folder/directory_table.html:219
 msgid "Clear selection"
 msgstr "Poništi odabir"
 
@@ -518,19 +556,25 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Brisanje odabranih objekata bi rezultiralo brisanjem povezanih objekata, ali Vaš korisnički račun nema ovlasti za brisanje slijedećih tipova objekata:"
+msgstr ""
+"Brisanje odabranih objekata bi rezultiralo brisanjem povezanih objekata, ali "
+"Vaš korisnički račun nema ovlasti za brisanje slijedećih tipova objekata:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Brisanje odabranih datoteka i/ili direktorija bi zahtijevalo brisanje slijedećih zaštičenih povezanih objekata:"
+msgstr ""
+"Brisanje odabranih datoteka i/ili direktorija bi zahtijevalo brisanje "
+"slijedećih zaštičenih povezanih objekata:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Jeste li sigurni kako želite obrisati odabrane datoteke i/ili direktorije? Svi navedeni objekti i s njima povezane stavke biti će obrisani:"
+msgstr ""
+"Jeste li sigurni kako želite obrisati odabrane datoteke i/ili direktorije? "
+"Svi navedeni objekti i s njima povezane stavke biti će obrisani:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:77
@@ -570,15 +614,17 @@ msgstr "početna stranica administracije"
 #: templates/admin/filer/folder/directory_listing.html:119
 #: templates/admin/filer/folder/directory_table.html:26
 #: templates/admin/filer/folder/directory_table.html:56
-#: templates/admin/filer/folder/directory_table.html:164
+#: templates/admin/filer/folder/directory_table.html:163
 msgid "Folder Icon"
 msgstr "Ikona direktorija"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:36
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Vaš korisnički račun nema ovlasti za kopiranje odabranih datoteka i/ili direktorija."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za kopiranje odabranih datoteka i/ili "
+"direktorija."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:38
 #: templates/admin/filer/folder/choose_copy_destination.html:44
@@ -602,7 +648,9 @@ msgstr "Nema dostupnih datoteka i/ili direktorija za kopiranje."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "Slijedeće datoteke i/ili direktoriji biti će kopirani u odredišni direktorij (zadržavajući postojeću strukturu):"
+msgstr ""
+"Slijedeće datoteke i/ili direktoriji biti će kopirani u odredišni direktorij "
+"(zadržavajući postojeću strukturu):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
 #: templates/admin/filer/folder/choose_move_destination.html:65
@@ -622,7 +670,8 @@ msgstr ""
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Vaš korisnički račun nema ovlasti za promjenu veličina odabranih slika."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za promjenu veličina odabranih slika."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -634,7 +683,9 @@ msgstr "Slijedećim slikama biti će promijenjena veličina:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Izaberite postojeću opciju sličica ili unesite parametre za promjenu veličine:"
+msgstr ""
+"Izaberite postojeću opciju sličica ili unesite parametre za promjenu "
+"veličine:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
@@ -644,7 +695,10 @@ msgstr "Odaberite parametre za promjenu veličine:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Pažnja: Slikama će biti promijenjena veličina, a originali će biti prepisani sa slikama s novom veličinom. Preporuča se prvo kopirati originalne slike prije promjene veličine."
+msgstr ""
+"Pažnja: Slikama će biti promijenjena veličina, a originali će biti prepisani "
+"sa slikama s novom veličinom. Preporuča se prvo kopirati originalne slike "
+"prije promjene veličine."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -652,9 +706,11 @@ msgstr "Promjeni veličinu"
 
 #: templates/admin/filer/folder/choose_move_destination.html:36
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Vaš korisnički račun nema ovlasti za premještaj svih odabranih datoteka i/ili direktorija."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za premještaj svih odabranih datoteka i/"
+"ili direktorija."
 
 #: templates/admin/filer/folder/choose_move_destination.html:48
 msgid "There are no files and/or folders available to move."
@@ -664,7 +720,9 @@ msgstr "Nema dostupnih datoteka i/ili direktorija za premještaj."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "Slijedeće datoteke i/ili direktoriji biti će premješteni u odredišni direktorij (zadržavajući postojeću strukturu):"
+msgstr ""
+"Slijedeće datoteke i/ili direktoriji biti će premješteni u odredišni "
+"direktorij (zadržavajući postojeću strukturu):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:74
 #: templates/admin/filer/folder/choose_move_destination.html:77
@@ -679,7 +737,8 @@ msgstr ""
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "Vaš korisnički račun nema ovlasti za preimenovanje svih odabranih datoteka."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za preimenovanje svih odabranih datoteka."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
@@ -689,7 +748,9 @@ msgstr "Nema dostupnih datoteka i/ili direktorija za preimenovanje."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "Slijedeće datoteke če biti preimenovane (ostati će u svojim direktorijima i zadržati ime datoteke, samo će prikazano ime biti promijenjeno):"
+msgstr ""
+"Slijedeće datoteke če biti preimenovane (ostati će u svojim direktorijima i "
+"zadržati ime datoteke, samo će prikazano ime biti promijenjeno):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -784,127 +845,112 @@ msgstr ""
 msgid "Change '%(item_label)s' folder details"
 msgstr "Promijeni detalje direktorija '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:73
-#: templates/admin/filer/tools/search_form.html:5
-#, python-format
-msgid "%(counter)s folder"
-msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: templates/admin/filer/folder/directory_table.html:74
-#: templates/admin/filer/tools/search_form.html:6
-#, python-format
-msgid "%(counter)s file"
-msgid_plural "%(counter)s files"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: templates/admin/filer/folder/directory_table.html:80
+#: templates/admin/filer/folder/directory_table.html:79
 msgid "Change folder details"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:81
+#: templates/admin/filer/folder/directory_table.html:80
 msgid "Remove folder"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:93
-#: templates/admin/filer/folder/directory_table.html:101
-#: templates/admin/filer/folder/directory_table.html:116
+#: templates/admin/filer/folder/directory_table.html:92
+#: templates/admin/filer/folder/directory_table.html:100
+#: templates/admin/filer/folder/directory_table.html:115
 msgid "Select this file"
 msgstr "Odaberi ovu datoteku"
 
-#: templates/admin/filer/folder/directory_table.html:104
-#: templates/admin/filer/folder/directory_table.html:119
-#: templates/admin/filer/folder/directory_table.html:143
+#: templates/admin/filer/folder/directory_table.html:103
+#: templates/admin/filer/folder/directory_table.html:118
+#: templates/admin/filer/folder/directory_table.html:142
 #, python-format
 msgid "Change '%(item_label)s' details"
 msgstr "Promijeni detalje za '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table.html:128
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "Permissions"
 msgstr "Ovlasti"
 
-#: templates/admin/filer/folder/directory_table.html:128
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "disabled"
 msgstr "onemogućeno"
 
-#: templates/admin/filer/folder/directory_table.html:128
+#: templates/admin/filer/folder/directory_table.html:127
 msgid "enabled"
 msgstr "omogućeno"
 
-#: templates/admin/filer/folder/directory_table.html:139
+#: templates/admin/filer/folder/directory_table.html:138
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:141
+#: templates/admin/filer/folder/directory_table.html:140
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:144
+#: templates/admin/filer/folder/directory_table.html:143
 msgid "Remove file"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:151
+#: templates/admin/filer/folder/directory_table.html:150
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:161
+#: templates/admin/filer/folder/directory_table.html:160
 msgid "Drop your file to upload into:"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:171
+#: templates/admin/filer/folder/directory_table.html:170
 msgid "Upload"
 msgstr "Prebaci"
 
-#: templates/admin/filer/folder/directory_table.html:183
+#: templates/admin/filer/folder/directory_table.html:182
 msgid "cancel"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:187
+#: templates/admin/filer/folder/directory_table.html:186
 msgid "Upload success!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:191
+#: templates/admin/filer/folder/directory_table.html:190
 msgid "Upload canceled!"
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:198
+#: templates/admin/filer/folder/directory_table.html:197
 msgid "previous"
 msgstr "prethodni"
 
-#: templates/admin/filer/folder/directory_table.html:203
+#: templates/admin/filer/folder/directory_table.html:202
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr ""
 
-#: templates/admin/filer/folder/directory_table.html:208
+#: templates/admin/filer/folder/directory_table.html:207
 msgid "next"
 msgstr "slijedeći"
 
-#: templates/admin/filer/folder/directory_table.html:218
+#: templates/admin/filer/folder/directory_table.html:217
 #, python-format
 msgid "Select all %(total_count)s"
 msgstr ""
 
-#: templates/admin/filer/folder/new_folder_form.html:5
+#: templates/admin/filer/folder/new_folder_form.html:4
+#: templates/admin/filer/folder/new_folder_form.html:7
 msgid "Add new"
 msgstr "Dodaj novi"
 
-#: templates/admin/filer/folder/new_folder_form.html:13
+#: templates/admin/filer/folder/new_folder_form.html:4
+msgid "Django site admin"
+msgstr ""
+
+#: templates/admin/filer/folder/new_folder_form.html:15
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Molimo ispravite pogrešku ispod."
 msgstr[1] "Molimo ispravite pogreške ispod."
 msgstr[2] "Molimo ispravite pogreške ispod."
 
-#: templates/admin/filer/folder/new_folder_form.html:28
+#: templates/admin/filer/folder/new_folder_form.html:30
 msgid "Save"
 msgstr "Spremi"
 
@@ -990,8 +1036,24 @@ msgid "found"
 msgstr "pronađeno"
 
 #: templates/admin/filer/tools/search_form.html:5
+#, python-format
+msgid "%(counter)s folder"
+msgid_plural "%(counter)s folders"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: templates/admin/filer/tools/search_form.html:5
 msgid "and"
 msgstr "i"
+
+#: templates/admin/filer/tools/search_form.html:6
+#, python-format
+msgid "%(counter)s file"
+msgid_plural "%(counter)s files"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/admin/filer/tools/search_form.html:7
 msgid "cancel search"
