@@ -175,7 +175,7 @@ class FolderPermissionsTestCase(TestCase):
             delattr(self.folder, 'permission_cache')
 
             self.assertEqual(self.test_user1.groups.filter(pk=self.group1.pk).exists(), True)
-            self.assertEqual(self.test_user1.groups.filter(pk=self.group2.pk).exists(), False)
+            self.assertEqual(self.test_user1.groups.filter(pk=self.group3.pk).exists(), False)
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_edit_permission(request1), False)
@@ -259,7 +259,7 @@ class FolderPermissionsTestCase(TestCase):
             fp1 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=None, can_read=FolderPermission.ALLOW, can_add_children=None)
             fp2 = FolderPermission.objects.create(folder=self.folder, type=FolderPermission.CHILDREN, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
             fp1.groups.add(self.group1)
-            fp1.groups.add(self.group3)
+            fp2.groups.add(self.group3)
             self.assertEqual(FolderPermission.objects.count(), 2)
 
             # We have to invalidate cache
@@ -305,7 +305,7 @@ class FolderPermissionsTestCase(TestCase):
             fp1 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=None, can_read=FolderPermission.ALLOW, can_add_children=None)
             fp2 = FolderPermission.objects.create(folder=self.folder_perm, type=FolderPermission.CHILDREN, can_edit=FolderPermission.ALLOW, can_read=FolderPermission.ALLOW, can_add_children=FolderPermission.ALLOW)
             fp1.groups.add(self.group3)
-            fp1.groups.add(self.group1)
+            fp2.groups.add(self.group1)
             self.assertEqual(FolderPermission.objects.count(), 2)
 
             # We have to invalidate cache
