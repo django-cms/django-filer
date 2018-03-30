@@ -137,7 +137,7 @@ You'll have to provide an admin class for your model; in this case, the admin wi
 
 .. note::
 
-    If you are not already familiar with the django CMS plugin architecture, http://docs.django-cms.org/en/latest/extending_cms/custom_plugins.html#overview will provide an explanation.
+    If you are not already familiar with the django CMS plugin architecture, http://docs.django-cms.org/en/latest/how_to/custom_plugins.html#overview will provide an explanation.
 
 .. code-block:: python
 
