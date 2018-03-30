@@ -268,8 +268,7 @@ If you added fields in your custom Image model, you have to customize the admin 
 .. code-block:: python
 
     from django.contrib import admin
-    from filer.admin.imageadmin import ImageAdmin
-    from filer.models.imagemodels import Image
+    from filer.admin.imageadmin import ImageAdmin, Image
 
     class CustomImageAdmin(ImageAdmin):
         # your custom code
@@ -289,7 +288,7 @@ If you added fields in your custom Image model, you have to customize the admin 
     )
 
     # Unregister the default admin
-    admin.site.unregister(ImageAdmin)
+    admin.site.unregister(Image)
     # Register your own
     admin.site.register(Image, CustomImageAdmin)
 
