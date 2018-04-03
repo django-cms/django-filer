@@ -11,11 +11,11 @@
                     {% trans "none selected" %}
                 {% endif %}
             </span>
-            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}">
                 {% trans "Add Folder" %}
             </a>
 
-            <img id="{{ clear_id }}" src="{% static 'admin/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" class="filerClearer{% if not object %} hidden{% endif %}">
+            <img id="{{ clear_id }}" src="{% static 'filer/img/icon_deletelink.gif' %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}" class="filerClearer{% if not object %} hidden{% endif %}">
             {{ hidden_input }}
         </span>
     </div>

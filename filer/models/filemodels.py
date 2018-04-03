@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
-from ..utils.compatibility import LTE_DJANGO_1_7, python_2_unicode_compatible
+from ..utils.compatibility import python_2_unicode_compatible
 from .foldermodels import Folder
 
 try:
@@ -248,12 +248,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_change_url(self):
-        if LTE_DJANGO_1_7:
-            model_name = self._meta.module_name
-        else:
-            model_name = self._meta.model_name
         return urlresolvers.reverse(
-            'admin:{0}_{1}_change'.format(self._meta.app_label, model_name),
+            'admin:{0}_{1}_change'.format(
+                self._meta.app_label,
+                self._meta.model_name,
+            ),
             args=(self.pk,)
         )
 

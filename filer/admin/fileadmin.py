@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 
 from .. import settings
 from ..models import File
-from ..utils.compatibility import LTE_DJANGO_1_5, LTE_DJANGO_1_6, unquote
+from ..utils.compatibility import unquote
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
@@ -33,11 +33,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     save_as = True
 
     form = FileAdminChangeFrom
-
-    def get_queryset(self, request):
-        if LTE_DJANGO_1_5:
-            return super(FileAdmin, self).queryset(request)
-        return super(FileAdmin, self).get_queryset(request)
 
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(),
@@ -121,10 +116,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         except self.model.DoesNotExist:
             parent_folder = None
 
-        admin_context = AdminContext(request)
-        if LTE_DJANGO_1_6:
-            extra_context = extra_context or {}
-            extra_context.update({'is_popup': admin_context.popup})
         if request.POST:
             # Return to folder listing, since there is no usable file listing.
             super(FileAdmin, self).delete_view(

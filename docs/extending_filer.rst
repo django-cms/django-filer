@@ -38,7 +38,7 @@ In your own application, you need to create a Video model. This model has to inh
         pass # for now...
     
 
-When a file is uploaded, :py:meth:`filer.admin.clipboardadmin.ClipboardAdmin.ajax_upload` loops over the different classes in ``filer.settings.FILER_FILE_MODELS`` and calls its ``matches_file_type()`` to see if the file matches a known filename extension.
+When a file is uploaded, :py:meth:`filer.admin.clipboardadmin.ClipboardAdmin.ajax_upload` loops over the different models in ``filer.settings.FILER_FILE_MODELS`` and calls its ``matches_file_type()`` to see if the file matches a known filename extension.
 
 When a match is found, the filer will create an instance of that class for the file.
 
@@ -137,7 +137,7 @@ You'll have to provide an admin class for your model; in this case, the admin wi
 
 .. note::
 
-    If you are not already familiar with the django CMS plugin architecture, http://docs.django-cms.org/en/latest/extending_cms/custom_plugins.html#overview will provide an explanation.
+    If you are not already familiar with the django CMS plugin architecture, http://docs.django-cms.org/en/latest/how_to/custom_plugins.html#overview will provide an explanation.
 
 .. code-block:: python
 
@@ -268,8 +268,7 @@ If you added fields in your custom Image model, you have to customize the admin 
 .. code-block:: python
 
     from django.contrib import admin
-    from filer.admin.imageadmin import ImageAdmin
-    from filer.models.imagemodels import Image
+    from filer.admin.imageadmin import ImageAdmin, Image
 
     class CustomImageAdmin(ImageAdmin):
         # your custom code
@@ -289,7 +288,7 @@ If you added fields in your custom Image model, you have to customize the admin 
     )
 
     # Unregister the default admin
-    admin.site.unregister(ImageAdmin)
+    admin.site.unregister(Image)
     # Register your own
     admin.site.register(Image, CustomImageAdmin)
 

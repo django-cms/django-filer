@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+
+from ..models import Clipboard, File, Folder, FolderPermission, ThumbnailOption
+from ..settings import FILER_IMAGE_MODEL
+from ..utils.loader import load_model
 from .clipboardadmin import ClipboardAdmin
 from .fileadmin import FileAdmin
 from .folderadmin import FolderAdmin
 from .imageadmin import ImageAdmin
-from .thumbnailoptionadmin import ThumbnailOptionAdmin
 from .permissionadmin import PermissionAdmin
-from ..models import FolderPermission, Folder, File, Clipboard, Image, ThumbnailOption
+from .thumbnailoptionadmin import ThumbnailOptionAdmin
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 admin.site.register(Folder, FolderAdmin)

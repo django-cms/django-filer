@@ -15,11 +15,7 @@ from django.utils.safestring import mark_safe
 
 from .. import settings as filer_settings
 from ..models import File
-from ..utils.compatibility import (
-    LTE_DJANGO_1_7,
-    LTE_DJANGO_1_8,
-    truncate_words,
-)
+from ..utils.compatibility import LTE_DJANGO_1_8, truncate_words
 from ..utils.model_label import get_model_label
 
 logger = logging.getLogger(__name__)
@@ -69,7 +65,6 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 'admin/img/icon_deletelink.gif' if LTE_DJANGO_1_8
                 else 'admin/img/icon-deletelink.svg'
             ),
-            'LTE_DJANGO_1_7': LTE_DJANGO_1_7,
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
@@ -143,12 +138,3 @@ class FilerFileField(models.ForeignKey):
         }
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)
-
-    def south_field_triple(self):
-        "Returns a suitable description of this field for South."
-        # We'll just introspect ourselves, since we inherit.
-        from south.modelsinspector import introspector
-        field_class = "django.db.models.fields.related.ForeignKey"
-        args, kwargs = introspector(self)
-        # That's our definition!
-        return (field_class, args, kwargs)

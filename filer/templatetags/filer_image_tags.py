@@ -112,7 +112,7 @@ divide_xy_by = register.filter(divide_xy_by)
 
 
 def get_css_position(image):
-    if not image.subject_location:
+    if not image or not image.subject_location:
         return '50% 50%'
 
     x, y = image.subject_location.split(',')
