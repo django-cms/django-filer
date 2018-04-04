@@ -67,6 +67,8 @@ class BaseImage(File):
                 imgfile.seek(0)
             except Exception:
                 if post_init is False:
+                    # in case `imgfile` could not be found, unset dimensions
+                    # but only if not initialized by loading a fixture file
                     self._width, self._height = None, None
         return attrs_updated
 
