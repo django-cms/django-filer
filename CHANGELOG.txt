@@ -8,6 +8,7 @@ CHANGELOG
 * Fixed broken reference for delete icon
 * Fixed minor documentation issues
 * Fixed travis configuration
+* Fixed a regression with loading and dumping fixtures (#965)
 
 1.3.0 (2017-11-02)
 ------------------
@@ -17,13 +18,6 @@ CHANGELOG
 * Fixed missing html title when adding folders
 * Fixed a regression where third party app migrations would require the
   ``FILER_IMAGE_MODEL`` setting.
-
-
-1.2.8 (2017-07-20)
-------------------
-
-* Fixed a regression with loading and dumping fixtures (#965)
-
 
 1.2.7 (2017-03-02)
 ------------------
