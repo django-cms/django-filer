@@ -11,6 +11,7 @@ CHANGELOG
 * Fixed a regression with loading and dumping fixtures (#965)
 * Added callable instead of setting as Filer.is_public default
 * Fixed canonical URL computation
+* Fixed image preview target size
 
 1.3.0 (2017-11-02)
 ------------------
