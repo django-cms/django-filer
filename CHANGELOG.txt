@@ -13,6 +13,8 @@ CHANGELOG
 * Fixed canonical URL computation
 * Fixed image preview target size
 * Fixed translatable string
+* Updated translations
+* Changed file size field to BigIntegerField
 
 1.3.0 (2017-11-02)
 ------------------
