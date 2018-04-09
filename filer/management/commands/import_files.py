@@ -133,6 +133,5 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        print(options)
         file_importer = FileImporter(**options)
         file_importer.walker()
