@@ -119,7 +119,7 @@ class Command(BaseCommand):
             '--path',
             action='store',
             dest='path',
-            default=False,
+            required=True,
             help='Import files located in the path into django-filer'
         )
 
