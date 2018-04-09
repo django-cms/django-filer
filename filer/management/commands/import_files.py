@@ -80,7 +80,7 @@ class FileImporter(object):
         This method walk a directory structure and create the
         Folders and Files as they appear.
         """
-        path = path or self.path if self.path is not False else ''
+        path = path or self.path or ''
         base_folder = base_folder or self.base_folder
         # prevent trailing slashes and other inconsistencies on path.
         path = os.path.normpath(upath(path))
