@@ -16,6 +16,7 @@ CHANGELOG
 * Updated translations
 * Changed file size field to BigIntegerField
 * Fixed import_files command to work on Django 1.10+
+* Use get_queryset in FolderAdmin instead of the manager
 
 1.3.0 (2017-11-02)
 ------------------
