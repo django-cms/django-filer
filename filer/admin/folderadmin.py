@@ -102,7 +102,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
-                folders_with_same_name = Folder.objects.filter(
+                folders_with_same_name = self.get_queryset(request).filter(
                     parent=form_obj.instance.parent,
                     name=cleaned_data['name'])
                 if form_obj.instance.pk:
@@ -127,7 +127,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not parent_id:
             parent_id = request.POST.get('parent_id', None)
         if parent_id:
-            parent = Folder.objects.get(id=parent_id)
+            parent = self.get_queryset(request).get(id=parent_id)
             r.parent = parent
         return r
 
@@ -191,7 +191,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             self.delete_files_or_folders(
                 request,
                 files_queryset=File.objects.none(),
-                folders_queryset=Folder.objects.filter(id=object_id)
+                folders_queryset=self.get_queryset(request).filter(id=object_id)
             )
             if parent_folder:
                 url = reverse('admin:filer-directory_listing',
@@ -207,7 +207,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return self.delete_files_or_folders(
             request,
             files_queryset=File.objects.none(),
-            folders_queryset=Folder.objects.filter(id=object_id)
+            folders_queryset=self.get_queryset(request).filter(id=object_id)
         )
 
     def icon_img(self, xs):
@@ -260,8 +260,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
-                Folder.objects.get(id=last_folder_id)
-            except Folder.DoesNotExist:
+                self.get_queryset(request).get(id=last_folder_id)
+            except self.model.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
                 url = "%s%s" % (url, admin_url_params_encoded(request))
             else:
@@ -271,7 +271,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         elif folder_id is None:
             folder = FolderRoot()
         else:
-            folder = get_object_or_404(Folder, id=folder_id)
+            folder = get_object_or_404(self.get_queryset(request), id=folder_id)
         request.session['filer_last_folder_id'] = folder_id
 
         # Check actions to see if any are available on this changelist
@@ -307,7 +307,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 file_qs = File.objects.filter(
                     folder__in=folder.get_descendants(include_self=True))
             else:
-                folder_qs = Folder.objects.all()
+                folder_qs = self.get_queryset(request)
                 file_qs = File.objects.all()
             folder_qs = self.filter_folder(folder_qs, search_terms)
             file_qs = self.filter_file(file_qs, search_terms)
@@ -869,7 +869,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 yield c
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        root_folders = Folder.objects.filter(parent__isnull=True).order_by('name')
+        root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
         return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
@@ -893,15 +893,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if perms_needed:
                 raise PermissionDenied
             try:
-                destination = Folder.objects.get(pk=request.POST.get('destination'))
-            except Folder.DoesNotExist:
+                destination = self.get_queryset(request).get(pk=request.POST.get('destination'))
+            except self.model.DoesNotExist:
                 raise PermissionDenied
             folders_dict = dict(folders)
             if destination not in folders_dict or not folders_dict[destination][1]:
                 raise PermissionDenied
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
-            conflicting_names = [folder.name for folder in Folder.objects.filter(parent=destination, name__in=folders_queryset.values('name'))]
+            conflicting_names = [folder.name for folder in self.get_queryset(request).filter(parent=destination, name__in=folders_queryset.values('name'))]
             if conflicting_names:
                 messages.error(request, _("Folders with names %s already exist at the selected "
                                           "destination") % ", ".join(conflicting_names))
@@ -1101,8 +1101,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             form = CopyFilesAndFoldersForm(request.POST)
             if form.is_valid():
                 try:
-                    destination = Folder.objects.get(pk=request.POST.get('destination'))
-                except Folder.DoesNotExist:
+                    destination = self.get_queryset(request).get(pk=request.POST.get('destination'))
+                except self.model.DoesNotExist:
                     raise PermissionDenied
                 folders_dict = dict(folders)
                 if destination not in folders_dict or not folders_dict[destination][1]:
