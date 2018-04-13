@@ -131,8 +131,8 @@ matrix:
       python: "3.6"
       env: DJANGO="master" SWAP="yes"
 
-# image model swapping is failing in Django==1.10 because django_polymorphic 2.0
-# only support Django>=1.11
+    # image model swapping is failing in Django==1.10 because django_polymorphic 2.0
+    # only support Django>=1.11
     - os: linux
       python: "2.7"
       env: DJANGO="1.10" SWAP="yes"
