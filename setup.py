@@ -21,7 +21,7 @@ setup(
     platforms=['OS Independent'],
     description="A file management application for django that makes handling "
                 "of files and images a breeze.",
-    long_description = read('README.rst'),
+    long_description=read('README.rst'),
     author='Stefan Foulis',
     author_email='stefan@foulis.ch',
     packages=find_packages(),
@@ -48,9 +48,9 @@ setup(
         'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
         'Framework :: Django :: 1.11',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )
