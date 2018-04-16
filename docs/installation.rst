@@ -28,7 +28,7 @@ check `Pillow doc`_.
 
 `django-polymorphic`_ version depends on `Django`_ version:
 
-* for `Django`_ >=1.8,<1.11 use `django-polymorphic`_ 1.3
+* for `Django`_ >=1.8,<1.11 use `django-polymorphic`_ 1.3.1
 * for `Django`_ >=1.11 use `django-polymorphic`_ >=2.0
 
 Configuration
