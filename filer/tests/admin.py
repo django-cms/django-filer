@@ -159,6 +159,32 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertTrue('site_header' in response.context)
         self.assertTrue('site_title' in response.context)
 
+    def test_folder_list_actions(self):
+        actions = [
+            'Delete selected files and/or folders',
+            'Move selected files and/or folders',
+            'Copy selected files and/or folders',
+            'Resize selected images',
+            'Rename files',
+        ]
+
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
+            response = self.client.get(reverse('admin:filer-directory_listing-root'))
+
+            for action in actions:
+                self.assertContains(response, '<a href="#">%s</a>' % action, html=True)
+
+        actions_with_permissions = [
+            'Disable permissions for selected files',
+            'Enable permissions for selected files',
+        ]
+
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            response = self.client.get(reverse('admin:filer-directory_listing-root'))
+
+            for action in (actions_with_permissions + actions):
+                self.assertContains(response, '<a href="#">%s</a>' % action, html=True)
+
 
 class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):

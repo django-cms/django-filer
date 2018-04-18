@@ -78,9 +78,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', ]
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['files_set_public', 'files_set_private',
-               'delete_files_or_folders', 'move_files_and_folders',
+    actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
+
+    if settings.FILER_ENABLE_PERMISSIONS:
+        actions = ['files_set_public', 'files_set_private'] + actions
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
     order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
@@ -644,7 +646,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not self.has_change_permission(request):
             raise PermissionDenied
 
-        if request.method != 'POST':
+        permissions_enabled = settings.FILER_ENABLE_PERMISSIONS
+
+        if request.method != 'POST' or not permissions_enabled:
             return None
 
         check_files_edit_permissions(request, files_queryset)
