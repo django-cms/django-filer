@@ -172,7 +172,7 @@ class FilerFolderAdminUrlsTests(TestCase):
             response = self.client.get(reverse('admin:filer-directory_listing-root'))
 
             for action in actions:
-                self.assertContains(response, '<a href="#">%s</a>' % action, html=True)
+                self.assertContains(response, action)
 
         actions_with_permissions = [
             'Disable permissions for selected files',
@@ -183,7 +183,7 @@ class FilerFolderAdminUrlsTests(TestCase):
             response = self.client.get(reverse('admin:filer-directory_listing-root'))
 
             for action in (actions_with_permissions + actions):
-                self.assertContains(response, '<a href="#">%s</a>' % action, html=True)
+                self.assertContains(response, action)
 
 
 class FilerImageAdminUrlsTests(TestCase):
@@ -562,12 +562,14 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
-        response = self.client.post(url, {
-            'action': 'files_set_public',
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
-        })
-        self.image_obj = Image.objects.get(id=self.image_obj.id)
-        self.assertEqual(self.image_obj.is_public, True)
+
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            response = self.client.post(url, {
+                'action': 'files_set_public',
+                helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+            })
+            self.image_obj = Image.objects.get(id=self.image_obj.id)
+            self.assertEqual(self.image_obj.is_public, True)
 
     def test_files_set_private_action(self):
         self.image_obj.is_public = True
@@ -576,14 +578,16 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
-        response = self.client.post(url, {
-            'action': 'files_set_private',
-            helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
-        })
-        self.image_obj = Image.objects.get(id=self.image_obj.id)
-        self.assertEqual(self.image_obj.is_public, False)
-        self.image_obj.is_public = True
-        self.image_obj.save()
+
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            response = self.client.post(url, {
+                'action': 'files_set_private',
+                helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
+            })
+            self.image_obj = Image.objects.get(id=self.image_obj.id)
+            self.assertEqual(self.image_obj.is_public, False)
+            self.image_obj.is_public = True
+            self.image_obj.save()
 
     def test_copy_files_and_folders_action(self):
         # TODO: Test recursive (files and folders tree) copy
