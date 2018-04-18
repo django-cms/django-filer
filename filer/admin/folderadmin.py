@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from collections import OrderedDict
 import itertools
 import os
 import re
@@ -80,9 +81,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     save_as = True  # see ImageAdmin
     actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
-
-    if settings.FILER_ENABLE_PERMISSIONS:
-        actions = ['files_set_public', 'files_set_private'] + actions
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
     order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
@@ -588,7 +586,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return None
 
     def get_actions(self, request):
-        actions = super(FolderAdmin, self).get_actions(request)
+        if settings.FILER_ENABLE_PERMISSIONS:
+            actions = OrderedDict()
+            actions['files_set_public'] = self.get_action('files_set_public')
+            actions['files_set_private'] = self.get_action('files_set_private')
+            actions.update(super(FolderAdmin, self).get_actions(request))
+        else:
+            actions = super(FolderAdmin, self).get_actions(request)
+
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions

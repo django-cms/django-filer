@@ -160,6 +160,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertTrue('site_title' in response.context)
 
     def test_folder_list_actions(self):
+        Folder.objects.create(name='foo')
         actions = [
             'Delete selected files and/or folders',
             'Move selected files and/or folders',
