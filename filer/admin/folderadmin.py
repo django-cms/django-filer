@@ -2,10 +2,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from collections import OrderedDict
 import itertools
 import os
 import re
+from collections import OrderedDict
 
 from django import forms
 from django.conf import settings as django_settings
