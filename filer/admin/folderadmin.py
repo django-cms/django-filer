@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, unicode_literals
 import itertools
 import os
 import re
+from collections import OrderedDict
 
 from django import forms
 from django.conf import settings as django_settings
@@ -78,8 +79,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', ]
     raw_id_fields = ('owner',)
     save_as = True  # see ImageAdmin
-    actions = ['files_set_public', 'files_set_private',
-               'delete_files_or_folders', 'move_files_and_folders',
+    actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
@@ -586,7 +586,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return None
 
     def get_actions(self, request):
-        actions = super(FolderAdmin, self).get_actions(request)
+        if settings.FILER_ENABLE_PERMISSIONS:
+            actions = OrderedDict()
+            actions['files_set_public'] = self.get_action('files_set_public')
+            actions['files_set_private'] = self.get_action('files_set_private')
+            actions.update(super(FolderAdmin, self).get_actions(request))
+        else:
+            actions = super(FolderAdmin, self).get_actions(request)
+
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
@@ -644,7 +651,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not self.has_change_permission(request):
             raise PermissionDenied
 
-        if request.method != 'POST':
+        permissions_enabled = settings.FILER_ENABLE_PERMISSIONS
+
+        if request.method != 'POST' or not permissions_enabled:
             return None
 
         check_files_edit_permissions(request, files_queryset)
