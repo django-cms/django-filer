@@ -74,8 +74,8 @@
                     url: dropzoneUrl,
                     paramName: 'file',
                     maxFiles: 100,
-                    // for now disabled as we don't have the correct file size limit
-                    // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+                    // filer and django do not limit file size, let's use some ridiculously large value
+                    maxFilesize: 4000000, // MB
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,

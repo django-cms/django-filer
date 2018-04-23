@@ -1,7 +1,7 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags staticfiles %}
 <div class="drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}">
         <thead>
             <tr>
                 <th class="column-checkbox">
@@ -39,7 +39,7 @@
             {% for item in paginated_items.object_list %}
                 {% if item.file_type == "Folder" %}
                     {% with item as subfolder %}
-                        <tr class="js-filer-dropzone js-filer-dropzone-folder" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+                        <tr class="js-filer-dropzone js-filer-dropzone-folder" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}" data-max-uploader-connections="{{ uploader_connections }}">
                             <td class="column-checkbox">
                                 {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
                                     <a class="insertlink insertlinkButton"
@@ -154,7 +154,7 @@
         </tbody>
     </table>
 
-    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}">
         <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
         <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
