@@ -84,7 +84,7 @@ class FolderPermissionManager(models.Manager):
 
 
 @python_2_unicode_compatible
-class Folder(models.Model, mixins.IconsMixin):
+class Folder(mptt.models.MPTTModel, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -234,12 +234,6 @@ class Folder(models.Model, mixins.IconsMixin):
         app_label = 'filer'
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
-
-# MPTT registration
-try:
-    mptt.register(Folder)
-except mptt.AlreadyRegistered:
-    pass
 
 
 @python_2_unicode_compatible
