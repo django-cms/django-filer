@@ -2,7 +2,7 @@ include AUTHORS
 include LICENSE
 include LICENSES
 include README.rst
-include HISTORY
+include CHANGELOG.txt
 recursive-include filer/templates *
 recursive-include filer/static *
 recursive-include filer/locale *

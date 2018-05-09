@@ -1,0 +1,22 @@
+.filer-label {
+    display: inline-block;
+    font-weight: normal;
+    padding: 3px 8px;
+    white-space: nowrap;
+    border-radius: 4px;
+}
+
+.filer-label-primary {
+    color: white;
+    background-color: $color-primary;
+}
+
+.filer-label-danger {
+    color: white;
+    background-color: $color-danger;
+}
+
+.filer-label-warning {
+    color: #333;
+    background-color: $color-warning;
+}

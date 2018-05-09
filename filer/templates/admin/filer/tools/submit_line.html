@@ -1,0 +1,42 @@
+{% load i18n admin_urls filer_admin_tags %}
+<div class="submit-row">
+
+{% for button in draft_workflow_buttons.values %}
+    {% if button.deletelink %}
+        {# special case for the deletelink because it has special markup #}
+        {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+        <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}{% filer_admin_context_url_params %}" class="deletelink">{% trans "Delete" %}</a></p>
+    {% elif button.url %}
+        <a href="{{ button.url }}{% filer_admin_context_url_params %}" class="btn">{{ button.label }}</a>
+    {% elif button.deletelink_button %}
+        <p class="deletelink-box">
+            <button
+                type="submit"
+                name="{{ button.field_name }}"
+                class="deletelink{% if button.class %} {{ button.class }}{% endif %}"
+                {% if not button.has_permission %}
+                    disabled="disabled"
+                    {% if button.disabled_message %}
+                        title="{{ button.disabled_message }}"
+                    {% endif %}
+                {% endif %}
+            >
+                {{ button.label }}
+            </button>
+        </p>
+    {% else %}
+        <input
+            type="submit"
+            value="{{ button.label }}"
+            name="{{ button.field_name }}"
+            {% if button.class %}class="{{ button.class }}"{% endif %}
+            {% if not button.has_permission %}
+                disabled="disabled"
+                {% if button.disabled_message %}
+                    title="{{ button.disabled_message }}"
+                {% endif %}
+            {% endif %}
+        />
+    {% endif %}
+{% endfor %}
+</div>

@@ -23,7 +23,7 @@ def serve_protected_file(request, path):
         file_obj = File.objects.get(file=path, is_public=False)
     except File.DoesNotExist:
         raise Http404('File not found')
-    if not file_obj.has_read_permission(request):
+    if not file_obj.user_can_view(request.user):
         if settings.DEBUG:
             raise PermissionDenied
         else:
@@ -43,7 +43,7 @@ def serve_protected_thumbnail(request, path):
         file_obj = File.objects.get(file=source_path, is_public=False)
     except File.DoesNotExist:
         raise Http404('File not found')
-    if not file_obj.has_read_permission(request):
+    if not file_obj.user_can_view(request.user):
         if settings.DEBUG:
             raise PermissionDenied
         else:

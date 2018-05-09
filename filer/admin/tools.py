@@ -10,13 +10,13 @@ ALLOWED_PICK_TYPES = ('folder', 'file')
 
 def check_files_edit_permissions(request, files):
     for f in files:
-        if not f.has_edit_permission(request):
+        if not f.user_can_change(request.user):
             raise PermissionDenied
 
 
 def check_folder_edit_permissions(request, folders):
     for f in folders:
-        if not f.has_edit_permission(request):
+        if not f.user_can_change(request.user):
             raise PermissionDenied
         check_files_edit_permissions(request, f.files)
         check_folder_edit_permissions(request, f.children.all())
@@ -24,13 +24,13 @@ def check_folder_edit_permissions(request, folders):
 
 def check_files_read_permissions(request, files):
     for f in files:
-        if not f.has_read_permission(request):
+        if not f.user_can_view(request.user):
             raise PermissionDenied
 
 
 def check_folder_read_permissions(request, folders):
     for f in folders:
-        if not f.has_read_permission(request):
+        if not f.user_can_view(request.user):
             raise PermissionDenied
         check_files_read_permissions(request, f.files)
         check_folder_read_permissions(request, f.children.all())
@@ -102,12 +102,3 @@ class AdminContext(dict):
             return self.get('_pick', '')
         elif key.startswith('pick_'):
             return self.get('_pick', '') == key.split('pick_')[1]
-
-    def __getattr__(self, name):
-        """
-        Always allow accessing 'popup', 'pick', 'pick_file' and 'pick_folder'
-        as attributes.
-        """
-        if name in ('popup', 'pick') or name.startswith('pick_'):
-            return self.get(name)
-        raise AttributeError
