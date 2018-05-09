@@ -39,10 +39,10 @@ class BaseImage(File):
     subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
                                         default='')
     file_ptr = models.OneToOneField(
-        to='filer.File', parent_link=True,
+        to='filer.File',
+        parent_link=True,
         related_name='%(app_label)s_%(class)s_file',
         on_delete=models.CASCADE,
-        parent_link=True,
     )
 
     @classmethod
