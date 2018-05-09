@@ -8,7 +8,7 @@ import filer.settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filer', '0007_auto_20161016_1055'),
+        ('filer', '0010_auto_20180414_2058'),
     ]
 
     operations = [
