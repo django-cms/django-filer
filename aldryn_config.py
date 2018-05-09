@@ -3,6 +3,16 @@ from aldryn_client import forms
 
 
 class Form(forms.BaseForm):
+    enable_publisher = forms.CheckboxField(
+        'Enable Publisher support',
+        required=False,
+        initial=False,
+        help_text=(
+            'When enabled, changes to files need to be published before they '
+            'are visible and a draft version can be edited independently of the'
+            'published version.'
+        ),
+    )
 
     def to_settings(self, data, settings):
         from functools import partial
@@ -25,6 +35,8 @@ class Form(forms.BaseForm):
                 'Cache-Control': 'public, max-age={}'.format(86400 * 365),
             },
         ))
+
+        settings['FILER_ENABLE_PUBLISHER'] = data['enable_publisher']
 
         # easy-thumbnails
         settings['THUMBNAIL_QUALITY'] = env('THUMBNAIL_QUALITY', 90)
@@ -51,4 +63,7 @@ class Form(forms.BaseForm):
             if storage_backend == settings['DEFAULT_FILE_STORAGE']:
                 settings['THUMBNAIL_DEFAULT_STORAGE'] = storage_backend
                 break
+        # FIXME: just a workaround until
+        #        https://github.com/divio/django-filer/issues/1002 is resolved
+        settings['FILER_IMAGE_MODEL'] = 'filer.Image'
         return settings

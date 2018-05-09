@@ -21,17 +21,6 @@ class ImageAdminForm(forms.ModelForm):
         help_text=_('Location of the main subject of the scene. '
                     'Format: "x,y".'))
 
-    def sidebar_image_ratio(self):
-        if self.instance:
-            # this is very important. It forces the value to be returned as a
-            # string and always with a "." as separator. If the conversion
-            # from float to string is done in the template, the locale will
-            # be used and in some cases there would be a "," instead of ".".
-            # javascript would parse that to an integer.
-            return '%.6F' % self.instance.sidebar_image_ratio()
-        else:
-            return ''
-
     def _set_previous_subject_location(self, cleaned_data):
         subject_location = self.instance.subject_location
         cleaned_data['subject_location'] = subject_location
@@ -89,15 +78,28 @@ class ImageAdminForm(forms.ModelForm):
 
 
 class ImageAdmin(FileAdmin):
+    change_form_template = 'admin/filer/image/change_form.html'
     form = ImageAdminForm
-
-
-ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
-    extra_main_fields=('author', 'default_alt_text', 'default_caption',),
-    extra_fieldsets=(
+    extra_main_fields = (
+        'author',
+        'default_alt_text',
+        'default_caption',
+    )
+    extra_fieldsets = (
         (_('Subject location'), {
             'fields': ('subject_location',),
             'classes': ('collapse',),
         }),
     )
-)
+
+    def get_file_info_context(self, obj):
+        context = super(ImageAdmin, self).get_file_info_context(obj)
+        context['filetype'] = 'image'
+        if obj:
+            # this is very important. It forces the value to be returned as a
+            # string and always with a "." as separator. If the conversion
+            # from float to string is done in the template, the locale will
+            # be used and in some cases there would be a "," instead of ".".
+            # javascript would parse that to an integer.
+            context['sidebar_image_ratio'] = '%.6F' % obj.sidebar_image_ratio()
+        return context

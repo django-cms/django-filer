@@ -1,0 +1,93 @@
+{% load i18n staticfiles l10n %}
+<section class="image-info image-info-detail">
+    <div class="image-info-title">
+        <span class="icon fa {% if file %}fa-file{% else %}fa-file-image-o{% endif %}"></span> 
+        {{ original.label }}
+
+        {% if filer_show_picker %}
+        <button type="button" 
+            {% with file=original %}
+            onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file|escapejs }}'); return false;">{% trans "Choose this file" %}</button>
+            {% endwith %}
+        {% endif %}
+
+        {% if original.publisher_is_published_version and original.publisher_has_pending_changes %}
+            <div style="float:right; margin-left: auto;">
+                {% include 'admin/filer/includes/pending-changes-indicator.html' %}
+            </div>
+        {% endif %}
+        {% if original.publisher_has_pending_deletion_request %}
+            <div style="float:right; margin-left: auto;">
+                {% include 'admin/filer/includes/pending-deletion-indicator.html' %}
+            </div>
+        {% endif %}
+        {% if original.publisher_is_draft_version %}
+            <div style="float:right; margin-left: auto;">
+                {% include 'admin/filer/includes/draft-indicator.html' %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="image-details-left">
+        <div class="image-preview-container">
+            {% if filetype == 'image' and is_readonly %}
+                <div class="image-preview">
+                    <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ sidebar_image_ratio }}">
+                </div>
+            {% elif filetype == 'image' %}
+                <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
+                    <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image">
+                    <div class="image-preview-field">
+                        <div class="js-focal-point-circle image-preview-circle hidden"></div>
+                    </div>
+                </div>
+            {% else %}
+                <img src="{% if original.icons.48 %}{{ original.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}">
+            {% endif %}
+            <div class="text-left">
+                <a href="{{ original.url }}" target="_blank" class="btn">
+                    {% if filetype == 'image' %}
+                        {% trans "Full size preview" %}
+                    {% else %}
+                        {% trans "Open file" %}
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="image-details-right">
+        {% if original.file_type or original.modified_at or original.uploaded_at or original.width or original.height or original.size %}
+            <dl class="image-details">
+                {% if original.file_type %}
+                    <dt>{% trans "Type" %}</dt>
+                    <dd>{{ original.extension|upper }} {{ original.file_type }}</dd>
+                {% endif %}
+                {% if original.width or original.height %}
+                    <dt>{% trans "Size" %}</dt>
+                    <dd>{{ original.width }}x{{ original.height }} px</dd>
+                {% endif %}
+                {% if original.size %}
+                    <dt>{% trans "File-size" %}</dt>
+                    <dd>{{ original.size|filesizeformat }}</dd>
+                {% endif %}
+                {% if original.modified_at %}
+                    <dt>{% trans "Modified" %}</dt>
+                    <dd>{{ original.modified_at }}</dd>
+                {% endif %}
+                {% if original.uploaded_at %}
+                    <dt>{% trans "Created" %}</dt>
+                    <dd>{{ original.uploaded_at }}</dd>
+                {% endif %}
+            </dl>
+            <div class="image-actions">
+                <ul class="actions-list">
+                    <li>
+                        <span class="icon fa fa-user"></span>
+                        {% if original.owner %}
+                            <span class="text">{% trans "Owner" %}: <strong>{{ original.owner }}</strong></span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</section>

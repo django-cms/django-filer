@@ -139,3 +139,20 @@ body {
     box-shadow: 0 0 10px -2px rgba(black, 0.2);
     background-color: white;
 }
+
+input.left,
+.btn.left {
+    float: left;
+}
+
+.submit-row {
+    .deletelink,
+    .btn {
+        padding: 10px 20px !important;
+        height: 36px !important;
+        box-sizing: border-box;
+        display: inline-flex !important;
+        vertical-align: top;
+        align-items: center;
+    }
+}

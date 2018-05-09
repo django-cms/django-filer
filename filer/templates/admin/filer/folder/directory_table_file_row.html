@@ -1,0 +1,62 @@
+{% load i18n l10n admin_list filer_tags filer_admin_tags staticfiles %}
+
+{% with item as file %}
+    {% filer_has_permission item 'edit' as has_change_permission %}
+    <tr>
+        <td class="column-checkbox">
+            {% if action_form %}
+                <input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action">
+            {% endif %}
+        </td>
+        <td class="column-icon">
+            {% if has_change_permission %}
+                <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
+                        title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
+            {% endif %}
+                <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
+            {% if has_change_permission %}
+                </a>
+            {% endif %}
+        </td>
+        <td class="column-name">
+            <div>
+                <strong>
+                    {% if has_change_permission %}
+                        <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
+                            title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
+                    {% endif %}
+                    {{ file.label }}
+                    {% if has_change_permission %}
+                        </a>
+                    {% endif %}
+                    {% if file.publisher_is_published_version and file.publisher_has_pending_changes %}
+                        <a href="{{ file.draft.get_admin_change_url }}">{% include 'admin/filer/includes/pending-changes-indicator.html' %}</a>
+                    {% elif file.publisher_is_draft_version %}
+                        <a href="{{ file.get_admin_change_url }}">{% include 'admin/filer/includes/draft-indicator.html' %}</a>
+                    {% endif %}
+                    {% if file.publisher_has_pending_deletion_request %}
+                        <span>{% include 'admin/filer/includes/pending-deletion-indicator.html' %}</span>
+                    {% endif %}
+                </strong>
+            </div>
+            {% if enable_permissions %}
+                <div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>
+            {% endif %}
+        </td>
+        <td class="column-owner">
+            {{ file.owner|default:"n/a" }}
+        </td>
+        <td class="column-size">
+            <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
+        </td>
+        <td class="column-action">
+            <a href="{{ file.canonical_url }}"
+                title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" class="action-button" target="_blank"><span class="fa fa-link"></span></a>
+            <a href="{{ file.url }}" target="_blank"
+                title="{% blocktrans with file.label as item_label %}Download '{{ item_label }}'{% endblocktrans %}" class="action-button"><span class="fa fa-download"></span></a>
+            <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
+                title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil"></span></a>
+            <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash"></span></a>
+        </td>
+    </tr>
+{% endwith %}
