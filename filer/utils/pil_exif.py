@@ -19,7 +19,9 @@ def get_exif(im):
 
 
 def get_exif_for_file(file_obj):
-    storage = getattr(file_obj, 'storage', default_storage)
+    storage = getattr(file_obj, 'storage', None)
+    if storage is None:
+        storage = default_storage
     im = PILImage.open(storage.open(file_obj.name), 'r')
     return get_exif(im)
 
