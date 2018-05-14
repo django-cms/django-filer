@@ -6,6 +6,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from filer.settings import FILER_FILE_MODELS
 from filer.utils.loader import load_object
 
+
+import imghdr
+
 class UploadException(Exception):
     pass
 
@@ -68,3 +71,22 @@ def matching_file_subtypes(filename, file_pointer, request):
         return is_match
     type_matches = filter(_match_subtype, types)
     return type_matches
+
+
+
+def clean_filename(upload, filename, is_raw, maxlen=None):
+    """
+    Return good filename and title:
+    Filename will be less than or equals maxlen(if passed)
+    """
+    title, extension = os.path.splitext(filename)
+    clean_title = title[:maxlen]
+    filename = clean_title + extension
+    if not extension:
+        # try to guess if it's an image and append extension
+        # imghdr will detect file is a '.jpeg', '.png' or '.gif' image
+        guessed_extension = imghdr.what(upload)
+        if guessed_extension:
+            filename = '%s.%s' % (filename, guessed_extension)
+    return upload, filename, clean_title
+

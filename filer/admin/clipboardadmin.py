@@ -15,7 +15,6 @@ from filer.views import (
     file_type_param
 )
 from filer.admin.tools import is_valid_destination
-import imghdr
 import os
 import json
 
@@ -120,18 +119,9 @@ class ClipboardAdmin(admin.ModelAdmin):
         mimetype = "application/json" if request.is_ajax() else "text/html"
         upload, file_obj = None, None
         try:
-            upload, filename, is_raw = handle_upload(request)
-
-            title, extension = os.path.splitext(filename)
-            title = title[:FILENAME_LIMIT]
-            upload.name = title # the upload raw has also the title saved in a CharField
-            filename = title + extension
-            if not extension:
-                # try to guess if it's an image and append extension
-                # imghdr will detect file is a '.jpeg', '.png' or '.gif' image
-                guessed_extension = imghdr.what(upload)
-                if guessed_extension:
-                    filename = '%s.%s' % (filename, guessed_extension)
+            upload, filename, title = clean_filename(handle_upload(request),
+                                                     maxlen=FILENAME_LIMIT)
+            upload.name = filename # the upload raw has also the title saved in a CharField
 
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
