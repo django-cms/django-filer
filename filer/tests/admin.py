@@ -2510,11 +2510,17 @@ class TestAdminTools(TestCase):
         self.assertEqual(File.objects.filter(restricted=False).count(), 0)
         self.assertEqual(Folder.objects.filter(restricted=False).count(), 0)
 
-    def test_truncate_filename(self):
+    def test_truncate_filename_no_extension(self):
         jpeg_file = StringIO.StringIO('      JFIF') # jpeg signature
-        jpeg_file.name = 'empty{}'.format(12345)
+        jpeg_file.name = '123456789'
         filename = filer.utils.files.truncate_filename(jpeg_file, maxlen=7)
-        self.assertEquals(filename, 'empty12.jpeg')
+        self.assertEquals(filename, '1234567.jpeg')
+
+    def test_truncate_filename_with_extension(self):
+        jpeg_file = StringIO.StringIO('      JFIF') # jpeg signature
+        jpeg_file.name = '1234567.jpeg'
+        filename = filer.utils.files.truncate_filename(jpeg_file, maxlen=5)
+        self.assertEquals(filename, '12345.jpeg')
 
 
 class TestMPTTCorruptionsOnFolderOperations(TestCase):
