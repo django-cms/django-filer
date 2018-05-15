@@ -73,20 +73,14 @@ def matching_file_subtypes(filename, file_pointer, request):
     return type_matches
 
 
-
-def clean_filename(upload, filename, is_raw, maxlen=None):
+def truncate_filename(upload, maxlen=None):
     """
-    Return good filename and title:
-    Filename will be less than or equals maxlen(if passed)
+    Return truncated filename
+    Pre-extension filename will be less than or equals maxlen(if passed)
     """
-    title, extension = os.path.splitext(filename)
-    clean_title = title[:maxlen]
-    filename = clean_title + extension
-    if not extension:
-        # try to guess if it's an image and append extension
-        # imghdr will detect file is a '.jpeg', '.png' or '.gif' image
-        guessed_extension = imghdr.what(upload)
-        if guessed_extension:
-            filename = '%s.%s' % (filename, guessed_extension)
-    return upload, filename, clean_title
+    title, extension = os.path.splitext(upload.name)
+    filename = '{title}.{ext}'.format(title=title[:maxlen],
+                                      ext=extension.lstrip('.') or
+                                      imghdr.what(upload))
+    return filename
 
