@@ -8,14 +8,13 @@ from django.views.decorators.csrf import csrf_exempt
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem, Folder, tools
 from filer.utils.files import (
-    handle_upload, UploadException, matching_file_subtypes
+    handle_upload, UploadException, matching_file_subtypes, truncate_filename
 )
 from filer.views import (
     popup_param, selectfolder_param, current_site_param,
     file_type_param
 )
 from filer.admin.tools import is_valid_destination
-import imghdr
 import os
 import json
 
@@ -120,18 +119,9 @@ class ClipboardAdmin(admin.ModelAdmin):
         mimetype = "application/json" if request.is_ajax() else "text/html"
         upload, file_obj = None, None
         try:
-            upload, filename, is_raw = handle_upload(request)
-
-            title, extension = os.path.splitext(filename)
-            title = title[:FILENAME_LIMIT]
-            upload.name = title # the upload raw has also the title saved in a CharField
-            filename = title + extension
-            if not extension:
-                # try to guess if it's an image and append extension
-                # imghdr will detect file is a '.jpeg', '.png' or '.gif' image
-                guessed_extension = imghdr.what(upload)
-                if guessed_extension:
-                    filename = '%s.%s' % (filename, guessed_extension)
+            upload, original_filename, _ = handle_upload(request)
+            filename = truncate_filename(upload, maxlen=FILENAME_LIMIT)
+            upload.name = filename # the upload raw has also the title saved in a CharField
 
             # Get clipboad
             clipboard = Clipboard.objects.get_or_create(user=request.user)[0]

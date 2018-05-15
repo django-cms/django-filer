@@ -2,6 +2,7 @@
 import os
 import tempfile
 import zipfile
+import StringIO
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -33,6 +34,7 @@ from cmsroles.tests.tests import HelpersMixin
 from cmsroles.siteadmin import get_site_admin_required_permission
 import json
 from filer.admin import ClipboardAdmin
+import filer.utils.files
 
 
 class FilerFolderAdminUrlsTests(TestCase):
@@ -2507,6 +2509,18 @@ class TestAdminTools(TestCase):
         f1.save()
         self.assertEqual(File.objects.filter(restricted=False).count(), 0)
         self.assertEqual(Folder.objects.filter(restricted=False).count(), 0)
+
+    def test_truncate_filename_no_extension(self):
+        jpeg_file = StringIO.StringIO('      JFIF') # jpeg signature
+        jpeg_file.name = '123456789'
+        filename = filer.utils.files.truncate_filename(jpeg_file, maxlen=7)
+        self.assertEquals(filename, '1234567.jpeg')
+
+    def test_truncate_filename_with_extension(self):
+        jpeg_file = StringIO.StringIO('      JFIF') # jpeg signature
+        jpeg_file.name = '1234567.jpeg'
+        filename = filer.utils.files.truncate_filename(jpeg_file, maxlen=5)
+        self.assertEquals(filename, '12345.jpeg')
 
 
 class TestMPTTCorruptionsOnFolderOperations(TestCase):

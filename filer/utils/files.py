@@ -6,6 +6,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from filer.settings import FILER_FILE_MODELS
 from filer.utils.loader import load_object
 
+
+import imghdr
+
 class UploadException(Exception):
     pass
 
@@ -68,3 +71,16 @@ def matching_file_subtypes(filename, file_pointer, request):
         return is_match
     type_matches = filter(_match_subtype, types)
     return type_matches
+
+
+def truncate_filename(upload, maxlen=None):
+    """
+    Return truncated filename
+    Pre-extension filename will be less than or equals maxlen(if passed)
+    """
+    title, extension = os.path.splitext(upload.name)
+    filename = '{title}.{ext}'.format(title=title[:maxlen],
+                                      ext=extension.lstrip('.') or
+                                      imghdr.what(upload))
+    return filename
+
