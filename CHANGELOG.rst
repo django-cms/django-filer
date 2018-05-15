@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Revision 6af1333 (15.05.2018, 12:39 UTC)
+----------------------------------------
+
+No new issues.
+
+* Misc commits
+
+  * BEN-434: Add second trucate filename test.
+  * BEN-434: Add filename truncate test.
+  * BEN-434: Use filename with extesion instead of title.
+
 Revision e86cfa2 (08.08.2017, 15:01 UTC)
 ----------------------------------------
 
