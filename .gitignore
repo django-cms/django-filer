@@ -39,3 +39,4 @@ pep8.txt
 share/
 .python-version
 data
+local.sqlite

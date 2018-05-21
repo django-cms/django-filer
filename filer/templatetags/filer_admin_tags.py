@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
 
+from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 
@@ -27,6 +28,30 @@ def filer_actions(context):
 
 filer_actions = register.inclusion_tag(
     "admin/filer/actions.html", takes_context=True)(filer_actions)
+
+
+@register.inclusion_tag(
+    'admin/filer/folder/list_type_switcher.html',
+    takes_context=True,
+)
+def filer_folder_list_type_switcher(context):
+    choice_list = settings.FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES
+    current_list_type = context['list_type']
+    # This solution is user friendly when there's only 2 choices
+    # If there will be more list types then please change this switcher to more
+    # proper widget (like for e.g. select list)
+    next_list_type = next(
+        iter(choice_list[choice_list.index(current_list_type) + 1:]),
+        choice_list[0],
+    )
+
+    context['url'] = admin_url_params_encoded(
+        context['request'],
+        params={'_list_type': next_list_type},
+    )
+    context['tooltip_text'] = settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[next_list_type]['tooltip_text']  # noqa: E501
+    context['icon'] = settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[next_list_type]['icon']  # noqa: E501
+    return context
 
 
 @register.simple_tag(takes_context=True)

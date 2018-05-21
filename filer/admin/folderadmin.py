@@ -38,7 +38,8 @@ from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
     AdminContext, admin_url_params_encoded, check_files_edit_permissions,
     check_files_read_permissions, check_folder_edit_permissions,
-    check_folder_read_permissions, popup_status, userperms_for_request,
+    check_folder_read_permissions, get_directory_listing_type, popup_status,
+    userperms_for_request,
 )
 
 
@@ -405,6 +406,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
 
+        list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE  # noqa: E501
         context = self.admin_site.each_context(request)
         context.update({
             'folder': folder,
@@ -435,6 +437,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'actions_selection_counter': self.actions_selection_counter,
             'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
             'selection_note_all': selection_note_all % {'total_count': paginator.count},
+            'list_type': list_type,
+            'list_type_template': settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[list_type]['template'],  # noqa: E501
             'media': self.media,
             'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
             'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),

@@ -83,9 +83,9 @@ Cl.mediator = new Mediator();
 
         // show counter if file is selected
         (function () {
-            var navigatorTable = $('.navigator-table').find('tr');
+            var navigatorTable = $('.navigator-table, .navigator-list').find('tr, .list-item');
             var actionList = $('.actions-wrapper');
-            var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
+            var actionSelect = $('.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a');
 
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
@@ -120,7 +120,7 @@ Cl.mediator = new Mediator();
             var valueDelete = 'delete_files_or_folders';
             var valueCopy = 'copy_files_and_folders';
             var valueMove = 'move_files_and_folders';
-            var navigatorTable = $('.navigator-table').find('tr');
+            var navigatorTable = $('.navigator-table, .navigator-list').find('tr, .list-item');
 
             // triggers delete copy and move actions on separate buttons
             function actionsButton(optionValue, actionButton) {
@@ -206,5 +206,23 @@ Cl.mediator = new Mediator();
             });
 
         }());
+        // thumbnail folder admin view
+        (function() {
+            $(document).ready(function() {
+                var $folderActionsEls = $('.navigator-list .navigator-folders-body .list-item input.action-select');
+
+                if ($folderActionsEls.length > 0) {
+                    $folderActionsEls.actions({
+                        allToggle: '#folders-action-toggle'
+                    });
+                }
+                var $fileActionsEls = $('.navigator-list .navigator-files-body .list-item input.action-select');
+                if ($fileActionsEls.length > 0) {
+                    $fileActionsEls.actions({
+                        allToggle: '#files-action-toggle'
+                    });
+                }
+            });
+        })();
     });
 })(djQuery);
