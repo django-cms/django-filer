@@ -3,6 +3,7 @@
 <section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list">
 
     <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+        <input type="checkbox" id="all-items-action-toggle">
 
         <div class="navigator-thumbnail-list-header navigator-header">
           <p>Folders</p>
@@ -16,7 +17,7 @@
 
         <div class="navigator-body navigator-folders-body">
         {% for item in virtual_items %}
-            <div class="list-item thumbnail-item thumbnail-virtual-item">
+            <div class="thumbnail-item thumbnail-virtual-item">
                 <div class="item-icon">
                     <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                         title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">

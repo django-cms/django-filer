@@ -202,19 +202,53 @@ Cl.mediator = new Mediator();
         // thumbnail folder admin view
         (function() {
             $(document).ready(function() {
-                var $folderActionsEls = $('.navigator-list .navigator-folders-body .list-item input.action-select');
+                var $actionEls = $('.navigator-list .list-item input.action-select'),
+                    foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select',
+                    filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select',
+                    $allFilesToggle = $('#files-action-toggle'),
+                    $allFoldersToggle = $('#folders-action-toggle');
 
-                if ($folderActionsEls.length > 0) {
-                    $folderActionsEls.actions({
-                        allToggle: '#folders-action-toggle'
+                if ($actionEls.length > 0) {
+                    $actionEls.actions({
+                        allToggle: '#all-items-action-toggle'
                     });
                 }
-                var $fileActionsEls = $('.navigator-list .navigator-files-body .list-item input.action-select');
-                if ($fileActionsEls.length > 0) {
-                    $fileActionsEls.actions({
-                        allToggle: '#files-action-toggle'
-                    });
-                }
+
+                $allFoldersToggle.on('click', function() {
+                    if (!!$(this).prop('checked')) {
+                        $(foldersActionCheckboxes).filter(':not(:checked)').trigger('click');
+                    } else {
+                        $(foldersActionCheckboxes).filter(':checked').trigger('click');
+                    }
+                });
+                $allFilesToggle.on('click', function() {
+                    if (!!$(this).prop('checked')) {
+                        $(filesActionCheckboxes).filter(':not(:checked)').trigger('click');
+                    } else {
+                        $(filesActionCheckboxes).filter(':checked').trigger('click');
+                    }
+                });
+                $actionEls.on('click', function() {
+                    if (!$(this).prop('checked')) {
+                        if (!!$(filesActionCheckboxes).filter(':not(:checked)').length) {
+                            $allFilesToggle.prop('checked', false);
+                        }
+                        if (!!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
+                            $allFoldersToggle.prop('checked', false);
+                        }
+                    } else {
+                        if (!$(filesActionCheckboxes).filter(':not(:checked)').length) {
+                            $allFilesToggle.prop('checked', true);
+                        }
+                        if (!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
+                            $allFoldersToggle.prop('checked', true);
+                        }
+                    }
+                });
+                $('.navigator .actions .clear a').on('click', function() {
+                    $allFoldersToggle.prop('checked', false);
+                    $allFilesToggle.prop('checked', false);
+                });
             });
         })();
     });

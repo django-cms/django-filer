@@ -139,3 +139,15 @@ body {
     box-shadow: 0 0 10px -2px rgba(black, 0.2);
     background-color: white;
 }
+
+.navigator .actions span.all,
+.navigator .actions span.clear,
+.navigator .actions span.question {
+    font-size: 13px;
+    margin: 0 0.5em;
+    display: none;
+}
+
+#all-items-action-toggle {
+    display: none !important;
+}
