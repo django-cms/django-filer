@@ -6,10 +6,10 @@
         <input type="checkbox" id="all-items-action-toggle">
 
         <div class="navigator-thumbnail-list-header navigator-header">
-          <p>Folders</p>
+          <p>{% trans 'Folders' %}</p>
           <span class="navigator-checkbox">
               {% if paginator.count and not is_popup %}
-                  Select all
+                  {% trans 'Select all' %}
                   <input type="checkbox" id="folders-action-toggle">
               {% endif %}
           </span>
@@ -68,7 +68,7 @@
           <p>{% trans 'Files' %}</p>
           <span class="navigator-checkbox">
               {% if paginator.count and not is_popup %}
-                  Select all
+                  {% trans 'Select all' %}
                   <input type="checkbox" id="files-action-toggle">
               {% endif %}
           </span>

@@ -132,10 +132,13 @@ if (django.jQuery) {
                         var topBorderSize = $('.drag-hover-border').css('border-top-width');
                         var leftBorderSize = $('.drag-hover-border').css('border-left-width');
                         var dropzonePosition = {
+                            top: dropzoneBoundingRect.top,
+                            bottom: dropzoneBoundingRect.bottom,
                             left: dropzoneBoundingRect.left,
                             right: dropzoneBoundingRect.right,
                             width: dropzoneBoundingRect.width - parseInt(leftBorderSize, 10) * 2,
-                            height: dropzoneBoundingRect.height - parseInt(topBorderSize, 10) * 2
+                            height: dropzoneBoundingRect.height - parseInt(topBorderSize, 10) * 2,
+                            display: 'block'
                         };
                         if (dropzoneFolder) {
                             dragHoverBorder.css(dropzonePosition);
