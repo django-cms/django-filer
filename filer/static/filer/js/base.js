@@ -78,7 +78,9 @@ Cl.mediator = new Mediator();
         (function () {
             var navigatorTable = $('.navigator-table, .navigator-list').find('tr, .list-item');
             var actionList = $('.actions-wrapper');
-            var actionSelect = $('.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a');
+            var actionSelect = $(
+                '.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a'
+            );
 
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
@@ -200,8 +202,8 @@ Cl.mediator = new Mediator();
 
         }());
         // thumbnail folder admin view
-        (function() {
-            $(document).ready(function() {
+        (function () {
+            $(document).ready(function () {
                 var $actionEls = $('.navigator-list .list-item input.action-select'),
                     foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select',
                     filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select',
@@ -214,21 +216,21 @@ Cl.mediator = new Mediator();
                     });
                 }
 
-                $allFoldersToggle.on('click', function() {
+                $allFoldersToggle.on('click', function () {
                     if (!!$(this).prop('checked')) {
                         $(foldersActionCheckboxes).filter(':not(:checked)').trigger('click');
                     } else {
                         $(foldersActionCheckboxes).filter(':checked').trigger('click');
                     }
                 });
-                $allFilesToggle.on('click', function() {
+                $allFilesToggle.on('click', function () {
                     if (!!$(this).prop('checked')) {
                         $(filesActionCheckboxes).filter(':not(:checked)').trigger('click');
                     } else {
                         $(filesActionCheckboxes).filter(':checked').trigger('click');
                     }
                 });
-                $actionEls.on('click', function() {
+                $actionEls.on('click', function () {
                     if (!$(this).prop('checked')) {
                         if (!!$(filesActionCheckboxes).filter(':not(:checked)').length) {
                             $allFilesToggle.prop('checked', false);
@@ -245,7 +247,7 @@ Cl.mediator = new Mediator();
                         }
                     }
                 });
-                $('.navigator .actions .clear a').on('click', function() {
+                $('.navigator .actions .clear a').on('click', function () {
                     $allFoldersToggle.prop('checked', false);
                     $allFilesToggle.prop('checked', false);
                 });
