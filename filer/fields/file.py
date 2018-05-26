@@ -139,7 +139,10 @@ class FilerFileField(models.ForeignKey):
         # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
-            'rel': self.rel,
         }
+        try:
+            defaults['remote_field'] = self.remote_field
+        except AttributeError:
+            defaults['rel'] = self.rel
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)
