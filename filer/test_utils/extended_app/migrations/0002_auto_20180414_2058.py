@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         ),
     ]
     if GTE_DJANGO_1_10:
-        operations = [
+        operations += [
             migrations.AlterModelOptions(
                 name='extimage',
                 options={'default_manager_name': 'objects'},
