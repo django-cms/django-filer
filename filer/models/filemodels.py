@@ -241,9 +241,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
         """
         user = request.user
         try:
-            is_authenticated = user.is_authenticated() # Django<1.10
+            is_authenticated = user.is_authenticated()  # Django<1.10
         except TypeError:
-            is_authenticated = user.is_authenticated # Django 1.10 - 2.x
+            is_authenticated = user.is_authenticated  # Django 1.10 - 2.x
         if not is_authenticated:
             return False
         elif user.is_superuser:

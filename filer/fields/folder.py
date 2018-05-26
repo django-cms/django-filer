@@ -131,7 +131,7 @@ class FilerFolderField(models.ForeignKey):
             'form_class': self.default_form_class,
         }
         try:
-            defaults['remote_field'] = self.remote_field
+            defaults['rel'] = self.remote_field
         except AttributeError:
             defaults['rel'] = self.rel
         defaults.update(kwargs)

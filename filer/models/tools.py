@@ -15,9 +15,9 @@ def delete_clipboard(clipboard):
 
 def get_user_clipboard(user):
     try:
-        is_authenticated = user.is_authenticated() # Django<1.10
+        is_authenticated = user.is_authenticated()  # Django<1.10
     except TypeError:
-        is_authenticated = user.is_authenticated # Django 1.10 - 2.x
+        is_authenticated = user.is_authenticated  # Django 1.10 - 2.x
     if is_authenticated:
         clipboard = Clipboard.objects.get_or_create(user=user)[0]
         return clipboard
