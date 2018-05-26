@@ -12,7 +12,7 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve,
         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^', include('filer.server.urls')),
     url(r'^filer/', include('filer.urls')),
 ]
