@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.3.3 (unreleased)
+------------------
+
+* Enabled django-mptt 0.9
+* Converted QueryDict to dict before manipulating in admin
+
 1.3.2 (2018-04-23)
 ------------------
 
