@@ -90,11 +90,17 @@ class ImageAdminForm(forms.ModelForm):
 
 
 class ImageAdmin(FileAdmin):
+    change_form_template = 'admin/filer/image/change_form.html'
     form = ImageAdminForm
 
 
+if FILER_IMAGE_MODEL == 'filer.Image':
+    extra_main_fields = ('author', 'default_alt_text', 'default_caption',)
+else:
+    extra_main_fields = ('default_alt_text', 'default_caption',)
+
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
-    extra_main_fields=('author', 'default_alt_text', 'default_caption',),
+    extra_main_fields=extra_main_fields,
     extra_fieldsets=(
         (_('Subject location'), {
             'fields': ('subject_location',),
