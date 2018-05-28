@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import os
 
 from django.core.files.storage import DefaultStorage
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 from django.utils.six.moves import input
 from filer.settings import DEFAULT_FILER_STORAGES
@@ -61,7 +61,8 @@ class Command(BaseCommand):
                 msg = "\nThis will delete entries from your database. Are you sure you want to do this?\n\n" \
                       "Type 'yes' to continue, or 'no' to cancel: "
                 if input(msg) != 'yes':
-                    raise CommandError("Aborted: Delete missing file entries from database.")
+                    self.stdout.write("Aborted: Delete missing file entries from database.")
+                    return
             self.verify_references(options)
 
         if options['orphans']:
@@ -71,7 +72,8 @@ class Command(BaseCommand):
                 msg = "\nThis will delete orphaned files from your storage. Are you sure you want to do this?\n\n" \
                       "Type 'yes' to continue, or 'no' to cancel: "
                 if input(msg) != 'yes':
-                    raise CommandError("Aborted: Delete orphaned files from storage.")
+                    self.stdout.write("Aborted: Delete orphaned files from storage.")
+                    return
             self.verify_storages(options)
 
     def verify_references(self, options):
