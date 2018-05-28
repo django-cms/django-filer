@@ -7,12 +7,11 @@ from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 from django.utils.six.moves import input
-from django.utils.translation import ugettext_lazy as _
 from filer.settings import DEFAULT_FILER_STORAGES
 
 
 class Command(BaseCommand):
-    help = _("Look for orphaned files in media folders.")
+    help = "Look for orphaned files in media folders."
     storage = DefaultStorage()
     prefix = DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX']
 
@@ -22,28 +21,28 @@ class Command(BaseCommand):
             action='store_true',
             dest='orphans',
             default=False,
-            help=_("Walk through the media folders and look for orphaned files."),
+            help="Walk through the media folders and look for orphaned files.",
         )
         parser.add_argument(
             '--delete-orphans',
             action='store_true',
             dest='delete_orphans',
             default=False,
-            help=_("Delete orphaned files from their media folders."),
+            help="Delete orphaned files from their media folders.",
         )
         parser.add_argument(
             '--missing',
             action='store_true',
             dest='missing',
             default=False,
-            help=_("Verify media folders and report about missing files."),
+            help="Verify media folders and report about missing files.",
         )
         parser.add_argument(
             '--delete-missing',
             action='store_true',
             dest='delete_missing',
             default=False,
-            help=_("Delete references in database if files are missing in media folder."),
+            help="Delete references in database if files are missing in media folder.",
         )
         parser.add_argument(
             '--noinput',
@@ -59,8 +58,8 @@ class Command(BaseCommand):
             self.verify_references(options)
         if options['delete_missing']:
             if options['interactive']:
-                msg = _("\nThis will delete entries from your database. Are you sure you want to do this?\n\n"
-                        "Type 'yes' to continue, or 'no' to cancel: ")
+                msg = "\nThis will delete entries from your database. Are you sure you want to do this?\n\n" \
+                      "Type 'yes' to continue, or 'no' to cancel: "
                 if input(msg) != 'yes':
                     raise CommandError("Aborted: Delete missing file entries from database.")
             self.verify_references(options)
@@ -69,8 +68,8 @@ class Command(BaseCommand):
             self.verify_storages(options)
         if options['delete_orphans']:
             if options['interactive']:
-                msg = _("\nThis will delete orphaned files from your storage. Are you sure you want to do this?\n\n"
-                        "Type 'yes' to continue, or 'no' to cancel: ")
+                msg = "\nThis will delete orphaned files from your storage. Are you sure you want to do this?\n\n" \
+                      "Type 'yes' to continue, or 'no' to cancel: "
                 if input(msg) != 'yes':
                     raise CommandError("Aborted: Delete orphaned files from storage.")
             self.verify_storages(options)
@@ -82,9 +81,9 @@ class Command(BaseCommand):
             if not file.file.storage.exists(file.file.name):
                 if options['delete_missing']:
                     file.delete()
-                    msg = _("Delete missing file reference '{}/{}' from database.")
+                    msg = "Delete missing file reference '{}/{}' from database."
                 else:
-                    msg = _("Referenced file '{}/{}' is missing in media folder.")
+                    msg = "Referenced file '{}/{}' is missing in media folder."
                 if options['verbosity'] > 2:
                     self.stdout.write(msg.format(str(file.folder), str(file)))
                 elif options['verbosity']:
