@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 from .. import settings as filer_settings
-from ..models import Clipboard, ClipboardItem, Folder, Image
+from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import (
     UploadException,
     handle_request_files_upload,
@@ -21,6 +21,9 @@ NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
     "Can't use this folder, Permission Denied. Please select another folder."
 )
+
+
+Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
 
 # ModelAdmins

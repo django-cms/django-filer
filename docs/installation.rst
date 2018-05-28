@@ -26,6 +26,10 @@ Please make sure you install `Pillow`_ with JPEG and  ZLIB support installed;
 for further information on Pillow installation and its binary dependencies,
 check `Pillow doc`_.
 
+`django-polymorphic`_ version depends on `Django`_ version:
+
+* for `Django`_ >=1.8,<1.11 use `django-polymorphic`_ 1.3.1
+* for `Django`_ >=1.11 use `django-polymorphic`_ >=2.0
 
 Configuration
 -------------

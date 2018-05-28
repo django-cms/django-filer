@@ -22,7 +22,7 @@ class BaseImage(File):
     DEFAULT_THUMBNAILS = {
         'admin_clipboard_icon': {'size': (32, 32), 'crop': True,
                                  'upscale': True},
-        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH, 10000), 'upscale': True},
+        'admin_sidebar_preview': {'size': (SIDEBAR_IMAGE_WIDTH, 0), 'upscale': True},
         'admin_directory_listing_icon': {'size': (48, 48),
                                          'crop': True, 'upscale': True},
         'admin_tiny_icon': {'size': (32, 32), 'crop': True, 'upscale': True},
@@ -39,7 +39,7 @@ class BaseImage(File):
     subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
                                         default='')
     file_ptr = models.OneToOneField(
-        to='filer.File',
+        to='filer.File', parent_link=True,
         related_name='%(app_label)s_%(class)s_file',
         on_delete=models.CASCADE,
     )
@@ -66,7 +66,10 @@ class BaseImage(File):
                 self._width, self._height = PILImage.open(imgfile).size
                 imgfile.seek(0)
             except Exception:
-                self._width, self._height = None, None
+                if post_init is False:
+                    # in case `imgfile` could not be found, unset dimensions
+                    # but only if not initialized by loading a fixture file
+                    self._width, self._height = None, None
         return attrs_updated
 
     def save(self, *args, **kwargs):

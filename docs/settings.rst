@@ -76,6 +76,17 @@ default generates a random path like ``1d/a5/1da50fee-5003-46a1-a191-b547125053a
 will be applied whenever a file is uploaded or moved between public (without permission checks) and 
 private (with permission checks) storages. Defaults to ``'filer.utils.generate_filename.randomized'``.
 
+Overriding single keys is possible, for example just set your custom ``UPLOAD_TO``::
+
+    FILER_STORAGES = {
+        'public': {
+            'main': {
+                'UPLOAD_TO': 'my_package.generate_filer_filename.no_dirs',
+            },
+        },
+        # same for private, or not
+    }
+
 
 ``FILER_SERVERS``
 -----------------

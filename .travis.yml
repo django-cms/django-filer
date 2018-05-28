@@ -53,35 +53,43 @@ matrix:
       language: generic
       python: "2.7"
       env: DJANGO="1.8" SWAP="no"
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.9" SWAP="no"
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.10" SWAP="no"
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.11" SWAP="no"
+      osx_image: xcode7.3
 
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.8" SWAP="yes"
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.9" SWAP="yes"
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.10" SWAP="yes"
+      osx_image: xcode7.3
     - os: osx
       language: generic
       python: "2.7"
       env: DJANGO="1.11" SWAP="yes"
+      osx_image: xcode7.3
 
     - os: linux
       python: "3.4"
@@ -122,38 +130,3 @@ matrix:
     - os: linux
       python: "3.6"
       env: DJANGO="master" SWAP="yes"
-
-# image model swapping is failing in Django>=1.10
-    - os: linux
-      python: "2.7"
-      env: DJANGO="1.10" SWAP="yes"
-    - os: linux
-      python: "2.7"
-      env: DJANGO="1.11" SWAP="yes"
-    - os: linux
-      python: "3.4"
-      env: DJANGO="1.10" SWAP="yes"
-    - os: linux
-      python: "3.4"
-      env: DJANGO="1.11" SWAP="yes"
-    - os: linux
-      python: "3.5"
-      env: DJANGO="1.10" SWAP="yes"
-    - os: linux
-      python: "3.5"
-      env: DJANGO="1.11" SWAP="yes"
-    - os: linux
-      python: "3.6"
-      env: DJANGO="1.10" SWAP="yes"
-    - os: linux
-      python: "3.6"
-      env: DJANGO="1.11" SWAP="yes"
-
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.10" SWAP="yes"
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.11" SWAP="yes"
