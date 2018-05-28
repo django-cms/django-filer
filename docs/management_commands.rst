@@ -32,13 +32,13 @@ deletes those file references from the database.
 
 Invoking::
 
-    ./manage.py filer_check --orphanes
+    ./manage.py filer_check --orphans
 
 lists all files found on disk belonging to the configured storage engine, but which
 are not referenced by the database.
 
 Invoking::
 
-    ./manage.py filer_check --delete-orphanes
+    ./manage.py filer_check --delete-orphans
 
 deletes those orphaned files from disk.

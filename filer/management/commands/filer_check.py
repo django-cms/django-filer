@@ -100,9 +100,9 @@ class Command(BaseCommand):
                 if not File.objects.filter(file=relfilename).exists():
                     if options['delete_orphans']:
                         storage.delete(relfilename)
-                        msg = _("Deleted orphanded file '{}'")
+                        msg = "Deleted orphaned file '{}'"
                     else:
-                        msg = _("Found orphanded file '{}'")
+                        msg = "Found orphaned file '{}'"
                     if options['verbosity'] > 2:
                         self.stdout.write(msg.format(relfilename))
                     elif options['verbosity']:
