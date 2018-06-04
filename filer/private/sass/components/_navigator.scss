@@ -21,14 +21,19 @@ body {
     border-bottom: solid 2px $color-primary;
     pointer-events: none;
     z-index: 100;
+    display: none;
 }
-
+.thumbnail-drag-hover-border {
+    border: solid 2px $color-primary;
+}
+.filebrowser .navigator-list,
 .filebrowser .navigator-table {
     // required for django CMS <= 3.1 #673
     width: 100%;
     margin: 0;
     border-top: solid 1px $gray-lighter !important;
     border-collapse: collapse !important;
+    .navigator-header,
     thead th,
     tbody td {
         text-align: left;
@@ -45,6 +50,7 @@ body {
             color: $gray-darker !important;
         }
     }
+    .navigator-body,
     .unfiled td {
         padding: 12px 5px !important;
         background-color: $gray-super-light !important;
@@ -284,6 +290,7 @@ body {
         width: calc(100% - 30px);
     }
 }
+
 .navigator-tools {
     @include clearfix;
     white-space: nowrap;
@@ -338,6 +345,23 @@ body {
             margin-left: 10px;
             padding-left: 10px;
             border-left: solid 1px $gray-lighter;
+        }
+    }
+    .filer-list-type-switcher-wrapper {
+        display: inline-block;
+        line-height: 34px;
+        vertical-align: middle;
+        padding: 0 15px;
+        border-left: 1px solid $gray-lighter;
+        border-right: 1px solid $gray-lighter;
+        margin-right: 10px;
+        a {
+          font-size: 17px;
+          color: $gray !important;
+          cursor: pointer;
+        }
+        @media screen and (max-width: $screen-tablet) {
+            margin-top: 10px;
         }
     }
 }
@@ -681,4 +705,116 @@ body {
 .empty-filer-header-cell {
     display: table-cell;
     vertical-align: middle;
+}
+
+.filebrowser .navigator-thumbnail-list {
+    overflow: hidden;
+    .navigator-list {
+        border-top: 0 !important;
+    }
+    .navigator-thumbnail-list-header {
+        & > * {
+            display: inline-block;
+            text-transform: uppercase;
+            margin: 0;
+            padding: 0;
+            padding-left: 10px;
+        }
+        .navigator-checkbox {
+            float: right;
+            text-transform: initial;
+            color: $color-primary;
+            input[type="checkbox"] {
+              margin-left: 5px;
+              vertical-align: middle;
+            }
+        }
+    }
+    .navigator-body {
+        @include clearfix;
+        padding: 0 !important;
+    }
+    .thumbnail-item {
+        float: left;
+        display: inline-block;
+        padding: 10px;
+        width: 125px;
+        height: 125px;
+        border: 1px solid $gray-lighter;
+        margin: 16px 12px;
+        background-color: $white;
+        position: relative;
+        overflow: hidden;
+        .thumbnail-file-item-box {
+            padding: 10px;
+            width: 125px;
+            height: 125px;
+            border: 1px solid $gray-lighter;
+            margin: 16px 12px;
+            background-color: $white;
+            &:hover {
+                background-color: #f1faff;
+            }
+        }
+        .navigator-checkbox {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            input {
+               margin: 0;
+               vertical-align: top;
+            }
+        }
+        .item-thumbnail,
+        .item-icon {
+            height: 50%;
+            width: 50%;
+            margin: 10px auto;
+            margin-bottom: 18px;
+            a {
+                display: block;
+                height: 100%;
+                width: 100%;
+            }
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .item-name {
+            background: transparent;
+            text-align: center;
+            word-break: break-word;
+        }
+    }
+    .thumbnail-virtual-item {
+        background-color: initial;
+    }
+    .thumbnail-folder-item {
+        &:hover {
+            background-color: #f1faff;
+        }
+    }
+    .thumbnail-file-item {
+        float: none;
+        width: 147px;
+        height: 200px;
+        border: 0;
+        padding: 0;
+        background-color: transparent;
+        .thumbnail-file-item-box {
+            float: none;
+            margin: 0;
+            margin-bottom: 5px;
+        }
+        .item-thumbnail {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        .item-name {
+            position: relative;
+            word-break: break-word;
+        }
+    }
 }

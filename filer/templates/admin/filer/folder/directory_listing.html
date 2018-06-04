@@ -144,7 +144,7 @@
                                     </a>
                                     <ul class="filer-dropdown-menu">
                                         <li>
-                                            <a href="{% url 'admin:filer_folder_change' folder.id %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
+                                            <a href="{% url 'admin:filer_folder_change' folder.id %}{% filer_admin_context_url_params %}" title="{% trans 'Change current folder details' %}">{% trans "Change" %}</a>
                                         </li>
                                     </ul>
                                 {% endif %}
@@ -207,6 +207,9 @@
                                 </div>
                             </div>
                         {% endif %}
+                            <div class="filer-list-type-switcher-wrapper">
+                              {% filer_folder_list_type_switcher %}
+                            </div>
                         {% block object-tools-items %}
                             <div class="navigator-button-wrapper">
                                 {% if folder.can_have_subfolders and can_make_folder %}
@@ -257,7 +260,7 @@
                 {% if action_form and actions_on_top and paginator.count and not is_popup %}
                     {% filer_actions %}
                 {% endif %}
-                {% include "admin/filer/folder/directory_table.html" %}
+                {% include list_type_template %}
                 {% if action_form and actions_on_bottom and paginator.count and not is_popup %}
                     {% filer_actions %}
                 {% endif %}
