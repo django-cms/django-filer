@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from filer.test_utils.extended_app.models import ExtImage, Video

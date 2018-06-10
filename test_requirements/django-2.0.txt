@@ -1,0 +1,7 @@
+django==2.0.6
+django-mptt>=0.8,<0.10
+djangocms-helper>=1.0,<1.2
+django_polymorphic>=2.0,<2.1
+coverage
+
+-r base.txt

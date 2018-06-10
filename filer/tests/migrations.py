@@ -14,6 +14,6 @@ class MigrationsTests(TestCase):
             'migrations not supported in django < 1.7')
     def test_makemigrations(self):
         out = StringIO()
-        call_command('makemigrations', dry_run=True, noinput=True, stdout=out)
+        call_command('makemigrations', dry_run=True, no_input=True, stdout=out)
         output = out.getvalue()
         self.assertEqual(output, 'No changes detected\n')
