@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 from django.conf import settings
-from django.core import urlresolvers
+from django import urls
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
@@ -54,7 +54,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     _file_data_changed_hint = None
 
     folder = models.ForeignKey(Folder, verbose_name=_('folder'), related_name='all_files',
-        null=True, blank=True)
+        null=True, blank=True, on_delete=models.CASCADE)
     file = MultiStorageFileField(_('file'), null=True, blank=True, max_length=255)
     _file_size = models.BigIntegerField(_('file size'), null=True, blank=True)
 
@@ -235,7 +235,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         image. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return False
         elif user.is_superuser:
             return True
@@ -254,7 +254,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return text
 
     def get_admin_change_url(self):
-        return urlresolvers.reverse(
+        return urls.reverse(
             'admin:{0}_{1}_change'.format(
                 self._meta.app_label,
                 self._meta.model_name,
@@ -269,7 +269,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         except AttributeError:
             # Django >1.6
             model_name = self._meta.model_name
-        return urlresolvers.reverse(
+        return urls.reverse(
             'admin:{0}_{1}_delete'.format(self._meta.app_label, model_name,),
             args=(self.pk,))
 
@@ -296,11 +296,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         url = ''
         if self.file and self.is_public:
             try:
-                url = urlresolvers.reverse('canonical', kwargs={
+                url = urls.reverse('canonical', kwargs={
                     'uploaded_at': self.canonical_time,
                     'file_id': self.id
                 })
-            except urlresolvers.NoReverseMatch:
+            except urls.NoReverseMatch:
                 pass  # No canonical url, return empty string
         return url
 

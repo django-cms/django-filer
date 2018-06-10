@@ -34,3 +34,6 @@ testenv1
 node_modules/
 .python-version
 data
+/manage.py
+/test_project/
+/filer_public/

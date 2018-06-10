@@ -15,3 +15,6 @@ build
 .project
 .pydevproject
 node_modules
+/manage.py
+/test_project/
+/filer_public/

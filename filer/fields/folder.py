@@ -6,7 +6,7 @@ import warnings
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
