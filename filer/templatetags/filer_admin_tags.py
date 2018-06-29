@@ -36,7 +36,7 @@ def filer_admin_context_hidden_formfields(context):
     )
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def filer_has_permission(context, item, action):
     """Does the current user (taken from the request in the context) have
     permission to do the given action on the given item.

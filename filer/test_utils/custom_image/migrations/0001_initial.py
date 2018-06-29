@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Image',
             fields=[
-                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File', on_delete=models.CASCADE)),
                 ('_height', models.IntegerField(null=True, blank=True)),
                 ('_width', models.IntegerField(null=True, blank=True)),
                 ('default_alt_text', models.CharField(max_length=255, null=True, verbose_name='default alt text', blank=True)),
