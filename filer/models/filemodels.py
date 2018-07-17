@@ -21,24 +21,9 @@ from .foldermodels import Folder
 
 try:
     from polymorphic.models import PolymorphicModel
-    from polymorphic.managers import PolymorphicManager
 except ImportError:
     # django-polymorphic < 0.8
-    from polymorphic import PolymorphicModel, PolymorphicManager
-
-
-class FileManager(PolymorphicManager):
-    def find_all_duplicates(self):
-        r = {}
-        for file_obj in self.all():
-            if file_obj.sha1:
-                q = self.filter(sha1=file_obj.sha1)
-                if len(q) > 1:
-                    r[file_obj.sha1] = q
-        return r
-
-    def find_duplicates(self, file_obj):
-        return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
+    from polymorphic import PolymorphicModel
 
 
 def is_public_default():
@@ -82,7 +67,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
                     'file. File will be publicly accessible '
                     'to anyone.'))
 
-    objects = FileManager()
+    objects = load_object(filer_settings.FILER_FILE_MANAGER)()
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
