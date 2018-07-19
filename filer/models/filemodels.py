@@ -17,6 +17,7 @@ from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from ..utils.compatibility import python_2_unicode_compatible
+from ..utils.loader import load_object
 from .foldermodels import Folder
 
 try:

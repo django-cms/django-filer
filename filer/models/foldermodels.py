@@ -15,7 +15,7 @@ from . import mixins
 from .. import settings as filer_settings
 from ..utils.compatibility import python_2_unicode_compatible
 from ..utils.loader import load_object
-from .managers import FolderPermissionManager
+from ..managers import FolderPermissionManager
 
 
 @python_2_unicode_compatible

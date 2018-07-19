@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 from django.core import urlresolvers
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from . import mixins
@@ -22,7 +23,10 @@ class DummyFolder(mixins.IconsMixin):
 
     @property
     def virtual_folders(self):
-        return []
+        return {}
+
+    def get_virtual_folder(self, slug):
+        return
 
     @property
     def children(self):
@@ -81,18 +85,26 @@ class FolderRoot(DummyFolder):
     is_smart_folder = False
     can_have_subfolders = True
 
-    @property
+    @cached_property
     def virtual_folders(self):
-        return [UnsortedImages()]
+        return {
+            'unfiled_images': UnsortedImages(),
+        }
+
+    def get_virtual_folder(self, slug):
+        return self.virtual_folders.get(slug)
 
     @property
     def children(self):
+        # FIXME: this doesn't make much sense because in FolderAdmin.directory_listing parent__isnull=False
+        # is excluded, so it's the same as if this 'if' did not exist...
         if filer_settings.FILER_ENABLE_PERMISSIONS:
             return Folder.objects.all()
         return Folder.objects.filter(parent__isnull=True)
     parent_url = None
 
     def contains_folder(self, folder_name):
+        # FIXME: when filer_settings.FILER_ENABLE_PERMISSIONS is True, this doesn't work properly :)
         try:
             self.children.get(name=folder_name)
             return True

@@ -11,7 +11,7 @@ from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
-from ..models import Clipboard, Folder, FolderRoot, tools
+from ..models import Clipboard, Folder, tools
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
@@ -52,7 +52,7 @@ def make_folder(request, folder_id=None):
         new_folder_form = NewFolderForm(request.POST)
         if new_folder_form.is_valid():
             new_folder = new_folder_form.save(commit=False)
-            if (folder or FolderRoot()).contains_folder(new_folder.name):
+            if (folder or Folder.objects.root_folder).contains_folder(new_folder.name):
                 new_folder_form._errors['name'] = new_folder_form.error_class(
                     [_('Folder with this name already exists.')])
             else:

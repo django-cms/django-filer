@@ -31,9 +31,6 @@ from ..models import (
     File,
     Folder,
     FolderPermission,
-    FolderRoot,
-    ImagesWithMissingData,
-    UnsortedImages,
     tools,
 )
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
@@ -216,6 +213,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
+        virtual_folder_urls = []
+        for viewtype in Folder.objects.root_folder.virtual_folders.keys():
+            virtual_folder_urls.append(
+                url(r'^%s/$' % viewtype,
+                    self.admin_site.admin_view(self.directory_listing),
+                    {'viewtype': viewtype},
+                    name='filer-directory_listing-%s' % viewtype))
+
         return [
             # we override the default list view with our own directory listing
             # of the root directories
@@ -238,26 +243,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_root_folder'),
-
-            url(r'^images_with_missing_data/$',
-                self.admin_site.admin_view(self.directory_listing),
-                {'viewtype': 'images_with_missing_data'},
-                name='filer-directory_listing-images_with_missing_data'),
-
-            url(r'^unfiled_images/$',
-                self.admin_site.admin_view(self.directory_listing),
-                {'viewtype': 'unfiled_images'},
-                name='filer-directory_listing-unfiled_images'),
-        ] + super(FolderAdmin, self).get_urls()
+        ] + virtual_folder_urls + super(FolderAdmin, self).get_urls()
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
         clipboard = tools.get_user_clipboard(request.user)
-        if viewtype == 'images_with_missing_data':
-            folder = ImagesWithMissingData()
-        elif viewtype == 'unfiled_images':
-            folder = UnsortedImages()
-        elif viewtype == 'last':
+        if viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
                 self.get_queryset(request).get(id=last_folder_id)
@@ -268,8 +259,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
                 url = "%s%s" % (url, admin_url_params_encoded(request))
             return HttpResponseRedirect(url)
+        elif viewtype:
+            folder = Folder.objects.root_folder.virtual_folders[viewtype]
         elif folder_id is None:
-            folder = FolderRoot()
+            folder = Folder.objects.root_folder
         else:
             folder = get_object_or_404(self.get_queryset(request), id=folder_id)
         request.session['filer_last_folder_id'] = folder_id
@@ -330,7 +323,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder_children = []
         folder_files = []
         if folder.is_root and not search_mode:
-            virtual_items = folder.virtual_folders
+            virtual_items = list(folder.virtual_folders.values())
         else:
             virtual_items = []
 

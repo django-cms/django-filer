@@ -3,6 +3,8 @@ from __future__ import absolute_import, unicode_literals
 from django.db import models
 from django.db.models import Q
 from mptt.managers import TreeManager
+from mptt.querysets import TreeQuerySet
+from polymorphic.query import PolymorphicQuerySet
 
 from . import settings as filer_settings
 
@@ -13,15 +15,22 @@ except ImportError:
     from polymorphic import PolymorphicManager
 
 
+class FolderQuerySet(TreeQuerySet):
+    def filter_for_user(self, user):
+        return self
+
+
 class FolderManager(TreeManager):
-    def virtual_folders(self):
-        return []
+    _queryset_class = FolderQuerySet
 
+    def filter_for_user(self, user):
+        return self.get_queryset().filter_for_user(user)
+
+    @property
     def root_folder(self):
-        return []
+        from .models.virtualitems import FolderRoot
 
-    def children_for(self, folder):
-        pass
+        return FolderRoot()
 
 
 class FolderPermissionManager(models.Manager):
@@ -79,7 +88,6 @@ class FolderPermissionManager(models.Manager):
                 deny_list.add(folder_id)
 
             if perm.type == self.model.CHILDREN:
-                # FIXME: use Folder.objects.children_for(perm.folder) instead
                 folder_children_ids = perm.folder.get_descendants().values_list('id', flat=True)
                 if p == self.model.ALLOW:
                     allow_list.update(folder_children_ids)
@@ -90,9 +98,17 @@ class FolderPermissionManager(models.Manager):
         return allow_list - deny_list
 
 
+class FileQuerySet(PolymorphicQuerySet):
+    def filter_for_user(self, user):
+        return self
+
+
 class FileManager(PolymorphicManager):
-    def in_folder(self, folder):
-        pass
+    _queryset_class = FileQuerySet
+    queryset_class = FileQuerySet  # for PolymorphicManager
+
+    def filter_for_user(self, user):
+        return self.get_queryset().filter_for_user(user)
 
     def find_all_duplicates(self):
         r = {}
