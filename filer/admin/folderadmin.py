@@ -83,6 +83,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
                             'uploaded_at', 'modified_at')
 
+    def get_queryset(self, request):
+        qs = super(FolderAdmin, self).get_queryset(request)
+        return qs.filter_for_user(request.user)
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by
@@ -99,7 +103,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
-                folders_with_same_name = self.get_queryset(request).filter(
+                # not using get_queryset since folders could be filtered out
+                folders_with_same_name = Folder.objects.filter(
                     parent=form_obj.instance.parent,
                     name=cleaned_data['name'])
                 if form_obj.instance.pk:
@@ -304,7 +309,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     folder_qs = folder.get_children_for_user(request.user)
                     file_qs = folder.get_files_for_user(request.user)
             else:
-                folder_qs = self.get_queryset(request).filter_for_user(request.user)  # FIXME: should filter_for_user be included in get_queryset already?
+                folder_qs = self.get_queryset(request)
                 file_qs = File.objects.filter_for_user(request.user)
             folder_qs = self.filter_folder(folder_qs, search_terms)
             file_qs = self.filter_file(file_qs, search_terms)
@@ -659,8 +664,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         def set_folders(folders):
             for f in folders:
-                set_files(f.files)
-                set_folders(f.children.all())
+                set_files(f.get_files_for_user(request.user))
+                set_folders(f.get_children_for_user(request.user))
 
         set_files(files_queryset)
         set_folders(folders_queryset)
@@ -865,7 +870,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 yield c
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
+        root_folders = Folder.objects.root_folder.get_children_for_user(request.user).order_by('name')
         return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
@@ -897,7 +902,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 raise PermissionDenied
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
-            conflicting_names = [folder.name for folder in self.get_queryset(request).filter(parent=destination, name__in=folders_queryset.values('name'))]
+            # not using get_queryset since folders could be filtered out
+            conflicting_names = [folder.name for folder in
+                                 Folder.objects.filter(parent=destination,
+                                                       name__in=folders_queryset.values('name'))]
             if conflicting_names:
                 messages.error(request, _("Folders with names %s already exist at the selected "
                                           "destination") % ", ".join(conflicting_names))
