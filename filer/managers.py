@@ -17,7 +17,12 @@ except ImportError:
 
 class FolderQuerySet(TreeQuerySet):
     def filter_for_user(self, user):
-        return self
+        from .models.foldermodels import FolderPermission
+
+        perms = FolderPermission.objects.get_read_id_list(user)
+        if perms == 'All':
+            return self.all()
+        return self.filter(Q(id__in=perms) | Q(owner=user))
 
 
 class FolderManager(TreeManager):
@@ -56,51 +61,53 @@ class FolderPermissionManager(models.Manager):
 
         if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
-        allow_list = set()
-        deny_list = set()
+
+        # try to return from cache
+        try:
+            return user._filer_folder_perms[attr]
+        except AttributeError:
+            pass
+
+        id_lists = {
+            'can_read': (set(), set()),
+            'can_edit': (set(), set()),
+            'can_add_children': (set(), set()),
+        }
         group_ids = user.groups.all().values_list('id', flat=True)
         q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
         perms = self.filter(q).order_by('folder__tree_id', 'folder__level',
                                         'folder__lft')
         for perm in perms:
-            p = getattr(perm, attr)
-
-            if p is None:
-                # Not allow nor deny, we continue with the next permission
-                continue
-
             if not perm.folder:
                 assert perm.type == self.model.ALL
 
-                all_folder_ids = Folder.objects.all().values_list('id', flat=True)
-                if p == self.model.ALLOW:
-                    allow_list.update(all_folder_ids)
-                else:
-                    deny_list.update(all_folder_ids)
-
-                continue
-
-            folder_id = perm.folder.id
-
-            if p == self.model.ALLOW:
-                allow_list.add(folder_id)
+                ids = Folder.objects.all().values_list('id', flat=True)
+            elif perm.type == self.model.CHILDREN:
+                ids = perm.folder.get_descendants().values_list('id', flat=True)
             else:
-                deny_list.add(folder_id)
+                ids = [perm.folder.id]
 
-            if perm.type == self.model.CHILDREN:
-                folder_children_ids = perm.folder.get_descendants().values_list('id', flat=True)
+            for p_attr in id_lists.keys():
+                p = getattr(perm, p_attr)
                 if p == self.model.ALLOW:
-                    allow_list.update(folder_children_ids)
+                    id_lists[p_attr][0].update(ids)
                 else:
-                    deny_list.update(folder_children_ids)
+                    id_lists[p_attr][1].update(ids)
 
-        # Deny has precedence over allow
-        return allow_list - deny_list
+        # cache inside user instance (deny has precedence over allow)
+        user._filer_folder_perms = {p_attr: p_lists[0] - p_lists[1] for p_attr, p_lists in id_lists.items()}
+
+        return user._filer_folder_perms[attr]
 
 
 class FileQuerySet(PolymorphicQuerySet):
     def filter_for_user(self, user):
-        return self
+        from .models.foldermodels import FolderPermission
+
+        perms = FolderPermission.objects.get_read_id_list(user)
+        if perms == 'All':
+            return self.all()
+        return self.filter(Q(folder__id__in=perms) | Q(owner=user))
 
 
 class FileManager(PolymorphicManager):

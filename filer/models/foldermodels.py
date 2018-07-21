@@ -65,9 +65,15 @@ class Folder(MPTTModel, mixins.IconsMixin):
     def item_count(self):
         return self.file_count + self.children_count
 
+    def get_children_for_user(self, user):
+        return self.children.filter_for_user(user)
+
     @property
     def files(self):
         return self.all_files.all()
+
+    def get_files_for_user(self, user):
+        return self.files.filter_for_user(user)
 
     @property
     def logical_path(self):

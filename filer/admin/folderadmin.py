@@ -292,23 +292,27 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                                  False) in (True, 'on')
 
         if len(search_terms) > 0:
-            if folder and limit_search_to_folder and not folder.is_root:
-                # Do not include current folder itself in search results.
-                folder_qs = folder.get_descendants(include_self=False)
-                # Limit search results to files in the current folder or any
-                # nested folder.
-                file_qs = File.objects.filter(
-                    folder__in=folder.get_descendants(include_self=True))
+            if folder and limit_search_to_folder:
+                if not folder.is_root:
+                    # Do not include current folder itself in search results.
+                    folder_qs = folder.get_descendants(include_self=False).filter_for_user(request.user)
+                    # Limit search results to files in the current folder or any
+                    # nested folder.
+                    file_qs = File.objects.filter(
+                        folder__in=folder.get_descendants(include_self=True)).filter_for_user(request.user)
+                else:
+                    folder_qs = folder.get_children_for_user(request.user)
+                    file_qs = folder.get_files_for_user(request.user)
             else:
-                folder_qs = self.get_queryset(request)
-                file_qs = File.objects.all()
+                folder_qs = self.get_queryset(request).filter_for_user(request.user)  # FIXME: should filter_for_user be included in get_queryset already?
+                file_qs = File.objects.filter_for_user(request.user)
             folder_qs = self.filter_folder(folder_qs, search_terms)
             file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
         else:
-            folder_qs = folder.children.all()
-            file_qs = folder.files.all()
+            folder_qs = folder.get_children_for_user(request.user)
+            file_qs = folder.get_files_for_user(request.user)
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
@@ -326,16 +330,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             virtual_items = list(folder.virtual_folders.values())
         else:
             virtual_items = []
-
-        perms = FolderPermission.objects.get_read_id_list(request.user)
-        root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
-        if perms != 'All':
-            file_qs = file_qs.filter(models.Q(folder__id__in=perms) | models.Q(owner=request.user))
-            folder_qs = folder_qs.filter(models.Q(id__in=perms) | models.Q(owner=request.user))
-        else:
-            root_exclude_kw.pop('parent__id__in')
-        if folder.is_root:
-            folder_qs = folder_qs.exclude(**root_exclude_kw)
 
         folder_children += folder_qs
         folder_files += file_qs
