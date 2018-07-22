@@ -116,7 +116,7 @@ class FolderRoot(DummyFolder):
             qs = Folder.objects.filter_for_user(user)
             # get folders which are in root or user has only indirect access to (permission for nested folder
             # but not it's parent)
-            return qs.exclude(Q(parent__isnull=False) & (Q(parent__id__in=perms) | Q(owner=user)))
+            return qs.exclude(Q(parent__isnull=False) & (Q(parent__id__in=perms) | Q(parent__owner=user)))
         return Folder.objects.filter(parent__isnull=True)
 
     def contains_folder(self, folder_name):
