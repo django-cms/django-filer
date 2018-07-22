@@ -68,7 +68,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
                     'file. File will be publicly accessible '
                     'to anyone.'))
 
-    objects = load_object(filer_settings.FILER_FILE_MANAGER)()
+    # Here additional '_file_manager' manager accessor is added so that if child classes
+    # override default manager, original file manager is still accessible.
+    _file_manager = load_object(filer_settings.FILER_FILE_MANAGER)()
+    objects = _file_manager
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):

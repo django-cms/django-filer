@@ -28,6 +28,16 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     form = FileAdminChangeFrom
 
+    def get_queryset(self, request):
+        # instead of default manager (which might be overriden)
+        # _file_manager is used which is always guaranteed to have
+        # filter_for_user functionality
+        qs = self.model._file_manager.filter_for_user(request.user)
+        ordering = self.get_ordering(request)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return qs
+
     @classmethod
     def build_fieldsets(cls, extra_main_fields=(), extra_advanced_fields=(),
                         extra_fieldsets=()):
