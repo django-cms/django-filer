@@ -86,7 +86,7 @@ class FolderPermissionManager(models.Manager):
 
                 ids = Folder.objects.all().values_list('id', flat=True)
             elif perm.type == self.model.CHILDREN:
-                ids = perm.folder.get_descendants().values_list('id', flat=True)
+                ids = perm.folder.get_descendants(include_self=True).values_list('id', flat=True)
             else:
                 ids = [perm.folder.id]
 
