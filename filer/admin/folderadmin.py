@@ -31,9 +31,6 @@ from ..models import (
     File,
     Folder,
     FolderPermission,
-    FolderRoot,
-    ImagesWithMissingData,
-    UnsortedImages,
     tools,
 )
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
@@ -86,6 +83,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
                             'uploaded_at', 'modified_at')
 
+    def get_queryset(self, request):
+        qs = super(FolderAdmin, self).get_queryset(request)
+        return qs.filter_for_user(request.user)
+
     def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by
@@ -102,7 +103,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
-                folders_with_same_name = self.get_queryset(request).filter(
+                # not using get_queryset since folders could be filtered out
+                folders_with_same_name = Folder.objects.filter(
                     parent=form_obj.instance.parent,
                     name=cleaned_data['name'])
                 if form_obj.instance.pk:
@@ -216,6 +218,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
+        virtual_folder_urls = []
+        for viewtype in Folder.objects.root_folder.virtual_folders.keys():
+            virtual_folder_urls.append(
+                url(r'^%s/$' % viewtype,
+                    self.admin_site.admin_view(self.directory_listing),
+                    {'viewtype': viewtype},
+                    name='filer-directory_listing-%s' % viewtype))
+
         return [
             # we override the default list view with our own directory listing
             # of the root directories
@@ -238,26 +248,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             url(r'^make_folder/$',
                 self.admin_site.admin_view(views.make_folder),
                 name='filer-directory_listing-make_root_folder'),
-
-            url(r'^images_with_missing_data/$',
-                self.admin_site.admin_view(self.directory_listing),
-                {'viewtype': 'images_with_missing_data'},
-                name='filer-directory_listing-images_with_missing_data'),
-
-            url(r'^unfiled_images/$',
-                self.admin_site.admin_view(self.directory_listing),
-                {'viewtype': 'unfiled_images'},
-                name='filer-directory_listing-unfiled_images'),
-        ] + super(FolderAdmin, self).get_urls()
+        ] + virtual_folder_urls + super(FolderAdmin, self).get_urls()
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
         clipboard = tools.get_user_clipboard(request.user)
-        if viewtype == 'images_with_missing_data':
-            folder = ImagesWithMissingData()
-        elif viewtype == 'unfiled_images':
-            folder = UnsortedImages()
-        elif viewtype == 'last':
+        if viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:
                 self.get_queryset(request).get(id=last_folder_id)
@@ -268,8 +264,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
                 url = "%s%s" % (url, admin_url_params_encoded(request))
             return HttpResponseRedirect(url)
+        elif viewtype:
+            folder = Folder.objects.root_folder.virtual_folders[viewtype]
         elif folder_id is None:
-            folder = FolderRoot()
+            folder = Folder.objects.root_folder
         else:
             folder = get_object_or_404(self.get_queryset(request), id=folder_id)
         request.session['filer_last_folder_id'] = folder_id
@@ -299,23 +297,27 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                                                  False) in (True, 'on')
 
         if len(search_terms) > 0:
-            if folder and limit_search_to_folder and not folder.is_root:
-                # Do not include current folder itself in search results.
-                folder_qs = folder.get_descendants(include_self=False)
-                # Limit search results to files in the current folder or any
-                # nested folder.
-                file_qs = File.objects.filter(
-                    folder__in=folder.get_descendants(include_self=True))
+            if folder and limit_search_to_folder:
+                if not folder.is_root:
+                    # Do not include current folder itself in search results.
+                    folder_qs = folder.get_descendants(include_self=False).filter_for_user(request.user)
+                    # Limit search results to files in the current folder or any
+                    # nested folder.
+                    file_qs = File.objects.filter(
+                        folder__in=folder.get_descendants(include_self=True)).filter_for_user(request.user)
+                else:
+                    folder_qs = folder.get_children_for_user(request.user)
+                    file_qs = folder.get_files_for_user(request.user)
             else:
                 folder_qs = self.get_queryset(request)
-                file_qs = File.objects.all()
+                file_qs = File.objects.filter_for_user(request.user)
             folder_qs = self.filter_folder(folder_qs, search_terms)
             file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
         else:
-            folder_qs = folder.children.all()
-            file_qs = folder.files.all()
+            folder_qs = folder.get_children_for_user(request.user)
+            file_qs = folder.get_files_for_user(request.user)
             show_result_count = False
 
         folder_qs = folder_qs.order_by('name')
@@ -330,19 +332,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         folder_children = []
         folder_files = []
         if folder.is_root and not search_mode:
-            virtual_items = folder.virtual_folders
+            virtual_items = list(folder.virtual_folders.values())
         else:
             virtual_items = []
-
-        perms = FolderPermission.objects.get_read_id_list(request.user)
-        root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
-        if perms != 'All':
-            file_qs = file_qs.filter(models.Q(folder__id__in=perms) | models.Q(owner=request.user))
-            folder_qs = folder_qs.filter(models.Q(id__in=perms) | models.Q(owner=request.user))
-        else:
-            root_exclude_kw.pop('parent__id__in')
-        if folder.is_root:
-            folder_qs = folder_qs.exclude(**root_exclude_kw)
 
         folder_children += folder_qs
         folder_files += file_qs
@@ -672,8 +664,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         def set_folders(folders):
             for f in folders:
-                set_files(f.files)
-                set_folders(f.children.all())
+                set_files(f.get_files_for_user(request.user))
+                set_folders(f.get_children_for_user(request.user))
 
         set_files(files_queryset)
         set_folders(folders_queryset)
@@ -878,7 +870,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 yield c
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
+        root_folders = Folder.objects.root_folder.get_children_for_user(request.user).order_by('name')
         return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
@@ -910,7 +902,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 raise PermissionDenied
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
-            conflicting_names = [folder.name for folder in self.get_queryset(request).filter(parent=destination, name__in=folders_queryset.values('name'))]
+            # not using get_queryset since folders could be filtered out
+            conflicting_names = [folder.name for folder in
+                                 Folder.objects.filter(parent=destination,
+                                                       name__in=folders_queryset.values('name'))]
             if conflicting_names:
                 messages.error(request, _("Folders with names %s already exist at the selected "
                                           "destination") % ", ".join(conflicting_names))

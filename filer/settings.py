@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 if not hasattr(settings, 'FILER_IMAGE_MODEL'):
     setattr(settings, 'FILER_IMAGE_MODEL', 'filer.Image')
 FILER_IMAGE_MODEL = settings.FILER_IMAGE_MODEL
+FILER_FOLDER_MANAGER = getattr(settings, 'FILER_FOLDER_MANAGER', 'filer.managers.FolderManager')
+FILER_FILE_MANAGER = getattr(settings, 'FILER_FILE_MANAGER', 'filer.managers.FileManager')
 
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False)  # When True makes
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)

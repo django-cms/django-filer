@@ -17,28 +17,14 @@ from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from ..utils.compatibility import python_2_unicode_compatible
+from ..utils.loader import load_object
 from .foldermodels import Folder
 
 try:
     from polymorphic.models import PolymorphicModel
-    from polymorphic.managers import PolymorphicManager
 except ImportError:
     # django-polymorphic < 0.8
-    from polymorphic import PolymorphicModel, PolymorphicManager
-
-
-class FileManager(PolymorphicManager):
-    def find_all_duplicates(self):
-        r = {}
-        for file_obj in self.all():
-            if file_obj.sha1:
-                q = self.filter(sha1=file_obj.sha1)
-                if len(q) > 1:
-                    r[file_obj.sha1] = q
-        return r
-
-    def find_duplicates(self, file_obj):
-        return [i for i in self.exclude(pk=file_obj.pk).filter(sha1=file_obj.sha1)]
+    from polymorphic import PolymorphicModel
 
 
 def is_public_default():
@@ -82,7 +68,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
                     'file. File will be publicly accessible '
                     'to anyone.'))
 
-    objects = FileManager()
+    # Here additional '_file_manager' manager accessor is added so that if child classes
+    # override default manager, original file manager is still accessible.
+    _file_manager = load_object(filer_settings.FILER_FILE_MANAGER)()
+    objects = _file_manager
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -329,8 +318,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         Folder object
         """
         if not self.folder:
-            from .virtualitems import UnsortedImages
-            return UnsortedImages()
+            return Folder.objects.get_default_folder(self.__class__)
         else:
             return self.folder
 
