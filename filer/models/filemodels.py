@@ -318,8 +318,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         Folder object
         """
         if not self.folder:
-            from .virtualitems import UnsortedImages
-            return UnsortedImages()
+            return Folder.objects.get_default_folder(self.__class__)
         else:
             return self.folder
 

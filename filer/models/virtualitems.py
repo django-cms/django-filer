@@ -119,6 +119,15 @@ class FolderRoot(DummyFolder):
             return qs.exclude(Q(parent__isnull=False) & (Q(parent__id__in=perms) | Q(parent__owner=user)))
         return Folder.objects.filter(parent__isnull=True)
 
+    def get_default_folder(self, file_model=None):
+        """
+        Returns default virtual folder for File (sub)model.
+        Default implementation always returns UnsortedImages virtual folder.
+        This is used mostly for redirecting to relevant directory listing after various actions
+        in admin.
+        """
+        return self.virtual_folders['unfiled_images']
+
     def contains_folder(self, folder_name):
         try:
             Folder.objects.filter(parent__isnull=True).get(name=folder_name)

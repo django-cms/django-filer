@@ -31,6 +31,9 @@ class FolderManager(TreeManager):
     def filter_for_user(self, user):
         return self.get_queryset().filter_for_user(user)
 
+    def get_default_folder(self, file_model=None):
+        return self.root_folder.get_default_folder(file_model)
+
     @property
     def root_folder(self):
         from .models.virtualitems import FolderRoot
