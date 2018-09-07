@@ -147,9 +147,18 @@ django.jQuery(function ($) {
             Dropzone.autoDiscover = false;
         }
         dropzones.each(createDropzone);
-        $('.add-row a').on('click', function () {
-            var dropzones = $(dropzoneSelector);
-            dropzones.each(createDropzone);
-        });
+        // window.__admin_utc_offset__ is used as canary to detect Django 1.8
+        // There is no way to feature detect the new behavior implemented in Django 1.9
+        if (!window.__admin_utc_offset__) {
+            $(document).on('formset:added', function (ev, row) {
+                var dropzones = $(row).find(dropzoneSelector);
+                dropzones.each(createDropzone);
+            });
+        } else {
+            $('.add-row a').on('click', function () {
+                var dropzones = $(dropzoneSelector);
+                dropzones.each(createDropzone);
+            });
+        }
     }
 });

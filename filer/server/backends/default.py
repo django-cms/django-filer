@@ -8,7 +8,6 @@ from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 
-from ...utils.compatibility import LTE_DJANGO_1_4
 from .base import ServerBase
 
 
@@ -27,9 +26,7 @@ class DefaultServer(ServerBase):
             raise Http404('"%s" does not exist' % fullpath)
         # Respect the If-Modified-Since header.
         statobj = os.stat(fullpath)
-
-        content_type_key = 'mimetype' if LTE_DJANGO_1_4 else 'content_type'
-        response_params = {content_type_key: self.get_mimetype(fullpath)}
+        response_params = {'content_type': self.get_mimetype(fullpath)}
         if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                                   statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
             return HttpResponseNotModified(**response_params)

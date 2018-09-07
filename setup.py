@@ -21,15 +21,15 @@ setup(
     platforms=['OS Independent'],
     description="A file management application for django that makes handling "
                 "of files and images a breeze.",
-    long_description = read('README.rst'),
+    long_description=read('README.rst'),
     author='Stefan Foulis',
     author_email='stefan@foulis.ch',
     packages=find_packages(),
     install_requires=(
-        'Django>=1.5,<1.10.999',  # Django is known to use rc versions
-        'easy-thumbnails>=1.0,<2.4',
-        'django-mptt>=0.6,<0.9',  # the exact version depends on Django
-        'django_polymorphic>=0.7,<1.1',
+        'Django>=1.8,<1.11.999',  # Django is known to use rc versions
+        'easy-thumbnails>=2,<3.0',
+        'django-mptt>=0.6,<0.10',  # the exact version depends on Django
+        'django_polymorphic>=0.7,<2.1',
         'Unidecode>=0.04,<0.05',
     ),
     include_package_data=True,
@@ -44,14 +44,13 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
         'Framework :: Django',
-        'Framework :: Django :: 1.5',
-        'Framework :: Django :: 1.6',
-        'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
         'Framework :: Django :: 1.9',
-        'Programming Language :: Python :: 2.6',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )

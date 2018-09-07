@@ -20,6 +20,7 @@
     "karma-jasmine": "0.3.*",
     "karma-json-fixtures-preprocessor": "0.0.*",
     "karma-phantomjs-launcher": "0.2.*",
-    "phantomjs": "1.9.*"
+    "phantomjs": "1.9.*",
+    "request": "2.81.0"
   }
 }

@@ -5,27 +5,21 @@ import sys
 
 import django
 from django.utils import six
-
-try:
-    from django.utils.text import truncate_words
-except ImportError:
-    # django >=1.5
-    from django.utils.text import Truncator
-    from django.utils.functional import allow_lazy
-
-    def truncate_words(s, num, end_text='...'):
-        truncate = end_text and ' %s' % end_text or ''
-        return Truncator(s).words(num, truncate=truncate)
-    truncate_words = allow_lazy(truncate_words, six.text_type)
+from django.utils.functional import allow_lazy
+from django.utils.text import Truncator
 
 
-LTE_DJANGO_1_4 = django.VERSION < (1, 5)  # not supported!
-LTE_DJANGO_1_5 = django.VERSION < (1, 6)  # not supported!
-LTE_DJANGO_1_6 = django.VERSION < (1, 7)
-LTE_DJANGO_1_7 = django.VERSION < (1, 8)
+def truncate_words(s, num, end_text='...'):
+    # truncate_words was removed in Django 1.5.
+    truncate = end_text and ' %s' % end_text or ''
+    return Truncator(s).words(num, truncate=truncate)
+truncate_words = allow_lazy(truncate_words, six.text_type)
+
+
 LTE_DJANGO_1_8 = django.VERSION < (1, 9)
 LTE_DJANGO_1_9 = django.VERSION < (1, 10)
 GTE_DJANGO_1_10 = django.VERSION >= (1, 10)
+DJANGO_1_10 = django.VERSION[:2] == (1, 10)
 
 
 if not six.PY3:

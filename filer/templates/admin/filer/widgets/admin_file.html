@@ -36,14 +36,14 @@
                  data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
-               title="{% trans 'Lookup' %}"{% if LTE_DJANGO_1_7 %} onclick="return showRelatedObjectLookupPopup(this);"{% endif %}>
+               title="{% trans 'Lookup' %}">
                 <span class="choose-file"><span class="fa fa-picture-o"></span>{% trans 'Choose File' %}</span>
                 <span class="edit-file"><span class="fa fa-pencil"></span></span>
             </a>
 
             <br>
 
-            {{ hidden_input }}
+            <div class="hidden">{{ hidden_input }}</div>
             <script type="text/javascript" id="{{id}}_javascript">
                 django.jQuery(document).ready(function(){
                     var plus = django.jQuery('#add_{{ id }}');

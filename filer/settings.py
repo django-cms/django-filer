@@ -13,7 +13,13 @@ from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 
 logger = logging.getLogger(__name__)
 
-FILER_IMAGE_MODEL = getattr(settings, 'FILER_IMAGE_MODEL', False)
+# FILER_IMAGE_MODEL setting is used to swap Image model.
+# If such global setting does not exist, it will be created at this point (with default model name).
+# This is needed especially when using this setting in migrations.
+if not hasattr(settings, 'FILER_IMAGE_MODEL'):
+    setattr(settings, 'FILER_IMAGE_MODEL', 'filer.Image')
+FILER_IMAGE_MODEL = settings.FILER_IMAGE_MODEL
+
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False)  # When True makes
 FILER_SUBJECT_LOCATION_IMAGE_DEBUG = getattr(settings, 'FILER_SUBJECT_LOCATION_IMAGE_DEBUG', False)
 FILER_WHITESPACE_COLOR = getattr(settings, 'FILER_WHITESPACE_COLOR', '#FFFFFF')
@@ -52,8 +58,7 @@ if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
 # classes that I should check for when adding files
 FILER_FILE_MODELS = getattr(
     settings, 'FILER_FILE_MODELS',
-    (FILER_IMAGE_MODEL if FILER_IMAGE_MODEL else 'filer.models.imagemodels.Image',
-     'filer.models.filemodels.File'))
+    (FILER_IMAGE_MODEL, 'filer.File'))
 
 DEFAULT_FILE_STORAGE = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
 

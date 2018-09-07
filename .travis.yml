@@ -2,64 +2,131 @@ language: python
 
 sudo: false
 
-python: 3.5
+python:
+  - "3.6"
+  - "3.5"
+  - "3.4"
+  - "2.7"
 
 install:
-  - pip install tox coveralls
+  - pip install tox-travis coveralls
 
 branches:
   only:
     - master
     - develop
 
-# Explicit environments list here is a complete list of environments from tox.
-# It is intentionally shortened.
-env:
-  - TOX_ENV=flake8
-
-# python 2.7
-  - TOX_ENV=py27-dj16-thumbs1x
-  - TOX_ENV=py27-dj16-thumbs2x
-  - TOX_ENV=py27-dj17-thumbs2x
-  - TOX_ENV=py27-dj18-thumbs2x
-  - TOX_ENV=py27-dj19-thumbs2x
-  - TOX_ENV=py27-dj110-thumbs2x
-
-# python 3.4
-  - TOX_ENV=py34-dj16-thumbs2x
-  - TOX_ENV=py34-dj17-thumbs2x
-  - TOX_ENV=py34-dj18-thumbs2x
-  - TOX_ENV=py34-dj19-thumbs2x
-  - TOX_ENV=py34-dj110-thumbs2x
-
-# python 3.5
-  - TOX_ENV=py35-dj18-thumbs2x
-  - TOX_ENV=py35-dj19-thumbs2x
-  - TOX_ENV=py35-dj110-thumbs2x
-
-# next Django release
-  - TOX_ENV=py27-djmaster-thumbs2x
-  - TOX_ENV=py34-djmaster-thumbs2x
-  - TOX_ENV=py35-djmaster-thumbs2x
-
-  - TOX_ENV=frontend FE=1
-
 before_script:
-  - if [ "$FE" == 1 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
-  - if [ "$FE" == 1 ]; then npm config set spin false; fi
-  - if [ "$FE" == 1 ]; then npm install -g npm@2; fi
-  - if [ "$FE" == 1 ]; then npm install -g gulp@3.9.0; fi
-  - if [ "$FE" == 1 ]; then npm install; fi
+  - if [ "$FRONTEND" == "yes" ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+  - if [ "$FRONTEND" == "yes" ]; then npm config set spin false; fi
+  - if [ "$FRONTEND" == "yes" ]; then npm install -g npm@2; fi
+  - if [ "$FRONTEND" == "yes" ]; then npm install -g gulp@3.9.0; fi
+  - if [ "$FRONTEND" == "yes" ]; then npm install; fi
 
 script:
-  - tox -e $TOX_ENV
+  - tox
 
 after_success:
   - coveralls --config_file=.coveragerc
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
 
+env:
+  - DJANGO="1.8" SWAP="no"
+  - DJANGO="1.8" SWAP="yes"
+  - DJANGO="1.9" SWAP="no"
+  - DJANGO="1.9" SWAP="yes"
+  - DJANGO="1.10" SWAP="no"
+  - DJANGO="1.10" SWAP="yes"
+  - DJANGO="1.11" SWAP="no"
+  - DJANGO="1.11" SWAP="yes"
+
 matrix:
+  include:
+    - env: DOCS="yes"
+      python: "3.6"
+    - env: FLAKE8="yes"
+      python: "3.6"
+    - env: FRONTEND="yes"
+      python: "3.6"
+
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.8" SWAP="no"
+      osx_image: xcode7.3
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.9" SWAP="no"
+      osx_image: xcode7.3
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.10" SWAP="no"
+      osx_image: xcode7.3
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.11" SWAP="no"
+      osx_image: xcode7.3
+
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.8" SWAP="yes"
+      osx_image: xcode7.3
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.9" SWAP="yes"
+      osx_image: xcode7.3
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.10" SWAP="yes"
+      osx_image: xcode7.3
+    - os: osx
+      language: generic
+      python: "2.7"
+      env: DJANGO="1.11" SWAP="yes"
+      osx_image: xcode7.3
+
+    - os: linux
+      python: "3.4"
+      env: DJANGO="master" SWAP="yes"
+    - os: linux
+      python: "3.5"
+      env: DJANGO="master" SWAP="yes"
+    - os: linux
+      python: "3.6"
+      env: DJANGO="master" SWAP="yes"
+
+    - os: linux
+      python: "3.4"
+      env: DJANGO="master" SWAP="no"
+    - os: linux
+      python: "3.5"
+      env: DJANGO="master" SWAP="no"
+    - os: linux
+      python: "3.6"
+      env: DJANGO="master" SWAP="no"
+
   allow_failures:
-    - env: TOX_ENV=py27-djmaster-thumbs2x
-    - env: TOX_ENV=py34-djmaster-thumbs2x
-    - env: TOX_ENV=py35-djmaster-thumbs2x
+    - os: linux
+      python: "3.4"
+      env: DJANGO="master" SWAP="no"
+    - os: linux
+      python: "3.5"
+      env: DJANGO="master" SWAP="no"
+    - os: linux
+      python: "3.6"
+      env: DJANGO="master" SWAP="no"
+    - os: linux
+      python: "3.4"
+      env: DJANGO="master" SWAP="yes"
+    - os: linux
+      python: "3.5"
+      env: DJANGO="master" SWAP="yes"
+    - os: linux
+      python: "3.6"
+      env: DJANGO="master" SWAP="yes"

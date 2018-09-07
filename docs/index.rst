@@ -16,8 +16,6 @@ Welcome to django-filer's documentation!
 ``django-filer`` is a file management application for django. It handles uploading
 and organizing files and images in contrib.admin.
 
-.. note:: upgrading from 0.8.7? Checkout :ref:`upgrading`.
-
 +--------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
 | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/filer_1.png | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/filer_2.png |
 +--------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
@@ -33,7 +31,7 @@ Filer picker widget:
 +--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
 | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_1.png | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_2.png |
 +--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_3.png |                                                                                                                       |
+| .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_3.png |                                                                                                        |
 +--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
 
 Custom model fields are provided for use in 3rd party apps as a replacement for 

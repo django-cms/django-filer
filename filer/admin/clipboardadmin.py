@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-import json
-
 from django.conf.urls import url
 from django.contrib import admin
 from django.forms.models import modelform_factory
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 from .. import settings as filer_settings
-from ..models import Clipboard, ClipboardItem, Folder, Image
-from ..utils.compatibility import LTE_DJANGO_1_4
+from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import (
     UploadException,
     handle_request_files_upload,
     handle_upload,
 )
-from ..utils.loader import load_object
+from ..utils.loader import load_model
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
     "Can't use this folder, Permission Denied. Please select another folder."
 )
+
+
+Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
 
 # ModelAdmins
@@ -74,23 +74,17 @@ def ajax_upload(request, folder_id=None):
     """
     Receives an upload from the uploader. Receives only one file at a time.
     """
-    mimetype = "application/json" if request.is_ajax() else "text/html"
-    content_type_key = 'mimetype' if LTE_DJANGO_1_4 else 'content_type'
-    response_params = {content_type_key: mimetype}
     folder = None
     if folder_id:
         try:
             # Get folder
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
-            return HttpResponse(json.dumps({'error': NO_FOLDER_ERROR}),
-                                **response_params)
+            return JsonResponse({'error': NO_FOLDER_ERROR})
 
     # check permissions
     if folder and not folder.has_add_children_permission(request):
-        return HttpResponse(
-            json.dumps({'error': NO_PERMISSIONS_FOR_FOLDER}),
-            **response_params)
+        return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
     try:
         if len(request.FILES) == 1:
             # dont check if request is ajax or not, just grab the file
@@ -104,7 +98,7 @@ def ajax_upload(request, folder_id=None):
 
         # find the file type
         for filer_class in filer_settings.FILER_FILE_MODELS:
-            FileSubClass = load_object(filer_class)
+            FileSubClass = load_model(filer_class)
             # TODO: What if there are more than one that qualify?
             if FileSubClass.matches_file_type(filename, upload, request):
                 FileForm = modelform_factory(
@@ -134,12 +128,10 @@ def ajax_upload(request, folder_id=None):
                 file_obj.delete()
                 # This would be logged in BaseImage._generate_thumbnails()
                 # if FILER_ENABLE_LOGGING is on.
-                return HttpResponse(
-                    json.dumps(
-                        {'error': 'failed to generate icons for file'}),
+                return JsonResponse(
+                    {'error': 'failed to generate icons for file'},
                     status=500,
-                    **response_params)
-
+                )
             thumbnail = None
             # Backwards compatibility: try to get specific icon size (32px)
             # first. Then try medium icon size (they are already sorted),
@@ -152,7 +144,7 @@ def ajax_upload(request, folder_id=None):
                 except KeyError:
                     continue
 
-            json_response = {
+            data = {
                 'thumbnail': thumbnail,
                 'alt_text': '',
                 'label': str(file_obj),
@@ -167,10 +159,9 @@ def ajax_upload(request, folder_id=None):
                 }
                 thumbnail_180 = file_obj.file.get_thumbnail(
                     thumbnail_180_options)
-                json_response['thumbnail_180'] = thumbnail_180.url
-                json_response['original_image'] = file_obj.url
-            return HttpResponse(json.dumps(json_response),
-                                **response_params)
+                data['thumbnail_180'] = thumbnail_180.url
+                data['original_image'] = file_obj.url
+            return JsonResponse(data)
         else:
             form_errors = '; '.join(['%s: %s' % (
                 field,
@@ -181,6 +172,4 @@ def ajax_upload(request, folder_id=None):
                 "AJAX request not valid: form invalid '%s'" % (
                     form_errors,))
     except UploadException as e:
-        return HttpResponse(json.dumps({'error': str(e)}),
-                            status=500,
-                            **response_params)
+        return JsonResponse({'error': str(e)}, status=500)

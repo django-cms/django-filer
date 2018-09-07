@@ -5,20 +5,7 @@ from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
 
-from ..utils.compatibility import LTE_DJANGO_1_6, LTE_DJANGO_1_7
-
 ALLOWED_PICK_TYPES = ('folder', 'file')
-
-
-if LTE_DJANGO_1_6:
-    def admin_each_context(admin_site, request):
-        return {}
-elif LTE_DJANGO_1_7:
-    def admin_each_context(admin_site, request):
-        return admin_site.each_context()
-else:
-    def admin_each_context(admin_site, request):
-        return admin_site.each_context(request)
 
 
 def check_files_edit_permissions(request, files):
