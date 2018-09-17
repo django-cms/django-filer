@@ -122,6 +122,18 @@ django.jQuery(function ($) {
                 $('img', this.element).on('dragstart', function (event) {
                     event.preventDefault();
                 });
+
+                var $editLink = $('<a></a>')
+                    .attr('href', '#')
+                    .text(response.label)
+                    .on('click', function(){
+                        window.open(
+                            '/admin/filer/image/' +  response.file_id + '/change/?_to_field=id&_popup=1',
+                            'EDIT',
+                            'height=500,width=800,resizable=yes,scrollbars=yes'
+                        ).focus();
+                    });
+                inputId.parent().parent().find('.dz-name').html($editLink);
             },
             error: function (file, response) {
                 showError(file.name + ': ' + response.error);

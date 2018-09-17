@@ -21,7 +21,11 @@
             {% if object %}
                 {% if object.icons.32 %}
                     <a href="{{ object.url }}" target="_blank"><img class="thumbnail_img" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
-                    &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
+                    &nbsp;
+                    <a href="#" class="description_text"
+                       onclick="window.open('/admin/filer/image/{{ object.id }}/change/?_to_field=id&_popup=1', 'EDIT',
+                                            'height=500,width=800,resizable=yes,scrollbars=yes').focus();"
+                       >{{ object.label }}</a>
                 {% else %}
                     <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
                     &nbsp;<span class="description_text" title="{% trans 'file missing' %}">{% trans 'file missing' %}</span>
