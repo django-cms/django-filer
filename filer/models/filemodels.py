@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
 from filer.utils.files import get_valid_filename
 
 from . import mixins
