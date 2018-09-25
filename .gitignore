@@ -11,6 +11,7 @@ build
 tmp
 *.egg-info
 *.egg
+*.sqlite
 .DS_Store
 .project
 .pydevproject
