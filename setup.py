@@ -13,6 +13,7 @@ def read(fname):
     # read the contents of a text file
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 setup(
     name="django-filer",
     version=version,
