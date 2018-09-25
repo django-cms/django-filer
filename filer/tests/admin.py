@@ -43,6 +43,110 @@ def model_to_dict(instance, **kwargs):
     return model_to_dict_django(instance, **kwargs)
 
 
+class FilerFileAdminViewTests(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.folder = Folder.objects.create(name='folder')
+        self.filename = 'test.pdf'
+        self.file_data = django.core.files.base.ContentFile('some data')
+        self.file_data.name = self.filename
+        self.info = (File._meta.app_label, File._meta.model_name)
+
+    def test_rename_file_with_valid_data(self):
+        file_obj = File.objects.create(
+            is_public=False,
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=self.file_data,
+            folder=self.folder,
+        )
+
+        self.client.post(
+            reverse('admin:%s_%s_change' % self.info, args=(file_obj.pk,)),
+            {'changed_filename': 'new.pdf'}
+        )
+
+        file_obj.refresh_from_db()
+        self.assertEqual(file_obj.original_filename, 'new.pdf')
+        self.assertIn('new.pdf', file_obj.file.name)
+
+    def test_rename_file_when_changed_filename_value_is_invalid(self):
+        file_obj = File.objects.create(
+            is_public=False,
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=self.file_data,
+            folder=self.folder,
+        )
+
+        self.client.post(
+            reverse('admin:%s_%s_change' % self.info, args=(file_obj.pk,)),
+            {'changed_filename': 'invalid /]\ name * .pdf'}
+        )
+
+        file_obj.refresh_from_db()
+        self.assertEqual(file_obj.original_filename, 'invalid__name__.pdf')
+        self.assertIn('invalid__name__.pdf', file_obj.file.name)
+
+    def test_do_not_rename_file_when_file_not_exist(self):
+        file_obj = File.objects.create(
+            is_public=False,
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=self.file_data,
+            folder=self.folder,
+        )
+
+        self.client.post(
+            reverse('admin:%s_%s_change' % self.info, args=(file_obj.pk,)),
+            {
+                'file-clear': True,
+                'changed_filename': 'new2.pdf',
+            }
+        )
+
+        file_obj.refresh_from_db()
+        self.assertEqual(file_obj.original_filename, self.filename)
+        self.assertFalse(file_obj.file)
+
+    def test_do_not_rename_file_when_changed_filename_is_same_as_present(self):
+        file_obj = File.objects.create(
+            is_public=False,
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=self.file_data,
+            folder=self.folder,
+        )
+
+        self.client.post(
+            reverse('admin:%s_%s_change' % self.info, args=(file_obj.pk,)),
+            {'changed_filename': self.filename}
+        )
+
+        file_obj.refresh_from_db()
+        self.assertEqual(file_obj.original_filename, self.filename)
+        self.assertIn(self.filename, file_obj.file.name)
+
+    def test_do_not_rename_file_when_changed_filename_value_is_empty(self):
+        file_obj = File.objects.create(
+            is_public=False,
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=self.file_data,
+            folder=self.folder,
+        )
+
+        self.client.post(
+            reverse('admin:%s_%s_change' % self.info, args=(file_obj.pk,)),
+            {'changed_filename': ''}
+        )
+
+        file_obj.refresh_from_db()
+        self.assertEqual(file_obj.original_filename, self.filename)
+        self.assertIn(self.filename, file_obj.file.name)
+
+
 class FilerFolderAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
