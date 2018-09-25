@@ -9,12 +9,12 @@ from django.utils.translation import ugettext_lazy
 from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.loader import load_model
-from .fileadmin import ChangeFilenameForm, FileAdmin
+from .fileadmin import ChangeFilenameFormMixin, FileAdmin
 
 Image = load_model(FILER_IMAGE_MODEL)
 
 
-class ImageAdminForm(ChangeFilenameForm):
+class ImageAdminForm(ChangeFilenameFormMixin, forms.ModelForm):
     subject_location = forms.CharField(
         max_length=64, required=False,
         label=_('Subject location'),
