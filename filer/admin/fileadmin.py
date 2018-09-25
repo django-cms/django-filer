@@ -13,7 +13,7 @@ from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
-class ChangeFilenameForm(forms.ModelForm):
+class ChangeFilenameFormMixin(forms.Form):
     changed_filename = forms.CharField(
         max_length=256,
         required=False,
@@ -21,7 +21,7 @@ class ChangeFilenameForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(ChangeFilenameForm, self).__init__(*args, **kwargs)
+        super(ChangeFilenameFormMixin, self).__init__(*args, **kwargs)
         instance = kwargs.pop('instance', None)
         if instance and instance.file:
             self.fields['changed_filename'].initial = instance.file.name.split('/')[-1]
@@ -30,10 +30,10 @@ class ChangeFilenameForm(forms.ModelForm):
 
     def save(self, **kwargs):
         self.instance.new_filename = self.cleaned_data.get('changed_filename', None)
-        return super(ChangeFilenameForm, self).save(**kwargs)
+        return super(ChangeFilenameFormMixin, self).save(**kwargs)
 
 
-class FileAdminChangeFrom(ChangeFilenameForm):
+class FileAdminChangeFrom(ChangeFilenameFormMixin, forms.ModelForm):
     class Meta(object):
         model = File
         exclude = ()
