@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from filer.utils.files import get_valid_filename
 
 from . import mixins
 from .. import settings as filer_settings
@@ -172,6 +173,19 @@ class File(PolymorphicModel, mixins.IconsMixin):
         src_file.open()
         return storage.save(destination, ContentFile(src_file.read()))
 
+    def _rename_file(self, new_filename):
+        """
+        Change file name to a new valid value
+        """
+
+        old_filename = self.file.name.split('/')[-1]
+        if new_filename != old_filename:
+            new_filename = get_valid_filename(new_filename)
+            new_path = self.file.path.replace(old_filename, new_filename)
+            os.rename(self.file.path, new_path)
+            self.file.name = self.file.name.replace(old_filename, new_filename)
+            self.original_filename = new_filename
+
     def generate_sha1(self):
         sha = hashlib.sha1()
         self.file.seek(0)
@@ -197,6 +211,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
+
+        # rename file
+        if self.pk and self.file and getattr(self, 'new_filename', None):
+            self._rename_file(new_filename=self.new_filename)
+
         super(File, self).save(*args, **kwargs)
     save.alters_data = True
 
