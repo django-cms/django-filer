@@ -67,9 +67,13 @@ class FilerFileAdminViewTests(TestCase):
             {'changed_filename': 'new.pdf'}
         )
 
+        old_file_name = file_obj.file.name
         file_obj.refresh_from_db()
         self.assertEqual(file_obj.original_filename, 'new.pdf')
         self.assertIn('new.pdf', file_obj.file.name)
+        storage = file_obj.file.storage
+        self.assertTrue(storage.exists(file_obj.file.name))
+        self.assertFalse(storage.exists(old_file_name))
 
     def test_rename_file_when_changed_filename_value_is_invalid(self):
         file_obj = File.objects.create(
