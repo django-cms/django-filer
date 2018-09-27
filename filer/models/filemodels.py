@@ -181,6 +181,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         new_filename = get_valid_filename(new_filename)
         if new_filename != old_filename:
             self._copy_file(self.file.name.replace(old_filename, new_filename))
+            self.file.delete_thumbnails()
             storage = self.file.storage
             storage.delete(self.file.name)
             self.file.name = self.file.name.replace(old_filename, new_filename)
