@@ -5,8 +5,34 @@ import sys
 
 import django
 from django.utils import six
-from django.utils.functional import allow_lazy
 from django.utils.text import Truncator
+
+try:
+    # Django>=1.10
+    from django.urls import reverse, NoReverseMatch
+except ImportError:
+    from django.core.urlresolvers import reverse, NoReverseMatch
+
+try:
+    from django.utils.functional import keep_lazy as allow_lazy
+except ImportError:
+    from django.utils.functional import allow_lazy
+
+
+def is_authenticated(user):
+    try:
+        return user.is_authenticated()  # Django<1.10
+    except TypeError:
+        return user.is_authenticated  # Django>=1.10
+
+
+try:
+    from django.utils.translation import string_concat
+except ImportError:
+    from django.utils.text import format_lazy
+
+    def string_concat(*strings):
+        return format_lazy('{}' * len(strings), *strings)
 
 
 def truncate_words(s, num, end_text='...'):
@@ -18,6 +44,7 @@ truncate_words = allow_lazy(truncate_words, six.text_type)
 
 LTE_DJANGO_1_8 = django.VERSION < (1, 9)
 LTE_DJANGO_1_9 = django.VERSION < (1, 10)
+GTE_DJANGO_1_9 = django.VERSION >= (1, 9)
 GTE_DJANGO_1_10 = django.VERSION >= (1, 10)
 DJANGO_1_10 = django.VERSION[:2] == (1, 10)
 
@@ -63,6 +90,7 @@ def get_delete_permission(opts):
     except ImportError:
         return '%s.%s' % (opts.app_label,
                           opts.get_delete_permission())
+
 
 try:
     from django.contrib.admin.utils import unquote, quote, NestedObjects, capfirst  # flake8: noqa

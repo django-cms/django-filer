@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, division, unicode_literals
 
 import itertools
@@ -14,7 +13,6 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.core.urlresolvers import reverse
 from django.db import models, router
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -42,6 +40,7 @@ from ..utils.compatibility import (
     capfirst,
     get_delete_permission,
     quote,
+    reverse,
     unquote,
 )
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
@@ -156,7 +155,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
+        info = self.model._meta.app_label, self.model._meta.model_name
         extra_context = {'show_delete': True,
+                         'history_url': 'admin:%s_%s_history' % info,
                          'is_popup': popup_status(request),
                          'filer_admin_context': AdminContext(request)}
         context.update(extra_context)

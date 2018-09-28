@@ -8,6 +8,7 @@ from tempfile import mkdtemp
 def gettext(s):
     return s
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 HELPER_SETTINGS = {
@@ -68,6 +69,7 @@ if os.environ.get('CUSTOM_IMAGE', False):
 def run():
     from djangocms_helper import runner
     runner.run('filer')
+
 
 if __name__ == "__main__":
     run()

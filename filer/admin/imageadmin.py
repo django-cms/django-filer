@@ -2,12 +2,12 @@
 from __future__ import absolute_import
 
 from django import forms
-from django.utils.translation import string_concat
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
+from ..utils.compatibility import string_concat
 from ..utils.loader import load_model
 from .fileadmin import FileAdmin
 
