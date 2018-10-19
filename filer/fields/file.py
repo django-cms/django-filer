@@ -74,10 +74,11 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
 
     def obj_for_value(self, value):
+        key = self.rel.get_related_field().name
+        model = self.rel.model
         try:
-            key = self.rel.get_related_field().name
-            obj = self.rel.to._default_manager.get(**{key: value})
-        except:
+            obj = model._default_manager.get(**{key: value})
+        except model.DoesNotExists:
             obj = None
         return obj
 
