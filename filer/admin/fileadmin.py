@@ -23,10 +23,11 @@ class ChangeFilenameFormMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ChangeFilenameFormMixin, self).__init__(*args, **kwargs)
         instance = kwargs.pop('instance', None)
-        if instance and instance.file:
-            self.fields['changed_filename'].initial = instance.file.name.split('/')[-1]
-        else:
-            self.fields['changed_filename'].widget = forms.HiddenInput()
+        if 'changed_filename' in self.fields:
+            if instance and instance.file:
+                self.fields['changed_filename'].initial = instance.file.name.split('/')[-1]
+            else:
+                self.fields['changed_filename'].widget = forms.HiddenInput()
 
     def save(self, **kwargs):
         self.instance.new_filename = self.cleaned_data.get('changed_filename', None)
