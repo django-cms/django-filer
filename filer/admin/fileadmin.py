@@ -13,7 +13,28 @@ from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
-class FileAdminChangeFrom(forms.ModelForm):
+class ChangeFilenameFormMixin(forms.Form):
+    changed_filename = forms.CharField(
+        max_length=256,
+        required=False,
+        label=_('Change file name'),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(ChangeFilenameFormMixin, self).__init__(*args, **kwargs)
+        instance = kwargs.pop('instance', None)
+        if 'changed_filename' in self.fields:
+            if instance and instance.file:
+                self.fields['changed_filename'].initial = instance.file.name.split('/')[-1]
+            else:
+                self.fields['changed_filename'].widget = forms.HiddenInput()
+
+    def save(self, **kwargs):
+        self.instance.new_filename = self.cleaned_data.get('changed_filename', None)
+        return super(ChangeFilenameFormMixin, self).save(**kwargs)
+
+
+class FileAdminChangeFrom(ChangeFilenameFormMixin, forms.ModelForm):
     class Meta(object):
         model = File
         exclude = ()
@@ -25,7 +46,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
     readonly_fields = ('sha1', 'display_canonical')
-
     form = FileAdminChangeFrom
 
     @classmethod
@@ -42,6 +62,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             (_('Advanced'), {
                 'fields': (
                     'file',
+                    'changed_filename',
                     'sha1',
                     'display_canonical',
                 ) + extra_advanced_fields,
@@ -148,5 +169,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             return '-'
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
+
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()

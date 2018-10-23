@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from filer.utils.files import get_valid_filename
 
 from . import mixins
 from .. import settings as filer_settings
@@ -128,7 +129,6 @@ class File(PolymorphicModel, mixins.IconsMixin):
         src_file_name = self.file.name
         dst_file_name = self._meta.get_field('file').generate_filename(
             self, self.original_filename)
-
         if self.is_public:
             src_storage = self.file.storages['private']
             dst_storage = self.file.storages['public']
@@ -172,6 +172,22 @@ class File(PolymorphicModel, mixins.IconsMixin):
         src_file.open()
         return storage.save(destination, ContentFile(src_file.read()))
 
+    def _rename_file(self, new_filename):
+        """
+        Changes file name to a new.
+        """
+
+        old_filename = self.file.name.split('/')[-1]
+        new_filename = get_valid_filename(new_filename)
+        if new_filename != old_filename:
+            self._copy_file(self.file.name.replace(old_filename, new_filename))
+            self.file.delete_thumbnails()
+            storage = self.file.storage
+            storage.delete(self.file.name)
+            self.file.name = self.file.name.replace(old_filename, new_filename)
+            self.original_filename = new_filename
+            self.save()
+
     def generate_sha1(self):
         sha = hashlib.sha1()
         self.file.seek(0)
@@ -197,6 +213,10 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
+
+        if self.pk and self.file and getattr(self, 'new_filename', None):
+            self._rename_file(new_filename=self.new_filename)
+
         super(File, self).save(*args, **kwargs)
     save.alters_data = True
 
