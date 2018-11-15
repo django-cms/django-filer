@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import easy_thumbnails
 from distutils.version import LooseVersion
 

@@ -2,13 +2,13 @@
 from __future__ import absolute_import
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from .. import settings
 from ..models import File
-from ..utils.compatibility import unquote
+from ..utils.compatibility import reverse, unquote
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
@@ -143,7 +143,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     def display_canonical(self, instance):
         canonical = instance.canonical_url
         if canonical:
-            return '<a href="%s">%s</a>' % (canonical, canonical)
+            return mark_safe('<a href="%s">%s</a>' % (canonical, canonical))
         else:
             return '-'
     display_canonical.allow_tags = True

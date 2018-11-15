@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.contrib import admin
 
 from ..models import Clipboard, File, Folder, FolderPermission, ThumbnailOption
