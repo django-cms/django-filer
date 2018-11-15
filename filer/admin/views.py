@@ -25,7 +25,7 @@ class NewFolderForm(forms.ModelForm):
 
 
 @login_required
-def make_folder(request, folder_id=None):
+def make_folder(self, request, folder_id=None):
     if not folder_id:
         folder_id = request.GET.get('parent_id')
     if not folder_id:
@@ -62,12 +62,16 @@ def make_folder(request, folder_id=None):
                 return render(request, 'admin/filer/dismiss_popup.html')
     else:
         new_folder_form = NewFolderForm()
-    return render(request, 'admin/filer/folder/new_folder_form.html', {
+
+    context = self.admin_site.each_context(request)
+    context.update({
         'opts': Folder._meta,
         'new_folder_form': new_folder_form,
         'is_popup': popup_status(request),
         'filer_admin_context': AdminContext(request),
     })
+
+    return render(request, 'admin/filer/folder/new_folder_form.html', context)
 
 
 @login_required
