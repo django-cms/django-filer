@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from django import forms
 from django.http import HttpResponseRedirect
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from .. import settings
@@ -142,7 +143,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     def display_canonical(self, instance):
         canonical = instance.canonical_url
         if canonical:
-            return '<a href="%s">%s</a>' % (canonical, canonical)
+            return mark_safe('<a href="%s">%s</a>' % (canonical, canonical))
         else:
             return '-'
     display_canonical.allow_tags = True

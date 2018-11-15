@@ -9,6 +9,7 @@ CHANGELOG
 * Converted QueryDict to dict before manipulating in admin
 * Hide 'Save as new' button in file admin
 * Fixed history link for folder and image object
+* Fixed rendering canonical URL in change form
 
 1.3.2 (2018-04-23)
 ------------------
