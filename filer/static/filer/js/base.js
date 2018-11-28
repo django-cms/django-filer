@@ -7,15 +7,15 @@ var Cl = window.Cl || {};
 
 /* globals Mediator, django */
 
-// mediator init
-Cl.mediator = new Mediator();
-
 // as of Django 2.x we need to check where jQuery is
 var djQuery = window.$;
 
 if (django.jQuery) {
     djQuery = django.jQuery;
 }
+
+// mediator init
+Cl.mediator = new Mediator();
 
 (function ($) {
     $(function () {

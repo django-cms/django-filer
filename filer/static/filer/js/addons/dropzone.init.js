@@ -3,15 +3,15 @@
 /* globals Dropzone, django */
 'use strict';
 
-if (Dropzone) {
-    Dropzone.autoDiscover = false;
-}
-
 // as of Django 2.x we need to check where jQuery is
 var djQuery = window.$;
 
 if (django.jQuery) {
     djQuery = django.jQuery;
+}
+
+if (Dropzone) {
+    Dropzone.autoDiscover = false;
 }
 
 /* globals Dropzone, django */
