@@ -72,7 +72,6 @@ def make_folder(request, folder_id=None):
         'is_popup': popup_status(request),
         'filer_admin_context': AdminContext(request),
     })
-    
     return render(request, 'admin/filer/folder/new_folder_form.html', context)
 
 
