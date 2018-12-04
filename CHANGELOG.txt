@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.4.1 (unreleased)
+------------------
+
+* Fixed widgets to work with Django 2.x (#1111)
+* Added admin site context to make_folder view (#1112)
+* Added never_cache decorator in server views. (#1100)
+
 1.4.0 (2018-11-15)
 ------------------
 
