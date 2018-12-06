@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-1.4.1 (unreleased)
+1.4.1 (2018-12-06)
 ------------------
 
 * Fixed widgets to work with Django 2.x (#1111)
