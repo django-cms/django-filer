@@ -222,6 +222,7 @@
                                     <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
                                        class="navigator-button navigator-button-upload js-upload-button"
                                        data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}"
+                                       data-accept="{% url 'admin:filer-check_file_constraint' folder_id=folder.id  %}"
                                        data-max-uploader-connections="{{ uploader_connections }}">
                                         {% trans "Upload Files" %}
                                     </a>
