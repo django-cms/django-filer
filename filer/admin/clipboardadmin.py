@@ -207,7 +207,7 @@ def ajax_upload(request, folder_id=None):
                 field,
                 ', '.join(errors)) for field, errors in list(
                 uploadform.errors.items())
-                                     ])
+            ])
             raise UploadException(
                 "AJAX request not valid: form invalid '%s'" % (
                     form_errors,))
