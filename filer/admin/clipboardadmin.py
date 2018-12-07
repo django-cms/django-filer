@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+import importlib
+
 from django.conf.urls import url
 from django.contrib import admin
 from django.forms.models import modelform_factory
@@ -14,7 +16,7 @@ from ..utils.files import (
     UploadException,
     handle_request_files_upload,
     handle_upload,
-    filename_exists,
+    FileDoesExist,
 )
 from ..utils.loader import load_model
 
@@ -56,7 +58,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/no_folder/$',
                 ajax_upload,
                 name='filer-ajax_upload'),
-            url(r'^operations/upload/(?P<folder_id>[0-9]+)/check/$',
+            url(r'^operations/upload/check/(?P<folder_id>[0-9]+)/$',
                 check_file_constraint,
                 name='filer-check_file_constraint'),
         ] + super(ClipboardAdmin, self).get_urls()
@@ -75,8 +77,16 @@ class ClipboardAdmin(admin.ModelAdmin):
 @csrf_exempt
 def check_file_constraint(request, folder_id=None):
     file_constraint_check = filer_settings.FILER_FILE_CONSTRAINT
-    file_constraint_check += [filename_exists, ]
-    return all(func(request, folder_id) for func in file_constraint_check)
+    # import pdb; pdb.set_trace()
+    p, m = file_constraint_check.rsplit('.',1)
+    mod = importlib.import_module(p)
+    file_check = getattr(mod, m)
+    try:
+        file_check(request, folder_id)
+    except FileDoesExist:
+        return JsonResponse({'success': False})
+
+    return JsonResponse({'success': True})
 
 
 @csrf_exempt
