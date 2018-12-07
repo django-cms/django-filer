@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
+from django.http import JsonResponse
 from django.http.multipartparser import (
     ChunkIter,
     SkipFile,
@@ -15,6 +16,7 @@ from django.utils.encoding import force_text
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from unidecode import unidecode
 
+from ..models import File, Folder
 
 class UploadException(Exception):
     pass
@@ -135,3 +137,39 @@ def get_valid_filename(s):
         return "%s.%s" % (filename, ext)
     else:
         return "%s" % (filename,)
+
+
+NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
+FILE_EXISTS = 'Filename already exists'
+
+
+def filename_exists(request, folder_id=None):
+
+    if folder_id is None:
+        return False
+
+    try:
+        # Get folder
+        folder = Folder.objects.get(pk=folder_id)
+    except Folder.DoesNotExist:
+        return JsonResponse({'error': NO_FOLDER_ERROR})
+
+    if folder and folder.has_add_children_permission(request):
+        if len(request.FILES) == 1:
+            # dont check if request is ajax or not, just grab the file
+            upload = list(request.FILES.values())[0]
+            filename = upload.name
+            if File.objects.filter(
+                original_filename=filename,
+                folder_id=folder_id
+            ):
+                return JsonResponse({'error': FILE_EXISTS})
+        else:
+            # else process the request as usual
+            filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
+            if File.objects.filter(
+                original_filename=filename,
+                folder_id=folder_id
+            ):
+                return JsonResponse({'error': FILE_EXISTS})
+    return False

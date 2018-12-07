@@ -14,6 +14,7 @@ from ..utils.files import (
     UploadException,
     handle_request_files_upload,
     handle_upload,
+    filename_exists,
 )
 from ..utils.loader import load_model
 
@@ -21,7 +22,6 @@ NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
     "Can't use this folder, Permission Denied. Please select another folder."
 )
-FILE_EXISTS = 'Filename already exists'
 
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
@@ -75,39 +75,8 @@ class ClipboardAdmin(admin.ModelAdmin):
 @csrf_exempt
 def check_file_constraint(request, folder_id=None):
     file_constraint_check = filer_settings.FILER_FILE_CONSTRAINT
-    file_constraint_check += [is_filename_exists, ]
+    file_constraint_check += [filename_exists, ]
     return all(func(request, folder_id) for func in file_constraint_check)
-
-
-def is_filename_exists(request, folder_id=None):
-    if folder_id is None:
-        return False
-
-    try:
-        # Get folder
-        folder = Folder.objects.get(pk=folder_id)
-    except Folder.DoesNotExist:
-        return JsonResponse({'error': NO_FOLDER_ERROR})
-
-    if folder and folder.has_add_children_permission(request):
-        if len(request.FILES) == 1:
-            # dont check if request is ajax or not, just grab the file
-            upload = list(request.FILES.values())[0]
-            filename = upload.name
-            if File.objects.filter(
-                original_filename=filename,
-                folder_id=folder_id
-            ):
-                return JsonResponse({'error': FILE_EXISTS})
-        else:
-            # else process the request as usual
-            filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
-            if File.objects.filter(
-                original_filename=filename,
-                folder_id=folder_id
-            ):
-                return JsonResponse({'error': FILE_EXISTS})
-    return False
 
 
 @csrf_exempt
