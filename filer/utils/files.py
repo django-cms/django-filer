@@ -16,7 +16,6 @@ from django.utils.encoding import force_text
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from unidecode import unidecode
 
-from ..models import File, Folder
 
 class UploadException(Exception):
     pass
@@ -144,6 +143,7 @@ FILE_EXISTS = 'Filename already exists'
 
 
 def filename_exists(request, folder_id=None):
+    from ..models import Folder, File
 
     if folder_id is None:
         return False
