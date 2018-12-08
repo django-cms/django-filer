@@ -7,6 +7,7 @@ import warnings
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
@@ -75,8 +76,13 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     def obj_for_value(self, value):
         try:
             key = self.rel.get_related_field().name
-            obj = self.rel.to._default_manager.get(**{key: value})
-        except:
+            # noinspection PyProtectedMember
+            obj = self.rel.model._default_manager.get(**{key: value})
+        except ObjectDoesNotExist as ex:
+            logger.info("Failed to load related field object %s", self.rel, exc_info=ex)
+            obj = None
+        except Exception as ex:
+            logger.warning("Failed to load related field object %s", self.rel, exc_info=ex)
             obj = None
         return obj
 
