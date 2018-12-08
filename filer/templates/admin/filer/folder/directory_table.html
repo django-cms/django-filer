@@ -1,7 +1,6 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags staticfiles %}
 <div class="drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-{{ file_constraint }}
     <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list"
            data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}"
            {% if file_constraint %}
