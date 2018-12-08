@@ -5,9 +5,11 @@ import importlib
 
 from django.conf.urls import url
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.module_loading import import_string
 
 from . import views
 from .. import settings as filer_settings
@@ -16,7 +18,6 @@ from ..utils.files import (
     UploadException,
     handle_request_files_upload,
     handle_upload,
-    FileDoesExist,
 )
 from ..utils.loader import load_model
 
@@ -77,14 +78,12 @@ class ClipboardAdmin(admin.ModelAdmin):
 @csrf_exempt
 def check_file_constraint(request, folder_id=None):
     file_constraint_check = filer_settings.FILER_FILE_CONSTRAINT
-    # import pdb; pdb.set_trace()
-    p, m = file_constraint_check.rsplit('.',1)
-    mod = importlib.import_module(p)
-    file_check = getattr(mod, m)
-    try:
-        file_check(request, folder_id)
-    except FileDoesExist:
-        return JsonResponse({'success': False})
+    for path in file_constraint_check:
+        func = import_string(path)
+        try:
+            func(request, folder_id)
+        except ValidationError:
+            return JsonResponse({'success': False})
 
     return JsonResponse({'success': True})
 
@@ -101,6 +100,7 @@ def ajax_upload(request, folder_id=None):
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
             return JsonResponse({'error': NO_FOLDER_ERROR})
+
     # check permissions
     if folder and not folder.has_add_children_permission(request):
         return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
@@ -185,7 +185,7 @@ def ajax_upload(request, folder_id=None):
             form_errors = '; '.join(['%s: %s' % (
                 field,
                 ', '.join(errors)) for field, errors in list(
-                uploadform.errors.items())
+                    uploadform.errors.items())
             ])
             raise UploadException(
                 "AJAX request not valid: form invalid '%s'" % (

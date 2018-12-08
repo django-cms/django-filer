@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-
+from django.core.exceptions import ValidationError
 from django.http.multipartparser import (
     ChunkIter,
     SkipFile,
@@ -142,10 +142,6 @@ FILE_EXISTS = 'Do you want to overwrite existed file'
 SUCCESS_MESSAGE = 'File to process'
 
 
-class FileDoesExist(Exception):
-    pass
-
-
 def filename_exists(request, folder_id=None):
     from ..models import Folder, File
     # import pdb; pdb.set_trace()
@@ -165,7 +161,7 @@ def filename_exists(request, folder_id=None):
                 original_filename=filename,
                 folder_id=folder_id
             ):
-                raise FileDoesExist(FILE_EXISTS)
+                raise ValidationError(FILE_EXISTS)
         else:
             # else process the request as usual
             filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
@@ -173,5 +169,5 @@ def filename_exists(request, folder_id=None):
                 original_filename=filename,
                 folder_id=folder_id
             ):
-                raise FileDoesExist(FILE_EXISTS)
+                raise ValidationError(FILE_EXISTS)
     return
