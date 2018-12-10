@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-import importlib
-
 from django.conf.urls import url
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.module_loading import import_string
+from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 from .. import settings as filer_settings
-from ..models import Clipboard, ClipboardItem, Folder, File
+from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import (
     UploadException,
     handle_request_files_upload,
@@ -60,8 +58,11 @@ class ClipboardAdmin(admin.ModelAdmin):
                 ajax_upload,
                 name='filer-ajax_upload'),
             url(r'^operations/upload/check/(?P<folder_id>[0-9]+)/$',
-                check_file_constraint,
-                name='filer-check_file_constraint'),
+                check_file_constraints,
+                name='filer-check_file_constraints'),
+            url(r'^operations/upload/check/no_folder/$',
+                check_file_constraints,
+                name='filer-check_file_constraints'),
         ] + super(ClipboardAdmin, self).get_urls()
 
     def get_model_perms(self, *args, **kwargs):
@@ -76,14 +77,17 @@ class ClipboardAdmin(admin.ModelAdmin):
 
 
 @csrf_exempt
-def check_file_constraint(request, folder_id=None):
-    file_constraint_check = filer_settings.FILER_FILE_CONSTRAINT
-    for path in file_constraint_check:
+def check_file_constraints(request, folder_id=None):
+    file_constraint_checks = filer_settings.FILER_FILE_CONSTRAINTS
+    for path in file_constraint_checks:
         func = import_string(path)
         try:
             func(request, folder_id)
-        except ValidationError:
-            return JsonResponse({'success': False})
+        except ValidationError as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            })
 
     return JsonResponse({'success': True})
 

@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-from django.core.exceptions import ValidationError
+
 from django.http.multipartparser import (
     ChunkIter,
     SkipFile,
@@ -135,39 +135,3 @@ def get_valid_filename(s):
         return "%s.%s" % (filename, ext)
     else:
         return "%s" % (filename,)
-
-
-NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
-FILE_EXISTS = 'Do you want to overwrite existed file'
-SUCCESS_MESSAGE = 'File to process'
-
-
-def filename_exists(request, folder_id=None):
-    from ..models import Folder, File
-    # import pdb; pdb.set_trace()
-
-    try:
-        # Get folder
-        folder = Folder.objects.get(pk=folder_id)
-    except Folder.DoesNotExist:
-       return
-
-    if folder:
-        if len(request.FILES) == 1:
-            # dont check if request is ajax or not, just grab the file
-            upload = list(request.FILES.values())[0]
-            filename = upload.name
-            if File.objects.filter(
-                original_filename=filename,
-                folder_id=folder_id
-            ):
-                raise ValidationError(FILE_EXISTS)
-        else:
-            # else process the request as usual
-            filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
-            if File._base_manager.filter(
-                original_filename=filename,
-                folder_id=folder_id
-            ):
-                raise ValidationError(FILE_EXISTS)
-    return
