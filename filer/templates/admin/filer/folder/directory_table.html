@@ -3,8 +3,8 @@
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
     <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list"
            data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}"
-           {% if file_constraint %}
-           data-accept="{% if folder.id %}{% url 'admin:filer-check_file_constraint' folder_id=folder.id  %}{% endif %}"
+           {% if file_constraints %}
+           data-accept="{% if folder.id %}{% url 'admin:filer-check_file_constraints' folder_id=folder.id  %}{% endif %}"
            {%  endif %}
            data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
            data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
@@ -48,8 +48,8 @@
 
                         <tr class="js-filer-dropzone js-filer-dropzone-folder"
                             data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}"
-                            {% if file_constraint %}
-                             data-accept="{% url 'admin:filer-check_file_constraint' folder_id=subfolder.id  %}"
+                            {% if file_constraints %}
+                             data-accept="{% url 'admin:filer-check_file_constraints' folder_id=subfolder.id  %}"
                             {% endif %}
                             data-folder-name="{{ subfolder.name }}"
                             data-max-uploader-connections="{{ uploader_connections }}"
@@ -170,8 +170,8 @@
 
     <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden"
          data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}"
-         {% if file_constraint %}
-         data-accept="{% if folder.id %}{% url 'admin:filer-check_file_constraint' folder_id=folder.id  %}{% endif %}"
+         {% if file_constraints %}
+         data-accept="{% if folder.id %}{% url 'admin:filer-check_file_constraints' folder_id=folder.id  %}{% endif %}"
          {% endif %}
          data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
          data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
