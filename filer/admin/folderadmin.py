@@ -449,6 +449,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'media': self.media,
             'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
             'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),
+            'file_constraints': settings.FILER_FILE_CONSTRAINTS,
         })
         return render(request, self.directory_listing_template, context)
 
