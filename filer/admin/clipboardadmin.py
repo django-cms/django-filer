@@ -93,7 +93,7 @@ class FileContraints(View):
             except ValidationError as e:
                 return JsonResponse({
                     'success': False,
-                    'message': str(e)
+                    'message': str(e.message)
                 })
 
         return JsonResponse({'success': True})
