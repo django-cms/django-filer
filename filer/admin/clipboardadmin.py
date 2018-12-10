@@ -60,10 +60,10 @@ class ClipboardAdmin(admin.ModelAdmin):
                 ajax_upload,
                 name='filer-ajax_upload'),
             url(r'^operations/upload/check/(?P<folder_id>[0-9]+)/$',
-                FileContraints.as_view(),
+                FileConstraints.as_view(),
                 name='filer-check_file_constraints'),
             url(r'^operations/upload/check/no_folder/$',
-                FileContraints.as_view(),
+                FileConstraints.as_view(),
                 name='filer-check_file_constraints'),
         ] + super(ClipboardAdmin, self).get_urls()
 
@@ -79,7 +79,7 @@ class ClipboardAdmin(admin.ModelAdmin):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class FileContraints(View):
+class FileConstraints(View):
 
     def post(self, request, folder_id=None):
         """
@@ -93,11 +93,10 @@ class FileContraints(View):
             except ValidationError as e:
                 return JsonResponse({
                     'success': False,
-                    'message': str(e.message)
+                    'error': str(e)
                 })
 
         return JsonResponse({'success': True})
-
 
 
 @csrf_exempt
