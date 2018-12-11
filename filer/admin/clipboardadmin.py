@@ -9,7 +9,6 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from django.views.decorators.csrf import csrf_exempt
-from django.views import View
 
 from . import views
 from .. import settings as filer_settings
@@ -60,10 +59,10 @@ class ClipboardAdmin(admin.ModelAdmin):
                 ajax_upload,
                 name='filer-ajax_upload'),
             url(r'^operations/upload/check/(?P<folder_id>[0-9]+)/$',
-                FileConstraints.as_view(),
+                file_constraints_check,
                 name='filer-check_file_constraints'),
             url(r'^operations/upload/check/no_folder/$',
-                FileConstraints.as_view(),
+                file_constraints_check,
                 name='filer-check_file_constraints'),
         ] + super(ClipboardAdmin, self).get_urls()
 
@@ -78,25 +77,22 @@ class ClipboardAdmin(admin.ModelAdmin):
         }
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class FileConstraints(View):
-
-    def post(self, request, folder_id=None):
-        """
-        Call all file constraints define in settings and return json response
-        """
-        file_constraint_checks = filer_settings.FILER_FILE_CONSTRAINTS
-        for path in file_constraint_checks:
-            func = import_string(path)
-            try:
-                func(request, folder_id)
-            except ValidationError as e:
-                return JsonResponse({
-                    'success': False,
-                    'error': str(e)
-                })
-
-        return JsonResponse({'success': True})
+@csrf_exempt
+def file_constraints_check(request, folder_id=None):
+    """
+    Call all file constraints define in settings and return json response
+    """
+    file_constraint_checks = filer_settings.FILER_FILE_CONSTRAINTS
+    for path in file_constraint_checks:
+        func = import_string(path)
+        try:
+            func(request, folder_id)
+        except ValidationError as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({'success': True})
 
 
 @csrf_exempt
