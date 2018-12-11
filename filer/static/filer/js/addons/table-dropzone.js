@@ -86,7 +86,7 @@ if (django.jQuery) {
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
-                    parallelUploads: dropzone.data(dataUploaderConnections) || 1,
+                    parallelUploads: dropzone.data(dataUploaderConnections) || 3,
                     // Rename the file to include the full path for folder uploads
                     // This will be stripped out by Django but it allows the value to be picked up
                     // in the params method below
