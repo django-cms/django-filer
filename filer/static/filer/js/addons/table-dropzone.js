@@ -2,6 +2,13 @@
 // This script implements the dropzone settings
 'use strict';
 
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
 /* globals Dropzone, Cl, django */
 (function ($) {
     $(function () {
@@ -79,7 +86,40 @@
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
-                    parallelUploads: dropzone.data(dataUploaderConnections) || 3,
+                    parallelUploads: dropzone.data(dataUploaderConnections) || 1,
+                    // Rename the file to include the full path for folder uploads
+                    // This will be stripped out by Django but it allows the value to be picked up
+                    // in the params method below
+                    renameFile: function(file) {
+                        if (typeof file.fullPath === 'string') {
+                            return file.fullPath
+                        }
+                        return file.name
+                    },
+                    // ensure that the path informatio is sent as part of the request, 
+                    // without this the path is stripped out automatically by Djano.
+                    params(files, xhr, chunk) {
+                        var metadata = {}
+                        files.forEach(function(file, index) {
+                            let fullPath = file.upload.filename
+                            let path = fullPath.substr(0, fullPath.lastIndexOf('/'))
+                            metadata = {
+                                path: path,
+                                uuid: file.upload.uuid,
+                                size: file.upload.total,
+                                chunked: file.upload.chunked
+                            }
+                        })
+                        if (chunk) {
+                            metadata.dzuuid = chunk.file.upload.uuid
+                            metadata.dzchunkindex = chunk.index
+                            metadata.dztotalfilesize = chunk.file.size
+                            metadata.dzchunksize = this.options.chunkSize
+                            metadata.dztotalchunkcount = chunk.file.upload.totalChunkCount
+                            metadata.dzchunkbyteoffset = chunk.index * this.options.chunkSize
+                        }
+                        return metadata
+                    },
                     accept: function (file, done) {
                         var uploadInfoClone;
 
@@ -213,4 +253,4 @@
             });
         }
     });
-})(django.jQuery);
+})(djQuery);
