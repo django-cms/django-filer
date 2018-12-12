@@ -86,22 +86,14 @@ if (django.jQuery) {
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
-                    parallelUploads: dropzone.data(dataUploaderConnections) || 3,
-                    // Rename the file to include the full path for folder uploads
-                    // This will be stripped out by Django but it allows the value to be picked up
-                    // in the params method below
-                    renameFile: function(file) {
-                        if (typeof file.fullPath === 'string') {
-                            return file.fullPath
-                        }
-                        return file.name
-                    },
+                    parallelUploads: dropzone.data(dataUploaderConnections) || 1,
                     // ensure that the path informatio is sent as part of the request, 
                     // without this the path is stripped out automatically by Djano.
                     params(files, xhr, chunk) {
                         var metadata = {}
                         files.forEach(function(file, index) {
-                            let fullPath = file.upload.filename
+                            let fullPath = file.fullPath
+                            // remove the filename from the path, as this is already transmitted separately
                             let path = fullPath.substr(0, fullPath.lastIndexOf('/'))
                             metadata = {
                                 path: path,
