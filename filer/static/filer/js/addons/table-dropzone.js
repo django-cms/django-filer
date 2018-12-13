@@ -92,15 +92,16 @@ if (django.jQuery) {
                     params(files, xhr, chunk) {
                         var metadata = {}
                         files.forEach(function(file, index) {
-                            let fullPath = file.fullPath
-                            // remove the filename from the path, as this is already transmitted separately
-                            let path = fullPath.substr(0, fullPath.lastIndexOf('/'))
                             metadata = {
-                                path: path,
                                 uuid: file.upload.uuid,
                                 size: file.upload.total,
                                 chunked: file.upload.chunked
                             }
+                            let fullPath = file.fullPath
+                            if (fullPath) {
+                                // remove the filename from the path, as this is already transmitted separately
+                                metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/')) 
+                            }                            
                         })
                         if (chunk) {
                             metadata.dzuuid = chunk.file.upload.uuid
