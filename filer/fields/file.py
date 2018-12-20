@@ -7,6 +7,7 @@ import warnings
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
@@ -79,7 +80,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 obj = self.rel.to._default_manager.get(**{key: value})
             else:
                 obj = self.rel.model._default_manager.get(**{key: value})
-        except AttributeError:
+        except ObjectDoesNotExist:
             obj = None
         return obj
 
