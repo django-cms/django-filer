@@ -5,7 +5,8 @@ CHANGELOG
 ------------------
 
 * Fixed missing renderer argument for render method for AdminFolderWidget and
-  AdminFileWidget classes for Django 2.1 and up (#1120)
+  AdminFileWidget classes for Django 2.x (#1120)
+* Fixed getting an object in Django 2.x (#1118)
 
 
 1.4.1 (2018-12-06)
