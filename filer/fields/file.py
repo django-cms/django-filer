@@ -75,8 +75,11 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     def obj_for_value(self, value):
         try:
             key = self.rel.get_related_field().name
-            obj = self.rel.to._default_manager.get(**{key: value})
-        except:
+            if LTE_DJANGO_1_8:
+                obj = self.rel.to._default_manager.get(**{key: value})
+            else:
+                obj = self.rel.model._default_manager.get(**{key: value})
+        except AttributeError:
             obj = None
         return obj
 
