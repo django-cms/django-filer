@@ -4,7 +4,6 @@ CHANGELOG
 1.4.2 (unreleased)
 ------------------
 
-<<<<<<< HEAD
 * Fixed missing renderer argument for render method for AdminFolderWidget and
   AdminFileWidget classes for Django 2.x (#1120)
 * Fixed a problem in Django 2.x with getting None instead of
