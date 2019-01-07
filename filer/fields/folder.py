@@ -21,7 +21,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     input_type = 'hidden'
     is_hidden = False
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id

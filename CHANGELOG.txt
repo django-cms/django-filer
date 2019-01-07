@@ -1,12 +1,20 @@
 CHANGELOG
 =========
 
+1.4.2 (unreleased)
+------------------
+
+* Fixed missing renderer argument for render method for AdminFolderWidget and
+  AdminFileWidget classes for Django 2.1 and up (#1120)
+
+
 1.4.1 (2018-12-06)
 ------------------
 
 * Fixed widgets to work with Django 2.x (#1111)
 * Added admin site context to make_folder view (#1112)
 * Added never_cache decorator in server views. (#1100)
+
 
 1.4.0 (2018-11-15)
 ------------------
@@ -18,10 +26,12 @@ CHANGELOG
 * Fixed history link for folder and image object
 * Fixed rendering canonical URL in change form
 
+
 1.3.2 (2018-04-23)
 ------------------
 
 * Don't show set public / set private actions if permissions are disabled.
+
 
 1.3.1 (2018-04-15)
 ------------------
@@ -42,6 +52,7 @@ CHANGELOG
 * Cleaned up swapped models implementation
 * Allowed django-polymorphic>_2.0
 
+
 1.3.0 (2017-11-02)
 ------------------
 
@@ -50,6 +61,7 @@ CHANGELOG
 * Fixed missing html title when adding folders
 * Fixed a regression where third party app migrations would require the
   ``FILER_IMAGE_MODEL`` setting.
+
 
 1.2.7 (2017-03-02)
 ------------------
