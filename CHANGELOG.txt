@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.4.3 (2019-01-07)
+------------------
+
+* Fixed wrong argument for AdminFileWidget render method (#1120)
+
+
 1.4.2 (2019-01-07)
 ------------------
 
