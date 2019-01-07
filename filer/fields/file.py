@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, render=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         related_url = None
