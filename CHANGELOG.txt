@@ -7,7 +7,7 @@ CHANGELOG
 <<<<<<< HEAD
 * Fixed missing renderer argument for render method for AdminFolderWidget and
   AdminFileWidget classes for Django 2.x (#1120)
-* Fixed a problem in Django 2.0 and up with getting None instead of
+* Fixed a problem in Django 2.x with getting None instead of
   the object in AdminFileWidget and AdminFolderWidget (#1118)
 
 
