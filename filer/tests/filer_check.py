@@ -29,10 +29,10 @@ class FilerCheckTestCase(BaseServerBackendTestCase):
         with self.assertRaises(File.DoesNotExist):
             File.objects.get(id=file_pk)
 
-    def test_delete_orphanes(self):
+    def test_delete_orphans(self):
         out = StringIO()
         self.assertTrue(os.path.exists(self.filer_file.file.path))
-        call_command('filer_check', stdout=out, orphanes=True)
+        call_command('filer_check', stdout=out, orphans=True)
         self.assertEqual('', out.getvalue())
 
         # add an orphan file to our storage
