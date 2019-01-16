@@ -11,6 +11,7 @@ class Image(BaseImage):
     extra_description = models.TextField()
 
     class Meta(BaseImage.Meta):
+        swappable = 'FILER_IMAGE_MODEL'
         app_label = 'custom_image'
         if GTE_DJANGO_1_10:
             default_manager_name = 'objects'

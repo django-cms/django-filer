@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, unicode_literals
 
 import mptt
 from django.conf import settings
 from django.contrib.auth import models as auth_models
-from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -14,7 +12,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import mixins
 from .. import settings as filer_settings
-from ..utils.compatibility import python_2_unicode_compatible
+from ..utils.compatibility import (
+    is_authenticated,
+    python_2_unicode_compatible,
+    reverse,
+)
 
 
 class FolderManager(models.Manager):
@@ -99,13 +101,24 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
-    parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
-                               related_name='children')
+    parent = models.ForeignKey(
+        'self',
+        verbose_name=('parent'),
+        null=True,
+        blank=True,
+        related_name='children',
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(_('name'), max_length=255)
 
-    owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=_('owner'),
-                              related_name='filer_owned_folders', on_delete=models.SET_NULL,
-                              null=True, blank=True)
+    owner = models.ForeignKey(
+        getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+        verbose_name=_('owner'),
+        related_name='filer_owned_folders',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
 
@@ -169,7 +182,7 @@ class Folder(models.Model, mixins.IconsMixin):
         folder. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated():
+        if not is_authenticated(user):
             return False
         elif user.is_superuser:
             return True
@@ -198,12 +211,10 @@ class Folder(models.Model, mixins.IconsMixin):
             return self.permission_cache[permission_type]
 
     def get_admin_change_url(self):
-        return urlresolvers.reverse('admin:filer_folder_change',
-                                    args=(self.id,))
+        return reverse('admin:filer_folder_change', args=(self.id,))
 
     def get_admin_directory_listing_url_path(self):
-        return urlresolvers.reverse('admin:filer-directory_listing',
-                                    args=(self.id,))
+        return reverse('admin:filer-directory_listing', args=(self.id,))
 
     def get_admin_delete_url(self):
         try:
@@ -212,7 +223,7 @@ class Folder(models.Model, mixins.IconsMixin):
         except AttributeError:
             # Django >1.6
             model_name = self._meta.model_name
-        return urlresolvers.reverse(
+        return reverse(
             'admin:{0}_{1}_delete'.format(self._meta.app_label, model_name,),
             args=(self.pk,))
 
@@ -262,15 +273,26 @@ class FolderPermission(models.Model):
         (DENY, _('deny')),
     )
 
-    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
+    folder = models.ForeignKey(
+        Folder,
+        verbose_name=('folder'),
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
                              related_name="filer_folder_permissions", on_delete=models.SET_NULL,
                              verbose_name=_("user"), blank=True, null=True)
-    group = models.ForeignKey(auth_models.Group,
-                              related_name="filer_folder_permissions",
-                              verbose_name=_("group"), blank=True, null=True)
+    group = models.ForeignKey(
+        auth_models.Group,
+        related_name="filer_folder_permissions",
+        verbose_name=_("group"),
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
     everybody = models.BooleanField(_("everybody"), default=False)
 
     can_edit = models.SmallIntegerField(_("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)

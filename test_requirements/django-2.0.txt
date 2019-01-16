@@ -1,6 +1,6 @@
 -r base.txt
 
-django>=1.11,<2.0
-django-mptt>=0.9
+django>=2.0,<2.1
+django-mptt>0.9
 djangocms-helper==1.1.0
 django_polymorphic>=2.0,<2.1

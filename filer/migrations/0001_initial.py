@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import django.db.models.deletion
 import filer.fields.multistorage_file
 import filer.models.mixins
 from filer.settings import FILER_IMAGE_MODEL
@@ -32,7 +33,7 @@ class Migration(migrations.Migration):
             name='ClipboardItem',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard')),
+                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': 'clipboard item',
@@ -73,8 +74,8 @@ class Migration(migrations.Migration):
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('owner', models.ForeignKey(related_name='filer_owned_folders', verbose_name='owner', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
-                ('parent', models.ForeignKey(related_name='children', verbose_name='parent', blank=True, to='filer.Folder', null=True)),
+                ('owner', models.ForeignKey(related_name='filer_owned_folders', verbose_name='owner', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('parent', models.ForeignKey(related_name='children', verbose_name='parent', blank=True, to='filer.Folder', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'ordering': ('name',),
@@ -93,9 +94,9 @@ class Migration(migrations.Migration):
                 ('can_edit', models.SmallIntegerField(default=None, null=True, verbose_name='can edit', blank=True, choices=[(1, 'allow'), (0, 'deny')])),
                 ('can_read', models.SmallIntegerField(default=None, null=True, verbose_name='can read', blank=True, choices=[(1, 'allow'), (0, 'deny')])),
                 ('can_add_children', models.SmallIntegerField(default=None, null=True, verbose_name='can add children', blank=True, choices=[(1, 'allow'), (0, 'deny')])),
-                ('folder', models.ForeignKey(verbose_name='folder', blank=True, to='filer.Folder', null=True)),
-                ('group', models.ForeignKey(related_name='filer_folder_permissions', verbose_name='group', blank=True, to='auth.Group', null=True)),
-                ('user', models.ForeignKey(related_name='filer_folder_permissions', verbose_name='user', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('folder', models.ForeignKey(verbose_name='folder', blank=True, to='filer.Folder', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('group', models.ForeignKey(related_name='filer_folder_permissions', verbose_name='group', blank=True, to='auth.Group', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('user', models.ForeignKey(related_name='filer_folder_permissions', verbose_name='user', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': 'folder permission',
@@ -110,25 +111,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='folder',
-            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', null=True),
+            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', null=True, on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='file',
             name='owner',
-            field=models.ForeignKey(related_name='owned_files', verbose_name='owner', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(related_name='owned_files', verbose_name='owner', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='file',
             name='polymorphic_ctype',
-            field=models.ForeignKey(related_name='polymorphic_filer.file_set', editable=False, to='contenttypes.ContentType', null=True),
+            field=models.ForeignKey(related_name='polymorphic_filer.file_set', editable=False, to='contenttypes.ContentType', null=True, on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='clipboarditem',
             name='file',
-            field=models.ForeignKey(verbose_name='file', to='filer.File'),
+            field=models.ForeignKey(verbose_name='file', to='filer.File', on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -140,13 +141,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='clipboard',
             name='user',
-            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.CreateModel(
             name='Image',
             fields=[
-                ('file_ptr', models.OneToOneField(serialize=False, auto_created=True, to='filer.File', primary_key=True, parent_link=True)),
+                ('file_ptr', models.OneToOneField(serialize=False, auto_created=True, to='filer.File', primary_key=True, parent_link=True, on_delete=django.db.models.deletion.CASCADE)),
                 ('_height', models.IntegerField(null=True, blank=True)),
                 ('_width', models.IntegerField(null=True, blank=True)),
                 ('date_taken', models.DateTimeField(verbose_name='date taken', null=True, editable=False, blank=True)),

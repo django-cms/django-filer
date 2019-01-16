@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
 import os
@@ -9,7 +9,6 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from filer.test_utils.extended_app.models import ExtImage, Video
@@ -27,6 +26,7 @@ from ..tests.helpers import (
     create_superuser,
 )
 from ..thumbnail_processors import normalize_subject_location
+from ..utils.compatibility import reverse
 from ..utils.loader import load_model
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -72,7 +72,7 @@ class FilerFolderAdminUrlsTests(TestCase):
                                     })
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
-        #TODO: not sure why the status code is 200
+        # TODO: not sure why the status code is 200
         self.assertEqual(response.status_code, 200)
 
     def test_filer_remember_last_opened_directory(self):
@@ -920,9 +920,9 @@ class FolderListingTest(TestCase):
         self.assertEqual(len(folder_qs), 0)
 
     def test_search_special_characters(self):
-        """ 
+        """
         Regression test for https://github.com/divio/django-filer/pull/945.
-        Because of a wrong unquoting function being used, searches with 
+        Because of a wrong unquoting function being used, searches with
         some "_XX" sequences got unquoted as unicode characters.
         For example, "_ec" gets unquoted as u'ì'.
         """
@@ -1085,40 +1085,38 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         )
 
     def test_pick_mode_image_save(self):
-        if not FILER_IMAGE_MODEL:
-            image = self.create_image(folder=None)
-            base_url = image.get_admin_change_url()
-            pick_url = base_url + '?_pick=file&_popup=1'
+        image = self.create_image(folder=None)
+        base_url = image.get_admin_change_url()
+        pick_url = base_url + '?_pick=file&_popup=1'
 
-            response = self.client.get(pick_url)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, '<input type="hidden" name="_pick" value="file"')
-            self.assertContains(response, '<input type="hidden" name="_popup" value="1"')
-            data = {'_popup': '1'}
-            data.update(model_to_dict(image, all=True))
-            response = self.client.post(pick_url, data=data)
-            self.assertRedirects(
-                response=response,
-                expected_url=reverse(
-                    'admin:filer-directory_listing-unfiled_images'
-                ) + '?_pick=file&_popup=1'
-            )
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<input type="hidden" name="_pick" value="file"')
+        self.assertContains(response, '<input type="hidden" name="_popup" value="1"')
+        data = {'_popup': '1'}
+        data.update(model_to_dict(image, all=True))
+        response = self.client.post(pick_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-unfiled_images'
+            ) + '?_pick=file&_popup=1'
+        )
 
     def test_regular_mode_image_save(self):
-        if not FILER_IMAGE_MODEL:
-            image = self.create_image(folder=None)
-            base_url = image.get_admin_change_url()
+        image = self.create_image(folder=None)
+        base_url = image.get_admin_change_url()
 
-            response = self.client.get(base_url)
-            self.assertEqual(response.status_code, 200)
-            data = model_to_dict(image, all=True)
-            response = self.client.post(base_url, data=data)
-            self.assertRedirects(
-                response=response,
-                expected_url=reverse(
-                    'admin:filer-directory_listing-unfiled_images'
-                )
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
+        data = model_to_dict(image, all=True)
+        response = self.client.post(base_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing-unfiled_images'
             )
+        )
 
     def test_image_subject_location(self):
         def do_test_image_subject_location(subject_location=None,
@@ -1143,56 +1141,55 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 self.assertEqual(saved_image.subject_location,
                                  image.subject_location)
 
-        if not FILER_IMAGE_MODEL:
-            for subject_location in '', '10,10', '800,0', '0,600', '800,600':
-                do_test_image_subject_location(subject_location=subject_location)
+        for subject_location in '', '10,10', '800,0', '0,600', '800,600':
+            do_test_image_subject_location(subject_location=subject_location)
 
-            for subject_location in '-1,1', '801,0', '801,601':
-                do_test_image_subject_location(subject_location=subject_location,
-                                               should_succeed=False)
+        for subject_location in '-1,1', '801,0', '801,601':
+            do_test_image_subject_location(subject_location=subject_location,
+                                           should_succeed=False)
 
     def test_pick_mode_image_with_folder_save(self):
-        if not FILER_IMAGE_MODEL:
-            parent_folder = Folder.objects.create(name='parent')
-            image = self.create_image(folder=parent_folder)
-            base_url = image.get_admin_change_url()
-            pick_url = base_url + '?_pick=file&_popup=1'
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_change_url()
+        pick_url = base_url + '?_pick=file&_popup=1'
 
-            response = self.client.get(pick_url)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response,
-                                '<input type="hidden" name="_pick" value="file"')
-            self.assertContains(response,
-                                '<input type="hidden" name="_popup" value="1"')
-            data = {'_popup': '1'}
-            data.update(model_to_dict(image, all=True))
-            response = self.client.post(pick_url, data=data)
-            self.assertRedirects(
-                response=response,
-                expected_url=reverse(
-                    'admin:filer-directory_listing',
-                    args=[parent_folder.id]
-                ) + '?_pick=file&_popup=1'
-            )
+        response = self.client.get(pick_url)
+        self.assertEqual(response.status_code, 200)
+
+        response.render()
+        self.assertContains(response,
+                            '<input type="hidden" name="_pick" value="file"')
+        self.assertContains(response,
+                            '<input type="hidden" name="_popup" value="1"')
+        data = {'_popup': '1'}
+        data.update(model_to_dict(image, all=True))
+        response = self.client.post(pick_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
+            ) + '?_pick=file&_popup=1'
+        )
 
     def test_regular_mode_image_with_folder_save(self):
-        if not FILER_IMAGE_MODEL:
-            parent_folder = Folder.objects.create(name='parent')
-            image = self.create_image(folder=parent_folder)
-            base_url = image.get_admin_change_url()
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_change_url()
 
-            response = self.client.get(base_url)
-            self.assertEqual(response.status_code, 200)
+        response = self.client.get(base_url)
+        self.assertEqual(response.status_code, 200)
 
-            data = model_to_dict(image, all=True)
-            response = self.client.post(base_url, data=data)
-            self.assertRedirects(
-                response=response,
-                expected_url=reverse(
-                    'admin:filer-directory_listing',
-                    args=[parent_folder.id]
-                )
+        data = model_to_dict(image, all=True)
+        response = self.client.post(base_url, data=data)
+        self.assertRedirects(
+            response=response,
+            expected_url=reverse(
+                'admin:filer-directory_listing',
+                args=[parent_folder.id]
             )
+        )
 
     def test_pick_mode_folder_save(self):
         folder = Folder.objects.create(name='foo')
