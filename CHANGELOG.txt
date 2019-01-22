@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.4.5 (unreleased)
+------------------
+
+* Fixed missing validation message for folder plugin when folder field are empty (#1129)
+
+
 1.4.4 (2019-01-22)
 ------------------
 
