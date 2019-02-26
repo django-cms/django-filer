@@ -161,3 +161,16 @@ Number of simultaneous AJAX uploads. Defaults to 3.
 If your database backend is SQLite it would be set to 1 by default. This allows
 to avoid ``database is locked`` errors on SQLite during multiple simultaneous
 file uploads.
+
+
+``FILER_FILE_CONSTRAINTS``
+--------------------------
+
+Defines the path for callable method.
+
+If you would like to introduce new constraint to filer, you can use this setting and pass string as method path. Actual constraint
+method should raise validation error for case which is not valid.
+
+e.g::
+
+    FILER_FILE_CONSTRAINTS = ['PATH_TO_METHOD_NAME']
