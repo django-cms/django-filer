@@ -166,11 +166,11 @@ file uploads.
 ``FILER_FILE_CONSTRAINTS``
 --------------------------
 
-Defines the path for callable method.
+Defines the full path of the method. Default is None
 
-If you would like to introduce new constraint to filer, you can use this setting and pass string as method path. Actual constraint
-method should raise validation error for case which is not valid.
+If you would like to introduce new constraint to filer, you can use this setting and pass full path of method as string. The
+method should raise validation error for the case which is not valid.
 
 e.g::
 
-    FILER_FILE_CONSTRAINTS = ['PATH_TO_METHOD_NAME']
+    FILER_FILE_CONSTRAINTS = ['myapp.helper.file_check_method_name']

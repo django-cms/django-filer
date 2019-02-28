@@ -313,9 +313,17 @@ Set ``FILER_IMAGE_MODEL`` to the path of your custom model:
 Adding custom file upload constraints
 .....................................
 
-Set ``FILER_FILE_CONSTRAINTS`` to project setting file with path custom method which does the validation.
+Overview
+````````
+Filer provide functionality to upload various files to CMS. Using custom file upload constraints functionality, it
+allows to add a check before it get uploaded.
 
-For example, Let's say project has myapp package under helper.py file we have constraint method
+Setting
+~~~~~~~
+
+Set ``FILER_FILE_CONSTRAINTS`` to project ``setting.py`` file with full path of custom method which does the validation.
+
+For example, Let's say project has ``myapp`` package which has ``helper.py`` file where we define constraint method as below
 
 .. code-block:: python
 
@@ -329,7 +337,7 @@ For example, Let's say project has myapp package under helper.py file we have co
             raise ValidationError(VALIDATION_MESSAGE)
         return
 
-Then, `FILER_FILE_CONSTRAINTS` attribute can be added to project setting file like below.
+Then, `FILER_FILE_CONSTRAINTS` attribute can be added to project ``setting.py`` file as below.
 
 .. code-block:: python
 
