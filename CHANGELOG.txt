@@ -1,11 +1,17 @@
 CHANGELOG
 =========
 
-
 Next release
 ------------
+
 * Added management command ``filer_check`` to check the integrity of the
   database against the file system, and vice versa.
+
+
+1.4.4 (2019-01-22)
+------------------
+
+* Fixed missing validation message for empty file field in file and image widget (#1125)
 
 
 1.4.3 (2019-01-07)
