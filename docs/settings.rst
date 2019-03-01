@@ -166,9 +166,9 @@ file uploads.
 ``FILER_FILE_CONSTRAINTS``
 --------------------------
 
-Defines the full path of the method. Default is None
+Defines dotted path to function. Default is None
 
-If you would like to introduce new constraint to filer, you can use this setting and pass full path of method as string. The
+If you would like to introduce new constraint to filer, you can use this setting and pass a list of dotted paths to functions. The
 method should raise validation error for the case which is not valid.
 
 e.g::

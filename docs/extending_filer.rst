@@ -315,13 +315,12 @@ Adding custom file upload constraints
 
 Overview
 ````````
-Filer provide functionality to upload various files to CMS. Using custom file upload constraints functionality, it
-allows to add a check before it get uploaded.
+Using custom file upload constraints functionality, it allows to add a check before it get uploaded.
 
 Setting
 ~~~~~~~
 
-Set ``FILER_FILE_CONSTRAINTS`` to project ``setting.py`` file with full path of custom method which does the validation.
+Set ``FILER_FILE_CONSTRAINTS`` to project ``settings.py`` file with a list of dotted paths to functions which does the validation.
 
 For example, Let's say project has ``myapp`` package which has ``helper.py`` file where we define constraint method as below
 
