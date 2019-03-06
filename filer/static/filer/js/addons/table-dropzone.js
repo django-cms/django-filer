@@ -98,7 +98,7 @@ if (django.jQuery) {
                                 uuid: file.upload.uuid,
                                 size: file.upload.total,
                                 chunked: file.upload.chunked
-                            }
+                            };
                             let fullPath = file.fullPath;
                             if (fullPath) {
                                 // remove the filename from the path, as this is already transmitted separately
