@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 // #DROPZONE#
 // This script implements the dropzone settings
 'use strict';
