@@ -92,28 +92,28 @@ if (django.jQuery) {
                     // ensure that the path informatio is sent as part of the request, 
                     // without this the path is stripped out automatically by Djano.
                     params(files, xhr, chunk) {
-                        var metadata = {}
-                        files.forEach(function(file, index) {
+                        var metadata = {};
+                        files.forEach(function(file) {
                             metadata = {
                                 uuid: file.upload.uuid,
                                 size: file.upload.total,
                                 chunked: file.upload.chunked
                             }
-                            let fullPath = file.fullPath
+                            let fullPath = file.fullPath;
                             if (fullPath) {
                                 // remove the filename from the path, as this is already transmitted separately
-                                metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/')) 
+                                metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/'));
                             }                            
-                        })
+                        });
                         if (chunk) {
-                            metadata.dzuuid = chunk.file.upload.uuid
-                            metadata.dzchunkindex = chunk.index
-                            metadata.dztotalfilesize = chunk.file.size
-                            metadata.dzchunksize = this.options.chunkSize
-                            metadata.dztotalchunkcount = chunk.file.upload.totalChunkCount
-                            metadata.dzchunkbyteoffset = chunk.index * this.options.chunkSize
+                            metadata.dzuuid = chunk.file.upload.uuid;
+                            metadata.dzchunkindex = chunk.index;
+                            metadata.dztotalfilesize = chunk.file.size;
+                            metadata.dzchunksize = this.options.chunkSize;
+                            metadata.dztotalchunkcount = chunk.file.upload.totalChunkCount;
+                            metadata.dzchunkbyteoffset = chunk.index * this.options.chunkSize;
                         }
-                        return metadata
+                        return metadata;
                     },
                     accept: function (file, done) {
                         var uploadInfoClone;
