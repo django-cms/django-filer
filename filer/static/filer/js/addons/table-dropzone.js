@@ -89,11 +89,11 @@ if (django.jQuery) {
                     clickable: false,
                     addRemoveLinks: false,
                     parallelUploads: dropzone.data(dataUploaderConnections) || 1,
-                    // ensure that the path informatio is sent as part of the request, 
+                    // ensure that the path informatio is sent as part of the request,
                     // without this the path is stripped out automatically by Djano.
-                    params(files, xhr, chunk) {
+                    params (files, xhr, chunk) {
                         var metadata = {};
-                        files.forEach(function(file) {
+                        files.forEach(function (file) {
                             metadata = {
                                 uuid: file.upload.uuid,
                                 size: file.upload.total,
@@ -103,7 +103,7 @@ if (django.jQuery) {
                             if (fullPath) {
                                 // remove the filename from the path, as this is already transmitted separately
                                 metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/'));
-                            }                            
+                            }
                         });
                         if (chunk) {
                             metadata.dzuuid = chunk.file.upload.uuid;
