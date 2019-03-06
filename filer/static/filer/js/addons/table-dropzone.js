@@ -89,8 +89,8 @@ if (django.jQuery) {
                     clickable: false,
                     addRemoveLinks: false,
                     parallelUploads: dropzone.data(dataUploaderConnections) || 1,
-                    // ensure that the path informatio is sent as part of the request,
-                    // without this the path is stripped out automatically by Djano.
+                    // ensure that the path information is sent as part of the request,
+                    // without this the path is stripped out automatically by Django.
                     params (files, xhr, chunk) {
                         var metadata = {};
                         files.forEach(function (file) {
