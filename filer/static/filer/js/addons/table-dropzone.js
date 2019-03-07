@@ -1,10 +1,9 @@
-/*jshint esversion: 6 */
-
 // #DROPZONE#
 // This script implements the dropzone settings
 'use strict';
 
 // as of Django 2.x we need to check where jQuery is
+
 var djQuery = window.$;
 
 if (django.jQuery) {
@@ -43,24 +42,18 @@ if (django.jQuery) {
         var hasErrors = false;
         var baseUrl;
         var baseFolderTitle;
-        var updateUploadNumber = function () {
+        var updateUploadNumber = function updateUploadNumber() {
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
             uploadText.removeClass('hidden');
             uploadCount.removeClass('hidden');
         };
-        var destroyDropzones = function () {
+        var destroyDropzones = function destroyDropzones() {
             $.each(dropzoneInstances, function (index) {
                 dropzoneInstances[index].destroy();
             });
         };
-        var getElementByFile = function (file, url) {
-            return $(document.getElementById(
-                'file-' +
-                encodeURIComponent(file.name) +
-                file.size +
-                file.lastModified +
-                url
-            ));
+        var getElementByFile = function getElementByFile(file, url) {
+            return $(document.getElementById('file-' + encodeURIComponent(file.name) + file.size + file.lastModified + url));
         };
 
         if (dropzoneBase && dropzoneBase.length) {
@@ -91,7 +84,7 @@ if (django.jQuery) {
                     parallelUploads: dropzone.data(dataUploaderConnections) || 1,
                     // ensure that the path information is sent as part of the request,
                     // without this the path is stripped out automatically by Django.
-                    params (files, xhr, chunk) {
+                    params: function params(files, xhr, chunk) {
                         var metadata = {};
                         files.forEach(function (file) {
                             metadata = {
@@ -99,7 +92,7 @@ if (django.jQuery) {
                                 size: file.upload.total,
                                 chunked: file.upload.chunked
                             };
-                            let fullPath = file.fullPath;
+                            var fullPath = file.fullPath;
                             if (fullPath) {
                                 // remove the filename from the path, as this is already transmitted separately
                                 metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/'));
@@ -115,7 +108,8 @@ if (django.jQuery) {
                         }
                         return metadata;
                     },
-                    accept: function (file, done) {
+
+                    accept: function accept(file, done) {
                         var uploadInfoClone;
 
                         Cl.mediator.remove('filer-upload-in-progress', destroyDropzones);
@@ -132,16 +126,7 @@ if (django.jQuery) {
 
                             uploadInfoClone.find(uploadFileNameSelector).text(file.name);
                             uploadInfoClone.find(uploadProgressSelector).width(0);
-                            uploadInfoClone
-                                .attr(
-                                    'id',
-                                    'file-' +
-                                        encodeURIComponent(file.name) +
-                                        file.size +
-                                        file.lastModified +
-                                        dropzoneUrl
-                                )
-                                .appendTo(uploadInfoContainer);
+                            uploadInfoClone.attr('id', 'file-' + encodeURIComponent(file.name) + file.size + file.lastModified + dropzoneUrl).appendTo(uploadInfoContainer);
 
                             submitNum++;
                             maxSubmitNum++;
@@ -153,7 +138,7 @@ if (django.jQuery) {
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                     },
-                    dragover: function (dragEvent) {
+                    dragover: function dragover(dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
                         var dropzoneFolder = dropzone.hasClass('js-filer-dropzone-folder');
                         var dropzoneBoundingRect = dropzone[0].getBoundingClientRect();
@@ -162,7 +147,7 @@ if (django.jQuery) {
                             top: dropzoneBoundingRect.top,
                             bottom: dropzoneBoundingRect.bottom,
                             width: dropzoneBoundingRect.width,
-                            height: dropzoneBoundingRect.height - (parseInt(borderSize, 10) * 2)
+                            height: dropzoneBoundingRect.height - parseInt(borderSize, 10) * 2
                         };
                         if (dropzoneFolder) {
                             dragHoverBorder.css(dropzonePosition);
@@ -175,7 +160,7 @@ if (django.jQuery) {
 
                         folderName.text(folderTitle);
                     },
-                    dragend: function () {
+                    dragend: function dragend() {
                         clearTimeout(hideMessageTimeout);
                         hideMessageTimeout = setTimeout(function () {
                             infoMessage.addClass(hiddenClass);
@@ -185,7 +170,7 @@ if (django.jQuery) {
                         dropzones.removeClass(dragHoverClass);
                         dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
                     },
-                    dragleave: function () {
+                    dragleave: function dragleave() {
                         clearTimeout(hideMessageTimeout);
                         hideMessageTimeout = setTimeout(function () {
                             infoMessage.addClass(hiddenClass);
@@ -194,20 +179,19 @@ if (django.jQuery) {
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                         dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
-
                     },
-                    sending: function (file) {
+                    sending: function sending(file) {
                         getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);
                     },
-                    uploadprogress: function (file, progress) {
+                    uploadprogress: function uploadprogress(file, progress) {
                         getElementByFile(file, dropzoneUrl).find(uploadProgressSelector).width(progress + '%');
                     },
-                    success: function (file) {
+                    success: function success(file) {
                         submitNum--;
                         updateUploadNumber();
                         getElementByFile(file, dropzoneUrl).remove();
                     },
-                    queuecomplete: function () {
+                    queuecomplete: function queuecomplete() {
                         if (submitNum !== 0) {
                             return;
                         }
@@ -227,7 +211,7 @@ if (django.jQuery) {
                             window.location.reload();
                         }
                     },
-                    error: function (file, errorText) {
+                    error: function error(file, errorText) {
                         updateUploadNumber();
                         if (errorText === 'duplicate') {
                             return;
