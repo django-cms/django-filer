@@ -52,11 +52,11 @@ if (django.jQuery) {
             });
         };
         var getElementByFile = function getElementByFile(file, url) {
-            return $(document.getElementById('file-' 
-                + encodeURIComponent(file.name) 
-                + file.size 
-                + file.lastModified 
-                + url
+            return $(document.getElementById('file-' +
+                encodeURIComponent(file.name) +
+                file.size +
+                file.lastModified + 
+                url
             ));
         };
 
@@ -131,10 +131,10 @@ if (django.jQuery) {
 
                             uploadInfoClone.find(uploadFileNameSelector).text(file.name);
                             uploadInfoClone.find(uploadProgressSelector).width(0);
-                            uploadInfoClone.attr('id', 'file-' 
-                                + encodeURIComponent(file.name) 
-                                + file.size + file.lastModified 
-                                + dropzoneUrl
+                            uploadInfoClone.attr('id', 'file-' +
+                                encodeURIComponent(file.name) +
+                                file.size + file.lastModified +
+                                dropzoneUrl
                             ).appendTo(uploadInfoContainer);
 
                             submitNum++;
