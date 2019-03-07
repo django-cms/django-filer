@@ -52,7 +52,12 @@ if (django.jQuery) {
             });
         };
         var getElementByFile = function getElementByFile(file, url) {
-            return $(document.getElementById('file-' + encodeURIComponent(file.name) + file.size + file.lastModified + url));
+            return $(document.getElementById('file-' 
+                + encodeURIComponent(file.name) 
+                + file.size 
+                + file.lastModified 
+                + url
+            ));
         };
 
         if (dropzoneBase && dropzoneBase.length) {
@@ -85,13 +90,14 @@ if (django.jQuery) {
                     // without this the path is stripped out automatically by Django.
                     params: function params(files, xhr, chunk) {
                         var metadata = {};
+                        var fullPath;
                         files.forEach(function (file) {
                             metadata = {
                                 uuid: file.upload.uuid,
                                 size: file.upload.total,
                                 chunked: file.upload.chunked
                             };
-                            var fullPath = file.fullPath;
+                            fullPath = file.fullPath;
                             if (fullPath) {
                                 // remove the filename from the path, as this is already transmitted separately
                                 metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/'));
@@ -125,7 +131,11 @@ if (django.jQuery) {
 
                             uploadInfoClone.find(uploadFileNameSelector).text(file.name);
                             uploadInfoClone.find(uploadProgressSelector).width(0);
-                            uploadInfoClone.attr('id', 'file-' + encodeURIComponent(file.name) + file.size + file.lastModified + dropzoneUrl).appendTo(uploadInfoContainer);
+                            uploadInfoClone.attr('id', 'file-' 
+                                + encodeURIComponent(file.name) 
+                                + file.size + file.lastModified 
+                                + dropzoneUrl
+                            ).appendTo(uploadInfoContainer);
 
                             submitNum++;
                             maxSubmitNum++;
