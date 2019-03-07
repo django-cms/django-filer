@@ -3,7 +3,6 @@
 'use strict';
 
 // as of Django 2.x we need to check where jQuery is
-
 var djQuery = window.$;
 
 if (django.jQuery) {

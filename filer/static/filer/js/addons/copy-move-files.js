@@ -6,7 +6,14 @@
     to disable submit if there is only one folder to copy
 */
 
-django.jQuery(function ($) {
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
+djQuery(function ($) {
     var destinationOptions = $('#destination').find('option');
     var destinationOptionLength = destinationOptions.length;
     var submit = $('.js-submit-copy-move');

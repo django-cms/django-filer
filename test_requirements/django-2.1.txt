@@ -1,6 +1,6 @@
 -r base.txt
 
-git+git://github.com/django/django.git@master#egg=Django
+django>=2.1,<2.2
 django-mptt>=0.9.1
 djangocms-helper==1.1.0
 django_polymorphic>=2.0,<2.1
