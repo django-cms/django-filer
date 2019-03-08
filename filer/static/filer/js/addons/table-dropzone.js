@@ -55,7 +55,7 @@ if (django.jQuery) {
             return $(document.getElementById('file-' +
                 encodeURIComponent(file.name) +
                 file.size +
-                file.lastModified + 
+                file.lastModified +
                 url
             ));
         };
