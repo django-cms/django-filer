@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from . import Clipboard
 from ..utils.compatibility import is_authenticated
+from . import Clipboard
 
 
 def discard_clipboard(clipboard):

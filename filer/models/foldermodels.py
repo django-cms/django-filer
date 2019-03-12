@@ -10,13 +10,13 @@ from django.db.models import Q
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
-from . import mixins
 from .. import settings as filer_settings
 from ..utils.compatibility import (
     is_authenticated,
     python_2_unicode_compatible,
     reverse,
 )
+from . import mixins
 
 
 class FolderManager(models.Manager):
