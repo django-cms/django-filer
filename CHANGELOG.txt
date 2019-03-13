@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.4.5 (unreleased)
+------------------
+
+* Added the ability to upload a folder of assets (via drag and drop) and retain the inner folder structure .
+
+
 1.4.4 (2019-01-22)
 ------------------
 

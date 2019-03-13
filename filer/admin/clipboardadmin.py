@@ -7,7 +7,6 @@ from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from . import views
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import (
@@ -16,6 +15,7 @@ from ..utils.files import (
     handle_upload,
 )
 from ..utils.loader import load_model
+from . import views
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (

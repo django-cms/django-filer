@@ -41,19 +41,18 @@ if (django.jQuery) {
         var hasErrors = false;
         var baseUrl;
         var baseFolderTitle;
-        var updateUploadNumber = function () {
+        var updateUploadNumber = function updateUploadNumber() {
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
             uploadText.removeClass('hidden');
             uploadCount.removeClass('hidden');
         };
-        var destroyDropzones = function () {
+        var destroyDropzones = function destroyDropzones() {
             $.each(dropzoneInstances, function (index) {
                 dropzoneInstances[index].destroy();
             });
         };
-        var getElementByFile = function (file, url) {
-            return $(document.getElementById(
-                'file-' +
+        var getElementByFile = function getElementByFile(file, url) {
+            return $(document.getElementById('file-' +
                 encodeURIComponent(file.name) +
                 file.size +
                 file.lastModified +
@@ -86,8 +85,36 @@ if (django.jQuery) {
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
-                    parallelUploads: dropzone.data(dataUploaderConnections) || 3,
-                    accept: function (file, done) {
+                    parallelUploads: dropzone.data(dataUploaderConnections) || 1,
+                    // ensure that the path information is sent as part of the request,
+                    // without this the path is stripped out automatically by Django.
+                    params: function params(files, xhr, chunk) {
+                        var metadata = {};
+                        var fullPath;
+                        files.forEach(function (file) {
+                            metadata = {
+                                uuid: file.upload.uuid,
+                                size: file.upload.total,
+                                chunked: file.upload.chunked
+                            };
+                            fullPath = file.fullPath;
+                            if (fullPath) {
+                                // remove the filename from the path, as this is already transmitted separately
+                                metadata.path = fullPath.substr(0, fullPath.lastIndexOf('/'));
+                            }
+                        });
+                        if (chunk) {
+                            metadata.dzuuid = chunk.file.upload.uuid;
+                            metadata.dzchunkindex = chunk.index;
+                            metadata.dztotalfilesize = chunk.file.size;
+                            metadata.dzchunksize = this.options.chunkSize;
+                            metadata.dztotalchunkcount = chunk.file.upload.totalChunkCount;
+                            metadata.dzchunkbyteoffset = chunk.index * this.options.chunkSize;
+                        }
+                        return metadata;
+                    },
+
+                    accept: function accept(file, done) {
                         var uploadInfoClone;
 
                         Cl.mediator.remove('filer-upload-in-progress', destroyDropzones);
@@ -104,16 +131,11 @@ if (django.jQuery) {
 
                             uploadInfoClone.find(uploadFileNameSelector).text(file.name);
                             uploadInfoClone.find(uploadProgressSelector).width(0);
-                            uploadInfoClone
-                                .attr(
-                                    'id',
-                                    'file-' +
-                                        encodeURIComponent(file.name) +
-                                        file.size +
-                                        file.lastModified +
-                                        dropzoneUrl
-                                )
-                                .appendTo(uploadInfoContainer);
+                            uploadInfoClone.attr('id', 'file-' +
+                                encodeURIComponent(file.name) +
+                                file.size + file.lastModified +
+                                dropzoneUrl
+                            ).appendTo(uploadInfoContainer);
 
                             submitNum++;
                             maxSubmitNum++;
@@ -125,7 +147,7 @@ if (django.jQuery) {
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                     },
-                    dragover: function (dragEvent) {
+                    dragover: function dragover(dragEvent) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
                         var dropzoneFolder = dropzone.hasClass('js-filer-dropzone-folder');
                         var dropzoneBoundingRect = dropzone[0].getBoundingClientRect();
@@ -134,7 +156,7 @@ if (django.jQuery) {
                             top: dropzoneBoundingRect.top,
                             bottom: dropzoneBoundingRect.bottom,
                             width: dropzoneBoundingRect.width,
-                            height: dropzoneBoundingRect.height - (parseInt(borderSize, 10) * 2)
+                            height: dropzoneBoundingRect.height - parseInt(borderSize, 10) * 2
                         };
                         if (dropzoneFolder) {
                             dragHoverBorder.css(dropzonePosition);
@@ -147,7 +169,7 @@ if (django.jQuery) {
 
                         folderName.text(folderTitle);
                     },
-                    dragend: function () {
+                    dragend: function dragend() {
                         clearTimeout(hideMessageTimeout);
                         hideMessageTimeout = setTimeout(function () {
                             infoMessage.addClass(hiddenClass);
@@ -157,7 +179,7 @@ if (django.jQuery) {
                         dropzones.removeClass(dragHoverClass);
                         dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
                     },
-                    dragleave: function () {
+                    dragleave: function dragleave() {
                         clearTimeout(hideMessageTimeout);
                         hideMessageTimeout = setTimeout(function () {
                             infoMessage.addClass(hiddenClass);
@@ -166,20 +188,19 @@ if (django.jQuery) {
                         infoMessage.removeClass(hiddenClass);
                         dropzones.removeClass(dragHoverClass);
                         dragHoverBorder.css({ top: 0, bottom: 0, width: 0, height: 0 });
-
                     },
-                    sending: function (file) {
+                    sending: function sending(file) {
                         getElementByFile(file, dropzoneUrl).removeClass(hiddenClass);
                     },
-                    uploadprogress: function (file, progress) {
+                    uploadprogress: function uploadprogress(file, progress) {
                         getElementByFile(file, dropzoneUrl).find(uploadProgressSelector).width(progress + '%');
                     },
-                    success: function (file) {
+                    success: function success(file) {
                         submitNum--;
                         updateUploadNumber();
                         getElementByFile(file, dropzoneUrl).remove();
                     },
-                    queuecomplete: function () {
+                    queuecomplete: function queuecomplete() {
                         if (submitNum !== 0) {
                             return;
                         }
@@ -199,7 +220,7 @@ if (django.jQuery) {
                             window.location.reload();
                         }
                     },
-                    error: function (file, errorText) {
+                    error: function error(file, errorText) {
                         updateUploadNumber();
                         if (errorText === 'duplicate') {
                             return;
