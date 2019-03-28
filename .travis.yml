@@ -43,6 +43,8 @@ env:
   - DJANGO="2.0" SWAP="yes"
   - DJANGO="2.1" SWAP="no"
   - DJANGO="2.1" SWAP="yes"
+  - DJANGO="2.2" SWAP="no"
+  - DJANGO="2.2" SWAP="yes"
 
 matrix:
   include:
@@ -127,6 +129,19 @@ matrix:
 
     - os: linux
       python: "3.4"
+      env: DJANGO="2.2" SWAP="no"
+    - os: linux
+      python: "3.5"
+      env: DJANGO="2.2" SWAP="no"
+    - os: linux
+      python: "3.6"
+      env: DJANGO="2.2" SWAP="no"
+    - os: linux
+      python: "3.7"
+      env: DJANGO="2.2" SWAP="no"
+
+    - os: linux
+      python: "3.4"
       env: DJANGO="master" SWAP="no"
     - os: linux
       python: "3.5"
@@ -134,6 +149,11 @@ matrix:
     - os: linux
       python: "3.6"
       env: DJANGO="master" SWAP="no"
+    - os: linux
+      python: "3.7"
+      env: DJANGO="master" SWAP="no"
+      dist: xenial
+      sudo: true
 
   allow_failures:
     - os: linux
