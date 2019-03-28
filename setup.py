@@ -26,7 +26,7 @@ setup(
     author_email='stefan@foulis.ch',
     packages=find_packages(),
     install_requires=(
-        'Django>=1.8,<2.2',
+        'Django>=1.8,<3.0',
         'easy-thumbnails>=2,<3.0',
         'django-mptt>=0.6,<1.0',  # the exact version depends on Django
         'django_polymorphic>=0.7,<2.1',
@@ -50,9 +50,11 @@ setup(
         'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
         'Framework :: Django :: 2.1',
+        'Framework :: Django :: 2.2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
