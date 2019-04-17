@@ -2,8 +2,7 @@ include AUTHORS
 include LICENSE
 include LICENSES
 include README.rst
-include HISTORY
 recursive-include filer/templates *
 recursive-include filer/static *
 recursive-include filer/locale *
-recursive-exclude .*
+recursive-exclude * *.py[co]
