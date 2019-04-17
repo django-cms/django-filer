@@ -2,11 +2,8 @@
 from __future__ import absolute_import
 
 import os
+
 from tempfile import mkdtemp
-
-
-def gettext(s):
-    return s
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,35 +12,35 @@ HELPER_SETTINGS = {
     'NOSE_ARGS': [
         '-s',
     ],
-    'ROOT_URLCONF': 'filer.test_utils.urls',
+    'ROOT_URLCONF': 'tests.utils.urls',
     'INSTALLED_APPS': [
         'easy_thumbnails',
         'mptt',
         'filer',
-        'filer.test_utils.test_app',
-        'filer.test_utils.extended_app',
+        'tests.utils.test_app',
+        'tests.utils.extended_app',
     ],
     'LANGUAGE_CODE': 'en',
     'LANGUAGES': (
-        ('en', gettext('English')),
-        ('fr_FR', gettext('French')),
-        ('it', gettext('Italiano')),
+        ('en', 'English'),
+        ('fr_FR', 'French'),
+        ('it', 'Italiano'),
     ),
     'CMS_LANGUAGES': {
         1: [
             {
                 'code': 'en',
-                'name': gettext('English'),
+                'name': 'English',
                 'public': True,
             },
             {
                 'code': 'it',
-                'name': gettext('Italiano'),
+                'name': 'Italiano',
                 'public': True,
             },
             {
                 'code': 'fr_FR',
-                'name': gettext('French'),
+                'name': 'French',
                 'public': True,
             },
         ],
@@ -58,12 +55,12 @@ HELPER_SETTINGS = {
         'easy_thumbnails.processors.filters',
     ),
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
-    'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'test_utils', 'templates'),),
+    'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
 }
 if os.environ.get('CUSTOM_IMAGE', False):
     HELPER_SETTINGS['FILER_IMAGE_MODEL'] = os.environ.get('CUSTOM_IMAGE')
-    HELPER_SETTINGS['INSTALLED_APPS'].append('filer.test_utils.custom_image')
+    HELPER_SETTINGS['INSTALLED_APPS'].append('tests.utils.custom_image')
 
 
 def run():
@@ -71,5 +68,5 @@ def run():
     runner.run('filer')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()

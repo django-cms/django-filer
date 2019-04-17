@@ -3,9 +3,9 @@ from __future__ import absolute_import
 
 from django.db import models
 
-from ...fields.file import FilerFileField
-from ...fields.folder import FilerFolderField
-from ...fields.image import FilerImageField
+from filer.fields.file import FilerFileField
+from filer.fields.folder import FilerFolderField
+from filer.fields.image import FilerImageField
 
 
 class MyModel(models.Model):

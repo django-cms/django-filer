@@ -14,7 +14,7 @@ from ..models.filemodels import File
 from ..models.foldermodels import Folder
 from ..models.mixins import IconsMixin
 from ..settings import FILER_IMAGE_MODEL
-from ..test_utils import ET_2
+from tests.utils import ET_2
 from ..utils.loader import load_model
 from .helpers import (
     create_clipboard_item,
