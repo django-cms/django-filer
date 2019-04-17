@@ -31,12 +31,6 @@ after_success:
   - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
 
 env:
-  - DJANGO="1.8" SWAP="no"
-  - DJANGO="1.8" SWAP="yes"
-  - DJANGO="1.9" SWAP="no"
-  - DJANGO="1.9" SWAP="yes"
-  - DJANGO="1.10" SWAP="no"
-  - DJANGO="1.10" SWAP="yes"
   - DJANGO="1.11" SWAP="no"
   - DJANGO="1.11" SWAP="yes"
   - DJANGO="2.0" SWAP="no"
@@ -58,38 +52,7 @@ matrix:
     - os: osx
       language: generic
       python: "2.7"
-      env: DJANGO="1.8" SWAP="no"
-      osx_image: xcode7.3
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.9" SWAP="no"
-      osx_image: xcode7.3
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.10" SWAP="no"
-      osx_image: xcode7.3
-    - os: osx
-      language: generic
-      python: "2.7"
       env: DJANGO="1.11" SWAP="no"
-      osx_image: xcode7.3
-
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.8" SWAP="yes"
-      osx_image: xcode7.3
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.9" SWAP="yes"
-      osx_image: xcode7.3
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.10" SWAP="yes"
       osx_image: xcode7.3
     - os: osx
       language: generic
