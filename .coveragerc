@@ -4,8 +4,7 @@ branch = True
 omit =
     filer/south_migrations/*
     filer/migrations/*
-    filer/tests/*
-    filer/test_utils/*
+    tests/*
 
 [report]
 exclude_lines =

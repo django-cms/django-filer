@@ -8,9 +8,10 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
-from ..utils.loader import load_object as load
-from ..utils.zip import unzip
-from .helpers import create_image
+from filer.utils.loader import load_object
+from filer.utils.zip import unzip
+
+from tests.helpers import create_image
 
 
 #===============================================================================
@@ -31,17 +32,17 @@ class ClassLoaderTestCase(TestCase):
     ''' Tests filer.utils.loader.load() '''
 
     def test_loader_loads_strings_properly(self):
-        target = 'filer.tests.utils.TestTargetClass'
-        result = load(target, None) # Should return an instance
-        self.assertEqual(result.__class__, TestTargetClass)
+        target = 'tests.test_utils.TestTargetClass'
+        result = load_object(target) # Should return an instance
+        self.assertEqual(result, TestTargetClass)
 
     def test_loader_loads_class(self):
-        result = load(TestTargetClass(), TestTargetSuperClass)
+        result = load_object(TestTargetClass())
         self.assertEqual(result.__class__, TestTargetClass)
 
     def test_loader_loads_subclass(self):
-        result = load(TestTargetClass, TestTargetSuperClass)
-        self.assertEqual(result.__class__, TestTargetClass)
+        result = load_object(TestTargetClass)
+        self.assertEqual(result, TestTargetClass)
 
 
 #===============================================================================

@@ -8,15 +8,16 @@ from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
 
-from .. import settings as filer_settings
-from ..models.clipboardmodels import Clipboard
-from ..models.filemodels import File
-from ..models.foldermodels import Folder
-from ..models.mixins import IconsMixin
-from ..settings import FILER_IMAGE_MODEL
+from filer import settings as filer_settings
+from filer.models.clipboardmodels import Clipboard
+from filer.models.filemodels import File
+from filer.models.foldermodels import Folder
+from filer.models.mixins import IconsMixin
+from filer.settings import FILER_IMAGE_MODEL
 from tests.utils import ET_2
-from ..utils.loader import load_model
-from .helpers import (
+from filer.utils.loader import load_model
+
+from tests.helpers import (
     create_clipboard_item,
     create_folder_structure,
     create_image,

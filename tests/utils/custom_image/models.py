@@ -3,8 +3,8 @@ from __future__ import absolute_import
 
 from django.db import models
 
-from ...models.abstract import BaseImage
-from ...utils.compatibility import GTE_DJANGO_1_10
+from filer.models.abstract import BaseImage
+from filer.utils.compatibility import GTE_DJANGO_1_10
 
 
 class Image(BaseImage):

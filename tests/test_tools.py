@@ -7,12 +7,12 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
-from ..models import tools
-from ..models.clipboardmodels import Clipboard
-from ..models.foldermodels import Folder
-from ..settings import FILER_IMAGE_MODEL
-from ..utils.loader import load_model
-from .helpers import create_image, create_superuser
+from filer.models import tools
+from filer.models.clipboardmodels import Clipboard
+from filer.models.foldermodels import Folder
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
+from tests.helpers import create_image, create_superuser
 
 Image = load_model(FILER_IMAGE_MODEL)
 

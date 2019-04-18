@@ -9,13 +9,16 @@ from django.http import Http404, HttpResponseNotModified
 from django.test import TestCase
 from django.utils.http import http_date
 
-from .. import settings as filer_settings
-from ..models import File
-from ..server.backends.default import DefaultServer
-from ..server.backends.nginx import NginxXAccelRedirectServer
-from ..server.backends.xsendfile import ApacheXSendfileServer
-from .helpers import create_image
-from .utils import Mock
+from filer import settings as filer_settings
+from filer.models import File
+from filer.server.backends.default import DefaultServer
+from filer.server.backends.nginx import NginxXAccelRedirectServer
+from filer.server.backends.xsendfile import ApacheXSendfileServer
+from tests.helpers import create_image
+
+
+class Mock():
+    pass
 
 
 class BaseServerBackendTestCase(TestCase):

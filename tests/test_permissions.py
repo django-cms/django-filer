@@ -8,15 +8,20 @@ from django.contrib.auth.models import Group
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
-from .. import settings as filer_settings
-from ..models.clipboardmodels import Clipboard
-from ..models.foldermodels import Folder, FolderPermission
-from ..settings import FILER_IMAGE_MODEL
-from ..utils.loader import load_model
-from .helpers import create_image, create_superuser
-from .utils import Mock
+from filer import settings as filer_settings
+from filer.models.clipboardmodels import Clipboard
+from filer.models.foldermodels import Folder, FolderPermission
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
+
+from tests.helpers import create_image, create_superuser
+
 
 Image = load_model(FILER_IMAGE_MODEL)
+
+
+class Mock():
+    pass
 
 
 class FolderPermissionsTestCase(TestCase):
