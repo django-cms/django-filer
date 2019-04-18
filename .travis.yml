@@ -15,8 +15,11 @@ matrix:
 
     - python: 3.6
       env: DJANGO='dj111' SWAP='noswap'
-      os: linux
-      
+    - python: 3.6
+      env: DJANGO='dj21' SWAP='noswap'
+    - python: 3.6
+      env: DJANGO='dj22' SWAP='noswap'
+
     # - os: osx
     #   language: generic
     #   python: "2.7"
