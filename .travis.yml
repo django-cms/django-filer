@@ -12,103 +12,33 @@ matrix:
       env: TOX_ENV='docs'
     - python: 3.5
       env: TOX_ENV='frontend'
-
-    - python: 3.6
+    # Django 1.11
+    - python: 2.7
+      env: DJANGO='dj111' SWAP='noswap'
+    - python: 3.4
+      env: DJANGO='dj111' SWAP='noswap'
+    - python: 3.5
       env: DJANGO='dj111' SWAP='noswap'
     - python: 3.6
-      env: DJANGO='dj21' SWAP='noswap'
+      env: DJANGO='dj111' SWAP='noswap'
+      dist: xenial
     - python: 3.6
+      env: DJANGO='dj111' SWAP='swap'
+      dist: xenial
+    # Django 2.1
+    - python: 3.6
+      env: DJANGO='dj21' SWAP='noswap'
+      dist: xenial
+    - python: 3.6
+      env: DJANGO='dj21' SWAP='swap'
+      dist: xenial
+    # Django 2.2
+    - python: 3.7
       env: DJANGO='dj22' SWAP='noswap'
       dist: xenial
-      sudo: true
-
-    # - python: 3.6
-    #   env: DJANGO='dj111' SWAP='noswap'
-    #   os: osx
-    #   osx_image: xcode7.3
-
-    # - os: osx
-    #   language: generic
-    #   python: "2.7"
-    #   env: DJANGO="1.11" SWAP="no"
-    #   osx_image: xcode7.3
-    # - os: osx
-    #   language: generic
-    #   python: "2.7"
-    #   env: DJANGO="1.11" SWAP="yes"
-    #   osx_image: xcode7.3
-
-    # - os: linux
-    #   python: "3.4"
-    #   env: DJANGO="2.1" SWAP="no"
-    # - os: linux
-    #   python: "3.5"
-    #   env: DJANGO="2.1" SWAP="no"
-    # - os: linux
-    #   python: "3.6"
-    #   env: DJANGO="2.1" SWAP="no"
-
-    # - os: linux
-    #   python: "3.4"
-    #   env: DJANGO="2.2" SWAP="no"
-    # - os: linux
-    #   python: "3.5"
-    #   env: DJANGO="2.2" SWAP="no"
-    # - os: linux
-    #   python: "3.6"
-    #   env: DJANGO="2.2" SWAP="no"
-    # - os: linux
-    #   python: "3.7"
-    #   env: DJANGO="2.2" SWAP="no"
-
-    # - os: linux
-    #   python: "3.4"
-    #   env: DJANGO="master" SWAP="no"
-    # - os: linux
-    #   python: "3.4"
-    #   env: DJANGO="master" SWAP="yes"
-
-    #   - os: linux
-    #   python: "3.5"
-    #   env: DJANGO="master" SWAP="no"
-    # - os: linux
-    #   python: "3.5"
-    #   env: DJANGO="master" SWAP="yes"
-
-    #   - os: linux
-    #   python: "3.6"
-    #   env: DJANGO="master" SWAP="no"
-    # - os: linux
-    #   python: "3.6"
-    #   env: DJANGO="master" SWAP="yes"
-
-    #   - os: linux
-    #   python: "3.7"
-    #   env: DJANGO="master" SWAP="no"
-    #   dist: xenial
-    #   sudo: true
-
-
-
-  # allow_failures:
-  #   - os: linux
-  #     python: "3.4"
-  #     env: DJANGO="master" SWAP="no"
-  #   - os: linux
-  #     python: "3.5"
-  #     env: DJANGO="master" SWAP="no"
-  #   - os: linux
-  #     python: "3.6"
-  #     env: DJANGO="master" SWAP="no"
-  #   - os: linux
-  #     python: "3.4"
-  #     env: DJANGO="master" SWAP="yes"
-  #   - os: linux
-  #     python: "3.5"
-  #     env: DJANGO="master" SWAP="yes"
-  #   - os: linux
-  #     python: "3.6"
-  #     env: DJANGO="master" SWAP="yes"
+    - python: 3.7
+      env: DJANGO='dj22' SWAP='swap'
+      dist: xenial
 
 install:
   - pip install coverage isort tox
