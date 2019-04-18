@@ -10,8 +10,8 @@ matrix:
       env: TOX_ENV='isort'
     - python: 3.5
       env: TOX_ENV='docs'
-    # - python: 3.5
-    #   env: TOX_ENV='frontend'
+    - python: 3.5
+      env: TOX_ENV='frontend'
 
     - python: 3.6
       env: DJANGO='dj111' SWAP='noswap'
@@ -19,6 +19,13 @@ matrix:
       env: DJANGO='dj21' SWAP='noswap'
     - python: 3.6
       env: DJANGO='dj22' SWAP='noswap'
+      dist: xenial
+      sudo: true
+
+    - python: 3.6
+      env: DJANGO='dj111' SWAP='noswap'
+      os: osx
+      osx_image: xcode7.3
 
     # - os: osx
     #   language: generic
@@ -112,12 +119,12 @@ install:
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then export PY_VER=py37; fi"
   - "if [[ ${DJANGO}z != 'z' ]]; then export TOX_ENV=$PY_VER-$DJANGO-$SWAP; fi"
 
-# before_script:
-#   - if [ "$FRONTEND" == "yes" ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
-#   - if [ "$FRONTEND" == "yes" ]; then npm config set spin false; fi
-#   - if [ "$FRONTEND" == "yes" ]; then npm install -g npm@2; fi
-#   - if [ "$FRONTEND" == "yes" ]; then npm install -g gulp@3.9.0; fi
-#   - if [ "$FRONTEND" == "yes" ]; then npm install; fi
+before_script:
+  - "if [ TOX_ENV='frontend' ]; then nvm install 0.12.7 && nvm use 0.12.7; fi"
+  - "if [ TOX_ENV='frontend' ]; then npm config set spin false; fi"
+  - "if [ TOX_ENV='frontend' ]; then npm install -g npm@2; fi"
+  - "if [ TOX_ENV='frontend' ]; then npm install -g gulp@3.9.0; fi"
+  - "if [ TOX_ENV='frontend' ]; then npm install; fi"
 
 script:
   - tox -e $TOX_ENV
