@@ -1107,8 +1107,8 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         data = {'_popup': '1'}
         data.update(model_to_dict(image, all=True))
         # Django 2.2
-        # To catch usage mistakes, the test Client and django.utils.http.urlencode() 
-        # now raise TypeError if None is passed as a value to encode because None can’t 
+        # To catch usage mistakes, the test Client and django.utils.http.urlencode()
+        # now raise TypeError if None is passed as a value to encode because None can’t
         # be encoded in GET and POST data. Either pass an empty string or omit the value.
         data = {k: v if v is not None else '' for k, v in data.items()}
 

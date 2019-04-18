@@ -22,13 +22,13 @@ module.exports = function (config) {
         files: [
             // the current order meets the dependency requirements
             // dependency loading is not handled yet
-            '../static/filer/js/libs/jquery.min.js',
-            '../static/filer/js/libs/!(jquery.min)*.js',
+            '../filer/static/filer/js/libs/jquery.min.js',
+            '../filer/static/filer/js/libs/!(jquery.min)*.js',
 
             'frontend/unit/mocks.js',
             'frontend/unit/mock-ajax.min.js',
 
-            '../static/filer/js/addons/*.js',
+            '../filer/static/filer/js/addons/*.js',
 
             // tests themselves
             'frontend/unit/*.js',
