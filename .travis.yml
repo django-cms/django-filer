@@ -14,7 +14,7 @@ matrix:
     #   env: TOX_ENV='frontend'
 
     - python: 3.6
-      env: DJANGO='dj111' SWAP='no'
+      env: DJANGO='dj111' SWAP='noswap'
       os: linux
       
     # - os: osx
