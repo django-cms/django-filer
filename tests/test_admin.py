@@ -1106,6 +1106,12 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         self.assertContains(response, '<input type="hidden" name="_popup" value="1"')
         data = {'_popup': '1'}
         data.update(model_to_dict(image, all=True))
+        # Django 2.2
+        # To catch usage mistakes, the test Client and django.utils.http.urlencode() 
+        # now raise TypeError if None is passed as a value to encode because None can’t 
+        # be encoded in GET and POST data. Either pass an empty string or omit the value.
+        data = {k: v if v is not None else '' for k, v in data.items()}
+
         response = self.client.post(pick_url, data=data)
         self.assertRedirects(
             response=response,
@@ -1121,6 +1127,7 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         response = self.client.get(base_url)
         self.assertEqual(response.status_code, 200)
         data = model_to_dict(image, all=True)
+        data = {k: v if v is not None else '' for k, v in data.items()}
         response = self.client.post(base_url, data=data)
         self.assertRedirects(
             response=response,
@@ -1136,8 +1143,11 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             image = self.create_image(folder=None)
             base_url = image.get_admin_change_url()
             data = model_to_dict(image, all=True)
+            data = {k: v if v is not None else '' for k, v in data.items()}
+
             if subject_location is not None:
                 data.update(dict(subject_location=subject_location))
+
             response = self.client.post(base_url, data=data)
             saved_image = Image.objects.get(pk=image.pk)
             if should_succeed:
@@ -1175,6 +1185,7 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                             '<input type="hidden" name="_popup" value="1"')
         data = {'_popup': '1'}
         data.update(model_to_dict(image, all=True))
+        data = {k: v if v is not None else '' for k, v in data.items()}
         response = self.client.post(pick_url, data=data)
         self.assertRedirects(
             response=response,
@@ -1193,7 +1204,9 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         self.assertEqual(response.status_code, 200)
 
         data = model_to_dict(image, all=True)
-        response = self.client.post(base_url, data=data)
+        data = {k: v if v is not None else '' for k, v in data.items()}
+
+        response = self.client.post(base_url, data)
         self.assertRedirects(
             response=response,
             expected_url=reverse(

@@ -22,10 +22,10 @@ matrix:
       dist: xenial
       sudo: true
 
-    - python: 3.6
-      env: DJANGO='dj111' SWAP='noswap'
-      os: osx
-      osx_image: xcode7.3
+    # - python: 3.6
+    #   env: DJANGO='dj111' SWAP='noswap'
+    #   os: osx
+    #   osx_image: xcode7.3
 
     # - os: osx
     #   language: generic
