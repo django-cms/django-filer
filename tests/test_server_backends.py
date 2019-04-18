@@ -14,6 +14,7 @@ from filer.models import File
 from filer.server.backends.default import DefaultServer
 from filer.server.backends.nginx import NginxXAccelRedirectServer
 from filer.server.backends.xsendfile import ApacheXSendfileServer
+
 from tests.helpers import create_image
 
 
