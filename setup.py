@@ -49,7 +49,7 @@ setup(
     description='A file management application for django that makes handling '
                 'of files and images a breeze.',
     long_description=open('README.rst').read(),
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,

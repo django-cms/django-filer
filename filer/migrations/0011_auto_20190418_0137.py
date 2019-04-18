@@ -15,16 +15,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='folder',
             name='level',
-            field=models.PositiveIntegerField(editable=False),
+            field=models.PositiveIntegerField(db_index=True, editable=False),
         ),
         migrations.AlterField(
             model_name='folder',
             name='lft',
-            field=models.PositiveIntegerField(editable=False),
+            field=models.PositiveIntegerField(db_index=True, editable=False),
         ),
         migrations.AlterField(
             model_name='folder',
             name='rght',
-            field=models.PositiveIntegerField(editable=False),
+            field=models.PositiveIntegerField(db_index=True, editable=False),
         ),
     ]
