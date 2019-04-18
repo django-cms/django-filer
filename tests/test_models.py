@@ -32,7 +32,6 @@ except ImportError:
     from django.utils.unittest import skipIf, skipUnless
 
 
-
 class FilerApiTests(TestCase):
 
     def setUp(self):
@@ -73,11 +72,12 @@ class FilerApiTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         ImageUploadForm = modelform_factory(Image, fields=('original_filename', 'owner', 'file'))
-        upoad_image_form = ImageUploadForm({'original_filename': self.image_name,
-                                                'owner': self.superuser.pk},
-                                                {'file': file_obj})
+        upoad_image_form = ImageUploadForm({
+            'original_filename': self.image_name,
+            'owner': self.superuser.pk
+        }, {'file': file_obj})
         if upoad_image_form.is_valid():
-            image = upoad_image_form.save()
+            image = upoad_image_form.save()  # noqa
         self.assertEqual(Image.objects.count(), 1)
 
     def test_create_clipboard_item(self):
@@ -89,7 +89,7 @@ class FilerApiTests(TestCase):
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
 
-    @skipIf(ET_2, 'Skipping for easy_thumbnails version >= 2.0')
+    @skipIf(ET_2, 'Skipping for easy_thumbnails version >= 2.0')  # noqa
     def test_create_icons(self):
         image = self.create_filer_image()
         image.save()
@@ -100,7 +100,7 @@ class FilerApiTests(TestCase):
             self.assertEqual(os.path.basename(icons[size]),
                              file_basename + '__%sx%s_q85_crop_upscale.jpg' % (size, size))
 
-    @skipUnless(ET_2, 'Skipping for easy_thumbnails version < 2.0')
+    @skipUnless(ET_2, 'Skipping for easy_thumbnails version < 2.0')  # noqa
     def test_create_icons(self):
         image = self.create_filer_image()
         image.save()
@@ -198,9 +198,6 @@ class FilerApiTests(TestCase):
         file_1 = self.create_filer_image()
         self.assertTrue(file_1.file.storage.exists(file_1.file.name))
 
-        # create some thumbnails
-        thumbnail_urls = file_1.thumbnails
-
         # check if the thumnails exist
         thumbnails = [x for x in file_1.file.get_thumbnails()]
         for tn in thumbnails:
@@ -290,13 +287,13 @@ class FilerApiTests(TestCase):
         image.save()
         canonical = image.canonical_url
         self.assertEqual(self.client.get(canonical).status_code, 404)
-        # First public version
+        # First public version
         image.is_public = True
         image.save()
         canonical = image.canonical_url
         file_url_1 = image.file.url
         self.assertRedirects(self.client.get(canonical), file_url_1)
-        # Second public version
+        # Second public version
         img_2 = create_image()
         image_name_2 = 'test_file_2.jpg'
         filename_2 = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, image_name_2)
@@ -307,11 +304,11 @@ class FilerApiTests(TestCase):
         file_url_2 = image.file.url
         self.assertNotEqual(file_url_1, file_url_2)
         self.assertRedirects(self.client.get(canonical), file_url_2)
-        # No file
+        # No file
         image.file = None
         image.save()
         self.assertEqual(self.client.get(canonical).status_code, 404)
-        # Teardown
+        # Teardown
         image.file = file_2
         image.save()
         os.remove(filename_2)

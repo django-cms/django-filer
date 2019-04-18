@@ -73,7 +73,7 @@ class DumpDataTests(TestCase):
         Testing the dump / load with no dump of file content data
         """
         # Initialize the test data
-        create_folder_structure(1,1)
+        create_folder_structure(1, 1)
         fileobj = self.create_filer_file(Folder.objects.all()[0])
 
         self.assertEqual(Image.objects.count(), 0)
@@ -121,7 +121,7 @@ class DumpDataTests(TestCase):
         """
         with SettingsOverride(filer_settings, FILER_DUMP_PAYLOAD=True):
             # Initialize the test data
-            create_folder_structure(1,1)
+            create_folder_structure(1, 1)
             fileobj = self.create_filer_file(Folder.objects.all()[0])
             jdata = StringIO()
 

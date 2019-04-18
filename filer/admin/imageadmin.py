@@ -60,8 +60,10 @@ class ImageAdminForm(forms.ModelForm):
             err_msg = ugettext_lazy('Invalid subject location format. ')
             err_code = 'invalid_subject_format'
 
-        elif (coordinates[0] > self.instance.width or
-                coordinates[1] > self.instance.height):
+        elif (
+            coordinates[0] > self.instance.width
+            or coordinates[1] > self.instance.height
+        ):
             err_msg = ugettext_lazy(
                 'Subject location is outside of the image. ')
             err_code = 'subject_out_of_bounds'

@@ -105,4 +105,6 @@ def filesize(bytes, format='auto1024'):
     elif format_len == 3:
         bytes = bytes >> (10 * (base - 1))
         return bytes / 1024.0
+
+
 register.filter(filesize)

@@ -123,11 +123,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         if (
-            request.POST and
-            '_continue' not in request.POST and
-            '_saveasnew' not in request.POST and
-            '_addanother' not in request.POST
+            request.POST
+            and '_continue' not in request.POST
+            and '_saveasnew' not in request.POST
+            and '_addanother' not in request.POST
         ):
+
             if obj.parent:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': obj.parent.id})
@@ -342,7 +343,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'has_add_children_permission':
                     folder.has_add_children_permission(request),
             }
-        except:
+        except:  # noqa
             permissions = {}
 
         if order_by is None or len(order_by) == 0:
@@ -365,8 +366,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
         # Actions with no confirmation
-        if (actions and request.method == 'POST' and
-                'index' in request.POST and '_save' not in request.POST):
+        if (
+            actions and request.method == 'POST'
+            and 'index' in request.POST
+            and '_save' not in request.POST
+        ):
             if selected:
                 response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
                 if response:
@@ -377,9 +381,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.message_user(request, msg)
 
         # Actions with confirmation
-        if (actions and request.method == 'POST' and
-                helpers.ACTION_CHECKBOX_NAME in request.POST and
-                'index' not in request.POST and '_save' not in request.POST):
+        if (
+            actions and request.method == 'POST'
+            and helpers.ACTION_CHECKBOX_NAME in request.POST
+            and 'index' not in request.POST
+            and '_save' not in request.POST
+        ):
             if selected:
                 response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
                 if response:
@@ -462,9 +469,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def filter_file(self, qs, terms=()):
         for term in terms:
-            filters = (models.Q(name__icontains=term) |
-                       models.Q(description__icontains=term) |
-                       models.Q(original_filename__icontains=term))
+            filters = (models.Q(name__icontains=term)
+                       | models.Q(description__icontains=term)
+                       | models.Q(original_filename__icontains=term))
             for filter_ in self.get_owner_filter_lookups():
                 filters |= models.Q(**{filter_: term})
             qs = qs.filter(filters)

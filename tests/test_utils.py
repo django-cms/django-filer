@@ -14,9 +14,7 @@ from filer.utils.loader import load_object
 from filer.utils.zip import unzip
 
 
-#===============================================================================
 # Some target classes for the classloading tests
-#===============================================================================
 class TestTargetSuperClass(object):
     pass
 
@@ -25,15 +23,13 @@ class TestTargetClass(TestTargetSuperClass):
     pass
 
 
-#===============================================================================
 # Testing the classloader
-#===============================================================================
 class ClassLoaderTestCase(TestCase):
     ''' Tests filer.utils.loader.load() '''
 
     def test_loader_loads_strings_properly(self):
         target = 'tests.test_utils.TestTargetClass'
-        result = load_object(target) # Should return an instance
+        result = load_object(target)  # Should return an instance
         self.assertEqual(result, TestTargetClass)
 
     def test_loader_loads_class(self):
@@ -45,9 +41,7 @@ class ClassLoaderTestCase(TestCase):
         self.assertEqual(result, TestTargetClass)
 
 
-#===============================================================================
 # Testing the zipping/unzipping of files
-#===============================================================================
 class ZippingTestCase(TestCase):
 
     def setUp(self):

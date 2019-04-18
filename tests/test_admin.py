@@ -55,7 +55,7 @@ class FilerFolderAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_filer_make_root_folder_get(self):
-        response = self.client.get(reverse('admin:filer-directory_listing-make_root_folder')+"?_popup=1")
+        response = self.client.get(reverse('admin:filer-directory_listing-make_root_folder') + "?_popup=1")
         self.assertEqual(response.status_code, 200)
 
     def test_filer_make_root_folder_get_no_param(self):
@@ -65,10 +65,11 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_make_root_folder_post(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'),
-                                    {
-                                        "name":FOLDER_NAME,
-                                    })
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name": FOLDER_NAME,
+            }
+        )
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
         # TODO: not sure why the status code is 200
@@ -77,7 +78,7 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_remember_last_opened_directory(self):
         folder = Folder.objects.create(name='remember me please')
 
-        get_last_folder = lambda: self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)
+        get_last_folder = lambda: self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)  # noqa
 
         self.client.get(reverse('admin:filer-directory_listing', kwargs={'folder_id': folder.id}))
         self.assertEqual(int(self.client.session['filer_last_folder_id']), folder.id)
@@ -101,30 +102,40 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"
         self.assertEqual(Folder.objects.count(), 0)
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
-                "name":FOLDER_NAME,
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'), {
+                "name": FOLDER_NAME,
                 "_popup": 1
-                })
+            }
+        )
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, FOLDER_NAME)
         # and create another one
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'),
-                                    {"name":FOLDER_NAME, "_popup": 1})
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'),
+            {"name": FOLDER_NAME, "_popup": 1}
+        )
         # second folder didn't get created
         self.assertEqual(Folder.objects.count(), 1)
         self.assertContains(response, 'Folder with this name already exists')
 
     def test_validate_no_duplicate_folders_on_rename(self):
         self.assertEqual(Folder.objects.count(), 0)
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'), {
                 "name": "foo",
-                "_popup": 1})
+                "_popup": 1
+            }
+        )
         self.assertEqual(Folder.objects.count(), 1)
         self.assertEqual(Folder.objects.all()[0].name, "foo")
         # and create another one
-        response = self.client.post(reverse('admin:filer-directory_listing-make_root_folder'), {
+        response = self.client.post(
+            reverse('admin:filer-directory_listing-make_root_folder'), {
                 "name": "bar",
-                "_popup": 1})
+                "_popup": 1
+            }
+        )
         self.assertEqual(Folder.objects.count(), 2)
         bar = Folder.objects.get(name="bar")
         admin_url = reverse("admin:filer_folder_change", args=(bar.pk, ))
@@ -140,9 +151,10 @@ class FilerFolderAdminUrlsTests(TestCase):
             'gigi', 'admin@ignore.com', 'secret')
         admin_url = reverse("admin:filer_folder_change", args=(folder.pk, ))
         response = self.client.post(admin_url, {
-                'owner': another_superuser.pk,
-                'name': 'foobar',
-                '_continue': 'Save and continue editing'})
+            'owner': another_superuser.pk,
+            'name': 'foobar',
+            '_continue': 'Save and continue editing'
+        })
         # successful POST returns a redirect
         self.assertEqual(response.status_code, 302)
         folder = Folder.objects.get(pk=folder.pk)
@@ -225,7 +237,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             'Filedata': file_obj,
             'jsessionid': self.client.session.session_key
         }
-        response = self.client.post(url, post_data, **extra_headers)
+        response = self.client.post(url, post_data, **extra_headers)  # noqa
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
@@ -246,7 +258,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'Filedata': file_obj,
                 'jsessionid': self.client.session.session_key
             }
-            response = self.client.post(url, post_data, **extra_headers)
+            response = self.client.post(url, post_data, **extra_headers)  # noqa
             self.assertEqual(Video.objects.count(), 1)
             self.assertEqual(Video.objects.all()[0].original_filename, self.video_name)
 
@@ -266,7 +278,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'Filedata': file_obj,
                 'jsessionid': self.client.session.session_key
             }
-            response = self.client.post(url, post_data, **extra_headers)
+            response = self.client.post(url, post_data, **extra_headers)  # noqa
             self.assertEqual(ExtImage.objects.count(), 1)
             self.assertEqual(ExtImage.objects.all()[0].original_filename, self.image_name)
 
@@ -279,7 +291,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             'Filedata': file_obj,
             'jsessionid': self.client.session.session_key
         }
-        response = self.client.post(url, post_data, **extra_headers)
+        response = self.client.post(url, post_data, **extra_headers)  # noqa
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
@@ -290,8 +302,9 @@ class FilerClipboardAdminUrlsTests(TestCase):
         file_obj = django.core.files.File(open(self.filename, 'rb'))
         url = reverse(
             'admin:filer-ajax_upload',
-            kwargs={'folder_id': folder.pk})+'?filename=%s' % self.image_name
-        response = self.client.post(
+            kwargs={'folder_id': folder.pk}
+        ) + '?filename=%s' % self.image_name
+        response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
             content_type='application/octet-stream',
@@ -305,8 +318,9 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename, 'rb'))
         url = reverse(
-            'admin:filer-ajax_upload')+'?filename=%s' % self.image_name
-        response = self.client.post(
+            'admin:filer-ajax_upload'
+        ) + '?filename=%s' % self.image_name
+        response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
             content_type='application/octet-stream',
@@ -340,7 +354,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             'admin:filer-ajax_upload',
             kwargs={
                 'folder_id': folder.pk + 1}
-        )+'?filename={0}'.format(self.image_name)
+        ) + '?filename={0}'.format(self.image_name)
         response = self.client.post(
             url,
             data=file_obj.read(),
@@ -410,7 +424,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'admin:filer-ajax_upload',
                 kwargs={
                     'folder_id': folder.pk}
-                )+'?filename={0}'.format(self.image_name)
+            ) + '?filename={0}'.format(self.image_name)
             response = self.client.post(
                 url,
                 data=file_obj.read(),
@@ -484,7 +498,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
-        response = self.client.post(url, {
+        response = self.client.post(url, {  # noqa
             'action': 'move_files_and_folders',
             'post': 'yes',
             'destination': self.dst_folder.id,
@@ -495,7 +509,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.dst_folder.id,
         })
-        response = self.client.post(url, {
+        response = self.client.post(url, {  # noqa
             'action': 'move_files_and_folders',
             'post': 'yes',
             'destination': self.src_folder.id,
@@ -519,11 +533,11 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         root = Folder.objects.create(name='root', owner=self.superuser)
         foo = Folder.objects.create(name='foo', parent=root, owner=self.superuser)
         bar = Folder.objects.create(name='bar', parent=root, owner=self.superuser)
-        foos_bar = Folder.objects.create(name='bar', parent=foo, owner=self.superuser)
+        foos_bar = Folder.objects.create(name='bar', parent=foo, owner=self.superuser)  # noqa
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': root.pk,
         })
-        response = self.client.post(url, {
+        response = self.client.post(url, {  # noqa
             'action': 'move_files_and_folders',
             'post': 'yes',
             'destination': foo.pk,
@@ -564,7 +578,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         })
 
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
-            response = self.client.post(url, {
+            response = self.client.post(url, {  # noqa
                 'action': 'files_set_public',
                 helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
             })
@@ -580,7 +594,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         })
 
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
-            response = self.client.post(url, {
+            response = self.client.post(url, {  # noqa
                 'action': 'files_set_private',
                 helpers.ACTION_CHECKBOX_NAME: 'file-%d' % (self.image_obj.id,),
             })
@@ -623,11 +637,9 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         dst_image_obj = self.dst_folder.files[0]
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
-
     def _do_test_rename(self, url, new_name, file_obj=None, folder_obj=None):
         """
         Helper to submit rename form and check renaming result.
-
         'new_name' should be a plain string, no formatting supported.
         """
         if file_obj is not None:
@@ -693,7 +705,7 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
             helpers.ACTION_CHECKBOX_NAME: folders,
         })
         # this does the actual deleting
-        response = self.client.post(url, {
+        response = self.client.post(url, {  # noqa
             'action': 'delete_files_or_folders',
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: folders,
@@ -715,11 +727,11 @@ class FilerDeleteOperationTests(BulkOperationsMixin, TestCase):
         for f in File.objects.filter(folder=self.folder):
             folders.append('file-%d' % (f.id,))
         folders.append('folder-%d' % self.sub_folder1.id)
-        response = self.client.post(url, {
+        response = self.client.post(url, {  # noqa
             'action': 'delete_files_or_folders',
             'post': 'yes',
             helpers.ACTION_CHECKBOX_NAME: folders,
-            })
+        })
         self.assertEqual(File.objects.filter(folder__in=[self.folder.id, self.sub_folder1.id]).count(), 0)
 
 
@@ -1207,7 +1219,7 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         }
         response = self.client.post(pick_url, data=data)
         if response.status_code == 200:
-            from pprint import pprint;
+            from pprint import pprint
             pprint(response.content)
         self.assertRedirects(
             response=response,
@@ -1227,7 +1239,7 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
         }
         response = self.client.post(base_url, data=data)
         if response.status_code == 200:
-            from pprint import pprint;
+            from pprint import pprint
             pprint(response.content)
         self.assertRedirects(
             response=response,

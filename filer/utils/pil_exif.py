@@ -9,7 +9,7 @@ from ..utils.compatibility import PILExifTags, PILImage
 def get_exif(im):
     try:
         exif_raw = im._getexif() or {}
-    except:
+    except:  # noqa
         return {}
     ret = {}
     for tag, value in list(exif_raw.items()):
@@ -26,6 +26,6 @@ def get_exif_for_file(file_obj):
 def get_subject_location(exif_data):
     try:
         r = (int(exif_data['SubjectLocation'][0]), int(exif_data['SubjectLocation'][1]),)
-    except:
+    except:  # noqa
         r = None
     return r

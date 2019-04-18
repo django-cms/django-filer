@@ -122,7 +122,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # cache the file size
         try:
             self._file_size = self.file.size
-        except:
+        except:   # noqa
             self._file_size = None
         # generate SHA1 hash
         try:
@@ -290,7 +290,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         """
         try:
             r = self.file.url
-        except:
+        except:  # noqa
             r = ''
         return r
 
@@ -318,7 +318,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def path(self):
         try:
             return self.file.path
-        except:
+        except:  # noqa
             return ""
 
     @property
