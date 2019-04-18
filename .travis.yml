@@ -13,7 +13,7 @@ matrix:
       python: 3.6
     - env: FRONTEND="yes"
       python: 3.6
-
+      
     - os: osx
       language: generic
       python: "2.7"
@@ -98,6 +98,7 @@ matrix:
   #     env: DJANGO="master" SWAP="yes"
 
 python:
+  - "3.7"
   - "3.6"
   - "3.5"
   - "3.4"
