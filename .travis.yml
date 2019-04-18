@@ -8,45 +8,48 @@ matrix:
       env: TOX_ENV='flake8'
     - python: 3.5
       env: TOX_ENV='isort'
+    - python: 3.5
+      env: TOX_ENV='docs'
+    # - python: 3.5
+    #   env: TOX_ENV='frontend'
 
-    - env: DOCS="yes"
-      python: 3.6
-    - env: FRONTEND="yes"
-      python: 3.6
+    - python: 3.6
+      env: DJANGO='dj111' SWAP='no'
+      os: linux
       
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.11" SWAP="no"
-      osx_image: xcode7.3
-    - os: osx
-      language: generic
-      python: "2.7"
-      env: DJANGO="1.11" SWAP="yes"
-      osx_image: xcode7.3
+    # - os: osx
+    #   language: generic
+    #   python: "2.7"
+    #   env: DJANGO="1.11" SWAP="no"
+    #   osx_image: xcode7.3
+    # - os: osx
+    #   language: generic
+    #   python: "2.7"
+    #   env: DJANGO="1.11" SWAP="yes"
+    #   osx_image: xcode7.3
 
-    - os: linux
-      python: "3.4"
-      env: DJANGO="2.1" SWAP="no"
-    - os: linux
-      python: "3.5"
-      env: DJANGO="2.1" SWAP="no"
-    - os: linux
-      python: "3.6"
-      env: DJANGO="2.1" SWAP="no"
+    # - os: linux
+    #   python: "3.4"
+    #   env: DJANGO="2.1" SWAP="no"
+    # - os: linux
+    #   python: "3.5"
+    #   env: DJANGO="2.1" SWAP="no"
+    # - os: linux
+    #   python: "3.6"
+    #   env: DJANGO="2.1" SWAP="no"
 
-    - os: linux
-      python: "3.4"
-      env: DJANGO="2.2" SWAP="no"
-    - os: linux
-      python: "3.5"
-      env: DJANGO="2.2" SWAP="no"
-    - os: linux
-      python: "3.6"
-      env: DJANGO="2.2" SWAP="no"
-    - os: linux
-      python: "3.7"
-      env: DJANGO="2.2" SWAP="no"
+    # - os: linux
+    #   python: "3.4"
+    #   env: DJANGO="2.2" SWAP="no"
+    # - os: linux
+    #   python: "3.5"
+    #   env: DJANGO="2.2" SWAP="no"
+    # - os: linux
+    #   python: "3.6"
+    #   env: DJANGO="2.2" SWAP="no"
+    # - os: linux
+    #   python: "3.7"
+    #   env: DJANGO="2.2" SWAP="no"
 
     # - os: linux
     #   python: "3.4"
@@ -97,48 +100,24 @@ matrix:
   #     python: "3.6"
   #     env: DJANGO="master" SWAP="yes"
 
-python:
-  - "3.7"
-  - "3.6"
-  - "3.5"
-  - "3.4"
-  - "2.7"
-
 install:
-  - pip install tox-travis coveralls
   - pip install coverage isort tox
   - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then export PY_VER=py27; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then export PY_VER=py34; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then export PY_VER=py35; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then export PY_VER=py36; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then export PY_VER=py37; fi"
-  - "if [[ ${DJANGO}z != 'z' ]]; then export TOX_ENV=$PY_VER-$DJANGO; fi"
+  - "if [[ ${DJANGO}z != 'z' ]]; then export TOX_ENV=$PY_VER-$DJANGO-$SWAP; fi"
 
-branches:
-  only:
-    - master
-    - develop
-
-before_script:
-  - if [ "$FRONTEND" == "yes" ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
-  - if [ "$FRONTEND" == "yes" ]; then npm config set spin false; fi
-  - if [ "$FRONTEND" == "yes" ]; then npm install -g npm@2; fi
-  - if [ "$FRONTEND" == "yes" ]; then npm install -g gulp@3.9.0; fi
-  - if [ "$FRONTEND" == "yes" ]; then npm install; fi
+# before_script:
+#   - if [ "$FRONTEND" == "yes" ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+#   - if [ "$FRONTEND" == "yes" ]; then npm config set spin false; fi
+#   - if [ "$FRONTEND" == "yes" ]; then npm install -g npm@2; fi
+#   - if [ "$FRONTEND" == "yes" ]; then npm install -g gulp@3.9.0; fi
+#   - if [ "$FRONTEND" == "yes" ]; then npm install; fi
 
 script:
   - tox -e $TOX_ENV
 
 after_success:
-  - coveralls --config_file=.coveragerc
-  - mkdir -p shippable/codecoverage && cp coverage.xml shippable/codecoverage/coverage.xml
   - bash <(curl -s https://codecov.io/bash)
-
-env:
-  - DJANGO="1.11" SWAP="no"
-  - DJANGO="1.11" SWAP="yes"
-  - DJANGO="2.1" SWAP="no"
-  - DJANGO="2.1" SWAP="yes"
-  - DJANGO="2.2" SWAP="no"
-  - DJANGO="2.2" SWAP="yes"
-
