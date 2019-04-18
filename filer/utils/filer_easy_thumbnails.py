@@ -6,6 +6,7 @@ import re
 
 from easy_thumbnails.files import Thumbnailer
 
+
 # match the source filename using `__` as the seperator. ``opts_and_ext`` is non
 # greedy so it should match the last occurence of `__`.
 # in ``ThumbnailerNameMixin.get_thumbnail_name`` we ensure that there is no `__`

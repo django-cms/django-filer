@@ -8,10 +8,10 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
+from tests.helpers import create_image
+
 from filer.utils.loader import load_object
 from filer.utils.zip import unzip
-
-from tests.helpers import create_image
 
 
 #===============================================================================

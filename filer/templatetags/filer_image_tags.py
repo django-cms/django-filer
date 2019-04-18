@@ -6,6 +6,7 @@ import re
 from django.template import Library
 from django.utils import six
 
+
 register = Library()
 
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')

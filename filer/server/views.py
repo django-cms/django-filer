@@ -5,11 +5,13 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.views.decorators.cache import never_cache
+
 from easy_thumbnails.files import ThumbnailFile
 
 from .. import settings as filer_settings
 from ..models import File
 from ..utils.filer_easy_thumbnails import thumbnail_to_original_filename
+
 
 server = filer_settings.FILER_PRIVATEMEDIA_SERVER
 thumbnail_server = filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_SERVER

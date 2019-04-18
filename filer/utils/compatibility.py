@@ -7,6 +7,7 @@ import django
 from django.utils import six
 from django.utils.text import Truncator
 
+
 try:
     # Django>=1.10
     from django.urls import reverse, NoReverseMatch

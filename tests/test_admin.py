@@ -12,6 +12,11 @@ from django.contrib.auth.models import User
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 
+from tests.helpers import (
+    SettingsOverride, create_folder_structure, create_image, create_superuser,
+)
+from tests.utils.extended_app.models import ExtImage, Video
+
 from filer import settings as filer_settings
 from filer.admin.folderadmin import FolderAdmin
 from filer.models.filemodels import File
@@ -22,13 +27,6 @@ from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.compatibility import reverse
 from filer.utils.loader import load_model
 
-from tests.utils.extended_app.models import ExtImage, Video
-from tests.helpers import (
-    SettingsOverride,
-    create_folder_structure,
-    create_image,
-    create_superuser,
-)
 
 Image = load_model(FILER_IMAGE_MODEL)
 

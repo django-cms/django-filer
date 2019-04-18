@@ -8,21 +8,20 @@ from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
 
+from tests.helpers import (
+    create_clipboard_item, create_folder_structure, create_image,
+    create_superuser,
+)
+from tests.utils import ET_2
+
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
 from filer.models.mixins import IconsMixin
 from filer.settings import FILER_IMAGE_MODEL
-from tests.utils import ET_2
 from filer.utils.loader import load_model
 
-from tests.helpers import (
-    create_clipboard_item,
-    create_folder_structure,
-    create_image,
-    create_superuser,
-)
 
 Image = load_model(FILER_IMAGE_MODEL)
 

@@ -12,6 +12,7 @@ from ...settings import FILER_IMAGE_MODEL, FILER_IS_PUBLIC_DEFAULT
 from ...utils.compatibility import upath
 from ...utils.loader import load_model
 
+
 Image = load_model(FILER_IMAGE_MODEL)
 
 

@@ -11,6 +11,7 @@ from ..utils.compatibility import string_concat
 from ..utils.loader import load_model
 from .fileadmin import FileAdmin
 
+
 Image = load_model(FILER_IMAGE_MODEL)
 
 

@@ -23,41 +23,28 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy, ungettext
 
-from . import views
 from .. import settings
 from ..models import (
-    File,
-    Folder,
-    FolderPermission,
-    FolderRoot,
-    ImagesWithMissingData,
-    UnsortedImages,
-    tools,
+    File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData,
+    UnsortedImages, tools,
 )
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import (
-    capfirst,
-    get_delete_permission,
-    quote,
-    reverse,
-    unquote,
+    capfirst, get_delete_permission, quote, reverse, unquote,
 )
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
+from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext,
-    admin_url_params_encoded,
-    check_files_edit_permissions,
-    check_files_read_permissions,
-    check_folder_edit_permissions,
-    check_folder_read_permissions,
-    popup_status,
-    userperms_for_request,
+    AdminContext, admin_url_params_encoded, check_files_edit_permissions,
+    check_files_read_permissions, check_folder_edit_permissions,
+    check_folder_read_permissions, popup_status, userperms_for_request,
 )
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 

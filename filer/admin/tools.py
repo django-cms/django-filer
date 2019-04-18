@@ -5,6 +5,7 @@ from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
 
+
 ALLOWED_PICK_TYPES = ('folder', 'file')
 
 

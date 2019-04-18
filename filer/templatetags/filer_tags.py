@@ -6,6 +6,7 @@ import math
 from django.template import Library
 from django.utils import six
 
+
 register = Library()
 
 # The templatetag below is copied from sorl.thumbnail

@@ -18,6 +18,7 @@ from ..models import File
 from ..utils.compatibility import LTE_DJANGO_1_8, reverse, truncate_words
 from ..utils.model_label import get_model_label
 
+
 logger = logging.getLogger(__name__)
 
 

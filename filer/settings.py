@@ -11,6 +11,7 @@ from django.core.files.storage import get_storage_class
 from .utils.loader import load_object
 from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 
+
 logger = logging.getLogger(__name__)
 
 # FILER_IMAGE_MODEL setting is used to swap Image model.

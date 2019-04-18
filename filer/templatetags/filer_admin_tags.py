@@ -6,6 +6,7 @@ from django.utils.html import format_html_join
 
 from ..admin.tools import admin_url_params, admin_url_params_encoded
 
+
 register = Library()
 
 assignment_tag = getattr(register, 'assignment_tag', register.simple_tag)

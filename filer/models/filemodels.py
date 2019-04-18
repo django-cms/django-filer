@@ -11,16 +11,14 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from ..utils.compatibility import (
-    NoReverseMatch,
-    is_authenticated,
-    python_2_unicode_compatible,
-    reverse,
+    NoReverseMatch, is_authenticated, python_2_unicode_compatible, reverse,
 )
+from . import mixins
 from .foldermodels import Folder
+
 
 try:
     from polymorphic.models import PolymorphicModel
