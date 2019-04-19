@@ -52,8 +52,9 @@ def folders_available(current_site, user, folders_qs):
                 Q(site__in=available_sites) |
                 Q(shared__in=available_sites))
 
+    user_sites = get_sites_for_user(user)
     if has_admin_role(user) and not current_site:
-        sites_q |= Q(site__isnull=True)
+        sites_q |= Q(site__pk__in=user_sites)
 
     return folders_qs.filter(sites_q).distinct()
 
@@ -84,10 +85,11 @@ def files_available(current_site, user, files_qs):
                 Q(folder__site__in=available_sites) |
                 Q(folder__shared__in=available_sites))
 
+    user_sites = get_sites_for_user(user)
     if not current_site:
         sites_q |= Q(folder__isnull=True)
         if has_admin_role(user):
-            sites_q |= Q(folder__site__isnull=True)
+            sites_q |= Q(folder__site__pk__in=user_sites)
     else:
         # never show unfiled in popup
         sites_q &= Q(folder__isnull=False)
