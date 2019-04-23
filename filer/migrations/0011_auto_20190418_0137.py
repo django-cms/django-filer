@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
         'editable': False,
     }
 
-    # only for django 11 and py <= 3.4
-    if sys.version_info <= (3, 4):
+    # use only for python <= 3.4.x
+    if sys.version_info < (3, 5):
         options['db_index'] = True
 
     operations = [
