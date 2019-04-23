@@ -48,11 +48,13 @@ install:
   - "if [[ ${DJANGO}z != 'z' ]]; then export TOX_ENV=$PY_VER-$DJANGO-$SWAP; fi"
 
 before_script:
-  - "if [ TOX_ENV='frontend' ]; then nvm install 0.12.7 && nvm use 0.12.7; fi"
-  - "if [ TOX_ENV='frontend' ]; then npm config set spin false; fi"
-  - "if [ TOX_ENV='frontend' ]; then npm install -g npm@2; fi"
-  - "if [ TOX_ENV='frontend' ]; then npm install -g gulp@3.9.0; fi"
-  - "if [ TOX_ENV='frontend' ]; then npm install; fi"
+  - if [ $TOX_ENV == 'frontend' ]; then
+    nvm install 0.12.7 && nvm use 0.12.7;
+    npm config set spin false;
+    npm install -g npm@2;
+    npm install -g gulp@3.9.0;
+    npm install;
+    fi
 
 script:
   - tox -e $TOX_ENV
