@@ -24,7 +24,10 @@ matrix:
     - python: 3.6
       env: DJANGO='dj111' SWAP='swap'
     # Django 2.1
-    - python: 3.6
+    - python: 3.4
+      env: DJANGO='dj21' SWAP='noswap'
+      dist: xenial
+    - python: 3.5
       env: DJANGO='dj21' SWAP='noswap'
       dist: xenial
     - python: 3.6
