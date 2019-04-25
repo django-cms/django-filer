@@ -120,7 +120,7 @@ def ajax_upload(request, folder_id=None):
             # clipboard_item.save()
 
             # Try to generate thumbnails.
-            if not file_obj.icons and not file_obj.extension == 'svg'
+            if not file_obj.icons and not file_obj.extension == 'svg':
                 # There is no point to continue, as we can't generate
                 # thumbnails for this file. Usual reasons: bad format or
                 # filename.

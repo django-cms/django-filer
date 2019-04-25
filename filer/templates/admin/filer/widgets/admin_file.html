@@ -22,6 +22,8 @@
                 {% if object.icons.32 %}
                     <a href="{{ object.url }}" target="_blank"><img class="thumbnail_img" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
                     &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
+                {% elif object.extension == "svg" %}
+                <img class="thumbnail_img" src="{{ object.url }}" alt="{{ object.label }}"> 
                 {% else %}
                     <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
                     &nbsp;<span class="description_text" title="{% trans 'file missing' %}">{% trans 'file missing' %}</span>
