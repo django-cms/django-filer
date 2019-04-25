@@ -70,10 +70,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 else 'admin/img/icon-deletelink.svg'
             ),
         }
-        if file_size_svg_max_4ko :
-            context.update({
-              'file_size_svg_max_4ko': file_size_svg_max_4ko, 
-            })
+        if file_size_svg_max_4ko:
+            context.update({ 'file_size_svg_max_4ko': file_size_svg_max_4ko })
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
 
