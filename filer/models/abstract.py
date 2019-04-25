@@ -14,6 +14,7 @@ from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
 from .filemodels import File
 
+
 logger = logging.getLogger(__name__)
 
 

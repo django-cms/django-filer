@@ -11,6 +11,7 @@ from django.core.files.storage import get_storage_class
 from .utils.loader import load_object
 from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 
+
 logger = logging.getLogger(__name__)
 
 # FILER_IMAGE_MODEL setting is used to swap Image model.
@@ -29,9 +30,9 @@ FILER_0_8_COMPATIBILITY_MODE = getattr(settings, 'FILER_0_8_COMPATIBILITY_MODE',
 FILER_ENABLE_LOGGING = getattr(settings, 'FILER_ENABLE_LOGGING', False)
 if FILER_ENABLE_LOGGING:
     FILER_ENABLE_LOGGING = (
-        FILER_ENABLE_LOGGING and (getattr(settings, 'LOGGING') and
-                                  ('' in settings.LOGGING['loggers'] or
-                                   'filer' in settings.LOGGING['loggers'])))
+        FILER_ENABLE_LOGGING and (getattr(settings, 'LOGGING')
+                             and ('' in settings.LOGGING['loggers']
+                             or 'filer' in settings.LOGGING['loggers'])))
 
 FILER_ENABLE_PERMISSIONS = getattr(settings, 'FILER_ENABLE_PERMISSIONS', False)
 FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS = getattr(settings, 'FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS', False)
@@ -201,6 +202,7 @@ def update_storage_settings(user_settings, defaults, s, t):
             user_settings[s][t]['THUMBNAIL_OPTIONS'] = defaults[s][t]['THUMBNAIL_OPTIONS']
     return user_settings
 
+
 update_storage_settings(FILER_STORAGES, DEFAULT_FILER_STORAGES, 'public', 'main')
 update_storage_settings(FILER_STORAGES, DEFAULT_FILER_STORAGES, 'public', 'thumbnails')
 update_storage_settings(FILER_STORAGES, DEFAULT_FILER_STORAGES, 'private', 'main')
@@ -215,6 +217,7 @@ def update_server_settings(settings, defaults, s, t):
         settings[s][t]['ENGINE'] = defaults[s][t]['ENGINE']
         settings[s][t]['OPTIONS'] = defaults[s][t]['OPTIONS']
     return settings
+
 
 update_server_settings(FILER_SERVERS, DEFAULT_FILER_SERVERS, 'private', 'main')
 update_server_settings(FILER_SERVERS, DEFAULT_FILER_SERVERS, 'private', 'thumbnails')

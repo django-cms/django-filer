@@ -62,10 +62,10 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         if (
-            request.POST and
-            '_continue' not in request.POST and
-            '_saveasnew' not in request.POST and
-            '_addanother' not in request.POST
+            request.POST
+            and '_continue' not in request.POST
+            and '_saveasnew' not in request.POST
+            and '_addanother' not in request.POST
         ):
             # Popup in pick mode or normal mode. In both cases we want to go
             # back to the folder list view after save. And not the useless file
@@ -148,5 +148,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             return '-'
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
+
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()

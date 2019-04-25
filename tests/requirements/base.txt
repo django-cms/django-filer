@@ -1,0 +1,7 @@
+# requirements from setup.py
+Pillow>3.0,!=5.1.0 # pillow 5.1.0 is broken on OS X 10.11 we use on travis
+
+# other requirements
+djangocms-helper
+tox
+coverage

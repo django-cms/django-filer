@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+
+1.5.0 (unreleased)
+------------------
+
+* Added support for Django 2.2
+* Adapted test matrix
+* Adapted test structure and added fixes
+
+
 1.4.4 (2019-01-22)
 ------------------
 

@@ -23,6 +23,7 @@ from django.utils.text import capfirst
 
 from ...utils.compatibility import NoReverseMatch, quote, reverse
 
+
 try:
     from django.utils.encoding import force_text
 except ImportError:
