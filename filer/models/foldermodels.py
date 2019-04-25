@@ -100,6 +100,13 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
+    # explicitly define MPTT fields which would otherwise change
+    # and create a migration, depending on django-mptt version
+    # (see: https://github.com/django-mptt/django-mptt/pull/578)
+    level = models.PositiveIntegerField(editable=False)
+    lft = models.PositiveIntegerField(editable=False)
+    rght = models.PositiveIntegerField(editable=False)
+
     parent = models.ForeignKey(
         'self',
         verbose_name=('parent'),
@@ -237,6 +244,8 @@ class Folder(models.Model, mixins.IconsMixin):
             return False
 
     class Meta(object):
+        # see: https://github.com/django-mptt/django-mptt/pull/577
+        index_together = (('tree_id', 'lft'),)
         unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
