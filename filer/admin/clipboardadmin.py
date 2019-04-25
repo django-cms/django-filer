@@ -120,7 +120,7 @@ def ajax_upload(request, folder_id=None):
             # clipboard_item.save()
 
             # Try to generate thumbnails.
-            if not file_obj.icons:
+            if not file_obj.icons and not file_obj.extension == 'svg'
                 # There is no point to continue, as we can't generate
                 # thumbnails for this file. Usual reasons: bad format or
                 # filename.
@@ -156,9 +156,10 @@ def ajax_upload(request, folder_id=None):
                     'crop': True,
                     'upscale': True,
                 }
-                thumbnail_180 = file_obj.file.get_thumbnail(
-                    thumbnail_180_options)
-                data['thumbnail_180'] = thumbnail_180.url
+                if not file_obj.icons and not file_obj.extension == 'svg':
+                    thumbnail_180 = file_obj.file.get_thumbnail(
+                        thumbnail_180_options)
+                    data['thumbnail_180'] = thumbnail_180.url
                 data['original_image'] = file_obj.url
             return JsonResponse(data)
         else:

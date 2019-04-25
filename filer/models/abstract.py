@@ -53,7 +53,7 @@ class BaseImage(File):
         # doing for me was obscuring errors...
         # --Dave Butler <croepha@gmail.com>
         iext = os.path.splitext(iname)[1].lower()
-        return iext in ['.jpg', '.jpeg', '.png', '.gif']
+        return iext in ['.jpg', '.jpeg', '.png', '.gif', '.svg']
 
     def file_data_changed(self, post_init=False):
         attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
@@ -92,7 +92,7 @@ class BaseImage(File):
         if hasattr(self, '_exif_cache'):
             return self._exif_cache
         else:
-            if self.file:
+            if hasattr(self.file, 'exif'):
                 self._exif_cache = get_exif_for_file(self.file)
             else:
                 self._exif_cache = {}
