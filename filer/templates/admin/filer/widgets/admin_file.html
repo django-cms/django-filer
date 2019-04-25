@@ -23,7 +23,12 @@
                     <a href="{{ object.url }}" target="_blank"><img class="thumbnail_img" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
                     &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
                 {% elif object.extension == "svg" %}
-                <img class="thumbnail_img" src="{{ object.url }}" alt="{{ object.label }}"> 
+                    {% if file_size_svg_max_4ko %}
+                <svg class="thumbnail_img" src="{{ object.url }}" alt="{{ object.label }}"></svg>
+                    {% else %}
+                    <img class="thumbnail_img" src="{% static 'filer/icons/file_16x16.png' %}" alt="{% trans 'preview in file not available' %}">
+                    &nbsp;<span class="description_text" title="{% trans 'preview in file not available' %}">{% trans 'preview in file not available' %}</span>
+                    {% endif %}
                 {% else %}
                     <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
                     &nbsp;<span class="description_text" title="{% trans 'file missing' %}">{% trans 'file missing' %}</span>

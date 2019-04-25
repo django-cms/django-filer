@@ -29,9 +29,12 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         related_url = None
+        file_size_svg_max_4ko = None
         if value:
             try:
                 file_obj = File.objects.get(pk=value)
+                if file_obj.extension == 'svg' and file_obj._file_size <= 4000:
+                    file_size_svg_max_4ko = True
                 related_url = file_obj.logical_folder.get_admin_directory_listing_url_path()
             except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
@@ -67,6 +70,10 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 else 'admin/img/icon-deletelink.svg'
             ),
         }
+        if file_size_svg_max_4ko :
+            context.update({
+              'file_size_svg_max_4ko': file_size_svg_max_4ko, 
+            })
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
 
