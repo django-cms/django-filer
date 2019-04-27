@@ -53,7 +53,7 @@ class BaseImage(File):
         # doing for me was obscuring errors...
         # --Dave Butler <croepha@gmail.com>
         iext = os.path.splitext(iname)[1].lower()
-        return iext in ['.jpg', '.jpeg', '.png', '.gif', '.svg']
+        return iext in filer_settings.FILER_FILE_EXTENSION_ACCEPTED
 
     def file_data_changed(self, post_init=False):
         attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
