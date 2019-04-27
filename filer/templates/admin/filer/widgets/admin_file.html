@@ -25,9 +25,10 @@
                 {% elif object.extension == "svg" %}
                     {% if file_size_svg_max_4ko %}
                         <img class="thumbnail_img" src="{{ object.url }}" alt="{{ object.label }}">
+                        &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
                     {% else %}
-                        <img class="thumbnail_img" src="{% static 'filer/icons/file_16x16.png' %}" alt="{% trans 'preview in file not available' %}">
-                        &nbsp;<span class="description_text" title="{% trans 'preview in file not available' %}">{% trans 'preview in file not available' %}</span>
+                        <img class="thumbnail_img" src="{% static 'filer/icons/file_16x16.png' %}" alt="{{ object.label }}">
+                        &nbsp;<span class="description_text" title="{% trans 'Thumbail is not available for this file.' %}">{% trans 'Thumbail is not available for this file.' %}</span>
                     {% endif %}
                 {% else %}
                     <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
