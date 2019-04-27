@@ -24,7 +24,7 @@
                     &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
                 {% elif object.extension == "svg" %}
                     {% if file_size_svg_max_4ko %}
-                        <svg class="thumbnail_img" src="{{ object.url }}" alt="{{ object.label }}"></svg>
+                        <img class="thumbnail_img" src="{{ object.url }}" alt="{{ object.label }}">
                     {% else %}
                         <img class="thumbnail_img" src="{% static 'filer/icons/file_16x16.png' %}" alt="{% trans 'preview in file not available' %}">
                         &nbsp;<span class="description_text" title="{% trans 'preview in file not available' %}">{% trans 'preview in file not available' %}</span>
