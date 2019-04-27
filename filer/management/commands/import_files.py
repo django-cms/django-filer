@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 
 from ...models.filemodels import File
 from ...models.foldermodels import Folder
-from ...settings import FILER_IMAGE_MODEL, FILER_IS_PUBLIC_DEFAULT
+from ...settings import FILER_IMAGE_MODEL, FILER_IS_PUBLIC_DEFAULT, FILER_FILE_EXTENSION_ACCEPTED
 from ...utils.compatibility import upath
 from ...utils.loader import load_model
 
@@ -33,7 +33,7 @@ class FileImporter(object):
             iext = os.path.splitext(file_obj.name)[1].lower()
         except:  # noqa
             iext = ''
-        if iext in filer_settings.FILER_FILE_EXTENSION_ACCEPTED:
+        if iext in FILER_FILE_EXTENSION_ACCEPTED:
             obj, created = Image.objects.get_or_create(
                 original_filename=file_obj.name,
                 file=file_obj,

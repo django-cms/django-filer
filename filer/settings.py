@@ -255,4 +255,4 @@ FILER_DUMP_PAYLOAD = getattr(settings, 'FILER_DUMP_PAYLOAD', False)  # Whether t
 FILER_CANONICAL_URL = getattr(settings, 'FILER_CANONICAL_URL', 'canonical/')
 
 FILER_FILE_EXTENSION_ACCEPTED = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.gltf']
-FILER_FILE_EXTENSION_NOTHUMBS =  getattr(settings, 'FILER_FILE_EXTENSION_NOTHUMBS', ['.svg' ,'.gltf']   )
+FILER_FILE_EXTENSION_NOTHUMBS = getattr(settings, 'FILER_FILE_EXTENSION_NOTHUMBS', ['.svg', '.gltf'])
