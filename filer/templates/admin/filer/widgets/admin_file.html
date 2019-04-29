@@ -30,6 +30,9 @@
                         <img class="thumbnail_img" src="{% static 'filer/icons/file_16x16.png' %}" alt="{{ object.label }}">
                         &nbsp;<span class="description_text" title="{% trans 'Thumbail is not available for this file.' %}">{% trans 'Thumbail is not available for this file.' %}</span>
                     {% endif %}
+                {% elif object.extension == "gltf" %}
+                        <img class="thumbnail_img" src="{% static 'filer/icons/file_16x16.png' %}" alt="{{ object.label }}">
+                        &nbsp;<span class="description_text" title="{% trans 'Thumbail is not available for this file.' %}">{% trans 'Thumbail is not available for this file.' %}</span>
                 {% else %}
                     <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
                     &nbsp;<span class="description_text" title="{% trans 'file missing' %}">{% trans 'file missing' %}</span>
