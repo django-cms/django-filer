@@ -22,7 +22,7 @@ from django.utils.http import urlquote, urlunquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy, ungettext
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.admin.utils import unquote, quote, capfirst
 
 from .. import settings

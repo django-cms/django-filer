@@ -7,7 +7,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _

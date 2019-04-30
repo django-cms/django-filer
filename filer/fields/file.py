@@ -12,7 +12,7 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .. import settings as filer_settings
 from ..models import File

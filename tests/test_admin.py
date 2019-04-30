@@ -11,7 +11,7 @@ from django.contrib.admin import helpers
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from tests.helpers import (
     SettingsOverride, create_folder_structure, create_image, create_superuser,
