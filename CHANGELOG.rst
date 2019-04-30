@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+1.6.0 (unreleased)
+==================
+
+* Removed support for Django <= 1.10
+* Removed outdated files
+* Code alignments with other addons
+
+
 1.5.0 (2019-04-30)
 ==================
 
