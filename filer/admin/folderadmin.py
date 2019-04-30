@@ -11,19 +11,19 @@ from django.conf import settings as django_settings
 from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote, urlunquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy, ungettext
-from django.urls import reverse
-from django.contrib.admin.utils import unquote, quote, capfirst
 
 from .. import settings
 from ..models import (
@@ -32,9 +32,7 @@ from ..models import (
 )
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
-from ..utils.compatibility import (
-    get_delete_permission,
-)
+from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
 from . import views

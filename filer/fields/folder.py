@@ -9,9 +9,9 @@ from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.urls import reverse
 
 from ..models import Folder
 from ..utils.compatibility import truncate_words

@@ -7,11 +7,11 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.urls import NoReverseMatch, reverse
 from django.db import models
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField

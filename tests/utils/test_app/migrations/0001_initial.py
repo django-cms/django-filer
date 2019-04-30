@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
 import django.db.models.deletion
-from filer.settings import FILER_IMAGE_MODEL
-import filer.fields.folder
+from django.db import migrations, models
+
 import filer.fields.file
+import filer.fields.folder
 import filer.fields.image
+from filer.settings import FILER_IMAGE_MODEL
 
 
 class Migration(migrations.Migration):

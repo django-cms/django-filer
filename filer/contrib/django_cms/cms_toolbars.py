@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
-from django.urls import reverse
 
 from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.toolbar.items import Break

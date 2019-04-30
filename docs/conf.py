@@ -11,10 +11,14 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
-sys.path.append(os.path.abspath('../'))
 import datetime
+import os
+import sys
+
 import filer
+
+
+sys.path.append(os.path.abspath('../'))
 
 
 

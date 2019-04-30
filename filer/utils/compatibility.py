@@ -5,8 +5,8 @@ import sys
 
 import django
 from django.utils import six
-from django.utils.text import Truncator, format_lazy
 from django.utils.functional import keep_lazy
+from django.utils.text import Truncator, format_lazy
 
 
 def string_concat(*strings):
