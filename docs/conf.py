@@ -11,15 +11,11 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import datetime
-import os
-import sys
-
-import filer
-
-
+import sys, os
 sys.path.append(os.path.abspath('../'))
+import datetime
 
+from filer import __version__
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -57,9 +53,9 @@ copyright = '%s, Stefan Foulis' % (datetime.date.today().year,)
 # built documents.
 #
 # The short X.Y version.
-version = '.'.join(filer.__version__.split('.')[0:2])
+version = '.'.join(__version__.split('.')[0:2])
 # The full version, including alpha/beta/rc tags.
-release = filer.__version__
+release = __version__
 
 for c in ('a', 'b', 'dev', 'r'):
     if c in release:
