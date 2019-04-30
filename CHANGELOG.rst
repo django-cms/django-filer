@@ -1,9 +1,10 @@
+=========
 CHANGELOG
 =========
 
 
 1.5.0 (2019-04-30)
-------------------
+==================
 
 * Added support for Django 2.2
 * Adapted test matrix
@@ -11,19 +12,19 @@ CHANGELOG
 
 
 1.4.4 (2019-01-22)
-------------------
+==================
 
 * Fixed missing validation message for empty file field in file and image widget (#1125)
 
 
 1.4.3 (2019-01-07)
-------------------
+==================
 
 * Fixed wrong argument for AdminFileWidget render method (#1120)
 
 
 1.4.2 (2019-01-07)
-------------------
+==================
 
 * Fixed missing renderer argument for render method for AdminFolderWidget and
   AdminFileWidget classes for Django 2.x (#1120)
@@ -32,7 +33,7 @@ CHANGELOG
 
 
 1.4.1 (2018-12-06)
-------------------
+==================
 
 * Fixed widgets to work with Django 2.x (#1111)
 * Added admin site context to make_folder view (#1112)
@@ -40,7 +41,7 @@ CHANGELOG
 
 
 1.4.0 (2018-11-15)
-------------------
+==================
 
 * Added support for Django 2.0 and 2.1
 * Enabled django-mptt 0.9
@@ -51,13 +52,13 @@ CHANGELOG
 
 
 1.3.2 (2018-04-23)
-------------------
+==================
 
 * Don't show set public / set private actions if permissions are disabled.
 
 
 1.3.1 (2018-04-15)
-------------------
+==================
 
 * Allowed easy-thumbnails < 3 in setup.py
 * Fixed broken reference for delete icon
@@ -77,7 +78,7 @@ CHANGELOG
 
 
 1.3.0 (2017-11-02)
-------------------
+==================
 
 * Introduced Django 1.11 support
 * Fixed `get_css_position` filter breaking when there is no image
@@ -87,14 +88,14 @@ CHANGELOG
 
 
 1.2.7 (2017-03-02)
-------------------
+==================
 
 * Added 'get_css_position' template filter for background images
 * Updated translations
 
 
 1.2.6 (2017-01-13)
-------------------
+==================
 
 * Fixed markup issue with editing file in admin
 * Fixed error message not always showing up properly
@@ -115,21 +116,21 @@ CHANGELOG
 
 
 1.2.5 (2016-09-05)
-------------------
+==================
 
 * Dropping or uploading an image will now fire a js change event
 * Added native Aldryn support
 
 
 1.2.4 (2016-07-06)
-------------------
+==================
 
 * Fixed add/change arguments in FileAdmin.render_change_form
 * Fixed minor issues which results in spurious migration generation
 
 
 1.2.3 (2016-07-05)
-------------------
+==================
 
 * Added a menu into django CMS projects via filer.contrib.django_cms
 * Added tests for extended models
@@ -137,7 +138,7 @@ CHANGELOG
 
 
 1.2.2 (2016-06-23)
-------------------
+==================
 
 * Fixed an issue with `file_ptr` on Django 1.9+ installations
 * Addressed file_ptr issue
@@ -145,7 +146,7 @@ CHANGELOG
 
 
 1.2.1 (2016-06-23)
-------------------
+==================
 
 * Rename filer picker widget upload button
 * Adds missing @2x icon files
@@ -156,7 +157,7 @@ CHANGELOG
 
 
 1.2.0 (2016-04-26)
-------------------
+==================
 
 * Drop Django 1.5 support
 * Drop Python 3.3 support (now 3.4+)
@@ -179,7 +180,7 @@ CHANGELOG
 
 
 1.1.1 (2016-01-27)
-------------------
+==================
 
 * Fixes tests and configuration to run under Django 1.9
 * Allow Django 1.9.x in setup requirements
@@ -194,7 +195,7 @@ CHANGELOG
 
 
 1.1.0 (2016-01-19)
-------------------
+==================
 
 * Allow to provide single dimension for resizing images.
 * Search result fixes for current folder search.
@@ -208,7 +209,7 @@ CHANGELOG
 
 
 1.0.6 (2015-12-30)
-------------------
+==================
 
 * Fix imports for django-polymorphic>=0.8.
 * Limit dependencies versions in setup.py.
@@ -217,39 +218,39 @@ CHANGELOG
 
 
 1.0.5 (2015-12-29)
-------------------
+==================
 
 * Pin django-polymorphic version.
 * Use specific django-mptt versions in tox.ini for different Django versions.
 
 
 1.0.4 (2015-11-14)
-------------------
+==================
 
 * Repackage for PyPI.
 
 
 1.0.3 (2015-11-24)
-------------------
+==================
 
 * Fixes a bad static path.
 * Adds a fix for Django 1.8 envs.
 
 
 1.0.2 (2015-11-10)
-------------------
+==================
 
 * Repackage for PyPI.
 
 
 1.0.1 (2015-11-03)
-------------------
+==================
 
 * Repackage for PyPI.
 
 
 1.0.0 (2015-11-03)
-------------------
+==================
 
 * Substantial UI/UX overhaul.
 * Fixes some Django 1.9 issues.
@@ -264,19 +265,19 @@ CHANGELOG
 
 
 0.9.12 (2015-07-28)
--------------------
+===================
 
 * Various bugfixes.
 * Better Django 1.7 and 1.8 support.
 
 0.9.11 (2015-06-09)
--------------------
+===================
 
 * Update Django 1.7 migrations because of change in django_polymorphic>=0.7.
 
 
 0.9.10 (2015-05-31)
--------------------
+===================
 
 * Migrations in default locations for Django 1.7 and South>=1.0.
 * jQuery isolation fixes
@@ -284,7 +285,7 @@ CHANGELOG
 
 
 0.9.9 (2015-01-20)
-------------------
+==================
 
 * Fixes in Django 1.7 support.
 * Implement PEP440 compliant.
@@ -294,14 +295,14 @@ CHANGELOG
 
 
 0.9.8 (2014-11-03)
-------------------
+==================
 
 * Experimental Django 1.7 support.
 * Bugfixes.
 
 
 0.9.7 (2014-07-22)
-------------------
+==================
 
 * thumbnails: add zoom support.
 * Fixed migration custom User compatibility.
@@ -311,7 +312,7 @@ CHANGELOG
 
 
 0.9.6 (2014-06-27)
-------------------
+==================
 
 * Various bugfixes.
 * Dropped support for Django 1.3.
@@ -320,7 +321,7 @@ CHANGELOG
 
 
 0.9.5 (2013-06-28)
-------------------
+==================
 
 * File paths now contain random component by default (to avoid filename clashes).
 * Fixed migrations to be better compatible with custom user models.
@@ -328,20 +329,20 @@ CHANGELOG
 
 
 0.9.4 (2013-04-09)
-------------------
+==================
 
 * Experimental Django 1.5 support.
 * Bugfixes.
 
 
 0.9.3 (2012-11-29)
-------------------
+==================
 
 * Fixes template file permissions (packaging issue).
 
 
 0.9.2 (2012-11-19)
-------------------
+==================
 
 * File.name move to not null (run migrations).
 * Fix popup mode when Folder doesn't exists.
@@ -353,7 +354,7 @@ CHANGELOG
 
 
 0.9.1 (2012-10-12)
-------------------
+==================
 
 * Removed nginx X-Accel-Redirect Content-Type header (#245).
 * Validate_related_name method appears to break in FilerFileField (#148).
@@ -361,7 +362,7 @@ CHANGELOG
 
 
 0.9 (2012-09-05)
-----------------
+================
 
 * Django-1.4 compatibility.
 * Separate, customizable file storage backends for public and private files.
@@ -376,7 +377,7 @@ CHANGELOG
 
 
 0.8.7 (2012-07-26)
-------------------
+==================
 
 * Minor maintenance release.
 * No longer unpack uploaded zip files (#172).
@@ -384,7 +385,7 @@ CHANGELOG
 
 
 0.8.6 (2012-03-13)
-------------------
+==================
 
 * Renamed media to static.
 * New dependency: django-staticfiles or django >= 1.3.
@@ -392,32 +393,32 @@ CHANGELOG
 
 
 0.8.5 (2011-09-28)
-------------------
+==================
 
 * Fix thumbnail templatetag support for easy-thumbnails>=1.0-alpha-17.
 
 
 0.8.4 (2011-09-27)
-------------------
+==================
 
 * Fix ajax file upload for django < 1.3.
 
 
 0.8.3 (2011-08-27)
-------------------
+==================
 
 * Replaced flash uploader with pure javascript (burn in hell, flash uplaoder!).
 
 
 0.8.2 (2010-12-16)
-------------------
+==================
 
 * Sha hash for files.
 * Packaging fixes.
 
 
 0.8.1 (2010-10-30)
-------------------
+==================
 
 * Moved to easy-thumbnails for thumbnailing. added tests and lots of cleanup.
 * Backwards incompatible changes:
@@ -425,18 +426,18 @@ CHANGELOG
 
 
 0.7.0
------
+=====
 
-* Bugfixes.
+* Bugfixes
 
 
 0.5.4a1
--------
+=======
 
 * Adds description field.
 
 
 0.0.2a (2009-11-04)
--------------------
+===================
 
 * First test release as a pypi package.
