@@ -15,7 +15,7 @@ handling of files and images a breeze.
 +---------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+
 | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/detail_image.png   | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/detail_file.png    |
 +---------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_1.png  | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_1.png  |
+| .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_1.png  | .. image:: https://raw.githubusercontent.com/divio/django-filer/develop/docs/_static/file_picker_3.png  |
 +---------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+
 
 
