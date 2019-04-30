@@ -11,6 +11,7 @@ from django.contrib.admin import helpers
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 
 from tests.helpers import (
     SettingsOverride, create_folder_structure, create_image, create_superuser,
@@ -24,7 +25,6 @@ from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
 from filer.settings import FILER_IMAGE_MODEL
 from filer.thumbnail_processors import normalize_subject_location
-from filer.utils.compatibility import reverse
 from filer.utils.loader import load_model
 
 

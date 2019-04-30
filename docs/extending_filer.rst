@@ -239,7 +239,6 @@ First a custom model must be defined; it should inherit from BaseImage, the basi
 .. code-block:: python
 
     from filer.models.abstract.BaseImage
-    from filer.utils.compatibility import GTE_DJANGO_1_10
 
     class CustomImage(BaseImage):
         my_field = models.CharField(max_length=10)
@@ -247,8 +246,7 @@ First a custom model must be defined; it should inherit from BaseImage, the basi
         class Meta(BaseImage.Meta):
             # You must define a meta with en explicit app_label
             app_label = 'myapp'
-            if GTE_DJANGO_1_10:
-                default_manager_name = 'objects'
+            default_manager_name = 'objects'
 
 The model can be defined in any installed application declared **after** ``django-filer``.
 

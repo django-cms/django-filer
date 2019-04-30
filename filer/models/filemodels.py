@@ -7,15 +7,14 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
 
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
-from ..utils.compatibility import (
-    NoReverseMatch, is_authenticated, python_2_unicode_compatible, reverse,
-)
 from . import mixins
 from .foldermodels import Folder
 
@@ -245,7 +244,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         image. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not is_authenticated(user):
+        if not user.is_authenticated:
             return False
         elif user.is_superuser:
             return True

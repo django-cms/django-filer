@@ -11,9 +11,10 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.core.urlresolvers import reverse
 
 from ..models import Folder
-from ..utils.compatibility import LTE_DJANGO_1_8, reverse, truncate_words
+from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
 
@@ -74,10 +75,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     def obj_for_value(self, value):
         try:
             key = self.rel.get_related_field().name
-            if LTE_DJANGO_1_8:
-                obj = self.rel.to._default_manager.get(**{key: value})
-            else:
-                obj = self.rel.model._default_manager.get(**{key: value})
+            obj = self.rel.model._default_manager.get(**{key: value})
         except ObjectDoesNotExist:
             obj = None
         return obj

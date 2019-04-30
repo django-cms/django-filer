@@ -12,10 +12,11 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.core.urlresolvers import reverse
 
 from .. import settings as filer_settings
 from ..models import File
-from ..utils.compatibility import LTE_DJANGO_1_8, reverse, truncate_words
+from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
 
@@ -63,8 +64,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'lookup_name': name,
             'id': css_id,
             'admin_icon_delete': (
-                'admin/img/icon_deletelink.gif' if LTE_DJANGO_1_8
-                else 'admin/img/icon-deletelink.svg'
+                'admin/img/icon-deletelink.svg'
             ),
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
@@ -78,10 +78,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         if value:
             try:
                 key = self.rel.get_related_field().name
-                if LTE_DJANGO_1_8:
-                    obj = self.rel.to._default_manager.get(**{key: value})
-                else:
-                    obj = self.rel.model._default_manager.get(**{key: value})
+                obj = self.rel.model._default_manager.get(**{key: value})
             except ObjectDoesNotExist:
                 obj = None
         else:

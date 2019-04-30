@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from ..utils.compatibility import is_authenticated
 from . import Clipboard
 
 
@@ -15,7 +14,7 @@ def delete_clipboard(clipboard):
 
 
 def get_user_clipboard(user):
-    if is_authenticated(user):
+    if user.is_authenticated:
         clipboard = Clipboard.objects.get_or_create(user=user)[0]
         return clipboard
 
