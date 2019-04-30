@@ -119,7 +119,7 @@ CHANGELOG
 ==================
 
 * Dropping or uploading an image will now fire a js change event
-* Added native Aldryn support
+* Added native Divio Cloud support
 
 
 1.2.4 (2016-07-06)
