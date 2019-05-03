@@ -4,6 +4,7 @@ import os
 from functools import partial
 
 from django import template
+from django.conf import settings
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import quote, unquote, capfirst
 from django.contrib import messages
@@ -52,12 +53,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
         'delete_files_or_folders',
         'move_files_and_folders',
     ]
-
-    actions = [
+    actions_restrictions = [
         'disable_restriction',
         'enable_restriction',
+    ] if getattr(settings, 'FILER_ENABLE_RESTRICTION_ACTIONS', True) else []
+    actions = actions_restrictions + [
         'copy_files_and_folders',
-        'extract_files', ] + actions_affecting_position
+        'extract_files',
+    ] + actions_affecting_position
 
     # form fields
     exclude = ('parent', 'owner', 'folder_type')
