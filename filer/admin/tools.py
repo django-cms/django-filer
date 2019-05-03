@@ -53,7 +53,6 @@ def folders_available(current_site, user, folders_qs):
                 Q(site__in=available_sites) |
                 Q(shared__in=available_sites))
 
-    user_sites = get_sites_for_user(user)
     if (getattr(settings, 'FILER_INCLUDE_SITELESS_FOLDERS', True) and
         has_admin_role(user) and not current_site):
         sites_q |= Q(site__pk__isnull=True)
