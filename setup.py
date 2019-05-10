@@ -6,7 +6,7 @@ from filer import __version__
 
 
 REQUIREMENTS = [
-    'django>=1.8,<3.0',
+    'django>=1.11,<3.0',
     'django-mptt>=0.6,<1.0',  # the exact version depends on Django
     'django_polymorphic>=0.7,<2.1',
     'easy-thumbnails>=2,<3.0',

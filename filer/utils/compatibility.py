@@ -36,20 +36,9 @@ def upath(path):
 
 
 def get_delete_permission(opts):
-    try:
-        from django.contrib.auth import get_permission_codename  # noqa
-        return '%s.%s' % (opts.app_label,
-                          get_permission_codename('delete', opts))
-    except ImportError:
-        return '%s.%s' % (opts.app_label,
-                          opts.get_delete_permission())
-
-
-try:
-    from importlib import import_module  # noqa
-except ImportError:
-    # python < 2.7
-    from django.utils.importlib import import_module  # noqa
+    from django.contrib.auth import get_permission_codename  # noqa
+    return '%s.%s' % (opts.app_label,
+                        get_permission_codename('delete', opts))
 
 
 try:
