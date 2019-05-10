@@ -14,8 +14,6 @@ from importlib import import_module
 
 from django.utils import six
 
-from .compatibility import import_module
-
 
 def load_object(import_path):
     """
