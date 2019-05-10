@@ -2,13 +2,14 @@
 from __future__ import absolute_import
 
 from django import forms
+from django.contrib.admin.utils import unquote
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from .. import settings
 from ..models import File
-from ..utils.compatibility import reverse, unquote
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 

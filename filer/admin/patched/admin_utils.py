@@ -15,13 +15,13 @@ from __future__ import absolute_import, unicode_literals
 
 from collections import defaultdict
 
+from django.contrib.admin.utils import quote
 from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models.deletion import Collector
+from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
 from django.utils.text import capfirst
-
-from ...utils.compatibility import NoReverseMatch, quote, reverse
 
 
 try:

@@ -6,15 +6,14 @@ from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
 import mptt
 
 from .. import settings as filer_settings
-from ..utils.compatibility import (
-    is_authenticated, python_2_unicode_compatible, reverse,
-)
 from . import mixins
 
 
@@ -188,7 +187,7 @@ class Folder(models.Model, mixins.IconsMixin):
         folder. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not is_authenticated(user):
+        if not user.is_authenticated:
             return False
         elif user.is_superuser:
             return True

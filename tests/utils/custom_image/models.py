@@ -4,7 +4,6 @@ from __future__ import absolute_import
 from django.db import models
 
 from filer.models.abstract import BaseImage
-from filer.utils.compatibility import GTE_DJANGO_1_10
 
 
 class Image(BaseImage):
@@ -13,5 +12,4 @@ class Image(BaseImage):
     class Meta(BaseImage.Meta):
         swappable = 'FILER_IMAGE_MODEL'
         app_label = 'custom_image'
-        if GTE_DJANGO_1_10:
-            default_manager_name = 'objects'
+        default_manager_name = 'objects'
