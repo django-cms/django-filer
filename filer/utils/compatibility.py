@@ -37,8 +37,7 @@ def upath(path):
 
 def get_delete_permission(opts):
     from django.contrib.auth import get_permission_codename  # noqa
-    return '%s.%s' % (opts.app_label,
-                        get_permission_codename('delete', opts))
+    return '%s.%s' % (opts.app_label, get_permission_codename('delete', opts))
 
 
 try:
