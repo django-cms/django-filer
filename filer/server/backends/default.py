@@ -26,7 +26,7 @@ class DefaultServer(ServerBase):
             raise Http404('"%s" does not exist' % fullpath)
         # Respect the If-Modified-Since header.
         statobj = os.stat(fullpath)
-        response_params = {'content_type': self.get_mimetype(fullpath)}
+        response_params = {'content_type': file_obj.mime_type}
         if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                                   statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
             return HttpResponseNotModified(**response_params)

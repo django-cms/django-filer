@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import mimetypes
 import os
 
 from django.utils.encoding import smart_str
@@ -13,9 +12,6 @@ class ServerBase(object):
 
     Warning: this API is EXPERIMENTAL and may change at any time.
     """
-    def get_mimetype(self, path):
-        return mimetypes.guess_type(path)[0] or 'application/octet-stream'
-
     def default_headers(self, **kwargs):
         self.save_as_header(**kwargs)
         self.size_header(**kwargs)
