@@ -8,13 +8,13 @@ from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 from django.utils.six.moves import input
 
-from filer.settings import DEFAULT_FILER_STORAGES
+from filer import settings as filer_settings
 
 
 class Command(BaseCommand):
     help = "Look for orphaned files in media folders."
     storage = DefaultStorage()
-    prefix = DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX']
+    prefix = filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX']
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -113,6 +113,6 @@ class Command(BaseCommand):
             for child in child_dirs:
                 walk(os.path.join(prefix, child))
 
-        filer_public = DEFAULT_FILER_STORAGES['public']['main']
+        filer_public = filer_settings.FILER_STORAGES['public']['main']
         storage = import_string(filer_public['ENGINE'])()
         walk(filer_public['UPLOAD_TO_PREFIX'])

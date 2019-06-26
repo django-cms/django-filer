@@ -3,17 +3,38 @@ from __future__ import absolute_import
 
 import os, shutil
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.test import TestCase
 from django.utils.module_loading import import_string
 from django.utils.six import StringIO
 
+from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.settings import DEFAULT_FILER_STORAGES
 
-from .server_backends import BaseServerBackendTestCase
+from tests.helpers import create_image
 
 
-class FilerCheckTestCase(BaseServerBackendTestCase):
+class FilerCheckTestCase(TestCase):
+    def setUp(self):
+        # ensure that filer_public directory is empty from previous tests
+        storage = import_string(filer_settings.FILER_STORAGES['public']['main']['ENGINE'])()
+        upload_to_prefix = filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX']
+        if storage.exists(upload_to_prefix):
+            shutil.rmtree(storage.path(upload_to_prefix))
+
+        original_filename = 'testimage.jpg'
+        file_obj = SimpleUploadedFile(
+            name=original_filename,
+            content=create_image().tobytes(),
+            content_type='image/jpeg')
+        self.filer_file = File.objects.create(
+            file=file_obj,
+            original_filename=original_filename)
+
+    def tearDown(self):
+        self.filer_file.delete()
+
     def test_delete_missing(self):
         out = StringIO()
         self.assertTrue(os.path.exists(self.filer_file.file.path))
@@ -34,14 +55,12 @@ class FilerCheckTestCase(BaseServerBackendTestCase):
         out = StringIO()
         self.assertTrue(os.path.exists(self.filer_file.file.path))
         call_command('filer_check', stdout=out, orphans=True)
+        # folder must be clean, free of orphans
         self.assertEqual('', out.getvalue())
 
         # add an orphan file to our storage
-        storage = import_string(DEFAULT_FILER_STORAGES['public']['main']['ENGINE'])()
-        filer_public = os.path.join(storage.base_location, DEFAULT_FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
-        if os.path.isdir(filer_public):
-            shutil.rmtree(filer_public)
-        os.mkdir(filer_public)
+        storage = import_string(filer_settings.FILER_STORAGES['public']['main']['ENGINE'])()
+        filer_public = storage.path(filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
         orphan_file = os.path.join(filer_public, 'hello.txt')
         with open(orphan_file, 'w') as fh:
             fh.write("I don't belong here!")
