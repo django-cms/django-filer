@@ -45,4 +45,4 @@ class ServerBase(object):
         #     response['Content-Length'] = file.size
 
     def serve(self, request, filer_file, **kwargs):
-        raise NotImplemented(".serve() must be overridden")
+        raise NotImplementedError(".serve() must be overridden")
