@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import os
 import mimetypes
+import os
 
 from django.http.multipartparser import (
     ChunkIter, SkipFile, StopFutureHandlers, StopUpload, exhaust,
