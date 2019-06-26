@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-import os, shutil
+import os
+import shutil
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
