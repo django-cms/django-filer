@@ -9,6 +9,8 @@ CHANGELOG
 * Removed support for Django <= 1.10
 * Removed outdated files
 * Code alignments with other addons
+* In models.File, add field mime_type to store the Content-Type as set by the browser during
+  file upload.
 
 
 1.5.0 (2019-04-30)
