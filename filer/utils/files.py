@@ -35,6 +35,8 @@ def handle_upload(request):
             # This means we shouldn't continue...raise an error.
             raise UploadException("Invalid content length: %r" % content_length)
 
+        mime_type = request.META.get('CONTENT_TYPE', 'application/octet-stream')
+
         upload_handlers = request.upload_handlers
         for handler in upload_handlers:
             handler.handle_raw_input(request,

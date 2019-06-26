@@ -22,8 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='mime_type',
-            field=models.CharField(help_text='MIME type of uploaded content', max_length=255, validators=[filer.models.filemodels.mimetype_validator]),
-            preserve_default=False,
+            field=models.CharField(default='application/octet-stream', help_text='MIME type of uploaded content', max_length=255, validators=[filer.models.filemodels.mimetype_validator]),
         ),
         migrations.RunPython(guess_mimetypes, reverse_code=migrations.RunPython.noop),
     ]

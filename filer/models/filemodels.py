@@ -103,6 +103,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         max_length=255,
         help_text='MIME type of uploaded content',
         validators=[mimetype_validator],
+        default='application/octet-stream',
     )
 
     objects = FileManager()
