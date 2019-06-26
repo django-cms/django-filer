@@ -307,7 +307,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
-            content_type='application/octet-stream',
+            content_type='image/jpeg',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
@@ -323,7 +323,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
-            content_type='application/octet-stream',
+            content_type='image/jpeg',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
