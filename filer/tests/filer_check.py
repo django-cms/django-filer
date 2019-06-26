@@ -4,11 +4,12 @@ from __future__ import absolute_import
 import os, shutil
 
 from django.core.management import call_command
-from django.utils.six import StringIO
 from django.utils.module_loading import import_string
+from django.utils.six import StringIO
 
 from filer.models.filemodels import File
 from filer.settings import DEFAULT_FILER_STORAGES
+
 from .server_backends import BaseServerBackendTestCase
 
 
