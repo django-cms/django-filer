@@ -8,19 +8,16 @@ from datetime import datetime
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from . import mixins
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
-from ..utils.compatibility import (
-    NoReverseMatch,
-    is_authenticated,
-    python_2_unicode_compatible,
-    reverse,
-)
+from . import mixins
 from .foldermodels import Folder
+
 
 try:
     from polymorphic.models import PolymorphicModel
@@ -124,7 +121,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # cache the file size
         try:
             self._file_size = self.file.size
-        except:
+        except:   # noqa
             self._file_size = None
         # generate SHA1 hash
         try:
@@ -247,7 +244,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         image. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not is_authenticated(user):
+        if not user.is_authenticated:
             return False
         elif user.is_superuser:
             return True
@@ -292,7 +289,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         """
         try:
             r = self.file.url
-        except:
+        except:  # noqa
             r = ''
         return r
 
@@ -320,7 +317,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def path(self):
         try:
             return self.file.path
-        except:
+        except:  # noqa
             return ""
 
     @property

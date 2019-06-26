@@ -2,13 +2,14 @@
 from __future__ import absolute_import
 
 from django import forms
+from django.contrib.admin.utils import unquote
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from .. import settings
 from ..models import File
-from ..utils.compatibility import reverse, unquote
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
@@ -62,10 +63,10 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         if (
-            request.POST and
-            '_continue' not in request.POST and
-            '_saveasnew' not in request.POST and
-            '_addanother' not in request.POST
+            request.POST
+            and '_continue' not in request.POST
+            and '_saveasnew' not in request.POST
+            and '_addanother' not in request.POST
         ):
             # Popup in pick mode or normal mode. In both cases we want to go
             # back to the folder list view after save. And not the useless file
@@ -148,5 +149,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             return '-'
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
+
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()

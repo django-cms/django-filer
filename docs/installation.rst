@@ -14,7 +14,7 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
 Dependencies
 ------------
 
-* `Django`_ >= 1.8
+* `Django`_ >= 1.11
 * `django-mptt`_ >=0.6
 * `easy_thumbnails`_ >= 2.0
 * `django-polymorphic`_ >= 0.7
