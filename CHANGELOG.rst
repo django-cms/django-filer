@@ -9,6 +9,7 @@ CHANGELOG
 * Removed support for Django <= 1.10
 * Removed outdated files
 * Code alignments with other addons
+* Replace deprectaed templatetag ``staticfiles`` by ``static``.
 
 
 1.5.0 (2019-04-30)
