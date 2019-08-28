@@ -78,6 +78,8 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             obj = self.rel.model._default_manager.get(**{key: value})
         except ObjectDoesNotExist:
             obj = None
+        except ValueError:
+            obj = None
         return obj
 
     class Media(object):
