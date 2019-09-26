@@ -9,6 +9,7 @@ CHANGELOG
 * Removed support for Django <= 1.10
 * Removed outdated files
 * Code alignments with other addons
+* Add jQuery as AdminFileWidget Media dependency
 
 
 1.5.0 (2019-04-30)
