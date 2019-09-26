@@ -11,6 +11,7 @@ CHANGELOG
 * Code alignments with other addons
 * Added management command ``filer_check`` to check the integrity of the
   database against the file system, and vice versa.
+* Add jQuery as AdminFileWidget Media dependency
 
 
 1.5.0 (2019-04-30)
