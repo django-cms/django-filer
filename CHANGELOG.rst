@@ -9,6 +9,7 @@ CHANGELOG
 * Removed support for Django <= 1.10
 * Removed outdated files
 * Code alignments with other addons
+* Replace deprecated templatetag ``staticfiles`` against ``static``.
 * Added management command ``filer_check`` to check the integrity of the
   database against the file system, and vice versa.
 * Add jQuery as AdminFileWidget Media dependency
