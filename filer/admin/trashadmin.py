@@ -102,7 +102,7 @@ class TrashAdmin(admin.ModelAdmin):
         filer_model_cls = getattr(filer.models, filer_model.capitalize())
         try:
             filer_object = filer_model_cls.trash.get(id=filer_obj_id)
-        except filer_model_cls.DoesNotExist, e:
+        except filer_model_cls.DoesNotExist as e:
             raise Http404
 
         return filer_model_cls, filer_object
@@ -156,7 +156,7 @@ class TrashAdmin(admin.ModelAdmin):
         container_attr = 'folder' if filer_model == 'file' else 'parent'
         try:
             getattr(filer_object, container_attr)
-        except filer.models.Folder.DoesNotExist, e:
+        except filer.models.Folder.DoesNotExist as e:
             raise PermissionDenied
 
         if request.method == 'POST' and request.POST.get('post'):
@@ -179,7 +179,7 @@ class TrashAdmin(admin.ModelAdmin):
 
         try:
             file_obj = filer.models.filemodels.File.trash.get(id=file_id)
-        except filer.models.filemodels.File.DoesNotExist, e:
+        except filer.models.filemodels.File.DoesNotExist as e:
             raise Http404
 
         data = {}

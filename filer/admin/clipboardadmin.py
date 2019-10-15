@@ -156,7 +156,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                     ', '.join(errors)) for field, errors in uploadform.errors.items()
                 ])
                 raise UploadException(self.messages['request-invalid'].format(form_errors))
-        except UploadException, exception:
+        except UploadException as exception:
             return HttpResponse(json.dumps({'error': unicode(exception)}),
                                 content_type=mimetype)
         except Exception as error: # no matter the error, we don't return a 500 code
