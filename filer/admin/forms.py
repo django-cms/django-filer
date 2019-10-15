@@ -50,9 +50,9 @@ class RenameFilesForm(forms.Form, AsPWithHelpMixin):
                 'counter': 42,
                 'global_counter': 42,
             }
-        except KeyError, e:
+        except KeyError as e:
             raise forms.ValidationError(_('Unknown rename format value key "%(key)s".') % {'key': e.args[0]})
-        except Exception, e:
+        except Exception as e:
             raise forms.ValidationError(_('Invalid rename format: %(error)s.') % {'error': e})
         return self.cleaned_data['rename_format']
 

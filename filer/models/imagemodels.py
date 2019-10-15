@@ -178,7 +178,7 @@ class Image(File):
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
                 _thumbnails[name] = thumb.url
-            except Exception,e:
+            except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
                 # proper logging configuration
