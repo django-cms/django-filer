@@ -418,7 +418,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                 'paginator': paginator,
                 'paginated_items': paginated_items,
                 'current_url': request.path,
-                'title': u'Directory listing for %s' % folder.name,
+                'title': 'Directory listing for %s' % folder.name,
                 'search_string': ' '.join(search_terms),
                 'q': q,
                 'show_result_count': show_result_count,
@@ -711,14 +711,14 @@ class FolderAdmin(FolderPermissionModelAdmin):
             if not user.has_perm(p, obj) and not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return mark_safe(u'%s: <a href="%s">%s</a>' %
+            return mark_safe('%s: <a href="%s">%s</a>' %
                              (escape(capfirst(opts.verbose_name)),
                               admin_url,
                               escape(obj.actual_name)))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return u'%s: %s' % (capfirst(opts.verbose_name),
+            return '%s: %s' % (capfirst(opts.verbose_name),
                                 force_text(obj.actual_name))
 
     def _get_current_action_folder(self, request, files_qs, folders_qs):
@@ -812,11 +812,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         current_folder = self._as_folder(request.GET, 'current_folder')
         parent = self._as_folder(request.GET, 'parent')
-        selected_ids = filter(
-            None,
-            map(lambda f_id: f_id or None,
-                json.loads(request.GET.get('selected_folders') or '[]'))
-        )
+        selected_ids = [_f for _f in [f_id or None for f_id in json.loads(request.GET.get('selected_folders') or '[]')] if _f]
         candidates = Folder.objects.filter(parent=parent)
         fancytree_candidates = []
         for folder in _valid_candidates(request, candidates, selected_ids):
@@ -932,7 +928,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         "Move selected files and/or folders")
 
     def extract_files(self, request, files_queryset, folder_queryset):
-        success_format = u"Successfully extracted archive {}."
+        success_format = "Successfully extracted archive {}."
 
         files_queryset = files_queryset.filter(
             polymorphic_ctype=ContentType.objects.get_for_model(Archive).id)
@@ -947,7 +943,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         def is_valid_archive(filer_file):
             is_valid = filer_file.is_valid()
             if not is_valid:
-                error_format = u"{} is not a valid zip file"
+                error_format = "{} is not a valid zip file"
                 message = error_format.format(filer_file.clean_actual_name)
                 messages.error(request, _(message))
             return is_valid
@@ -955,9 +951,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
         def has_collisions(filer_file):
             collisions = filer_file.collisions()
             if collisions:
-                error_format = u"Files/Folders from {archive} with names:"
-                error_format += u"{names} already exist."
-                names = u", ".join(collisions)
+                error_format = "Files/Folders from {archive} with names:"
+                error_format += "{names} already exist."
+                names = ", ".join(collisions)
                 archive = filer_file.clean_actual_name
                 message = error_format.format(
                     archive=archive,
@@ -1066,8 +1062,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
 
         if existing_names:
             messages.error(request,
-                _(u"File or folders with names %s already exist at the "
-                  "selected destination") % u", ".join(existing_names))
+                _("File or folders with names %s already exist at the "
+                  "selected destination") % ", ".join(existing_names))
             return False
         return True
 

@@ -30,7 +30,7 @@ def get_or_fetch(fetch_func):
     """
     @wraps(fetch_func)
     def wrapper(user, *args, **kwargs):
-        attr_name = '_%s' % fetch_func.func_name
+        attr_name = '_%s' % fetch_func.__name__
         if not hasattr(user, attr_name):
             result = fetch_func(user, *args, **kwargs)
             setattr(user, attr_name, result)
@@ -45,7 +45,7 @@ def has_admin_role(user):
 
 def can_restrict_on_site(user, site):
     site_id = site
-    if not unicode(site_id).isnumeric():
+    if not str(site_id).isnumeric():
         site_id = getattr(site, 'id', None)
 
     def _fetch_perm_existance():

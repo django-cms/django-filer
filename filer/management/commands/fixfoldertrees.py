@@ -28,7 +28,7 @@ class Command(BaseCommand):
                         'There are multiple root folders with the same '
                         'tree_id. This will require a full rebuild.\n')
                 else:
-                    for folder_pk, msg in checker.corrupted_folders.items():
+                    for folder_pk, msg in list(checker.corrupted_folders.items()):
                         self.stdout.write('Folder /%s:\n\t%s' % (
                             checker._get_folder_path(folder_pk), msg))
                         self.stdout.write('\n')

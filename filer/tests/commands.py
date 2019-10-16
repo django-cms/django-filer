@@ -1,5 +1,5 @@
 """ Tests for management commdands. """
-from StringIO import StringIO
+from io import StringIO
 from datetime import datetime, timedelta
 
 from django.test import TestCase

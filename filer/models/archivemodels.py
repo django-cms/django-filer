@@ -199,6 +199,6 @@ class Archive(File):
 
 
 def to_unicode(x):  # expects str or unicode
-    if isinstance(x, unicode):
+    if isinstance(x, str):
         return x
     return x.decode('utf8')

@@ -147,7 +147,7 @@ class Folder(models.Model, mixins.IconsMixin):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
 
-    folder_type = models.IntegerField(choices=FOLDER_TYPES.items(),
+    folder_type = models.IntegerField(choices=list(FOLDER_TYPES.items()),
                                       default=SITE_FOLDER)
 
     site = models.ForeignKey(Site, null=True, blank=True,
@@ -188,7 +188,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
         if self.name == filer.models.clipboardmodels.Clipboard.folder_name:
             raise ValidationError(
-                _(u'%s is reserved for internal use. '
+                _('%s is reserved for internal use. '
                   'Please choose a different name') % self.name)
 
         if self.name and "/" in self.name:
@@ -474,7 +474,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def pretty_logical_path(self):
-        return u"/%s" % u"/".join([f.name
+        return "/%s" % "/".join([f.name
                                    for f in self.logical_path + [self]])
 
     @property

@@ -1,4 +1,5 @@
 *.pyc
+*.bak
 *.pyo
 .installed.cfg
 bin

@@ -1,4 +1,5 @@
 import itertools
+from functools import reduce
 
 
 class MultiMoldelQuerysetChain(object):
@@ -19,7 +20,7 @@ class MultiMoldelQuerysetChain(object):
     def __getitem__(self, key):
         if isinstance(key, slice):
             return self._get_slice(key)
-        elif isinstance(key, (int, long)):
+        elif isinstance(key, int):
             return self._get_item(key)
         else:
             raise TypeError("QuerysetChain index must be int or slice not {}".format(type(key)))
@@ -38,7 +39,7 @@ class MultiMoldelQuerysetChain(object):
         assert key.stop is not None
         assert key.step is None
         slices = (self.slice(qs, key.start-offset, key.stop-offset)
-                  for qs, offset in itertools.izip(self._qsets, self._offsets))
+                  for qs, offset in zip(self._qsets, self._offsets))
         return reduce(lambda s1, s2: s1+s2, slices)
 
     def slice(self, qset, start, stop):

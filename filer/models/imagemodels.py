@@ -173,7 +173,7 @@ class Image(File):
         _thumbnails = {}
         if self.is_in_trash():
             return _thumbnails
-        for name, opts in required_thumbnails.iteritems():
+        for name, opts in list(required_thumbnails.items()):
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)

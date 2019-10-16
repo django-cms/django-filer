@@ -15,10 +15,10 @@ class AsPWithHelpMixin(object):
     def as_p_with_help(self):
         "Returns this form rendered as HTML <p>s with help text formated for admin."
         return self._html_output(
-            normal_row=u'<p%(html_class_attr)s>%(label)s %(field)s</p>%(help_text)s',
-            error_row=u'%s',
+            normal_row='<p%(html_class_attr)s>%(label)s %(field)s</p>%(help_text)s',
+            error_row='%s',
             row_ender='</p>',
-            help_text_html=u'<p class="help">%s</p>',
+            help_text_html='<p class="help">%s</p>',
             errors_on_separate_row=True)
 
 

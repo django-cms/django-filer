@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import smart_str
@@ -27,7 +27,7 @@ class PrivateFileSystemStorage(FileSystemStorage):
 def filepath_to_url(path):
     if path is None:
         return path
-    return urllib.quote(smart_str(path).replace("\\", "/"), safe="/~!*()")
+    return urllib.parse.quote(smart_str(path).replace("\\", "/"), safe="/~!*()")
 
 
 try:

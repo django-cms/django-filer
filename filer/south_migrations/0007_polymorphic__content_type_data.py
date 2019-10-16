@@ -19,7 +19,7 @@ class Migration(DataMigration):
                     file.polymorphic_ctype_id = file_ct
                 file.save()
         except ObjectDoesNotExist:
-            print "No filer contentypes to migrate. This is probably because migrate is running on a new database."
+            print("No filer contentypes to migrate. This is probably because migrate is running on a new database.")
 
 
     def backwards(self, orm):
