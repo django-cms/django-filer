@@ -51,7 +51,7 @@ class FileStats(object):
         for prefix in ('public', 'private'):
             data.update({
                 "{prefix}_{marker}".format(prefix=prefix, marker=k): len(v)
-                for k, v in getattr(self, prefix).items()
+                for k, v in list(getattr(self, prefix).items())
                 if k != 'total'
             })
         return data
@@ -61,7 +61,7 @@ class FileStats(object):
         for prefix in ('public', 'private'):
             data.update({
                 "{prefix}_{marker}".format(prefix=prefix, marker=k): v
-                for k, v in getattr(self, prefix).items()
+                for k, v in list(getattr(self, prefix).items())
                 if k != 'total'
             })
         return data
@@ -73,7 +73,7 @@ class FileStats(object):
         data = self.full_summary() if full else self.summary()
         return '\n'.join(sorted([
             "%s %s" % (to_title(k), join(v) if hasattr(v, '__iter__') else v)
-            for k, v in data.items()]))
+            for k, v in list(data.items())]))
 
 
 class FileChecker(object):
@@ -110,7 +110,7 @@ class FileChecker(object):
         return response.status_code == requests.codes.ok
 
     def as_string(self):
-        return u"%s: %s" % (self._file.pk, self.logical_path, )
+        return "%s: %s" % (self._file.pk, self.logical_path, )
 
     @classmethod
     def check_all(cls, log_progress=None):

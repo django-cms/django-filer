@@ -42,7 +42,7 @@ class ThumbnailerNameMixin(object):
         quality = thumbnail_options.pop('quality', self.thumbnail_quality)
         initial_opts = ['%sx%s' % size, 'q%s' % quality]
 
-        opts = thumbnail_options.items()
+        opts = list(thumbnail_options.items())
         opts.sort()   # Sort the options so the file name is consistent.
         opts = ['%s' % (v is not True and '%s-%s' % (k, v) or k)
                 for k, v in opts if v]
@@ -56,7 +56,7 @@ class ThumbnailerNameMixin(object):
         all_opts = all_opts.replace('__', '_')
         if high_resolution:
             all_opts += '@2x'
-        filename = u'%s__%s.%s' % (source_filename, all_opts, extension)
+        filename = '%s__%s.%s' % (source_filename, all_opts, extension)
 
         return os.path.join(basedir, path, subdir, filename)
 

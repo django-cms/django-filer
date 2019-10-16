@@ -41,11 +41,11 @@ class RecursiveDictionary(dict):
         {'foo': {'baz': 36, 'bar': 42}}
         """
         try:
-            iterator = other.iteritems()
+            iterator = list(other.items())
         except AttributeError:
             iterator = other
         self.iter_rec_update(iterator)
-        self.iter_rec_update(third.iteritems())
+        self.iter_rec_update(list(third.items()))
 
     def iter_rec_update(self, iterator):
         for (key, value) in iterator:

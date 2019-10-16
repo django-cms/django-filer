@@ -58,7 +58,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         params = self.url_parameters()
         if params:
             lookup_url = '?' + '&amp;'.join(
-                                ['%s=%s' % (k, v) for k, v in params.items()])
+                                ['%s=%s' % (k, v) for k, v in list(params.items())])
         else:
             lookup_url = ''
         if not 'class' in attrs:
@@ -166,4 +166,4 @@ class FilerFileField(models.ForeignKey):
 
 
 class NonClearableFileInput(django_widgets.AdminFileWidget):
-    template_with_clear = u''
+    template_with_clear = ''

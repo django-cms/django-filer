@@ -31,7 +31,7 @@ def move_file_to_clipboard(request, files, clipboard):
         for f in clipboard.files.all() if f.clean_actual_name in file_names]
     for file_obj in files:
         if file_obj.clean_actual_name in already_existing:
-            messages.error(request, _(u'Clipboard already contains a file '
+            messages.error(request, _('Clipboard already contains a file '
                                       'named %s') % file_obj.clean_actual_name)
             continue
         if clipboard.append_file(file_obj):
@@ -70,6 +70,6 @@ def move_files_to_folder(request, files, destination):
 
     for file_obj in invalid_files:
         messages.error(
-            request, _(u"File or folder named %s already exists in "
+            request, _("File or folder named %s already exists in "
                        "this folder.") % file_obj.clean_actual_name)
     return valid_files

@@ -29,7 +29,7 @@ class TreeChecker(object):
         attr_idx = {'lft':0, 'rght':1, 'level':2, 'tree_id':3}
         expected, actual = list(expected), list(actual)
         diff = []
-        for attr, idx in attr_idx.items():
+        for attr, idx in list(attr_idx.items()):
             if expected[idx] != actual[idx]:
                 diff.append('wrong %s value: expected %s, actual %s' % (
                     attr, expected[idx], actual[idx]))
@@ -50,7 +50,7 @@ class TreeChecker(object):
         if not self.corruption_check_done:
             self.check_corruptions()
         corrupted_trees = self.manager.filter(
-            pk__in=self.corrupted_folders.keys()).\
+            pk__in=list(self.corrupted_folders.keys())).\
             values_list('tree_id', flat=True).distinct()
         return self.manager.filter(
             parent__isnull=True, tree_id__in=corrupted_trees)

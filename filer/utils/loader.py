@@ -26,7 +26,7 @@ def load_object(import_path):
 
     If the attribute does not exist in the module, a AttributeError is raised.
     """
-    if not isinstance(import_path, basestring):
+    if not isinstance(import_path, str):
         return import_path
     if '.' not in import_path:
         raise TypeError(

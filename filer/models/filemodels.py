@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 #-*- coding: utf-8 -*-
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
@@ -194,7 +194,7 @@ class File(polymorphic.PolymorphicModel,
             entries = self.folder.entries_with_names([self.actual_name])
             if entries and any(entry.pk != self.pk for entry in entries):
                 raise ValidationError(
-                    _(u'Current folder already contains a file named %s') % \
+                    _('Current folder already contains a file named %s') % \
                         self.actual_name)
 
     def _move_file(self):
@@ -504,7 +504,7 @@ class File(polymorphic.PolymorphicModel,
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
-        text = u"%s" % (text,)
+        text = "%s" % (text,)
         return text
 
     def __lt__(self, other):
@@ -549,19 +549,19 @@ class File(polymorphic.PolymorphicModel,
         This property is used for enforcing unique filenames within the same folder.
         """
         if self.name in ('', None):
-            name = u"%s" % (self.original_filename,)
+            name = "%s" % (self.original_filename,)
         else:
-            name = u"%s" % (self.name,)
+            name = "%s" % (self.name,)
         return name
 
     @property
     def pretty_logical_path(self):
         its_dir = self.logical_folder
         if its_dir.is_root:
-            directory_path = u''
+            directory_path = ''
         else:
             directory_path = its_dir.pretty_logical_path
-        full_path = u'{}{}{}'.format(directory_path, os.sep, self.actual_name)
+        full_path = '{}{}{}'.format(directory_path, os.sep, self.actual_name)
         return full_path
 
     def __unicode__(self):

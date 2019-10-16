@@ -2,7 +2,7 @@
 import os
 import tempfile
 import zipfile
-import StringIO
+import io
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -1061,10 +1061,10 @@ class BaseTestFolderTypePermissionLayer(object):
             return {int(el['key']): el for el in tree_data}
 
         root_destinations = _fetch_destinations('null')
-        assert root_destinations.keys() == [foo.id]
+        assert list(root_destinations.keys()) == [foo.id]
         assert root_destinations[foo.id]['unselectable'] == True
         foo_destinations = _fetch_destinations(foo.pk)
-        assert foo_destinations.keys() == [valid_destination.id]
+        assert list(foo_destinations.keys()) == [valid_destination.id]
         assert foo_destinations[valid_destination.id]['unselectable'] == False
 
     def test_move_from_unfiled(self):
@@ -1648,15 +1648,15 @@ class TestFolderTypeFunctionality(TestCase):
         foo.save()
 
         bar = Folder(name='foo', site_id=1)
-        with self.assertRaisesRegexp(ValidationError, 'name is already in use'):
+        with self.assertRaisesRegex(ValidationError, 'name is already in use'):
             bar.full_clean()
         bar.name = 'bar'
         bar.site = None
-        with self.assertRaisesRegexp(ValidationError, 'Site is required'):
+        with self.assertRaisesRegex(ValidationError, 'Site is required'):
             bar.full_clean()
         bar.site = Site.objects.get(id=1)
         bar.folder_type = Folder.CORE_FOLDER
-        with self.assertRaisesRegexp(ValidationError, 'Site must be empty.'):
+        with self.assertRaisesRegex(ValidationError, 'Site must be empty.'):
             bar.full_clean()
 
         response = self.client.post(
@@ -1716,7 +1716,7 @@ class TestValidationOnFileName(TestCase):
         for a_file in files:
             a_file.full_clean()
             a_file.name = "some/name"
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                     ValidationError, 'Slashes are not allowed'):
                 a_file.full_clean()
 
@@ -1725,7 +1725,7 @@ class TestValidationOnFileName(TestCase):
         for a_file in files:
             a_file.full_clean()
             a_file.name = "some_name"
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                     ValidationError, 'without extension is not allowed'):
                 a_file.full_clean()
 
@@ -1745,17 +1745,17 @@ class TestValidationOnFileName(TestCase):
 
         # should allow extension changes that "imply" filer objects conversion
         for ext in ['.txt', '.png', '.jpeg', '.tiff']:
-            with self.assertRaisesRegexp(ValidationError, err_msg1):
+            with self.assertRaisesRegex(ValidationError, err_msg1):
                 zip_file.name = 'abc%s' % ext
                 zip_file.full_clean()
 
         for ext in ['.txt', '.zip', '.tiff']:
-            with self.assertRaisesRegexp(ValidationError, err_msg1):
+            with self.assertRaisesRegex(ValidationError, err_msg1):
                 image_file.name = 'abc%s' % ext
                 image_file.full_clean()
 
         for ext in Image._filename_extensions + Archive._filename_extensions:
-            with self.assertRaisesRegexp(ValidationError, err_msg2):
+            with self.assertRaisesRegex(ValidationError, err_msg2):
                 plain_file.name = 'abc%s' % ext
                 plain_file.full_clean()
 
@@ -2419,11 +2419,11 @@ class TestAdminTools(TestCase):
         request.GET['current_site'] = '1'
         request.user = self.user
         from filer.admin.tools import _filter_available_sites, files_available
-        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        self.assertItemsEqual([1], _filter_available_sites('1', request.user))
         request.GET['current_site'] = 1
-        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
-        request.GET['current_site'] = 1L
-        self.assertItemsEqual([1L], _filter_available_sites('1', request.user))
+        self.assertItemsEqual([1], _filter_available_sites('1', request.user))
+        request.GET['current_site'] = 1
+        self.assertItemsEqual([1], _filter_available_sites('1', request.user))
         request.GET['current_site'] = '2'
         self.assertEqual([], _filter_available_sites('2', request.user))
         f1 = File.objects.create(original_filename='foo_file')
@@ -2511,16 +2511,16 @@ class TestAdminTools(TestCase):
         self.assertEqual(Folder.objects.filter(restricted=False).count(), 0)
 
     def test_truncate_filename_no_extension(self):
-        jpeg_file = StringIO.StringIO('      JFIF') # jpeg signature
+        jpeg_file = io.StringIO('      JFIF') # jpeg signature
         jpeg_file.name = '123456789'
         filename = filer.utils.files.truncate_filename(jpeg_file, maxlen=7)
-        self.assertEquals(filename, '1234567.jpeg')
+        self.assertEqual(filename, '1234567.jpeg')
 
     def test_truncate_filename_with_extension(self):
-        jpeg_file = StringIO.StringIO('      JFIF') # jpeg signature
+        jpeg_file = io.StringIO('      JFIF') # jpeg signature
         jpeg_file.name = '1234567.jpeg'
         filename = filer.utils.files.truncate_filename(jpeg_file, maxlen=5)
-        self.assertEquals(filename, '12345.jpeg')
+        self.assertEqual(filename, '12345.jpeg')
 
 
 class TestMPTTCorruptionsOnFolderOperations(TestCase):

@@ -90,7 +90,7 @@ def create_folder_structure(depth=2, sibling=2, parent=None):
     * parent: is the folder instance of the parent.
     """
     if depth > 0 and sibling > 0:
-        depth_range = range(1, depth+1)
+        depth_range = list(range(1, depth+1))
         depth_range.reverse()
         for d in depth_range:
             for s in range(1,sibling+1):
@@ -153,12 +153,12 @@ class SettingsOverride(object):
 
     def enable(self):
         self.old = {}
-        for key, value in self.overrides.items():
+        for key, value in list(self.overrides.items()):
             self.old[key] = getattr(self.settings_module, key, None)
             setattr(self.settings_module, key, value)
 
     def disable(self):
-       for key, value in self.old.items():
+       for key, value in list(self.old.items()):
             if value is not None:
                 setattr(self.settings_module, key, value)
             else:

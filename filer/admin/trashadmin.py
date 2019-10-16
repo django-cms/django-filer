@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib import admin
-from django.utils.encoding import force_unicode
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
@@ -14,6 +13,7 @@ import filer
 import json
 import logging
 import operator
+from functools import reduce
 
 logger = logging.getLogger(__name__)
 
@@ -135,15 +135,15 @@ class TrashAdmin(admin.ModelAdmin):
             descendants = []
 
         context = {
-            'model_name': force_unicode(opts.verbose_name_plural),
+            'model_name': opts.verbose_name_plural,
             'media': self.media,
             'opts': opts,
             'app_label': opts.app_label,
             'current_item': filer_object,
             'current_item_type': filer_model,
             'descendants': descendants,
-            'title': u'Restore %s %s' % (
-                filer_model.capitalize(), force_unicode(filer_object)),
+            'title': 'Restore %s %s' % (
+                filer_model.capitalize(), str(filer_object)),
         }
         return render_to_response('admin/filer/trash/item_restore.html',
            context, context_instance=RequestContext(request))
@@ -222,14 +222,14 @@ class TrashAdmin(admin.ModelAdmin):
             paginated_items = paginator.page(paginator.num_pages)
 
         context = {
-            'model_name': force_unicode(opts.verbose_name_plural),
+            'model_name': opts.verbose_name_plural,
             'media': self.media,
             'opts': opts,
             'app_label': opts.app_label,
             'paginator': paginator,
             'paginated_items': paginated_items,
             'search_string': request.GET.get('q', ''),
-            'title': u'Deleted Files and Folders',
+            'title': 'Deleted Files and Folders',
         }
         context.update(extra_context or {})
         return render_to_response('admin/filer/trash/directory_listing.html',

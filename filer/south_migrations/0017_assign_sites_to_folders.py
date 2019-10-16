@@ -91,7 +91,7 @@ class Migration(DataMigration):
                 lambda x: x in " \t-'\"", match_with.lower(), station).ratio()
 
         if site_match:
-            site_id = max(site_match.iterkeys(), key=lambda k: site_match[k])
+            site_id = max(iter(site_match.keys()), key=lambda k: site_match[k])
             match_val = site_match[site_id]
             if match_val < valid_limit:
                 return None

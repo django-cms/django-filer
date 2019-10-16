@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 import os
 import tempfile
-import urlparse
+import urllib.parse
 import zipfile
 import time
 
@@ -106,7 +106,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + u'__%sx%s_q85_crop_subsampling-2_upscale.jpg' %(size,size))
+                             file_basename + '__%sx%s_q85_crop_subsampling-2_upscale.jpg' %(size,size))
 
     def test_file_upload_public_destination(self):
         """
@@ -279,13 +279,13 @@ class FilerApiTests(TestCase):
                               USE_TZ=True,
                               CDN_INVALIDATION_TIME=1):
             image = self.create_filer_image()
-            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            _, netloc, _, _, _, _ = urllib.parse.urlparse(image.url)
             self.assertEqual(netloc, '')
             time.sleep(1)
-            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            _, netloc, _, _, _, _ = urllib.parse.urlparse(image.url)
             self.assertEqual(netloc, cdn_domain)
-            for url in image.thumbnails.values():
-                _, netloc, _, _, _, _ = urlparse.urlparse(url)
+            for url in list(image.thumbnails.values()):
+                _, netloc, _, _, _, _ = urllib.parse.urlparse(url)
                 self.assertEqual(netloc, cdn_domain)
 
     @override_settings(USE_TZ=False)
@@ -296,13 +296,13 @@ class FilerApiTests(TestCase):
                               USE_TZ=False,
                               CDN_INVALIDATION_TIME=1):
             image = self.create_filer_image()
-            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            _, netloc, _, _, _, _ = urllib.parse.urlparse(image.url)
             self.assertEqual(netloc, '')
             time.sleep(1)
-            _, netloc, _, _, _, _ = urlparse.urlparse(image.url)
+            _, netloc, _, _, _, _ = urllib.parse.urlparse(image.url)
             self.assertEqual(netloc, cdn_domain)
-            for url in image.thumbnails.values():
-                _, netloc, _, _, _, _ = urlparse.urlparse(url)
+            for url in list(image.thumbnails.values()):
+                _, netloc, _, _, _, _ = urllib.parse.urlparse(url)
                 self.assertEqual(netloc, cdn_domain)
 
 
@@ -371,7 +371,7 @@ class ArchiveTest(TestCase):
             filer_matches = file_match or folder_match
             self.assertNotEqual(0, len(filer_matches))
             filer_entry = filer_matches[0]
-            fields = map(lambda x: x.name, filer_entry.logical_path)
+            fields = [x.name for x in filer_entry.logical_path]
             fields += [filer_entry.name or filer_entry.original_filename]
             filer_path = os.sep + os.sep.join(fields)
             self.assertEqual(filer_path, entry)
@@ -410,15 +410,15 @@ class ArchiveTest(TestCase):
         )
 
     def test_folder_quoted_logical_path(self):
-        root_folder = Folder.objects.create(name=u"Foo's Bar", parent=None)
-        child = Folder.objects.create(name=u'Bar"s Foo', parent=root_folder)
-        self.assertEqual(child.quoted_logical_path, u'/Foo%27s%20Bar/Bar%22s%20Foo')
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        child = Folder.objects.create(name='Bar"s Foo', parent=root_folder)
+        self.assertEqual(child.quoted_logical_path, '/Foo%27s%20Bar/Bar%22s%20Foo')
 
     def test_folder_quoted_logical_path_with_unicode(self):
-        root_folder = Folder.objects.create(name=u"Foo's Bar", parent=None)
-        child = Folder.objects.create(name=u'Bar"s 日本 Foo', parent=root_folder)
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        child = Folder.objects.create(name='Bar"s 日本 Foo', parent=root_folder)
         self.assertEqual(child.quoted_logical_path,
-                         u'/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
+                         '/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
 
 
 @SettingsOverride(filer_settings,

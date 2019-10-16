@@ -5,10 +5,11 @@ import filer
 from filer.utils.files import get_valid_filename
 
 from django.core.files.uploadedfile import UploadedFile
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import smart_str
+
 
 def by_date(instance, filename):
-    datepart = force_unicode(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
+    datepart = str(datetime.datetime.now().strftime(smart_str("%Y/%m/%d")))
     return os.path.join(datepart, get_valid_filename(filename))
 
 

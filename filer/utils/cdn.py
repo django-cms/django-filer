@@ -1,5 +1,5 @@
 import datetime
-import urlparse
+import urllib.parse
 
 from django.utils import timezone
 
@@ -32,8 +32,8 @@ def get_cdn_url(file_obj, url):
         now = now.astimezone(tz_used)
 
     if invalidated_at < now:
-        scheme, netloc, path, params, query, fragment = urlparse.urlparse(url)
-        return urlparse.urlunparse(
+        scheme, netloc, path, params, query, fragment = urllib.parse.urlparse(url)
+        return urllib.parse.urlunparse(
             (scheme, cdn_domain, path, params, query, fragment))
     else:
         return url

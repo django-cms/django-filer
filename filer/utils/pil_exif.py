@@ -16,7 +16,7 @@ def get_exif(im):
     except:
         return {}
     ret = {}
-    for tag, value in exif_raw.items():
+    for tag, value in list(exif_raw.items()):
         decoded = ExifTags.TAGS.get(tag, tag)
         ret[decoded] = value
     return ret

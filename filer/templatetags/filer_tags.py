@@ -51,7 +51,7 @@ def filesize(bytes, format='auto1024'):
         return bytes
     # Check for valid bytes
     try:
-        bytes = long(bytes)
+        bytes = int(bytes)
     except (ValueError, TypeError):
         return bytes
 

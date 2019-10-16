@@ -146,18 +146,18 @@ class ClipboardAdmin(admin.ModelAdmin):
                 json_response = {
                     'thumbnail': file_obj.icons['32'],
                     'alt_text': '',
-                    'label': unicode(file_obj),
+                    'label': str(file_obj),
                 }
                 return HttpResponse(json.dumps(json_response),
                                     content_type=mimetype)
             else:
                 form_errors = '; '.join(['%s: %s' % (
                     field,
-                    ', '.join(errors)) for field, errors in uploadform.errors.items()
+                    ', '.join(errors)) for field, errors in list(uploadform.errors.items())
                 ])
                 raise UploadException(self.messages['request-invalid'].format(form_errors))
         except UploadException as exception:
-            return HttpResponse(json.dumps({'error': unicode(exception)}),
+            return HttpResponse(json.dumps({'error': str(exception)}),
                                 content_type=mimetype)
         except Exception as error: # no matter the error, we don't return a 500 code
             # an error occurred trying to build the file obj and the clipboard item
@@ -166,7 +166,7 @@ class ClipboardAdmin(admin.ModelAdmin):
                 clipboard_item.file.file.close()
                 clipboard_item.file.file.delete()
                 clipboard_item.delete()
-            return HttpResponse(json.dumps({'error': unicode(error)}),
+            return HttpResponse(json.dumps({'error': str(error)}),
                                 content_type=mimetype)
         finally:
             if upload:
