@@ -24,12 +24,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     is_hidden = False
 
     def render(self, name, value, attrs=None, renderer=None):
-        if value:
-            # we have selected a folder
-            obj = self.obj_for_value(value)
-        else:
-            # we have not selected a folder
-            obj = None
+        obj = self.obj_for_value(value)
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
@@ -83,6 +78,8 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             key = self.rel.get_related_field().name
             obj = self.rel.model._default_manager.get(**{key: value})
         except ObjectDoesNotExist:
+            obj = None
+        except ValueError:
             obj = None
         return obj
 
