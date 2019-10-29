@@ -28,7 +28,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             # we have selected a folder
             obj = self.obj_for_value(value)
         else:
-            # we have not selected a folder
+            # we have not selected a folder
             obj = None
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id
