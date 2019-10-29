@@ -74,12 +74,12 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
 
     def obj_for_value(self, value):
+        if not value:
+            return None
         try:
             key = self.rel.get_related_field().name
             obj = self.rel.model._default_manager.get(**{key: value})
         except ObjectDoesNotExist:
-            obj = None
-        except ValueError:
             obj = None
         return obj
 
