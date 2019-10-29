@@ -24,13 +24,19 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     is_hidden = False
 
     def render(self, name, value, attrs=None, renderer=None):
-        obj = self.obj_for_value(value)
+        if value:
+            # we have selected a folder
+            obj = self.obj_for_value(value)
+        else:
+            # we have not selected a folder
+            obj = None
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
         if attrs is None:
             attrs = {}
         related_url = None
+
         if value:
             try:
                 folder = Folder.objects.get(pk=value)
