@@ -87,10 +87,10 @@ def ajax_upload(request, folder_id=None):
     try:
         if len(request.FILES) == 1:
             # dont check if request is ajax or not, just grab the file
-            upload, filename, is_raw = handle_request_files_upload(request)
+            upload, filename, is_raw, mime_type = handle_request_files_upload(request)
         else:
             # else process the request as usual
-            upload, filename, is_raw = handle_upload(request)
+            upload, filename, is_raw, mime_type = handle_upload(request)
         # TODO: Deprecated/refactor
         # Get clipboad
         # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
@@ -99,7 +99,7 @@ def ajax_upload(request, folder_id=None):
         for filer_class in filer_settings.FILER_FILE_MODELS:
             FileSubClass = load_model(filer_class)
             # TODO: What if there are more than one that qualify?
-            if FileSubClass.matches_file_type(filename, upload, request):
+            if FileSubClass.matches_file_type(filename, upload, mime_type):
                 FileForm = modelform_factory(
                     model=FileSubClass,
                     fields=('original_filename', 'owner', 'file')
@@ -113,6 +113,7 @@ def ajax_upload(request, folder_id=None):
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
             file_obj.folder = folder
+            file_obj.mime_type = mime_type
             file_obj.save()
             # TODO: Deprecated/refactor
             # clipboard_item = ClipboardItem(

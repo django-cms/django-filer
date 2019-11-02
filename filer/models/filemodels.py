@@ -2,10 +2,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import hashlib
+import mimetypes
 import os
 from datetime import datetime
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import NoReverseMatch, reverse
@@ -45,6 +47,12 @@ def is_public_default():
     # not using this setting directly as `is_public` default value
     # so that Django doesn't generate new migrations upon setting change
     return filer_settings.FILER_IS_PUBLIC_DEFAULT
+
+
+def mimetype_validator(value):
+    if not mimetypes.guess_extension(value):
+        msg = "'{mimetype}' is not a recognized MIME-Type."
+        raise ValidationError(msg.format(mimetype=value))
 
 
 @python_2_unicode_compatible
@@ -91,10 +99,17 @@ class File(PolymorphicModel, mixins.IconsMixin):
                     'file. File will be publicly accessible '
                     'to anyone.'))
 
+    mime_type = models.CharField(
+        max_length=255,
+        help_text='MIME type of uploaded content',
+        validators=[mimetype_validator],
+        default='application/octet-stream',
+    )
+
     objects = FileManager()
 
     @classmethod
-    def matches_file_type(cls, iname, ifile, request):
+    def matches_file_type(cls, iname, ifile, mime_type):
         return True  # I match all files...
 
     def __init__(self, *args, **kwargs):
