@@ -35,6 +35,17 @@ class BaseServerBackendTestCase(TestCase):
             original_filename=original_filename,
             mime_type=mime_type)
 
+        original_filename_svg, mime_type_svg = 'testimage.svg', 'image/svg+xml'
+        file_obj_svg = SimpleUploadedFile(
+            name=original_filename_svg,
+            content="<svg></svg>".encode(),
+            content_type=mime_type)
+        self.filer_file_svg = File.objects.create(
+            is_public=False,
+            file=file_obj_svg,
+            original_filename=original_filename_svg,
+            mime_type=mime_type_svg)
+
     def tearDown(self):
         self.filer_file.delete()
 
@@ -45,6 +56,13 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
         request = Mock()
         request.META = {}
         response = server.serve(request, self.filer_file)
+        self.assertTrue(response.has_header('Last-Modified'))
+
+    def test_normal_svg(self):
+        server = DefaultServer()
+        request = Mock()
+        request.META = {}
+        response = server.serve(request, self.filer_file_svg)
         self.assertTrue(response.has_header('Last-Modified'))
 
     def test_save_as(self):
