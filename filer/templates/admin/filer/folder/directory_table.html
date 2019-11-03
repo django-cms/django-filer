@@ -103,7 +103,11 @@
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                             title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                 {% endif %}
+                                {% if file.extension == "svg" %}
+                                    <img src="{{ file.url }}">
+                                {% else %}
                                     <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
+                                {% endif %}
                                 {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                     </a>
                                 {% endif %}
