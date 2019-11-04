@@ -6,6 +6,7 @@ CHANGELOG
 1.6.0 (unreleased)
 ==================
 
+* Bypassing the thumbnailing step for SVG file
 * Store mimetype of uploaded file in database
 * Removed support for Django <= 1.10
 * Removed outdated files
