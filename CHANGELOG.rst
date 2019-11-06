@@ -3,7 +3,7 @@ CHANGELOG
 =========
 
 
-1.6.0 (unreleased)
+1.6.0 (2019-11-06)
 ==================
 
 * Removed support for Django <= 1.10
@@ -13,9 +13,9 @@ CHANGELOG
 * Added management command ``filer_check`` to check the integrity of the
   database against the file system, and vice versa.
 * Add jQuery as AdminFileWidget Media dependency
-* Add rel="noopener noreferrer" for tab nabbing 
+* Add rel="noopener noreferrer" for tab nabbing
 * Fixed an issue where a value error is raised when no folder is selected
-* Fixed search field overflow 
+* Fixed search field overflow
 
 
 1.5.0 (2019-04-30)
