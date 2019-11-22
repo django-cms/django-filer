@@ -336,6 +336,26 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(stored_image.original_filename, self.image_name)
         self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
+    def test_filer_ajax_upload_file_using_content_type(self):
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
+        url = reverse(
+            'admin:filer-ajax_upload',
+            kwargs={'folder_id': folder.pk}
+        ) + '?filename=renamed.pdf'
+        response = self.client.post(  # noqa
+            url,
+            data=file_obj.read(),
+            content_type='application/pdf',
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        )
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 1)
+        stored_file = File.objects.first()
+        self.assertEqual(stored_file.original_filename, 'renamed.pdf')
+        self.assertEqual(stored_file.mime_type, 'application/pdf')
+
     def test_filer_ajax_upload_file_no_folder(self):
         self.assertEqual(Image.objects.count(), 0)
         file_obj = django.core.files.File(open(self.filename, 'rb'))
