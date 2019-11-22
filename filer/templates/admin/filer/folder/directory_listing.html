@@ -1,5 +1,5 @@
 {% extends "admin/filer/base_site.html" %}
-{% load i18n staticfiles filer_admin_tags %}
+{% load i18n static filer_admin_tags %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -157,7 +157,7 @@
                             <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
                             <div class="filter-search-wrapper">
                                 {% filer_admin_context_hidden_formfields %}
-                                <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+                                <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" name="q">
                                 <div class="filer-dropdown-container filer-dropdown-container-down">
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
                                         <span class="fa fa-caret-down"></span>
