@@ -9,9 +9,9 @@ import filer.models.filemodels
 
 def guess_mimetypes(apps, schema_editor):
     FileModel = apps.get_model('filer', 'File')
-    for fileobj in FileModel.objects.all():
-        fileobj.mime_type, _ = mimetypes.guess_type(fileobj.file.path)
-        fileobj.save(update_fields=['mime_type'])
+    for file_obj in FileModel.objects.all():
+        file_obj.mime_type, _ = mimetypes.guess_type(file_obj.file.url)
+        file_obj.save(update_fields=['mime_type'])
 
 
 class Migration(migrations.Migration):
