@@ -47,11 +47,12 @@ So let's add a ``matches_file_type()`` method to the ``Video`` model:
 .. code-block:: python
 
     @classmethod
-    def matches_file_type(cls, iname, ifile, request):
-        # the extensions we'll recognise for this file type
-        filename_extensions = ['.dv', '.mov', '.mp4', '.avi', '.wmv',]
-        ext = os.path.splitext(iname)[1].lower()
-        return ext in filename_extensions
+    def matches_file_type(cls, iname, ifile, mime_type):
+        video_types = ['application/vnd.dvb.ait', 'video/x-sgi-movie', 'video/mp4', 'video/mpeg',
+                       'video/x-msvideo', 'video/x-ms-wmv', 'video/ogg', 'video/webm', 'video/quicktime']
+        return mime_type in video_types
+
+.. note:: The signature of this classmethod changed in version 1.7.
 
 Now you can upload files of those types into the Filer.
 
