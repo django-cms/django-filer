@@ -4,10 +4,13 @@ CHANGELOG
 
 unreleased
 ==========
-* In models.File, add field ``mime_type`` to store the Content-Type as set by
+
+* In ``models.File``, add field ``mime_type`` to store the Content-Type as set by
   the browser during file upload.
 * For extended Django Filer models, adopt the classmethod ``matches_file_type`` to its
   new signature.
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name.
 
 
 1.6.0 (2019-11-06)

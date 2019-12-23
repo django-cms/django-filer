@@ -10,7 +10,7 @@ REQUIREMENTS = [
     'django-mptt>=0.6,<1.0',  # the exact version depends on Django
     'django_polymorphic>=0.7,<2.1',
     'easy-thumbnails>=2,<3.0',
-    'Unidecode>=0.04,<1.1',
+    'Unidecode>=0.04,<1.2',
 ]
 
 
