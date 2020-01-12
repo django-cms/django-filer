@@ -5,7 +5,7 @@ import logging
 import os
 
 from django.db import models
-from django.utils import six
+import six
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings

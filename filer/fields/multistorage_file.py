@@ -8,7 +8,7 @@ from io import BytesIO
 
 from django.core.files.base import ContentFile
 from django.db.models.fields.files import FileDescriptor
-from django.utils import six
+import six
 
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files

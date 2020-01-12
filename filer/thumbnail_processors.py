@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import re
 
-from django.utils import six
+import six
 
 from easy_thumbnails import processors
 

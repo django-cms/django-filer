@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import
 
-from django.utils import six
+import six
 
 
 __author__ = 'jannis@itisme.org (Jannis Andrija Schnitzer)'
