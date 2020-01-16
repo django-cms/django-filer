@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name.
+
 
 2.0.0 (unreleased)
 ==================
