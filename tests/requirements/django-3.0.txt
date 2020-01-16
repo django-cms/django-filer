@@ -2,4 +2,4 @@
 
 django>=3.0,<3.1
 django-mptt>=0.9.1
-django_polymorphic>=2.0,<2.1
+django_polymorphic>=2.1,<2.2

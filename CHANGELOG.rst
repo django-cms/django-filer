@@ -2,18 +2,14 @@
 CHANGELOG
 =========
 
-unreleased
-==========
-* Add attribute ``download`` to the download link in order to offer the file
-  under its original name.
 
-
-2.0.0 (unreleased)
+1.7.0 (unreleased)
 ==================
 
 * Added Django 3.0 support
 * Added support for Python 3.8
-* Dropped Python 2 support
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name.
 
 
 1.6.0 (2019-11-06)
