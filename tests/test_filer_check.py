@@ -8,8 +8,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.module_loading import import_string
-from django.utils.six import StringIO
 
+from six import StringIO
 from tests.helpers import create_image
 
 from filer import settings as filer_settings
