@@ -63,7 +63,7 @@ if os.environ.get('CUSTOM_IMAGE', False):
 
 
 def run():
-    from djangocms_helper import runner
+    from app_helper import runner
     runner.run('filer')
 
 
