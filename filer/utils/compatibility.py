@@ -2,8 +2,8 @@
 from __future__ import absolute_import, unicode_literals
 
 import sys
+import six
 
-from django.utils import six
 from django.utils.functional import keep_lazy
 from django.utils.text import Truncator, format_lazy
 

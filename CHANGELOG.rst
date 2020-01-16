@@ -3,10 +3,12 @@ CHANGELOG
 =========
 
 
-1.7.0 (unreleased)
+2.0.0 (unreleased)
 ==================
 
 * Added Django 3.0 support
+* Added support for Python 3.8
+* Dropped Python 2 support
 
 
 1.6.0 (2019-11-06)

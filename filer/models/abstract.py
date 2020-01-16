@@ -3,9 +3,9 @@ from __future__ import absolute_import
 
 import logging
 import os
+import six
 
 from django.db import models
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from .. import settings as filer_settings
