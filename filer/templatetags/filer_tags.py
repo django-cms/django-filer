@@ -2,9 +2,10 @@
 from __future__ import absolute_import
 
 import math
-import six
 
 from django.template import Library
+
+import six
 
 
 register = Library()

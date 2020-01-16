@@ -4,12 +4,12 @@ from __future__ import absolute_import
 import base64
 import hashlib
 import warnings
-import six
 from io import BytesIO
 
 from django.core.files.base import ContentFile
 from django.db.models.fields.files import FileDescriptor
 
+import six
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
 

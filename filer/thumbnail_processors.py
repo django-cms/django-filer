@@ -2,8 +2,8 @@
 from __future__ import absolute_import
 
 import re
-import six
 
+import six
 from easy_thumbnails import processors
 
 from .settings import (

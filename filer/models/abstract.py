@@ -3,10 +3,11 @@ from __future__ import absolute_import
 
 import logging
 import os
-import six
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+import six
 
 from .. import settings as filer_settings
 from ..utils.compatibility import PILImage

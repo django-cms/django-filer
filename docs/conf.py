@@ -11,11 +11,15 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
-sys.path.append(os.path.abspath('../'))
 import datetime
+import os
+import sys
 
 from filer import __version__
+
+
+sys.path.append(os.path.abspath('../'))
+
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
