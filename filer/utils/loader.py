@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This function is snatched from
 https://github.com/ojii/django-load/blob/3058ab9d9d4875589638cc45e84b59e7e1d7c9c3/django_load/core.py#L49
@@ -8,7 +7,6 @@ local changes:
   or method.
 
 """
-from __future__ import absolute_import
 
 from importlib import import_module
 

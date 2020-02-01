@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
-import sys
-
 from django.utils.functional import keep_lazy
 from django.utils.text import Truncator, format_lazy
 

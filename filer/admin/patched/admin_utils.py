@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
 """
 Copy of ``django.contrib.admin.utils.get_deleted_objects`` and a subclass of
-``django.contrib.admin.utils.NestedObjects`` that work with djongo_polymorphic
+``django.contrib.admin.utils.NestedObjects`` that work with django-polymorphic
 querysets.
-Ultimatly these should go directly into django_polymorphic or, in a more
-generic way, into django itself.
+Ultimately these should go directly into django-polymorphic or, in a more
+generic way, into Django itself.
 
 This code has been copied from Django 1.9.4.
 
 At all locations where something has been changed, there are inline comments
 in the code.
 """
-from __future__ import absolute_import, unicode_literals
 
 from collections import defaultdict
 

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django import forms
 from django.conf import settings
 from django.contrib.admin import widgets
