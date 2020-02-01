@@ -7,8 +7,6 @@ import os
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-import six
-
 from .. import settings as filer_settings
 from ..utils.compatibility import PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
@@ -143,7 +141,7 @@ class BaseImage(File):
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
-        for name, opts in six.iteritems(required_thumbnails):
+        for name, opts in required_thumbnails.items():
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)

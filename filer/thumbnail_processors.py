@@ -3,7 +3,6 @@ from __future__ import absolute_import
 
 import re
 
-import six
 from easy_thumbnails import processors
 
 from .settings import (
@@ -26,7 +25,7 @@ RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 
 def normalize_subject_location(subject_location):
     if subject_location:
-        if isinstance(subject_location, six.string_types):
+        if isinstance(subject_location, str):
             m = RE_SUBJECT_LOCATION.match(subject_location)
             if m:
                 return (int(m.group(1)), int(m.group(2)))

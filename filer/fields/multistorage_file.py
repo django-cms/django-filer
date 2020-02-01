@@ -9,7 +9,6 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.db.models.fields.files import FileDescriptor
 
-import six
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
 
@@ -161,7 +160,7 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
             return value
 
     def to_python(self, value):
-        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], six.text_type):
+        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], str):
             filename, payload = value
             try:
                 payload = base64.b64decode(payload)

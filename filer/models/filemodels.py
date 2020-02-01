@@ -12,8 +12,6 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from six import python_2_unicode_compatible
-
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from . import mixins
@@ -48,7 +46,6 @@ def is_public_default():
     return filer_settings.FILER_IS_PUBLIC_DEFAULT
 
 
-@python_2_unicode_compatible
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"

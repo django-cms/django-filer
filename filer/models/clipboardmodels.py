@@ -5,12 +5,9 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from six import python_2_unicode_compatible
-
 from . import filemodels
 
 
-@python_2_unicode_compatible
 class Clipboard(models.Model):
     user = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
