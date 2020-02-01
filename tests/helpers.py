@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 from filer.models.foldermodels import Folder
 from filer.utils.compatibility import PILImage, PILImageDraw
