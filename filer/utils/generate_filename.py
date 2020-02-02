@@ -24,7 +24,7 @@ def randomized(instance, filename):
             get_valid_filename(filename))
 
 
-class prefixed_factory(object):
+class prefixed_factory:
     def __init__(self, upload_to, prefix):
         self.upload_to = upload_to
         self.prefix = prefix

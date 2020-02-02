@@ -80,7 +80,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
+    class Media:
         js = (
             'filer/js/addons/popup_handling.js',
         )

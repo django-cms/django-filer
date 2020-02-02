@@ -12,7 +12,7 @@ from filer.utils.zip import unzip
 
 
 # Some target classes for the classloading tests
-class TestTargetSuperClass(object):
+class TestTargetSuperClass:
     pass
 
 

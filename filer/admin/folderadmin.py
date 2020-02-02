@@ -49,7 +49,7 @@ Image = load_model(FILER_IMAGE_MODEL)
 class AddFolderPopupForm(forms.ModelForm):
     folder = forms.HiddenInput()
 
-    class Meta(object):
+    class Meta:
         model = Folder
         fields = ('name',)
 

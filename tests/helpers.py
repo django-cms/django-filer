@@ -49,7 +49,7 @@ def create_image(mode='RGB', size=(800, 600)):
     return image
 
 
-class SettingsOverride(object):
+class SettingsOverride:
     """
     Overrides Django settings within a context and resets them to their inital
     values on exit.

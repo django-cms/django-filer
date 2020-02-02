@@ -12,7 +12,7 @@ from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class FileAdminChangeFrom(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = File
         exclude = ()
 

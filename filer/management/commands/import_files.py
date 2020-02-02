@@ -12,7 +12,7 @@ from ...utils.loader import load_model
 Image = load_model(FILER_IMAGE_MODEL)
 
 
-class FileImporter(object):
+class FileImporter:
     def __init__(self, * args, **kwargs):
         self.path = kwargs.get('path')
         self.base_folder = kwargs.get('base_folder')

@@ -237,7 +237,7 @@ class Folder(models.Model, mixins.IconsMixin):
         except Folder.DoesNotExist:
             return False
 
-    class Meta(object):
+    class Meta:
         # see: https://github.com/django-mptt/django-mptt/pull/577
         index_together = (('tree_id', 'lft'),)
         unique_together = (('parent', 'name'),)
@@ -340,7 +340,7 @@ class FolderPermission(models.Model):
         if not self.user and not self.group and not self.everybody:
             raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
 
-    class Meta(object):
+    class Meta:
         verbose_name = _('folder permission')
         verbose_name_plural = _('folder permissions')
         app_label = 'filer'

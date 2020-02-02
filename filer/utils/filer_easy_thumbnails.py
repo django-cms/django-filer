@@ -18,7 +18,7 @@ def thumbnail_to_original_filename(thumbnail_name):
     return None
 
 
-class ThumbnailerNameMixin(object):
+class ThumbnailerNameMixin:
     thumbnail_basedir = ''
     thumbnail_subdir = ''
     thumbnail_prefix = ''
@@ -69,7 +69,7 @@ class ThumbnailerNameMixin(object):
         return os.path.join(basedir, path, subdir, filename)
 
 
-class ActionThumbnailerMixin(object):
+class ActionThumbnailerMixin:
     thumbnail_basedir = ''
     thumbnail_subdir = ''
     thumbnail_prefix = ''

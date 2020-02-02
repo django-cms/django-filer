@@ -433,7 +433,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
 
 
-class BulkOperationsMixin(object):
+class BulkOperationsMixin:
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')

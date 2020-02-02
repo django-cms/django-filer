@@ -80,7 +80,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
+    class Media:
         css = {
             'all': [
                 'filer/css/admin_filer.css',

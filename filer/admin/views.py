@@ -14,7 +14,7 @@ from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class NewFolderForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = Folder
         fields = ('name',)
         widgets = {

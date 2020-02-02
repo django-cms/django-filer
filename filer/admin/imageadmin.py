@@ -76,11 +76,11 @@ class ImageAdminForm(forms.ModelForm):
                 'Previous value is restored.'),
             code=err_code)
 
-    class Meta(object):
+    class Meta:
         model = Image
         exclude = ()
 
-    class Media(object):
+    class Media:
         css = {
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
