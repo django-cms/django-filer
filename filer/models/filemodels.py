@@ -93,7 +93,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return True  # I match all files...
 
     def __init__(self, *args, **kwargs):
-        super(File, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self.file_data_changed(post_init=True)
 
@@ -201,12 +201,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
-        super(File, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
     save.alters_data = True
 
     def delete(self, *args, **kwargs):
         # Delete the model before the file
-        super(File, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         # Delete the file if there are no other Files referencing it.
         if not File.objects.filter(file=self.file.name, is_public=self.is_public).exists():
             self.file.delete(False)

@@ -53,7 +53,7 @@ class MultiStorageFileDescriptor(FileDescriptor):
     def __set__(self, instance, value):
         prev_assigned = self.field.name in instance.__dict__
         previous_file = instance.__dict__.get(self.field.name)
-        super(MultiStorageFileDescriptor, self).__set__(instance, value)
+        super().__set__(instance, value)
 
         # To prevent recalculating file data related attributes when we are instantiating
         # an object from the database, update only if the field had a value before this assignment.
@@ -117,7 +117,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
 
     def save(self, name, content, save=True):
         content.seek(0)  # Ensure we upload the whole file
-        super(MultiStorageFieldFile, self).save(name, content, save)
+        super().save(name, content, save)
 
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
@@ -137,10 +137,10 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(
             verbose_name=verbose_name, name=name,
             upload_to=generate_filename_multistorage,
-            storage=None, **kwargs)
+            storage=None, **kwargs)  # grandparent super
 
     def value_to_string(self, obj):
-        value = super(MultiStorageFileField, self).value_to_string(obj)
+        value = super().value_to_string(obj)
         if not filer_settings.FILER_DUMP_PAYLOAD:
             return value
         try:

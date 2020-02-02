@@ -73,7 +73,7 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
 
 class NginxServerTestCase(BaseServerBackendTestCase):
     def setUp(self):
-        super(NginxServerTestCase, self).setUp()
+        super().setUp()
         self.server = NginxXAccelRedirectServer(
             location=filer_settings.FILER_PRIVATEMEDIA_STORAGE.location,
             nginx_location='mylocation',
@@ -106,7 +106,7 @@ class NginxServerTestCase(BaseServerBackendTestCase):
 
 class XSendfileServerTestCase(BaseServerBackendTestCase):
     def setUp(self):
-        super(XSendfileServerTestCase, self).setUp()
+        super().setUp()
         self.server = ApacheXSendfileServer()
 
     def test_normal(self):

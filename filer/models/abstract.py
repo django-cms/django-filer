@@ -52,7 +52,7 @@ class BaseImage(File):
         return iext in ['.jpg', '.jpeg', '.png', '.gif']
 
     def file_data_changed(self, post_init=False):
-        attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
+        attrs_updated = super().file_data_changed(post_init=post_init)
         if attrs_updated:
             try:
                 try:
@@ -71,7 +71,7 @@ class BaseImage(File):
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        super(BaseImage, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def _check_validity(self):
         if not self.name:

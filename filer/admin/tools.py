@@ -90,7 +90,7 @@ def admin_url_params_encoded(request, first_separator='?', params=None):
 
 class AdminContext(dict):
     def __init__(self, request):
-        super(AdminContext, self).__init__()
+        super().__init__()
         self.update(admin_url_params(request))
 
     def __missing__(self, key):

@@ -80,7 +80,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if parent_id:
             return AddFolderPopupForm
         else:
-            folder_form = super(FolderAdmin, self).get_form(
+            folder_form = super().get_form(
                 request, obj=None, **kwargs)
 
             def folder_form_clean(form_obj):
@@ -136,7 +136,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 admin_url_params_encoded(request),
             )
             return HttpResponseRedirect(url)
-        return super(FolderAdmin, self).response_change(request, obj)
+        return super().response_change(request, obj)
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
@@ -146,7 +146,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                          'is_popup': popup_status(request),
                          'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
-        return super(FolderAdmin, self).render_change_form(
+        return super().render_change_form(
             request=request, context=context, add=add,
             change=change, form_url=form_url, obj=obj)
 
@@ -234,7 +234,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
                 name='filer-directory_listing-unfiled_images'),
-        ] + super(FolderAdmin, self).get_urls()
+        ] + super().get_urls()
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
@@ -582,9 +582,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             actions = OrderedDict()
             actions['files_set_public'] = self.get_action('files_set_public')
             actions['files_set_private'] = self.get_action('files_set_private')
-            actions.update(super(FolderAdmin, self).get_actions(request))
+            actions.update(super().get_actions(request))
         else:
-            actions = super(FolderAdmin, self).get_actions(request)
+            actions = super().get_actions(request)
 
         if 'delete_selected' in actions:
             del actions['delete_selected']

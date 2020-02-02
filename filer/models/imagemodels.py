@@ -45,4 +45,4 @@ class Image(BaseImage):
                 pass
         if self.date_taken is None:
             self.date_taken = now()
-        super(Image, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)

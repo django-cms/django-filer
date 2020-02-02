@@ -94,7 +94,7 @@ class ActionThumbnailerMixin:
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
     def __init__(self, *args, **kwargs):
         self.thumbnail_basedir = kwargs.pop('thumbnail_basedir', '')
-        super(FilerThumbnailer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class FilerActionThumbnailer(ActionThumbnailerMixin, Thumbnailer):

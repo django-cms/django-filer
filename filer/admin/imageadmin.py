@@ -44,7 +44,7 @@ class ImageAdminForm(forms.ModelForm):
         for subject location widget to receive valid coordinates on field
         validation errors.
         """
-        cleaned_data = super(ImageAdminForm, self).clean()
+        cleaned_data = super().clean()
         subject_location = cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it

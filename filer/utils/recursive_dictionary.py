@@ -65,7 +65,7 @@ class RecursiveDictionaryWithExcludes(RecursiveDictionary):
     """
     def __init__(self, *args, **kwargs):
         self.rec_excluded_keys = kwargs.pop('rec_excluded_keys', ())
-        super(RecursiveDictionaryWithExcludes, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def iter_rec_update(self, iterator):
         for (key, value) in iterator:

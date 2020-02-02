@@ -52,7 +52,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/no_folder/$',
                 ajax_upload,
                 name='filer-ajax_upload'),
-        ] + super(ClipboardAdmin, self).get_urls()
+        ] + super().get_urls()
 
     def get_model_perms(self, *args, **kwargs):
         """
