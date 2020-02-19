@@ -6,7 +6,8 @@ import os
 from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
-from django.utils.six.moves import input
+
+from six.moves import input
 
 from filer import settings as filer_settings
 

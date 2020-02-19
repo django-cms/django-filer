@@ -12,7 +12,7 @@ from __future__ import absolute_import
 
 from importlib import import_module
 
-from django.utils import six
+import six
 
 
 def load_object(import_path):

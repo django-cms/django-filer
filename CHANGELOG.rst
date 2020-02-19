@@ -2,8 +2,12 @@
 CHANGELOG
 =========
 
-unreleased
-==========
+
+1.7.0 (unreleased)
+==================
+
+* Added Django 3.0 support
+* Added support for Python 3.8
 * Add attribute ``download`` to the download link in order to offer the file
   under its original name.
 

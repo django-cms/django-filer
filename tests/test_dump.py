@@ -9,8 +9,8 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.management import call_command
 from django.test import TestCase
-from django.utils.six import StringIO
 
+from six import StringIO
 from tests.helpers import (
     SettingsOverride, create_folder_structure, create_image, create_superuser,
 )
