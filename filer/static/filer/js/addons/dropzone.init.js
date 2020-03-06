@@ -3,12 +3,19 @@
 /* globals Dropzone, django */
 'use strict';
 
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
 if (Dropzone) {
     Dropzone.autoDiscover = false;
 }
 
 /* globals Dropzone, django */
-django.jQuery(function ($) {
+djQuery(function ($) {
     var dropzoneTemplateSelector = '.js-filer-dropzone-template';
     var previewImageSelector = '.js-img-preview';
     var dropzoneSelector = '.js-filer-dropzone';

@@ -3,13 +3,13 @@ from __future__ import absolute_import
 
 import re
 
-from django.utils import six
+import six
 from easy_thumbnails import processors
 
 from .settings import (
-    FILER_SUBJECT_LOCATION_IMAGE_DEBUG,
-    FILER_WHITESPACE_COLOR,
+    FILER_SUBJECT_LOCATION_IMAGE_DEBUG, FILER_WHITESPACE_COLOR,
 )
+
 
 try:
     from PIL import Image

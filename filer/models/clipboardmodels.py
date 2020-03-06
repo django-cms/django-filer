@@ -1,23 +1,28 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from six import python_2_unicode_compatible
+
 from . import filemodels
-from ..utils.compatibility import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
 class Clipboard(models.Model):
     user = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
-        verbose_name=_('user'), related_name="filer_clipboards")
+        verbose_name=_('user'), related_name="filer_clipboards",
+        on_delete=models.CASCADE,
+    )
     files = models.ManyToManyField(
-        'File', verbose_name=_('files'), related_name="in_clipboards",
-        through='ClipboardItem')
+        'File',
+        verbose_name=_('files'),
+        related_name="in_clipboards",
+        through='ClipboardItem',
+    )
 
     def append_file(self, file_obj):
         try:
@@ -39,8 +44,16 @@ class Clipboard(models.Model):
 
 
 class ClipboardItem(models.Model):
-    file = models.ForeignKey('File', verbose_name=_('file'))
-    clipboard = models.ForeignKey(Clipboard, verbose_name=_('clipboard'))
+    file = models.ForeignKey(
+        'File',
+        verbose_name=_('file'),
+        on_delete=models.CASCADE,
+    )
+    clipboard = models.ForeignKey(
+        Clipboard,
+        verbose_name=_('clipboard'),
+        on_delete=models.CASCADE,
+    )
 
     class Meta(object):
         app_label = 'filer'

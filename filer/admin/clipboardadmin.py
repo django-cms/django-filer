@@ -7,15 +7,14 @@ from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from . import views
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import (
-    UploadException,
-    handle_request_files_upload,
-    handle_upload,
+    UploadException, handle_request_files_upload, handle_upload,
 )
 from ..utils.loader import load_model
+from . import views
+
 
 NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
@@ -136,8 +135,8 @@ def ajax_upload(request, folder_id=None):
             # Backwards compatibility: try to get specific icon size (32px)
             # first. Then try medium icon size (they are already sorted),
             # fallback to the first (smallest) configured icon.
-            for size in (['32'] +
-                         filer_settings.FILER_ADMIN_ICON_SIZES[1::-1]):
+            for size in (['32']
+                        + filer_settings.FILER_ADMIN_ICON_SIZES[1::-1]):
                 try:
                     thumbnail = file_obj.icons[size]
                     break

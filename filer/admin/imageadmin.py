@@ -2,14 +2,15 @@
 from __future__ import absolute_import
 
 from django import forms
-from django.utils.translation import string_concat
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 
 from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
+from ..utils.compatibility import string_concat
 from ..utils.loader import load_model
 from .fileadmin import FileAdmin
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 
@@ -35,6 +36,7 @@ class ImageAdminForm(forms.ModelForm):
     def _set_previous_subject_location(self, cleaned_data):
         subject_location = self.instance.subject_location
         cleaned_data['subject_location'] = subject_location
+        self.data = self.data.copy()
         self.data['subject_location'] = subject_location
 
     def clean_subject_location(self):
@@ -58,8 +60,10 @@ class ImageAdminForm(forms.ModelForm):
             err_msg = ugettext_lazy('Invalid subject location format. ')
             err_code = 'invalid_subject_format'
 
-        elif (coordinates[0] > self.instance.width or
-                coordinates[1] > self.instance.height):
+        elif (
+            coordinates[0] > self.instance.width
+            or coordinates[1] > self.instance.height
+        ):
             err_msg = ugettext_lazy(
                 'Subject location is outside of the image. ')
             err_code = 'subject_out_of_bounds'
@@ -89,11 +93,17 @@ class ImageAdminForm(forms.ModelForm):
 
 
 class ImageAdmin(FileAdmin):
+    change_form_template = 'admin/filer/image/change_form.html'
     form = ImageAdminForm
 
 
+if FILER_IMAGE_MODEL == 'filer.Image':
+    extra_main_fields = ('author', 'default_alt_text', 'default_caption',)
+else:
+    extra_main_fields = ('default_alt_text', 'default_caption',)
+
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
-    extra_main_fields=('author', 'default_alt_text', 'default_caption',),
+    extra_main_fields=extra_main_fields,
     extra_fieldsets=(
         (_('Subject location'), {
             'fields': ('subject_location',),

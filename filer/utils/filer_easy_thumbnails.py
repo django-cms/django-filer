@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, unicode_literals
 
 import os
 import re
 
 from easy_thumbnails.files import Thumbnailer
+
 
 # match the source filename using `__` as the seperator. ``opts_and_ext`` is non
 # greedy so it should match the last occurence of `__`.
@@ -35,10 +35,10 @@ class ThumbnailerNameMixin(object):
         """
         path, source_filename = os.path.split(self.name)
         source_extension = os.path.splitext(source_filename)[1][1:]
-        if self.thumbnail_preserve_extensions is True or  \
-            (self.thumbnail_preserve_extensions and
-             source_extension.lower() in self.thumbnail_preserve_extensions):
-                extension = source_extension
+        if self.thumbnail_preserve_extensions is True or \
+            (self.thumbnail_preserve_extensions and source_extension.lower()
+             in self.thumbnail_preserve_extensions):
+            extension = source_extension
         elif transparent:
             extension = self.thumbnail_transparency_extension
         else:

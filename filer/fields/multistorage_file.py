@@ -8,12 +8,14 @@ from io import BytesIO
 
 from django.core.files.base import ContentFile
 from django.db.models.fields.files import FileDescriptor
-from django.utils import six
+
+import six
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
 
 from .. import settings as filer_settings
 from ..utils.filer_easy_thumbnails import ThumbnailerNameMixin
+
 
 STORAGES = {
     'public': filer_settings.FILER_PUBLICMEDIA_STORAGE,

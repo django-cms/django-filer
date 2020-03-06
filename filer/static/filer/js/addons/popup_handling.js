@@ -1,6 +1,13 @@
 'use strict';
 /* global django */
 
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
 (function ($) {
     window.dismissPopupAndReload = function (win) {
         document.location.reload();
@@ -43,4 +50,4 @@
         addFolderButton.addClass('hidden');
         win.close();
     };
-})(django.jQuery);
+})(djQuery);

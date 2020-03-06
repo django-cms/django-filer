@@ -1,0 +1,467 @@
+=========
+CHANGELOG
+=========
+
+
+1.7.0 (2020-02-20)
+==================
+
+* Added Django 3.0 support
+* Added support for Python 3.8
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name.
+
+
+1.6.0 (2019-11-06)
+==================
+
+* Removed support for Django <= 1.10
+* Removed outdated files
+* Code alignments with other addons
+* Replace deprecated templatetag ``staticfiles`` against ``static``.
+* Added management command ``filer_check`` to check the integrity of the
+  database against the file system, and vice versa.
+* Add jQuery as AdminFileWidget Media dependency
+* Add rel="noopener noreferrer" for tab nabbing
+* Fixed an issue where a value error is raised when no folder is selected
+* Fixed search field overflow
+
+
+1.5.0 (2019-04-30)
+==================
+
+* Added support for Django 2.2
+* Adapted test matrix
+* Adapted test structure and added fixes
+
+
+1.4.4 (2019-01-22)
+==================
+
+* Fixed missing validation message for empty file field in file and image widget (#1125)
+
+
+1.4.3 (2019-01-07)
+==================
+
+* Fixed wrong argument for AdminFileWidget render method (#1120)
+
+
+1.4.2 (2019-01-07)
+==================
+
+* Fixed missing renderer argument for render method for AdminFolderWidget and
+  AdminFileWidget classes for Django 2.x (#1120)
+* Fixed a problem in Django 2.x with getting None instead of
+  the object in AdminFileWidget and AdminFolderWidget (#1118)
+
+
+1.4.1 (2018-12-06)
+==================
+
+* Fixed widgets to work with Django 2.x (#1111)
+* Added admin site context to make_folder view (#1112)
+* Added never_cache decorator in server views. (#1100)
+
+
+1.4.0 (2018-11-15)
+==================
+
+* Added support for Django 2.0 and 2.1
+* Enabled django-mptt 0.9
+* Converted QueryDict to dict before manipulating in admin
+* Hide 'Save as new' button in file admin
+* Fixed history link for folder and image object
+* Fixed rendering canonical URL in change form
+
+
+1.3.2 (2018-04-23)
+==================
+
+* Don't show set public / set private actions if permissions are disabled.
+
+
+1.3.1 (2018-04-15)
+==================
+
+* Allowed easy-thumbnails < 3 in setup.py
+* Fixed broken reference for delete icon
+* Fixed minor documentation issues
+* Fixed travis configuration
+* Fixed a regression with loading and dumping fixtures (#965)
+* Added callable instead of setting as Filer.is_public default
+* Fixed canonical URL computation
+* Fixed image preview target size
+* Fixed translatable string
+* Updated translations
+* Changed file size field to BigIntegerField
+* Fixed import_files command to work on Django 1.10+
+* Used get_queryset in FolderAdmin instead of the manager
+* Cleaned up swapped models implementation
+* Allowed django-polymorphic>_2.0
+
+
+1.3.0 (2017-11-02)
+==================
+
+* Introduced Django 1.11 support
+* Fixed `get_css_position` filter breaking when there is no image
+* Fixed missing html title when adding folders
+* Fixed a regression where third party app migrations would require the
+  ``FILER_IMAGE_MODEL`` setting.
+
+
+1.2.7 (2017-03-02)
+==================
+
+* Added 'get_css_position' template filter for background images
+* Updated translations
+
+
+1.2.6 (2017-01-13)
+==================
+
+* Fixed markup issue with editing file in admin
+* Fixed error message not always showing up properly
+* Added generate thumbnails management command
+* Fixed dropzone styles on smaller widths
+* Fixed dropzones in inlines not initializing in Django < 1.9
+* Added an action button to the directory listings to download files
+* Added support for Django 1.10
+* Added title attribute to the file name
+* Fixed an issue whereas the CSS was compiled incorrectly
+* Fixed an issue where links failed to open from django CMS sideframe
+* Fixes object tools placement on image detail page and removed background color and shadow
+* Added edit button to image widget
+* Removed arrow in breadcrumbs if no folder or name follows
+* Fixed jQuery loading on file move/copy page with Django 1.9
+* Fixed localization for fieldsets of ImageAdmin
+* Fixed unquoting in files search
+
+
+1.2.5 (2016-09-05)
+==================
+
+* Dropping or uploading an image will now fire a js change event
+* Added native Divio Cloud support
+
+
+1.2.4 (2016-07-06)
+==================
+
+* Fixed add/change arguments in FileAdmin.render_change_form
+* Fixed minor issues which results in spurious migration generation
+
+
+1.2.3 (2016-07-05)
+==================
+
+* Added a menu into django CMS projects via filer.contrib.django_cms
+* Added tests for extended models
+* Updated file_ptr to use string-replacement strategy for newer Djangos
+
+
+1.2.2 (2016-06-23)
+==================
+
+* Fixed an issue with `file_ptr` on Django 1.9+ installations
+* Addressed file_ptr issue
+* Updated translation strings
+
+
+1.2.1 (2016-06-23)
+==================
+
+* Rename filer picker widget upload button
+* Adds missing @2x icon files
+* Added missing migration #854
+* Updated translations
+* Fixed an issue with hashes in URLs in the wrong place
+* Fixed issue where deleting a user from a project would delete their assets
+
+
+1.2.0 (2016-04-26)
+==================
+
+* Drop Django 1.5 support
+* Drop Python 3.3 support (now 3.4+)
+* Testrunner cleanup
+* Fix many regressions and bugs in Django 1.8/1.9
+* Admin UI enhancements
+* Fix issues with non-default STATICFILES_STORAGE
+* Hide related widget wrapper links
+* Fix cancel link in delete confirmation
+* Make BaseImage.subject_location field non-nullable
+* Adds icon sizes
+* Fixes owner search icon on detail view
+* Disable submit button if only one folder to copy file
+* Design improvements
+* Empty folder design
+* Removes disabled action button border
+* Adds unsorted uploads empty view
+* Fix issues with subject location being off on images smaller than 210px
+* Ignores unsorted uploads from search and count
+
+
+1.1.1 (2016-01-27)
+==================
+
+* Fixes tests and configuration to run under Django 1.9
+* Allow Django 1.9.x in setup requirements
+* Fixes an issue where only the first drop-zone will be active
+* Fixes an issue with Python 3 for the import_files command
+* Fixes button space on delete confirmation modal
+* Updates Filer image plugin form fields
+* Removes folder content space in admin, side frame and modal
+* Updates drag and drop modal window
+* Updates drag and drop widget styles
+* Fixes empty folder alignment
+
+
+1.1.0 (2016-01-19)
+==================
+
+* Allow to provide single dimension for resizing images.
+* Search result fixes for current folder search.
+* Workaround for SQLite problems on simultaneous file uploads.
+* Add missing search results counters.
+* Move project to divio/django-filer.
+* Adapt documentation links.
+* Cleanup frontend code and adapt to guidelines.
+* Added drag & drop capabilities.
+* Redesign of the User Interface
+
+
+1.0.6 (2015-12-30)
+==================
+
+* Fix imports for django-polymorphic>=0.8.
+* Limit dependencies versions in setup.py.
+* Simplify tox setup.
+* Refactor Travis setup to use tox environments list.
+
+
+1.0.5 (2015-12-29)
+==================
+
+* Pin django-polymorphic version.
+* Use specific django-mptt versions in tox.ini for different Django versions.
+
+
+1.0.4 (2015-11-14)
+==================
+
+* Repackage for PyPI.
+
+
+1.0.3 (2015-11-24)
+==================
+
+* Fixes a bad static path.
+* Adds a fix for Django 1.8 envs.
+
+
+1.0.2 (2015-11-10)
+==================
+
+* Repackage for PyPI.
+
+
+1.0.1 (2015-11-03)
+==================
+
+* Repackage for PyPI.
+
+
+1.0.0 (2015-11-03)
+==================
+
+* Substantial UI/UX overhaul.
+* Fixes some Django 1.9 issues.
+* Drop support for Django older than v1.5.
+* Fixes urls for changed files.
+* Fixes an issue with KeyErrors during saving folder.
+* Provides support for configuring the canonical URLs.
+* Remove `FILER_STATICMEDIA_PREFIX` and use `staticfiles` for static files.
+* Fixes searching for folders.
+* Adds checkerboard-tile backgrounds to illustrate transparency in thumbnails.
+* Other fixes.
+
+
+0.9.12 (2015-07-28)
+===================
+
+* Various bugfixes.
+* Better Django 1.7 and 1.8 support.
+
+0.9.11 (2015-06-09)
+===================
+
+* Update Django 1.7 migrations because of change in django_polymorphic>=0.7.
+
+
+0.9.10 (2015-05-31)
+===================
+
+* Migrations in default locations for Django 1.7 and South>=1.0.
+* jQuery isolation fixes
+* Various bugfixes.
+
+
+0.9.9 (2015-01-20)
+==================
+
+* Fixes in Django 1.7 support.
+* Implement PEP440 compliant.
+* Add author to admin.
+* Allow customizing dismiss popup.
+* Add order_by parameter in directory listing.
+
+
+0.9.8 (2014-11-03)
+==================
+
+* Experimental Django 1.7 support.
+* Bugfixes.
+
+
+0.9.7 (2014-07-22)
+==================
+
+* thumbnails: add zoom support.
+* Fixed migration custom User compatibility.
+* Disallow copying folders to self.
+* Build random path using os.path.join.
+* Replace use of force_str by force_text.
+
+
+0.9.6 (2014-06-27)
+==================
+
+* Various bugfixes.
+* Dropped support for Django 1.3.
+* Added better support for Django 1.6.
+* Experimental python 3.3 support.
+
+
+0.9.5 (2013-06-28)
+==================
+
+* File paths now contain random component by default (to avoid filename clashes).
+* Fixed migrations to be better compatible with custom user models.
+* Bugfixes, performance improvements.
+
+
+0.9.4 (2013-04-09)
+==================
+
+* Experimental Django 1.5 support.
+* Bugfixes.
+
+
+0.9.3 (2012-11-29)
+==================
+
+* Fixes template file permissions (packaging issue).
+
+
+0.9.2 (2012-11-19)
+==================
+
+* File.name move to not null (run migrations).
+* Fix popup mode when Folder doesn't exists.
+* #271 Remove unused templatetag from django 1.4.
+* #269 Hide "Folder permissions" entry for "normal" users.
+* #265 click on image thumbnail in popup looses context.
+* #264 cancel search button looses popup context.
+* #263 deleting images from the image detail view redirects to the wrong list view.
+
+
+0.9.1 (2012-10-12)
+==================
+
+* Removed nginx X-Accel-Redirect Content-Type header (#245).
+* Validate_related_name method appears to break in FilerFileField (#148).
+* Remember last openened folder in file picker  (#187).
+
+
+0.9 (2012-09-05)
+================
+
+* Django-1.4 compatibility.
+* Separate, customizable file storage backends for public and private files.
+* Deleting a file in filer now deletes the file and all its thumbnails from the filesystem.
+* Many bulk operations (admin actions).
+* Backwards incompatible changes:
+  * storage refactor: path to private files in the db has changed (no longer relative to MEDIA_ROOT)
+  * `filer.server.urls` needs to be included to serve private files
+  * static media has been moved from 'media' to 'static'
+    (as proposed by django.contrib.staticfiles and django 1.3)
+  * django 1.2 no longer supported
+
+
+0.8.7 (2012-07-26)
+==================
+
+* Minor maintenance release.
+* No longer unpack uploaded zip files (#172).
+* Removed some print statements.
+
+
+0.8.6 (2012-03-13)
+==================
+
+* Renamed media to static.
+* New dependency: django-staticfiles or django >= 1.3.
+* Minor bugfixes.
+
+
+0.8.5 (2011-09-28)
+==================
+
+* Fix thumbnail templatetag support for easy-thumbnails>=1.0-alpha-17.
+
+
+0.8.4 (2011-09-27)
+==================
+
+* Fix ajax file upload for django < 1.3.
+
+
+0.8.3 (2011-08-27)
+==================
+
+* Replaced flash uploader with pure javascript (burn in hell, flash uplaoder!).
+
+
+0.8.2 (2010-12-16)
+==================
+
+* Sha hash for files.
+* Packaging fixes.
+
+
+0.8.1 (2010-10-30)
+==================
+
+* Moved to easy-thumbnails for thumbnailing. added tests and lots of cleanup.
+* Backwards incompatible changes:
+  * use easy-thumbnails instead of sorl.thumbnail
+
+
+0.7.0
+=====
+
+* Bugfixes
+
+
+0.5.4a1
+=======
+
+* Adds description field.
+
+
+0.0.2a (2009-11-04)
+===================
+
+* First test release as a pypi package.

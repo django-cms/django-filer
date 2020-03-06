@@ -60,7 +60,13 @@ class RenameFilesForm(forms.Form, AsPWithHelpMixin):
 
 class ResizeImagesForm(forms.Form, AsPWithHelpMixin):
     if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
-        thumbnail_option = models.ForeignKey(ThumbnailOption, null=True, blank=True, verbose_name=_("thumbnail option")).formfield()
+        thumbnail_option = models.ForeignKey(
+            ThumbnailOption,
+            null=True,
+            blank=True,
+            verbose_name=_("thumbnail option"),
+            on_delete=models.CASCADE,
+        ).formfield()
     width = models.PositiveIntegerField(_("width"), null=True, blank=True).formfield(widget=widgets.AdminIntegerFieldWidget)
     height = models.PositiveIntegerField(_("height"), null=True, blank=True).formfield(widget=widgets.AdminIntegerFieldWidget)
     crop = models.BooleanField(_("crop"), default=True).formfield()
