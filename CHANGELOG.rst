@@ -3,7 +3,16 @@ CHANGELOG
 =========
 
 
-1.6.0 (unreleased)
+1.7.0 (2020-02-20)
+==================
+
+* Added Django 3.0 support
+* Added support for Python 3.8
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name.
+
+
+1.6.0 (2019-11-06)
 ==================
 
 * Bypassing the thumbnailing step for SVG file
@@ -15,9 +24,9 @@ CHANGELOG
 * Added management command ``filer_check`` to check the integrity of the
   database against the file system, and vice versa.
 * Add jQuery as AdminFileWidget Media dependency
-* Add rel="noopener noreferrer" for tab nabbing 
+* Add rel="noopener noreferrer" for tab nabbing
 * Fixed an issue where a value error is raised when no folder is selected
-* Fixed search field overflow 
+* Fixed search field overflow
 
 
 1.5.0 (2019-04-30)

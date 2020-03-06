@@ -87,13 +87,15 @@ It is highly recommended to use the `git flow <http://github.com/nvie/gitflow>`_
 * clone your fork ``git clone git@github.com:username/django-filer.git``
 * ``cd django-filer``
 * initialize git flow: ``git flow init`` (choose all the defaults)
-* ``git flow feature start my_feature_name`` creates a new branch called ``feature/my_feature_name`` based on ``develop``
+* ``git flow feature start my_feature_name`` creates a new branch called ``feature/my_feature_name`` based on ``master``
 * ...code... ...code... ..commit.. ..commit..
 * ``git flow feature publish`` creates a new branch remotely and pushes your changes
-* navigate to the feature branch on github and create a pull request to the ``develop`` branch on ``divio/django-filer``
-* after reviewing the changes may be merged into ``develop`` and then eventually into ``master`` for the release.
+* navigate to the feature branch on github and create a pull request to the ``master`` branch on ``divio/django-filer``
+* after reviewing the changes may be merged into ``master`` for the release.
 
-If the feature branch is long running, it is good practice to merge in the current state of the ``develop`` branch into the feature branch sometimes. This keeps the feature branch up to date and reduces the likeliness of merge conflicts once it is merged back into develop.
+If the feature branch is long running, it is good practice to merge in the current state of the ``master`` branch into
+the feature branch sometimes. This keeps the feature branch up to date and reduces the likeliness of merge conflicts
+once it is merged back into master.
 
 
 .. _`PEP8`: http://www.python.org/dev/peps/pep-0008

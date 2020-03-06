@@ -22,7 +22,7 @@ HELPER_SETTINGS = {
     'LANGUAGE_CODE': 'en',
     'LANGUAGES': (
         ('en', 'English'),
-        ('fr_FR', 'French'),
+        ('fr', 'French'),
         ('it', 'Italiano'),
     ),
     'CMS_LANGUAGES': {
@@ -38,7 +38,7 @@ HELPER_SETTINGS = {
                 'public': True,
             },
             {
-                'code': 'fr_FR',
+                'code': 'fr',
                 'name': 'French',
                 'public': True,
             },
@@ -63,7 +63,7 @@ if os.environ.get('CUSTOM_IMAGE', False):
 
 
 def run():
-    from djangocms_helper import runner
+    from app_helper import runner
     runner.run('filer')
 
 

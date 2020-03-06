@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 
-from django.utils import six
+import six
 
 
 def get_model_label(model):

@@ -4,7 +4,8 @@ from __future__ import absolute_import
 import math
 
 from django.template import Library
-from django.utils import six
+
+import six
 
 
 register = Library()
