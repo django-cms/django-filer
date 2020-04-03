@@ -5,6 +5,7 @@ import logging
 import warnings
 
 from django import forms
+from django.conf import settings as django_settings
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.exceptions import ObjectDoesNotExist
@@ -89,8 +90,9 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
                 'filer/css/admin_filer.css',
             ]
         }
+        jquery = 'admin/js/vendor/jquery/jquery.js' if django_settings.DEBUG else 'admin/js/vendor/jquery/jquery.min.js'
         js = (
-            'admin/js/vendor/jquery/jquery.js',
+            jquery,
             'admin/js/jquery.init.js',
             'filer/js/libs/dropzone.min.js',
             'filer/js/addons/dropzone.init.js',
