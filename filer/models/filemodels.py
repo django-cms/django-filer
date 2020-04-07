@@ -1,7 +1,7 @@
 
 #-*- coding: utf-8 -*-
 from django.contrib.auth import models as auth_models
-from django.core import urlresolvers
+from django.urls import reverse
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.db import (models, IntegrityError, transaction)
@@ -13,7 +13,10 @@ from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
 from django.utils import timezone
-import polymorphic
+
+from polymorphic.models import PolymorphicModel
+from polymorphic.managers import PolymorphicManager
+from polymorphic.query import PolymorphicQuerySet
 import hashlib
 import os
 import filer
@@ -35,7 +38,7 @@ def silence_error_if_missing_file(exception):
         raise exception
 
 
-class FileQuerySet(polymorphic.PolymorphicQuerySet):
+class FileQuerySet(PolymorphicQuerySet):
 
     def readonly(self, user):
         Folder = filer.models.foldermodels.Folder
@@ -61,7 +64,7 @@ class FileQuerySet(polymorphic.PolymorphicQuerySet):
             folder__site__in=sites)
 
 
-class FileManager(polymorphic.PolymorphicManager):
+class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
@@ -89,13 +92,13 @@ class TrashFileManager(FileManager):
 
 
 @mixins.trashable
-class File(polymorphic.PolymorphicModel,
+class File(PolymorphicModel,
            mixins.IconsMixin):
 
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey('filer.Folder', verbose_name=_('folder'), related_name='all_files',
-        null=True, blank=True)
+        null=True, blank=True, on_delete=models.deletion.CASCADE)
     file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=255)
     _file_size = models.IntegerField(_('file size'), null=True, blank=True)
 
@@ -572,7 +575,7 @@ class File(polymorphic.PolymorphicModel,
         return name
 
     def get_admin_url_path(self):
-        return urlresolvers.reverse(
+        return reverse(
             'admin:%s_%s_change' % (self._meta.app_label,
                                     self._meta.model_name,),
             args=(self.pk,)

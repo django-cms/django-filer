@@ -26,7 +26,7 @@ setup(
     packages=find_packages(),
     install_requires=(
         'pytz==2015.4',
-        'Django>=1.8,<1.9',
+        'Django>=2.2,<3.0',
         'easy-thumbnails<=2.2',
         'django-mptt==0.7.4',
         'django_polymorphic<=0.7.1',

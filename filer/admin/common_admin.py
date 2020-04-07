@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.admin.utils import unquote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth import get_permission_codename
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 from django.http import HttpResponseRedirect
 
 from filer.models import Folder, File

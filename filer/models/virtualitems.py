@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django.core import urlresolvers
+from django.urls import reverse
 from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from filer.models import mixins
@@ -54,8 +54,7 @@ class UnfiledImages(DummyFolder):
     files = property(_files)
 
     def get_admin_directory_listing_url_path(self):
-        return urlresolvers.reverse(
-                            'admin:filer-directory_listing-unfiled_images')
+        return reverse('admin:filer-directory_listing-unfiled_images')
 
 
 class ImagesWithMissingData(DummyFolder):
@@ -68,8 +67,7 @@ class ImagesWithMissingData(DummyFolder):
         return File.objects.filter(has_all_mandatory_data=False)
 
     def get_admin_directory_listing_url_path(self):
-        return urlresolvers.reverse(
-                    'admin:filer-directory_listing-images_with_missing_data')
+        return reverse('admin:filer-directory_listing-images_with_missing_data')
 
 
 class FolderRoot(DummyFolder):
@@ -100,7 +98,7 @@ class FolderRoot(DummyFolder):
         return self.children.filter(name__in=names)
 
     def get_admin_directory_listing_url_path(self):
-        return urlresolvers.reverse('admin:filer-directory_listing-root')
+        return reverse('admin:filer-directory_listing-root')
 
     def is_restricted_for_user(self, user):
         return not has_admin_role(user)

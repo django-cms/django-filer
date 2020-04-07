@@ -11,7 +11,7 @@ from django.contrib import messages
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import router
 from django.db.models import Q
 from django.contrib.sites.models import Site

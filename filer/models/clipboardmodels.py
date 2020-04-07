@@ -7,7 +7,7 @@ from filer.models import filemodels
 
 class Clipboard(models.Model):
     user = models.OneToOneField(
-        auth_models.User, verbose_name=_('user'), related_name="filer_clipboard",
+        auth_models.User, verbose_name=_('user'), related_name="filer_clipboard",  on_delete=models.CASCADE
     )
     files = models.ManyToManyField(
         'File', verbose_name=_('files'), related_name="in_clipboards",
@@ -39,8 +39,8 @@ class Clipboard(models.Model):
 
 
 class ClipboardItem(models.Model):
-    file = models.ForeignKey('File', verbose_name=_('file'))
-    clipboard = models.ForeignKey(Clipboard, verbose_name=_('clipboard'))
+    file = models.ForeignKey('File', verbose_name=_('file'), on_delete=models.CASCADE)
+    clipboard = models.ForeignKey(Clipboard, verbose_name=_('clipboard'), on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'filer'

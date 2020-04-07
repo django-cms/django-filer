@@ -4,7 +4,7 @@ from PIL import Image, ImageChops, ImageDraw
 from django.contrib.auth.models import User, Permission
 from filer.models.foldermodels import Folder
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.admin import helpers
 
 

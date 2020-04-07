@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib import admin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import render_to_response, redirect

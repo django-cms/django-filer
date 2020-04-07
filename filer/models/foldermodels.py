@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
-from django.core import urlresolvers
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.db import (models, IntegrityError, transaction)
 from django.db.models import (query, Q, signals)
@@ -134,7 +134,7 @@ class Folder(models.Model, mixins.IconsMixin):
     }
 
     parent = models.ForeignKey('self', verbose_name=('parent'), null=True,
-                               blank=True, related_name='children')
+                               blank=True, related_name='children', on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=255)
 
     owner = models.ForeignKey(auth_models.User, verbose_name=('owner'),
@@ -482,12 +482,10 @@ class Folder(models.Model, mixins.IconsMixin):
         return urlquote(self.pretty_logical_path)
 
     def get_admin_url_path(self):
-        return urlresolvers.reverse('admin:filer_folder_change',
-                                    args=(self.id,))
+        return reverse('admin:filer_folder_change', args=(self.id,))
 
     def get_admin_directory_listing_url_path(self):
-        return urlresolvers.reverse('admin:filer-directory_listing',
-                                    args=(self.id,))
+        return reverse('admin:filer-directory_listing', args=(self.id,))
 
     def __unicode__(self):
         try:
