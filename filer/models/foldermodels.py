@@ -177,7 +177,7 @@ class Folder(models.Model, mixins.IconsMixin):
     all_objects = FolderManager()
     # required in order for django to know about trashed folders in case of
     #   deleting owners or other related objects
-    _base_manager = models.Manager()
+    objects = models.Manager()
 
     def __init__(self, *args, **kwargs):
         super(Folder, self).__init__(*args, **kwargs)

@@ -150,7 +150,7 @@ class File(PolymorphicModel,
     all_objects = FileManager()
 
     # fix for https://github.com/chrisglass/django_polymorphic/issues/34
-    _base_manager = models.Manager()
+    objects = models.Manager()
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):

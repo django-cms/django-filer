@@ -36,13 +36,13 @@ class ImageAdmin(FileAdmin):
     form = ImageAdminForm
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(ImageAdmin, self).get_urls()
-        url_patterns = patterns('',
+        url_patterns = ['',
             url(r'^(?P<file_id>\d+)/full_size_preview/$',
                 self.admin_site.admin_view(self.full_size_preview),
                 name='filer-image-preview'),
-        )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 

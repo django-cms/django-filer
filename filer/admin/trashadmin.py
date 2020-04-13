@@ -24,6 +24,7 @@ class Trash(object):
     entry in the admin index.
     """
     class _meta:
+        app_config = 'filer.apps.FilerConfig'
         app_label = 'filer'  # This is the app that the form will exist under
         model_name = 'trash'  # This is what will be used in the link url
         object_name = 'Trash'
@@ -40,9 +41,9 @@ class TrashAdmin(admin.ModelAdmin):
         model = Trash
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(TrashAdmin, self).get_urls()
-        url_patterns = patterns('',
+        url_patterns = ['',
             url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
                 self.admin_site.admin_view(self.restorable_item_view),
                 name='filer_trash_item'),
@@ -52,7 +53,7 @@ class TrashAdmin(admin.ModelAdmin):
             url(r'^file/check/(?P<file_id>\d+)/$',
                 self.admin_site.admin_view(self.file_check),
                 name='filer_trash_file_check'),
-            )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 

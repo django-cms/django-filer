@@ -161,9 +161,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(FolderAdmin, self).get_urls()
-        url_patterns = patterns('',
+        url_patterns = ['',
             # we override the default list view with our own directory listing
             # of the root directories
             url(r'^$', self.admin_site.admin_view(self.directory_listing),
@@ -185,7 +185,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             url(r'^destination_folders/$',
                 self.admin_site.admin_view(self.destination_folders),
                 name='filer-destination_folders'),
-        )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 
