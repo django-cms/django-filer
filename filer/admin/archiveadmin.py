@@ -14,8 +14,3 @@ class ArchiveAdminForm(forms.ModelForm):
 
 class ArchiveAdmin(FileAdmin):
     form = ArchiveAdminForm
-
-    def get_urls(self):
-        urls = super(ArchiveAdmin, self).get_urls()
-        archive_urls = ['']
-        return archive_urls + urls

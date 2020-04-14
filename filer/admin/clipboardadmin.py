@@ -43,7 +43,7 @@ class ClipboardAdmin(admin.ModelAdmin):
     def get_urls(self):
         from django.conf.urls import url
         urls = super(ClipboardAdmin, self).get_urls()
-        url_patterns = ['',
+        url_patterns = [
             url(r'^operations/paste_clipboard_to_folder/$',
                 self.admin_site.admin_view(self.paste_clipboard_to_folder),
                 name='filer-paste_clipboard_to_folder'),

@@ -163,7 +163,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
     def get_urls(self):
         from django.conf.urls import url
         urls = super(FolderAdmin, self).get_urls()
-        url_patterns = ['',
+        url_patterns = [
             # we override the default list view with our own directory listing
             # of the root directories
             url(r'^$', self.admin_site.admin_view(self.directory_listing),

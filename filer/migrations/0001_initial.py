@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             name='ClipboardItem',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard')),
+                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'clipboard item',
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Archive',
             fields=[
-                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': 'archive',
@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('owner', models.ForeignKey(related_name='filer_owned_folders', on_delete=django.db.models.deletion.SET_NULL, verbose_name=b'owner', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
-                ('parent', models.ForeignKey(related_name='children', verbose_name=b'parent', blank=True, to='filer.Folder', null=True)),
+                ('parent', models.ForeignKey(related_name='children', verbose_name=b'parent', blank=True, to='filer.Folder', null=True, on_delete=django.db.models.deletion.SET_NULL)),
                 ('shared', models.ManyToManyField(related_name='shared', to='sites.Site', blank=True, help_text='All the sites which you share this folder with will be able to use this folder on their pages, with all of its assets. However, they will not be able to change, delete or move it, not even add new assets.', null=True, verbose_name='Share folder with sites')),
                 ('site', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to='sites.Site', help_text='Select the site which will use this folder.', null=True)),
             ],
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Image',
             fields=[
-                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File', on_delete=django.db.models.deletion.CASCADE)),
                 ('_height', models.IntegerField(null=True, blank=True)),
                 ('_width', models.IntegerField(null=True, blank=True)),
                 ('date_taken', models.DateTimeField(verbose_name='date taken', null=True, editable=False, blank=True)),
@@ -127,7 +127,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='folder',
-            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', null=True),
+            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', on_delete=django.db.models.deletion.SET_NULL, null=True),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -139,13 +139,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='polymorphic_ctype',
-            field=models.ForeignKey(related_name='polymorphic_filer.file_set+', editable=False, to='contenttypes.ContentType', null=True),
+            field=models.ForeignKey(related_name='polymorphic_filer.file_set+', on_delete=django.db.models.deletion.SET_NULL, editable=False, to='contenttypes.ContentType', null=True),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='clipboarditem',
             name='file',
-            field=models.ForeignKey(verbose_name='file', to='filer.File'),
+            field=models.ForeignKey(verbose_name='file', to='filer.File', on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -157,7 +157,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='clipboard',
             name='user',
-            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
     ]

@@ -43,7 +43,7 @@ class TrashAdmin(admin.ModelAdmin):
     def get_urls(self):
         from django.conf.urls import url
         urls = super(TrashAdmin, self).get_urls()
-        url_patterns = ['',
+        url_patterns = [
             url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
                 self.admin_site.admin_view(self.restorable_item_view),
                 name='filer_trash_item'),
