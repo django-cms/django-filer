@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from django import forms
 from django.utils.translation import ugettext  as _
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.http import Http404
 from filer import settings as filer_settings, settings
@@ -52,14 +52,12 @@ class ImageAdmin(FileAdmin):
         except Image.DoesNotExist:
             raise Http404
 
-        return render_to_response(
-            'admin/filer/image/full_size_preview.html', {
+        return render(request, 'admin/filer/image/full_size_preview.html', {
                 'image': image,
                 'current_site': request.GET.get('current_site', None),
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
-                },
-            context_instance=RequestContext(request))
+                })
 
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
     extra_main_fields=('default_alt_text', 'default_caption', 'default_credit'),

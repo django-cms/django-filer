@@ -18,7 +18,7 @@ from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_permission_codename
 from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
@@ -407,10 +407,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             paginated_items = paginator.page(page)
         except (EmptyPage, InvalidPage):
             paginated_items = paginator.page(paginator.num_pages)
-        context = RequestContext(request)
-        context.update(self.admin_site.each_context(request))
-        response = render_to_response(
-            'admin/filer/folder/directory_listing.html', {
+        context = {
                 'folder': folder,
                 'user_clipboard': clipboard,
                 'clipboard_files': clipboard.files.distinct(),
@@ -437,7 +434,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
                     'total_count': paginator.count},
                 'media': self.media,
                 'file_type': file_type,
-            }, context_instance=context)
+            }
+        context.update(self.admin_site.each_context(request))
+        response = render(request, 'admin/filer/folder/directory_listing.html', context)
         return response
 
     def response_action(self, request, files_queryset, folders_queryset):
@@ -687,9 +686,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
         context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/delete_selected_files_confirmation.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/delete_selected_files_confirmation.html", context)
 
     delete_files_or_folders.short_description = ugettext_lazy(
         "Delete selected files and/or folders")
@@ -796,7 +793,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         all_required = all((
             request.method == 'GET',
             request.is_ajax(),
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             'parent' in request.GET
         ))
         if not all_required:
@@ -920,9 +917,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
         context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/folder/choose_move_destination.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_move_destination.html", context)
 
     move_files_and_folders.short_description = ugettext_lazy(
         "Move selected files and/or folders")
@@ -1133,9 +1128,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
         context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/folder/choose_copy_destination.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_copy_destination.html", context)
 
     copy_files_and_folders.short_description = ugettext_lazy(
         "Copy selected files and/or folders")
@@ -1283,9 +1276,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
 
         # Display the rename format selection page
-        return render_to_response([
-            "admin/filer/folder/choose_rename_format.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_rename_format.html", context=context)
 
     rename_files.short_description = ugettext_lazy("Rename files")
 
@@ -1420,9 +1411,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
 
         # Display the resize options page
-        return render_to_response([
-            "admin/filer/folder/choose_images_resize_options.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render("admin/filer/folder/choose_images_resize_options.html", context=context)
 
     resize_images.short_description = ugettext_lazy("Resize selected images")
 

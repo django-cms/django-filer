@@ -4,7 +4,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, Http404
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
@@ -146,8 +146,7 @@ class TrashAdmin(admin.ModelAdmin):
             'title': 'Restore %s %s' % (
                 filer_model.capitalize(), str(filer_object)),
         }
-        return render_to_response('admin/filer/trash/item_restore.html',
-           context, context_instance=RequestContext(request))
+        return render(request, 'admin/filer/trash/item_restore.html', context)
 
     def restore_items(self, request, filer_model, filer_obj_id):
         filer_model_cls, filer_object = self._check_restore_view_valid(
@@ -233,5 +232,4 @@ class TrashAdmin(admin.ModelAdmin):
             'title': 'Deleted Files and Folders',
         }
         context.update(extra_context or {})
-        return render_to_response('admin/filer/trash/directory_listing.html',
-           context, context_instance=RequestContext(request))
+        return render(request, 'admin/filer/trash/directory_listing.html', context)
