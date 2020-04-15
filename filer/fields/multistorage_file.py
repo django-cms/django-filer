@@ -100,7 +100,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
     def _get_url(self):
         if self.instance.is_in_trash():
             return ''
-        url = super(MultiStorageFieldFile, self)._get_url()
+        url = super(MultiStorageFieldFile, self).url
         return get_cdn_url(self.instance, url)
     url = property(_get_url)
 
