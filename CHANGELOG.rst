@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+1.7.1 (2020-04-29)
+==================
+
+* Fix problem with loading jquery.js after jquery.min.js had been loaded.
+* Fix usability: Upload files into most recently used folder, instead of
+  root folder.
+
 
 1.7.0 (2020-02-20)
 ==================
