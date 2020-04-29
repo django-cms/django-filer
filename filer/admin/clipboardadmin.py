@@ -73,13 +73,14 @@ def ajax_upload(request, folder_id=None):
     """
     Receives an upload from the uploader. Receives only one file at a time.
     """
-    folder = None
     if folder_id:
         try:
             # Get folder
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
             return JsonResponse({'error': NO_FOLDER_ERROR})
+    else:
+        folder = Folder.objects.filter(pk=request.session.get('filer_last_folder_id', 0)).first()
 
     # check permissions
     if folder and not folder.has_add_children_permission(request):
