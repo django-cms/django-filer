@@ -6,7 +6,10 @@ from django.utils.html import format_html_join
 
 from ..admin.tools import admin_url_params, admin_url_params_encoded
 
+
 register = Library()
+
+assignment_tag = getattr(register, 'assignment_tag', register.simple_tag)
 
 
 def filer_actions(context):
@@ -16,6 +19,8 @@ def filer_actions(context):
     """
     context['action_index'] = context.get('action_index', -1) + 1
     return context
+
+
 filer_actions = register.inclusion_tag(
     "admin/filer/actions.html", takes_context=True)(filer_actions)
 
@@ -36,7 +41,7 @@ def filer_admin_context_hidden_formfields(context):
     )
 
 
-@register.assignment_tag(takes_context=True)
+@assignment_tag(takes_context=True)
 def filer_has_permission(context, item, action):
     """Does the current user (taken from the request in the context) have
     permission to do the given action on the given item.

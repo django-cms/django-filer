@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.views.decorators.cache import never_cache
+
 from easy_thumbnails.files import ThumbnailFile
 
 from .. import settings as filer_settings
 from ..models import File
 from ..utils.filer_easy_thumbnails import thumbnail_to_original_filename
 
+
 server = filer_settings.FILER_PRIVATEMEDIA_SERVER
 thumbnail_server = filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_SERVER
 
 
+@never_cache
 def serve_protected_file(request, path):
     """
     Serve protected files to authenticated users with read permissions.
@@ -31,6 +34,7 @@ def serve_protected_file(request, path):
     return server.serve(request, file_obj=file_obj.file, save_as=False)
 
 
+@never_cache
 def serve_protected_thumbnail(request, path):
     """
     Serve protected thumbnails to authenticated users.

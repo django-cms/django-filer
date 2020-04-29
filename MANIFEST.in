@@ -1,8 +1,6 @@
-include AUTHORS
-include LICENSE
-include LICENSES
+include LICENSE.txt
 include README.rst
-include HISTORY
-recursive-include filer/templates *
-recursive-include filer/static *
 recursive-include filer/locale *
+recursive-include filer/static *
+recursive-include filer/templates *
+recursive-exclude * *.py[co]

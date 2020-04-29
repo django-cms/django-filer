@@ -14,7 +14,7 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
 Dependencies
 ------------
 
-* `Django`_ >= 1.8
+* `Django`_ >= 1.11
 * `django-mptt`_ >=0.6
 * `easy_thumbnails`_ >= 2.0
 * `django-polymorphic`_ >= 0.7
@@ -30,6 +30,7 @@ check `Pillow doc`_.
 
 * for `Django`_ >=1.8,<1.11 use `django-polymorphic`_ 1.3.1
 * for `Django`_ >=1.11 use `django-polymorphic`_ >=2.0
+* for `Django`_ >=3.0 use `django-polymorphic`_ >=2.1
 
 Configuration
 -------------
@@ -49,8 +50,8 @@ Note that `easy_thumbnails`_ also has database tables and needs a ``python manag
 For `easy_thumbnails`_ to support retina displays (recent MacBooks, iOS) add to settings.py::
 
     THUMBNAIL_HIGH_RESOLUTION = True
-    
-If you forget this, you may not see thumbnails for your uploaded files. Adding this line and 
+
+If you forget this, you may not see thumbnails for your uploaded files. Adding this line and
 refreshing the admin page will create the missing thumbnails.
 
 

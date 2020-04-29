@@ -5,18 +5,21 @@ import logging
 import warnings
 
 from django import forms
+from django.conf import settings
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from .. import settings as filer_settings
 from ..models import File
-from ..utils.compatibility import LTE_DJANGO_1_8, truncate_words
+from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
+
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +27,7 @@ logger = logging.getLogger(__name__)
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         related_url = None
@@ -61,10 +64,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'object': obj,
             'lookup_name': name,
             'id': css_id,
-            'admin_icon_delete': (
-                'admin/img/icon_deletelink.gif' if LTE_DJANGO_1_8
-                else 'admin/img/icon-deletelink.svg'
-            ),
+            'admin_icon_delete': ('admin/img/icon-deletelink.svg'),
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
@@ -74,20 +74,26 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
 
     def obj_for_value(self, value):
-        try:
-            key = self.rel.get_related_field().name
-            obj = self.rel.to._default_manager.get(**{key: value})
-        except:
+        if value:
+            try:
+                key = self.rel.get_related_field().name
+                obj = self.rel.model._default_manager.get(**{key: value})
+            except ObjectDoesNotExist:
+                obj = None
+        else:
             obj = None
         return obj
 
     class Media(object):
+        extra = '' if settings.DEBUG else '.min'
         css = {
             'all': [
                 'filer/css/admin_filer.css',
             ]
         }
         js = (
+            'admin/js/vendor/jquery/jquery%s.js' % extra,
+            'admin/js/jquery.init.js',
             'filer/js/libs/dropzone.min.js',
             'filer/js/addons/dropzone.init.js',
             'filer/js/addons/popup_handling.js',
@@ -134,7 +140,10 @@ class FilerFileField(models.ForeignKey):
         # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
-            'rel': self.rel,
         }
+        try:
+            defaults['rel'] = self.remote_field
+        except AttributeError:
+            defaults['rel'] = self.rel
         defaults.update(kwargs)
         return super(FilerFileField, self).formfield(**defaults)

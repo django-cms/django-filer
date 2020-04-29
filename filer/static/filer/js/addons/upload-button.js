@@ -2,6 +2,13 @@
 // This script implements the upload button logic
 'use strict';
 
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
 /* globals qq, Cl, django */
 (function ($) {
     $(function () {
@@ -132,4 +139,4 @@
             Cl.filerTooltip($);
         }
     });
-})(django.jQuery);
+})(djQuery);

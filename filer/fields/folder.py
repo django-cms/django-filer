@@ -6,9 +6,10 @@ import warnings
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
@@ -22,7 +23,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     input_type = 'hidden'
     is_hidden = False
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id
@@ -30,6 +31,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         if attrs is None:
             attrs = {}
         related_url = None
+
         if value:
             try:
                 folder = Folder.objects.get(pk=value)
@@ -72,10 +74,12 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
 
     def obj_for_value(self, value):
+        if not value:
+            return None
         try:
             key = self.rel.get_related_field().name
-            obj = self.rel.to._default_manager.get(**{key: value})
-        except:
+            obj = self.rel.model._default_manager.get(**{key: value})
+        except ObjectDoesNotExist:
             obj = None
         return obj
 
@@ -125,16 +129,10 @@ class FilerFolderField(models.ForeignKey):
         # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
-            'rel': self.rel,
         }
+        try:
+            defaults['rel'] = self.remote_field
+        except AttributeError:
+            defaults['rel'] = self.rel
         defaults.update(kwargs)
         return super(FilerFolderField, self).formfield(**defaults)
-
-    def south_field_triple(self):
-        "Returns a suitable description of this field for South."
-        # We'll just introspect ourselves, since we inherit.
-        from south.modelsinspector import introspector
-        field_class = "django.db.models.fields.related.ForeignKey"
-        args, kwargs = introspector(self)
-        # That's our definition!
-        return (field_class, args, kwargs)

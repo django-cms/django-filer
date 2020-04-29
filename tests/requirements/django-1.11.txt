@@ -1,0 +1,5 @@
+-r base.txt
+
+django>=1.11,<2.0
+django-mptt>=0.9
+django_polymorphic>=2.0,<2.1
