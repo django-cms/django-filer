@@ -5,6 +5,7 @@ from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
 
+
 ALLOWED_PICK_TYPES = ('folder', 'file')
 
 
@@ -49,8 +50,12 @@ def userperms_for_request(item, request):
 
 
 def popup_status(request):
-    return (IS_POPUP_VAR in request.GET or 'pop' in request.GET or
-            IS_POPUP_VAR in request.POST or 'pop' in request.POST)
+    return (
+        IS_POPUP_VAR in request.GET
+        or 'pop' in request.GET
+        or IS_POPUP_VAR in request.POST
+        or 'pop' in request.POST
+    )
 
 
 def popup_pick_type(request):

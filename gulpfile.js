@@ -18,8 +18,8 @@ var PROJECT_PATH = {
     'sass': PROJECT_ROOT + '/filer/private/sass/',
     'css': PROJECT_ROOT + '/filer/static/filer/css/',
     'js': PROJECT_ROOT + '/filer/static/filer/js/',
-    'tests': PROJECT_ROOT + '/filer/tests/frontend/',
-    'icons': PROJECT_ROOT + '/filer/static/filer/fonts/'
+    'icons': PROJECT_ROOT + '/filer/static/filer/fonts/',
+    'tests': PROJECT_ROOT + '/tests/frontend/'
 };
 
 var PROJECT_PATTERNS = {

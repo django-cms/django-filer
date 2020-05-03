@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.contrib import admin
 
 from ..models import Clipboard, File, Folder, FolderPermission, ThumbnailOption
@@ -11,6 +10,7 @@ from .folderadmin import FolderAdmin
 from .imageadmin import ImageAdmin
 from .permissionadmin import PermissionAdmin
 from .thumbnailoptionadmin import ThumbnailOptionAdmin
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 

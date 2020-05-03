@@ -7,6 +7,7 @@ from django.utils.timezone import now
 
 from .files import get_valid_filename
 
+
 try:
     from django.utils.encoding import force_text
 except ImportError:

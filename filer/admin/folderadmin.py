@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, division, unicode_literals
 
 import itertools
@@ -12,12 +11,13 @@ from django.conf import settings as django_settings
 from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.core.urlresolvers import reverse
 from django.db import models, router
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote, urlunquote
@@ -25,40 +25,26 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy, ungettext
 
-from . import views
 from .. import settings
 from ..models import (
-    File,
-    Folder,
-    FolderPermission,
-    FolderRoot,
-    ImagesWithMissingData,
-    UnsortedImages,
-    tools,
+    File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData,
+    UnsortedImages, tools,
 )
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
-from ..utils.compatibility import (
-    capfirst,
-    get_delete_permission,
-    quote,
-    unquote,
-)
+from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
 from ..utils.loader import load_model
+from . import views
 from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext,
-    admin_url_params_encoded,
-    check_files_edit_permissions,
-    check_files_read_permissions,
-    check_folder_edit_permissions,
-    check_folder_read_permissions,
-    popup_status,
-    userperms_for_request,
+    AdminContext, admin_url_params_encoded, check_files_edit_permissions,
+    check_files_read_permissions, check_folder_edit_permissions,
+    check_folder_read_permissions, popup_status, userperms_for_request,
 )
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 
@@ -137,11 +123,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         if (
-            request.POST and
-            '_continue' not in request.POST and
-            '_saveasnew' not in request.POST and
-            '_addanother' not in request.POST
+            request.POST
+            and '_continue' not in request.POST
+            and '_saveasnew' not in request.POST
+            and '_addanother' not in request.POST
         ):
+
             if obj.parent:
                 url = reverse('admin:filer-directory_listing',
                               kwargs={'folder_id': obj.parent.id})
@@ -156,7 +143,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
+        info = self.model._meta.app_label, self.model._meta.model_name
         extra_context = {'show_delete': True,
+                         'history_url': 'admin:%s_%s_history' % info,
                          'is_popup': popup_status(request),
                          'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
@@ -354,7 +343,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 'has_add_children_permission':
                     folder.has_add_children_permission(request),
             }
-        except:
+        except:  # noqa
             permissions = {}
 
         if order_by is None or len(order_by) == 0:
@@ -377,8 +366,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
         # Actions with no confirmation
-        if (actions and request.method == 'POST' and
-                'index' in request.POST and '_save' not in request.POST):
+        if (
+            actions and request.method == 'POST'
+            and 'index' in request.POST
+            and '_save' not in request.POST
+        ):
             if selected:
                 response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
                 if response:
@@ -389,9 +381,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.message_user(request, msg)
 
         # Actions with confirmation
-        if (actions and request.method == 'POST' and
-                helpers.ACTION_CHECKBOX_NAME in request.POST and
-                'index' not in request.POST and '_save' not in request.POST):
+        if (
+            actions and request.method == 'POST'
+            and helpers.ACTION_CHECKBOX_NAME in request.POST
+            and 'index' not in request.POST
+            and '_save' not in request.POST
+        ):
             if selected:
                 response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
                 if response:
@@ -474,9 +469,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def filter_file(self, qs, terms=()):
         for term in terms:
-            filters = (models.Q(name__icontains=term) |
-                       models.Q(description__icontains=term) |
-                       models.Q(original_filename__icontains=term))
+            filters = (models.Q(name__icontains=term)
+                       | models.Q(description__icontains=term)
+                       | models.Q(original_filename__icontains=term))
             for filter_ in self.get_owner_filter_lookups():
                 filters |= models.Q(**{filter_: term})
             qs = qs.filter(filters)
