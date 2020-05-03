@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 
-import mptt
+from mptt.models import MPTTModel
 from six import python_2_unicode_compatible
 
 from .. import settings as filer_settings
@@ -84,7 +84,7 @@ class FolderPermissionManager(models.Manager):
 
 
 @python_2_unicode_compatible
-class Folder(mptt.models.MPTTModel, mixins.IconsMixin):
+class Folder(MPTTModel, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
