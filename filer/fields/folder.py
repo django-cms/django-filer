@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import warnings
 
+from django import VERSION as DJANGO_VERSION
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
@@ -122,6 +123,8 @@ class FilerFolderField(models.ForeignKey):
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
+        if DJANGO_VERSION >= (1, 9):
+            kwargs['on_delete'] = models.CASCADE
         super(FilerFolderField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
