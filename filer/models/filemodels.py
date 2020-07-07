@@ -1,5 +1,11 @@
-
 #-*- coding: utf-8 -*-
+import polymorphic
+import hashlib
+import os
+import filer
+import logging
+import operator
+
 from django.contrib.auth import models as auth_models
 from django.core import urlresolvers
 from django.core.files.base import ContentFile
@@ -13,11 +19,7 @@ from filer.utils.files import matching_file_subtypes
 from filer import settings as filer_settings
 from django.db.models import Count
 from django.utils import timezone
-import polymorphic
-import hashlib
-import os
-import filer
-import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -508,7 +510,7 @@ class File(polymorphic.PolymorphicModel,
         return text
 
     def __lt__(self, other):
-        return cmp(self.label.lower(), other.label.lower()) < 0
+        return operator.lt(self.label.lower(), other.label.lower())
 
     @property
     def actual_name(self):
