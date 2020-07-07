@@ -489,7 +489,7 @@ class Folder(models.Model, mixins.IconsMixin):
         return urlresolvers.reverse('admin:filer-directory_listing',
                                     args=(self.id,))
 
-    def __unicode__(self):
+    def __str__(self):
         try:
             name = self.pretty_logical_path
         except:
