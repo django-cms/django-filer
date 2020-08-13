@@ -33,7 +33,7 @@ matrix:
       env: DJANGO='dj31' SWAP='swap'
 
 install:
-  - pip install coverage isort tox
+  - pip install coverage isort<5 tox
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then export PY_VER=py36; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then export PY_VER=py37; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then export PY_VER=py38; fi"
