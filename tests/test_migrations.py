@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # original from
 # http://tech.octopus.energy/news/2016/01/21/testing-for-missing-migrations-in-django.html
 from django.core.management import call_command

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 See PEP 386 (https://www.python.org/dev/peps/pep-0386/)
 

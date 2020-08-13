@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django-filer documentation build configuration file, created by
 # sphinx-quickstart on Tue Nov 16 22:05:55 2010.

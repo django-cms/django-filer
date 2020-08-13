@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from . import views
 
 
 urlpatterns = [
-    url(r'^(?P<path>.*)$', views.serve_protected_thumbnail),
+    re_path(r'^(?P<path>.*)$', views.serve_protected_thumbnail),
 ]

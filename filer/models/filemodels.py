@@ -7,20 +7,15 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from . import mixins
 from .foldermodels import Folder
 
-
-try:
-    from polymorphic.models import PolymorphicModel
-    from polymorphic.managers import PolymorphicManager
-except ImportError:
-    # django-polymorphic < 0.8
-    from polymorphic import PolymorphicModel, PolymorphicManager
+from polymorphic.models import PolymorphicModel
+from polymorphic.managers import PolymorphicManager
 
 
 class FileManager(PolymorphicManager):

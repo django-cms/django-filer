@@ -24,13 +24,9 @@ from filer.settings import FILER_IMAGE_MODEL
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 
+from unittest import skipIf
 
 Image = load_model(FILER_IMAGE_MODEL)
-
-try:
-    from unittest import skipIf
-except ImportError:  # for python 2.6
-    from unittest2 import skipIf
 
 
 def model_to_dict(instance, **kwargs):
