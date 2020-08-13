@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import warnings
 
 from django import forms
@@ -50,7 +47,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             # The JavaScript looks for this hook.
             attrs['class'] = 'vForeignKeyRawIdAdminField'
         super_attrs = attrs.copy()
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)  # grandparent super
 
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
@@ -83,7 +80,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
+    class Media:
         js = (
             'filer/js/addons/popup_handling.js',
         )
@@ -122,7 +119,7 @@ class FilerFolderField(models.ForeignKey):
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
-        super(FilerFolderField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
@@ -135,4 +132,4 @@ class FilerFolderField(models.ForeignKey):
         except AttributeError:
             defaults['rel'] = self.rel
         defaults.update(kwargs)
-        return super(FilerFolderField, self).formfield(**defaults)
+        return super().formfield(**defaults)

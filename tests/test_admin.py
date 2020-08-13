@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
 
 import django
@@ -219,13 +216,13 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.video_name = 'test_file.mov'
         self.video_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.video_name)
         self.video.save(self.video_filename, 'JPEG')
-        super(FilerClipboardAdminUrlsTests, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
         os.remove(self.video_filename)
-        super(FilerClipboardAdminUrlsTests, self).tearDown()
+        super().tearDown()
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
@@ -436,7 +433,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
 
 
-class BulkOperationsMixin(object):
+class BulkOperationsMixin:
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')

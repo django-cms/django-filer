@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import os
 
 from django.core.files import File as DjangoFile
@@ -9,14 +6,13 @@ from django.core.management.base import BaseCommand
 from ...models.filemodels import File
 from ...models.foldermodels import Folder
 from ...settings import FILER_IMAGE_MODEL, FILER_IS_PUBLIC_DEFAULT
-from ...utils.compatibility import upath
 from ...utils.loader import load_model
 
 
 Image = load_model(FILER_IMAGE_MODEL)
 
 
-class FileImporter(object):
+class FileImporter:
     def __init__(self, * args, **kwargs):
         self.path = kwargs.get('path')
         self.base_folder = kwargs.get('base_folder')
@@ -84,9 +80,9 @@ class FileImporter(object):
         path = path or self.path or ''
         base_folder = base_folder or self.base_folder
         # prevent trailing slashes and other inconsistencies on path.
-        path = os.path.normpath(upath(path))
+        path = os.path.normpath(path)
         if base_folder:
-            base_folder = os.path.normpath(upath(base_folder))
+            base_folder = os.path.normpath(base_folder)
             print("The directory structure will be imported in %s" % (base_folder,))
         if self.verbosity >= 1:
             print("Import the folders and files in %s" % (path,))

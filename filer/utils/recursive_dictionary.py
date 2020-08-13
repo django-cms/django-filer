@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # https://gist.github.com/114831
 # recursive_dictionary.py
 #   Created 2009-05-20 by Jannis Andrija Schnitzer.
@@ -23,9 +21,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from __future__ import absolute_import
-
-import six
 
 
 __author__ = 'jannis@itisme.org (Jannis Andrija Schnitzer)'
@@ -46,11 +41,11 @@ class RecursiveDictionary(dict):
         {'foo': {'baz': 36, 'bar': 42}}
         """
         try:
-            iterator = six.iteritems(other)
+            iterator = other.items()
         except AttributeError:
             iterator = other
         self.iter_rec_update(iterator)
-        self.iter_rec_update(six.iteritems(third))
+        self.iter_rec_update(third.items())
 
     def iter_rec_update(self, iterator):
         for (key, value) in iterator:
@@ -70,7 +65,7 @@ class RecursiveDictionaryWithExcludes(RecursiveDictionary):
     """
     def __init__(self, *args, **kwargs):
         self.rec_excluded_keys = kwargs.pop('rec_excluded_keys', ())
-        super(RecursiveDictionaryWithExcludes, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def iter_rec_update(self, iterator):
         for (key, value) in iterator:

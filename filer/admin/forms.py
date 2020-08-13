@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django import forms
 from django.conf import settings
 from django.contrib.admin import widgets
@@ -12,7 +9,7 @@ from ..models import ThumbnailOption
 from ..utils.files import get_valid_filename
 
 
-class AsPWithHelpMixin(object):
+class AsPWithHelpMixin:
     def as_p_with_help(self):
         "Returns this form rendered as HTML <p>s with help text formated for admin."
         return self._html_output(

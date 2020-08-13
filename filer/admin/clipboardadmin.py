@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django.conf.urls import url
 from django.contrib import admin
 from django.forms.models import modelform_factory
@@ -55,7 +52,7 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/no_folder/$',
                 ajax_upload,
                 name='filer-ajax_upload'),
-        ] + super(ClipboardAdmin, self).get_urls()
+        ] + super().get_urls()
 
     def get_model_perms(self, *args, **kwargs):
         """

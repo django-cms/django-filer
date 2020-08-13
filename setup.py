@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from setuptools import find_packages, setup
 
 from filer import __version__
@@ -11,7 +10,6 @@ REQUIREMENTS = [
     'django_polymorphic>=0.7,<2.2',
     'easy-thumbnails>=2,<3.0',
     'Unidecode>=0.04,<1.2',
-    'six',
 ]
 
 

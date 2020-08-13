@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django.contrib import admin
 
 from .. import settings
@@ -27,7 +24,7 @@ class PermissionAdmin(admin.ModelAdmin):
             except AttributeError:
                 remote = db_field.rel
             kwargs['widget'] = folder.AdminFolderWidget(remote, self.admin_site, using=db)
-        return super(PermissionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_model_perms(self, request):
         # don't display the permissions admin if permissions are disabled.
