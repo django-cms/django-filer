@@ -13,20 +13,15 @@ in the code.
 
 from collections import defaultdict
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib.admin.utils import quote
 from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models.deletion import Collector
 from django.urls import NoReverseMatch, reverse
+from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
-
-
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    # Django < 1.5
-    from django.utils.encoding import force_unicode as force_text
 
 
 def get_deleted_objects(objs, opts, user, admin_site, using):
@@ -108,9 +103,14 @@ class NestedObjects(Collector):
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
-    def related_objects(self, related, objs):
-        qs = super().related_objects(related, objs)
-        return qs.select_related(related.field.name)
+    if DJANGO_VERSION >= (3, 1):
+        def related_objects(self, related_model, related_fields, objs):
+            qs = super().related_objects(related_model, related_fields, objs)
+            return qs.select_related(*[related.name for related in related_fields])
+    else:
+        def related_objects(self, related, objs):
+            qs = super().related_objects(related, objs)
+            return qs.select_related(related.field.name)
 
     def _nested(self, obj, seen, format_callback):
         if obj in seen:
