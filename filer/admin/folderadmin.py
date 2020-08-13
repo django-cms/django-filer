@@ -1112,7 +1112,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 if destination not in folders_dict or not folders_dict[destination][1]:
                     raise PermissionDenied
                 if files_queryset.count() + folders_queryset.count():
-                    # We count all files and folders here (recursivelly)
+                    # We count all files and folders here (recursively)
                     n = self._copy_files_and_folders_impl(files_queryset, folders_queryset, destination, form.cleaned_data['suffix'], False)
                     self.message_user(request, _("Successfully copied %(count)d files and/or folders to folder '%(destination)s'.") % {
                         "count": n,
@@ -1254,7 +1254,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     form.cleaned_data['crop'] = form.cleaned_data['thumbnail_option'].crop
                     form.cleaned_data['upscale'] = form.cleaned_data['thumbnail_option'].upscale
                 if files_queryset.count() + folders_queryset.count():
-                    # We count all files here (recursivelly)
+                    # We count all files here (recursively)
                     n = self._resize_images_impl(files_queryset, folders_queryset, form.cleaned_data)
                     self.message_user(request, _("Successfully resized %(count)d images.") % {"count": n, })
                 return None

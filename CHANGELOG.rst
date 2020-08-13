@@ -3,7 +3,22 @@ CHANGELOG
 =========
 
 
-1.7.0 (unreleased)
+2.0.0 (unreleased)
+==================
+
+* Changed the preferred way to do model registration via model inheritance
+  and ``mptt.AlreadyRegistered``, which is deprecated since django-mptt 0.4
+
+
+1.7.1 (2020-04-29)
+==================
+
+* Fix problem with loading jquery.js after jquery.min.js had been loaded.
+* Fix usability: Upload files into most recently used folder, instead of
+  root folder.
+
+
+1.7.0 (2020-02-20)
 ==================
 
 * Added Django 3.0 support

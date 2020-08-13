@@ -5,6 +5,7 @@ import logging
 import warnings
 
 from django import forms
+from django.conf import settings
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.core.exceptions import ObjectDoesNotExist
@@ -84,13 +85,14 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media(object):
+        extra = '' if settings.DEBUG else '.min'
         css = {
             'all': [
                 'filer/css/admin_filer.css',
             ]
         }
         js = (
-            'admin/js/vendor/jquery/jquery.js',
+            'admin/js/vendor/jquery/jquery%s.js' % extra,
             'admin/js/jquery.init.js',
             'filer/js/libs/dropzone.min.js',
             'filer/js/addons/dropzone.init.js',
