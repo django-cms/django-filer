@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
 import warnings
 
@@ -57,7 +54,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         # rendering the super for ForeignKeyRawIdWidget on purpose here because
         # we only need the input and none of the other stuff that
         # ForeignKeyRawIdWidget adds
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)  # grandparent super
         context = {
             'hidden_input': hidden_input,
             'lookup_url': '%s%s' % (related_url, lookup_url),
@@ -84,7 +81,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
+    class Media:
         extra = '' if settings.DEBUG else '.min'
         css = {
             'all': [
@@ -111,7 +108,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
+        super().__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -133,7 +130,7 @@ class FilerFileField(models.ForeignKey):
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
-        super(FilerFileField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
@@ -146,4 +143,4 @@ class FilerFileField(models.ForeignKey):
         except AttributeError:
             defaults['rel'] = self.rel
         defaults.update(kwargs)
-        return super(FilerFileField, self).formfield(**defaults)
+        return super().formfield(**defaults)

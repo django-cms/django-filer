@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
@@ -17,7 +14,7 @@ from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class NewFolderForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = Folder
         fields = ('name',)
         widgets = {

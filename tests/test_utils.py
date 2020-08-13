@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
 from zipfile import ZipFile
 
@@ -15,7 +12,7 @@ from filer.utils.zip import unzip
 
 
 # Some target classes for the classloading tests
-class TestTargetSuperClass(object):
+class TestTargetSuperClass:
     pass
 
 

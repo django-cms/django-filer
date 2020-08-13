@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django import forms
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
@@ -47,7 +44,7 @@ class ImageAdminForm(forms.ModelForm):
         for subject location widget to receive valid coordinates on field
         validation errors.
         """
-        cleaned_data = super(ImageAdminForm, self).clean()
+        cleaned_data = super().clean()
         subject_location = cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it
@@ -79,11 +76,11 @@ class ImageAdminForm(forms.ModelForm):
                 'Previous value is restored.'),
             code=err_code)
 
-    class Meta(object):
+    class Meta:
         model = Image
         exclude = ()
 
-    class Media(object):
+    class Media:
         css = {
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
