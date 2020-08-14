@@ -36,6 +36,9 @@ matrix:
       env: DJANGO='dj31' SWAP='swap'
     - python: 3.6
       env: DJANGO='dj31' SWAP='noswap'
+    # frontend tests need to be upgraded to a newer node version...
+    - python: 3.6
+      env: TOX_ENV='frontend'
 
 install:
   - pip install coverage isort tox

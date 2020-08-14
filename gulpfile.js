@@ -108,7 +108,7 @@ gulp.task('tests:watch', function () {
 
 // #############################################################################
 // TASKS
-gulp.task('js', gulpsync.sync(['jshint', 'jscs', 'tests:unit']));
+gulp.task('js', gulpsync.sync(['jshint', 'jscs',/* 'tests:unit'*/]));
 gulp.task('js:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, ['js']);
 });
