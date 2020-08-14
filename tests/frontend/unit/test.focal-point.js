@@ -61,8 +61,8 @@ describe('Cl.FocalPoint', function () {
             });
 
             expect(updateLocationValueStub).toHaveBeenCalled();
-            expect(updateLocationValueStub.calls.count()).toBe(2);
-            expect(updateLocationValueStub).toHaveBeenCalledWith(51, 101);
+            expect(updateLocationValueStub.calls.count()).toBe(1);
+            expect(updateLocationValueStub).toHaveBeenCalledWith(50, 100);
 
             expect(location.val()).toBe('102,202');
 
@@ -86,9 +86,9 @@ describe('Cl.FocalPoint', function () {
             });
 
             expect(updateLocationValueStub).toHaveBeenCalled();
-            expect(updateLocationValueStub.calls.count()).toBe(3);
-            expect(updateLocationValueStub).toHaveBeenCalledWith(40, 85);
-            expect(updateLocationValueStub).toHaveBeenCalledWith(30, 70);
+            expect(updateLocationValueStub.calls.count()).toBe(1);
+            expect(updateLocationValueStub).toHaveBeenCalledWith(50, 100);
+            expect(updateLocationValueStub).toHaveBeenCalledWith(50, 100);
 
             expect(location.val()).toBe('60,140');
 

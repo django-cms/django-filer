@@ -21,13 +21,13 @@ def get_delete_permission(opts):
 
 
 try:
+    from PIL import ExifTags as PILExifTags  # noqa
     from PIL import Image as PILImage  # noqa
     from PIL import ImageDraw as PILImageDraw  # noqa
-    from PIL import ExifTags as PILExifTags  # noqa
 except ImportError:
     try:
+        import ExifTags as PILExifTags  # noqa
         import Image as PILImage  # noqa
         import ImageDraw as PILImageDraw  # noqa
-        import ExifTags as PILExifTags  # noqa
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")

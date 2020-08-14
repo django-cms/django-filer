@@ -4,13 +4,13 @@ dist: xenial
 
 matrix:
   include:
-    - python: 3.5
+    - python: 3.6
       env: TOX_ENV='flake8'
-    - python: 3.5
+    - python: 3.6
       env: TOX_ENV='isort'
     - python: 3.6
       env: TOX_ENV='docs'
-    - python: 3.5
+    - python: 3.6
       env: TOX_ENV='frontend'
     # Django 2.2
     - python: 3.5
@@ -47,6 +47,7 @@ install:
 
 before_script:
   - if [ $TOX_ENV == 'frontend' ]; then
+    pip install -r tests/requirements/frontend.txt;
     nvm install 0.12.7 && nvm use 0.12.7;
     npm config set spin false;
     npm install -g npm@2;
