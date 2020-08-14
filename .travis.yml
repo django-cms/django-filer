@@ -14,28 +14,28 @@ matrix:
       env: TOX_ENV='frontend'
     # Django 2.2
     - python: 3.5
-      env: DJANGO='dj22' CMS='cms37' SWAP='swap'
+      env: DJANGO='dj22' SWAP='swap'
     - python: 3.6
-      env: DJANGO='dj22' CMS='cms37' SWAP='noswap'
+      env: DJANGO='dj22' SWAP='noswap'
     - python: 3.7
-      env: DJANGO='dj22' CMS='cms37' SWAP='swap'
+      env: DJANGO='dj22' SWAP='swap'
     - python: 3.8
-      env: DJANGO='dj22' CMS='cms37' SWAP='noswap'
+      env: DJANGO='dj22' SWAP='noswap'
     # Django 3.0, always run the lowest supported version
     - python: 3.6
-      env: DJANGO='dj30' CMS='cms37' SWAP='swap'
+      env: DJANGO='dj30' SWAP='swap'
     - python: 3.6
-      env: DJANGO='dj30' CMS='cms37' SWAP='noswap'
+      env: DJANGO='dj30' SWAP='noswap'
     # Django 3.1, always run the lowest supported version
     - python: 3.6
-      env: DJANGO='dj31' CMS='cms38' SWAP='swap'
+      env: DJANGO='dj31' SWAP='swap'
     - python: 3.6
-      env: DJANGO='dj31' CMS='cms38' SWAP='noswap'
+      env: DJANGO='dj31' SWAP='noswap'
   allow_failures:
     - python: 3.6
-      env: DJANGO='dj31' CMS='cms38' SWAP='swap'
+      env: DJANGO='dj31' SWAP='swap'
     - python: 3.6
-      env: DJANGO='dj31' CMS='cms38' SWAP='noswap'
+      env: DJANGO='dj31' SWAP='noswap'
 
 install:
   - pip install coverage isort tox

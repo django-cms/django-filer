@@ -7,7 +7,7 @@ from filer import __version__
 REQUIREMENTS = [
     'django>=2.2,<4.0',
     'django-mptt>=0.6,<1.0',  # the exact version depends on Django
-    'django_polymorphic>=0.7,<2.2',
+    'django_polymorphic>=2,<2.3',
     'easy-thumbnails>=2,<3.0',
     'Unidecode>=0.04,<1.2',
 ]

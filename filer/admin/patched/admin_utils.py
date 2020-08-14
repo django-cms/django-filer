@@ -10,9 +10,9 @@ This code has been copied from Django 1.9.4.
 At all locations where something has been changed, there are inline comments
 in the code.
 """
-
 from collections import defaultdict
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib.admin.utils import quote
 from django.contrib.auth import get_permission_codename
 from django.db import models
@@ -102,9 +102,14 @@ class NestedObjects(Collector):
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
-    def related_objects(self, related, objs):
-        qs = super().related_objects(related, objs)
-        return qs.select_related(related.field.name)
+    if DJANGO_VERSION >= (3, 1):
+        def related_objects(self, related_model, related_fields, objs):
+            qs = super().related_objects(related_model, related_fields, objs)
+            return qs.select_related(*[related.name for related in related_fields])
+    else:
+        def related_objects(self, related, objs):
+            qs = super().related_objects(related, objs)
+            return qs.select_related(related.field.name)
 
     def _nested(self, obj, seen, format_callback):
         if obj in seen:
