@@ -1,11 +1,12 @@
 import os
+from unittest import skipIf
 
 import django
 import django.core.files
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from django.urls import reverse
@@ -24,9 +25,9 @@ from filer.settings import FILER_IMAGE_MODEL
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 
-from unittest import skipIf
 
 Image = load_model(FILER_IMAGE_MODEL)
+User = get_user_model()
 
 
 def model_to_dict(instance, **kwargs):

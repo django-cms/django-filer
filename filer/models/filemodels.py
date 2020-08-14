@@ -9,13 +9,13 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from polymorphic.managers import PolymorphicManager
+from polymorphic.models import PolymorphicModel
+
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from . import mixins
 from .foldermodels import Folder
-
-from polymorphic.models import PolymorphicModel
-from polymorphic.managers import PolymorphicManager
 
 
 class FileManager(PolymorphicManager):

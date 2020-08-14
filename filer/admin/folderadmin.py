@@ -5,7 +5,6 @@ from collections import OrderedDict
 
 from django import forms
 from django.conf import settings as django_settings
-from django.urls import re_path
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import capfirst, quote, unquote
@@ -14,7 +13,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote, urlunquote
@@ -482,6 +481,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         first_name, last_name, and email.
         """
         from django.contrib.auth import get_user_model
+        User = get_user_model()
 
         return [
             field.name for field in User._meta.fields

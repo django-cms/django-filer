@@ -1,11 +1,10 @@
 import os
+from unittest import skipIf, skipUnless
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
-
-from unittest import skipIf, skipUnless
 
 from tests.helpers import (
     create_clipboard_item, create_folder_structure, create_image,
@@ -23,7 +22,6 @@ from filer.utils.loader import load_model
 
 
 Image = load_model(FILER_IMAGE_MODEL)
-
 
 
 class FilerApiTests(TestCase):

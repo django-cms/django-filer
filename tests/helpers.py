@@ -4,11 +4,8 @@ from filer.utils.compatibility import PILImage, PILImageDraw
 
 
 def create_superuser():
-    try:
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-    except ImportError:
-        from django.contrib.auth.models import User  # NOQA
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     superuser = User.objects.create_superuser('admin',
                                               'admin@free.fr',
                                               'secret')

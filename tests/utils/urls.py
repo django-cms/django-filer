@@ -1,6 +1,6 @@
 from django.conf import settings
-from django.urls import re_path, include
 from django.contrib import admin
+from django.urls import include, re_path
 from django.views.static import serve
 
 

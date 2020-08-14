@@ -24,11 +24,9 @@ class Mock():
 class FolderPermissionsTestCase(TestCase):
 
     def setUp(self):
-        try:
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-        except ImportError:
-            from django.contrib.auth.models import User  # NOQA
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
 
