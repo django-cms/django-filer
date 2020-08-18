@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='image',
             name='file_ptr',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='custom_image_image_file', serialize=False, to='filer.File'),
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='custom_image_image_file', serialize=False, to='filer.File', parent_link=True),
         ),
         migrations.AlterField(
             model_name='image',
