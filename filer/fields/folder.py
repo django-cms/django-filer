@@ -114,7 +114,7 @@ class FilerFolderField(models.ForeignKey):
         dfl = get_model_label(self.default_model_class)
         if "to" in kwargs.keys():  # pragma: no cover
             old_to = get_model_label(kwargs.pop("to"))
-            if old_to != dfl:
+            if old_to.lower() != dfl.lower():
                 msg = "%s can only be a ForeignKey to %s; %s passed" % (
                     self.__class__.__name__, dfl, old_to
                 )
