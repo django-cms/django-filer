@@ -11,6 +11,7 @@ CHANGELOG
 * Dropped support for Django < 2.2
 * Changed the preferred way to do model registration via model inheritance
   and ``mptt.AlreadyRegistered``, which is deprecated since django-mptt 0.4
+* Use dashed name for django-polymorphic dependency in setup.py
 
 
 1.7.1 (2020-04-29)
