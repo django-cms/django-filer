@@ -30,7 +30,7 @@ check `Pillow doc`_.
 
 * for `Django`_ >=2.2 use `django-polymorphic`_ >=2.0
 * for `Django`_ >=3.0 use `django-polymorphic`_ >=2.1
-* for `Django`_ >=3.1 use `django-polymorphic`_ >=3.1
+* for `Django`_ >=3.1 use `django-polymorphic`_ >=3.0
 
 Configuration
 -------------
