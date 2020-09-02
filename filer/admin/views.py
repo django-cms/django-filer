@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
@@ -9,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBadRequest
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
 from ..models import Clipboard, Folder, FolderRoot, tools
@@ -17,7 +14,7 @@ from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class NewFolderForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = Folder
         fields = ('name',)
         widgets = {

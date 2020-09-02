@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
-from six import python_2_unicode_compatible
+from django.utils.translation import gettext_lazy as _
 
 from . import filemodels
 
 
-@python_2_unicode_compatible
 class Clipboard(models.Model):
     user = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -37,7 +31,7 @@ class Clipboard(models.Model):
     def __str__(self):
         return "Clipboard %s of %s" % (self.id, self.user)
 
-    class Meta(object):
+    class Meta:
         app_label = 'filer'
         verbose_name = _('clipboard')
         verbose_name_plural = _('clipboards')
@@ -55,7 +49,7 @@ class ClipboardItem(models.Model):
         on_delete=models.CASCADE,
     )
 
-    class Meta(object):
+    class Meta:
         app_label = 'filer'
         verbose_name = _('clipboard item')
         verbose_name_plural = _('clipboard items')

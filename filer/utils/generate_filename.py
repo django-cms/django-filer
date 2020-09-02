@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import os
 
+from django.utils.encoding import force_text
 from django.utils.timezone import now
 
 from .files import get_valid_filename
-
-
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    # Django < 1.5
-    from django.utils.encoding import force_unicode as force_text
 
 
 def by_date(instance, filename):
@@ -27,7 +18,7 @@ def randomized(instance, filename):
             get_valid_filename(filename))
 
 
-class prefixed_factory(object):
+class prefixed_factory:
     def __init__(self, upload_to, prefix):
         self.upload_to = upload_to
         self.prefix = prefix

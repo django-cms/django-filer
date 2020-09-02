@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
@@ -8,10 +5,9 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.http import urlquote
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from mptt.models import MPTTModel
-from six import python_2_unicode_compatible
+import mptt
 
 from .. import settings as filer_settings
 from . import mixins
@@ -83,8 +79,7 @@ class FolderPermissionManager(models.Manager):
         return allow_list - deny_list
 
 
-@python_2_unicode_compatible
-class Folder(MPTTModel, mixins.IconsMixin):
+class Folder(models.Model, mixins.IconsMixin):
     """
     Represents a Folder that things (files) can be put into. Folders are *NOT*
     mirrored in the Filesystem and can have any unicode chars as their name.
@@ -242,7 +237,7 @@ class Folder(MPTTModel, mixins.IconsMixin):
         except Folder.DoesNotExist:
             return False
 
-    class Meta(object):
+    class Meta:
         # see: https://github.com/django-mptt/django-mptt/pull/577
         index_together = (('tree_id', 'lft'),)
         unique_together = (('parent', 'name'),)
@@ -254,7 +249,13 @@ class Folder(MPTTModel, mixins.IconsMixin):
         verbose_name_plural = _("Folders")
 
 
-@python_2_unicode_compatible
+# MPTT registration
+try:
+    mptt.register(Folder)
+except mptt.AlreadyRegistered:
+    pass
+
+
 class FolderPermission(models.Model):
     ALL = 0
     THIS = 1
@@ -339,7 +340,7 @@ class FolderPermission(models.Model):
         if not self.user and not self.group and not self.everybody:
             raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
 
-    class Meta(object):
+    class Meta:
         verbose_name = _('folder permission')
         verbose_name_plural = _('folder permissions')
         app_label = 'filer'

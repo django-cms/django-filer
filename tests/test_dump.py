@@ -1,16 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import json
 import os
 import tempfile
+from io import StringIO
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.management import call_command
 from django.test import TestCase
 
-from six import StringIO
 from tests.helpers import (
     SettingsOverride, create_folder_structure, create_image, create_superuser,
 )

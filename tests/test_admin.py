@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
+from unittest import skipIf
 
 import django
 import django.core.files
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from django.urls import reverse
@@ -29,11 +27,7 @@ from filer.utils.loader import load_model
 
 
 Image = load_model(FILER_IMAGE_MODEL)
-
-try:
-    from unittest import skipIf
-except ImportError:  # for python 2.6
-    from unittest2 import skipIf
+User = get_user_model()
 
 
 def model_to_dict(instance, **kwargs):
@@ -219,13 +213,13 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.video_name = 'test_file.mov'
         self.video_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.video_name)
         self.video.save(self.video_filename, 'JPEG')
-        super(FilerClipboardAdminUrlsTests, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
         os.remove(self.video_filename)
-        super(FilerClipboardAdminUrlsTests, self).tearDown()
+        super().tearDown()
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
@@ -436,7 +430,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
 
 
-class BulkOperationsMixin(object):
+class BulkOperationsMixin:
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')

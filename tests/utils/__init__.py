@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from distutils.version import LooseVersion
 
 import easy_thumbnails

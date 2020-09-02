@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import hashlib
 import os
 from datetime import datetime
@@ -10,22 +7,15 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from six import python_2_unicode_compatible
+from polymorphic.managers import PolymorphicManager
+from polymorphic.models import PolymorphicModel
 
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
 from . import mixins
 from .foldermodels import Folder
-
-
-try:
-    from polymorphic.models import PolymorphicModel
-    from polymorphic.managers import PolymorphicManager
-except ImportError:
-    # django-polymorphic < 0.8
-    from polymorphic import PolymorphicModel, PolymorphicManager
 
 
 class FileManager(PolymorphicManager):
@@ -48,7 +38,6 @@ def is_public_default():
     return filer_settings.FILER_IS_PUBLIC_DEFAULT
 
 
-@python_2_unicode_compatible
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
     _icon = "file"
@@ -99,7 +88,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         return True  # I match all files...
 
     def __init__(self, *args, **kwargs):
-        super(File, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self.file_data_changed(post_init=True)
 
@@ -207,12 +196,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if self._old_is_public != self.is_public and self.pk:
             self._move_file()
             self._old_is_public = self.is_public
-        super(File, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
     save.alters_data = True
 
     def delete(self, *args, **kwargs):
         # Delete the model before the file
-        super(File, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         # Delete the file if there are no other Files referencing it.
         if not File.objects.filter(file=self.file.name, is_public=self.is_public).exists():
             self.file.delete(False)
@@ -360,7 +349,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
     def duplicates(self):
         return File.objects.find_duplicates(self)
 
-    class Meta(object):
+    class Meta:
         app_label = 'filer'
         verbose_name = _('file')
         verbose_name_plural = _('files')
