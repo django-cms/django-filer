@@ -219,6 +219,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.video_name = 'test_file.mov'
         self.video_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.video_name)
         self.video.save(self.video_filename, 'JPEG')
+        self.binary_name = 'aaa.bin'
+        self.binary_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.binary_name)
+        with open(self.binary_filename, 'wb') as fh:
+            fh.write(bytearray(100 * b'a'))
         super(FilerClipboardAdminUrlsTests, self).setUp()
 
     def tearDown(self):
@@ -293,8 +297,25 @@ class FilerClipboardAdminUrlsTests(TestCase):
         }
         response = self.client.post(url, post_data, **extra_headers)  # noqa
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    def test_filer_upload_binary_data(self, extra_headers={}):
+        self.assertEqual(File.objects.count(), 0)
+        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
+        url = reverse('admin:filer-ajax_upload')
+        post_data = {
+            'Filename': self.binary_name,
+            'Filedata': file_obj,
+            'jsessionid': self.client.session.session_key
+        }
+        response = self.client.post(url, post_data, **extra_headers)  # noqa
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 1)
+        stored_file = File.objects.first()
+        self.assertEqual(stored_file.original_filename, self.binary_name)
+        self.assertEqual(stored_file.mime_type, 'application/octet-stream')
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
@@ -307,12 +328,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
-            content_type='application/octet-stream',
+            content_type='image/jpeg',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    def test_filer_ajax_upload_file_using_content_type(self):
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
+        url = reverse(
+            'admin:filer-ajax_upload',
+            kwargs={'folder_id': folder.pk}
+        ) + '?filename=renamed.pdf'
+        response = self.client.post(  # noqa
+            url,
+            data=file_obj.read(),
+            content_type='application/pdf',
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        )
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 1)
+        stored_file = File.objects.first()
+        self.assertEqual(stored_file.original_filename, 'renamed.pdf')
+        self.assertEqual(stored_file.mime_type, 'application/pdf')
 
     def test_filer_ajax_upload_file_no_folder(self):
         self.assertEqual(Image.objects.count(), 0)
@@ -323,12 +365,13 @@ class FilerClipboardAdminUrlsTests(TestCase):
         response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
-            content_type='application/octet-stream',
+            content_type='image/jpeg',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
     def test_filer_upload_file_error(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)

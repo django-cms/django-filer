@@ -17,7 +17,7 @@
                     </div>
                 {% endif %}
                 <div class="text-left">
-                    <a href="{{ original.url }}" target="_blank" class="btn">
+                    <a href="{{ original.url }}" target="_blank" class="btn" download="{{ original.original_filename }}">
                         {% if file %}
                             {% trans "Open file" %}
                         {% else %}

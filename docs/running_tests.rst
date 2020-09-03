@@ -22,7 +22,7 @@ done for you. Tox will setup multiple virtual environments with different python
     tox -e py27-dj18 -- test filer.tests.models.FilerApiTests.test_create_folder_structure
 
 Other test runner options are also supported, see
-`djangocms-helper <https://djangocms-helper.readthedocs.io/en/develop/>`_
+`djangocms-helper <https://djangocms-helper.readthedocs.io/en/latest/>`_
 documentation for details.
 
 To speed things up a bit use `detox <http://pypi.python.org/pypi/detox/>`_. ``detox`` runs each testsuite in a
