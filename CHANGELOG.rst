@@ -12,6 +12,12 @@ CHANGELOG
 * Changed the preferred way to do model registration via model inheritance
   and ``mptt.AlreadyRegistered``, which is deprecated since django-mptt 0.4
 * Use dashed name for django-polymorphic dependency in setup.py
+* In ``models.File``, add field ``mime_type`` to store the Content-Type as set by
+  the browser during file upload.
+* For extended Django Filer models, adopt the classmethod ``matches_file_type`` to its
+  new signature.
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name.
 
 
 1.7.1 (2020-04-29)
