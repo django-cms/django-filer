@@ -52,7 +52,7 @@ So let's add a ``matches_file_type()`` method to the ``Video`` model:
                        'video/x-msvideo', 'video/x-ms-wmv', 'video/ogg', 'video/webm', 'video/quicktime']
         return mime_type in video_types
 
-.. note:: The signature of this classmethod changed in version 1.7.
+.. note:: The signature of this classmethod changed in version 2.0.
 
 Now you can upload files of those types into the Filer.
 
