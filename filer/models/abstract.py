@@ -1,5 +1,4 @@
 import logging
-import os
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -42,14 +41,11 @@ class BaseImage(File):
     )
 
     @classmethod
-    def matches_file_type(cls, iname, ifile, request):
-        # This was originally in admin/clipboardadmin.py  it was inside of a try
-        # except, I have moved it here outside of a try except because I can't
-        # figure out just what kind of exception this could generate... all it was
-        # doing for me was obscuring errors...
-        # --Dave Butler <croepha@gmail.com>
-        iext = os.path.splitext(iname)[1].lower()
-        return iext in ['.jpg', '.jpeg', '.png', '.gif']
+    def matches_file_type(cls, iname, ifile, mime_type):
+        # source: https://www.freeformatter.com/mime-types-list.html
+        image_subtypes = ['gif', 'jpeg', 'png', 'x-png']
+        maintype, subtype = mime_type.split('/')
+        return maintype == 'image' and subtype in image_subtypes
 
     def file_data_changed(self, post_init=False):
         attrs_updated = super().file_data_changed(post_init=post_init)

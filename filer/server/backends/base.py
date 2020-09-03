@@ -1,4 +1,3 @@
-import mimetypes
 import os
 
 from django.utils.encoding import smart_str
@@ -10,9 +9,6 @@ class ServerBase:
 
     Warning: this API is EXPERIMENTAL and may change at any time.
     """
-    def get_mimetype(self, path):
-        return mimetypes.guess_type(path)[0] or 'application/octet-stream'
-
     def default_headers(self, **kwargs):
         self.save_as_header(**kwargs)
         self.size_header(**kwargs)
@@ -44,3 +40,6 @@ class ServerBase:
         # be an expensive operation.
         # elif file and file.size is not None:
         #     response['Content-Length'] = file.size
+
+    def serve(self, request, filer_file, **kwargs):
+        raise NotImplementedError(".serve() must be overridden")
