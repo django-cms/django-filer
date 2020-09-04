@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+2.0.1 (2020-09-04)
+==================
+
+* Fixed NotNullViolation: null value in column "mime_type" in migration
+  ``filer.0012_file_mime_type.py``.
+
+
 2.0.0 (2020-09-03)
 ==================
 
