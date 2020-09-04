@@ -2,8 +2,9 @@
 
 import mimetypes
 
-from django.db import migrations, models
 import filer.models.filemodels
+
+from django.db import migrations, models
 
 
 def guess_mimetypes(apps, schema_editor):
