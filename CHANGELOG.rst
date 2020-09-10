@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+2.0.2 (2020-09-10)
+==================
+
+* Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
+* Fix #1211: On upload MIME-type is not set correctly.
+
 
 2.0.1 (2020-09-04)
 ==================
