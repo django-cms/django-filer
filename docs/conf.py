@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django-filer documentation build configuration file, created by
 # sphinx-quickstart on Tue Nov 16 22:05:55 2010.
@@ -11,12 +10,13 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
-sys.path.append(os.path.abspath('../'))
 import datetime
+import os
+import sys
+
+sys.path.append(os.path.abspath('../'))
 
 from filer import __version__
-
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

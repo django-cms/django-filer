@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django import forms
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 
 from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
@@ -47,7 +44,7 @@ class ImageAdminForm(forms.ModelForm):
         for subject location widget to receive valid coordinates on field
         validation errors.
         """
-        cleaned_data = super(ImageAdminForm, self).clean()
+        cleaned_data = super().clean()
         subject_location = cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it
@@ -57,14 +54,14 @@ class ImageAdminForm(forms.ModelForm):
         coordinates = normalize_subject_location(subject_location)
 
         if not coordinates:
-            err_msg = ugettext_lazy('Invalid subject location format. ')
+            err_msg = gettext_lazy('Invalid subject location format. ')
             err_code = 'invalid_subject_format'
 
         elif (
             coordinates[0] > self.instance.width
             or coordinates[1] > self.instance.height
         ):
-            err_msg = ugettext_lazy(
+            err_msg = gettext_lazy(
                 'Subject location is outside of the image. ')
             err_code = 'subject_out_of_bounds'
         else:
@@ -74,16 +71,16 @@ class ImageAdminForm(forms.ModelForm):
         raise forms.ValidationError(
             string_concat(
                 err_msg,
-                ugettext_lazy('Your input: "{subject_location}". '.format(
+                gettext_lazy('Your input: "{subject_location}". '.format(
                     subject_location=subject_location)),
                 'Previous value is restored.'),
             code=err_code)
 
-    class Meta(object):
+    class Meta:
         model = Image
         exclude = ()
 
-    class Media(object):
+    class Media:
         css = {
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }

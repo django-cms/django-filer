@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
+from unittest import skipIf
 
 import django
 import django.core.files
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from django.urls import reverse
@@ -29,11 +27,7 @@ from filer.utils.loader import load_model
 
 
 Image = load_model(FILER_IMAGE_MODEL)
-
-try:
-    from unittest import skipIf
-except ImportError:  # for python 2.6
-    from unittest2 import skipIf
+User = get_user_model()
 
 
 def model_to_dict(instance, **kwargs):
@@ -219,13 +213,17 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.video_name = 'test_file.mov'
         self.video_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.video_name)
         self.video.save(self.video_filename, 'JPEG')
-        super(FilerClipboardAdminUrlsTests, self).setUp()
+        self.binary_name = 'aaa.bin'
+        self.binary_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.binary_name)
+        with open(self.binary_filename, 'wb') as fh:
+            fh.write(bytearray(100 * b'a'))
+        super().setUp()
 
     def tearDown(self):
         self.client.logout()
         os.remove(self.filename)
         os.remove(self.video_filename)
-        super(FilerClipboardAdminUrlsTests, self).tearDown()
+        super().tearDown()
 
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
@@ -293,8 +291,25 @@ class FilerClipboardAdminUrlsTests(TestCase):
         }
         response = self.client.post(url, post_data, **extra_headers)  # noqa
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    def test_filer_upload_binary_data(self, extra_headers={}):
+        self.assertEqual(File.objects.count(), 0)
+        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
+        url = reverse('admin:filer-ajax_upload')
+        post_data = {
+            'Filename': self.binary_name,
+            'Filedata': file_obj,
+            'jsessionid': self.client.session.session_key
+        }
+        response = self.client.post(url, post_data, **extra_headers)  # noqa
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 1)
+        stored_file = File.objects.first()
+        self.assertEqual(stored_file.original_filename, self.binary_name)
+        self.assertEqual(stored_file.mime_type, 'application/octet-stream')
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
@@ -307,12 +322,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
-            content_type='application/octet-stream',
+            content_type='image/jpeg',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    def test_filer_ajax_upload_file_using_content_type(self):
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
+        url = reverse(
+            'admin:filer-ajax_upload',
+            kwargs={'folder_id': folder.pk}
+        ) + '?filename=renamed.pdf'
+        response = self.client.post(  # noqa
+            url,
+            data=file_obj.read(),
+            content_type='application/pdf',
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        )
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 1)
+        stored_file = File.objects.first()
+        self.assertEqual(stored_file.original_filename, 'renamed.pdf')
+        self.assertEqual(stored_file.mime_type, 'application/pdf')
 
     def test_filer_ajax_upload_file_no_folder(self):
         self.assertEqual(Image.objects.count(), 0)
@@ -323,12 +359,13 @@ class FilerClipboardAdminUrlsTests(TestCase):
         response = self.client.post(  # noqa
             url,
             data=file_obj.read(),
-            content_type='application/octet-stream',
+            content_type='image/jpeg',
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         )
         self.assertEqual(Image.objects.count(), 1)
-        self.assertEqual(Image.objects.all()[0].original_filename,
-                         self.image_name)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
     def test_filer_upload_file_error(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
@@ -436,7 +473,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 0)
 
 
-class BulkOperationsMixin(object):
+class BulkOperationsMixin:
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')

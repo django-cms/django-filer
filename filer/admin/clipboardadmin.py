@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
-from django.conf.urls import url
 from django.contrib import admin
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
+from django.urls import re_path
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
@@ -40,22 +37,22 @@ class ClipboardAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         return [
-            url(r'^operations/paste_clipboard_to_folder/$',
-                self.admin_site.admin_view(views.paste_clipboard_to_folder),
-                name='filer-paste_clipboard_to_folder'),
-            url(r'^operations/discard_clipboard/$',
-                self.admin_site.admin_view(views.discard_clipboard),
-                name='filer-discard_clipboard'),
-            url(r'^operations/delete_clipboard/$',
-                self.admin_site.admin_view(views.delete_clipboard),
-                name='filer-delete_clipboard'),
-            url(r'^operations/upload/(?P<folder_id>[0-9]+)/$',
-                ajax_upload,
-                name='filer-ajax_upload'),
-            url(r'^operations/upload/no_folder/$',
-                ajax_upload,
-                name='filer-ajax_upload'),
-        ] + super(ClipboardAdmin, self).get_urls()
+            re_path(r'^operations/paste_clipboard_to_folder/$',
+                    self.admin_site.admin_view(views.paste_clipboard_to_folder),
+                    name='filer-paste_clipboard_to_folder'),
+            re_path(r'^operations/discard_clipboard/$',
+                    self.admin_site.admin_view(views.discard_clipboard),
+                    name='filer-discard_clipboard'),
+            re_path(r'^operations/delete_clipboard/$',
+                    self.admin_site.admin_view(views.delete_clipboard),
+                    name='filer-delete_clipboard'),
+            re_path(r'^operations/upload/(?P<folder_id>[0-9]+)/$',
+                    ajax_upload,
+                    name='filer-ajax_upload'),
+            re_path(r'^operations/upload/no_folder/$',
+                    ajax_upload,
+                    name='filer-ajax_upload'),
+        ] + super().get_urls()
 
     def get_model_perms(self, *args, **kwargs):
         """
@@ -73,13 +70,14 @@ def ajax_upload(request, folder_id=None):
     """
     Receives an upload from the uploader. Receives only one file at a time.
     """
-    folder = None
     if folder_id:
         try:
             # Get folder
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
             return JsonResponse({'error': NO_FOLDER_ERROR})
+    else:
+        folder = Folder.objects.filter(pk=request.session.get('filer_last_folder_id', 0)).first()
 
     # check permissions
     if folder and not folder.has_add_children_permission(request):
@@ -87,10 +85,10 @@ def ajax_upload(request, folder_id=None):
     try:
         if len(request.FILES) == 1:
             # dont check if request is ajax or not, just grab the file
-            upload, filename, is_raw = handle_request_files_upload(request)
+            upload, filename, is_raw, mime_type = handle_request_files_upload(request)
         else:
             # else process the request as usual
-            upload, filename, is_raw = handle_upload(request)
+            upload, filename, is_raw, mime_type = handle_upload(request)
         # TODO: Deprecated/refactor
         # Get clipboad
         # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
@@ -99,7 +97,7 @@ def ajax_upload(request, folder_id=None):
         for filer_class in filer_settings.FILER_FILE_MODELS:
             FileSubClass = load_model(filer_class)
             # TODO: What if there are more than one that qualify?
-            if FileSubClass.matches_file_type(filename, upload, request):
+            if FileSubClass.matches_file_type(filename, upload, mime_type):
                 FileForm = modelform_factory(
                     model=FileSubClass,
                     fields=('original_filename', 'owner', 'file')
@@ -113,6 +111,7 @@ def ajax_upload(request, folder_id=None):
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
             file_obj.folder = folder
+            file_obj.mime_type = mime_type
             file_obj.save()
             # TODO: Deprecated/refactor
             # clipboard_item = ClipboardItem(

@@ -1,34 +1,26 @@
-# -*- coding: utf-8 -*-
 """
 Copy of ``django.contrib.admin.utils.get_deleted_objects`` and a subclass of
-``django.contrib.admin.utils.NestedObjects`` that work with djongo_polymorphic
+``django.contrib.admin.utils.NestedObjects`` that work with django-polymorphic
 querysets.
-Ultimatly these should go directly into django_polymorphic or, in a more
-generic way, into django itself.
+Ultimately these should go directly into django-polymorphic or, in a more
+generic way, into Django itself.
 
 This code has been copied from Django 1.9.4.
 
 At all locations where something has been changed, there are inline comments
 in the code.
 """
-from __future__ import absolute_import, unicode_literals
-
 from collections import defaultdict
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib.admin.utils import quote
 from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models.deletion import Collector
 from django.urls import NoReverseMatch, reverse
+from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
-
-
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    # Django < 1.5
-    from django.utils.encoding import force_unicode as force_text
 
 
 def get_deleted_objects(objs, opts, user, admin_site, using):
@@ -86,7 +78,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
 class NestedObjects(Collector):
     def __init__(self, *args, **kwargs):
-        super(NestedObjects, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
         self.model_objs = defaultdict(set)
@@ -106,13 +98,18 @@ class NestedObjects(Collector):
                 self.add_edge(None, obj)
             self.model_objs[obj._meta.model].add(obj)
         try:
-            return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+            return super().collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
-    def related_objects(self, related, objs):
-        qs = super(NestedObjects, self).related_objects(related, objs)
-        return qs.select_related(related.field.name)
+    if DJANGO_VERSION >= (3, 1):
+        def related_objects(self, related_model, related_fields, objs):
+            qs = super().related_objects(related_model, related_fields, objs)
+            return qs.select_related(*[related.name for related in related_fields])
+    else:
+        def related_objects(self, related, objs):
+            qs = super().related_objects(related, objs)
+            return qs.select_related(related.field.name)
 
     def _nested(self, obj, seen, format_callback):
         if obj in seen:
@@ -153,5 +150,5 @@ class PolymorphicAwareNestedObjects(NestedObjects):
             # .filter() is needed, because there may already be cached
             # polymorphic results in the queryset
             objs = objs.non_polymorphic().filter()
-        return super(PolymorphicAwareNestedObjects, self).collect(
+        return super().collect(
             objs, source_attr=source_attr, **kwargs)

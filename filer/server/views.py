@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -31,7 +28,7 @@ def serve_protected_file(request, path):
             raise PermissionDenied
         else:
             raise Http404('File not found')
-    return server.serve(request, file_obj=file_obj.file, save_as=False)
+    return server.serve(request, file_obj, save_as=False)
 
 
 @never_cache
@@ -54,6 +51,7 @@ def serve_protected_thumbnail(request, path):
             raise Http404('File not found')
     try:
         thumbnail = ThumbnailFile(name=path, storage=file_obj.file.thumbnail_storage)
-        return thumbnail_server.serve(request, thumbnail, save_as=False)
+        thumbnail_temp_file = File(file=thumbnail, mime_type=file_obj.mime_type)
+        return thumbnail_server.serve(request, thumbnail_temp_file, save_as=False)
     except Exception:
         raise Http404('File not found')

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
 import time
 
@@ -24,15 +21,16 @@ class Mock():
 
 class BaseServerBackendTestCase(TestCase):
     def setUp(self):
-        original_filename = 'testimage.jpg'
+        original_filename, mime_type = 'testimage.jpg', 'image/jpeg'
         file_obj = SimpleUploadedFile(
             name=original_filename,
             content=create_image().tobytes(),
-            content_type='image/jpeg')
+            content_type=mime_type)
         self.filer_file = File.objects.create(
             is_public=False,
             file=file_obj,
-            original_filename=original_filename)
+            original_filename=original_filename,
+            mime_type=mime_type)
 
     def tearDown(self):
         self.filer_file.delete()
@@ -43,27 +41,27 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
         server = DefaultServer()
         request = Mock()
         request.META = {}
-        response = server.serve(request, self.filer_file.file)
+        response = server.serve(request, self.filer_file)
         self.assertTrue(response.has_header('Last-Modified'))
 
     def test_save_as(self):
         server = DefaultServer()
         request = Mock()
         request.META = {}
-        response = server.serve(request, self.filer_file.file, save_as=True)
+        response = server.serve(request, self.filer_file, save_as=True)
         self.assertEqual(response['Content-Disposition'], 'attachment; filename=testimage.jpg')
 
-        response = server.serve(request, self.filer_file.file, save_as=False)
+        response = server.serve(request, self.filer_file, save_as=False)
         self.assertFalse(response.has_header('Content-Disposition'))
 
-        response = server.serve(request, self.filer_file.file, save_as='whatever.png')
+        response = server.serve(request, self.filer_file, save_as='whatever.png')
         self.assertEqual(response['Content-Disposition'], 'attachment; filename=whatever.png')
 
     def test_not_modified(self):
         server = DefaultServer()
         request = Mock()
         request.META = {'HTTP_IF_MODIFIED_SINCE': http_date(time.time())}
-        response = server.serve(request, self.filer_file.file)
+        response = server.serve(request, self.filer_file)
         self.assertTrue(isinstance(response, HttpResponseNotModified))
 
     def test_missing_file(self):
@@ -76,7 +74,7 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
 
 class NginxServerTestCase(BaseServerBackendTestCase):
     def setUp(self):
-        super(NginxServerTestCase, self).setUp()
+        super().setUp()
         self.server = NginxXAccelRedirectServer(
             location=filer_settings.FILER_PRIVATEMEDIA_STORAGE.location,
             nginx_location='mylocation',
@@ -85,7 +83,7 @@ class NginxServerTestCase(BaseServerBackendTestCase):
     def test_normal(self):
         request = Mock()
         request.META = {}
-        response = self.server.serve(request, self.filer_file.file)
+        response = self.server.serve(request, self.filer_file)
         headers = dict(response.items())
         self.assertTrue(response.has_header('X-Accel-Redirect'))
         self.assertTrue(headers['X-Accel-Redirect'].startswith(self.server.nginx_location))
@@ -100,7 +98,7 @@ class NginxServerTestCase(BaseServerBackendTestCase):
         request = Mock()
         request.META = {}
         os.remove(self.filer_file.file.path)
-        response = self.server.serve(request, self.filer_file.file)
+        response = self.server.serve(request, self.filer_file)
         headers = dict(response.items())
         self.assertTrue(response.has_header('X-Accel-Redirect'))
         self.assertTrue(headers['X-Accel-Redirect'].startswith(self.server.nginx_location))
@@ -109,13 +107,13 @@ class NginxServerTestCase(BaseServerBackendTestCase):
 
 class XSendfileServerTestCase(BaseServerBackendTestCase):
     def setUp(self):
-        super(XSendfileServerTestCase, self).setUp()
+        super().setUp()
         self.server = ApacheXSendfileServer()
 
     def test_normal(self):
         request = Mock()
         request.META = {}
-        response = self.server.serve(request, self.filer_file.file)
+        response = self.server.serve(request, self.filer_file)
         headers = dict(response.items())
         self.assertTrue(response.has_header('X-Sendfile'))
         self.assertEqual(headers['X-Sendfile'], self.filer_file.file.path)
@@ -130,7 +128,7 @@ class XSendfileServerTestCase(BaseServerBackendTestCase):
         request = Mock()
         request.META = {}
         os.remove(self.filer_file.file.path)
-        response = self.server.serve(request, self.filer_file.file)
+        response = self.server.serve(request, self.filer_file)
         headers = dict(response.items())
         self.assertTrue(response.has_header('X-Sendfile'))
         self.assertEqual(headers['X-Sendfile'], self.filer_file.file.path)

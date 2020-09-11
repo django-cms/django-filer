@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
+import mimetypes
 import os
 
 from django.http.multipartparser import (
@@ -33,6 +31,8 @@ def handle_upload(request):
         if content_length < 0:
             # This means we shouldn't continue...raise an error.
             raise UploadException("Invalid content length: %r" % content_length)
+
+        mime_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
         upload_handlers = request.upload_handlers
         for handler in upload_handlers:
@@ -92,16 +92,16 @@ def handle_upload(request):
                 break
     else:
         if len(request.FILES) == 1:
-            upload, filename, is_raw = handle_request_files_upload(request)
+            upload, filename, is_raw, mime_type = handle_request_files_upload(request)
         else:
             raise UploadException("AJAX request not valid: Bad Upload")
-    return upload, filename, is_raw
+    return upload, filename, is_raw, mime_type
 
 
 def handle_request_files_upload(request):
     """
     Handle request.FILES if len(request.FILES) == 1.
-    Returns tuple(upload, filename, is_raw) where upload is file itself.
+    Returns tuple(upload, filename, is_raw, mime_type) where upload is file itself.
     """
     # FILES is a dictionary in Django but Ajax Upload gives the uploaded file
     # an ID based on a random number, so it cannot be guessed here in the code.
@@ -112,7 +112,12 @@ def handle_request_files_upload(request):
     is_raw = False
     upload = list(request.FILES.values())[0]
     filename = upload.name
-    return upload, filename, is_raw
+    _, iext = os.path.splitext(filename)
+    mime_type = upload.content_type.lower()
+    if iext not in mimetypes.guess_all_extensions(mime_type):
+        msg = "MIME-Type '{mimetype}' does not correspond to file extension of {filename}."
+        raise UploadException(msg.format(mimetype=mime_type, filename=filename))
+    return upload, filename, is_raw, mime_type
 
 
 def slugify(string):

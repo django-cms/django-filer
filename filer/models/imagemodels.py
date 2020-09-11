@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
 from datetime import datetime
 
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import get_current_timezone, make_aware, now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .abstract import BaseImage
 
@@ -48,4 +45,4 @@ class Image(BaseImage):
                 pass
         if self.date_taken is None:
             self.date_taken = now()
-        super(Image, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
