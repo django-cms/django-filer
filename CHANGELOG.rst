@@ -2,6 +2,10 @@
 CHANGELOG
 =========
 
+Unreleased
+==================
+* Bypassing the thumbnailing step for SVG file
+
 2.0.2 (2020-09-10)
 ==================
 

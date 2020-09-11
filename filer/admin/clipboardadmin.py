@@ -118,47 +118,53 @@ def ajax_upload(request, folder_id=None):
             #     clipboard=clipboard, file=file_obj)
             # clipboard_item.save()
 
-            # Try to generate thumbnails.
-            if not file_obj.icons:
-                # There is no point to continue, as we can't generate
-                # thumbnails for this file. Usual reasons: bad format or
-                # filename.
-                file_obj.delete()
-                # This would be logged in BaseImage._generate_thumbnails()
-                # if FILER_ENABLE_LOGGING is on.
-                return JsonResponse(
-                    {'error': 'failed to generate icons for file'},
-                    status=500,
-                )
-            thumbnail = None
-            # Backwards compatibility: try to get specific icon size (32px)
-            # first. Then try medium icon size (they are already sorted),
-            # fallback to the first (smallest) configured icon.
-            for size in (['32']
-                        + filer_settings.FILER_ADMIN_ICON_SIZES[1::-1]):
-                try:
-                    thumbnail = file_obj.icons[size]
-                    break
-                except KeyError:
-                    continue
+            data = {}
+            # Try to generate thumbnails if not svg file.
+            if not file_obj.mime_type == "image/svg+xml":
+                if not file_obj.icons:
+                    # There is no point to continue, as we can't generate
+                    # thumbnails for this file. Usual reasons: bad format or
+                    # filename.
+                    file_obj.delete()
+                    # This would be logged in BaseImage._generate_thumbnails()
+                    # if FILER_ENABLE_LOGGING is on.
+                    return JsonResponse(
+                        {'error': 'failed to generate icons for file'},
+                        status=500,
+                    )
+                thumbnail = None
+                # Backwards compatibility: try to get specific icon size (32px)
+                # first. Then try medium icon size (they are already sorted),
+                # fallback to the first (smallest) configured icon.
+                for size in (['32']
+                            + filer_settings.FILER_ADMIN_ICON_SIZES[1::-1]):
+                    try:
+                        thumbnail = file_obj.icons[size]
+                        break
+                    except KeyError:
+                        continue
 
-            data = {
-                'thumbnail': thumbnail,
+                # prepare preview thumbnail
+                if type(file_obj) == Image:
+                    thumbnail_180_options = {
+                        'size': (180, 180),
+                        'crop': True,
+                        'upscale': True,
+                    }
+
+                    thumbnail_180 = file_obj.file.get_thumbnail(
+                        thumbnail_180_options)
+                    data['thumbnail'] = thumbnail
+                    data['thumbnail_180'] = thumbnail_180.url
+                    data['original_image'] = file_obj.url
+
+            data_common = {
                 'alt_text': '',
                 'label': str(file_obj),
                 'file_id': file_obj.pk,
+                'original_image': file_obj.url
             }
-            # prepare preview thumbnail
-            if type(file_obj) == Image:
-                thumbnail_180_options = {
-                    'size': (180, 180),
-                    'crop': True,
-                    'upscale': True,
-                }
-                thumbnail_180 = file_obj.file.get_thumbnail(
-                    thumbnail_180_options)
-                data['thumbnail_180'] = thumbnail_180.url
-                data['original_image'] = file_obj.url
+            data.update(data_common)
             return JsonResponse(data)
         else:
             form_errors = '; '.join(['%s: %s' % (
