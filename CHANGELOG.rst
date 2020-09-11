@@ -5,7 +5,45 @@ CHANGELOG
 Unreleased
 ==================
 * Bypassing the thumbnailing step for SVG file
-* Store mimetype of uploaded file in database
+
+2.0.2 (2020-09-10)
+==================
+
+* Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
+* Fix #1211: On upload MIME-type is not set correctly.
+
+
+2.0.1 (2020-09-04)
+==================
+
+* Fixed NotNullViolation: null value in column "mime_type" in migration
+  ``filer.0012_file_mime_type.py``.
+
+
+2.0.0 (2020-09-03)
+==================
+
+* Added support for Django 3.1
+* Dropped support for Python 2.7 and Python 3.4
+* Dropped support for Django < 2.2
+* Changed the preferred way to do model registration via model inheritance
+  and ``mptt.AlreadyRegistered``, which is deprecated since django-mptt 0.4
+* Use dashed name for django-polymorphic dependency in setup.py
+* In ``models.File``, add field ``mime_type`` to store the Content-Type as set by
+  the browser during file upload
+* For extended Django Filer models, adopt the classmethod ``matches_file_type`` to its
+  new signature, this is a breaking change
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name
+
+
+1.7.1 (2020-04-29)
+==================
+
+* Fix problem with loading jquery.js after jquery.min.js had been loaded.
+* Fix usability: Upload files into most recently used folder, instead of
+  root folder.
+
 
 1.7.0 (2020-02-20)
 ==================

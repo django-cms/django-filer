@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import math
 
 from django.template import Library
-
-import six
 
 
 register = Library()
@@ -58,7 +53,7 @@ def filesize(bytes, format='auto1024'):
 
     # Check for valid bytes
     try:
-        bytes = int(bytes) if six.PY3 else long(bytes)  # NOQA - flake8/py3 reports error: long does not exists in py3
+        bytes = int(bytes)
     except (ValueError, TypeError):
         return bytes
 

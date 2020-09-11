@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
-import six
+from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
 from ..utils.compatibility import PILImage
@@ -53,7 +48,7 @@ class BaseImage(File):
         return maintype == 'image' and subtype in image_subtypes
 
     def file_data_changed(self, post_init=False):
-        attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
+        attrs_updated = super().file_data_changed(post_init=post_init)
         if attrs_updated:
             try:
                 try:
@@ -72,7 +67,7 @@ class BaseImage(File):
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        super(BaseImage, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def _check_validity(self):
         if not self.name:
@@ -139,7 +134,7 @@ class BaseImage(File):
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
-        for name, opts in six.iteritems(required_thumbnails):
+        for name, opts in required_thumbnails.items():
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
@@ -177,7 +172,7 @@ class BaseImage(File):
             thumbnail_basedir=self.file.thumbnail_basedir)
         return tn
 
-    class Meta(object):
+    class Meta:
         app_label = 'filer'
         verbose_name = _('image')
         verbose_name_plural = _('images')

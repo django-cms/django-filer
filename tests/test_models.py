@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import os
+from unittest import skipIf, skipUnless
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
@@ -24,12 +22,6 @@ from filer.utils.loader import load_model
 
 
 Image = load_model(FILER_IMAGE_MODEL)
-
-try:
-    from unittest import skipIf, skipUnless
-except ImportError:
-    # Django<1.9
-    from django.utils.unittest import skipIf, skipUnless
 
 
 class FilerApiTests(TestCase):

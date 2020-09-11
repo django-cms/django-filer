@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import os
 
 from django.utils.encoding import smart_str
 
 
-class ServerBase(object):
+class ServerBase:
     """
     Server classes define a way to serve a Django File object.
 

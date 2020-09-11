@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .clipboardmodels import *  # noqa
 from .filemodels import *  # noqa
 from .foldermodels import *  # noqa

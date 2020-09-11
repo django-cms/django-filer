@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import mimetypes
 import os
 
@@ -35,7 +32,7 @@ def handle_upload(request):
             # This means we shouldn't continue...raise an error.
             raise UploadException("Invalid content length: %r" % content_length)
 
-        mime_type = request.META.get('CONTENT_TYPE', 'application/octet-stream')
+        mime_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
         upload_handlers = request.upload_handlers
         for handler in upload_handlers:

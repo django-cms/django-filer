@@ -1,7 +1,6 @@
 language: python
 
 dist: xenial
-sudo: false
 
 matrix:
   include:
@@ -13,29 +12,33 @@ matrix:
       env: TOX_ENV='docs'
     - python: 3.6
       env: TOX_ENV='frontend'
-    # Django 1.11
-    - python: 3.4
-      env: DJANGO='dj111' SWAP='noswap'
-    - python: 3.5
-      env: DJANGO='dj111' SWAP='noswap'
-    - python: 3.6
-      env: DJANGO='dj111' SWAP='noswap'
-    - python: 3.6
-      env: DJANGO='dj111' SWAP='swap'
     # Django 2.2
-    - python: 3.7
-      env: DJANGO='dj22' SWAP='noswap'
-    - python: 3.8
+    - python: 3.5
       env: DJANGO='dj22' SWAP='swap'
-    # Django 3.0
+    - python: 3.6
+      env: DJANGO='dj22' SWAP='noswap'
     - python: 3.7
-      env: DJANGO='dj30' SWAP='noswap'
+      env: DJANGO='dj22' SWAP='swap'
     - python: 3.8
+      env: DJANGO='dj22' SWAP='noswap'
+    # Django 3.0, always run the lowest supported version
+    - python: 3.6
       env: DJANGO='dj30' SWAP='swap'
+    - python: 3.6
+      env: DJANGO='dj30' SWAP='noswap'
+    # Django 3.1, always run the lowest supported version
+    - python: 3.6
+      env: DJANGO='dj31' SWAP='swap'
+    - python: 3.6
+      env: DJANGO='dj31' SWAP='noswap'
+  allow_failures:
+    - python: 3.6
+      env: DJANGO='dj31' SWAP='swap'
+    - python: 3.6
+      env: DJANGO='dj31' SWAP='noswap'
 
 install:
   - pip install coverage isort tox
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then export PY_VER=py34; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then export PY_VER=py35; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then export PY_VER=py36; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then export PY_VER=py37; fi"
@@ -44,6 +47,7 @@ install:
 
 before_script:
   - if [ $TOX_ENV == 'frontend' ]; then
+    pip install -r tests/requirements/frontend.txt;
     nvm install 0.12.7 && nvm use 0.12.7;
     npm config set spin false;
     npm install -g npm@2;
