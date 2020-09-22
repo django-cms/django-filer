@@ -7,11 +7,7 @@
         <div class="image-details-left">
             <div class="image-preview-container">
                 {% if file %}
-                    {% if original.extension == "svg" %}
-                        <img src="{{ original.url }}">
-                    {% else %}
                         <img src="{% if original.icons.48 %}{{ original.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}">
-                    {% endif %}
                 {% else %}
                     <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
                         {% if original.extension == "svg" %}
