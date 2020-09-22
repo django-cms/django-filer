@@ -14,6 +14,9 @@
                     {% endif %}
                 {% else %}
                     <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
+                        {% if original.extension == "svg" %}
+                            <img src="{{ original.url }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}"  class="js-focal-point-image">
+                        {% else %}
                         <img src="{{ original.thumbnails.admin_sidebar_preview }}" data-ratio="{{ adminform.form.sidebar_image_ratio }}" class="js-focal-point-image">
                         <div class="image-preview-field">
                             <div class="js-focal-point-circle image-preview-circle hidden"></div>
