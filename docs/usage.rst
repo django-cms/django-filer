@@ -89,6 +89,30 @@ uploading new images.
    will try to set the focus to the first field in the form. But since the form
    field of ``FilerFileField`` is hidden that will cause in a javascript error.
 
+Populating ``FilerFileField`` programmatically
+..............................................
+
+A ``FilerFileField`` field is just a ``ForeignKey`` pointing to a ``filer.File``
+object. But how to programmatically populate ``FilerFileField`` or ``FilerImageField`` 
+field if all you have is the path to a filesystem file? The answer is to create a 
+``filer.File`` object first::
+
+   from filer.models import Image
+   from django.core.files import File as DjangoFile
+   from django.contrib.auth.models import User
+   import os
+
+   path = '/path/to/image/file.jpg'
+   filename = os.path.basename(path)
+   user = User.objects.first()
+
+   # make a django.core.files.File
+   file_obj = DjangoFile(open(path), name=filename)
+   # make a filer.models.Image
+   image = Image.objects.create(owner=user, original_filename=filename, file=file_obj)
+   
+   # Now you can assign this image to a FilerImageField
+   my_model = MyModel.objects.create(featured_image=image, **kwargs)
 
 .. _django.db.models.ForeignKey: http://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey
 .. _django.db.models.FileField: http://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.FileField
