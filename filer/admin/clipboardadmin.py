@@ -117,7 +117,7 @@ class ClipboardAdmin(admin.ModelAdmin):
         receives an upload from the uploader. Receives only one file at the time.
         """
         mimetype = "application/json" if request.is_ajax() else "text/html"
-        upload, file_obj = None, None
+        upload, file_obj, clipboard_item = None, None, None
         try:
             upload, original_filename, _ = handle_upload(request)
             filename = truncate_filename(upload, maxlen=FILENAME_LIMIT)
