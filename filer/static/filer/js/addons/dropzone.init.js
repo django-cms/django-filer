@@ -31,7 +31,6 @@ djQuery(function ($) {
     var hiddenClass = 'hidden';
     var mobileClass = 'filer-dropzone-mobile';
     var objectAttachedClass = 'js-object-attached';
-    // var dataMaxFileSize = 'max-file-size';
     var minWidth = 500;
     var checkMinWidth = function (element) {
         element.toggleClass(mobileClass, element.width() < minWidth);
@@ -72,8 +71,8 @@ djQuery(function ($) {
             url: dropzoneUrl,
             paramName: 'file',
             maxFiles: 1,
-            // for now disabled as we don't have the correct file size limit
-            // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+            // filer and django do not limit file size, let's use some ridiculously large value
+            maxFilesize: 4000000, // MB
             previewTemplate: $(dropzoneTemplateSelector).html(),
             clickable: false,
             addRemoveLinks: false,

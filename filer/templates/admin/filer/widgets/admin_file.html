@@ -11,7 +11,7 @@
         </span>
     </div>
 
-    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}">
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
