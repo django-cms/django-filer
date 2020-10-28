@@ -102,6 +102,7 @@ def ajax_upload(request, folder_id=None):
                     model=FileSubClass,
                     fields=('original_filename', 'owner', 'file')
                 )
+                upload.content_type = mime_type
                 break
         uploadform = FileForm({'original_filename': filename,
                                'owner': request.user.pk},
