@@ -3,6 +3,8 @@ import logging
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from easy_thumbnails.VIL import Image as VILImage
+
 from .. import settings as filer_settings
 from ..utils.compatibility import PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
@@ -43,7 +45,7 @@ class BaseImage(File):
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
         # source: https://www.freeformatter.com/mime-types-list.html
-        image_subtypes = ['gif', 'jpeg', 'png', 'x-png']
+        image_subtypes = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml']
         maintype, subtype = mime_type.split('/')
         return maintype == 'image' and subtype in image_subtypes
 
@@ -56,7 +58,10 @@ class BaseImage(File):
                 except ValueError:
                     imgfile = self.file_ptr.file
                 imgfile.seek(0)
-                self._width, self._height = PILImage.open(imgfile).size
+                if imgfile.content_type == 'image/svg+xml':
+                    self._width, self._height = VILImage.load(imgfile).size
+                else:
+                    self._width, self._height = PILImage.open(imgfile).size
                 imgfile.seek(0)
             except Exception:
                 if post_init is False:
