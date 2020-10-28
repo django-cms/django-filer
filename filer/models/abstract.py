@@ -26,8 +26,8 @@ class BaseImage(File):
     file_type = 'Image'
     _icon = "image"
 
-    _height = models.IntegerField(null=True, blank=True)
-    _width = models.IntegerField(null=True, blank=True)
+    _height = models.FloatField(null=True, blank=True)
+    _width = models.FloatField(null=True, blank=True)
 
     default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
     default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
@@ -126,11 +126,11 @@ class BaseImage(File):
 
     @property
     def width(self):
-        return self._width or 0
+        return self._width or 0.0
 
     @property
     def height(self):
-        return self._height or 0
+        return self._height or 0.0
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
