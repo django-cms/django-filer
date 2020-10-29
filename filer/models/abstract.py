@@ -84,7 +84,7 @@ class BaseImage(File):
         if hasattr(self, '_exif_cache'):
             return self._exif_cache
         else:
-            if self.file:
+            if self.file and self.mime_type != 'image/svg+xml':
                 self._exif_cache = get_exif_for_file(self.file)
             else:
                 self._exif_cache = {}
