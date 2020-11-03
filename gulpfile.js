@@ -116,5 +116,5 @@ gulp.task('lint', gulp.series('jscs', 'jshint'));
 gulp.task('lint:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, gulp.series('lint'));
 });
-gulp.task('ci', gulp.series('js'));
+gulp.task('ci', gulp.series('sass', 'jscs', 'lint', 'tests:unit'));
 gulp.task('default', gulp.parallel('sass:watch', 'js:watch', 'lint:watch'));
