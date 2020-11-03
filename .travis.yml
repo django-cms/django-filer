@@ -50,8 +50,6 @@ before_script:
     pip install -r tests/requirements/frontend.txt;
     nvm install 0.12.7 && nvm use 0.12.7;
     npm config set spin false;
-    npm install -g npm@2;
-    npm install -g gulp@3.9.0;
     npm install;
     fi
 
