@@ -228,7 +228,7 @@ form .form-row {
                 background-color: $white;
             }
             // make sure that text crops if there is not enough space #670
-            span:not(:empty):not('.choose-file'):not('.edit-file') {
+            span:not(:empty):not(.choose-file):not(.edit-file) {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
@@ -316,7 +316,7 @@ form .form-row {
                             height: 20px;
                         }
                     }
-                    span:not('.choose-file'):not('.edit-file'), .dz-name {
+                    span:not(.choose-file):not(.edit-file), .dz-name {
                         width: calc(100% - 145px);
                     }
                 }
