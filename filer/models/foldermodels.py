@@ -13,11 +13,6 @@ from .. import settings as filer_settings
 from . import mixins
 
 
-class FolderManager(models.Manager):
-    def with_bad_metadata(self):
-        return self.get_query_set().filter(has_all_mandatory_data=False)
-
-
 class FolderPermissionManager(models.Manager):
     """
     Theses methods are called by introspection from "has_generic_permisison" on
@@ -124,8 +119,6 @@ class Folder(models.Model, mixins.IconsMixin):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
-
-    objects = FolderManager()
 
     @property
     def file_count(self):
