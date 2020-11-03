@@ -19,9 +19,9 @@
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-jasmine": "~0.3.8",
     "karma-json-fixtures-preprocessor": "~0.0.6",
-    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-phantomjs-launcher": "^0.2.3",
     "phantomjs": "^1.9.20",
-    "request": "^2.88.2"
+    "request": "^2.81.0"
   },
   "dependencies": {
     "node-sass": "^4.14.1"
