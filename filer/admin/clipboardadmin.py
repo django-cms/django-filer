@@ -3,8 +3,10 @@ from __future__ import absolute_import
 
 from django.conf.urls import url
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
+from django.utils.module_loading import import_string
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
@@ -20,7 +22,6 @@ NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
 NO_PERMISSIONS_FOR_FOLDER = (
     "Can't use this folder, Permission Denied. Please select another folder."
 )
-
 
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
@@ -55,6 +56,12 @@ class ClipboardAdmin(admin.ModelAdmin):
             url(r'^operations/upload/no_folder/$',
                 ajax_upload,
                 name='filer-ajax_upload'),
+            url(r'^operations/upload/check/(?P<folder_id>[0-9]+)/$',
+                file_constraints_check,
+                name='filer-check_file_constraints'),
+            url(r'^operations/upload/check/no_folder/$',
+                file_constraints_check,
+                name='filer-check_file_constraints'),
         ] + super(ClipboardAdmin, self).get_urls()
 
     def get_model_perms(self, *args, **kwargs):
@@ -66,6 +73,24 @@ class ClipboardAdmin(admin.ModelAdmin):
             'change': False,
             'delete': False,
         }
+
+
+@csrf_exempt
+def file_constraints_check(request, folder_id=None):
+    """
+    Call all file constraints define in settings and return json response
+    """
+    file_constraint_checks = filer_settings.FILER_FILE_CONSTRAINTS
+    for path in file_constraint_checks:
+        func = import_string(path)
+        try:
+            func(request, folder_id)
+        except ValidationError as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({'success': True})
 
 
 @csrf_exempt
