@@ -48,10 +48,9 @@ install:
 before_script:
   - if [ $TOX_ENV == 'frontend' ]; then
     pip install -r tests/requirements/frontend.txt;
-    nvm install 0.12.7 && nvm use 0.12.7;
+    nvm install 14.15.0 && nvm use node;
     npm config set spin false;
-    npm install -g npm@2;
-    npm install -g gulp@3.9.0;
+    npm install -g gulp@4.0.2;
     npm install;
     fi
 
