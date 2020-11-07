@@ -1,3 +1,5 @@
+import warnings
+
 from django.templatetags.static import static
 
 from ..settings import FILER_ADMIN_ICON_SIZES
@@ -10,6 +12,8 @@ class IconsMixin:
     """
     @property
     def icons(self):
+        warnings.warn("Method 'icons' is deprecated and will be re moved in future versions",
+                      DeprecationWarning)
         r = {}
         if getattr(self, '_icon', False):
             for size in FILER_ADMIN_ICON_SIZES:
