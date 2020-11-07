@@ -114,7 +114,8 @@ def handle_request_files_upload(request):
     filename = upload.name
     _, iext = os.path.splitext(filename)
     mime_type = upload.content_type.lower()
-    if mime_type != 'application/octet-stream' and iext.lower() not in mimetypes.guess_all_extensions(mime_type):
+    extensions = mimetypes.guess_all_extensions(mime_type)
+    if mime_type != 'application/octet-stream' and extensions and iext.lower() not in extensions:
         msg = "MIME-Type '{mimetype}' does not correspond to file extension of {filename}."
         raise UploadException(msg.format(mimetype=mime_type, filename=filename))
     return upload, filename, is_raw, mime_type
