@@ -3,10 +3,15 @@
 <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
 {% endif %}
 {% if download_url and mime_maintype == 'audio' %}
-<audio controls>
-    <source src="{{ download_url }}" type="{{ mime_type }}">
-    {% trans 'Your browser does not support audio.' %}
-</audio>
+    <audio controls>
+        <source src="{{ download_url }}" type="{{ mime_type }}">
+        {% trans 'Your browser does not support audio.' %}
+    </audio>
+{% elif download_url and mime_maintype == 'video' %}
+    <video width="320" height="240" controls>
+        <source src="{{ download_url }}" type="{{ mime_type }}">
+        {% trans 'Your browser does not support video.' %}
+    </video>
 {% else %}
     <img src="{{ icon_url }}" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}{% if mime_maintype == 'image' %} data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image"{% endif %} />
 {% endif %}

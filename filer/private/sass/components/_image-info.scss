@@ -189,7 +189,7 @@
         cursor: move;
         background: rgba(255, 255, 255, 0.5);
     }
-    audio {
+    audio, video {
         margin-bottom: 15px;
         &:focus {
             outline: none;
