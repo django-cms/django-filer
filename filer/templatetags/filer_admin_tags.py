@@ -1,7 +1,12 @@
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import Library
 from django.utils.html import format_html_join
+from django.utils.translation import gettext_lazy as _
 
-from ..admin.tools import admin_url_params, admin_url_params_encoded
+from easy_thumbnails.files import get_thumbnailer
+
+from filer.admin.tools import admin_url_params, admin_url_params_encoded
+from filer.models.imagemodels import BaseImage
 
 
 register = Library()
@@ -53,3 +58,54 @@ def filer_has_permission(context, item, action):
     # Call the permission method.
     # This amounts to calling `item.has_X_permission(request)`
     return permission_method(request)
+
+
+@register.inclusion_tag('admin/filer/templatetags/file_icon.html')
+def file_icon(file, detail=False):
+    """
+    This templatetag returns an `easy_thumbnails.models.Thumbnail` to be used when rendering a file
+    icon inside a directory folder. This icon reflects the type of file. In case of an image it
+    renders a thumbnailed version of that image.
+    """
+    width, height = (75, 75) if detail else (40, 40)
+    if not file.file.exists():
+        return {
+            'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
+            'alt_text': _("File is missing"),
+            'width': width,
+            'height': height,
+        }
+    mime_maintype, mime_subtype = file.mime_type.split('/')
+    if isinstance(file, BaseImage):
+        thumbnailer = get_thumbnailer(file)
+        if detail:
+            width, height = 210, 210 / file.width * file.height
+            context = {
+                'sidebar_image_ratio': file.width / 210, # 7.619048,  # wie bestimmt man das?
+                'image_preview': True,
+            }
+            opts = {'size': (width, height), 'upscale': True}
+        else:
+            context = {}
+            opts = {'size': (width, height), 'crop': True}
+        context.update(
+            icon_url=thumbnailer.get_thumbnail(opts).url,
+            alt_text=file.default_alt_text,
+        )
+        opts['size'] = 2 * width, 2 * height
+        if mime_subtype != 'svg+xml':
+            context['highres_url'] = thumbnailer.get_thumbnail(opts).url
+    elif mime_maintype in ['audio', 'font', 'video']:
+        context = {
+            'icon_url': staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype)),
+        }
+    elif mime_maintype == 'application' and mime_subtype in ['zip']:
+        context = {
+            'icon_url': staticfiles_storage.url('filer/icons/file-zip.svg'),
+        }
+    else:
+        context = {
+            'icon_url': staticfiles_storage.url('filer/icons/file.svg'),
+        }
+    context.update(width=width, height=height)
+    return context

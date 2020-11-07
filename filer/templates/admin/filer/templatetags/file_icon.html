@@ -1,0 +1,10 @@
+{% if image_preview %}
+<div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
+{% endif %}
+    <img src="{{ icon_url }}" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}{% if image_preview %} data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image"{% endif %} />
+{% if image_preview %}
+    <div class="image-preview-field">
+        <div class="js-focal-point-circle image-preview-circle hidden"></div>
+    </div>
+</div>
+{% endif %}
