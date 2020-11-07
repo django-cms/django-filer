@@ -1,8 +1,16 @@
-{% if image_preview %}
+{% load i18n %}
+{% if mime_maintype == 'image' %}
 <div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
 {% endif %}
-    <img src="{{ icon_url }}" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}{% if image_preview %} data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image"{% endif %} />
-{% if image_preview %}
+{% if download_url and mime_maintype == 'audio' %}
+<audio controls>
+    <source src="{{ download_url }}" type="{{ mime_type }}">
+    {% trans 'Your browser does not support audio.' %}
+</audio>
+{% else %}
+    <img src="{{ icon_url }}" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}{% if mime_maintype == 'image' %} data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image"{% endif %} />
+{% endif %}
+{% if mime_maintype == 'image' %}
     <div class="image-preview-field">
         <div class="js-focal-point-circle image-preview-circle hidden"></div>
     </div>

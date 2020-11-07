@@ -75,37 +75,31 @@ def file_icon(file, detail=False):
             'width': width,
             'height': height,
         }
-    mime_maintype, mime_subtype = file.mime_type.split('/')
+    mime_maintype, mime_subtype = file.mime_maintype, file.mime_subtype
+    context = {
+        'mime_maintype': mime_maintype,
+        'mime_type': file.mime_type,
+    }
+    if detail:
+        context['download_url'] = file.url
     if isinstance(file, BaseImage):
         thumbnailer = get_thumbnailer(file)
         if detail:
             width, height = 210, 210 / file.width * file.height
-            context = {
-                'sidebar_image_ratio': file.width / 210, # 7.619048,  # wie bestimmt man das?
-                'image_preview': True,
-            }
+            context['sidebar_image_ratio'] = file.width / 210
             opts = {'size': (width, height), 'upscale': True}
         else:
-            context = {}
             opts = {'size': (width, height), 'crop': True}
-        context.update(
-            icon_url=thumbnailer.get_thumbnail(opts).url,
-            alt_text=file.default_alt_text,
-        )
+        icon_url = thumbnailer.get_thumbnail(opts).url
+        context['alt_text'] = file.default_alt_text
         opts['size'] = 2 * width, 2 * height
         if mime_subtype != 'svg+xml':
             context['highres_url'] = thumbnailer.get_thumbnail(opts).url
     elif mime_maintype in ['audio', 'font', 'video']:
-        context = {
-            'icon_url': staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype)),
-        }
+        icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
     elif mime_maintype == 'application' and mime_subtype in ['zip']:
-        context = {
-            'icon_url': staticfiles_storage.url('filer/icons/file-zip.svg'),
-        }
+        icon_url = staticfiles_storage.url('filer/icons/file-zip.svg')
     else:
-        context = {
-            'icon_url': staticfiles_storage.url('filer/icons/file.svg'),
-        }
-    context.update(width=width, height=height)
+        icon_url = staticfiles_storage.url('filer/icons/file.svg')
+    context.update(width=width, height=height, icon_url=icon_url)
     return context

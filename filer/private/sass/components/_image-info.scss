@@ -189,4 +189,10 @@
         cursor: move;
         background: rgba(255, 255, 255, 0.5);
     }
+    audio {
+        margin-bottom: 15px;
+        &:focus {
+            outline: none;
+        }
+    }
 }

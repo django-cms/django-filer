@@ -12,7 +12,7 @@
                         <span class="icon fa fa-download"></span>
                         &nbsp;<span>{% trans "Download" %}</span>
                     </a>
-                    {% if original.file_type == 'Image' %}
+                    {% if original.mime_maintype == 'image' %}
                     <a href="{{ original.url }}" target="_blank" class="btn float-right">
                         <span>{% trans "Expand" %}</span>&nbsp;
                         <span class="icon fa fa-expand"></span>
