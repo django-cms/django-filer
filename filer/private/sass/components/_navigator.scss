@@ -67,12 +67,12 @@ body {
         color: $color-primary;
     }
     .column-icon {
-        width: 25px;
+        width: 50px;
         // removes padding to make sure that column has correct height #664
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         img {
-            width: 25px;
+            width: 40px;
             height: auto;
         }
     }
