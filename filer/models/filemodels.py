@@ -9,6 +9,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from polymorphic.managers import PolymorphicManager
@@ -106,6 +107,14 @@ class File(PolymorphicModel, mixins.IconsMixin):
         super().__init__(*args, **kwargs)
         self._old_is_public = self.is_public
         self.file_data_changed(post_init=True)
+
+    @cached_property
+    def mime_maintype(self):
+        return self.mime_type.split('/')[0]
+
+    @cached_property
+    def mime_subtype(self):
+        return self.mime_type.split('/')[1]
 
     def file_data_changed(self, post_init=False):
         """
