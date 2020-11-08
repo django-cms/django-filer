@@ -97,8 +97,8 @@ def file_icon(file, detail=False):
             context['highres_url'] = thumbnailer.get_thumbnail(opts).url
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
-    elif mime_maintype == 'application' and mime_subtype in ['zip']:
-        icon_url = staticfiles_storage.url('filer/icons/file-zip.svg')
+    elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
+        icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_subtype))
     else:
         icon_url = staticfiles_storage.url('filer/icons/file.svg')
     context.update(width=width, height=height, icon_url=icon_url)
