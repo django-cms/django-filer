@@ -1,6 +1,6 @@
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import Library
-from django.utils.html import format_html_join
+from django.utils.html import format_html_join, escapejs
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
@@ -60,14 +60,7 @@ def filer_has_permission(context, item, action):
     return permission_method(request)
 
 
-@register.inclusion_tag('admin/filer/templatetags/file_icon.html')
-def file_icon(file, detail=False):
-    """
-    This templatetag returns an `easy_thumbnails.models.Thumbnail` to be used when rendering a file
-    icon inside a directory folder. This icon reflects the type of file. In case of an image it
-    renders a thumbnailed version of that image.
-    """
-    width, height = (75, 75) if detail else (40, 40)
+def file_icon_context(file, detail, width, height):
     if not file.file.exists():
         return {
             'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
@@ -92,8 +85,8 @@ def file_icon(file, detail=False):
             opts = {'size': (width, height), 'crop': True}
         icon_url = thumbnailer.get_thumbnail(opts).url
         context['alt_text'] = file.default_alt_text
-        opts['size'] = 2 * width, 2 * height
         if mime_subtype != 'svg+xml':
+            opts['size'] = 2 * width, 2 * height
             context['highres_url'] = thumbnailer.get_thumbnail(opts).url
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
@@ -103,3 +96,23 @@ def file_icon(file, detail=False):
         icon_url = staticfiles_storage.url('filer/icons/file.svg')
     context.update(width=width, height=height, icon_url=icon_url)
     return context
+
+
+@register.inclusion_tag('admin/filer/templatetags/file_icon.html')
+def file_icon(file, detail=False, size=None):
+    """
+    This templatetag returns a redered `<img src="..." srcset="..." width="..." height="..." class="..." />
+    to be used for rendering thumbnails of files in the directory listing or in the corresponding detail
+    views for that image.
+    """
+    if size:
+        width, height = (int(s) for s in size.split('x'))
+    else:
+        width, height = (75, 75) if detail else (40, 40)
+    return file_icon_context(file, detail, width, height)
+
+
+@register.simple_tag
+def file_icon_url(file):
+    context = file_icon_context(file, False, 80, 80)
+    return escapejs(context.get('highres_url', context['icon_url']))

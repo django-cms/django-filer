@@ -6,7 +6,7 @@
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
             <img class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
-                 data-dz-remove data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
+                 data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
     </div>
@@ -19,12 +19,12 @@
 
         <span class="filerFile js-file-selector">
             {% if object %}
-                {% if object.icons.32 %}
-                    <a href="{{ object.url }}" target="_blank"><img class="thumbnail_img" src="{{ object.icons.48 }}" alt="{{ object.label }}"></a>
-                    &nbsp;<span class="description_text" title="{{ object.label }}">{{ object.label }}</span>
+                {% if object.file.exists %}
+                    <a href="{{ object.url }}" target="_blank">{% file_icon object size='80x80' %}</a>
+                    &nbsp;<span class="description_text">{{ object.label }}</span>
                 {% else %}
-                    <img class="thumbnail_img" src="{% static 'filer/icons/missingfile_48x48.png' %}" alt="{% trans 'file missing' %}">
-                    &nbsp;<span class="description_text" title="{% trans 'file missing' %}">{% trans 'file missing' %}</span>
+                    {% file_icon object %}
+                    &nbsp;<span class="description_text">{% trans 'File is missing' %}</span>
                 {% endif %}
             {% else %}
                 <img class="thumbnail_img hidden quiet" alt="{% trans 'no file selected' %}">
@@ -33,7 +33,7 @@
 
             <img class="filerClearer {% if not object %}hidden{% endif %}" src="{% static admin_icon_delete %}"
                  width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
-                 data-no-icon-file="{% static 'filer/icons/nofile_48x48.png' %}">
+                 data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
                title="{% trans 'Lookup' %}">
