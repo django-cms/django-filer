@@ -67,7 +67,7 @@
     &[disabled] {
         &,
         &:hover,
-        &:focus
+        &:focus,
         &:active {
             background-color: rgba($background, 0.4) important($important);
             border-color: rgba($border, 0.4) important($important);

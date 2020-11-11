@@ -26,7 +26,6 @@ form .form-row {
             left: 0;
         }
         &.dz-drag-hover {
-            padding-top: 19px;
             background-color: $color-primary-light;
             border: solid 2px $color-primary !important;
             .z-index-fix {
@@ -232,15 +231,16 @@ form .form-row {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                width: calc(100% - 150px);
+                width: calc(100% - 200px);
             }
             // required for django CMS <= 3.1 #673
             img {
-                width: 36px;
-                height: 36px;
+                width: 80px;
+                height: 80px;
                 margin-right: 10px;
                 border: solid 1px $gray-lighter;
                 border-radius: $border-radius-base;
+                vertical-align: top;
                 &[src*="nofile"] {
                     box-sizing: border-box;
                     margin-right: 0;
@@ -248,12 +248,9 @@ form .form-row {
                     border-radius: $border-radius-base;
                 }
             }
-            // required for django CMS <= 3.1 #673
-            img,
             .related-lookup {
-                display: inline-block;
                 text-align: center !important;
-                vertical-align: top;
+                margin-top: 24px;
             }
             // required for django CMS <= 3.1
             a {
@@ -265,7 +262,7 @@ form .form-row {
                 display: inline-block;
                 color: $gray;
                 font-weight: normal;
-                margin-top: 6px;
+                margin-top: 32px;
                 margin-bottom: 6px;
                 text-align: left;
                 &:empty + .related-lookup {
@@ -280,7 +277,7 @@ form .form-row {
                 // make sure that clear button has correct size #272
                 width: 10px;
                 height: 10px;
-                margin: 0 0 0 5px !important;
+                margin: 24px 0 0 5px !important;
                 padding: 12px !important;
                 border: solid 1px $gray-lighter;
                 border-radius: $border-radius-base;
@@ -329,19 +326,12 @@ form .form-row {
             }
         }
         @media screen and (max-width: $screen-tablet-filer) {
-            .filerFile {
-                top: 40px !important;
-                text-align: center;
-            }
             .dz-message {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 // make sure that drag and drop widget looks nice on mobile #670
                 margin-top: 75px !important;
-            }
-            &.js-object-attached .filerFile {
-                top: 62px !important;
             }
             &.filer-dropzone-folder .filerFile {
                 top: 62px !important;
@@ -352,9 +342,6 @@ form .form-row {
 
 .filer-dropzone {
     min-height: 100px !important;
-    @media screen and (max-width: $screen-tablet-filer) {
-        min-height: 150px !important;
-    }
     .dz-upload {
         height: 5px;
         background-color: #0bf;
@@ -369,12 +356,12 @@ form .form-row {
         display: inline-block;
         overflow: hidden;
         vertical-align: top;
-        width: 36px;
-        height: 36px;
+        width: 80px;
+        height: 80px;
         margin-right: 10px;
         border: solid 1px #ddd;
         border-radius: 3px;
-        background: #fff url("../icons/nofile_48x48.png");
+        background: #fff url("../icons/file-unknown.svg");
         background-size: cover;
         img {
             background: #fff;
