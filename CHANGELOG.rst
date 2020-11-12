@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+next
+====
+
+* Add support for SVG images. They behave like normal images.
+* Changed all icons to SVG.
+* Increased the size of the uploaded preview image from 36x36 to 80x80 pixels.
+
+
 2.0.2 (2020-09-10)
 ==================
 
