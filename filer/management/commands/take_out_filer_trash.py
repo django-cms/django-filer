@@ -1,6 +1,4 @@
 from django.core.management.base import BaseCommand
-# make sure cms is loaded first
-import cms
 from filer.models import File, Folder
 from filer import settings as filer_settings
 from django.utils import timezone
