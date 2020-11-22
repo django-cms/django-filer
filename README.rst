@@ -46,10 +46,10 @@ for all the details on how to install, configure and use django-filer.
 
 .. |pypi| image:: https://badge.fury.io/py/django-filer.svg
     :target: http://badge.fury.io/py/django-filer
-.. |build| image:: https://travis-ci.org/divio/django-filer.svg?branch=master
-    :target: https://travis-ci.org/divio/django-filer
-.. |coverage| image:: https://codecov.io/gh/divio/django-filer/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/divio/django-filer
+.. |build| image:: https://travis-ci.org/django-cms/django-filer.svg?branch=master
+    :target: https://travis-ci.org/django-cms/django-filer
+.. |coverage| image:: https://codecov.io/gh/django-cms/django-filer/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/django-cms/django-filer
 
 .. |python| image:: https://img.shields.io/badge/python-3.5+-blue.svg
     :target: https://pypi.org/project/django-filer/
