@@ -33,7 +33,7 @@ class ThumbnailerNameMixin:
         source_extension = os.path.splitext(source_filename)[1][1:].lower()
         preserve_extensions = self.thumbnail_preserve_extensions
         if preserve_extensions is True or source_extension == 'svg' or \
-            isinstance(preserve_extensions, (list, tuple)) and source_extension in preserve_extensions:
+                isinstance(preserve_extensions, (list, tuple)) and source_extension in preserve_extensions:
             extension = source_extension
         elif transparent:
             extension = self.thumbnail_transparency_extension
