@@ -132,7 +132,7 @@
                                 {{ file.owner|default:"n/a" }}
                             </td>
                             <td class="column-size">
-                                <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
+                                <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width|floatformat }}x{{ file.height|floatformat }} px{% endifequal %})</span>
                             </td>
                             <td class="column-action">
                                 <a href="{{ file.canonical_url }}"

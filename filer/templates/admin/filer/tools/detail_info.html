@@ -33,7 +33,7 @@
                     {% endif %}
                     {% if original.width or original.height %}
                         <dt>{% trans "Size" %}</dt>
-                        <dd>{{ original.width }}x{{ original.height }} px</dd>
+                        <dd>{{ original.width|floatformat }}x{{ original.height|floatformat }} px</dd>
                     {% endif %}
                     {% if original.size %}
                         <dt>{% trans "File-size" %}</dt>
