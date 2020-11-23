@@ -4,6 +4,7 @@ from django.utils.html import format_html_join, escapejs
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
+from math import ceil
 
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
@@ -78,7 +79,7 @@ def file_icon_context(file, detail, width, height):
     if isinstance(file, BaseImage):
         thumbnailer = get_thumbnailer(file)
         if detail:
-            width, height = 210, 210 / file.width * file.height
+            width, height = 210, ceil(210 / file.width * file.height)
             context['sidebar_image_ratio'] = file.width / 210
             opts = {'size': (width, height), 'upscale': True}
         else:
