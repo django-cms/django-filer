@@ -102,17 +102,15 @@ def ajax_upload(request, folder_id=None):
                     model=FileSubClass,
                     fields=('original_filename', 'owner', 'file')
                 )
-                upload.content_type = mime_type
                 break
-        uploadform = FileForm({'original_filename': filename,
-                               'owner': request.user.pk},
+        uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
                               {'file': upload})
+        uploadform.instance.mime_type = mime_type
         if uploadform.is_valid():
             file_obj = uploadform.save(commit=False)
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
             file_obj.folder = folder
-            file_obj.mime_type = mime_type
             file_obj.save()
             # TODO: Deprecated/refactor
             # clipboard_item = ClipboardItem(

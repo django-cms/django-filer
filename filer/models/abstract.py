@@ -58,7 +58,7 @@ class BaseImage(File):
                 except ValueError:
                     imgfile = self.file_ptr.file
                 imgfile.seek(0)
-                if imgfile.content_type == 'image/svg+xml':
+                if self.mime_type == 'image/svg+xml':
                     self._width, self._height = VILImage.load(imgfile).size
                 else:
                     self._width, self._height = PILImage.open(imgfile).size

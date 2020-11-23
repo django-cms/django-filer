@@ -513,7 +513,7 @@ class BulkOperationsMixin:
     def create_image(self, folder, filename=None):
         filename = filename or 'test_image.jpg'
         file_obj = django.core.files.File(open(self.filename, 'rb'), name=filename)
-        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder)
+        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder, mime_type='image/jpeg')
         image_obj.save()
         return image_obj
 
