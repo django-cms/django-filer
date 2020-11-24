@@ -6,6 +6,7 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
+
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 
