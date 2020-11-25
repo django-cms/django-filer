@@ -1,6 +1,7 @@
 import logging
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.VIL import Image as VILImage
@@ -85,16 +86,12 @@ class BaseImage(File):
         else:
             return 1.0
 
-    def _get_exif(self):
-        if hasattr(self, '_exif_cache'):
-            return self._exif_cache
-        else:
-            if self.file.exists() and self.mime_type != 'image/svg+xml':
-                self._exif_cache = get_exif_for_file(self.file)
-            else:
-                self._exif_cache = {}
-        return self._exif_cache
-    exif = property(_get_exif)
+    @cached_property
+    def exif(self):
+        try:
+            return get_exif_for_file(self.file)
+        except:
+            return {}
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
