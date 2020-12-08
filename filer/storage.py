@@ -66,12 +66,11 @@ class PatchedS3BotoStorage(S3BotoStorage):
             'Bucket': self.bucket.name,
             'Key': src_path
         }
-        extra_args = {}
-        # we cannot preserve acl in boto3, but we can give public read
         source_obj = self.bucket.Object(src_path)
+        extra_args = {
+        'ContentType': source_obj.content_type
+        }
+        # we cannot preserve acl in boto3, but we can give public read
         if self.has_public_read(source_obj):
-            extra_args = {
-                'ACL': 'public-read',
-                'ContentType': source_obj.content_type
-            }
+            extra_args['ACL'] = 'public-read'
         self.bucket.copy(copy_source, dst_path, extra_args)
