@@ -47,8 +47,8 @@ class PatchedS3BotoStorage(S3BotoStorage):
             method='GET', bucket=self.bucket.name, key=self._encode_name(name),
             query_auth=self.querystring_auth, force_http=not self.secure_urls)
 
-    def has_public_read(self, path):
-        old_acl = self.bucket.Object(path).Acl().grants
+    def has_public_read(self, object_key):
+        old_acl = object_key.Acl().grants
         if not old_acl:
             return False
         for right in old_acl:
@@ -66,10 +66,11 @@ class PatchedS3BotoStorage(S3BotoStorage):
             'Bucket': self.bucket.name,
             'Key': src_path
         }
-        extra_args = {}
+        source_obj = self.bucket.Object(src_path)
+        extra_args = {
+            'ContentType': source_obj.content_type
+        }
         # we cannot preserve acl in boto3, but we can give public read
-        if self.has_public_read(src_path):
-            extra_args = {
-                'ACL': 'public-read'
-            }
+        if self.has_public_read(source_obj):
+            extra_args['ACL'] = 'public-read'
         self.bucket.copy(copy_source, dst_path, extra_args)
