@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import re
 from functools import partial
 
 from django import template
@@ -40,6 +41,9 @@ from filer.models import (Folder, FolderRoot, UnfiledImages, File, tools,
                           Archive, Image, DummyFolder)
 from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
+
+
+ELEM_ID = re.compile(r'.*<a href=".*/(?P<file_id>[0-9]+)/".*a>$')
 
 
 class FolderAdmin(FolderPermissionModelAdmin):
@@ -594,6 +598,21 @@ class FolderAdmin(FolderPermissionModelAdmin):
     move_to_clipboard.short_description = ugettext_lazy(
         "Move selected files to clipboard")
 
+    def _get_unique_items(self, deletable_items, unique_items, depth=5):
+        count = 0
+        if depth < 0:
+            return count
+        for elem in deletable_items:
+            if isinstance(elem, (list, tuple)):
+                count += self._get_unique_items(elem, unique_items, depth-1)
+            elif isinstance(elem, str):
+                match = ELEM_ID.match(elem)
+                elem_id = match and match.group('file_id')
+                if elem_id and elem_id not in unique_items:
+                    unique_items.append(elem_id)
+                    count += 1
+        return count
+
     def delete_files_or_folders(self, request,
                                 files_queryset, folders_queryset):
         """
@@ -625,16 +644,16 @@ class FolderAdmin(FolderPermissionModelAdmin):
         all_protected = []
 
         using = router.db_for_write(self.model)
-        deletable_files, model_count, perms_needed_files, protected_files = \
+        deletable_files, perms_needed_files, protected_files = \
             get_deleted_objects(
                 files_queryset, files_queryset.model._meta,
                 request.user, self.admin_site, using)
-        files_count = model_count[File._meta.verbose_name_plural]
-        deletable_folders, model_count, perms_needed_folders, protected_folders = \
+        files_count = self._get_unique_items(deletable_files, unique_items=[])
+        deletable_folders, perms_needed_folders, protected_folders = \
             get_deleted_objects(
                 folders_queryset, folders_queryset.model._meta,
                 request.user, self.admin_site, using)
-        folders_count = model_count[Folder._meta.verbose_name_plural]
+        folders_count = self._get_unique_items(deletable_folders, unique_items=[])
         all_protected.extend(protected_files)
         all_protected.extend(protected_folders)
 
@@ -647,20 +666,20 @@ class FolderAdmin(FolderPermissionModelAdmin):
         if request.POST.get('post'):
             if all_perms_needed:
                 raise PermissionDenied
-            n = files_count + folders_count
-            if n:
+            total_count = files_count + folders_count
+            if total_count:
                 # delete all explicitly selected files
-                for f in files_queryset:
-                    self.log_deletion(request, f, force_text(f))
-                    f.delete()
+                for file_obj in files_queryset:
+                    self.log_deletion(request, file_obj, force_text(file_obj))
+                    file_obj.delete()
                 # delete all folders
-                for f_id in folders_queryset.values_list('id', flat=True):
-                    f = Folder.objects.get(id=f_id)
-                    self.log_deletion(request, f, force_text(f))
-                    f.delete()
+                for file_id in folders_queryset.values_list('id', flat=True):
+                    file_obj = Folder.objects.get(id=file_id)
+                    self.log_deletion(request, file_obj, force_text(file_obj))
+                    file_obj.delete()
                 self.message_user(request,
                     _("Successfully deleted %(count)d files "
-                      "and/or folders.") % {"count": n, })
+                      "and/or folders.") % {"count": total_count, })
             # Return None to display the change list page again.
             return None
 

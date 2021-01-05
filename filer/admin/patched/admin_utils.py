@@ -69,7 +69,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
     protected = [format_callback(obj) for obj in collector.protected]
 
-    return to_delete, collector.model_count, perms_needed, protected
+    return to_delete, perms_needed, protected
 
 
 class PolymorphicAwareNestedObjects(NestedObjects):
