@@ -159,11 +159,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
         # This is needed because most of the remote File Storage backend do not
         # open the file.
         src_file = src_storage.open(src_file_name)
-        src_file.open()
+        # Context manager closes file after reading contents
+        with src_file.open() as f:
+            content_file = ContentFile(f.read())
         # hint file_data_changed callback that data is actually unchanged
         self._file_data_changed_hint = False
-        self.file = dst_storage.save(dst_file_name,
-            ContentFile(src_file.read()))
+        self.file = dst_storage.save(dst_file_name, content_file)
         src_storage.delete(src_file_name)
 
     def _copy_file(self, destination, overwrite=False):
