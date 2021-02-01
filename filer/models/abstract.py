@@ -90,7 +90,7 @@ class BaseImage(File):
     def exif(self):
         try:
             return get_exif_for_file(self.file)
-        except:
+        except Exception:
             return {}
 
     def has_edit_permission(self, request):

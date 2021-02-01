@@ -1,5 +1,4 @@
 import os
-from unittest import skipIf, skipUnless
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
@@ -10,7 +9,6 @@ from tests.helpers import (
     create_clipboard_item, create_folder_structure, create_image,
     create_superuser,
 )
-from tests.utils import ET_2
 
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
@@ -81,18 +79,6 @@ class FilerApiTests(TestCase):
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
 
-    @skipIf(ET_2, 'Skipping for easy_thumbnails version >= 2.0')  # noqa
-    def test_create_icons(self):
-        image = self.create_filer_image()
-        image.save()
-        icons = image.icons
-        file_basename = os.path.basename(image.file.path)
-        self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
-        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
-            self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + '__%sx%s_q85_crop_upscale.jpg' % (size, size))
-
-    @skipUnless(ET_2, 'Skipping for easy_thumbnails version < 2.0')  # noqa
     def test_create_icons(self):
         image = self.create_filer_image()
         image.save()
