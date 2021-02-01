@@ -95,7 +95,7 @@ def file_icon_context(file, detail, width, height):
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_subtype))
     else:
-        icon_url = staticfiles_storage.url('filer/icons/file.svg')
+        icon_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
     context.update(width=width, height=height, icon_url=icon_url)
     return context
 
