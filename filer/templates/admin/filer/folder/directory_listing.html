@@ -101,14 +101,14 @@
                     <div class="navigator-breadcrumbs">
                         <div class="filer-navigator-breadcrumbs-dropdown-container filer-dropdown-container">
                             <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
+                                <img src="{% static 'filer/icons/folder-dropdown.svg' %}" alt="" width="28" height="28">
                             </a>
                             <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
                                 {% for folder in folder.logical_path %}
                                     <li>
                                         <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
                                             title="{% trans 'Go back to the parent folder' %}">
-                                            <img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                            <img src="{% static 'filer/icons/folder.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                             {{ folder.name }}
                                         </a>
                                     </li>
@@ -116,7 +116,7 @@
                                 <li>
                                     <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}"
                                         title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
-                                        <img src="{% static 'filer/icons/root_28x28.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                        <img src="{% static 'filer/icons/folder-root.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                         Root
                                     </a>
                                 </li>

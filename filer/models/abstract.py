@@ -1,7 +1,10 @@
 import logging
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+
+from easy_thumbnails.VIL import Image as VILImage
 
 from .. import settings as filer_settings
 from ..utils.compatibility import PILImage
@@ -26,8 +29,8 @@ class BaseImage(File):
     file_type = 'Image'
     _icon = "image"
 
-    _height = models.IntegerField(null=True, blank=True)
-    _width = models.IntegerField(null=True, blank=True)
+    _height = models.FloatField(null=True, blank=True)
+    _width = models.FloatField(null=True, blank=True)
 
     default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
     default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
@@ -43,7 +46,7 @@ class BaseImage(File):
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
         # source: https://www.freeformatter.com/mime-types-list.html
-        image_subtypes = ['gif', 'jpeg', 'png', 'x-png']
+        image_subtypes = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml']
         maintype, subtype = mime_type.split('/')
         return maintype == 'image' and subtype in image_subtypes
 
@@ -56,7 +59,10 @@ class BaseImage(File):
                 except ValueError:
                     imgfile = self.file_ptr.file
                 imgfile.seek(0)
-                self._width, self._height = PILImage.open(imgfile).size
+                if self.mime_type == 'image/svg+xml':
+                    self._width, self._height = VILImage.load(imgfile).size
+                else:
+                    self._width, self._height = PILImage.open(imgfile).size
                 imgfile.seek(0)
             except Exception:
                 if post_init is False:
@@ -80,16 +86,12 @@ class BaseImage(File):
         else:
             return 1.0
 
-    def _get_exif(self):
-        if hasattr(self, '_exif_cache'):
-            return self._exif_cache
-        else:
-            if self.file:
-                self._exif_cache = get_exif_for_file(self.file)
-            else:
-                self._exif_cache = {}
-        return self._exif_cache
-    exif = property(_get_exif)
+    @cached_property
+    def exif(self):
+        try:
+            return get_exif_for_file(self.file)
+        except:
+            return {}
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
@@ -126,11 +128,11 @@ class BaseImage(File):
 
     @property
     def width(self):
-        return self._width or 0
+        return self._width or 0.0
 
     @property
     def height(self):
-        return self._height or 0
+        return self._height or 0.0
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}

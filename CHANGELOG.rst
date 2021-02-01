@@ -2,6 +2,41 @@
 CHANGELOG
 =========
 
+2.1rc1  (2020-11-25)
+====================
+
+* Add support for SVG images. They now are handled by the model
+  ``filer.imagemodels.Image`` and can be used whereever a pixel based image
+  was used. This includes scaling and cropping using existing thumbnailing
+  functionality from the
+  `easy-thumbnails <https://easy-thumbnails.readthedocs.io/en/latest/index.html>`_
+  library.
+* Drop support for high resolution images and remove ``retina.js`` from project.
+  High resolution images are handled by the HTML standard attribute in
+  ``<img srcset="..." ... />``.
+* In model ``filer.imagemodels.Image`` change ``_width`` and ``_height`` to
+  Django's ``FloatFields``; this because SVG images specify their image
+  extensions as floats rather than integers.
+* All icons for displaying folders, files (not images) have been replaced by
+  nicer looking SVG variants from `PaoMedia <https://paomedia.github.io/small-n-flat/>`_.
+* Increase size of thumbnails in the admin backend's list view from 25x25 to
+  40x40 pixels.
+* For local development switched to NodeJS version 14.
+* Add templatetag ``file_icon`` to ``file_admin_tags.py``. It now handles the
+  rendering of all file types, including folders, zip-files and missing files.
+* Remove pre-thumbnailing of images. Up to version 2.0, all images were scaled
+  immediatly after upload into many different sizes, most of which never were
+  used. Thumbnailing in the admin backend now is perfomerd lazily.
+* Uploaded audio can be listened at in their detail view.
+* Uploaded video files can be previewed in their detail view.
+* Fix scaling of very wide but short images – causing a division by zero
+  exception: ceil height to integer.
+* Add method ``exists()`` to ``MultiStorageFieldFile``, which checks if a file
+  exists on disk.
+* Drop support of Python-3.5 (Reason: Third party requirement
+  `reportlabs <https://www.reportlab.com/>`_ requires Python>=3.6).
+
+
 2.0.2 (2020-09-10)
 ==================
 

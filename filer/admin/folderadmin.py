@@ -271,9 +271,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 pass
 
         # search
-        q = request.GET.get('q', None)
+        q = request.GET.get('q')
         if q:
-            search_terms = urlunquote(q).split(" ")
+            search_terms = urlunquote(q).split(' ')
             search_mode = True
         else:
             search_terms = []

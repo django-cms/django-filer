@@ -13,8 +13,6 @@ matrix:
     - python: 3.6
       env: TOX_ENV='frontend'
     # Django 2.2
-    - python: 3.5
-      env: DJANGO='dj22' SWAP='swap'
     - python: 3.6
       env: DJANGO='dj22' SWAP='noswap'
     - python: 3.7
@@ -39,7 +37,6 @@ matrix:
 
 install:
   - pip install coverage isort tox
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then export PY_VER=py35; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then export PY_VER=py36; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then export PY_VER=py37; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then export PY_VER=py38; fi"
@@ -48,10 +45,9 @@ install:
 before_script:
   - if [ $TOX_ENV == 'frontend' ]; then
     pip install -r tests/requirements/frontend.txt;
-    nvm install 0.12.7 && nvm use 0.12.7;
+    nvm install 14.15.0 && nvm use node;
     npm config set spin false;
-    npm install -g npm@2;
-    npm install -g gulp@3.9.0;
+    npm install -g gulp@4.0.2;
     npm install;
     fi
 

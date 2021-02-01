@@ -23,18 +23,17 @@ class ThumbnailerNameMixin:
     thumbnail_subdir = ''
     thumbnail_prefix = ''
 
-    def get_thumbnail_name(self, thumbnail_options, transparent=False,
-                           high_resolution=False):
+    def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
         reproducible thumbnail name that can be converted back to the original
         filename.
         """
         path, source_filename = os.path.split(self.name)
-        source_extension = os.path.splitext(source_filename)[1][1:]
-        if self.thumbnail_preserve_extensions is True or \
-            (self.thumbnail_preserve_extensions and source_extension.lower()
-             in self.thumbnail_preserve_extensions):
+        source_extension = os.path.splitext(source_filename)[1][1:].lower()
+        preserve_extensions = self.thumbnail_preserve_extensions
+        if preserve_extensions is True or source_extension == 'svg' or \
+                isinstance(preserve_extensions, (list, tuple)) and source_extension in preserve_extensions:
             extension = source_extension
         elif transparent:
             extension = self.thumbnail_transparency_extension
@@ -44,14 +43,18 @@ class ThumbnailerNameMixin:
 
         thumbnail_options = thumbnail_options.copy()
         size = tuple(thumbnail_options.pop('size'))
+        initial_opts = ['{0}x{1}'.format(*size)]
         quality = thumbnail_options.pop('quality', self.thumbnail_quality)
-        initial_opts = ['%sx%s' % size, 'q%s' % quality]
+        if extension == 'jpg':
+            initial_opts.append('q{}'.format(quality))
+        elif extension == 'svg':
+            thumbnail_options.pop('subsampling', None)
+            thumbnail_options.pop('upscale', None)
 
         opts = list(thumbnail_options.items())
         opts.sort()   # Sort the options so the file name is consistent.
-        opts = ['%s' % (v is not True and '%s-%s' % (k, v) or k)
+        opts = ['{}'.format(v is not True and '{}-{}'.format(k, v) or k)
                 for k, v in opts if v]
-
         all_opts = '_'.join(initial_opts + opts)
 
         basedir = self.thumbnail_basedir
@@ -59,12 +62,7 @@ class ThumbnailerNameMixin:
 
         # make sure our magic delimiter is not used in all_opts
         all_opts = all_opts.replace('__', '_')
-        if high_resolution:
-            try:
-                all_opts += self.thumbnail_highres_infix
-            except AttributeError:
-                all_opts += '@2x'
-        filename = '%s__%s.%s' % (source_filename, all_opts, extension)
+        filename = '{}__{}.{}'.format(source_filename, all_opts, extension)
 
         return os.path.join(basedir, path, subdir, filename)
 
@@ -74,8 +72,7 @@ class ActionThumbnailerMixin:
     thumbnail_subdir = ''
     thumbnail_prefix = ''
 
-    def get_thumbnail_name(self, thumbnail_options, transparent=False,
-                           high_resolution=False):
+    def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that returns the original
         filename to resize.

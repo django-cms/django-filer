@@ -103,45 +103,21 @@ def ajax_upload(request, folder_id=None):
                     fields=('original_filename', 'owner', 'file')
                 )
                 break
-        uploadform = FileForm({'original_filename': filename,
-                               'owner': request.user.pk},
+        uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
                               {'file': upload})
+        uploadform.instance.mime_type = mime_type
         if uploadform.is_valid():
             file_obj = uploadform.save(commit=False)
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
             file_obj.folder = folder
-            file_obj.mime_type = mime_type
             file_obj.save()
             # TODO: Deprecated/refactor
             # clipboard_item = ClipboardItem(
             #     clipboard=clipboard, file=file_obj)
             # clipboard_item.save()
 
-            # Try to generate thumbnails.
-            if not file_obj.icons:
-                # There is no point to continue, as we can't generate
-                # thumbnails for this file. Usual reasons: bad format or
-                # filename.
-                file_obj.delete()
-                # This would be logged in BaseImage._generate_thumbnails()
-                # if FILER_ENABLE_LOGGING is on.
-                return JsonResponse(
-                    {'error': 'failed to generate icons for file'},
-                    status=500,
-                )
             thumbnail = None
-            # Backwards compatibility: try to get specific icon size (32px)
-            # first. Then try medium icon size (they are already sorted),
-            # fallback to the first (smallest) configured icon.
-            for size in (['32']
-                        + filer_settings.FILER_ADMIN_ICON_SIZES[1::-1]):
-                try:
-                    thumbnail = file_obj.icons[size]
-                    break
-                except KeyError:
-                    continue
-
             data = {
                 'thumbnail': thumbnail,
                 'alt_text': '',

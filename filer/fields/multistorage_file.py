@@ -119,6 +119,12 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         content.seek(0)  # Ensure we upload the whole file
         super().save(name, content, save)
 
+    def exists(self):
+        """
+        Returns ``True`` if underlying file exists in storage.
+        """
+        return self.storage.exists(self.name)
+
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
     attr_class = MultiStorageFieldFile
