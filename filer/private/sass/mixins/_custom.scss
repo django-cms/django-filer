@@ -3,7 +3,6 @@
 
 // add clearfix which doesnt add overflow:hidden
 @mixin clearfix() {
-    *zoom: 1;
     &:before,
     &:after {
         content: " ";
