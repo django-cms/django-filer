@@ -6,9 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
-from ..utils.files import (
-    UploadException, handle_request_files_upload, handle_upload,
-)
+from ..utils.files import handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
 from . import views
 
@@ -82,68 +80,64 @@ def ajax_upload(request, folder_id=None):
     # check permissions
     if folder and not folder.has_add_children_permission(request):
         return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
-    try:
-        if len(request.FILES) == 1:
-            # dont check if request is ajax or not, just grab the file
-            upload, filename, is_raw, mime_type = handle_request_files_upload(request)
-        else:
-            # else process the request as usual
-            upload, filename, is_raw, mime_type = handle_upload(request)
+
+    if len(request.FILES) == 1:
+        # dont check if request is ajax or not, just grab the file
+        upload, filename, is_raw, mime_type = handle_request_files_upload(request)
+    else:
+        # else process the request as usual
+        upload, filename, is_raw, mime_type = handle_upload(request)
+    # TODO: Deprecated/refactor
+    # Get clipboad
+    # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
+
+    # find the file type
+    for filer_class in filer_settings.FILER_FILE_MODELS:
+        FileSubClass = load_model(filer_class)
+        # TODO: What if there are more than one that qualify?
+        if FileSubClass.matches_file_type(filename, upload, mime_type):
+            FileForm = modelform_factory(
+                model=FileSubClass,
+                fields=('original_filename', 'owner', 'file')
+            )
+            break
+    uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
+                          {'file': upload})
+    uploadform.instance.mime_type = mime_type
+    if uploadform.is_valid():
+        file_obj = uploadform.save(commit=False)
+        # Enforce the FILER_IS_PUBLIC_DEFAULT
+        file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+        file_obj.folder = folder
+        file_obj.save()
         # TODO: Deprecated/refactor
-        # Get clipboad
-        # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
+        # clipboard_item = ClipboardItem(
+        #     clipboard=clipboard, file=file_obj)
+        # clipboard_item.save()
 
-        # find the file type
-        for filer_class in filer_settings.FILER_FILE_MODELS:
-            FileSubClass = load_model(filer_class)
-            # TODO: What if there are more than one that qualify?
-            if FileSubClass.matches_file_type(filename, upload, mime_type):
-                FileForm = modelform_factory(
-                    model=FileSubClass,
-                    fields=('original_filename', 'owner', 'file')
-                )
-                break
-        uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
-                              {'file': upload})
-        uploadform.instance.mime_type = mime_type
-        if uploadform.is_valid():
-            file_obj = uploadform.save(commit=False)
-            # Enforce the FILER_IS_PUBLIC_DEFAULT
-            file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
-            file_obj.folder = folder
-            file_obj.save()
-            # TODO: Deprecated/refactor
-            # clipboard_item = ClipboardItem(
-            #     clipboard=clipboard, file=file_obj)
-            # clipboard_item.save()
-
-            thumbnail = None
-            data = {
-                'thumbnail': thumbnail,
-                'alt_text': '',
-                'label': str(file_obj),
-                'file_id': file_obj.pk,
+        thumbnail = None
+        data = {
+            'thumbnail': thumbnail,
+            'alt_text': '',
+            'label': str(file_obj),
+            'file_id': file_obj.pk,
+        }
+        # prepare preview thumbnail
+        if type(file_obj) == Image:
+            thumbnail_180_options = {
+                'size': (180, 180),
+                'crop': True,
+                'upscale': True,
             }
-            # prepare preview thumbnail
-            if type(file_obj) == Image:
-                thumbnail_180_options = {
-                    'size': (180, 180),
-                    'crop': True,
-                    'upscale': True,
-                }
-                thumbnail_180 = file_obj.file.get_thumbnail(
-                    thumbnail_180_options)
-                data['thumbnail_180'] = thumbnail_180.url
-                data['original_image'] = file_obj.url
-            return JsonResponse(data)
-        else:
-            form_errors = '; '.join(['%s: %s' % (
-                field,
-                ', '.join(errors)) for field, errors in list(
-                    uploadform.errors.items())
-            ])
-            raise UploadException(
-                "AJAX request not valid: form invalid '%s'" % (
-                    form_errors,))
-    except UploadException as e:
-        return JsonResponse({'error': str(e)}, status=500)
+            thumbnail_180 = file_obj.file.get_thumbnail(
+                thumbnail_180_options)
+            data['thumbnail_180'] = thumbnail_180.url
+            data['original_image'] = file_obj.url
+        return JsonResponse(data)
+    else:
+        form_errors = '; '.join(['%s: %s' % (
+            field,
+            ', '.join(errors)) for field, errors in list(
+                uploadform.errors.items())
+        ])
+        return JsonResponse({'message': str(form_errors)}, status=422)

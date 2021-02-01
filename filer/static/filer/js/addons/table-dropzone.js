@@ -199,14 +199,14 @@ if (django.jQuery) {
                             window.location.reload();
                         }
                     },
-                    error: function (file, errorText) {
+                    error: function (file, error) {
                         updateUploadNumber();
-                        if (errorText === 'duplicate') {
+                        if (error === 'duplicate') {
                             return;
                         }
                         hasErrors = true;
                         if (window.filerShowError) {
-                            window.filerShowError(file.name + ': ' + errorText);
+                            window.filerShowError(file.name + ': ' + error.message);
                         }
                     }
                 });
