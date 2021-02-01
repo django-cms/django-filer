@@ -1,13 +1,13 @@
 import os
 
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.timezone import now
 
 from .files import get_valid_filename
 
 
 def by_date(instance, filename):
-    datepart = force_text(now().strftime("%Y/%m/%d"))
+    datepart = force_str(now().strftime("%Y/%m/%d"))
     return os.path.join(datepart, get_valid_filename(filename))
 
 
