@@ -2,11 +2,17 @@
 CHANGELOG
 =========
 
-2.1rc2  (2021-02-01)
+2.1rc3  (2021-02-02)
 ====================
 
 * Fix #1234: Directory listing template conflicts with djangocms-admin-style
   sidebar style.
+* Fix minor styling regressions introduced in 2.1rc2.
+
+
+2.1rc2  (2021-02-01)
+====================
+
 * Fix #1227: Some icons were not aligned in the dropzone layout.
 * All file/image fields render the field label.
 * Fix #1232: Drag & drop of empty files results into Internal Server Error.
