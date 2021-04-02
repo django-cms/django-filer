@@ -15,6 +15,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - run: python -m pip install -r tests/requirements/frontend.txt
     - run: npm install
     - run: npm install -g gulp@4.0.2
     - run: gulp ci
