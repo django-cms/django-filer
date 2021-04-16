@@ -1,5 +1,7 @@
 #-*- coding: utf-8 -*-
-import urllib.request, urllib.parse, urllib.error
+import logging
+import botocore.exceptions
+import urllib.parse
 
 from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import smart_str
@@ -8,6 +10,9 @@ try:
     from storages.backends.s3boto import S3BotoStorage
 except ImportError:
     from storages.backends.s3boto3 import S3Boto3Storage as S3BotoStorage
+
+
+logger = logging.getLogger(__name__)
 
 
 class PublicFileSystemStorage(FileSystemStorage):
@@ -67,9 +72,13 @@ class PatchedS3BotoStorage(S3BotoStorage):
             'Key': src_path
         }
         source_obj = self.bucket.Object(src_path)
-        extra_args = {
-            'ContentType': source_obj.content_type
-        }
+        try:
+            extra_args = {
+                'ContentType': source_obj.content_type
+            }
+        except botocore.exceptions.ClientError as error:
+            logger.warning("Copy: source error: %s", error)
+            return False
         # we cannot preserve acl in boto3, but we can give public read
         if self.has_public_read(source_obj):
             extra_args['ACL'] = 'public-read'

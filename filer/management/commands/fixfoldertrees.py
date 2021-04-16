@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-import cms
 from filer.utils.checktrees import TreeChecker, TreeCorruption
 from optparse import make_option
 
