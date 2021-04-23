@@ -13,7 +13,7 @@ class PermissionAdmin(admin.ModelAdmin):
         )}),
     )
     raw_id_fields = ('user', 'group',)
-    list_filter = ['user']
+    list_filter = ['group']
     list_display = ['__str__', 'folder', 'user']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
