@@ -15,6 +15,7 @@ class PermissionAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'group',)
     list_filter = ['group']
     list_display = ['__str__', 'folder', 'user']
+    search_fields = ["user__username", "group__name", "folder__name"]
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         db = kwargs.get('using')
