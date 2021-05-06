@@ -123,14 +123,9 @@ class FilerFolderField(models.ForeignKey):
         super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
-        # This is a fairly standard way to set up some defaults
-        # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
+            'rel': self.remote_field,
         }
-        try:
-            defaults['rel'] = self.remote_field
-        except AttributeError:
-            defaults['rel'] = self.rel
         defaults.update(kwargs)
         return super().formfield(**defaults)
