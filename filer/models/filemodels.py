@@ -507,8 +507,11 @@ class File(PolymorphicModel,
         text = "%s" % (text,)
         return text
 
+    def _cmp(self, a, b):
+        return (a > b) - (a < b) 
+
     def __lt__(self, other):
-        return cmp(self.label.lower(), other.label.lower()) < 0
+        return self._cmp(self.label.lower(), other.label.lower()) < 0
 
     @property
     def actual_name(self):

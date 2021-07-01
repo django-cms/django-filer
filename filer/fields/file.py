@@ -101,8 +101,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
 
     def obj_for_value(self, value):
         try:
-            key = self.rel.get_related_field().name
-            obj = self.rel.to.objects.get(**{key: value})
+            key = self.remote_field.get_related_field().name
+            obj = self.remote_field.model.objects.get(**{key: value})
         except:
             obj = None
         return obj

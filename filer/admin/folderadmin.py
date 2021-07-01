@@ -86,7 +86,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         """
         formfield = super(FolderAdmin, self).formfield_for_foreignkey(
             db_field, request, **kwargs)
-        if request and db_field.rel.to is Site:
+        if request and db_field.remote_field.model is Site:
             formfield.queryset = self._get_sites_available_for_user(
                 request.user)
         return formfield
@@ -97,7 +97,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         """
         formfield = super(FolderAdmin, self).formfield_for_manytomany(
             db_field, request, **kwargs)
-        if request and db_field.rel.to is Site:
+        if request and db_field.remote_field.model is Site:
             formfield.queryset = self._get_sites_available_for_user(
                 request.user)
         return formfield
@@ -203,7 +203,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         #   successed HttpResponse
         if (request.method == 'POST' and popup_status(request) and
             response.status_code == 200 and
-            not isinstance(response, TemplateResponse) and
+            # not isinstance(response, TemplateResponse) and
             not isinstance(response, HttpResponseRedirect)):
             return HttpResponse('<script type="text/javascript">' +
                                 'opener.dismissPopupAndReload(window);' +
@@ -628,12 +628,12 @@ class FolderAdmin(FolderPermissionModelAdmin):
             get_deleted_objects(
                 files_queryset, files_queryset.model._meta,
                 request.user, self.admin_site, using)
-        files_count = model_count[File._meta.verbose_name_plural]
+        files_count = model_count.get(File._meta.verbose_name_plural, 0)
         deletable_folders, model_count, perms_needed_folders, protected_folders = \
             get_deleted_objects(
                 folders_queryset, folders_queryset.model._meta,
                 request.user, self.admin_site, using)
-        folders_count = model_count[Folder._meta.verbose_name_plural]
+        folders_count = model_count.get(Folder._meta.verbose_name_plural, 0)
         all_protected.extend(protected_files)
         all_protected.extend(protected_folders)
 
@@ -781,10 +781,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
         # don't allow selected folders to be copied/moved inside
         #   themselves or inside any of their descendants
-        mgr = Folder._tree_manager
-        destination_in_selected = mgr.get_queryset_descendants(
-            selected_folders, include_self=True
-        ).filter(id=destination.pk).exists()
+        destination_in_selected = Folder.get_descendants(*selected_folders, include_self=True).filter(id=destination.pk).exists()
         if destination_in_selected:
             raise PermissionDenied
         return destination

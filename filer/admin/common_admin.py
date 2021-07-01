@@ -100,8 +100,8 @@ class CommonModelAdmin(admin.ModelAdmin):
             # The model was auto-created as intermediary for a
             # ManyToMany-relationship, find the target model
             for field in opts.fields:
-                if field.rel and field.rel.to != self.parent_model:
-                    opts = field.rel.to._meta
+                if field.remote_field and field.remote_field.model != self.parent_model:
+                    opts = field.remote_field.model._meta
                     break
         codename = get_permission_codename('change', opts)
         perm_name, user = "{}.{}".format(opts.app_label, codename), request.user

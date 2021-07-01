@@ -50,6 +50,8 @@ def get_valid_filename(s):
     like the regular get_valid_filename, but also slugifies away
     umlauts and stuff.
     """
+    if not s:
+        return ''
     s = get_valid_filename_django(s)
     filename, ext = os.path.splitext(s)
     filename = slugify(filename)
