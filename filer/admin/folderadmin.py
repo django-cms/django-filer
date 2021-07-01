@@ -203,7 +203,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
         #   successed HttpResponse
         if (request.method == 'POST' and popup_status(request) and
             response.status_code == 200 and
-            # not isinstance(response, TemplateResponse) and
             not isinstance(response, HttpResponseRedirect)):
             return HttpResponse('<script type="text/javascript">' +
                                 'opener.dismissPopupAndReload(window);' +
