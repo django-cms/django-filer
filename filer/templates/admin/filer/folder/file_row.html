@@ -16,7 +16,7 @@
 <!-- Filename/Dimensions -->
 <td>{% if not is_popup and not file|is_restricted_for_user:user %}
         <!-- File delete link -->
-        <a class="deletelink inline pull-right red" href="{{ file.get_admin_url_path }}delete{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}"><i class="ace-icon fa fa-trash-o"></i>{% trans "Delete" %}</a>
+        <a class="deletelink inline pull-right red" href="{{ file.get_admin_delete_url }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Delete '{{ item_label }}'{% endblocktrans %}"><i class="ace-icon fa fa-trash-o"></i>{% trans "Delete" %}</a>
         <!-- File change link -->
         <a class="changelink block pull-right" href="{{ file.get_admin_url_path }}{% get_popup_params %}" title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}"><i class="ace-icon fa fa-pencil"></i><span>{% trans "Change" %}</span></a>
     {% endif %}

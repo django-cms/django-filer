@@ -581,6 +581,11 @@ class File(PolymorphicModel,
             args=(self.pk,)
         )
 
+    def get_admin_delete_url(self):
+        return reverse(
+            'admin:{0}_{1}_delete'.format(self._meta.app_label, self._meta.model_name,),
+            args=(self.pk,))
+
     @property
     def url(self):
         """
@@ -718,6 +723,8 @@ class File(PolymorphicModel,
             return can_delete_file and has_role_on_site(user, self.folder.site)
         return False
 
+    def __str__(self):
+        return self.__unicode__()
     class Meta:
         app_label = 'filer'
         verbose_name = _('file')

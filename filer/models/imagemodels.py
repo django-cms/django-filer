@@ -206,6 +206,8 @@ class Image(File):
     def easy_thumbnails_thumbnailer(self):
         return self.file
 
+    def __str__(self):
+        return self.__unicode__()
     class Meta:
         app_label = 'filer'
         verbose_name = _('image')

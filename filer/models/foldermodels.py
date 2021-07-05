@@ -491,6 +491,9 @@ class Folder(models.Model, mixins.IconsMixin):
             name = self.name
         return name
 
+    def __str__(self):
+        return self.__unicode__()
+
     @property
     def actual_name(self):
         return self.name
