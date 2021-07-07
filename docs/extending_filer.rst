@@ -307,3 +307,158 @@ Set ``FILER_IMAGE_MODEL`` to the path of your custom model:
 .. code-block:: python
 
     FILER_IMAGE_MODEL = 'myapp.CustomImage'
+
+
+Concrete exemple: CSV model which only accepts *.csv files
+----------------------------------------------------------
+
+In this example, we will stick together all already viewed parts above :
+we will create a specific CSV file model which will have custom fields and
+file's extension detection
+(you could add more robust verification than what is done in the example).
+
+
+Defining the model
+..................
+
+First a custom model must be defined; it must inherits from File at least.
+
+.. code-block:: python
+
+    # myapp/models.py
+    from chardet.universaldetector import UniversalDetector
+    import csv
+    from os.path import splitext
+    from django.db import models
+    from django.utils.translation import ugettext_lazy as _
+    from filer.models.filemodels import File
+
+    class ExtensionFileMixin:
+        """
+        A little mixin which checks that a file matches specific file_type via a list of
+        allowed extensions.
+        """
+        filename_extensions = []
+
+        @classmethod
+        def matches_file_type(cls, iname, ifile, request):
+            ext = splitext(iname)[1].lower()
+            return ext in cls.filename_extensions and super().matches_file_type(
+                iname, ifile, request
+            )
+
+
+    class CSV(ExtensionFileMixin, File):
+        """
+        only accepts *.csv files and store some usefull informations to read it.
+        """
+        _icon = "spreadsheet"
+        filename_extensions = [".csv"]
+        delimiter = models.CharField(_("Delimiteur"), max_length=1, null=True, blank=False)
+        quotechars = models.CharField(
+            _("Séparateur de chaîne de caractères"), max_length=1, null=True, blank=False
+        )
+        encoding = models.CharField(_("Encodage"), max_length=20, null=True, blank=False)
+
+        class Meta:
+            verbose_name = _("Tableur CSV")
+            verbose_name_plural = _("Tableurs CSV")
+
+        def save(self, *args, **kwargs):
+            if (
+                not self.encoding
+                or not self.delimiter
+                or self.quotechar is None
+                or self.has_header is None
+            ):
+                sniffer = csv.Sniffer()
+                detector = UniversalDetector()
+                self.file.seek(0)
+                lines = []
+                i = 0
+                length = 0
+                for line in self.file:
+                    if not line:
+                        continue
+                    if length < 1024 or i < 5:
+                        i += 1
+                        length += len(line)
+                        lines.append(line)
+                    if not self.encoding:
+                        detector.feed(line)
+                        if detector.done:
+                            self.encoding = detector.result['encoding']
+                    if self.encoding and length > 1024 and i >= 5:
+                        break
+                if not self.encoding:
+                    raise ValueError('Can not detect the file encoding.')
+                detector.close()
+                lines = bytes("\n", encoding=self.encoding).join(lines)
+                lines = lines.decode(self.encoding)
+                dialect = sniffer.sniff(lines)
+                self.delimiter = dialect.delimiter
+                self.quotechar = dialect.quotechar
+                self.has_header = sniffer.has_header(lines)
+                self.file.seek(0)
+            return super().save(*args, **kwargs)
+        save.alters_data = True
+
+Then, do not forget to add this model to `FILER_FILE_MODELS` in `settings.py`
+
+
+.. code-block:: python
+    # myproject/settings.py
+
+    FILER_FILE_MODELS = (
+        "myapp.CSV",
+        "filer.Image",
+        "filer.File",
+    )
+
+
+Defining the model fields, widgets and form field
+.................................................
+
+.. code-block:: python
+
+    # myapp/fields.py
+
+    from filer.fields.file import AdminFileFormField, AdminFileWidget
+    from myapp.models import CSV
+
+
+    class AdminExtensionFileWidget(AdminFileWidget):
+        dz_template_name = 'admin/myapp/widgets/admin_file.html'
+
+        def get_context(self, name, value, attrs):
+            context = super().get_context(name, value, attrs)
+            if isinstance(self.rel.model, ExtensionFileMixin):
+                context['allowed_extensions'] = self.rel.model.filename_extensions
+            return context
+
+    class AdminExtensionFileFormField(AdminFileFormField):
+        widget = AdminExtensionFileWidget
+
+
+    class FilerCSVField(FilerFileField):
+        default_form_class = AdminExtensionFileFormField
+        default_model_class = CSV
+
+
+Add extra options to the admin Dropzone
+.......................................
+
+This will avoid to store wrong files when drag'n drop a file which has an invalid extension.
+Uploaded file won't be uploaded : Dropzone will reject it ASAP.
+
+.. code-block:: html
+    <!-- admin/myapp/widgets/admin_file.html -->
+
+    {% include 'admin/filer/widgets/admin_file.html' %}
+    {% if camelized_id and allowed_extensions %}
+        <script type="text/javascript">
+            Dropzone.options.{{ camelized_id }}Dz = {
+                acceptedFiles : '{{ allowed_extensions|join:',' }}',
+            };
+        </script>
+    {% endif %}

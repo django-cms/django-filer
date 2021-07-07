@@ -23,8 +23,11 @@ logger = logging.getLogger(__name__)
 
 class AdminFileWidget(ForeignKeyRawIdWidget):
     choices = None
+    # we don't use template_name because we need the default one to render the grandparent input
+    # see render function.
+    dz_template_name = 'admin/filer/widgets/admin_file.html'
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def get_context(self, name, value, attrs):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         related_url = None
@@ -51,20 +54,26 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         if 'class' not in attrs:
             # The JavaScript looks for this hook.
             attrs['class'] = 'vForeignKeyRawIdAdminField'
-        # rendering the super for ForeignKeyRawIdWidget on purpose here because
-        # we only need the input and none of the other stuff that
-        # ForeignKeyRawIdWidget adds
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)  # grandparent super
-        context = {
-            'hidden_input': hidden_input,
+        camelized_id = (
+            css_id[0]  # keep first letter unchanged
+            + css_id.replace('-', ' ').replace('_', ' ').title().replace(' ', '')[1:]
+        )
+        return {
             'lookup_url': '%s%s' % (related_url, lookup_url),
             'object': obj,
             'lookup_name': name,
             'id': css_id,
             'admin_icon_delete': ('admin/img/icon-deletelink.svg'),
+            'camelized_id': camelized_id,
         }
-        html = render_to_string('admin/filer/widgets/admin_file.html', context)
-        return mark_safe(html)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        context = self.get_context(name, value, attrs)
+        # rendering the super for ForeignKeyRawIdWidget on purpose here because
+        # we only need the input and none of the other stuff that
+        # ForeignKeyRawIdWidget adds
+        context["hidden_input"] = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)  # grandparent super
+        return self._render(self.dz_template_name, context, renderer)
 
     def label_for_value(self, value):
         obj = self.obj_for_value(value)
