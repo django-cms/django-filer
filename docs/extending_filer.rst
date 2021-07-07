@@ -309,8 +309,8 @@ Set ``FILER_IMAGE_MODEL`` to the path of your custom model:
     FILER_IMAGE_MODEL = 'myapp.CustomImage'
 
 
-Concrete exemple: CSV model which only accepts *.csv files
-----------------------------------------------------------
+Concrete exemple: CSV model which only accepts \*.csv files
+-----------------------------------------------------------
 
 In this example, we will stick together all already viewed parts above :
 we will create a specific CSV file model which will have custom fields and
@@ -407,6 +407,7 @@ Then, do not forget to add this model to `FILER_FILE_MODELS` in `settings.py`
 
 
 .. code-block:: python
+
     # myproject/settings.py
 
     FILER_FILE_MODELS = (
@@ -452,6 +453,7 @@ This will avoid to store wrong files when drag'n drop a file which has an invali
 Uploaded file won't be uploaded : Dropzone will reject it ASAP.
 
 .. code-block:: html
+
     <!-- admin/myapp/widgets/admin_file.html -->
 
     {% include 'admin/filer/widgets/admin_file.html' %}
