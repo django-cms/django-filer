@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+2.1rc4  (2021-07-20)
+====================
+
+* Remove unused legacy CSS from project.
+* Remove legacy code for compatibility of old Django versions.
+
+
 2.1rc3  (2021-02-02)
 ====================
 
