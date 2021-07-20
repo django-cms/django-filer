@@ -15,7 +15,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import re_path, reverse
 from django.utils.encoding import force_str
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 from django.utils.http import urlquote, urlunquote
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
@@ -196,8 +196,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         )
 
     def icon_img(self, xs):
-        return mark_safe(('<img src="%simg/icons/plainfolder_32x32.png" '
-                          'alt="Folder Icon" />') % django_settings.MEDIA_ROOT)
+        return format_html('<img src="filer/icons/folder.svg" alt="Folder Icon" />', django_settings.STATIC_ROOT)
     icon_img.allow_tags = True
 
     def get_urls(self):
@@ -801,10 +800,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return mark_safe('%s: <a href="%s">%s</a>' %
-                             (escape(capfirst(opts.verbose_name)),
-                              admin_url,
-                              escape(obj)))
+            return format_html('{}: <a href="{}">{}</a>', escape(capfirst(opts.verbose_name)), admin_url, escape(obj))
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.

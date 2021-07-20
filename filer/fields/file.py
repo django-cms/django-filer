@@ -73,6 +73,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     def obj_for_value(self, value):
         if value:
             try:
+                # the next line may never bee reached
                 key = self.rel.get_related_field().name
                 obj = self.rel.model._default_manager.get(**{key: value})
             except ObjectDoesNotExist:
@@ -120,27 +121,18 @@ class FilerFileField(models.ForeignKey):
     default_model_class = File
 
     def __init__(self, **kwargs):
-        # We hard-code the `to` argument for ForeignKey.__init__
+        to = kwargs.pop('to', None)
         dfl = get_model_label(self.default_model_class)
-        if "to" in kwargs.keys():  # pragma: no cover
-            old_to = get_model_label(kwargs.pop("to"))
-            if old_to.lower() != dfl.lower():
-                msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                    self.__class__.__name__, dfl, old_to
-                )
-                warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = dfl
+        if to and get_model_label(to).lower() != dfl.lower():
+            msg = "In {}: ForeignKey must point to {}; instead passed {}"
+            warnings.warn(msg.format(self.__class__.__name__, dfl, to), SyntaxWarning)
+        kwargs['to'] = dfl  # hard-code `to` to model `filer.File`
         super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
-        # This is a fairly standard way to set up some defaults
-        # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
+            'rel': self.remote_field,
         }
-        try:
-            defaults['rel'] = self.remote_field
-        except AttributeError:
-            defaults['rel'] = self.rel
         defaults.update(kwargs)
         return super().formfield(**defaults)

@@ -12,7 +12,7 @@ class PermissionAdmin(admin.ModelAdmin):
             ('can_edit', 'can_read', 'can_add_children')
         )}),
     )
-    raw_id_fields = ('user', 'group',)
+    raw_id_fields = ['user', 'group']
     list_filter = ['group']
     list_display = ['__str__', 'folder', 'user']
     search_fields = ["user__username", "group__name", "folder__name"]
@@ -24,11 +24,7 @@ class PermissionAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         db = kwargs.get('using')
         if db_field.name == 'folder':
-            try:
-                remote = db_field.remote_field
-            except AttributeError:
-                remote = db_field.rel
-            kwargs['widget'] = folder.AdminFolderWidget(remote, self.admin_site, using=db)
+            kwargs['widget'] = folder.AdminFolderWidget(db_field.remote_field, self.admin_site, using=db)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_model_perms(self, request):
