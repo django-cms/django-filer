@@ -2,6 +2,17 @@
 CHANGELOG
 =========
 
+2.1rc4  (2021-07-20)
+====================
+
+* Remove unused legacy CSS from project.
+* Remove legacy code for compatibility of old Django versions.
+* Improve PermissionAdmin performance:
+
+  * PermissionAdmin: filter by groups instead of users
+  * PermissionAdmin: allow to search via user, group or folder names
+  * PermissionAdmin: use prefetch_related to decrease number of DB queries
+
 2.1rc3  (2021-02-02)
 ====================
 

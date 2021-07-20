@@ -14,6 +14,6 @@ Release logic:
 10. twine upload dist/django-filer-{new version}.tar.gz
 """
 
-__version__ = '2.1rc3'
+__version__ = '2.1rc4'
 
 default_app_config = 'filer.apps.FilerConfig'
