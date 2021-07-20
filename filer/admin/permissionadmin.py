@@ -13,8 +13,13 @@ class PermissionAdmin(admin.ModelAdmin):
         )}),
     )
     raw_id_fields = ['user', 'group']
-    list_filter = ['user']
+    list_filter = ['group']
     list_display = ['__str__', 'folder', 'user']
+    search_fields = ['user__username', 'group__name', 'folder__name']
+
+    def get_queryset(self, request):
+        qs = super(PermissionAdmin, self).get_queryset(request)
+        return qs.prefetch_related("group", "folder")
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         db = kwargs.get('using')
