@@ -1,5 +1,11 @@
-
 #-*- coding: utf-8 -*-
+import polymorphic
+import hashlib
+import os
+import filer
+import logging
+import operator
+
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
 from django.core.files.base import ContentFile
@@ -567,7 +573,7 @@ class File(PolymorphicModel,
         full_path = '{}{}{}'.format(directory_path, os.sep, self.actual_name)
         return full_path
 
-    def __unicode__(self):
+    def __str__(self):
         try:
             name = self.pretty_logical_path
         except:
