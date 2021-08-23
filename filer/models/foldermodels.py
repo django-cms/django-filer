@@ -484,7 +484,7 @@ class Folder(models.Model, mixins.IconsMixin):
     def get_admin_directory_listing_url_path(self):
         return reverse('admin:filer-directory_listing', args=(self.id,))
 
-    def __str__(self):
+    def __unicode__(self):
         try:
             name = self.pretty_logical_path
         except:

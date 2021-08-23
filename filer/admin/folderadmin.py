@@ -642,7 +642,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         all_protected = []
 
         using = router.db_for_write(self.model)
-        deletable_files, perms_needed_files, protected_files = \
+        deletable_files, model_count, perms_needed_files, protected_files = \
             get_deleted_objects(
                 files_queryset, files_queryset.model._meta,
                 request.user, self.admin_site, using)
@@ -799,7 +799,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
         # don't allow selected folders to be copied/moved inside
         #   themselves or inside any of their descendants
-        destination_in_selected = Folder.get_descendants(*selected_folders, include_self=True).filter(id=destination.pk).exists()
+        destination_in_selected = Folder._tree_manager.get_queryset_descendants(selected_folders, include_self=True).filter(id=destination.pk).exists()
         if destination_in_selected:
             raise PermissionDenied
         return destination

@@ -573,7 +573,7 @@ class File(PolymorphicModel,
         full_path = '{}{}{}'.format(directory_path, os.sep, self.actual_name)
         return full_path
 
-    def __str__(self):
+    def __unicode__(self):
         try:
             name = self.pretty_logical_path
         except:
