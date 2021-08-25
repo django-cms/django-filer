@@ -410,7 +410,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
             paginated_items = paginator.page(page)
         except (EmptyPage, InvalidPage):
             paginated_items = paginator.page(paginator.num_pages)
-        context = {
+        context = self.admin_site.each_context(request) 
+        context.update({
                 'folder': folder,
                 'user_clipboard': clipboard,
                 'clipboard_files': clipboard.files.distinct(),
@@ -437,8 +438,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
                     'total_count': paginator.count},
                 'media': self.media,
                 'file_type': file_type,
-            }
-        context.update(self.admin_site.each_context(request))
+            })
         response = render(request, 'admin/filer/folder/directory_listing.html', context)
         return response
 

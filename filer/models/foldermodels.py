@@ -627,4 +627,4 @@ def update_shared_sites_for_descendants(instance, **kwargs):
     sites = instance.shared.all()
     descendants = instance.get_descendants()
     for desc_folder in descendants:
-        desc_folder.shared = sites
+        desc_folder.shared.set(sites)
