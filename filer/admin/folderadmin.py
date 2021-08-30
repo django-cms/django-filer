@@ -12,7 +12,7 @@ from django.contrib import messages
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.urls import reverse
+from django.urls import reverse, re_path
 from django.db import router
 from django.db.models import Q
 from django.contrib.sites.models import Site
@@ -43,7 +43,7 @@ from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 
 
-ELEM_ID = re.compile(r'.*<a href=".*/(?P<file_id>[0-9]+)/".*a>$')
+ELEM_ID = re.compile(r'.*<a href=".*/(?P<file_id>[0-9]+)/.*".*a>$')
 
 
 class FolderAdmin(FolderPermissionModelAdmin):
@@ -170,23 +170,23 @@ class FolderAdmin(FolderPermissionModelAdmin):
         url_patterns = [
             # we override the default list view with our own directory listing
             # of the root directories
-            url(r'^$', self.admin_site.admin_view(self.directory_listing),
+            re_path(r'^$', self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing-root'),
-            url(r'^(?P<folder_id>\d+)/list/$',
+            re_path(r'^(?P<folder_id>\d+)/list/$',
                 self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing'),
-            url(r'^make_folder/$',
+            re_path(r'^make_folder/$',
                 self.admin_site.admin_view(self.make_folder),
                 name='filer-directory_listing-make_root_folder'),
-            url(r'^images_with_missing_data/$',
+            re_path(r'^images_with_missing_data/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'images_with_missing_data'},
                 name='filer-directory_listing-images_with_missing_data'),
-            url(r'^unfiled_images/$',
+            re_path(r'^unfiled_images/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
                 name='filer-directory_listing-unfiled_images'),
-            url(r'^destination_folders/$',
+            re_path(r'^destination_folders/$',
                 self.admin_site.admin_view(self.destination_folders),
                 name='filer-destination_folders'),
         ]
@@ -642,16 +642,16 @@ class FolderAdmin(FolderPermissionModelAdmin):
         all_protected = []
 
         using = router.db_for_write(self.model)
-        deletable_files, model_count, perms_needed_files, protected_files = \
+        deletable_files, perms_needed_files, protected_files = \
             get_deleted_objects(
                 files_queryset, files_queryset.model._meta,
                 request.user, self.admin_site, using)
-        files_count = model_count.get(File._meta.verbose_name_plural, 0)
-        deletable_folders, model_count, perms_needed_folders, protected_folders = \
+        files_count = self._get_unique_items(deletable_files, unique_items=[])
+        deletable_folders, perms_needed_folders, protected_folders = \
             get_deleted_objects(
                 folders_queryset, folders_queryset.model._meta,
                 request.user, self.admin_site, using)
-        folders_count = model_count.get(Folder._meta.verbose_name_plural, 0)
+        folders_count = self._get_unique_items(deletable_folders, unique_items=[])
         all_protected.extend(protected_files)
         all_protected.extend(protected_folders)
 

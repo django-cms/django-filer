@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib import admin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.urls import reverse
+from django.urls import reverse, re_path
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -44,13 +44,13 @@ class TrashAdmin(admin.ModelAdmin):
         from django.conf.urls import url
         urls = super(TrashAdmin, self).get_urls()
         url_patterns = [
-            url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
+            re_path(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
                 self.admin_site.admin_view(self.restorable_item_view),
                 name='filer_trash_item'),
-            url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/restore/$',
+            re_path(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/restore/$',
                 self.admin_site.admin_view(self.restore_items),
                 name='filer_restore_items'),
-            url(r'^file/check/(?P<file_id>\d+)/$',
+            re_path(r'^file/check/(?P<file_id>\d+)/$',
                 self.admin_site.admin_view(self.file_check),
                 name='filer_trash_file_check'),
         ]

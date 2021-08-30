@@ -4,6 +4,7 @@ from django.utils.translation import ugettext  as _
 from django.shortcuts import render
 from django.template import RequestContext
 from django.http import Http404
+from django.urls import re_path
 from filer import settings as filer_settings, settings
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
@@ -39,7 +40,7 @@ class ImageAdmin(FileAdmin):
         from django.conf.urls import url
         urls = super(ImageAdmin, self).get_urls()
         url_patterns = [
-            url(r'^(?P<file_id>\d+)/full_size_preview/$',
+            re_path(r'^(?P<file_id>\d+)/full_size_preview/$',
                 self.admin_site.admin_view(self.full_size_preview),
                 name='filer-image-preview'),
         ]
