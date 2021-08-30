@@ -799,7 +799,9 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
         # don't allow selected folders to be copied/moved inside
         #   themselves or inside any of their descendants
-        destination_in_selected = Folder._tree_manager.get_queryset_descendants(selected_folders, include_self=True).filter(id=destination.pk).exists()
+        destination_in_selected = Folder.get_descendants(
+            *selected_folders, include_self=True
+        ).filter(id=destination.pk).exists()
         if destination_in_selected:
             raise PermissionDenied
         return destination
