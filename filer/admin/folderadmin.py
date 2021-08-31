@@ -799,11 +799,10 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
         # don't allow selected folders to be copied/moved inside
         #   themselves or inside any of their descendants
-        destination_in_selected = Folder.get_descendants(
-            *selected_folders, include_self=True
-        ).filter(id=destination.pk).exists()
-        if destination_in_selected:
-            raise PermissionDenied
+        for folder in selected_folders: 
+            destination_in_selected = folder.get_descendants(include_self=True).filter(id=destination.pk).exists() 
+            if destination_in_selected: 
+                raise PermissionDenied
         return destination
 
     def destination_folders(self, request):
