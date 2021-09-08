@@ -1,9 +1,10 @@
 #-*- coding: utf-8 -*-
 from django import forms
 from django.utils.translation import ugettext  as _
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.http import Http404
+from django.urls import re_path
 from filer import settings as filer_settings, settings
 from filer.admin.fileadmin import FileAdmin
 from filer.models import Image
@@ -36,13 +37,13 @@ class ImageAdmin(FileAdmin):
     form = ImageAdminForm
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(ImageAdmin, self).get_urls()
-        url_patterns = patterns('',
-            url(r'^(?P<file_id>\d+)/full_size_preview/$',
+        url_patterns = [
+            re_path(r'^(?P<file_id>\d+)/full_size_preview/$',
                 self.admin_site.admin_view(self.full_size_preview),
                 name='filer-image-preview'),
-        )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 
@@ -52,14 +53,12 @@ class ImageAdmin(FileAdmin):
         except Image.DoesNotExist:
             raise Http404
 
-        return render_to_response(
-            'admin/filer/image/full_size_preview.html', {
+        return render(request, 'admin/filer/image/full_size_preview.html', {
                 'image': image,
                 'current_site': request.GET.get('current_site', None),
                 'is_popup': popup_status(request),
                 'select_folder': selectfolder_status(request),
-                },
-            context_instance=RequestContext(request))
+                })
 
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
     extra_main_fields=('default_alt_text', 'default_caption', 'default_credit'),

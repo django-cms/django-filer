@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='clipboard',
             name='user',
-            field=models.OneToOneField(related_name='filer_clipboard', verbose_name='user', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='filer_clipboard', verbose_name='user', to=settings.AUTH_USER_MODEL,
+                                       on_delete=models.CASCADE),
         ),
     ]

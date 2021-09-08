@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib import admin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse
+from django.urls import reverse, re_path
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, Http404
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
@@ -24,6 +24,7 @@ class Trash(object):
     entry in the admin index.
     """
     class _meta:
+        app_config = 'filer.apps.FilerConfig'
         app_label = 'filer'  # This is the app that the form will exist under
         model_name = 'trash'  # This is what will be used in the link url
         object_name = 'Trash'
@@ -40,19 +41,19 @@ class TrashAdmin(admin.ModelAdmin):
         model = Trash
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(TrashAdmin, self).get_urls()
-        url_patterns = patterns('',
-            url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
+        url_patterns = [
+            re_path(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/$',
                 self.admin_site.admin_view(self.restorable_item_view),
                 name='filer_trash_item'),
-            url(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/restore/$',
+            re_path(r'^(?P<filer_model>\w+)/(?P<filer_obj_id>\d+)/restore/$',
                 self.admin_site.admin_view(self.restore_items),
                 name='filer_restore_items'),
-            url(r'^file/check/(?P<file_id>\d+)/$',
+            re_path(r'^file/check/(?P<file_id>\d+)/$',
                 self.admin_site.admin_view(self.file_check),
                 name='filer_trash_file_check'),
-            )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 
@@ -145,8 +146,7 @@ class TrashAdmin(admin.ModelAdmin):
             'title': 'Restore %s %s' % (
                 filer_model.capitalize(), str(filer_object)),
         }
-        return render_to_response('admin/filer/trash/item_restore.html',
-           context, context_instance=RequestContext(request))
+        return render(request, 'admin/filer/trash/item_restore.html', context)
 
     def restore_items(self, request, filer_model, filer_obj_id):
         filer_model_cls, filer_object = self._check_restore_view_valid(
@@ -232,5 +232,4 @@ class TrashAdmin(admin.ModelAdmin):
             'title': 'Deleted Files and Folders',
         }
         context.update(extra_context or {})
-        return render_to_response('admin/filer/trash/directory_listing.html',
-           context, context_instance=RequestContext(request))
+        return render(request, 'admin/filer/trash/directory_listing.html', context)

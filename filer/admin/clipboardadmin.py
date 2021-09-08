@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import re_path
 from filer import settings as filer_settings
 from filer.models import Clipboard, ClipboardItem, Folder, tools
 from filer.utils.files import (
@@ -41,24 +42,24 @@ class ClipboardAdmin(admin.ModelAdmin):
     }
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(ClipboardAdmin, self).get_urls()
-        url_patterns = patterns('',
-            url(r'^operations/paste_clipboard_to_folder/$',
+        url_patterns = [
+            re_path(r'^operations/paste_clipboard_to_folder/$',
                 self.admin_site.admin_view(self.paste_clipboard_to_folder),
                 name='filer-paste_clipboard_to_folder'),
-            url(r'^operations/discard_clipboard/$',
+            re_path(r'^operations/discard_clipboard/$',
                 self.admin_site.admin_view(self.discard_clipboard),
                 name='filer-discard_clipboard'),
-            url(r'^operations/delete_clipboard/$',
+            re_path(r'^operations/delete_clipboard/$',
                 self.admin_site.admin_view(self.delete_clipboard),
                 name='filer-delete_clipboard'),
             # upload does it's own permission stuff (because of the stupid
             # flash missing cookie stuff)
-            url(r'^operations/upload/$',
+            re_path(r'^operations/upload/$',
                 self.ajax_upload,
                 name='filer-ajax_upload'),
-        )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 

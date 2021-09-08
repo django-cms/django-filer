@@ -7,7 +7,7 @@ import logging
 import operator
 
 from django.contrib.auth import models as auth_models
-from django.core import urlresolvers
+from django.urls import reverse
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.db import (models, IntegrityError, transaction)
@@ -20,6 +20,13 @@ from filer import settings as filer_settings
 from django.db.models import Count
 from django.utils import timezone
 
+from polymorphic.models import PolymorphicModel
+from polymorphic.managers import PolymorphicManager
+from polymorphic.query import PolymorphicQuerySet
+import hashlib
+import os
+import filer
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +44,7 @@ def silence_error_if_missing_file(exception):
         raise exception
 
 
-class FileQuerySet(polymorphic.PolymorphicQuerySet):
+class FileQuerySet(PolymorphicQuerySet):
 
     def readonly(self, user):
         Folder = filer.models.foldermodels.Folder
@@ -63,7 +70,7 @@ class FileQuerySet(polymorphic.PolymorphicQuerySet):
             folder__site__in=sites)
 
 
-class FileManager(polymorphic.PolymorphicManager):
+class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
     def find_all_duplicates(self):
@@ -91,13 +98,13 @@ class TrashFileManager(FileManager):
 
 
 @mixins.trashable
-class File(polymorphic.PolymorphicModel,
+class File(PolymorphicModel,
            mixins.IconsMixin):
 
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey('filer.Folder', verbose_name=_('folder'), related_name='all_files',
-        null=True, blank=True)
+        null=True, blank=True, on_delete=models.deletion.CASCADE)
     file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=255)
     _file_size = models.IntegerField(_('file size'), null=True, blank=True)
 
@@ -147,9 +154,6 @@ class File(polymorphic.PolymorphicModel,
     objects = AliveFileManager()
     trash = TrashFileManager()
     all_objects = FileManager()
-
-    # fix for https://github.com/chrisglass/django_polymorphic/issues/34
-    _base_manager = models.Manager()
 
     @classmethod
     def matches_file_type(cls, iname, ifile, request):
@@ -509,8 +513,11 @@ class File(polymorphic.PolymorphicModel,
         text = "%s" % (text,)
         return text
 
+    def _cmp(self, a, b):
+        return (a > b) - (a < b) 
+
     def __lt__(self, other):
-        return operator.lt(self.label.lower(), other.label.lower())
+        return self._cmp(self.label.lower(), other.label.lower()) < 0
 
     @property
     def actual_name(self):
@@ -566,7 +573,7 @@ class File(polymorphic.PolymorphicModel,
         full_path = '{}{}{}'.format(directory_path, os.sep, self.actual_name)
         return full_path
 
-    def __str__(self):
+    def __unicode__(self):
         try:
             name = self.pretty_logical_path
         except:
@@ -574,11 +581,16 @@ class File(polymorphic.PolymorphicModel,
         return name
 
     def get_admin_url_path(self):
-        return urlresolvers.reverse(
+        return reverse(
             'admin:%s_%s_change' % (self._meta.app_label,
                                     self._meta.model_name,),
             args=(self.pk,)
         )
+
+    def get_admin_delete_url(self):
+        return reverse(
+            'admin:{0}_{1}_delete'.format(self._meta.app_label, self._meta.model_name,),
+            args=(self.pk,))
 
     @property
     def url(self):
@@ -717,6 +729,8 @@ class File(polymorphic.PolymorphicModel,
             return can_delete_file and has_role_on_site(user, self.folder.site)
         return False
 
+    def __str__(self):
+        return self.__unicode__()
     class Meta:
         app_label = 'filer'
         verbose_name = _('file')

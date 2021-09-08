@@ -12,14 +12,14 @@ from django.contrib import messages
 from filer.admin.patched.admin_utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse
+from django.urls import reverse, re_path
 from django.db import router
 from django.db.models import Q
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_permission_codename
 from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
@@ -43,7 +43,7 @@ from filer.settings import FILER_STATICMEDIA_PREFIX, FILER_PAGINATE_BY
 from filer.utils.multi_model_qs import MultiMoldelQuerysetChain
 
 
-ELEM_ID = re.compile(r'.*<a href=".*/(?P<file_id>[0-9]+)/".*a>$')
+ELEM_ID = re.compile(r'.*<a href=".*/(?P<file_id>[0-9]+)/.*".*a>$')
 
 
 class FolderAdmin(FolderPermissionModelAdmin):
@@ -90,7 +90,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         """
         formfield = super(FolderAdmin, self).formfield_for_foreignkey(
             db_field, request, **kwargs)
-        if request and db_field.rel.to is Site:
+        if request and db_field.remote_field.model is Site:
             formfield.queryset = self._get_sites_available_for_user(
                 request.user)
         return formfield
@@ -101,7 +101,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         """
         formfield = super(FolderAdmin, self).formfield_for_manytomany(
             db_field, request, **kwargs)
-        if request and db_field.rel.to is Site:
+        if request and db_field.remote_field.model is Site:
             formfield.queryset = self._get_sites_available_for_user(
                 request.user)
         return formfield
@@ -165,31 +165,31 @@ class FolderAdmin(FolderPermissionModelAdmin):
     icon_img.allow_tags = True
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(FolderAdmin, self).get_urls()
-        url_patterns = patterns('',
+        url_patterns = [
             # we override the default list view with our own directory listing
             # of the root directories
-            url(r'^$', self.admin_site.admin_view(self.directory_listing),
+            re_path(r'^$', self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing-root'),
-            url(r'^(?P<folder_id>\d+)/list/$',
+            re_path(r'^(?P<folder_id>\d+)/list/$',
                 self.admin_site.admin_view(self.directory_listing),
                 name='filer-directory_listing'),
-            url(r'^make_folder/$',
+            re_path(r'^make_folder/$',
                 self.admin_site.admin_view(self.make_folder),
                 name='filer-directory_listing-make_root_folder'),
-            url(r'^images_with_missing_data/$',
+            re_path(r'^images_with_missing_data/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'images_with_missing_data'},
                 name='filer-directory_listing-images_with_missing_data'),
-            url(r'^unfiled_images/$',
+            re_path(r'^unfiled_images/$',
                 self.admin_site.admin_view(self.directory_listing),
                 {'viewtype': 'unfiled_images'},
                 name='filer-directory_listing-unfiled_images'),
-            url(r'^destination_folders/$',
+            re_path(r'^destination_folders/$',
                 self.admin_site.admin_view(self.destination_folders),
                 name='filer-destination_folders'),
-        )
+        ]
         url_patterns.extend(urls)
         return url_patterns
 
@@ -207,7 +207,6 @@ class FolderAdmin(FolderPermissionModelAdmin):
         #   successed HttpResponse
         if (request.method == 'POST' and popup_status(request) and
             response.status_code == 200 and
-            not isinstance(response, TemplateResponse) and
             not isinstance(response, HttpResponseRedirect)):
             return HttpResponse('<script type="text/javascript">' +
                                 'opener.dismissPopupAndReload(window);' +
@@ -411,10 +410,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
             paginated_items = paginator.page(page)
         except (EmptyPage, InvalidPage):
             paginated_items = paginator.page(paginator.num_pages)
-        context = RequestContext(request)
-        context.update(self.admin_site.each_context(request))
-        response = render_to_response(
-            'admin/filer/folder/directory_listing.html', {
+        context = self.admin_site.each_context(request) 
+        context.update({
                 'folder': folder,
                 'user_clipboard': clipboard,
                 'clipboard_files': clipboard.files.distinct(),
@@ -441,7 +438,8 @@ class FolderAdmin(FolderPermissionModelAdmin):
                     'total_count': paginator.count},
                 'media': self.media,
                 'file_type': file_type,
-            }, context_instance=context)
+            })
+        response = render(request, 'admin/filer/folder/directory_listing.html', context)
         return response
 
     def response_action(self, request, files_queryset, folders_queryset):
@@ -706,9 +704,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
         context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/delete_selected_files_confirmation.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/delete_selected_files_confirmation.html", context)
 
     delete_files_or_folders.short_description = ugettext_lazy(
         "Delete selected files and/or folders")
@@ -803,19 +799,17 @@ class FolderAdmin(FolderPermissionModelAdmin):
             raise PermissionDenied
         # don't allow selected folders to be copied/moved inside
         #   themselves or inside any of their descendants
-        mgr = Folder._tree_manager
-        destination_in_selected = mgr.get_queryset_descendants(
-            selected_folders, include_self=True
-        ).filter(id=destination.pk).exists()
-        if destination_in_selected:
-            raise PermissionDenied
+        for folder in selected_folders: 
+            destination_in_selected = folder.get_descendants(include_self=True).filter(id=destination.pk).exists() 
+            if destination_in_selected: 
+                raise PermissionDenied
         return destination
 
     def destination_folders(self, request):
         all_required = all((
             request.method == 'GET',
             request.is_ajax(),
-            request.user.is_authenticated(),
+            request.user.is_authenticated,
             'parent' in request.GET
         ))
         if not all_required:
@@ -939,9 +933,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
         context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/folder/choose_move_destination.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_move_destination.html", context)
 
     move_files_and_folders.short_description = ugettext_lazy(
         "Move selected files and/or folders")
@@ -1152,9 +1144,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
         context.update(self.admin_site.each_context(request))
         # Display the destination folder selection page
-        return render_to_response([
-            "admin/filer/folder/choose_copy_destination.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_copy_destination.html", context)
 
     copy_files_and_folders.short_description = ugettext_lazy(
         "Copy selected files and/or folders")
@@ -1302,9 +1292,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
 
         # Display the rename format selection page
-        return render_to_response([
-            "admin/filer/folder/choose_rename_format.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render(request, "admin/filer/folder/choose_rename_format.html", context=context)
 
     rename_files.short_description = ugettext_lazy("Rename files")
 
@@ -1439,9 +1427,7 @@ class FolderAdmin(FolderPermissionModelAdmin):
         }
 
         # Display the resize options page
-        return render_to_response([
-            "admin/filer/folder/choose_images_resize_options.html"
-        ], context, context_instance=template.RequestContext(request))
+        return render("admin/filer/folder/choose_images_resize_options.html", context=context)
 
     resize_images.short_description = ugettext_lazy("Resize selected images")
 

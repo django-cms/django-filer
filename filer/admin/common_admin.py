@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.admin.utils import unquote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth import get_permission_codename
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 from django.http import HttpResponseRedirect
 
 from filer.models import Folder, File
@@ -100,8 +100,8 @@ class CommonModelAdmin(admin.ModelAdmin):
             # The model was auto-created as intermediary for a
             # ManyToMany-relationship, find the target model
             for field in opts.fields:
-                if field.rel and field.rel.to != self.parent_model:
-                    opts = field.rel.to._meta
+                if field.remote_field and field.remote_field.model != self.parent_model:
+                    opts = field.remote_field.model._meta
                     break
         codename = get_permission_codename('change', opts)
         perm_name, user = "{}.{}".format(opts.app_label, codename), request.user

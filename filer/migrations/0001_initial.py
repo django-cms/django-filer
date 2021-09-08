@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             name='ClipboardItem',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard')),
+                ('clipboard', models.ForeignKey(verbose_name='clipboard', to='filer.Clipboard', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'clipboard item',
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('file', filer.fields.multistorage_file.MultiStorageFileField(upload_to=filer.fields.multistorage_file.generate_filename_multistorage, max_length=255, blank=True, null=True, verbose_name='file', db_index=True)),
                 ('_file_size', models.IntegerField(null=True, verbose_name='file size', blank=True)),
-                ('sha1', models.CharField(default=b'', max_length=40, verbose_name='sha1', blank=True)),
+                ('sha1', models.CharField(default='', max_length=40, verbose_name='sha1', blank=True)),
                 ('has_all_mandatory_data', models.BooleanField(default=False, verbose_name='has all mandatory data', editable=False)),
                 ('original_filename', models.CharField(max_length=255, null=True, verbose_name='original filename', blank=True)),
                 ('name', models.CharField(help_text='Change the FILE name for an image in the cloud storage system; be sure to include the extension (.jpg or .png, for example) to ensure asset remains valid.', max_length=255, null=True, verbose_name='file name', blank=True)),
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Archive',
             fields=[
-                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'verbose_name': 'archive',
@@ -83,15 +83,15 @@ class Migration(migrations.Migration):
                 ('uploaded_at', models.DateTimeField(auto_now_add=True, verbose_name='uploaded at')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
                 ('modified_at', models.DateTimeField(auto_now=True, verbose_name='modified at')),
-                ('folder_type', models.IntegerField(default=0, choices=[(0, b'Site Folder'), (1, b'Core Folder')])),
+                ('folder_type', models.IntegerField(default=0, choices=[(0, 'Site Folder'), (1, 'Core Folder')])),
                 ('restricted', models.BooleanField(default=False, help_text='If this box is checked, Editors and Writers will still be able to view this folder assets, add them to a plugin or smart snippet but will not be able to delete or modify the current version of the assets.', verbose_name='Restrict Editors and Writers from being able to edit or delete anything from this folder')),
                 ('deleted_at', models.DateTimeField(verbose_name='deleted at', null=True, editable=False, blank=True)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('owner', models.ForeignKey(related_name='filer_owned_folders', on_delete=django.db.models.deletion.SET_NULL, verbose_name=b'owner', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
-                ('parent', models.ForeignKey(related_name='children', verbose_name=b'parent', blank=True, to='filer.Folder', null=True)),
+                ('owner', models.ForeignKey(related_name='filer_owned_folders', on_delete=django.db.models.deletion.SET_NULL, verbose_name='owner', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('parent', models.ForeignKey(related_name='children', verbose_name='parent', blank=True, to='filer.Folder', null=True, on_delete=django.db.models.deletion.CASCADE)),
                 ('shared', models.ManyToManyField(related_name='shared', to='sites.Site', blank=True, help_text='All the sites which you share this folder with will be able to use this folder on their pages, with all of its assets. However, they will not be able to change, delete or move it, not even add new assets.', null=True, verbose_name='Share folder with sites')),
                 ('site', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to='sites.Site', help_text='Select the site which will use this folder.', null=True)),
             ],
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Image',
             fields=[
-                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
+                ('file_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File', on_delete=django.db.models.deletion.CASCADE)),
                 ('_height', models.IntegerField(null=True, blank=True)),
                 ('_width', models.IntegerField(null=True, blank=True)),
                 ('date_taken', models.DateTimeField(verbose_name='date taken', null=True, editable=False, blank=True)),
@@ -127,25 +127,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='folder',
-            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', null=True),
+            field=models.ForeignKey(related_name='all_files', verbose_name='folder', blank=True, to='filer.Folder', on_delete=django.db.models.deletion.CASCADE, null=True),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='file',
             name='owner',
-            field=models.ForeignKey(related_name='owned_files', on_delete=django.db.models.deletion.SET_NULL, verbose_name='uploaded by', blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.ForeignKey(related_name='owned_files', on_delete=django.db.models.deletion.CASCADE, verbose_name='uploaded by', blank=True, to=settings.AUTH_USER_MODEL, null=True),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='file',
             name='polymorphic_ctype',
-            field=models.ForeignKey(related_name='polymorphic_filer.file_set+', editable=False, to='contenttypes.ContentType', null=True),
+            field=models.ForeignKey(related_name='polymorphic_filer.file_set+', on_delete=django.db.models.deletion.CASCADE, editable=False, to='contenttypes.ContentType', null=True),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='clipboarditem',
             name='file',
-            field=models.ForeignKey(verbose_name='file', to='filer.File'),
+            field=models.ForeignKey(verbose_name='file', to='filer.File', on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -157,7 +157,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='clipboard',
             name='user',
-            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='filer_clipboards', verbose_name='user', to=settings.AUTH_USER_MODEL, on_delete=django.db.models.deletion.CASCADE),
             preserve_default=True,
         ),
     ]
