@@ -11,11 +11,6 @@ from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from django.urls import reverse
 
-from tests.helpers import (
-    SettingsOverride, create_folder_structure, create_image, create_superuser,
-)
-from tests.utils.extended_app.models import ExtImage, Video
-
 from filer import settings as filer_settings
 from filer.admin.folderadmin import FolderAdmin
 from filer.models.filemodels import File
@@ -24,6 +19,10 @@ from filer.models.virtualitems import FolderRoot
 from filer.settings import FILER_IMAGE_MODEL
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
+from tests.helpers import (
+    SettingsOverride, create_folder_structure, create_image, create_superuser,
+)
+from tests.utils.extended_app.models import ExtImage, Video
 
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -192,10 +191,10 @@ class FilerFolderAdminUrlsTests(TestCase):
                 self.assertContains(response, action)
 
     def test_filer_list_type_query_string(self):
-        response = self.client.get(reverse('admin:filer-directory_listing-root')+"?_list_type=th")
+        response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=th")
         self.assertContains(response, 'navigator-thumbnail-list')
 
-        response = self.client.get(reverse('admin:filer-directory_listing-root')+"?_list_type=tb")
+        response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=tb")
         self.assertContains(response, 'navigator-table')
 
     def test_filer_list_type_setting(self):
@@ -214,7 +213,7 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_list_type_setting_when_use_wrong_query_string_choice(self):
         # If list type in query string not exists show default list type
         with SettingsOverride(filer_settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='th'):
-            response = self.client.get(reverse('admin:filer-directory_listing-root')+"?_list_type=qwerty")
+            response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=qwerty")
             self.assertContains(response, 'navigator-thumbnail-list')
 
 

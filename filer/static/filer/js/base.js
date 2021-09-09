@@ -85,7 +85,9 @@ Cl.mediator = new Mediator();
         (function () {
             var navigatorTable = $('.navigator-table, .navigator-list').find('tr, .list-item');
             var actionList = $('.actions-wrapper');
-            var actionSelect = $('.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a');
+            var actionSelect = $(
+                '.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a'
+            );
 
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
@@ -207,16 +209,17 @@ Cl.mediator = new Mediator();
 
         }());
         // thumbnail folder admin view
-        (function() {
-            $(document).ready(function() {
+        (function () {
+            $(document).ready(function () {
                 var $folderActionsEls = $('.navigator-list .navigator-folders-body .list-item input.action-select');
+                var $fileActionsEls = $('.navigator-list .navigator-files-body .list-item input.action-select');
 
                 if ($folderActionsEls.length > 0) {
                     $folderActionsEls.actions({
                         allToggle: '#folders-action-toggle'
                     });
                 }
-                var $fileActionsEls = $('.navigator-list .navigator-files-body .list-item input.action-select');
+
                 if ($fileActionsEls.length > 0) {
                     $fileActionsEls.actions({
                         allToggle: '#files-action-toggle'
