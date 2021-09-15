@@ -73,6 +73,14 @@ class FileQuerySet(PolymorphicQuerySet):
 class FileManager(PolymorphicManager):
     queryset_class = FileQuerySet
 
+    # Proxy all unknown method calls to the queryset, so that its members are
+    # directly accessible as PolymorphicModel.objects.*
+    # Exclude any special functions (__) from this automatic proxying.
+    def __getattr__(self, name):
+        if name.startswith('__'):
+            return super(PolymorphicManager, self).__getattr__(self, name)
+        return getattr(self.all(), name)
+
     def find_all_duplicates(self):
         return {file_data['sha1']: file_data['count']
                 for file_data in self.get_queryset().values('sha1').annotate(
