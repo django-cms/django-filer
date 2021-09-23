@@ -2,6 +2,7 @@
 import logging
 import botocore.exceptions
 import urllib.parse
+import mimetypes
 
 from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import smart_str
@@ -83,3 +84,7 @@ class PatchedS3BotoStorage(S3BotoStorage):
         if self.has_public_read(source_obj):
             extra_args['ACL'] = 'public-read'
         self.bucket.copy(copy_source, dst_path, extra_args)
+
+    def get_object_parameters(self, name):
+        mime_type = mimetypes.guess_type(name)[0] or "text/plain"
+        return {'ContentType': mime_type}
