@@ -1,8 +1,11 @@
 #-*- coding: utf-8 -*-
 import os
+import mimetypes
+
 from django.utils.text import get_valid_filename as get_valid_filename_django
 from django.template.defaultfilters import slugify
 from django.core.files.uploadedfile import SimpleUploadedFile
+
 from filer.settings import FILER_FILE_MODELS
 from filer.utils.loader import load_object
 
@@ -29,7 +32,8 @@ def handle_upload(request):
             data = request.raw_post_data
         else:
             raise UploadException("Request is not valid: there is no request body.")
-        upload = SimpleUploadedFile(name=filename, content=data)
+        mime_type = mimetypes.guess_type(filename)[0] or "text/plain"
+        upload = SimpleUploadedFile(name=filename, content=data, content_type=mime_type)
     else:
         if len(request.FILES) == 1:
             # FILES is a dictionary in Django but Ajax Upload gives the uploaded file an
