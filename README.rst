@@ -7,6 +7,12 @@ Django Filer
 **django Filer** is a file management application for django that makes
 handling of files and images a breeze.
 
+.. note:: 
+        
+        This project is endorsed by the `django CMS Association <https://www.django-cms.org/en/about-us/>`_.
+        That means that it is officially accepted by the dCA as being in line with our roadmap vision and development/plugin policy. 
+        Join us on `Slack <https://www.django-cms.org/slack/>`_.
+
 .. We're using absolute image url below, because relative paths won't work on
    pypi. github would render relative paths correctly.
 
@@ -19,20 +25,26 @@ handling of files and images a breeze.
 +--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
 
 
-Contributing
-============
+*******************************************
+Contribute to this project and win rewards
+*******************************************
 
-This is a an open-source project. We'll be delighted to receive your
+Because this is a an open-source project, we welcome everyone to
+`get involved in the project <https://www.django-cms.org/en/contribute/>`_ and
+`receive a reward <https://www.django-cms.org/en/bounty-program/>`_ for their contribution. 
+Become part of a fantastic community and help us make django CMS the best CMS in the world.   
+
+We'll be delighted to receive your
 feedback in the form of issues and pull requests. Before submitting your
 pull request, please review our `contribution guidelines
 <http://docs.django-cms.org/en/latest/contributing/index.html>`_.
 
 We're grateful to all contributors who have helped create and maintain this package.
-Contributors are listed at the `contributors <https://github.com/divio/django-filer/graphs/contributors>`_
+Contributors are listed at the `contributors <https://github.com/divio/djangocms-text-ckeditor/graphs/contributors>`_
 section.
 
 One of the easiest contributions you can make is helping to translate this addon on
-`Transifex <https://www.transifex.com/projects/p/django-filer/>`_.
+`Transifex <https://www.transifex.com/projects/p/djangocms-text-ckeditor/>`_.
 
 
 Documentation
