@@ -695,7 +695,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
             'rename_format': new_name,
             helpers.ACTION_CHECKBOX_NAME: checkbox_name,
         })
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         for f in files:
             f = f._meta.model.objects.get(pk=f.pk)
@@ -884,7 +884,7 @@ class FolderListingTest(TestCase):
                         kwargs={'folder_id': self.parent.id}))
             item_list = response.context['paginated_items'].object_list
             # user sees all items: FOO, BAR, BAZ, SAMP
-            self.assertEquals(
+            self.assertEqual(
                 set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
@@ -898,7 +898,7 @@ class FolderListingTest(TestCase):
             # user sees only 1 folder : FOO
             # he doesn't see BAR, BAZ and SPAM because he doesn't own them
             # and no permission has been given
-            self.assertEquals(
+            self.assertEqual(
                 set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk]))
 
@@ -917,7 +917,7 @@ class FolderListingTest(TestCase):
                         kwargs={'folder_id': self.parent.id}))
             item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
-            self.assertEquals(
+            self.assertEqual(
                 set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk]))
 
@@ -935,7 +935,7 @@ class FolderListingTest(TestCase):
                         kwargs={'folder_id': self.parent.id}))
             item_list = response.context['paginated_items'].object_list
             # user sees all items because he has permissions on the parent folder
-            self.assertEquals(
+            self.assertEqual(
                 set(folder.pk for folder in item_list),
                 set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
                      self.spam_file.pk]))
@@ -1357,7 +1357,7 @@ class PolymorphicDeleteViewTests(BulkOperationsMixin, TestCase):
         self.assertEqual(Folder.objects.filter(id=folder.id).count(), 1)
 
         response = self.client.get(folder.get_admin_delete_url())
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         response = self.client.post(
             folder.get_admin_delete_url(),
