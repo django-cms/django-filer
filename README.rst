@@ -40,12 +40,8 @@ pull request, please review our `contribution guidelines
 <http://docs.django-cms.org/en/latest/contributing/index.html>`_.
 
 We're grateful to all contributors who have helped create and maintain this package.
-Contributors are listed at the `contributors <https://github.com/divio/djangocms-text-ckeditor/graphs/contributors>`_
+Contributors are listed at the `contributors <https://github.com/django-cms/django-filer/graphs/contributors>`_
 section.
-
-One of the easiest contributions you can make is helping to translate this addon on
-`Transifex <https://www.transifex.com/projects/p/djangocms-text-ckeditor/>`_.
-
 
 Documentation
 =============
