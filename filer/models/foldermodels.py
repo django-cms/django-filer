@@ -257,29 +257,41 @@ class FolderPermission(models.Model):
     ALLOW = 1
     DENY = 0
 
-    TYPES = (
-        (ALL, _('all items')),
-        (THIS, _('this item only')),
-        (CHILDREN, _('this item and all children')),
-    )
+    TYPES = [
+        (ALL, _("all items")),
+        (THIS, _("this item only")),
+        (CHILDREN, _("this item and all children")),
+    ]
 
-    PERMISIONS = (
-        (ALLOW, _('allow')),
-        (DENY, _('deny')),
-    )
+    PERMISIONS = [
+        (None, _("inherit")),
+        (ALLOW, _("allow")),
+        (DENY, _("deny")),
+    ]
 
     folder = models.ForeignKey(
         Folder,
-        verbose_name=('folder'),
+        verbose_name=("folder"),
         null=True,
         blank=True,
         on_delete=models.CASCADE,
     )
 
-    type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
-                             related_name="filer_folder_permissions", on_delete=models.SET_NULL,
-                             verbose_name=_("user"), blank=True, null=True)
+    type = models.SmallIntegerField(
+        _("type"),
+        choices=TYPES,
+        default=ALL,
+    )
+
+    user = models.ForeignKey(
+        getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+        related_name="filer_folder_permissions",
+        on_delete=models.SET_NULL,
+        verbose_name=_("user"),
+        blank=True,
+        null=True,
+    )
+
     group = models.ForeignKey(
         auth_models.Group,
         related_name="filer_folder_permissions",
@@ -290,9 +302,29 @@ class FolderPermission(models.Model):
     )
     everybody = models.BooleanField(_("everybody"), default=False)
 
-    can_edit = models.SmallIntegerField(_("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)
-    can_read = models.SmallIntegerField(_("can read"), choices=PERMISIONS, blank=True, null=True, default=None)
-    can_add_children = models.SmallIntegerField(_("can add children"), choices=PERMISIONS, blank=True, null=True, default=None)
+    can_read = models.SmallIntegerField(
+        _("can read"),
+        choices=PERMISIONS,
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    can_edit = models.SmallIntegerField(
+        _("can edit"),
+        choices=PERMISIONS,
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    can_add_children = models.SmallIntegerField(
+        _("can add children"),
+        choices=PERMISIONS,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     objects = FolderPermissionManager()
 

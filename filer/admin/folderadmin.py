@@ -58,15 +58,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     exclude = ('parent',)
     list_per_page = 20
     list_filter = ('owner',)
-    search_fields = ['name', ]
-    raw_id_fields = ('owner',)
+    search_fields = ['name']
+    autocomplete_fields = ['owner']
     save_as = True  # see ImageAdmin
     actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
     directory_listing_template = 'admin/filer/folder/directory_listing.html'
-    order_by_file_fields = ('_file_size', 'original_filename', 'name', 'owner',
-                            'uploaded_at', 'modified_at')
+    order_by_file_fields = ['_file_size', 'original_filename', 'name', 'owner',
+                            'uploaded_at', 'modified_at']
 
     def get_form(self, request, obj=None, **kwargs):
         """
