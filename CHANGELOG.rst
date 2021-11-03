@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+2.1.1 (2021-11-03)
+==================
+
+* Pin dependency for easy-thumbnails to version 2.8.0.
+
+
 2.1 (2021-11-03)
 ================
 
