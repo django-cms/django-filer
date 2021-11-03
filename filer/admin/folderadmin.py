@@ -321,7 +321,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         perms = FolderPermission.objects.get_read_id_list(request.user)
         root_exclude_kw = {'parent__isnull': False, 'parent__id__in': perms}
         if perms != 'All':
-            file_qs = file_qs.filter(models.Q(folder__id__in=perms) | models.Q(owner=request.user))
+            file_qs = file_qs.filter(
+                models.Q(folder__id__in=perms)
+                | models.Q(folder_id__isnull=True)
+                | models.Q(owner=request.user)
+            )
             folder_qs = folder_qs.filter(models.Q(id__in=perms) | models.Q(owner=request.user))
         else:
             root_exclude_kw.pop('parent__id__in')
