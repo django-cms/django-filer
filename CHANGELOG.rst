@@ -2,8 +2,9 @@
 CHANGELOG
 =========
 
-2.1rc4  (2021-07-20)
-====================
+
+2.1 (2021-11-03)
+================
 
 * Remove unused legacy CSS from project.
 * Remove legacy code for compatibility of old Django versions.
@@ -13,25 +14,12 @@ CHANGELOG
   * PermissionAdmin: allow to search via user, group or folder names
   * PermissionAdmin: use prefetch_related to decrease number of DB queries
 
-2.1rc3  (2021-02-02)
-====================
-
 * Fix #1234: Directory listing template conflicts with djangocms-admin-style
   sidebar style.
 * Fix minor styling regressions introduced in 2.1rc2.
-
-
-2.1rc2  (2021-02-01)
-====================
-
 * Fix #1227: Some icons were not aligned in the dropzone layout.
 * All file/image fields render the field label.
 * Fix #1232: Drag & drop of empty files results into Internal Server Error.
-
-
-2.1rc1  (2020-11-25)
-====================
-
 * Add support for SVG images. They now are handled by the model
   ``filer.imagemodels.Image`` and can be used whereever a pixel based image
   was used. This includes scaling and cropping using existing thumbnailing
