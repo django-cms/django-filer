@@ -130,8 +130,11 @@ djQuery(function ($) {
                     event.preventDefault();
                 });
             },
-            error: function (file, response) {
-                showError(file.name + ': ' + response.error);
+            error: function (file, msg, response) {
+                if(response && response.error){
+                    msg += ' ; ' + response.error;
+                }
+                showError(file.name + ': ' + msg);
                 this.removeAllFiles(true);
             },
             reset: function () {
