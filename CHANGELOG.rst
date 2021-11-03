@@ -50,7 +50,9 @@ CHANGELOG
   exists on disk.
 * Drop support of Python-3.5 (Reason: Third party requirement
   `reportlabs <https://www.reportlab.com/>`_ requires Python>=3.6).
-
+* Fix dropzone error callback for admin fields.
+* Fix #1247: Not owned files in unfiled folder can not be listed if perms are ON.
+* Fix #1184: OSError close file before deletion on file move.
 
 2.0.2 (2020-09-10)
 ==================
