@@ -4,8 +4,6 @@ from tempfile import mkdtemp
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = '__secret__'
-
 HELPER_SETTINGS = {
     'NOSE_ARGS': [
         '-s',
@@ -55,6 +53,7 @@ HELPER_SETTINGS = {
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
+    'SECRET_KEY': '__secret__',
 }
 if os.environ.get('CUSTOM_IMAGE', False):
     HELPER_SETTINGS['FILER_IMAGE_MODEL'] = os.environ.get('CUSTOM_IMAGE')
