@@ -13,6 +13,7 @@ class PermissionAdmin(admin.ModelAdmin):
     list_filter = ['group']
     list_display = ['__str__', 'folder', 'user']
     search_fields = ['user__username', 'group__name', 'folder__name']
+    autocomplete_fields = ['user', 'group']
 
     def get_queryset(self, request):
         qs = super(PermissionAdmin, self).get_queryset(request)
