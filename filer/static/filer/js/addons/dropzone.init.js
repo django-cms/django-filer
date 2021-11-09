@@ -131,7 +131,7 @@ djQuery(function ($) {
                 });
             },
             error: function (file, msg, response) {
-                if(response && response.error){
+                if (response && response.error) {
                     msg += ' ; ' + response.error;
                 }
                 showError(file.name + ': ' + msg);
