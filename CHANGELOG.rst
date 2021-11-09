@@ -3,6 +3,13 @@ CHANGELOG
 =========
 
 
+2.1.2 (2021-11-09)
+==================
+
+* In Folder permissions, make user and group autocomplete fields.
+* Extent testing matrix to Python-3.10.
+
+
 2.1.1 (2021-11-03)
 ==================
 
