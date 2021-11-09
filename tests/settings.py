@@ -4,6 +4,8 @@ from tempfile import mkdtemp
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SECRET_KEY = '__secret__'
+
 HELPER_SETTINGS = {
     'NOSE_ARGS': [
         '-s',
