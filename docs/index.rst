@@ -17,21 +17,21 @@ Welcome to django-filer's documentation!
 and organizing files and images in contrib.admin.
 
 +-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/filer_1.png | .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/filer_2.png |
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/filer_1.png | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/filer_2.png |
 +-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+
 
 Filer detail view:
 
 +------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/detail_image.png | .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/detail_file.png |
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/detail_image.png | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/detail_file.png |
 +------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------+
 
 Filer picker widget:
 
 +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/file_picker_1.png | .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/file_picker_2.png |
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_1.png | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_2.png |
 +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/file_picker_3.png |                                                                                                       |
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_3.png |                                                                                                       |
 +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------+
 
 Custom model fields are provided for use in 3rd party apps as a replacement for
