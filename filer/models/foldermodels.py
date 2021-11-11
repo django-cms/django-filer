@@ -104,7 +104,11 @@ class Folder(models.Model, mixins.IconsMixin):
         related_name='children',
         on_delete=models.CASCADE,
     )
-    name = models.CharField(_('name'), max_length=255)
+
+    name = models.CharField(
+        _('name'),
+        max_length=255,
+    )
 
     owner = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -115,10 +119,31 @@ class Folder(models.Model, mixins.IconsMixin):
         blank=True,
     )
 
-    uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
+    uploaded_at = models.DateTimeField(
+        _('uploaded at'),
+        auto_now_add=True,
+    )
 
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
+    created_at = models.DateTimeField(
+        _('created at'),
+        auto_now_add=True,
+    )
+
+    modified_at = models.DateTimeField(
+        _('modified at'),
+        auto_now=True,
+    )
+
+    class Meta:
+        # see: https://github.com/django-mptt/django-mptt/pull/577
+        index_together = (('tree_id', 'lft'),)
+        unique_together = (('parent', 'name'),)
+        ordering = ('name',)
+        permissions = (("can_use_directory_listing",
+                        "Can use directory listing"),)
+        app_label = 'filer'
+        verbose_name = _("Folder")
+        verbose_name_plural = _("Folders")
 
     @property
     def file_count(self):
@@ -230,17 +255,6 @@ class Folder(models.Model, mixins.IconsMixin):
         except Folder.DoesNotExist:
             return False
 
-    class Meta:
-        # see: https://github.com/django-mptt/django-mptt/pull/577
-        index_together = (('tree_id', 'lft'),)
-        unique_together = (('parent', 'name'),)
-        ordering = ('name',)
-        permissions = (("can_use_directory_listing",
-                        "Can use directory listing"),)
-        app_label = 'filer'
-        verbose_name = _("Folder")
-        verbose_name_plural = _("Folders")
-
 
 # MPTT registration
 try:
@@ -300,7 +314,11 @@ class FolderPermission(models.Model):
         null=True,
         on_delete=models.CASCADE,
     )
-    everybody = models.BooleanField(_("everybody"), default=False)
+
+    everybody = models.BooleanField(
+        _("everybody"),
+        default=False,
+    )
 
     can_read = models.SmallIntegerField(
         _("can read"),
@@ -325,6 +343,11 @@ class FolderPermission(models.Model):
         null=True,
         default=None,
     )
+
+    class Meta:
+        verbose_name = _('folder permission')
+        verbose_name_plural = _('folder permissions')
+        app_label = 'filer'
 
     objects = FolderPermissionManager()
 
@@ -365,7 +388,3 @@ class FolderPermission(models.Model):
         if not self.user and not self.group and not self.everybody:
             raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
 
-    class Meta:
-        verbose_name = _('folder permission')
-        verbose_name_plural = _('folder permissions')
-        app_label = 'filer'

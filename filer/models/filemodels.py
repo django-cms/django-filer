@@ -49,27 +49,63 @@ def mimetype_validator(value):
 
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
-    _icon = "file"
+    _icon = 'file'
     _file_data_changed_hint = None
 
     folder = models.ForeignKey(
         Folder,
-        verbose_name=_('folder'),
+        verbose_name=_("Folder"),
         related_name='all_files',
         null=True,
         blank=True,
         on_delete=models.CASCADE,
     )
-    file = MultiStorageFileField(_('file'), null=True, blank=True, max_length=255)
-    _file_size = models.BigIntegerField(_('file size'), null=True, blank=True)
 
-    sha1 = models.CharField(_('sha1'), max_length=40, blank=True, default='')
+    file = MultiStorageFileField(
+        _("File"),
+        null=True,
+        blank=True,
+        max_length=255,
+    )
 
-    has_all_mandatory_data = models.BooleanField(_('has all mandatory data'), default=False, editable=False)
+    _file_size = models.BigIntegerField(
+        _("File size"),
+        null=True,
+        blank=True,
+    )
 
-    original_filename = models.CharField(_('original filename'), max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, default="", blank=True, verbose_name=_('name'))
-    description = models.TextField(null=True, blank=True, verbose_name=_('description'))
+    sha1 = models.CharField(
+        _("sha1"),
+        max_length=40,
+        blank=True,
+        default='',
+    )
+
+    has_all_mandatory_data = models.BooleanField(
+        _("has all mandatory data"),
+        default=False,
+        editable=False,
+    )
+
+    original_filename = models.CharField(
+        _("original filename"),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
+    name = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name=_('name'),
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_('description'),
+    )
 
     owner = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -80,15 +116,22 @@ class File(PolymorphicModel, mixins.IconsMixin):
         verbose_name=_('owner'),
     )
 
-    uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
+    uploaded_at = models.DateTimeField(
+        _('uploaded at'),
+        auto_now_add=True,
+    )
+
+    modified_at = models.DateTimeField(
+        _('modified at'),
+        auto_now=True,
+    )
 
     is_public = models.BooleanField(
         default=is_public_default,
-        verbose_name=_('Permissions disabled'),
-        help_text=_('Disable any permission checking for this '
-                    'file. File will be publicly accessible '
-                    'to anyone.'))
+        verbose_name=_("Permissions disabled"),
+        help_text=_("Disable any permission checking for this "
+                    "file. File will be publicly accessible "
+                    "to anyone."))
 
     mime_type = models.CharField(
         max_length=255,
@@ -98,6 +141,18 @@ class File(PolymorphicModel, mixins.IconsMixin):
     )
 
     objects = FileManager()
+
+    class Meta:
+        app_label = 'filer'
+        verbose_name = _("File")
+        verbose_name_plural = _("Files")
+
+    def __str__(self):
+        if self.name in ('', None):
+            text = "%s" % (self.original_filename,)
+        else:
+            text = "%s" % (self.name,)
+        return text
 
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
@@ -270,13 +325,6 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             return False
 
-    def __str__(self):
-        if self.name in ('', None):
-            text = "%s" % (self.original_filename,)
-        else:
-            text = "%s" % (self.name,)
-        return text
-
     def get_admin_change_url(self):
         return reverse(
             'admin:{0}_{1}_change'.format(
@@ -373,8 +421,3 @@ class File(PolymorphicModel, mixins.IconsMixin):
     @property
     def duplicates(self):
         return File.objects.find_duplicates(self)
-
-    class Meta:
-        app_label = 'filer'
-        verbose_name = _('file')
-        verbose_name_plural = _('files')

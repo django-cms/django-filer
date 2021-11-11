@@ -14,11 +14,29 @@ logger = logging.getLogger("filer")
 
 # This is the standard Image model which can be swapped for a custom model using FILER_IMAGE_MODEL setting
 class Image(BaseImage):
-    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
-                                      editable=False)
-    author = models.CharField(_('author'), max_length=255, null=True, blank=True)
-    must_always_publish_author_credit = models.BooleanField(_('must always publish author credit'), default=False)
-    must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
+    date_taken = models.DateTimeField(
+        _("Date taken"),
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    author = models.CharField(
+        _("Author"),
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+
+    must_always_publish_author_credit = models.BooleanField(
+        _("must always publish author credit"),
+        default=False,
+    )
+
+    must_always_publish_copyright = models.BooleanField(
+        _('must always publish copyright'),
+        default=False,
+    )
 
     class Meta(BaseImage.Meta):
         swappable = 'FILER_IMAGE_MODEL'
