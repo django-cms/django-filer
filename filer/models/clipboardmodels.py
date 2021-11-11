@@ -21,8 +21,8 @@ class Clipboard(models.Model):
 
     class Meta:
         app_label = 'filer'
-        verbose_name = _("Clipboard")
-        verbose_name_plural = _("Clipboards")
+        verbose_name = _("clipboard")
+        verbose_name_plural = _("clipboards")
 
     def append_file(self, file_obj):
         try:
@@ -41,17 +41,17 @@ class Clipboard(models.Model):
 class ClipboardItem(models.Model):
     file = models.ForeignKey(
         'File',
-        verbose_name=_("File"),
+        verbose_name=_("file"),
         on_delete=models.CASCADE,
     )
 
     clipboard = models.ForeignKey(
         Clipboard,
-        verbose_name=_("Clipboard"),
+        verbose_name=_("clipboard"),
         on_delete=models.CASCADE,
     )
 
     class Meta:
         app_label = 'filer'
-        verbose_name = _("Clipboard item")
-        verbose_name_plural = _("Clipboard items")
+        verbose_name = _("clipboard item")
+        verbose_name_plural = _("clipboard items")

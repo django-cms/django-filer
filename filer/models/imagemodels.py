@@ -15,14 +15,14 @@ logger = logging.getLogger("filer")
 # This is the standard Image model which can be swapped for a custom model using FILER_IMAGE_MODEL setting
 class Image(BaseImage):
     date_taken = models.DateTimeField(
-        _("Date taken"),
+        _("date taken"),
         null=True,
         blank=True,
         editable=False,
     )
 
     author = models.CharField(
-        _("Author"),
+        _("author"),
         max_length=255,
         null=True,
         blank=True,

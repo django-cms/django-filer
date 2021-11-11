@@ -7,27 +7,27 @@ class ThumbnailOption(models.Model):
     This class defines the option use to create the thumbnail.
     """
     name = models.CharField(
-        _("Name"),
+        _("name"),
         max_length=100,
     )
 
     width = models.IntegerField(
-        _("Width"),
-        help_text=_("Width in pixel."),
+        _("width"),
+        help_text=_("width in pixel."),
     )
 
     height = models.IntegerField(
-        _("Height"),
-        help_text=_("Height in pixel."),
+        _("height"),
+        help_text=_("height in pixel."),
     )
 
     crop = models.BooleanField(
-        _("Crop"),
+        _("crop"),
         default=True,
     )
 
     upscale = models.BooleanField(
-        _("Upscale"),
+        _("upscale"),
         default=True,
     )
 

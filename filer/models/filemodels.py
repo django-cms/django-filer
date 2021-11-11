@@ -54,7 +54,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     folder = models.ForeignKey(
         Folder,
-        verbose_name=_("Folder"),
+        verbose_name=_("folder"),
         related_name='all_files',
         null=True,
         blank=True,
@@ -62,14 +62,14 @@ class File(PolymorphicModel, mixins.IconsMixin):
     )
 
     file = MultiStorageFileField(
-        _("File"),
+        _("file"),
         null=True,
         blank=True,
         max_length=255,
     )
 
     _file_size = models.BigIntegerField(
-        _("File size"),
+        _("file size"),
         null=True,
         blank=True,
     )
@@ -98,13 +98,13 @@ class File(PolymorphicModel, mixins.IconsMixin):
         max_length=255,
         default="",
         blank=True,
-        verbose_name=_('name'),
+        verbose_name=_("name"),
     )
 
     description = models.TextField(
         null=True,
         blank=True,
-        verbose_name=_('description'),
+        verbose_name=_("description"),
     )
 
     owner = models.ForeignKey(
@@ -113,16 +113,16 @@ class File(PolymorphicModel, mixins.IconsMixin):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name=_('owner'),
+        verbose_name=_("owner"),
     )
 
     uploaded_at = models.DateTimeField(
-        _('uploaded at'),
+        _("uploaded at"),
         auto_now_add=True,
     )
 
     modified_at = models.DateTimeField(
-        _('modified at'),
+        _("modified at"),
         auto_now=True,
     )
 
@@ -135,7 +135,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     mime_type = models.CharField(
         max_length=255,
-        help_text='MIME type of uploaded content',
+        help_text="MIME type of uploaded content",
         validators=[mimetype_validator],
         default='application/octet-stream',
     )
@@ -144,8 +144,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     class Meta:
         app_label = 'filer'
-        verbose_name = _("File")
-        verbose_name_plural = _("Files")
+        verbose_name = _("file")
+        verbose_name_plural = _("files")
 
     def __str__(self):
         if self.name in ('', None):
@@ -335,14 +335,8 @@ class File(PolymorphicModel, mixins.IconsMixin):
         )
 
     def get_admin_delete_url(self):
-        try:
-            # Django <=1.6
-            model_name = self._meta.module_name
-        except AttributeError:
-            # Django >1.6
-            model_name = self._meta.model_name
         return reverse(
-            'admin:{0}_{1}_delete'.format(self._meta.app_label, model_name,),
+            'admin:{0}_{1}_delete'.format(self._meta.app_label, self._meta.model_name),
             args=(self.pk,))
 
     @property
