@@ -387,4 +387,3 @@ class FolderPermission(models.Model):
             raise ValidationError('User or group cannot be selected together with "everybody".')
         if not self.user and not self.group and not self.everybody:
             raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
-
