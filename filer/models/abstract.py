@@ -29,19 +29,50 @@ class BaseImage(File):
     file_type = 'Image'
     _icon = "image"
 
-    _height = models.FloatField(null=True, blank=True)
-    _width = models.FloatField(null=True, blank=True)
+    _height = models.FloatField(
+        null=True,
+        blank=True,
+    )
 
-    default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
-    default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
+    _width = models.FloatField(
+        null=True,
+        blank=True,
+    )
 
-    subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
-                                        default='')
+    default_alt_text = models.CharField(
+        _("default alt text"),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
+    default_caption = models.CharField(
+        _("default caption"),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
+    subject_location = models.CharField(
+        _("subject location"),
+        max_length=64,
+        blank=True,
+        default='',
+    )
+
     file_ptr = models.OneToOneField(
-        to='filer.File', parent_link=True,
+        to='filer.File',
+        parent_link=True,
         related_name='%(app_label)s_%(class)s_file',
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        app_label = 'filer'
+        verbose_name = _("image")
+        verbose_name_plural = _("images")
+        abstract = True
+        default_manager_name = 'objects'
 
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
@@ -173,10 +204,3 @@ class BaseImage(File):
             thumbnail_storage=self.file.thumbnail_storage,
             thumbnail_basedir=self.file.thumbnail_basedir)
         return tn
-
-    class Meta:
-        app_label = 'filer'
-        verbose_name = _('image')
-        verbose_name_plural = _('images')
-        abstract = True
-        default_manager_name = 'objects'
