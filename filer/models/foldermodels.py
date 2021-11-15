@@ -68,7 +68,7 @@ class FolderPermissionManager(models.Manager):
             else:
                 deny_list.add(folder_id)
 
-            if perm.type == FolderPermission.CHILDREN:
+            if perm.type in [FolderPermission.ALL, FolderPermission.CHILDREN]:
                 if p == FolderPermission.ALLOW:
                     allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
                 else:
