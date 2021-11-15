@@ -13,7 +13,7 @@
 .settings/
 .tox/
 __pycache__/
-build/
+docs/_build/
 dist/
 env/
 .venv/
