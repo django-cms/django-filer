@@ -16,13 +16,13 @@ handling of files and images a breeze.
 .. We're using absolute image url below, because relative paths won't work on
    pypi. github would render relative paths correctly.
 
-+--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/filer_2.png        | .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/filer_3.png        |
-+--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/detail_image.png   | .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/detail_file.png    |
-+--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/file_picker_1.png  | .. image:: https://raw.githubusercontent.com/divio/django-filer/master/docs/_static/file_picker_3.png  |
-+--------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/filer_2.png        | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/filer_3.png        |
++-------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/detail_image.png   | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/detail_file.png    |
++-------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_1.png  | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_3.png  |
++-------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 
 
 *******************************************
