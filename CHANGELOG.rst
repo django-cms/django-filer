@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+2.1.3 (next)
+============
+
+* Improve the list view of Folder permissions.
+* Fix: Folder permissions were disabled for descendants, if parent folder
+  has type set to CHILDREN.
+
 
 2.1.2 (2021-11-09)
 ==================
