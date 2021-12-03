@@ -214,12 +214,12 @@ class FilerApiTests(TestCase):
     def test_folder_pretty_logical_path(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s Foo', parent=root_folder)
-        self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s Foo')
+        self.assertEqual(child.pretty_logical_path, '/Foo&#39;s Bar/Bar&quot;s Foo')
 
     def test_folder_pretty_logical_path_with_unicode(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s 日本 Foo', parent=root_folder)
-        self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s 日本 Foo')
+        self.assertEqual(child.pretty_logical_path, '/Foo&#39;s Bar/Bar&quot;s 日本 Foo')
 
     def test_custom_model(self):
         """
