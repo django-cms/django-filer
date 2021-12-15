@@ -4,7 +4,7 @@ from django.contrib.auth import models as auth_models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.db import (models, IntegrityError, transaction)
-from django.db.models import (query, Q, signals)
+from django.db.models import (query, Q, signals, DEFERRED)
 from django.dispatch import receiver
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
@@ -178,8 +178,10 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def __init__(self, *args, **kwargs):
         super(Folder, self).__init__(*args, **kwargs)
-        self._old_name = self.name
-        self._old_parent_id = self.parent_id
+        if self.__dict__.get('name', DEFERRED) is not DEFERRED:
+            self._old_name = self.name
+        if self.__dict__.get('parent_id', DEFERRED) is not DEFERRED:
+            self._old_parent_id = self.parent_id
 
     def clean(self):
 
@@ -247,7 +249,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def is_affecting_file_paths(self):
         return (self._old_name != self.name or
-                self._old_parent_id != getattr(self.parent, 'id', None))
+                self._old_parent_id != getattr(self, 'parent_id', None))
 
     def update_descendants_metadata(self):
         """
