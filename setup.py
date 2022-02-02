@@ -25,7 +25,7 @@ setup(
     author_email='stefan.foulis@gmail.com',
     packages=find_packages(),
     install_requires=(
-        'django>=1.11,<4.0',
+        'django>=1.11,<3.0',
         'django-mptt>=0.6,<1.0',  # the exact version depends on Django
         'django_polymorphic>=0.7,<2.2',
         'easy-thumbnails>=2,<3.0',
