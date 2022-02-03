@@ -94,6 +94,11 @@ class BaseImage(File):
                     self._width, self._height = VILImage.load(imgfile).size
                 else:
                     self._width, self._height = PILImage.open(imgfile).size
+                if self.subject_location:
+                    # subject location is filled but outside uploaded image
+                    coordinates = normalize_subject_location(self.subject_location)
+                    if coordinates[0] > self._width or coordinates[1] > self._height:
+                        self.subject_location = '{},{}'.format(int(self._width / 2), int(self._height / 2))
                 imgfile.seek(0)
             except Exception:
                 if post_init is False:
