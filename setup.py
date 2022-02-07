@@ -5,7 +5,7 @@ from filer import __version__
 
 
 REQUIREMENTS = [
-    'django>=2.2,<4.0',
+    'django>=3.2,<4.1',
     'django-mptt>=0.6,<1.0',  # the exact version depends on Django
     'django-polymorphic>=2,<3.1',
     'easy-thumbnails>=2.8.0',
@@ -55,7 +55,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     classifiers=CLASSIFIERS,
     test_suite='tests.settings.run',
 )
