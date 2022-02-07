@@ -46,7 +46,9 @@ setup(
     version=__version__,
     author='Divio AG',
     author_email='info@divio.ch',
-    url='http://github.com/divio/django-filer',
+    maintainer='Django CMS Association and contributors',
+    maintainer_email='info@django-cms.org',
+    url='https://github.com/django-cms/django-filer',
     license='BSD-3-Clause',
     description='A file management application for django that makes handling '
                 'of files and images a breeze.',
