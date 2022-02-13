@@ -19,7 +19,6 @@ env/
 .venv/
 /*docs/env*/
 /*docs/_build*/
-/*docs/_images*/
 
 /~
 /node_modules
