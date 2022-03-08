@@ -1,33 +1,46 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
-
 import logging
 from datetime import datetime
 
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import get_current_timezone, make_aware, now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from ..utils.compatibility import GTE_DJANGO_1_10
 from .abstract import BaseImage
+
 
 logger = logging.getLogger("filer")
 
 
 # This is the standard Image model which can be swapped for a custom model using FILER_IMAGE_MODEL setting
 class Image(BaseImage):
-    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
-                                      editable=False)
-    author = models.CharField(_('author'), max_length=255, null=True, blank=True)
-    must_always_publish_author_credit = models.BooleanField(_('must always publish author credit'), default=False)
-    must_always_publish_copyright = models.BooleanField(_('must always publish copyright'), default=False)
+    date_taken = models.DateTimeField(
+        _("date taken"),
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    author = models.CharField(
+        _("author"),
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+
+    must_always_publish_author_credit = models.BooleanField(
+        _("must always publish author credit"),
+        default=False,
+    )
+
+    must_always_publish_copyright = models.BooleanField(
+        _('must always publish copyright'),
+        default=False,
+    )
 
     class Meta(BaseImage.Meta):
         swappable = 'FILER_IMAGE_MODEL'
-        if GTE_DJANGO_1_10:
-            default_manager_name = 'objects'
+        default_manager_name = 'objects'
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
@@ -50,4 +63,4 @@ class Image(BaseImage):
                 pass
         if self.date_taken is None:
             self.date_taken = now()
-        super(Image, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)

@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import re
 
-from django.utils import six
 from easy_thumbnails import processors
 
 from .settings import (
-    FILER_SUBJECT_LOCATION_IMAGE_DEBUG,
-    FILER_WHITESPACE_COLOR,
+    FILER_SUBJECT_LOCATION_IMAGE_DEBUG, FILER_WHITESPACE_COLOR,
 )
 
+
 try:
-    from PIL import Image
-    from PIL import ImageDraw
+    from PIL import Image, ImageDraw
 except ImportError:
     try:
         import Image
@@ -26,7 +21,7 @@ RE_SUBJECT_LOCATION = re.compile(r'^(\d+),(\d+)$')
 
 def normalize_subject_location(subject_location):
     if subject_location:
-        if isinstance(subject_location, six.string_types):
+        if isinstance(subject_location, str):
             m = RE_SUBJECT_LOCATION.match(subject_location)
             if m:
                 return (int(m.group(1)), int(m.group(2)))

@@ -1,5 +1,5 @@
 {% extends "admin/filer/change_form.html" %}
-{% load i18n admin_modify staticfiles %}
+{% load i18n admin_modify static %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -15,10 +15,8 @@
     <script src="{% static 'filer/js/libs/jquery.cookie.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/fileuploader.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/mediator.min.js' %}"></script>
-    <script src="{% static 'filer/js/libs/retina.min.js' %}"></script>
     <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
     <script src="{% static 'filer/js/addons/popup_handling.js' %}"></script>
-    <script src="{% static 'filer/js/addons/focal-point.js' %}"></script>
     <script src="{% static 'filer/js/addons/toggler.js' %}"></script>
     <script src="{% static 'filer/js/base.js' %}"></script>
     <script type="text/javascript">
@@ -40,5 +38,5 @@
             {% endif%}
         </ul>
     {% endif %}
-    {% include "admin/filer/tools/detail_info.html" with detail=True file=True %}
+    {% include "admin/filer/tools/detail_info.html" %}
 {% endblock %}

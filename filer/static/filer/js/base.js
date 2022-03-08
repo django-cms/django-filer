@@ -7,6 +7,13 @@ var Cl = window.Cl || {};
 
 /* globals Mediator, django */
 
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
 // mediator init
 Cl.mediator = new Mediator();
 
@@ -29,7 +36,7 @@ Cl.mediator = new Mediator();
 
             showErrorTimeout = setTimeout(function () {
                 $('.' + filerErrorClass).remove();
-            }, 3000);
+            }, 5000);
         };
 
         // Focal point logic init
@@ -200,4 +207,4 @@ Cl.mediator = new Mediator();
 
         }());
     });
-})(django.jQuery);
+})(djQuery);

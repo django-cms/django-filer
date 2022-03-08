@@ -1,0 +1,27 @@
+{% load i18n %}
+{% if sidebar_image_ratio %}
+<div class="image-preview js-focal-point" data-location-selector="#id_subject_location">
+{% endif %}
+{% if download_url %}
+    {% if mime_maintype == 'audio' %}
+    <audio controls>
+        <source src="{{ download_url }}" type="{{ mime_type }}">
+        {% trans 'Your browser does not support audio.' %}
+    </audio>
+    {% elif mime_maintype == 'video' %}
+    <video width="320" height="240" controls>
+        <source src="{{ download_url }}" type="{{ mime_type }}">
+        {% trans 'Your browser does not support video.' %}
+    </video>
+    {% else %}
+    <img src="{{ icon_url }}" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}{% if sidebar_image_ratio %} data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image"{% endif %} />
+    {% endif %}
+{% else %}
+    <img src="{{ icon_url }}" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %} class="thumbnail_img" />
+{% endif %}
+{% if sidebar_image_ratio %}
+    <div class="image-preview-field">
+        <div class="js-focal-point-circle image-preview-circle hidden"></div>
+    </div>
+</div>
+{% endif %}

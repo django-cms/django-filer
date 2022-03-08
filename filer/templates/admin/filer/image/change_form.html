@@ -1,5 +1,5 @@
 {% extends "admin/filer/change_form.html" %}
-{% load i18n admin_modify staticfiles %}
+{% load i18n admin_modify static %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -15,7 +15,6 @@
     <script src="{% static 'filer/js/libs/jquery.cookie.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/fileuploader.min.js' %}"></script>
     <script src="{% static 'filer/js/libs/mediator.min.js' %}"></script>
-    <script src="{% static 'filer/js/libs/retina.min.js' %}"></script>
     <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
     <script src="{% static 'filer/js/addons/popup_handling.js' %}"></script>
     <script src="{% static 'filer/js/addons/focal-point.js' %}"></script>
@@ -33,11 +32,11 @@
 {% block object-tools %}
     {% if change and not is_popup %}
         <ul class="object-tools">
-            <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+            <li><a href="{% url history_url object_id %}" class="historylink">{% trans "History" %}</a></li>
             {% if has_absolute_url %}
                 <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>
             {% endif%}
         </ul>
     {% endif %}
-    {% include "admin/filer/tools/detail_info.html" with detail=True %}
+    {% include "admin/filer/tools/detail_info.html" %}
 {% endblock %}

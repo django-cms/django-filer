@@ -1,20 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django import forms
-from django.core.urlresolvers import reverse
+from django.contrib.admin.utils import unquote
 from django.http import HttpResponseRedirect
-from django.utils.translation import ugettext as _
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext as _
 
 from .. import settings
 from ..models import File
-from ..utils.compatibility import unquote
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
 class FileAdminChangeFrom(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = File
         exclude = ()
 
@@ -25,12 +23,6 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     search_fields = ['name', 'original_filename', 'sha1', 'description']
     raw_id_fields = ('owner',)
     readonly_fields = ('sha1', 'display_canonical')
-
-    # save_as hack, because without save_as it is impossible to hide the
-    # save_and_add_another if save_as is False. To show only save_and_continue
-    # and save in the submit row we need save_as=True and in
-    # render_change_form() override add and change to False.
-    save_as = True
 
     form = FileAdminChangeFrom
 
@@ -68,10 +60,10 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         instead of the default change_list_view
         """
         if (
-            request.POST and
-            '_continue' not in request.POST and
-            '_saveasnew' not in request.POST and
-            '_addanother' not in request.POST
+            request.POST
+            and '_continue' not in request.POST
+            and '_saveasnew' not in request.POST
+            and '_addanother' not in request.POST
         ):
             # Popup in pick mode or normal mode. In both cases we want to go
             # back to the folder list view after save. And not the useless file
@@ -87,7 +79,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 admin_url_params_encoded(request),
             )
             return HttpResponseRedirect(url)
-        return super(FileAdmin, self).response_change(request, obj)
+        return super().response_change(request, obj)
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
@@ -97,7 +89,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                          'is_popup': popup_status(request),
                          'filer_admin_context': AdminContext(request)}
         context.update(extra_context)
-        return super(FileAdmin, self).render_change_form(
+        return super().render_change_form(
             request=request, context=context, add=add, change=change,
             form_url=form_url, obj=obj)
 
@@ -118,7 +110,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
         if request.POST:
             # Return to folder listing, since there is no usable file listing.
-            super(FileAdmin, self).delete_view(
+            super().delete_view(
                 request=request, object_id=object_id,
                 extra_context=extra_context)
             if parent_folder:
@@ -132,7 +124,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             )
             return HttpResponseRedirect(url)
 
-        return super(FileAdmin, self).delete_view(
+        return super().delete_view(
             request=request, object_id=object_id,
             extra_context=extra_context)
 
@@ -149,10 +141,11 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     def display_canonical(self, instance):
         canonical = instance.canonical_url
         if canonical:
-            return '<a href="%s">%s</a>' % (canonical, canonical)
+            return mark_safe('<a href="%s">%s</a>' % (canonical, canonical))
         else:
             return '-'
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
+
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()

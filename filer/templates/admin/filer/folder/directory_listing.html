@@ -1,5 +1,5 @@
 {% extends "admin/filer/base_site.html" %}
-{% load i18n staticfiles filer_admin_tags %}
+{% load i18n static filer_admin_tags %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block coltype %}{% endblock %}
-{% block bodyclass %}change-list filebrowser{% endblock %}
+{% block bodyclass %}{{ block.super }} change-list filebrowser{% endblock %}
 
 
 {% block extrastyle %}
@@ -101,14 +101,14 @@
                     <div class="navigator-breadcrumbs">
                         <div class="filer-navigator-breadcrumbs-dropdown-container filer-dropdown-container">
                             <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                <img src="{% static 'filer/icons/breadcrubms_dropdown_28_28.png' %}" alt="" width="28" height="28">
+                                <img src="{% static 'filer/icons/folder-dropdown.svg' %}" alt="" width="28" height="28">
                             </a>
                             <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
                                 {% for folder in folder.logical_path %}
                                     <li>
                                         <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
                                             title="{% trans 'Go back to the parent folder' %}">
-                                            <img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                            <img src="{% static 'filer/icons/folder.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                             {{ folder.name }}
                                         </a>
                                     </li>
@@ -116,7 +116,7 @@
                                 <li>
                                     <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}"
                                         title="{% trans 'Go back to' %} {% trans 'root'|title %} {% trans 'folder' %}">
-                                        <img src="{% static 'filer/icons/root_28x28.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                        <img src="{% static 'filer/icons/folder-root.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                         Root
                                     </a>
                                 </li>
@@ -157,7 +157,7 @@
                             <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
                             <div class="filter-search-wrapper">
                                 {% filer_admin_context_hidden_formfields %}
-                                <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" size="40" name="q">
+                                <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" name="q">
                                 <div class="filer-dropdown-container filer-dropdown-container-down">
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
                                         <span class="fa fa-caret-down"></span>

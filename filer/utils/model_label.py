@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
-
-from django.utils import six
-
 
 def get_model_label(model):
     """
@@ -15,7 +9,7 @@ def get_model_label(model):
     >>> get_model_label("myapp.MyModel")
     "myapp.MyModel"
     """
-    if isinstance(model, six.string_types):
+    if isinstance(model, str):
         return model
     else:
         return "%s.%s" % (

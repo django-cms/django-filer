@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
+
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
 
@@ -49,8 +47,12 @@ def userperms_for_request(item, request):
 
 
 def popup_status(request):
-    return (IS_POPUP_VAR in request.GET or 'pop' in request.GET or
-            IS_POPUP_VAR in request.POST or 'pop' in request.POST)
+    return (
+        IS_POPUP_VAR in request.GET
+        or 'pop' in request.GET
+        or IS_POPUP_VAR in request.POST
+        or 'pop' in request.POST
+    )
 
 
 def popup_pick_type(request):
@@ -88,7 +90,7 @@ def admin_url_params_encoded(request, first_separator='?', params=None):
 
 class AdminContext(dict):
     def __init__(self, request):
-        super(AdminContext, self).__init__()
+        super().__init__()
         self.update(admin_url_params(request))
 
     def __missing__(self, key):

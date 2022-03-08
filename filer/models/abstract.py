@@ -1,18 +1,17 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
-import os
 
 from django.db import models
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+
+from easy_thumbnails.VIL import Image as VILImage
 
 from .. import settings as filer_settings
-from ..utils.compatibility import GTE_DJANGO_1_10, PILImage
+from ..utils.compatibility import PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
 from .filemodels import File
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,32 +29,60 @@ class BaseImage(File):
     file_type = 'Image'
     _icon = "image"
 
-    _height = models.IntegerField(null=True, blank=True)
-    _width = models.IntegerField(null=True, blank=True)
+    _height = models.FloatField(
+        null=True,
+        blank=True,
+    )
 
-    default_alt_text = models.CharField(_('default alt text'), max_length=255, blank=True, null=True)
-    default_caption = models.CharField(_('default caption'), max_length=255, blank=True, null=True)
+    _width = models.FloatField(
+        null=True,
+        blank=True,
+    )
 
-    subject_location = models.CharField(_('subject location'), max_length=64, blank=True,
-                                        default='')
+    default_alt_text = models.CharField(
+        _("default alt text"),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
+    default_caption = models.CharField(
+        _("default caption"),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+
+    subject_location = models.CharField(
+        _("subject location"),
+        max_length=64,
+        blank=True,
+        default='',
+    )
+
     file_ptr = models.OneToOneField(
-        to='filer.File', parent_link=True,
+        to='filer.File',
+        parent_link=True,
         related_name='%(app_label)s_%(class)s_file',
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        app_label = 'filer'
+        verbose_name = _("image")
+        verbose_name_plural = _("images")
+        abstract = True
+        default_manager_name = 'objects'
+
     @classmethod
-    def matches_file_type(cls, iname, ifile, request):
-        # This was originally in admin/clipboardadmin.py  it was inside of a try
-        # except, I have moved it here outside of a try except because I can't
-        # figure out just what kind of exception this could generate... all it was
-        # doing for me was obscuring errors...
-        # --Dave Butler <croepha@gmail.com>
-        iext = os.path.splitext(iname)[1].lower()
-        return iext in ['.jpg', '.jpeg', '.png', '.gif']
+    def matches_file_type(cls, iname, ifile, mime_type):
+        # source: https://www.freeformatter.com/mime-types-list.html
+        image_subtypes = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml']
+        maintype, subtype = mime_type.split('/')
+        return maintype == 'image' and subtype in image_subtypes
 
     def file_data_changed(self, post_init=False):
-        attrs_updated = super(BaseImage, self).file_data_changed(post_init=post_init)
+        attrs_updated = super().file_data_changed(post_init=post_init)
         if attrs_updated:
             try:
                 try:
@@ -63,7 +90,10 @@ class BaseImage(File):
                 except ValueError:
                     imgfile = self.file_ptr.file
                 imgfile.seek(0)
-                self._width, self._height = PILImage.open(imgfile).size
+                if self.mime_type == 'image/svg+xml':
+                    self._width, self._height = VILImage.load(imgfile).size
+                else:
+                    self._width, self._height = PILImage.open(imgfile).size
                 imgfile.seek(0)
             except Exception:
                 if post_init is False:
@@ -74,7 +104,7 @@ class BaseImage(File):
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
-        super(BaseImage, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def _check_validity(self):
         if not self.name:
@@ -87,16 +117,12 @@ class BaseImage(File):
         else:
             return 1.0
 
-    def _get_exif(self):
-        if hasattr(self, '_exif_cache'):
-            return self._exif_cache
-        else:
-            if self.file:
-                self._exif_cache = get_exif_for_file(self.file)
-            else:
-                self._exif_cache = {}
-        return self._exif_cache
-    exif = property(_get_exif)
+    @cached_property
+    def exif(self):
+        try:
+            return get_exif_for_file(self.file)
+        except Exception:
+            return {}
 
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
@@ -113,7 +139,7 @@ class BaseImage(File):
         image. Return the string 'ALL' if the user has all rights.
         """
         user = request.user
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return False
         elif user.is_superuser:
             return True
@@ -133,15 +159,15 @@ class BaseImage(File):
 
     @property
     def width(self):
-        return self._width or 0
+        return self._width or 0.0
 
     @property
     def height(self):
-        return self._height or 0
+        return self._height or 0.0
 
     def _generate_thumbnails(self, required_thumbnails):
         _thumbnails = {}
-        for name, opts in six.iteritems(required_thumbnails):
+        for name, opts in required_thumbnails.items():
             try:
                 opts.update({'subject_location': self.subject_location})
                 thumb = self.file.get_thumbnail(opts)
@@ -178,11 +204,3 @@ class BaseImage(File):
             thumbnail_storage=self.file.thumbnail_storage,
             thumbnail_basedir=self.file.thumbnail_basedir)
         return tn
-
-    class Meta(object):
-        app_label = 'filer'
-        verbose_name = _('image')
-        verbose_name_plural = _('images')
-        abstract = True
-        if GTE_DJANGO_1_10:
-            default_manager_name = 'objects'

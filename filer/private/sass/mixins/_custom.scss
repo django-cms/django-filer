@@ -3,7 +3,6 @@
 
 // add clearfix which doesnt add overflow:hidden
 @mixin clearfix() {
-    *zoom: 1;
     &:before,
     &:after {
         content: " ";
@@ -67,7 +66,7 @@
     &[disabled] {
         &,
         &:hover,
-        &:focus
+        &:focus,
         &:active {
             background-color: rgba($background, 0.4) important($important);
             border-color: rgba($border, 0.4) important($important);

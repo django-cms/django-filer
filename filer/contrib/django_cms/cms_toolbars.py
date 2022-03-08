@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
-from django.core.urlresolvers import reverse
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 
 from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.toolbar.items import Break
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
+
 
 SHORTCUTS_BREAK = 'Shortcuts Break'
 
@@ -36,7 +33,7 @@ class FilerToolbar(CMSToolbar):
         items = admin_menu.get_items()[start.index + 1: end.index]
         for idx, item in enumerate(items):
             try:
-                if force_text(item_name.lower()) < force_text(item.name.lower()):
+                if force_str(item_name.lower()) < force_str(item.name.lower()):
                     return idx + start.index + 1
             except AttributeError:
                 # Some item types do not have a 'name' attribute.

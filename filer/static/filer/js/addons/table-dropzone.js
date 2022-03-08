@@ -2,6 +2,13 @@
 // This script implements the dropzone settings
 'use strict';
 
+// as of Django 2.x we need to check where jQuery is
+var djQuery = window.$;
+
+if (django.jQuery) {
+    djQuery = django.jQuery;
+}
+
 /* globals Dropzone, Cl, django */
 (function ($) {
     $(function () {
@@ -192,14 +199,14 @@
                             window.location.reload();
                         }
                     },
-                    error: function (file, errorText) {
+                    error: function (file, error) {
                         updateUploadNumber();
-                        if (errorText === 'duplicate') {
+                        if (error === 'duplicate') {
                             return;
                         }
                         hasErrors = true;
                         if (window.filerShowError) {
-                            window.filerShowError(file.name + ': ' + errorText);
+                            window.filerShowError(file.name + ': ' + error.message);
                         }
                     }
                 });
@@ -213,4 +220,4 @@
             });
         }
     });
-})(django.jQuery);
+})(djQuery);

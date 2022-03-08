@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import warnings
 
 from django import forms
 from django.contrib.admin.sites import site
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
-from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
@@ -22,7 +20,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
     input_type = 'hidden'
     is_hidden = False
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id')
         css_id_folder = "%s_folder" % css_id
@@ -30,6 +28,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         if attrs is None:
             attrs = {}
         related_url = None
+
         if value:
             try:
                 folder = Folder.objects.get(pk=value)
@@ -48,7 +47,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             # The JavaScript looks for this hook.
             attrs['class'] = 'vForeignKeyRawIdAdminField'
         super_attrs = attrs.copy()
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)  # grandparent super
 
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
@@ -72,14 +71,16 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return '&nbsp;<strong>%s</strong>' % truncate_words(obj, 14)
 
     def obj_for_value(self, value):
+        if not value:
+            return None
         try:
             key = self.rel.get_related_field().name
-            obj = self.rel.to._default_manager.get(**{key: value})
-        except:
+            obj = self.rel.model._default_manager.get(**{key: value})
+        except ObjectDoesNotExist:
             obj = None
         return obj
 
-    class Media(object):
+    class Media:
         js = (
             'filer/js/addons/popup_handling.js',
         )
@@ -96,6 +97,7 @@ class AdminFolderFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
+        kwargs.pop('blank', None)
         forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
@@ -112,29 +114,18 @@ class FilerFolderField(models.ForeignKey):
         dfl = get_model_label(self.default_model_class)
         if "to" in kwargs.keys():  # pragma: no cover
             old_to = get_model_label(kwargs.pop("to"))
-            if old_to != dfl:
+            if old_to.lower() != dfl.lower():
                 msg = "%s can only be a ForeignKey to %s; %s passed" % (
                     self.__class__.__name__, dfl, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
-        super(FilerFolderField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
-        # This is a fairly standard way to set up some defaults
-        # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
-            'rel': self.rel,
+            'rel': self.remote_field,
         }
         defaults.update(kwargs)
-        return super(FilerFolderField, self).formfield(**defaults)
-
-    def south_field_triple(self):
-        "Returns a suitable description of this field for South."
-        # We'll just introspect ourselves, since we inherit.
-        from south.modelsinspector import introspector
-        field_class = "django.db.models.fields.related.ForeignKey"
-        args, kwargs = introspector(self)
-        # That's our definition!
-        return (field_class, args, kwargs)
+        return super().formfield(**defaults)

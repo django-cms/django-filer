@@ -1,4 +1,4 @@
-{% load i18n l10n admin_list filer_tags filer_admin_tags staticfiles %}
+{% load i18n l10n admin_list filer_tags filer_admin_tags static thumbnail %}
 <div class="drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
     <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
@@ -23,7 +23,7 @@
                     <td class="column-icon">
                         <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                             title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                            <img src="{% static 'filer/icons/unfiled_folder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                            <img src="{% static 'filer/icons/folder-unfiled.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                         </a>
                     </td>
                     <td class="column-name" colspan="4">
@@ -53,7 +53,7 @@
                             <td class="column-icon">
                                 <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                                     title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    <img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                    <img src="{% static 'filer/icons/folder.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
                                 </a>
                             </td>
                             <td class="column-name">
@@ -89,7 +89,7 @@
                         <tr>
                             <td class="column-checkbox">
                                 {% if is_popup and filer_admin_context.pick_file %}
-                                    <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"
+                                    <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                         title="{% trans 'Select this file' %}">&nbsp;</a>
                                 {% elif action_form and not is_popup %}
                                     <input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action">
@@ -97,13 +97,13 @@
                             </td>
                             <td class="column-icon">
                                 {% if is_popup and filer_admin_context.pick_file %}
-                                    <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"
+                                    <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                         title="{% trans 'Select this file' %}">
                                 {% elif has_change_permission %}
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                             title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                 {% endif %}
-                                    <img src="{% if file.icons.48 %}{{ file.icons.48 }}{% else %}{% static 'filer/icons/missingfile_48x48.png' %}{% endif %}" alt="{{ file.default_alt_text }}" width="28" height="28">
+                                {% file_icon file %}
                                 {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                     </a>
                                 {% endif %}
@@ -112,7 +112,7 @@
                                 <div>
                                     <strong>
                                         {% if is_popup and filer_admin_context.pick_file %}
-                                            <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.48|escapejs }}', '{{ file.label|escapejs }}'); return false;"
+                                            <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                                 title="{% trans 'Select this file' %}">
                                         {% elif has_change_permission %}
                                             <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
@@ -132,7 +132,7 @@
                                 {{ file.owner|default:"n/a" }}
                             </td>
                             <td class="column-size">
-                                <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width }}x{{ file.height }} px{% endifequal %})</span>
+                                <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% ifequal file.file_type "Image" %}, {{ file.width|floatformat }}x{{ file.height|floatformat }} px{% endifequal %})</span>
                             </td>
                             <td class="column-action">
                                 <a href="{{ file.canonical_url }}"
@@ -143,8 +143,8 @@
                                     title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil"></span></a>
                                 <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash"></span></a>
                             </td>
+                            {% endwith %}
                         </tr>
-                    {% endwith %}
                 {% endif %}
             {% empty %}
                 <tr>
@@ -161,7 +161,7 @@
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
             <div class="folder">
                 <div class="folder-inner">
-                    <img src="{% static 'filer/icons/plainfolder_48x48.png' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18">
+                    <img src="{% static 'filer/icons/folder.svg' %}" alt="{% trans 'Folder Icon' %}" width="18" height="18">
                     <span class="js-filer-dropzone-folder-name"></span>
                 </div>
             </div>

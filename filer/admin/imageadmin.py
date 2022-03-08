@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django import forms
-from django.utils.translation import string_concat
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 
 from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
+from ..utils.compatibility import string_concat
 from ..utils.loader import load_model
 from .fileadmin import FileAdmin
+
 
 Image = load_model(FILER_IMAGE_MODEL)
 
@@ -35,6 +33,7 @@ class ImageAdminForm(forms.ModelForm):
     def _set_previous_subject_location(self, cleaned_data):
         subject_location = self.instance.subject_location
         cleaned_data['subject_location'] = subject_location
+        self.data = self.data.copy()
         self.data['subject_location'] = subject_location
 
     def clean_subject_location(self):
@@ -45,7 +44,7 @@ class ImageAdminForm(forms.ModelForm):
         for subject location widget to receive valid coordinates on field
         validation errors.
         """
-        cleaned_data = super(ImageAdminForm, self).clean()
+        cleaned_data = super().clean()
         subject_location = cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it
@@ -55,12 +54,14 @@ class ImageAdminForm(forms.ModelForm):
         coordinates = normalize_subject_location(subject_location)
 
         if not coordinates:
-            err_msg = ugettext_lazy('Invalid subject location format. ')
+            err_msg = gettext_lazy('Invalid subject location format. ')
             err_code = 'invalid_subject_format'
 
-        elif (coordinates[0] > self.instance.width or
-                coordinates[1] > self.instance.height):
-            err_msg = ugettext_lazy(
+        elif (
+            coordinates[0] > self.instance.width
+            or coordinates[1] > self.instance.height
+        ):
+            err_msg = gettext_lazy(
                 'Subject location is outside of the image. ')
             err_code = 'subject_out_of_bounds'
         else:
@@ -70,16 +71,16 @@ class ImageAdminForm(forms.ModelForm):
         raise forms.ValidationError(
             string_concat(
                 err_msg,
-                ugettext_lazy('Your input: "{subject_location}". '.format(
+                gettext_lazy('Your input: "{subject_location}". '.format(
                     subject_location=subject_location)),
                 'Previous value is restored.'),
             code=err_code)
 
-    class Meta(object):
+    class Meta:
         model = Image
         exclude = ()
 
-    class Media(object):
+    class Media:
         css = {
             # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
         }
@@ -89,11 +90,17 @@ class ImageAdminForm(forms.ModelForm):
 
 
 class ImageAdmin(FileAdmin):
+    change_form_template = 'admin/filer/image/change_form.html'
     form = ImageAdminForm
 
 
+if FILER_IMAGE_MODEL == 'filer.Image':
+    extra_main_fields = ('author', 'default_alt_text', 'default_caption',)
+else:
+    extra_main_fields = ('default_alt_text', 'default_caption',)
+
 ImageAdmin.fieldsets = ImageAdmin.build_fieldsets(
-    extra_main_fields=('author', 'default_alt_text', 'default_caption',),
+    extra_main_fields=extra_main_fields,
     extra_fieldsets=(
         (_('Subject location'), {
             'fields': ('subject_location',),
