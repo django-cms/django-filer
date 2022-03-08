@@ -50,6 +50,12 @@ class ClipboardAdmin(admin.ModelAdmin):
             re_path(r'^operations/upload/no_folder/$',
                     ajax_upload,
                     name='filer-ajax_upload'),
+           re_path(r'^operations/upload/check/(?P<folder_id>[0-9]+)/$',
+                    file_constraints_check,
+                    name='filer-check_file_constraints'),
+           re_path(r'^operations/upload/check/no_folder/$',
+                    file_constraints_check,
+                    name='filer-check_file_constraints'),
         ] + super().get_urls()
 
     def get_model_perms(self, *args, **kwargs):
@@ -61,6 +67,24 @@ class ClipboardAdmin(admin.ModelAdmin):
             'change': False,
             'delete': False,
         }
+
+
+@csrf_exempt
+def file_constraints_check(request, folder_id=None):
+    """
+    Call all file constraints define in settings and return json response
+    """
+    file_constraint_checks = filer_settings.FILER_FILE_CONSTRAINTS
+    for path in file_constraint_checks:
+        func = import_string(path)
+        try:
+            func(request, folder_id)
+        except ValidationError as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({'success': True})
 
 
 @csrf_exempt
