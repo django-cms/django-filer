@@ -63,9 +63,13 @@ if (django.jQuery) {
 
         if (dropzoneBase && dropzoneBase.length) {
             baseUrl = dropzoneBase.data('url');
+            var acceptUrl = dropzoneBase.data('accept');
             baseFolderTitle = dropzoneBase.data('folder-name');
 
-            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-filer-dropzone');
+            $('body').data('url', baseUrl);
+            $('body').data('accept', acceptUrl);
+            $('body').data('folder-name', baseFolderTitle);
+            $('body').addClass('js-filer-dropzone');
         }
 
         Cl.mediator.subscribe('filer-upload-in-progress', destroyDropzones);
@@ -87,8 +91,14 @@ if (django.jQuery) {
                     clickable: false,
                     addRemoveLinks: false,
                     parallelUploads: dropzone.data(dataUploaderConnections) || 3,
+                    init: function() {
+                        this.on("addedfile", file => {
+                            console.log("A file has been added");
+                        });
+                    },
                     accept: function (file, done) {
                         var uploadInfoClone;
+                        var dropzoneChecksUrl = dropzone.data('accept');
 
                         Cl.mediator.remove('filer-upload-in-progress', destroyDropzones);
                         Cl.mediator.publish('filer-upload-in-progress');
@@ -97,9 +107,39 @@ if (django.jQuery) {
                         uploadWelcome.addClass(hiddenClass);
                         cancelUpload.removeClass(hiddenClass);
 
-                        if (getElementByFile(file, dropzoneUrl).length) {
+                        var hasFailedChecks = false;
+                        var message = "None";
+                        var formData = new FormData();
+                        formData.append('file', file);
+                        $.ajax({
+                            url: dropzoneChecksUrl,
+                            async: false,
+                            type : 'POST',
+                            data : formData,
+                            processData: false,
+                            contentType: false,
+                            success : function(result) {
+                                if(result.success) {
+                                    console.log("Succeeded: ", result);
+                                    done();
+                                }
+                                else {
+                                    var confirm = window.confirm(file.name + ": " + result.error);
+
+                                    if(confirm === false) {
+                                        hasFailedChecks = true;
+                                    }
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.log("error " + errorThrown)
+                            }
+                        });
+
+                        if(getElementByFile(file, dropzoneUrl).length) {
                             done('duplicate');
-                        } else {
+                        }
+                        else if(hasFailedChecks === false) {
                             uploadInfoClone = uploadInfo.clone();
 
                             uploadInfoClone.find(uploadFileNameSelector).text(file.name);
