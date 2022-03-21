@@ -107,8 +107,7 @@ if (django.jQuery) {
                         uploadWelcome.addClass(hiddenClass);
                         cancelUpload.removeClass(hiddenClass);
 
-                        var hasFailedChecks = false;
-                        var message = "None";
+                        var fileProceed = true;
                         var formData = new FormData();
                         formData.append('file', file);
                         $.ajax({
@@ -119,27 +118,27 @@ if (django.jQuery) {
                             processData: false,
                             contentType: false,
                             success : function(result) {
-                                if(result.success) {
-                                    console.log("Succeeded: ", result);
-                                    done();
-                                }
-                                else {
+                                if(result.success != true) {
                                     var confirm = window.confirm(file.name + ": " + result.error);
 
                                     if(confirm === false) {
-                                        hasFailedChecks = true;
+                                        fileProceed = false;
                                     }
                                 }
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
-                                console.log("error " + errorThrown)
+                                console.log("error " + errorThrown);
                             }
                         });
+
+                        if(fileProceed === false) {
+                            return done('duplicate');
+                        }
 
                         if(getElementByFile(file, dropzoneUrl).length) {
                             done('duplicate');
                         }
-                        else if(hasFailedChecks === false) {
+                        else {
                             uploadInfoClone = uploadInfo.clone();
 
                             uploadInfoClone.find(uploadFileNameSelector).text(file.name);
