@@ -51,6 +51,8 @@ if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
         "FILER_ADMIN_ICON_SIZES has not all of the essential icon sizes "
         "listed: {}. Some icons might be missing in admin templates.".format(
             _ESSENTIAL_ICON_SIZES))
+# Max file size, in megabytes
+FILER_MAX_FILE_SIZE = 256
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files

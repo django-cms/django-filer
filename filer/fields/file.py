@@ -62,6 +62,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             'lookup_name': name,
             'id': css_id,
             'admin_icon_delete': ('admin/img/icon-deletelink.svg'),
+            'max_file_size': filer_settings.FILER_MAX_FILE_SIZE,
         }
         html = render_to_string('admin/filer/widgets/admin_file.html', context)
         return mark_safe(html)
