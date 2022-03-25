@@ -60,16 +60,44 @@ if (django.jQuery) {
                 url
             ));
         };
+        var runChecks = function (file, checksUrl) {
+            var formData = new FormData();
+            var shouldUpload = true;
+            formData.append('file', file);
+
+            $.ajax({
+                url: checksUrl,
+                async: false,
+                type : 'POST',
+                data : formData,
+                processData: false,
+                contentType: false,
+                success : function(result) {
+                    if(result.success !== true) {
+                        var confirm = window.confirm(file.name + ": " + result.error);
+
+                        if(confirm === false) {
+                            shouldUpload = false;
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("error " + errorThrown);
+                }
+            });
+            return shouldUpload;
+        };
 
         if (dropzoneBase && dropzoneBase.length) {
             baseUrl = dropzoneBase.data('url');
-            var acceptUrl = dropzoneBase.data('accept');
+            var checksUrl = dropzoneBase.data('accept');
             baseFolderTitle = dropzoneBase.data('folder-name');
 
-            $('body').data('url', baseUrl);
-            $('body').data('accept', acceptUrl);
-            $('body').data('folder-name', baseFolderTitle);
-            $('body').addClass('js-filer-dropzone');
+            var $body = $('body');
+            $body.data('url', baseUrl);
+            $body.data('accept', checksUrl);
+            $body.data('folder-name', baseFolderTitle);
+            $body.addClass('js-filer-dropzone');
         }
 
         Cl.mediator.subscribe('filer-upload-in-progress', destroyDropzones);
@@ -91,11 +119,6 @@ if (django.jQuery) {
                     clickable: false,
                     addRemoveLinks: false,
                     parallelUploads: dropzone.data(dataUploaderConnections) || 3,
-                    init: function() {
-                        this.on("addedfile", file => {
-                            console.log("A file has been added");
-                        });
-                    },
                     accept: function (file, done) {
                         var uploadInfoClone;
                         var dropzoneChecksUrl = dropzone.data('accept');
@@ -108,34 +131,14 @@ if (django.jQuery) {
                         cancelUpload.removeClass(hiddenClass);
 
                         var fileProceed = true;
-                        var formData = new FormData();
-                        formData.append('file', file);
-                        $.ajax({
-                            url: dropzoneChecksUrl,
-                            async: false,
-                            type : 'POST',
-                            data : formData,
-                            processData: false,
-                            contentType: false,
-                            success : function(result) {
-                                if(result.success != true) {
-                                    var confirm = window.confirm(file.name + ": " + result.error);
-
-                                    if(confirm === false) {
-                                        fileProceed = false;
-                                    }
-                                }
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                console.log("error " + errorThrown);
-                            }
-                        });
+                        if (checksUrl !== "undefined") {
+                            fileProceed = runChecks(file, checksUrl);
+                        }
 
                         if(fileProceed === false) {
                             return done('duplicate');
                         }
-
-                        if(getElementByFile(file, dropzoneUrl).length) {
+                        else if(getElementByFile(file, dropzoneUrl).length) {
                             done('duplicate');
                         }
                         else {
