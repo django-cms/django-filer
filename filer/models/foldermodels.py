@@ -8,8 +8,9 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.html import format_html, format_html_join
-from django.utils.http import urlquote
 from django.utils.translation import gettext_lazy as _
+
+from urllib.parse import quote as urlquote
 
 import mptt
 
