@@ -13,6 +13,6 @@ Release logic:
  9. Check that new version is published on PyPI
 """
 
-__version__ = '2.1.2'
+__version__ = '2.2dev0'
 
 default_app_config = 'filer.apps.FilerConfig'
