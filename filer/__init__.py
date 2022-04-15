@@ -7,11 +7,10 @@ Release logic:
  3. git add filer/__init__.py CHANGELOG.rst
  4. git commit -m 'Bump to {new version}'
  5. git push
- 6. Assure that all tests pass on https://travis-ci.org/github/divio/django-filer.
+ 6. Assure that all tests pass on https://github.com/django-cms/django-filer/actions
  7. git tag {new version}
  8. git push --tags
- 9. python setup.py sdist
-10. twine upload dist/django-filer-{new version}.tar.gz
+ 9. Check that new version is published on PyPI
 """
 
 __version__ = '2.1.2'
