@@ -79,17 +79,23 @@ def file_icon_context(file, detail, width, height):
         context['download_url'] = file.url
     if isinstance(file, BaseImage):
         thumbnailer = get_thumbnailer(file)
-        if detail:
-            width, height = 210, ceil(210 / file.width * file.height)
-            context['sidebar_image_ratio'] = file.width / 210
-            opts = {'size': (width, height), 'upscale': True}
+
+        # SVG files may contain multiple vector graphics, and width and height are not available for them. If file does
+        # not have width or height just ignore the thumbnail icon. Otherwise, continue with the standard procedure.
+        if file.width == 0.0 or file.height == 0.0:
+            icon_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
         else:
-            opts = {'size': (width, height), 'crop': True}
-        icon_url = thumbnailer.get_thumbnail(opts).url
-        context['alt_text'] = file.default_alt_text
-        if mime_subtype != 'svg+xml':
-            opts['size'] = 2 * width, 2 * height
-            context['highres_url'] = thumbnailer.get_thumbnail(opts).url
+            if detail:
+                width, height = 210, ceil(210 / file.width * file.height)
+                context['sidebar_image_ratio'] = file.width / 210
+                opts = {'size': (width, height), 'upscale': True}
+            else:
+                opts = {'size': (width, height), 'crop': True}
+            icon_url = thumbnailer.get_thumbnail(opts).url
+            context['alt_text'] = file.default_alt_text
+            if mime_subtype != 'svg+xml':
+                opts['size'] = 2 * width, 2 * height
+                context['highres_url'] = thumbnailer.get_thumbnail(opts).url
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
