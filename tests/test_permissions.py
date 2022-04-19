@@ -63,6 +63,10 @@ class FolderPermissionsTestCase(TestCase):
     def tearDown(self):
         self.image.delete()
 
+    def test_folder_all(self):
+        folder = Folder.objects.create(name="test_folder3")
+        self.assertEqual(str(folder), "/test_folder3")
+
     def test_superuser_has_rights(self):
         request = Mock()
         setattr(request, 'user', self.superuser)
@@ -141,6 +145,7 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder_perm.has_read_permission(request1), True)
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
 
+            self.assertEqual(self.folder_perm.pretty_logical_path, "/test_folder2")
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
@@ -321,3 +326,34 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_folder_who_owner(self):
+        perm = FolderPermission.objects.create(
+            user=self.owner,
+            folder=Folder.objects.create(name="folder4"),
+            type=FolderPermission.CHILDREN,
+            can_edit=FolderPermission.DENY,
+            can_read=FolderPermission.ALLOW,
+            can_add_children=FolderPermission.ALLOW,
+        )
+        self.assertEqual(perm.who, "User: owner")
+        self.assertEqual(perm.pretty_logical_path, "/folder4")
+        self.assertEqual(perm.what, "E̶d̶i̶t̶, Read, Add children")
+
+    def test_folder_who_group(self):
+        perm = FolderPermission.objects.create(
+            group=self.group1,
+        )
+        self.assertEqual(perm.who, "Group: name1")
+
+    def test_folder_who_everybody(self):
+        perm = FolderPermission.objects.create(
+            everybody=True,
+        )
+        self.assertEqual(perm.who, "Everybody")
+        self.assertEqual(perm.pretty_logical_path, "All Folders")
+        self.assertEqual(perm.__str__(), "All Folders")
+
+    def test_folder_who_nobody(self):
+        perm = FolderPermission.objects.create()
+        self.assertEqual(perm.who, "–")

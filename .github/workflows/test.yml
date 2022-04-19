@@ -8,13 +8,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt
         ]
+        exclude:
+          - python-version: 3.9
+            requirements-file: django-2.2.txt
+          - python-version: 3.10
+            requirements-file: django-2.2.txt
+          - python-version: 3.10
+            requirements-file: django-3.0.txt
+          - python-version: 3.10
+            requirements-file: django-3.1.txt
         os: [
           ubuntu-20.04,
         ]
@@ -25,12 +34,16 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: library prerequisites
+      run: sudo apt-get install python-dev libpq-dev libmagic1 gcc libxml2-dev libxslt1-dev libjpeg62 libopenjp2-7 -y
+    - name: Install extra dependencies
+      run: pip install lxml
+      if: matrix.python-version == '3.10'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r tests/requirements/${{ matrix.requirements-file }}
         python setup.py install
-
     - name: Run coverage
       run: coverage run setup.py test
 

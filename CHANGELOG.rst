@@ -3,7 +3,6 @@ CHANGELOG
 =========
 
 2.2 (2022-04-19)
-================
 
 * Improve the list view of Folder permissions.
 * Fix: Folder permissions were disabled for descendants, if parent folder
