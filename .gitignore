@@ -4,6 +4,7 @@
 *.log
 *.pot
 .DS_Store
+.coverage
 .coverage/
 .eggs/
 .idea/
