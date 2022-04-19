@@ -153,7 +153,7 @@ class Folder(models.Model, mixins.IconsMixin):
         return self.pretty_logical_path
 
     def __repr__(self):
-        return '<{}: {}>'.format(self.__class__.__name__, self.pretty_logical_path)
+        return f'<{self.__class__.__name__}(pk={self.pk}): {self.pretty_logical_path}>'
 
     @property
     def file_count(self):
@@ -250,7 +250,7 @@ class Folder(models.Model, mixins.IconsMixin):
 
     def get_admin_delete_url(self):
         return reverse(
-            'admin:{0}_{1}_delete'.format(self._meta.app_label, self._meta.model_name),
+            f'admin:{self._meta.app_label}_{self._meta.model_name}_delete',
             args=(self.pk,)
         )
 
@@ -361,9 +361,8 @@ class FolderPermission(models.Model):
         return self.pretty_logical_path
 
     def __repr__(self):
-        return '<{} folder="{}", who="{}", what="{}">'.format(
-            self.__class__.__name__, self.pretty_logical_path, self.who, self.what
-        )
+        return f'<{self.__class__.__name__}(pk={self.pk}): folder="{self.pretty_logical_path}", ' \
+               'who="{self.who}", what="{self.what}">'
 
     def clean(self):
         if self.type == self.ALL and self.folder:
@@ -390,9 +389,9 @@ class FolderPermission(models.Model):
         """
         parts = []
         if self.user:
-            parts.append(_("User: {}").format(self.user))
+            parts.append(_("User: {user}").format(user=self.user))
         if self.group:
-            parts.append(_("Group: {}").format(self.group))
+            parts.append(_("Group: {group}").format(group=self.group))
         if self.everybody:
             parts.append(_("Everybody"))
         if parts:
