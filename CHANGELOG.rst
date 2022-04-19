@@ -2,6 +2,15 @@
 CHANGELOG
 =========
 
+2.1.3 (next)
+============
+
+* Improve the list view of Folder permissions.
+* Fix: Folder permissions were disabled for descendants, if parent folder
+  has type set to CHILDREN.
+* The input field for Folder changes from a standard HTML select element to
+  a very wide autocomplete field, showing the complete path in Filer.
+
 
 2.1.2 (2021-11-09)
 ==================
