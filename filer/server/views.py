@@ -51,7 +51,7 @@ def serve_protected_thumbnail(request, path):
             raise Http404('File not found')
     try:
         thumbnail = ThumbnailFile(name=path, storage=file_obj.file.thumbnail_storage)
-        thumbnail_temp_file = File(file=thumbnail, mime_type=file_obj.mime_type)
-        return thumbnail_server.serve(request, thumbnail_temp_file, save_as=False)
+        thumbnail.mime_type = file_obj.mime_type
+        return thumbnail_server.serve(request, thumbnail, save_as=False)
     except Exception:
         raise Http404('File not found')
