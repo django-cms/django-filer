@@ -10,7 +10,10 @@ CHANGELOG
   has type set to CHILDREN.
 * The input field for Folder changes from a standard HTML select element to
   a very wide autocomplete field, showing the complete path in Filer.
+* Fix: Upload invalid SVG file.
 * Add support for Python-3.10.
+* Switch theme for readthedocs to Furo.
+* Fix: 404 error when serving thumbnail.
 
 
 2.1.2 (2021-11-09)
