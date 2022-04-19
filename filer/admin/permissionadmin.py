@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from .. import settings
 
@@ -6,14 +7,16 @@ from .. import settings
 class PermissionAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['type', 'folder']}),
-        (None, {'fields': ['user', 'group', 'everybody']}),
-        (None, {'fields': ['can_edit', 'can_read', 'can_add_children']}),
+        (_("Who"), {'fields': ['user', 'group', 'everybody']}),
+        (_("What"), {'fields': ['can_edit', 'can_read', 'can_add_children']}),
     ]
-    raw_id_fields = ['user', 'group']
     list_filter = ['group']
-    list_display = ['__str__', 'folder', 'user']
+    list_display = ['pretty_logical_path', 'who', 'what']
     search_fields = ['user__username', 'group__name', 'folder__name']
-    autocomplete_fields = ['user', 'group']
+    autocomplete_fields = ['user', 'group', 'folder']
+
+    class Media:
+        css = {'all': ['filer/css/admin_folderpermissions.css']}
 
     def get_queryset(self, request):
         qs = super(PermissionAdmin, self).get_queryset(request)

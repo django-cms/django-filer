@@ -1,5 +1,6 @@
 import os
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
@@ -211,16 +212,30 @@ class FilerApiTests(TestCase):
         # file should still be here
         self.assertTrue(storage.exists(name))
 
-    def test_folder_quoted_logical_path(self):
+    def test_folder_pretty_logical_path(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s Foo', parent=root_folder)
-        self.assertEqual(child.quoted_logical_path, '/Foo%27s%20Bar/Bar%22s%20Foo')
+        if DJANGO_VERSION < (3,):
+            self.assertEqual(child.pretty_logical_path, '/Foo&#39;s Bar/Bar&quot;s Foo')
+        else:
+            self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s Foo')
 
-    def test_folder_quoted_logical_path_with_unicode(self):
+    def test_legacy_quoted_logical_path(self):
+        folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        with self.assertWarns(Warning):
+            isinstance(folder.quoted_logical_path, str)
+
+    def test_folder_pretty_logical_path_with_unicode(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s 日本 Foo', parent=root_folder)
-        self.assertEqual(child.quoted_logical_path,
-                         '/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
+        if DJANGO_VERSION < (3,):
+            self.assertEqual(child.pretty_logical_path, '/Foo&#39;s Bar/Bar&quot;s 日本 Foo')
+        else:
+            self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s 日本 Foo')
+
+    def test_folder_str_method(self):
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        self.assertEqual(root_folder.pretty_logical_path, str(root_folder))
 
     def test_custom_model(self):
         """
