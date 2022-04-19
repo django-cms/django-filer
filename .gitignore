@@ -17,6 +17,8 @@ build/
 dist/
 env/
 .venv/
+/*docs/env*/
+/*docs/_build*/
 
 /~
 /node_modules
