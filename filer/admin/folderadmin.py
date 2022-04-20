@@ -2,6 +2,8 @@ import itertools
 import os
 import re
 from collections import OrderedDict
+from urllib.parse import quote as urlquote
+from urllib.parse import unquote as urlunquote
 
 from django import forms
 from django.conf import settings as django_settings
@@ -16,10 +18,9 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import re_path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
-from django.utils.http import urlquote, urlunquote
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy, ungettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from .. import settings
 from ..models import (
@@ -398,7 +399,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             action_form = None
 
-        selection_note_all = ungettext('%(total_count)s selected',
+        selection_note_all = ngettext_lazy('%(total_count)s selected',
             'All %(total_count)s selected', paginator.count)
 
         # If page request (9999) is out of range, deliver last page of results.
@@ -629,8 +630,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         return None
 
-    move_to_clipboard.short_description = gettext_lazy(
-        "Move selected files to clipboard")
+    move_to_clipboard.short_description = _("Move selected files to clipboard")
 
     def files_set_public_or_private(self, request, set_public, files_queryset,
                                     folders_queryset):
@@ -680,15 +680,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return self.files_set_public_or_private(request, False, files_queryset,
                                                 folders_queryset)
 
-    files_set_private.short_description = gettext_lazy(
-        "Enable permissions for selected files")
+    files_set_private.short_description = _("Enable permissions for selected files")
 
     def files_set_public(self, request, files_queryset, folders_queryset):
         return self.files_set_public_or_private(request, True, files_queryset,
                                                 folders_queryset)
 
-    files_set_public.short_description = gettext_lazy(
-        "Disable permissions for selected files")
+    files_set_public.short_description = _("Disable permissions for selected files")
 
     def delete_files_or_folders(self, request, files_queryset, folders_queryset):
         """
@@ -787,8 +785,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             context
         )
 
-    delete_files_or_folders.short_description = gettext_lazy(
-        "Delete selected files and/or folders")
+    delete_files_or_folders.short_description = _("Delete selected files and/or folders")
 
     # Copied from django.contrib.admin.util
     def _format_callback(self, obj, user, admin_site, perms_needed):
@@ -929,7 +926,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Display the destination folder selection page
         return render(request, "admin/filer/folder/choose_move_destination.html", context)
 
-    move_files_and_folders.short_description = gettext_lazy("Move selected files and/or folders")
+    move_files_and_folders.short_description = _("Move selected files and/or folders")
 
     def _rename_file(self, file_obj, form_data, counter, global_counter):
         original_basename, original_extension = os.path.splitext(file_obj.original_filename)
@@ -1012,7 +1009,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Display the rename format selection page
         return render(request, "admin/filer/folder/choose_rename_format.html", context)
 
-    rename_files.short_description = gettext_lazy("Rename files")
+    rename_files.short_description = _("Rename files")
 
     def _generate_new_filename(self, filename, suffix):
         basename, extension = os.path.splitext(filename)
@@ -1144,7 +1141,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Display the destination folder selection page
         return render(request, "admin/filer/folder/choose_copy_destination.html", context)
 
-    copy_files_and_folders.short_description = gettext_lazy("Copy selected files and/or folders")
+    copy_files_and_folders.short_description = _("Copy selected files and/or folders")
 
     def _check_resize_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -1274,4 +1271,4 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Display the resize options page
         return render(request, "admin/filer/folder/choose_images_resize_options.html", context)
 
-    resize_images.short_description = gettext_lazy("Resize selected images")
+    resize_images.short_description = _("Resize selected images")

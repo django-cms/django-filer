@@ -4,6 +4,7 @@
 *.log
 *.pot
 .DS_Store
+.coverage
 .coverage/
 .eggs/
 .idea/
@@ -17,6 +18,8 @@ docs/_build/
 dist/
 env/
 .venv/
+/*docs/env*/
+/*docs/_build*/
 
 /~
 /node_modules

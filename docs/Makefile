@@ -6,6 +6,8 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
+VENV = env/bin/activate
+PORT = 8001
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -17,6 +19,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html       to make standalone HTML files"
+	@echo "  run       to build the docs, watch for changes, and serve them at http://0.0.0.0:8001"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 	@echo "  pickle     to make pickle files"
@@ -32,7 +35,22 @@ help:
 	@echo "  changes    to make an overview of all changed/added/deprecated items"
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
+	@echo "  spelling  to check for typos in documentation"
 
+install:
+	@echo "... setting up virtualenv"
+	python3 -m venv env
+	. $(VENV); pip install -r requirements.txt
+
+	@echo "\n" \
+	      "-------------------------------------------------------------------------------------------------- \n" \
+		    "* watch, build and serve the documentation: make run \n" \
+		    "* check spelling: make spelling \n" \
+		    "\n" \
+				"enchant must be installed in order for pyenchant (and therefore spelling checks) to work. See \n" \
+				"http://docs.django-cms.org/en/latest/contributing/documentation.html#install-the-spelling-software \n" \
+	      "-------------------------------------------------------------------------------------------------- \n" \	
+		  
 clean:
 	-rm -rf $(BUILDDIR)/*
 
@@ -128,3 +146,12 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+spelling:
+	. $(VENV); $(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) build/spelling
+	@echo
+	@echo "Check finished. Wrong words can be found in " \
+		"build/spelling/output.txt."
+
+run:
+	. $(VENV); sphinx-autobuild $(ALLSPHINXOPTS) build/html --host 0.0.0.0 --port $(PORT)		  

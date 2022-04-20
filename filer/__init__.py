@@ -8,11 +8,11 @@ Release logic:
  4. git commit -m 'Bump to {new version}'
  5. git push
  6. Assure that all tests pass on https://github.com/django-cms/django-filer/actions
- 7. git tag {new version}
- 8. git push --tags
- 9. Check that new version is published on PyPI
+ 7. Create a new release on github. Create the new tag against the latest master commit and auto generate
+    the release notes https://github.com/django-cms/django-filer/releases/new
+ 8. Publish the release and it will automatically release to pypi
 """
 
-__version__ = '2.2dev1'
+__version__ = '2.2'
 
 default_app_config = 'filer.apps.FilerConfig'

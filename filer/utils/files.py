@@ -16,9 +16,9 @@ class UploadException(Exception):
 
 
 def handle_upload(request):
-    if not request.method == "POST":
-        raise UploadException("AJAX request not valid: must be POST")
-    if request.is_ajax():
+    if not request.method == 'POST':
+        raise UploadException("XMLHttpRequest not valid: must be POST")
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         # the file is stored raw in the request
         is_raw = True
         filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
@@ -94,7 +94,7 @@ def handle_upload(request):
         if len(request.FILES) == 1:
             upload, filename, is_raw, mime_type = handle_request_files_upload(request)
         else:
-            raise UploadException("AJAX request not valid: Bad Upload")
+            raise UploadException("XMLHttpRequest request not valid: Bad Upload")
     return upload, filename, is_raw, mime_type
 
 
