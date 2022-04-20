@@ -2,6 +2,8 @@ import itertools
 import os
 import re
 from collections import OrderedDict
+from urllib.parse import quote as urlquote
+from urllib.parse import unquote as urlunquote
 
 from django import forms
 from django.conf import settings as django_settings
@@ -17,9 +19,8 @@ from django.urls import re_path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _, ngettext_lazy
-
-from urllib.parse import quote as urlquote, unquote as urlunquote
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from .. import settings
 from ..models import (
