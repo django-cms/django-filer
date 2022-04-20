@@ -21,6 +21,7 @@ from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
 from filer.settings import FILER_IMAGE_MODEL
+from filer.templatetags.filer_admin_tags import file_icon_url
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 
@@ -468,6 +469,16 @@ class FilerClipboardAdminUrlsTests(TestCase):
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
         self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
         self.assertEqual(Image.objects.count(), 0)
+
+    def test_templatetag_file_icon_url(self):
+        filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, 'invalid.svg')
+        with open(filename, 'wb') as fh:
+            fh.write(b'<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" height="0" width="0"><circle cx="0" cy="0" r="0" stroke="black" stroke-width="3" fill="red" /></svg>')
+        file_obj = django.core.files.File(open(filename, 'rb'), name=filename)
+        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, mime_type='image/svg+xml')
+        image_obj.save()
+        url = file_icon_url(image_obj)
+        self.assertEqual(url, '/static/filer/icons/file\\u002Dunknown.svg')
 
 
 class BulkOperationsMixin:
