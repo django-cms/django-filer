@@ -14,6 +14,7 @@ CHANGELOG
 * Add support for Python-3.10.
 * Switch theme for readthedocs to Furo.
 * Fix: 404 error when serving thumbnail.
+* Experimental support for Django-4.
 
 
 2.1.2 (2021-11-09)
