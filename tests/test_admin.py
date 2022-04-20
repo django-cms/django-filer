@@ -1,5 +1,4 @@
 import os
-from unittest import skipIf
 
 import django
 import django.core.files
@@ -154,8 +153,6 @@ class FilerFolderAdminUrlsTests(TestCase):
         folder = Folder.objects.get(pk=folder.pk)
         self.assertEqual(folder.owner.pk, another_superuser.pk)
 
-    @skipIf(django.get_version() < '1.7',
-            'admin context not supported in django < 1.7')
     def test_folder_admin_uses_admin_context(self):
         folder = Folder.objects.create(name='foo')
         url = reverse('admin:filer-directory_listing', kwargs={
