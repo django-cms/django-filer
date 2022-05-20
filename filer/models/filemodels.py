@@ -266,7 +266,7 @@ class File(PolymorphicModel,
                                        ContentFile(src_file.read()))
             src_file.close()
         self._current_file_location = destination
-        self.old_name = self.name
+        self._old_name = self.name
         self._old_folder_id = getattr(self.folder, 'id', None)
         return destination
 
