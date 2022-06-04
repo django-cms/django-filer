@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+Unreleased
+==========
+
+* Fix: Define a ``default_auto_field`` as part of the app config.
+
 2.2 (2022-04-20)
 ================
 
