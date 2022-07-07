@@ -1,7 +1,10 @@
 import gc
 import requests
 from collections import defaultdict
-from filer.models import File
+
+from django.contrib.sites.models import Site
+
+from filer.models import File, Folder
 
 
 def chunked_items(qs, size=100):
@@ -130,3 +133,26 @@ class FileChecker(object):
             log_progress(stats)
 
         return stats
+
+    @classmethod
+    def check_site(cls, site_id, log_progress=None):
+        folders = Folder.objects.filter(site_id=site_id).values_list('pk', flat=True)
+        files = File.objects.filter(folder_id__in=folders)
+
+        stats = FileStats(files.count())
+        log_progress = log_progress or (lambda x: None)
+
+        for _file in chunked_items(files):
+            asset = cls(_file)
+            stats.set_current(f'{asset.as_string()} url:{_file.url}', _file.is_public)
+
+            if not asset.path_logical():
+                stats.mark_current('path_mismatch')
+            if not asset.accessible():
+                stats.mark_current('not_accessible')
+            if not asset.exists():
+                stats.mark_current('missing')
+            log_progress(stats)
+
+        return stats
+
