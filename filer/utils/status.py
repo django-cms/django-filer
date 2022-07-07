@@ -144,7 +144,7 @@ class FileChecker(object):
 
         for _file in chunked_items(files):
             asset = cls(_file)
-            stats.set_current(f'{asset.as_string()} url:{_file.url}', _file.is_public)
+            stats.set_current(f'{asset.as_string()} url:{str(_file.file)}', _file.is_public)
 
             if not asset.path_logical():
                 stats.mark_current('path_mismatch')
