@@ -67,6 +67,13 @@ class FileStats(object):
                 for k, v in list(getattr(self, prefix).items())
                 if k != 'total'
             })
+        for prefix in ('public', 'private'):
+            data.update({
+                "Total {prefix}_{marker}".format(prefix=prefix, marker=k): len(v)
+                for k, v in list(getattr(self, prefix).items())
+                if k != 'total'
+            })
+
         return data
 
     def as_string(self, full=False):
@@ -144,7 +151,7 @@ class FileChecker(object):
 
         for _file in chunked_items(files):
             asset = cls(_file)
-            stats.set_current(f'{asset.as_string()} url:{str(_file.file)}', _file.is_public)
+            stats.set_current(f'{asset.as_string()} \nurl:{str(_file.file)}', _file.is_public)
 
             if not asset.path_logical():
                 stats.mark_current('path_mismatch')

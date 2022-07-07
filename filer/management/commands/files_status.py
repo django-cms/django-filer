@@ -33,12 +33,13 @@ class Command(BaseCommand):
         logger.times = 0
 
         site_id = options['site_id']
-        self.stdout.write(f'The site  id {site_id} .')
         if site_id:
+            self.stdout.write(f'The site id is: {site_id}.')
             try:
-                site_obj = Site.objects.get(pk=site_id)
+                _ = Site.objects.get(pk=site_id)
             except Site.DoesNotExist:
                 self.stdout.write(f'The site with id {site_id} does not exist.')
+                return
 
             result_stats = FileChecker.check_site(site_id, log_progress=logger)
             self.stdout.write(result_stats.as_string(full=True))
