@@ -6,14 +6,14 @@ from optparse import make_option
 class Command(BaseCommand):
 
     help = "Fixes the folder mptt tree hierarchy (tree corruption)."
-    option_list = BaseCommand.option_list + (
-        make_option('--check',
-            action='store_true',
-            dest='checktree',
-            default=False,
-            help='Performs only a check for corrupted folder trees. '
-                 'Prints all the corruptions it finds.'),
-        )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--check',
+                            action='store_true',
+                            dest='checktree',
+                            default=False,
+                            help='Performs only a check for corrupted folder trees. '
+                                 'Prints all the corruptions it finds.')
 
     def handle(self, *args, **options):
         checker = TreeChecker()
