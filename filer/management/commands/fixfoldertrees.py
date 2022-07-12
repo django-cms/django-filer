@@ -55,5 +55,5 @@ class Command(BaseCommand):
                     self.stdout.write(f"\n\tPerforming partial rebuild for folder {folder.name}")
                     checker.manager.partial_rebuild(folder.tree_id)
             else:
-                self.stdout.write("There are no corruptions, nothign to be done.\n")
+                self.stdout.write("There are no corruptions, nothing to be done.\n")
             self.stdout.write("\nRebuild Done.")
