@@ -14,6 +14,11 @@ class Command(BaseCommand):
                             default=False,
                             help='Performs only a check for corrupted folder trees. '
                                  'Prints all the corruptions it finds.')
+        parser.add_argument('--full-rebuild',
+                            action='store_true',
+                            dest='force_full_rebuild',
+                            default=False,
+                            help='Force a full tree rebuild.')
 
     def handle(self, *args, **options):
         checker = TreeChecker()
@@ -39,4 +44,16 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("There are no corruptions\n")
         else:
-            checker.rebuild()
+            self.stdout.write("Checking folder tree...\n")
+            checker.check_corruptions()
+            if checker.full_rebuild or options['force_full_rebuild']:
+                self.stdout.write("\nPerforming full rebuild...")
+                checker.manager.rebuild()
+            elif checker.corrupted_folders:
+                self.stdout.write("\nPerforming corrupted folders rebuild...")
+                for folder in checker.get_corrupted_root_nodes():
+                    self.stdout.write(f"\n\tPerforming partial rebuild for folder {folder.name}")
+                    checker.manager.partial_rebuild(folder.tree_id)
+            else:
+                self.stdout.write("There are no corruptions, nothign to be done.\n")
+            self.stdout.write("\nRebuild Done.")

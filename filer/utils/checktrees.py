@@ -107,7 +107,4 @@ class TreeChecker(object):
             self.manager.rebuild()
         elif self.corrupted_folders:
             for folder in self.get_corrupted_root_nodes():
-                # since we use an older version of djang-mptt and method
-                #   partial_rebuild does not exist ...
-                self.manager._rebuild_helper(
-                    folder.pk, 1, folder.tree_id)
+                self.manager.partial_rebuild(folder.tree_id)
