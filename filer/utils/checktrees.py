@@ -1,4 +1,5 @@
 from django.db.models import Count
+from filer.models import Folder
 
 
 class TreeCorruption(Exception):
@@ -53,12 +54,13 @@ class TreeChecker(object):
             pk__in=list(self.corrupted_folders.keys())).\
             values_list('tree_id', flat=True).distinct()
         return self.manager.filter(
-            parent__isnull=True, tree_id__in=corrupted_trees)
+            parent__isnull=True, deleted_ta__isnull=True, tree_id__in=corrupted_trees)
 
     def check_tree(self, pk, lft, tree_id, level=0):
         """
             * checks if a certain folder tree is corrupted or not.
             * uses the same logic as django-mptt's rebuild tree
+            * ignores deleted folders, same as django-mptt's rebuild
         """
         rght = lft + 1
         child_ids = self.manager.filter(parent__pk=pk).\
@@ -68,11 +70,12 @@ class TreeChecker(object):
             rght = self.check_tree(child_id, rght, tree_id, level + 1)
 
         folder = self.manager.get(pk=pk)
-        expected = (lft, rght, level, tree_id)
-        actual = (folder.lft, folder.rght, folder.level, folder.tree_id)
-        if expected != actual:
-            self.corrupted_folders.setdefault(
-                pk, self._build_diff_msg(expected, actual))
+        if folder.deleted_at is None:
+            expected = (lft, rght, level, tree_id)
+            actual = (folder.lft, folder.rght, folder.level, folder.tree_id)
+            if expected != actual:
+                self.corrupted_folders.setdefault(
+                    pk, self._build_diff_msg(expected, actual))
         return rght + 1
 
     def check_corruptions(self):
