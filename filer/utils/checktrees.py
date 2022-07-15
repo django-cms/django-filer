@@ -54,7 +54,7 @@ class TreeChecker(object):
             pk__in=list(self.corrupted_folders.keys())).\
             values_list('tree_id', flat=True).distinct()
         return self.manager.filter(
-            parent__isnull=True, deleted_ta__isnull=True, tree_id__in=corrupted_trees)
+            parent__isnull=True, deleted_at__isnull=True, tree_id__in=corrupted_trees)
 
     def check_tree(self, pk, lft, tree_id, level=0):
         """
