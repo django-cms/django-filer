@@ -1,5 +1,4 @@
 from django.db.models import Count
-from filer.models import Folder
 
 
 class TreeCorruption(Exception):
@@ -7,7 +6,6 @@ class TreeCorruption(Exception):
 
 
 class TreeChecker(object):
-
     ordering = ['tree_id', 'lft', 'rght']
 
     def __init__(self, folder_manager=None):
@@ -20,14 +18,13 @@ class TreeChecker(object):
         else:
             self.manager = folder_manager
 
-
     def find_corruptions(self):
         self.check_corruptions()
         if (self.full_rebuild or self.corrupted_folders):
             raise TreeCorruption()
 
     def _build_diff_msg(self, expected, actual):
-        attr_idx = {'lft':0, 'rght':1, 'level':2, 'tree_id':3}
+        attr_idx = {'lft': 0, 'rght': 1, 'level': 2, 'tree_id': 3}
         expected, actual = list(expected), list(actual)
         diff = []
         for attr, idx in list(attr_idx.items()):
@@ -51,7 +48,7 @@ class TreeChecker(object):
         if not self.corruption_check_done:
             self.check_corruptions()
         corrupted_trees = self.manager.filter(
-            pk__in=list(self.corrupted_folders.keys())).\
+            pk__in=list(self.corrupted_folders.keys())). \
             values_list('tree_id', flat=True).distinct()
         return self.manager.filter(
             parent__isnull=True, deleted_at__isnull=True, tree_id__in=corrupted_trees)
@@ -63,7 +60,7 @@ class TreeChecker(object):
             * ignores deleted folders, same as django-mptt's rebuild
         """
         rght = lft + 1
-        child_ids = self.manager.filter(parent__pk=pk).\
+        child_ids = self.manager.filter(parent__pk=pk). \
             order_by(*self.ordering).values_list('pk', flat=True)
 
         for child_id in child_ids:
@@ -85,15 +82,15 @@ class TreeChecker(object):
             * checks if there are multiple root folders with the
         same tree id(fixing this will require a full rebuild)
         """
-        tree_duplicates = self.manager.filter(parent=None).\
-            values_list('tree_id').\
+        tree_duplicates = self.manager.filter(parent=None). \
+            values_list('tree_id'). \
             annotate(count=Count('id')).filter(count__gt=1)
         if len(tree_duplicates) > 0:
             self.full_rebuild = True
             self.corruption_check_done = True
             return
 
-        pks = self.manager.filter(parent=None).\
+        pks = self.manager.filter(parent=None). \
             order_by(*self.ordering).values_list('pk', flat=True)
         idx = 0
         for pk in pks:
