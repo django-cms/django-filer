@@ -51,7 +51,7 @@ def mimetype_validator(value):
 validate_canonical_url_slug = RegexValidator(
     r"^[\-\.\w]+\Z",
     _(
-        "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, hyphens or dots."
+        "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, hyphens or periods."
     ),
     "invalid",
 )
