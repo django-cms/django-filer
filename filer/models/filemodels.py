@@ -11,6 +11,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import RegexValidator
 
 from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
@@ -46,6 +47,29 @@ def mimetype_validator(value):
         msg = "'{mimetype}' is not a recognized MIME-Type."
         raise ValidationError(msg.format(mimetype=value))
 
+
+validate_canonical_url_slug = RegexValidator(
+    f"^[{filer_settings.FILER_CANONICAL_URL_SLUG_ALLOWED_CHARS_RE}]+\Z",
+    _(
+        "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, hyphens or dots."
+    ),
+    "invalid",
+)
+
+
+class CanonicalUrlSlugField(models.SlugField):
+    default_validators = [validate_canonical_url_slug]
+    
+    def __init__(self, *args, max_length=255, **kwargs):
+        super().__init__(*args, max_length=max_length, **kwargs)
+    
+    def pre_save(self, model_instance, add):
+        # Force empty to be null in database
+        value = super().pre_save(model_instance, add)
+        if value:
+            return value
+        setattr(model_instance, self.attname, None)
+        return None
 
 class File(PolymorphicModel, mixins.IconsMixin):
     file_type = 'File'
@@ -99,6 +123,14 @@ class File(PolymorphicModel, mixins.IconsMixin):
         default="",
         blank=True,
         verbose_name=_("name"),
+    )
+
+    canonical_url_slug = CanonicalUrlSlugField(
+        _("Canonical URL slug"),
+        unique=True,
+        null=True,
+        blank=True,
+        help_text=_("slug used to override canonical URL"),
     )
 
     description = models.TextField(
@@ -358,14 +390,29 @@ class File(PolymorphicModel, mixins.IconsMixin):
             return int((self.uploaded_at - datetime(1970, 1, 1, 1)).total_seconds())
 
     @property
+    def raw_canonical_url(self):
+        url = ''
+        if self.file and self.is_public:
+            try:
+                url = reverse(
+                    "canonical",
+                    kwargs={"uploaded_at": self.canonical_time, "file_id": self.id},
+                )
+            except NoReverseMatch:
+                pass  # No canonical url, return empty string
+        return url
+
+    @property
     def canonical_url(self):
         url = ''
         if self.file and self.is_public:
             try:
-                url = reverse('canonical', kwargs={
-                    'uploaded_at': self.canonical_time,
-                    'file_id': self.id
-                })
+                if self.canonical_url_slug:
+                    url = reverse(
+                        "canonical", kwargs={"slug": self.canonical_url_slug}
+                    )
+                else:
+                    url = self.raw_canonical_url
             except NoReverseMatch:
                 pass  # No canonical url, return empty string
         return url

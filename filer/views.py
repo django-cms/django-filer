@@ -12,3 +12,12 @@ def canonical(request, uploaded_at, file_id):
     if (not filer_file.file or int(uploaded_at) != filer_file.canonical_time):
         raise Http404('No %s matches the given query.' % File._meta.object_name)
     return redirect(filer_file.url)
+
+def canonical_slug(request, slug):
+    """
+    Redirect to the current url of a public file
+    """
+    filer_file = get_object_or_404(File, canonical_url_slug=slug, is_public=True)
+    if not filer_file.file:
+        raise Http404('No %s matches the given query.' % File._meta.object_name)
+    return redirect(filer_file.url)

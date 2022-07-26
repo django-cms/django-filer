@@ -10,4 +10,10 @@ urlpatterns = [
         views.canonical,
         name='canonical'
     ),
+    re_path(
+        filer_settings.FILER_CANONICAL_URL
+        + f"(?P<slug>[{filer_settings.FILER_CANONICAL_URL_SLUG_ALLOWED_CHARS_RE}]+)/?$",  # flake8: noqa
+        views.canonical_slug,
+        name="canonical",
+    ),
 ]

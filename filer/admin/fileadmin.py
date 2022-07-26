@@ -5,13 +5,22 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
+from filer.models.filemodels import validate_canonical_url_slug
+
 from .. import settings
 from ..models import File
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
 
+class CanonicalUrlSlugField(forms.SlugField):
+    default_validators= [validate_canonical_url_slug]
+
+
 class FileAdminChangeFrom(forms.ModelForm):
+
+    canonical_url_slug = CanonicalUrlSlugField(required=False)
+
     class Meta:
         model = File
         exclude = ()
@@ -41,6 +50,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 'fields': (
                     'file',
                     'sha1',
+                    'canonical_url_slug',
                     'display_canonical',
                 ) + extra_advanced_fields,
                 'classes': ('collapse',),
@@ -139,11 +149,14 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         }
 
     def display_canonical(self, instance):
-        canonical = instance.canonical_url
-        if canonical:
-            return mark_safe('<a href="%s">%s</a>' % (canonical, canonical))
-        else:
-            return '-'
+        urls = sorted(filter(bool, {instance.raw_canonical_url, instance.canonical_url}))
+        if not urls:
+            return "-"
+        return mark_safe(
+            "<br>".join(
+                '<a href="{url}">{url}</a>'.format(url=url) for url in urls
+            )
+        )
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
 
