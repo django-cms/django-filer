@@ -49,7 +49,7 @@ def mimetype_validator(value):
 
 
 validate_canonical_url_slug = RegexValidator(
-    f"^[{filer_settings.FILER_CANONICAL_URL_SLUG_ALLOWED_CHARS_RE}]+\Z",
+    r"^[\-\.\w]+\Z",
     _(
         "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, hyphens or dots."
     ),
