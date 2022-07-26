@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+2.3 (2022-xx-xx)
+================
+
+* Allow users to define a custon slug for file as an alternative canonical URL
+
+
 2.2.1 (2022-06-05)
 ==================
 
