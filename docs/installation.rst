@@ -126,6 +126,9 @@ changed with the setting ``FILER_CANONICAL_URL``, which defaults to ``'canonical
 
     FILER_CANONICAL_URL = 'sharing/'
 
+A custom slug can also be defined for a file as an alternative to canonical URL in the "advanced" panel on the file's admin page.
+
+    /filer/canonical/my-custom-slug.pdf
 
 Debugging and logging
 .....................
