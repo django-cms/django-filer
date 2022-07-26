@@ -1,7 +1,10 @@
 import os
+import zoneinfo
+from datetime import datetime
 
 from django import VERSION as DJANGO_VERSION
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
@@ -305,6 +308,28 @@ class FilerApiTests(TestCase):
         image.file = file_2
         image.save()
         os.remove(filename_2)
+
+    def test_canonical_url_slug(self):
+        image = self.create_filer_image()
+        image.uploaded_at = datetime(2022, 7, 26, tzinfo=zoneinfo.ZoneInfo("Europe/Paris"))
+        image.is_public = True
+        image.save()
+        self.assertTrue(image.raw_canonical_url.endswith('1658782800/{}/'.format(image.id)))
+        self.assertEqual(image.canonical_url, image.raw_canonical_url)
+        image.canonical_url_slug = "test.pdf"
+        image.save()
+        self.assertTrue(image.canonical_url.endswith('test.pdf'))
+        self.assertRedirects(self.client.get(image.canonical_url), image.file.url)
+        
+        for bad_slug in ("test test", "test@test", "test#test", "test/test", "test\test"):
+            with self.assertRaises(ValidationError):
+                image.canonical_url_slug = bad_slug
+                image.full_clean()
+
+        image.canonical_url_slug = ""
+        image.save()
+        self.assertIsNone(image.canonical_url_slug)
+
 
     def test_canonical_url_settings(self):
         image = self.create_filer_image()
