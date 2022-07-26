@@ -1,6 +1,4 @@
 import os
-import zoneinfo
-from datetime import datetime
 
 from django import VERSION as DJANGO_VERSION
 from django.conf import settings
@@ -311,10 +309,8 @@ class FilerApiTests(TestCase):
 
     def test_canonical_url_slug(self):
         image = self.create_filer_image()
-        image.uploaded_at = datetime(2022, 7, 26, tzinfo=zoneinfo.ZoneInfo("Europe/Paris"))
         image.is_public = True
         image.save()
-        self.assertTrue(image.raw_canonical_url.endswith('1658782800/{}/'.format(image.id)))
         self.assertEqual(image.canonical_url, image.raw_canonical_url)
         image.canonical_url_slug = "test.pdf"
         image.save()
