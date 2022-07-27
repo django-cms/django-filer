@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-2.3 (2022-xx-xx)
+unreleased
 ================
 
 * Allow users to define a custon slug for file as an alternative canonical URL
