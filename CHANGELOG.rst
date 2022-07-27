@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+unreleased
+================
+
+* Add an edit button to the file widget which open edit file popup
+
+
 2.2.1 (2022-06-05)
 ==================
 

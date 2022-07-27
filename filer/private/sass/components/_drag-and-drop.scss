@@ -180,11 +180,15 @@ form .form-row {
                 display: none;
             }
             .choose-file,
+            .replace-file,
             .edit-file {
                 color: white;
                 margin: 0;
             }
-            .edit-file {
+            .replace-file {
+                display: none;
+            }
+            &.edit {
                 display: none;
             }
             &.related-lookup-change {
@@ -207,7 +211,10 @@ form .form-row {
                 .choose-file {
                     display: none;
                 }
-                .edit-file {
+                .replace-file {
+                    display: block;
+                }
+                &.edit {
                     display: block;
                 }
             }
@@ -227,11 +234,11 @@ form .form-row {
                 background-color: $white;
             }
             // make sure that text crops if there is not enough space #670
-            span:not(:empty):not(.choose-file):not(.edit-file) {
+            span:not(:empty):not(.choose-file):not(.replace-file):not(.edit-file) {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                width: calc(100% - 200px);
+                width: calc(100% - 240px);
             }
             // required for django CMS <= 3.1 #673
             img {
@@ -313,7 +320,7 @@ form .form-row {
                             height: 20px;
                         }
                     }
-                    span:not(.choose-file):not(.edit-file), .dz-name {
+                    span:not(.choose-file):not(.replace-file):not(.edit-file), .dz-name {
                         width: calc(100% - 145px);
                     }
                 }

@@ -64,6 +64,10 @@ def popup_pick_type(request):
     return None
 
 
+def edit_from_widget(request):
+    return bool(request.GET.get('_edit_from_widget'))
+
+
 def admin_url_params(request, params=None):
     """
     given a request, looks at GET and POST values to determine which params
@@ -75,6 +79,8 @@ def admin_url_params(request, params=None):
     pick_type = popup_pick_type(request)
     if pick_type:
         params['_pick'] = pick_type
+    if edit_from_widget(request):
+        params['_edit_from_widget'] = '1'
     return params
 
 

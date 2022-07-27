@@ -64,6 +64,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             and '_continue' not in request.POST
             and '_saveasnew' not in request.POST
             and '_addanother' not in request.POST
+            and '_edit_from_widget' not in request.POST
         ):
             # Popup in pick mode or normal mode. In both cases we want to go
             # back to the folder list view after save. And not the useless file
@@ -79,7 +80,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 admin_url_params_encoded(request),
             )
             return HttpResponseRedirect(url)
-        return super().response_change(request, obj)
+
+        # Add media to context to allow default django js inclusions in django/filer/base_site.html ({{ media.js }})
+        # This is required by popup_handling.js used in popup_response
+        template_response = super().response_change(request, obj)
+        if hasattr(template_response, 'context_data'):
+            template_response.context_data["media"] = self.media
+        return template_response
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):

@@ -37,10 +37,15 @@
                  width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
                  data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
 
+            <a href="{{ change_url }}?_edit_from_widget=1" class="js-related-edit related-lookup {% if object %}related-lookup-change{% endif %} edit" id="{{ id }}_change"
+                 title="{% trans 'Edit' %}">
+                  <span class="edit-file"><span class="fa fa-pencil"></span></span>
+            </a>
+
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
                title="{% trans 'Lookup' %}">
                 <span class="choose-file"><span class="fa fa-picture-o"></span>{% trans 'Choose File' %}</span>
-                <span class="edit-file"><span class="fa fa-pencil"></span></span>
+                <span class="replace-file"><span class="fa fa-file"></span></span>
             </a>
 
             <br>
