@@ -287,11 +287,13 @@ form .form-row {
                     vertical-align: middle;
                     margin: 0;
                 }
+                @media screen and (max-width: 1024px) {
+                    margin-left: 15px !important;
+                }
             }
         }
         &.filer-dropzone-mobile {
             .filerFile {
-                top: 40px;
                 text-align: center;
             }
             .dz-message {
@@ -302,22 +304,22 @@ form .form-row {
                 margin-top: 75px;
             }
             &.js-object-attached .filerFile {
-                top: 32px;
-                text-align: left;
+                text-align: center;
                 &.js-file-selector {
                     @media screen and (max-width: $screen-tablet-filer) {
                         .description_text {
                             text-overflow: ellipsis;
-                            width: calc(100% - 150px);
+                            width: calc(100% - 200px);
                             overflow: hidden;
                             height: 20px;
                         }
                     }
-                    span:not(.choose-file):not(.edit-file), .dz-name {
-                        width: calc(100% - 145px);
+                    >span:not(.choose-file):not(.edit-file), .dz-name {
+                        width: calc(100% - 200px);
                     }
                 }
             }
+
         }
         &.filer-dropzone-folder .filerFile {
             top: 32px !important;
@@ -325,6 +327,11 @@ form .form-row {
                 float: left;
             }
         }
+
+        @media (max-width: 767px) {
+            flex-grow: 1;
+        }
+
     }
 }
 
