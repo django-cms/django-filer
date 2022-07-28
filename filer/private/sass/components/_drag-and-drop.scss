@@ -232,7 +232,7 @@ form .form-row {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                width: calc(100% - 220px);
+                width: calc(100% - 240px);
             }
             // required for django CMS <= 3.1 #673
             img {
@@ -310,13 +310,13 @@ form .form-row {
                     @media screen and (max-width: $screen-tablet-filer) {
                         .description_text {
                             text-overflow: ellipsis;
-                            width: calc(100% - 200px);
+                            width: calc(100% - 250px);
                             overflow: hidden;
                             height: 20px;
                         }
                     }
                     >span:not(.choose-file):not(.replace-file):not(.edit-file), .dz-name {
-                        width: calc(100% - 200px);
+                        width: calc(100% - 250px);
                     }
                 }
             }
