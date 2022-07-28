@@ -65,7 +65,7 @@ def popup_pick_type(request):
 
 
 def edit_from_widget(request):
-    return bool(request.GET.get('_edit_from_widget'))
+    return request.GET.get('_edit_from_widget') == '1'
 
 
 def admin_url_params(request, params=None):
