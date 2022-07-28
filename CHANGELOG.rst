@@ -3,7 +3,7 @@ CHANGELOG
 =========
 
 unreleased
-================
+==========
 
 * Allow users to define a custon slug for file as an alternative canonical URL
 
