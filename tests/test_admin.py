@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict as model_to_dict_django
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
 from tests.helpers import (
@@ -17,6 +17,7 @@ from tests.utils.extended_app.models import ExtImage, Video
 
 from filer import settings as filer_settings
 from filer.admin.folderadmin import FolderAdmin
+from filer.admin import tools
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
@@ -1259,6 +1260,30 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 args=[parent_folder.id]
             )
         )
+    
+    def test_edit_from_widget_mode_save(self):
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_change_url()
+        edit_popup_url = base_url + '?_edit_from_widget=1&_popup=1'
+
+        response = self.client.get(edit_popup_url)
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        self.assertContains(response,
+                            '<input type="hidden" name="_popup" value="1"')
+        self.assertContains(response,
+                            '<input type="hidden" name="_edit_from_widget" value="1"')
+
+        data = {'_popup': '1', '_edit_from_widget': '1'}
+        data.update(model_to_dict(image, all=True))
+        data = {k: v if v is not None else '' for k, v in data.items()}
+
+        response = self.client.post(edit_popup_url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('media', response.context_data)
+        response.render()
+        self.assertContains(response, 'popup_response.js')
 
     def test_pick_mode_folder_save(self):
         folder = Folder.objects.create(name='foo')
@@ -1380,3 +1405,28 @@ class PolymorphicDeleteViewTests(BulkOperationsMixin, TestCase):
             )
         )
         self.assertEqual(Folder.objects.filter(id=folder.id).count(), 0)
+
+class AdminToolsTests(TestCase):
+
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_admin_url_params(self):
+        request_factory = RequestFactory()
+        request = request_factory.get('/')
+        self.assertDictEqual(tools.admin_url_params(request), {})
+        request = request_factory.get('/', {'_popup': '1', '_pick': 'file', '_edit_from_widget':'1'})
+        self.assertDictEqual(tools.admin_url_params(request, {'extra_param': 42}), {
+            '_popup': '1',
+            '_pick': 'file',
+            '_edit_from_widget': '1',
+            'extra_param': 42,
+        })
+        request = request_factory.get('/', {'_pick': 'bad_type'})
+        self.assertDictEqual(tools.admin_url_params(request), {})
+        
+        
