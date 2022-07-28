@@ -188,9 +188,6 @@ form .form-row {
             .replace-file {
                 display: none;
             }
-            &.edit {
-                display: none;
-            }
             &.related-lookup-change {
                 @include button-variant($btn-default-color, white, $btn-default-border, true);
                 float: right !important;
@@ -214,9 +211,6 @@ form .form-row {
                 .replace-file {
                     display: block;
                 }
-                &.edit {
-                    display: block;
-                }
             }
         }
         // makes sure that filer clear button has correct size #669
@@ -238,7 +232,7 @@ form .form-row {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                width: calc(100% - 240px);
+                width: calc(100% - 220px);
             }
             // required for django CMS <= 3.1 #673
             img {
