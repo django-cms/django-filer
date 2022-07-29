@@ -188,6 +188,9 @@ form .form-row {
             .replace-file {
                 display: none;
             }
+            &.edit {
+                display: none;
+            }
             &.related-lookup-change {
                 @include button-variant($btn-default-color, white, $btn-default-border, true);
                 float: right !important;
@@ -209,6 +212,9 @@ form .form-row {
                     display: none;
                 }
                 .replace-file {
+                    display: block;
+                }
+                &.edit {
                     display: block;
                 }
             }
