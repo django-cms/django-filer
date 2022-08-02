@@ -5,10 +5,10 @@ from filer import __version__
 
 
 REQUIREMENTS = [
-    'django>=2.2,<4.1',
+    'django>=2.2,<5',
     'django-mptt',
     'django-polymorphic',
-    'easy-thumbnails>=2.8.0',
+    'easy-thumbnails[svg]',
     'Unidecode>=0.04,<1.2',
 ]
 
