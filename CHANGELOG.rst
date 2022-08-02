@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+2.2.2 (2022-08-02)
+==================
+* Fix #1305: Install django-filer with easy-thumbnail's optional SVG support.
+
+
 2.2.1 (2022-06-05)
 ==================
 
@@ -86,6 +91,7 @@ CHANGELOG
 * Fix dropzone error callback for admin fields.
 * Fix #1247: Not owned files in unfiled folder can not be listed if perms are ON.
 * Fix #1184: OSError close file before deletion on file move.
+
 
 2.0.2 (2020-09-10)
 ==================
