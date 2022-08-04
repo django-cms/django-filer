@@ -14,10 +14,10 @@ import datetime
 import os
 import sys
 
-from filer import __version__
-
 
 sys.path.append(os.path.abspath('../'))
+
+from filer import __version__  # NOQA
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
