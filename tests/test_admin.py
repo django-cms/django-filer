@@ -695,7 +695,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
             # files inside this folder, non-recursive
             files = File.objects.filter(folder=folder_obj)
         else:
-            raise(ValueError('file_obj or folder_obj is required'))
+            raise ValueError('file_obj or folder_obj is required')
 
         response = self.client.post(url, {
             'action': 'rename_files',
