@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+2.2.3 (2022-08-08)
+==================
+* Fix CSS styles (Modified SCSS had to be recompiled).
+
+
 2.2.2 (2022-08-02)
 ==================
 * Fix #1305: Install django-filer with easy-thumbnail's optional SVG support.
