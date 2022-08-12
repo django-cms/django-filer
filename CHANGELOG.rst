@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* Fix File.objects.only() query.
+
+
 2.2.3 (2022-08-08)
 ==================
 * Fix CSS styles (Modified SCSS had to be recompiled).
