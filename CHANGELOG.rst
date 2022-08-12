@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* Fix File.objects.only() query required for deleting user who own files.
+
 2.2.4 (2023-01-13)
 ==================
 * Add Django 4.1 support
