@@ -119,7 +119,7 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
     if ex or ey:
         crop_box = ((int(tex), int(tey), int(tfx), int(tfy)))
         if FILER_SUBJECT_LOCATION_IMAGE_DEBUG:
-            # draw elipse on focal point for Debugging
+            # draw ellipse on focal point for Debugging
             draw = ImageDraw.Draw(im)
             esize = 10
             draw.ellipse(((subj_x - esize, subj_y - esize),

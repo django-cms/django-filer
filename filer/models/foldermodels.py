@@ -19,7 +19,7 @@ from . import mixins
 
 class FolderPermissionManager(models.Manager):
     """
-    Theses methods are called by introspection from "has_generic_permisison" on
+    Theses methods are called by introspection from "has_generic_permission" on
     the folder model.
     """
     def get_read_id_list(self, user):

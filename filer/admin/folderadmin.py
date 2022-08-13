@@ -689,7 +689,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Action which deletes the selected files and/or folders.
 
         This action first displays a confirmation page whichs shows all the
-        deleteable files and/or folders, or, if the user has no permission on
+        deletable files and/or folders, or, if the user has no permission on
         one of the related childs (foreignkeys), a "permission denied" message.
 
         Next, it deletes all selected files and/or folders and redirects back to
