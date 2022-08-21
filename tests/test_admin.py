@@ -569,7 +569,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |
           |--bar
 
-        and try to move the owter bar in foo. This has to fail since it would result
+        and try to move the outer bar in foo. This has to fail since it would result
         in two folders with the same name and parent.
         """
         root = Folder.objects.create(name='root', owner=self.superuser)
