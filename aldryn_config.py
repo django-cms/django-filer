@@ -29,15 +29,6 @@ class Form(forms.BaseForm):
         # easy-thumbnails
         settings['THUMBNAIL_QUALITY'] = env('THUMBNAIL_QUALITY', 90)
         settings['THUMBNAIL_PRESERVE_EXTENSIONS'] = ['png', 'gif']
-        settings['THUMBNAIL_PROCESSORS'] = (
-            'easy_thumbnails.processors.colorspace',
-            'easy_thumbnails.processors.autocrop',
-            'filer.thumbnail_processors.scale_and_crop_with_subject_location',
-            'easy_thumbnails.processors.filters',
-        )
-        settings['THUMBNAIL_SOURCE_GENERATORS'] = (
-            'easy_thumbnails.source_generators.pil_image',
-        )
         settings['THUMBNAIL_CACHE_DIMENSIONS'] = True
 
         # easy_thumbnails uses django's default storage backend (local file
