@@ -42,7 +42,7 @@ body {
     }
     tbody tr.selected {
         .action-button span {
-            color: $gray-darker !important;
+            color: $gray-darkest !important;
         }
     }
     .unfiled td {
@@ -116,7 +116,7 @@ body {
             box-sizing: border-box !important;
             a {
                 &.icon {
-                    color: $gray-darker !important;
+                    color: $gray-darkest !important;
                     background-color: $white !important;
                 }
                 color: $color-primary !important;

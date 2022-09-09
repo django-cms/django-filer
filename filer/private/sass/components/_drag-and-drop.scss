@@ -189,7 +189,7 @@ form .form-row {
                 display: none;
             }
             &.related-lookup-change {
-                @include button-variant($btn-default-color, $white, $btn-default-border, true);
+                @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
                 float: right !important;
                 padding: 5px 0 !important;
                 width: 36px !important;
@@ -202,7 +202,7 @@ form .form-row {
                     line-height: 24px;
                 }
                 .fa {
-                    color: $gray-light;
+                    color: $btn-default-color;
                     margin-right: 0 !important;
                 }
                 .choose-file {
