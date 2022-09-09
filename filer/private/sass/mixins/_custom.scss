@@ -99,7 +99,7 @@
         } @else {
             background-color: $background important($important);
             border-color: $border important($important);
-            filter: brightness(var(--focus-brightness)) opacity(1) important($important);
+            filter: opacity(0.7) important($important);
             // Strange: removing opacity(1.) or correcting it makes item transparent
         }
         text-decoration: none important($important);
