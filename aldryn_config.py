@@ -1,5 +1,7 @@
 from aldryn_client import forms
-from easy_thumbnails.conf import settings as easy_settings
+from easy_thumbnails.conf import Settings as EasySettings
+
+EasyThumbnailSettings = EasySettings(isolated=True)
 
 class Form(forms.BaseForm):
 
@@ -36,7 +38,7 @@ class Form(forms.BaseForm):
             processor
             if processor != 'easy_thumbnails.processors.scale_and_crop'
             else 'filer.thumbnail_processors.scale_and_crop_with_subject_location'
-            for processor in easy_settings.THUMBNAIL_PROCESSORS
+            for processor in EasyThumbnailSettings.THUMBNAIL_PROCESSORS
         ])
 
         # easy_thumbnails uses django's default storage backend (local file
