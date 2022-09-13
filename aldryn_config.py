@@ -1,5 +1,5 @@
 from aldryn_client import forms
-
+from easy_thumbnails.conf import settings as easy_settings
 
 class Form(forms.BaseForm):
 
@@ -32,13 +32,12 @@ class Form(forms.BaseForm):
         settings['THUMBNAIL_CACHE_DIMENSIONS'] = True
 
         # Swap scale and crop for django-filer version
-        processors = [
+        settings['THUMBNAIL_PROCESSORS'] = tuple([
             processor
             if processor != 'easy_thumbnails.processors.scale_and_crop'
             else 'filer.thumbnail_processors.scale_and_crop_with_subject_location'
-            for processor in list(settings['THUMBNAIL_PROCESSORS'])
-        ]
-        settings['THUMBNAIL_PROCESSORS'] = tuple(processors)
+            for processor in easy_settings.THUMBNAIL_PROCESSORS
+        ])
 
         # easy_thumbnails uses django's default storage backend (local file
         # system storage) by default, even if the DEFAULT_FILE_STORAGE setting
