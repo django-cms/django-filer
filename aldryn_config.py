@@ -41,8 +41,6 @@ class Form(forms.BaseForm):
             for processor in EasyThumbnailSettings.THUMBNAIL_PROCESSORS
         ])
 
-        print("*** " + settings["THUMBNAIL_PROCESSORS"])
-
         # easy_thumbnails uses django's default storage backend (local file
         # system storage) by default, even if the DEFAULT_FILE_STORAGE setting
         # points to something else.
