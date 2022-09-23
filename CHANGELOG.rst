@@ -8,6 +8,16 @@ unreleased
 * Allow users to define a custon slug for file as an alternative canonical URL
 
 
+2.2.3 (2022-08-08)
+==================
+* Fix CSS styles (Modified SCSS had to be recompiled).
+
+
+2.2.2 (2022-08-02)
+==================
+* Fix #1305: Install django-filer with easy-thumbnail's optional SVG support.
+
+
 2.2.1 (2022-06-05)
 ==================
 
