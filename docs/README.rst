@@ -5,8 +5,8 @@ Django Filer Documentation
 Run the documentation locally
 -----------------------------
 
-Install the Enchant libary
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install the Enchant library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will need to install the
 `enchant <https://www.abisource.com/projects/enchant/>`__ library that

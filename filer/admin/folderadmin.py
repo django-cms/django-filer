@@ -23,10 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
 from .. import settings
-from ..models import (
-    File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData,
-    UnsortedImages, tools,
-)
+from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
@@ -37,9 +34,8 @@ from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext, admin_url_params_encoded, check_files_edit_permissions,
-    check_files_read_permissions, check_folder_edit_permissions,
-    check_folder_read_permissions, popup_status, userperms_for_request,
+    AdminContext, admin_url_params_encoded, check_files_edit_permissions, check_files_read_permissions,
+    check_folder_edit_permissions, check_folder_read_permissions, popup_status, userperms_for_request,
 )
 
 
@@ -693,7 +689,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         Action which deletes the selected files and/or folders.
 
         This action first displays a confirmation page whichs shows all the
-        deleteable files and/or folders, or, if the user has no permission on
+        deletable files and/or folders, or, if the user has no permission on
         one of the related childs (foreignkeys), a "permission denied" message.
 
         Next, it deletes all selected files and/or folders and redirects back to

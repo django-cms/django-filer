@@ -10,11 +10,6 @@ from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from tests.helpers import (
-    SettingsOverride, create_folder_structure, create_image, create_superuser,
-)
-from tests.utils.extended_app.models import ExtImage, Video
-
 from filer import settings as filer_settings
 from filer.admin.folderadmin import FolderAdmin
 from filer.admin import tools
@@ -25,6 +20,8 @@ from filer.settings import FILER_IMAGE_MODEL
 from filer.templatetags.filer_admin_tags import file_icon_url
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
+from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
+from tests.utils.extended_app.models import ExtImage, Video
 
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -544,7 +541,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         url = reverse('admin:filer-directory_listing', kwargs={
             'folder_id': self.src_folder.id,
         })
-        response = self.client.post(url, {  # noqa
+        response = self.client.post(url, {
             'action': 'move_files_and_folders',
             'post': 'yes',
             'destination': self.dst_folder.id,
@@ -573,7 +570,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |
           |--bar
 
-        and try to move the owter bar in foo. This has to fail since it would result
+        and try to move the outer bar in foo. This has to fail since it would result
         in two folders with the same name and parent.
         """
         root = Folder.objects.create(name='root', owner=self.superuser)
@@ -696,7 +693,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
             # files inside this folder, non-recursive
             files = File.objects.filter(folder=folder_obj)
         else:
-            raise(ValueError('file_obj or folder_obj is required'))
+            raise ValueError('file_obj or folder_obj is required')
 
         response = self.client.post(url, {
             'action': 'rename_files',

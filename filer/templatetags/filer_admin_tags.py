@@ -109,7 +109,7 @@ def file_icon_context(file, detail, width, height):
 @register.inclusion_tag('admin/filer/templatetags/file_icon.html')
 def file_icon(file, detail=False, size=None):
     """
-    This templatetag returns a redered `<img src="..." srcset="..." width="..." height="..." class="..." />
+    This templatetag returns a rendered `<img src="..." srcset="..." width="..." height="..." class="..." />
     to be used for rendering thumbnails of files in the directory listing or in the corresponding detail
     views for that image.
     """
