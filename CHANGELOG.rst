@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+* Add Django 4.1 support
+* Add python 3.11 tests
+
 2.2.3 (2022-08-08)
 ==================
 * Fix CSS styles (Modified SCSS had to be recompiled).
