@@ -8,7 +8,7 @@ REQUIREMENTS = [
     'django>=2.2,<5',
     'django-mptt',
     'django-polymorphic',
-    'easy-thumbnails[svg]',
+    'easy-thumbnails',
     'Unidecode>=0.04,<1.2',
 ]
 
@@ -24,12 +24,14 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Framework :: Django',
     'Framework :: Django :: 2.2',
     'Framework :: Django :: 3.0',
     'Framework :: Django :: 3.1',
     'Framework :: Django :: 3.2',
     'Framework :: Django :: 4.0',
+    'Framework :: Django :: 4.1',
     'Framework :: Django CMS',
     'Framework :: Django CMS :: 3.6',
     'Framework :: Django CMS :: 3.7',

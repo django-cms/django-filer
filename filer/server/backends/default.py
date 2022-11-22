@@ -25,7 +25,7 @@ class DefaultServer(ServerBase):
         statobj = os.stat(fullpath)
         response_params = {'content_type': filer_file.mime_type}
         if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                                  statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+                                  statobj[stat.ST_MTIME]):
             return HttpResponseNotModified(**response_params)
         response = HttpResponse(open(fullpath, 'rb').read(), **response_params)
         response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
