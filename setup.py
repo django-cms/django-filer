@@ -8,7 +8,7 @@ REQUIREMENTS = [
     'django>=2.2,<5',
     'django-mptt',
     'django-polymorphic',
-    'easy-thumbnails',
+    'easy-thumbnails[svg]',
     'Unidecode>=0.04,<1.2',
 ]
 
