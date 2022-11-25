@@ -2,6 +2,49 @@
 CHANGELOG
 =========
 
+2.2.3 (2022-08-08)
+==================
+* Fix CSS styles (Modified SCSS had to be recompiled).
+
+
+2.2.2 (2022-08-02)
+==================
+* Fix #1305: Install django-filer with easy-thumbnail's optional SVG support.
+
+
+2.2.1 (2022-06-05)
+==================
+
+* Fix: Define a ``default_auto_field`` as part of the app config.
+
+
+2.2 (2022-04-20)
+================
+
+* Improve the list view of Folder permissions.
+* Fix: Folder permissions were disabled for descendants, if parent folder
+  has type set to CHILDREN.
+* The input field for Folder changes from a standard HTML select element to
+  a very wide autocomplete field, showing the complete path in Filer.
+* Fix: Upload invalid SVG file.
+* Add support for Python-3.10.
+* Switch theme for readthedocs to Furo.
+* Fix: 404 error when serving thumbnail.
+* Experimental support for Django-4.
+
+
+2.1.2 (2021-11-09)
+==================
+
+* In Folder permissions, make user and group autocomplete fields.
+* Extent testing matrix to Python-3.10.
+
+
+2.1.1 (2021-11-03)
+==================
+
+* Pin dependency for easy-thumbnails to version 2.8.0.
+
 
 2.1 (2021-11-03)
 ================
@@ -53,6 +96,7 @@ CHANGELOG
 * Fix dropzone error callback for admin fields.
 * Fix #1247: Not owned files in unfiled folder can not be listed if perms are ON.
 * Fix #1184: OSError close file before deletion on file move.
+
 
 2.0.2 (2020-09-10)
 ==================

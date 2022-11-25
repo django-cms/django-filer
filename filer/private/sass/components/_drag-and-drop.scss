@@ -26,7 +26,8 @@ form .form-row {
             left: 0;
         }
         &.dz-drag-hover {
-            background-color: $color-primary-light;
+            background-color: $color-primary;
+            filter: brightness(1.5);
             border: solid 2px $color-primary !important;
             .z-index-fix {
                 z-index: 1;
@@ -171,7 +172,7 @@ form .form-row {
             padding: 10px 20px !important;
             cursor: pointer;
             .fa {
-                color: white;
+                color: $white;
                 font-size: 17px;
                 margin: 0 10px 0 0 !important;
                 vertical-align: middle;
@@ -181,27 +182,27 @@ form .form-row {
             }
             .choose-file,
             .edit-file {
-                color: white;
+                color: $white;
                 margin: 0;
             }
             .edit-file {
                 display: none;
             }
             &.related-lookup-change {
-                @include button-variant($btn-default-color, white, $btn-default-border, true);
+                @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
                 float: right !important;
                 padding: 5px 0 !important;
                 width: 36px !important;
                 height: 36px !important;
                 &:focus {
-                    background-color: white !important;
+                    background-color: $white !important;
                 }
                 span {
                     text-align: center;
                     line-height: 24px;
                 }
                 .fa {
-                    color: #999;
+                    color: $btn-default-color;
                     margin-right: 0 !important;
                 }
                 .choose-file {
@@ -287,11 +288,13 @@ form .form-row {
                     vertical-align: middle;
                     margin: 0;
                 }
+                @media screen and (max-width: 1024px) {
+                    margin-left: 15px !important;
+                }
             }
         }
         &.filer-dropzone-mobile {
             .filerFile {
-                top: 40px;
                 text-align: center;
             }
             .dz-message {
@@ -302,22 +305,22 @@ form .form-row {
                 margin-top: 75px;
             }
             &.js-object-attached .filerFile {
-                top: 32px;
-                text-align: left;
+                text-align: center;
                 &.js-file-selector {
                     @media screen and (max-width: $screen-tablet-filer) {
                         .description_text {
                             text-overflow: ellipsis;
-                            width: calc(100% - 150px);
+                            width: calc(100% - 200px);
                             overflow: hidden;
                             height: 20px;
                         }
                     }
-                    span:not(.choose-file):not(.edit-file), .dz-name {
-                        width: calc(100% - 145px);
+                    >span:not(.choose-file):not(.edit-file), .dz-name {
+                        width: calc(100% - 200px);
                     }
                 }
             }
+
         }
         &.filer-dropzone-folder .filerFile {
             top: 32px !important;
@@ -325,6 +328,11 @@ form .form-row {
                 float: left;
             }
         }
+
+        @media (max-width: 767px) {
+            flex-grow: 1;
+        }
+
     }
 }
 
@@ -332,7 +340,7 @@ form .form-row {
     min-height: 100px !important;
     .dz-upload {
         height: 5px;
-        background-color: #0bf;
+        background-color: $color-primary;
     }
     .dz-name {
         overflow: hidden;
@@ -347,12 +355,12 @@ form .form-row {
         width: 80px;
         height: 80px;
         margin-right: 10px;
-        border: solid 1px #ddd;
+        border: solid 1px $gray-lighter;
         border-radius: 3px;
-        background: #fff url("../icons/file-unknown.svg");
+        background: $white url("../icons/file-unknown.svg");
         background-size: cover;
         img {
-            background: #fff;
+            background: $white;
             &[src=""],
             &:not([src]) {
                 width: 104%;
@@ -400,7 +408,7 @@ form .form-row {
 .filer-dropzone-progress {
     height: 5px;
     margin-top: 5px;
-    background-color: #0bf;
+    background-color: $color-primary;
 }
 
 .filer-dropzone-upload-welcome .folder {

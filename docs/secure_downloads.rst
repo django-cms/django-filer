@@ -48,7 +48,7 @@ live in ``filer.server.backends`` and it is easy to create new ones.
 The default is ``filer.server.backends.default.DefaultServer``. It is suitable
 for development and serves the file directly from django.
 
-More suitiable for production are server backends that delegate the actual file
+More suitable for production are server backends that delegate the actual file
 serving to an upstream webserver.
 
 ``NginxXAccelRedirectServer``

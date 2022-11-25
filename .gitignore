@@ -4,6 +4,7 @@
 *.log
 *.pot
 .DS_Store
+.coverage
 .coverage/
 .eggs/
 .idea/
@@ -13,10 +14,12 @@
 .settings/
 .tox/
 __pycache__/
-build/
+docs/_build/
 dist/
 env/
 .venv/
+/*docs/env*/
+/*docs/_build*/
 
 /~
 /node_modules

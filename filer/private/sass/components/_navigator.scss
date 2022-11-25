@@ -12,7 +12,7 @@ body {
         }
     }
     &.reset-hover td {
-        background-color: white !important;
+        background-color: $white !important;
     }
 }
 .drag-hover-border {
@@ -47,7 +47,7 @@ body {
     }
     tbody tr.selected {
         .action-button span {
-            color: $gray-darker !important;
+            color: $gray-darkest !important;
         }
     }
     .navigator-body,
@@ -122,8 +122,8 @@ body {
             box-sizing: border-box !important;
             a {
                 &.icon {
-                    color: $gray-darker !important;
-                    background-color: white !important;
+                    color: $gray-darkest !important;
+                    background-color: $white !important;
                 }
                 color: $color-primary !important;
             }
@@ -234,7 +234,7 @@ body {
             bottom: -11px;
             overflow: hidden;
             width: 1px;
-            background-color: #ccc;
+            background-color: $gray-lighter;
         }
     }
 }
@@ -509,7 +509,7 @@ body {
             }
         }
         a:hover {
-            color: white !important;
+            color: $white !important;
             background: $color-primary !important;
         }
     }
@@ -557,7 +557,7 @@ body {
     list-style: none;
     font-size: 14px;
     text-align: left;
-    background-color: #fff;
+    background-color: $white;
     border-radius: 4px;
     background-clip: padding-box;
     &:before {
@@ -570,7 +570,7 @@ body {
         height: 10px;
         margin-left: -5px;
         transform: rotate(45deg);
-        background-color: #fff;
+        background-color: $white;
     }
     &.create-menu-dropdown:before {
         left: auto;
@@ -646,9 +646,9 @@ body {
             > a {
                 color: $color-primary;
                 padding: 12px 20px 3px !important;
-                border-bottom: solid 1px #e1e1e1;
+                border-bottom: solid 1px $gray-lightest;
                 &:hover {
-                    color: white !important;
+                    color: $white !important;
                     background: $color-primary !important;
                 }
             }

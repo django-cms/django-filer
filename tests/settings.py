@@ -53,6 +53,8 @@ HELPER_SETTINGS = {
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
+    'SECRET_KEY': '__secret__',
+    'DEFAULT_AUTO_FIELD': 'django.db.models.AutoField',
 }
 if os.environ.get('CUSTOM_IMAGE', False):
     HELPER_SETTINGS['FILER_IMAGE_MODEL'] = os.environ.get('CUSTOM_IMAGE')

@@ -1,10 +1,14 @@
+import warnings
+from urllib.parse import quote as urlquote
+
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
-from django.utils.http import urlquote
+from django.utils.functional import cached_property
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
 import mptt
@@ -15,7 +19,7 @@ from . import mixins
 
 class FolderPermissionManager(models.Manager):
     """
-    Theses methods are called by introspection from "has_generic_permisison" on
+    These methods are called by introspection from "has_generic_permission" on
     the folder model.
     """
     def get_read_id_list(self, user):
@@ -64,7 +68,7 @@ class FolderPermissionManager(models.Manager):
             else:
                 deny_list.add(folder_id)
 
-            if perm.type == FolderPermission.CHILDREN:
+            if perm.type in [FolderPermission.ALL, FolderPermission.CHILDREN]:
                 if p == FolderPermission.ALLOW:
                     allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
                 else:
@@ -104,7 +108,11 @@ class Folder(models.Model, mixins.IconsMixin):
         related_name='children',
         on_delete=models.CASCADE,
     )
-    name = models.CharField(_('name'), max_length=255)
+
+    name = models.CharField(
+        _('name'),
+        max_length=255,
+    )
 
     owner = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -115,10 +123,37 @@ class Folder(models.Model, mixins.IconsMixin):
         blank=True,
     )
 
-    uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
+    uploaded_at = models.DateTimeField(
+        _('uploaded at'),
+        auto_now_add=True,
+    )
 
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('modified at'), auto_now=True)
+    created_at = models.DateTimeField(
+        _('created at'),
+        auto_now_add=True,
+    )
+
+    modified_at = models.DateTimeField(
+        _('modified at'),
+        auto_now=True,
+    )
+
+    class Meta:
+        # see: https://github.com/django-mptt/django-mptt/pull/577
+        index_together = (('tree_id', 'lft'),)
+        unique_together = (('parent', 'name'),)
+        ordering = ('name',)
+        permissions = (("can_use_directory_listing",
+                        "Can use directory listing"),)
+        app_label = 'filer'
+        verbose_name = _("Folder")
+        verbose_name_plural = _("Folders")
+
+    def __str__(self):
+        return self.pretty_logical_path
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(pk={self.pk}): {self.pretty_logical_path}>'
 
     @property
     def file_count(self):
@@ -140,7 +175,7 @@ class Folder(models.Model, mixins.IconsMixin):
     def files(self):
         return self.all_files.all()
 
-    @property
+    @cached_property
     def logical_path(self):
         """
         Gets logical path of the folder in the tree structure.
@@ -154,10 +189,14 @@ class Folder(models.Model, mixins.IconsMixin):
 
     @property
     def pretty_logical_path(self):
-        return "/%s" % "/".join([f.name for f in self.logical_path + [self]])
+        return format_html('/{}', format_html_join('/', '{0}', ((f.name,) for f in self.logical_path + [self])))
 
     @property
     def quoted_logical_path(self):
+        warnings.warn(
+            'Method filer.foldermodels.Folder.quoted_logical_path is deprecated and will be removed',
+            DeprecationWarning, stacklevel=2,
+        )
         return urlquote(self.pretty_logical_path)
 
     def has_edit_permission(self, request):
@@ -210,18 +249,10 @@ class Folder(models.Model, mixins.IconsMixin):
         return reverse('admin:filer-directory_listing', args=(self.id,))
 
     def get_admin_delete_url(self):
-        try:
-            # Django <=1.6
-            model_name = self._meta.module_name
-        except AttributeError:
-            # Django >1.6
-            model_name = self._meta.model_name
         return reverse(
-            'admin:{0}_{1}_delete'.format(self._meta.app_label, model_name,),
-            args=(self.pk,))
-
-    def __str__(self):
-        return "%s" % (self.name,)
+            f'admin:{self._meta.app_label}_{self._meta.model_name}_delete',
+            args=(self.pk,)
+        )
 
     def contains_folder(self, folder_name):
         try:
@@ -229,17 +260,6 @@ class Folder(models.Model, mixins.IconsMixin):
             return True
         except Folder.DoesNotExist:
             return False
-
-    class Meta:
-        # see: https://github.com/django-mptt/django-mptt/pull/577
-        index_together = (('tree_id', 'lft'),)
-        unique_together = (('parent', 'name'),)
-        ordering = ('name',)
-        permissions = (("can_use_directory_listing",
-                        "Can use directory listing"),)
-        app_label = 'filer'
-        verbose_name = _("Folder")
-        verbose_name_plural = _("Folders")
 
 
 # MPTT registration
@@ -300,7 +320,11 @@ class FolderPermission(models.Model):
         null=True,
         on_delete=models.CASCADE,
     )
-    everybody = models.BooleanField(_("everybody"), default=False)
+
+    everybody = models.BooleanField(
+        _("everybody"),
+        default=False,
+    )
 
     can_read = models.SmallIntegerField(
         _("can read"),
@@ -326,34 +350,19 @@ class FolderPermission(models.Model):
         default=None,
     )
 
+    class Meta:
+        verbose_name = _('folder permission')
+        verbose_name_plural = _('folder permissions')
+        app_label = 'filer'
+
     objects = FolderPermissionManager()
 
     def __str__(self):
-        if self.folder:
-            name = '%s' % self.folder
-        else:
-            name = 'All Folders'
+        return self.pretty_logical_path
 
-        ug = []
-        if self.everybody:
-            ug.append('Everybody')
-        else:
-            if self.group:
-                ug.append("Group: %s" % self.group)
-            if self.user:
-                ug.append("User: %s" % self.user)
-        usergroup = " ".join(ug)
-        perms = []
-        for s in ['can_edit', 'can_read', 'can_add_children']:
-            perm = getattr(self, s)
-            if perm == self.ALLOW:
-                perms.append(s)
-            elif perm == self.DENY:
-                perms.append('!%s' % s)
-        perms = ', '.join(perms)
-        return "Folder: '%s'->%s [%s] [%s]" % (
-            name, self.get_type_display(),
-            perms, usergroup)
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(pk={self.pk}): folder="{self.pretty_logical_path}", ' \
+               'who="{self.who}", what="{self.what}">'
 
     def clean(self):
         if self.type == self.ALL and self.folder:
@@ -365,7 +374,49 @@ class FolderPermission(models.Model):
         if not self.user and not self.group and not self.everybody:
             raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
 
-    class Meta:
-        verbose_name = _('folder permission')
-        verbose_name_plural = _('folder permissions')
-        app_label = 'filer'
+    @cached_property
+    def pretty_logical_path(self):
+        if self.folder:
+            return self.folder.pretty_logical_path
+        return _("All Folders")
+
+    pretty_logical_path.short_description = _("Logical Path")
+
+    @cached_property
+    def who(self):
+        """
+        Returns a human readable string of *who* can interact with a given folder
+        """
+        parts = []
+        if self.user:
+            parts.append(_("User: {user}").format(user=self.user))
+        if self.group:
+            parts.append(_("Group: {group}").format(group=self.group))
+        if self.everybody:
+            parts.append(_("Everybody"))
+        if parts:
+            return format_html_join("; ", '{}', ((p,) for p in parts))
+        return '–'
+
+    who.short_description = _("Who")
+
+    @cached_property
+    def what(self):
+        """
+        Returns a human readable string of *what* a user/group/everybody can do with a given folder
+        """
+        mapping = {
+            'can_edit': _("Edit"),
+            'can_read': _("Read"),
+            'can_add_children': _("Add children"),
+        }
+        perms = []
+        for key, text in mapping.items():
+            perm = getattr(self, key)
+            if perm == self.ALLOW:
+                perms.append(text)
+            elif perm == self.DENY:
+                perms.append('\u0336'.join(text) + '\u0336')
+        return format_html_join(", ", '{}', ((p,) for p in perms))
+
+    what.short_description = _("What")
