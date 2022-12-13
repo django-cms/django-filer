@@ -82,7 +82,7 @@
                           <div class="list-item thumbnail-item thumbnail-file-item">
                               <div class="navigator-checkbox">
                                   {% if is_popup and filer_admin_context.pick_file %}
-                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.128|escapejs }}', '{{ file.label|escapejs }}'); return false;"
+                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                           title="{% trans 'Select this file' %}">&nbsp;</a>
                                   {% elif action_form and not is_popup %}
                                       <input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action">
@@ -91,13 +91,13 @@
                               <div class="thumbnail-file-item-box">
                                   <div class="item-thumbnail">
                                       {% if is_popup and filer_admin_context.pick_file %}
-                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.128|escapejs }}', '{{ file.label|escapejs }}'); return false;"
+                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                               title="{% trans 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                                   title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                       {% endif %}
-                                      <img src="{% if file.file_type == "Image" %}{% thumbnail file 128x128 crop %}{% elif file.icons.64 %}{{ file.icons.64 }}{% else %}{% static 'filer/icons/missingfile_128x128.png' %}{% endif %}" alt="{{ file.default_alt_text }}">
+                                      <img src="{% if file.file_type == "Image" %}{% thumbnail file 128x128 crop %}{% else %}{% static 'filer/icons/file-missing.svg' %}{% endif %}" alt="{{ file.default_alt_text }}">
                                       {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                           </a>
                                       {% endif %}
@@ -106,7 +106,7 @@
                               <div class="item-name">
                                   <div>
                                       {% if is_popup and filer_admin_context.pick_file %}
-                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{{ file.icons.128|escapejs }}', '{{ file.label|escapejs }}'); return false;"
+                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                               title="{% trans 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
