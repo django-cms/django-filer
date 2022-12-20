@@ -12,7 +12,7 @@ if (django.jQuery) {
     function windowname_to_id(text) {
         text = text.replace(/__dot__/g, '.');
         text = text.replace(/__dash__/g, '-');
-        return text;
+        return text.split('__')[0];
     }
 
     window.dismissPopupAndReload = function (win) {
