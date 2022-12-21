@@ -59,5 +59,5 @@ for all the details on how to install, configure and use django-filer.
 
 .. |python| image:: https://img.shields.io/badge/python-3.7+-blue.svg
     :target: https://pypi.org/project/django-filer/
-.. |django| image:: https://img.shields.io/badge/django-2.2,%203.2,%204.0-blue.svg
+.. |django| image:: https://img.shields.io/badge/django-2.2,%203.2,%204.1-blue.svg
     :target: https://www.djangoproject.com/
