@@ -6,6 +6,7 @@ unreleased
 ==========
 * Add Django 4.1 support
 * Add python 3.11 tests
+* Fix thumbnail generation for SVG images when used as a Divio addon.
 
 2.2.3 (2022-08-08)
 ==================
