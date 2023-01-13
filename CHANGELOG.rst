@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-2.2.3 (2023-01-13)
+2.2.4 (2023-01-13)
 ==================
 * Add Django 4.1 support
 * Add python 3.11 tests
