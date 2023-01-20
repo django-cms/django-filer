@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import get_storage_class
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .utils.loader import load_object
 from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
