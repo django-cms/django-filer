@@ -4,6 +4,7 @@ import os
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import get_storage_class
+from django.utils.translation import ugettext_lazy as _
 
 from .utils.loader import load_object
 from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
@@ -250,3 +251,26 @@ FILER_UPLOADER_CONNECTIONS = getattr(
 FILER_DUMP_PAYLOAD = getattr(settings, 'FILER_DUMP_PAYLOAD', False)  # Whether the filer shall dump the files payload
 
 FILER_CANONICAL_URL = getattr(settings, 'FILER_CANONICAL_URL', 'canonical/')
+
+TABLE_LIST_TYPE = 'tb'
+THUMBNAIL_LIST_TYPE = 'th'
+FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES = (
+    TABLE_LIST_TYPE,
+    THUMBNAIL_LIST_TYPE,
+)
+FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE = getattr(settings, 'FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE', TABLE_LIST_TYPE)
+if FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE not in FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES:
+    FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE = TABLE_LIST_TYPE
+
+FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
+    TABLE_LIST_TYPE: {
+        'icon': 'th-list',
+        'tooltip_text': _('Show table view'),
+        'template': 'admin/filer/folder/directory_table_list.html',
+    },
+    THUMBNAIL_LIST_TYPE: {
+        'icon': 'th-large',
+        'tooltip_text': _('Show thumbnail view'),
+        'template': 'admin/filer/folder/directory_thumbnail_list.html',
+    },
+}
