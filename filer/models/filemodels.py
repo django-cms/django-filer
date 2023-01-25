@@ -309,7 +309,7 @@ class File(PolymorphicModel,
             self.generate_sha1()
         except (IOError, TypeError, ValueError) as e:
             pass
-        if filer_settings.FOLDER_AFFECTS_URL and self._is_path_changed():
+        if filer_settings.FOLDER_AFFECTS_URL and (self._is_path_changed() or (self._old_sha1 != self.sha1)):
             self._force_commit = True
             self.update_location_on_storage(*args, **kwargs)
         else:
