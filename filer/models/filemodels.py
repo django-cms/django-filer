@@ -309,7 +309,10 @@ class File(PolymorphicModel,
             self.generate_sha1()
         except (IOError, TypeError, ValueError) as e:
             pass
-        if filer_settings.FOLDER_AFFECTS_URL and (self._is_path_changed() or (self._old_sha1 != self.sha1)):
+        replaced_file = self._old_sha1 != self.sha1
+        if filer_settings.FOLDER_AFFECTS_URL and (self._is_path_changed() or replaced_file):
+            if replaced_file:
+                self.file.name = None  # if new file submitted for same id we overwrite what was previously in name
             self._force_commit = True
             self.update_location_on_storage(*args, **kwargs)
         else:
