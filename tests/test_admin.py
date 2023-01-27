@@ -503,6 +503,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         url = file_icon_url(image_obj)
         self.assertEqual(url, '/static/filer/icons/file\\u002Dunknown.svg')
 
+    def test_custom_validation_upload_func(self):
+        error_message = 'Image file upload file too big'
+
+        def custom_validation_func(request, upload, filename, mime_type):
+            from pathlib import Path
+
+            file_extension = Path(filename).suffix
+
+            if file_extension == '.jpg' and upload.size > 1:
+                return error_message
+
+        with SettingsOverride(filer_settings, FILER_CUSTOM_UPLOAD_VALIDATION_FUNC=custom_validation_func):
+            folder = Folder.objects.create(name='foo')
+            file_obj = django.core.files.File(open(self.filename, 'rb'))
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename={0}'.format(self.image_name)
+
+            response = self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='application/octet-stream',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+            self.assertContains(response, error_message)
+
 
 class BulkOperationsMixin:
     def setUp(self):
