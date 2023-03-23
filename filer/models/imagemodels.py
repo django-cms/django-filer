@@ -95,7 +95,7 @@ class Image(File):
             raise ValidationError(
                 "Ensure default credit text has at most 30 characters ("
                 "%s characters found)." % len(self.default_credit))
-        if int(len(self.default_caption or 0)) > 140:
+        if int(len(self.default_caption or '')) > 140:
             raise ValidationError(
                 "Ensure default caption text has at most 140 characters ("
                 "%s characters found)." % len(self.default_caption))
