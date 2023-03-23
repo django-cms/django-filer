@@ -91,17 +91,18 @@ class Image(File):
         if self.default_caption:
             self.default_caption = self.default_caption.strip()
 
-        if len(self.default_credit or '') > 30:
+        if int(len(self.default_credit or '')) > 30:
             raise ValidationError(
                 "Ensure default credit text has at most 30 characters ("
                 "%s characters found)." % len(self.default_credit))
-        if len(self.default_caption or '') > 140:
+        if int(len(self.default_caption or 0)) > 140:
             raise ValidationError(
                 "Ensure default caption text has at most 140 characters ("
                 "%s characters found)." % len(self.default_caption))
         super(Image, self).clean()
 
     def save(self, *args, **kwargs):
+        self.full_clean()
         if self.date_taken is None:
             try:
                 exif_date = self.exif.get('DateTimeOriginal', None)
