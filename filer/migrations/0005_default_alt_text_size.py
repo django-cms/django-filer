@@ -10,6 +10,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='Image',
             name='default_alt_text',
-            field=models.TextField(), # Use TextField to allow unlimited length
+            field=models.TextField(null=True), # Use TextField to allow unlimited length
         ),
     ]
