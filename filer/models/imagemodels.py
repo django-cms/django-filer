@@ -53,7 +53,7 @@ class Image(File):
     default_caption = models.TextField(
         _('default caption'), blank=True, null=True,
         help_text=_('Caption text is displayed directly below an image '
-                    'plugin to add context; there is a 140-character limit,'
+                    'plugin to add context; there is no character limit,'
                     ' including spaces; for images fewer than 200 pixels '
                     'wide, the caption text is only displayed on hover.'))
     default_credit = models.CharField(
