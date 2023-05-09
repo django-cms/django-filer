@@ -6,6 +6,7 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.options import ThumbnailOptions
 
 from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
@@ -116,11 +117,12 @@ def file_icon_context(file, detail, width, height):
                 opts = {'size': (width, height), 'upscale': True}
             else:
                 opts = {'size': (width, height), 'crop': True}
-            icon_url = thumbnailer.get_thumbnail(opts).url
+            thumbnail_options = ThumbnailOptions(opts)
+            icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
             context['alt_text'] = file.default_alt_text
             if mime_subtype != 'svg+xml':
-                opts['size'] = 2 * width, 2 * height
-                context['highres_url'] = thumbnailer.get_thumbnail(opts).url
+                thumbnail_options['size'] = 2 * width, 2 * height
+                context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
