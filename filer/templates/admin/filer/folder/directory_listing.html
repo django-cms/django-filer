@@ -1,23 +1,8 @@
 {% extends "admin/filer/base_site.html" %}
 {% load i18n static filer_admin_tags %}
 
-{% block extrahead %}
-    {{ block.super }}
-
-    {% if action_form and actions_on_top or actions_on_bottom %}
-        <script type="text/javascript">
-            (function($) {
-                $(document).ready(function($) {
-                    $('tr input.action-select').actions();
-                });
-            })(django.jQuery);
-        </script>
-    {% endif %}
-{% endblock %}
-
 {% block coltype %}{% endblock %}
 {% block bodyclass %}{{ block.super }} change-list filebrowser{% endblock %}
-
 
 {% block extrastyle %}
     {{ block.super }}
