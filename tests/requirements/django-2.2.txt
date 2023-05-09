@@ -1,5 +1,0 @@
--r base.txt
-
-django>=2.2,<3.0
-django_polymorphic>=2.0,<2.1
-django-app-helper
