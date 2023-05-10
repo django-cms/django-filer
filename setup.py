@@ -5,7 +5,7 @@ from filer import __version__
 
 
 REQUIREMENTS = [
-    'django>=2.2,<5',
+    'django>=3.2,<4.2',
     'django-mptt',
     'django-polymorphic',
     'easy-thumbnails[svg]',
@@ -29,7 +29,6 @@ CLASSIFIERS = [
     'Framework :: Django :: 3.2',
     'Framework :: Django :: 4.0',
     'Framework :: Django :: 4.1',
-    'Framework :: Django :: 4.2',
     'Framework :: Django CMS',
     'Framework :: Django CMS :: 3.10',
     'Framework :: Django CMS :: 3.11',
