@@ -8,7 +8,7 @@ from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.contrib.admin.decorators import display, action
+from django.contrib.admin.decorators import action
 from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -866,7 +866,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             f.move_to(destination, 'last-child')
             f.save()
 
-    @display(description=_("Move selected files and/or folders"))
+    @action(description=_("Move selected files and/or folders"))
     def move_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
@@ -959,7 +959,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         return n
 
-    @display(description=_("Rename files"))
+    @action(description=_("Rename files"))
     def rename_files(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
@@ -1070,7 +1070,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         return n
 
-    @display(description=_("Copy selected files and/or folders"))
+    @action(description=_("Copy selected files and/or folders"))
     def copy_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
@@ -1214,7 +1214,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         return n
 
-    @display(description=_("Resize selected images"))
+    @action(description=_("Resize selected images"))
     def resize_images(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
         app_label = opts.app_label
