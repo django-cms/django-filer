@@ -1,23 +1,8 @@
 {% extends "admin/filer/base_site.html" %}
 {% load i18n static filer_admin_tags %}
 
-{% block extrahead %}
-    {{ block.super }}
-
-    {% if action_form and actions_on_top or actions_on_bottom %}
-        <script type="text/javascript">
-            (function($) {
-                $(document).ready(function($) {
-                    $('tr input.action-select').actions();
-                });
-            })(django.jQuery);
-        </script>
-    {% endif %}
-{% endblock %}
-
 {% block coltype %}{% endblock %}
 {% block bodyclass %}{{ block.super }} change-list filebrowser{% endblock %}
-
 
 {% block extrastyle %}
     {{ block.super }}
@@ -28,7 +13,7 @@
         <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
     {% endif %}
     {% if query.pop %}
-        <style type="text/css">
+        <style>
             #header {
                 display: none;
             }
@@ -251,7 +236,7 @@
     <div id="content-main">
         {% include "admin/filer/tools/search_form.html" %}
         <div class="js-navigator navigator{% if not actions_on_top and not actions_on_bottom %}navigator-no-actions{% endif %}">
-            <form class="js-navigator-form" method="post">
+            <form id="changelist-form" class="js-navigator-form" method="post">
                 {% csrf_token %}
                 {% filer_admin_context_hidden_formfields %}
                 {% if action_form and actions_on_top and paginator.count and not is_popup %}
