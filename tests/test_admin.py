@@ -162,11 +162,11 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_folder_list_actions(self):
         Folder.objects.create(name='foo')
         actions = [
-            'Delete selected files and/or folders',
-            'Move selected files and/or folders',
-            'Copy selected files and/or folders',
-            'Resize selected images',
-            'Rename files',
+            '<a href="#" class="js-action-delete" title="Delete"><span class="fa fa-trash"></span></a>',
+            '<a href="#" class="js-action-copy" title="Copy"><span class="fa fa-copy"></span></a>',
+            '<a href="#" class="js-action-move" title="Move"><span class="fa fa-cut"></span></a>',
+            '<option value="resize_images">Resize selected images</option>',
+            '<option value="rename_files">Rename files</option>',
         ]
 
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
@@ -176,8 +176,8 @@ class FilerFolderAdminUrlsTests(TestCase):
                 self.assertContains(response, action)
 
         actions_with_permissions = [
-            'Disable permissions for selected files',
-            'Enable permissions for selected files',
+            '<option value="files_set_public">Disable permissions for selected files</option>',
+            '<option value="files_set_private">Enable permissions for selected files</option>',
         ]
 
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
