@@ -1,1 +1,17 @@
-<button name="index" class="hidden"><!-- dummy to prevent JS error in admin/js/actions.js --></button>
+{% load i18n %}
+
+<div class="actions hidden">
+    {% for field in action_form %}{{ field }}{% endfor %}
+    <button type="submit" class="button" title="{% translate "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% translate "Go" %}</button>
+
+    {% if actions_selection_counter %}
+        <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+        {% if cl.result_count != cl.result_list|length %}
+        <span class="all hidden">{{ selection_note_all }}</span>
+        <span class="question hidden">
+            <a href="#" title="{% translate "Click here to select the objects across all pages" %}">{% blocktranslate with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktranslate %}</a>
+        </span>
+        <span class="clear hidden"><a href="#">{% translate "Clear selection" %}</a></span>
+        {% endif %}
+    {% endif %}
+</div>
