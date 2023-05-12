@@ -307,3 +307,34 @@ Set ``FILER_IMAGE_MODEL`` to the path of your custom model:
 .. code-block:: python
 
     FILER_IMAGE_MODEL = 'myapp.CustomImage'
+
+
+Customize Upload Validation
+...........................
+
+Set a custom validation function before storing a File into the Filer.
+Sometimes you might want to restrict the upload according to some defined
+criterias. For example: "All the image files must be lower than 10 MB" 
+For this you can set a custom upload validation function in your settings: 
+
+Set ``FILER_CUSTOM_UPLOAD_VALIDATION`` to the path of your custom function:
+
+.. code-block:: python
+
+    FILER_CUSTOM_UPLOAD_VALIDATION = 'myapp.filer.custom_upload_validation'
+
+
+The signature of the function should look like this:
+
+.. code-block:: python
+
+    def custom_validation_func(request, upload, filename, mime_type):
+        from pathlib import Path
+
+        file_extension = Path(filename).suffix
+
+        image_extensions = ['.jpg', 'png', '.svg', '.webp']
+
+        if file_extension in image_extensions and upload.size > 10485760:
+            return 'Image files should be lower than 10 MB'
+

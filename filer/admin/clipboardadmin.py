@@ -91,6 +91,12 @@ def ajax_upload(request, folder_id=None):
     # Get clipboad
     # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
 
+    validate_upload_func = getattr(filer_settings, 'FILER_CUSTOM_UPLOAD_VALIDATION_FUNC', None)
+    if validate_upload_func is not None:
+        error_message = validate_upload_func(request, upload, filename, mime_type)
+        if error_message is not None:
+            return JsonResponse({'error': error_message})
+
     # find the file type
     for filer_class in filer_settings.FILER_FILE_MODELS:
         FileSubClass = load_model(filer_class)

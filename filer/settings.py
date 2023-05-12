@@ -274,3 +274,6 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
         'template': 'admin/filer/folder/directory_thumbnail_list.html',
     },
 }
+
+FILER_CUSTOM_UPLOAD_VALIDATION = getattr(settings, 'FILER_CUSTOM_UPLOAD_VALIDATION', None)
+FILER_CUSTOM_UPLOAD_VALIDATION_FUNC = load_object(FILER_CUSTOM_UPLOAD_VALIDATION) if FILER_CUSTOM_UPLOAD_VALIDATION is not None else None 
