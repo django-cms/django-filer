@@ -98,7 +98,11 @@ Cl.mediator = new Mediator();
 
             actionSelect.on('change', function () {
                 // Mark element selected (for table view this is done by Django admin js - we do it ourselves
-                $(this).closest('.list-item').addClass('selected');
+                if ($(this).prop("checked")) {
+                    $(this).closest('.list-item').addClass('selected');
+                } else {
+                    $(this).closest('.list-item').removeClass('selected');
+                }
                 // setTimeout makes sure that change event fires before click event which is reliable to admin
                 setTimeout(function () {
                     if (navigatorTable.hasClass('selected')) {
