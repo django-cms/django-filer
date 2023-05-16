@@ -83,7 +83,7 @@ Cl.mediator = new Mediator();
 
         // show counter if file is selected
         (function () {
-            var navigatorTable = $('.navigator-table, .navigator-list').find('tr, .list-item');
+            var navigatorTable = $('.navigator-table tr, .navigator-list .list-item');
             var actionList = $('.actions-wrapper');
             var actionSelect = $(
                 '.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a'
@@ -97,6 +97,12 @@ Cl.mediator = new Mediator();
             }, 100);
 
             actionSelect.on('change', function () {
+                // Mark element selected (for table view this is done by Django admin js - we do it ourselves
+                if ($(this).prop("checked")) {
+                    $(this).closest('.list-item').addClass('selected');
+                } else {
+                    $(this).closest('.list-item').removeClass('selected');
+                }
                 // setTimeout makes sure that change event fires before click event which is reliable to admin
                 setTimeout(function () {
                     if (navigatorTable.hasClass('selected')) {
@@ -122,7 +128,7 @@ Cl.mediator = new Mediator();
             var valueDelete = 'delete_files_or_folders';
             var valueCopy = 'copy_files_and_folders';
             var valueMove = 'move_files_and_folders';
-            var navigatorTable = $('.navigator-table, .navigator-list').find('tr, .list-item');
+            var navigatorTable =  $('.navigator-table tr, .navigator-list .list-item');
 
             // triggers delete copy and move actions on separate buttons
             function actionsButton(optionValue, actionButton) {
@@ -210,54 +216,46 @@ Cl.mediator = new Mediator();
         }());
         // thumbnail folder admin view
         (function () {
-            $(document).ready(function () {
-                var $actionEls = $('.navigator-list .list-item input.action-select'),
-                    foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select',
-                    filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select',
-                    $allFilesToggle = $('#files-action-toggle'),
-                    $allFoldersToggle = $('#folders-action-toggle');
+            var $actionEls = $('.navigator-list .list-item input.action-select'),
+                foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select',
+                filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select',
+                $allFilesToggle = $('#files-action-toggle'),
+                $allFoldersToggle = $('#folders-action-toggle');
 
-                if ($actionEls.length > 0) {
-                    $actionEls.actions({
-                        allToggle: '#all-items-action-toggle'
-                    });
+            $allFoldersToggle.on('click', function () {
+                if (!!$(this).prop('checked')) {
+                    $(foldersActionCheckboxes).filter(':not(:checked)').trigger('click');
+                } else {
+                    $(foldersActionCheckboxes).filter(':checked').trigger('click');
                 }
-
-                $allFoldersToggle.on('click', function () {
-                    if (!!$(this).prop('checked')) {
-                        $(foldersActionCheckboxes).filter(':not(:checked)').trigger('click');
-                    } else {
-                        $(foldersActionCheckboxes).filter(':checked').trigger('click');
+            });
+            $allFilesToggle.on('click', function () {
+                if (!!$(this).prop('checked')) {
+                    $(filesActionCheckboxes).filter(':not(:checked)').trigger('click');
+                } else {
+                    $(filesActionCheckboxes).filter(':checked').trigger('click');
+                }
+            });
+            $actionEls.on('click', function () {
+                if (!$(this).prop('checked')) {
+                    if (!!$(filesActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFilesToggle.prop('checked', false);
                     }
-                });
-                $allFilesToggle.on('click', function () {
-                    if (!!$(this).prop('checked')) {
-                        $(filesActionCheckboxes).filter(':not(:checked)').trigger('click');
-                    } else {
-                        $(filesActionCheckboxes).filter(':checked').trigger('click');
+                    if (!!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFoldersToggle.prop('checked', false);
                     }
-                });
-                $actionEls.on('click', function () {
-                    if (!$(this).prop('checked')) {
-                        if (!!$(filesActionCheckboxes).filter(':not(:checked)').length) {
-                            $allFilesToggle.prop('checked', false);
-                        }
-                        if (!!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
-                            $allFoldersToggle.prop('checked', false);
-                        }
-                    } else {
-                        if (!$(filesActionCheckboxes).filter(':not(:checked)').length) {
-                            $allFilesToggle.prop('checked', true);
-                        }
-                        if (!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
-                            $allFoldersToggle.prop('checked', true);
-                        }
+                } else {
+                    if (!$(filesActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFilesToggle.prop('checked', true);
                     }
-                });
-                $('.navigator .actions .clear a').on('click', function () {
-                    $allFoldersToggle.prop('checked', false);
-                    $allFilesToggle.prop('checked', false);
-                });
+                    if (!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFoldersToggle.prop('checked', true);
+                    }
+                }
+            });
+            $('.navigator .actions .clear a').on('click', function () {
+                $allFoldersToggle.prop('checked', false);
+                $allFilesToggle.prop('checked', false);
             });
         })();
     });
