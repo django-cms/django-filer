@@ -6,8 +6,6 @@ from django.template.defaultfilters import slugify as slugify_django
 from django.utils.encoding import force_str
 from django.utils.text import get_valid_filename as get_valid_filename_django
 
-from unidecode import unidecode
-
 
 class UploadException(Exception):
     pass
@@ -120,7 +118,7 @@ def handle_request_files_upload(request):
 
 
 def slugify(string):
-    return slugify_django(unidecode(force_str(string)))
+    return slugify_django(force_str(string))
 
 
 def get_valid_filename(s):
