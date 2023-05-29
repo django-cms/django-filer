@@ -6,7 +6,6 @@ class TreeCorruption(Exception):
 
 
 class TreeChecker(object):
-
     ordering = ['tree_id', 'lft', 'rght']
 
     def __init__(self, folder_manager=None):
@@ -19,14 +18,13 @@ class TreeChecker(object):
         else:
             self.manager = folder_manager
 
-
     def find_corruptions(self):
         self.check_corruptions()
         if (self.full_rebuild or self.corrupted_folders):
             raise TreeCorruption()
 
     def _build_diff_msg(self, expected, actual):
-        attr_idx = {'lft':0, 'rght':1, 'level':2, 'tree_id':3}
+        attr_idx = {'lft': 0, 'rght': 1, 'level': 2, 'tree_id': 3}
         expected, actual = list(expected), list(actual)
         diff = []
         for attr, idx in list(attr_idx.items()):
@@ -50,29 +48,31 @@ class TreeChecker(object):
         if not self.corruption_check_done:
             self.check_corruptions()
         corrupted_trees = self.manager.filter(
-            pk__in=list(self.corrupted_folders.keys())).\
+            pk__in=list(self.corrupted_folders.keys())). \
             values_list('tree_id', flat=True).distinct()
         return self.manager.filter(
-            parent__isnull=True, tree_id__in=corrupted_trees)
+            parent__isnull=True, deleted_at__isnull=True, tree_id__in=corrupted_trees)
 
     def check_tree(self, pk, lft, tree_id, level=0):
         """
             * checks if a certain folder tree is corrupted or not.
             * uses the same logic as django-mptt's rebuild tree
+            * ignores deleted folders, same as django-mptt's rebuild
         """
         rght = lft + 1
-        child_ids = self.manager.filter(parent__pk=pk).\
+        child_ids = self.manager.filter(parent__pk=pk). \
             order_by(*self.ordering).values_list('pk', flat=True)
 
         for child_id in child_ids:
             rght = self.check_tree(child_id, rght, tree_id, level + 1)
 
         folder = self.manager.get(pk=pk)
-        expected = (lft, rght, level, tree_id)
-        actual = (folder.lft, folder.rght, folder.level, folder.tree_id)
-        if expected != actual:
-            self.corrupted_folders.setdefault(
-                pk, self._build_diff_msg(expected, actual))
+        if folder.deleted_at is None:
+            expected = (lft, rght, level, tree_id)
+            actual = (folder.lft, folder.rght, folder.level, folder.tree_id)
+            if expected != actual:
+                self.corrupted_folders.setdefault(
+                    pk, self._build_diff_msg(expected, actual))
         return rght + 1
 
     def check_corruptions(self):
@@ -82,15 +82,15 @@ class TreeChecker(object):
             * checks if there are multiple root folders with the
         same tree id(fixing this will require a full rebuild)
         """
-        tree_duplicates = self.manager.filter(parent=None).\
-            values_list('tree_id').\
+        tree_duplicates = self.manager.filter(parent=None). \
+            values_list('tree_id'). \
             annotate(count=Count('id')).filter(count__gt=1)
         if len(tree_duplicates) > 0:
             self.full_rebuild = True
             self.corruption_check_done = True
             return
 
-        pks = self.manager.filter(parent=None).\
+        pks = self.manager.filter(parent=None). \
             order_by(*self.ordering).values_list('pk', flat=True)
         idx = 0
         for pk in pks:
@@ -107,7 +107,4 @@ class TreeChecker(object):
             self.manager.rebuild()
         elif self.corrupted_folders:
             for folder in self.get_corrupted_root_nodes():
-                # since we use an older version of djang-mptt and method
-                #   partial_rebuild does not exist ...
-                self.manager._rebuild_helper(
-                    folder.pk, 1, folder.tree_id)
+                self.manager.partial_rebuild(folder.tree_id)
