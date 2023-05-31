@@ -84,8 +84,8 @@
 }
 .filer-dropzone .dz-preview.dz-file-preview .dz-image {
     border-radius: 20px;
-    background: #999;
-    background: linear-gradient(to bottom, #eee, #ddd);
+    background: $gray-light;
+    background: linear-gradient(to bottom, $gray-lightest, $gray-lighter);
 }
 .filer-dropzone .dz-preview.dz-file-preview .dz-details {
     opacity: 1;
@@ -221,8 +221,8 @@
     bottom: 0;
     left: 0;
     width: 0;
-    background: #333;
-    background: linear-gradient(to bottom, #666, #444);
+    background: $gray-darkest;
+    background: linear-gradient(to bottom, $gray, $gray-darkest);
     transition: width 300ms ease-in-out;
 }
 .filer-dropzone .dz-preview.dz-error .dz-error-message {
@@ -239,7 +239,7 @@
     top: 130px;
     left: -10px;
     z-index: 1000;
-    color: white;
+    color: $white;
     font-size: 13px;
     width: 140px;
     padding: 0.5em 1.2em;

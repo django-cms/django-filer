@@ -2,11 +2,19 @@
 CHANGELOG
 =========
 
+<<<<<<< HEAD
 unreleased
 ================
 
 * Add an edit button to the file widget which open edit file popup
 
+=======
+2.2.4 (2023-01-13)
+==================
+* Add Django 4.1 support
+* Add python 3.11 tests
+* Fix thumbnail generation for SVG images when used as a Divio addon.
+>>>>>>> master
 
 2.2.3 (2022-08-08)
 ==================
