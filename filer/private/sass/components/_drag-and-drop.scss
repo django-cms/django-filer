@@ -215,6 +215,9 @@ form .form-row {
                 .replace-file {
                     display: block;
                 }
+                &.lookup {
+                    display: block !important;
+                }
                 &.edit {
                     display: block;
                 }
