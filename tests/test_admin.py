@@ -1283,7 +1283,7 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
                 args=[parent_folder.id]
             )
         )
-    
+
     def test_edit_from_widget_mode_save(self):
         parent_folder = Folder.objects.create(name='parent')
         image = self.create_image(folder=parent_folder)
@@ -1429,6 +1429,7 @@ class PolymorphicDeleteViewTests(BulkOperationsMixin, TestCase):
         )
         self.assertEqual(Folder.objects.filter(id=folder.id).count(), 0)
 
+
 class AdminToolsTests(TestCase):
 
     def setUp(self):
@@ -1442,7 +1443,7 @@ class AdminToolsTests(TestCase):
         request_factory = RequestFactory()
         request = request_factory.get('/')
         self.assertDictEqual(tools.admin_url_params(request), {})
-        request = request_factory.get('/', {'_popup': '1', '_pick': 'file', '_edit_from_widget':'1'})
+        request = request_factory.get('/', {'_popup': '1', '_pick': 'file', '_edit_from_widget': '1'})
         self.assertDictEqual(tools.admin_url_params(request, {'extra_param': 42}), {
             '_popup': '1',
             '_pick': 'file',
@@ -1451,5 +1452,3 @@ class AdminToolsTests(TestCase):
         })
         request = request_factory.get('/', {'_pick': 'bad_type'})
         self.assertDictEqual(tools.admin_url_params(request), {})
-        
-        
