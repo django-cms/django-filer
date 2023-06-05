@@ -82,7 +82,7 @@
                           <div class="list-item thumbnail-item thumbnail-file-item">
                               <div class="navigator-checkbox">
                                   {% if is_popup and filer_admin_context.pick_file %}
-                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                           title="{% trans 'Select this file' %}">&nbsp;</a>
                                   {% elif action_form and not is_popup %}
                                       <input type="checkbox" class="action-select" value="file-{{ item.pk|safe }}" name="_selected_action">
