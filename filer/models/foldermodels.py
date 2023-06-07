@@ -188,14 +188,6 @@ class Folder(models.Model, mixins.IconsMixin):
     def pretty_logical_path(self):
         return format_html('/{}', format_html_join('/', '{0}', ((f.name,) for f in self.logical_path + [self])))
 
-    @property
-    def quoted_logical_path(self):
-        warnings.warn(
-            'Method filer.foldermodels.Folder.quoted_logical_path is deprecated and will be removed',
-            DeprecationWarning, stacklevel=2,
-        )
-        return urlquote(self.pretty_logical_path)
-
     def has_edit_permission(self, request):
         return self.has_generic_permission(request, 'edit')
 
