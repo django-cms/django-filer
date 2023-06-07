@@ -11,8 +11,6 @@ from django.utils.functional import cached_property
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
-import mptt
-
 from .. import settings as filer_settings
 from . import mixins
 
@@ -70,9 +68,9 @@ class FolderPermissionManager(models.Manager):
 
             if perm.type in [FolderPermission.ALL, FolderPermission.CHILDREN]:
                 if p == FolderPermission.ALLOW:
-                    allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                    allow_list.update(perm.folder.get_descendants_ids())
                 else:
-                    deny_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                    deny_list.update(perm.folder.get_descendants_ids())
 
         # Deny has precedence over allow
         return allow_list - deny_list
@@ -93,16 +91,9 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
-    # explicitly define MPTT fields which would otherwise change
-    # and create a migration, depending on django-mptt version
-    # (see: https://github.com/django-mptt/django-mptt/pull/578)
-    level = models.PositiveIntegerField(editable=False)
-    lft = models.PositiveIntegerField(editable=False)
-    rght = models.PositiveIntegerField(editable=False)
-
     parent = models.ForeignKey(
         'self',
-        verbose_name=('parent'),
+        verbose_name=_('parent'),
         null=True,
         blank=True,
         related_name='children',
@@ -139,8 +130,6 @@ class Folder(models.Model, mixins.IconsMixin):
     )
 
     class Meta:
-        # see: https://github.com/django-mptt/django-mptt/pull/577
-        index_together = (('tree_id', 'lft'),)
         unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
@@ -183,9 +172,17 @@ class Folder(models.Model, mixins.IconsMixin):
         """
         folder_path = []
         if self.parent:
-            folder_path.extend(self.parent.get_ancestors())
+            folder_path.extend(self.parent.logical_path)
             folder_path.append(self.parent)
         return folder_path
+
+    def get_descendants_ids(self):
+        children = self.children
+        desc = []
+        for child in self.children.all():
+            desc.append(child.id)
+            desc.extend(child.get_descendants_ids())
+        return desc
 
     @property
     def pretty_logical_path(self):
@@ -260,13 +257,6 @@ class Folder(models.Model, mixins.IconsMixin):
             return True
         except Folder.DoesNotExist:
             return False
-
-
-# MPTT registration
-try:
-    mptt.register(Folder)
-except mptt.AlreadyRegistered:
-    pass
 
 
 class FolderPermission(models.Model):

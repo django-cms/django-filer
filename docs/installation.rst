@@ -15,7 +15,6 @@ Dependencies
 ------------
 
 * `Django`_ >= 2.2
-* `django-mptt`_ >=0.6
 * `easy_thumbnails`_ >= 2.0
 * `django-polymorphic`_ >= 0.7
 * `Pillow`_ >=2.3.0 (with JPEG and ZLIB support, `PIL`_ may work but is not supported)
@@ -41,7 +40,6 @@ Add ``"filer"`` and related apps to your project's ``INSTALLED_APPS`` setting an
         ...
         'easy_thumbnails',
         'filer',
-        'mptt',
         ...
     ]
 
@@ -147,7 +145,6 @@ generation errors,  two options are provided to help when working with ``django-
 .. _django-polymorphic: https://github.com/bconstantin/django_polymorphic
 .. _easy_thumbnails: https://github.com/SmileyChris/easy-thumbnails
 .. _sorl.thumbnail: http://thumbnail.sorl.net/
-.. _django-mptt: https://github.com/django-mptt/django-mptt/
 .. _Pillow: http://pypi.python.org/pypi/Pillow/
 .. _Pillow doc: https://pillow.readthedocs.io/en/latest/installation.html
 .. _PIL: http://www.pythonware.com/products/pil/

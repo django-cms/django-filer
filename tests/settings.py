@@ -11,7 +11,6 @@ HELPER_SETTINGS = {
     'ROOT_URLCONF': 'tests.utils.urls',
     'INSTALLED_APPS': [
         'easy_thumbnails',
-        'mptt',
         'filer',
         'tests.utils.test_app',
         'tests.utils.extended_app',
