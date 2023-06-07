@@ -1,6 +1,3 @@
-import warnings
-from urllib.parse import quote as urlquote
-
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
@@ -177,7 +174,6 @@ class Folder(models.Model, mixins.IconsMixin):
         return folder_path
 
     def get_descendants_ids(self):
-        children = self.children
         desc = []
         for child in self.children.all():
             desc.append(child.id)
