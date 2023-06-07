@@ -866,12 +866,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
-        for f in files_queryset:
-            f.folder = destination
-            f.save(update_fields=["folder"])
-        for f in folders_queryset:
-            f.parent = destination
-            f.save(update_fields=["parent"])
+        files_queryset.update(folder=destination)
+        folders_queryset.update(parent=destination)
 
     def move_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
