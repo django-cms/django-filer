@@ -868,10 +868,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
         for f in files_queryset:
             f.folder = destination
-            f.save()
+            f.save(update_fields=["folder"])
         for f in folders_queryset:
-            f.move_to(destination, 'last-child')
-            f.save()
+            f.parent = destination
+            f.save(update_fields=["parent"])
 
     def move_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta
