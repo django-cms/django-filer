@@ -6,7 +6,9 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.options import ThumbnailOptions
 
+from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 
@@ -27,6 +29,30 @@ def filer_actions(context):
 
 filer_actions = register.inclusion_tag(
     "admin/filer/actions.html", takes_context=True)(filer_actions)
+
+
+@register.inclusion_tag(
+    'admin/filer/folder/list_type_switcher.html',
+    takes_context=True,
+)
+def filer_folder_list_type_switcher(context):
+    choice_list = settings.FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES
+    current_list_type = context['list_type']
+    # This solution is user friendly when there's only 2 choices
+    # If there will be more list types then please change this switcher to more
+    # proper widget (like for e.g. select list)
+    next_list_type = next(
+        iter(choice_list[choice_list.index(current_list_type) + 1:]),
+        choice_list[0],
+    )
+
+    context['url'] = admin_url_params_encoded(
+        context['request'],
+        params={'_list_type': next_list_type},
+    )
+    context['tooltip_text'] = settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[next_list_type]['tooltip_text']
+    context['icon'] = settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[next_list_type]['icon']
+    return context
 
 
 @register.simple_tag(takes_context=True)
@@ -91,11 +117,12 @@ def file_icon_context(file, detail, width, height):
                 opts = {'size': (width, height), 'upscale': True}
             else:
                 opts = {'size': (width, height), 'crop': True}
-            icon_url = thumbnailer.get_thumbnail(opts).url
+            thumbnail_options = ThumbnailOptions(opts)
+            icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
             context['alt_text'] = file.default_alt_text
             if mime_subtype != 'svg+xml':
-                opts['size'] = 2 * width, 2 * height
-                context['highres_url'] = thumbnailer.get_thumbnail(opts).url
+                thumbnail_options['size'] = 2 * width, 2 * height
+                context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
@@ -109,7 +136,7 @@ def file_icon_context(file, detail, width, height):
 @register.inclusion_tag('admin/filer/templatetags/file_icon.html')
 def file_icon(file, detail=False, size=None):
     """
-    This templatetag returns a redered `<img src="..." srcset="..." width="..." height="..." class="..." />
+    This templatetag returns a rendered `<img src="..." srcset="..." width="..." height="..." class="..." />
     to be used for rendering thumbnails of files in the directory listing or in the corresponding detail
     views for that image.
     """

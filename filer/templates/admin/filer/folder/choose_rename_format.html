@@ -23,10 +23,10 @@
                 {% csrf_token %}
                 <div>
                     {% for f in files_queryset %}
-                        <input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}">
+                        <input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk|safe }}">
                     {% endfor %}
                     {% for f in folders_queryset %}
-                        <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}">
+                        <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk|safe }}">
                     {% endfor %}
                     <input type="hidden" name="action" value="rename_files">
                     <input type="hidden" name="post" value="yes">

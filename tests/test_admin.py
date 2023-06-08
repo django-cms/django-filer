@@ -186,6 +186,32 @@ class FilerFolderAdminUrlsTests(TestCase):
             for action in (actions_with_permissions + actions):
                 self.assertContains(response, action)
 
+    def test_filer_list_type_query_string(self):
+        response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=th")
+        self.assertContains(response, 'navigator-thumbnail-list')
+
+        response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=tb")
+        self.assertContains(response, 'navigator-table')
+
+    def test_filer_list_type_setting(self):
+        with SettingsOverride(filer_settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='th'):
+            response = self.client.get(reverse('admin:filer-directory_listing-root'))
+            self.assertContains(response, 'navigator-thumbnail-list')
+
+    def test_filer_list_type_setting_when_user_set_wrong_choice(self):
+        # If choice not exists then it should set table view as default
+        with SettingsOverride(settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='qwerty'):
+            # `settings` instead of `filer_settings` to give chance filer_settings
+            # conditional to fire up
+            response = self.client.get(reverse('admin:filer-directory_listing-root'))
+            self.assertContains(response, 'navigator-table')
+
+    def test_filer_list_type_setting_when_use_wrong_query_string_choice(self):
+        # If list type in query string not exists show default list type
+        with SettingsOverride(filer_settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='th'):
+            response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=qwerty")
+            self.assertContains(response, 'navigator-thumbnail-list')
+
 
 class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):
@@ -569,7 +595,7 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
           |
           |--bar
 
-        and try to move the owter bar in foo. This has to fail since it would result
+        and try to move the outer bar in foo. This has to fail since it would result
         in two folders with the same name and parent.
         """
         root = Folder.objects.create(name='root', owner=self.superuser)
