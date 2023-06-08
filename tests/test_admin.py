@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from django.urls import reverse
@@ -429,6 +430,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             username='joe_new', password='x', email='joe@mata.com')
         staff_user.is_staff = True
         staff_user.save()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="add_file"))
         self.client.login(username='joe_new', password='x')
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
@@ -463,6 +465,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             username='joe_new', password='x', email='joe@mata.com')
         staff_user.is_staff = True
         staff_user.save()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="add_file"))
         self.client.login(username='joe_new', password='x')
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
@@ -895,6 +898,8 @@ class FolderListingTest(TestCase):
             username='joe', password='x', email='joe@mata.com')
         self.staff_user.is_staff = True
         self.staff_user.save()
+        perms = Permission.objects.filter(codename__in=["view_folder", "add_file", "add_folder", "can_use_directory_listing"])
+        self.staff_user.user_permissions.add(*perms)
         self.parent = Folder.objects.create(name='bar', parent=None, owner=superuser)
 
         self.foo_folder = Folder.objects.create(name='foo', parent=self.parent, owner=self.staff_user)
