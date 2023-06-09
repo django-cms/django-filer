@@ -35,6 +35,7 @@ class ToolsTestCase(TestCase):
         self.folder = Folder.objects.create(name='test_folder')
 
     def tearDown(self):
+        self.file.close()
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():
