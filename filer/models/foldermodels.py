@@ -38,7 +38,7 @@ class FolderPermissionManager(models.Manager):
         group_ids = user.groups.all().values_list('id', flat=True)
         q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
         perms = self.filter(q)
-        
+
         for perm in perms:
             p = getattr(perm, attr)
 
