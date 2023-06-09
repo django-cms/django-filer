@@ -489,7 +489,6 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertContains(response, NO_PERMISSIONS)
         self.assertEqual(Image.objects.count(), 0)
 
-
     def test_filer_ajax_upload_permissions_error(self, extra_headers={}):
         self.client.logout()
         staff_user = User.objects.create_user(
