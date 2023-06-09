@@ -8,7 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.forms.models import model_to_dict as model_to_dict_django
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -500,6 +500,32 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
         self.assertContains(response, NO_PERMISSIONS)
         self.assertEqual(Image.objects.count(), 0)
+
+    def test_filer_add_file_permissions(self, extra_headers={}):
+        """Add_file permissions reflect in has_... methods of File and Folder classes"""
+        self.client.logout()
+        staff_user = User.objects.create_user(
+            username='joe_new', password='x', email='joe@mata.com')
+        staff_user.is_staff = True
+        staff_user.save()
+        self.client.login(username='joe_new', password='x')
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+
+        file_data = django.core.files.base.ContentFile('some data')
+        file_data.name = self.filename
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=file_data,
+            folder=folder
+        )
+        file.save()
+        request = HttpRequest()
+        setattr(request, "user", staff_user)
+
+        self.assertEqual(folder.has_add_children_permission(request), False)
+        self.assertEqual(file.has_add_children_permission(request), False)
 
     def test_filer_ajax_upload_permissions_error(self, extra_headers={}):
         self.client.logout()
