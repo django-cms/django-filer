@@ -259,7 +259,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'Filedata': file_obj,
                 'jsessionid': self.client.session.session_key
             }
-            response = self.client.post(url, post_data, **extra_headers)  # noqa
+            self.client.post(url, post_data, **extra_headers)  # noqa
+
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
@@ -281,7 +282,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
                     'Filedata': file_obj,
                     'jsessionid': self.client.session.session_key
                 }
-                response = self.client.post(url, post_data, **extra_headers)  # noqa
+                self.client.post(url, post_data, **extra_headers)  # noqa
+
             self.assertEqual(Video.objects.count(), 1)
             self.assertEqual(Video.objects.all()[0].original_filename, self.video_name)
 
@@ -302,7 +304,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
                     'Filedata': file_obj,
                     'jsessionid': self.client.session.session_key
                 }
-                response = self.client.post(url, post_data, **extra_headers)  # noqa
+                self.client.post(url, post_data, **extra_headers)  # noqa
+
             self.assertEqual(ExtImage.objects.count(), 1)
             self.assertEqual(ExtImage.objects.all()[0].original_filename, self.image_name)
 
@@ -332,7 +335,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'Filedata': file_obj,
                 'jsessionid': self.client.session.session_key
             }
-            response = self.client.post(url, post_data, **extra_headers)  # noqa
+            self.client.post(url, post_data, **extra_headers)  # noqa
             self.assertEqual(Image.objects.count(), 0)
             self.assertEqual(File.objects.count(), 1)
             stored_file = File.objects.first()
@@ -368,7 +371,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'admin:filer-ajax_upload',
                 kwargs={'folder_id': folder.pk}
             ) + '?filename=renamed.pdf'
-            response = self.client.post(  # noqa
+            self.client.post(  # noqa
                 url,
                 data=file_obj.read(),
                 content_type='application/pdf',
@@ -387,7 +390,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             url = reverse(
                 'admin:filer-ajax_upload'
             ) + '?filename=%s' % self.image_name
-            response = self.client.post(  # noqa
+            self.client.post(  # noqa
                 url,
                 data=file_obj.read(),
                 content_type='image/jpeg',
