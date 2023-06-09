@@ -8,6 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.forms.models import model_to_dict as model_to_dict_django
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
@@ -458,6 +459,36 @@ class FilerClipboardAdminUrlsTests(TestCase):
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
         self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
         self.assertEqual(Image.objects.count(), 0)
+
+    def test_filer_ajax_upload_without_permissions_error(self, extra_headers={}):
+        """User without add_file permission cannot upload"""
+        self.client.logout()
+        staff_user = User.objects.create_user(
+            username='joe_new', password='x', email='joe@mata.com')
+        staff_user.is_staff = True
+        staff_user.save()
+        self.client.login(username='joe_new', password='x')
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        file_obj = django.core.files.File(open(self.filename, 'rb'))
+
+        url = reverse(
+            'admin:filer-ajax_upload',
+            kwargs={
+                'folder_id': folder.pk}
+        ) + '?filename={0}'.format(self.image_name)
+        response = self.client.post(
+            url,
+            data=file_obj.read(),
+            content_type='application/octet-stream',
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        )
+
+        from filer.admin.clipboardadmin import NO_PERMISSIONS
+
+        self.assertContains(response, NO_PERMISSIONS)
+        self.assertEqual(Image.objects.count(), 0)
+
 
     def test_filer_ajax_upload_permissions_error(self, extra_headers={}):
         self.client.logout()
@@ -912,6 +943,18 @@ class FolderListingTest(TestCase):
             owner=superuser, original_filename='spam',
             file=file_data, folder=self.parent)
         self.client.login(username='joe', password='x')
+
+    def test_with_without_permissions(self):
+        staff_user_wo_permissions = User.objects.create_user(
+            username='joemata', password='x', email='joe@mata.com')
+        staff_user_wo_permissions.is_staff = True
+        staff_user_wo_permissions.save()
+        self.client.login(username='joemata', password='x')
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+        self.assertIsInstance(response, HttpResponseForbidden)
 
     def test_with_permissions_disabled(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
