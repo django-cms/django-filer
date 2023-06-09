@@ -1,7 +1,9 @@
 from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import default_storage
 from django.template import Library
+from django.urls import reverse
 from django.utils.html import escapejs, format_html_join
 from django.utils.translation import gettext_lazy as _
 
@@ -11,7 +13,7 @@ from easy_thumbnails.options import ThumbnailOptions
 from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
-
+from filer.settings import DEFERRED_THUMBNAIL_SIZES
 
 register = Library()
 
@@ -38,7 +40,7 @@ filer_actions = register.inclusion_tag(
 def filer_folder_list_type_switcher(context):
     choice_list = settings.FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES
     current_list_type = context['list_type']
-    # This solution is user friendly when there's only 2 choices
+    # This solution is user-friendly when there's only 2 choices
     # If there will be more list types then please change this switcher to more
     # proper widget (like for e.g. select list)
     next_list_type = next(
@@ -118,11 +120,26 @@ def file_icon_context(file, detail, width, height):
             else:
                 opts = {'size': (width, height), 'crop': True}
             thumbnail_options = ThumbnailOptions(opts)
-            icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
-            context['alt_text'] = file.default_alt_text
-            if mime_subtype != 'svg+xml':
-                thumbnail_options['size'] = 2 * width, 2 * height
-                context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
+            if not detail and width == height and width in DEFERRED_THUMBNAIL_SIZES:
+                # Optimize directory listing:
+                # Avoid jpg thubnails for pngs with transparency
+                transparent = file.file.name.rsplit(".", 1)[-1] == "png"
+                # Get name of thumbnail from easy-thumbnail
+                configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=transparent)
+                # If the name was annotated: Thumbnail exists and we can use it
+                if configured_name == getattr(file, "thumbnail_name", ""):
+                    icon_url = default_storage.url(configured_name)
+                else:  # Probably does not exist, defer creation
+                    icon_url = reverse("admin:filer_file_fileicon", args=(file.pk, width))
+                context['alt_text'] = file.default_alt_text
+            else:
+                width, height = 210, ceil(210 / file.width * file.height)
+                context['sidebar_image_ratio'] = file.width / 210
+                icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
+                context['alt_text'] = file.default_alt_text
+                if mime_subtype != 'svg+xml':
+                    thumbnail_options['size'] = 2 * width, 2 * height
+                    context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
