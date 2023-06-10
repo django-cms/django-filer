@@ -35,17 +35,19 @@ class DumpDataTests(TestCase):
         pass
 
     def create_filer_image(self, folder=None):
-        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
-        image = Image.objects.create(owner=self.superuser,
-                                     original_filename=self.image_name,
-                                     file=file_obj, folder=folder)
+        with open(self.filename, 'rb') as file:
+            file_obj = DjangoFile(file, name=self.image_name)
+            image = Image.objects.create(owner=self.superuser,
+                                         original_filename=self.image_name,
+                                         file=file_obj, folder=folder)
         return image
 
     def create_filer_file(self, folder=None):
-        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
-        fileobj = File.objects.create(owner=self.superuser,
-                                      original_filename=self.image_name,
-                                      file=file_obj, folder=folder)
+        with open(self.filename, 'rb') as file:
+            file_obj = DjangoFile(file, name=self.image_name)
+            fileobj = File.objects.create(owner=self.superuser,
+                                          original_filename=self.image_name,
+                                          file=file_obj, folder=folder)
         return fileobj
 
     def test_dump_data_base(self):
