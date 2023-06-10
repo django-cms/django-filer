@@ -233,6 +233,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     # custom views
     def directory_listing(self, request, folder_id=None, viewtype=None):
+        if not request.user.has_perm("filer.can_use_directory_listing"):
+            raise PermissionDenied()
         clipboard = tools.get_user_clipboard(request.user)
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
