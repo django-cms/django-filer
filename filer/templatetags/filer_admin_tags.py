@@ -1,7 +1,7 @@
 from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, FileSystemStorage
 from django.template import Library
 from django.urls import reverse
 from django.utils.html import escapejs, format_html_join
@@ -91,7 +91,8 @@ def filer_has_permission(context, item, action):
 
 
 def file_icon_context(file, detail, width, height):
-    if not file.file.exists():
+    # Only check on FileSystemStorage if file exists for performance reasons
+    if isinstance(default_storage, FileSystemStorage) and not file.file.exists():
         return {
             'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
             'alt_text': _("File is missing"),
@@ -120,21 +121,21 @@ def file_icon_context(file, detail, width, height):
             else:
                 opts = {'size': (width, height), 'crop': True}
             thumbnail_options = ThumbnailOptions(opts)
-            if not detail and width == height and width in DEFERRED_THUMBNAIL_SIZES:
-                # Optimize directory listing:
-                # Avoid jpg thubnails for pngs with transparency
+            # Optimize directory listing:
+            if not detail and width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
+                # Avoid jpg thumbnails for pngs with transparency
                 transparent = file.file.name.rsplit(".", 1)[-1] == "png"
                 # Get name of thumbnail from easy-thumbnail
                 configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=transparent)
                 # If the name was annotated: Thumbnail exists and we can use it
                 if configured_name == getattr(file, "thumbnail_name", ""):
                     icon_url = default_storage.url(configured_name)
+                    if mime_subtype != 'svg+xml' and file.thumbnailx2_name:
+                        context['highres_url'] = default_storage.url(file.thumbnailx2_name)
                 else:  # Probably does not exist, defer creation
                     icon_url = reverse("admin:filer_file_fileicon", args=(file.pk, width))
                 context['alt_text'] = file.default_alt_text
             else:
-                width, height = 210, ceil(210 / file.width * file.height)
-                context['sidebar_image_ratio'] = file.width / 210
                 icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
                 context['alt_text'] = file.default_alt_text
                 if mime_subtype != 'svg+xml':
@@ -166,5 +167,8 @@ def file_icon(file, detail=False, size=None):
 
 @register.simple_tag
 def file_icon_url(file):
-    context = file_icon_context(file, False, 80, 80)
-    return escapejs(context.get('highres_url', context['icon_url']))
+    # Cache since it is called repeatedly by templates
+    if not hasattr(file, "_file_icon_url_cache"):
+        context = file_icon_context(file, False, 80, 80)
+        file._file_icon_url_cache = escapejs(context.get('highres_url', context['icon_url']))
+    return file._file_icon_url_cache

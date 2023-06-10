@@ -13,7 +13,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Subquery, F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import re_path, reverse
@@ -261,8 +261,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
         if list_type == TABLE_LIST_TYPE:
             size = "40x40"  # Prefetch thumbnails for listing
+            size_x2 = "80x80"
         else:
             size = "160x160"  # Prefetch thumbnails for thumbnail view
+            size_x2 = "320x320"
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -342,13 +344,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             Thumbnail.objects
             .filter(
                 source__name=OuterRef("file"),
-                modified__gte=OuterRef("modified_at"),
-                name__contains=f"__{size}_")
+                modified__gte=F("source__modified"),
+            )
             .exclude(name__contains="upscale")  # TODO: Check WHY not used by directory listing
             .order_by("-modified")
         )
         file_qs = file_qs.annotate(
-            thumbnail_name=Subquery(thumbnail_qs.values_list("name")[:1])
+            thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]),
+            thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[:1])
         ).select_related("owner")
 
         try:
@@ -360,9 +363,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:  # noqa
             permissions = {}
-
-        # if order_by is None or len(order_by) == 0:
-        #     folder_files.sort()
 
         items = list(itertools.chain(folder_qs, file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
