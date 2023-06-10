@@ -1,7 +1,7 @@
 from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.storage import default_storage, FileSystemStorage
+from django.core.files.storage import FileSystemStorage, default_storage
 from django.template import Library
 from django.urls import reverse
 from django.utils.html import escapejs, format_html_join
@@ -14,6 +14,7 @@ from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 from filer.settings import DEFERRED_THUMBNAIL_SIZES
+
 
 register = Library()
 
