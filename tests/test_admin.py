@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.test import TestCase
 from django.urls import reverse
+
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
