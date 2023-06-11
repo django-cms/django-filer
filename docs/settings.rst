@@ -117,12 +117,12 @@ Defaults to using the DefaultServer (doh)! This will serve the files with the dj
 The number of items (Folders, Files) that should be displayed per page in
 admin.
 
-Defaults to ``20``
+Defaults to ``100``
 
 ``FILER_SUBJECT_LOCATION_IMAGE_DEBUG``
 --------------------------------------
 
-Draws a red circle around to point in the image that was used to do the 
+Draws a red circle around to point in the image that was used to do the
 subject location aware image cropping.
 
 Defaults to ``False``
