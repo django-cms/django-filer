@@ -129,7 +129,7 @@ def file_icon_context(file, detail, width, height):
                 # Get name of thumbnail from easy-thumbnail
                 configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=transparent)
                 # If the name was annotated: Thumbnail exists and we can use it
-                if configured_name == getattr(file, "thumbnail_name", ""):
+                if configured_name == file.thumbnail_name:
                     icon_url = default_storage.url(configured_name)
                     if mime_subtype != 'svg+xml' and file.thumbnailx2_name:
                         context['highres_url'] = default_storage.url(file.thumbnailx2_name)
