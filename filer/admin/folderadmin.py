@@ -13,7 +13,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import re_path, reverse
@@ -57,7 +57,7 @@ class AddFolderPopupForm(forms.ModelForm):
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
-    list_per_page = 20
+    list_per_page = 100
     list_filter = ('owner',)
     search_fields = ['name']
     autocomplete_fields = ['owner']
@@ -345,7 +345,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             Thumbnail.objects
             .filter(
                 source__name=OuterRef("file"),
-                modified__gte=F("source__modified"),
+                modified__gte=OuterRef("modified_at"),
             )
             .exclude(name__contains="upscale")  # TODO: Check WHY not used by directory listing
             .order_by("-modified")
