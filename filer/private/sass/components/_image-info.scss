@@ -50,9 +50,6 @@
             float: left;
             margin-left: 50px;
         }
-        .icon {
-            font-size: 18px;
-        }
         .image-details,
         .actions-list {
             margin-top: 0;
@@ -67,7 +64,7 @@
                 color: $gray-light;
                 font-size: 13px;
                 // required for django CMS without admin styles #673
-                line-height: $font-size-large !important;
+                line-height: 1rem !important;
                 font-weight: normal;
                 // required for django CMS without admin styles #673
                 margin-top: 0;
@@ -195,4 +192,9 @@
             outline: none;
         }
     }
+}
+
+.button-group .button {
+    margin-right: 10px;
+    padding: 10px 15px;
 }

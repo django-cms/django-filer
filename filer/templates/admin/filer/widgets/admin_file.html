@@ -7,8 +7,8 @@
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <img class="filerClearer" src="{% static admin_icon_delete %}" width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
-                 data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
+            <span class="filerClearer fa fa-close cms-icon cms-icon-close" title="{% trans 'Clear' %}"
+                 data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}"></span>
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
     </div>
@@ -16,7 +16,7 @@
     <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
-            <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
+            <span class="icon cms-icon cms-icon-arrow-down fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>
 
         <span class="filerFile js-file-selector">
@@ -33,14 +33,15 @@
                 &nbsp;<span class="description_text"></span>
             {% endif %}
 
-            <img class="filerClearer {% if not object %}hidden{% endif %}" src="{% static admin_icon_delete %}"
-                 width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
-                 data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
+            <a class="filerClearer {% if not object %}hidden{% endif %}" title="{% trans 'Clear' %}"
+                 data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}" href="#">
+                <span class="fa fa-close cms-icon cms-icon-close"></span>
+            </a>
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
                title="{% trans 'Lookup' %}">
-                <span class="choose-file"><span class="fa fa-picture-o"></span>{% trans 'Choose File' %}</span>
-                <span class="edit-file"><span class="fa fa-pencil"></span></span>
+                <span class="choose-file"><span class="fa fa-image cms-icon cms-icon-picture"></span>{% trans 'Choose File' %}</span>
+                <span class="edit-file"><span class="fa fa-pencil cms-icon cms-icon-edit"></span></span>
             </a>
 
             <br>

@@ -95,7 +95,7 @@ body {
             @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
             padding: 9px !important;
             span {
-                font-size: 16px;
+                font-size: 17px;
                 line-height: 33px;
                 vertical-align: middle;
             }
@@ -407,7 +407,7 @@ body {
     }
     .icon {
         position: relative;
-        margin-right: 5px;
+        margin-right: 3px;
     }
     .fa-folder {
         top: 0;
@@ -722,6 +722,7 @@ body {
         }
         .navigator-checkbox {
             float: right;
+            padding-right: 20px;
             text-transform: initial;
             color: $color-primary;
             input[type="checkbox"] {
@@ -816,5 +817,14 @@ body {
             position: relative;
             word-break: break-word;
         }
+    }
+}
+
+.insertlinkButton {
+    &:before {
+        content:"" !important;  // Necessary since djangocms-admin-style tries to add its own icon
+    }
+    span {
+        font-size: 17px;
     }
 }

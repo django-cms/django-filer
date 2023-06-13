@@ -16,7 +16,7 @@
 
 %icon {
     display: inline-block;
-    font: normal normal normal 14px/1 <%= fontName %>;
+    font-family: <%= fontName %>;
     font-size: inherit;
     text-rendering: auto;
     transform: translate(0, 0);

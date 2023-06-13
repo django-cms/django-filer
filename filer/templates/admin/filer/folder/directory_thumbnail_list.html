@@ -133,7 +133,7 @@
   </div>
 
   <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
-      <div class="icon"><span class="fa fa-cloud-upload"></span></div>
+      <div class="icon"><span class="cms-icon cms-icon-upload fa fa-cloud-upload"></span></div>
 
       <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
           <div class="text">{% trans "Drop your file to upload into:" %}</div>

@@ -109,7 +109,7 @@
                             </ul>
                         </div>
                         {% if not folder.is_root or folder.is_smart_folder %}
-                            <span class="icon fa fa-chevron-right"></span>
+                            <span class="icon cms-icon cms-icon-chevron-right fa fa-chevron-right"></span>
                         {% endif %}
                     </div>
                     <div class="navigator-breadcrumbs-name-dropdown-wrapper">
@@ -126,7 +126,7 @@
                             <div class="filer-dropdown-container filer-dropdown-container-down">
                                 {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                        <span class="fa fa-caret-down"></span>
+                                        <span class="cms-icon cms-caret-down fa fa-caret-down"></span>
                                     </a>
                                     <ul class="filer-dropdown-menu">
                                         <li>
@@ -140,7 +140,7 @@
                     </div>
                     <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
                         <div class="filter-filers-container-inner">
-                            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
+                            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search cms-icon cms-icon-search"></span></button>
                             <div class="filter-search-wrapper">
                                 {% filer_admin_context_hidden_formfields %}
                                 <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" name="q">
@@ -150,7 +150,7 @@
                                     </a>
                                 </div>
                                 <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
-                                    <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
+                                    <span class="fa fa-close cms-icon cms-icon-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
                                     <li>
                                         <p>{% trans "Limit" %}</p>
                                         <label>
@@ -174,18 +174,18 @@
                             <div class="actions-wrapper">
                                 <ul class="actions-separated-list">
                                     <li>
-                                        <a href="#" class="js-action-delete" title="{% trans 'Delete' %}"><span class="fa fa-trash"></span></a>
+                                        <a href="#" class="js-action-delete" title="{% trans 'Delete' %}"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
                                     </li>
                                     <li>
-                                        <a href="#" class="js-action-copy" title="{% trans 'Copy' %}"><span class="fa fa-copy"></span></a>
+                                        <a href="#" class="js-action-copy" title="{% trans 'Copy' %}"><span class="fa fa-copy cms-icon cms-icon-copy fa fa-copy"></span></a>
                                     </li>
                                     <li>
-                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-cut"></span></a>
+                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-folder cms-icon cms-icon-move fa fa-cut"></span></a>
                                     </li>
                                 </ul>
                                 <div class="filer-dropdown-container js-actions-menu">
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false" class="nav-button nav-button-dots">
-                                        <span class="fa fa-ellipsis-h"></span>
+                                        <span class="fa fa-ellipsis-h cms-icon cms-icon-menu"></span>
                                     </a>
                                     <ul class="create-menu-dropdown filer-dropdown-menu">
                                         {# This list is populated in javascript #}

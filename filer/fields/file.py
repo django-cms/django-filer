@@ -13,6 +13,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from .. import settings as filer_settings
+from ..admin.helper import ICON_CSS_LIB
 from ..models import File
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
@@ -87,6 +88,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         css = {
             'all': [
                 'filer/css/admin_filer.css',
+                ICON_CSS_LIB,
             ]
         }
         js = (

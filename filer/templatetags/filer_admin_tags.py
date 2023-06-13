@@ -2,13 +2,16 @@ from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import Library
+from django.templatetags.static import static
 from django.utils.html import escapejs, format_html_join
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
 from filer import settings
+from filer.admin.helper import ICON_CSS_LIB
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 
@@ -151,3 +154,8 @@ def file_icon(file, detail=False, size=None):
 def file_icon_url(file):
     context = file_icon_context(file, False, 80, 80)
     return escapejs(context.get('highres_url', context['icon_url']))
+
+
+@register.simple_tag
+def icon_css_library():
+    return mark_safe(f'<link rel="stylesheet" type="text/css" href="{static(ICON_CSS_LIB)}">')
