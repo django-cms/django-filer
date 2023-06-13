@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+Unpublished
+===========
+
+* Refactored directory list view for significant performance increses
+* Remove thumbnail generation from the directory list view request response cylce
+* Add Django 4.2 support
+* Add thumbnail view for faster visual management of image libraries
+
 2.2.4 (2023-01-13)
 ==================
 * Add Django 4.1 support
