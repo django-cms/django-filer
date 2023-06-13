@@ -438,6 +438,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'paginated_items': paginated_items,
             'virtual_items': virtual_items,
             'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
+            'max_files': settings.FILER_UPLOADER_MAX_FILES,
+            'max_filesize': settings.FILER_UPLOADER_MAX_FILE_SIZE,
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),
             'current_url': request.path,

@@ -247,6 +247,11 @@ else:
     _uploader_connections = 3
 FILER_UPLOADER_CONNECTIONS = getattr(
     settings, 'FILER_UPLOADER_CONNECTIONS', _uploader_connections)
+FILER_UPLOADER_MAX_FILES = getattr(
+    settings, 'FILER_UPLOADER_MAX_FILES', 100)
+FILER_UPLOADER_MAX_FILE_SIZE = getattr(
+    settings, 'FILER_UPLOADER_MAX_FILE_SIZE', None)
+
 
 FILER_DUMP_PAYLOAD = getattr(settings, 'FILER_DUMP_PAYLOAD', False)  # Whether the filer shall dump the files payload
 

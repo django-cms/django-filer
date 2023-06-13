@@ -6,7 +6,7 @@ Settings
 ``FILER_ENABLE_PERMISSIONS``
 ----------------------------
 
-Activate the or not the Permission check on the files and folders before 
+Activate the or not the Permission check on the files and folders before
 displaying them in the admin. When set to ``False`` it gives all the authorization
 to staff members based on standard Django model permissions.
 
@@ -73,7 +73,7 @@ Public storage uses ``DEFAULT_FILE_STORAGE`` as default storage backend.
 
 ``UPLOAD_TO`` is the function to generate the path relative to the storage root. The
 default generates a random path like ``1d/a5/1da50fee-5003-46a1-a191-b547125053a8/filename.jpg``. This
-will be applied whenever a file is uploaded or moved between public (without permission checks) and 
+will be applied whenever a file is uploaded or moved between public (without permission checks) and
 private (with permission checks) storages. Defaults to ``'filer.utils.generate_filename.randomized'``.
 
 Overriding single keys is possible, for example just set your custom ``UPLOAD_TO``::
@@ -153,6 +153,15 @@ Defines the path element common to all canonical file URLs.
 Defaults to ``'canonical/'``
 
 
+``FILER_UPLOADER_MAX_FILES``
+----------------------------
+
+Limit of files to upload by one drag and drop event. This is to avoid
+extensive accidental uploads, e.g. by dragging to root direcory onto an
+upload field.
+
+Defaults to ``100``.
+
 ``FILER_UPLOADER_CONNECTIONS``
 ------------------------------
 
@@ -161,3 +170,10 @@ Number of simultaneous AJAX uploads. Defaults to 3.
 If your database backend is SQLite it would be set to 1 by default. This allows
 to avoid ``database is locked`` errors on SQLite during multiple simultaneous
 file uploads.
+
+``FILER_UPLOADER_MAX_FILE_SIZE``
+--------------------------------
+
+Limits the maximal file size if set. Takes an integer (file size in MB).
+
+Defaults to ``None``.
