@@ -13,7 +13,6 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <script src="{% static 'filer/js/libs/jquery.min.js' %}"></script>
     <script src="{% static 'admin/js/jquery.init.js' %}"></script>
     <script type="text/javascript">
         var __jQuery = django.jQuery;
@@ -55,17 +54,17 @@
                 <form action="" method="post">{% csrf_token %}
                     <div>
                         {% for f in files_queryset %}
-                            <input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk }}">
+                            <input type="hidden" name="{{ action_checkbox_name }}" value="file-{{ f.pk|safe }}">
                         {% endfor %}
                         {% for f in folders_queryset %}
-                            <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk }}">
+                            <input type="hidden" name="{{ action_checkbox_name }}" value="folder-{{ f.pk|safe }}">
                         {% endfor %}
                         <input type="hidden" name="action" value="move_files_and_folders">
                         <input type="hidden" name="post" value="yes">
                         <p><label for="destination">{% blocktrans %}Destination folder:{% endblocktrans %}</label>
                         <select name="destination" id="destination">
                             {% for folder, name_and_enabled in destination_folders %}
-                                <option value="{{ folder.pk }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}>{{ name_and_enabled.0 }}</option>
+                                <option value="{{ folder.pk|safe }}"{% if not name_and_enabled.1 %} disabled="disabled"{% endif %}>{{ name_and_enabled.0 }}</option>
                             {% endfor %}
                         </select></p>
 

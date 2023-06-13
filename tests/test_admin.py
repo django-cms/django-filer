@@ -6,7 +6,9 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.forms.models import model_to_dict as model_to_dict_django
+from django.http import HttpResponseForbidden, HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -186,6 +188,32 @@ class FilerFolderAdminUrlsTests(TestCase):
             for action in (actions_with_permissions + actions):
                 self.assertContains(response, action)
 
+    def test_filer_list_type_query_string(self):
+        response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=th")
+        self.assertContains(response, 'navigator-thumbnail-list')
+
+        response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=tb")
+        self.assertContains(response, 'navigator-table')
+
+    def test_filer_list_type_setting(self):
+        with SettingsOverride(filer_settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='th'):
+            response = self.client.get(reverse('admin:filer-directory_listing-root'))
+            self.assertContains(response, 'navigator-thumbnail-list')
+
+    def test_filer_list_type_setting_when_user_set_wrong_choice(self):
+        # If choice not exists then it should set table view as default
+        with SettingsOverride(settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='qwerty'):
+            # `settings` instead of `filer_settings` to give chance filer_settings
+            # conditional to fire up
+            response = self.client.get(reverse('admin:filer-directory_listing-root'))
+            self.assertContains(response, 'navigator-table')
+
+    def test_filer_list_type_setting_when_use_wrong_query_string_choice(self):
+        # If list type in query string not exists show default list type
+        with SettingsOverride(filer_settings, FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE='th'):
+            response = self.client.get(reverse('admin:filer-directory_listing-root') + "?_list_type=qwerty")
+            self.assertContains(response, 'navigator-thumbnail-list')
+
 
 class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):
@@ -223,14 +251,16 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
-        post_data = {
-            'Filename': self.image_name,
-            'Filedata': file_obj,
-            'jsessionid': self.client.session.session_key
-        }
-        response = self.client.post(url, post_data, **extra_headers)  # noqa
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            post_data = {
+                'Filename': self.image_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            self.client.post(url, post_data, **extra_headers)
+
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
@@ -244,14 +274,16 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )):
             self.assertEqual(Video.objects.count(), 0)
             folder = Folder.objects.create(name='foo')
-            file_obj = django.core.files.File(open(self.video_filename, 'rb'))
-            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
-            post_data = {
-                'Filename': self.video_name,
-                'Filedata': file_obj,
-                'jsessionid': self.client.session.session_key
-            }
-            response = self.client.post(url, post_data, **extra_headers)  # noqa
+            with open(self.video_filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+                post_data = {
+                    'Filename': self.video_name,
+                    'Filedata': file_obj,
+                    'jsessionid': self.client.session.session_key
+                }
+                self.client.post(url, post_data, **extra_headers)
+
             self.assertEqual(Video.objects.count(), 1)
             self.assertEqual(Video.objects.all()[0].original_filename, self.video_name)
 
@@ -264,62 +296,67 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )):
             self.assertEqual(ExtImage.objects.count(), 0)
             folder = Folder.objects.create(name='foo')
-            file_obj = django.core.files.File(open(self.filename, 'rb'))
-            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            with open(self.filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+                post_data = {
+                    'Filename': self.image_name,
+                    'Filedata': file_obj,
+                    'jsessionid': self.client.session.session_key
+                }
+                self.client.post(url, post_data, **extra_headers)
+
+            self.assertEqual(ExtImage.objects.count(), 1)
+            self.assertEqual(ExtImage.objects.all()[0].original_filename, self.image_name)
+
+    def test_filer_upload_file_no_folder(self, extra_headers={}):
+        self.assertEqual(Image.objects.count(), 0)
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload')
             post_data = {
                 'Filename': self.image_name,
                 'Filedata': file_obj,
                 'jsessionid': self.client.session.session_key
             }
             response = self.client.post(url, post_data, **extra_headers)  # noqa
-            self.assertEqual(ExtImage.objects.count(), 1)
-            self.assertEqual(ExtImage.objects.all()[0].original_filename, self.image_name)
-
-    def test_filer_upload_file_no_folder(self, extra_headers={}):
-        self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse('admin:filer-ajax_upload')
-        post_data = {
-            'Filename': self.image_name,
-            'Filedata': file_obj,
-            'jsessionid': self.client.session.session_key
-        }
-        response = self.client.post(url, post_data, **extra_headers)  # noqa
-        self.assertEqual(Image.objects.count(), 1)
-        stored_image = Image.objects.first()
-        self.assertEqual(stored_image.original_filename, self.image_name)
-        self.assertEqual(stored_image.mime_type, 'image/jpeg')
+            self.assertEqual(Image.objects.count(), 1)
+            stored_image = Image.objects.first()
+            self.assertEqual(stored_image.original_filename, self.image_name)
+            self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
     def test_filer_upload_binary_data(self, extra_headers={}):
         self.assertEqual(File.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
-        url = reverse('admin:filer-ajax_upload')
-        post_data = {
-            'Filename': self.binary_name,
-            'Filedata': file_obj,
-            'jsessionid': self.client.session.session_key
-        }
-        response = self.client.post(url, post_data, **extra_headers)  # noqa
-        self.assertEqual(Image.objects.count(), 0)
-        self.assertEqual(File.objects.count(), 1)
-        stored_file = File.objects.first()
-        self.assertEqual(stored_file.original_filename, self.binary_name)
-        self.assertEqual(stored_file.mime_type, 'application/octet-stream')
+        with open(self.binary_filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload')
+            post_data = {
+                'Filename': self.binary_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            self.client.post(url, post_data, **extra_headers)
+            self.assertEqual(Image.objects.count(), 0)
+            self.assertEqual(File.objects.count(), 1)
+            stored_file = File.objects.first()
+            self.assertEqual(stored_file.original_filename, self.binary_name)
+            self.assertEqual(stored_file.mime_type, 'application/octet-stream')
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse(
-            'admin:filer-ajax_upload',
-            kwargs={'folder_id': folder.pk}
-        ) + '?filename=%s' % self.image_name
-        response = self.client.post(  # noqa
-            url,
-            data=file_obj.read(),
-            content_type='image/jpeg',
-            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-        )
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            response = self.client.post(  # noqa
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
         self.assertEqual(Image.objects.count(), 1)
         stored_image = Image.objects.first()
         self.assertEqual(stored_image.original_filename, self.image_name)
@@ -328,17 +365,18 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def test_filer_ajax_upload_file_using_content_type(self):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.binary_filename, 'rb'))
-        url = reverse(
-            'admin:filer-ajax_upload',
-            kwargs={'folder_id': folder.pk}
-        ) + '?filename=renamed.pdf'
-        response = self.client.post(  # noqa
-            url,
-            data=file_obj.read(),
-            content_type='application/pdf',
-            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-        )
+        with open(self.binary_filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=renamed.pdf'
+            self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='application/pdf',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
         self.assertEqual(Image.objects.count(), 0)
         self.assertEqual(File.objects.count(), 1)
         stored_file = File.objects.first()
@@ -347,16 +385,17 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_ajax_upload_file_no_folder(self):
         self.assertEqual(Image.objects.count(), 0)
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse(
-            'admin:filer-ajax_upload'
-        ) + '?filename=%s' % self.image_name
-        response = self.client.post(  # noqa
-            url,
-            data=file_obj.read(),
-            content_type='image/jpeg',
-            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-        )
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload'
+            ) + '?filename=%s' % self.image_name
+            self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
         self.assertEqual(Image.objects.count(), 1)
         stored_image = Image.objects.first()
         self.assertEqual(stored_image.original_filename, self.image_name)
@@ -365,15 +404,16 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def test_filer_upload_file_error(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse('admin:filer-ajax_upload',
-                      kwargs={'folder_id': folder.pk + 1})
-        post_data = {
-            'Filename': self.image_name,
-            'Filedata': file_obj,
-            'jsessionid': self.client.session.session_key
-        }
-        response = self.client.post(url, post_data, **extra_headers)
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload',
+                          kwargs={'folder_id': folder.pk + 1})
+            post_data = {
+                'Filename': self.image_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            response = self.client.post(url, post_data, **extra_headers)
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
         self.assertContains(response, NO_FOLDER_ERROR)
         self.assertEqual(Image.objects.count(), 0)
@@ -381,18 +421,19 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def test_filer_ajax_upload_file_error(self):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
-        url = reverse(
-            'admin:filer-ajax_upload',
-            kwargs={
-                'folder_id': folder.pk + 1}
-        ) + '?filename={0}'.format(self.image_name)
-        response = self.client.post(
-            url,
-            data=file_obj.read(),
-            content_type='application/octet-stream',
-            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-        )
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={
+                    'folder_id': folder.pk + 1}
+            ) + '?filename={0}'.format(self.image_name)
+            response = self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='application/octet-stream',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
         self.assertContains(response, NO_FOLDER_ERROR)
         self.assertEqual(Image.objects.count(), 0)
@@ -403,35 +444,38 @@ class FilerClipboardAdminUrlsTests(TestCase):
             username='joe_new', password='x', email='joe@mata.com')
         staff_user.is_staff = True
         staff_user.save()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="add_file"))
         self.client.login(username='joe_new', password='x')
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
 
-        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
 
-            # give permissions over BAR
-            FolderPermission.objects.create(
-                folder=folder,
-                user=staff_user,
-                type=FolderPermission.THIS,
-                can_edit=FolderPermission.DENY,
-                can_read=FolderPermission.ALLOW,
-                can_add_children=FolderPermission.DENY)
-            url = reverse('admin:filer-ajax_upload',
-                          kwargs={'folder_id': folder.pk})
-            post_data = {
-                'Filename': self.image_name,
-                'Filedata': file_obj,
-                'jsessionid': self.client.session.session_key
-            }
-            response = self.client.post(url, post_data, **extra_headers)
+                # give permissions over BAR
+                FolderPermission.objects.create(
+                    folder=folder,
+                    user=staff_user,
+                    type=FolderPermission.THIS,
+                    can_edit=FolderPermission.DENY,
+                    can_read=FolderPermission.ALLOW,
+                    can_add_children=FolderPermission.DENY)
+                url = reverse('admin:filer-ajax_upload',
+                              kwargs={'folder_id': folder.pk})
+                post_data = {
+                    'Filename': self.image_name,
+                    'Filedata': file_obj,
+                    'jsessionid': self.client.session.session_key
+                }
+                response = self.client.post(url, post_data, **extra_headers)
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
         self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
         self.assertEqual(Image.objects.count(), 0)
 
-    def test_filer_ajax_upload_permissions_error(self, extra_headers={}):
+    def test_filer_ajax_upload_without_permissions_error(self, extra_headers={}):
+        """User without add_file permission cannot upload"""
         self.client.logout()
         staff_user = User.objects.create_user(
             username='joe_new', password='x', email='joe@mata.com')
@@ -440,18 +484,9 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.client.login(username='joe_new', password='x')
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
-        file_obj = django.core.files.File(open(self.filename, 'rb'))
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
 
-        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
-
-            # give permissions over BAR
-            FolderPermission.objects.create(
-                folder=folder,
-                user=staff_user,
-                type=FolderPermission.THIS,
-                can_edit=FolderPermission.DENY,
-                can_read=FolderPermission.ALLOW,
-                can_add_children=FolderPermission.DENY)
             url = reverse(
                 'admin:filer-ajax_upload',
                 kwargs={
@@ -463,6 +498,73 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 content_type='application/octet-stream',
                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
             )
+
+        from filer.admin.clipboardadmin import NO_PERMISSIONS
+
+        self.assertContains(response, NO_PERMISSIONS)
+        self.assertEqual(Image.objects.count(), 0)
+
+    def test_filer_add_file_permissions(self, extra_headers={}):
+        """Add_file permissions reflect in has_... methods of File and Folder classes"""
+        self.client.logout()
+        staff_user = User.objects.create_user(
+            username='joe_new', password='x', email='joe@mata.com')
+        staff_user.is_staff = True
+        staff_user.save()
+        self.client.login(username='joe_new', password='x')
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+
+        file_data = django.core.files.base.ContentFile('some data')
+        file_data.name = self.filename
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename=self.filename,
+            file=file_data,
+            folder=folder
+        )
+        file.save()
+        request = HttpRequest()
+        setattr(request, "user", staff_user)
+
+        self.assertEqual(folder.has_add_children_permission(request), False)
+        self.assertEqual(file.has_add_children_permission(request), False)
+
+    def test_filer_ajax_upload_permissions_error(self, extra_headers={}):
+        self.client.logout()
+        staff_user = User.objects.create_user(
+            username='joe_new', password='x', email='joe@mata.com')
+        staff_user.is_staff = True
+        staff_user.save()
+        staff_user.user_permissions.add(*Permission.objects.filter(codename="add_file"))
+        self.client.login(username='joe_new', password='x')
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+
+            with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+
+                # give permissions over BAR
+                FolderPermission.objects.create(
+                    folder=folder,
+                    user=staff_user,
+                    type=FolderPermission.THIS,
+                    can_edit=FolderPermission.DENY,
+                    can_read=FolderPermission.ALLOW,
+                    can_add_children=FolderPermission.DENY)
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={
+                        'folder_id': folder.pk}
+                ) + '?filename={0}'.format(self.image_name)
+                response = self.client.post(
+                    url,
+                    data=file_obj.read(),
+                    content_type='application/octet-stream',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
         self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
         self.assertEqual(Image.objects.count(), 0)
@@ -471,9 +573,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
         filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, 'invalid.svg')
         with open(filename, 'wb') as fh:
             fh.write(b'<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" height="0" width="0"><circle cx="0" cy="0" r="0" stroke="black" stroke-width="3" fill="red" /></svg>')
-        file_obj = django.core.files.File(open(filename, 'rb'), name=filename)
-        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, mime_type='image/svg+xml')
-        image_obj.save()
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh, name=filename)
+            image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, mime_type='image/svg+xml')
+            image_obj.save()
         url = file_icon_url(image_obj)
         self.assertEqual(url, '/static/filer/icons/file\\u002Dunknown.svg')
 
@@ -517,9 +620,10 @@ class BulkOperationsMixin:
 
     def create_image(self, folder, filename=None):
         filename = filename or 'test_image.jpg'
-        file_obj = django.core.files.File(open(self.filename, 'rb'), name=filename)
-        image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder, mime_type='image/jpeg')
-        image_obj.save()
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh, name=filename)
+            image_obj = Image.objects.create(owner=self.superuser, original_filename=self.image_name, file=file_obj, folder=folder, mime_type='image/jpeg')
+            image_obj.save()
         return image_obj
 
     def create_file(self, folder, filename=None):
@@ -869,6 +973,8 @@ class FolderListingTest(TestCase):
             username='joe', password='x', email='joe@mata.com')
         self.staff_user.is_staff = True
         self.staff_user.save()
+        perms = Permission.objects.filter(codename__in=["view_folder", "add_file", "add_folder", "can_use_directory_listing"])
+        self.staff_user.user_permissions.add(*perms)
         self.parent = Folder.objects.create(name='bar', parent=None, owner=superuser)
 
         self.foo_folder = Folder.objects.create(name='foo', parent=self.parent, owner=self.staff_user)
@@ -881,6 +987,18 @@ class FolderListingTest(TestCase):
             owner=superuser, original_filename='spam',
             file=file_data, folder=self.parent)
         self.client.login(username='joe', password='x')
+
+    def test_with_without_permissions(self):
+        staff_user_wo_permissions = User.objects.create_user(
+            username='joemata', password='x', email='joe@mata.com')
+        staff_user_wo_permissions.is_staff = True
+        staff_user_wo_permissions.save()
+        self.client.login(username='joemata', password='x')
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
+            response = self.client.get(
+                reverse('admin:filer-directory_listing',
+                        kwargs={'folder_id': self.parent.id}))
+        self.assertIsInstance(response, HttpResponseForbidden)
 
     def test_with_permissions_disabled(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):

@@ -1,7 +1,8 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.urls import re_path
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
@@ -11,8 +12,9 @@ from ..utils.loader import load_model
 from . import views
 
 
-NO_FOLDER_ERROR = "Can't find folder to upload. Please refresh and try again"
-NO_PERMISSIONS_FOR_FOLDER = (
+NO_PERMISSIONS = _("You do not have permission to upload files.")
+NO_FOLDER_ERROR = _("Can't find folder to upload. Please refresh and try again")
+NO_PERMISSIONS_FOR_FOLDER = _(
     "Can't use this folder, Permission Denied. Please select another folder."
 )
 
@@ -68,17 +70,24 @@ def ajax_upload(request, folder_id=None):
     """
     Receives an upload from the uploader. Receives only one file at a time.
     """
+
+    if not request.user.has_perm("filer.add_file"):
+        messages.error(request, NO_PERMISSIONS)
+        return JsonResponse({'error': NO_PERMISSIONS})
+
     if folder_id:
         try:
             # Get folder
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
+            messages.error(request, NO_FOLDER_ERROR)
             return JsonResponse({'error': NO_FOLDER_ERROR})
     else:
         folder = Folder.objects.filter(pk=request.session.get('filer_last_folder_id', 0)).first()
 
     # check permissions
     if folder and not folder.has_add_children_permission(request):
+        messages.error(request, NO_PERMISSIONS_FOR_FOLDER)
         return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
 
     if len(request.FILES) == 1:

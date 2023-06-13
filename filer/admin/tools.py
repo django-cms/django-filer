@@ -2,6 +2,8 @@ from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
 
+from .. import settings
+
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
 
@@ -64,6 +66,13 @@ def popup_pick_type(request):
     return None
 
 
+def get_directory_listing_type(request):
+    list_type = request.GET.get('_list_type', None)
+    if list_type not in settings.FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES:
+        return
+    return list_type
+
+
 def admin_url_params(request, params=None):
     """
     given a request, looks at GET and POST values to determine which params
@@ -75,6 +84,9 @@ def admin_url_params(request, params=None):
     pick_type = popup_pick_type(request)
     if pick_type:
         params['_pick'] = pick_type
+    list_type = get_directory_listing_type(request)
+    if list_type and '_list_type' not in params.keys():
+        params['_list_type'] = list_type
     return params
 
 
