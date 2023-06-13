@@ -40,14 +40,14 @@
     {% else %}
         {% if not destination_folders %}
             <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
-            <div class="text-right clearfix">
-                <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Take me back" %}</a>
+            <div class="text-right clearfix submit-row">
+                <a href="#" onclick="window.history.back(); return false;" class="closelink">{% trans "Take me back" %}</a>
             </div>
         {% else %}
             {% if not to_move %}
                 <p>{% blocktrans %}There are no files and/or folders available to move.{% endblocktrans %}</p>
-                <div class="text-right clearfix">
-                    <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Take me back" %}</a>
+                <div class="text-right clearfix submit-row">
+                    <a href="#" onclick="window.history.back(); return false;" class="closelink">{% trans "Take me back" %}</a>
                 </div>
             {% else %}
                 <p>{% blocktrans %}The following files and/or folders will be moved to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
@@ -69,8 +69,8 @@
                             {% endfor %}
                         </select></p>
 
-                       <div class="text-right clearfix">
-                            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
+                       <div class="text-right clearfix submit-row">
+                            <a href="#" onclick="window.history.back(); return false;" class="closelink">{% trans "No, take me back" %}</a>
                             <input type="submit" value="{% trans 'Move' %}" class="default js-submit-copy-move">
                             <span class="js-disabled-btn-tooltip disabled-btn-tooltip js-filer-tooltip filer-tooltip-wrapper"
                                 title="{% trans 'It is not allowed to move files into same folder' %}" tabindex="-1">
