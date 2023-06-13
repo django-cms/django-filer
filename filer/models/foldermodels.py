@@ -185,13 +185,13 @@ class Folder(models.Model, mixins.IconsMixin):
         return format_html('/{}', format_html_join('/', '{0}', ((f.name,) for f in self.logical_path + [self])))
 
     def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
+        return request.user.has_perm("filer.change_folder") and self.has_generic_permission(request, 'edit')
 
     def has_read_permission(self, request):
         return self.has_generic_permission(request, 'read')
 
     def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
+        return request.user.has_perm("filer.change_folder") and self.has_generic_permission(request, 'add_children')
 
     def has_generic_permission(self, request, permission_type):
         """
