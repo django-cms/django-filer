@@ -19,7 +19,13 @@ if (django.jQuery) {
         document.location.reload();
         win.close();
     };
-    window.dismissRelatedImageLookupPopup = function (win, chosenId, chosenThumbnailUrl, chosenDescriptionTxt, chosenAdminChangeUrl) {
+    window.dismissRelatedImageLookupPopup = function (
+        win,
+        chosenId,
+        chosenThumbnailUrl,
+        chosenDescriptionTxt,
+        chosenAdminChangeUrl
+    ) {
         var id = windowname_to_id(win.name);
         var lookup = $('#' + id);
         var container = lookup.closest('.filerFile');
@@ -35,13 +41,15 @@ if (django.jQuery) {
         element.closest('.js-filer-dropzone').addClass('js-object-attached');
         if (chosenThumbnailUrl) {
             image.attr('src', chosenThumbnailUrl).removeClass('hidden');
-            image.removeAttr('srcset');  // would be nicer, but much more complicate to also replace 'srcset'
+            image.removeAttr('srcset'); // would be nicer, but much more complicate to also replace 'srcset'
         }
         descriptionText.text(chosenDescriptionTxt);
         clearer.removeClass('hidden');
         lookup.addClass('related-lookup-change');
         edit.addClass('related-lookup-change');
-        if (chosenAdminChangeUrl) edit.attr('href', chosenAdminChangeUrl + '?_edit_from_widget=1');
+        if (chosenAdminChangeUrl) {
+            edit.attr('href', chosenAdminChangeUrl + '?_edit_from_widget=1');
+        }
         dropzoneMessage.addClass('hidden');
 
         if (oldId !== chosenId) {
