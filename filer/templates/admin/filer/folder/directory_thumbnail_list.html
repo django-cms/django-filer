@@ -39,11 +39,11 @@
                     <div class="navigator-checkbox">
                         {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
                             <a class="insertlink insertlinkButton"
-                                href="#" onclick="opener.dismissRelatedFolderLookupPopup(window, {{ subfolder.id }}, '{{ subfolder.quoted_logical_path }}'); return false;" >
+                                href="#" onclick="opener.dismissRelatedFolderLookupPopup(window, '{{ subfolder.pk|safe }}', '{{ subfolder.quoted_logical_path }}'); return false;" >
                                 &nbsp;
                             </a>
                         {% elif action_form and item.pk and not is_popup %}
-                            <input type="checkbox" class="action-select" value="folder-{{ item.pk }}" name="_selected_action">
+                            <input type="checkbox" class="action-select" value="folder-{{ item.pk|safe }}" name="_selected_action">
                         {% endif %}
                     </div>
                     <div class="item-icon">
@@ -82,10 +82,10 @@
                           <div class="list-item thumbnail-item thumbnail-file-item">
                               <div class="navigator-checkbox">
                                   {% if is_popup and filer_admin_context.pick_file %}
-                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                           title="{% trans 'Select this file' %}">&nbsp;</a>
                                   {% elif action_form and not is_popup %}
-                                      <input type="checkbox" class="action-select" value="file-{{ item.pk }}" name="_selected_action">
+                                      <input type="checkbox" class="action-select" value="file-{{ item.pk|safe }}" name="_selected_action">
                                   {% endif %}
                               </div>
                               <div class="thumbnail-file-item-box">

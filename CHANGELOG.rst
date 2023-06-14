@@ -2,19 +2,25 @@
 CHANGELOG
 =========
 
-<<<<<<< HEAD
 unreleased
-================
+==================
 
 * Add an edit button to the file widget which open edit file popup
 
-=======
+2.2.5 (2023-06-11)
+==================
+
+* Security patch (https://github.com/django-cms/django-filer/pull/1352):
+  While admin options shown correctly represented the user rights, some admin
+  end-points were available directly. A staff user without any permissions
+  could browse the filer folder structure, list files in a folder, add files,
+  and move files and folders.
+
 2.2.4 (2023-01-13)
 ==================
 * Add Django 4.1 support
 * Add python 3.11 tests
 * Fix thumbnail generation for SVG images when used as a Divio addon.
->>>>>>> master
 
 2.2.3 (2022-08-08)
 ==================
