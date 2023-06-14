@@ -90,7 +90,7 @@
                                 <img src="{% static 'filer/icons/folder-dropdown.svg' %}" alt="" width="28" height="28">
                             </a>
                             <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
-                                {% for folder in folder.logical_path %}
+                                {% for folder in folder.logical_path reversed %}
                                     <li>
                                         <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
                                             title="{% trans 'Go back to the parent folder' %}">
