@@ -1,7 +1,7 @@
 /*global opener */
-'use strict';
-{
-    const initData = JSON.parse(document.getElementById('django-admin-popup-response-constants').dataset.popupResponse);
+(function () {
+    'use strict';
+    var initData = JSON.parse(document.getElementById('django-admin-popup-response-constants').dataset.popupResponse);
     switch (initData.action) {
         case 'change':
             // Specific function for file editing popup opened from widget
@@ -14,4 +14,4 @@
             opener.dismissAddRelatedObjectPopup(window, initData.value, initData.obj);
             break;
     }
-}
+})();
