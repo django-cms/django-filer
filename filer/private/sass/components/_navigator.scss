@@ -319,6 +319,10 @@ body {
                 display: inline-block;
             }
         }
+        + .filer-list-type-switcher-wrapper {
+            border-left: solid 1px $gray-lighter;
+            margin-left: 0;
+        }
     }
     .actions {
         display: none;
@@ -349,21 +353,9 @@ body {
     }
     .filer-list-type-switcher-wrapper {
         display: inline-block;
-        line-height: 34px;
-        vertical-align: middle;
-        padding: 0 15px;
-        border-left: 1px solid $gray-lighter;
-        border-right: 1px solid $gray-lighter;
-        margin-right: 10px;
-        a {
-          font-size: 17px;
-          color: $gray !important;
-          cursor: pointer;
-        }
-        @media screen and (max-width: $screen-tablet) {
-            margin-top: 10px;
-        }
+        margin-left: 10px;
     }
+
 }
 @media screen and (max-width: $screen-tablet) {
     .navigator-top-nav {

@@ -180,7 +180,7 @@
                                         <a href="#" class="js-action-copy" title="{% trans 'Copy' %}"><span class="fa fa-copy cms-icon cms-icon-copy fa fa-copy"></span></a>
                                     </li>
                                     <li>
-                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-folder cms-icon cms-icon-move fa fa-cut"></span></a>
+                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-folder cms-icon cms-icon-move-to-folder fa fa-cut"></span></a>
                                     </li>
                                 </ul>
                                 <div class="filer-dropdown-container js-actions-menu">
@@ -193,9 +193,11 @@
                                 </div>
                             </div>
                         {% endif %}
-                            <div class="filer-list-type-switcher-wrapper">
-                              {% filer_folder_list_type_switcher %}
-                            </div>
+                        <div class="filer-list-type-switcher-wrapper">
+                            <ul class="actions-separated-list">
+                                <li>{% filer_folder_list_type_switcher %}</li>
+                            </ul>
+                        </div>
                         {% block object-tools-items %}
                             <div class="navigator-button-wrapper">
                                 {% if folder.can_have_subfolders and can_make_folder %}
