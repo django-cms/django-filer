@@ -11,7 +11,6 @@ from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
 from filer import settings
-from filer.admin.helper import ICON_CSS_LIB
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 
@@ -158,4 +157,4 @@ def file_icon_url(file):
 
 @register.simple_tag
 def icon_css_library():
-    return mark_safe(f'<link rel="stylesheet" type="text/css" href="{static(ICON_CSS_LIB)}">')
+    return mark_safe(f'<link rel="stylesheet" type="text/css" href="{static(settings.ICON_CSS_LIB)}">')
