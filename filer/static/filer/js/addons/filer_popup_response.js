@@ -1,7 +1,7 @@
 /*global opener */
 'use strict';
-var initData = JSON.parse(document.getElementById('django-admin-popup-response-constants').dataset.popupResponse);
 {
+    const initData = JSON.parse(document.getElementById('django-admin-popup-response-constants').dataset.popupResponse);
     switch (initData.action) {
         case 'change':
             // Specific function for file editing popup opened from widget
