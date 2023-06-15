@@ -9,6 +9,7 @@ Unpublished
 * Remove thumbnail generation from the directory list view request response cylce
 * Add Django 4.2 support
 * Add thumbnail view for faster visual management of image libraries
+* Fix File.objects.only() query required for deleting user who own files.
 
 2.2.5 (2023-06-11)
 ==================

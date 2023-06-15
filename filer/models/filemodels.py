@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from polymorphic.managers import PolymorphicManager
+from polymorphic.query import PolymorphicQuerySet
 from polymorphic.models import PolymorphicModel
 
 from .. import settings as filer_settings
@@ -20,7 +21,16 @@ from . import mixins
 from .foldermodels import Folder
 
 
+class FileQuerySet(PolymorphicQuerySet):
+    def only(self, *fields):
+        fields = set(fields)
+        fields.update(["_file_size", "sha1", "is_public"])
+        return super().only(*fields)
+
+
 class FileManager(PolymorphicManager):
+    queryset_class = FileQuerySet
+
     def find_all_duplicates(self):
         r = {}
         for file_obj in self.all():
