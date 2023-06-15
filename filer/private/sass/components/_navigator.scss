@@ -431,8 +431,8 @@ body {
     display: inline-block;
     position: relative;
     vertical-align: top;
-    .fa-caret-down {
-        font-size: 16px;
+    .fa-caret-down, .cms-icon-caret-down {
+        font-size: 14px;
     }
     .filer-dropdown-menu,
     + .filer-dropdown-menu {
@@ -546,6 +546,7 @@ body {
     min-width: 160px;
     margin: 2px 0 0;
     margin-top: 0 !important;
+    padding: 0;
     list-style: none;
     font-size: 14px;
     text-align: left;
