@@ -286,4 +286,5 @@ if "cms" in settings.INSTALLED_APPS:
         if __version__ >= "4":
             ICON_CSS_LIB = static_with_version("cms/css/cms.admin.css")
     except (ModuleNotFoundError, ImportError):
+        # Import error? No django CMS used: stay with own icons
         pass
