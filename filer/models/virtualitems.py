@@ -57,7 +57,7 @@ class UnsortedImages(DummyFolder):
         If the current user is not a superuser, we don't them to see/edit/change
         file in the unsorted uploads folder that they don't own.
         """
-        if self.user.is_superuser:
+        if self.user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return File.objects.filter(folder__isnull=True)
         else:
             return File.objects.filter(folder__isnull=True, owner=self.user)
