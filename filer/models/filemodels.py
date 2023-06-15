@@ -12,8 +12,8 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from polymorphic.managers import PolymorphicManager
-from polymorphic.query import PolymorphicQuerySet
 from polymorphic.models import PolymorphicModel
+from polymorphic.query import PolymorphicQuerySet
 
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
