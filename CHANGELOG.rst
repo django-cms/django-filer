@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* Fix File.objects.only() query required for deleting user who own files.
+
 2.2.5 (2023-06-11)
 ==================
 
