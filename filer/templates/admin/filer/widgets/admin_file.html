@@ -16,7 +16,7 @@
     <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
-            <span class="icon cms-filer-icon cms-icon-arrow-down fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
+            <span class="icon filer-icon filer-icon-arrow-down fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
         </div>
 
         <span class="filerFile js-file-selector">
@@ -40,7 +40,7 @@
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
                title="{% trans 'Lookup' %}">
-                <span class="choose-file"><span class="fa fa-image cms-filer-icon cms-icon-picture"></span>{% trans 'Choose File' %}</span>
+                <span class="choose-file"><span class="fa fa-image filer-icon filer-icon-picture"></span>{% trans 'Choose File' %}</span>
                 <span class="edit-file"><span class="fa fa-pencil cms-icon cms-icon-edit"></span></span>
             </a>
 

@@ -109,7 +109,7 @@
                             </ul>
                         </div>
                         {% if not folder.is_root or folder.is_smart_folder %}
-                            <span class="icon cms-filer-icon cms-icon-chevron-right fa fa-chevron-right"></span>
+                            <span class="icon filer-icon filer-icon-chevron-right fa fa-chevron-right"></span>
                         {% endif %}
                     </div>
                     <div class="navigator-breadcrumbs-name-dropdown-wrapper">
@@ -126,7 +126,7 @@
                             <div class="filer-dropdown-container filer-dropdown-container-down">
                                 {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                        <span class="cms-filer-icon cms-icon-caret-down fa fa-caret-down"></span>
+                                        <span class="filer-icon filer-icon-caret-down fa fa-caret-down"></span>
                                     </a>
                                     <ul class="filer-dropdown-menu">
                                         <li>
@@ -180,7 +180,7 @@
                                         <a href="#" class="js-action-copy" title="{% trans 'Copy' %}"><span class="fa fa-copy cms-icon cms-icon-copy fa fa-copy"></span></a>
                                     </li>
                                     <li>
-                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-folder cms-icon cms-icon-move-to-folder fa fa-cut"></span></a>
+                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-folder filer-icon filer-icon-move-to-folder fa fa-cut"></span></a>
                                     </li>
                                 </ul>
                                 <div class="filer-dropdown-container js-actions-menu">

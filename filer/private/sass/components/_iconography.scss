@@ -51,23 +51,20 @@
     @if $filename == select {
         $char: "E008";
     }
-    @if $filename == settings {
+    @if $filename == th-large {
         $char: "E009";
     }
-    @if $filename == th-large {
+    @if $filename == th-list {
         $char: "E00A";
     }
-    @if $filename == th-list {
-        $char: "E00B";
-    }
     @if $filename == upload {
-        $char: "E00C";
+        $char: "E00B";
     }
 
     @return $char;
 }
 
-.cms-filer-icon {
+.filer-icon {
     @extend %icon;
 }
 @mixin icon($filename, $insert: before) {
@@ -81,50 +78,46 @@
 // use unicode characters for accessibility reasons and use aria-hidden="true" for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
 
-.cms-icon-arrow-down {
+.filer-icon-arrow-down {
     @include icon(arrow-down);
 }
 
-.cms-icon-caret-down {
+.filer-icon-caret-down {
     @include icon(caret-down);
 }
 
-.cms-icon-chevron-right {
+.filer-icon-chevron-right {
     @include icon(chevron-right);
 }
 
-.cms-icon-download {
+.filer-icon-download {
     @include icon(download);
 }
 
-.cms-icon-link {
+.filer-icon-link {
     @include icon(link);
 }
 
-.cms-icon-move-to-folder {
+.filer-icon-move-to-folder {
     @include icon(move-to-folder);
 }
 
-.cms-icon-picture {
+.filer-icon-picture {
     @include icon(picture);
 }
 
-.cms-icon-select {
+.filer-icon-select {
     @include icon(select);
 }
 
-.cms-icon-settings {
-    @include icon(settings);
-}
-
-.cms-icon-th-large {
+.filer-icon-th-large {
     @include icon(th-large);
 }
 
-.cms-icon-th-list {
+.filer-icon-th-list {
     @include icon(th-list);
 }
 
-.cms-icon-upload {
+.filer-icon-upload {
     @include icon(upload);
 }
