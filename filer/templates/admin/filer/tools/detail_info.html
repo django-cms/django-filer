@@ -7,7 +7,7 @@
                 <div class="text-left button-group">
                 {% if original.file.exists %}
                     <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}">
-                        <span class="icon fa fa-download cms-icon cms-icon-download"></span>
+                        <span class="icon fa fa-download cms-filer-icon cms-icon-download"></span>
                         &nbsp;<span>{% trans "Download" %}</span>
                     </a>
                     {% if original.mime_maintype == 'image' %}

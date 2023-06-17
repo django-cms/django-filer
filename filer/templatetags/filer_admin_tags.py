@@ -157,4 +157,7 @@ def file_icon_url(file):
 
 @register.simple_tag
 def icon_css_library():
-    return mark_safe(f'<link rel="stylesheet" type="text/css" href="{static(settings.ICON_CSS_LIB)}">')
+    html = ""
+    for lib in settings.ICON_CSS_LIB:
+        html += f'<link rel="stylesheet" type="text/css" href="{static(lib)}">'
+    return mark_safe(html)

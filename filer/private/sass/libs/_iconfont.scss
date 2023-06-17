@@ -34,7 +34,7 @@
     @return $char;
 }
 
-.cms-icon {
+.cms-filer-icon {
     @extend %icon;
 }
 @mixin icon($filename, $insert: before) {

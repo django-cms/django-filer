@@ -86,10 +86,9 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     class Media:
         extra = '' if settings.DEBUG else '.min'
         css = {
-            'all': [
+            'all': (
                 'filer/css/admin_filer.css',
-                ICON_CSS_LIB,
-            ]
+            ) + ICON_CSS_LIB,
         }
         js = (
             'admin/js/vendor/jquery/jquery%s.js' % extra,

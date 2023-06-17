@@ -109,7 +109,7 @@
                             </ul>
                         </div>
                         {% if not folder.is_root or folder.is_smart_folder %}
-                            <span class="icon cms-icon cms-icon-chevron-right fa fa-chevron-right"></span>
+                            <span class="icon cms-filer-icon cms-icon-chevron-right fa fa-chevron-right"></span>
                         {% endif %}
                     </div>
                     <div class="navigator-breadcrumbs-name-dropdown-wrapper">
@@ -126,7 +126,7 @@
                             <div class="filer-dropdown-container filer-dropdown-container-down">
                                 {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                        <span class="cms-icon cms-icon-caret-down fa fa-caret-down"></span>
+                                        <span class="cms-filer-icon cms-icon-caret-down fa fa-caret-down"></span>
                                     </a>
                                     <ul class="filer-dropdown-menu">
                                         <li>
@@ -146,7 +146,7 @@
                                 <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" name="q">
                                 <div class="filer-dropdown-container filer-dropdown-container-down">
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                        <span class="fa fa-caret-down cms-icon cms-icon-caret-down"></span>
+                                        <span class="fa fa-caret-down cms-icon cms-filer-icon-caret-down"></span>
                                     </a>
                                 </div>
                                 <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
