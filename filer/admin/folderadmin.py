@@ -13,6 +13,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
+from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import re_path, reverse
@@ -22,9 +23,11 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
+from easy_thumbnails.models import Thumbnail
+
 from .. import settings
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
-from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY
+from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY, TABLE_LIST_TYPE
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
@@ -54,7 +57,7 @@ class AddFolderPopupForm(forms.ModelForm):
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('name',)
     exclude = ('parent',)
-    list_per_page = 20
+    list_per_page = 100
     list_filter = ('owner',)
     search_fields = ['name']
     autocomplete_fields = ['owner']
@@ -258,6 +261,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             folder = get_object_or_404(self.get_queryset(request), id=folder_id)
         request.session['filer_last_folder_id'] = folder_id
 
+        list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
+        if list_type == TABLE_LIST_TYPE:
+            size = "40x40"  # Prefetch thumbnails for listing
+            size_x2 = "80x80"
+        else:
+            size = "160x160"  # Prefetch thumbnails for thumbnail view
+            size_x2 = "320x320"
+
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
 
@@ -302,17 +313,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             file_qs = folder.files.all()
             show_result_count = False
 
-        folder_qs = folder_qs.order_by('name')
+        folder_qs = folder_qs.order_by('name').select_related("owner")
         order_by = request.GET.get('order_by', None)
-        if order_by is not None:
-            order_by = order_by.split(',')
-            order_by = [field for field in order_by
-                        if re.sub(r'^-', '', field) in self.order_by_file_fields]
-            if len(order_by) > 0:
-                file_qs = file_qs.order_by(*order_by)
+        if order_by is None:
+            order_by = "file"
+        order_by = order_by.split(',')
+        order_by = [field for field in order_by
+                    if re.sub(r'^-', '', field) in self.order_by_file_fields]
+        if len(order_by) > 0:
+            file_qs = file_qs.order_by(*order_by)
 
-        folder_children = []
-        folder_files = []
         if folder.is_root and not search_mode:
             virtual_items = folder.virtual_folders
         else:
@@ -332,8 +342,20 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_qs = folder_qs.exclude(**root_exclude_kwargs)
 
-        folder_children += folder_qs
-        folder_files += file_qs
+        # Annotate thumbnail status
+        thumbnail_qs = (
+            Thumbnail.objects
+            .filter(
+                source__name=OuterRef("file"),
+                modified__gte=OuterRef("modified_at"),
+            )
+            .exclude(name__contains="upscale")  # TODO: Check WHY not used by directory listing
+            .order_by("-modified")
+        )
+        file_qs = file_qs.annotate(
+            thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]),
+            thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[:1])
+        ).select_related("owner")
 
         try:
             permissions = {
@@ -345,16 +367,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except:  # noqa
             permissions = {}
 
-        if order_by is None or len(order_by) == 0:
-            folder_files.sort()
-
-        items = folder_children + folder_files
+        items = list(itertools.chain(folder_qs, file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
         if request.method == 'POST' and '_save' not in request.POST:
             # TODO: Refactor/remove clipboard parts
-            for f in folder_files:
+            for f in folder_qs:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
                     clipboard = tools.get_user_clipboard(request.user)
                     if f.has_edit_permission(request):
@@ -409,7 +428,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
 
-        list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
         context = self.admin_site.each_context(request)
         context.update({
             'folder': folder,
@@ -420,6 +438,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'paginated_items': paginated_items,
             'virtual_items': virtual_items,
             'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
+            'max_files': settings.FILER_UPLOADER_MAX_FILES,
+            'max_filesize': settings.FILER_UPLOADER_MAX_FILE_SIZE,
             'permissions': permissions,
             'permstest': userperms_for_request(folder, request),
             'current_url': request.path,
@@ -427,8 +447,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'search_string': ' '.join(search_terms),
             'q': urlquote(q),
             'show_result_count': show_result_count,
-            'folder_children': folder_children,
-            'folder_files': folder_files,
+            'folder_children': folder_qs,
+            'folder_files': file_qs,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
@@ -744,8 +764,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 folder_ids = set()
                 for folder in folders_queryset:
                     folder_ids.add(folder.id)
-                    folder_ids.update(
-                        folder.get_descendants().values_list('id', flat=True))
+                    folder_ids.update(folder.get_descendants_ids())
                 for f in File.objects.filter(folder__in=folder_ids):
                     self.log_deletion(request, f, force_str(f))
                     f.delete()
@@ -869,12 +888,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
 
     def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
-        for f in files_queryset:
-            f.folder = destination
-            f.save()
-        for f in folders_queryset:
-            f.move_to(destination, 'last-child')
-            f.save()
+        files_queryset.update(folder=destination)
+        folders_queryset.update(parent=destination)
 
     def move_files_and_folders(self, request, files_queryset, folders_queryset):
         opts = self.model._meta

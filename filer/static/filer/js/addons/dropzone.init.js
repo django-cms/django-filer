@@ -72,8 +72,7 @@ djQuery(function ($) {
             url: dropzoneUrl,
             paramName: 'file',
             maxFiles: 1,
-            // for now disabled as we don't have the correct file size limit
-            // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+            maxFilesize: this.dataset.maxFilesize,
             previewTemplate: $(dropzoneTemplateSelector).html(),
             clickable: false,
             addRemoveLinks: false,

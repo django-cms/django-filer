@@ -12,6 +12,9 @@ from django.http import HttpResponseForbidden, HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
+from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.options import ThumbnailOptions
+
 from filer import settings as filer_settings
 from filer.admin.folderadmin import FolderAdmin
 from filer.models.filemodels import File
@@ -91,6 +94,37 @@ class FilerFolderAdminUrlsTests(TestCase):
         response = self.client.get(reverse('admin:filer-directory_listing-root'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
+
+    def test_filer_directory_listing_performance(self):
+        # Any number of images > then the number of allowed queries to ensure that images do not trigger individual
+        # queries.
+        images = 10
+
+        thumbnail_urls = []
+        for i in range(images):
+            filename = f'test_image_{i}.jpg'
+            os_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, filename)
+            create_image().save(os_filename, 'JPEG')
+            with open(os_filename, 'rb') as f:
+                file_obj = django.core.files.File(f, name=filename)
+                image_obj = Image.objects.create(owner=self.superuser, original_filename=filename, file=file_obj, mime_type='image/jpeg')
+                image_obj.save()
+                thumbnailer = get_thumbnailer(image_obj)
+                thumbnail_options = ThumbnailOptions({"size": (40, 40), "crop": True})
+                thumbnail_urls.append(thumbnailer.get_thumbnail(thumbnail_options).url)
+
+        self.assertEqual(Image.objects.count(), images)
+        with self.assertNumQueries(7):
+            # Expected queries:
+            # 1. Authentication check
+            # 2.-5. Loading the user clipboard
+            # 6. Loading directory data and thumbnails (1 query)
+            # 7. Selecting file and owner data
+            response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
+        self.assertContains(response, "test_image_0.jpg")
+
+        for thumbnail_url in thumbnail_urls:
+            self.assertContains(response, thumbnail_url)
 
     def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"

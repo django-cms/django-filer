@@ -3,7 +3,6 @@
     "installed-apps": [
         "filer",
         "easy_thumbnails",
-        "mptt",
         "polymorphic"
     ]
 }
