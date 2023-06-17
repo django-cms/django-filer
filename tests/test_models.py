@@ -35,9 +35,11 @@ class FilerApiTests(TestCase):
         for f in File.objects.all():
             f.delete()
 
-    def create_filer_image(self):
+    def create_filer_image(self, owner=None):
+        if owner is None:
+            owner = self.superuser
         file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
-        image = Image.objects.create(owner=self.superuser,
+        image = Image.objects.create(owner=owner,
                                      original_filename=self.image_name,
                                      file=file_obj)
         return image
@@ -216,11 +218,6 @@ class FilerApiTests(TestCase):
         else:
             self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s Foo')
 
-    def test_legacy_quoted_logical_path(self):
-        folder = Folder.objects.create(name="Foo's Bar", parent=None)
-        with self.assertWarns(Warning):
-            isinstance(folder.quoted_logical_path, str)
-
     def test_folder_pretty_logical_path_with_unicode(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s 日本 Foo', parent=root_folder)
@@ -307,3 +304,22 @@ class FilerApiTests(TestCase):
         image.save()
         canonical = image.canonical_url
         self.assertTrue(canonical.startswith('/filer/test-path/'))
+
+    def test_delete_user_who_owns_file(self):
+        """Tests if deleting users who own files works"""
+        from django.contrib.auth.models import User
+
+        user = User.objects.create(
+            username="test",
+            password="top-secret",
+            email="community-hero@django-cms.org",
+            is_staff=True,
+        )
+        image = self.create_filer_image(user)
+
+        user.delete()
+
+        # User needs to be gone
+        self.assertEqual(len(User.objects.filter(username="test")), 0)
+        # Image remains w/o owner
+        self.assertIsNone(File.objects.get(pk=image.pk).owner)

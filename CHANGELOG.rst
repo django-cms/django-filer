@@ -2,6 +2,24 @@
 CHANGELOG
 =========
 
+Unpublished
+===========
+
+* Refactored directory list view for significant performance increses
+* Remove thumbnail generation from the directory list view request response cylce
+* Add Django 4.2 support
+* Add thumbnail view for faster visual management of image libraries
+* Fix File.objects.only() query required for deleting user who own files.
+
+2.2.5 (2023-06-11)
+==================
+
+* Security patch (https://github.com/django-cms/django-filer/pull/1352):
+  While admin options shown correctly represented the user rights, some admin
+  end-points were available directly. A staff user without any permissions
+  could browse the filer folder structure, list files in a folder, add files,
+  and move files and folders.
+
 2.2.4 (2023-01-13)
 ==================
 * Add Django 4.1 support
