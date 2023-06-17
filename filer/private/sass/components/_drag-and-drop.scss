@@ -170,6 +170,8 @@ form .form-row {
             width: auto !important;
             height: auto !important;
             padding: 10px 20px !important;
+            margin-top: 24px;
+            text-align: center !important;
             cursor: pointer;
             .fa {
                 color: $white;
@@ -181,11 +183,15 @@ form .form-row {
                 display: none;
             }
             .choose-file,
+            .replace-file,
             .edit-file {
                 color: $white;
                 margin: 0;
             }
-            .edit-file {
+            .replace-file {
+                display: none;
+            }
+            &.edit {
                 display: none;
             }
             &.related-lookup-change {
@@ -208,15 +214,16 @@ form .form-row {
                 .choose-file {
                     display: none;
                 }
-                .edit-file {
+                .replace-file {
+                    display: block;
+                }
+                &.lookup {
+                    display: block !important;
+                }
+                &.edit {
                     display: block;
                 }
             }
-        }
-        // makes sure that filer clear button has correct size #669
-        .filerClearer {
-            width: 36px !important;
-            height: 36px !important;
         }
         .filerFile {
             position: absolute;
@@ -228,11 +235,11 @@ form .form-row {
                 background-color: $white;
             }
             // make sure that text crops if there is not enough space #670
-            span:not(:empty):not(.choose-file):not(.edit-file) {
+            span:not(:empty):not(.choose-file):not(.replace-file):not(.edit-file) {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                width: calc(100% - 200px);
+                width: calc(100% - 260px);
             }
             // required for django CMS <= 3.1 #673
             img {
@@ -248,10 +255,6 @@ form .form-row {
                     border: solid 1px $gray-lighter;
                     border-radius: $border-radius-base;
                 }
-            }
-            .related-lookup {
-                text-align: center !important;
-                margin-top: 24px;
             }
             // required for django CMS <= 3.1
             a {
@@ -275,23 +278,20 @@ form .form-row {
             .filerClearer {
                 @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
                 float: right;
-                // make sure that clear button has correct size #272
-                width: 10px;
-                height: 10px;
-                margin: 24px 0 0 5px !important;
-                padding: 12px !important;
-                border: solid 1px $gray-lighter;
-                border-radius: $border-radius-base;
+                padding: 12px;
+                margin: 24px 0 0 10px;
+                width: 36px;
+                height: 36px;
                 cursor: pointer;
-                &:before {
-                    color: $gray-light !important;
-                    vertical-align: middle;
-                    margin: 0;
+                &:focus {
+                    background-color: $white;
                 }
-                @media screen and (max-width: 1024px) {
-                    margin-left: 15px !important;
+                span {
+                    text-align: center;
+                    line-height: 24px;
                 }
             }
+
         }
         &.filer-dropzone-mobile {
             .filerFile {
@@ -310,13 +310,13 @@ form .form-row {
                     @media screen and (max-width: $screen-tablet-filer) {
                         .description_text {
                             text-overflow: ellipsis;
-                            width: calc(100% - 200px);
+                            width: calc(100% - 250px);
                             overflow: hidden;
                             height: 20px;
                         }
                     }
-                    >span:not(.choose-file):not(.edit-file), .dz-name {
-                        width: calc(100% - 200px);
+                    >span:not(.choose-file):not(.replace-file):not(.edit-file), .dz-name {
+                        width: calc(100% - 250px);
                     }
                 }
             }

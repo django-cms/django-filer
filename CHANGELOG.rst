@@ -10,6 +10,7 @@ Unpublished
 * Add Django 4.2 support
 * Add thumbnail view for faster visual management of image libraries
 * Fix File.objects.only() query required for deleting user who own files.
+* Add an edit button to the file widget which open edit file popup
 
 2.2.5 (2023-06-11)
 ==================
@@ -120,7 +121,6 @@ Unpublished
 * Fix dropzone error callback for admin fields.
 * Fix #1247: Not owned files in unfiled folder can not be listed if perms are ON.
 * Fix #1184: OSError close file before deletion on file move.
-
 
 2.0.2 (2020-09-10)
 ==================
@@ -614,7 +614,7 @@ Unpublished
 
 
 0.5.4a1
-=======
+========
 
 * Adds description field.
 
