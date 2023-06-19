@@ -1,6 +1,5 @@
 # requirements from setup.py
 Pillow
-django-mptt
 
 # other requirements
 coverage

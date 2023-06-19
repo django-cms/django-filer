@@ -12,8 +12,12 @@ from django.http import HttpRequest, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
+from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.options import ThumbnailOptions
+
 from filer import settings as filer_settings
 from filer.admin.folderadmin import FolderAdmin
+from filer.admin import tools
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
@@ -91,6 +95,37 @@ class FilerFolderAdminUrlsTests(TestCase):
         response = self.client.get(reverse('admin:filer-directory_listing-root'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['folder'].children.count(), 6)
+
+    def test_filer_directory_listing_performance(self):
+        # Any number of images > then the number of allowed queries to ensure that images do not trigger individual
+        # queries.
+        images = 10
+
+        thumbnail_urls = []
+        for i in range(images):
+            filename = f'test_image_{i}.jpg'
+            os_filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, filename)
+            create_image().save(os_filename, 'JPEG')
+            with open(os_filename, 'rb') as f:
+                file_obj = django.core.files.File(f, name=filename)
+                image_obj = Image.objects.create(owner=self.superuser, original_filename=filename, file=file_obj, mime_type='image/jpeg')
+                image_obj.save()
+                thumbnailer = get_thumbnailer(image_obj)
+                thumbnail_options = ThumbnailOptions({"size": (40, 40), "crop": True})
+                thumbnail_urls.append(thumbnailer.get_thumbnail(thumbnail_options).url)
+
+        self.assertEqual(Image.objects.count(), images)
+        with self.assertNumQueries(7):
+            # Expected queries:
+            # 1. Authentication check
+            # 2.-5. Loading the user clipboard
+            # 6. Loading directory data and thumbnails (1 query)
+            # 7. Selecting file and owner data
+            response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
+        self.assertContains(response, "test_image_0.jpg")
+
+        for thumbnail_url in thumbnail_urls:
+            self.assertContains(response, thumbnail_url)
 
     def test_validate_no_duplicate_folders(self):
         FOLDER_NAME = "root folder 1"
@@ -1375,6 +1410,30 @@ class FilerAdminContextTests(TestCase, BulkOperationsMixin):
             )
         )
 
+    def test_edit_from_widget_mode_save(self):
+        parent_folder = Folder.objects.create(name='parent')
+        image = self.create_image(folder=parent_folder)
+        base_url = image.get_admin_change_url()
+        edit_popup_url = base_url + '?_edit_from_widget=1&_popup=1'
+
+        response = self.client.get(edit_popup_url)
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        self.assertContains(response,
+                            '<input type="hidden" name="_popup" value="1"')
+        self.assertContains(response,
+                            '<input type="hidden" name="_edit_from_widget" value="1"')
+
+        data = {'_popup': '1', '_edit_from_widget': '1'}
+        data.update(model_to_dict(image, all=True))
+        data = {k: v if v is not None else '' for k, v in data.items()}
+
+        response = self.client.post(edit_popup_url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('media', response.context_data)
+        response.render()
+        self.assertContains(response, 'popup_response.js')
+
     def test_pick_mode_folder_save(self):
         folder = Folder.objects.create(name='foo')
         base_url = reverse('admin:filer_folder_change', args=[folder.id])
@@ -1495,3 +1554,27 @@ class PolymorphicDeleteViewTests(BulkOperationsMixin, TestCase):
             )
         )
         self.assertEqual(Folder.objects.filter(id=folder.id).count(), 0)
+
+
+class AdminToolsTests(TestCase):
+
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_admin_url_params(self):
+        request_factory = RequestFactory()
+        request = request_factory.get('/')
+        self.assertDictEqual(tools.admin_url_params(request), {})
+        request = request_factory.get('/', {'_popup': '1', '_pick': 'file', '_edit_from_widget': '1'})
+        self.assertDictEqual(tools.admin_url_params(request, {'extra_param': 42}), {
+            '_popup': '1',
+            '_pick': 'file',
+            '_edit_from_widget': '1',
+            'extra_param': 42,
+        })
+        request = request_factory.get('/', {'_pick': 'bad_type'})
+        self.assertDictEqual(tools.admin_url_params(request), {})

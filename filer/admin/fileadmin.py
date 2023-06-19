@@ -1,12 +1,17 @@
 from django import forms
 from django.contrib.admin.utils import unquote
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import path, reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
+from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.options import ThumbnailOptions
+
 from .. import settings
-from ..models import File
+from ..models import BaseImage, File
+from ..settings import DEFERRED_THUMBNAIL_SIZES
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
 
@@ -64,6 +69,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             and '_continue' not in request.POST
             and '_saveasnew' not in request.POST
             and '_addanother' not in request.POST
+            and '_edit_from_widget' not in request.POST
         ):
             # Popup in pick mode or normal mode. In both cases we want to go
             # back to the folder list view after save. And not the useless file
@@ -79,7 +85,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                 admin_url_params_encoded(request),
             )
             return HttpResponseRedirect(url)
-        return super().response_change(request, obj)
+
+        # Add media to context to allow default django js inclusions in django/filer/base_site.html ({{ media.js }})
+        # This is required by popup_handling.js used in popup_response
+        template_response = super().response_change(request, obj)
+        if hasattr(template_response, 'context_data'):
+            template_response.context_data["media"] = self.media
+        return template_response
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
@@ -146,6 +158,26 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             return '-'
     display_canonical.allow_tags = True
     display_canonical.short_description = _('canonical URL')
+
+    def get_urls(self):
+        return super().get_urls() + [
+            path("icon/<int:file_id>/<int:size>",
+                 self.admin_site.admin_view(self.icon_view),
+                 name="filer_file_fileicon")
+        ]
+
+    def icon_view(self, request, file_id: int, size: int) -> HttpResponse:
+        if size not in DEFERRED_THUMBNAIL_SIZES:
+            # Only allow icon sizes relevant for the admin
+            raise Http404
+        file = get_object_or_404(File, pk=file_id)
+        if not isinstance(file, BaseImage):
+            raise Http404()
+
+        thumbnailer = get_thumbnailer(file)
+        thumbnail_options = ThumbnailOptions({'size': (size, size), "crop": True})
+        thumbnail = thumbnailer.get_thumbnail(thumbnail_options, generate=True)
+        return HttpResponseRedirect(thumbnail.url)
 
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()

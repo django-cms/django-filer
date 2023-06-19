@@ -2,7 +2,10 @@
 <div class="drag-hover-border thumbnail-drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list">
 
-    <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
+    <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}"
+         data-max-files="{{ max_files|safe }}"
+         {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+
         <input type="checkbox" id="all-items-action-toggle">
 
         <div class="navigator-thumbnail-list-header navigator-header">
@@ -35,7 +38,13 @@
         {% for item in paginated_items.object_list %}
             {% if item.file_type == "Folder" %}
                 {% with item as subfolder %}
-                <div class="js-filer-dropzone js-filer-dropzone-folder list-item thumbnail-item thumbnail-folder-item" data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}" data-folder-name="{{ subfolder.name }}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="19">
+                <div class="js-filer-dropzone js-filer-dropzone-folder list-item thumbnail-item thumbnail-folder-item"
+                     data-url="{% url 'admin:filer-ajax_upload' folder_id=subfolder.id %}"
+                     data-folder-name="{{ subfolder.name }}"
+                     data-max-uploader-connections="{{ uploader_connections }}"
+                     data-max-files="{{ max_files|safe }}"
+                     {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+
                     <div class="navigator-checkbox">
                         {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
                             <a class="insertlink insertlinkButton"
@@ -132,8 +141,13 @@
       </div>
   </div>
 
-  <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}" data-max-file-size="20">
-      <div class="icon"><span class="fa fa-cloud-upload"></span></div>
+  <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden"
+       data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}"
+       data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
+       data-max-uploader-connections="{{ uploader_connections }}"
+       data-max-files="{{ max_files|safe }}"
+       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+  <div class="icon"><span class="fa fa-cloud-upload"></span></div>
 
       <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
           <div class="text">{% trans "Drop your file to upload into:" %}</div>

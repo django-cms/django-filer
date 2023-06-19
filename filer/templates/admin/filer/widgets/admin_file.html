@@ -13,7 +13,10 @@
         </span>
     </div>
 
-    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}" data-url="{% url 'admin:filer-ajax_upload' %}" data-max-file-size="20">
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}"
+         data-url="{% url 'admin:filer-ajax_upload' %}"
+         data-max-files="1"
+         {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
             <span class="icon fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
@@ -37,10 +40,15 @@
                  width="10" height="10" alt="{% trans 'Clear' %}" title="{% trans 'Clear' %}"
                  data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
 
+            <a href="{{ change_url }}?_edit_from_widget=1" class="js-related-edit related-lookup {% if object %}related-lookup-change{% endif %} edit" id="{{ id }}_change"
+                 title="{% trans 'Edit' %}">
+                  <span class="edit-file"><span class="fa fa-pencil"></span></span>
+            </a>
+
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
                title="{% trans 'Lookup' %}">
-                <span class="choose-file"><span class="fa fa-picture-o"></span>{% trans 'Choose File' %}</span>
-                <span class="edit-file"><span class="fa fa-pencil"></span></span>
+                <span class="choose-file"><span class="fa fa-search"></span>{% trans 'Choose File' %}</span>
+                <span class="replace-file"><span class="fa fa-search"></span></span>
             </a>
 
             <br>

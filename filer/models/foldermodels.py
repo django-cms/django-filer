@@ -1,6 +1,3 @@
-import warnings
-from urllib.parse import quote as urlquote
-
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
@@ -10,8 +7,6 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext as _
-
-import mptt
 
 from .. import settings as filer_settings
 from . import mixins
@@ -42,8 +37,8 @@ class FolderPermissionManager(models.Manager):
         deny_list = set()
         group_ids = user.groups.all().values_list('id', flat=True)
         q = Q(user=user) | Q(group__in=group_ids) | Q(everybody=True)
-        perms = self.filter(q).order_by('folder__tree_id', 'folder__level',
-                                        'folder__lft')
+        perms = self.filter(q)
+
         for perm in perms:
             p = getattr(perm, attr)
 
@@ -70,9 +65,9 @@ class FolderPermissionManager(models.Manager):
 
             if perm.type in [FolderPermission.ALL, FolderPermission.CHILDREN]:
                 if p == FolderPermission.ALLOW:
-                    allow_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                    allow_list.update(perm.folder.get_descendants_ids())
                 else:
-                    deny_list.update(perm.folder.get_descendants().values_list('id', flat=True))
+                    deny_list.update(perm.folder.get_descendants_ids())
 
         # Deny has precedence over allow
         return allow_list - deny_list
@@ -93,16 +88,9 @@ class Folder(models.Model, mixins.IconsMixin):
     can_have_subfolders = True
     _icon = 'plainfolder'
 
-    # explicitly define MPTT fields which would otherwise change
-    # and create a migration, depending on django-mptt version
-    # (see: https://github.com/django-mptt/django-mptt/pull/578)
-    level = models.PositiveIntegerField(editable=False)
-    lft = models.PositiveIntegerField(editable=False)
-    rght = models.PositiveIntegerField(editable=False)
-
     parent = models.ForeignKey(
         'self',
-        verbose_name=('parent'),
+        verbose_name=_('parent'),
         null=True,
         blank=True,
         related_name='children',
@@ -139,8 +127,6 @@ class Folder(models.Model, mixins.IconsMixin):
     )
 
     class Meta:
-        # see: https://github.com/django-mptt/django-mptt/pull/577
-        index_together = (('tree_id', 'lft'),)
         unique_together = (('parent', 'name'),)
         ordering = ('name',)
         permissions = (("can_use_directory_listing",
@@ -183,21 +169,20 @@ class Folder(models.Model, mixins.IconsMixin):
         """
         folder_path = []
         if self.parent:
-            folder_path.extend(self.parent.get_ancestors())
+            folder_path.extend(self.parent.logical_path)
             folder_path.append(self.parent)
         return folder_path
+
+    def get_descendants_ids(self):
+        desc = []
+        for child in self.children.all():
+            desc.append(child.id)
+            desc.extend(child.get_descendants_ids())
+        return desc
 
     @property
     def pretty_logical_path(self):
         return format_html('/{}', format_html_join('/', '{0}', ((f.name,) for f in self.logical_path + [self])))
-
-    @property
-    def quoted_logical_path(self):
-        warnings.warn(
-            'Method filer.foldermodels.Folder.quoted_logical_path is deprecated and will be removed',
-            DeprecationWarning, stacklevel=2,
-        )
-        return urlquote(self.pretty_logical_path)
 
     def has_edit_permission(self, request):
         return request.user.has_perm("filer.change_folder") and self.has_generic_permission(request, 'edit')
@@ -260,13 +245,6 @@ class Folder(models.Model, mixins.IconsMixin):
             return True
         except Folder.DoesNotExist:
             return False
-
-
-# MPTT registration
-try:
-    mptt.register(Folder)
-except mptt.AlreadyRegistered:
-    pass
 
 
 class FolderPermission(models.Model):

@@ -38,7 +38,7 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
     Like ``easy_thumbnails.processors.scale_and_crop``, but will use the
     coordinates in ``subject_location`` to make sure that that part of the
     image is in the center or at least somewhere on the cropped image.
-    Please not that this does *not* work correctly if the image has been
+    Please note that this does *not* work correctly if the image has been
     resized by a previous processor (e.g ``autocrop``).
 
     ``crop`` needs to be set for this to work, but any special cropping

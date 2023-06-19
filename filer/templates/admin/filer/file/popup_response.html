@@ -1,0 +1,10 @@
+{% extends "admin/filer/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script id="django-admin-popup-response-constants"
+            src="{% static "filer/js/addons/filer_popup_response.js" %}"
+            data-popup-response="{{ popup_response_data }}">
+    </script>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var sass = require('gulp-sass');
+var sass = require('gulp-sass')(require('sass'));
 var iconfont = require('gulp-iconfont');
 var iconfontCss = require('gulp-iconfont-css');
 var autoprefixer = require('gulp-autoprefixer');
