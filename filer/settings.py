@@ -285,7 +285,7 @@ DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
 """Determine if django CMS is installed and if it comes with its own iconset"""
 
 ICON_CSS_LIB = ("filer/css/admin_filer.fa.icons.css",)
-if "cms" in settings.INSTALLED_APPS:  # pragma: no-cover
+if "cms" in settings.INSTALLED_APPS:  # pragma: no cover
     try:
         from cms import __version__
         from cms.utils.urlutils import static_with_version
