@@ -8,7 +8,7 @@ from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.forms.models import model_to_dict as model_to_dict_django
-from django.http import HttpResponseForbidden, HttpRequest
+from django.http import HttpRequest, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
