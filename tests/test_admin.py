@@ -9,15 +9,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
 from filer import settings as filer_settings
-from filer.admin.folderadmin import FolderAdmin
 from filer.admin import tools
+from filer.admin.folderadmin import FolderAdmin
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot

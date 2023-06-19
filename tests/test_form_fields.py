@@ -4,7 +4,6 @@ from django.test import TestCase
 
 from filer.fields.file import AdminFileWidget
 from filer.models import File
-
 from tests.helpers import create_image
 
 
