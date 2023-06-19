@@ -2,8 +2,10 @@
 (function () {
     'use strict';
     var dataElement = document.getElementById('django-admin-popup-response-constants');
+    var initData;
+
     if (dataElement) {
-        var initData = JSON.parse(dataElement.dataset.popupResponse);
+        initData = JSON.parse(dataElement.dataset.popupResponse);
         switch (initData.action) {
             case 'change':
                 // Specific function for file editing popup opened from widget
