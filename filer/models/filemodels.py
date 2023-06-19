@@ -1,19 +1,19 @@
 import hashlib
 import mimetypes
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import NoReverseMatch, reverse
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
+from polymorphic.query import PolymorphicQuerySet
 
 from .. import settings as filer_settings
 from ..fields.multistorage_file import MultiStorageFileField
@@ -21,7 +21,16 @@ from . import mixins
 from .foldermodels import Folder
 
 
+class FileQuerySet(PolymorphicQuerySet):
+    def only(self, *fields):
+        fields = set(fields)
+        fields.update(["_file_size", "sha1", "is_public"])
+        return super().only(*fields)
+
+
 class FileManager(PolymorphicManager):
+    queryset_class = FileQuerySet
+
     def find_all_duplicates(self):
         r = {}
         for file_obj in self.all():
@@ -408,7 +417,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         """
         folder_path = []
         if self.folder:
-            folder_path.extend(self.folder.get_ancestors())
+            folder_path.extend(self.folder.logical_path)
         folder_path.append(self.logical_folder)
         return folder_path
 
