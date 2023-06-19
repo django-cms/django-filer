@@ -232,11 +232,6 @@ form .form-row {
             width: 36px !important;
             height: 36px !important;
             color: $color-danger;
-            span {
-                position: relative;
-                top: -2px;
-                left: -2px;
-            }
         }
         .filerFile {
             position: absolute;
@@ -292,10 +287,11 @@ form .form-row {
             a.filerClearer {
                 @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
                 float: right;
-                padding: 12px;
+                padding: 5px 0  !important;
                 margin: 24px 0 0 10px;
                 width: 36px;
                 height: 36px;
+                text-align: center;
                 cursor: pointer;
                 span:before {
                     color: $color-danger !important;

@@ -48,17 +48,20 @@
     @if $filename == picture {
         $char: "E007";
     }
-    @if $filename == select {
+    @if $filename == remove-selection {
         $char: "E008";
     }
-    @if $filename == th-large {
+    @if $filename == select {
         $char: "E009";
     }
-    @if $filename == th-list {
+    @if $filename == th-large {
         $char: "E00A";
     }
-    @if $filename == upload {
+    @if $filename == th-list {
         $char: "E00B";
+    }
+    @if $filename == upload {
+        $char: "E00C";
     }
 
     @return $char;
@@ -104,6 +107,10 @@
 
 .filer-icon-picture {
     @include icon(picture);
+}
+
+.filer-icon-remove-selection {
+    @include icon(remove-selection);
 }
 
 .filer-icon-select {

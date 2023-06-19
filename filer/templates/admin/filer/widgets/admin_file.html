@@ -7,7 +7,7 @@
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <span class="filerClearer fa fa-close cms-icon cms-icon-close" title="{% trans 'Clear' %}"
+            <span class="filerClearer fa fa-close filer-icon filer-icon-remove-selection" title="{% trans 'Clear' %}"
                  data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}"></span>
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
@@ -38,12 +38,12 @@
 
             <a class="filerClearer {% if not object %}hidden{% endif %}" title="{% trans 'Clear' %}"
                  data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}" href="#">
-                <span class="fa fa-close cms-icon cms-icon-close"></span>
+                <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
             </a>
 
             <a href="{{ change_url }}?_edit_from_widget=1" class="js-related-edit related-lookup {% if object %}related-lookup-change{% endif %} edit" id="{{ id }}_change"
                  title="{% trans 'Edit' %}">
-                  <span class="edit-file"><span class="fa fa-pencil"></span></span>
+                  <span class="edit-file"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></span>
             </a>
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
