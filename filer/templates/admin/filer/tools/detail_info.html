@@ -1,21 +1,19 @@
 {% load filer_admin_tags i18n static %}
     <section class="image-info image-info-detail">
-        <div class="image-info-title">
-            <span class="icon fa fa-file{% if original.file_type == 'Image' %}-image-o{% endif %}"></span> {{ original }}
-        </div>
+        <div class="image-info-title"></div>
         <div class="image-details-left">
             <div class="image-preview-container">
                 {% file_icon original detail=True %}
-                <div class="text-left">
+                <div class="text-left button-group">
                 {% if original.file.exists %}
-                    <a href="{{ original.url }}" target="_blank" class="btn" download="{{ original.original_filename }}">
-                        <span class="icon fa fa-download"></span>
-                        &nbsp;<span>{% trans "Download" %}</span>
+                    <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}">
+                        <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
+                        <span>{% trans "Download" %}</span>
                     </a>
-                    {% if original.mime_maintype == 'image' %}
-                    <a href="{{ original.url }}" target="_blank" class="btn float-right">
+                    {% if original.mime_maintype == 'image' and "svg" not in original.mime_type %}
+                    <a href="{{ original.url }}" target="_blank" class="button">
                         <span>{% trans "Expand" %}</span>&nbsp;
-                        <span class="icon fa fa-expand"></span>
+                        <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
                     </a>
                     {% endif %}
                 {% else %}
@@ -47,17 +45,11 @@
                         <dt>{% trans "Created" %}</dt>
                         <dd>{{ original.uploaded_at }}</dd>
                     {% endif %}
+                    {% if original.owner %}
+                        <dt>{% trans "Owner" %}</dt>
+                        <dd><strong>{{ original.owner }}</strong></dd>
+                    {% endif %}
                 </dl>
-                <div class="image-actions">
-                    <ul class="actions-list">
-                        <li>
-                            <span class="icon fa fa-user"></span>
-                            {% if original.owner %}
-                                <span class="text">{% trans "Owner" %}: <strong>{{ original.owner }}</strong></span>
-                            {% endif %}
-                        </li>
-                    </ul>
-                </div>
             {% endif %}
         </div>
     </section>
