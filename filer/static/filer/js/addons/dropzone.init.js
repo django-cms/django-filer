@@ -22,6 +22,7 @@ djQuery(function ($) {
     var dropzones = $(dropzoneSelector);
     var messageSelector = '.js-filer-dropzone-message';
     var lookupButtonSelector = '.js-related-lookup';
+    var editButtonSelector = '.js-related-edit';
     var progressSelector = '.js-filer-dropzone-progress';
     var previewImageWrapperSelector = '.js-img-wrapper';
     var filerClearerSelector = '.filerClearer';
@@ -56,6 +57,7 @@ djQuery(function ($) {
         var inputId = dropzone.find(fileIdInputSelector);
         var isImage = inputId.is('[name="image"]');
         var lookupButton = dropzone.find(lookupButtonSelector);
+        var editButton = dropzone.find(editButtonSelector);
         var message = dropzone.find(messageSelector);
         var clearButton = dropzone.find(filerClearerSelector);
         var fileChoose = dropzone.find(fileChooseSelector);
@@ -99,6 +101,7 @@ djQuery(function ($) {
                 this.removeAllFiles(true);
                 fileChoose.hide();
                 lookupButton.addClass('related-lookup-change');
+                editButton.addClass('related-lookup-change');
                 message.addClass(hiddenClass);
                 dropzone.removeClass(dragHoverClass);
                 dropzone.addClass(objectAttachedClass);
@@ -144,6 +147,7 @@ djQuery(function ($) {
                 dropzone.removeClass(objectAttachedClass);
                 inputId.val('');
                 lookupButton.removeClass('related-lookup-change');
+                editButton.removeClass('related-lookup-change');
                 message.removeClass(hiddenClass);
                 inputId.trigger('change');
             }

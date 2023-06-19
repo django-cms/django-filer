@@ -66,6 +66,10 @@ def popup_pick_type(request):
     return None
 
 
+def edit_from_widget(request):
+    return request.GET.get('_edit_from_widget') == '1'
+
+
 def get_directory_listing_type(request):
     list_type = request.GET.get('_list_type', None)
     if list_type not in settings.FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES:
@@ -84,6 +88,8 @@ def admin_url_params(request, params=None):
     pick_type = popup_pick_type(request)
     if pick_type:
         params['_pick'] = pick_type
+    if edit_from_widget(request):
+        params['_edit_from_widget'] = '1'
     list_type = get_directory_listing_type(request)
     if list_type and '_list_type' not in params.keys():
         params['_list_type'] = list_type

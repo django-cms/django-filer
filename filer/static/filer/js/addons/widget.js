@@ -16,6 +16,7 @@ djQuery(function ($) {
         var thumbnail = container.find('.thumbnail_img');
         var description = container.find('.description_text');
         var addImageButton = container.find('.lookup');
+        var editImageButton = container.find('.edit');
         var dropzoneMessage = container.siblings('.dz-message');
         var hiddenClass = 'hidden';
 
@@ -24,6 +25,7 @@ djQuery(function ($) {
         thumbnail.addClass(hiddenClass);
         thumbnail.parent('a').removeAttr('href');
         addImageButton.removeClass('related-lookup-change');
+        editImageButton.removeClass('related-lookup-change');
         dropzoneMessage.removeClass(hiddenClass);
         description.empty();
     };
