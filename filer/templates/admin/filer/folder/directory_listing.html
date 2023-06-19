@@ -213,14 +213,20 @@
                                     <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
                                        class="navigator-button navigator-button-upload js-upload-button"
                                        data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}"
-                                       data-max-uploader-connections="{{ uploader_connections }}">
+                                       data-max-uploader-connections="{{ uploader_connections }}"
+                                       data-max-files="{{ max_files|safe }}"
+                                       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
+                                    >
                                         {% trans "Upload Files" %}
                                     </a>
                                 {% elif folder.is_unsorted_uploads %}
                                     <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
                                        class="navigator-button navigator-button-upload js-upload-button"
                                        data-url="{% url 'admin:filer-ajax_upload' %}"
-                                       data-max-uploader-connections="{{ uploader_connections }}">
+                                       data-max-uploader-connections="{{ uploader_connections }}"
+                                       data-max-files="{{ max_files|safe }}"
+                                       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
+                                    >
                                         {% trans "Upload Files" %}
                                     </a>
                                 {% endif %}

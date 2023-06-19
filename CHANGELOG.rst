@@ -2,6 +2,29 @@
 CHANGELOG
 =========
 
+unreleased
+==================
+
+* Add an edit button to the file widget which open edit file popup
+
+Unpublished
+===========
+
+* Refactored directory list view for significant performance increses
+* Remove thumbnail generation from the directory list view request response cylce
+* Add Django 4.2 support
+* Add thumbnail view for faster visual management of image libraries
+* Fix File.objects.only() query required for deleting user who own files.
+
+2.2.5 (2023-06-11)
+==================
+
+* Security patch (https://github.com/django-cms/django-filer/pull/1352):
+  While admin options shown correctly represented the user rights, some admin
+  end-points were available directly. A staff user without any permissions
+  could browse the filer folder structure, list files in a folder, add files,
+  and move files and folders.
+
 2.2.4 (2023-01-13)
 ==================
 * Add Django 4.1 support
@@ -102,7 +125,6 @@ CHANGELOG
 * Fix dropzone error callback for admin fields.
 * Fix #1247: Not owned files in unfiled folder can not be listed if perms are ON.
 * Fix #1184: OSError close file before deletion on file move.
-
 
 2.0.2 (2020-09-10)
 ==================

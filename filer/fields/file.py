@@ -29,10 +29,12 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         related_url = None
+        change_url = ''
         if value:
             try:
                 file_obj = File.objects.get(pk=value)
                 related_url = file_obj.logical_folder.get_admin_directory_listing_url_path()
+                change_url = file_obj.get_admin_change_url()
             except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
@@ -59,6 +61,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         context = {
             'hidden_input': hidden_input,
             'lookup_url': '%s%s' % (related_url, lookup_url),
+            'change_url': change_url,
             'object': obj,
             'lookup_name': name,
             'id': css_id,

@@ -65,7 +65,12 @@ if (django.jQuery) {
             baseUrl = dropzoneBase.data('url');
             baseFolderTitle = dropzoneBase.data('folder-name');
 
-            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-filer-dropzone');
+            $('body')
+                .data('url', baseUrl)
+                .data('folder-name', baseFolderTitle)
+                .data('max-files', dropzoneBase.data('max-files'))
+                .data('max-filesize', dropzoneBase.data('max-files'))
+                .addClass('js-filer-dropzone');
         }
 
         Cl.mediator.subscribe('filer-upload-in-progress', destroyDropzones);
@@ -80,9 +85,8 @@ if (django.jQuery) {
                 var dropzoneInstance = new Dropzone(this, {
                     url: dropzoneUrl,
                     paramName: 'file',
-                    maxFiles: 100,
-                    // for now disabled as we don't have the correct file size limit
-                    // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+                    maxFiles: parseInt(dropzone.data('max-files')) || 100,
+                    maxFilesize: parseInt(dropzone.data('max-filesize')),  // no default
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
