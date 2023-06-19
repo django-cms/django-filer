@@ -6,7 +6,7 @@
                 {% file_icon original detail=True %}
                 <div class="text-left button-group">
                 {% if original.file.exists %}
-                    <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}">
+                    <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}" rel="noopener noreferrer">
                         <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
                         <span>{% trans "Download" %}</span>
                     </a>
