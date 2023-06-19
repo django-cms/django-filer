@@ -39,29 +39,32 @@
     @if $filename == download {
         $char: "E004";
     }
-    @if $filename == link {
+    @if $filename == expand {
         $char: "E005";
     }
-    @if $filename == move-to-folder {
+    @if $filename == link {
         $char: "E006";
     }
-    @if $filename == picture {
+    @if $filename == move-to-folder {
         $char: "E007";
     }
-    @if $filename == remove-selection {
+    @if $filename == picture {
         $char: "E008";
     }
-    @if $filename == select {
+    @if $filename == remove-selection {
         $char: "E009";
     }
-    @if $filename == th-large {
+    @if $filename == select {
         $char: "E00A";
     }
-    @if $filename == th-list {
+    @if $filename == th-large {
         $char: "E00B";
     }
-    @if $filename == upload {
+    @if $filename == th-list {
         $char: "E00C";
+    }
+    @if $filename == upload {
+        $char: "E00D";
     }
 
     @return $char;
@@ -95,6 +98,10 @@
 
 .filer-icon-download {
     @include icon(download);
+}
+
+.filer-icon-expand {
+    @include icon(expand);
 }
 
 .filer-icon-link {
