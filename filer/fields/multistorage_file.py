@@ -60,7 +60,7 @@ class MultiStorageFileDescriptor(FileDescriptor):
         # To prevent recalculating upon reassignment of the same file, update only if value is
         # different than the previous one.
         if prev_assigned and value != previous_file:
-            callback_attr = '{}_data_changed'.format(self.field.name)
+            callback_attr = f'{self.field.name}_data_changed'
             if hasattr(instance, callback_attr):
                 getattr(instance, callback_attr)()
 
@@ -158,8 +158,8 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
             payload_file.seek(0)
             encoded_string = base64.b64encode(payload_file.read()).decode('utf-8')
             return value, encoded_string
-        except IOError:
-            warnings.warn('The payload for "%s" is missing. No such file on disk: %s!' % (obj.original_filename, self.storage.location))
+        except OSError:
+            warnings.warn('The payload for "{}" is missing. No such file on disk: {}!'.format(obj.original_filename, self.storage.location))
             return value
 
     def to_python(self, value):

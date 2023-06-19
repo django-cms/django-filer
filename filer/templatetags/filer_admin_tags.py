@@ -80,7 +80,7 @@ def filer_has_permission(context, item, action):
     permission to do the given action on the given item.
 
     """
-    permission_method_name = 'has_{action}_permission'.format(action=action)
+    permission_method_name = f'has_{action}_permission'
     permission_method = getattr(item, permission_method_name, None)
     request = context.get('request')
 
@@ -143,9 +143,9 @@ def file_icon_context(file, detail, width, height):
                     thumbnail_options['size'] = 2 * width, 2 * height
                     context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
     elif mime_maintype in ['audio', 'font', 'video']:
-        icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_maintype))
+        icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_maintype}.svg')
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
-        icon_url = staticfiles_storage.url('filer/icons/file-{}.svg'.format(mime_subtype))
+        icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_subtype}.svg')
     else:
         icon_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
     context.update(width=width, height=height, icon_url=icon_url)

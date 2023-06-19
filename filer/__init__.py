@@ -14,5 +14,3 @@ Release logic:
 """
 
 __version__ = '2.3rc1'
-
-default_app_config = 'filer.apps.FilerConfig'

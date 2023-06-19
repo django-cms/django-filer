@@ -54,8 +54,8 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
 
     # --snip-- this is a copy and paste of the first few
     #          lines of ``scale_and_crop``
-    source_x, source_y = [float(v) for v in im.size]
-    target_x, target_y = [float(v) for v in size]
+    source_x, source_y = (float(v) for v in im.size)
+    target_x, target_y = (float(v) for v in size)
 
     if crop or not target_x or not target_y:
         scale = max(target_x / source_x, target_y / source_y)
@@ -83,7 +83,7 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
     # subject location aware cropping
     # ===============================
     # res_x, res_y: the resolution of the possibly already resized image
-    res_x, res_y = [float(v) for v in im.size]
+    res_x, res_y = (float(v) for v in im.size)
 
     # subj_x, subj_y: the position of the subject (maybe already re-scaled)
     subj_x = res_x * float(subject_location[0]) / source_x
