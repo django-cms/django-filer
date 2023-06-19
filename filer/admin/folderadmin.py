@@ -16,8 +16,7 @@ from django.db import models, router
 from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import path
-from django.urls import reverse
+from django.urls import path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
