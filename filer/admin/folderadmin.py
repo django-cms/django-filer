@@ -243,7 +243,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if viewtype == 'images_with_missing_data':
             folder = ImagesWithMissingData()
         elif viewtype == 'unfiled_images':
-            folder = UnsortedImages()
+            # pass user in the class invocation, so that we can get
+            # access to the current user instance in the class
+            folder = UnsortedImages(user=request.user)
         elif viewtype == 'last':
             last_folder_id = request.session.get('filer_last_folder_id')
             try:

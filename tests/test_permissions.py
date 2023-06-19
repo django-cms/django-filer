@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
+from django.urls import reverse
 
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
@@ -34,7 +35,10 @@ class FolderPermissionsTestCase(TestCase):
         self.owner = User.objects.create(username='owner')
 
         perms = Permission.objects.filter(codename="change_folder")
-        self.test_user1 = User.objects.create(username='test1', password='secret')
+        perms |= Permission.objects.filter(codename="can_use_directory_listing")
+        self.test_user1 = User.objects.create(username='test1', password='secret', is_staff=True)
+        self.test_user1.set_password("secret")
+        self.test_user1.save()
         self.test_user2 = User.objects.create(username='test2', password='secret')
         self.test_user1.user_permissions.add(*perms)
         self.test_user2.user_permissions.add(*perms)
@@ -63,6 +67,7 @@ class FolderPermissionsTestCase(TestCase):
         self.folder_perm = Folder.objects.create(name='test_folder2')
 
     def tearDown(self):
+        self.file.close()
         self.image.delete()
 
     def test_folder_all(self):
@@ -85,6 +90,22 @@ class FolderPermissionsTestCase(TestCase):
 
             result = self.folder.has_read_permission(request)
             self.assertEqual(result, False)
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_user_cannot_see_other_users_files(self):
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+
+            url = reverse("admin:filer-directory_listing-unfiled_images")
+            response = self.client.get(url)
+            self.assertContains(response, self.image_name)
+            loginok = self.client.login(username=self.test_user1.username, password="secret")
+            self.assertTrue(loginok, "Could not login 'test_user1'")
+            response = self.client.get(url)
+            self.assertNotContains(response, self.image_name)
+
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 

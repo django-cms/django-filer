@@ -141,10 +141,12 @@
                                 <a href="{{ file.canonical_url }}"
                                     title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" class="action-button" target="_blank"><span class="fa fa-link filer-icon filer-icon-link"></span></a>
                                 <a href="{{ file.url }}" target="_blank"
-                                    title="{% blocktrans with file.label as item_label %}Download '{{ item_label }}'{% endblocktrans %}" class="action-button"><span class="fa fa-download filer-icon filer-icon-download"></span></a>
-                                <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
-                                    title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
-                                <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
+                                    title="{% blocktrans with file.label as item_label %}Download '{{ item_label }}'{% endblocktrans %}" class="action-button"><span class="fa fa-download"></span></a>
+                                {% if has_change_permission %}
+                                    <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
+                                        title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
+                                    <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
+                                {% endif %}
                             </td>
                             {% endwith %}
                         </tr>
