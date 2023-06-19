@@ -53,7 +53,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         # API to determine the ID dynamically.
         context = {
             'hidden_input': hidden_input,
-            'lookup_url': '%s%s' % (related_url, url),
+            'lookup_url': '{}{}'.format(related_url, url),
             'lookup_name': name,
             'span_id': css_id_description_txt,
             'object': obj,
@@ -115,7 +115,7 @@ class FilerFolderField(models.ForeignKey):
         if "to" in kwargs.keys():  # pragma: no cover
             old_to = get_model_label(kwargs.pop("to"))
             if old_to.lower() != dfl.lower():
-                msg = "%s can only be a ForeignKey to %s; %s passed" % (
+                msg = "{} can only be a ForeignKey to {}; {} passed".format(
                     self.__class__.__name__, dfl, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)

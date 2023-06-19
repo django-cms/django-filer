@@ -16,7 +16,7 @@ from django.db import models, router
 from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import re_path, reverse
+from django.urls import path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -131,7 +131,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': obj.parent.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "{0}{1}".format(
+            url = "{}{}".format(
                 url,
                 admin_url_params_encoded(request),
             )
@@ -184,7 +184,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "{0}{1}".format(
+            url = "{}{}".format(
                 url,
                 admin_url_params_encoded(request),
             )
@@ -204,35 +204,35 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return [
             # we override the default list view with our own directory listing
             # of the root directories
-            re_path(r'^$',
-                    self.admin_site.admin_view(self.directory_listing),
-                    name='filer-directory_listing-root'),
+            path('',
+                 self.admin_site.admin_view(self.directory_listing),
+                 name='filer-directory_listing-root'),
 
-            re_path(r'^last/$',
-                    self.admin_site.admin_view(self.directory_listing),
-                    {'viewtype': 'last'},
-                    name='filer-directory_listing-last'),
+            path('last/',
+                 self.admin_site.admin_view(self.directory_listing),
+                 {'viewtype': 'last'},
+                 name='filer-directory_listing-last'),
 
-            re_path(r'^(?P<folder_id>\d+)/list/$',
-                    self.admin_site.admin_view(self.directory_listing),
-                    name='filer-directory_listing'),
+            path('<int:folder_id>/list/',
+                 self.admin_site.admin_view(self.directory_listing),
+                 name='filer-directory_listing'),
 
-            re_path(r'^(?P<folder_id>\d+)/make_folder/$',
-                    self.admin_site.admin_view(views.make_folder),
-                    name='filer-directory_listing-make_folder'),
-            re_path(r'^make_folder/$',
-                    self.admin_site.admin_view(views.make_folder),
-                    name='filer-directory_listing-make_root_folder'),
+            path('<int:folder_id>/make_folder/',
+                 self.admin_site.admin_view(views.make_folder),
+                 name='filer-directory_listing-make_folder'),
+            path('make_folder/',
+                 self.admin_site.admin_view(views.make_folder),
+                 name='filer-directory_listing-make_root_folder'),
 
-            re_path(r'^images_with_missing_data/$',
-                    self.admin_site.admin_view(self.directory_listing),
-                    {'viewtype': 'images_with_missing_data'},
-                    name='filer-directory_listing-images_with_missing_data'),
+            path('images_with_missing_data/',
+                 self.admin_site.admin_view(self.directory_listing),
+                 {'viewtype': 'images_with_missing_data'},
+                 name='filer-directory_listing-images_with_missing_data'),
 
-            re_path(r'^unfiled_images/$',
-                    self.admin_site.admin_view(self.directory_listing),
-                    {'viewtype': 'unfiled_images'},
-                    name='filer-directory_listing-unfiled_images'),
+            path('unfiled_images/',
+                 self.admin_site.admin_view(self.directory_listing),
+                 {'viewtype': 'unfiled_images'},
+                 name='filer-directory_listing-unfiled_images'),
         ] + super().get_urls()
 
     # custom views
@@ -252,10 +252,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.get_queryset(request).get(id=last_folder_id)
             except self.model.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
-                url = "%s%s" % (url, admin_url_params_encoded(request))
+                url = "{}{}".format(url, admin_url_params_encoded(request))
             else:
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
-                url = "%s%s" % (url, admin_url_params_encoded(request))
+                url = "{}{}".format(url, admin_url_params_encoded(request))
             return HttpResponseRedirect(url)
         elif folder_id is None:
             folder = FolderRoot()
@@ -518,7 +518,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def get_owner_filter_lookups(self):
         return [
-            'owner__{field}__icontains'.format(field=field)
+            f'owner__{field}__icontains'
             for field in self.owner_search_fields
         ]
 
@@ -828,7 +828,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return '%s: %s' % (capfirst(opts.verbose_name), force_str(obj))
+            return '{}: {}'.format(capfirst(opts.verbose_name), force_str(obj))
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -882,8 +882,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # We do not allow copying/moving back to the folder itself
             enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
-            for c in self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1):
-                yield c
+            yield from self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1)
 
     def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
         root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
@@ -1062,7 +1061,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         count = itertools.count(1)
         original = name
         while destination.contains_folder(name):
-            name = "%s_%s" % (original, next(count))
+            name = "{}_{}".format(original, next(count))
         return name
 
     def _copy_folder(self, folder, destination, suffix, overwrite):

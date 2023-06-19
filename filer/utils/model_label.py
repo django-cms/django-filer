@@ -1,4 +1,3 @@
-
 def get_model_label(model):
     """
     Take a model class or model label and return its model label.
@@ -12,7 +11,7 @@ def get_model_label(model):
     if isinstance(model, str):
         return model
     else:
-        return "%s.%s" % (
+        return "{}.{}".format(
             model._meta.app_label,
             model.__name__
         )

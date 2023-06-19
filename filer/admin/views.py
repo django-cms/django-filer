@@ -90,7 +90,7 @@ def paste_clipboard_to_folder(request):
     if not redirect:
         redirect = request.POST.get('redirect_to', '')
     return HttpResponseRedirect(
-        '{0}?order_by=-modified_at{1}'.format(
+        '{}?order_by=-modified_at{}'.format(
             redirect,
             admin_url_params_encoded(request, first_separator='&'),
         )
@@ -107,7 +107,7 @@ def discard_clipboard(request):
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.discard_clipboard(clipboard)
     return HttpResponseRedirect(
-        '{0}{1}'.format(
+        '{}{}'.format(
             request.POST.get('redirect_to', ''),
             admin_url_params_encoded(request, first_separator='&'),
         )
@@ -124,7 +124,7 @@ def delete_clipboard(request):
         clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
         tools.delete_clipboard(clipboard)
     return HttpResponseRedirect(
-        '{0}{1}'.format(
+        '{}{}'.format(
             request.POST.get('redirect_to', ''),
             admin_url_params_encoded(request, first_separator='&'),
         )
