@@ -10,7 +10,7 @@ require special attention from the developer and here we provide upgrade instruc
 from 2.x to 3.0
 ---------------
 
-The dependency on django-mptt is droped as of django-filer 3.0.
+The dependency on django-mptt is dropped as of django-filer 3.0.
 
 This implies that three fields are removed from the `Folder` model:
 * `level`
