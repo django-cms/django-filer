@@ -5,11 +5,8 @@ CHANGELOG
 unreleased
 ==================
 
+* Only show uncategorized files to owner or superuser if permissions are active
 * Add an edit button to the file widget which open edit file popup
-
-Unpublished
-===========
-
 * Refactored directory list view for significant performance increses
 * Remove thumbnail generation from the directory list view request response cylce
 * Add Django 4.2 support
