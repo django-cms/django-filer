@@ -103,7 +103,7 @@ def admin_url_params_encoded(request, first_separator='?', params=None):
     )
     if not params:
         return ''
-    return '{0}{1}'.format(first_separator, params)
+    return f'{first_separator}{params}'
 
 
 class AdminContext(dict):

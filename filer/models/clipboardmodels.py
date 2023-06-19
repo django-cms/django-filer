@@ -35,7 +35,7 @@ class Clipboard(models.Model):
             return True
 
     def __str__(self):
-        return "Clipboard %s of %s" % (self.id, self.user)
+        return "Clipboard {} of {}".format(self.id, self.user)
 
 
 class ClipboardItem(models.Model):

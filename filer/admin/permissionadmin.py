@@ -19,7 +19,7 @@ class PermissionAdmin(admin.ModelAdmin):
         css = {'all': ['filer/css/admin_folderpermissions.css']}
 
     def get_queryset(self, request):
-        qs = super(PermissionAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         return qs.prefetch_related("group", "folder")
 
     def get_model_perms(self, request):

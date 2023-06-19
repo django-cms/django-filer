@@ -43,17 +43,17 @@ class ThumbnailerNameMixin:
 
         thumbnail_options = thumbnail_options.copy()
         size = tuple(thumbnail_options.pop('size'))
-        initial_opts = ['{0}x{1}'.format(*size)]
+        initial_opts = ['{}x{}'.format(*size)]
         quality = thumbnail_options.pop('quality', self.thumbnail_quality)
         if extension == 'jpg':
-            initial_opts.append('q{}'.format(quality))
+            initial_opts.append(f'q{quality}')
         elif extension == 'svg':
             thumbnail_options.pop('subsampling', None)
             thumbnail_options.pop('upscale', None)
 
         opts = list(thumbnail_options.items())
         opts.sort()   # Sort the options so the file name is consistent.
-        opts = ['{}'.format(v is not True and '{}-{}'.format(k, v) or k)
+        opts = ['{}'.format(v is not True and f'{k}-{v}' or k)
                 for k, v in opts if v]
         all_opts = '_'.join(initial_opts + opts)
 
@@ -62,7 +62,7 @@ class ThumbnailerNameMixin:
 
         # make sure our magic delimiter is not used in all_opts
         all_opts = all_opts.replace('__', '_')
-        filename = '{}__{}.{}'.format(source_filename, all_opts, extension)
+        filename = f'{source_filename}__{all_opts}.{extension}'
 
         return os.path.join(basedir, path, subdir, filename)
 

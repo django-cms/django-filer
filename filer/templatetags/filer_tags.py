@@ -84,12 +84,12 @@ def filesize(bytes, format='auto1024'):
             unit = filesize_long_formats.get(unit, '')
             if base == 1024 and unit:
                 unit = '%sbi' % unit[:2]
-            unit = '%sbyte%s' % (unit, bytes != '1' and 's' or '')
+            unit = '{}byte{}'.format(unit, bytes != '1' and 's' or '')
         else:
-            unit = '%s%s' % (base == 1024 and unit.upper() or unit,
+            unit = '{}{}'.format(base == 1024 and unit.upper() or unit,
                              base == 1024 and 'iB' or 'B')
 
-        return '%s %s' % (bytes, unit)
+        return '{} {}'.format(bytes, unit)
 
     if bytes == 0:
         return bytes
