@@ -64,6 +64,7 @@ Contents
    usage
    permissions
    secure_downloads
+   validation
    settings
    development
    extending_filer

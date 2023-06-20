@@ -5,6 +5,7 @@ CHANGELOG
 unreleased
 ==================
 
+* Add validation framework to prevent XSS attacks using HTML or SVG files
 * Only show uncategorized files to owner or superuser if permissions are active
 * Add an edit button to the file widget which open edit file popup
 * Refactored directory list view for significant performance increses

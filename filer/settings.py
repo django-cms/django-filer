@@ -281,3 +281,22 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
 }
 
 DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
+
+
+FILE_VALIDATORS = {
+    "text/html": ["filer.validation.deny_html"],
+    "image/svg+xml": ["filer.validation.validate_svg"],
+}
+
+remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
+for mime_type in remove_mime_types:
+    try:
+        del FILE_VALIDATORS[mime_type]
+    except KeyError:
+        pass
+
+for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).items():
+    if mime_type in FILE_VALIDATORS:
+        FILE_VALIDATORS[mime_type] += list(validators)
+    else:
+        FILE_VALIDATORS[mime_type] = list(validators)
