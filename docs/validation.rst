@@ -101,3 +101,34 @@ the actual code also checks for occurences of event attribute like
 Clearly, the validator can be improved by parsing the SVG's xml code, but
 this could be error-prone and we decided to go with the potentially too strict
 but simpler method.
+
+Common validator settings
+=========================
+
+Here are common examples for settings (in ``settings.py``) on file upload
+validation.
+
+Allow upload of any file
+------------------------
+
+.. code-block:: python
+
+    FILER_REMOVE_FILE_VALIDATORS = [
+        "text/html",
+        "image/svg+xml",
+    ]
+
+No HTML upload and restricted SVG upload
+----------------------------------------
+
+This is the default setting.
+
+No HTML and no SVG upload
+-------------------------
+
+.. code-block:: python
+
+    FILER_ADD_FILE_VALIDATORS = {
+        "text/html": ["filer.validators.deny_html"],
+        "image/svg+xml": ["filer.validators.deny_svg"],
+    }

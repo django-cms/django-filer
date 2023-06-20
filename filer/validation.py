@@ -13,6 +13,13 @@ def deny_html(file_name, file, owner, mime_type):
     )
 
 
+def deny_svg(file_name, file, owner, mime_type):
+    """Simple validator that denies all files"""
+    raise FileValidationError(
+        _('File "{}": SVG upload denied by site security policy').format(file_name)
+    )
+
+
 EVENT_ATTRIBUTES = (
     # See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/Events
     b"onbegin=", b"onend=", b"onrepeat=",
