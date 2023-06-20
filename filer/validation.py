@@ -27,6 +27,9 @@ EVENT_ATTRIBUTES = (
     b"onscroll=", b"onseeked=", b"onseeking=", b"onselect=", b"onshow=", b"onstalled=", b"onsubmit=", b"onsuspend=",
     b"ontimeupdate=", b"ontoggle==", b"onvolumechange==", b"onwaiting=",
     b"onactivate=", b"onfocusin=", b"onfocusout=",
+) + (
+    # Reject base64 obfuscated content
+    b";base64,",
 )
 
 
