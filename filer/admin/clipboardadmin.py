@@ -9,8 +9,9 @@ from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
+from ..validation import FileValidationError, validate_upload
 from . import views
-from ..validation import validate_upload, FileValidationError
+
 
 NO_PERMISSIONS = _("You do not have permission to upload files.")
 NO_FOLDER_ERROR = _("Can't find folder to upload. Please refresh and try again")
