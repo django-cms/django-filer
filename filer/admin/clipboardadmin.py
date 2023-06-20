@@ -10,7 +10,7 @@ from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
 from . import views
-
+from ..validation import validate_upload, FileValidationError
 
 NO_PERMISSIONS = _("You do not have permission to upload files.")
 NO_FOLDER_ERROR = _("Can't find folder to upload. Please refresh and try again")
@@ -91,7 +91,7 @@ def ajax_upload(request, folder_id=None):
         return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
 
     if len(request.FILES) == 1:
-        # dont check if request is ajax or not, just grab the file
+        # don't check if request is ajax or not, just grab the file
         upload, filename, is_raw, mime_type = handle_request_files_upload(request)
     else:
         # else process the request as usual
@@ -114,6 +114,12 @@ def ajax_upload(request, folder_id=None):
                           {'file': upload})
     uploadform.instance.mime_type = mime_type
     if uploadform.is_valid():
+        try:
+            validate_upload(filename, upload, request.user, mime_type)
+        except FileValidationError as error:
+            from django.contrib.messages import ERROR, add_message
+            add_message(request, ERROR, str(error))
+            return JsonResponse({'error': str(error)})
         file_obj = uploadform.save(commit=False)
         # Enforce the FILER_IS_PUBLIC_DEFAULT
         file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT

@@ -27,7 +27,7 @@
                 <dl class="image-details">
                     {% if original.file_type %}
                         <dt>{% trans "Type" %}</dt>
-                        <dd>{{ original.extension|upper }} {{ original.file_type }}</dd>
+                        <dd>{{ original.extension|upper }} {{ original.file_type }} ({{ original.mime_type }})</dd>
                     {% endif %}
                     {% if original.width or original.height %}
                         <dt>{% trans "Size" %}</dt>
