@@ -89,7 +89,9 @@ This just rejects any HTML file for upload.
 
 This validator rejects any SVG file that contains the bytes ``<script`` or
 ``javascript:``. This probably is a too strict criteria, since those bytes
-might be part of a legitimate say string.
+might be part of a legitimate say string. The above code is a simplification
+the actual code also checks for occurences of event attribute like
+``onclick="..."``.
 
 .. note::
 
