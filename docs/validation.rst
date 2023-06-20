@@ -83,7 +83,7 @@ This just rejects any HTML file for upload.
         content = file.read()
         if b"<script" in content or b"javascript:" in content:
             raise FileValidationError(
-                _('File "{}": Rejected due to potential cross site scripting attack').format(file_name)
+                _('File "{}": Rejected due to potential cross site scripting vulnerability').format(file_name)
             )
 
 
