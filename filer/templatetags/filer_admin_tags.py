@@ -9,6 +9,7 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from easy_thumbnails.conf import settings as thumbnail_settings
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
@@ -127,7 +128,7 @@ def file_icon_context(file, detail, width, height):
             # Optimize directory listing:
             if not detail and width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
                 # Avoid jpg thumbnails for pngs with transparency
-                transparent = file.file.name.rsplit(".", 1)[-1] == "png"
+                transparent = file.file.name.rsplit(".", 1)[-1] == thumbnail_settings.THUMBNAIL_TRANSPARENCY_EXTENSION
                 # Get name of thumbnail from easy-thumbnail
                 configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=transparent)
                 # If the name was annotated: Thumbnail exists and we can use it
