@@ -98,6 +98,7 @@ class BaseImage(File):
                 imgfile.seek(0)
                 if self.mime_type == 'image/svg+xml':
                     self._width, self._height = VILImage.load(imgfile).size
+                    self._transparent = True
                 else:
                     pil_image = PILImage.open(imgfile)
                     self._width, self._height = pil_image.size
