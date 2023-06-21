@@ -13,4 +13,6 @@ Release logic:
  8. Publish the release and it will automatically release to pypi
 """
 
-__version__ = '2.3rc1'
+__version__ = '3.0.0rc1'
+
+default_app_config = 'filer.apps.FilerConfig'

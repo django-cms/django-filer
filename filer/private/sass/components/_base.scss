@@ -36,7 +36,11 @@ body {
     // make sure that paginator has correct font size and color #666
     font-size: $font-size-small;
     color: $gray-light !important;
-    padding: 10px 15px;
+    padding-left: 10px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    box-sizing: border-box;
     background: $white;
     span {
         // make sure that paginator has correct font size and color #666

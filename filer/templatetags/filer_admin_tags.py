@@ -3,10 +3,13 @@ from math import ceil
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage, default_storage
 from django.template import Library
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escapejs, format_html_join
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from easy_thumbnails.conf import settings as thumbnail_settings
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
@@ -171,3 +174,11 @@ def file_icon_url(file):
         context = file_icon_context(file, False, 80, 80)
         file._file_icon_url_cache = escapejs(context.get('highres_url', context['icon_url']))
     return file._file_icon_url_cache
+
+
+@register.simple_tag
+def icon_css_library():
+    html = ""
+    for lib in settings.ICON_CSS_LIB:
+        html += f'<link rel="stylesheet" type="text/css" href="{static(lib)}">'
+    return mark_safe(html)

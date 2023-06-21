@@ -14,6 +14,7 @@ from django.utils.safestring import mark_safe
 
 from .. import settings as filer_settings
 from ..models import File
+from ..settings import ICON_CSS_LIB
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
@@ -88,9 +89,9 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     class Media:
         extra = '' if settings.DEBUG else '.min'
         css = {
-            'all': [
+            'all': (
                 'filer/css/admin_filer.css',
-            ]
+            ) + ICON_CSS_LIB,
         }
         js = (
             'admin/js/vendor/jquery/jquery%s.js' % extra,
