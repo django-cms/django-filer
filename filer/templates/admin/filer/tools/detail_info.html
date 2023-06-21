@@ -6,15 +6,12 @@
                 {% file_icon original detail=True %}
                 <div class="text-left button-group">
                 {% if original.file.exists %}
-                    <a href="{{ original.url }}"
-                       rel="noreferrer noopener"
-                       target="_blank" class="button"
-                       download="{{ original.original_filename }}">
+                    <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}" rel="noopener noreferrer">
                         <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
                         <span>{% trans "Download" %}</span>
                     </a>
                     {% if original.mime_maintype == 'image' and "svg" not in original.mime_type %}
-                    <a href="{{ original.url }}" rel="norefferer noopener" target="_blank" class="button">
+                    <a href="{{ original.url }}" target="_blank" rel="noopener noreferrer" class="button">
                         <span>{% trans "Expand" %}</span>&nbsp;
                         <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
                     </a>

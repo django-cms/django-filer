@@ -282,7 +282,6 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
 
 DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
 
-
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
     "image/svg+xml": ["filer.validation.validate_svg"],
@@ -301,3 +300,21 @@ for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).
         FILE_VALIDATORS[mime_type] += list(validators)
     else:
         FILE_VALIDATORS[mime_type] = list(validators)
+
+
+# Determine if django CMS is installed and if it comes with its own iconset
+
+ICON_CSS_LIB = ("filer/css/admin_filer.fa.icons.css",)
+if "cms" in settings.INSTALLED_APPS:  # pragma: no cover
+    try:
+        from cms import __version__
+        from cms.utils.urlutils import static_with_version
+
+        if __version__ >= "4":
+            ICON_CSS_LIB = (
+                static_with_version("cms/css/cms.admin.css"),
+                "filer/css/admin_filer.cms.icons.css",
+            )
+    except (ModuleNotFoundError, ImportError):
+        # Import error? No django CMS used: stay with own icons
+        pass

@@ -95,7 +95,7 @@ body {
             @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
             padding: 9px !important;
             span {
-                font-size: 16px;
+                font-size: 17px;
                 line-height: 33px;
                 vertical-align: middle;
             }
@@ -319,6 +319,10 @@ body {
                 display: inline-block;
             }
         }
+        + .filer-list-type-switcher-wrapper {
+            border-left: solid 1px $gray-lighter;
+            margin-left: 0;
+        }
     }
     .actions {
         display: none;
@@ -349,21 +353,9 @@ body {
     }
     .filer-list-type-switcher-wrapper {
         display: inline-block;
-        line-height: 34px;
-        vertical-align: middle;
-        padding: 0 15px;
-        border-left: 1px solid $gray-lighter;
-        border-right: 1px solid $gray-lighter;
-        margin-right: 10px;
-        a {
-          font-size: 17px;
-          color: $gray !important;
-          cursor: pointer;
-        }
-        @media screen and (max-width: $screen-tablet) {
-            margin-top: 10px;
-        }
+        margin-left: 10px;
     }
+
 }
 @media screen and (max-width: $screen-tablet) {
     .navigator-top-nav {
@@ -407,7 +399,7 @@ body {
     }
     .icon {
         position: relative;
-        margin-right: 5px;
+        margin-right: 3px;
     }
     .fa-folder {
         top: 0;
@@ -439,8 +431,8 @@ body {
     display: inline-block;
     position: relative;
     vertical-align: top;
-    .fa-caret-down {
-        font-size: 16px;
+    .fa-caret-down, .cms-icon-caret-down {
+        font-size: 14px;
     }
     .filer-dropdown-menu,
     + .filer-dropdown-menu {
@@ -554,6 +546,7 @@ body {
     min-width: 160px;
     margin: 2px 0 0;
     margin-top: 0 !important;
+    padding: 0;
     list-style: none;
     font-size: 14px;
     text-align: left;
@@ -722,6 +715,7 @@ body {
         }
         .navigator-checkbox {
             float: right;
+            padding-right: 20px;
             text-transform: initial;
             color: $color-primary;
             input[type="checkbox"] {
@@ -816,5 +810,14 @@ body {
             position: relative;
             word-break: break-word;
         }
+    }
+}
+
+.insertlinkButton {
+    &:before {
+        content:"" !important;  // Necessary since djangocms-admin-style tries to add its own icon
+    }
+    span {
+        font-size: 17px;
     }
 }
