@@ -13,10 +13,14 @@ def deny_html(file_name, file, owner, mime_type):
     )
 
 
-def deny_svg(file_name, file, owner, mime_type):
-    """Simple validator that denies all files"""
+def deny(file_name, file, owner, mime_type):
+    file_type = file_name.rsplit(".")[-1]
+    if file_type == file_name:
+        raise FileValidationError(
+            _('File "{}": Upload denied by site security policy').format(file_name)
+        )
     raise FileValidationError(
-        _('File "{}": SVG upload denied by site security policy').format(file_name)
+        _('File "{}": {} upload denied by site security policy').format(file_name, file_type.upper())
     )
 
 

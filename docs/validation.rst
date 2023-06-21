@@ -14,12 +14,24 @@ To this end django-filer implements a basic file validation
 framework. By default, it will reject any HTML files for upload and certain
 SVG files that might include JavaScript code.
 
+.. warning::
+
+    File validation is done at upload time. It does not affect already
+    uploaded files.
+
+
 Validation hooks
 ----------------
 
 Uploaded files are validated by their mime-type. The two bundled validators
 reject and ``text/html`` file and will check for signs of JavaScript code in
-files with the mime type ``image/svg+xml``.
+files with the mime type ``image/svg+xml``. Those files are dangerous since
+they are executed by a browser without any warnings.
+
+Validation hooks do not restrict the upload of other executable files
+(like ``*.exe`` or shell scripts). Those are not automatically executed
+by the browser but still present a point of attack, if a user saves them
+to disk and executes them locally.
 
 You can release validation restrictions by setting
 ``FILER_REMOVE_FILE_VALIDATORS`` to a list of mime types to be removed from
@@ -67,20 +79,21 @@ The two build-in validators are extremely simple.
 
 .. code-block:: python
 
-    def deny_html(file_name, file, owner, mime_type):
+    def deny(file_name, file, owner, mime_type):
         """Simple validator that denies all files"""
         raise FileValidationError(
-            _('File "{}": HTML upload denied by site security policy').format(file_name)
+            _('File "{}": Upload denied by site security policy').format(file_name)
         )
 
-This just rejects any HTML file for upload.
+This just rejects any file for upload. By default this happens for HTML files
+(mime type `text/html``).
 
 .. code-block:: python
 
     def validate_svg(file_name, file, owner, mime_type):
         """SVG files must not contain script tags or javascript hrefs.
         This might be too strict but avoids parsing the xml"""
-        content = file.read()
+        content = file.read().lower()
         if b"<script" in content or b"javascript:" in content:
             raise FileValidationError(
                 _('File "{}": Rejected due to potential cross site scripting vulnerability').format(file_name)
@@ -90,7 +103,7 @@ This just rejects any HTML file for upload.
 This validator rejects any SVG file that contains the bytes ``<script`` or
 ``javascript:``. This probably is a too strict criteria, since those bytes
 might be part of a legitimate say string. The above code is a simplification
-the actual code also checks for occurences of event attribute like
+the actual code also checks for occurrences of event attribute like
 ``onclick="..."``.
 
 .. note::
@@ -103,13 +116,19 @@ this could be error-prone and we decided to go with the potentially too strict
 but simpler method.
 
 Common validator settings
-=========================
+-------------------------
 
 Here are common examples for settings (in ``settings.py``) on file upload
 validation.
 
 Allow upload of any file
-------------------------
+........................
+
+This setting does not restrict uploads at all. It is only advisable for
+setups where all users with upload rights can be fully trusted.
+
+Your site will still be subject to an attack where a trusted user uploads
+a malicious file unknowingly.
 
 .. code-block:: python
 
@@ -119,16 +138,41 @@ Allow upload of any file
     ]
 
 No HTML upload and restricted SVG upload
-----------------------------------------
+........................................
 
-This is the default setting.
+This is the default setting. It will deny any SVG file that might contain
+Javascript. It is prone to false positives (i.e. files being rejected that
+actually are secure).
+
+.. note::
+
+    If you identify false negatives (i.e. files being
+    accepted despite containing Javascript) please contact the maintainer only
+    through `security@django-cms.org <mailto:security@django-cms.org>`_.
+
+
 
 No HTML and no SVG upload
--------------------------
+.........................
+
+This is the most secure setting. Both HTML and SVG will be rejected for uploads
+since they can contain Javascript and thereby might be used to execute malware
+in the user's browser.
+
 
 .. code-block:: python
 
     FILER_ADD_FILE_VALIDATORS = {
-        "text/html": ["filer.validators.deny_html"],
-        "image/svg+xml": ["filer.validators.deny_svg"],
+        "text/html": ["filer.validation.deny_html"],
+        "image/svg+xml": ["filer.validation.deny"],
     }
+
+
+Block other mime-types
+----------------------
+
+To block other mime types add an entry for that mime type to
+``FILER_ADD_FILE_VALIDATORS`` with ``filer.validation.deny``::
+
+    FILER_ADD_FILE_VALIDATORS[mime_type] = ["filer.validation.deny"]
+
