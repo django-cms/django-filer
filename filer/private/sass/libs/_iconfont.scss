@@ -16,7 +16,7 @@
 
 %icon {
     display: inline-block;
-    font: normal normal normal 14px/1 <%= fontName %>;
+    font-family: <%= fontName %>;
     font-size: inherit;
     text-rendering: auto;
     transform: translate(0, 0);
@@ -34,7 +34,7 @@
     @return $char;
 }
 
-.cms-icon {
+.filer-icon {
     @extend %icon;
 }
 @mixin icon($filename, $insert: before) {
@@ -48,7 +48,7 @@
 // use unicode characters for accessibility reasons and use aria-hidden="true" for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
 <% _.each(glyphs, function(glyph) { %>
-.cms-icon-<%= glyph.fileName %> {
+.filer-icon-<%= glyph.fileName %> {
     @include icon(<%= glyph.fileName %>);
 }
 <% }); %>

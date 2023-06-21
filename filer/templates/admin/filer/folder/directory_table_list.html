@@ -47,7 +47,7 @@
                                 {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
                                     <a class="insertlink insertlinkButton"
                                         href="#" onclick="opener.dismissRelatedFolderLookupPopup(window, '{{ subfolder.pk|safe }}', '{{ subfolder.quoted_logical_path }}'); return false;" >
-                                        &nbsp;
+                                        <span class="fa fa-arrow-left filer-icon cms-icon-select"></span>
                                     </a>
                                 {% elif action_form and item.pk and not is_popup %}
                                     <input type="checkbox" class="action-select" value="folder-{{ item.pk|safe }}" name="_selected_action">
@@ -80,8 +80,8 @@
                             </td>
                             <td class="column-action">
                                 {% if subfolder.file_type == "Folder" %}
-                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% filer_admin_context_url_params %}" title="{% trans 'Change folder details' %}" class="action-button"><span class="fa fa-pencil"></span></a>
-                                    <a href="{{ subfolder.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="action-button" title="{% trans 'Remove folder' %}"><span class="fa fa-trash"></span></a>
+                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% filer_admin_context_url_params %}" title="{% trans 'Change folder details' %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
+                                    <a href="{{ subfolder.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="action-button" title="{% trans 'Remove folder' %}"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -93,7 +93,7 @@
                             <td class="column-checkbox">
                                 {% if is_popup and filer_admin_context.pick_file %}
                                     <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
-                                        title="{% trans 'Select this file' %}">&nbsp;</a>
+                                        title="{% trans 'Select this file' %}"><span class="fa fa-arrow-left filer-icon filer-icon-select"></span></a>
                                 {% elif action_form and not is_popup %}
                                     <input type="checkbox" class="action-select" value="file-{{ item.pk|safe }}" name="_selected_action">
                                 {% endif %}
@@ -138,14 +138,18 @@
                                 <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% if file.file_type == "Image" and file.width > 0.0 and file.height > 0.0 %}, {{ file.width|floatformat }}x{{ file.height|floatformat }} px{% endif %})</span>
                             </td>
                             <td class="column-action">
-                                <a href="{{ file.canonical_url }}"
-                                    title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" class="action-button" target="_blank"><span class="fa fa-link"></span></a>
-                                <a href="{{ file.url }}" target="_blank"
-                                    title="{% blocktrans with file.label as item_label %}Download '{{ item_label }}'{% endblocktrans %}" class="action-button"><span class="fa fa-download"></span></a>
+                                {% if file.canonical_url %}
+                                    <a href="{{ file.canonical_url }}" rel="noopener noreferrer"
+                                       download="{{ file.original_filename }}"
+                                       title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" class="action-button" target="_blank"><span class="fa fa-link filer-icon filer-icon-link"></span></a>
+                                {% endif %}
+                                <a href="{{ file.url }}" target="_blank" rel="noopener noreferrer"
+                                   download="{{ file.original_filename }}"
+                                   title="{% blocktrans with file.label as item_label %}Download '{{ item_label }}'{% endblocktrans %}" class="action-button"><span class="fa fa-download filer-icon filer-icon-download"></span></a>
                                 {% if has_change_permission %}
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
-                                        title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil"></span></a>
-                                    <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash"></span></a>
+                                        title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
+                                    <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
                                 {% endif %}
                             </td>
                             {% endwith %}
@@ -153,19 +157,19 @@
                 {% endif %}
             {% empty %}
                 <tr>
-                    <td colspan="6" class="no-files"><span class="fa fa-arrow-down"></span>{% trans 'Drop files here or use the "Upload Files" button' %}</td>
+                    <td colspan="6" class="no-files"><span class="fa fa-arrow-down filer-icon filer-arrow-down"></span>{% trans 'Drop files here or use the "Upload Files" button' %}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}"
+  <div class="filer-dropzone-info-message js-filer-dropzone js-filer-dropzone-info-message hidden" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}"
          data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
          data-max-uploader-connections="{{ uploader_connections }}"
          data-max-files="{{ max_files|safe }}"
          {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
 
-        <div class="icon"><span class="fa fa-cloud-upload"></span></div>
+        <div class="icon"><span class="filer-icon filer-upload fa fa-cloud-upload"></span></div>
 
         <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
             <div class="text">{% trans "Drop your file to upload into:" %}</div>
