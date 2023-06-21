@@ -1,10 +1,10 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% load i18n static filer_admin_tags %}
 
 {% block extrastyle %}
     {{ block.super }}
-
     <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+    {% icon_css_library %}
 {% endblock %}
 
 {% block extrahead %}

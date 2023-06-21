@@ -32,25 +32,25 @@
             <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}">
                 {% trans "Filer" %}
             </a>
-            {% if not instance.is_root and instance.is_smart_folder %}
+            {% if not folder.is_root and folder.is_smart_folder %}
                 &rsaquo;
-                <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
+                <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
             {% endif %}
-            {% for ancestor_folder in instance.logical_path %}
+            {% for ancestor_folder in folder.logical_path %}
                 &rsaquo;
-                <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}"
+                <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                     title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
                     {% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}
                 </a>
             {% endfor %}
             {% if breadcrumbs_action %}
                 &rsaquo;
-                <a href="{{ instance.get_admin_directory_listing_url_path }}"
-                    title="{% blocktrans with instance.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
-                    {% if instance.label %}
-                        {{ instance.label }}
+                <a href="{{ folder.get_admin_directory_listing_url_path }}"
+                    title="{% blocktrans with folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
+                    {% if folder.label %}
+                        {{ folder.label }}
                     {% else %}
-                        {{ instance.name }}
+                        {{ folder.name }}
                     {% endif %}
                 </a>
                 &rsaquo;
@@ -90,7 +90,7 @@
                                 <img src="{% static 'filer/icons/folder-dropdown.svg' %}" alt="" width="28" height="28">
                             </a>
                             <ul class="filer-dropdown-menu navigator-breadcrumbs-dropdown">
-                                {% for folder in folder.logical_path %}
+                                {% for folder in folder.logical_path reversed %}
                                     <li>
                                         <a href="{% url 'admin:filer-directory_listing' folder.id %}{% filer_admin_context_url_params %}"
                                             title="{% trans 'Go back to the parent folder' %}">
@@ -109,7 +109,7 @@
                             </ul>
                         </div>
                         {% if not folder.is_root or folder.is_smart_folder %}
-                            <span class="icon fa fa-chevron-right"></span>
+                            <span class="icon filer-icon filer-icon-chevron-right fa fa-chevron-right"></span>
                         {% endif %}
                     </div>
                     <div class="navigator-breadcrumbs-name-dropdown-wrapper">
@@ -126,7 +126,7 @@
                             <div class="filer-dropdown-container filer-dropdown-container-down">
                                 {% if not is_popup and folder.file_type == 'Folder' and permissions.has_edit_permission %}
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                        <span class="fa fa-caret-down"></span>
+                                        <span class="filer-icon filer-icon-caret-down fa fa-caret-down"></span>
                                     </a>
                                     <ul class="filer-dropdown-menu">
                                         <li>
@@ -140,17 +140,17 @@
                     </div>
                     <form class="filter-files-container js-filter-files-container" action="." method="get" class="js-filer-search-form">
                         <div class="filter-filers-container-inner">
-                            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search"></span></button>
+                            <button class="navigator-button filter-files-button" title="{% trans 'Click here to run search for entered phrase' %}"><span class="icon fa fa-search cms-icon cms-icon-search"></span></button>
                             <div class="filter-search-wrapper">
                                 {% filer_admin_context_hidden_formfields %}
                                 <input type="text" placeholder="{% trans 'Search' %}" class="filter-files-field js-filter-files" value="{{ search_string }}" name="q">
                                 <div class="filer-dropdown-container filer-dropdown-container-down">
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false">
-                                        <span class="fa fa-caret-down"></span>
+                                        <span class="fa fa-caret-down cms-icon cms-filer-icon-caret-down"></span>
                                     </a>
                                 </div>
                                 <ul class="filer-dropdown-menu filer-dropdown-menu-checkboxes">
-                                    <span class="fa fa-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
+                                    <span class="fa fa-close cms-icon cms-icon-close js-close-dropdown-menu-checkboxes"><span class="sr-only">{% trans "Close" %}</span></span>
                                     <li>
                                         <p>{% trans "Limit" %}</p>
                                         <label>
@@ -174,18 +174,18 @@
                             <div class="actions-wrapper">
                                 <ul class="actions-separated-list">
                                     <li>
-                                        <a href="#" class="js-action-delete" title="{% trans 'Delete' %}"><span class="fa fa-trash"></span></a>
+                                        <a href="#" class="js-action-delete" title="{% trans 'Delete' %}"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
                                     </li>
                                     <li>
-                                        <a href="#" class="js-action-copy" title="{% trans 'Copy' %}"><span class="fa fa-copy"></span></a>
+                                        <a href="#" class="js-action-copy" title="{% trans 'Copy' %}"><span class="fa fa-copy cms-icon cms-icon-copy fa fa-copy"></span></a>
                                     </li>
                                     <li>
-                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-cut"></span></a>
+                                        <a href="#" class="js-action-move" title="{% trans 'Move' %}"><span class="fa fa-folder filer-icon filer-icon-move-to-folder fa fa-cut"></span></a>
                                     </li>
                                 </ul>
                                 <div class="filer-dropdown-container js-actions-menu">
                                     <a href="#" data-toggle="filer-dropdown" aria-expanded="false" class="nav-button nav-button-dots">
-                                        <span class="fa fa-ellipsis-h"></span>
+                                        <span class="fa fa-ellipsis-h cms-icon cms-icon-menu"></span>
                                     </a>
                                     <ul class="create-menu-dropdown filer-dropdown-menu">
                                         {# This list is populated in javascript #}
@@ -193,9 +193,11 @@
                                 </div>
                             </div>
                         {% endif %}
-                            <div class="filer-list-type-switcher-wrapper">
-                              {% filer_folder_list_type_switcher %}
-                            </div>
+                        <div class="filer-list-type-switcher-wrapper">
+                            <ul class="actions-separated-list">
+                                <li>{% filer_folder_list_type_switcher %}</li>
+                            </ul>
+                        </div>
                         {% block object-tools-items %}
                             <div class="navigator-button-wrapper">
                                 {% if folder.can_have_subfolders and can_make_folder %}

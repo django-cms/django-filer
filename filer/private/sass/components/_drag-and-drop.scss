@@ -84,16 +84,15 @@ form .form-row {
                 }
             }
             .dz-remove {
-                @include icon(trash-o);
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-trash' viewBox='0 0 16 16'%3E%3Cpath d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z'/%3E%3Cpath d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z'/%3E%3C/svg%3E%0A");
+                background-size:contain;
                 display: inline-block;
                 position: absolute;
                 top: 7px;
                 right: 25px;
                 font: 0/0 a;
-                &:before {
-                    color: $gray;
-                    font-size: 18px;
-                }
+                width: 18px;
+                height: 18px;
             }
             .dz-error-message {
                 top: 65px;
@@ -114,16 +113,18 @@ form .form-row {
                 }
             }
             .dz-success-mark {
-                @include icon(check);
-                &:before {
-                    color: $color-success;
-                }
+                // Check icon
+                width: 16px;
+                height: 16px;
+                background-image: url("data:image/svg+xml,%3Csvg width='13' height='13' viewBox='0 0 1792 1792' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%2370bf2b' d='M1412 734q0-28-18-46l-91-90q-19-19-45-19t-45 19l-408 407-226-226q-19-19-45-19t-45 19l-91 90q-18 18-18 46 0 27 18 45l362 362q19 19 45 19 27 0 46-19l543-543q18-18 18-45zm252 162q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z'/%3E%3C/svg%3E%0A");
+                background-size: contain;
             }
             .dz-error-mark {
-                @include icon(remove);
-                &:before {
-                    color: $color-danger;
-                }
+                // Remove icon
+                background-image: url("data:image/svg+xml,%3Csvg width='13' height='13' viewBox='0 0 1792 1792' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23dd4646' d='M1277 1122q0-26-19-45l-181-181 181-181q19-19 19-45 0-27-19-46l-90-90q-19-19-46-19-26 0-45 19l-181 181-181-181q-19-19-45-19-27 0-46 19l-90 90q-19 19-19 46 0 26 19 45l181 181-181 181q-19 19-19 45 0 27 19 46l90 90q19 19 46 19 26 0 45-19l181-181 181 181q19 19 45 19 27 0 46-19l90-90q19-19 19-46zm387-226q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z'/%3E%3C/svg%3E%0A");
+                width: 16px;
+                height: 16px;
+                background-size: contain;
             }
             &.dz-image-preview,
             &.dz-file-preview {
@@ -174,10 +175,10 @@ form .form-row {
             margin-left: 10px;
             text-align: center !important;
             cursor: pointer;
-            .fa {
+            .cms-icon {
                 color: $white;
                 font-size: 17px;
-                margin: 0 10px 0 0 !important;
+                margin: 0 10px 0 0;
                 vertical-align: middle;
             }
             &:before {
@@ -208,7 +209,7 @@ form .form-row {
                     text-align: center;
                     line-height: 24px;
                 }
-                .fa {
+                .cms-icon {
                     color: $btn-default-color;
                     margin-right: 0 !important;
                 }
@@ -226,6 +227,12 @@ form .form-row {
                 }
             }
         }
+        // makes sure that filer clear button has correct size #669
+        .filerClearer {
+            width: 36px !important;
+            height: 36px !important;
+            color: $color-danger;
+        }
         .filerFile {
             position: absolute;
             top: 9px;
@@ -241,6 +248,8 @@ form .form-row {
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 width: calc(100% - 260px);
+                height: 80px;
+                line-height: 80px;
             }
             // required for django CMS <= 3.1 #673
             img {
@@ -267,7 +276,6 @@ form .form-row {
                 display: inline-block;
                 color: $gray;
                 font-weight: normal;
-                margin-top: 32px;
                 margin-bottom: 6px;
                 text-align: left;
                 &:empty + .related-lookup {
@@ -276,16 +284,17 @@ form .form-row {
                 }
             }
             // required for django CMS <= 3.1 #673
-            .filerClearer {
+            a.filerClearer {
                 @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
                 float: right;
-                padding: 12px;
+                padding: 5px 0  !important;
                 margin: 24px 0 0 10px;
                 width: 36px;
                 height: 36px;
+                text-align: center;
                 cursor: pointer;
-                &:focus {
-                    background-color: $white;
+                span:before {
+                    color: $color-danger !important;
                 }
                 span {
                     text-align: center;
@@ -313,7 +322,6 @@ form .form-row {
                             text-overflow: ellipsis;
                             width: calc(100% - 250px);
                             overflow: hidden;
-                            height: 20px;
                         }
                     }
                     >span:not(.choose-file):not(.replace-file):not(.edit-file), .dz-name {
@@ -358,8 +366,8 @@ form .form-row {
         margin-right: 10px;
         border: solid 1px $gray-lighter;
         border-radius: 3px;
-        background: $white url("../icons/file-unknown.svg");
-        background-size: cover;
+        background: $white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath fill='%232980b9' d='M5 2c-1.105 0-2 .9-2 2v18c0 1.1.895 2 2 2h14c1.105 0 2-.9 2-2V8l-6-6z'/%3E%3Cpath fill='%233498db' d='M5 1c-1.105 0-2 .9-2 2v18c0 1.1.895 2 2 2h14c1.105 0 2-.9 2-2V7l-6-6z'/%3E%3Cpath fill='%232980b9' d='m21 7-6-6v4c0 1.1.895 2 2 2z'/%3E%3C/svg%3E");
+        background-size: contain;
         img {
             background: $white;
             &[src=""],

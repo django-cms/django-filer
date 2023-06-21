@@ -135,7 +135,7 @@
               {% endif %}
           {% empty %}
               <div>
-                  <div class="no-files"><span class="fa fa-arrow-down"></span>{% trans 'Drop files here or use the "Upload Files" button' %}</div>
+                  <div class="no-files"><span class="fa fa-arrow-down filer-icon filer-icon-arrow-down"></span>{% trans 'Drop files here or use the "Upload Files" button' %}</div>
               </div>
           {% endfor %}
       </div>
@@ -147,7 +147,7 @@
        data-max-uploader-connections="{{ uploader_connections }}"
        data-max-files="{{ max_files|safe }}"
        {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
-  <div class="icon"><span class="fa fa-cloud-upload"></span></div>
+  <div class="icon"><span class="filer-icon filer-icon-upload fa fa-cloud-upload"></span></div>
 
       <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
           <div class="text">{% trans "Drop your file to upload into:" %}</div>
