@@ -34,11 +34,11 @@
             </a>
             {% if not folder.is_root and folder.is_smart_folder %}
                 &rsaquo;
-                <a href="{% url 'admin:filer-directory_listing-root' %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
+                <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
             {% endif %}
             {% for ancestor_folder in folder.logical_path %}
                 &rsaquo;
-                <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}"
+                <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                     title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
                     {% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}
                 </a>
