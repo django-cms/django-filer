@@ -293,6 +293,7 @@ for mime_type in remove_mime_types:
     try:
         del FILE_VALIDATORS[mime_type]
     except KeyError:
+        # Cannot remove validator that is not in FILE_VALIDATORS
         pass
 
 for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).items():

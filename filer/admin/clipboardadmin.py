@@ -119,8 +119,9 @@ def ajax_upload(request, folder_id=None):
             validate_upload(filename, upload, request.user, mime_type)
         except FileValidationError as error:
             from django.contrib.messages import ERROR, add_message
-            add_message(request, ERROR, str(error))
-            return JsonResponse({'error': str(error)})
+            message = str(error)
+            add_message(request, ERROR, message)
+            return JsonResponse({'error': message})
         file_obj = uploadform.save(commit=False)
         # Enforce the FILER_IS_PUBLIC_DEFAULT
         file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
