@@ -5,18 +5,11 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 
 
-User = get_user_model()
+User = get_user_model()  # Needed for typing
 
 
 class FileValidationError(Exception):
     pass
-
-
-def deny_html(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-    """Simple validator that denies all files"""
-    raise FileValidationError(
-        _('File "{}": HTML upload denied by site security policy').format(file_name)
-    )
 
 
 def deny(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
@@ -27,6 +20,14 @@ def deny(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
         )
     raise FileValidationError(
         _('File "{}": {} upload denied by site security policy').format(file_name, file_type.upper())
+    )
+
+
+def deny_html(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
+    """Simple validator that denies all files. Separate for HTML since .html and .htm are both
+    common suffixes for text/html files."""
+    raise FileValidationError(
+        _('File "{}": HTML upload denied by site security policy').format(file_name)
     )
 
 

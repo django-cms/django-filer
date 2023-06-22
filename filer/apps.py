@@ -18,7 +18,7 @@ class FilerConfig(AppConfig):
         for mime_type, validators in FILE_VALIDATORS.items():
             functions = []
             for item in validators:
-                if callable(item):
+                if callable(item):  # pragma: no cover
                     functions.append(item)
                 else:
                     split = item.rsplit(".", 1)
