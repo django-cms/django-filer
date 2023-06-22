@@ -79,3 +79,36 @@ stroke="#004400"/>
 
         self.assertContains(response, "Rejected due to potential cross site scripting vulnerability")
         self.assertEqual(File.objects.count(), 0)
+
+    def test_deny_validator(self):
+        from filer.validation import deny, FileValidationError
+
+        self.assertRaisesRegex(
+            FileValidationError,
+            "HTML upload denied by site security policy",
+            deny,
+            "test.html",
+            None,
+            None,
+            "text/html",
+        )
+
+        self.assertRaisesRegex(
+            FileValidationError,
+            "MY_FUNNY_EXT upload denied by site security policy",
+            deny,
+            "test.my_funny_ext",
+            None,
+            None,
+            "text/html",
+        )
+
+        self.assertRaisesRegex(
+            FileValidationError,
+            "Upload denied by site security policy",
+            deny,
+            "test",
+            None,
+            None,
+            "text/html",
+        )

@@ -41,6 +41,10 @@ EVENT_ATTRIBUTES = (
 ) + (
     # Reject base64 obfuscated content
     b";base64,",
+) + (
+    # Reject direct <scrpit> tags or javascript: uri
+    b"<script",
+    b"javascript:",
 )
 
 
@@ -48,7 +52,7 @@ def validate_svg(file_name, file, owner, mime_type):
     """SVG files must not contain script tags or javascript hrefs.
     This might be too strict but avoids parsing the xml"""
     content = file.read().lower()
-    if any(map(lambda x: x in content, EVENT_ATTRIBUTES)) or b"<script" in content or b"javascript:" in content:
+    if any(map(lambda x: x in content, EVENT_ATTRIBUTES)):
         raise FileValidationError(
             _('File "{}": Rejected due to potential cross site scripting vulnerability').format(file_name)
         )
