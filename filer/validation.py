@@ -73,8 +73,7 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     from easy_thumbnails.VIL.Image import load
 
     image = load(file)  # Load svg
-    xml = image.canvas.svg.toxml(encoding="utf-8")  # Removes non-graphic nodes ->  sanitation
-    print(f"{xml=}")
+    xml = image.canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes ->  sanitation
     file.seek(0)  # Rewind file
     file.write(xml)  # write to binary file with utf-8 encoding
 
