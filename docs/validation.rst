@@ -200,8 +200,8 @@ The resulting file is not identical to the uploaded file.
 
 .. note::
 
-    If you identfy an attack vector when using ``sanitize_svg`` please
-    contact us only througj
+    If you identify an attack vector when using ``sanitize_svg`` please
+    contact us only through
     `security@django-cms.org <mailto:security@django-cms.org>`_.
 
 Block other mime-types
