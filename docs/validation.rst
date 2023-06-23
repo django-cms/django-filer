@@ -79,23 +79,7 @@ files, you could do this:
 
 This would imply that two functions in the ``my_validator_app.validators``
 module are present that will be called to validate any ``text/html`` file
-uploaded:
-
-.. code-block:: python
-
-    from filer.valiation import FileValidationError
-
-
-    def no_javascript(file_name, file, owner, mime_type):
-        """Take the file's name, the file iteslf, the owner user object
-        and the mime_type (as string) as a parameter"""
-        ...
-        if validation_failed:
-            # Validation error will be forwarded to the user as admin message
-            raise FileValidationError(
-                _('File "{}"': Upload rejected since file contains JavaScript code").format(file_name)
-            )
-
+uploaded. See :ref:`own_validator` for more info.
 
 Built-in validators
 -------------------
@@ -202,6 +186,8 @@ To block other mime types add an entry for that mime type to
     FILER_ADD_FILE_VALIDATORS[mime_type] = ["filer.validation.deny"]
 
 
+.. _own_validator:
+
 Creating your own file upload validators
 ----------------------------------------
 
@@ -219,7 +205,7 @@ mime type::
     User = get_user_model()
 
 
-    def my_upload_validator(
+    def no_javascript(
         file_name: str,
         file: typing.IO,
         owner: User,
@@ -230,7 +216,7 @@ mime type::
         ...
         if invalid:
             raise FileValidationError(
-                _('File "{}": Upload denied by site security policy').format(file_name)
+                _('File "{}": Upload rejected since file contains JavaScript code').format(file_name)
             )
 
 The file will be accepted for upload if the validation functions returns
