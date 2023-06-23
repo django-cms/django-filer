@@ -19,6 +19,31 @@ SVG files that might include JavaScript code.
     File validation is done at upload time. It does not affect already
     uploaded files.
 
+Mime type white list
+--------------------
+
+The first thing you can do to set up a security policy is to only allow
+white-listed mime types for upload.
+
+The setting ``FILER_MIME_TYPE_WHITE_LIST`` (default: ``[]``)  is a list of
+strings django-filer will consider for upload, e.g.::
+
+    FILER_MIME_TYPE_WHITE_LIST = [
+        "text/plain",  # Exact mime type match
+        "image/*",  # All types of "image"
+    ]
+
+If ``FILER_MIME_TYPE_WHITE_LIST`` is empty, all mime types will be accepted
+(default behaviour).
+
+.. note::
+
+    django-filer determines the mime-type of a file by its extension.
+    It does **not** check if the file format is aligned with its extension.
+    Restricting mime types therefore effectively blocks certain extensions.
+    It does not prevent a user from uploading an .exe file disguised as
+    an image file, say .jpeg.
+
 
 Validation hooks
 ----------------

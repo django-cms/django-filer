@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
 
@@ -12,8 +13,16 @@ class FilerConfig(AppConfig):
 
         import importlib
 
-        from filer.settings import FILE_VALIDATORS
+        from filer.settings import FILE_VALIDATORS, FILER_MIME_TYPE_WHITE_LIST
 
+        if (
+            not isinstance(FILER_MIME_TYPE_WHITE_LIST, (list, tuple)) or  # noqa W504
+            any(map(lambda x: not isinstance(x, str), FILER_MIME_TYPE_WHITE_LIST))
+        ):  # pragma: no cover
+            raise ImproperlyConfigured(
+                "filer: setting FILER_MIME_TYPE_WHITE_LIST needs to be a list or tuple of strings"
+            )
+        self.MIME_TYPE_WHITE_LIST = FILER_MIME_TYPE_WHITE_LIST
         self.FILE_VALIDATORS = {}
         for mime_type, validators in FILE_VALIDATORS.items():
             functions = []
@@ -22,6 +31,9 @@ class FilerConfig(AppConfig):
                     functions.append(item)
                 else:
                     split = item.rsplit(".", 1)
-                    module = importlib.import_module(split[0])
-                    functions.append(getattr(module, split[-1]))
+                    try:
+                        module = importlib.import_module(split[0])
+                        functions.append(getattr(module, split[-1]))
+                    except (ImportError, ModuleNotFoundError, AttributeError):
+                        raise ImproperlyConfigured(f"""filer: could not import validator "{item}".""")
             self.FILE_VALIDATORS[mime_type] = functions
