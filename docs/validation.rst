@@ -72,7 +72,7 @@ uploaded:
             )
 
 
-Build-in validators
+Built-in validators
 -------------------
 
 The two build-in validators are extremely simple.
