@@ -301,7 +301,7 @@ for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).
     else:
         FILE_VALIDATORS[mime_type] = list(validators)
 
-FILER_MIME_TYPE_WHITE_LIST = getattr(settings.FILER_MIME_TYPE_WHITE_LIST, [])
+FILER_MIME_TYPE_WHITELIST = getattr(settings.FILER_MIME_TYPE_WHITELIST, [])
 
 
 # Determine if django CMS is installed and if it comes with its own iconset

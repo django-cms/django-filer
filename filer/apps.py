@@ -13,16 +13,16 @@ class FilerConfig(AppConfig):
 
         import importlib
 
-        from filer.settings import FILE_VALIDATORS, FILER_MIME_TYPE_WHITE_LIST
+        from filer.settings import FILE_VALIDATORS, FILER_MIME_TYPE_WHITELIST
 
         if (
-            not isinstance(FILER_MIME_TYPE_WHITE_LIST, (list, tuple)) or  # noqa W504
-            any(map(lambda x: not isinstance(x, str), FILER_MIME_TYPE_WHITE_LIST))
+            not isinstance(FILER_MIME_TYPE_WHITELIST, (list, tuple)) or  # noqa W504
+            any(map(lambda x: not isinstance(x, str), FILER_MIME_TYPE_WHITELIST))
         ):  # pragma: no cover
             raise ImproperlyConfigured(
-                "filer: setting FILER_MIME_TYPE_WHITE_LIST needs to be a list or tuple of strings"
+                "filer: setting FILER_MIME_TYPE_WHITELIST needs to be a list or tuple of strings"
             )
-        self.MIME_TYPE_WHITE_LIST = FILER_MIME_TYPE_WHITE_LIST
+        self.MIME_TYPE_WHITELIST = FILER_MIME_TYPE_WHITELIST
         self.FILE_VALIDATORS = {}
         for mime_type, validators in FILE_VALIDATORS.items():
             functions = []

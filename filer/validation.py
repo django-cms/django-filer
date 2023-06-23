@@ -76,9 +76,9 @@ def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str
     config = apps.get_app_config("filer")
 
     # First, check white list if provided
-    if config.MIME_TYPE_WHITE_LIST:
-        # FILER_MIME_TYPE_WHITE_LIST restricts the allowed mime types to, e.g., "image/*" or "text/plain"
-        for allowed_mime_type in config.MIME_TYPE_WHITE_LIST:
+    if config.MIME_TYPE_WHITELIST:
+        # FILER_MIME_TYPE_WHITELIST restricts the allowed mime types to, e.g., "image/*" or "text/plain"
+        for allowed_mime_type in config.MIME_TYPE_WHITELIST:
             if mime_type == allowed_mime_type:
                 break
             elif "/" in allowed_mime_type and [mime_type.split("/")[0], "*"] == allowed_mime_type.split("/", 1):

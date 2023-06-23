@@ -25,15 +25,15 @@ Mime type white list
 The first thing you can do to set up a security policy is to only allow
 white-listed mime types for upload.
 
-The setting ``FILER_MIME_TYPE_WHITE_LIST`` (default: ``[]``)  is a list of
+The setting ``FILER_MIME_TYPE_WHITELIST`` (default: ``[]``)  is a list of
 strings django-filer will consider for upload, e.g.::
 
-    FILER_MIME_TYPE_WHITE_LIST = [
+    FILER_MIME_TYPE_WHITELIST = [
         "text/plain",  # Exact mime type match
         "image/*",  # All types of "image"
     ]
 
-If ``FILER_MIME_TYPE_WHITE_LIST`` is empty, all mime types will be accepted
+If ``FILER_MIME_TYPE_WHITELIST`` is empty, all mime types will be accepted
 (default behaviour).
 
 .. note::
