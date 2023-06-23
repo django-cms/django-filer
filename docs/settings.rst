@@ -177,3 +177,16 @@ file uploads.
 Limits the maximal file size if set. Takes an integer (file size in MB).
 
 Defaults to ``None``.
+
+
+``FILER_ADD_FILE_VALIDATORS``
+-----------------------------
+
+Dictionary that adds file upload validators for specific mime types.
+See :ref:`validation`.
+
+``FILER_REMOVE_FILE_VALIDATORS``
+--------------------------------
+
+List of default file validators to be ignored.
+See :ref:`validation`.

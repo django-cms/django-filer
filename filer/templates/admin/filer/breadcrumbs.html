@@ -1,10 +1,10 @@
 {% load i18n filer_admin_tags %}
 
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}" title="{% trans 'Go back to admin homepage' %}">{% trans "Home" %}</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}"> {% trans "Filer" %}</a>
+    <a href="{% url 'admin:index' %}" title="{% translate 'Go back to admin homepage' %}">{% translate "Home" %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% translate 'Go back to Filer app' %}"> {% translate "Filer" %}</a>
     {% if not instance.is_root and instance.is_smart_folder %}
-        &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
+        &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% translate 'Go back to root folder' %}">{% translate "root" %}</a>
     {% endif %}
     {% for ancestor_folder in instance.logical_path %}
         &rsaquo; <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}" title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">

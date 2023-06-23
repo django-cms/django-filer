@@ -2,17 +2,17 @@
 <div class="drag-hover-border thumbnail-drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list">
 
-    <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}"
+    <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% translate 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}"
          data-max-files="{{ max_files|safe }}"
          {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
 
         <input type="checkbox" id="all-items-action-toggle">
 
         <div class="navigator-thumbnail-list-header navigator-header">
-          <p>{% trans 'Folders' %}</p>
+          <p>{% translate 'Folders' %}</p>
           <span class="navigator-checkbox">
               {% if paginator.count and not is_popup %}
-                  {% trans 'Select all' %}
+                  {% translate 'Select all' %}
                   <input type="checkbox" id="folders-action-toggle">
               {% endif %}
           </span>
@@ -24,7 +24,7 @@
                 <div class="item-icon">
                     <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                         title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                        <img src="{% static 'filer/icons/folder-unfiled.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                        <img src="{% static 'filer/icons/folder-unfiled.svg' %}" alt="{% translate 'Folder Icon' %}" width="28" height="28">
                     </a>
                 </div>
                 <div class="item-name">
@@ -58,7 +58,7 @@
                     <div class="item-icon">
                         <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                             title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                            <img src="{% static 'filer/icons/folder.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                            <img src="{% static 'filer/icons/folder.svg' %}" alt="{% translate 'Folder Icon' %}" width="28" height="28">
                         </a>
                     </div>
                     <div class="item-name">
@@ -74,10 +74,10 @@
         </div>
 
         <div class="navigator-thumbnail-list-header navigator-header">
-          <p>{% trans 'Files' %}</p>
+          <p>{% translate 'Files' %}</p>
           <span class="navigator-checkbox">
               {% if paginator.count and not is_popup %}
-                  {% trans 'Select all' %}
+                  {% translate 'Select all' %}
                   <input type="checkbox" id="files-action-toggle">
               {% endif %}
           </span>
@@ -92,7 +92,7 @@
                               <div class="navigator-checkbox">
                                   {% if is_popup and filer_admin_context.pick_file %}
                                       <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
-                                          title="{% trans 'Select this file' %}">&nbsp;</a>
+                                          title="{% translate 'Select this file' %}">&nbsp;</a>
                                   {% elif action_form and not is_popup %}
                                       <input type="checkbox" class="action-select" value="file-{{ item.pk|safe }}" name="_selected_action">
                                   {% endif %}
@@ -101,7 +101,7 @@
                                   <div class="item-thumbnail">
                                       {% if is_popup and filer_admin_context.pick_file %}
                                           <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
-                                              title="{% trans 'Select this file' %}">
+                                              title="{% translate 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                                   title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
@@ -116,7 +116,7 @@
                                   <div>
                                       {% if is_popup and filer_admin_context.pick_file %}
                                           <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
-                                              title="{% trans 'Select this file' %}">
+                                              title="{% translate 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                               title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
@@ -127,7 +127,7 @@
                                       {% endif %}
                                   </div>
                                   {% if enable_permissions %}
-                                      <div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>
+                                      <div>{% translate "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>
                                   {% endif %}
                             </div>
                         </div>

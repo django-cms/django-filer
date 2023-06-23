@@ -8,16 +8,16 @@
                 {% if original.file.exists %}
                     <a href="{{ original.url }}" target="_blank" class="button" download="{{ original.original_filename }}" rel="noopener noreferrer">
                         <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
-                        <span>{% trans "Download" %}</span>
+                        <span>{% translate "Download" %}</span>
                     </a>
-                    {% if original.mime_maintype == 'image' %}
+                    {% if original.mime_maintype == 'image' and "svg" not in original.mime_type %}
                     <a href="{{ original.url }}" target="_blank" rel="noopener noreferrer" class="button">
-                        <span>{% trans "Expand" %}</span>&nbsp;
+                        <span>{% translate "Expand" %}</span>&nbsp;
                         <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
                     </a>
                     {% endif %}
                 {% else %}
-                    <span class="warning">{% trans "File is missing" %}</span>
+                    <span class="warning">{% translate "File is missing" %}</span>
                 {% endif %}
                 </div>
             </div>
@@ -26,27 +26,27 @@
             {% if original.file_type or original.modified_at or original.uploaded_at or original.width or original.height or original.size %}
                 <dl class="image-details">
                     {% if original.file_type %}
-                        <dt>{% trans "Type" %}</dt>
-                        <dd>{{ original.extension|upper }} {{ original.file_type }}</dd>
+                        <dt>{% translate "Type" %}</dt>
+                        <dd>{{ original.extension|upper }} {{ original.file_type }} ({{ original.mime_type }})</dd>
                     {% endif %}
                     {% if original.width or original.height %}
-                        <dt>{% trans "Size" %}</dt>
+                        <dt>{% translate "Size" %}</dt>
                         <dd>{{ original.width|floatformat }}x{{ original.height|floatformat }} px</dd>
                     {% endif %}
                     {% if original.size %}
-                        <dt>{% trans "File-size" %}</dt>
+                        <dt>{% translate "File-size" %}</dt>
                         <dd>{{ original.size|filesizeformat }}</dd>
                     {% endif %}
                     {% if original.modified_at %}
-                        <dt>{% trans "Modified" %}</dt>
+                        <dt>{% translate "Modified" %}</dt>
                         <dd>{{ original.modified_at }}</dd>
                     {% endif %}
                     {% if original.uploaded_at %}
-                        <dt>{% trans "Created" %}</dt>
+                        <dt>{% translate "Created" %}</dt>
                         <dd>{{ original.uploaded_at }}</dd>
                     {% endif %}
                     {% if original.owner %}
-                        <dt>{% trans "Owner" %}</dt>
+                        <dt>{% translate "Owner" %}</dt>
                         <dd><strong>{{ original.owner }}</strong></dd>
                     {% endif %}
                 </dl>

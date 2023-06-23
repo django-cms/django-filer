@@ -282,7 +282,26 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
 
 DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
 
-"""Determine if django CMS is installed and if it comes with its own iconset"""
+FILE_VALIDATORS = {
+    "text/html": ["filer.validation.deny_html"],
+    "image/svg+xml": ["filer.validation.validate_svg"],
+}
+
+remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
+for mime_type in remove_mime_types:  # pragma: no cover
+    if mime_type in FILE_VALIDATORS:
+        del FILE_VALIDATORS[mime_type]
+
+for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).items():  # pragma: no cover
+    if mime_type in FILE_VALIDATORS:
+        FILE_VALIDATORS[mime_type] += list(validators)
+    else:
+        FILE_VALIDATORS[mime_type] = list(validators)
+
+FILER_MIME_TYPE_WHITELIST = getattr(settings, "FILER_MIME_TYPE_WHITELIST", [])
+
+
+# Determine if django CMS is installed and if it comes with its own iconset
 
 ICON_CSS_LIB = ("filer/css/admin_filer.fa.icons.css",)
 if "cms" in settings.INSTALLED_APPS:  # pragma: no cover

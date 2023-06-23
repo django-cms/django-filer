@@ -1,10 +1,10 @@
 {% extends "admin/change_form.html" %}
 {% load i18n filer_admin_tags %}
 
-{% block title %}{% trans "Add new" %} {% trans "folder" %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block title %}{% translate "Add new" %} {% translate "folder" %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Add new" %} {% trans "folder" %}</h1>
+    <h1>{% translate "Add new" %} {% translate "folder" %}</h1>
     <div id="content-main">
         <form id="folder_form" method="post" action="" enctype="multipart/form-data">
             {% csrf_token %}

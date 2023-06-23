@@ -2,7 +2,7 @@
 
 <div class="actions hidden">
     {% for field in action_form %}{% if field.label %}<label>{{ field.label }} {% endif %}{{ field }}{% if field.label %}</label>{% endif %}{% endfor %}
-    <button type="submit" class="button" title="{% trans 'Run the selected action' %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+    <button type="submit" class="button" title="{% translate 'Run the selected action' %}" name="index" value="{{ action_index|default:0 }}">{% translate "Go" %}</button>
     {% if actions_selection_counter %}
         <script type="text/javascript">
             var _actions_icnt="{{ paginated_items.object_list|length|default:'0' }}";
@@ -11,9 +11,9 @@
         {% if paginator.count != paginated_items.object_list|length %}
             <span class="all">{{ selection_note_all }}</span>
             <span class="question">
-                <a href="javascript:;" title="{% trans 'Click here to select the objects across all pages' %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }} files and/or folders{% endblocktrans %}</a>
+                <a href="javascript:;" title="{% translate 'Click here to select the objects across all pages' %}">{% blocktrans with paginator.count as total_count %}Select all {{ total_count }} files and/or folders{% endblocktrans %}</a>
             </span>
-            <span class="clear"><a href="javascript:;">{% trans "Clear selection" %}</a></span>
+            <span class="clear"><a href="javascript:;">{% translate "Clear selection" %}</a></span>
         {% endif %}
     {% endif %}
 </div>
