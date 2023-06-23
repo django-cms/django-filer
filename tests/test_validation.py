@@ -1,11 +1,14 @@
 import os
 
+from django.apps import apps
 from django.conf import settings
 import django.core
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
+from filer.validation import validate_upload, FileValidationError
 from tests.helpers import create_superuser
 
 
@@ -15,6 +18,9 @@ class TestValidators(TestCase):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
         self.folder = Folder.objects.create(name='foo')
+
+    def tearDown(self) -> None:
+        self.folder.delete()
 
     svg_file = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "
@@ -81,7 +87,7 @@ stroke="#004400"/>
         self.assertEqual(File.objects.count(), n + expected_files)
 
     def test_deny_validator(self):
-        from filer.validation import deny, FileValidationError
+        from filer.validation import deny
 
         self.assertRaisesRegex(
             FileValidationError,
@@ -112,3 +118,47 @@ stroke="#004400"/>
             None,
             "text/html",
         )
+
+
+class TestWhitelist(TestCase):
+    def setUp(self) -> None:
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.folder = Folder.objects.create(name='foo')
+        self.config = apps.get_app_config("filer")
+        self.MIME_TYPE_WHITELIST = self.config.MIME_TYPE_WHITELIST
+
+    def tearDown(self) -> None:
+        self.folder.delete()
+        self.config.MIME_TYPE_WHITELIST = self.MIME_TYPE_WHITELIST
+
+    def set_whitelist(self, whitelist):
+        self.config.MIME_TYPE_WHITELIST = whitelist
+
+    def test_no_whitelist(self):
+        self.set_whitelist([])
+        for i in range(10):
+            mime_type = get_random_string(6) + "/" + get_random_string(5)
+
+            # If this throws an error, the test fails
+            validate_upload(f"test.{mime_type.split('/')[-1]}", None, None, mime_type)
+
+    def test_whitelist(self):
+        self.set_whitelist(["text/*", "image/x-png"])
+
+        expectation = {
+            "text/plain": "ok",
+            "text/html": "fail",  # OK by whitelist but blocked by html validator
+            "image/x-png": "ok",
+            "image/jpeg": "fail",
+        }
+
+        for mime_type, expected_result in expectation.items():
+            if expected_result == "ok":
+                try:
+                    validate_upload("test-file", None, None, mime_type)
+                except FileValidationError:
+                    self.assertFalse(f"Mime type {mime_type} expected to pass")
+            else:
+                with self.assertRaises(FileValidationError):
+                    validate_upload("test-file", None, None, mime_type)
