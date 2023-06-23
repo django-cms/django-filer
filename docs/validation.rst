@@ -201,3 +201,48 @@ To block other mime types add an entry for that mime type to
 
     FILER_ADD_FILE_VALIDATORS[mime_type] = ["filer.validation.deny"]
 
+
+Creating your own file upload validators
+----------------------------------------
+
+You can create your own fule upload validators and register them with
+``FILER_ADD_FILE_VALIDATORS``.
+
+All you need is a function that validates the upload of a specified
+mime type::
+
+    import typing
+    from django.contrib.auth import get_user_model
+    from filer.validation import FileValidationError
+
+
+    User = get_user_model()
+
+
+    def my_upload_validator(
+        file_name: str,
+        file: typing.IO,
+        owner: User,
+        mime_type: str
+    ) -> None:
+        # You can read the file `file` to test its validity
+        # You can also use file_name, owner, or mime_type
+        ...
+        if invalid:
+            raise FileValidationError(
+                _('File "{}": Upload denied by site security policy').format(file_name)
+            )
+
+The file will be accepted for upload if the validation functions returns
+without a ``FileValidationError``.
+
+If the file should be rejected raise a ``FileValidationError``. Its error
+message will be forwarded to the user. It is good practice to include the
+name of the invalid file since users might be uploading many files at a
+time.
+
+The ``owner`` argument is the ``User`` object of the user uploading the file.
+You can use it to distinguish validation for certain user groups if needed.
+
+If you distinguish validation by the mime type, remember to register the
+validator function for all relevant mime types.
