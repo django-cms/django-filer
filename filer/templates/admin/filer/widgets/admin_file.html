@@ -7,7 +7,7 @@
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <span class="filerClearer fa fa-close filer-icon filer-icon-remove-selection" title="{% trans 'Clear' %}"
+            <span class="filerClearer fa fa-close filer-icon filer-icon-remove-selection" title="{% translate 'Clear' %}"
                  data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}"></span>
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
@@ -19,7 +19,7 @@
          {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
         <div class="z-index-fix"></div>
         <div class="dz-default dz-message js-filer-dropzone-message{% if object %} hidden{% endif %}">
-            <span class="icon filer-icon filer-icon-arrow-down fa fa-arrow-down"></span><span>{% trans "or drop your file here" %}</span>
+            <span class="icon filer-icon filer-icon-arrow-down fa fa-arrow-down"></span><span>{% translate "or drop your file here" %}</span>
         </div>
 
         <span class="filerFile js-file-selector">
@@ -29,26 +29,26 @@
                     &nbsp;<span class="description_text">{{ object.label }}</span>
                 {% else %}
                     {% file_icon object %}
-                    &nbsp;<span class="description_text">{% trans 'File is missing' %}</span>
+                    &nbsp;<span class="description_text">{% translate 'File is missing' %}</span>
                 {% endif %}
             {% else %}
-                <img class="thumbnail_img hidden quiet" alt="{% trans 'no file selected' %}">
+                <img class="thumbnail_img hidden quiet" alt="{% translate 'no file selected' %}">
                 &nbsp;<span class="description_text"></span>
             {% endif %}
 
-            <a class="filerClearer {% if not object %}hidden{% endif %}" title="{% trans 'Clear' %}"
+            <a class="filerClearer {% if not object %}hidden{% endif %}" title="{% translate 'Clear' %}"
                  data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}" href="#">
                 <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
             </a>
 
             <a href="{{ change_url }}?_edit_from_widget=1" class="js-related-edit related-lookup {% if object %}related-lookup-change{% endif %} edit" id="{{ id }}_change"
-                 title="{% trans 'Edit' %}">
+                 title="{% translate 'Edit' %}">
                   <span class="edit-file"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></span>
             </a>
 
             <a href="{{ lookup_url }}" class="js-related-lookup related-lookup {% if object %}related-lookup-change{% endif %} lookup" id="{{ id }}_lookup"
-               title="{% trans 'Lookup' %}">
-                <span class="choose-file"><span class="fa fa-search cms-icon cms-icon-search"></span>{% trans 'Choose File' %}</span>
+               title="{% translate 'Lookup' %}">
+                <span class="choose-file"><span class="fa fa-search cms-icon cms-icon-search"></span>{% translate 'Choose File' %}</span>
                 <span class="replace-file"><span class="fa fa-search cms-icon cms-icon-search"></span></span>
             </a>
 

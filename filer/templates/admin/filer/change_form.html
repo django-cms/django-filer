@@ -23,7 +23,7 @@
         {% with original.duplicates as duplicates %}
             {% if duplicates %}
                 <div class="file-duplicates">
-                    <h3>{% trans "Duplicates" %}</h3>
+                    <h3>{% translate "Duplicates" %}</h3>
                     <ul>
                         {% for duplicate in duplicates %}
                             <li><a href="{{ duplicate.get_admin_change_url }}">{{ duplicate }}</a></li>

@@ -1,7 +1,7 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags static thumbnail %}
 <div class="drag-hover-border"></div>
 <section class="navigator{% if is_popup %} navigator-popup{% endif %}">
-    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
+    <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% translate 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
            data-max-uploader-connections="{{ uploader_connections }}"
            data-max-files="{{ max_files|safe }}"
            {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
@@ -13,10 +13,10 @@
                     {% endif %}
                 </th>
                 <th class="column-icon">&nbsp;</th>
-                <th class="column-name">{% trans "Name" %}</th>
-                <th class="column-owner">{% trans "Owner" %}</th>
-                <th class="column-size">{% trans "Size" %}</th>
-                <th class="column-action">{% trans "Action" %}</th>
+                <th class="column-name">{% translate "Name" %}</th>
+                <th class="column-owner">{% translate "Owner" %}</th>
+                <th class="column-size">{% translate "Size" %}</th>
+                <th class="column-action">{% translate "Action" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
                     <td class="column-icon">
                         <a href="{{ item.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                             title="{% blocktrans with item.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                            <img src="{% static 'filer/icons/folder-unfiled.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                            <img src="{% static 'filer/icons/folder-unfiled.svg' %}" alt="{% translate 'Folder Icon' %}" width="28" height="28">
                         </a>
                     </td>
                     <td class="column-name" colspan="4">
@@ -56,7 +56,7 @@
                             <td class="column-icon">
                                 <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                                     title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    <img src="{% static 'filer/icons/folder.svg' %}" alt="{% trans 'Folder Icon' %}" width="28" height="28">
+                                    <img src="{% static 'filer/icons/folder.svg' %}" alt="{% translate 'Folder Icon' %}" width="28" height="28">
                                 </a>
                             </td>
                             <td class="column-name">
@@ -80,8 +80,8 @@
                             </td>
                             <td class="column-action">
                                 {% if subfolder.file_type == "Folder" %}
-                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% filer_admin_context_url_params %}" title="{% trans 'Change folder details' %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
-                                    <a href="{{ subfolder.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="action-button" title="{% trans 'Remove folder' %}"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
+                                    <a href="{% url 'admin:filer_folder_change' subfolder.id %}{% filer_admin_context_url_params %}" title="{% translate 'Change folder details' %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
+                                    <a href="{{ subfolder.get_admin_delete_url }}{% filer_admin_context_url_params %}" class="action-button" title="{% translate 'Remove folder' %}"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -93,7 +93,7 @@
                             <td class="column-checkbox">
                                 {% if is_popup and filer_admin_context.pick_file %}
                                     <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
-                                        title="{% trans 'Select this file' %}"><span class="fa fa-arrow-left filer-icon filer-icon-select"></span></a>
+                                        title="{% translate 'Select this file' %}"><span class="fa fa-arrow-left filer-icon filer-icon-select"></span></a>
                                 {% elif action_form and not is_popup %}
                                     <input type="checkbox" class="action-select" value="file-{{ item.pk|safe }}" name="_selected_action">
                                 {% endif %}
@@ -101,7 +101,7 @@
                             <td class="column-icon">
                                 {% if is_popup and filer_admin_context.pick_file %}
                                     <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
-                                        title="{% trans 'Select this file' %}">
+                                        title="{% translate 'Select this file' %}">
                                 {% elif has_change_permission %}
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                             title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
@@ -116,7 +116,7 @@
                                     <strong>
                                         {% if is_popup and filer_admin_context.pick_file %}
                                             <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
-                                                title="{% trans 'Select this file' %}">
+                                                title="{% translate 'Select this file' %}">
                                         {% elif has_change_permission %}
                                             <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                                 title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
@@ -128,7 +128,7 @@
                                     </strong>
                                 </div>
                                 {% if enable_permissions %}
-                                    <div>{% trans "Permissions" %}: {% if file.is_public %}{% trans "disabled" %}{% else %}{% trans "enabled" %}{% endif %}</div>
+                                    <div>{% translate "Permissions" %}: {% if file.is_public %}{% translate "disabled" %}{% else %}{% translate "enabled" %}{% endif %}</div>
                                 {% endif %}
                             </td>
                             <td class="column-owner">
@@ -149,7 +149,7 @@
                                 {% if has_change_permission %}
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                         title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}" class="action-button"><span class="fa fa-pencil cms-icon cms-icon-settings"></span></a>
-                                    <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% trans 'Remove file' %}" class="action-button"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
+                                    <a href="{{ file.get_admin_delete_url }}{% filer_admin_context_url_params %}" title="{% translate 'Remove file' %}" class="action-button"><span class="fa fa-trash cms-icon cms-icon-bin"></span></a>
                                 {% endif %}
                             </td>
                             {% endwith %}
