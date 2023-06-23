@@ -306,7 +306,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 folder_qs = self.get_queryset(request)
                 file_qs = File.objects.all()
-            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "files")
+            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "all_files")
             file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
