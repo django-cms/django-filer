@@ -72,10 +72,10 @@ uploaded:
             )
 
 
-Build-in validators
+Built-in validators
 -------------------
 
-The two build-in validators are extremely simple.
+The two built-in validators are extremely simple.
 
 .. code-block:: python
 
