@@ -289,11 +289,8 @@ FILE_VALIDATORS = {
 
 remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
 for mime_type in remove_mime_types:  # pragma: no cover
-    try:
+    if mime_type in FILE_VALIDATORS:
         del FILE_VALIDATORS[mime_type]
-    except KeyError:
-        # Cannot remove validator that is not in FILE_VALIDATORS
-        pass
 
 for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).items():  # pragma: no cover
     if mime_type in FILE_VALIDATORS:
