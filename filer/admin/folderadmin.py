@@ -297,16 +297,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
+                desc_folder_ids = folder.get_descendants_ids()
                 # Do not include current folder itself in search results.
-                folder_qs = folder.get_descendants(include_self=False)
+                folder_qs = Folder.objects.filter(pk__in=desc_folder_ids)
                 # Limit search results to files in the current folder or any
                 # nested folder.
-                file_qs = File.objects.filter(
-                    folder__in=folder.get_descendants(include_self=True))
+                file_qs = File.objects.filter(folder_id__in=desc_folder_ids + [folder.pk])
             else:
                 folder_qs = self.get_queryset(request)
                 file_qs = File.objects.all()
-            folder_qs = self.filter_folder(folder_qs, search_terms)
+            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "all_files")
             file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
