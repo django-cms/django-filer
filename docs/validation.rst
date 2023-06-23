@@ -176,7 +176,7 @@ in the user's browser.
         "image/svg+xml": ["filer.validation.deny"],
     }
 
-Experimental svg sanitization
+Experimental SVG sanitization
 .............................
 
 This experimental feature passes an uploaded SVG image through easy-thumbnail
@@ -197,6 +197,12 @@ The resulting file is not identical to the uploaded file.
 
     This feature is experimental. It is not clear how effective the
     sanitization is in practice. Use it at own risk.
+
+.. note::
+
+    If you identfy an attack vector when using ``sanitize_svg`` please
+    contact us only througj
+    `security@django-cms.org <mailto:security@django-cms.org>`_.
 
 Block other mime-types
 ----------------------
