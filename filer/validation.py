@@ -69,6 +69,16 @@ def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
         )
 
 
+def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
+    from easy_thumbnails.VIL.Image import load
+
+    image = load(file)  # Load svg
+    xml = image.canvas.svg.toxml(encoding="utf-8")  # Removes non-graphic nodes ->  sanitation
+    print(f"{xml=}")
+    file.seek(0)  # Rewind file
+    file.write(xml)  # write to binary file with utf-8 encoding
+
+
 def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     """Actual validation: Call all validators for the given mime type. The app config reads
     the validators from the settings and replaces dotted paths by callables."""

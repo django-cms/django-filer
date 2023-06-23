@@ -13,7 +13,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import path, reverse
@@ -349,7 +349,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             Thumbnail.objects
             .filter(
                 source__name=OuterRef("file"),
-                modified__gte=OuterRef("modified_at"),
+                modified__gte=F("source__modified"),
             )
             .exclude(name__contains="upscale")  # TODO: Check WHY not used by directory listing
             .order_by("-modified")

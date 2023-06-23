@@ -176,6 +176,27 @@ in the user's browser.
         "image/svg+xml": ["filer.validation.deny"],
     }
 
+Experimental svg sanitization
+.............................
+
+This experimental feature passes an uploaded SVG image through easy-thumbnail
+and is rewritten without non-graphic tags or attributes. Any javascript
+within the SVG file will be lost.
+
+The resulting file is not identical to the uploaded file.
+
+.. code-block:: python
+
+    FILER_REMOVE_FILE_VALIDATORS = ["image/svg+xml"]
+
+    FILER_ADD_FILE_VALIDATORS = {
+        "image/svg+xml": ["filer.validation.sanitize_svg"],
+    }
+
+.. warning::
+
+    This feature is experimental. It is not clear how effective the
+    sanitization is in practice. Use it at own risk.
 
 Block other mime-types
 ----------------------
