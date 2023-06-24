@@ -1,5 +1,6 @@
 import logging
 
+import easy_thumbnails.utils
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -37,6 +38,11 @@ class BaseImage(File):
     _width = models.FloatField(
         null=True,
         blank=True,
+    )
+
+    _transparent = models.BooleanField(
+        null=False,
+        default=False,
     )
 
     default_alt_text = models.CharField(
@@ -92,14 +98,18 @@ class BaseImage(File):
                 imgfile.seek(0)
                 if self.mime_type == 'image/svg+xml':
                     self._width, self._height = VILImage.load(imgfile).size
+                    self._transparent = True
                 else:
-                    self._width, self._height = PILImage.open(imgfile).size
+                    pil_image = PILImage.open(imgfile)
+                    self._width, self._height = pil_image.size
+                    self._transparent = easy_thumbnails.utils.is_transparent(pil_image)
                 imgfile.seek(0)
             except Exception:
                 if post_init is False:
                     # in case `imgfile` could not be found, unset dimensions
                     # but only if not initialized by loading a fixture file
                     self._width, self._height = None, None
+                    self._transparent = False
         return attrs_updated
 
     def save(self, *args, **kwargs):
