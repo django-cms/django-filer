@@ -12,13 +12,18 @@ from 2.x to 3.0
 
 The dependency on django-mptt is dropped as of django-filer 3.0.
 
-This implies that three fields are removed from the `Folder` model:
-* `level`
-* `lft`
-* `rght`
-* `tree_id`
+This implies that three fields are removed from the ``Folder`` model:
 
-Those fields were used by django-mptt for performance optimization.
+* ``level``
+* ``lft``
+* ``rght``
+* ``tree_id``
+
+Those fields were used by django-mptt for performance optimization and are
+not required any more.
+
+Also, upload restrictions exist for HTML and SVG files by default. Please
+check :ref:`validation` for more details.
 
 
 from 0.9.1 to 0.9.2
