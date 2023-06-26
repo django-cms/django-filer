@@ -1,10 +1,10 @@
 import logging
 
-import easy_thumbnails.utils
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+import easy_thumbnails.utils
 from easy_thumbnails.VIL import Image as VILImage
 
 from .. import settings as filer_settings
