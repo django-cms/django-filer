@@ -32,8 +32,6 @@ CLASSIFIERS = [
     'Framework :: Django :: 4.1',
     'Framework :: Django :: 4.2',
     'Framework :: Django CMS',
-    'Framework :: Django CMS :: 3.6',
-    'Framework :: Django CMS :: 3.7',
     'Framework :: Django CMS :: 3.8',
     'Framework :: Django CMS :: 3.9',
     'Framework :: Django CMS :: 3.10',
@@ -63,7 +61,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     classifiers=CLASSIFIERS,
     test_suite='tests.settings.run',
 )
