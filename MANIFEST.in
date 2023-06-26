@@ -1,8 +1,8 @@
 include LICENSE
 include README.rst
+exclude mptt/__init__.py
 recursive-include filer/locale *
 recursive-include filer/static *
 recursive-include filer/templates *
 recursive-exclude * *.py[co]
-recusrive-exclude mptt *
 recursive-exclude tests *
