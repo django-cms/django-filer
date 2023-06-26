@@ -5,3 +5,4 @@ recursive-include filer/static *
 recursive-include filer/templates *
 recursive-exclude * *.py[co]
 recusrive-exclude mptt *
+recursive-exclude tests *
