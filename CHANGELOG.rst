@@ -5,15 +5,15 @@ CHANGELOG
 3.0.0rc1
 ==================
 
-* Add validation framework to prevent XSS attacks using HTML or SVG files
-* Only show uncategorized files to owner or superuser if permissions are active
-* Add an edit button to the file widget which open edit file popup
-* Refactored directory list view for significant performance increses
-* Remove thumbnail generation from the directory list view request response cylce
+* Add validation framework to prevent XSS attacks using HTML or SVG files (see docs)
+* Only show uncategorized files to the owner or superuser if permissions are active
+* Add an edit button to the file widget which opens edit file pop-up
+* Refactored directory list view for significant performance increases
+* Remove thumbnail generation from the directory list view request response cycle
 * Add Django 4.2 support
 * Add thumbnail view for faster visual management of image libraries
 * Fix File.objects.only() query required for deleting user who own files.
-* Fix several css quirks
+* Fix several CSS quirks
 
 2.2.5 (2023-06-11)
 ==================
