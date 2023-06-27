@@ -1,9 +1,8 @@
 {% extends "admin/delete_confirmation.html" %}
-{% load i18n static filer_admin_tags %}
+{% load i18n static %}
 
 {% block extrastyle %}{{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
-    {% icon_css_library %}
 {% endblock %}
 
 {% block breadcrumbs %}
