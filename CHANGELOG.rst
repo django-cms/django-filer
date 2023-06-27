@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-3.0.0rc1
+3.0.0rc2
 ==================
 
 * Add validation framework to prevent XSS attacks using HTML or SVG files (see docs)
@@ -14,6 +14,7 @@ CHANGELOG
 * Add thumbnail view for faster visual management of image libraries
 * Fix File.objects.only() query required for deleting user who own files.
 * Fix several CSS quirks
+* Remove unused css from delete confirmation view and move file view
 
 2.2.5 (2023-06-11)
 ==================
