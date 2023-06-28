@@ -61,10 +61,10 @@ if (django.jQuery) {
         var id = windowname_to_id(win.name);
         var lookup = $('#' + id);
         var container = lookup.closest('.filerFile');
-        var image = container.find(".thumbnail_img");
+        var image = container.find('.thumbnail_img');
         var clearButton = $('#id_' + id + '_clear');
         var input = $('#id_' + id);
-        var folderName = container.find(".description_text");
+        var folderName = container.find('.description_text');
         var addFolderButton = $('#' + id);
 
         input.val(chosenId);
