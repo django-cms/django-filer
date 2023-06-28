@@ -3,6 +3,7 @@
 
 form .form-row {
     &[class*="file"],
+    &[class*="folder"],
     &[class*="img"],
     &[class*="image"],
     &[class*="visual"] {
@@ -332,7 +333,7 @@ form .form-row {
 
         }
         &.filer-dropzone-folder .filerFile {
-            top: 32px !important;
+            top: 8px;
             #id_folder_description_txt {
                 float: left;
             }

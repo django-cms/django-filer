@@ -11,6 +11,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from ..models import Folder
+from ..settings import ICON_CSS_LIB
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
@@ -59,7 +60,6 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             'object': obj,
             'clear_id': '%s_clear' % css_id,
             'descid': css_id_description_txt,
-            'noimg': 'filer/icons/nofile_32x32.png',
             'foldid': css_id_folder,
             'id': css_id,
         }
@@ -81,9 +81,8 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         return obj
 
     class Media:
-        js = (
-            'filer/js/addons/popup_handling.js',
-        )
+        css = {"all": ('filer/css/admin_filer.css',) + ICON_CSS_LIB}
+        js = ('filer/js/addons/popup_handling.js',)
 
 
 class AdminFolderFormField(forms.ModelChoiceField):

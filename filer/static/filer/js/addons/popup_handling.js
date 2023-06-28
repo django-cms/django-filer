@@ -59,12 +59,17 @@ if (django.jQuery) {
     };
     window.dismissRelatedFolderLookupPopup = function (win, chosenId, chosenName) {
         var id = windowname_to_id(win.name);
+        var lookup = $('#' + id);
+        var container = lookup.closest('.filerFile');
+        var image = container.find('.thumbnail_img');
         var clearButton = $('#id_' + id + '_clear');
         var input = $('#id_' + id);
-        var folderName = $('#id_' + id + '_description_txt');
+        var folderName = container.find('.description_text');
         var addFolderButton = $('#' + id);
 
         input.val(chosenId);
+
+        image.removeClass('hidden');
         folderName.text(chosenName);
         clearButton.removeClass('hidden');
         addFolderButton.addClass('hidden');
