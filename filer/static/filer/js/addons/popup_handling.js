@@ -67,7 +67,6 @@ if (django.jQuery) {
         var folderName = container.find(".description_text");
         var addFolderButton = $('#' + id);
 
-        console.log(win, chosenId, chosenName, x, y);
         input.val(chosenId);
 
         image.removeClass('hidden');
