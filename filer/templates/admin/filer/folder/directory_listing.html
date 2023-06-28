@@ -32,10 +32,7 @@
             <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}">
                 {% trans "Filer" %}
             </a>
-            {% if not folder.is_root and folder.is_smart_folder %}
-                &rsaquo;
-                <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% trans 'Go back to root folder' %}">{% trans "root" %}</a>
-            {% endif %}
+            &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% translate 'Go back to root folder' %}">{% translate "Folder" %}</a>
             {% for ancestor_folder in folder.logical_path %}
                 &rsaquo;
                 <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
@@ -43,6 +40,7 @@
                     {% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}
                 </a>
             {% endfor %}
+            &rsaquo; {% if folder.label %}{{ folder.label }}{% else %}{{ folder.name }}{% endif %}
             {% if breadcrumbs_action %}
                 &rsaquo;
                 <a href="{{ folder.get_admin_directory_listing_url_path }}"

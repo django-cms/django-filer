@@ -534,16 +534,16 @@ msgstr "Dateien mit fehlenden Metadaten"
 #: templates/admin/filer/folder/directory_listing.html:37
 #: templates/admin/filer/folder/directory_listing.html:104
 msgid "root"
-msgstr "Root"
+msgstr "Start"
 
 #: settings.py:273
 msgid "Show table view"
-msgstr "Tabellenansicht zeigen"
+msgstr "Tabellenansicht"
 
 #: settings.py:278
 #| msgid "thumbnail option"
 msgid "Show thumbnail view"
-msgstr "Vorschauansicht zeigen"
+msgstr "Vorschauansicht"
 
 #: templates/admin/filer/actions.html:5
 msgid "Run the selected action"
@@ -1157,7 +1157,7 @@ msgstr "Datei \"{file_name}\": Die Sicherheitseinstellung weisen HTML-Dateien zu
 msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
-msgstr "Datei \"{file_type}\": Zurückgewiesen, da eine \"Cross Site Scripting\"-Attacke nicht ausgeschlossen werden kann."
+msgstr "Datei \"{file_name}\": Zurückgewiesen, da eine \"Cross Site Scripting\"-Attacke nicht ausgeschlossen werden kann."
 
 #~ msgid "Open file"
 #~ msgstr "Open file"
