@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 19:02+0200\n"
+"POT-Creation-Date: 2023-06-28 19:25+0200\n"
 "PO-Revision-Date: 2018-04-09 06:58+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Japanese (http://www.transifex.com/divio/django-filer/"
@@ -1115,20 +1115,25 @@ msgid "Choose Folder"
 msgstr ""
 
 #: validation.py:19
-msgid "File \"{}\": Upload denied by site security policy"
+#, python-brace-format
+msgid "File \"{file_name}\": Upload denied by site security policy"
 msgstr ""
 
 #: validation.py:22
-msgid "File \"{}\": {} upload denied by site security policy"
+#, python-brace-format
+msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
 msgstr ""
 
-#: validation.py:30
-msgid "File \"{}\": HTML upload denied by site security policy"
+#: validation.py:33
+#, python-brace-format
+msgid "File \"{file_name}\": HTML upload denied by site security policy"
 msgstr ""
 
-#: validation.py:68
+#: validation.py:71
+#, python-brace-format
 msgid ""
-"File \"{}\": Rejected due to potential cross site scripting vulnerability"
+"File \"{file_name}\": Rejected due to potential cross site scripting "
+"vulnerability"
 msgstr ""
 
 #~ msgid "Subject Location"

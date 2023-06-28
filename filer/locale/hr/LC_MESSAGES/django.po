@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Translators:
@@ -11,19 +11,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 19:02+0200\n"
+"POT-Creation-Date: 2023-06-28 19:25+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Aleks Acimovic, 2022\n"
-"Language-Team: Croatian (http://app.transifex.com/divio/django-filer/language/hr/)\n"
+"Language-Team: Croatian (http://app.transifex.com/divio/django-filer/"
+"language/hr/)\n"
+"Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #: admin/clipboardadmin.py:16
-#| msgid ""
-#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -32,8 +32,7 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid ""
-"Can't use this folder, Permission Denied. Please select another folder."
+msgid "Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:45
@@ -48,7 +47,9 @@ msgstr ""
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Stavke moraju biti odabrane kako bi se obavila akcija. Nijedna stavka nije promijenjena."
+msgstr ""
+"Stavke moraju biti odabrane kako bi se obavila akcija. Nijedna stavka nije "
+"promijenjena."
 
 #: admin/folderadmin.py:422
 #, python-format
@@ -130,7 +131,9 @@ msgstr ""
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Uspješno premješteno %(count)d datoteka i/ili direktorija u direktorij '%(destination)s'."
+msgstr ""
+"Uspješno premješteno %(count)d datoteka i/ili direktorija u direktorij "
+"'%(destination)s'."
 
 #: admin/folderadmin.py:930 admin/folderadmin.py:932
 msgid "Move files and/or folders"
@@ -155,7 +158,9 @@ msgstr "Preimenuj datoteke"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "Uspješno kopirano %(count)d datoteka i/ili direktorija u direktorij '%(destination)s'."
+msgstr ""
+"Uspješno kopirano %(count)d datoteka i/ili direktorija u direktorij "
+"'%(destination)s'."
 
 #: admin/folderadmin.py:1143 admin/folderadmin.py:1145
 msgid "Copy files and/or folders"
@@ -187,7 +192,8 @@ msgstr "Sufiks koji će biti dodan imenima kopiranih datoteka."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Sufiks treba biti jednostavan i upisan malim slovima poput \"%(valid)s\"."
+msgstr ""
+"Sufiks treba biti jednostavan i upisan malim slovima poput \"%(valid)s\"."
 
 #: admin/forms.py:52
 #, python-format
@@ -221,7 +227,8 @@ msgstr "povećaj veličinu"
 
 #: admin/forms.py:75
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Opcija sličica ili parametri za promjenu veličine moraju biti izabrani."
+msgstr ""
+"Opcija sličica ili parametri za promjenu veličine moraju biti izabrani."
 
 #: admin/forms.py:77
 msgid "Resize parameters must be choosen."
@@ -448,7 +455,6 @@ msgid "folder permissions"
 msgstr "ovlasti direktorija"
 
 #: models/foldermodels.py:359
-#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -467,7 +473,6 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:374
-#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -480,7 +485,6 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:389
-#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -537,7 +541,6 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
-#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -605,19 +608,25 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Brisanje odabranih objekata bi rezultiralo brisanjem povezanih objekata, ali Vaš korisnički račun nema ovlasti za brisanje slijedećih tipova objekata:"
+msgstr ""
+"Brisanje odabranih objekata bi rezultiralo brisanjem povezanih objekata, ali "
+"Vaš korisnički račun nema ovlasti za brisanje slijedećih tipova objekata:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Brisanje odabranih datoteka i/ili direktorija bi zahtijevalo brisanje slijedećih zaštičenih povezanih objekata:"
+msgstr ""
+"Brisanje odabranih datoteka i/ili direktorija bi zahtijevalo brisanje "
+"slijedećih zaštičenih povezanih objekata:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Jeste li sigurni kako želite obrisati odabrane datoteke i/ili direktorije? Svi navedeni objekti i s njima povezane stavke biti će obrisani:"
+msgstr ""
+"Jeste li sigurni kako želite obrisati odabrane datoteke i/ili direktorije? "
+"Svi navedeni objekti i s njima povezane stavke biti će obrisani:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -666,9 +675,11 @@ msgstr "Ikona direktorija"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Vaš korisnički račun nema ovlasti za kopiranje odabranih datoteka i/ili direktorija."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za kopiranje odabranih datoteka i/ili "
+"direktorija."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -692,7 +703,9 @@ msgstr "Nema dostupnih datoteka i/ili direktorija za kopiranje."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "Slijedeće datoteke i/ili direktoriji biti će kopirani u odredišni direktorij (zadržavajući postojeću strukturu):"
+msgstr ""
+"Slijedeće datoteke i/ili direktoriji biti će kopirani u odredišni direktorij "
+"(zadržavajući postojeću strukturu):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -712,7 +725,8 @@ msgstr ""
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Vaš korisnički račun nema ovlasti za promjenu veličina odabranih slika."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za promjenu veličina odabranih slika."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -724,7 +738,9 @@ msgstr "Slijedećim slikama biti će promijenjena veličina:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Izaberite postojeću opciju sličica ili unesite parametre za promjenu veličine:"
+msgstr ""
+"Izaberite postojeću opciju sličica ili unesite parametre za promjenu "
+"veličine:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
@@ -734,7 +750,10 @@ msgstr "Odaberite parametre za promjenu veličine:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Pažnja: Slikama će biti promijenjena veličina, a originali će biti prepisani sa slikama s novom veličinom. Preporuča se prvo kopirati originalne slike prije promjene veličine."
+msgstr ""
+"Pažnja: Slikama će biti promijenjena veličina, a originali će biti prepisani "
+"sa slikama s novom veličinom. Preporuča se prvo kopirati originalne slike "
+"prije promjene veličine."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -742,9 +761,11 @@ msgstr "Promjeni veličinu"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Vaš korisnički račun nema ovlasti za premještaj svih odabranih datoteka i/ili direktorija."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za premještaj svih odabranih datoteka i/"
+"ili direktorija."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -754,7 +775,9 @@ msgstr "Nema dostupnih datoteka i/ili direktorija za premještaj."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "Slijedeće datoteke i/ili direktoriji biti će premješteni u odredišni direktorij (zadržavajući postojeću strukturu):"
+msgstr ""
+"Slijedeće datoteke i/ili direktoriji biti će premješteni u odredišni "
+"direktorij (zadržavajući postojeću strukturu):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -769,7 +792,8 @@ msgstr ""
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "Vaš korisnički račun nema ovlasti za preimenovanje svih odabranih datoteka."
+msgstr ""
+"Vaš korisnički račun nema ovlasti za preimenovanje svih odabranih datoteka."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
@@ -779,7 +803,9 @@ msgstr "Nema dostupnih datoteka i/ili direktorija za preimenovanje."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "Slijedeće datoteke če biti preimenovane (ostati će u svojim direktorijima i zadržati ime datoteke, samo će prikazano ime biti promijenjeno):"
+msgstr ""
+"Slijedeće datoteke če biti preimenovane (ostati će u svojim direktorijima i "
+"zadržati ime datoteke, samo će prikazano ime biti promijenjeno):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -936,13 +962,11 @@ msgstr "omogućeno"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -1004,12 +1028,10 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
-#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
-#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1076,7 +1098,6 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:101
-#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1132,24 +1153,29 @@ msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:16
-#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
 #: validation.py:19
-msgid "File \"{}\": Upload denied by site security policy"
+#, python-brace-format
+msgid "File \"{file_name}\": Upload denied by site security policy"
 msgstr ""
 
 #: validation.py:22
-msgid "File \"{}\": {} upload denied by site security policy"
+#, python-brace-format
+msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
 msgstr ""
 
-#: validation.py:30
-msgid "File \"{}\": HTML upload denied by site security policy"
+#: validation.py:33
+#, python-brace-format
+msgid "File \"{file_name}\": HTML upload denied by site security policy"
 msgstr ""
 
-#: validation.py:68
-msgid "File \"{}\": Rejected due to potential cross site scripting vulnerability"
+#: validation.py:71
+#, python-brace-format
+msgid ""
+"File \"{file_name}\": Rejected due to potential cross site scripting "
+"vulnerability"
 msgstr ""
 
 #~ msgid "Open file"
