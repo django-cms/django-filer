@@ -16,10 +16,13 @@ def deny(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     file_type = file_name.rsplit(".")[-1]
     if file_type == file_name:
         raise FileValidationError(
-            _('File "{}": Upload denied by site security policy').format(file_name)
+            _('File "{file_name}": Upload denied by site security policy').format(file_name=file_name)
         )
     raise FileValidationError(
-        _('File "{}": {} upload denied by site security policy').format(file_name, file_type.upper())
+        _('File "{file_name}": {file_type} upload denied by site security policy').format(
+            file_name=file_name,
+            file_type=file_type.upper()
+        )
     )
 
 
@@ -27,7 +30,7 @@ def deny_html(file_name: str, file: typing.IO, owner: User, mime_type: str) -> N
     """Simple validator that denies all files. Separate for HTML since .html and .htm are both
     common suffixes for text/html files."""
     raise FileValidationError(
-        _('File "{}": HTML upload denied by site security policy').format(file_name)
+        _('File "{file_name}": HTML upload denied by site security policy').format(file_name=file_name)
     )
 
 
@@ -65,7 +68,8 @@ def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     if any(map(lambda x: x in content, TRIGGER_XSS_THREAD)):
         # If any element of TRIGGER_XSS_THREAD is found in file, raise FileValidationError
         raise FileValidationError(
-            _('File "{}": Rejected due to potential cross site scripting vulnerability').format(file_name)
+            _('File "{file_name}": Rejected due to potential cross site scripting vulnerability')
+            .format(file_name=file_name)
         )
 
 
