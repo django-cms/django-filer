@@ -75,8 +75,13 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
         scale *= (100 + int(zoom)) / 100.0
 
     if scale < 1.0 or (scale > 1.0 and upscale):
-        im = im.resize((int(source_x * scale), int(source_y * scale)),
-                       resample=Image.ANTIALIAS)
+        try:
+            im = im.resize((int(source_x * scale), int(source_y * scale)),
+                           resample=Image.LANCZOS)
+        except AttributeError:
+            im = im.resize((int(source_x * scale), int(source_y * scale)),
+                           resample=Image.ANTIALIAS)
+
     # --endsnip-- begin real code
 
     # ===============================
