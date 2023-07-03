@@ -78,7 +78,7 @@ def scale_and_crop_with_subject_location(im, size, subject_location=False,
         try:
             im = im.resize((int(source_x * scale), int(source_y * scale)),
                            resample=Image.LANCZOS)
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             im = im.resize((int(source_x * scale), int(source_y * scale)),
                            resample=Image.ANTIALIAS)
 

@@ -16,6 +16,7 @@ CHANGELOG
 * Fix several CSS quirks
 * Fix folder widget
 * Remove unused css from delete confirmation view and move file view
+* Add Pillow 10 compatibility
 * Update translations (de/fr/nl)
 
 2.2.5 (2023-06-11)
