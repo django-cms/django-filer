@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -12,17 +12,18 @@ msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-28 19:25+0200\n"
-"PO-Revision-Date: 2018-04-09 06:58+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Galician (http://www.transifex.com/divio/django-filer/"
-"language/gl/)\n"
-"Language: gl\n"
+"PO-Revision-Date: 2012-07-13 15:50+0000\n"
+"Last-Translator: Pablo, 2015\n"
+"Language-Team: Galician (http://app.transifex.com/divio/django-filer/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: gl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -31,7 +32,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:45
@@ -445,10 +447,9 @@ msgid "folder permissions"
 msgstr "permisos da carpeta"
 
 #: models/foldermodels.py:359
-#, fuzzy
 #| msgid "Folders"
 msgid "All Folders"
-msgstr "Carpetas"
+msgstr ""
 
 #: models/foldermodels.py:361
 msgid "Logical Path"
@@ -465,10 +466,9 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:374
-#, fuzzy
 #| msgid "everybody"
 msgid "Everybody"
-msgstr "todos"
+msgstr ""
 
 #: models/foldermodels.py:387 templates/admin/filer/widgets/admin_file.html:45
 msgid "Edit"
@@ -479,10 +479,9 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:389
-#, fuzzy
 #| msgid "can add children"
 msgid "Add children"
-msgstr "pode engadir fillos"
+msgstr ""
 
 #: models/imagemodels.py:18
 msgid "date taken"
@@ -537,10 +536,9 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
-#, fuzzy
 #| msgid "thumbnail option"
 msgid "Show thumbnail view"
-msgstr "opción da miniatura"
+msgstr ""
 
 #: templates/admin/filer/actions.html:5
 msgid "Run the selected action"
@@ -667,8 +665,8 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -743,8 +741,8 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
@@ -935,11 +933,13 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -1001,14 +1001,14 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
-#, fuzzy
-#| msgid "files"
+#| msgid "Filer"
 msgid "Files"
-msgstr "arquivos"
+msgstr ""
 
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
@@ -1072,6 +1072,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:101
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1127,10 +1128,9 @@ msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:16
-#, fuzzy
-#| msgid "Folder"
+#| msgid "Choose File"
 msgid "Choose Folder"
-msgstr "Carpeta"
+msgstr ""
 
 #: validation.py:19
 #, python-brace-format
@@ -1153,6 +1153,36 @@ msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
 msgstr ""
+
+#~ msgid "Open file"
+#~ msgstr "Open file"
+
+#~ msgid "Full size preview"
+#~ msgstr "Full size preview"
+
+#~ msgid "Add Description"
+#~ msgstr "Add Description"
+
+#~ msgid "Author"
+#~ msgstr "Author"
+
+#~ msgid "Add Alt-Text"
+#~ msgstr "Add Alt-Text"
+
+#~ msgid "Add caption"
+#~ msgstr "Add caption"
+
+#~ msgid "Add Tags"
+#~ msgstr "Add Tags"
+
+#~ msgid "Change File"
+#~ msgstr "Change File"
+
+#~ msgid "none selected"
+#~ msgstr "none selected"
+
+#~ msgid "Add Folder"
+#~ msgstr "Add Folder"
 
 #~ msgid "Subject Location"
 #~ msgstr "Subject location"

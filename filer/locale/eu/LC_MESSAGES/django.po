@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -13,15 +13,16 @@ msgstr ""
 "POT-Creation-Date: 2023-06-28 19:25+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Ales Zabala Alava <shagi@gisa-elkartea.org>, 2013\n"
-"Language-Team: Basque (http://app.transifex.com/divio/django-filer/language/"
-"eu/)\n"
-"Language: eu\n"
+"Language-Team: Basque (http://app.transifex.com/divio/django-filer/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -30,7 +31,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:45
@@ -45,9 +47,7 @@ msgstr ""
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Elementuak hautatu behar dira beraiekin zeozer egiteko. Ez da elementurik "
-"aldatu."
+msgstr "Elementuak hautatu behar dira beraiekin zeozer egiteko. Ez da elementurik aldatu."
 
 #: admin/folderadmin.py:422
 #, python-format
@@ -128,8 +128,7 @@ msgstr ""
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"%(count)d fitxategi eta/edo karpeta '%(destination)s' karpetara mugituta."
+msgstr "%(count)d fitxategi eta/edo karpeta '%(destination)s' karpetara mugituta."
 
 #: admin/folderadmin.py:930 admin/folderadmin.py:932
 msgid "Move files and/or folders"
@@ -154,8 +153,7 @@ msgstr "Fitxategiak berrizendatu"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"%(count)d fitxategi eta/edo karpeta %(destination)s karpetara kopiatuta."
+msgstr "%(count)d fitxategi eta/edo karpeta %(destination)s karpetara kopiatuta."
 
 #: admin/folderadmin.py:1143 admin/folderadmin.py:1145
 msgid "Copy files and/or folders"
@@ -187,9 +185,7 @@ msgstr "Kopiatutako fitxategiei gehituko zaien atzizkia."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Atzizkia baliozko, sinple eta letra xehetan dagoen fitxategi izen zatia izan "
-"beharko luke, \"%(valid)s\" bezala."
+msgstr "Atzizkia baliozko, sinple eta letra xehetan dagoen fitxategi izen zatia izan beharko luke, \"%(valid)s\" bezala."
 
 #: admin/forms.py:52
 #, python-format
@@ -223,8 +219,7 @@ msgstr "handitu"
 
 #: admin/forms.py:75
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr ""
-"Argazkitxo aukerak edo tamaina aldatzeko parametroak zehaztu behar dira."
+msgstr "Argazkitxo aukerak edo tamaina aldatzeko parametroak zehaztu behar dira."
 
 #: admin/forms.py:77
 msgid "Resize parameters must be choosen."
@@ -451,6 +446,7 @@ msgid "folder permissions"
 msgstr "karpeta baimenak"
 
 #: models/foldermodels.py:359
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -469,6 +465,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:374
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -481,6 +478,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:389
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -537,6 +535,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -616,9 +615,7 @@ msgstr ""
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Ziur hautatutako fitxategi eta/edo karpetak ezabatu nahi dituzula? Ondoko "
-"objektu eta erlazionatutako elementu guztiak ezabatuko lirateke:"
+msgstr "Ziur hautatutako fitxategi eta/edo karpetak ezabatu nahi dituzula? Ondoko objektu eta erlazionatutako elementu guztiak ezabatuko lirateke:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -667,8 +664,8 @@ msgstr "Karpeta ikonoa"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -725,8 +722,7 @@ msgstr "Ondoko irudien tamaina aldatuko da:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Argazkitxo aukera bat hautatu edo tamaina aldatzeko parametroak ezarri:"
+msgstr "Argazkitxo aukera bat hautatu edo tamaina aldatzeko parametroak ezarri:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
@@ -736,9 +732,7 @@ msgstr "Tamaina aldatzeko parametroak aukeratu:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Kontuz: Irudien tamaina aldatzean jatorrizkoak galduko dira. Lehenbizi "
-"jatorrizkoen kopia egin zenezake."
+msgstr "Kontuz: Irudien tamaina aldatzean jatorrizkoak galduko dira. Lehenbizi jatorrizkoen kopia egin zenezake."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -746,11 +740,9 @@ msgstr "Tamaina aldatu"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"Zure kontuak ez du hautatutako fitxategi eta/edo karpeta guztiak mugitzeko "
-"baimenik."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "Zure kontuak ez du hautatutako fitxategi eta/edo karpeta guztiak mugitzeko baimenik."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -940,11 +932,13 @@ msgstr "gaituta"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -1006,10 +1000,12 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1075,6 +1071,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:101
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1130,6 +1127,7 @@ msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 

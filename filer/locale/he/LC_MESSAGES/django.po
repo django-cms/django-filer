@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -12,16 +12,16 @@ msgstr ""
 "POT-Creation-Date: 2023-06-28 19:25+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
-"Language-Team: Hebrew (http://app.transifex.com/divio/django-filer/language/"
-"he/)\n"
-"Language: he\n"
+"Language-Team: Hebrew (http://app.transifex.com/divio/django-filer/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
-"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Language: he\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -30,7 +30,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:45
@@ -446,6 +447,7 @@ msgid "folder permissions"
 msgstr "הרשאות תיקיה"
 
 #: models/foldermodels.py:359
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -464,6 +466,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:374
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -476,6 +479,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:389
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -532,6 +536,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -599,25 +604,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק אובייקטים מקושרים, אך "
-"לחשבונך אין הרשאות למחוק אובייקטים מהסוגים הבאים:"
+msgstr "עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק אובייקטים מקושרים, אך לחשבונך אין הרשאות למחוק אובייקטים מהסוגים הבאים:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק את האובייקטים המוגנים "
-"הבאים:"
+msgstr "עבור מחיקת הקבצים ו/או התיקיות הבחורים יש צורך למחוק את האובייקטים המוגנים הבאים:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"האם את/ה בטוח/ה שברצונך למחוק את הקבצים ו/או התיקיות הבחורים? כל הפריטים "
-"המקושרים יימחקו:"
+msgstr "האם את/ה בטוח/ה שברצונך למחוק את הקבצים ו/או התיקיות הבחורים? כל הפריטים המקושרים יימחקו:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -666,8 +665,8 @@ msgstr "צלמית תיקייה"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr "לחשבונך אין רשות להעתיק את כל הקבצים ו/או התיקיות הבחורים."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -692,8 +691,7 @@ msgstr "אין קבצים ו/או תיקיות זמינים להעתקה."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"הקבצים ו/או התיקיות הבאים יועתקו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
+msgstr "הקבצים ו/או התיקיות הבאים יועתקו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -735,9 +733,7 @@ msgstr "בחר פרמטרי שינוי גודל:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"הזהרה: התמונות ישונה גודלן במקום והמקוריות יאבדו. אולי ראשית עשה/י העתק שלהם "
-"כדי לשמור על המקויות."
+msgstr "הזהרה: התמונות ישונה גודלן במקום והמקוריות יאבדו. אולי ראשית עשה/י העתק שלהם כדי לשמור על המקויות."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -745,8 +741,8 @@ msgstr "שנה גודל"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
 msgstr "לחשבונך אין רשות להעביר את כל הקבצים ו/או התיקיות הבחורים."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
@@ -757,8 +753,7 @@ msgstr "אין קבצים ו/או תיקיות זמינים להעברה."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"הקבצים ו/או התיקיות הבאים יועברו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
+msgstr "הקבצים ו/או התיקיות הבאים יועברו לתיקיית יעד (תוך שמירה על מבנה העץ שלהם):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -783,9 +778,7 @@ msgstr "אין קבצים זמינים לשינוי שמם."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"הקבצים הבאים ישונו שמותיהם (הם יישארו בתיקיות הנוכחיות שלהם ושמם המקורי "
-"יישאר - רק שמות התצוגה שלהם ישונו):"
+msgstr "הקבצים הבאים ישונו שמותיהם (הם יישארו בתיקיות הנוכחיות שלהם ושמם המקורי יישאר - רק שמות התצוגה שלהם ישונו):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -944,11 +937,13 @@ msgstr "מאופשר"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -1010,10 +1005,12 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1081,6 +1078,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:101
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1136,6 +1134,7 @@ msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 

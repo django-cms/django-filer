@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-3.0.0rc2
+3.0.0 (2023-07-05)
 ==================
 
 * Add validation framework to prevent XSS attacks using HTML or SVG files (see docs)
@@ -16,6 +16,7 @@ CHANGELOG
 * Fix several CSS quirks
 * Fix folder widget
 * Remove unused css from delete confirmation view and move file view
+* Update translations (de/fr/nl)
 
 2.2.5 (2023-06-11)
 ==================
