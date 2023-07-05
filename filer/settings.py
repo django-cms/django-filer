@@ -281,6 +281,8 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
 }
 
 DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
+IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],

@@ -10,6 +10,14 @@ The easiest way to get ``django-filer`` is simply install it with `pip`_::
 
     $ pip install django-filer
 
+Optional heic support
+---------------------
+
+Currently, django-filer supports upload of heif images (``*.heic``, such as
+retrieved from iOS devices by airdrop) using an optional dependency::
+
+    $ pip install django-filer\[heif\]
+
 
 Dependencies
 ------------
@@ -30,6 +38,11 @@ check `Pillow doc`_.
 * for `Django`_ >=2.2 use `django-polymorphic`_ >=2.0
 * for `Django`_ >=3.0 use `django-polymorphic`_ >=2.1
 * for `Django`_ >=3.1 use `django-polymorphic`_ >=3.0
+
+If heif support is chosen, django-filer also installs
+
+* pillow-heif
+
 
 Configuration
 -------------
