@@ -9,7 +9,7 @@ class FilerConfig(AppConfig):
     verbose_name = _("Filer")
 
     def register_optional_heif_supprt(self):
-        try:
+        try:  # pragma:  no cover
             from pillow_heif import register_heif_opener
 
             from .settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
