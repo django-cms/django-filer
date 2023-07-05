@@ -11,6 +11,7 @@ class FilerConfig(AppConfig):
     def register_optional_heif_supprt(self):
         try:
             from pillow_heif import register_heif_opener
+
             from .settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
 
             register_heif_opener()
