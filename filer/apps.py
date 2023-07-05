@@ -8,7 +8,19 @@ class FilerConfig(AppConfig):
     name = 'filer'
     verbose_name = _("Filer")
 
-    def ready(self):
+    def register_optional_heif_supprt(self):
+        try:
+            from pillow_heif import register_heif_opener
+            from .settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
+
+            register_heif_opener()
+            IMAGE_EXTENSIONS += [".heic", ".heics", ".heif", ".heifs", ".hif"]
+            IMAGE_MIME_TYPES.append("heic")
+        except (ModuleNotFoundError, ImportError):
+            # No heif support installed
+            pass
+
+    def resolve_validators(self):
         """Resolve dotted path file validators"""
 
         import importlib
@@ -37,3 +49,7 @@ class FilerConfig(AppConfig):
                     except (ImportError, ModuleNotFoundError, AttributeError):
                         raise ImproperlyConfigured(f"""filer: could not import validator "{item}".""")
             self.FILE_VALIDATORS[mime_type] = functions
+
+    def ready(self):
+        self.resolve_validators()
+        self.register_optional_heif_supprt()

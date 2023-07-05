@@ -83,9 +83,9 @@ class BaseImage(File):
     @classmethod
     def matches_file_type(cls, iname, ifile, mime_type):
         # source: https://www.freeformatter.com/mime-types-list.html
-        image_subtypes = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
+        from ..settings import IMAGE_MIME_TYPES
         maintype, subtype = mime_type.split('/')
-        return maintype == 'image' and subtype in image_subtypes
+        return maintype == 'image' and subtype in IMAGE_MIME_TYPES
 
     def file_data_changed(self, post_init=False):
         attrs_updated = super().file_data_changed(post_init=post_init)

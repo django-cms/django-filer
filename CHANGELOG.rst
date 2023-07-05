@@ -10,6 +10,8 @@ CHANGELOG
 * Add an edit button to the file widget which opens edit file pop-up
 * Refactored directory list view for significant performance increases
 * Remove thumbnail generation from the directory list view request response cycle
+* Support for upload of webp images
+* Optional support for upload of heif images
 * Add Django 4.2 support
 * Add thumbnail view for faster visual management of image libraries
 * Fix File.objects.only() query required for deleting user who own files.
