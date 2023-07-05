@@ -11,6 +11,13 @@ REQUIREMENTS = [
 ]
 
 
+EXTRA_REQUIREMENTS = {
+    "heif": [
+        "pillow-heif",
+    ],
+}
+
+
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
@@ -61,6 +68,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,
+    extras_require=EXTRA_REQUIREMENTS,
     python_requires='>=3.8',
     classifiers=CLASSIFIERS,
     test_suite='tests.settings.run',

@@ -25,11 +25,12 @@ class FileImporter:
         """
         Create a File or an Image into the given folder
         """
+        from ...settings import IMAGE_EXTENSIONS
         try:
             iext = os.path.splitext(file_obj.name)[1].lower()
         except:  # noqa
             iext = ''
-        if iext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+        if iext in IMAGE_EXTENSIONS:
             obj, created = Image.objects.get_or_create(
                 original_filename=file_obj.name,
                 file=file_obj,
