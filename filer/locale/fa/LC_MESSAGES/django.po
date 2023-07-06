@@ -1,26 +1,28 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
+# Fariman Ghaedi <farimanghaedi@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-28 19:25+0200\n"
-"PO-Revision-Date: 2018-04-09 06:58+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Persian (http://www.transifex.com/divio/django-filer/language/"
-"fa/)\n"
-"Language: fa\n"
+"PO-Revision-Date: 2012-07-13 15:50+0000\n"
+"Last-Translator: Fariman Ghaedi <farimanghaedi@gmail.com>, 2019\n"
+"Language-Team: Persian (http://app.transifex.com/divio/django-filer/language/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -29,28 +31,30 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:45
 msgid "Advanced"
-msgstr ""
+msgstr "پیشرفته"
 
 #: admin/fileadmin.py:160
 msgid "canonical URL"
-msgstr ""
+msgstr "آدرس کانونی"
 
 #: admin/folderadmin.py:399 admin/folderadmin.py:570
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
+msgstr "برای اینکه بتوانید روی آیتم ها اقداماتی انجام دهید ابتدا باید آیتم ها را انتخاب کنید. هیچ آیتمی تغییر نکرد."
 
 #: admin/folderadmin.py:422
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
+msgstr[1] ""
 
 #: admin/folderadmin.py:448
 #, python-format
@@ -64,7 +68,7 @@ msgstr ""
 
 #: admin/folderadmin.py:600
 msgid "No action selected."
-msgstr ""
+msgstr "هیچ اقدامی انتخاب نشده است."
 
 #: admin/folderadmin.py:652
 #, python-format
@@ -73,7 +77,7 @@ msgstr ""
 
 #: admin/folderadmin.py:657
 msgid "Move selected files to clipboard"
-msgstr ""
+msgstr "انتقال فایل های انتخاب شده به کلیپ برد"
 
 #: admin/folderadmin.py:697
 #, python-format
@@ -104,15 +108,15 @@ msgstr ""
 
 #: admin/folderadmin.py:784
 msgid "Are you sure?"
-msgstr ""
+msgstr "آیا مطمئن هستید؟"
 
 #: admin/folderadmin.py:790
 msgid "Delete files and/or folders"
-msgstr ""
+msgstr "پاک کردن فایل ها و/یا پوشه ها"
 
 #: admin/folderadmin.py:811
 msgid "Delete selected files and/or folders"
-msgstr ""
+msgstr "پاک کردن فایل ها و/یا پوشه های انتخاب شده"
 
 #: admin/folderadmin.py:918
 #, python-format
@@ -442,6 +446,7 @@ msgid "folder permissions"
 msgstr ""
 
 #: models/foldermodels.py:359
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -460,6 +465,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:374
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -472,6 +478,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:389
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -528,6 +535,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -656,8 +664,8 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -732,8 +740,8 @@ msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
 msgstr ""
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
@@ -871,6 +879,7 @@ msgstr ""
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
 msgstr[0] ""
+msgstr[1] ""
 
 #: templates/admin/filer/folder/directory_table_list.html:77
 #: templates/admin/filer/tools/search_form.html:6
@@ -878,6 +887,7 @@ msgstr[0] ""
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
 msgstr[0] ""
+msgstr[1] ""
 
 #: templates/admin/filer/folder/directory_table_list.html:83
 msgid "Change folder details"
@@ -922,11 +932,13 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -988,10 +1000,12 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1008,6 +1022,7 @@ msgstr ""
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
+msgstr[1] ""
 
 #: templates/admin/filer/folder/new_folder_form.html:30
 msgid "Save"
@@ -1056,6 +1071,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:101
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1111,6 +1127,7 @@ msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1136,6 +1153,36 @@ msgid ""
 "vulnerability"
 msgstr ""
 
+#~ msgid "Open file"
+#~ msgstr "Open file"
+
+#~ msgid "Full size preview"
+#~ msgstr "Full size preview"
+
+#~ msgid "Add Description"
+#~ msgstr "Add Description"
+
+#~ msgid "Author"
+#~ msgstr "Author"
+
+#~ msgid "Add Alt-Text"
+#~ msgstr "Add Alt-Text"
+
+#~ msgid "Add caption"
+#~ msgstr "Add caption"
+
+#~ msgid "Add Tags"
+#~ msgstr "Add Tags"
+
+#~ msgid "Change File"
+#~ msgstr "Change File"
+
+#~ msgid "none selected"
+#~ msgstr "none selected"
+
+#~ msgid "Add Folder"
+#~ msgstr "Add Folder"
+
 #~ msgid "Subject Location"
 #~ msgstr "Subject location"
 
@@ -1146,6 +1193,7 @@ msgstr ""
 #~ "%(counter)s files\n"
 #~ "        "
 #~ msgstr[0] "15c0f2d28d6dab1af1f6d94906beb627_pl_0"
+#~ msgstr[1] "15c0f2d28d6dab1af1f6d94906beb627_pl_1"
 
 #~ msgid "Upload File"
 #~ msgstr "Upload File"
