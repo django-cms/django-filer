@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
+from easy_thumbnails.exceptions import InvalidImageFormatError
 
 from .. import settings
 from ..models import BaseImage, File
@@ -174,10 +175,13 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         if not isinstance(file, BaseImage):
             raise Http404()
 
-        thumbnailer = get_thumbnailer(file)
-        thumbnail_options = ThumbnailOptions({'size': (size, size), "crop": True})
-        thumbnail = thumbnailer.get_thumbnail(thumbnail_options, generate=True)
-        return HttpResponseRedirect(thumbnail.url)
+        try:
+            thumbnailer = get_thumbnailer(file)
+            thumbnail_options = ThumbnailOptions({'size': (size, size), "crop": True})
+            thumbnail = thumbnailer.get_thumbnail(thumbnail_options, generate=True)
+            return HttpResponseRedirect(thumbnail.url)
+        except InvalidImageFormatError:
+            raise Http404
 
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()
