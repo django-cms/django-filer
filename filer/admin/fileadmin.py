@@ -181,7 +181,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             thumbnail = thumbnailer.get_thumbnail(thumbnail_options, generate=True)
             return HttpResponseRedirect(thumbnail.url)
         except InvalidImageFormatError:
-            raise Http404
+            return HttpResponseRedirect(staticfiles_storage.url('filer/icons/file-missing.svg'))
 
 
 FileAdmin.fieldsets = FileAdmin.build_fieldsets()
