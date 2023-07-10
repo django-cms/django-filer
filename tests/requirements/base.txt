@@ -1,5 +1,6 @@
 # requirements from setup.py
 Pillow
+django-app-helper>=3.3.1
 
 # other requirements
 coverage
