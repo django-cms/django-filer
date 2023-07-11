@@ -1,14 +1,14 @@
 import os
 
+import django.core
 from django.apps import apps
 from django.conf import settings
-import django.core
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
-from filer.validation import validate_upload, FileValidationError
+from filer.validation import FileValidationError, validate_upload
 from tests.helpers import create_superuser
 
 

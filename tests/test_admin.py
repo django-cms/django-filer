@@ -21,7 +21,7 @@ from filer.admin.folderadmin import FolderAdmin
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
-from filer.settings import FILER_IMAGE_MODEL
+from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
 from filer.templatetags.filer_admin_tags import file_icon_url
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
@@ -254,9 +254,50 @@ class FilerImageAdminUrlsTests(TestCase):
     def setUp(self):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
+        self.img = create_image()
+        self.image_name = 'test_file.jpg'
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
+        self.img.save(self.filename, 'JPEG')
+        self.file_object = Image.objects.create(
+            file=django.core.files.File(open(self.filename, 'rb'), name=self.image_name)
+        )
 
     def tearDown(self):
         self.client.logout()
+        os.remove(self.filename)
+
+    def test_icon_view_sizes(self):
+        """Tests if redirects are issued for accepted thumbnail sizes and 404 otherwise"""
+        test_set = tuple((size, 302) for size in DEFERRED_THUMBNAIL_SIZES)
+        test_set += (50, 404), (90, 404), (320, 404)
+        for size, expected_status in test_set:
+            url = reverse('admin:filer_file_fileicon', kwargs={
+                'file_id': self.file_object.pk,
+                'size': size,
+            })
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, expected_status)
+            if response.status_code == 302:  # redirect
+                # Redirects to a media file
+                self.assertIn("/media/", response["Location"])
+                # Does not redirect to a static file
+                self.assertNotIn("/static/", response["Location"])
+
+    def test_missing_file(self):
+        image = Image.objects.create(
+            owner=self.superuser,
+            original_filename="some-image.jpg",
+        )
+        url = reverse('admin:filer_file_fileicon', kwargs={
+            'file_id': image.pk,
+            'size': 80,
+        })
+        # Make file unaccessible
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("icons/file-missing.svg", response["Location"])
 
 
 class FilerClipboardAdminUrlsTests(TestCase):
