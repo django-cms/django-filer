@@ -258,8 +258,8 @@ class FilerImageAdminUrlsTests(TestCase):
         self.image_name = 'test_file.jpg'
         self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
         self.img.save(self.filename, 'JPEG')
-        with django.core.files.File(open(self.filename, 'rb'), name=self.image_name) as upload:
-            self.file_object = Image.objects.create(file=upload)
+        with open(self.filename, 'rb') as upload:
+            self.file_object = Image.objects.create(file=django.core.files.File(upload, name=self.image_name))
 
     def tearDown(self):
         self.client.logout()
