@@ -1,6 +1,6 @@
 # requirements from setup.py
 Pillow
-
+pillow-heif
 # other requirements
 coverage
 isort
