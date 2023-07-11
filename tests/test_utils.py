@@ -68,6 +68,7 @@ class ZippingTestCase(TestCase):
 
 class MimeTypesTestCase(TestCase):
     def test_mime_types_known(self):
+        """Ensure that for all IMAGE_EXTENSIONS the mime types can be identified"""
         for ext in IMAGE_EXTENSIONS:
             self.assertIsNotNone(mimetypes.guess_type(f"file{ext}")[0],
                                  f"Mime type for extension {ext} unknown")
