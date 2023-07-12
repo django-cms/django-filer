@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+unreleased
+==================
+
+* Fix a bug that creates a server error when requesting a thumbnail from an
+  invalid or missing file
+* Fix a bug that on some systems webp images were not recognized
+* Add missing css map files
+
 3.0.0 (2023-07-05)
 ==================
 
