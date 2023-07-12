@@ -26,7 +26,7 @@ class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
     # overwrite_files = forms.BooleanField(required=False, help_text=_("Overwrite a file if there already exists a file with the same filename?"))
 
     def clean_suffix(self):
-        valid = get_valid_filename(self.cleaned_data['suffix'])
+        valid = get_valid_filename(self.cleaned_data['suffix']) if self.cleaned_data['suffix'] else ""
         if valid != self.cleaned_data['suffix']:
             raise forms.ValidationError(_('Suffix should be a valid, simple and lowercase filename part, like "%(valid)s".') % {'valid': valid})
         return self.cleaned_data['suffix']
