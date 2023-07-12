@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-unreleased
+3.0.1 (2023-07-13)
 ==================
 
 * Fix a bug that creates a server error when requesting a thumbnail from an
