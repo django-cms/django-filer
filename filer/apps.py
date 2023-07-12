@@ -1,3 +1,5 @@
+import mimetypes
+
 from django.apps import AppConfig
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
@@ -14,8 +16,14 @@ class FilerConfig(AppConfig):
 
             from .settings import IMAGE_EXTENSIONS, IMAGE_MIME_TYPES
 
+            # Register with easy_thumbnails
             register_heif_opener()
-            IMAGE_EXTENSIONS += [".heic", ".heics", ".heif", ".heifs", ".hif"]
+            HEIF_EXTENSIONS = [".heic", ".heics", ".heif", ".heifs", ".hif"]
+            # Add extensions to python mimetypes which filer uses
+            for ext in HEIF_EXTENSIONS:
+                mimetypes.add_type("image/heic", ext)
+            # Mark them as images
+            IMAGE_EXTENSIONS += HEIF_EXTENSIONS
             IMAGE_MIME_TYPES.append("heic")
         except (ModuleNotFoundError, ImportError):
             # No heif support installed
@@ -52,5 +60,8 @@ class FilerConfig(AppConfig):
             self.FILE_VALIDATORS[mime_type] = functions
 
     def ready(self):
+        # Make webp mime type known to python (needed for python < 3.11)
+        mimetypes.add_type("image/webp", ".webp")
+        #
         self.resolve_validators()
         self.register_optional_heif_supprt()
