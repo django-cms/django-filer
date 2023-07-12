@@ -2,4 +2,3 @@
 
 django>=3.0,<3.1
 django_polymorphic>=2.1,<2.2
-django-app-helper

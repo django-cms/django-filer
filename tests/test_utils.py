@@ -1,3 +1,4 @@
+import mimetypes
 import os
 from zipfile import ZipFile
 
@@ -5,6 +6,7 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
+from filer.settings import IMAGE_EXTENSIONS
 from filer.utils.loader import load_object
 from filer.utils.zip import unzip
 from tests.helpers import create_image
@@ -62,3 +64,11 @@ class ZippingTestCase(TestCase):
     def test_unzipping_works(self):
         result = unzip(self.zipfilename)
         self.assertEqual(result[0][0].name, self.file.name)
+
+
+class MimeTypesTestCase(TestCase):
+    def test_mime_types_known(self):
+        """Ensure that for all IMAGE_EXTENSIONS the mime types can be identified"""
+        for ext in IMAGE_EXTENSIONS:
+            self.assertIsNotNone(mimetypes.guess_type(f"file{ext}")[0],
+                                 f"Mime type for extension {ext} unknown")
