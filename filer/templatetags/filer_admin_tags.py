@@ -9,6 +9,7 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
@@ -137,11 +138,18 @@ def file_icon_context(file, detail, width, height):
                     icon_url = reverse("admin:filer_file_fileicon", args=(file.pk, width))
                 context['alt_text'] = file.default_alt_text
             else:
-                icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
-                context['alt_text'] = file.default_alt_text
-                if mime_subtype != 'svg+xml':
-                    thumbnail_options['size'] = 2 * width, 2 * height
-                    context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
+                try:
+                    icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
+                except InvalidImageFormatError:
+                    icon_url = staticfiles_storage.url('filer/icons/file-missing.svg')
+                    context['alt_text'] = file.default_alt_text
+                    if mime_subtype != 'svg+xml':
+                        thumbnail_options['size'] = 2 * width, 2 * height
+                        try:
+                            context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
+                        except InvalidImageFormatError:
+                            context['highres_url'] = staticfiles_storage.url('filer/icons/file-missing.svg')
+
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_maintype}.svg')
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
