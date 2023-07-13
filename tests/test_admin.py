@@ -266,7 +266,7 @@ class FilerImageAdminUrlsTests(TestCase):
         os.remove(self.filename)
 
     def test_icon_view_sizes(self):
-        """Tests if redirects are issued for accepted thumbnail sizes and 404 otherwise"""
+        """Redirects are issued for accepted thumbnail sizes and 404 otherwise"""
         test_set = tuple((size, 302) for size in DEFERRED_THUMBNAIL_SIZES)
         test_set += (50, 404), (90, 404), (320, 404)
         for size, expected_status in test_set:
@@ -283,6 +283,7 @@ class FilerImageAdminUrlsTests(TestCase):
                 self.assertNotIn("/static/", response["Location"])
 
     def test_missing_file(self):
+        """Directory shows static icon for missing files"""
         image = Image.objects.create(
             owner=self.superuser,
             original_filename="some-image.jpg",
@@ -291,12 +292,32 @@ class FilerImageAdminUrlsTests(TestCase):
             'file_id': image.pk,
             'size': 80,
         })
-        # Make file unaccessible
 
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("icons/file-missing.svg", response["Location"])
+
+    def test_detail_view_missing_file(self):
+        """Detail view shows static icon for missing file"""
+        image = Image.objects.create(
+            owner=self.superuser,
+            original_filename="some-image.jpg",
+        )
+        image._width = 50
+        image._height = 200
+        image.save()
+
+        url = reverse('admin:filer_image_change', kwargs={
+            'object_id': image.pk,
+        })
+
+        response = self.client.get(url)
+
+        self.assertContains(response, "icons/file-missing.svg")
+        self.assertContains(response, 'width="210"')
+        self.assertContains(response, 'height="210"')
+        self.assertContains(response, 'alt="File is missing"')
 
 
 class FilerClipboardAdminUrlsTests(TestCase):
