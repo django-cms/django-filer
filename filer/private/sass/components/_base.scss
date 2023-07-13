@@ -116,9 +116,10 @@ body {
     padding: 20px 0 0;
 }
 
-.delete-confirmation form .cancel-link {
+form .cancel-link {
     height: auto !important;
     line-height: inherit !important;
+    padding: 10px 15px;
 }
 
 .sr-only {
