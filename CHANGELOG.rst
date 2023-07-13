@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+
+3.0.2 (2023-07-14)
+==================
+
+* Fix another crash in thumbnailing when the image is missing from the storage
+  source but has a reference in the database.
+
+
 3.0.1 (2023-07-13)
 ==================
 
