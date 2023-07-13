@@ -298,6 +298,21 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("icons/file-missing.svg", response["Location"])
 
+    def test_icon_view_non_image(self):
+        """Getting an icon for a non-image results in a 404"""
+        file = File.objects.create(
+            owner=self.superuser,
+            original_filename="some-file.xyz",
+        )
+        url = reverse('admin:filer_file_fileicon', kwargs={
+            'file_id': file.pk,
+            'size': 80,
+        })
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
     def test_detail_view_missing_file(self):
         """Detail view shows static icon for missing file"""
         image = Image.objects.create(
