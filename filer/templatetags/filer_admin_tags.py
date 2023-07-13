@@ -9,6 +9,7 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
 
@@ -94,21 +95,28 @@ def filer_has_permission(context, item, action):
 
 
 def file_icon_context(file, detail, width, height):
-    # Only check on FileSystemStorage if file exists for performance reasons
-    if isinstance(default_storage, FileSystemStorage) and not file.file.exists():
-        return {
-            'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
-            'alt_text': _("File is missing"),
-            'width': width,
-            'height': height,
-        }
     mime_maintype, mime_subtype = file.mime_maintype, file.mime_subtype
     context = {
         'mime_maintype': mime_maintype,
         'mime_type': file.mime_type,
     }
+    # Get download_url and aspect ratio right for detail view
     if detail:
         context['download_url'] = file.url
+        if file.width:
+            width, height = 210, ceil(210 / file.width * file.height)
+            context['sidebar_image_ratio'] = file.width / 210
+    # returned context if icon is not available
+    not_available_context = {
+        'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
+        'alt_text': _("File is missing"),
+        'width': width,
+        'height': width,  # The icon is a square
+    }
+    # Check if file exists for performance reasons (only on FileSystemStorage)
+    if isinstance(default_storage, FileSystemStorage) and file.file and not file.file.exists():
+        return not_available_context
+
     if isinstance(file, BaseImage):
         thumbnailer = get_thumbnailer(file)
 
@@ -118,14 +126,12 @@ def file_icon_context(file, detail, width, height):
             icon_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
         else:
             if detail:
-                width, height = 210, ceil(210 / file.width * file.height)
-                context['sidebar_image_ratio'] = file.width / 210
                 opts = {'size': (width, height), 'upscale': True}
             else:
                 opts = {'size': (width, height), 'crop': True}
             thumbnail_options = ThumbnailOptions(opts)
             # Optimize directory listing:
-            if not detail and width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
+            if width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
                 # Get name of thumbnail from easy-thumbnail
                 configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=file._transparent)
                 # If the name was annotated: Thumbnail exists and we can use it
@@ -137,17 +143,27 @@ def file_icon_context(file, detail, width, height):
                     icon_url = reverse("admin:filer_file_fileicon", args=(file.pk, width))
                 context['alt_text'] = file.default_alt_text
             else:
-                icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
-                context['alt_text'] = file.default_alt_text
-                if mime_subtype != 'svg+xml':
-                    thumbnail_options['size'] = 2 * width, 2 * height
-                    context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
+                # Try creating thumbnails / take existing ones
+                try:
+                    icon_url = thumbnailer.get_thumbnail(thumbnail_options).url
+                    context['alt_text'] = file.default_alt_text
+                    if mime_subtype != 'svg+xml':
+                        thumbnail_options['size'] = 2 * width, 2 * height
+                        context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
+                except (InvalidImageFormatError, ):
+                    # This is caught by file.exists() for file storage systems
+                    # For remote storage systems we catch the error to avoid second trip
+                    # to the storage system
+                    return not_available_context
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_maintype}.svg')
+        height = width  # icon is a square
     elif mime_maintype == 'application' and mime_subtype in ['zip', 'pdf']:
         icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_subtype}.svg')
+        height = width  # icon is a square
     else:
         icon_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
+        height = width  # icon is a square
     context.update(width=width, height=height, icon_url=icon_url)
     return context
 
