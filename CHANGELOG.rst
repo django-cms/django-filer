@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+3.0.2 (2023-07-14)
+==================
+
+* Fix another bug when the the thumbnailer in admin tags crashes because of
+  invalid or missing file
+
+
 3.0.1 (2023-07-13)
 ==================
 
