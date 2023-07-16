@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* Ensure action buttons in directory listing do not get disabled after using
+  cancel or back button if files or folders are selected.
+
 3.0.1 (2023-07-13)
 ==================
 
