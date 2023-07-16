@@ -2,12 +2,13 @@
 CHANGELOG
 =========
 
-3.0.2 (2023-07-14)
+Unreleased
 ==================
 
 * Fix another bug when the the thumbnailer in admin tags crashes because of
   invalid or missing file
-
+* Ensure action buttons in directory listing do not get disabled after using
+  cancel or back button if files or folders are selected.
 
 3.0.1 (2023-07-13)
 ==================
