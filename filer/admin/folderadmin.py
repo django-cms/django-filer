@@ -1076,7 +1076,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         old_folder = Folder.objects.get(pk=folder.pk)
 
-        new_folder = Folder.objects.create(
+        folder, _ = Folder.objects.get_or_create(
             name=foldername,
             owner=old_folder.owner,
             parent=destination,
@@ -1085,10 +1085,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         for perm in FolderPermission.objects.filter(folder=old_folder):
             perm.pk = None
             perm.id = None
-            perm.folder = new_folder
+            perm.folder = folder
             perm.save()
 
-        return 1 + self._copy_files_and_folders_impl(old_folder.files.all(), old_folder.children.all(), new_folder, suffix, overwrite)
+        return 1 + self._copy_files_and_folders_impl(old_folder.files.all(), old_folder.children.all(), folder, suffix, overwrite)
 
     def _copy_files_and_folders_impl(self, files_queryset, folders_queryset, destination, suffix, overwrite):
         n = self._copy_files(files_queryset, destination, suffix, overwrite)
