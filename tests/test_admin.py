@@ -894,6 +894,30 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         dst_image_obj = self.dst_folder.files[0]
         self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
 
+    def test_copy_folder_action(self):
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+        self.assertEqual(self.dst_folder.children.count(), 0)
+        self.assertEqual(self.image_obj.original_filename, 'test_file.jpg')
+        url = reverse('admin:filer-directory_listing-root')
+        response = self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': 'test',
+            'destination': self.dst_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'folder-%d' % (self.src_folder.id,),
+        })
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(self.src_folder.files.count(), 1)
+        self.assertEqual(self.dst_folder.files.count(), 0)
+        self.assertEqual(self.dst_folder.children.count(), 1)
+        copied_dir = self.dst_folder.children.first()
+        dst_image_obj = copied_dir.files[0]
+        self.assertEqual(copied_dir.name, self.src_folder.name)
+        self.assertEqual(copied_dir.files.count(), 1)
+        self.assertEqual(dst_image_obj.original_filename, 'test_filetest.jpg')
+
     def _do_test_rename(self, url, new_name, file_obj=None, folder_obj=None):
         """
         Helper to submit rename form and check renaming result.
