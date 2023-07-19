@@ -103,9 +103,13 @@ def file_icon_context(file, detail, width, height):
     # Get download_url and aspect ratio right for detail view
     if detail:
         context['download_url'] = file.url
-        if file.width:
-            width, height = 210, ceil(210 / file.width * file.height)
-            context['sidebar_image_ratio'] = file.width / 210
+        if isinstance(file, BaseImage):
+            # only check for file width, if the file
+            # is actually an image and not on other files
+            # because they don't really have width or height
+            if file.width:
+                width, height = 210, ceil(210 / file.width * file.height)
+                context['sidebar_image_ratio'] = file.width / 210
     # returned context if icon is not available
     not_available_context = {
         'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
