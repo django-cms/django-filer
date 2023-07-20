@@ -22,7 +22,8 @@ from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
 from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
-from filer.templatetags.filer_admin_tags import file_icon_url
+from filer.templatetags.filer_admin_tags import file_icon_url, get_aspect_ratio_and_download_url
+
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
@@ -1678,3 +1679,29 @@ class AdminToolsTests(TestCase):
         })
         request = request_factory.get('/', {'_pick': 'bad_type'})
         self.assertDictEqual(tools.admin_url_params(request), {})
+
+
+class FileIconContextTests(TestCase):
+
+    def test_image_icon_with_size(self):
+        """
+        Image with get an aspect ratio and will be present in context
+        """
+        image = Image.objects.create(name='test.jpg')
+        image._width = 50
+        image._height = 200
+        image.save()
+        context = {}
+        height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=image, height=40, width=40)
+        assert 'sidebar_image_ratio' in context.keys()
+        assert 'download_url' in context.keys()
+
+    def test_file_icon_with_size(self):
+        """
+        File with not get an aspect ratio and will not be present in context
+        """
+        file = File.objects.create(name='test.pdf')
+        context = {}
+        height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=file, height=40, width=40)
+        assert 'sidebar_image_ratio' not in context.keys()
+        assert 'download_url' in context.keys()
