@@ -100,12 +100,7 @@ def file_icon_context(file, detail, width, height):
         'mime_maintype': mime_maintype,
         'mime_type': file.mime_type,
     }
-    # Get download_url and aspect ratio right for detail view
-    if detail:
-        context['download_url'] = file.url
-        if file.width:
-            width, height = 210, ceil(210 / file.width * file.height)
-            context['sidebar_image_ratio'] = file.width / 210
+    height, width, context = get_aspect_ratio_and_download_url(context, detail, file, height, width)
     # returned context if icon is not available
     not_available_context = {
         'icon_url': staticfiles_storage.url('filer/icons/file-missing.svg'),
@@ -166,6 +161,20 @@ def file_icon_context(file, detail, width, height):
         height = width  # icon is a square
     context.update(width=width, height=height, icon_url=icon_url)
     return context
+
+
+def get_aspect_ratio_and_download_url(context, detail, file, height, width):
+    # Get download_url and aspect ratio right for detail view
+    if detail:
+        context['download_url'] = file.url
+        if isinstance(file, BaseImage):
+            # only check for file width, if the file
+            # is actually an image and not on other files
+            # because they don't really have width or height
+            if file.width:
+                width, height = 210, ceil(210 / file.width * file.height)
+                context['sidebar_image_ratio'] = file.width / 210
+    return height, width, context
 
 
 @register.inclusion_tag('admin/filer/templatetags/file_icon.html')
