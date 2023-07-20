@@ -1076,11 +1076,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         old_folder = Folder.objects.get(pk=folder.pk)
 
-        # Due to how inheritance works, we have to set both pk and id to None
-        folder.pk = None
-        folder.id = None
-        folder.name = foldername
-        folder.insert_at(destination, 'last-child', True)  # We save folder here
+        folder, _ = Folder.objects.get_or_create(
+            name=foldername,
+            owner=old_folder.owner,
+            parent=destination,
+        )
 
         for perm in FolderPermission.objects.filter(folder=old_folder):
             perm.pk = None

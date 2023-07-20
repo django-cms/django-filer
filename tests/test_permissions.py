@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.contrib.admin import helpers
 from django.contrib.auth.models import Group, Permission
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
@@ -380,3 +381,33 @@ class FolderPermissionsTestCase(TestCase):
     def test_folder_who_nobody(self):
         perm = FolderPermission.objects.create()
         self.assertEqual(perm.who, "–")
+
+    def test_folderpermission_is_copied(self):
+        source_folder = Folder.objects.create(name="source")
+        destination_folder = Folder.objects.create(name="destination")
+        perm = FolderPermission.objects.create(
+            user=self.owner,
+            folder=source_folder,
+            type=FolderPermission.CHILDREN,
+            can_edit=FolderPermission.ALLOW,
+            can_read=FolderPermission.DENY,
+            can_add_children=FolderPermission.ALLOW,
+        )
+        self.assertEqual(FolderPermission.objects.count(), 1)
+        url = reverse('admin:filer-directory_listing-root')
+        self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': 'test',
+            'destination': destination_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'folder-%d' % (source_folder.id,),
+        })
+        self.assertEqual(FolderPermission.objects.count(), 2)
+        copied_folder = destination_folder.children.first()
+        self.assertEqual(copied_folder.name, source_folder.name)
+        new_perm = FolderPermission.objects.get(folder=copied_folder)
+        self.assertEqual(perm.user, new_perm.user)
+        self.assertEqual(perm.type, new_perm.type)
+        self.assertEqual(perm.can_edit, new_perm.can_edit)
+        self.assertEqual(perm.can_read, new_perm.can_read)
+        self.assertEqual(perm.can_add_children, new_perm.can_add_children)
