@@ -1669,7 +1669,6 @@ class FileIconContextTests(TestCase):
         image.save()
         context = {}
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=image, height=40, width=40)
-        print(height, width, context)
         assert 'sidebar_image_ratio' in context.keys()
         assert 'download_url' in context.keys()
 
