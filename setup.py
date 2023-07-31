@@ -5,7 +5,7 @@ from filer import __version__
 
 
 REQUIREMENTS = [
-    'django>=2.2,<5',
+    'django>=3.2,<5',
     'django-polymorphic',
     'easy-thumbnails[svg]',
 ]
