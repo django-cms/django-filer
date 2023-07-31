@@ -345,13 +345,13 @@ class FolderPermission(models.Model):
 
     def clean(self):
         if self.type == self.ALL and self.folder:
-            raise ValidationError('Folder cannot be selected with type "all items".')
+            raise ValidationError(_('Folder cannot be selected with type "all items".'))
         if self.type != self.ALL and not self.folder:
-            raise ValidationError('Folder has to be selected when type is not "all items".')
+            raise ValidationError(_('Folder has to be selected when type is not "all items".'))
         if self.everybody and (self.user or self.group):
-            raise ValidationError('User or group cannot be selected together with "everybody".')
+            raise ValidationError(_('User or group cannot be selected together with "everybody".'))
         if not self.user and not self.group and not self.everybody:
-            raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
+            raise ValidationError(_('At least one of user, group, or "everybody" has to be selected.'))
 
     @cached_property
     def pretty_logical_path(self):
