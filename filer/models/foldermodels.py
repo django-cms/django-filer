@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.html import format_html, format_html_join
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from .. import settings as filer_settings
 from . import mixins
@@ -356,7 +356,7 @@ class FolderPermission(models.Model):
     def pretty_logical_path(self):
         if self.folder:
             return self.folder.pretty_logical_path
-        return _("All Folders")
+        return gettext("All Folders")
 
     pretty_logical_path.short_description = _("Logical Path")
 
