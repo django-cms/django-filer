@@ -5,10 +5,12 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import path, reverse
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.models import Thumbnail as EasyThumbnail
 from easy_thumbnails.options import ThumbnailOptions
 
 from .. import settings
@@ -180,6 +182,8 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             thumbnailer = get_thumbnailer(file)
             thumbnail_options = ThumbnailOptions({'size': (size, size), "crop": True})
             thumbnail = thumbnailer.get_thumbnail(thumbnail_options, generate=True)
+            # Touch thumbnail to allow it to be prefetched for directory listing
+            EasyThumbnail.objects.filter(name=thumbnail.name).update(modified=now())
             return HttpResponseRedirect(thumbnail.url)
         except InvalidImageFormatError:
             return HttpResponseRedirect(staticfiles_storage.url('filer/icons/file-missing.svg'))
