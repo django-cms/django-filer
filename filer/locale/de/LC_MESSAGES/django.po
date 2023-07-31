@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 19:25+0200\n"
+"POT-Creation-Date: 2023-07-31 22:21+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
 "Language-Team: German (http://app.transifex.com/divio/django-filer/language/de/)\n"
@@ -41,11 +41,11 @@ msgid ""
 "Can't use this folder, Permission Denied. Please select another folder."
 msgstr "Zugriff auf diesen Ordner verweigert. Bitte wähle einen anderen Ordner."
 
-#: admin/fileadmin.py:45
+#: admin/fileadmin.py:47
 msgid "Advanced"
 msgstr "Fortgeschritten"
 
-#: admin/fileadmin.py:160
+#: admin/fileadmin.py:162
 msgid "canonical URL"
 msgstr "Kanonische URL"
 
@@ -252,11 +252,11 @@ msgstr "Angegebene Position des Hauptinhalts liegt außerhalb des Bildes."
 msgid "Your input: \"{subject_location}\". "
 msgstr "Deine Eingabe: \"{subject_location}\". "
 
-#: admin/permissionadmin.py:10 models/foldermodels.py:379
+#: admin/permissionadmin.py:10 models/foldermodels.py:380
 msgid "Who"
 msgstr "Wer"
 
-#: admin/permissionadmin.py:11 models/foldermodels.py:400
+#: admin/permissionadmin.py:11 models/foldermodels.py:401
 msgid "What"
 msgstr "Was"
 
@@ -264,7 +264,7 @@ msgstr "Was"
 msgid "Folder with this name already exists."
 msgstr "Dieser Ordnername wird bereits verwendet."
 
-#: apps.py:9 templates/admin/filer/breadcrumbs.html:5
+#: apps.py:11 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/directory_listing.html:33
 msgid "Filer"
@@ -294,7 +294,7 @@ msgstr "Bild"
 msgid "images"
 msgstr "Bilder"
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:288
+#: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
 msgstr "Benutzer"
 
@@ -324,7 +324,7 @@ msgid "clipboard items"
 msgstr "Einträge der Zwischenablage"
 
 #: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:104
+#: templates/admin/filer/folder/directory_listing.html:102
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
@@ -347,7 +347,7 @@ msgstr "hat alle Pflichtinhalte"
 msgid "original filename"
 msgstr "ursprünglicher Dateiname"
 
-#: models/filemodels.py:110 models/foldermodels.py:101
+#: models/filemodels.py:110 models/foldermodels.py:102
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
 msgstr "Name"
@@ -356,15 +356,15 @@ msgstr "Name"
 msgid "description"
 msgstr "Beschreibung"
 
-#: models/filemodels.py:125 models/foldermodels.py:107
+#: models/filemodels.py:125 models/foldermodels.py:108
 msgid "owner"
 msgstr "Besitzer"
 
-#: models/filemodels.py:129 models/foldermodels.py:115
+#: models/filemodels.py:129 models/foldermodels.py:116
 msgid "uploaded at"
 msgstr "Hochgeladen am"
 
-#: models/filemodels.py:134 models/foldermodels.py:125
+#: models/filemodels.py:134 models/foldermodels.py:126
 msgid "modified at"
 msgstr "Verändert am"
 
@@ -378,112 +378,129 @@ msgid ""
 "accessible to anyone."
 msgstr "Zugriffskontrolle für diese Datei deaktivieren. Die Datei wird für jeden öffentlich zugreifbar sein."
 
-#: models/foldermodels.py:93
+#: models/foldermodels.py:94
 msgid "parent"
 msgstr "Übergeordneter Ordner"
 
-#: models/foldermodels.py:120
+#: models/foldermodels.py:121
 msgid "created at"
 msgstr "Angelegt am"
 
-#: models/foldermodels.py:135
+#: models/foldermodels.py:136 templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
 msgid "Folder"
 msgstr "Ordner"
 
-#: models/foldermodels.py:136
+#: models/foldermodels.py:137
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Ordner"
 
-#: models/foldermodels.py:259
+#: models/foldermodels.py:260
 msgid "all items"
 msgstr "alle Einträge"
 
-#: models/foldermodels.py:260
+#: models/foldermodels.py:261
 msgid "this item only"
 msgstr "nur dieser Eintrag"
 
-#: models/foldermodels.py:261
+#: models/foldermodels.py:262
 msgid "this item and all children"
 msgstr "dieser Eintrag und alle darunter liegenden Einträge"
 
-#: models/foldermodels.py:265
+#: models/foldermodels.py:266
 msgid "inherit"
 msgstr "vererben"
 
-#: models/foldermodels.py:266
+#: models/foldermodels.py:267
 msgid "allow"
 msgstr "erlauben"
 
-#: models/foldermodels.py:267
+#: models/foldermodels.py:268
 msgid "deny"
 msgstr "verbieten"
 
-#: models/foldermodels.py:279
+#: models/foldermodels.py:280
 msgid "type"
 msgstr "Typ"
 
-#: models/foldermodels.py:296
+#: models/foldermodels.py:297
 msgid "group"
 msgstr "Gruppe"
 
-#: models/foldermodels.py:303
+#: models/foldermodels.py:304
 msgid "everybody"
 msgstr "Jeder"
 
-#: models/foldermodels.py:308
+#: models/foldermodels.py:309
 msgid "can read"
 msgstr "kann lesen"
 
-#: models/foldermodels.py:316
+#: models/foldermodels.py:317
 msgid "can edit"
 msgstr "kann ändern"
 
-#: models/foldermodels.py:324
+#: models/foldermodels.py:325
 msgid "can add children"
 msgstr "kann Kinder hinzufügen"
 
-#: models/foldermodels.py:332
+#: models/foldermodels.py:333
 msgid "folder permission"
 msgstr "Ordnerberechtigung"
 
-#: models/foldermodels.py:333
+#: models/foldermodels.py:334
 msgid "folder permissions"
 msgstr "Ordnerberechtigungen"
 
-#: models/foldermodels.py:359
+#: models/foldermodels.py:348
+msgid "Folder cannot be selected with type \"all items\"."
+msgstr "Für den Typ \"Alle Einträge\" kann kein Ordner ausgewählt werden. "
+
+#: models/foldermodels.py:350
+msgid "Folder has to be selected when type is not \"all items\"."
+msgstr "Für alle Typen außer \"Alle Einträge\" muss ein Ordner ausgewählt werden."
+
+#: models/foldermodels.py:352
+msgid "User or group cannot be selected together with \"everybody\"."
+msgstr "Zusammen mit \"Jeder\" kann kein Benutzer oder eine Gruppe ausgewählt werden."
+
+#: models/foldermodels.py:354
+msgid "At least one of user, group, or \"everybody\" has to be selected."
+msgstr "Mindestens ein Eintrag muss gewählt werden: \"Benutzer\", \"Gruppe\" oder \"Jeder\"."
+
+#: models/foldermodels.py:360
 #| msgid "Folders"
 msgid "All Folders"
 msgstr "Alle Ordner"
 
-#: models/foldermodels.py:361
+#: models/foldermodels.py:362
 msgid "Logical Path"
 msgstr "Logischer Pfad"
 
-#: models/foldermodels.py:370
+#: models/foldermodels.py:371
 #, python-brace-format
 msgid "User: {user}"
 msgstr "Nutzer: {user}"
 
-#: models/foldermodels.py:372
+#: models/foldermodels.py:373
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "Gruppe: {group}"
 
-#: models/foldermodels.py:374
+#: models/foldermodels.py:375
 #| msgid "everybody"
 msgid "Everybody"
 msgstr "Jede(r)"
 
-#: models/foldermodels.py:387 templates/admin/filer/widgets/admin_file.html:45
+#: models/foldermodels.py:388 templates/admin/filer/widgets/admin_file.html:45
 msgid "Edit"
 msgstr "Edit"
 
-#: models/foldermodels.py:388
+#: models/foldermodels.py:389
 msgid "Read"
 msgstr "Lesen"
 
-#: models/foldermodels.py:389
+#: models/foldermodels.py:390
 #| msgid "can add children"
 msgid "Add children"
 msgstr "Unterordner hinzufügen"
@@ -529,10 +546,8 @@ msgstr "Nicht sortierte Uploads"
 msgid "files with missing metadata"
 msgstr "Dateien mit fehlenden Metadaten"
 
-#: models/virtualitems.py:87 templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:37
-#: templates/admin/filer/folder/directory_listing.html:104
+#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:102
 msgid "root"
 msgstr "Start"
 
@@ -586,16 +601,16 @@ msgstr "Startseite"
 msgid "Go back to Filer app"
 msgstr "Zur Filer App zurück gehen"
 
-#: templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/folder/directory_listing.html:37
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
 msgid "Go back to root folder"
 msgstr "Zum Root Ordner zurück gehen"
 
-#: templates/admin/filer/breadcrumbs.html:10
-#: templates/admin/filer/breadcrumbs.html:20
+#: templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:18
 #: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:42
-#: templates/admin/filer/folder/directory_listing.html:49
+#: templates/admin/filer/folder/directory_listing.html:39
+#: templates/admin/filer/folder/directory_listing.html:47
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Zum Ordner '%(folder_name)s' zurück gehen"
@@ -648,7 +663,7 @@ msgstr "Auf der Website ansehen"
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:104
+#: templates/admin/filer/folder/directory_listing.html:102
 msgid "Go back to"
 msgstr "Gehe zurück zu"
 
@@ -657,8 +672,8 @@ msgid "admin homepage"
 msgstr "Admin Startseite"
 
 #: templates/admin/filer/folder/change_form.html:37
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/directory_listing.html:105
+#: templates/admin/filer/folder/directory_listing.html:95
+#: templates/admin/filer/folder/directory_listing.html:103
 #: templates/admin/filer/folder/directory_table_list.html:29
 #: templates/admin/filer/folder/directory_table_list.html:59
 #: templates/admin/filer/folder/directory_table_list.html:178
@@ -705,7 +720,7 @@ msgstr "Zielordner"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
-#: templates/admin/filer/folder/directory_listing.html:180
+#: templates/admin/filer/folder/directory_listing.html:178
 msgid "Copy"
 msgstr "Kopieren"
 
@@ -762,7 +777,7 @@ msgstr "Die folgenden Dateien und/oder Ordner werden in ein Zielordner verschobe
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
-#: templates/admin/filer/folder/directory_listing.html:183
+#: templates/admin/filer/folder/directory_listing.html:181
 msgid "Move"
 msgstr "Verschieben"
 
@@ -789,63 +804,63 @@ msgstr "Die folgenden Dateien werden umbenannt (sie bleiben in ihren Ordnern und
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: templates/admin/filer/folder/directory_listing.html:96
+#: templates/admin/filer/folder/directory_listing.html:94
 msgid "Go back to the parent folder"
 msgstr "Gehe zurück zum übergeordneten Ordner"
 
-#: templates/admin/filer/folder/directory_listing.html:133
+#: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change current folder details"
 msgstr "Details des aktuellen Ordners ändern"
 
-#: templates/admin/filer/folder/directory_listing.html:133
+#: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change"
 msgstr "Ändern"
 
-#: templates/admin/filer/folder/directory_listing.html:143
+#: templates/admin/filer/folder/directory_listing.html:141
 msgid "Click here to run search for entered phrase"
 msgstr "Hier klicken, um nach dem eingegebenen Text zu suchen"
 
-#: templates/admin/filer/folder/directory_listing.html:146
+#: templates/admin/filer/folder/directory_listing.html:144
 msgid "Search"
 msgstr "Suchen"
 
-#: templates/admin/filer/folder/directory_listing.html:153
+#: templates/admin/filer/folder/directory_listing.html:151
 msgid "Close"
 msgstr "Schliessen"
 
-#: templates/admin/filer/folder/directory_listing.html:155
+#: templates/admin/filer/folder/directory_listing.html:153
 msgid "Limit"
 msgstr "Limit"
 
-#: templates/admin/filer/folder/directory_listing.html:160
+#: templates/admin/filer/folder/directory_listing.html:158
 msgid "Check it to limit the search to current folder"
 msgstr "Aktivieren, um die Suche auf den aktuellen Ordner zu beschränken"
 
-#: templates/admin/filer/folder/directory_listing.html:161
+#: templates/admin/filer/folder/directory_listing.html:159
 msgid "Limit the search to current folder"
 msgstr "Suche auf aktuellen Ordner beschränken"
 
-#: templates/admin/filer/folder/directory_listing.html:177
+#: templates/admin/filer/folder/directory_listing.html:175
 msgid "Delete"
 msgstr "Löschen"
 
-#: templates/admin/filer/folder/directory_listing.html:205
+#: templates/admin/filer/folder/directory_listing.html:203
 msgid "Adds a new Folder"
 msgstr "Fügt einen neuen Ordner hinzu"
 
-#: templates/admin/filer/folder/directory_listing.html:208
+#: templates/admin/filer/folder/directory_listing.html:206
 msgid "New Folder"
 msgstr "Neuer Ordner"
 
-#: templates/admin/filer/folder/directory_listing.html:213
-#: templates/admin/filer/folder/directory_listing.html:220
-#: templates/admin/filer/folder/directory_listing.html:223
-#: templates/admin/filer/folder/directory_listing.html:230
-#: templates/admin/filer/folder/directory_listing.html:237
+#: templates/admin/filer/folder/directory_listing.html:211
+#: templates/admin/filer/folder/directory_listing.html:218
+#: templates/admin/filer/folder/directory_listing.html:221
+#: templates/admin/filer/folder/directory_listing.html:228
+#: templates/admin/filer/folder/directory_listing.html:235
 msgid "Upload Files"
 msgstr "Dateien hochladen"
 
-#: templates/admin/filer/folder/directory_listing.html:235
+#: templates/admin/filer/folder/directory_listing.html:233
 msgid "You have to select a folder first"
 msgstr "Du musst zuerst einen Ordner auswählen"
 
@@ -1076,7 +1091,7 @@ msgstr "Vergrößern"
 
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:101
+#: templatetags/filer_admin_tags.py:107
 #| msgid "file missing"
 msgid "File is missing"
 msgstr "Datei fehlt"
