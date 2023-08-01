@@ -246,7 +246,7 @@
     <div id="content-main">
         {% include "admin/filer/tools/search_form.html" %}
         <div class="js-navigator navigator{% if not actions_on_top and not actions_on_bottom %}navigator-no-actions{% endif %}">
-            <form class="js-navigator-form" method="post">
+            <form class="js-navigator-form" method="post" id="changelist-form">
                 {% csrf_token %}
                 {% filer_admin_context_hidden_formfields %}
                 {% if action_form and actions_on_top and paginator.count and not is_popup %}

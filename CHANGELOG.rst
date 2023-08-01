@@ -2,6 +2,21 @@
 CHANGELOG
 =========
 
+3.0.3 (2023-07-21)
+==================
+
+* Fix copy folder being broken after django-mptt removal by @protoroto in https://github.com/django-cms/django-filer/pull/1393
+* fix: crash in the file detail view by @vinitkumar in https://github.com/django-cms/django-filer/pull/1395
+* Fix: actions.js error thrown in js console by @fsbraun in https://github.com/django-cms/django-filer/pull/1397
+
+3.0.2 (2023-07-17)
+==================
+
+* Fix another bug when the the thumbnailer in admin tags crashes because of
+  invalid or missing file
+* Ensure action buttons in directory listing do not get disabled after using
+  cancel or back button if files or folders are selected.
+
 3.0.1 (2023-07-13)
 ==================
 
