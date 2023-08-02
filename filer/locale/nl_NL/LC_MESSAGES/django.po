@@ -12,13 +12,14 @@
 # Jeroen, 2018
 # Maikel Wever, 2013
 # Maikel Wever, 2013
+# Stefan van den Eertwegh <stefan@corebyte.nl>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 19:25+0200\n"
+"POT-Creation-Date: 2023-07-31 22:21+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
-"Last-Translator: Edwin Janssen, 2023\n"
+"Last-Translator: Stefan van den Eertwegh <stefan@corebyte.nl>, 2023\n"
 "Language-Team: Dutch (Netherlands) (http://app.transifex.com/divio/django-filer/language/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,11 +42,11 @@ msgid ""
 "Can't use this folder, Permission Denied. Please select another folder."
 msgstr "Kan deze map niet gebruiken, rechten geweigerd. Kies een andere map."
 
-#: admin/fileadmin.py:45
+#: admin/fileadmin.py:47
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: admin/fileadmin.py:160
+#: admin/fileadmin.py:162
 msgid "canonical URL"
 msgstr "canonieke URL"
 
@@ -252,11 +253,11 @@ msgstr "Locatie van het onderwerp bevindt zich buiten de afbeelding."
 msgid "Your input: \"{subject_location}\". "
 msgstr "Je invoer: \"{subject_location}\"."
 
-#: admin/permissionadmin.py:10 models/foldermodels.py:379
+#: admin/permissionadmin.py:10 models/foldermodels.py:380
 msgid "Who"
 msgstr "Wie"
 
-#: admin/permissionadmin.py:11 models/foldermodels.py:400
+#: admin/permissionadmin.py:11 models/foldermodels.py:401
 msgid "What"
 msgstr "Wat"
 
@@ -264,7 +265,7 @@ msgstr "Wat"
 msgid "Folder with this name already exists."
 msgstr "Er bestaat al een map met deze naam."
 
-#: apps.py:9 templates/admin/filer/breadcrumbs.html:5
+#: apps.py:11 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/directory_listing.html:33
 msgid "Filer"
@@ -294,7 +295,7 @@ msgstr "afbeelding"
 msgid "images"
 msgstr "afbeeldingen"
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:288
+#: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
 msgstr "gebruiker"
 
@@ -324,7 +325,7 @@ msgid "clipboard items"
 msgstr "klembord items"
 
 #: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:104
+#: templates/admin/filer/folder/directory_listing.html:102
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
@@ -347,7 +348,7 @@ msgstr "heeft allen verplichte eigenschappen"
 msgid "original filename"
 msgstr "oorspronkelijke bestandsnaam"
 
-#: models/filemodels.py:110 models/foldermodels.py:101
+#: models/filemodels.py:110 models/foldermodels.py:102
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
 msgstr "naam"
@@ -356,15 +357,15 @@ msgstr "naam"
 msgid "description"
 msgstr "omschrijving"
 
-#: models/filemodels.py:125 models/foldermodels.py:107
+#: models/filemodels.py:125 models/foldermodels.py:108
 msgid "owner"
 msgstr "eigenaar"
 
-#: models/filemodels.py:129 models/foldermodels.py:115
+#: models/filemodels.py:129 models/foldermodels.py:116
 msgid "uploaded at"
 msgstr "geüpload op"
 
-#: models/filemodels.py:134 models/foldermodels.py:125
+#: models/filemodels.py:134 models/foldermodels.py:126
 msgid "modified at"
 msgstr "gewijzigd op"
 
@@ -378,112 +379,129 @@ msgid ""
 "accessible to anyone."
 msgstr "Schakel controle op toegangsrechten uit voor dit bestand. Het bestand zal publiek toegankelijk zijn voor iedereen"
 
-#: models/foldermodels.py:93
+#: models/foldermodels.py:94
 msgid "parent"
 msgstr "ouder"
 
-#: models/foldermodels.py:120
+#: models/foldermodels.py:121
 msgid "created at"
 msgstr "aangemaakt op"
 
-#: models/foldermodels.py:135
+#: models/foldermodels.py:136 templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
 msgid "Folder"
 msgstr "Map"
 
-#: models/foldermodels.py:136
+#: models/foldermodels.py:137
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Mappen"
 
-#: models/foldermodels.py:259
+#: models/foldermodels.py:260
 msgid "all items"
 msgstr "alle items"
 
-#: models/foldermodels.py:260
+#: models/foldermodels.py:261
 msgid "this item only"
 msgstr "alleen dit item"
 
-#: models/foldermodels.py:261
+#: models/foldermodels.py:262
 msgid "this item and all children"
 msgstr "dit item en alle onderliggende items"
 
-#: models/foldermodels.py:265
+#: models/foldermodels.py:266
 msgid "inherit"
 msgstr "overerven"
 
-#: models/foldermodels.py:266
+#: models/foldermodels.py:267
 msgid "allow"
 msgstr "toestaan"
 
-#: models/foldermodels.py:267
+#: models/foldermodels.py:268
 msgid "deny"
 msgstr "afwijzen"
 
-#: models/foldermodels.py:279
+#: models/foldermodels.py:280
 msgid "type"
 msgstr "type"
 
-#: models/foldermodels.py:296
+#: models/foldermodels.py:297
 msgid "group"
 msgstr "groep"
 
-#: models/foldermodels.py:303
+#: models/foldermodels.py:304
 msgid "everybody"
 msgstr "iedereen"
 
-#: models/foldermodels.py:308
+#: models/foldermodels.py:309
 msgid "can read"
 msgstr "mag lezen"
 
-#: models/foldermodels.py:316
+#: models/foldermodels.py:317
 msgid "can edit"
 msgstr "mag wijzigen"
 
-#: models/foldermodels.py:324
+#: models/foldermodels.py:325
 msgid "can add children"
 msgstr "mag onderliggende items toevoegen"
 
-#: models/foldermodels.py:332
+#: models/foldermodels.py:333
 msgid "folder permission"
 msgstr "toegangsrecht folder"
 
-#: models/foldermodels.py:333
+#: models/foldermodels.py:334
 msgid "folder permissions"
 msgstr "toegangsrechten folder"
 
-#: models/foldermodels.py:359
+#: models/foldermodels.py:348
+msgid "Folder cannot be selected with type \"all items\"."
+msgstr "Map kan niet geselecteerd worden met type \"alle items\"."
+
+#: models/foldermodels.py:350
+msgid "Folder has to be selected when type is not \"all items\"."
+msgstr "Map moet geselecteerd worden wanneer type niet \"alle items\" is."
+
+#: models/foldermodels.py:352
+msgid "User or group cannot be selected together with \"everybody\"."
+msgstr "Gebruiker of groep kan niet geselecteerd worden samen met \"iedereen\"."
+
+#: models/foldermodels.py:354
+msgid "At least one of user, group, or \"everybody\" has to be selected."
+msgstr "Ten minste één gebruiker, groep of \"iedereen\" moet worden geselecteerd."
+
+#: models/foldermodels.py:360
 #| msgid "Folders"
 msgid "All Folders"
 msgstr "Alle Mappen"
 
-#: models/foldermodels.py:361
+#: models/foldermodels.py:362
 msgid "Logical Path"
 msgstr "Logisch Pad"
 
-#: models/foldermodels.py:370
+#: models/foldermodels.py:371
 #, python-brace-format
 msgid "User: {user}"
 msgstr "Gebruiker:{user}"
 
-#: models/foldermodels.py:372
+#: models/foldermodels.py:373
 #, python-brace-format
 msgid "Group: {group}"
 msgstr "Groep: {group}"
 
-#: models/foldermodels.py:374
+#: models/foldermodels.py:375
 #| msgid "everybody"
 msgid "Everybody"
 msgstr "Iedereen"
 
-#: models/foldermodels.py:387 templates/admin/filer/widgets/admin_file.html:45
+#: models/foldermodels.py:388 templates/admin/filer/widgets/admin_file.html:45
 msgid "Edit"
 msgstr "Bewerken"
 
-#: models/foldermodels.py:388
+#: models/foldermodels.py:389
 msgid "Read"
 msgstr "Lezen"
 
-#: models/foldermodels.py:389
+#: models/foldermodels.py:390
 #| msgid "can add children"
 msgid "Add children"
 msgstr "Toevoegen kinderen"
@@ -529,10 +547,8 @@ msgstr "Ongesorteerde uploads"
 msgid "files with missing metadata"
 msgstr "bestanden met ontbrekende meta gegevens"
 
-#: models/virtualitems.py:87 templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:37
-#: templates/admin/filer/folder/directory_listing.html:104
+#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:102
 msgid "root"
 msgstr "hoofdmap"
 
@@ -586,16 +602,16 @@ msgstr "Home"
 msgid "Go back to Filer app"
 msgstr "Ga terug naar Bestandsbeheer"
 
-#: templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/folder/directory_listing.html:37
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
 msgid "Go back to root folder"
 msgstr "Ga terug naar de hoofdmap"
 
-#: templates/admin/filer/breadcrumbs.html:10
-#: templates/admin/filer/breadcrumbs.html:20
+#: templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:18
 #: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:42
-#: templates/admin/filer/folder/directory_listing.html:49
+#: templates/admin/filer/folder/directory_listing.html:39
+#: templates/admin/filer/folder/directory_listing.html:47
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Ga terug naar map '%(folder_name)s'"
@@ -648,7 +664,7 @@ msgstr "Bekijk op site"
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:104
+#: templates/admin/filer/folder/directory_listing.html:102
 msgid "Go back to"
 msgstr "Ga terug naar"
 
@@ -657,8 +673,8 @@ msgid "admin homepage"
 msgstr "admin homepage"
 
 #: templates/admin/filer/folder/change_form.html:37
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/directory_listing.html:105
+#: templates/admin/filer/folder/directory_listing.html:95
+#: templates/admin/filer/folder/directory_listing.html:103
 #: templates/admin/filer/folder/directory_table_list.html:29
 #: templates/admin/filer/folder/directory_table_list.html:59
 #: templates/admin/filer/folder/directory_table_list.html:178
@@ -705,7 +721,7 @@ msgstr "Bestemmingsmap:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
-#: templates/admin/filer/folder/directory_listing.html:180
+#: templates/admin/filer/folder/directory_listing.html:178
 msgid "Copy"
 msgstr "Kopiëren"
 
@@ -762,7 +778,7 @@ msgstr "De volgende bestanden en/of mappen zullen worden verplaatst naar een bes
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
-#: templates/admin/filer/folder/directory_listing.html:183
+#: templates/admin/filer/folder/directory_listing.html:181
 msgid "Move"
 msgstr "Verplaatsen"
 
@@ -789,63 +805,63 @@ msgstr "De volgende bestanden zullen worden hernoemd (de oorspronkelijke mapstru
 msgid "Rename"
 msgstr "Hernoemen"
 
-#: templates/admin/filer/folder/directory_listing.html:96
+#: templates/admin/filer/folder/directory_listing.html:94
 msgid "Go back to the parent folder"
 msgstr "Ga terug naar de bovenliggende folder"
 
-#: templates/admin/filer/folder/directory_listing.html:133
+#: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change current folder details"
 msgstr "Wijzig eigenschappen van huidige map"
 
-#: templates/admin/filer/folder/directory_listing.html:133
+#: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change"
 msgstr "Wijzigen"
 
-#: templates/admin/filer/folder/directory_listing.html:143
+#: templates/admin/filer/folder/directory_listing.html:141
 msgid "Click here to run search for entered phrase"
 msgstr "Klik hier om een zoekopdracht te doen voor de ingevoerde woorden"
 
-#: templates/admin/filer/folder/directory_listing.html:146
+#: templates/admin/filer/folder/directory_listing.html:144
 msgid "Search"
 msgstr "Zoeken"
 
-#: templates/admin/filer/folder/directory_listing.html:153
+#: templates/admin/filer/folder/directory_listing.html:151
 msgid "Close"
 msgstr "Sluiten"
 
-#: templates/admin/filer/folder/directory_listing.html:155
+#: templates/admin/filer/folder/directory_listing.html:153
 msgid "Limit"
 msgstr "Limiteren"
 
-#: templates/admin/filer/folder/directory_listing.html:160
+#: templates/admin/filer/folder/directory_listing.html:158
 msgid "Check it to limit the search to current folder"
 msgstr "Vink het aan om de zoekopdracht te beperken tot de huidige map"
 
-#: templates/admin/filer/folder/directory_listing.html:161
+#: templates/admin/filer/folder/directory_listing.html:159
 msgid "Limit the search to current folder"
 msgstr "Zoekopdracht beperken tot huidige map"
 
-#: templates/admin/filer/folder/directory_listing.html:177
+#: templates/admin/filer/folder/directory_listing.html:175
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: templates/admin/filer/folder/directory_listing.html:205
+#: templates/admin/filer/folder/directory_listing.html:203
 msgid "Adds a new Folder"
 msgstr "Voegt een nieuwe map toe"
 
-#: templates/admin/filer/folder/directory_listing.html:208
+#: templates/admin/filer/folder/directory_listing.html:206
 msgid "New Folder"
 msgstr "Nieuwe map"
 
-#: templates/admin/filer/folder/directory_listing.html:213
-#: templates/admin/filer/folder/directory_listing.html:220
-#: templates/admin/filer/folder/directory_listing.html:223
-#: templates/admin/filer/folder/directory_listing.html:230
-#: templates/admin/filer/folder/directory_listing.html:237
+#: templates/admin/filer/folder/directory_listing.html:211
+#: templates/admin/filer/folder/directory_listing.html:218
+#: templates/admin/filer/folder/directory_listing.html:221
+#: templates/admin/filer/folder/directory_listing.html:228
+#: templates/admin/filer/folder/directory_listing.html:235
 msgid "Upload Files"
 msgstr "Bestanden uploaden"
 
-#: templates/admin/filer/folder/directory_listing.html:235
+#: templates/admin/filer/folder/directory_listing.html:233
 msgid "You have to select a folder first"
 msgstr "Je moet eerst een map selecteren"
 
@@ -1076,7 +1092,7 @@ msgstr "Uitvouwen"
 
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:101
+#: templatetags/filer_admin_tags.py:107
 #| msgid "file missing"
 msgid "File is missing"
 msgstr "Bestand ontbreekt"
