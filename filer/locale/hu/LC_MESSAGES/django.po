@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Translators:
@@ -10,19 +10,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 19:25+0200\n"
+"POT-Creation-Date: 2023-07-31 22:21+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>, 2016-2017\n"
-"Language-Team: Hungarian (http://app.transifex.com/divio/django-filer/language/hu/)\n"
+"Language-Team: Hungarian (http://app.transifex.com/divio/django-filer/"
+"language/hu/)\n"
+"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/clipboardadmin.py:16
-#| msgid ""
-#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -31,15 +30,14 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid ""
-"Can't use this folder, Permission Denied. Please select another folder."
+msgid "Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
-#: admin/fileadmin.py:45
+#: admin/fileadmin.py:47
 msgid "Advanced"
 msgstr "Haladó"
 
-#: admin/fileadmin.py:160
+#: admin/fileadmin.py:162
 msgid "canonical URL"
 msgstr "egyedi URL"
 
@@ -47,7 +45,9 @@ msgstr "egyedi URL"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "Az akciók végrehajtásához egy vagy több elemet ki kell választani. Egyetlen elem sem változott."
+msgstr ""
+"Az akciók végrehajtásához egy vagy több elemet ki kell választani. Egyetlen "
+"elem sem változott."
 
 #: admin/folderadmin.py:422
 #, python-format
@@ -128,7 +128,9 @@ msgstr "A kiválasztott helyen már létezik %s nevű mappa"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d fájl és/vagy mappa sikeresen átmozgatva ebbe a mappába: %(destination)s"
+msgstr ""
+"%(count)d fájl és/vagy mappa sikeresen átmozgatva ebbe a mappába: "
+"%(destination)s"
 
 #: admin/folderadmin.py:930 admin/folderadmin.py:932
 msgid "Move files and/or folders"
@@ -153,7 +155,9 @@ msgstr "Fájlok átnevezése"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d fájl és/vagy mappa sikeresen átmásolva ebbe a mappába: %(destination)s"
+msgstr ""
+"%(count)d fájl és/vagy mappa sikeresen átmásolva ebbe a mappába: "
+"%(destination)s"
 
 #: admin/folderadmin.py:1143 admin/folderadmin.py:1145
 msgid "Copy files and/or folders"
@@ -185,7 +189,9 @@ msgstr "Utótag, amely a másolt fájlok nevéhez lesz hozzáadva."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Az utótag lehetőleg egyszerű, kisbetűs fájlnév részlet legyen, például \"%(valid)s\"."
+msgstr ""
+"Az utótag lehetőleg egyszerű, kisbetűs fájlnév részlet legyen, például "
+"\"%(valid)s\"."
 
 #: admin/forms.py:52
 #, python-format
@@ -219,7 +225,8 @@ msgstr "felméretezés"
 
 #: admin/forms.py:75
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr "Előnézeti kép beállítást vagy átméretezési paramétert kötelező kiválasztani."
+msgstr ""
+"Előnézeti kép beállítást vagy átméretezési paramétert kötelező kiválasztani."
 
 #: admin/forms.py:77
 msgid "Resize parameters must be choosen."
@@ -246,11 +253,11 @@ msgstr "A fókusz helye kívül esik a képen."
 msgid "Your input: \"{subject_location}\". "
 msgstr "A beírt érték: \"{subject_location}\"."
 
-#: admin/permissionadmin.py:10 models/foldermodels.py:379
+#: admin/permissionadmin.py:10 models/foldermodels.py:380
 msgid "Who"
 msgstr ""
 
-#: admin/permissionadmin.py:11 models/foldermodels.py:400
+#: admin/permissionadmin.py:11 models/foldermodels.py:401
 msgid "What"
 msgstr ""
 
@@ -258,7 +265,7 @@ msgstr ""
 msgid "Folder with this name already exists."
 msgstr "Már létezik ilyen nevű mappa."
 
-#: apps.py:9 templates/admin/filer/breadcrumbs.html:5
+#: apps.py:11 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/directory_listing.html:33
 msgid "Filer"
@@ -288,7 +295,7 @@ msgstr "kép"
 msgid "images"
 msgstr "képek"
 
-#: models/clipboardmodels.py:11 models/foldermodels.py:288
+#: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
 msgstr "felhasználó"
 
@@ -318,7 +325,7 @@ msgid "clipboard items"
 msgstr "vágólap elemek"
 
 #: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:104
+#: templates/admin/filer/folder/directory_listing.html:102
 #: templates/admin/filer/folder/new_folder_form.html:4
 #: templates/admin/filer/folder/new_folder_form.html:7
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
@@ -341,7 +348,7 @@ msgstr "fontos adatok kitöltve"
 msgid "original filename"
 msgstr "eredeti fájlnév"
 
-#: models/filemodels.py:110 models/foldermodels.py:101
+#: models/filemodels.py:110 models/foldermodels.py:102
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
 msgstr "név"
@@ -350,15 +357,15 @@ msgstr "név"
 msgid "description"
 msgstr "leírás"
 
-#: models/filemodels.py:125 models/foldermodels.py:107
+#: models/filemodels.py:125 models/foldermodels.py:108
 msgid "owner"
 msgstr "tulajdonos"
 
-#: models/filemodels.py:129 models/foldermodels.py:115
+#: models/filemodels.py:129 models/foldermodels.py:116
 msgid "uploaded at"
 msgstr "feltöltés ideje"
 
-#: models/filemodels.py:134 models/foldermodels.py:125
+#: models/filemodels.py:134 models/foldermodels.py:126
 msgid "modified at"
 msgstr "módosítás ideje"
 
@@ -370,115 +377,131 @@ msgstr "Jogosultságok kikapcsolva"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr "Jogosultságok ellenőrzésének kikapcsolása ennél a fájlnál. Ezt a fájlt bárki letöltheti."
+msgstr ""
+"Jogosultságok ellenőrzésének kikapcsolása ennél a fájlnál. Ezt a fájlt bárki "
+"letöltheti."
 
-#: models/foldermodels.py:93
+#: models/foldermodels.py:94
 msgid "parent"
 msgstr ""
 
-#: models/foldermodels.py:120
+#: models/foldermodels.py:121
 msgid "created at"
 msgstr "létrehozás ideje"
 
-#: models/foldermodels.py:135
+#: models/foldermodels.py:136 templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
 msgid "Folder"
 msgstr "Mappa"
 
-#: models/foldermodels.py:136
+#: models/foldermodels.py:137
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
 msgstr "Mappák"
 
-#: models/foldermodels.py:259
+#: models/foldermodels.py:260
 msgid "all items"
 msgstr "minden elem"
 
-#: models/foldermodels.py:260
+#: models/foldermodels.py:261
 msgid "this item only"
 msgstr "csak ez az elem"
 
-#: models/foldermodels.py:261
+#: models/foldermodels.py:262
 msgid "this item and all children"
 msgstr "csak ez az elem, és az alá tartozók"
 
-#: models/foldermodels.py:265
+#: models/foldermodels.py:266
 msgid "inherit"
 msgstr ""
 
-#: models/foldermodels.py:266
+#: models/foldermodels.py:267
 msgid "allow"
 msgstr "engedélyez"
 
-#: models/foldermodels.py:267
+#: models/foldermodels.py:268
 msgid "deny"
 msgstr "letilt"
 
-#: models/foldermodels.py:279
+#: models/foldermodels.py:280
 msgid "type"
 msgstr "típus"
 
-#: models/foldermodels.py:296
+#: models/foldermodels.py:297
 msgid "group"
 msgstr "csoport"
 
-#: models/foldermodels.py:303
+#: models/foldermodels.py:304
 msgid "everybody"
 msgstr "mindenki"
 
-#: models/foldermodels.py:308
+#: models/foldermodels.py:309
 msgid "can read"
 msgstr "olvashatja"
 
-#: models/foldermodels.py:316
+#: models/foldermodels.py:317
 msgid "can edit"
 msgstr "szerkesztheti"
 
-#: models/foldermodels.py:324
+#: models/foldermodels.py:325
 msgid "can add children"
 msgstr "hozzáadhat gyermekelemet"
 
-#: models/foldermodels.py:332
+#: models/foldermodels.py:333
 msgid "folder permission"
 msgstr "mappa jogosultság"
 
-#: models/foldermodels.py:333
+#: models/foldermodels.py:334
 msgid "folder permissions"
 msgstr "mappa jogosultságok"
 
-#: models/foldermodels.py:359
-#| msgid "Folders"
+#: models/foldermodels.py:348
+msgid "Folder cannot be selected with type \"all items\"."
+msgstr ""
+
+#: models/foldermodels.py:350
+msgid "Folder has to be selected when type is not \"all items\"."
+msgstr ""
+
+#: models/foldermodels.py:352
+msgid "User or group cannot be selected together with \"everybody\"."
+msgstr ""
+
+#: models/foldermodels.py:354
+msgid "At least one of user, group, or \"everybody\" has to be selected."
+msgstr ""
+
+#: models/foldermodels.py:360
 msgid "All Folders"
 msgstr ""
 
-#: models/foldermodels.py:361
+#: models/foldermodels.py:362
 msgid "Logical Path"
 msgstr ""
 
-#: models/foldermodels.py:370
+#: models/foldermodels.py:371
 #, python-brace-format
 msgid "User: {user}"
 msgstr ""
 
-#: models/foldermodels.py:372
+#: models/foldermodels.py:373
 #, python-brace-format
 msgid "Group: {group}"
 msgstr ""
 
-#: models/foldermodels.py:374
-#| msgid "everybody"
+#: models/foldermodels.py:375
 msgid "Everybody"
 msgstr ""
 
-#: models/foldermodels.py:387 templates/admin/filer/widgets/admin_file.html:45
+#: models/foldermodels.py:388 templates/admin/filer/widgets/admin_file.html:45
 msgid "Edit"
 msgstr ""
 
-#: models/foldermodels.py:388
+#: models/foldermodels.py:389
 msgid "Read"
 msgstr ""
 
-#: models/foldermodels.py:389
-#| msgid "can add children"
+#: models/foldermodels.py:390
 msgid "Add children"
 msgstr ""
 
@@ -523,10 +546,8 @@ msgstr "Kategorizálatlan feltöltések"
 msgid "files with missing metadata"
 msgstr "fájlok hiányzó meta adatokkal"
 
-#: models/virtualitems.py:87 templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:37
-#: templates/admin/filer/folder/directory_listing.html:104
+#: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
+#: templates/admin/filer/folder/directory_listing.html:102
 msgid "root"
 msgstr "gyökér"
 
@@ -535,7 +556,6 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
-#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -580,16 +600,16 @@ msgstr "Nyitólap"
 msgid "Go back to Filer app"
 msgstr "Vissza a fájlkezelőbe"
 
-#: templates/admin/filer/breadcrumbs.html:7
-#: templates/admin/filer/folder/directory_listing.html:37
+#: templates/admin/filer/breadcrumbs.html:6
+#: templates/admin/filer/folder/directory_listing.html:35
 msgid "Go back to root folder"
 msgstr "Vissza a gyökérmappába"
 
-#: templates/admin/filer/breadcrumbs.html:10
-#: templates/admin/filer/breadcrumbs.html:20
+#: templates/admin/filer/breadcrumbs.html:8
+#: templates/admin/filer/breadcrumbs.html:18
 #: templates/admin/filer/folder/change_form.html:10
-#: templates/admin/filer/folder/directory_listing.html:42
-#: templates/admin/filer/folder/directory_listing.html:49
+#: templates/admin/filer/folder/directory_listing.html:39
+#: templates/admin/filer/folder/directory_listing.html:47
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
 msgstr "Vissza a(z)  '%(folder_name)s'  mappába"
@@ -603,19 +623,26 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "A kiválasztott fájlok és mappák törlése csatlakozó elemek törlésével is járna, viszont a jelenlegi fiók nem rendelkezik a megfelelő jogosultságokkal a következő objektum típusok törléséhez:"
+msgstr ""
+"A kiválasztott fájlok és mappák törlése csatlakozó elemek törlésével is "
+"járna, viszont a jelenlegi fiók nem rendelkezik a megfelelő jogosultságokkal "
+"a következő objektum típusok törléséhez:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "A kiválasztott fájlok és mappák törlése azzal járna, hogy a következő kapcsolt elemek is törlődnek:"
+msgstr ""
+"A kiválasztott fájlok és mappák törlése azzal járna, hogy a következő "
+"kapcsolt elemek is törlődnek:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Biztosan törli a kiválasztott fájlokat és/vagy mappákat? A következő objektumok, és a hozzájuk kapcsolt elemek is törlődni fognak:"
+msgstr ""
+"Biztosan törli a kiválasztott fájlokat és/vagy mappákat? A következő "
+"objektumok, és a hozzájuk kapcsolt elemek is törlődni fognak:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -642,7 +669,7 @@ msgstr "Megtekintés az oldalon"
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
-#: templates/admin/filer/folder/directory_listing.html:104
+#: templates/admin/filer/folder/directory_listing.html:102
 msgid "Go back to"
 msgstr "Vissza ide:"
 
@@ -651,8 +678,8 @@ msgid "admin homepage"
 msgstr "adminisztrációs felület"
 
 #: templates/admin/filer/folder/change_form.html:37
-#: templates/admin/filer/folder/directory_listing.html:97
-#: templates/admin/filer/folder/directory_listing.html:105
+#: templates/admin/filer/folder/directory_listing.html:95
+#: templates/admin/filer/folder/directory_listing.html:103
 #: templates/admin/filer/folder/directory_table_list.html:29
 #: templates/admin/filer/folder/directory_table_list.html:59
 #: templates/admin/filer/folder/directory_table_list.html:178
@@ -664,9 +691,10 @@ msgstr "Mappa Ikon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Nincs jogosultsága az összes kiválasztott fájl és/vagy mappa másolásához."
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Nincs jogosultsága az összes kiválasztott fájl és/vagy mappa másolásához."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -690,7 +718,9 @@ msgstr "Nincsenek másolható fájlok és/vagy könyvtárak"
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "A következő fájlok és/vagy mappák lesznek a célkönyvtárba másolva (megtartva a szerkezetüket):"
+msgstr ""
+"A következő fájlok és/vagy mappák lesznek a célkönyvtárba másolva (megtartva "
+"a szerkezetüket):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -699,7 +729,7 @@ msgstr "Cél mappa:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
-#: templates/admin/filer/folder/directory_listing.html:180
+#: templates/admin/filer/folder/directory_listing.html:178
 msgid "Copy"
 msgstr "Másol"
 
@@ -722,7 +752,9 @@ msgstr "A következő képek lesznek átméretezve:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:33
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr "Válasszon ki egy meglévő előnézeti kép beállítást, vagy írja be az átméretezési paramétereket:"
+msgstr ""
+"Válasszon ki egy meglévő előnézeti kép beállítást, vagy írja be az "
+"átméretezési paramétereket:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:35
 msgid "Choose resize parameters:"
@@ -732,7 +764,9 @@ msgstr "Válasszon átméretezési paramétereket:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Figyelem: a képek helyben lesznek átméretezve, felülírva az eredetieket. Ha meg szeretné őrizni az eredeti képeket, előbb másolja át őket."
+msgstr ""
+"Figyelem: a képek helyben lesznek átméretezve, felülírva az eredetieket. Ha "
+"meg szeretné őrizni az eredeti képeket, előbb másolja át őket."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -740,9 +774,10 @@ msgstr "Átméretezés"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Nincs jogosultsága az összes kiválasztott fájl és/vagy mappa mozgatásához."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Nincs jogosultsága az összes kiválasztott fájl és/vagy mappa mozgatásához."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -752,11 +787,13 @@ msgstr "Nincsenek mozgatható fájlok és/vagy mappák."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "A következő fájlok és/vagy mappák lesznek átmozgatva a cél mappába (megtartva a szerkezetüket):"
+msgstr ""
+"A következő fájlok és/vagy mappák lesznek átmozgatva a cél mappába "
+"(megtartva a szerkezetüket):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
-#: templates/admin/filer/folder/directory_listing.html:183
+#: templates/admin/filer/folder/directory_listing.html:181
 msgid "Move"
 msgstr "Mozgatás"
 
@@ -777,69 +814,71 @@ msgstr "Nincsenek átnevezhető fájlok."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "A következő fájlok lesznek átnevezve (a mappában maradnak, és az eredeti fájlnév megmarad, csak a megjelenített név változik):"
+msgstr ""
+"A következő fájlok lesznek átnevezve (a mappában maradnak, és az eredeti "
+"fájlnév megmarad, csak a megjelenített név változik):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
 msgstr "Átnevezés"
 
-#: templates/admin/filer/folder/directory_listing.html:96
+#: templates/admin/filer/folder/directory_listing.html:94
 msgid "Go back to the parent folder"
 msgstr "Vissza a szülőmappába"
 
-#: templates/admin/filer/folder/directory_listing.html:133
+#: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change current folder details"
 msgstr "Jelenlegi mappa beállításai"
 
-#: templates/admin/filer/folder/directory_listing.html:133
+#: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change"
 msgstr "Szerkeszt"
 
-#: templates/admin/filer/folder/directory_listing.html:143
+#: templates/admin/filer/folder/directory_listing.html:141
 msgid "Click here to run search for entered phrase"
 msgstr "Kattintson ide a beírt szó kereséséhez"
 
-#: templates/admin/filer/folder/directory_listing.html:146
+#: templates/admin/filer/folder/directory_listing.html:144
 msgid "Search"
 msgstr "Keresés"
 
-#: templates/admin/filer/folder/directory_listing.html:153
+#: templates/admin/filer/folder/directory_listing.html:151
 msgid "Close"
 msgstr "Bezár"
 
-#: templates/admin/filer/folder/directory_listing.html:155
+#: templates/admin/filer/folder/directory_listing.html:153
 msgid "Limit"
 msgstr "Korlátozás"
 
-#: templates/admin/filer/folder/directory_listing.html:160
+#: templates/admin/filer/folder/directory_listing.html:158
 msgid "Check it to limit the search to current folder"
 msgstr "Kattintsa be, hogy a keresést a jelenlegi mappára korlátozza"
 
-#: templates/admin/filer/folder/directory_listing.html:161
+#: templates/admin/filer/folder/directory_listing.html:159
 msgid "Limit the search to current folder"
 msgstr "Keresés korlátozása a jelenlegi mappára"
 
-#: templates/admin/filer/folder/directory_listing.html:177
+#: templates/admin/filer/folder/directory_listing.html:175
 msgid "Delete"
 msgstr "Törlés"
 
-#: templates/admin/filer/folder/directory_listing.html:205
+#: templates/admin/filer/folder/directory_listing.html:203
 msgid "Adds a new Folder"
 msgstr "Új mappát hoz létre"
 
-#: templates/admin/filer/folder/directory_listing.html:208
+#: templates/admin/filer/folder/directory_listing.html:206
 msgid "New Folder"
 msgstr "Új mappa"
 
-#: templates/admin/filer/folder/directory_listing.html:213
-#: templates/admin/filer/folder/directory_listing.html:220
-#: templates/admin/filer/folder/directory_listing.html:223
-#: templates/admin/filer/folder/directory_listing.html:230
-#: templates/admin/filer/folder/directory_listing.html:237
+#: templates/admin/filer/folder/directory_listing.html:211
+#: templates/admin/filer/folder/directory_listing.html:218
+#: templates/admin/filer/folder/directory_listing.html:221
+#: templates/admin/filer/folder/directory_listing.html:228
+#: templates/admin/filer/folder/directory_listing.html:235
 msgid "Upload Files"
 msgstr "Fájlok feltöltése"
 
-#: templates/admin/filer/folder/directory_listing.html:235
+#: templates/admin/filer/folder/directory_listing.html:233
 msgid "You have to select a folder first"
 msgstr "Először válasszon mappát"
 
@@ -932,13 +971,11 @@ msgstr "engedélyezve"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "'%(item_label)s' letöltése"
 
@@ -949,7 +986,8 @@ msgstr "Fájl eltávolítása"
 #: templates/admin/filer/folder/directory_table_list.html:160
 #: templates/admin/filer/folder/directory_thumbnail_list.html:138
 msgid "Drop files here or use the \"Upload Files\" button"
-msgstr "Egérrel dobjon ide fájlokat, vagy használja a \"Fájlok feltöltése\" gombot"
+msgstr ""
+"Egérrel dobjon ide fájlokat, vagy használja a \"Fájlok feltöltése\" gombot"
 
 #: templates/admin/filer/folder/directory_table_list.html:175
 #: templates/admin/filer/folder/directory_thumbnail_list.html:153
@@ -1000,12 +1038,10 @@ msgstr "Összes (%(total_count)s) kiválasztása"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
-#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
-#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1070,8 +1106,7 @@ msgstr ""
 
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:101
-#| msgid "file missing"
+#: templatetags/filer_admin_tags.py:107
 msgid "File is missing"
 msgstr ""
 
@@ -1127,7 +1162,6 @@ msgid "Choose File"
 msgstr "Fájl kiválasztása"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
-#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 

@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Translators:
@@ -24,22 +24,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/clipboardadmin.py:16
-#| msgid ""
-#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr "Je hebt geen rechten om bestanden te uploaden."
 
 #: admin/clipboardadmin.py:17
 msgid "Can't find folder to upload. Please refresh and try again"
-msgstr "Kan map niet vinden om te uploaden. Herlaad de pagina en probeer het opnieuw."
+msgstr ""
+"Kan map niet vinden om te uploaden. Herlaad de pagina en probeer het opnieuw."
 
 #: admin/clipboardadmin.py:19
-msgid ""
-"Can't use this folder, Permission Denied. Please select another folder."
+msgid "Can't use this folder, Permission Denied. Please select another folder."
 msgstr "Kan deze map niet gebruiken, rechten geweigerd. Kies een andere map."
 
 #: admin/fileadmin.py:47
@@ -54,7 +51,8 @@ msgstr "canonieke URL"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr "De actie kan niet worden uitgevoerd omdat er zijn geen items geselecteerd."
+msgstr ""
+"De actie kan niet worden uitgevoerd omdat er zijn geen items geselecteerd."
 
 #: admin/folderadmin.py:422
 #, python-format
@@ -135,7 +133,9 @@ msgstr "Er bestaan al mappen met de namen %s op de geselecteerde bestemming"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d bestanden en of mappen zijn succesvol verplaatst naar map '%(destination)s'."
+msgstr ""
+"%(count)d bestanden en of mappen zijn succesvol verplaatst naar map "
+"'%(destination)s'."
 
 #: admin/folderadmin.py:930 admin/folderadmin.py:932
 msgid "Move files and/or folders"
@@ -160,7 +160,9 @@ msgstr "Hernoem bestanden"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr "%(count)d bestanden en/of mappen zijn succesvol gekopieerd naar map '%(destination)s'."
+msgstr ""
+"%(count)d bestanden en/of mappen zijn succesvol gekopieerd naar map "
+"'%(destination)s'."
 
 #: admin/folderadmin.py:1143 admin/folderadmin.py:1145
 msgid "Copy files and/or folders"
@@ -185,14 +187,17 @@ msgstr "Afmetingen aanpassen van geselecteerde afbeeldingen"
 
 #: admin/forms.py:24
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr "Achtervoegsel wordt toegevoegd aan bestandsnaam van gekopieerde bestanden"
+msgstr ""
+"Achtervoegsel wordt toegevoegd aan bestandsnaam van gekopieerde bestanden"
 
 #: admin/forms.py:31
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr "Achtervoegsel moet een geldige waarde zijn in kleine letters, bv. \"%(valid)s\"."
+msgstr ""
+"Achtervoegsel moet een geldige waarde zijn in kleine letters, bv. "
+"\"%(valid)s\"."
 
 #: admin/forms.py:52
 #, python-format
@@ -377,7 +382,9 @@ msgstr "Toegangsrechten uitgeschakeld"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr "Schakel controle op toegangsrechten uit voor dit bestand. Het bestand zal publiek toegankelijk zijn voor iedereen"
+msgstr ""
+"Schakel controle op toegangsrechten uit voor dit bestand. Het bestand zal "
+"publiek toegankelijk zijn voor iedereen"
 
 #: models/foldermodels.py:94
 msgid "parent"
@@ -470,7 +477,6 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr "Ten minste één gebruiker, groep of \"iedereen\" moet worden geselecteerd."
 
 #: models/foldermodels.py:360
-#| msgid "Folders"
 msgid "All Folders"
 msgstr "Alle Mappen"
 
@@ -489,7 +495,6 @@ msgid "Group: {group}"
 msgstr "Groep: {group}"
 
 #: models/foldermodels.py:375
-#| msgid "everybody"
 msgid "Everybody"
 msgstr "Iedereen"
 
@@ -502,7 +507,6 @@ msgid "Read"
 msgstr "Lezen"
 
 #: models/foldermodels.py:390
-#| msgid "can add children"
 msgid "Add children"
 msgstr "Toevoegen kinderen"
 
@@ -557,7 +561,6 @@ msgid "Show table view"
 msgstr "Toon tabel weergave"
 
 #: settings.py:278
-#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr "Toon thumbnail weergave"
 
@@ -625,19 +628,27 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr "Het verwijderen van de geselecteerde bestanden en/of mappen resulteert in het verwijderen van gerelateerde objecten. Je hebt echter geen toegangsrechten voor het verwijderen van de volgende objecttypes:"
+msgstr ""
+"Het verwijderen van de geselecteerde bestanden en/of mappen resulteert in "
+"het verwijderen van gerelateerde objecten. Je hebt echter geen "
+"toegangsrechten voor het verwijderen van de volgende objecttypes:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr "Het verwijderen van de geselecteerde bestanden en/of mappen leidt tot het verwijderen van de volgende beschermde gerelateerde objecten:"
+msgstr ""
+"Het verwijderen van de geselecteerde bestanden en/of mappen leidt tot het "
+"verwijderen van de volgende beschermde gerelateerde objecten:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr "Weet je zeker dat je de geselecteerde bestanden en/of folders wilt verwijderen? Alle volgende objecten en gerelateerde items zullen worden verwijderd: "
+msgstr ""
+"Weet je zeker dat je de geselecteerde bestanden en/of folders wilt "
+"verwijderen? Alle volgende objecten en gerelateerde items zullen worden "
+"verwijderd: "
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -686,9 +697,11 @@ msgstr "Map icoon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files "
-"and/or folders."
-msgstr "Je account heeft geen toegangsrechten voor het kopiëren van de geselecteerde bestanden en/of mappen"
+"Your account doesn't have permissions to copy all of the selected files and/"
+"or folders."
+msgstr ""
+"Je account heeft geen toegangsrechten voor het kopiëren van de geselecteerde "
+"bestanden en/of mappen"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -712,7 +725,9 @@ msgstr "Er zijn geen bestanden en/of mappen beschikbaar om te kopiëren."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr "De volgende bestanden en/of mappen zullen worden gekopieerd naar een bestemmingsmap (structuur blijft behouden):"
+msgstr ""
+"De volgende bestanden en/of mappen zullen worden gekopieerd naar een "
+"bestemmingsmap (structuur blijft behouden):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -732,11 +747,14 @@ msgstr "Het is niet toegestaan om bestanden naar dezelfde map te kopiëren"
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr "Je account heeft geen toegangsrechten om afmetingen van alle geselecteerde afbeeldingen aan te passen."
+msgstr ""
+"Je account heeft geen toegangsrechten om afmetingen van alle geselecteerde "
+"afbeeldingen aan te passen."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
-msgstr "Er zijn geen afbeeldingen beschikbaar voor het aanpassen van afmetingen."
+msgstr ""
+"Er zijn geen afbeeldingen beschikbaar voor het aanpassen van afmetingen."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:20
 msgid "The following images will be resized:"
@@ -754,7 +772,10 @@ msgstr "Selecteer afmetingsopties:"
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr "Waarschuwing: bestaande afmetingen van afbeeldingen zullen worden aangepast. Oorspronkelijke bestanden zullen verloren gaan. Maak eventueel eerst een kopie om de oorspronkelijke bestanden te behouden."
+msgstr ""
+"Waarschuwing: bestaande afmetingen van afbeeldingen zullen worden aangepast. "
+"Oorspronkelijke bestanden zullen verloren gaan. Maak eventueel eerst een "
+"kopie om de oorspronkelijke bestanden te behouden."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:41
 msgid "Resize"
@@ -762,9 +783,11 @@ msgstr "Afmetingen aanpassen"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files "
-"and/or folders."
-msgstr "Je account heeft geen toegangsrechten om alle geselecteerde bestanden en/of mappen te verplaatsen."
+"Your account doesn't have permissions to move all of the selected files and/"
+"or folders."
+msgstr ""
+"Je account heeft geen toegangsrechten om alle geselecteerde bestanden en/of "
+"mappen te verplaatsen."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -774,7 +797,9 @@ msgstr "Er zijn geen bestanden en/of mappen beschikbaar om te verplaatsen."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr "De volgende bestanden en/of mappen zullen worden verplaatst naar een bestemmingsmap (huidige mapstructuur blijft behouden): "
+msgstr ""
+"De volgende bestanden en/of mappen zullen worden verplaatst naar een "
+"bestemmingsmap (huidige mapstructuur blijft behouden): "
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -789,7 +814,9 @@ msgstr "Het is niet toegestaan om bestanden naar dezelfde map te verplaatsen"
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr "Je account heeft onvoldoende toegangsrechten om alle geselecteerde bestanden te hernoemen."
+msgstr ""
+"Je account heeft onvoldoende toegangsrechten om alle geselecteerde bestanden "
+"te hernoemen."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
@@ -799,7 +826,10 @@ msgstr "Er zijn geen bestanden beschikbaar om te hernoemen."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr "De volgende bestanden zullen worden hernoemd (de oorspronkelijke mapstructuur en bestandsnamen blijven behouden, alleen de weergave zal worden gewijzigd):"
+msgstr ""
+"De volgende bestanden zullen worden hernoemd (de oorspronkelijke "
+"mapstructuur en bestandsnamen blijven behouden, alleen de weergave zal "
+"worden gewijzigd):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -954,13 +984,11 @@ msgstr "ingeschakeld"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr "Gebruikelijke url '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
-#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "Download '%(item_label)s'"
 
@@ -1022,12 +1050,10 @@ msgstr "Selecteer alle %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
-#| msgid "Select this file"
 msgid "Select all"
 msgstr "Alles selecteren"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
-#| msgid "Filer"
 msgid "Files"
 msgstr "Bestanden"
 
@@ -1093,7 +1119,6 @@ msgstr "Uitvouwen"
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
-#| msgid "file missing"
 msgid "File is missing"
 msgstr "Bestand ontbreekt"
 
@@ -1149,31 +1174,38 @@ msgid "Choose File"
 msgstr "Kies bestand"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
-#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr "Kies Map"
 
 #: validation.py:19
 #, python-brace-format
 msgid "File \"{file_name}\": Upload denied by site security policy"
-msgstr "Bestand \"{file_name}\": Upload geweigerd door het beveiligingsbeleid van de site"
+msgstr ""
+"Bestand \"{file_name}\": Upload geweigerd door het beveiligingsbeleid van de "
+"site"
 
 #: validation.py:22
 #, python-brace-format
 msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
-msgstr "Bestand \"{file_name}\": {file_type} upload geweigerd door het beveiligingsbeleid van de site"
+msgstr ""
+"Bestand \"{file_name}\": {file_type} upload geweigerd door het "
+"beveiligingsbeleid van de site"
 
 #: validation.py:33
 #, python-brace-format
 msgid "File \"{file_name}\": HTML upload denied by site security policy"
-msgstr "Bestand \"{file_name}\": HTML upload geweigerd door het beveiligingsbeleid van de site"
+msgstr ""
+"Bestand \"{file_name}\": HTML upload geweigerd door het beveiligingsbeleid "
+"van de site"
 
 #: validation.py:71
 #, python-brace-format
 msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
-msgstr "Bestand \"{file_name}\": Afgewezen wegens mogelijke kwetsbaarheid voor cross-site scripting"
+msgstr ""
+"Bestand \"{file_name}\": Afgewezen wegens mogelijke kwetsbaarheid voor cross-"
+"site scripting"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"
