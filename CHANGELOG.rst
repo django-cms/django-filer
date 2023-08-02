@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* Update Dutch and French locale
+
 3.0.3 (2023-07-21)
 ==================
 
