@@ -8,7 +8,7 @@ CHANGELOG
 * Fix bug when submitting permission admin form
 * Fix folder select field css of permission admin form
 * Fix requirements (Django>=3.2) in setup.py and docs
-* Update Dutch and French locale
+* Update Dutch, Spanish and French locale
 
 3.0.3 (2023-07-21)
 ==================
