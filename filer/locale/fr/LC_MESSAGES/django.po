@@ -468,19 +468,19 @@ msgstr "permissions du dossier"
 
 #: models/foldermodels.py:348
 msgid "Folder cannot be selected with type \"all items\"."
-msgstr ""
+msgstr "Le dossier ne peut pas être sélectionné avec le type \"tous les éléments\"."
 
 #: models/foldermodels.py:350
 msgid "Folder has to be selected when type is not \"all items\"."
-msgstr ""
+msgstr "Un dossier doit être sélectionné lorsque le type n'est pas \"tous les éléments\"."
 
 #: models/foldermodels.py:352
 msgid "User or group cannot be selected together with \"everybody\"."
-msgstr ""
+msgstr "Un utilisateur ou un groupe ne peuvent être sélectionnés lorsque \"tout le monde\" est également sélectionné."
 
 #: models/foldermodels.py:354
 msgid "At least one of user, group, or \"everybody\" has to be selected."
-msgstr ""
+msgstr "Au moins une option parmi un utilisateur, un groupe, ou \"tout le monde\" doit être sélectionnée."
 
 #: models/foldermodels.py:360
 msgid "All Folders"

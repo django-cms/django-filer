@@ -12,16 +12,15 @@
 # Jeroen, 2018
 # Maikel Wever, 2013
 # Maikel Wever, 2013
+# Stefan van den Eertwegh <stefan@corebyte.nl>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-31 22:21+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
-"Last-Translator: Edwin Janssen, 2023\n"
-"Language-Team: Dutch (Netherlands) (http://app.transifex.com/divio/django-"
-"filer/language/nl_NL/)\n"
-"Language: nl_NL\n"
+"Last-Translator: Stefan van den Eertwegh <stefan@corebyte.nl>, 2023\n"
+"Language-Team: Dutch (Netherlands) (http://app.transifex.com/divio/django-filer/language/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -463,19 +462,19 @@ msgstr "toegangsrechten folder"
 
 #: models/foldermodels.py:348
 msgid "Folder cannot be selected with type \"all items\"."
-msgstr ""
+msgstr "Map kan niet geselecteerd worden met type \"alle items\"."
 
 #: models/foldermodels.py:350
 msgid "Folder has to be selected when type is not \"all items\"."
-msgstr ""
+msgstr "Map moet geselecteerd worden wanneer type niet \"alle items\" is."
 
 #: models/foldermodels.py:352
 msgid "User or group cannot be selected together with \"everybody\"."
-msgstr ""
+msgstr "Gebruiker of groep kan niet geselecteerd worden samen met \"iedereen\"."
 
 #: models/foldermodels.py:354
 msgid "At least one of user, group, or \"everybody\" has to be selected."
-msgstr ""
+msgstr "Ten minste één gebruiker, groep of \"iedereen\" moet worden geselecteerd."
 
 #: models/foldermodels.py:360
 msgid "All Folders"
