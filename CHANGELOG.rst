@@ -2,8 +2,8 @@
 CHANGELOG
 =========
 
-unreleased
-==========
+3.0.4 (2023-08-04)
+==================
 
 * Fix bug when submitting permission admin form
 * Fix folder select field css of permission admin form
