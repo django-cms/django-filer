@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.html import format_html, format_html_join
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
@@ -344,19 +345,19 @@ class FolderPermission(models.Model):
 
     def clean(self):
         if self.type == self.ALL and self.folder:
-            raise ValidationError('Folder cannot be selected with type "all items".')
+            raise ValidationError(_('Folder cannot be selected with type "all items".'))
         if self.type != self.ALL and not self.folder:
-            raise ValidationError('Folder has to be selected when type is not "all items".')
+            raise ValidationError(_('Folder has to be selected when type is not "all items".'))
         if self.everybody and (self.user or self.group):
-            raise ValidationError('User or group cannot be selected together with "everybody".')
+            raise ValidationError(_('User or group cannot be selected together with "everybody".'))
         if not self.user and not self.group and not self.everybody:
-            raise ValidationError('At least one of user, group, or "everybody" has to be selected.')
+            raise ValidationError(_('At least one of user, group, or "everybody" has to be selected.'))
 
     @cached_property
     def pretty_logical_path(self):
         if self.folder:
             return self.folder.pretty_logical_path
-        return _("All Folders")
+        return gettext("All Folders")
 
     pretty_logical_path.short_description = _("Logical Path")
 
