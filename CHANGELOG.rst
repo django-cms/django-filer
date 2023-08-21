@@ -6,6 +6,8 @@ unreleased
 ==========
 
 * Fix bug that ignored thumbnail storage custom settings in directory view
+* remove Django 2.2, 3.0, and 3.1 classifiers in setup.py
+* remove tests for Django < 3.2 since those versions are not supported anymore
 
 3.0.4 (2023-08-04)
 ==================
@@ -56,6 +58,7 @@ unreleased
 * Remove unused css from delete confirmation view and move file view
 * Add Pillow 10 compatibility
 * Update translations (de/fr/nl)
+* Drop Django 2.2, 3.0, and 3.1 support
 
 2.2.5 (2023-06-11)
 ==================
