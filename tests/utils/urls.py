@@ -8,7 +8,9 @@ admin.autodiscover()
 admin_urls = admin.site.urls
 
 urlpatterns = [
-    re_path(r'^media/(?P<path>.*)$', serve,
+    re_path(r'^media/my-preferred-base-url-for-source-files/(?P<path>.*)$', serve,
+            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    re_path(r'^media/my-preferred-base-url-for-thumbnails/(?P<path>.*)$', serve,
             {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     re_path(r'^admin/', admin_urls),
     re_path(r'^', include('filer.server.urls')),

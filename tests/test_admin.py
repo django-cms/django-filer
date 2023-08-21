@@ -124,7 +124,8 @@ class FilerFolderAdminUrlsTests(TestCase):
             # 7. Selecting file and owner data
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
-
+        self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
+        self.assertContains(response, "/media/my-preferred-base-url-for-thumbnails/")
         for thumbnail_url in thumbnail_urls:
             self.assertContains(response, thumbnail_url)
 
@@ -1693,8 +1694,8 @@ class FileIconContextTests(TestCase):
         image.save()
         context = {}
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=image, height=40, width=40)
-        assert 'sidebar_image_ratio' in context.keys()
-        assert 'download_url' in context.keys()
+        self.assertIn('sidebar_image_ratio', context.keys())
+        self.assertIn('download_url', context.keys())
 
     def test_file_icon_with_size(self):
         """
@@ -1703,5 +1704,5 @@ class FileIconContextTests(TestCase):
         file = File.objects.create(name='test.pdf')
         context = {}
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=file, height=40, width=40)
-        assert 'sidebar_image_ratio' not in context.keys()
-        assert 'download_url' in context.keys()
+        self.assertNotIn('sidebar_image_ratio', context.keys())
+        self.assertIn('download_url', context.keys())
