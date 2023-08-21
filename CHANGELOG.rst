@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* Fix bug that ignored thumbnail storage custom settings in directory view
+
 3.0.4 (2023-08-04)
 ==================
 
