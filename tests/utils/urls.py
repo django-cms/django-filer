@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
+from django.urls import path
 from django.urls import include, re_path
 from django.views.static import serve
 
@@ -13,6 +14,6 @@ urlpatterns = [
     re_path(r'^media/my-preferred-base-url-for-thumbnails/(?P<path>.*)$', serve,
             {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     re_path(r'^admin/', admin_urls),
-    re_path(r'^', include('filer.server.urls')),
-    re_path(r'^filer/', include('filer.urls')),
+    path('', include('filer.server.urls')),
+    path('filer/', include('filer.urls')),
 ]
