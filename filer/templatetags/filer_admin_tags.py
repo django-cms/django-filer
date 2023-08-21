@@ -109,7 +109,7 @@ def file_icon_context(file, detail, width, height):
         'height': width,  # The icon is a square
     }
     # Check if file exists for performance reasons (only on FileSystemStorage)
-    if isinstance(file.file.thumbnail_storage, FileSystemStorage) and file.file and not file.file.exists():
+    if file.file and isinstance(file.file.source_storage, FileSystemStorage) and not file.file.exists():
         return not_available_context
 
     if isinstance(file, BaseImage):
