@@ -2,9 +2,10 @@
 CHANGELOG
 =========
 
-unreleased
-==========
+3.0.5 (2023-08-22)
+==================
 
+* Fix bug that ignored thumbnail storage custom settings in directory view
 * remove Django 2.2, 3.0, and 3.1 classifiers in setup.py
 * remove tests for Django < 3.2 since those versions are not supported anymore
 

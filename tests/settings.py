@@ -52,6 +52,22 @@ HELPER_SETTINGS = {
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
+    'FILER_STORAGES': {
+        "public": {
+            "main": {
+                "ENGINE": 'django.core.files.storage.FileSystemStorage',
+                "OPTIONS": {
+                    "base_url": "/media/my-preferred-base-url-for-source-files/",
+                }
+            },
+            "thumbnails": {
+                "ENGINE": 'django.core.files.storage.FileSystemStorage',
+                "OPTIONS": {
+                    "base_url": "/media/my-preferred-base-url-for-thumbnails/",
+                }
+            }
+        }
+    },
     'SECRET_KEY': '__secret__',
     'DEFAULT_AUTO_FIELD': 'django.db.models.AutoField',
 }
