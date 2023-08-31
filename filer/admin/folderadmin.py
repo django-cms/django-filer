@@ -317,13 +317,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         folder_qs = folder_qs.order_by('name').select_related("owner")
         order_by = request.GET.get('order_by', None)
-        if order_by is None:
-            order_by = "file"
-        order_by = order_by.split(',')
-        order_by = [field for field in order_by
-                    if re.sub(r'^-', '', field) in self.order_by_file_fields]
-        if len(order_by) > 0:
-            file_qs = file_qs.order_by(*order_by)
+        if order_by is not None:
+            order_by = order_by.split(',')
+            order_by = [field for field in order_by
+                        if re.sub(r'^-', '', field) in self.order_by_file_fields]
+            if len(order_by) > 0:
+                file_qs = file_qs.order_by(*order_by)
+        else:
+            file_qs.sort()
 
         if folder.is_root and not search_mode:
             virtual_items = folder.virtual_folders
