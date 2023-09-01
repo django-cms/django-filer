@@ -368,11 +368,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except:  # noqa
             permissions = {}
         
+        # When there is no order_by query param, order the qs
+        # with the default Python sort.
+        # (this is the behaviour of the 2.x versions)
+        file_list = []
         if order_by is None:
-            file_qs = list(file_qs)
-            file_qs.sort()
+            file_list = list(file_qs)
+            file_list.sort()
 
-        items = list(itertools.chain(folder_qs, file_qs))
+        items = list(itertools.chain(folder_qs, file_list or file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
@@ -453,7 +457,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'q': urlquote(q),
             'show_result_count': show_result_count,
             'folder_children': folder_qs,
-            'folder_files': file_qs,
+            # in case we do not order on the DB, use the ordered file_list here
+            'folder_files': file_list or file_qs,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
