@@ -13,7 +13,8 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery, Case, When
+from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import path, reverse
@@ -317,12 +318,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         folder_qs = folder_qs.order_by('name').select_related("owner")
         order_by = request.GET.get('order_by', None)
-        if order_by is not None:
-            order_by = order_by.split(',')
-            order_by = [field for field in order_by
-                        if re.sub(r'^-', '', field) in self.order_by_file_fields]
-            if len(order_by) > 0:
-                file_qs = file_qs.order_by(*order_by)
+        order_by_annotation = None
+        if order_by is None:
+            file_qs = file_qs.annotate(coalesce_sort_field=Coalesce(
+                Case(
+                    When(name__exact='', then=None),
+                    When(name__isnull=False, then='name')
+                ),
+                'original_filename'
+            ))
+            order_by_annotation = Lower('coalesce_sort_field')
+
+        order_by = order_by.split(',') if order_by else []
+        order_by = [field for field in order_by
+                    if re.sub(r'^-', '', field) in self.order_by_file_fields]
+        if len(order_by) > 0:
+            file_qs = file_qs.order_by(*order_by)
+        elif order_by_annotation:
+            file_qs = file_qs.order_by(order_by_annotation)
 
         if folder.is_root and not search_mode:
             virtual_items = folder.virtual_folders
@@ -368,15 +381,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         except:  # noqa
             permissions = {}
         
-        # When there is no order_by query param, order the qs
-        # with the default Python sort.
-        # (this is the behaviour of the 2.x versions)
-        file_list = []
-        if order_by is None:
-            file_list = list(file_qs)
-            file_list.sort()
-
-        items = list(itertools.chain(folder_qs, file_list or file_qs))
+        items = list(itertools.chain(folder_qs, file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
@@ -457,8 +462,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'q': urlquote(q),
             'show_result_count': show_result_count,
             'folder_children': folder_qs,
-            # in case we do not order on the DB, use the ordered file_list here
-            'folder_files': file_list or file_qs,
+            'folder_files': file_qs,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
