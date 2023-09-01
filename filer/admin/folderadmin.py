@@ -26,7 +26,15 @@ from django.utils.translation import ngettext_lazy
 from easy_thumbnails.models import Thumbnail
 
 from .. import settings
-from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
+from ..models import (
+    File,
+    Folder,
+    FolderPermission,
+    FolderRoot,
+    ImagesWithMissingData,
+    UnsortedImages,
+    tools,
+)
 from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY, TABLE_LIST_TYPE
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
@@ -37,8 +45,14 @@ from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext, admin_url_params_encoded, check_files_edit_permissions, check_files_read_permissions,
-    check_folder_edit_permissions, check_folder_read_permissions, get_directory_listing_type, popup_status,
+    AdminContext,
+    admin_url_params_encoded,
+    check_files_edit_permissions,
+    check_files_read_permissions,
+    check_folder_edit_permissions,
+    check_folder_read_permissions,
+    get_directory_listing_type,
+    popup_status,
     userperms_for_request,
 )
 
@@ -51,49 +65,59 @@ class AddFolderPopupForm(forms.ModelForm):
 
     class Meta:
         model = Folder
-        fields = ('name',)
+        fields = ("name",)
 
 
 class FolderAdmin(PrimitivePermissionAwareModelAdmin):
-    list_display = ('name',)
-    exclude = ('parent',)
+    list_display = ("name",)
+    exclude = ("parent",)
     list_per_page = 100
-    list_filter = ('owner',)
-    search_fields = ['name']
-    autocomplete_fields = ['owner']
+    list_filter = ("owner",)
+    search_fields = ["name"]
+    autocomplete_fields = ["owner"]
     save_as = True  # see ImageAdmin
-    actions = ['delete_files_or_folders', 'move_files_and_folders',
-               'copy_files_and_folders', 'resize_images', 'rename_files']
+    actions = [
+        "delete_files_or_folders",
+        "move_files_and_folders",
+        "copy_files_and_folders",
+        "resize_images",
+        "rename_files",
+    ]
 
-    directory_listing_template = 'admin/filer/folder/directory_listing.html'
-    order_by_file_fields = ['_file_size', 'original_filename', 'name', 'owner',
-                            'uploaded_at', 'modified_at']
+    directory_listing_template = "admin/filer/folder/directory_listing.html"
+    order_by_file_fields = [
+        "_file_size",
+        "original_filename",
+        "name",
+        "owner",
+        "uploaded_at",
+        "modified_at",
+    ]
 
     def get_form(self, request, obj=None, **kwargs):
         """
         Returns a Form class for use in the admin add view. This is used by
         add_view and change_view.
         """
-        parent_id = request.GET.get('parent_id', None)
+        parent_id = request.GET.get("parent_id", None)
         if not parent_id:
-            parent_id = request.POST.get('parent_id', None)
+            parent_id = request.POST.get("parent_id", None)
         if parent_id:
             return AddFolderPopupForm
         else:
-            folder_form = super().get_form(
-                request, obj=None, **kwargs)
+            folder_form = super().get_form(request, obj=None, **kwargs)
 
             def folder_form_clean(form_obj):
                 cleaned_data = form_obj.cleaned_data
                 folders_with_same_name = self.get_queryset(request).filter(
-                    parent=form_obj.instance.parent,
-                    name=cleaned_data['name'])
+                    parent=form_obj.instance.parent, name=cleaned_data["name"]
+                )
                 if form_obj.instance.pk:
                     folders_with_same_name = folders_with_same_name.exclude(
-                        pk=form_obj.instance.pk)
+                        pk=form_obj.instance.pk
+                    )
                 if folders_with_same_name.exists():
-                    raise ValidationError(
-                        'Folder with this name already exists.')
+                    raise ValidationError("Folder with this name already exists.")
                 return cleaned_data
 
             # attach clean to the default form rather than defining a new form class
@@ -106,9 +130,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         the object is being changed, and False if it's being added.
         """
         r = form.save(commit=False)
-        parent_id = request.GET.get('parent_id', None)
+        parent_id = request.GET.get("parent_id", None)
         if not parent_id:
-            parent_id = request.POST.get('parent_id', None)
+            parent_id = request.POST.get("parent_id", None)
         if parent_id:
             parent = self.get_queryset(request).get(id=parent_id)
             r.parent = parent
@@ -121,16 +145,16 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         """
         if (
             request.POST
-            and '_continue' not in request.POST
-            and '_saveasnew' not in request.POST
-            and '_addanother' not in request.POST
+            and "_continue" not in request.POST
+            and "_saveasnew" not in request.POST
+            and "_addanother" not in request.POST
         ):
-
             if obj.parent:
-                url = reverse('admin:filer-directory_listing',
-                              kwargs={'folder_id': obj.parent.id})
+                url = reverse(
+                    "admin:filer-directory_listing", kwargs={"folder_id": obj.parent.id}
+                )
             else:
-                url = reverse('admin:filer-directory_listing-root')
+                url = reverse("admin:filer-directory_listing-root")
             url = "{}{}".format(
                 url,
                 admin_url_params_encoded(request),
@@ -138,17 +162,25 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return HttpResponseRedirect(url)
         return super().response_change(request, obj)
 
-    def render_change_form(self, request, context, add=False, change=False,
-                           form_url='', obj=None):
+    def render_change_form(
+        self, request, context, add=False, change=False, form_url="", obj=None
+    ):
         info = self.model._meta.app_label, self.model._meta.model_name
-        extra_context = {'show_delete': True,
-                         'history_url': 'admin:%s_%s_history' % info,
-                         'is_popup': popup_status(request),
-                         'filer_admin_context': AdminContext(request)}
+        extra_context = {
+            "show_delete": True,
+            "history_url": "admin:%s_%s_history" % info,
+            "is_popup": popup_status(request),
+            "filer_admin_context": AdminContext(request),
+        }
         context.update(extra_context)
         return super().render_change_form(
-            request=request, context=context, add=add,
-            change=change, form_url=form_url, obj=obj)
+            request=request,
+            context=context,
+            add=add,
+            change=change,
+            form_url=form_url,
+            obj=obj,
+        )
 
     def delete_view(self, request, object_id, extra_context=None):
         """
@@ -177,13 +209,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             self.delete_files_or_folders(
                 request,
                 files_queryset=File.objects.none(),
-                folders_queryset=self.get_queryset(request).filter(id=object_id)
+                folders_queryset=self.get_queryset(request).filter(id=object_id),
             )
             if parent_folder:
-                url = reverse('admin:filer-directory_listing',
-                              kwargs={'folder_id': parent_folder.id})
+                url = reverse(
+                    "admin:filer-directory_listing",
+                    kwargs={"folder_id": parent_folder.id},
+                )
             else:
-                url = reverse('admin:filer-directory_listing-root')
+                url = reverse("admin:filer-directory_listing-root")
             url = "{}{}".format(
                 url,
                 admin_url_params_encoded(request),
@@ -193,46 +227,59 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return self.delete_files_or_folders(
             request,
             files_queryset=File.objects.none(),
-            folders_queryset=self.get_queryset(request).filter(id=object_id)
+            folders_queryset=self.get_queryset(request).filter(id=object_id),
         )
 
     def icon_img(self, xs):
-        return format_html('<img src="filer/icons/folder.svg" alt="Folder Icon" />', django_settings.STATIC_ROOT)
+        return format_html(
+            '<img src="filer/icons/folder.svg" alt="Folder Icon" />',
+            django_settings.STATIC_ROOT,
+        )
+
     icon_img.allow_tags = True
 
     def get_urls(self):
         return [
             # we override the default list view with our own directory listing
             # of the root directories
-            path('',
-                 self.admin_site.admin_view(self.directory_listing),
-                 name='filer-directory_listing-root'),
-
-            path('last/',
-                 self.admin_site.admin_view(self.directory_listing),
-                 {'viewtype': 'last'},
-                 name='filer-directory_listing-last'),
-
-            path('<int:folder_id>/list/',
-                 self.admin_site.admin_view(self.directory_listing),
-                 name='filer-directory_listing'),
-
-            path('<int:folder_id>/make_folder/',
-                 self.admin_site.admin_view(views.make_folder),
-                 name='filer-directory_listing-make_folder'),
-            path('make_folder/',
-                 self.admin_site.admin_view(views.make_folder),
-                 name='filer-directory_listing-make_root_folder'),
-
-            path('images_with_missing_data/',
-                 self.admin_site.admin_view(self.directory_listing),
-                 {'viewtype': 'images_with_missing_data'},
-                 name='filer-directory_listing-images_with_missing_data'),
-
-            path('unfiled_images/',
-                 self.admin_site.admin_view(self.directory_listing),
-                 {'viewtype': 'unfiled_images'},
-                 name='filer-directory_listing-unfiled_images'),
+            path(
+                "",
+                self.admin_site.admin_view(self.directory_listing),
+                name="filer-directory_listing-root",
+            ),
+            path(
+                "last/",
+                self.admin_site.admin_view(self.directory_listing),
+                {"viewtype": "last"},
+                name="filer-directory_listing-last",
+            ),
+            path(
+                "<int:folder_id>/list/",
+                self.admin_site.admin_view(self.directory_listing),
+                name="filer-directory_listing",
+            ),
+            path(
+                "<int:folder_id>/make_folder/",
+                self.admin_site.admin_view(views.make_folder),
+                name="filer-directory_listing-make_folder",
+            ),
+            path(
+                "make_folder/",
+                self.admin_site.admin_view(views.make_folder),
+                name="filer-directory_listing-make_root_folder",
+            ),
+            path(
+                "images_with_missing_data/",
+                self.admin_site.admin_view(self.directory_listing),
+                {"viewtype": "images_with_missing_data"},
+                name="filer-directory_listing-images_with_missing_data",
+            ),
+            path(
+                "unfiled_images/",
+                self.admin_site.admin_view(self.directory_listing),
+                {"viewtype": "unfiled_images"},
+                name="filer-directory_listing-unfiled_images",
+            ),
         ] + super().get_urls()
 
     # custom views
@@ -240,30 +287,36 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not request.user.has_perm("filer.can_use_directory_listing"):
             raise PermissionDenied()
         clipboard = tools.get_user_clipboard(request.user)
-        if viewtype == 'images_with_missing_data':
+        if viewtype == "images_with_missing_data":
             folder = ImagesWithMissingData()
-        elif viewtype == 'unfiled_images':
+        elif viewtype == "unfiled_images":
             # pass user in the class invocation, so that we can get
             # access to the current user instance in the class
             folder = UnsortedImages(user=request.user)
-        elif viewtype == 'last':
-            last_folder_id = request.session.get('filer_last_folder_id')
+        elif viewtype == "last":
+            last_folder_id = request.session.get("filer_last_folder_id")
             try:
                 self.get_queryset(request).get(id=last_folder_id)
             except self.model.DoesNotExist:
-                url = reverse('admin:filer-directory_listing-root')
+                url = reverse("admin:filer-directory_listing-root")
                 url = "{}{}".format(url, admin_url_params_encoded(request))
             else:
-                url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
+                url = reverse(
+                    "admin:filer-directory_listing",
+                    kwargs={"folder_id": last_folder_id},
+                )
                 url = "{}{}".format(url, admin_url_params_encoded(request))
             return HttpResponseRedirect(url)
         elif folder_id is None:
             folder = FolderRoot()
         else:
             folder = get_object_or_404(self.get_queryset(request), id=folder_id)
-        request.session['filer_last_folder_id'] = folder_id
+        request.session["filer_last_folder_id"] = folder_id
 
-        list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
+        list_type = (
+            get_directory_listing_type(request)
+            or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
+        )
         if list_type == TABLE_LIST_TYPE:
             size = "40x40"  # Prefetch thumbnails for listing
             size_x2 = "80x80"
@@ -278,22 +331,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         list_display = list(self.list_display)
         if not actions:
             try:
-                list_display.remove('action_checkbox')
+                list_display.remove("action_checkbox")
             except ValueError:
                 pass
 
         # search
-        q = request.GET.get('q')
+        q = request.GET.get("q")
         if q:
-            search_terms = urlunquote(q).split(' ')
+            search_terms = urlunquote(q).split(" ")
             search_mode = True
         else:
             search_terms = []
-            q = ''
+            q = ""
             search_mode = False
         # Limit search results to current folder.
-        limit_search_to_folder = request.GET.get('limit_search_to_folder',
-                                                 False) in (True, 'on')
+        limit_search_to_folder = request.GET.get("limit_search_to_folder", False) in (
+            True,
+            "on",
+        )
 
         if len(search_terms) > 0:
             if folder and limit_search_to_folder and not folder.is_root:
@@ -302,11 +357,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 folder_qs = Folder.objects.filter(pk__in=desc_folder_ids)
                 # Limit search results to files in the current folder or any
                 # nested folder.
-                file_qs = File.objects.filter(folder_id__in=desc_folder_ids + [folder.pk])
+                file_qs = File.objects.filter(
+                    folder_id__in=desc_folder_ids + [folder.pk]
+                )
             else:
                 folder_qs = self.get_queryset(request)
                 file_qs = File.objects.all()
-            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related("children", "all_files")
+            folder_qs = self.filter_folder(folder_qs, search_terms).prefetch_related(
+                "children", "all_files"
+            )
             file_qs = self.filter_file(file_qs, search_terms)
 
             show_result_count = True
@@ -315,12 +374,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             file_qs = folder.files.all()
             show_result_count = False
 
-        folder_qs = folder_qs.order_by('name').select_related("owner")
-        order_by = request.GET.get('order_by', None)
+        folder_qs = folder_qs.order_by("name").select_related("owner")
+        order_by = request.GET.get("order_by", None)
         if order_by is not None:
-            order_by = order_by.split(',')
-            order_by = [field for field in order_by
-                        if re.sub(r'^-', '', field) in self.order_by_file_fields]
+            order_by = order_by.split(",")
+            order_by = [
+                field
+                for field in order_by
+                if re.sub(r"^-", "", field) in self.order_by_file_fields
+            ]
             if len(order_by) > 0:
                 file_qs = file_qs.order_by(*order_by)
 
@@ -330,53 +392,64 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             virtual_items = []
 
         perms = FolderPermission.objects.get_read_id_list(request.user)
-        if perms != 'All':
+        if perms != "All":
             file_qs = file_qs.filter(
                 models.Q(folder__id__in=perms)
                 | models.Q(folder_id__isnull=True)
                 | models.Q(owner=request.user)
             )
-            folder_qs = folder_qs.filter(models.Q(id__in=perms) | models.Q(owner=request.user))
-            root_exclude_kwargs = {'parent__isnull': False, 'parent__id__in': perms}
+            folder_qs = folder_qs.filter(
+                models.Q(id__in=perms) | models.Q(owner=request.user)
+            )
+            root_exclude_kwargs = {"parent__isnull": False, "parent__id__in": perms}
         else:
-            root_exclude_kwargs = {'parent__isnull': False}
+            root_exclude_kwargs = {"parent__isnull": False}
         if folder.is_root:
             folder_qs = folder_qs.exclude(**root_exclude_kwargs)
 
         # Annotate thumbnail status
         thumbnail_qs = (
-            Thumbnail.objects
-            .filter(
+            Thumbnail.objects.filter(
                 source__name=OuterRef("file"),
                 modified__gte=F("source__modified"),
             )
-            .exclude(name__contains="upscale")  # TODO: Check WHY not used by directory listing
+            .exclude(
+                name__contains="upscale"
+            )  # TODO: Check WHY not used by directory listing
             .order_by("-modified")
         )
         file_qs = file_qs.annotate(
-            thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]),
-            thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[:1])
+            thumbnail_name=Subquery(
+                thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]
+            ),
+            thumbnailx2_name=Subquery(
+                thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[
+                    :1
+                ]
+            ),
         ).select_related("owner")
 
         try:
             permissions = {
-                'has_edit_permission': folder.has_edit_permission(request),
-                'has_read_permission': folder.has_read_permission(request),
-                'has_add_children_permission':
-                    folder.has_add_children_permission(request),
+                "has_edit_permission": folder.has_edit_permission(request),
+                "has_read_permission": folder.has_read_permission(request),
+                "has_add_children_permission": folder.has_add_children_permission(
+                    request
+                ),
             }
         except:  # noqa
             permissions = {}
-        
-        if order_by is None:
-            file_qs = list(file_qs)
-            file_qs.sort()
 
-        items = list(itertools.chain(folder_qs, file_qs))
+        file_list = None
+        if order_by is None:
+            file_list = list(file_qs)
+            file_list.sort()
+
+        items = list(itertools.chain(folder_qs, file_list or file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
         # Are we moving to clipboard?
-        if request.method == 'POST' and '_save' not in request.POST:
+        if request.method == "POST" and "_save" not in request.POST:
             # TODO: Refactor/remove clipboard parts
             for f in folder_qs:
                 if "move-to-clipboard-%d" % (f.id,) in request.POST:
@@ -390,97 +463,120 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
         # Actions with no confirmation
         if (
-            actions and request.method == 'POST'
-            and 'index' in request.POST
-            and '_save' not in request.POST
+            actions
+            and request.method == "POST"
+            and "index" in request.POST
+            and "_save" not in request.POST
         ):
             if selected:
-                response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
+                response = self.response_action(
+                    request, files_queryset=file_qs, folders_queryset=folder_qs
+                )
                 if response:
                     return response
             else:
-                msg = _("Items must be selected in order to perform "
-                        "actions on them. No items have been changed.")
+                msg = _(
+                    "Items must be selected in order to perform "
+                    "actions on them. No items have been changed."
+                )
                 self.message_user(request, msg)
 
         # Actions with confirmation
         if (
-            actions and request.method == 'POST'
+            actions
+            and request.method == "POST"
             and helpers.ACTION_CHECKBOX_NAME in request.POST
-            and 'index' not in request.POST
-            and '_save' not in request.POST
+            and "index" not in request.POST
+            and "_save" not in request.POST
         ):
             if selected:
-                response = self.response_action(request, files_queryset=file_qs, folders_queryset=folder_qs)
+                response = self.response_action(
+                    request, files_queryset=file_qs, folders_queryset=folder_qs
+                )
                 if response:
                     return response
 
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
-            action_form.fields['action'].choices = self.get_action_choices(request)
+            action_form.fields["action"].choices = self.get_action_choices(request)
         else:
             action_form = None
 
-        selection_note_all = ngettext_lazy('%(total_count)s selected',
-            'All %(total_count)s selected', paginator.count)
+        selection_note_all = ngettext_lazy(
+            "%(total_count)s selected", "All %(total_count)s selected", paginator.count
+        )
 
         # If page request (9999) is out of range, deliver last page of results.
         try:
-            paginated_items = paginator.page(request.GET.get('page', 1))
+            paginated_items = paginator.page(request.GET.get("page", 1))
         except PageNotAnInteger:
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
 
         context = self.admin_site.each_context(request)
-        context.update({
-            'folder': folder,
-            'clipboard_files': File.objects.filter(
-                in_clipboards__clipboarditem__clipboard__user=request.user
-            ).distinct(),
-            'paginator': paginator,
-            'paginated_items': paginated_items,
-            'virtual_items': virtual_items,
-            'uploader_connections': settings.FILER_UPLOADER_CONNECTIONS,
-            'max_files': settings.FILER_UPLOADER_MAX_FILES,
-            'max_filesize': settings.FILER_UPLOADER_MAX_FILE_SIZE,
-            'permissions': permissions,
-            'permstest': userperms_for_request(folder, request),
-            'current_url': request.path,
-            'title': _('Directory listing for %(folder_name)s') % {'folder_name': folder.name},
-            'search_string': ' '.join(search_terms),
-            'q': urlquote(q),
-            'show_result_count': show_result_count,
-            'folder_children': folder_qs,
-            'folder_files': file_qs,
-            'limit_search_to_folder': limit_search_to_folder,
-            'is_popup': popup_status(request),
-            'filer_admin_context': AdminContext(request),
-            # needed in the admin/base.html template for logout links
-            'root_path': reverse('admin:index'),
-            'action_form': action_form,
-            'actions_on_top': self.actions_on_top,
-            'actions_on_bottom': self.actions_on_bottom,
-            'actions_selection_counter': self.actions_selection_counter,
-            'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(paginated_items.object_list)},
-            'selection_note_all': selection_note_all % {'total_count': paginator.count},
-            'list_type': list_type,
-            'list_type_template': settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[list_type]['template'],
-            'media': self.media,
-            'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
-            'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),
-        })
+        context.update(
+            {
+                "folder": folder,
+                "clipboard_files": File.objects.filter(
+                    in_clipboards__clipboarditem__clipboard__user=request.user
+                ).distinct(),
+                "paginator": paginator,
+                "paginated_items": paginated_items,
+                "virtual_items": virtual_items,
+                "uploader_connections": settings.FILER_UPLOADER_CONNECTIONS,
+                "max_files": settings.FILER_UPLOADER_MAX_FILES,
+                "max_filesize": settings.FILER_UPLOADER_MAX_FILE_SIZE,
+                "permissions": permissions,
+                "permstest": userperms_for_request(folder, request),
+                "current_url": request.path,
+                "title": _("Directory listing for %(folder_name)s")
+                % {"folder_name": folder.name},
+                "search_string": " ".join(search_terms),
+                "q": urlquote(q),
+                "show_result_count": show_result_count,
+                "folder_children": folder_qs,
+                "folder_files": file_list or file_qs,
+                "limit_search_to_folder": limit_search_to_folder,
+                "is_popup": popup_status(request),
+                "filer_admin_context": AdminContext(request),
+                # needed in the admin/base.html template for logout links
+                "root_path": reverse("admin:index"),
+                "action_form": action_form,
+                "actions_on_top": self.actions_on_top,
+                "actions_on_bottom": self.actions_on_bottom,
+                "actions_selection_counter": self.actions_selection_counter,
+                "selection_note": _("0 of %(cnt)s selected")
+                % {"cnt": len(paginated_items.object_list)},
+                "selection_note_all": selection_note_all
+                % {"total_count": paginator.count},
+                "list_type": list_type,
+                "list_type_template": settings.FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS[
+                    list_type
+                ][
+                    "template"
+                ],
+                "media": self.media,
+                "enable_permissions": settings.FILER_ENABLE_PERMISSIONS,
+                "can_make_folder": request.user.is_superuser
+                or (
+                    folder.is_root
+                    and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS
+                )
+                or permissions.get("has_add_children_permission"),
+            }
+        )
         return render(request, self.directory_listing_template, context)
 
     def filter_folder(self, qs, terms=()):
         # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947  flake8: noqa
         def construct_search(field_name):
-            if field_name.startswith('^'):
+            if field_name.startswith("^"):
                 return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
+            elif field_name.startswith("="):
                 return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
+            elif field_name.startswith("@"):
                 return "%s__search" % field_name[1:]
             else:
                 return "%s__icontains" % field_name
@@ -496,9 +592,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
     def filter_file(self, qs, terms=()):
         for term in terms:
-            filters = (models.Q(name__icontains=term)
-                       | models.Q(description__icontains=term)
-                       | models.Q(original_filename__icontains=term))
+            filters = (
+                models.Q(name__icontains=term)
+                | models.Q(description__icontains=term)
+                | models.Q(original_filename__icontains=term)
+            )
             for filter_ in self.get_owner_filter_lookups():
                 filters |= models.Q(**{filter_: term})
             qs = qs.filter(filters)
@@ -512,18 +610,17 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         first_name, last_name, and email.
         """
         from django.contrib.auth import get_user_model
+
         User = get_user_model()
 
         return [
-            field.name for field in User._meta.fields
-            if isinstance(field, models.CharField) and field.name != 'password'
+            field.name
+            for field in User._meta.fields
+            if isinstance(field, models.CharField) and field.name != "password"
         ]
 
     def get_owner_filter_lookups(self):
-        return [
-            f'owner__{field}__icontains'
-            for field in self.owner_search_fields
-        ]
+        return [f"owner__{field}__icontains" for field in self.owner_search_fields]
 
     def response_action(self, request, files_queryset, folders_queryset):
         """
@@ -536,7 +633,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # and bottom of the change list, for example). Get the action
         # whose button was pushed.
         try:
-            action_index = int(request.POST.get('index', 0))
+            action_index = int(request.POST.get("index", 0))
         except ValueError:
             action_index = 0
 
@@ -547,7 +644,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # Use the action whose button was pushed
         try:
-            data.update({'action': data.getlist('action')[action_index]})
+            data.update({"action": data.getlist("action")[action_index]})
         except IndexError:
             # If we didn't get an action from the chosen form that's invalid
             # POST data, so by deleting action it'll fail the validation check
@@ -555,12 +652,12 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             pass
 
         action_form = self.action_form(data, auto_id=None)
-        action_form.fields['action'].choices = self.get_action_choices(request)
+        action_form.fields["action"].choices = self.get_action_choices(request)
 
         # If the form's valid we can handle the action.
         if action_form.is_valid():
-            action = action_form.cleaned_data['action']
-            select_across = action_form.cleaned_data['select_across']
+            action = action_form.cleaned_data["action"]
+            select_across = action_form.cleaned_data["select_across"]
             func, name, description = self.get_actions(request)[action]
 
             # Get the list of selected PKs. If nothing's selected, we can't
@@ -570,8 +667,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             if not selected and not select_across:
                 # Reminder that something needs to be selected or nothing
                 # will happen
-                msg = _("Items must be selected in order to perform "
-                        "actions on them. No items have been changed.")
+                msg = _(
+                    "Items must be selected in order to perform "
+                    "actions on them. No items have been changed."
+                )
                 self.message_user(request, msg)
                 return None
 
@@ -587,8 +686,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
                 # Perform the action only on the selected objects
                 files_queryset = files_queryset.filter(pk__in=selected_files)
-                folders_queryset = folders_queryset.filter(
-                    pk__in=selected_folders)
+                folders_queryset = folders_queryset.filter(pk__in=selected_folders)
 
             response = func(self, request, files_queryset, folders_queryset)
 
@@ -607,14 +705,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def get_actions(self, request):
         if settings.FILER_ENABLE_PERMISSIONS:
             actions = OrderedDict()
-            actions['files_set_public'] = self.get_action('files_set_public')
-            actions['files_set_private'] = self.get_action('files_set_private')
+            actions["files_set_public"] = self.get_action("files_set_public")
+            actions["files_set_private"] = self.get_action("files_set_private")
             actions.update(super().get_actions(request))
         else:
             actions = super().get_actions(request)
 
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
         return actions
 
     def move_to_clipboard(self, request, files_queryset, folders_queryset):
@@ -626,7 +724,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not self.has_change_permission(request):
             raise PermissionDenied
 
-        if request.method != 'POST':
+        if request.method != "POST":
             return None
 
         clipboard = tools.get_user_clipboard(request.user)
@@ -652,15 +750,19 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         move_files(files_queryset)
         move_folders(folders_queryset)
 
-        self.message_user(request, _("Successfully moved %(count)d files to "
-                                     "clipboard.") % {"count": files_count[0]})
+        self.message_user(
+            request,
+            _("Successfully moved %(count)d files to " "clipboard.")
+            % {"count": files_count[0]},
+        )
 
         return None
 
     move_to_clipboard.short_description = _("Move selected files to clipboard")
 
-    def files_set_public_or_private(self, request, set_public, files_queryset,
-                                    folders_queryset):
+    def files_set_public_or_private(
+        self, request, set_public, files_queryset, folders_queryset
+    ):
         """
         Action which enables or disables permissions for selected files and
         files in selected folders to clipboard (set them private or public).
@@ -671,7 +773,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         permissions_enabled = settings.FILER_ENABLE_PERMISSIONS
 
-        if request.method != 'POST' or not permissions_enabled:
+        if request.method != "POST" or not permissions_enabled:
             return None
 
         check_files_edit_permissions(request, files_queryset)
@@ -697,21 +799,35 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         set_folders(folders_queryset)
 
         if set_public:
-            self.message_user(request, _("Successfully disabled permissions for %(count)d files.") % {"count": files_count[0], })
+            self.message_user(
+                request,
+                _("Successfully disabled permissions for %(count)d files.")
+                % {
+                    "count": files_count[0],
+                },
+            )
         else:
-            self.message_user(request, _("Successfully enabled permissions for %(count)d files.") % {"count": files_count[0], })
+            self.message_user(
+                request,
+                _("Successfully enabled permissions for %(count)d files.")
+                % {
+                    "count": files_count[0],
+                },
+            )
 
         return None
 
     def files_set_private(self, request, files_queryset, folders_queryset):
-        return self.files_set_public_or_private(request, False, files_queryset,
-                                                folders_queryset)
+        return self.files_set_public_or_private(
+            request, False, files_queryset, folders_queryset
+        )
 
     files_set_private.short_description = _("Enable permissions for selected files")
 
     def files_set_public(self, request, files_queryset, folders_queryset):
-        return self.files_set_public_or_private(request, True, files_queryset,
-                                                folders_queryset)
+        return self.files_set_public_or_private(
+            request, True, files_queryset, folders_queryset
+        )
 
     files_set_public.short_description = _("Disable permissions for selected files")
 
@@ -734,7 +850,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             raise PermissionDenied
 
         current_folder = self._get_current_action_folder(
-            request, files_queryset, folders_queryset)
+            request, files_queryset, folders_queryset
+        )
 
         all_protected = []
 
@@ -743,8 +860,30 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # permissions.
         # TODO: Check if permissions are really verified
         using = router.db_for_write(self.model)
-        deletable_files, model_count_files, perms_needed_files, protected_files = get_deleted_objects(files_queryset, files_queryset.model._meta, request.user, self.admin_site, using)
-        deletable_folders, model_count_folder, perms_needed_folders, protected_folders = get_deleted_objects(folders_queryset, folders_queryset.model._meta, request.user, self.admin_site, using)
+        (
+            deletable_files,
+            model_count_files,
+            perms_needed_files,
+            protected_files,
+        ) = get_deleted_objects(
+            files_queryset,
+            files_queryset.model._meta,
+            request.user,
+            self.admin_site,
+            using,
+        )
+        (
+            deletable_folders,
+            model_count_folder,
+            perms_needed_folders,
+            protected_folders,
+        ) = get_deleted_objects(
+            folders_queryset,
+            folders_queryset.model._meta,
+            request.user,
+            self.admin_site,
+            using,
+        )
         all_protected.extend(protected_files)
         all_protected.extend(protected_folders)
 
@@ -753,7 +892,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         # The user has already confirmed the deletion. Do the deletion and
         # return a None to display the change list view again.
-        if request.POST.get('post'):
+        if request.POST.get("post"):
             if all_perms_needed:
                 raise PermissionDenied
             n = files_queryset.count() + folders_queryset.count()
@@ -777,7 +916,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 for f in folders_queryset:
                     self.log_deletion(request, f, force_str(f))
                     f.delete()
-                self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {"count": n, })
+                self.message_user(
+                    request,
+                    _("Successfully deleted %(count)d files and/or folders.")
+                    % {
+                        "count": n,
+                    },
+                )
             # Return None to display the change list page again.
             return None
 
@@ -787,51 +932,59 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             title = _("Are you sure?")
 
         context = self.admin_site.each_context(request)
-        context.update({
-            "title": title,
-            "instance": current_folder,
-            "breadcrumbs_action": _("Delete files and/or folders"),
-            "deletable_objects": all_deletable_objects,
-            "files_queryset": files_queryset,
-            "folders_queryset": folders_queryset,
-            "perms_lacking": all_perms_needed,
-            "protected": all_protected,
-            "opts": opts,
-            'is_popup': popup_status(request),
-            'filer_admin_context': AdminContext(request),
-            "root_path": reverse('admin:index'),
-            "app_label": app_label,
-            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        })
+        context.update(
+            {
+                "title": title,
+                "instance": current_folder,
+                "breadcrumbs_action": _("Delete files and/or folders"),
+                "deletable_objects": all_deletable_objects,
+                "files_queryset": files_queryset,
+                "folders_queryset": folders_queryset,
+                "perms_lacking": all_perms_needed,
+                "protected": all_protected,
+                "opts": opts,
+                "is_popup": popup_status(request),
+                "filer_admin_context": AdminContext(request),
+                "root_path": reverse("admin:index"),
+                "app_label": app_label,
+                "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
 
         # Display the destination folder selection page
         return render(
-            request,
-            "admin/filer/delete_selected_files_confirmation.html",
-            context
+            request, "admin/filer/delete_selected_files_confirmation.html", context
         )
 
-    delete_files_or_folders.short_description = _("Delete selected files and/or folders")
+    delete_files_or_folders.short_description = _(
+        "Delete selected files and/or folders"
+    )
 
     # Copied from django.contrib.admin.util
     def _format_callback(self, obj, user, admin_site, perms_needed):
         has_admin = obj.__class__ in admin_site._registry
         opts = obj._meta
         if has_admin:
-            admin_url = reverse('%s:%s_%s_change'
-                                % (admin_site.name,
-                                   opts.app_label,
-                                   opts.object_name.lower()),
-                                None, (quote(obj._get_pk_val()),))
+            admin_url = reverse(
+                "%s:%s_%s_change"
+                % (admin_site.name, opts.app_label, opts.object_name.lower()),
+                None,
+                (quote(obj._get_pk_val()),),
+            )
             p = get_delete_permission(opts)
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return format_html('{}: <a href="{}">{}</a>', escape(capfirst(opts.verbose_name)), admin_url, escape(obj))
+            return format_html(
+                '{}: <a href="{}">{}</a>',
+                escape(capfirst(opts.verbose_name)),
+                admin_url,
+                escape(obj),
+            )
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return '{}: {}'.format(capfirst(opts.verbose_name), force_str(obj))
+            return "{}: {}".format(capfirst(opts.verbose_name), force_str(obj))
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -851,8 +1004,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             return True
         return False
 
-    def _get_current_action_folder(self, request, files_queryset,
-                                   folders_queryset):
+    def _get_current_action_folder(self, request, files_queryset, folders_queryset):
         if files_queryset:
             return files_queryset[0].folder
         elif folders_queryset:
@@ -863,17 +1015,33 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _list_folders_to_copy_or_move(self, request, folders):
         for fo in folders:
             yield self._format_callback(fo, request.user, self.admin_site, set())
-            children = list(self._list_folders_to_copy_or_move(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files)])
+            children = list(
+                self._list_folders_to_copy_or_move(request, fo.children.all())
+            )
+            children.extend(
+                [
+                    self._format_callback(f, request.user, self.admin_site, set())
+                    for f in sorted(fo.files)
+                ]
+            )
             if children:
                 yield children
 
     def _list_all_to_copy_or_move(self, request, files_queryset, folders_queryset):
-        to_copy_or_move = list(self._list_folders_to_copy_or_move(request, folders_queryset))
-        to_copy_or_move.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset)])
+        to_copy_or_move = list(
+            self._list_folders_to_copy_or_move(request, folders_queryset)
+        )
+        to_copy_or_move.extend(
+            [
+                self._format_callback(f, request.user, self.admin_site, set())
+                for f in sorted(files_queryset)
+            ]
+        )
         return to_copy_or_move
 
-    def _list_all_destination_folders_recursive(self, request, folders_queryset, current_folder, folders, allow_self, level):
+    def _list_all_destination_folders_recursive(
+        self, request, folders_queryset, current_folder, folders, allow_self, level
+    ):
         for fo in folders:
             if not allow_self and fo in folders_queryset:
                 # We do not allow moving to selected folders or their descendants
@@ -883,15 +1051,34 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 continue
 
             # We do not allow copying/moving back to the folder itself
-            enabled = (allow_self or fo != current_folder) and fo.has_add_children_permission(request)
+            enabled = (
+                allow_self or fo != current_folder
+            ) and fo.has_add_children_permission(request)
             yield (fo, (mark_safe(("&nbsp;&nbsp;" * level) + force_str(fo)), enabled))
-            yield from self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, fo.children.all(), allow_self, level + 1)
+            yield from self._list_all_destination_folders_recursive(
+                request,
+                folders_queryset,
+                current_folder,
+                fo.children.all(),
+                allow_self,
+                level + 1,
+            )
 
-    def _list_all_destination_folders(self, request, folders_queryset, current_folder, allow_self):
-        root_folders = self.get_queryset(request).filter(parent__isnull=True).order_by('name')
-        return list(self._list_all_destination_folders_recursive(request, folders_queryset, current_folder, root_folders, allow_self, 0))
+    def _list_all_destination_folders(
+        self, request, folders_queryset, current_folder, allow_self
+    ):
+        root_folders = (
+            self.get_queryset(request).filter(parent__isnull=True).order_by("name")
+        )
+        return list(
+            self._list_all_destination_folders_recursive(
+                request, folders_queryset, current_folder, root_folders, allow_self, 0
+            )
+        )
 
-    def _move_files_and_folders_impl(self, files_queryset, folders_queryset, destination):
+    def _move_files_and_folders_impl(
+        self, files_queryset, folders_queryset, destination
+    ):
         files_queryset.update(folder=destination)
         folders_queryset.update(parent=destination)
 
@@ -899,16 +1086,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
+        current_folder = self._get_current_action_folder(
+            request, files_queryset, folders_queryset
+        )
         perms_needed = self._check_move_perms(request, files_queryset, folders_queryset)
-        to_move = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
+        to_move = self._list_all_to_copy_or_move(
+            request, files_queryset, folders_queryset
+        )
+        folders = self._list_all_destination_folders(
+            request, folders_queryset, current_folder, False
+        )
 
-        if request.method == 'POST' and request.POST.get('post'):
+        if request.method == "POST" and request.POST.get("post"):
             if perms_needed:
                 raise PermissionDenied
             try:
-                destination = self.get_queryset(request).get(pk=request.POST.get('destination'))
+                destination = self.get_queryset(request).get(
+                    pk=request.POST.get("destination")
+                )
             except self.model.DoesNotExist:
                 raise PermissionDenied
             folders_dict = dict(folders)
@@ -916,56 +1111,81 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 raise PermissionDenied
             # We count only topmost files and folders here
             n = files_queryset.count() + folders_queryset.count()
-            conflicting_names = [folder.name for folder in self.get_queryset(request).filter(parent=destination, name__in=folders_queryset.values('name'))]
+            conflicting_names = [
+                folder.name
+                for folder in self.get_queryset(request).filter(
+                    parent=destination, name__in=folders_queryset.values("name")
+                )
+            ]
             if conflicting_names:
-                messages.error(request, _("Folders with names %s already exist at the selected "
-                                          "destination") % ", ".join(conflicting_names))
+                messages.error(
+                    request,
+                    _(
+                        "Folders with names %s already exist at the selected "
+                        "destination"
+                    )
+                    % ", ".join(conflicting_names),
+                )
             elif n:
-                self._move_files_and_folders_impl(files_queryset, folders_queryset, destination)
-                self.message_user(request, _("Successfully moved %(count)d files and/or folders to folder '%(destination)s'.") % {
-                    "count": n,
-                    "destination": destination,
-                })
+                self._move_files_and_folders_impl(
+                    files_queryset, folders_queryset, destination
+                )
+                self.message_user(
+                    request,
+                    _(
+                        "Successfully moved %(count)d files and/or folders to folder '%(destination)s'."
+                    )
+                    % {
+                        "count": n,
+                        "destination": destination,
+                    },
+                )
             return None
 
         context = self.admin_site.each_context(request)
-        context.update({
-            "title": _("Move files and/or folders"),
-            "instance": current_folder,
-            "breadcrumbs_action": _("Move files and/or folders"),
-            "to_move": to_move,
-            "destination_folders": folders,
-            "files_queryset": files_queryset,
-            "folders_queryset": folders_queryset,
-            "perms_lacking": perms_needed,
-            "opts": opts,
-            "root_path": reverse('admin:index'),
-            "app_label": app_label,
-            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        })
+        context.update(
+            {
+                "title": _("Move files and/or folders"),
+                "instance": current_folder,
+                "breadcrumbs_action": _("Move files and/or folders"),
+                "to_move": to_move,
+                "destination_folders": folders,
+                "files_queryset": files_queryset,
+                "folders_queryset": folders_queryset,
+                "perms_lacking": perms_needed,
+                "opts": opts,
+                "root_path": reverse("admin:index"),
+                "app_label": app_label,
+                "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
 
         # Display the destination folder selection page
-        return render(request, "admin/filer/folder/choose_move_destination.html", context)
+        return render(
+            request, "admin/filer/folder/choose_move_destination.html", context
+        )
 
     move_files_and_folders.short_description = _("Move selected files and/or folders")
 
     def _rename_file(self, file_obj, form_data, counter, global_counter):
-        original_basename, original_extension = os.path.splitext(file_obj.original_filename)
+        original_basename, original_extension = os.path.splitext(
+            file_obj.original_filename
+        )
         if file_obj.name:
             current_basename, current_extension = os.path.splitext(file_obj.name)
         else:
             current_basename = ""
             current_extension = ""
-        file_obj.name = form_data['rename_format'] % {
-            'original_filename': file_obj.original_filename,
-            'original_basename': original_basename,
-            'original_extension': original_extension,
-            'current_filename': file_obj.name or "",
-            'current_basename': current_basename,
-            'current_extension': current_extension,
-            'current_folder': getattr(file_obj.folder, 'name', ''),
-            'counter': counter + 1,  # 1-based
-            'global_counter': global_counter + 1,  # 1-based
+        file_obj.name = form_data["rename_format"] % {
+            "original_filename": file_obj.original_filename,
+            "original_basename": original_basename,
+            "original_extension": original_extension,
+            "current_filename": file_obj.name or "",
+            "current_basename": current_basename,
+            "current_extension": current_extension,
+            "current_folder": getattr(file_obj.folder, "name", ""),
+            "counter": counter + 1,  # 1-based
+            "global_counter": global_counter + 1,  # 1-based
         }
         file_obj.save()
 
@@ -977,9 +1197,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return n
 
     def _rename_folder(self, folder, form_data, global_counter):
-        return self._rename_files_impl(folder.files.all(), folder.children.all(), form_data, global_counter)
+        return self._rename_files_impl(
+            folder.files.all(), folder.children.all(), form_data, global_counter
+        )
 
-    def _rename_files_impl(self, files_queryset, folders_queryset, form_data, global_counter):
+    def _rename_files_impl(
+        self, files_queryset, folders_queryset, form_data, global_counter
+    ):
         n = 0
 
         for f in folders_queryset:
@@ -993,39 +1217,51 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
+        current_folder = self._get_current_action_folder(
+            request, files_queryset, folders_queryset
+        )
         perms_needed = self._check_move_perms(request, files_queryset, folders_queryset)
-        to_rename = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
+        to_rename = self._list_all_to_copy_or_move(
+            request, files_queryset, folders_queryset
+        )
 
-        if request.method == 'POST' and request.POST.get('post'):
+        if request.method == "POST" and request.POST.get("post"):
             if perms_needed:
                 raise PermissionDenied
             form = RenameFilesForm(request.POST)
             if form.is_valid():
                 if files_queryset.count() + folders_queryset.count():
-                    n = self._rename_files_impl(files_queryset, folders_queryset, form.cleaned_data, 0)
-                    self.message_user(request, _("Successfully renamed %(count)d files.") % {
-                        "count": n,
-                    })
+                    n = self._rename_files_impl(
+                        files_queryset, folders_queryset, form.cleaned_data, 0
+                    )
+                    self.message_user(
+                        request,
+                        _("Successfully renamed %(count)d files.")
+                        % {
+                            "count": n,
+                        },
+                    )
                 return None
         else:
             form = RenameFilesForm()
 
         context = self.admin_site.each_context(request)
-        context.update({
-            "title": _("Rename files"),
-            "instance": current_folder,
-            "breadcrumbs_action": _("Rename files"),
-            "to_rename": to_rename,
-            "rename_form": form,
-            "files_queryset": files_queryset,
-            "folders_queryset": folders_queryset,
-            "perms_lacking": perms_needed,
-            "opts": opts,
-            "root_path": reverse('admin:index'),
-            "app_label": app_label,
-            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        })
+        context.update(
+            {
+                "title": _("Rename files"),
+                "instance": current_folder,
+                "breadcrumbs_action": _("Rename files"),
+                "to_rename": to_rename,
+                "rename_form": form,
+                "files_queryset": files_queryset,
+                "folders_queryset": folders_queryset,
+                "perms_lacking": perms_needed,
+                "opts": opts,
+                "root_path": reverse("admin:index"),
+                "app_label": app_label,
+                "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
 
         # Display the rename format selection page
         return render(request, "admin/filer/folder/choose_rename_format.html", context)
@@ -1052,7 +1288,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         file_obj.folder = destination
         file_obj._file_data_changed_hint = False  # no need to update size, sha1, etc.
         file_obj.file = file_obj._copy_file(filename)
-        file_obj.original_filename = self._generate_new_filename(file_obj.original_filename, suffix)
+        file_obj.original_filename = self._generate_new_filename(
+            file_obj.original_filename, suffix
+        )
         file_obj.save()
 
     def _copy_files(self, files, destination, suffix, overwrite):
@@ -1091,9 +1329,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             perm.folder = folder
             perm.save()
 
-        return 1 + self._copy_files_and_folders_impl(old_folder.files.all(), old_folder.children.all(), folder, suffix, overwrite)
+        return 1 + self._copy_files_and_folders_impl(
+            old_folder.files.all(), old_folder.children.all(), folder, suffix, overwrite
+        )
 
-    def _copy_files_and_folders_impl(self, files_queryset, folders_queryset, destination, suffix, overwrite):
+    def _copy_files_and_folders_impl(
+        self, files_queryset, folders_queryset, destination, suffix, overwrite
+    ):
         n = self._copy_files(files_queryset, destination, suffix, overwrite)
 
         for f in folders_queryset:
@@ -1105,18 +1347,26 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
+        current_folder = self._get_current_action_folder(
+            request, files_queryset, folders_queryset
+        )
         perms_needed = self._check_copy_perms(request, files_queryset, folders_queryset)
-        to_copy = self._list_all_to_copy_or_move(request, files_queryset, folders_queryset)
-        folders = self._list_all_destination_folders(request, folders_queryset, current_folder, False)
+        to_copy = self._list_all_to_copy_or_move(
+            request, files_queryset, folders_queryset
+        )
+        folders = self._list_all_destination_folders(
+            request, folders_queryset, current_folder, False
+        )
 
-        if request.method == 'POST' and request.POST.get('post'):
+        if request.method == "POST" and request.POST.get("post"):
             if perms_needed:
                 raise PermissionDenied
             form = CopyFilesAndFoldersForm(request.POST)
             if form.is_valid():
                 try:
-                    destination = self.get_queryset(request).get(pk=request.POST.get('destination'))
+                    destination = self.get_queryset(request).get(
+                        pk=request.POST.get("destination")
+                    )
                 except self.model.DoesNotExist:
                     raise PermissionDenied
                 folders_dict = dict(folders)
@@ -1124,17 +1374,29 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                     raise PermissionDenied
                 if files_queryset.count() + folders_queryset.count():
                     # We count all files and folders here (recursively)
-                    n = self._copy_files_and_folders_impl(files_queryset, folders_queryset, destination, form.cleaned_data['suffix'], False)
-                    self.message_user(request, _("Successfully copied %(count)d files and/or folders to folder '%(destination)s'.") % {
-                        "count": n,
-                        "destination": destination,
-                    })
+                    n = self._copy_files_and_folders_impl(
+                        files_queryset,
+                        folders_queryset,
+                        destination,
+                        form.cleaned_data["suffix"],
+                        False,
+                    )
+                    self.message_user(
+                        request,
+                        _(
+                            "Successfully copied %(count)d files and/or folders to folder '%(destination)s'."
+                        )
+                        % {
+                            "count": n,
+                            "destination": destination,
+                        },
+                    )
                 return None
         else:
             form = CopyFilesAndFoldersForm()
 
         try:
-            selected_destination_folder = int(request.POST.get('destination', 0))
+            selected_destination_folder = int(request.POST.get("destination", 0))
         except ValueError:
             if current_folder:
                 selected_destination_folder = current_folder.pk
@@ -1142,25 +1404,29 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 selected_destination_folder = 0
 
         context = self.admin_site.each_context(request)
-        context.update({
-            "title": _("Copy files and/or folders"),
-            "instance": current_folder,
-            "breadcrumbs_action": _("Copy files and/or folders"),
-            "to_copy": to_copy,
-            "destination_folders": folders,
-            "selected_destination_folder": selected_destination_folder,
-            "copy_form": form,
-            "files_queryset": files_queryset,
-            "folders_queryset": folders_queryset,
-            "perms_lacking": perms_needed,
-            "opts": opts,
-            "root_path": reverse('admin:index'),
-            "app_label": app_label,
-            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        })
+        context.update(
+            {
+                "title": _("Copy files and/or folders"),
+                "instance": current_folder,
+                "breadcrumbs_action": _("Copy files and/or folders"),
+                "to_copy": to_copy,
+                "destination_folders": folders,
+                "selected_destination_folder": selected_destination_folder,
+                "copy_form": form,
+                "files_queryset": files_queryset,
+                "folders_queryset": folders_queryset,
+                "perms_lacking": perms_needed,
+                "opts": opts,
+                "root_path": reverse("admin:index"),
+                "app_label": app_label,
+                "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
 
         # Display the destination folder selection page
-        return render(request, "admin/filer/folder/choose_copy_destination.html", context)
+        return render(
+            request, "admin/filer/folder/choose_copy_destination.html", context
+        )
 
     copy_files_and_folders.short_description = _("Copy selected files and/or folders")
 
@@ -1176,17 +1442,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _list_folders_to_resize(self, request, folders):
         for fo in folders:
             children = list(self._list_folders_to_resize(request, fo.children.all()))
-            children.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(fo.files) if isinstance(f, Image)])
+            children.extend(
+                [
+                    self._format_callback(f, request.user, self.admin_site, set())
+                    for f in sorted(fo.files)
+                    if isinstance(f, Image)
+                ]
+            )
             if children:
                 yield self._format_callback(fo, request.user, self.admin_site, set())
                 yield children
 
     def _list_all_to_resize(self, request, files_queryset, folders_queryset):
         to_resize = list(self._list_folders_to_resize(request, folders_queryset))
-        to_resize.extend([self._format_callback(f, request.user, self.admin_site, set()) for f in sorted(files_queryset) if isinstance(f, Image)])
+        to_resize.extend(
+            [
+                self._format_callback(f, request.user, self.admin_site, set())
+                for f in sorted(files_queryset)
+                if isinstance(f, Image)
+            ]
+        )
         return to_resize
 
-    def _new_subject_location(self, original_width, original_height, new_width, new_height, x, y, crop):
+    def _new_subject_location(
+        self, original_width, original_height, new_width, new_height, x, y, crop
+    ):
         # TODO: We could probably do even better, but this method knows nothing
         # about actual thumbnailing algorithm details.
         # It's better to reset subject location to the central point of the new
@@ -1202,14 +1482,21 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     def _resize_image(self, image, form_data):
         original_width = float(image.width)
         original_height = float(image.height)
-        thumbnailer = FilerActionThumbnailer(file=image.file, name=image.file.name, source_storage=image.file.source_storage, thumbnail_storage=image.file.source_storage)
+        thumbnailer = FilerActionThumbnailer(
+            file=image.file,
+            name=image.file.name,
+            source_storage=image.file.source_storage,
+            thumbnail_storage=image.file.source_storage,
+        )
         # This should overwrite the original image
-        new_image = thumbnailer.get_thumbnail({
-            'size': tuple(int(form_data[d] or 0) for d in ('width', 'height')),
-            'crop': form_data['crop'],
-            'upscale': form_data['upscale'],
-            'subject_location': image.subject_location,
-        })
+        new_image = thumbnailer.get_thumbnail(
+            {
+                "size": tuple(int(form_data[d] or 0) for d in ("width", "height")),
+                "crop": form_data["crop"],
+                "upscale": form_data["upscale"],
+                "subject_location": image.subject_location,
+            }
+        )
         image.file.file = new_image.file
         # Since only file data was changed, there is no way for file field to know about the change.
         # To update size, sha1, width and height fields let's call file_data_changed callback directly.
@@ -1223,7 +1510,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             y = float(y)
             new_width = float(image.width)
             new_height = float(image.height)
-            (new_x, new_y) = self._new_subject_location(original_width, original_height, new_width, new_height, x, y, form_data['crop'])
+            (new_x, new_y) = self._new_subject_location(
+                original_width,
+                original_height,
+                new_width,
+                new_height,
+                x,
+                y,
+                form_data["crop"],
+            )
             image.subject_location = "%d,%d" % (new_x, new_y)
             image.save()
 
@@ -1236,7 +1531,9 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return n
 
     def _resize_folder(self, folder, form_data):
-        return self._resize_images_impl(folder.files.all(), folder.children.all(), form_data)
+        return self._resize_images_impl(
+            folder.files.all(), folder.children.all(), form_data
+        )
 
     def _resize_images_impl(self, files_queryset, folders_queryset, form_data):
         n = self._resize_images(files_queryset, form_data)
@@ -1250,46 +1547,71 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         opts = self.model._meta
         app_label = opts.app_label
 
-        current_folder = self._get_current_action_folder(request, files_queryset, folders_queryset)
-        perms_needed = self._check_resize_perms(request, files_queryset, folders_queryset)
+        current_folder = self._get_current_action_folder(
+            request, files_queryset, folders_queryset
+        )
+        perms_needed = self._check_resize_perms(
+            request, files_queryset, folders_queryset
+        )
         to_resize = self._list_all_to_resize(request, files_queryset, folders_queryset)
 
-        if request.method == 'POST' and request.POST.get('post'):
+        if request.method == "POST" and request.POST.get("post"):
             if perms_needed:
                 raise PermissionDenied
             form = ResizeImagesForm(request.POST)
             if form.is_valid():
-                if form.cleaned_data.get('thumbnail_option'):
-                    form.cleaned_data['width'] = form.cleaned_data['thumbnail_option'].width
-                    form.cleaned_data['height'] = form.cleaned_data['thumbnail_option'].height
-                    form.cleaned_data['crop'] = form.cleaned_data['thumbnail_option'].crop
-                    form.cleaned_data['upscale'] = form.cleaned_data['thumbnail_option'].upscale
+                if form.cleaned_data.get("thumbnail_option"):
+                    form.cleaned_data["width"] = form.cleaned_data[
+                        "thumbnail_option"
+                    ].width
+                    form.cleaned_data["height"] = form.cleaned_data[
+                        "thumbnail_option"
+                    ].height
+                    form.cleaned_data["crop"] = form.cleaned_data[
+                        "thumbnail_option"
+                    ].crop
+                    form.cleaned_data["upscale"] = form.cleaned_data[
+                        "thumbnail_option"
+                    ].upscale
                 if files_queryset.count() + folders_queryset.count():
                     # We count all files here (recursively)
-                    n = self._resize_images_impl(files_queryset, folders_queryset, form.cleaned_data)
-                    self.message_user(request, _("Successfully resized %(count)d images.") % {"count": n, })
+                    n = self._resize_images_impl(
+                        files_queryset, folders_queryset, form.cleaned_data
+                    )
+                    self.message_user(
+                        request,
+                        _("Successfully resized %(count)d images.")
+                        % {
+                            "count": n,
+                        },
+                    )
                 return None
         else:
             form = ResizeImagesForm()
 
         context = self.admin_site.each_context(request)
-        context.update({
-            "title": _("Resize images"),
-            "instance": current_folder,
-            "breadcrumbs_action": _("Resize images"),
-            "to_resize": to_resize,
-            "resize_form": form,
-            "cmsplugin_enabled": 'cmsplugin_filer_image' in django_settings.INSTALLED_APPS,
-            "files_queryset": files_queryset,
-            "folders_queryset": folders_queryset,
-            "perms_lacking": perms_needed,
-            "opts": opts,
-            "root_path": reverse('admin:index'),
-            "app_label": app_label,
-            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
-        })
+        context.update(
+            {
+                "title": _("Resize images"),
+                "instance": current_folder,
+                "breadcrumbs_action": _("Resize images"),
+                "to_resize": to_resize,
+                "resize_form": form,
+                "cmsplugin_enabled": "cmsplugin_filer_image"
+                in django_settings.INSTALLED_APPS,
+                "files_queryset": files_queryset,
+                "folders_queryset": folders_queryset,
+                "perms_lacking": perms_needed,
+                "opts": opts,
+                "root_path": reverse("admin:index"),
+                "app_label": app_label,
+                "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
 
         # Display the resize options page
-        return render(request, "admin/filer/folder/choose_images_resize_options.html", context)
+        return render(
+            request, "admin/filer/folder/choose_images_resize_options.html", context
+        )
 
     resize_images.short_description = _("Resize selected images")
