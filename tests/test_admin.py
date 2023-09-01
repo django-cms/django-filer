@@ -815,7 +815,7 @@ class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
         # when using the default sort, the folder_files are of type `list`,
         # so we assert the length.
         self.assertEqual(len(response.context['folder_files']), 5)
-        
+
         expected_filenames = ['background.jpg', 'A_Testfile.jpg', 'Another_Test.jpg', 'A cute dog', 'Zeitung']
         for index, expected_filename in enumerate(expected_filenames):
             self.assertEqual(str(response.context['folder_files'][index]), expected_filename)
