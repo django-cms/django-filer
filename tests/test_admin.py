@@ -770,11 +770,11 @@ class FolderAndFileSortingMixin(BulkOperationsMixin):
         renamed_file.save()
 
     def tearDown(self):
-            self.client.logout()
-            for f in File.objects.all():
-                f.delete()
-            for folder in Folder.objects.all():
-                folder.delete()
+        self.client.logout()
+        for f in File.objects.all():
+            f.delete()
+        for folder in Folder.objects.all():
+            folder.delete()
 
 
 class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
@@ -787,7 +787,6 @@ class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
         self.assertEqual(response.context['folder_children'].count(), 2)
         self.assertEqual(response.context['folder_children'][0].name, 'Nested 1')
         self.assertEqual(response.context['folder_children'][1].name, 'Nested 2')
-        
 
     # Default sorting should be alphabetically
     def test_filer_directory_listing_default_sorting(self):
@@ -798,11 +797,11 @@ class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
         # when using the default sort, the folder_files are of type `list`,
         # so we assert the length.
         self.assertEqual(len(response.context['folder_files']), 5)
-        
+
         expected_filenames = ['A cute dog', 'A_Testfile.jpg', 'Another_Test.jpg', 'background.jpg', 'Zeitung']
         for index, expected_filename in enumerate(expected_filenames):
             self.assertEqual(str(response.context['folder_files'][index]), expected_filename)
-    
+
     # Now, all columns with empty name should be alphabetically sorted by their filename,
     # after that, at the end of the list, all files with and explicit name should appear;
     # however, since we ONLY sort by name, the order of items without name is not defined
@@ -817,7 +816,7 @@ class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
         # so we assert the length.
         self.assertEqual(len(response.context['folder_files']), 5)
         
-        expected_filenames = ['background.jpg' ,'A_Testfile.jpg', 'Another_Test.jpg', 'A cute dog', 'Zeitung']
+        expected_filenames = ['background.jpg', 'A_Testfile.jpg', 'Another_Test.jpg', 'A cute dog', 'Zeitung']
         for index, expected_filename in enumerate(expected_filenames):
             self.assertEqual(str(response.context['folder_files'][index]), expected_filename)
 
@@ -831,7 +830,7 @@ class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
         }), {'order_by': 'name,original_filename'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['folder_files']), 5)
-        
+
         expected_filenames = ['A_Testfile.jpg', 'Another_Test.jpg', 'background.jpg', 'A cute dog', 'Zeitung']
         for index, expected_filename in enumerate(expected_filenames):
             self.assertEqual(str(response.context['folder_files'][index]), expected_filename)

@@ -380,7 +380,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:  # noqa
             permissions = {}
-        
+
         items = list(itertools.chain(folder_qs, file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
 
