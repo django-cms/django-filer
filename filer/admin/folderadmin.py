@@ -323,8 +323,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                         if re.sub(r'^-', '', field) in self.order_by_file_fields]
             if len(order_by) > 0:
                 file_qs = file_qs.order_by(*order_by)
-        else:
-            file_qs.sort()
 
         if folder.is_root and not search_mode:
             virtual_items = folder.virtual_folders
@@ -369,6 +367,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             }
         except:  # noqa
             permissions = {}
+        
+        if order_by is None:
+            file_qs = list(file_qs)
+            file_qs.sort()
 
         items = list(itertools.chain(folder_qs, file_qs))
         paginator = Paginator(items, FILER_PAGINATE_BY)
