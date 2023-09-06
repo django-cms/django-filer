@@ -259,7 +259,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             # This is needed because most of the remote File Storage backend do not
             # open the file. Re-opening would create a value error.
             src_file.open()
-        except ValueError:
+        except ValueError:  # pragma: no cover
             # If a validation error is raised, the file is already open.
             pass
         return storage.save(destination, ContentFile(src_file.read()))
