@@ -70,7 +70,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
     def __init__(self, instance, field, name):
         """
         This is a little weird, but I couldn't find a better solution.
-        Thumbnailer.__init__ is called first for proper object inizialization.
+        Thumbnailer.__init__ is called first for proper object initialisation.
         Then we override some attributes defined at runtime with properties.
         We cannot simply call super().__init__ because filer Field objects
         doesn't have a storage attribute.

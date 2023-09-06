@@ -124,7 +124,8 @@ class FilerFolderAdminUrlsTests(TestCase):
             # 7. Selecting file and owner data
             response = self.client.get(reverse('admin:filer-directory_listing-unfiled_images'))
         self.assertContains(response, "test_image_0.jpg")
-
+        self.assertContains(response, "/media/my-preferred-base-url-for-source-files/")
+        self.assertContains(response, "/media/my-preferred-base-url-for-thumbnails/")
         for thumbnail_url in thumbnail_urls:
             self.assertContains(response, thumbnail_url)
 
@@ -745,6 +746,94 @@ class BulkOperationsMixin:
         file_obj = File.objects.create(owner=self.superuser, original_filename=filename, file=file_data, folder=folder)
         file_obj.save()
         return file_obj
+
+
+class FolderAndFileSortingMixin(BulkOperationsMixin):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.img = create_image()
+        self.folder_1 = Folder(name='Pictures', parent=None)
+        self.folder_1.save()
+        self.nested_folder_2 = Folder(name='Nested 2', parent=self.folder_1)
+        self.nested_folder_1 = Folder(name='Nested 1', parent=self.folder_1)
+        self.nested_folder_1.save()
+        self.nested_folder_2.save()
+        self.create_file(folder=self.folder_1, filename='background.jpg')
+        self.create_file(folder=self.folder_1, filename='A_Testfile.jpg')
+        self.create_file(folder=self.folder_1, filename='Another_Test.jpg')
+        newspaper_file = self.create_file(folder=self.folder_1, filename='Newspaper.pdf')
+        newspaper_file.name = 'Zeitung'
+        newspaper_file.save()
+        renamed_file = self.create_file(folder=self.folder_1, filename='last_when_sorting_by_filename.jpg')
+        renamed_file.name = 'A cute dog'
+        renamed_file.save()
+
+    def tearDown(self):
+        self.client.logout()
+        for f in File.objects.all():
+            f.delete()
+        for folder in Folder.objects.all():
+            folder.delete()
+
+
+class FilerFolderAndFileSortingTests(FolderAndFileSortingMixin, TestCase):
+    # Assert that the folders are correctly sorted
+    def test_filer_folder_sorting(self):
+        response = self.client.get(reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.folder_1.pk
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['folder_children'].count(), 2)
+        self.assertEqual(response.context['folder_children'][0].name, 'Nested 1')
+        self.assertEqual(response.context['folder_children'][1].name, 'Nested 2')
+
+    # Default sorting should be alphabetically
+    def test_filer_directory_listing_default_sorting(self):
+        response = self.client.get(reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.folder_1.pk
+        }))
+        self.assertEqual(response.status_code, 200)
+        # when using the default sort, the folder_files are of type `list`,
+        # so we assert the length.
+        self.assertEqual(len(response.context['folder_files']), 5)
+
+        expected_filenames = ['A cute dog', 'A_Testfile.jpg', 'Another_Test.jpg', 'background.jpg', 'Zeitung']
+        for index, expected_filename in enumerate(expected_filenames):
+            self.assertEqual(str(response.context['folder_files'][index]), expected_filename)
+
+    # Now, all columns with empty name should be alphabetically sorted by their filename,
+    # after that, at the end of the list, all files with and explicit name should appear;
+    # however, since we ONLY sort by name, the order of items without name is not defined
+    # by their filename but rather by their creation date.
+    # So, the order is expected to be ordered as they are created in the setUp method.
+    def test_filer_directory_listing_sorting_with_order_by_param(self):
+        response = self.client.get(reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.folder_1.pk
+        }), {'order_by': 'name'})
+        self.assertEqual(response.status_code, 200)
+        # when using the default sort, the folder_files are of type `list`,
+        # so we assert the length.
+        self.assertEqual(len(response.context['folder_files']), 5)
+
+        expected_filenames = ['background.jpg', 'A_Testfile.jpg', 'Another_Test.jpg', 'A cute dog', 'Zeitung']
+        for index, expected_filename in enumerate(expected_filenames):
+            self.assertEqual(str(response.context['folder_files'][index]), expected_filename)
+
+    # Finally, we can define a fallback column to pass into `order_by` so that files without
+    # any name are still sorted by something (in this case, their original_filename).
+    # This should yield the expected order as well, but NOT the exact same order as the default sorting,
+    # since we sort by name FIRST and all items with the same value again by original_filename.
+    def test_filer_directory_listing_sorting_with_multiple_order_by_params(self):
+        response = self.client.get(reverse('admin:filer-directory_listing', kwargs={
+            'folder_id': self.folder_1.pk
+        }), {'order_by': 'name,original_filename'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['folder_files']), 5)
+
+        expected_filenames = ['A_Testfile.jpg', 'Another_Test.jpg', 'background.jpg', 'A cute dog', 'Zeitung']
+        for index, expected_filename in enumerate(expected_filenames):
+            self.assertEqual(str(response.context['folder_files'][index]), expected_filename)
 
 
 class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
@@ -1693,8 +1782,8 @@ class FileIconContextTests(TestCase):
         image.save()
         context = {}
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=image, height=40, width=40)
-        assert 'sidebar_image_ratio' in context.keys()
-        assert 'download_url' in context.keys()
+        self.assertIn('sidebar_image_ratio', context.keys())
+        self.assertIn('download_url', context.keys())
 
     def test_file_icon_with_size(self):
         """
@@ -1703,5 +1792,5 @@ class FileIconContextTests(TestCase):
         file = File.objects.create(name='test.pdf')
         context = {}
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=file, height=40, width=40)
-        assert 'sidebar_image_ratio' not in context.keys()
-        assert 'download_url' in context.keys()
+        self.assertNotIn('sidebar_image_ratio', context.keys())
+        self.assertIn('download_url', context.keys())

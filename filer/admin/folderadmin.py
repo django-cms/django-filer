@@ -13,7 +13,8 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery, Case, When
+from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import path, reverse
@@ -317,13 +318,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         folder_qs = folder_qs.order_by('name').select_related("owner")
         order_by = request.GET.get('order_by', None)
+        order_by_annotation = None
         if order_by is None:
-            order_by = "file"
-        order_by = order_by.split(',')
+            file_qs = file_qs.annotate(coalesce_sort_field=Coalesce(
+                Case(
+                    When(name__exact='', then=None),
+                    When(name__isnull=False, then='name')
+                ),
+                'original_filename'
+            ))
+            order_by_annotation = Lower('coalesce_sort_field')
+
+        order_by = order_by.split(',') if order_by else []
         order_by = [field for field in order_by
                     if re.sub(r'^-', '', field) in self.order_by_file_fields]
         if len(order_by) > 0:
             file_qs = file_qs.order_by(*order_by)
+        elif order_by_annotation:
+            file_qs = file_qs.order_by(order_by_annotation)
 
         if folder.is_root and not search_mode:
             virtual_items = folder.virtual_folders

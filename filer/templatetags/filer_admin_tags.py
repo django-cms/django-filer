@@ -1,7 +1,7 @@
 from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.storage import FileSystemStorage, default_storage
+from django.core.files.storage import FileSystemStorage
 from django.template import Library
 from django.templatetags.static import static
 from django.urls import reverse
@@ -109,7 +109,7 @@ def file_icon_context(file, detail, width, height):
         'height': width,  # The icon is a square
     }
     # Check if file exists for performance reasons (only on FileSystemStorage)
-    if isinstance(default_storage, FileSystemStorage) and file.file and not file.file.exists():
+    if file.file and isinstance(file.file.source_storage, FileSystemStorage) and not file.file.exists():
         return not_available_context
 
     if isinstance(file, BaseImage):
@@ -131,9 +131,9 @@ def file_icon_context(file, detail, width, height):
                 configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=file._transparent)
                 # If the name was annotated: Thumbnail exists and we can use it
                 if configured_name == file.thumbnail_name:
-                    icon_url = default_storage.url(configured_name)
+                    icon_url = file.file.thumbnail_storage.url(configured_name)
                     if mime_subtype != 'svg+xml' and file.thumbnailx2_name:
-                        context['highres_url'] = default_storage.url(file.thumbnailx2_name)
+                        context['highres_url'] = file.file.thumbnail_storage.url(file.thumbnailx2_name)
                 else:  # Probably does not exist, defer creation
                     icon_url = reverse("admin:filer_file_fileicon", args=(file.pk, width))
                 context['alt_text'] = file.default_alt_text
