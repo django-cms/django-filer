@@ -230,15 +230,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self.file.delete_thumbnails()
         self.is_public = not self.is_public
         src_file = src_storage.open(src_file_name)
+        # This is needed because most of the remote File Storage backend do not
+        # open the file.
         # Context manager closes file after reading contents
-        if src_file.closed:
-            # This is needed because most of the remote File Storage backend do not
-            # open the file.
-            with src_file.open() as f:
-                content_file = ContentFile(f.read())
-        else:
-            content_file = ContentFile(src_file.read())
-            src_file.close()
+        with src_file.open() as f:
+            content_file = ContentFile(f.read())
         # hint file_data_changed callback that data is actually unchanged
         self._file_data_changed_hint = False
         self.file = dst_storage.save(dst_file_name, content_file)
@@ -259,9 +255,11 @@ class File(PolymorphicModel, mixins.IconsMixin):
         storage = self.file.storages['public' if self.is_public else 'private']
 
         src_file = storage.open(src_file_name)
-        if src_file.closed:
+        try:
             # This is needed because most of the remote File Storage backend do not
-            # open the file.
+            # open the file. Re-opening would create a value error.
+            src_file.open()
+        except ValueError:
             pass
         return storage.save(destination, ContentFile(src_file.read()))
 
