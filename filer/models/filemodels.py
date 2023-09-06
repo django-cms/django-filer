@@ -262,7 +262,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         if src_file.closed:
             # This is needed because most of the remote File Storage backend do not
             # open the file.
-            src_file.open()
+            pass
         return storage.save(destination, ContentFile(src_file.read()))
 
     def generate_sha1(self):
