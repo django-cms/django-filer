@@ -260,6 +260,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             # open the file. Re-opening would create a value error.
             src_file.open()
         except ValueError:
+            # If a validation error is raised, the file is already open.
             pass
         return storage.save(destination, ContentFile(src_file.read()))
 
