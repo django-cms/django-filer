@@ -229,9 +229,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
         self.is_public = not self.is_public
         self.file.delete_thumbnails()
         self.is_public = not self.is_public
+        src_file = src_storage.open(src_file_name)
         # This is needed because most of the remote File Storage backend do not
         # open the file.
-        src_file = src_storage.open(src_file_name)
         # Context manager closes file after reading contents
         with src_file.open() as f:
             content_file = ContentFile(f.read())
@@ -254,10 +254,14 @@ class File(PolymorphicModel, mixins.IconsMixin):
         src_file_name = self.file.name
         storage = self.file.storages['public' if self.is_public else 'private']
 
-        # This is needed because most of the remote File Storage backend do not
-        # open the file.
         src_file = storage.open(src_file_name)
-        src_file.open()
+        try:
+            # This is needed because most of the remote File Storage backend do not
+            # open the file. Re-opening would create a value error.
+            src_file.open()
+        except ValueError:  # pragma: no cover
+            # If a validation error is raised, the file is already open.
+            pass
         return storage.save(destination, ContentFile(src_file.read()))
 
     def generate_sha1(self):
