@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+3.0.6 (2023-09-08)
+==================
+
+* Fix issue with django-storages==1.14 (raising a value error when working with S3Storage)
+
+
 3.0.5 (2023-08-22)
 ==================
 
