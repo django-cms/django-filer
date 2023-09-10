@@ -31,19 +31,35 @@ class FileImporter:
         except:  # noqa
             iext = ''
         if iext in IMAGE_EXTENSIONS:
-            obj, created = Image.objects.get_or_create(
-                original_filename=file_obj.name,
-                file=file_obj,
-                folder=folder,
-                is_public=FILER_IS_PUBLIC_DEFAULT)
+            try:
+                obj, created = Image.objects.get_or_create(
+                    original_filename=file_obj.name,
+                    folder=folder,
+                    defaults=dict(
+                        file=file_obj,
+                        is_public=FILER_IS_PUBLIC_DEFAULT,
+                    ))
+            except Image.MultipleObjectsReturned:
+                obj, created = Image.objects.filter(
+                    original_filename=file_obj.name,
+                    folder=folder,
+                )[0], False
             if created:
                 self.image_created += 1
         else:
-            obj, created = File.objects.get_or_create(
-                original_filename=file_obj.name,
-                file=file_obj,
-                folder=folder,
-                is_public=FILER_IS_PUBLIC_DEFAULT)
+            try:
+                obj, created = File.objects.get_or_create(
+                    original_filename=file_obj.name,
+                    folder=folder,
+                    defaults=dict(
+                        file=file_obj,
+                        is_public=FILER_IS_PUBLIC_DEFAULT,
+                    ))
+            except File.MultipleObjectsReturned:
+                obj, created = File.objects.filter(
+                    original_filename=file_obj.name,
+                    folder=folder,
+                )[0], False
             if created:
                 self.file_created += 1
         if self.verbosity >= 2:
