@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+3.0.6 (2023-09-08)
+==================
+
+* Re-add alphabetical sorting as default (fixes #1415) by @filipweidemann in https://github.com/django-cms/django-filer/pull/1416
+* fix: django-storage 1.14 complains about files being opened twice when copying by @fsbraun in https://github.com/django-cms/django-filer/pull/1418
+
 3.0.5 (2023-08-22)
 ==================
 
