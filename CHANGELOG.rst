@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+unreleased
+==========
+
+* fix: ensure uniqueness of icon admin url names
+
 3.0.6 (2023-09-08)
 ==================
 
