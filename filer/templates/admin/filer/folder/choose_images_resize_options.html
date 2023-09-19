@@ -34,7 +34,9 @@
                     {% else %}
                         <p>{% blocktrans %}Choose resize parameters:{% endblocktrans %}</p>
                     {% endif %}
-                    {{ resize_form.as_p_with_help }}
+                    {% for fieldset in resize_form.admin_form %}
+                        {% include "admin/includes/fieldset.html" %}
+                    {% endfor %}
                     <p>{% blocktrans %}Warning: Images will be resized in-place and originals will be lost. Maybe first make a copy of them to retain the originals.{% endblocktrans %}</p>
 
                     <div class="text-right clearfix">

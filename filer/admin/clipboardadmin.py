@@ -31,7 +31,6 @@ class ClipboardItemInline(admin.TabularInline):
 class ClipboardAdmin(admin.ModelAdmin):
     model = Clipboard
     inlines = [ClipboardItemInline]
-    filter_horizontal = ('files',)
     raw_id_fields = ('user',)
     verbose_name = "DEBUG Clipboard"
     verbose_name_plural = "DEBUG Clipboards"

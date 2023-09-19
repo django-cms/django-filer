@@ -325,7 +325,7 @@ class FilerImageAdminUrlsTests(TestCase):
         image._height = 200
         image.save()
 
-        url = reverse('admin:filer_image_change', kwargs={
+        url = reverse(f'admin:{image.__class__._meta.app_label}_image_change', kwargs={
             'object_id': image.pk,
         })
 

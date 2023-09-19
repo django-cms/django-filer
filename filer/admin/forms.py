@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.admin import widgets
+from django.contrib.admin.helpers import AdminForm
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
@@ -9,18 +10,18 @@ from ..models import ThumbnailOption
 from ..utils.files import get_valid_filename
 
 
-class AsPWithHelpMixin:
-    def as_p_with_help(self):
-        "Returns this form rendered as HTML <p>s with help text formated for admin."
-        return self._html_output(
-            normal_row='<p%(html_class_attr)s>%(label)s %(field)s</p>%(help_text)s',
-            error_row='%s',
-            row_ender='</p>',
-            help_text_html='<p class="help">%s</p>',
-            errors_on_separate_row=True)
+class WithFieldsetMixin:
+    def get_fieldsets(self):
+        return getattr(self, "fieldsets", [
+            (None, {"fields": [field for field in self.fields]})
+        ])
+
+    def admin_form(self):
+        "Returns a class that mimics a fieldset of the admin."
+        return AdminForm(self, self.get_fieldsets(), {})
 
 
-class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
+class CopyFilesAndFoldersForm(forms.Form):
     suffix = forms.CharField(required=False, help_text=_("Suffix which will be appended to filenames of copied files."))
     # TODO: We have to find a way to overwrite files with different storage backends first.
     # overwrite_files = forms.BooleanField(required=False, help_text=_("Overwrite a file if there already exists a file with the same filename?"))
@@ -32,7 +33,7 @@ class CopyFilesAndFoldersForm(forms.Form, AsPWithHelpMixin):
         return self.cleaned_data['suffix']
 
 
-class RenameFilesForm(forms.Form, AsPWithHelpMixin):
+class RenameFilesForm(WithFieldsetMixin, forms.Form):
     rename_format = forms.CharField(required=True)
 
     def clean_rename_format(self):
@@ -55,7 +56,11 @@ class RenameFilesForm(forms.Form, AsPWithHelpMixin):
         return self.cleaned_data['rename_format']
 
 
-class ResizeImagesForm(forms.Form, AsPWithHelpMixin):
+class ResizeImagesForm(WithFieldsetMixin, forms.Form):
+    fieldsets = ((None, {"fields": (
+        ("width", "height"),
+        ("crop", "upscale"))}),)
+
     if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
         thumbnail_option = models.ForeignKey(
             ThumbnailOption,
@@ -64,6 +69,13 @@ class ResizeImagesForm(forms.Form, AsPWithHelpMixin):
             verbose_name=_("thumbnail option"),
             on_delete=models.CASCADE,
         ).formfield()
+
+        def get_fieldsets(self):
+            """Updates the static fieldset by prepending thumbnail options"""
+            fieldsets = super().get_fieldsets()
+            fieldsets[0][1]["fields"] = ("thumbnail_option") + fieldsets[0][1]["fields"]
+            return fieldsets
+
     width = models.PositiveIntegerField(_("width"), null=True, blank=True).formfield(widget=widgets.AdminIntegerFieldWidget)
     height = models.PositiveIntegerField(_("height"), null=True, blank=True).formfield(widget=widgets.AdminIntegerFieldWidget)
     crop = models.BooleanField(_("crop"), default=True).formfield()
