@@ -16,7 +16,7 @@ jobs:
           django-4.2.txt,
           django-5.0.txt,
         ]
-        except:
+        exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.8
           - requirements-file: django-5.0.txt
