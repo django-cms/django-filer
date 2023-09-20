@@ -16,7 +16,7 @@ class WithFieldsetMixin:
         ])
 
     def admin_form(self):
-        "Returns a class that mimics a fieldset of the admin."
+        "Returns a class contains the Admin fieldset to show form as admin form"
         return AdminForm(self, self.get_fieldsets(), {})
 
 
