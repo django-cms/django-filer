@@ -1839,5 +1839,4 @@ class AdditionalAdminFormsTests(TestCase):
     def test_resize_form(self):
         response = self.client.post(self.url, {"action": ["resize_images"], **self.payload})
         self.assertContains(response, 'Warning: Images will be resized in-place and originals will be lost.')
-        self.assertContains(response, '<div class="fieldBox field-crop">')
-        self.assertContains(response, '<div class="fieldBox field-upscale">')
+        self.assertContains(response, '<div class="form-row field-crop field-upscale">')
