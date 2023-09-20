@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -13,17 +13,16 @@ msgstr ""
 "POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>, 2015-2018\n"
-"Language-Team: Lithuanian (http://app.transifex.com/divio/django-filer/"
-"language/lt/)\n"
-"Language: lt\n"
+"Language-Team: Lithuanian (http://app.transifex.com/divio/django-filer/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
-"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
-"1 : n % 1 != 0 ? 2: 3);\n"
+"Language: lt\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -32,7 +31,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:49
@@ -47,9 +47,7 @@ msgstr "kanoninis URL"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Objektai turi būti pasirinkti, kad su jais būtų galima atlikti veiksmus. "
-"Jokie objektai nebuvo pakeisti."
+msgstr "Objektai turi būti pasirinkti, kad su jais būtų galima atlikti veiksmus. Jokie objektai nebuvo pakeisti."
 
 #: admin/folderadmin.py:434
 #, python-format
@@ -125,17 +123,14 @@ msgstr "Pašalinti pasirinktus failus ir / ar aplankus"
 #: admin/folderadmin.py:930
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
-msgstr ""
-"Aplankai su %s pavadinimais jau egzistuoja pasirinktoje paskirties vietoje."
+msgstr "Aplankai su %s pavadinimais jau egzistuoja pasirinktoje paskirties vietoje."
 
 #: admin/folderadmin.py:934
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Sėkmingai perkelti %(count)d failai ir / ar aplankai į aplanką "
-"'%(destination)s'."
+msgstr "Sėkmingai perkelti %(count)d failai ir / ar aplankai į aplanką '%(destination)s'."
 
 #: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
@@ -160,9 +155,7 @@ msgstr "Pervardinti failus"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Sėkmingai nukopijuoti %(count)d failai ir / ar aplankai į aplanką "
-"'%(destination)s'."
+msgstr "Sėkmingai nukopijuoti %(count)d failai ir / ar aplankai į aplanką '%(destination)s'."
 
 #: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
@@ -194,9 +187,7 @@ msgstr "Priesaga kuri bus pridėta prie nukopijuotų failų pavadinimų."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Priesaga turi būti paprasta ir taisyklinga bylos pavadinimo dalis pvz.  "
-"\"%(valid)s\"."
+msgstr "Priesaga turi būti paprasta ir taisyklinga bylos pavadinimo dalis pvz.  \"%(valid)s\"."
 
 #: admin/forms.py:53
 #, python-format
@@ -230,8 +221,7 @@ msgstr "išdidinti"
 
 #: admin/forms.py:80
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr ""
-"Miniatiūros nustatymas arba dydžio keitimo parametrai turi būti pasirinkti."
+msgstr "Miniatiūros nustatymas arba dydžio keitimo parametrai turi būti pasirinkti."
 
 #: admin/imageadmin.py:18 admin/imageadmin.py:105
 msgid "Subject location"
@@ -378,9 +368,7 @@ msgstr "Leidimai išjungti"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
-"Įšjungti bet kokius leidimų tikrinimus šiai bylai. Byla bus viešai "
-"pasiekiama bet kam."
+msgstr "Įšjungti bet kokius leidimų tikrinimus šiai bylai. Byla bus viešai pasiekiama bet kam."
 
 #: models/foldermodels.py:94
 msgid "parent"
@@ -473,6 +461,7 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
 #: models/foldermodels.py:360
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -491,6 +480,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:375
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -503,6 +493,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:390
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -557,6 +548,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -624,25 +616,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Pasirintų failų ir / ar aplankų šalinimas pašalintų susijusius objektus, "
-"tačiau jūsų vartotojas neturi leidimo šalinti šių objektų tipų:"
+msgstr "Pasirintų failų ir / ar aplankų šalinimas pašalintų susijusius objektus, tačiau jūsų vartotojas neturi leidimo šalinti šių objektų tipų:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Pasirinktų failų ir / ar aplankų šalinimas reikalautų pašalinti šiuos "
-"apsaugotus susijusius objektus:"
+msgstr "Pasirinktų failų ir / ar aplankų šalinimas reikalautų pašalinti šiuos apsaugotus susijusius objektus:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Ar tikrai norite pašalinti pasirinktus failus ir / ar aplankus? Visi susiję "
-"objektai bus pašalinti:"
+msgstr "Ar tikrai norite pašalinti pasirinktus failus ir / ar aplankus? Visi susiję objektai bus pašalinti:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -691,11 +677,9 @@ msgstr "Aplanko piktograma"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
-msgstr ""
-"Jūsų vartotojas neturi leidimų kopijuoti visus pasirinktus failus ir / ar "
-"aplankus."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
+msgstr "Jūsų vartotojas neturi leidimų kopijuoti visus pasirinktus failus ir / ar aplankus."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -719,9 +703,7 @@ msgstr "Nėra jokiu failų ir / ar aplankų kopijavimui."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Šie failai ir / ar aplankai bus nukopijuoti į paskirtą aplanką (išlaikant jų "
-"medžio struktūrą):"
+msgstr "Šie failai ir / ar aplankai bus nukopijuoti į paskirtą aplanką (išlaikant jų medžio struktūrą):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -741,9 +723,7 @@ msgstr "Neleidžiama kopijuoti bylų į tą patį aplanką"
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
-"Jūsų vartotojas neturi leidimų keisti dydžius visiems pasirinktiems "
-"paveikslėliams."
+msgstr "Jūsų vartotojas neturi leidimų keisti dydžius visiems pasirinktiems paveikslėliams."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -755,17 +735,13 @@ msgstr "Šių paveikslėlių dydis bus pakeistas:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Pasirinkite esamą miniatiūros nustatymą, arba įveskite dydžio keitimo "
-"parametrus:"
+msgstr "Pasirinkite esamą miniatiūros nustatymą, arba įveskite dydžio keitimo parametrus:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Įspėjimas: Paveikslėlių dydžiai bus pakeisti vietoje, ir originalas bus "
-"pašalintas. Patartina atsikopijuoti paveikslėlį, kad nedingtų originalas."
+msgstr "Įspėjimas: Paveikslėlių dydžiai bus pakeisti vietoje, ir originalas bus pašalintas. Patartina atsikopijuoti paveikslėlį, kad nedingtų originalas."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
@@ -773,11 +749,9 @@ msgstr "Pakeisti dydį"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"Jūsų vartotojas neturi leidimų perkelti visus pasirinktus failus ir / ar "
-"aplankus."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "Jūsų vartotojas neturi leidimų perkelti visus pasirinktus failus ir / ar aplankus."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -787,9 +761,7 @@ msgstr "Nėra jokiu failų ir / ar aplankų perkelimui."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Šie failai ir / ar aplankai bus perkelti į paskirtą aplanką (išlaikant jų "
-"medžio struktūrą):"
+msgstr "Šie failai ir / ar aplankai bus perkelti į paskirtą aplanką (išlaikant jų medžio struktūrą):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -814,9 +786,7 @@ msgstr "Nėra jokių failų pervardinimui."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"Šie failai bus pervardinti (jie liks savo aplankuose ir pasiliks savo "
-"originalius pavadinimus, pasikeis tik atvaizduojamas failo pavadinimas):"
+msgstr "Šie failai bus pervardinti (jie liks savo aplankuose ir pasiliks savo originalius pavadinimus, pasikeis tik atvaizduojamas failo pavadinimas):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -975,11 +945,13 @@ msgstr "įjungta"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr "Kanoninis url '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "Parsisiųsti '%(item_label)s'"
 
@@ -1041,10 +1013,12 @@ msgstr "Pasirinkti visus %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1112,6 +1086,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1167,6 +1142,7 @@ msgid "Choose File"
 msgstr "Pasirinkti bylą"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1193,10 +1169,10 @@ msgid ""
 msgstr ""
 
 #~ msgid "Resize parameters must be choosen."
-#~ msgstr "Turi būti pasirinkti dydžio keitimo parametrai."
+#~ msgstr "Resize parameters must be choosen."
 
 #~ msgid "Choose resize parameters:"
-#~ msgstr "Pasirinkite dydžio keitimo parametrus:"
+#~ msgstr "Choose resize parameters:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"

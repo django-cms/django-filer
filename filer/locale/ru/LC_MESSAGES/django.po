@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -17,17 +17,16 @@ msgstr ""
 "POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Alexander Naydenko <an@zeppelinen.com>, 2020\n"
-"Language-Team: Russian (http://app.transifex.com/divio/django-filer/language/"
-"ru/)\n"
-"Language: ru\n"
+"Language-Team: Russian (http://app.transifex.com/divio/django-filer/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
-"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -36,7 +35,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:49
@@ -51,9 +51,7 @@ msgstr "канонический URL"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Для выполнения действий нужно выбрать хотя бы один объект. Не произведено "
-"никаких изменений."
+msgstr "Для выполнения действий нужно выбрать хотя бы один объект. Не произведено никаких изменений."
 
 #: admin/folderadmin.py:434
 #, python-format
@@ -193,9 +191,7 @@ msgstr "Окончание, которое будет добавлено к им
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Окончание должно быть правильной, простой и в нижнем регистре частью имени "
-"файла, например \"%(valid)s\"."
+msgstr "Окончание должно быть правильной, простой и в нижнем регистре частью имени файла, например \"%(valid)s\"."
 
 #: admin/forms.py:53
 #, python-format
@@ -376,9 +372,7 @@ msgstr "Разрешения отключены"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
-"Отменить все проверки разрешений для этого файла. Файл будет доступен "
-"публично для каждого."
+msgstr "Отменить все проверки разрешений для этого файла. Файл будет доступен публично для каждого."
 
 #: models/foldermodels.py:94
 msgid "parent"
@@ -471,6 +465,7 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
 #: models/foldermodels.py:360
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -489,6 +484,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:375
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -501,6 +497,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:390
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -555,6 +552,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -622,25 +620,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Удаление выбранных файлов/папок приведет к удалению связанных объектов, но у "
-"вас нет прав удалять следующие объекты:"
+msgstr "Удаление выбранных файлов/папок приведет к удалению связанных объектов, но у вас нет прав удалять следующие объекты:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Удаление выбранных файлов/папок потребует удаления следующих защищенных "
-"связанных объектов:"
+msgstr "Удаление выбранных файлов/папок потребует удаления следующих защищенных связанных объектов:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Вы уверены, что хотите удалить выбранные файлы/папки? Следующие объекты "
-"вместе со связанными объектами будут удалены:"
+msgstr "Вы уверены, что хотите удалить выбранные файлы/папки? Следующие объекты вместе со связанными объектами будут удалены:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -689,8 +681,8 @@ msgstr "Иконка папки"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr "У вас нет прав на копирование выбранных файлов/папок"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -715,9 +707,7 @@ msgstr "Нет файлов для копирования."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Эти файлы/папки будут скопированы в целевую папку (с сохранением "
-"иерархичности):"
+msgstr "Эти файлы/папки будут скопированы в целевую папку (с сохранением иерархичности):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -755,9 +745,7 @@ msgstr "Выберите опцию миниатюры или введите п�
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Внимание: изображения будут изменены в размерах с заменой оригиналов. "
-"Возможно, лучше будет сперва сделать копии."
+msgstr "Внимание: изображения будут изменены в размерах с заменой оригиналов. Возможно, лучше будет сперва сделать копии."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
@@ -765,8 +753,8 @@ msgstr "Изменить размеры"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
 msgstr "Вы не имеете прав для перемещения выбранных файлов/папок."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
@@ -777,9 +765,7 @@ msgstr "Нет файлов/папок для перемещения."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Следующие файлы/папки будут перемещены в целевую папку (сохраняя "
-"иерархичность):"
+msgstr "Следующие файлы/папки будут перемещены в целевую папку (сохраняя иерархичность):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -804,9 +790,7 @@ msgstr "Нет файлов для переименовывания."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"Эти файлы будут переименованы (они остануться в их папках и сохранят имена "
-"оригинальных файлов, только отображаемое имя измениться):"
+msgstr "Эти файлы будут переименованы (они остануться в их папках и сохранят имена оригинальных файлов, только отображаемое имя измениться):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -965,11 +949,13 @@ msgstr "включены"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr "Канонический URL '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "Скачать '%(item_label)s'"
 
@@ -1031,10 +1017,12 @@ msgstr "Выбрать все %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1102,6 +1090,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1157,6 +1146,7 @@ msgid "Choose File"
 msgstr "Выбрать файл"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1183,10 +1173,10 @@ msgid ""
 msgstr ""
 
 #~ msgid "Resize parameters must be choosen."
-#~ msgstr "Параметры изменения размеры должны быть указаны."
+#~ msgstr "Resize parameters must be choosen."
 
 #~ msgid "Choose resize parameters:"
-#~ msgstr "Выбрите параметры изменения размеров:"
+#~ msgstr "Choose resize parameters:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"

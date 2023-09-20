@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -13,15 +13,16 @@ msgstr ""
 "POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Roger Pons <rogerpons@gmail.com>, 2013-2014,2016\n"
-"Language-Team: Catalan (http://app.transifex.com/divio/django-filer/language/"
-"ca/)\n"
-"Language: ca\n"
+"Language-Team: Catalan (http://app.transifex.com/divio/django-filer/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -30,7 +31,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:49
@@ -45,9 +47,7 @@ msgstr "URL canònica"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Cal seleccionar els elements en ordre per tal de realitzar accions sobre "
-"ells. No s'ha modificat cap element."
+msgstr "Cal seleccionar els elements en ordre per tal de realitzar accions sobre ells. No s'ha modificat cap element."
 
 #: admin/folderadmin.py:434
 #, python-format
@@ -128,8 +128,7 @@ msgstr "Ja existeixen carpetes amb els noms %s a la destinació seleccionada"
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"S'han mogut %(count)d fitxers i/o carpetes a la carpeta '%(destination)s'"
+msgstr "S'han mogut %(count)d fitxers i/o carpetes a la carpeta '%(destination)s'"
 
 #: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
@@ -154,8 +153,7 @@ msgstr "Canviar el nom a fitxers"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"S'han copiat %(count)d fitxeres i/o carpetes a la carpeta '%(destination)s'."
+msgstr "S'han copiat %(count)d fitxeres i/o carpetes a la carpeta '%(destination)s'."
 
 #: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
@@ -187,9 +185,7 @@ msgstr "Sufix que serà afegit als noms de fitxer dels fitxers copiats"
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"El sufix ha de ser una part de nom de fitxer vàlida, simple i en minúscules, "
-"com ara \"%(valid)s\"."
+msgstr "El sufix ha de ser una part de nom de fitxer vàlida, simple i en minúscules, com ara \"%(valid)s\"."
 
 #: admin/forms.py:53
 #, python-format
@@ -370,9 +366,7 @@ msgstr "Permisos desactivats"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
-"Desactiveu tots els permisos d'aquest fitxer. Aquest serà accessible de "
-"forma pública per a tothom."
+msgstr "Desactiveu tots els permisos d'aquest fitxer. Aquest serà accessible de forma pública per a tothom."
 
 #: models/foldermodels.py:94
 msgid "parent"
@@ -465,6 +459,7 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
 #: models/foldermodels.py:360
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -483,6 +478,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:375
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -495,6 +491,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:390
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -549,6 +546,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -564,8 +562,7 @@ msgstr "Anar"
 #: templates/admin/filer/folder/directory_table_list.html:232
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 msgid "Click here to select the objects across all pages"
-msgstr ""
-"Cliqueu aquí per seleccionar els objectes a través de totes les pàgines"
+msgstr "Cliqueu aquí per seleccionar els objectes a través de totes les pàgines"
 
 #: templates/admin/filer/actions.html:14
 #, python-format
@@ -617,26 +614,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Esborrar els fitxers seleccionats provocarà l'esborrar d'objectes "
-"relacionats, però el teu compte no té permisos per esborrar els següents "
-"tipus d'objectes:"
+msgstr "Esborrar els fitxers seleccionats provocarà l'esborrar d'objectes relacionats, però el teu compte no té permisos per esborrar els següents tipus d'objectes:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Esborrer els fitxers i/o carpetes seleccionades provocarà l'esborrat dels "
-"següents objectes protegits relacionats:"
+msgstr "Esborrer els fitxers i/o carpetes seleccionades provocarà l'esborrat dels següents objectes protegits relacionats:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Segur que voleu esborrar els fitxers i/o carpetes seleccionades? Els "
-"següents objectes i els seus elements relacionats seran esborrats:"
+msgstr "Segur que voleu esborrar els fitxers i/o carpetes seleccionades? Els següents objectes i els seus elements relacionats seran esborrats:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -685,8 +675,8 @@ msgstr "Icona de la carpeta"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr "Sense permisos per copiar tots els fitxers i/o carpetes seleccionats."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -711,9 +701,7 @@ msgstr "No hi ha fitxers i/o carpetes disponibles."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Els següents fitxers i/o carpetes seran copiats a una carpeta de destí "
-"(mantenint la seva estructura d'arbre):"
+msgstr "Els següents fitxers i/o carpetes seran copiats a una carpeta de destí (mantenint la seva estructura d'arbre):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -733,9 +721,7 @@ msgstr "No està permès copiar fitxers a la mateixa carpeta"
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
-"El vostre compte no té permisos per redimensionar totes les imatges "
-"seleccionades."
+msgstr "El vostre compte no té permisos per redimensionar totes les imatges seleccionades."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -747,18 +733,13 @@ msgstr "Les següents imatges seran redimensionades:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Trieu una opció de miniatura existent o especifiqueu paràmetres de "
-"redimensionat:"
+msgstr "Trieu una opció de miniatura existent o especifiqueu paràmetres de redimensionat:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Avís: les imatges seran redimensionades al mateix lloc i les originals es "
-"perdran. Considereu realitzar abans una còpia d'aquestes per mantenir els "
-"originals."
+msgstr "Avís: les imatges seran redimensionades al mateix lloc i les originals es perdran. Considereu realitzar abans una còpia d'aquestes per mantenir els originals."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
@@ -766,11 +747,9 @@ msgstr "Redimensionar"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"El vostre compte no té permisos per moure tots els fitxers i/o carpetes "
-"seleccionats."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "El vostre compte no té permisos per moure tots els fitxers i/o carpetes seleccionats."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -780,9 +759,7 @@ msgstr "No hi ha fitxers i/o carpetes disponibles per moure."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Els següents fitxers i/o carpetes seran moguts a una carpeta de destí "
-"(mantenint la seva estructura d'arbre):"
+msgstr "Els següents fitxers i/o carpetes seran moguts a una carpeta de destí (mantenint la seva estructura d'arbre):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -797,9 +774,7 @@ msgstr "No està permès moure fitxers a la mateixa carpeta"
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr ""
-"El vostre compte no té permisos per canviar el nom de tots els fitxers "
-"seleccionats."
+msgstr "El vostre compte no té permisos per canviar el nom de tots els fitxers seleccionats."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
@@ -809,10 +784,7 @@ msgstr "No hi ha fitxers per canviar el nom disponibles."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"En canviarà el nom dels següents fitxers (seguiran estant a les seves "
-"carpetes i mantindran el seu nom de fitxers original, només serà modificat "
-"el nom que es mostrarà):"
+msgstr "En canviarà el nom dels següents fitxers (seguiran estant a les seves carpetes i mantindran el seu nom de fitxers original, només serà modificat el nom que es mostrarà):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -967,11 +939,13 @@ msgstr "activat"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -1033,10 +1007,12 @@ msgstr "Seleccionar tots/es %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1102,6 +1078,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1157,6 +1134,7 @@ msgid "Choose File"
 msgstr "Escollir Fitxer"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1183,10 +1161,10 @@ msgid ""
 msgstr ""
 
 #~ msgid "Resize parameters must be choosen."
-#~ msgstr "Heu de triar paràmetres de redimensionat."
+#~ msgstr "Resize parameters must be choosen."
 
 #~ msgid "Choose resize parameters:"
-#~ msgstr "Trieu els paràmetres de redimensionat:"
+#~ msgstr "Choose resize parameters:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"

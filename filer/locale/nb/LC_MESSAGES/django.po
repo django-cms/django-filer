@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -13,15 +13,16 @@ msgstr ""
 "POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Eirik Krogstad <eirikkr@gmail.com>, 2013\n"
-"Language-Team: Norwegian Bokmål (http://app.transifex.com/divio/django-filer/"
-"language/nb/)\n"
-"Language: nb\n"
+"Language-Team: Norwegian Bokmål (http://app.transifex.com/divio/django-filer/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -30,7 +31,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:49
@@ -45,9 +47,7 @@ msgstr ""
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Du må velge noen elementer for å utføre handlinger på dem. Ingen elementer "
-"er endret."
+msgstr "Du må velge noen elementer for å utføre handlinger på dem. Ingen elementer er endret."
 
 #: admin/folderadmin.py:434
 #, python-format
@@ -128,8 +128,7 @@ msgstr ""
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Flyttet %(count)d filer og/eller mapper til mappen \"%(destination)s\"."
+msgstr "Flyttet %(count)d filer og/eller mapper til mappen \"%(destination)s\"."
 
 #: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
@@ -154,8 +153,7 @@ msgstr "Endre navn på filer"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Kopierte %(count)d filer og/eller mapper til mappen \"%(destination)s\"."
+msgstr "Kopierte %(count)d filer og/eller mapper til mappen \"%(destination)s\"."
 
 #: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
@@ -187,9 +185,7 @@ msgstr "Endelse som vil tilføyes filnavn på kopierte filer."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Endelse bør være en gyldig, enkel del av filnavnet med små bokstaver, som "
-"\"%(valid)s\"."
+msgstr "Endelse bør være en gyldig, enkel del av filnavnet med små bokstaver, som \"%(valid)s\"."
 
 #: admin/forms.py:53
 #, python-format
@@ -463,6 +459,7 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
 #: models/foldermodels.py:360
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -481,6 +478,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:375
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -493,6 +491,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:390
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -547,6 +546,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -614,26 +614,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Å slette de valgte filene og/eller mappene ville resultere i sletting av "
-"relaterte objekter, men din konto har ikke tillatelse til å slette objekter "
-"av følgende typer:"
+msgstr "Å slette de valgte filene og/eller mappene ville resultere i sletting av relaterte objekter, men din konto har ikke tillatelse til å slette objekter av følgende typer:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Å slette de valgte filene og/eller mappene ville kreve å slette følgende "
-"beskyttede relaterte objekter:"
+msgstr "Å slette de valgte filene og/eller mappene ville kreve å slette følgende beskyttede relaterte objekter:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Er du sikker på at du vil slette de valgte filene og/eller mappene? Alle de "
-"følgende objektene og deres relaterte elementer vil bli slettet:"
+msgstr "Er du sikker på at du vil slette de valgte filene og/eller mappene? Alle de følgende objektene og deres relaterte elementer vil bli slettet:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -682,11 +675,9 @@ msgstr "Mappeikon"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
-msgstr ""
-"Din konto har ikke tillatelse til å kopiere alle de valgte filene og/eller "
-"mappene."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
+msgstr "Din konto har ikke tillatelse til å kopiere alle de valgte filene og/eller mappene."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -710,9 +701,7 @@ msgstr "Det er ingen filer og/eller mapper å kopiere."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"De følgende filene og/eller mappene vil bli kopiert til en målmappe "
-"(mappestruktur vil beholdes):"
+msgstr "De følgende filene og/eller mappene vil bli kopiert til en målmappe (mappestruktur vil beholdes):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -732,8 +721,7 @@ msgstr ""
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
-"Din konto har ikke tillatelse til å endre størrelse på alle valgte bilder."
+msgstr "Din konto har ikke tillatelse til å endre størrelse på alle valgte bilder."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -745,17 +733,13 @@ msgstr "De følgende bildene vil få endret størrelse:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Velg et eksisterende miniatyrbildevalg eller skriv inn parametre for endring "
-"av størrelse:"
+msgstr "Velg et eksisterende miniatyrbildevalg eller skriv inn parametre for endring av størrelse:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Advarsel: Bilder vil få sin størrelse endret, og originalene vil gå tapt. "
-"Det kan være ønskelig å først gjøre en kopi for å beholde originalene."
+msgstr "Advarsel: Bilder vil få sin størrelse endret, og originalene vil gå tapt. Det kan være ønskelig å først gjøre en kopi for å beholde originalene."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
@@ -763,11 +747,9 @@ msgstr "Endre størrelse"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"Din konto har ikke tillatelse til å flytte alle de valgte filene og/eller "
-"mappene."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "Din konto har ikke tillatelse til å flytte alle de valgte filene og/eller mappene."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -777,9 +759,7 @@ msgstr "Det er ingen filer og/eller mapper å flytte."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"De følgende filene og/eller mappene vil bli flyttet til en målmappe "
-"(mappestruktur vil beholdes):"
+msgstr "De følgende filene og/eller mappene vil bli flyttet til en målmappe (mappestruktur vil beholdes):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -794,8 +774,7 @@ msgstr ""
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr ""
-"Din konto har ikke tillatelse til å endre navn på alle de valgte filene."
+msgstr "Din konto har ikke tillatelse til å endre navn på alle de valgte filene."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
@@ -805,9 +784,7 @@ msgstr "Det er ingen filer å endre navn på."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"De følgende filene vil få endret navn (de vil forbli på samme sted og "
-"beholde originalt filnavn, bare visningsnavn vil endres):"
+msgstr "De følgende filene vil få endret navn (de vil forbli på samme sted og beholde originalt filnavn, bare visningsnavn vil endres):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -962,11 +939,13 @@ msgstr "aktivert"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr ""
 
@@ -1028,10 +1007,12 @@ msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1097,6 +1078,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1152,6 +1134,7 @@ msgid "Choose File"
 msgstr ""
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1178,10 +1161,10 @@ msgid ""
 msgstr ""
 
 #~ msgid "Resize parameters must be choosen."
-#~ msgstr "Parametre for endring av størrelse må velges."
+#~ msgstr "Resize parameters must be choosen."
 
 #~ msgid "Choose resize parameters:"
-#~ msgstr "Velg parametre for endring av størrelse:"
+#~ msgstr "Choose resize parameters:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"

@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -13,15 +13,16 @@ msgstr ""
 "POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Duong Vu Hong <duong.vuhong.uet@gmail.com>, 2021\n"
-"Language-Team: Vietnamese (Viet Nam) (http://app.transifex.com/divio/django-"
-"filer/language/vi_VN/)\n"
-"Language: vi_VN\n"
+"Language-Team: Vietnamese (Viet Nam) (http://app.transifex.com/divio/django-filer/language/vi_VN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: vi_VN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -30,7 +31,8 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
 #: admin/fileadmin.py:49
@@ -45,9 +47,7 @@ msgstr "URL hợp chuẩn"
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
-"Những item được chọn để thực hiện hành động trên đó. Không có item nào bị "
-"thay đổi."
+msgstr "Những item được chọn để thực hiện hành động trên đó. Không có item nào bị thay đổi."
 
 #: admin/folderadmin.py:434
 #, python-format
@@ -127,8 +127,7 @@ msgstr "Các thư mục với tên %s đã tồn tại ở vị trí đã chọn
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Đã di chuyển %(count)d tệp và/hoặc thư mục tới thư mục '%(destination)s'."
+msgstr "Đã di chuyển %(count)d tệp và/hoặc thư mục tới thư mục '%(destination)s'."
 
 #: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
@@ -153,9 +152,7 @@ msgstr "Đổi tên tệp"
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Đã thành công sao chép %(count)d tệp và/hoặc thư mục tới thư mục "
-"'%(destination)s'."
+msgstr "Đã thành công sao chép %(count)d tệp và/hoặc thư mục tới thư mục '%(destination)s'."
 
 #: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
@@ -187,9 +184,7 @@ msgstr "Hậu tố sẽ được nối vào tên của tệp đã sao chép."
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Hậu tố phải là một phần tên tệp hợp lệ, đơn giản và chữ thường, như "
-"\"%(valid)s\"."
+msgstr "Hậu tố phải là một phần tên tệp hợp lệ, đơn giản và chữ thường, như \"%(valid)s\"."
 
 #: admin/forms.py:53
 #, python-format
@@ -370,9 +365,7 @@ msgstr "Quyền bị vô hiệu hóa"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
-"Vô hiệu hóa bất kỳ quyền kiểm tra cho tệp này. Tệp sẽ truy cập được bởi bất "
-"kỳ ai."
+msgstr "Vô hiệu hóa bất kỳ quyền kiểm tra cho tệp này. Tệp sẽ truy cập được bởi bất kỳ ai."
 
 #: models/foldermodels.py:94
 msgid "parent"
@@ -465,6 +458,7 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
 #: models/foldermodels.py:360
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -483,6 +477,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:375
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -495,6 +490,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:390
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -549,6 +545,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -616,25 +613,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Xóa tệp và/hoặc thưc mục đã chọn sẽ dẫn đến xóa đối tượng liên quan, nhưng "
-"tài khoản của bạn không có quyền xóa những loại của các đối tượng:"
+msgstr "Xóa tệp và/hoặc thưc mục đã chọn sẽ dẫn đến xóa đối tượng liên quan, nhưng tài khoản của bạn không có quyền xóa những loại của các đối tượng:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Xóa tệp và/hoặc thư mục đã chọn sẽ yêu cầu xóa những đối tượng liên quan "
-"được bảo vệ sau:"
+msgstr "Xóa tệp và/hoặc thư mục đã chọn sẽ yêu cầu xóa những đối tượng liên quan được bảo vệ sau:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Bạn có chắc muốn xóa tệp và/hoặc thư mục đã chọn? Tất cả những đối tượng và "
-"những thứ liên quan đến chúng sẽ bị xóa:"
+msgstr "Bạn có chắc muốn xóa tệp và/hoặc thư mục đã chọn? Tất cả những đối tượng và những thứ liên quan đến chúng sẽ bị xóa:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -683,10 +674,9 @@ msgstr "Biểu tượng thư mục"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
-msgstr ""
-"Tài khoản của bạn không có quyền để sao chép tất cả tệp và thư mục được chọn."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
+msgstr "Tài khoản của bạn không có quyền để sao chép tất cả tệp và thư mục được chọn."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -710,9 +700,7 @@ msgstr "Không có tệp và/hoặc thư mục để sao chép."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Những tệp và thư mục sau sẽ được sao chép tới một thư mục đích (giữ cấu trúc "
-"cây thư mục):"
+msgstr "Những tệp và thư mục sau sẽ được sao chép tới một thư mục đích (giữ cấu trúc cây thư mục):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -732,9 +720,7 @@ msgstr "Không cho phép sao chép tệp tới cùng thư mục"
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
-"Tài khoản của bạn không có quyền để thay đổi kích thước của tất cả hình ảnh "
-"đã chọn."
+msgstr "Tài khoản của bạn không có quyền để thay đổi kích thước của tất cả hình ảnh đã chọn."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
@@ -746,17 +732,13 @@ msgstr "Hình ảnh dưới đay sẽ bị thay đổi kích thước:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Chọn một tùy chọn của thumbnail đang tồn tại hoặc nhập tham số thay đổi kích "
-"thước:"
+msgstr "Chọn một tùy chọn của thumbnail đang tồn tại hoặc nhập tham số thay đổi kích thước:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Cảnh bảo: Hình ảnh sẽ bị thay đổi tại chỗ và ảnh gốc sẽ bị mất. Có thể tạo "
-"một sao chép của chúng để giữ lại hình ảnh gốc."
+msgstr "Cảnh bảo: Hình ảnh sẽ bị thay đổi tại chỗ và ảnh gốc sẽ bị mất. Có thể tạo một sao chép của chúng để giữ lại hình ảnh gốc."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
@@ -764,11 +746,9 @@ msgstr "Thay đổi kích thước"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
-msgstr ""
-"Tài khoản của bạn không có quyền để di chuyển tất cả các tệp và thư mục đã "
-"chọn."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
+msgstr "Tài khoản của bạn không có quyền để di chuyển tất cả các tệp và thư mục đã chọn."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
@@ -778,9 +758,7 @@ msgstr "Không có tệp và/hoặc thư mục để di chuyển."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Tệp và thư mục dưới đây sẽ được chuyển tới thư mục đích (giữ nguyên cấu trúc "
-"cây thư mục):"
+msgstr "Tệp và thư mục dưới đây sẽ được chuyển tới thư mục đích (giữ nguyên cấu trúc cây thư mục):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -805,9 +783,7 @@ msgstr "Không có tệp để đổi tên."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"Tệp dưới đây sẽ bị đổi tên (chúng vẫn ở trong thư mục của chúng và giữ tên "
-"gốc, chỉ tên hiển thị sẽ bị thay đổi):"
+msgstr "Tệp dưới đây sẽ bị đổi tên (chúng vẫn ở trong thư mục của chúng và giữ tên gốc, chỉ tên hiển thị sẽ bị thay đổi):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -960,11 +936,13 @@ msgstr "đã kích hoạt"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr "Url hợp chuẩn '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "Tải '%(item_label)s'"
 
@@ -1026,10 +1004,12 @@ msgstr "Chọn tất cả %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1094,6 +1074,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1149,6 +1130,7 @@ msgid "Choose File"
 msgstr "Chọn tệp"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1175,10 +1157,10 @@ msgid ""
 msgstr ""
 
 #~ msgid "Resize parameters must be choosen."
-#~ msgstr "Tham số thay đổi kích thước phải được chọn."
+#~ msgstr "Resize parameters must be choosen."
 
 #~ msgid "Choose resize parameters:"
-#~ msgstr "Chọn tham số thay dổi kích thước:"
+#~ msgstr "Choose resize parameters:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"
