@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.contrib.admin import widgets
 from django.contrib.admin.helpers import AdminForm
 from django.core.exceptions import ValidationError
@@ -58,23 +57,17 @@ class RenameFilesForm(WithFieldsetMixin, forms.Form):
 
 class ResizeImagesForm(WithFieldsetMixin, forms.Form):
     fieldsets = ((None, {"fields": (
+        "thumbnail_option",
         ("width", "height"),
         ("crop", "upscale"))}),)
 
-    if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
-        thumbnail_option = models.ForeignKey(
-            ThumbnailOption,
-            null=True,
-            blank=True,
-            verbose_name=_("thumbnail option"),
-            on_delete=models.CASCADE,
-        ).formfield()
-
-        def get_fieldsets(self):
-            """Updates the static fieldset by prepending thumbnail options"""
-            fieldsets = super().get_fieldsets()
-            fieldsets[0][1]["fields"] = ("thumbnail_option") + fieldsets[0][1]["fields"]
-            return fieldsets
+    thumbnail_option = models.ForeignKey(
+        ThumbnailOption,
+        null=True,
+        blank=True,
+        verbose_name=_("thumbnail option"),
+        on_delete=models.CASCADE,
+    ).formfield()
 
     width = models.PositiveIntegerField(_("width"), null=True, blank=True).formfield(widget=widgets.AdminIntegerFieldWidget)
     height = models.PositiveIntegerField(_("height"), null=True, blank=True).formfield(widget=widgets.AdminIntegerFieldWidget)
@@ -83,8 +76,5 @@ class ResizeImagesForm(WithFieldsetMixin, forms.Form):
 
     def clean(self):
         if not (self.cleaned_data.get('thumbnail_option') or ((self.cleaned_data.get('width') or 0) + (self.cleaned_data.get('height') or 0))):
-            if 'cmsplugin_filer_image' in settings.INSTALLED_APPS:
-                raise ValidationError(_('Thumbnail option or resize parameters must be choosen.'))
-            else:
-                raise ValidationError(_('Resize parameters must be choosen.'))
+            raise ValidationError(_('Thumbnail option or resize parameters must be choosen.'))
         return self.cleaned_data

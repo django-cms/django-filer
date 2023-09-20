@@ -29,11 +29,7 @@
                     {% endfor %}
                     <input type="hidden" name="action" value="resize_images">
                     <input type="hidden" name="post" value="yes">
-                    {% if cmsplugin_enabled %}
-                        <p>{% blocktrans %}Choose an existing thumbnail option or enter resize parameters:{% endblocktrans %}</p>
-                    {% else %}
-                        <p>{% blocktrans %}Choose resize parameters:{% endblocktrans %}</p>
-                    {% endif %}
+                    <p>{% blocktrans %}Choose an existing thumbnail option or enter resize parameters:{% endblocktrans %}</p>
                     {% for fieldset in resize_form.admin_form %}
                         {% include "admin/includes/fieldset.html" %}
                     {% endfor %}

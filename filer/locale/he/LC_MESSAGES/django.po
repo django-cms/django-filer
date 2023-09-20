@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-31 22:21+0200\n"
+"POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Angelo Dini <finalangeljp@hotmail.com>\n"
 "Language-Team: Hebrew (http://app.transifex.com/divio/django-filer/language/"
@@ -33,21 +33,21 @@ msgstr ""
 msgid "Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
-#: admin/fileadmin.py:47
+#: admin/fileadmin.py:49
 msgid "Advanced"
 msgstr "מתקדם"
 
-#: admin/fileadmin.py:162
+#: admin/fileadmin.py:164
 msgid "canonical URL"
 msgstr ""
 
-#: admin/folderadmin.py:399 admin/folderadmin.py:570
+#: admin/folderadmin.py:411 admin/folderadmin.py:582
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "יש לבחור פריטים על מנת לבצע עליהם פעולות. לא בוצעו פעולות."
 
-#: admin/folderadmin.py:422
+#: admin/folderadmin.py:434
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -56,174 +56,170 @@ msgstr[1] "כל ה-%(total_count)s  נבחרו"
 msgstr[2] "כל ה-%(total_count)s  נבחרו"
 msgstr[3] "כל ה-%(total_count)s  נבחרו"
 
-#: admin/folderadmin.py:448
+#: admin/folderadmin.py:460
 #, python-format
 msgid "Directory listing for %(folder_name)s"
 msgstr ""
 
-#: admin/folderadmin.py:463
+#: admin/folderadmin.py:475
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 מתוך %(cnt)s נבחרו"
 
-#: admin/folderadmin.py:600
+#: admin/folderadmin.py:612
 msgid "No action selected."
 msgstr "לא נבחרה פעולה."
 
-#: admin/folderadmin.py:652
+#: admin/folderadmin.py:664
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "הועברו בהצלחה %(count)d קבצים ללוח"
 
-#: admin/folderadmin.py:657
+#: admin/folderadmin.py:669
 msgid "Move selected files to clipboard"
 msgstr "העבר קבצים שנבחרו ללוח"
 
-#: admin/folderadmin.py:697
+#: admin/folderadmin.py:709
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "בוטלו בהצלחה הרשאות עבור %(count)d קבצים."
 
-#: admin/folderadmin.py:699
+#: admin/folderadmin.py:711
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "אופשרו בהצלחה הרשאות עבור %(count)d קבצים."
 
-#: admin/folderadmin.py:707
+#: admin/folderadmin.py:719
 msgid "Enable permissions for selected files"
 msgstr "אופשרו הרשאות עבור קבצים בחורים"
 
-#: admin/folderadmin.py:713
+#: admin/folderadmin.py:725
 msgid "Disable permissions for selected files"
 msgstr "בוטלו הרשאות עבור קבצים בחורים"
 
-#: admin/folderadmin.py:777
+#: admin/folderadmin.py:789
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "נמחקו בהצלחה %(count)d קבצים ו/או תיקיות."
 
-#: admin/folderadmin.py:782
+#: admin/folderadmin.py:794
 msgid "Cannot delete files and/or folders"
 msgstr "לא ניתן למחוק קבצים ו/או תיקיות"
 
-#: admin/folderadmin.py:784
+#: admin/folderadmin.py:796
 msgid "Are you sure?"
 msgstr "האם את/ה בטוח/ה?"
 
-#: admin/folderadmin.py:790
+#: admin/folderadmin.py:802
 msgid "Delete files and/or folders"
 msgstr "מחק קבצים ו/או תיקיות"
 
-#: admin/folderadmin.py:811
+#: admin/folderadmin.py:823
 msgid "Delete selected files and/or folders"
 msgstr "מחק קבצים ו/או תיקיות בחורים"
 
-#: admin/folderadmin.py:918
+#: admin/folderadmin.py:930
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr ""
 
-#: admin/folderadmin.py:922
+#: admin/folderadmin.py:934
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "הועברו בהצלחה %(count)d קבצים ו/או תיקיות לתיקיה '%(destination)s'."
 
-#: admin/folderadmin.py:930 admin/folderadmin.py:932
+#: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
 msgstr "העבר קבצים ו/או תיקיות"
 
-#: admin/folderadmin.py:947
+#: admin/folderadmin.py:959
 msgid "Move selected files and/or folders"
 msgstr "העבר קבצים ו/או תיקיות בחורים"
 
-#: admin/folderadmin.py:1004
+#: admin/folderadmin.py:1016
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "שונו בהצלחה שמותיהם של %(count)d קבצים."
 
-#: admin/folderadmin.py:1013 admin/folderadmin.py:1015
-#: admin/folderadmin.py:1030
+#: admin/folderadmin.py:1025 admin/folderadmin.py:1027
+#: admin/folderadmin.py:1042
 msgid "Rename files"
 msgstr "שנה שמות קבצים"
 
-#: admin/folderadmin.py:1125
+#: admin/folderadmin.py:1137
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
 msgstr "הועתקו בהצלחה %(count)d קבצים ו/או תיקיות לתיקיה '%(destination)s'."
 
-#: admin/folderadmin.py:1143 admin/folderadmin.py:1145
+#: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
 msgstr "העתק קבצים ו/או תיקיות"
 
-#: admin/folderadmin.py:1162
+#: admin/folderadmin.py:1174
 msgid "Copy selected files and/or folders"
 msgstr "העתק קבצים ו/או תיקיות בחורים"
 
-#: admin/folderadmin.py:1267
+#: admin/folderadmin.py:1279
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "שונה בהצלחה גודלם של %(count)d תמונות."
 
-#: admin/folderadmin.py:1274 admin/folderadmin.py:1276
+#: admin/folderadmin.py:1286 admin/folderadmin.py:1288
 msgid "Resize images"
 msgstr "שנה גודל תמונות"
 
-#: admin/folderadmin.py:1292
+#: admin/folderadmin.py:1303
 msgid "Resize selected images"
 msgstr "שנה גודל תמונות בחורות"
 
-#: admin/forms.py:24
+#: admin/forms.py:25
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "סיומת אשר תתווסף לשמות קבצים שהועתקו."
 
-#: admin/forms.py:31
+#: admin/forms.py:32
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
 msgstr "על הסיומת להיות תקינה, פשוטה ובאותיות קטנות, כגון \"%(valid)s\"."
 
-#: admin/forms.py:52
+#: admin/forms.py:53
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "ערך מפתח תבנית שינוי השם \"%(key)s\". אינו חוקי."
 
-#: admin/forms.py:54
+#: admin/forms.py:55
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "תבנית שינוי שם לא תקינה: %(error)s."
 
-#: admin/forms.py:64 models/thumbnailoptionmodels.py:37
+#: admin/forms.py:69 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
 msgstr "אפשרות תמונה ממוזערת"
 
-#: admin/forms.py:67 models/thumbnailoptionmodels.py:15
+#: admin/forms.py:73 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "רוחב"
 
-#: admin/forms.py:68 models/thumbnailoptionmodels.py:20
+#: admin/forms.py:74 models/thumbnailoptionmodels.py:20
 msgid "height"
 msgstr "גובה"
 
-#: admin/forms.py:69 models/thumbnailoptionmodels.py:25
+#: admin/forms.py:75 models/thumbnailoptionmodels.py:25
 msgid "crop"
 msgstr "חיתוך"
 
-#: admin/forms.py:70 models/thumbnailoptionmodels.py:30
+#: admin/forms.py:76 models/thumbnailoptionmodels.py:30
 msgid "upscale"
 msgstr "הגדל"
 
-#: admin/forms.py:75
+#: admin/forms.py:80
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "עליך לבחור אפשרות תמונה ממוזערת או פרמטרי שינוי גודל."
-
-#: admin/forms.py:77
-msgid "Resize parameters must be choosen."
-msgstr "יש לבחור פרמטרי שינוי גודל."
 
 #: admin/imageadmin.py:18 admin/imageadmin.py:105
 msgid "Subject location"
@@ -738,15 +734,11 @@ msgstr "אין תמונות זמינות לשינוי גודלן."
 msgid "The following images will be resized:"
 msgstr "התמונות הבאות ישונה גודלן:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:33
+#: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
 msgstr "בחר אפשרות תמונה ממוזערת קיימת או הזן פרמטרי שינוי גודל:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:35
-msgid "Choose resize parameters:"
-msgstr "בחר פרמטרי שינוי גודל:"
-
-#: templates/admin/filer/folder/choose_images_resize_options.html:38
+#: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
@@ -754,7 +746,7 @@ msgstr ""
 "הזהרה: התמונות ישונה גודלן במקום והמקוריות יאבדו. אולי ראשית עשה/י העתק שלהם "
 "כדי לשמור על המקויות."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:41
+#: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
 msgstr "שנה גודל"
 
@@ -1175,6 +1167,12 @@ msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
 msgstr ""
+
+#~ msgid "Resize parameters must be choosen."
+#~ msgstr "יש לבחור פרמטרי שינוי גודל."
+
+#~ msgid "Choose resize parameters:"
+#~ msgstr "בחר פרמטרי שינוי גודל:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"

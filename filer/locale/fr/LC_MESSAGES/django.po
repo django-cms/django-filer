@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-31 22:21+0200\n"
+"POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Corentin Bettiol, 2023\n"
 "Language-Team: French (http://app.transifex.com/divio/django-filer/language/"
@@ -42,15 +42,15 @@ msgstr ""
 "Utilisation du dossier impossible : Permissions insuffisantes. Sélectionnez "
 "un autre dossier."
 
-#: admin/fileadmin.py:47
+#: admin/fileadmin.py:49
 msgid "Advanced"
 msgstr "Avancé"
 
-#: admin/fileadmin.py:162
+#: admin/fileadmin.py:164
 msgid "canonical URL"
 msgstr "URL canonique"
 
-#: admin/folderadmin.py:399 admin/folderadmin.py:570
+#: admin/folderadmin.py:411 admin/folderadmin.py:582
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -58,7 +58,7 @@ msgstr ""
 "Des éléments doivent être sélectionnés pour effectuer les actions. Aucun "
 "élément n'a été modifié."
 
-#: admin/folderadmin.py:422
+#: admin/folderadmin.py:434
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -66,74 +66,74 @@ msgstr[0] "%(total_count)s sélectionné"
 msgstr[1] "Tous les %(total_count)s sélectionnés"
 msgstr[2] "Tous les %(total_count)s sélectionnés"
 
-#: admin/folderadmin.py:448
+#: admin/folderadmin.py:460
 #, python-format
 msgid "Directory listing for %(folder_name)s"
 msgstr "Liste du répertoire pour %(folder_name)s"
 
-#: admin/folderadmin.py:463
+#: admin/folderadmin.py:475
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 sur %(cnt)s sélectionné"
 
-#: admin/folderadmin.py:600
+#: admin/folderadmin.py:612
 msgid "No action selected."
 msgstr "Pas d'action sélectionnée."
 
-#: admin/folderadmin.py:652
+#: admin/folderadmin.py:664
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "%(count)d fichiers déplacés avec succès vers le presse-papiers."
 
-#: admin/folderadmin.py:657
+#: admin/folderadmin.py:669
 msgid "Move selected files to clipboard"
 msgstr "Déplacer les fichiers sélectionnés vers le presse-papiers"
 
-#: admin/folderadmin.py:697
+#: admin/folderadmin.py:709
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Permissions désactivées avec succès pour %(count)d fichiers."
 
-#: admin/folderadmin.py:699
+#: admin/folderadmin.py:711
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Permissions activées avec succès pour %(count)d fichiers."
 
-#: admin/folderadmin.py:707
+#: admin/folderadmin.py:719
 msgid "Enable permissions for selected files"
 msgstr "Activer les permissions pour les fichiers sélectionnés."
 
-#: admin/folderadmin.py:713
+#: admin/folderadmin.py:725
 msgid "Disable permissions for selected files"
 msgstr "Désactiver les permissions pour les fichiers sélectionnés."
 
-#: admin/folderadmin.py:777
+#: admin/folderadmin.py:789
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "%(count)d fichiers et/ou dossiers supprimés avec succès."
 
-#: admin/folderadmin.py:782
+#: admin/folderadmin.py:794
 msgid "Cannot delete files and/or folders"
 msgstr "Impossible de supprimer les fichiers et/ou dossiers."
 
-#: admin/folderadmin.py:784
+#: admin/folderadmin.py:796
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr(e) ?"
 
-#: admin/folderadmin.py:790
+#: admin/folderadmin.py:802
 msgid "Delete files and/or folders"
 msgstr "Supprimer les fichiers et/ou dossiers"
 
-#: admin/folderadmin.py:811
+#: admin/folderadmin.py:823
 msgid "Delete selected files and/or folders"
 msgstr "Supprimer les fichiers et/ou dossiers sélectionnés"
 
-#: admin/folderadmin.py:918
+#: admin/folderadmin.py:930
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Des dossiers nommés %s existent déjà dans la destination sélectionnée"
 
-#: admin/folderadmin.py:922
+#: admin/folderadmin.py:934
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
@@ -142,25 +142,25 @@ msgstr ""
 "%(count)d fichiers et/ou dossiers déplacés avec succès vers le dossier "
 "« %(destination)s »."
 
-#: admin/folderadmin.py:930 admin/folderadmin.py:932
+#: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
 msgstr "Déplacer les fichiers et/ou dossiers"
 
-#: admin/folderadmin.py:947
+#: admin/folderadmin.py:959
 msgid "Move selected files and/or folders"
 msgstr "Déplacer les fichiers et/ou dossiers sélectionnés"
 
-#: admin/folderadmin.py:1004
+#: admin/folderadmin.py:1016
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "%(count)d fichiers renommés avec succès."
 
-#: admin/folderadmin.py:1013 admin/folderadmin.py:1015
-#: admin/folderadmin.py:1030
+#: admin/folderadmin.py:1025 admin/folderadmin.py:1027
+#: admin/folderadmin.py:1042
 msgid "Rename files"
 msgstr "Renommer les fichiers"
 
-#: admin/folderadmin.py:1125
+#: admin/folderadmin.py:1137
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
@@ -169,32 +169,32 @@ msgstr ""
 "%(count)d fichiers et/dossiers copiés avec succès dans le dossier "
 "« %(destination)s »."
 
-#: admin/folderadmin.py:1143 admin/folderadmin.py:1145
+#: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
 msgstr "Copier les fichiers et/ou dossiers"
 
-#: admin/folderadmin.py:1162
+#: admin/folderadmin.py:1174
 msgid "Copy selected files and/or folders"
 msgstr "Copier les fichiers et/ou dossiers sélectionnés"
 
-#: admin/folderadmin.py:1267
+#: admin/folderadmin.py:1279
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "%(count)d images redimensionnées avec succès."
 
-#: admin/folderadmin.py:1274 admin/folderadmin.py:1276
+#: admin/folderadmin.py:1286 admin/folderadmin.py:1288
 msgid "Resize images"
 msgstr "Redimensionner les images"
 
-#: admin/folderadmin.py:1292
+#: admin/folderadmin.py:1303
 msgid "Resize selected images"
 msgstr "Redimensionner les images sélectionnées"
 
-#: admin/forms.py:24
+#: admin/forms.py:25
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "Suffixe qui sera ajouté au nom des fichiers copiés."
 
-#: admin/forms.py:31
+#: admin/forms.py:32
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
@@ -203,45 +203,41 @@ msgstr ""
 "Le suffixe doit être une partie de nom de fichier valide, simple et en "
 "minuscules, comme « %(valid)s »."
 
-#: admin/forms.py:52
+#: admin/forms.py:53
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "La clé de formatage « %(key)s » est inconnue."
 
-#: admin/forms.py:54
+#: admin/forms.py:55
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Format de renommage non valide : %(error)s."
 
-#: admin/forms.py:64 models/thumbnailoptionmodels.py:37
+#: admin/forms.py:69 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
 msgstr "option de miniature"
 
-#: admin/forms.py:67 models/thumbnailoptionmodels.py:15
+#: admin/forms.py:73 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "largeur"
 
-#: admin/forms.py:68 models/thumbnailoptionmodels.py:20
+#: admin/forms.py:74 models/thumbnailoptionmodels.py:20
 msgid "height"
 msgstr "hauteur"
 
-#: admin/forms.py:69 models/thumbnailoptionmodels.py:25
+#: admin/forms.py:75 models/thumbnailoptionmodels.py:25
 msgid "crop"
 msgstr "rogner"
 
-#: admin/forms.py:70 models/thumbnailoptionmodels.py:30
+#: admin/forms.py:76 models/thumbnailoptionmodels.py:30
 msgid "upscale"
 msgstr "agrandir"
 
-#: admin/forms.py:75
+#: admin/forms.py:80
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr ""
 "Une option de miniature ou des paramètres de dimensionnement doivent être "
 "choisis."
-
-#: admin/forms.py:77
-msgid "Resize parameters must be choosen."
-msgstr "Des paramètres de dimensionnement doivent être choisis."
 
 #: admin/imageadmin.py:18 admin/imageadmin.py:105
 msgid "Subject location"
@@ -468,19 +464,26 @@ msgstr "permissions du dossier"
 
 #: models/foldermodels.py:348
 msgid "Folder cannot be selected with type \"all items\"."
-msgstr "Le dossier ne peut pas être sélectionné avec le type \"tous les éléments\"."
+msgstr ""
+"Le dossier ne peut pas être sélectionné avec le type \"tous les éléments\"."
 
 #: models/foldermodels.py:350
 msgid "Folder has to be selected when type is not \"all items\"."
-msgstr "Un dossier doit être sélectionné lorsque le type n'est pas \"tous les éléments\"."
+msgstr ""
+"Un dossier doit être sélectionné lorsque le type n'est pas \"tous les "
+"éléments\"."
 
 #: models/foldermodels.py:352
 msgid "User or group cannot be selected together with \"everybody\"."
-msgstr "Un utilisateur ou un groupe ne peuvent être sélectionnés lorsque \"tout le monde\" est également sélectionné."
+msgstr ""
+"Un utilisateur ou un groupe ne peuvent être sélectionnés lorsque \"tout le "
+"monde\" est également sélectionné."
 
 #: models/foldermodels.py:354
 msgid "At least one of user, group, or \"everybody\" has to be selected."
-msgstr "Au moins une option parmi un utilisateur, un groupe, ou \"tout le monde\" doit être sélectionnée."
+msgstr ""
+"Au moins une option parmi un utilisateur, un groupe, ou \"tout le monde\" "
+"doit être sélectionnée."
 
 #: models/foldermodels.py:360
 msgid "All Folders"
@@ -764,17 +767,13 @@ msgstr "Il n'y a aucune image disponible à redimensionner."
 msgid "The following images will be resized:"
 msgstr "Les images suivantes seront redimensionnées :"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:33
+#: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
 msgstr ""
 "Choisissez une option de miniature existante ou entrez des paramètres de "
 "redimensionnement :"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:35
-msgid "Choose resize parameters:"
-msgstr "Choisissez des paramètres de redimensionnement :"
-
-#: templates/admin/filer/folder/choose_images_resize_options.html:38
+#: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
@@ -783,7 +782,7 @@ msgstr ""
 "seront perdues. Faites-en éventuellement une copie préalable afin de les "
 "conserver."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:41
+#: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
 msgstr "Redimensionner"
 
@@ -1216,6 +1215,12 @@ msgid ""
 msgstr ""
 "Fichier \"{file_name}\" : Rejeté à cause d'une potentielle vulnérabilité de "
 "cross-site scripting"
+
+#~ msgid "Resize parameters must be choosen."
+#~ msgstr "Des paramètres de dimensionnement doivent être choisis."
+
+#~ msgid "Choose resize parameters:"
+#~ msgstr "Choisissez des paramètres de redimensionnement :"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"
