@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Translators:
 # Translators:
@@ -11,19 +11,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-31 22:21+0200\n"
+"POT-Creation-Date: 2023-09-20 10:11+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Jakub Dorňák <jakub.dornak@misli.cz>, 2020\n"
-"Language-Team: Czech (http://app.transifex.com/divio/django-filer/language/"
-"cs/)\n"
-"Language: cs\n"
+"Language-Team: Czech (http://app.transifex.com/divio/django-filer/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
-"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #: admin/clipboardadmin.py:16
+#| msgid ""
+#| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr ""
 
@@ -32,24 +32,25 @@ msgid "Can't find folder to upload. Please refresh and try again"
 msgstr ""
 
 #: admin/clipboardadmin.py:19
-msgid "Can't use this folder, Permission Denied. Please select another folder."
+msgid ""
+"Can't use this folder, Permission Denied. Please select another folder."
 msgstr ""
 
-#: admin/fileadmin.py:47
+#: admin/fileadmin.py:49
 msgid "Advanced"
 msgstr "Pokročilé"
 
-#: admin/fileadmin.py:162
+#: admin/fileadmin.py:164
 msgid "canonical URL"
 msgstr "kanonický odkaz"
 
-#: admin/folderadmin.py:399 admin/folderadmin.py:570
+#: admin/folderadmin.py:411 admin/folderadmin.py:582
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "Nejdříve vyberte položku, která má být změněna."
 
-#: admin/folderadmin.py:422
+#: admin/folderadmin.py:434
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -58,182 +59,170 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: admin/folderadmin.py:448
+#: admin/folderadmin.py:460
 #, python-format
 msgid "Directory listing for %(folder_name)s"
 msgstr "Výpis složky %(folder_name)s"
 
-#: admin/folderadmin.py:463
+#: admin/folderadmin.py:475
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "žádná položka z %(cnt)s není vybrána"
 
-#: admin/folderadmin.py:600
+#: admin/folderadmin.py:612
 msgid "No action selected."
 msgstr "Nebyla vybrána žádná operace."
 
-#: admin/folderadmin.py:652
+#: admin/folderadmin.py:664
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
 msgstr "Soubory (%(count)d) byly přesunuty do schránky."
 
-#: admin/folderadmin.py:657
+#: admin/folderadmin.py:669
 msgid "Move selected files to clipboard"
 msgstr "Přesunout vybrané soubory do schránky"
 
-#: admin/folderadmin.py:697
+#: admin/folderadmin.py:709
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
 msgstr "Pro vybrané soubory (%(count)d) byla deaktivována oprávnění."
 
-#: admin/folderadmin.py:699
+#: admin/folderadmin.py:711
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
 msgstr "Pro vybrané soubory (%(count)d) byla aktivována oprávnění."
 
-#: admin/folderadmin.py:707
+#: admin/folderadmin.py:719
 msgid "Enable permissions for selected files"
 msgstr "Aktivovat oprávnění pro vybrané soubory"
 
-#: admin/folderadmin.py:713
+#: admin/folderadmin.py:725
 msgid "Disable permissions for selected files"
 msgstr "Deaktivovat oprávnění pro vybrané soubory"
 
-#: admin/folderadmin.py:777
+#: admin/folderadmin.py:789
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
 msgstr "Vybrané soubory a/nebo složky (%(count)d) byly smazány."
 
-#: admin/folderadmin.py:782
+#: admin/folderadmin.py:794
 msgid "Cannot delete files and/or folders"
 msgstr "Nemohu smazat soubory a/nebo složky"
 
-#: admin/folderadmin.py:784
+#: admin/folderadmin.py:796
 msgid "Are you sure?"
 msgstr "Opravdu provést?"
 
-#: admin/folderadmin.py:790
+#: admin/folderadmin.py:802
 msgid "Delete files and/or folders"
 msgstr "Smazat soubory a/nebo složky"
 
-#: admin/folderadmin.py:811
+#: admin/folderadmin.py:823
 msgid "Delete selected files and/or folders"
 msgstr "Smazat vybrané soubory a/nebo složky"
 
-#: admin/folderadmin.py:918
+#: admin/folderadmin.py:930
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
 msgstr "Složky pojmenované %s již v cílové složce existují"
 
-#: admin/folderadmin.py:922
+#: admin/folderadmin.py:934
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Vybrané soubory a/nebo složky (%(count)d) byly přesunuty do složky "
-"'%(destination)s'."
+msgstr "Vybrané soubory a/nebo složky (%(count)d) byly přesunuty do složky '%(destination)s'."
 
-#: admin/folderadmin.py:930 admin/folderadmin.py:932
+#: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
 msgstr "Přesunout soubory a/nebo složky"
 
-#: admin/folderadmin.py:947
+#: admin/folderadmin.py:959
 msgid "Move selected files and/or folders"
 msgstr "Přesunout vybrané soubory a/nebo složky"
 
-#: admin/folderadmin.py:1004
+#: admin/folderadmin.py:1016
 #, python-format
 msgid "Successfully renamed %(count)d files."
 msgstr "Soubory (%(count)d) vyly přejmenovány."
 
-#: admin/folderadmin.py:1013 admin/folderadmin.py:1015
-#: admin/folderadmin.py:1030
+#: admin/folderadmin.py:1025 admin/folderadmin.py:1027
+#: admin/folderadmin.py:1042
 msgid "Rename files"
 msgstr "Přejmenovat soubory"
 
-#: admin/folderadmin.py:1125
+#: admin/folderadmin.py:1137
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
-"Soubory a/nebo složky (%(count)d) byly zkopírovány do složky "
-"'%(destination)s'."
+msgstr "Soubory a/nebo složky (%(count)d) byly zkopírovány do složky '%(destination)s'."
 
-#: admin/folderadmin.py:1143 admin/folderadmin.py:1145
+#: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
 msgstr "Kopírovat soubory a/nebo složky"
 
-#: admin/folderadmin.py:1162
+#: admin/folderadmin.py:1174
 msgid "Copy selected files and/or folders"
 msgstr "Kopírovat vybrané soubory a/nebo složky"
 
-#: admin/folderadmin.py:1267
+#: admin/folderadmin.py:1279
 #, python-format
 msgid "Successfully resized %(count)d images."
 msgstr "Velikost obrázků (%(count)d) byla změněna."
 
-#: admin/folderadmin.py:1274 admin/folderadmin.py:1276
+#: admin/folderadmin.py:1286 admin/folderadmin.py:1288
 msgid "Resize images"
 msgstr "Změnit velikost obrázků"
 
-#: admin/folderadmin.py:1292
+#: admin/folderadmin.py:1303
 msgid "Resize selected images"
 msgstr "Změnit velikost vybraných obrázků"
 
-#: admin/forms.py:24
+#: admin/forms.py:25
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "Koncovka, která bude přidána ke jménům kopírovaných souborů."
 
-#: admin/forms.py:31
+#: admin/forms.py:32
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
-"Koncovka by měla být jednoduchá součást názvu souboru malými písmeny, "
-"například \"%(valid)s\"."
+msgstr "Koncovka by měla být jednoduchá součást názvu souboru malými písmeny, například \"%(valid)s\"."
 
-#: admin/forms.py:52
+#: admin/forms.py:53
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "Neznámý formát klíče pro přejmenování \"%(key)s\"."
 
-#: admin/forms.py:54
+#: admin/forms.py:55
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Špatný formát přejmenování: %(error)s."
 
-#: admin/forms.py:64 models/thumbnailoptionmodels.py:37
+#: admin/forms.py:69 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
 msgstr "volby náhledu"
 
-#: admin/forms.py:67 models/thumbnailoptionmodels.py:15
+#: admin/forms.py:73 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "šířka"
 
-#: admin/forms.py:68 models/thumbnailoptionmodels.py:20
+#: admin/forms.py:74 models/thumbnailoptionmodels.py:20
 msgid "height"
 msgstr "výška"
 
-#: admin/forms.py:69 models/thumbnailoptionmodels.py:25
+#: admin/forms.py:75 models/thumbnailoptionmodels.py:25
 msgid "crop"
 msgstr "oříznout"
 
-#: admin/forms.py:70 models/thumbnailoptionmodels.py:30
+#: admin/forms.py:76 models/thumbnailoptionmodels.py:30
 msgid "upscale"
 msgstr "zvětšit"
 
-#: admin/forms.py:75
+#: admin/forms.py:80
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr ""
-"Musíte vybrat předdefinované volby náhledu nebo nastavit jednotlivé "
-"parametry."
-
-#: admin/forms.py:77
-msgid "Resize parameters must be choosen."
-msgstr "Parametry pro změny velikosti musí být vybrány."
+msgstr "Musíte vybrat předdefinované volby náhledu nebo nastavit jednotlivé parametry."
 
 #: admin/imageadmin.py:18 admin/imageadmin.py:105
 msgid "Subject location"
@@ -380,9 +369,7 @@ msgstr "Oprávnění neaktivní"
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
-"Deaktivovat veškerá oprávnění pro tento soubor. Soubor bude komukoli veřejně "
-"dostupný."
+msgstr "Deaktivovat veškerá oprávnění pro tento soubor. Soubor bude komukoli veřejně dostupný."
 
 #: models/foldermodels.py:94
 msgid "parent"
@@ -475,6 +462,7 @@ msgid "At least one of user, group, or \"everybody\" has to be selected."
 msgstr ""
 
 #: models/foldermodels.py:360
+#| msgid "Folders"
 msgid "All Folders"
 msgstr ""
 
@@ -493,6 +481,7 @@ msgid "Group: {group}"
 msgstr ""
 
 #: models/foldermodels.py:375
+#| msgid "everybody"
 msgid "Everybody"
 msgstr ""
 
@@ -505,6 +494,7 @@ msgid "Read"
 msgstr ""
 
 #: models/foldermodels.py:390
+#| msgid "can add children"
 msgid "Add children"
 msgstr ""
 
@@ -559,6 +549,7 @@ msgid "Show table view"
 msgstr ""
 
 #: settings.py:278
+#| msgid "thumbnail option"
 msgid "Show thumbnail view"
 msgstr ""
 
@@ -626,26 +617,19 @@ msgid ""
 "Deleting the selected files and/or folders would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
-msgstr ""
-"Smazání vybraných souborů a/nebo složek bude mít za následek smazání všech "
-"přidružených objektů, nicméně ke smazání následujících objektů nemáte "
-"oprávnění:"
+msgstr "Smazání vybraných souborů a/nebo složek bude mít za následek smazání všech přidružených objektů, nicméně ke smazání následujících objektů nemáte oprávnění:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
-msgstr ""
-"Smazání vybraných souborů a/nebo složek bude mít za následek smazání "
-"následujících přidružených objektů:"
+msgstr "Smazání vybraných souborů a/nebo složek bude mít za následek smazání následujících přidružených objektů:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
-msgstr ""
-"Opravdu chcete smazat vybrané soubory a složky? Všechny následující objekty "
-"budou smazány:"
+msgstr "Opravdu chcete smazat vybrané soubory a složky? Všechny následující objekty budou smazány:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
@@ -694,8 +678,8 @@ msgstr "Ikona složky"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
-"Your account doesn't have permissions to copy all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to copy all of the selected files "
+"and/or folders."
 msgstr "Nemáte oprávnění kopírovat vybrané soubory a/nebo složky."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
@@ -720,9 +704,7 @@ msgstr "Žádné soubory ani složky není možno kopírovat."
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Následující soubory a/nebo složky budou zkopírovány do cílové slžoky (jejich "
-"stromová struktura bude zachována):"
+msgstr "Následující soubory a/nebo složky budou zkopírovány do cílové slžoky (jejich stromová struktura bude zachována):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
@@ -752,32 +734,24 @@ msgstr "Žádné obrázky ke změně velikosti."
 msgid "The following images will be resized:"
 msgstr "Následujícím obrázkům bude změněna velikost:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:33
+#: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
-"Vyberte existující volby náhledu nebo zadejte parametry změny velikosti:"
+msgstr "Vyberte existující volby náhledu nebo zadejte parametry změny velikosti:"
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:35
-msgid "Choose resize parameters:"
-msgstr "Vyberte parametry změny velikosti:"
-
-#: templates/admin/filer/folder/choose_images_resize_options.html:38
+#: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
-msgstr ""
-"Varování: Bude změněna velikost obrázků a původní obrázky budou přepsány. "
-"Pokud chcete zachovat obrázky v původní velikosti, nejdříve vytvořte jejich "
-"kopie."
+msgstr "Varování: Bude změněna velikost obrázků a původní obrázky budou přepsány. Pokud chcete zachovat obrázky v původní velikosti, nejdříve vytvořte jejich kopie."
 
-#: templates/admin/filer/folder/choose_images_resize_options.html:41
+#: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
 msgstr "Změnit velikost"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
-"Your account doesn't have permissions to move all of the selected files and/"
-"or folders."
+"Your account doesn't have permissions to move all of the selected files "
+"and/or folders."
 msgstr "Nemáte oprávnění k přesunu vybraných souborů nebo složek."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
@@ -788,9 +762,7 @@ msgstr "Žádné soubory k přesunutí."
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
-"Následující soubory a/nebo složky budou přesunyty do cílové složky (jejich "
-"stromová struktura bude zachována)"
+msgstr "Následující soubory a/nebo složky budou přesunyty do cílové složky (jejich stromová struktura bude zachována)"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
@@ -815,8 +787,7 @@ msgstr "Žádné soubory k přejmenování."
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
-"Následující soubory budou přejmenovány (změněno bude pouze zobrazované jméno)"
+msgstr "Následující soubory budou přejmenovány (změněno bude pouze zobrazované jméno)"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
@@ -975,11 +946,13 @@ msgstr "aktivní"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr "Kanonický odkaz '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:148
 #, python-format
+#| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "Stáhnout '%(item_label)s'"
 
@@ -1041,10 +1014,12 @@ msgstr "Vybrat všechny (%(total_count)s)"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
+#| msgid "Select this file"
 msgid "Select all"
 msgstr ""
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
+#| msgid "Filer"
 msgid "Files"
 msgstr ""
 
@@ -1112,6 +1087,7 @@ msgstr ""
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:107
+#| msgid "file missing"
 msgid "File is missing"
 msgstr ""
 
@@ -1167,6 +1143,7 @@ msgid "Choose File"
 msgstr "Vybrat soubor"
 
 #: templates/admin/filer/widgets/admin_folder.html:16
+#| msgid "Choose File"
 msgid "Choose Folder"
 msgstr ""
 
@@ -1191,6 +1168,12 @@ msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
 msgstr ""
+
+#~ msgid "Resize parameters must be choosen."
+#~ msgstr "Resize parameters must be choosen."
+
+#~ msgid "Choose resize parameters:"
+#~ msgstr "Choose resize parameters:"
 
 #~ msgid "Open file"
 #~ msgstr "Open file"
