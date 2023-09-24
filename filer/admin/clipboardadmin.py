@@ -1,10 +1,11 @@
-from django.contrib import admin, messages
 from django.conf import settings
+from django.contrib import admin, messages
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
+
 from PIL.Image import MAX_IMAGE_PIXELS
 
 from .. import settings as filer_settings
