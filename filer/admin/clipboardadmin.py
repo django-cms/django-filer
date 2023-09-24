@@ -1,9 +1,11 @@
 from django.contrib import admin, messages
+from django.conf import settings
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
+from PIL.Image import MAX_IMAGE_PIXELS
 
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
@@ -19,6 +21,15 @@ NO_PERMISSIONS_FOR_FOLDER = _(
     "Can't use this folder, Permission Denied. Please select another folder."
 )
 
+
+# We can never exceed the max pixel value set by Pillow's PIL Image MAX_IMAGE_PIXELS
+# as if we allow it, it will fail while thumbnailing (first in the admin thumbnails
+# and then in the page itself.
+# Refer this https://github.com/python-pillow/Pillow/blob/b723e9e62e4706a85f7e44cb42b3d838dae5e546/src/PIL/Image.py#L3148
+FILER_MAX_IMAGE_PIXELS = min(
+    getattr(settings, "FILER_MAX_IMAGE_PIXELS", MAX_IMAGE_PIXELS),
+    MAX_IMAGE_PIXELS,
+)
 
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
@@ -124,8 +135,35 @@ def ajax_upload(request, folder_id=None):
         file_obj = uploadform.save(commit=False)
         # Enforce the FILER_IS_PUBLIC_DEFAULT
         file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
-        file_obj.folder = folder
-        file_obj.save()
+        if isinstance(file_obj, Image):
+            # We check the Image size and calculate the pixel before
+            # the image gets attached to a folder and saved. We also
+            # send the error msg in the JSON and also post the message
+            # so that they know what is wrong with the image they uploaded
+            from django.contrib.messages import ERROR, add_message
+            pixels: int = max(1, file_obj.height) * max(1, file_obj.width)
+
+            if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
+                msg = (
+                    f"Image size ({pixels} pixels) exceeds limit of {2 * FILER_MAX_IMAGE_PIXELS} "
+                    "pixels, could be decompression bomb DOS attack."
+                )
+
+                message = str(msg)
+                add_message(request, ERROR, message)
+                return JsonResponse({'error': message})
+
+            if pixels > FILER_MAX_IMAGE_PIXELS:
+                msg = f"Image size ({pixels} pixels) exceeds limit of {FILER_MAX_IMAGE_PIXELS} pixels, could be decompression bomb DOS attack."
+
+                message = str(msg)
+                add_message(request, ERROR, message)
+                return JsonResponse({'error': message})
+            file_obj.folder = folder
+            file_obj.save()
+        else:
+            file_obj.folder = folder
+            file_obj.save()
         # TODO: Deprecated/refactor
         # clipboard_item = ClipboardItem(
         #     clipboard=clipboard, file=file_obj)
@@ -140,6 +178,8 @@ def ajax_upload(request, folder_id=None):
         }
         # prepare preview thumbnail
         if isinstance(file_obj, Image):
+
+
             thumbnail_180_options = {
                 'size': (180, 180),
                 'crop': True,
