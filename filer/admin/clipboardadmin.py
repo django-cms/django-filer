@@ -178,8 +178,6 @@ def ajax_upload(request, folder_id=None):
         }
         # prepare preview thumbnail
         if isinstance(file_obj, Image):
-
-
             thumbnail_180_options = {
                 'size': (180, 180),
                 'crop': True,
