@@ -1,3 +1,4 @@
+import json
 import os
 
 import django.core
@@ -8,7 +9,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
-from filer.validation import FileValidationError, validate_upload
+from filer.validation import FileValidationError, validate_upload, sanitize_svg
 from tests.helpers import create_superuser
 
 
@@ -57,7 +58,7 @@ stroke="#004400"/>
 
     def test_svg_upload_fails(self):
         for attack, expected_files in [
-            ("""<a href="javascript : alert('ing');">test</a>""", 0),
+            ("""<a href="javascript: alert('ing');">test</a>""", 0),
             ('<script>alert(document.domain);</script>', 0),
             ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 0),
             ("", 1)
@@ -68,23 +69,23 @@ stroke="#004400"/>
                 svg_file
             )
 
-        # create svg file with atack vector
-        with open(filename, 'w') as fh:
-            fh.write(self.svg_file.format(attack))
-        n = File.objects.count()
+            # create svg file with attack vector
+            with open(filename, 'w') as fh:
+                fh.write(self.svg_file.format(attack))
+            n = File.objects.count()
 
-        with open(filename, 'rb') as fh:
-            file_obj = django.core.files.File(fh)
-            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
-            post_data = {
-                'Filename': svg_file,
-                'Filedata': file_obj,
-                'jsessionid': self.client.session.session_key
-            }
-            response = self.client.post(url, post_data)
-        if expected_files == 0:
-            self.assertContains(response, "Rejected due to potential cross site scripting vulnerability")
-        self.assertEqual(File.objects.count(), n + expected_files)
+            with open(filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
+                post_data = {
+                    'Filename': svg_file,
+                    'Filedata': file_obj,
+                    'jsessionid': self.client.session.session_key
+                }
+                response = self.client.post(url, post_data)
+            if expected_files == 0:
+                self.assertContains(response, "Rejected due to potential cross site scripting vulnerability")
+            self.assertEqual(File.objects.count(), n + expected_files)
 
     def test_deny_validator(self):
         from filer.validation import deny
@@ -118,6 +119,41 @@ stroke="#004400"/>
             None,
             "text/html",
         )
+
+    def test_svg_sanitizer(self):
+        config = apps.get_app_config("filer")
+        svg_validation = config.FILE_VALIDATORS["image/svg+xml"]
+        config.FILE_VALIDATORS["image/svg+xml"] = [sanitize_svg]
+        for attack, disallowed in [
+            ("""<a href="javascript: alert('ing');">test</a>""", "javascript:"),
+            ('<script>alert(document.domain);</script>', "alert"),
+            ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", "onclick"),
+        ]:
+            svg_file = 'test_file.svg'
+            filename = os.path.join(
+                settings.FILE_UPLOAD_TEMP_DIR,
+                svg_file
+            )
+
+            # create svg file with attack vector
+            with open(filename, 'w') as fh:
+                fh.write(self.svg_file.format(attack))
+
+            with open(filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
+                post_data = {
+                    'Filename': svg_file,
+                    'Filedata': file_obj,
+                    'jsessionid': self.client.session.session_key
+                }
+                response = self.client.post(url, post_data)
+            file_id = json.loads(response.content.decode("utf-8"))["file_id"]
+            img = File.objects.get(pk=file_id)
+            content = img.file.file.read().decode("utf-8")
+            self.assertNotIn(disallowed, content)
+
+        config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
 
 
 class TestWhitelist(TestCase):
