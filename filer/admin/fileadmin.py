@@ -1,3 +1,5 @@
+import mimetypes
+
 from django import forms
 from django.contrib.admin.utils import unquote
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -24,6 +26,22 @@ class FileAdminChangeFrom(forms.ModelForm):
     class Meta:
         model = File
         exclude = ()
+
+    def clean(self):
+        from ..validation import validate_upload
+        cleaned_data = super().clean()
+
+        mime_type = mimetypes.guess_type(cleaned_data["file"].name)[0] or 'application/octet-stream'
+        file = cleaned_data["file"]
+        file.open("w+")  # Allow for sanitizing upload
+        validate_upload(
+            file_name=cleaned_data["file"].name,
+            file=file.file,
+            owner=cleaned_data["owner"],
+            mime_type=mime_type,
+        )
+        file.open("r")
+        return self.cleaned_data
 
 
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
