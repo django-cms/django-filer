@@ -43,7 +43,7 @@ class MultiStorageFileDescriptor(FileDescriptor):
     """
     This is rather similar to Django's ImageFileDescriptor.
     It calls <field name>_data_changed on model instance when new
-    value is set. The callback is suposed to update fields which
+    value is set. The callback is supposed to update fields which
     are related to file data (like size, checksum, etc.).
     When this is called from model __init__ (prev_assigned=False),
     it does nothing because related fields might not have values yet.
@@ -58,7 +58,7 @@ class MultiStorageFileDescriptor(FileDescriptor):
         # To prevent recalculating file data related attributes when we are instantiating
         # an object from the database, update only if the field had a value before this assignment.
         # To prevent recalculating upon reassignment of the same file, update only if value is
-        # different than the previous one.
+        # different from the previous one.
         if prev_assigned and value != previous_file:
             callback_attr = f'{self.field.name}_data_changed'
             if hasattr(instance, callback_attr):

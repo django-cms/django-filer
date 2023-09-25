@@ -2,13 +2,14 @@ import typing
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 
 User = get_user_model()  # Needed for typing
 
 
-class FileValidationError(Exception):
+class FileValidationError(ValidationError):
     pass
 
 

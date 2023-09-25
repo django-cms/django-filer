@@ -1,18 +1,16 @@
-from django.conf import settings
 from django.contrib import admin, messages
+from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 
-from PIL.Image import MAX_IMAGE_PIXELS
-
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
-from ..validation import FileValidationError, validate_upload
+from ..validation import validate_upload
 from . import views
 
 
@@ -22,15 +20,6 @@ NO_PERMISSIONS_FOR_FOLDER = _(
     "Can't use this folder, Permission Denied. Please select another folder."
 )
 
-
-# We can never exceed the max pixel value set by Pillow's PIL Image MAX_IMAGE_PIXELS
-# as if we allow it, it will fail while thumbnailing (first in the admin thumbnails
-# and then in the page itself.
-# Refer this https://github.com/python-pillow/Pillow/blob/b723e9e62e4706a85f7e44cb42b3d838dae5e546/src/PIL/Image.py#L3148
-FILER_MAX_IMAGE_PIXELS = min(
-    getattr(settings, "FILER_MAX_IMAGE_PIXELS", MAX_IMAGE_PIXELS),
-    MAX_IMAGE_PIXELS,
-)
 
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
@@ -124,78 +113,55 @@ def ajax_upload(request, folder_id=None):
             break
     uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
                           {'file': upload})
+    uploadform.request = request
     uploadform.instance.mime_type = mime_type
     if uploadform.is_valid():
         try:
             validate_upload(filename, upload, request.user, mime_type)
-        except FileValidationError as error:
+            file_obj = uploadform.save(commit=False)
+            # Enforce the FILER_IS_PUBLIC_DEFAULT
+            file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+        except ValidationError as error:
             messages.error(request, str(error))
             return JsonResponse({'error': str(error)})
-        file_obj = uploadform.save(commit=False)
-        # Enforce the FILER_IS_PUBLIC_DEFAULT
-        file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
-        if isinstance(file_obj, Image):
-            # We check the Image size and calculate the pixel before
-            # the image gets attached to a folder and saved. We also
-            # send the error msg in the JSON and also post the message
-            # so that they know what is wrong with the image they uploaded
-            height: int = max(1, file_obj.height)
-            width: int = max(1, file_obj.width)
-            pixels: int = width * height
-            aspect: float = width / height
-            res_x: int = int((FILER_MAX_IMAGE_PIXELS * aspect) ** 0.5)
-            res_y: int = int(res_x / aspect)
-            if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
-                msg = _(
-                    "Image size (%(pixels)d million pixels) exceeds limit of "
-                    "%(max_pixels)d million pixels by a factor of two or more. Resize "
-                    "image to %(width)d x %(height)d) resolution or lower."
-                ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
-                         width=res_x, height=res_y)
-                messages.error(request, msg)
-                return JsonResponse({'error': str(msg)})
-
-            if pixels > FILER_MAX_IMAGE_PIXELS:
-                msg = _(
-                    "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
-                    "million pixels. Consider resizing image to %(width)d x %(height)d resolution "
-                    "or lower."
-                ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
-                         width=res_x, height=res_y)
-                messages.warning(request, msg)
-            file_obj.folder = folder
-            file_obj.save()
-        else:
-            file_obj.folder = folder
-            file_obj.save()
+        file_obj.folder = folder
+        file_obj.save()
         # TODO: Deprecated/refactor
         # clipboard_item = ClipboardItem(
         #     clipboard=clipboard, file=file_obj)
         # clipboard_item.save()
 
-        thumbnail = None
-        data = {
-            'thumbnail': thumbnail,
-            'alt_text': '',
-            'label': str(file_obj),
-            'file_id': file_obj.pk,
-        }
-        # prepare preview thumbnail
-        if isinstance(file_obj, Image):
-            thumbnail_180_options = {
-                'size': (180, 180),
-                'crop': True,
-                'upscale': True,
+        try:
+            thumbnail = None
+            data = {
+                'thumbnail': thumbnail,
+                'alt_text': '',
+                'label': str(file_obj),
+                'file_id': file_obj.pk,
             }
-            thumbnail_180 = file_obj.file.get_thumbnail(
-                thumbnail_180_options)
-            data['thumbnail_180'] = thumbnail_180.url
-            data['original_image'] = file_obj.url
-        return JsonResponse(data)
+            # prepare preview thumbnail
+            if isinstance(file_obj, Image):
+                thumbnail_180_options = {
+                    'size': (180, 180),
+                    'crop': True,
+                    'upscale': True,
+                }
+                thumbnail_180 = file_obj.file.get_thumbnail(
+                    thumbnail_180_options)
+                data['thumbnail_180'] = thumbnail_180.url
+                data['original_image'] = file_obj.url
+            return JsonResponse(data)
+        except Exception as error:
+            messages.error(request, str(error))
+            return JsonResponse({"error": str(error)})
     else:
+        for key, error_list in uploadform.errors.items():
+            for error in error_list:
+                messages.error(request, error)
+
         form_errors = '; '.join(['{}: {}'.format(
             field,
             ', '.join(errors)) for field, errors in list(
                 uploadform.errors.items())
         ])
-        return JsonResponse({'message': str(form_errors)}, status=422)
+        return JsonResponse({'error': str(form_errors)}, status=200)
