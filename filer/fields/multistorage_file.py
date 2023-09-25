@@ -123,7 +123,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
         """
         Returns ``True`` if underlying file exists in storage.
         """
-        return self.storage.exists(self.name)
+        return self.name and self.storage.exists(self.name)
 
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):

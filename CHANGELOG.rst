@@ -5,7 +5,17 @@ CHANGELOG
 unreleased
 ==========
 
+* feat: limit uploaded image area (width x height) to prevent decompression
+  bombs
+* fix: Run validators on updated files in file change view
+* fix: Update mime type if uploading file in file change view
+* fix: Do not allow to remove the file field from an uplaoded file in
+  the admin interface
+* fix: refactor upload checks into running validators in the admin
+  and adding clean methods for file and (abstract) image models.
 * fix: ensure uniqueness of icon admin url names
+* fix: Crash with django-storage if filer file does not have a
+  storage file attached
 
 3.0.6 (2023-09-08)
 ==================

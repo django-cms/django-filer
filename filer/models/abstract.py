@@ -130,6 +130,8 @@ class BaseImage(File):
         # the image gets attached to a folder and saved. We also
         # send the error msg in the JSON and also post the message
         # so that they know what is wrong with the image they uploaded
+        if not self.file:
+            return
 
         if self._width is None or self._height is None:
             pixels = 2 * FILER_MAX_IMAGE_PIXELS + 1
@@ -144,7 +146,7 @@ class BaseImage(File):
             msg = _(
                 "Image format not recognized or image size exceeds limit of %(max_pixels)d million "
                 "pixels by a factor of two or more. Check file format or resize image to "
-                "%(width)d x %(height)d) resolution or lower."
+                "%(width)d x %(height)d resolution or lower."
             ) % dict(max_pixels=FILER_MAX_IMAGE_PIXELS // 1000000, width=res_x, height=res_y)
             raise ValidationError(str(msg), code="image_size")
 
