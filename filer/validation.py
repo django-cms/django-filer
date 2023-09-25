@@ -76,8 +76,8 @@ def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
 
 def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     from easy_thumbnails.VIL.Image import Image
-    from svglib.svglib import svg2rlg
     from reportlab.graphics import renderSVG
+    from svglib.svglib import svg2rlg
     drawing = svg2rlg(file)
     if not drawing:
         raise FileValidationError(

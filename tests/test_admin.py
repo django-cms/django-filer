@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.contrib.messages import get_messages, ERROR
+from django.contrib.messages import ERROR, get_messages
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.test import RequestFactory, TestCase
@@ -26,7 +26,6 @@ from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
 from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
 from filer.templatetags.filer_admin_tags import file_icon_url, get_aspect_ratio_and_download_url
-
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
