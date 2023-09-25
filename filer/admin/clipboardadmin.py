@@ -146,13 +146,12 @@ def ajax_upload(request, folder_id=None):
             res_x: int = int((FILER_MAX_IMAGE_PIXELS * aspect) ** 0.5)
             res_y: int = int(res_x / aspect)
             if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
-                if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
-                    msg = _(
-                        "Image size (%(pixels)d million pixels) exceeds limit of "
-                        "%(max_pixels)d million pixels by a factor of two or more. Resize "
-                        "image to %(width)d x %(height)d) resolution or lower."
-                    ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
-                             width=res_x, height=res_y)
+                msg = _(
+                    "Image size (%(pixels)d million pixels) exceeds limit of "
+                    "%(max_pixels)d million pixels by a factor of two or more. Resize "
+                    "image to %(width)d x %(height)d) resolution or lower."
+                ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
+                         width=res_x, height=res_y)
                 messages.error(request, msg)
                 return JsonResponse({'error': str(msg)})
 
