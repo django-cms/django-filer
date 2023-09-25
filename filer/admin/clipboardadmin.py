@@ -129,10 +129,8 @@ def ajax_upload(request, folder_id=None):
         try:
             validate_upload(filename, upload, request.user, mime_type)
         except FileValidationError as error:
-            from django.contrib.messages import ERROR, add_message
-            message = str(error)
-            add_message(request, ERROR, message)
-            return JsonResponse({'error': message})
+            messages.error(request, str(error))
+            return JsonResponse({'error': str(error)})
         file_obj = uploadform.save(commit=False)
         # Enforce the FILER_IS_PUBLIC_DEFAULT
         file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
@@ -141,7 +139,6 @@ def ajax_upload(request, folder_id=None):
             # the image gets attached to a folder and saved. We also
             # send the error msg in the JSON and also post the message
             # so that they know what is wrong with the image they uploaded
-            from django.contrib.messages import ERROR, WARNING, add_message
             height: int = max(1, file_obj.height)
             width: int = max(1, file_obj.width)
             pixels: int = width * height
@@ -156,9 +153,8 @@ def ajax_upload(request, folder_id=None):
                         "image to %(width)d x %(height)d) resolution or lower."
                     ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
                              width=res_x, height=res_y)
-                message = str(msg)
-                add_message(request, ERROR, message)
-                return JsonResponse({'error': message})
+                messages.error(request, msg)
+                return JsonResponse({'error': str(msg)})
 
             if pixels > FILER_MAX_IMAGE_PIXELS:
                 msg = _(
@@ -167,9 +163,7 @@ def ajax_upload(request, folder_id=None):
                     "or lower."
                 ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
                          width=res_x, height=res_y)
-
-                message = str(msg)
-                add_message(request, WARNING, message)
+                messages.warning(request, msg)
             file_obj.folder = folder
             file_obj.save()
         else:
