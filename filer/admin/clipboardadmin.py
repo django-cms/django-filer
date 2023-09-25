@@ -141,25 +141,35 @@ def ajax_upload(request, folder_id=None):
             # the image gets attached to a folder and saved. We also
             # send the error msg in the JSON and also post the message
             # so that they know what is wrong with the image they uploaded
-            from django.contrib.messages import ERROR, add_message
-            pixels: int = max(1, file_obj.height) * max(1, file_obj.width)
-
+            from django.contrib.messages import ERROR, WARNING, add_message
+            height: int = max(1, file_obj.height)
+            width: int = max(1, file_obj.width)
+            pixels: int = width * height
+            aspect: float = file_obj.width / file_obj.height
+            res_x: int = int((FILER_MAX_IMAGE_PIXELS * aspect) ** 0.5)
+            res_y: int = int(res_x / aspect)
             if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
-                msg = (
-                    f"Image size ({pixels} pixels) exceeds limit of {2 * FILER_MAX_IMAGE_PIXELS} "
-                    "pixels, could be decompression bomb DOS attack."
-                )
-
+                msg = _(
+                    "Image size (%(pixels)d pixels) exceeds limit of %(max_pixels)d "
+                    "pixels by a factor of two or more. Resize image to (%(width)d, "
+                    "%(height)d) resolution or lower."
+                ).format(pixels=pixels, max_pixels=FILER_MAX_IMAGE_PIXELS,
+                         width=res_x, height=res_y)
                 message = str(msg)
                 add_message(request, ERROR, message)
                 return JsonResponse({'error': message})
 
             if pixels > FILER_MAX_IMAGE_PIXELS:
-                msg = f"Image size ({pixels} pixels) exceeds limit of {FILER_MAX_IMAGE_PIXELS} pixels, could be decompression bomb DOS attack."
+                msg = _(
+                    "Image size (%(pixels)d pixels) exceeds limit of %(max_pixels)d "
+                    "pixels. Consider resizing image to (%(width)d, %(height)d) resolution "
+                    "or lower."
+                ).format(pixels=pixels, max_pixels=FILER_MAX_IMAGE_PIXELS,
+                         width=res_x, height=res_y)
 
                 message = str(msg)
-                add_message(request, ERROR, message)
-                return JsonResponse({'error': message})
+                add_message(request, WARNING, message)
+                # return JsonResponse({'warning': message})
             file_obj.folder = folder
             file_obj.save()
         else:

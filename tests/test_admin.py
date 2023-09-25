@@ -1,3 +1,4 @@
+import json
 import os
 
 import django
@@ -474,6 +475,28 @@ class FilerClipboardAdminUrlsTests(TestCase):
         stored_image = Image.objects.first()
         self.assertEqual(stored_image.original_filename, self.image_name)
         self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    def test_filer_ajax_decompression_bomb(self):
+        from filer.admin import clipboardadmin
+        DEFAULT_MAX_IMAGE_PIXELS = clipboardadmin.FILER_MAX_IMAGE_PIXELS
+        clipboardadmin.FILER_MAX_IMAGE_PIXELS = 800 * 200
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            response = self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertIn("error", json.loads(response.content.decode("utf-8")))
+        clipboardadmin.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
     def test_filer_ajax_upload_file_using_content_type(self):
         self.assertEqual(Image.objects.count(), 0)
