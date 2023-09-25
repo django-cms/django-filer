@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages, ERROR, WARNING
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.test import RequestFactory, TestCase
@@ -479,7 +480,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
     def test_filer_ajax_decompression_bomb(self):
         from filer.admin import clipboardadmin
         DEFAULT_MAX_IMAGE_PIXELS = clipboardadmin.FILER_MAX_IMAGE_PIXELS
-        clipboardadmin.FILER_MAX_IMAGE_PIXELS = 800 * 200
+        clipboardadmin.FILER_MAX_IMAGE_PIXELS = 800 * 200  # Triggers error
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
         with open(self.filename, 'rb') as fh:
@@ -496,6 +497,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
             )
         self.assertEqual(Image.objects.count(), 0)
         self.assertIn("error", json.loads(response.content.decode("utf-8")))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level, ERROR)
+
+        clipboardadmin.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            response = self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(response.status_code, 200)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)  # One more message
+        self.assertEqual(messages[1].level, WARNING)
+        self.assertEqual(Image.objects.count(), 1)
+        stored_image = Image.objects.first()
+        self.assertEqual(stored_image.original_filename, self.image_name)
+        self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
         clipboardadmin.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
     def test_filer_ajax_upload_file_using_content_type(self):

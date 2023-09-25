@@ -145,31 +145,31 @@ def ajax_upload(request, folder_id=None):
             height: int = max(1, file_obj.height)
             width: int = max(1, file_obj.width)
             pixels: int = width * height
-            aspect: float = file_obj.width / file_obj.height
+            aspect: float = width / height
             res_x: int = int((FILER_MAX_IMAGE_PIXELS * aspect) ** 0.5)
             res_y: int = int(res_x / aspect)
             if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
-                msg = _(
-                    "Image size (%(pixels)d pixels) exceeds limit of %(max_pixels)d "
-                    "pixels by a factor of two or more. Resize image to (%(width)d, "
-                    "%(height)d) resolution or lower."
-                ).format(pixels=pixels, max_pixels=FILER_MAX_IMAGE_PIXELS,
-                         width=res_x, height=res_y)
+                if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
+                    msg = _(
+                        "Image size (%(pixels)d million pixels) exceeds limit of "
+                        "%(max_pixels)d million pixels by a factor of two or more. Resize "
+                        "image to %(width)d x %(height)d) resolution or lower."
+                    ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
+                             width=res_x, height=res_y)
                 message = str(msg)
                 add_message(request, ERROR, message)
                 return JsonResponse({'error': message})
 
             if pixels > FILER_MAX_IMAGE_PIXELS:
                 msg = _(
-                    "Image size (%(pixels)d pixels) exceeds limit of %(max_pixels)d "
-                    "pixels. Consider resizing image to (%(width)d, %(height)d) resolution "
+                    "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
+                    "million pixels. Consider resizing image to %(width)d x %(height)d resolution "
                     "or lower."
-                ).format(pixels=pixels, max_pixels=FILER_MAX_IMAGE_PIXELS,
+                ) % dict(pixels=pixels / 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS / 1000000,
                          width=res_x, height=res_y)
 
                 message = str(msg)
                 add_message(request, WARNING, message)
-                # return JsonResponse({'warning': message})
             file_obj.folder = folder
             file_obj.save()
         else:
