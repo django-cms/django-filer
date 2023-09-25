@@ -9,8 +9,8 @@ from django.urls import path, reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
-from easy_thumbnails.engine import NoSourceGenerator
 
+from easy_thumbnails.engine import NoSourceGenerator
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.models import Thumbnail as EasyThumbnail
