@@ -100,7 +100,7 @@
                             </td>
                             <td class="column-icon">
                                 {% if is_popup and filer_admin_context.pick_file %}
-                                    <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
+                                    <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
                                         title="{% translate 'Select this file' %}">
                                 {% elif has_change_permission %}
                                     <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
@@ -115,7 +115,7 @@
                                 <div>
                                     <strong>
                                         {% if is_popup and filer_admin_context.pick_file %}
-                                            <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
+                                            <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}', '{{ file.get_admin_change_url }}'); return false;"
                                                 title="{% translate 'Select this file' %}">
                                         {% elif has_change_permission %}
                                             <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
