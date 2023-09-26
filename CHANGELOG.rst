@@ -13,6 +13,7 @@ unreleased
   the admin interface
 * fix: refactor upload checks into running validators in the admin
   and adding clean methods for file and (abstract) image models.
+* Fixed two more instances of javascript int overflow issue (#1335)
 * fix: ensure uniqueness of icon admin url names
 * fix: Crash with django-storage if filer file does not have a
   storage file attached
