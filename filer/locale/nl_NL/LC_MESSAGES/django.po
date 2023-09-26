@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-20 10:11+0200\n"
+"POT-Creation-Date: 2023-09-26 08:46+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Stefan van den Eertwegh <stefan@corebyte.nl>, 2023\n"
 "Language-Team: Dutch (Netherlands) (http://app.transifex.com/divio/django-filer/language/nl_NL/)\n"
@@ -27,26 +27,26 @@ msgstr ""
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/clipboardadmin.py:16
+#: admin/clipboardadmin.py:17
 #| msgid ""
 #| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr "Je hebt geen rechten om bestanden te uploaden."
 
-#: admin/clipboardadmin.py:17
+#: admin/clipboardadmin.py:18
 msgid "Can't find folder to upload. Please refresh and try again"
 msgstr "Kan map niet vinden om te uploaden. Herlaad de pagina en probeer het opnieuw."
 
-#: admin/clipboardadmin.py:19
+#: admin/clipboardadmin.py:20
 msgid ""
 "Can't use this folder, Permission Denied. Please select another folder."
 msgstr "Kan deze map niet gebruiken, rechten geweigerd. Kies een andere map."
 
-#: admin/fileadmin.py:49
+#: admin/fileadmin.py:73
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: admin/fileadmin.py:164
+#: admin/fileadmin.py:188
 msgid "canonical URL"
 msgstr "canonieke URL"
 
@@ -183,48 +183,48 @@ msgstr "Afmetingen aanpassen"
 msgid "Resize selected images"
 msgstr "Afmetingen aanpassen van geselecteerde afbeeldingen"
 
-#: admin/forms.py:25
+#: admin/forms.py:24
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "Achtervoegsel wordt toegevoegd aan bestandsnaam van gekopieerde bestanden"
 
-#: admin/forms.py:32
+#: admin/forms.py:31
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
 msgstr "Achtervoegsel moet een geldige waarde zijn in kleine letters, bv. \"%(valid)s\"."
 
-#: admin/forms.py:53
+#: admin/forms.py:52
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "Type \"%(key)s\" voor het hernoemen van bestandsnamen is ongeldig."
 
-#: admin/forms.py:55
+#: admin/forms.py:54
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Ongeldige waarde voor het hernoemen van bestandsnamen: %(error)s."
 
-#: admin/forms.py:69 models/thumbnailoptionmodels.py:37
+#: admin/forms.py:68 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
 msgstr "thumbnail optie"
 
-#: admin/forms.py:73 models/thumbnailoptionmodels.py:15
+#: admin/forms.py:72 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "breedte"
 
-#: admin/forms.py:74 models/thumbnailoptionmodels.py:20
+#: admin/forms.py:73 models/thumbnailoptionmodels.py:20
 msgid "height"
 msgstr "hoogte"
 
-#: admin/forms.py:75 models/thumbnailoptionmodels.py:25
+#: admin/forms.py:74 models/thumbnailoptionmodels.py:25
 msgid "crop"
 msgstr "uitsnijden"
 
-#: admin/forms.py:76 models/thumbnailoptionmodels.py:30
+#: admin/forms.py:75 models/thumbnailoptionmodels.py:30
 msgid "upscale"
 msgstr "opschalen"
 
-#: admin/forms.py:80
+#: admin/forms.py:79
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "Thumbnail optie of afmetingsopties moet zijn geselecteerd"
 
@@ -271,25 +271,41 @@ msgstr "Bestandsbeheer"
 msgid "Media library"
 msgstr "Mediabibliotheek"
 
-#: models/abstract.py:49
+#: models/abstract.py:62
 msgid "default alt text"
 msgstr "standaard alt. tekst"
 
-#: models/abstract.py:56
+#: models/abstract.py:69
 msgid "default caption"
 msgstr "standaard titel"
 
-#: models/abstract.py:63
+#: models/abstract.py:76
 msgid "subject location"
 msgstr "locatie van onderwerp"
 
-#: models/abstract.py:78
+#: models/abstract.py:91
 msgid "image"
 msgstr "afbeelding"
 
-#: models/abstract.py:79
+#: models/abstract.py:92
 msgid "images"
 msgstr "afbeeldingen"
+
+#: models/abstract.py:147
+#, python-format
+msgid ""
+"Image format not recognized or image size exceeds limit of %(max_pixels)d "
+"million pixels by a factor of two or more. Before uploading again, check "
+"file format or resize image to %(width)d x %(height)d resolution or lower."
+msgstr "Afbeelding formaat niet herkend of afbeelding grootte overtreft limiet van %(max_pixels)d miljoen pixels bij een factor twee of meer. Voor opnieuw uploaden, check bestandsformaat of wijzig grootte afbeelding van %(width)d x %(height)d resolutie of lager."
+
+#: models/abstract.py:156
+#, python-format
+msgid ""
+"Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
+"million pixels. Before uploading again, resize image to %(width)d x "
+"%(height)d resolution or lower."
+msgstr "Afbeelding grootte (%(pixels)d miljoen pixels) overtreft limiet van %(max_pixels)d miljoen pixels. Voor het opnieuw uploaden, afbeelding grootte van %(width)d x %(height)d resolutie of lager."
 
 #: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
@@ -1084,7 +1100,7 @@ msgstr "Uitvouwen"
 
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:107
+#: templatetags/filer_admin_tags.py:108
 #| msgid "file missing"
 msgid "File is missing"
 msgstr "Bestand ontbreekt"
@@ -1145,27 +1161,32 @@ msgstr "Kies bestand"
 msgid "Choose Folder"
 msgstr "Kies Map"
 
-#: validation.py:19
+#: validation.py:20
 #, python-brace-format
 msgid "File \"{file_name}\": Upload denied by site security policy"
 msgstr "Bestand \"{file_name}\": Upload geweigerd door het beveiligingsbeleid van de site"
 
-#: validation.py:22
+#: validation.py:23
 #, python-brace-format
 msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
 msgstr "Bestand \"{file_name}\": {file_type} upload geweigerd door het beveiligingsbeleid van de site"
 
-#: validation.py:33
+#: validation.py:34
 #, python-brace-format
 msgid "File \"{file_name}\": HTML upload denied by site security policy"
 msgstr "Bestand \"{file_name}\": HTML upload geweigerd door het beveiligingsbeleid van de site"
 
-#: validation.py:71
+#: validation.py:72
 #, python-brace-format
 msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
 msgstr "Bestand \"{file_name}\": Afgewezen wegens mogelijke kwetsbaarheid voor cross-site scripting"
+
+#: validation.py:84
+#, python-brace-format
+msgid "File \"{file_name}\": SVG file format not recognized"
+msgstr "Bestand \"{file_name}\": SVG bestandsformaat niet herkend"
 
 #~ msgid "Resize parameters must be choosen."
 #~ msgstr "Resize parameters must be choosen."

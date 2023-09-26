@@ -134,6 +134,7 @@ class BaseImage(File):
             return
 
         if self._width is None or self._height is None:
+            # If image size exceeds Pillow's max image size, Pillow will not return width or height
             pixels = 2 * FILER_MAX_IMAGE_PIXELS + 1
             aspect = 16 / 9
         else:
@@ -145,17 +146,16 @@ class BaseImage(File):
         if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
             msg = _(
                 "Image format not recognized or image size exceeds limit of %(max_pixels)d million "
-                "pixels by a factor of two or more. Check file format or resize image to "
-                "%(width)d x %(height)d resolution or lower."
+                "pixels by a factor of two or more. Before uploading again, check file format or resize "
+                "image to %(width)d x %(height)d resolution or lower."
             ) % dict(max_pixels=FILER_MAX_IMAGE_PIXELS // 1000000, width=res_x, height=res_y)
             raise ValidationError(str(msg), code="image_size")
 
         if pixels > FILER_MAX_IMAGE_PIXELS:
-            # Can I catch warnings?
             msg = _(
                 "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
-                "million pixels. Resize image to %(width)d x %(height)d resolution "
-                "or lower."
+                "million pixels. Before uploading again, resize image to %(width)d x %(height)d "
+                "resolution or lower."
             ) % dict(pixels=pixels // 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS // 1000000,
                      width=res_x, height=res_y)
             raise ValidationError(str(msg), code="image_size")
