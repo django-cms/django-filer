@@ -325,7 +325,7 @@ class FilerImageAdminUrlsTests(TestCase):
         image._height = 200
         image.save()
 
-        url = reverse('admin:filer_image_change', kwargs={
+        url = reverse(f'admin:{image.__class__._meta.app_label}_image_change', kwargs={
             'object_id': image.pk,
         })
 
@@ -1794,3 +1794,49 @@ class FileIconContextTests(TestCase):
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=file, height=40, width=40)
         self.assertNotIn('sidebar_image_ratio', context.keys())
         self.assertIn('download_url', context.keys())
+
+
+class AdditionalAdminFormsTests(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.img = create_image()
+        self.image_name = 'test_file.jpg'
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
+        self.img.save(self.filename, 'JPEG')
+        with open(self.filename, 'rb') as upload:
+            self.file_object = Image.objects.create(file=django.core.files.File(upload, name=self.image_name))
+        self.payload = {
+            'select_across': ['0'], 'index': ['0'],
+            '_selected_action': [f'file-{self.file_object.pk}',]
+        }
+        self.url = reverse("admin:filer-directory_listing-unfiled_images")
+
+    def tearDown(self):
+        self.client.logout()
+        os.remove(self.filename)
+
+    def test_copy_form(self):
+        response = self.client.post(self.url, {"action": ["copy_files_and_folders"], **self.payload})
+        self.assertContains(response, '<p>There are no destination folders available.</p>')
+
+        folder = Folder.objects.create(name="My Image Folder")
+        response = self.client.post(self.url, {"action": ["copy_files_and_folders"], **self.payload})
+        self.assertContains(response, ' <option value="1">/My Image Folder</option>')
+
+        folder.delete()
+
+    def test_move_form(self):
+        response = self.client.post(self.url, {"action": ["move_files_and_folders"], **self.payload})
+        self.assertContains(response, '<p>There are no destination folders available.</p>')
+
+        folder = Folder.objects.create(name="My Image Folder")
+        response = self.client.post(self.url, {"action": ["copy_files_and_folders"], **self.payload})
+        self.assertContains(response, ' <option value="1">/My Image Folder</option>')
+
+        folder.delete()
+
+    def test_resize_form(self):
+        response = self.client.post(self.url, {"action": ["resize_images"], **self.payload})
+        self.assertContains(response, 'Warning: Images will be resized in-place and originals will be lost.')
+        self.assertContains(response, '<div class="form-row field-crop field-upscale">')

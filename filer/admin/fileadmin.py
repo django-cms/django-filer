@@ -167,7 +167,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
         return super().get_urls() + [
             path("icon/<int:file_id>/<int:size>",
                  self.admin_site.admin_view(self.icon_view),
-                 name="filer_file_fileicon")
+                 name=f"filer_{self.model._meta.model_name}_fileicon")
         ]
 
     def icon_view(self, request, file_id: int, size: int) -> HttpResponse:

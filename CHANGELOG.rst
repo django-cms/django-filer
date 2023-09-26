@@ -2,10 +2,11 @@
 CHANGELOG
 =========
 
-unpublished
-===========
+unreleased
+==========
 
 * Fixed two more instances of javascript int overflow issue (#1335)
+* fix: ensure uniqueness of icon admin url names
 
 3.0.6 (2023-09-08)
 ==================
