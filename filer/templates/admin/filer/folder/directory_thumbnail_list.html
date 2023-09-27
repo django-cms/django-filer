@@ -100,7 +100,7 @@
                               <div class="thumbnail-file-item-box">
                                   <div class="item-thumbnail">
                                       {% if is_popup and filer_admin_context.pick_file %}
-                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                               title="{% translate 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
@@ -115,7 +115,7 @@
                               <div class="item-name">
                                   <div>
                                       {% if is_popup and filer_admin_context.pick_file %}
-                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, {{ file.id|unlocalize }}, '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
                                               title="{% translate 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
