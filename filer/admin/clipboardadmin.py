@@ -159,9 +159,7 @@ def ajax_upload(request, folder_id=None):
             for error in error_list:
                 messages.error(request, error)
 
-        form_errors = '; '.join(['{}: {}'.format(
-            field,
-            ', '.join(errors)) for field, errors in list(
-                uploadform.errors.items())
+        form_errors = '; '.join(['{}'.format(
+            ', '.join(errors)) for errors in list(uploadform.errors.values())
         ])
         return JsonResponse({'error': str(form_errors)}, status=200)
