@@ -30,7 +30,7 @@
                     {% endfor %}
                     <input type="hidden" name="action" value="rename_files">
                     <input type="hidden" name="post" value="yes">
-                    {{ rename_form.as_p_with_help }}
+                    {{ rename_form.as_p }}
                     <div class="help">
                         <p>Rename format is in <a href="http://docs.python.org/library/stdtypes.html#string-formatting-operations">Python % operator format</a> using dictionary of possible values:</p>
                         <dl>

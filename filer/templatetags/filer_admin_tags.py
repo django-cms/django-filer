@@ -9,6 +9,7 @@ from django.utils.html import escapejs, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from easy_thumbnails.engine import NoSourceGenerator
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
@@ -145,7 +146,7 @@ def file_icon_context(file, detail, width, height):
                     if mime_subtype != 'svg+xml':
                         thumbnail_options['size'] = 2 * width, 2 * height
                         context['highres_url'] = thumbnailer.get_thumbnail(thumbnail_options).url
-                except (InvalidImageFormatError, ):
+                except (InvalidImageFormatError, NoSourceGenerator):
                     # This is caught by file.exists() for file storage systems
                     # For remote storage systems we catch the error to avoid second trip
                     # to the storage system

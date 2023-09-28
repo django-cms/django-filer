@@ -2,13 +2,14 @@ import typing
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 
 User = get_user_model()  # Needed for typing
 
 
-class FileValidationError(Exception):
+class FileValidationError(ValidationError):
     pass
 
 
@@ -74,9 +75,17 @@ def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
 
 
 def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-    from easy_thumbnails.VIL.Image import load
-
-    image = load(file)  # Load svg
+    from easy_thumbnails.VIL.Image import Image
+    from reportlab.graphics import renderSVG
+    from svglib.svglib import svg2rlg
+    drawing = svg2rlg(file)
+    if not drawing:
+        raise FileValidationError(
+            _('File "{file_name}": SVG file format not recognized')
+            .format(file_name=file_name)
+        )
+    image = Image(size=(drawing.width, drawing.height))
+    renderSVG.draw(drawing, image.canvas)
     xml = image.canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes ->  sanitation
     file.seek(0)  # Rewind file
     file.write(xml)  # write to binary file with utf-8 encoding

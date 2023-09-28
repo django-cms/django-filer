@@ -206,6 +206,12 @@ class File(PolymorphicModel, mixins.IconsMixin):
             self.generate_sha1()
         except Exception:
             self.sha1 = ''
+        try:
+            self.mime_type = mimetypes.guess_type(self.file.name)[0] or 'application/octet-stream'
+        except Exception:
+            # Cannot find new mime-type? Keep existing
+            pass
+
         return True
 
     def _move_file(self):
