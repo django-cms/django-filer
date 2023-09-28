@@ -178,6 +178,19 @@ Limits the maximal file size if set. Takes an integer (file size in MB).
 
 Defaults to ``None``.
 
+``FILER_MAX_IMAGE_PIXELS``
+--------------------------------
+
+Limits the maximal pixel size of the image that can be uploaded to the Filer.
+It will also be lower than or equals to the MAX_IMAGE_PIXELS that Pillow's PIL allows.
+
+
+``MAX_IMAGE_PIXELS = int(1024 * 1024 * 1024 // 4 // 3)``
+
+Defaults to ``MAX_IMAGE_PIXELS``. But when set, should always be lower than the MAX_IMAGE_PIXELS limit set by Pillow.
+
+This is useful setting to prevent decompression bomb DOS attack.
+
 
 ``FILER_ADD_FILE_VALIDATORS``
 -----------------------------

@@ -65,6 +65,7 @@ class FilerApiTests(TestCase):
             'original_filename': self.image_name,
             'owner': self.superuser.pk
         }, {'file': file_obj})
+        self.assertTrue(upoad_image_form.is_valid())
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()  # noqa
         self.assertEqual(Image.objects.count(), 1)

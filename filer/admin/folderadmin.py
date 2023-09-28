@@ -1288,7 +1288,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             "breadcrumbs_action": _("Resize images"),
             "to_resize": to_resize,
             "resize_form": form,
-            "cmsplugin_enabled": 'cmsplugin_filer_image' in django_settings.INSTALLED_APPS,
             "files_queryset": files_queryset,
             "folders_queryset": folders_queryset,
             "perms_lacking": perms_needed,
