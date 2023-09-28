@@ -82,14 +82,6 @@ class ImageAdminForm(FileAdminChangeFrom):
         model = Image
         exclude = ()
 
-    class Media:
-        css = {
-            # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
-        }
-        js = (
-
-        )
-
 
 class ImageAdmin(FileAdmin):
     change_form_template = 'admin/filer/image/change_form.html'
