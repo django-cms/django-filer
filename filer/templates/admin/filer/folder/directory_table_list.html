@@ -138,10 +138,12 @@
                                 <span class="tiny"> ({{ file.size|filesize:"auto1000long" }}{% if file.file_type == "Image" and file.width > 0.0 and file.height > 0.0 %}, {{ file.width|floatformat }}x{{ file.height|floatformat }} px{% endif %})</span>
                             </td>
                             <td class="column-action">
-                                {% if file.canonical_url %}
-                                    <a href="{{ file.canonical_url }}" rel="noopener noreferrer"
-                                       download="{{ file.original_filename }}"
-                                       title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" class="action-button" target="_blank"><span class="fa fa-link filer-icon filer-icon-link"></span></a>
+                                {% if file.canonical_url and 'svg' not in file.mime_type %}
+                                    <a href="{{ file.canonical_url }}"
+                                       data-url="{{ file.canonical_url }}"
+                                       rel="noopener noreferrer"
+                                       class="action-button js-copy-url"
+                                       title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" target="_blank"><span class="fa fa-link filer-icon filer-icon-link"></span></a>
                                 {% endif %}
                                 <a href="{{ file.url }}" target="_blank" rel="noopener noreferrer"
                                    download="{{ file.original_filename }}"
