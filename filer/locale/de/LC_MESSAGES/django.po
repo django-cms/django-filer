@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-20 10:11+0200\n"
+"POT-Creation-Date: 2023-09-26 08:46+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
 "Language-Team: German (http://app.transifex.com/divio/django-filer/language/de/)\n"
@@ -26,26 +26,26 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/clipboardadmin.py:16
+#: admin/clipboardadmin.py:17
 #| msgid ""
 #| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr "Du hast keine Berechtigungen, um Dateien hochzuladen."
 
-#: admin/clipboardadmin.py:17
+#: admin/clipboardadmin.py:18
 msgid "Can't find folder to upload. Please refresh and try again"
 msgstr "Ich kann den Zielordner nicht finden. Bitter lade die Seite neu und versuche es noch einmal."
 
-#: admin/clipboardadmin.py:19
+#: admin/clipboardadmin.py:20
 msgid ""
 "Can't use this folder, Permission Denied. Please select another folder."
 msgstr "Zugriff auf diesen Ordner verweigert. Bitte wähle einen anderen Ordner."
 
-#: admin/fileadmin.py:49
+#: admin/fileadmin.py:73
 msgid "Advanced"
 msgstr "Fortgeschritten"
 
-#: admin/fileadmin.py:164
+#: admin/fileadmin.py:188
 msgid "canonical URL"
 msgstr "Kanonische URL"
 
@@ -182,48 +182,48 @@ msgstr "Bildgrössen verändern"
 msgid "Resize selected images"
 msgstr "Die Bildgrössen der ausgewählten Bilder verändern"
 
-#: admin/forms.py:25
+#: admin/forms.py:24
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "Die Dateiendung, welche an die Dateinamen der kopierten Dateien angehängt wird."
 
-#: admin/forms.py:32
+#: admin/forms.py:31
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
 msgstr "Die Dateiendung sollte ein gültiger, einfacher und kleingeschriebener Teil eines Dateinamens sein, wie zum Beispiel  \"%(valid)s\"."
 
-#: admin/forms.py:53
+#: admin/forms.py:52
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "Unbekannter Schlüssel für das Umbenennungs-Format: %(key)s."
 
-#: admin/forms.py:55
+#: admin/forms.py:54
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Ungültiges Umbenennungs-Format: %(error)s."
 
-#: admin/forms.py:69 models/thumbnailoptionmodels.py:37
+#: admin/forms.py:68 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
 msgstr "Vorschaubild Optionen"
 
-#: admin/forms.py:73 models/thumbnailoptionmodels.py:15
+#: admin/forms.py:72 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "Breite"
 
-#: admin/forms.py:74 models/thumbnailoptionmodels.py:20
+#: admin/forms.py:73 models/thumbnailoptionmodels.py:20
 msgid "height"
 msgstr "Höhe"
 
-#: admin/forms.py:75 models/thumbnailoptionmodels.py:25
+#: admin/forms.py:74 models/thumbnailoptionmodels.py:25
 msgid "crop"
 msgstr "Beschneiden"
 
-#: admin/forms.py:76 models/thumbnailoptionmodels.py:30
+#: admin/forms.py:75 models/thumbnailoptionmodels.py:30
 msgid "upscale"
 msgstr "Vergrössern"
 
-#: admin/forms.py:80
+#: admin/forms.py:79
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "Vorschaubild Optionen oder Parameter zur Grössenänderung müssen ausgewählt werden."
 
@@ -270,25 +270,41 @@ msgstr "Filer"
 msgid "Media library"
 msgstr "Medienbibliothek"
 
-#: models/abstract.py:49
+#: models/abstract.py:62
 msgid "default alt text"
 msgstr "Standard Alt-Text"
 
-#: models/abstract.py:56
+#: models/abstract.py:69
 msgid "default caption"
 msgstr "Standard Bildlegende"
 
-#: models/abstract.py:63
+#: models/abstract.py:76
 msgid "subject location"
 msgstr "Ort des Hauptinhalts"
 
-#: models/abstract.py:78
+#: models/abstract.py:91
 msgid "image"
 msgstr "Bild"
 
-#: models/abstract.py:79
+#: models/abstract.py:92
 msgid "images"
 msgstr "Bilder"
+
+#: models/abstract.py:147
+#, python-format
+msgid ""
+"Image format not recognized or image size exceeds limit of %(max_pixels)d "
+"million pixels by a factor of two or more. Before uploading again, check "
+"file format or resize image to %(width)d x %(height)d resolution or lower."
+msgstr "Bildformat nicht erkannt oder Bildgröße überschreitet den Grenzwert von %(max_pixels)d Millionen Pixeln um einen Faktor 2 oder mehr. Vor erneutem Hochladen prüfen Sie das Dateiformat oder verkleinern Sie das Bild auf %(width)d x %(height)d oder weniger."
+
+#: models/abstract.py:156
+#, python-format
+msgid ""
+"Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
+"million pixels. Before uploading again, resize image to %(width)d x "
+"%(height)d resolution or lower."
+msgstr "Bildgröße (%(pixels)d Millionen Pixel) überschreitet den Grenzwert von %(max_pixels)d Millionen Pixeln. Vor erneutem Hochladen verkleinern Sie das Bild auf %(width)d x %(height)d oder weniger."
 
 #: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
@@ -1083,7 +1099,7 @@ msgstr "Vergrößern"
 
 #: templates/admin/filer/tools/detail_info.html:20
 #: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:107
+#: templatetags/filer_admin_tags.py:108
 #| msgid "file missing"
 msgid "File is missing"
 msgstr "Datei fehlt"
@@ -1144,27 +1160,32 @@ msgstr "Datei auswählen"
 msgid "Choose Folder"
 msgstr "Ordner auswählen"
 
-#: validation.py:19
+#: validation.py:20
 #, python-brace-format
 msgid "File \"{file_name}\": Upload denied by site security policy"
 msgstr "Datei \"{file_name}\": Die Sicherheitseinstellung der Seite haben die Datei zurückgewiesen."
 
-#: validation.py:22
+#: validation.py:23
 #, python-brace-format
 msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
 msgstr "Datei \"{file_name}\": Die Sicherheitseinstellung weisen {file_type}-Dateien zurück."
 
-#: validation.py:33
+#: validation.py:34
 #, python-brace-format
 msgid "File \"{file_name}\": HTML upload denied by site security policy"
 msgstr "Datei \"{file_name}\": Die Sicherheitseinstellung weisen HTML-Dateien zurück."
 
-#: validation.py:71
+#: validation.py:72
 #, python-brace-format
 msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
 msgstr "Datei \"{file_name}\": Zurückgewiesen, da eine \"Cross Site Scripting\"-Attacke nicht ausgeschlossen werden kann."
+
+#: validation.py:84
+#, python-brace-format
+msgid "File \"{file_name}\": SVG file format not recognized"
+msgstr "Datei \"{file_name}\": SVG-Format nicht erkannt"
 
 #~ msgid "Resize parameters must be choosen."
 #~ msgstr "Resize parameters must be choosen."

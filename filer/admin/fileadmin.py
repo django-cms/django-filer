@@ -1,3 +1,5 @@
+import mimetypes
+
 from django import forms
 from django.contrib.admin.utils import unquote
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -8,6 +10,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
+from easy_thumbnails.engine import NoSourceGenerator
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.models import Thumbnail as EasyThumbnail
@@ -24,6 +27,27 @@ class FileAdminChangeFrom(forms.ModelForm):
     class Meta:
         model = File
         exclude = ()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["file"].widget = forms.FileInput()
+
+    def clean(self):
+        from ..validation import validate_upload
+        cleaned_data = super().clean()
+        if "file" in self.changed_data and cleaned_data["file"]:
+            mime_type = mimetypes.guess_type(cleaned_data["file"].name)[0] or 'application/octet-stream'
+            file = cleaned_data["file"]
+            file.open("w+")  # Allow for sanitizing upload
+            file.seek(0)
+            validate_upload(
+                file_name=cleaned_data["file"].name,
+                file=file.file,
+                owner=cleaned_data["owner"],
+                mime_type=mime_type,
+            )
+            file.open("r")
+        return self.cleaned_data
 
 
 class FileAdmin(PrimitivePermissionAwareModelAdmin):
@@ -185,7 +209,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             # Touch thumbnail to allow it to be prefetched for directory listing
             EasyThumbnail.objects.filter(name=thumbnail.name).update(modified=now())
             return HttpResponseRedirect(thumbnail.url)
-        except InvalidImageFormatError:
+        except (InvalidImageFormatError, NoSourceGenerator):
             return HttpResponseRedirect(staticfiles_storage.url('filer/icons/file-missing.svg'))
 
 

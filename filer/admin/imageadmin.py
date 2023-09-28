@@ -6,13 +6,13 @@ from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import string_concat
 from ..utils.loader import load_model
-from .fileadmin import FileAdmin
+from .fileadmin import FileAdmin, FileAdminChangeFrom
 
 
 Image = load_model(FILER_IMAGE_MODEL)
 
 
-class ImageAdminForm(forms.ModelForm):
+class ImageAdminForm(FileAdminChangeFrom):
     subject_location = forms.CharField(
         max_length=64, required=False,
         label=_('Subject location'),
@@ -58,8 +58,8 @@ class ImageAdminForm(forms.ModelForm):
             err_code = 'invalid_subject_format'
 
         elif (
-            coordinates[0] > self.instance.width
-            or coordinates[1] > self.instance.height
+            coordinates[0] > self.instance.width > 0
+            or coordinates[1] > self.instance.height > 0
         ):
             err_msg = gettext_lazy(
                 'Subject location is outside of the image. ')
