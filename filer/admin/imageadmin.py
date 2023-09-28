@@ -1,4 +1,6 @@
 from django import forms
+from django.shortcuts import get_object_or_404, render
+from django.urls import path
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
@@ -92,6 +94,19 @@ class ImageAdminForm(forms.ModelForm):
 class ImageAdmin(FileAdmin):
     change_form_template = 'admin/filer/image/change_form.html'
     form = ImageAdminForm
+
+    def get_urls(self):
+        return super().get_urls() + [
+            path("expand/<int:file_id>",
+                 self.admin_site.admin_view(self.expand_view),
+                 name=f"filer_{self.model._meta.model_name}_expand_view")
+        ]
+
+    def expand_view(self, request, file_id):
+        image = get_object_or_404(self.model, pk=file_id)
+        return render(request, "admin/filer/image/expand.html", context={
+            "original_url": image.url
+        })
 
 
 if FILER_IMAGE_MODEL == 'filer.Image':

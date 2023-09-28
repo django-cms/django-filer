@@ -10,8 +10,8 @@
                         <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
                         <span>{% translate "Download" %}</span>
                     </a>
-                    {% if original.mime_maintype == 'image' and "svg" not in original.mime_type %}
-                    <a href="{{ original.url }}" target="_blank" rel="noopener noreferrer" class="button">
+                    {% if original.mime_maintype == 'image' or True %}
+                    <a href="{% url 'admin:filer_image_expand_view' original.pk %}" target="_blank" rel="noopener noreferrer" class="button">
                         <span>{% translate "Expand" %}</span>&nbsp;
                         <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
                     </a>
