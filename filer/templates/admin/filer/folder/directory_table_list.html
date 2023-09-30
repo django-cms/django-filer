@@ -139,8 +139,12 @@
                             </td>
                             <td class="column-action">
                                 {% if file.canonical_url %}
-                                    <a href="{{ file.canonical_url }}" rel="noopener noreferrer"
-                                       title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" class="action-button" target="_blank"><span class="fa fa-link filer-icon filer-icon-link"></span></a>
+                                    <a href="{{ file.canonical_url }}"
+                                       data-url="{{ file.canonical_url }}"
+                                       data-msg="{% trans 'URL copied to clipboard' %}"
+                                       rel="noopener noreferrer"
+                                       class="action-button js-copy-url"
+                                       title="{% blocktrans with file.label as item_label %}Canonical url '{{ item_label }}'{% endblocktrans %}" target="_blank"><span class="fa fa-link filer-icon filer-icon-link"></span></a>
                                 {% endif %}
                                 <a href="{{ file.url }}" target="_blank" rel="noopener noreferrer"
                                    download="{{ file.original_filename }}"

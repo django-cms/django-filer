@@ -338,6 +338,20 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertContains(response, 'height="210"')
         self.assertContains(response, 'alt="File is missing"')
 
+    def test_image_expand_view(self):
+        url = reverse("admin:filer_image_expand_view", kwargs={
+            'file_id': self.file_object.pk
+        })
+        original_url = self.file_object.url
+
+        response = self.client.get(url)
+
+        self.assertContains(response, f"""<html>
+    <body style="margin: 0;">
+        <img style="max-width: 100%" src="{original_url}" />
+    </body>
+</html>""")
+
 
 class FilerClipboardAdminUrlsTests(TestCase):
     def setUp(self):
@@ -1818,7 +1832,6 @@ class AdminToolsTests(TestCase):
 
 
 class FileIconContextTests(TestCase):
-
     def test_image_icon_with_size(self):
         """
         Image with get an aspect ratio and will be present in context

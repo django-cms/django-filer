@@ -2,11 +2,13 @@
 CHANGELOG
 =========
 
-unreleased
-==========
+3.1.0 (2023-10-01)
+==================
 
 * feat: limit uploaded image area (width x height) to prevent decompression
   bombs
+* feat: Canonical URL action button now copies canonical URL to the user's
+  clipboard
 * fix: Run validators on updated files in file change view
 * fix: Update mime type if uploading file in file change view
 * fix: Do not allow to remove the file field from an uplaoded file in
