@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-26 08:46+0200\n"
+"POT-Creation-Date: 2023-09-30 18:10+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Alexander Naydenko <an@zeppelinen.com>, 2020\n"
 "Language-Team: Russian (http://app.transifex.com/divio/django-filer/language/"
@@ -231,23 +231,23 @@ msgstr "увеличивать"
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "Опция миниатюры или параметры изменения размера должны быть указаны."
 
-#: admin/imageadmin.py:18 admin/imageadmin.py:105
+#: admin/imageadmin.py:20 admin/imageadmin.py:112
 msgid "Subject location"
 msgstr "Расположение объекта"
 
-#: admin/imageadmin.py:19
+#: admin/imageadmin.py:21
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr "Расположение главного объекта сцены. Формат: \"x,y\"."
 
-#: admin/imageadmin.py:57
+#: admin/imageadmin.py:59
 msgid "Invalid subject location format. "
 msgstr "Неверный формат расположения объекта."
 
-#: admin/imageadmin.py:65
+#: admin/imageadmin.py:67
 msgid "Subject location is outside of the image. "
 msgstr "Расположение объекта указано за пределами изображения."
 
-#: admin/imageadmin.py:74
+#: admin/imageadmin.py:76
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
 msgstr "Вы ввели: \"{subject_location}\". "
@@ -294,7 +294,7 @@ msgstr "изображение"
 msgid "images"
 msgstr "изображения"
 
-#: models/abstract.py:147
+#: models/abstract.py:148
 #, python-format
 msgid ""
 "Image format not recognized or image size exceeds limit of %(max_pixels)d "
@@ -550,7 +550,7 @@ msgstr "опции миниатюры"
 
 #: models/virtualitems.py:46
 #: templates/admin/filer/folder/directory_table_list.html:4
-#: templates/admin/filer/folder/directory_table_list.html:167
+#: templates/admin/filer/folder/directory_table_list.html:170
 #: templates/admin/filer/folder/directory_thumbnail_list.html:5
 #: templates/admin/filer/folder/directory_thumbnail_list.html:146
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
@@ -583,7 +583,7 @@ msgid "Go"
 msgstr "Выполнить"
 
 #: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table_list.html:232
+#: templates/admin/filer/folder/directory_table_list.html:235
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 msgid "Click here to select the objects across all pages"
 msgstr "Нажмите здесь, чтобы выбрать объекты на всех страницах"
@@ -594,7 +594,7 @@ msgid "Select all %(total_count)s files and/or folders"
 msgstr "Выбрать все %(total_count)s файлов/папок"
 
 #: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table_list.html:234
+#: templates/admin/filer/folder/directory_table_list.html:237
 #: templates/admin/filer/folder/directory_thumbnail_list.html:212
 msgid "Clear selection"
 msgstr "Очистить выбор"
@@ -696,7 +696,7 @@ msgstr "главная страница администрирования"
 #: templates/admin/filer/folder/directory_listing.html:103
 #: templates/admin/filer/folder/directory_table_list.html:29
 #: templates/admin/filer/folder/directory_table_list.html:59
-#: templates/admin/filer/folder/directory_table_list.html:178
+#: templates/admin/filer/folder/directory_table_list.html:181
 #: templates/admin/filer/folder/directory_thumbnail_list.html:27
 #: templates/admin/filer/folder/directory_thumbnail_list.html:61
 #: templates/admin/filer/folder/directory_thumbnail_list.html:156
@@ -893,12 +893,12 @@ msgid "Name"
 msgstr "Имя"
 
 #: templates/admin/filer/folder/directory_table_list.html:17
-#: templates/admin/filer/tools/detail_info.html:49
+#: templates/admin/filer/tools/detail_info.html:50
 msgid "Owner"
 msgstr "Владелец"
 
 #: templates/admin/filer/folder/directory_table_list.html:18
-#: templates/admin/filer/tools/detail_info.html:33
+#: templates/admin/filer/tools/detail_info.html:34
 msgid "Size"
 msgstr "Размер"
 
@@ -957,7 +957,7 @@ msgstr "Выбрать этот файл"
 
 #: templates/admin/filer/folder/directory_table_list.html:107
 #: templates/admin/filer/folder/directory_table_list.html:122
-#: templates/admin/filer/folder/directory_table_list.html:151
+#: templates/admin/filer/folder/directory_table_list.html:154
 #: templates/admin/filer/folder/directory_thumbnail_list.html:107
 #: templates/admin/filer/folder/directory_thumbnail_list.html:122
 #, python-format
@@ -980,66 +980,72 @@ msgid "enabled"
 msgstr "включены"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
+#, fuzzy
+#| msgid "Move selected files to clipboard"
+msgid "URL copied to clipboard"
+msgstr "Переместить выбранные файлы в буфер обмена"
+
+#: templates/admin/filer/folder/directory_table_list.html:147
 #, python-format
 msgid "Canonical url '%(item_label)s'"
 msgstr "Канонический URL '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_table_list.html:151
 #, python-format
 msgid "Download '%(item_label)s'"
 msgstr "Скачать '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table_list.html:152
+#: templates/admin/filer/folder/directory_table_list.html:155
 msgid "Remove file"
 msgstr "Удалить файл"
 
-#: templates/admin/filer/folder/directory_table_list.html:160
+#: templates/admin/filer/folder/directory_table_list.html:163
 #: templates/admin/filer/folder/directory_thumbnail_list.html:138
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr "\"Скиньте\" сюда файлы или используйте кнопку \"Загрузить файлы\""
 
-#: templates/admin/filer/folder/directory_table_list.html:175
+#: templates/admin/filer/folder/directory_table_list.html:178
 #: templates/admin/filer/folder/directory_thumbnail_list.html:153
 msgid "Drop your file to upload into:"
 msgstr "\"Скиньте\" ваши файлы сюда для загрузки в:"
 
-#: templates/admin/filer/folder/directory_table_list.html:185
+#: templates/admin/filer/folder/directory_table_list.html:188
 #: templates/admin/filer/folder/directory_thumbnail_list.html:163
 msgid "Upload"
 msgstr "Загрузить"
 
-#: templates/admin/filer/folder/directory_table_list.html:197
+#: templates/admin/filer/folder/directory_table_list.html:200
 #: templates/admin/filer/folder/directory_thumbnail_list.html:175
 msgid "cancel"
 msgstr "отмена"
 
-#: templates/admin/filer/folder/directory_table_list.html:201
+#: templates/admin/filer/folder/directory_table_list.html:204
 #: templates/admin/filer/folder/directory_thumbnail_list.html:179
 msgid "Upload success!"
 msgstr "Загрузка успешно завершена!"
 
-#: templates/admin/filer/folder/directory_table_list.html:205
+#: templates/admin/filer/folder/directory_table_list.html:208
 #: templates/admin/filer/folder/directory_thumbnail_list.html:183
 msgid "Upload canceled!"
 msgstr "Загрузка отменена!"
 
-#: templates/admin/filer/folder/directory_table_list.html:212
+#: templates/admin/filer/folder/directory_table_list.html:215
 #: templates/admin/filer/folder/directory_thumbnail_list.html:190
 msgid "previous"
 msgstr "предыдущая"
 
-#: templates/admin/filer/folder/directory_table_list.html:217
+#: templates/admin/filer/folder/directory_table_list.html:220
 #: templates/admin/filer/folder/directory_thumbnail_list.html:195
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr "Страница %(number)s из %(num_pages)s."
 
-#: templates/admin/filer/folder/directory_table_list.html:222
+#: templates/admin/filer/folder/directory_table_list.html:225
 #: templates/admin/filer/folder/directory_thumbnail_list.html:200
 msgid "next"
 msgstr "следующая"
 
-#: templates/admin/filer/folder/directory_table_list.html:232
+#: templates/admin/filer/folder/directory_table_list.html:235
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 #, python-format
 msgid "Select all %(total_count)s"
@@ -1111,29 +1117,29 @@ msgstr "загрузка не удалась"
 msgid "Download"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:15
+#: templates/admin/filer/tools/detail_info.html:16
 msgid "Expand"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:20
+#: templates/admin/filer/tools/detail_info.html:21
 #: templates/admin/filer/widgets/admin_file.html:32
 #: templatetags/filer_admin_tags.py:108
 msgid "File is missing"
 msgstr ""
 
-#: templates/admin/filer/tools/detail_info.html:29
+#: templates/admin/filer/tools/detail_info.html:30
 msgid "Type"
 msgstr "Тип"
 
-#: templates/admin/filer/tools/detail_info.html:37
+#: templates/admin/filer/tools/detail_info.html:38
 msgid "File-size"
 msgstr "Размер файла"
 
-#: templates/admin/filer/tools/detail_info.html:41
+#: templates/admin/filer/tools/detail_info.html:42
 msgid "Modified"
 msgstr "Изменен"
 
-#: templates/admin/filer/tools/detail_info.html:45
+#: templates/admin/filer/tools/detail_info.html:46
 msgid "Created"
 msgstr "Создан"
 
