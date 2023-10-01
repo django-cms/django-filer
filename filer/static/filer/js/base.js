@@ -265,11 +265,11 @@ Cl.mediator = new Mediator();
             });
         })();
         $('.js-copy-url').on('click', function (e) {
-            var url = new URL(this.dataset.url, document.location.href);
-            var msg = this.dataset.msg || 'URL copied to clipboard';
-            var infobox = document.createElement('template');
+            const url = new URL(this.dataset.url, document.location.href);
+            const msg = this.dataset.msg || 'URL copied to clipboard';
+            let infobox = document.createElement('template');
             e.preventDefault();
-            for(var el of document.getElementsByClassName('info filer-tooltip')) {
+            for (let el of document.getElementsByClassName('info filer-tooltip')) {
                 el.remove();
             }
             navigator.clipboard.writeText(url.href);
