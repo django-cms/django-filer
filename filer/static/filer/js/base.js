@@ -265,18 +265,20 @@ Cl.mediator = new Mediator();
             });
         })();
         $('.js-copy-url').on('click', function (e) {
+            var url = new URL(this.dataset.url, document.location.href);
+            var msg = this.dataset.msg || 'URL copied to clipboard';
+            var infobox = document.createElement('template');
             e.preventDefault();
             for(var el of document.getElementsByClassName('info filer-tooltip')) {
                 el.remove();
             }
-            var url = new URL(this.dataset.url, document.location.href);
-            var msg = this.dataset.msg || 'URL copied to clipboard';
-            var infobox = document.createElement('template');
             navigator.clipboard.writeText(url.href);
             infobox.innerHTML = '<div class="info filer-tooltip">' + msg + '</div>';
             this.classList.add('filer-tooltip-wrapper');
             this.appendChild(infobox.content.firstChild);
-            setTimeout(() => {this.getElementsByClassName('info')[0].remove(); }, 1200);
+            setTimeout(() => {
+                this.getElementsByClassName('info')[0].remove();
+            }, 1200);
         });
     });
 })(djQuery);
