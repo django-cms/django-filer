@@ -5,7 +5,7 @@
                 cursor: zoom-in;
             }
             body.scrolling img {
-                cursor: zoom-in;
+                cursor: zoom-out;
             }
             body.scrolling img.zoom {
                 cursor: zoom-in;
@@ -21,7 +21,7 @@
         <script>
             setInterval(function () {
                 const img = document.getElementById('img')
-                document.body.classList.toggle('scrolling', img.width > document.body.clientWidth)
+                document.body.classList.toggle('scrolling', img.naturalWidth >= document.body.clientWidth)
             }, 200);
         </script>
     </body>
