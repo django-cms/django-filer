@@ -164,7 +164,7 @@ djQuery(function ($) {
         // There is no way to feature detect the new behavior implemented in Django 1.9
         if (!window.__admin_utc_offset__) {
             $(document).on('formset:added', function (ev, row) {
-                if(ev.detail.formsetName) {
+                if(ev.detail && ev.detail.formsetName) {
                     /*
                         Django 4.1 changed the event type being fired when adding
                         a new formset from a jQuery to a vanilla JavaScript event.
