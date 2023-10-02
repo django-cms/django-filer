@@ -164,7 +164,27 @@ djQuery(function ($) {
         // There is no way to feature detect the new behavior implemented in Django 1.9
         if (!window.__admin_utc_offset__) {
             $(document).on('formset:added', function (ev, row) {
-                var dropzones = $(row).find(dropzoneSelector);
+                if(ev.detail.formsetName) {
+                    /*
+                        Django 4.1 changed the event type being fired when adding
+                        a new formset from a jQuery to a vanilla JavaScript event.
+                        https://docs.djangoproject.com/en/4.1/ref/contrib/admin/javascript/
+
+                        In this case we find the newly added row and initialize the
+                        dropzone on any dropzoneSelector on that row.
+                    */
+                    let rowIdx = parseInt(
+                        document.getElementById(
+                            'id_' + event.detail.formsetName + '-TOTAL_FORMS'
+                        ).value, 10
+                    ) - 1;
+                    let row_ = document.getElementById( event.detail.formsetName + '-' + rowIdx);
+                    var dropzones = $(row_).find(dropzoneSelector)
+
+                } else {
+                    var dropzones = $(row).find(dropzoneSelector);
+                }
+
                 dropzones.each(createDropzone);
             });
         } else {
