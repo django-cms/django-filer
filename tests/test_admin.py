@@ -346,11 +346,10 @@ class FilerImageAdminUrlsTests(TestCase):
 
         response = self.client.get(url)
 
-        self.assertContains(response, f"""<html>
-    <body style="margin: 0;">
-        <img style="max-width: 100%" src="{original_url}" />
-    </body>
-</html>""")
+        self.assertContains(
+            response,
+            f"""<img id="img" src="{ original_url }" onclick="this.classList.toggle('zoom')"/>"""
+        )
 
 
 class FilerClipboardAdminUrlsTests(TestCase):
