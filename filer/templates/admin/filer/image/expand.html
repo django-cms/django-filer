@@ -20,7 +20,7 @@
         <img id="img" src="{{ original_url }}" onclick="this.classList.toggle('zoom')"/>
         <script>
             setInterval(function () {
-                img = document.getElementById('img')
+                const img = document.getElementById('img')
                 document.body.classList.toggle('scrolling', img.width > document.body.clientWidth)
             }, 200);
         </script>
