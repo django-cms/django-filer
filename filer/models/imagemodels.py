@@ -9,7 +9,6 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from datetime import datetime
-from django.urls import reverse
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -17,7 +16,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
 import os
 
@@ -36,7 +34,7 @@ class Image(File):
     }
     file_type = 'Image'
     _icon = "image"
-    _filename_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.ico']
+    _filename_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.ico', '.svg', '.webp']
 
     _height = models.IntegerField(null=True, blank=True)
     _width = models.IntegerField(null=True, blank=True)
