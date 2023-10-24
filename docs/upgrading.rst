@@ -7,6 +7,25 @@ Usually upgrade procedure is straightforward: update the package and run migrati
 require special attention from the developer and here we provide upgrade instructions for such cases.
 
 
+from 2.x to 3.0
+---------------
+
+The dependency on django-mptt is dropped as of django-filer 3.0.
+
+This implies that three fields are removed from the ``Folder`` model:
+
+* ``level``
+* ``lft``
+* ``rght``
+* ``tree_id``
+
+Those fields were used by django-mptt for performance optimization and are
+not required any more.
+
+Also, upload restrictions exist for HTML and SVG files by default. Please
+check :ref:`validation` for more details.
+
+
 from 0.9.1 to 0.9.2
 -------------------
 

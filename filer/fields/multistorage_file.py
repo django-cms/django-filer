@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import base64
 import hashlib
 import warnings
@@ -9,7 +6,6 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.db.models.fields.files import FileDescriptor
 
-import six
 from easy_thumbnails import fields as easy_thumbnails_fields
 from easy_thumbnails import files as easy_thumbnails_files
 
@@ -47,7 +43,7 @@ class MultiStorageFileDescriptor(FileDescriptor):
     """
     This is rather similar to Django's ImageFileDescriptor.
     It calls <field name>_data_changed on model instance when new
-    value is set. The callback is suposed to update fields which
+    value is set. The callback is supposed to update fields which
     are related to file data (like size, checksum, etc.).
     When this is called from model __init__ (prev_assigned=False),
     it does nothing because related fields might not have values yet.
@@ -57,14 +53,14 @@ class MultiStorageFileDescriptor(FileDescriptor):
     def __set__(self, instance, value):
         prev_assigned = self.field.name in instance.__dict__
         previous_file = instance.__dict__.get(self.field.name)
-        super(MultiStorageFileDescriptor, self).__set__(instance, value)
+        super().__set__(instance, value)
 
         # To prevent recalculating file data related attributes when we are instantiating
         # an object from the database, update only if the field had a value before this assignment.
         # To prevent recalculating upon reassignment of the same file, update only if value is
-        # different than the previous one.
+        # different from the previous one.
         if prev_assigned and value != previous_file:
-            callback_attr = '{}_data_changed'.format(self.field.name)
+            callback_attr = f'{self.field.name}_data_changed'
             if hasattr(instance, callback_attr):
                 getattr(instance, callback_attr)()
 
@@ -74,7 +70,7 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
     def __init__(self, instance, field, name):
         """
         This is a little weird, but I couldn't find a better solution.
-        Thumbnailer.__init__ is called first for proper object inizialization.
+        Thumbnailer.__init__ is called first for proper object initialisation.
         Then we override some attributes defined at runtime with properties.
         We cannot simply call super().__init__ because filer Field objects
         doesn't have a storage attribute.
@@ -121,7 +117,13 @@ class MultiStorageFieldFile(ThumbnailerNameMixin,
 
     def save(self, name, content, save=True):
         content.seek(0)  # Ensure we upload the whole file
-        super(MultiStorageFieldFile, self).save(name, content, save)
+        super().save(name, content, save)
+
+    def exists(self):
+        """
+        Returns ``True`` if underlying file exists in storage.
+        """
+        return self.name and self.storage.exists(self.name)
 
 
 class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
@@ -141,10 +143,10 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
         super(easy_thumbnails_fields.ThumbnailerField, self).__init__(
             verbose_name=verbose_name, name=name,
             upload_to=generate_filename_multistorage,
-            storage=None, **kwargs)
+            storage=None, **kwargs)  # grandparent super
 
     def value_to_string(self, obj):
-        value = super(MultiStorageFileField, self).value_to_string(obj)
+        value = super().value_to_string(obj)
         if not filer_settings.FILER_DUMP_PAYLOAD:
             return value
         try:
@@ -156,12 +158,12 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
             payload_file.seek(0)
             encoded_string = base64.b64encode(payload_file.read()).decode('utf-8')
             return value, encoded_string
-        except IOError:
-            warnings.warn('The payload for "%s" is missing. No such file on disk: %s!' % (obj.original_filename, self.storage.location))
+        except OSError:
+            warnings.warn('The payload for "{}" is missing. No such file on disk: {}!'.format(obj.original_filename, self.storage.location))
             return value
 
     def to_python(self, value):
-        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], six.text_type):
+        if isinstance(value, list) and len(value) == 2 and isinstance(value[0], str):
             filename, payload = value
             try:
                 payload = base64.b64decode(payload)

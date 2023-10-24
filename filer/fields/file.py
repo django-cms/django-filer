@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
 import warnings
 
@@ -17,6 +14,7 @@ from django.utils.safestring import mark_safe
 
 from .. import settings as filer_settings
 from ..models import File
+from ..settings import ICON_CSS_LIB
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
@@ -31,10 +29,12 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         obj = self.obj_for_value(value)
         css_id = attrs.get('id', 'id_image_x')
         related_url = None
+        change_url = ''
         if value:
             try:
                 file_obj = File.objects.get(pk=value)
                 related_url = file_obj.logical_folder.get_admin_directory_listing_url_path()
+                change_url = file_obj.get_admin_change_url()
             except Exception as e:
                 # catch exception and manage it. We can re-raise it for debugging
                 # purposes and/or just logging it, provided user configured
@@ -57,10 +57,11 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
         # rendering the super for ForeignKeyRawIdWidget on purpose here because
         # we only need the input and none of the other stuff that
         # ForeignKeyRawIdWidget adds
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, attrs)  # grandparent super
         context = {
             'hidden_input': hidden_input,
-            'lookup_url': '%s%s' % (related_url, lookup_url),
+            'lookup_url': '{}{}'.format(related_url, lookup_url),
+            'change_url': change_url,
             'object': obj,
             'lookup_name': name,
             'id': css_id,
@@ -76,6 +77,7 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
     def obj_for_value(self, value):
         if value:
             try:
+                # the next line may never bee reached
                 key = self.rel.get_related_field().name
                 obj = self.rel.model._default_manager.get(**{key: value})
             except ObjectDoesNotExist:
@@ -84,12 +86,12 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
+    class Media:
         extra = '' if settings.DEBUG else '.min'
         css = {
-            'all': [
+            'all': (
                 'filer/css/admin_filer.css',
-            ]
+            ) + ICON_CSS_LIB,
         }
         js = (
             'admin/js/vendor/jquery/jquery%s.js' % extra,
@@ -111,7 +113,7 @@ class AdminFileFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
-        super(AdminFileFormField, self).__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
+        super().__init__(queryset, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.required = self.required
@@ -123,27 +125,18 @@ class FilerFileField(models.ForeignKey):
     default_model_class = File
 
     def __init__(self, **kwargs):
-        # We hard-code the `to` argument for ForeignKey.__init__
+        to = kwargs.pop('to', None)
         dfl = get_model_label(self.default_model_class)
-        if "to" in kwargs.keys():  # pragma: no cover
-            old_to = get_model_label(kwargs.pop("to"))
-            if old_to != dfl:
-                msg = "%s can only be a ForeignKey to %s; %s passed" % (
-                    self.__class__.__name__, dfl, old_to
-                )
-                warnings.warn(msg, SyntaxWarning)
-        kwargs['to'] = dfl
-        super(FilerFileField, self).__init__(**kwargs)
+        if to and get_model_label(to).lower() != dfl.lower():
+            msg = "In {}: ForeignKey must point to {}; instead passed {}"
+            warnings.warn(msg.format(self.__class__.__name__, dfl, to), SyntaxWarning)
+        kwargs['to'] = dfl  # hard-code `to` to model `filer.File`
+        super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
-        # This is a fairly standard way to set up some defaults
-        # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
+            'rel': self.remote_field,
         }
-        try:
-            defaults['rel'] = self.remote_field
-        except AttributeError:
-            defaults['rel'] = self.rel
         defaults.update(kwargs)
-        return super(FilerFileField, self).formfield(**defaults)
+        return super().formfield(**defaults)

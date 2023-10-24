@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import django.db.models.deletion
 from django.db import migrations, models
 
@@ -16,8 +13,8 @@ class Migration(migrations.Migration):
             name='Image',
             fields=[
                 ('file_ptr', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, parent_link=True, auto_created=True, primary_key=True, serialize=False, to='filer.File')),
-                ('_height', models.IntegerField(null=True, blank=True)),
-                ('_width', models.IntegerField(null=True, blank=True)),
+                ('_height', models.FloatField(null=True, blank=True)),
+                ('_width', models.FloatField(null=True, blank=True)),
                 ('default_alt_text', models.CharField(max_length=255, null=True, verbose_name='default alt text', blank=True)),
                 ('default_caption', models.CharField(max_length=255, null=True, verbose_name='default caption', blank=True)),
                 ('subject_location', models.CharField(default=None, max_length=64, null=True, verbose_name='subject location', blank=True)),

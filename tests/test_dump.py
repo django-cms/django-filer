@@ -1,25 +1,19 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import json
 import os
 import tempfile
+from io import StringIO
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.management import call_command
 from django.test import TestCase
 
-from six import StringIO
-from tests.helpers import (
-    SettingsOverride, create_folder_structure, create_image, create_superuser,
-)
-
 from filer import settings as filer_settings
 from filer.models import Folder
 from filer.models.filemodels import File
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
+from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -41,17 +35,19 @@ class DumpDataTests(TestCase):
         pass
 
     def create_filer_image(self, folder=None):
-        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
-        image = Image.objects.create(owner=self.superuser,
-                                     original_filename=self.image_name,
-                                     file=file_obj, folder=folder)
+        with open(self.filename, 'rb') as file:
+            file_obj = DjangoFile(file, name=self.image_name)
+            image = Image.objects.create(owner=self.superuser,
+                                         original_filename=self.image_name,
+                                         file=file_obj, folder=folder)
         return image
 
     def create_filer_file(self, folder=None):
-        file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
-        fileobj = File.objects.create(owner=self.superuser,
-                                      original_filename=self.image_name,
-                                      file=file_obj, folder=folder)
+        with open(self.filename, 'rb') as file:
+            file_obj = DjangoFile(file, name=self.image_name)
+            fileobj = File.objects.create(owner=self.superuser,
+                                          original_filename=self.image_name,
+                                          file=file_obj, folder=folder)
         return fileobj
 
     def test_dump_data_base(self):

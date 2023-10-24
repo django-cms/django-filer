@@ -1,10 +1,10 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% load i18n static filer_admin_tags %}
 
 {% block extrastyle %}
     {{ block.super }}
-
     <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+    {% icon_css_library %}
 {% endblock %}
 
 {% block extrahead %}
@@ -29,7 +29,6 @@
     <script src="{% static 'filer/js/addons/table-dropzone.js' %}"></script>
     <script src="{% static 'filer/js/addons/upload-button.js' %}"></script>
     <script src="{% static 'filer/js/addons/tooltip.js' %}"></script>
-    <script src="{% static 'filer/js/addons/focal-point.js' %}"></script>
     <script src="{% static 'filer/js/addons/toggler.js' %}"></script>
     <script src="{% static 'filer/js/base.js' %}"></script>
     <script type="text/javascript">

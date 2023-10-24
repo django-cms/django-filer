@@ -9,7 +9,7 @@
     margin-top: 0;
     border: 0;
     border-radius: 3px;
-    background: #fff;
+    background: $white;
     box-shadow: 0 0 5px 0 rgba(black,0.2);
     .image-details,
     .actions-list {
@@ -50,9 +50,6 @@
             float: left;
             margin-left: 50px;
         }
-        .icon {
-            font-size: 18px;
-        }
         .image-details,
         .actions-list {
             margin-top: 0;
@@ -64,10 +61,10 @@
             }
             dt {
                 float: left;
-                color: #808080;
+                color: $gray-light;
                 font-size: 13px;
                 // required for django CMS without admin styles #673
-                line-height: $font-size-large !important;
+                line-height: 1rem !important;
                 font-weight: normal;
                 // required for django CMS without admin styles #673
                 margin-top: 0;
@@ -164,7 +161,7 @@
         display: inline-block;
         position: relative;
         margin-bottom: 15px;
-        outline: 1px solid #e3e3e3;
+        outline: 1px solid $gray-lightest;
         background-image: url("data:image/gif;base64,R0lGODlhCAAIAKECAOPj4/z8/P///////yH5BAEKAAIALAAAAAAIAAgAAAINhBEZh8q6DoTPSWvoKQA7");
         img {
             display: block;
@@ -183,10 +180,21 @@
         z-index: 1;
         width: 26px;
         height: 26px;
-        border: solid 2px #f00;
+        border: solid 2px $color-danger;
         margin: -13px;
         border-radius: 30px;
         cursor: move;
         background: rgba(255, 255, 255, 0.5);
     }
+    audio, video {
+        margin-bottom: 15px;
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+.button-group .button {
+    margin-right: 10px;
+    padding: 10px 15px;
 }

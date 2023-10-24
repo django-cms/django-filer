@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlencode
+
+from .. import settings
 
 
 ALLOWED_PICK_TYPES = ('folder', 'file')
@@ -67,6 +66,17 @@ def popup_pick_type(request):
     return None
 
 
+def edit_from_widget(request):
+    return request.GET.get('_edit_from_widget') == '1'
+
+
+def get_directory_listing_type(request):
+    list_type = request.GET.get('_list_type', None)
+    if list_type not in settings.FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES:
+        return
+    return list_type
+
+
 def admin_url_params(request, params=None):
     """
     given a request, looks at GET and POST values to determine which params
@@ -78,6 +88,11 @@ def admin_url_params(request, params=None):
     pick_type = popup_pick_type(request)
     if pick_type:
         params['_pick'] = pick_type
+    if edit_from_widget(request):
+        params['_edit_from_widget'] = '1'
+    list_type = get_directory_listing_type(request)
+    if list_type and '_list_type' not in params.keys():
+        params['_list_type'] = list_type
     return params
 
 
@@ -88,12 +103,12 @@ def admin_url_params_encoded(request, first_separator='?', params=None):
     )
     if not params:
         return ''
-    return '{0}{1}'.format(first_separator, params)
+    return f'{first_separator}{params}'
 
 
 class AdminContext(dict):
     def __init__(self, request):
-        super(AdminContext, self).__init__()
+        super().__init__()
         self.update(admin_url_params(request))
 
     def __missing__(self, key):

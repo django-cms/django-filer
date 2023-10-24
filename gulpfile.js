@@ -1,9 +1,8 @@
 'use strict';
 
 var gulp = require('gulp');
-var gulpsync = require('gulp-sync')(gulp);
 var gutil = require('gulp-util');
-var sass = require('gulp-sass');
+var sass = require('gulp-sass')(require('sass'));
 var iconfont = require('gulp-iconfont');
 var iconfontCss = require('gulp-iconfont-css');
 var autoprefixer = require('gulp-autoprefixer');
@@ -39,7 +38,7 @@ var PROJECT_PATTERNS = {
 // #############################################################################
 // sass
 gulp.task('sass', function () {
-    gulp.src(PROJECT_PATTERNS.sass)
+    return gulp.src(PROJECT_PATTERNS.sass)
         .pipe(sourcemaps.init())
         .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
         .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
@@ -48,28 +47,29 @@ gulp.task('sass', function () {
 });
 
 gulp.task('sass:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
+    gulp.watch(PROJECT_PATTERNS.sass, gulp.series('sass'));
 });
 
 // #############################################################################
 // Icons
 
 gulp.task('icons', function () {
-    gulp.src(PROJECT_PATTERNS.icons)
-    .pipe(iconfontCss({
-        fontName: 'django-filer-iconfont',
-        fontPath: '../fonts/',
-        path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-        targetPath: '../../../private/sass/layout/_iconography.scss'
-    }))
-    .pipe(iconfont({
-        fontName: 'django-filer-iconfont',
-        normalize: true
-    }))
-    .on('glyphs', function (glyphs, options) {
-        gutil.log.bind(glyphs, options);
-    })
-    .pipe(gulp.dest(PROJECT_PATH.icons));
+    return gulp.src(PROJECT_PATTERNS.icons)
+        .pipe(iconfontCss({
+            fontName: 'django-filer-iconfont',
+            fontPath: '../fonts/',
+            path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
+            targetPath: '../../../private/sass/components/_iconography.scss'
+        }))
+        .pipe(iconfont({
+            fontName: 'django-filer-iconfont',
+            normalize: true,
+            formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
+        }))
+        .on('glyphs', function (glyphs, options) {
+            gutil.log.bind(glyphs, options);
+        })
+        .pipe(gulp.dest(PROJECT_PATH.icons));
 });
 
 // #############################################################################
@@ -108,14 +108,14 @@ gulp.task('tests:watch', function () {
 
 // #############################################################################
 // TASKS
-gulp.task('js', gulpsync.sync(['jshint', 'jscs', 'tests:unit']));
+gulp.task('js', gulp.series('jshint', 'jscs' /* ,'tests:unit'*/));
 gulp.task('js:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.lint, ['js']);
+    gulp.watch(PROJECT_PATTERNS.lint, gulp.series('js'));
 });
-gulp.task('watch', ['sass:watch', 'js:watch']);
-gulp.task('lint', ['jscs', 'jshint']);
+gulp.task('watch', gulp.parallel('sass:watch', 'js:watch'));
+gulp.task('lint', gulp.series('jscs', 'jshint'));
 gulp.task('lint:watch', function () {
-    gulp.watch(PROJECT_PATTERNS.lint, ['lint']);
+    gulp.watch(PROJECT_PATTERNS.lint, gulp.series('lint'));
 });
-gulp.task('ci', ['js']);
-gulp.task('default', ['sass', 'sass:watch', 'js', 'js:watch']);
+gulp.task('ci', gulp.series('sass', 'jscs', 'lint', 'tests:unit'));
+gulp.task('default', gulp.parallel('sass:watch', 'js:watch', 'lint:watch'));

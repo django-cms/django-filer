@@ -1,0 +1,4 @@
+-r base.txt
+
+django>=3.2,<5
+django_polymorphic>=3

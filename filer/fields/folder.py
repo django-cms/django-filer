@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import warnings
 
 from django import forms
@@ -14,6 +11,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from ..models import Folder
+from ..settings import ICON_CSS_LIB
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
@@ -50,19 +48,18 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             # The JavaScript looks for this hook.
             attrs['class'] = 'vForeignKeyRawIdAdminField'
         super_attrs = attrs.copy()
-        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)
+        hidden_input = super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs)  # grandparent super
 
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
         context = {
             'hidden_input': hidden_input,
-            'lookup_url': '%s%s' % (related_url, url),
+            'lookup_url': '{}{}'.format(related_url, url),
             'lookup_name': name,
             'span_id': css_id_description_txt,
             'object': obj,
             'clear_id': '%s_clear' % css_id,
             'descid': css_id_description_txt,
-            'noimg': 'filer/icons/nofile_32x32.png',
             'foldid': css_id_folder,
             'id': css_id,
         }
@@ -83,10 +80,9 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
             obj = None
         return obj
 
-    class Media(object):
-        js = (
-            'filer/js/addons/popup_handling.js',
-        )
+    class Media:
+        css = {"all": ('filer/css/admin_filer.css',) + ICON_CSS_LIB}
+        js = ('filer/js/addons/popup_handling.js',)
 
 
 class AdminFolderFormField(forms.ModelChoiceField):
@@ -100,6 +96,7 @@ class AdminFolderFormField(forms.ModelChoiceField):
         self.max_value = None
         self.min_value = None
         kwargs.pop('widget', None)
+        kwargs.pop('blank', None)
         forms.Field.__init__(self, widget=self.widget(rel, site), *args, **kwargs)
 
     def widget_attrs(self, widget):
@@ -116,23 +113,18 @@ class FilerFolderField(models.ForeignKey):
         dfl = get_model_label(self.default_model_class)
         if "to" in kwargs.keys():  # pragma: no cover
             old_to = get_model_label(kwargs.pop("to"))
-            if old_to != dfl:
-                msg = "%s can only be a ForeignKey to %s; %s passed" % (
+            if old_to.lower() != dfl.lower():
+                msg = "{} can only be a ForeignKey to {}; {} passed".format(
                     self.__class__.__name__, dfl, old_to
                 )
                 warnings.warn(msg, SyntaxWarning)
         kwargs['to'] = dfl
-        super(FilerFolderField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
-        # This is a fairly standard way to set up some defaults
-        # while letting the caller override them.
         defaults = {
             'form_class': self.default_form_class,
+            'rel': self.remote_field,
         }
-        try:
-            defaults['rel'] = self.remote_field
-        except AttributeError:
-            defaults['rel'] = self.rel
         defaults.update(kwargs)
-        return super(FilerFolderField, self).formfield(**defaults)
+        return super().formfield(**defaults)

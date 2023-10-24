@@ -10,6 +10,7 @@
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'filer/css/admin_filer.css' %}">
+    {% icon_css_library %}
 {% endblock %}
 
 
@@ -22,7 +23,7 @@
         {% with original.duplicates as duplicates %}
             {% if duplicates %}
                 <div class="file-duplicates">
-                    <h3>{% trans "Duplicates" %}</h3>
+                    <h3>{% translate "Duplicates" %}</h3>
                     <ul>
                         {% for duplicate in duplicates %}
                             <li><a href="{{ duplicate.get_admin_change_url }}">{{ duplicate }}</a></li>

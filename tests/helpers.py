@@ -1,17 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 from filer.models.foldermodels import Folder
 from filer.utils.compatibility import PILImage, PILImageDraw
 
 
 def create_superuser():
-    try:
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-    except ImportError:
-        from django.contrib.auth.models import User  # NOQA
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     superuser = User.objects.create_superuser('admin',
                                               'admin@free.fr',
                                               'secret')
@@ -52,9 +46,9 @@ def create_image(mode='RGB', size=(800, 600)):
     return image
 
 
-class SettingsOverride(object):
+class SettingsOverride:
     """
-    Overrides Django settings within a context and resets them to their inital
+    Overrides Django settings within a context and resets them to their initial
     values on exit.
 
     Example:

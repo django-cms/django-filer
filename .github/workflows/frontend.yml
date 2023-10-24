@@ -1,0 +1,21 @@
+name: gulp
+
+on: [push]
+
+jobs:
+  gulp:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [16.20.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: python -m pip install -r tests/requirements/frontend.txt
+    - run: npm install
+    - run: npm install -g gulp@4.0.2
+    - run: gulp ci

@@ -1,6 +1,7 @@
 // #####################################################################################################################
 // #BASE#
 // Basic logic django filer
+/*jshint esversion: 6 */
 'use strict';
 
 var Cl = window.Cl || {};
@@ -36,7 +37,7 @@ Cl.mediator = new Mediator();
 
             showErrorTimeout = setTimeout(function () {
                 $('.' + filerErrorClass).remove();
-            }, 3000);
+            }, 5000);
         };
 
         // Focal point logic init
@@ -83,18 +84,32 @@ Cl.mediator = new Mediator();
 
         // show counter if file is selected
         (function () {
-            var navigatorTable = $('.navigator-table').find('tr');
+            var navigatorTable = $('.navigator-table tr, .navigator-list .list-item');
             var actionList = $('.actions-wrapper');
-            var actionSelect = $('.action-select, #action-toggle, .actions .clear a');
+            var actionSelect = $(
+                '.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a'
+            );
 
             // timeout is needed to wait until table row has class selected.
             setTimeout(function () {
+                // Set classes for checked items
+                actionSelect.each(function (no, el) {
+                    if (el.checked) {
+                        el.closest('.list-item').classList.add('selected');
+                    }
+                });
                 if (navigatorTable.hasClass('selected')) {
                     actionList.addClass('action-selected');
                 }
             }, 100);
 
             actionSelect.on('change', function () {
+                // Mark element selected (for table view this is done by Django admin js - we do it ourselves
+                if ($(this).prop('checked')) {
+                    $(this).closest('.list-item').addClass('selected');
+                } else {
+                    $(this).closest('.list-item').removeClass('selected');
+                }
                 // setTimeout makes sure that change event fires before click event which is reliable to admin
                 setTimeout(function () {
                     if (navigatorTable.hasClass('selected')) {
@@ -120,7 +135,7 @@ Cl.mediator = new Mediator();
             var valueDelete = 'delete_files_or_folders';
             var valueCopy = 'copy_files_and_folders';
             var valueMove = 'move_files_and_folders';
-            var navigatorTable = $('.navigator-table').find('tr');
+            var navigatorTable =  $('.navigator-table tr, .navigator-list .list-item');
 
             // triggers delete copy and move actions on separate buttons
             function actionsButton(optionValue, actionButton) {
@@ -206,5 +221,65 @@ Cl.mediator = new Mediator();
             });
 
         }());
+        // thumbnail folder admin view
+        (function () {
+            var $actionEls = $('.navigator-list .list-item input.action-select'),
+                foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select',
+                filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select',
+                $allFilesToggle = $('#files-action-toggle'),
+                $allFoldersToggle = $('#folders-action-toggle');
+
+            $allFoldersToggle.on('click', function () {
+                if (!!$(this).prop('checked')) {
+                    $(foldersActionCheckboxes).filter(':not(:checked)').trigger('click');
+                } else {
+                    $(foldersActionCheckboxes).filter(':checked').trigger('click');
+                }
+            });
+            $allFilesToggle.on('click', function () {
+                if (!!$(this).prop('checked')) {
+                    $(filesActionCheckboxes).filter(':not(:checked)').trigger('click');
+                } else {
+                    $(filesActionCheckboxes).filter(':checked').trigger('click');
+                }
+            });
+            $actionEls.on('click', function () {
+                if (!$(this).prop('checked')) {
+                    if (!!$(filesActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFilesToggle.prop('checked', false);
+                    }
+                    if (!!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFoldersToggle.prop('checked', false);
+                    }
+                } else {
+                    if (!$(filesActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFilesToggle.prop('checked', true);
+                    }
+                    if (!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
+                        $allFoldersToggle.prop('checked', true);
+                    }
+                }
+            });
+            $('.navigator .actions .clear a').on('click', function () {
+                $allFoldersToggle.prop('checked', false);
+                $allFilesToggle.prop('checked', false);
+            });
+        })();
+        $('.js-copy-url').on('click', function (e) {
+            const url = new URL(this.dataset.url, document.location.href);
+            const msg = this.dataset.msg || 'URL copied to clipboard';
+            let infobox = document.createElement('template');
+            e.preventDefault();
+            for (let el of document.getElementsByClassName('info filer-tooltip')) {
+                el.remove();
+            }
+            navigator.clipboard.writeText(url.href);
+            infobox.innerHTML = '<div class="info filer-tooltip">' + msg + '</div>';
+            this.classList.add('filer-tooltip-wrapper');
+            this.appendChild(infobox.content.firstChild);
+            setTimeout(() => {
+                this.getElementsByClassName('info')[0].remove();
+            }, 1200);
+        });
     });
 })(djQuery);

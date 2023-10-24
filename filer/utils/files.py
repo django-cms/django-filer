@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
+import mimetypes
 import os
 
-from django.http.multipartparser import (
-    ChunkIter, SkipFile, StopFutureHandlers, StopUpload, exhaust,
-)
+from django.http.multipartparser import ChunkIter, SkipFile, StopFutureHandlers, StopUpload, exhaust
 from django.template.defaultfilters import slugify as slugify_django
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import get_valid_filename as get_valid_filename_django
-
-from unidecode import unidecode
 
 
 class UploadException(Exception):
@@ -18,21 +12,23 @@ class UploadException(Exception):
 
 
 def handle_upload(request):
-    if not request.method == "POST":
-        raise UploadException("AJAX request not valid: must be POST")
-    if request.is_ajax():
+    if not request.method == 'POST':
+        raise UploadException("XMLHttpRequest not valid: must be POST")
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         # the file is stored raw in the request
         is_raw = True
         filename = request.GET.get('qqfile', False) or request.GET.get('filename', False) or ''
 
         try:
-            content_length = int(request.META['CONTENT_LENGTH'])
+            content_length = int(request.headers['content-length'])
         except (IndexError, TypeError, ValueError):
             content_length = None
 
         if content_length < 0:
             # This means we shouldn't continue...raise an error.
             raise UploadException("Invalid content length: %r" % content_length)
+
+        mime_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
         upload_handlers = request.upload_handlers
         for handler in upload_handlers:
@@ -92,16 +88,16 @@ def handle_upload(request):
                 break
     else:
         if len(request.FILES) == 1:
-            upload, filename, is_raw = handle_request_files_upload(request)
+            upload, filename, is_raw, mime_type = handle_request_files_upload(request)
         else:
-            raise UploadException("AJAX request not valid: Bad Upload")
-    return upload, filename, is_raw
+            raise UploadException("XMLHttpRequest request not valid: Bad Upload")
+    return upload, filename, is_raw, mime_type
 
 
 def handle_request_files_upload(request):
     """
     Handle request.FILES if len(request.FILES) == 1.
-    Returns tuple(upload, filename, is_raw) where upload is file itself.
+    Returns tuple(upload, filename, is_raw, mime_type) where upload is file itself.
     """
     # FILES is a dictionary in Django but Ajax Upload gives the uploaded file
     # an ID based on a random number, so it cannot be guessed here in the code.
@@ -112,11 +108,17 @@ def handle_request_files_upload(request):
     is_raw = False
     upload = list(request.FILES.values())[0]
     filename = upload.name
-    return upload, filename, is_raw
+    _, iext = os.path.splitext(filename)
+    mime_type = upload.content_type.lower()
+    extensions = mimetypes.guess_all_extensions(mime_type)
+    if mime_type != 'application/octet-stream' and extensions and iext.lower() not in extensions:
+        msg = "MIME-Type '{mimetype}' does not correspond to file extension of {filename}."
+        raise UploadException(msg.format(mimetype=mime_type, filename=filename))
+    return upload, filename, is_raw, mime_type
 
 
 def slugify(string):
-    return slugify_django(unidecode(force_text(string)))
+    return slugify_django(force_str(string))
 
 
 def get_valid_filename(s):
@@ -129,6 +131,6 @@ def get_valid_filename(s):
     filename = slugify(filename)
     ext = slugify(ext)
     if ext:
-        return "%s.%s" % (filename, ext)
+        return "{}.{}".format(filename, ext)
     else:
-        return "%s" % (filename,)
+        return "{}".format(filename)

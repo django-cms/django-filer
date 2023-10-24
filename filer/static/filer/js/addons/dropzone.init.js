@@ -22,6 +22,7 @@ djQuery(function ($) {
     var dropzones = $(dropzoneSelector);
     var messageSelector = '.js-filer-dropzone-message';
     var lookupButtonSelector = '.js-related-lookup';
+    var editButtonSelector = '.js-related-edit';
     var progressSelector = '.js-filer-dropzone-progress';
     var previewImageWrapperSelector = '.js-img-wrapper';
     var filerClearerSelector = '.filerClearer';
@@ -56,6 +57,7 @@ djQuery(function ($) {
         var inputId = dropzone.find(fileIdInputSelector);
         var isImage = inputId.is('[name="image"]');
         var lookupButton = dropzone.find(lookupButtonSelector);
+        var editButton = dropzone.find(editButtonSelector);
         var message = dropzone.find(messageSelector);
         var clearButton = dropzone.find(filerClearerSelector);
         var fileChoose = dropzone.find(fileChooseSelector);
@@ -72,8 +74,7 @@ djQuery(function ($) {
             url: dropzoneUrl,
             paramName: 'file',
             maxFiles: 1,
-            // for now disabled as we don't have the correct file size limit
-            // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+            maxFilesize: this.dataset.maxFilesize,
             previewTemplate: $(dropzoneTemplateSelector).html(),
             clickable: false,
             addRemoveLinks: false,
@@ -100,6 +101,7 @@ djQuery(function ($) {
                 this.removeAllFiles(true);
                 fileChoose.hide();
                 lookupButton.addClass('related-lookup-change');
+                editButton.addClass('related-lookup-change');
                 message.addClass(hiddenClass);
                 dropzone.removeClass(dragHoverClass);
                 dropzone.addClass(objectAttachedClass);
@@ -130,8 +132,11 @@ djQuery(function ($) {
                     event.preventDefault();
                 });
             },
-            error: function (file, response) {
-                showError(file.name + ': ' + response.error);
+            error: function (file, msg, response) {
+                if (response && response.error) {
+                    msg += ' ; ' + response.error;
+                }
+                showError(file.name + ': ' + msg);
                 this.removeAllFiles(true);
             },
             reset: function () {
@@ -142,6 +147,7 @@ djQuery(function ($) {
                 dropzone.removeClass(objectAttachedClass);
                 inputId.val('');
                 lookupButton.removeClass('related-lookup-change');
+                editButton.removeClass('related-lookup-change');
                 message.removeClass(hiddenClass);
                 inputId.trigger('change');
             }
@@ -154,18 +160,31 @@ djQuery(function ($) {
             Dropzone.autoDiscover = false;
         }
         dropzones.each(createDropzone);
-        // window.__admin_utc_offset__ is used as canary to detect Django 1.8
-        // There is no way to feature detect the new behavior implemented in Django 1.9
-        if (!window.__admin_utc_offset__) {
-            $(document).on('formset:added', function (ev, row) {
+
+        // Handle initialization of the dropzone on dynamic formsets (i.e. Django admin inlines)
+        $(document).on('formset:added', function (ev, row) {
+            if(ev.detail && ev.detail.formsetName) {
+                /*
+                    Django 4.1 changed the event type being fired when adding
+                    a new formset from a jQuery to a vanilla JavaScript event.
+                    https://docs.djangoproject.com/en/4.1/ref/contrib/admin/javascript/
+
+                    In this case we find the newly added row and initialize the
+                    dropzone on any dropzoneSelector on that row.
+                */
+                let rowIdx = parseInt(
+                    document.getElementById(
+                        'id_' + event.detail.formsetName + '-TOTAL_FORMS'
+                    ).value, 10
+                ) - 1;
+                let row_ = document.getElementById(event.detail.formsetName + '-' + rowIdx);
+                var dropzones = $(row_).find(dropzoneSelector)
+
+            } else {
                 var dropzones = $(row).find(dropzoneSelector);
-                dropzones.each(createDropzone);
-            });
-        } else {
-            $('.add-row a').on('click', function () {
-                var dropzones = $(dropzoneSelector);
-                dropzones.each(createDropzone);
-            });
-        }
+            }
+
+            dropzones.each(createDropzone);
+        });
     }
 });

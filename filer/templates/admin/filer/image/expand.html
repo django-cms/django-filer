@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <style>
+            img {
+                cursor: zoom-out;
+            }
+            body.scrolling img {
+                cursor: zoom-out;
+            }
+            body.scrolling img.zoom {
+                cursor: zoom-in;
+            }
+            img.zoom {
+                width: 100%;
+                cursor: zoom-out;
+            }
+        </style>
+    </head>
+    <body style="margin: 0;">
+        <img id="img" src="{{ original_url }}" onclick="this.classList.toggle('zoom')"/>
+        <script>
+            setInterval(function () {
+                const img = document.getElementById('img')
+                document.body.classList.toggle('scrolling', img.naturalWidth >= document.body.clientWidth)
+            }, 200);
+        </script>
+    </body>
+</html>

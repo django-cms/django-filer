@@ -1,20 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
 
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.admin import helpers
+from django.contrib.auth.models import Group, Permission
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
-
-from tests.helpers import create_image, create_superuser
+from django.urls import reverse
 
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
+from tests.helpers import create_image, create_superuser
 
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -27,11 +25,9 @@ class Mock():
 class FolderPermissionsTestCase(TestCase):
 
     def setUp(self):
-        try:
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-        except ImportError:
-            from django.contrib.auth.models import User  # NOQA
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
 
@@ -39,8 +35,14 @@ class FolderPermissionsTestCase(TestCase):
 
         self.owner = User.objects.create(username='owner')
 
-        self.test_user1 = User.objects.create(username='test1', password='secret')
+        perms = Permission.objects.filter(codename="change_folder")
+        perms |= Permission.objects.filter(codename="can_use_directory_listing")
+        self.test_user1 = User.objects.create(username='test1', password='secret', is_staff=True)
+        self.test_user1.set_password("secret")
+        self.test_user1.save()
         self.test_user2 = User.objects.create(username='test2', password='secret')
+        self.test_user1.user_permissions.add(*perms)
+        self.test_user2.user_permissions.add(*perms)
 
         self.group1 = Group.objects.create(name='name1')
         self.group2 = Group.objects.create(name='name2')
@@ -66,7 +68,12 @@ class FolderPermissionsTestCase(TestCase):
         self.folder_perm = Folder.objects.create(name='test_folder2')
 
     def tearDown(self):
+        self.file.close()
         self.image.delete()
+
+    def test_folder_all(self):
+        folder = Folder.objects.create(name="test_folder3")
+        self.assertEqual(str(folder), "/test_folder3")
 
     def test_superuser_has_rights(self):
         request = Mock()
@@ -84,6 +91,22 @@ class FolderPermissionsTestCase(TestCase):
 
             result = self.folder.has_read_permission(request)
             self.assertEqual(result, False)
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_user_cannot_see_other_users_files(self):
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+
+            url = reverse("admin:filer-directory_listing-unfiled_images")
+            response = self.client.get(url)
+            self.assertContains(response, self.image_name)
+            loginok = self.client.login(username=self.test_user1.username, password="secret")
+            self.assertTrue(loginok, "Could not login 'test_user1'")
+            response = self.client.get(url)
+            self.assertNotContains(response, self.image_name)
+
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
@@ -146,6 +169,7 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder_perm.has_read_permission(request1), True)
             self.assertEqual(self.folder_perm.has_read_permission(request2), True)
 
+            self.assertEqual(self.folder_perm.pretty_logical_path, "/test_folder2")
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
 
@@ -326,3 +350,64 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+
+    def test_folder_who_owner(self):
+        perm = FolderPermission.objects.create(
+            user=self.owner,
+            folder=Folder.objects.create(name="folder4"),
+            type=FolderPermission.CHILDREN,
+            can_edit=FolderPermission.DENY,
+            can_read=FolderPermission.ALLOW,
+            can_add_children=FolderPermission.ALLOW,
+        )
+        self.assertEqual(perm.who, "User: owner")
+        self.assertEqual(perm.pretty_logical_path, "/folder4")
+        self.assertEqual(perm.what, "E̶d̶i̶t̶, Read, Add children")
+
+    def test_folder_who_group(self):
+        perm = FolderPermission.objects.create(
+            group=self.group1,
+        )
+        self.assertEqual(perm.who, "Group: name1")
+
+    def test_folder_who_everybody(self):
+        perm = FolderPermission.objects.create(
+            everybody=True,
+        )
+        self.assertEqual(perm.who, "Everybody")
+        self.assertEqual(perm.pretty_logical_path, "All Folders")
+        self.assertEqual(perm.__str__(), "All Folders")
+
+    def test_folder_who_nobody(self):
+        perm = FolderPermission.objects.create()
+        self.assertEqual(perm.who, "–")
+
+    def test_folderpermission_is_copied(self):
+        source_folder = Folder.objects.create(name="source")
+        destination_folder = Folder.objects.create(name="destination")
+        perm = FolderPermission.objects.create(
+            user=self.owner,
+            folder=source_folder,
+            type=FolderPermission.CHILDREN,
+            can_edit=FolderPermission.ALLOW,
+            can_read=FolderPermission.DENY,
+            can_add_children=FolderPermission.ALLOW,
+        )
+        self.assertEqual(FolderPermission.objects.count(), 1)
+        url = reverse('admin:filer-directory_listing-root')
+        self.client.post(url, {
+            'action': 'copy_files_and_folders',
+            'post': 'yes',
+            'suffix': 'test',
+            'destination': destination_folder.id,
+            helpers.ACTION_CHECKBOX_NAME: 'folder-%d' % (source_folder.id,),
+        })
+        self.assertEqual(FolderPermission.objects.count(), 2)
+        copied_folder = destination_folder.children.first()
+        self.assertEqual(copied_folder.name, source_folder.name)
+        new_perm = FolderPermission.objects.get(folder=copied_folder)
+        self.assertEqual(perm.user, new_perm.user)
+        self.assertEqual(perm.type, new_perm.type)
+        self.assertEqual(perm.can_edit, new_perm.can_edit)
+        self.assertEqual(perm.can_read, new_perm.can_read)
+        self.assertEqual(perm.can_add_children, new_perm.can_add_children)

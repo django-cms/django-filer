@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django.conf import settings
-from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import include, path
 from django.views.static import serve
 
 
@@ -11,9 +8,11 @@ admin.autodiscover()
 admin_urls = admin.site.urls
 
 urlpatterns = [
-    url(r'^media/(?P<path>.*)$', serve,
-        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'^admin/', admin_urls),
-    url(r'^', include('filer.server.urls')),
-    url(r'^filer/', include('filer.urls')),
+    path('media/my-preferred-base-url-for-source-files/<path:path>', serve,
+         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    path('media/my-preferred-base-url-for-thumbnails/<path:path>', serve,
+         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    path('admin/', admin_urls),
+    path('', include('filer.server.urls')),
+    path('filer/', include('filer.urls')),
 ]

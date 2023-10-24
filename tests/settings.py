@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
 from tempfile import mkdtemp
 
@@ -14,7 +11,6 @@ HELPER_SETTINGS = {
     'ROOT_URLCONF': 'tests.utils.urls',
     'INSTALLED_APPS': [
         'easy_thumbnails',
-        'mptt',
         'filer',
         'tests.utils.test_app',
         'tests.utils.extended_app',
@@ -56,6 +52,24 @@ HELPER_SETTINGS = {
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
     'TEMPLATE_DIRS': (os.path.join(BASE_DIR, 'django-filer', 'filer', 'utils', 'templates'),),
     'FILER_CANONICAL_URL': 'test-path/',
+    'FILER_STORAGES': {
+        "public": {
+            "main": {
+                "ENGINE": 'django.core.files.storage.FileSystemStorage',
+                "OPTIONS": {
+                    "base_url": "/media/my-preferred-base-url-for-source-files/",
+                }
+            },
+            "thumbnails": {
+                "ENGINE": 'django.core.files.storage.FileSystemStorage',
+                "OPTIONS": {
+                    "base_url": "/media/my-preferred-base-url-for-thumbnails/",
+                }
+            }
+        }
+    },
+    'SECRET_KEY': '__secret__',
+    'DEFAULT_AUTO_FIELD': 'django.db.models.AutoField',
 }
 if os.environ.get('CUSTOM_IMAGE', False):
     HELPER_SETTINGS['FILER_IMAGE_MODEL'] = os.environ.get('CUSTOM_IMAGE')

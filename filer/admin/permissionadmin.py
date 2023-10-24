@@ -1,33 +1,26 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from .. import settings
-from ..fields import folder
 
 
 class PermissionAdmin(admin.ModelAdmin):
-    fieldsets = (
-        (None, {'fields': (('type', 'folder', ))}),
-        (None, {'fields': (('user', 'group', 'everybody'), )}),
-        (None, {'fields': (
-            ('can_edit', 'can_read', 'can_add_children')
-        )}),
-    )
-    raw_id_fields = ('user', 'group',)
-    list_filter = ['user']
-    list_display = ['__str__', 'folder', 'user']
+    fieldsets = [
+        (None, {'fields': ['type', 'folder']}),
+        (_("Who"), {'fields': ['user', 'group', 'everybody']}),
+        (_("What"), {'fields': ['can_edit', 'can_read', 'can_add_children']}),
+    ]
+    list_filter = ['group']
+    list_display = ['pretty_logical_path', 'who', 'what']
+    search_fields = ['user__username', 'group__name', 'folder__name']
+    autocomplete_fields = ['user', 'group', 'folder']
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        db = kwargs.get('using')
-        if db_field.name == 'folder':
-            try:
-                remote = db_field.remote_field
-            except AttributeError:
-                remote = db_field.rel
-            kwargs['widget'] = folder.AdminFolderWidget(remote, self.admin_site, using=db)
-        return super(PermissionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    class Media:
+        css = {'all': ['filer/css/admin_folderpermissions.css']}
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related("group", "folder")
 
     def get_model_perms(self, request):
         # don't display the permissions admin if permissions are disabled.

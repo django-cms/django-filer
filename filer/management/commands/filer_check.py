@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 
 from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
-
-from six.moves import input
 
 from filer import settings as filer_settings
 

@@ -1,18 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import os
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.forms.models import modelform_factory
 from django.test import TestCase
-
-from tests.helpers import (
-    create_clipboard_item, create_folder_structure, create_image,
-    create_superuser,
-)
-from tests.utils import ET_2
 
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
@@ -21,15 +13,10 @@ from filer.models.foldermodels import Folder
 from filer.models.mixins import IconsMixin
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
+from tests.helpers import create_clipboard_item, create_folder_structure, create_image, create_superuser
 
 
 Image = load_model(FILER_IMAGE_MODEL)
-
-try:
-    from unittest import skipIf, skipUnless
-except ImportError:
-    # Django<1.9
-    from django.utils.unittest import skipIf, skipUnless
 
 
 class FilerApiTests(TestCase):
@@ -48,9 +35,11 @@ class FilerApiTests(TestCase):
         for f in File.objects.all():
             f.delete()
 
-    def create_filer_image(self):
+    def create_filer_image(self, owner=None):
+        if owner is None:
+            owner = self.superuser
         file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
-        image = Image.objects.create(owner=self.superuser,
+        image = Image.objects.create(owner=owner,
                                      original_filename=self.image_name,
                                      file=file_obj)
         return image
@@ -76,6 +65,7 @@ class FilerApiTests(TestCase):
             'original_filename': self.image_name,
             'owner': self.superuser.pk
         }, {'file': file_obj})
+        self.assertTrue(upoad_image_form.is_valid())
         if upoad_image_form.is_valid():
             image = upoad_image_form.save()  # noqa
         self.assertEqual(Image.objects.count(), 1)
@@ -89,18 +79,6 @@ class FilerApiTests(TestCase):
         clipboard_item.save()
         self.assertEqual(Clipboard.objects.count(), 1)
 
-    @skipIf(ET_2, 'Skipping for easy_thumbnails version >= 2.0')  # noqa
-    def test_create_icons(self):
-        image = self.create_filer_image()
-        image.save()
-        icons = image.icons
-        file_basename = os.path.basename(image.file.path)
-        self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
-        for size in filer_settings.FILER_ADMIN_ICON_SIZES:
-            self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + '__%sx%s_q85_crop_upscale.jpg' % (size, size))
-
-    @skipUnless(ET_2, 'Skipping for easy_thumbnails version < 2.0')  # noqa
     def test_create_icons(self):
         image = self.create_filer_image()
         image.save()
@@ -233,16 +211,25 @@ class FilerApiTests(TestCase):
         # file should still be here
         self.assertTrue(storage.exists(name))
 
-    def test_folder_quoted_logical_path(self):
+    def test_folder_pretty_logical_path(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s Foo', parent=root_folder)
-        self.assertEqual(child.quoted_logical_path, '/Foo%27s%20Bar/Bar%22s%20Foo')
+        if DJANGO_VERSION < (3,):
+            self.assertEqual(child.pretty_logical_path, '/Foo&#39;s Bar/Bar&quot;s Foo')
+        else:
+            self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s Foo')
 
-    def test_folder_quoted_logical_path_with_unicode(self):
+    def test_folder_pretty_logical_path_with_unicode(self):
         root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
         child = Folder.objects.create(name='Bar"s 日本 Foo', parent=root_folder)
-        self.assertEqual(child.quoted_logical_path,
-                         '/Foo%27s%20Bar/Bar%22s%20%E6%97%A5%E6%9C%AC%20Foo')
+        if DJANGO_VERSION < (3,):
+            self.assertEqual(child.pretty_logical_path, '/Foo&#39;s Bar/Bar&quot;s 日本 Foo')
+        else:
+            self.assertEqual(child.pretty_logical_path, '/Foo&#x27;s Bar/Bar&quot;s 日本 Foo')
+
+    def test_folder_str_method(self):
+        root_folder = Folder.objects.create(name="Foo's Bar", parent=None)
+        self.assertEqual(root_folder.pretty_logical_path, str(root_folder))
 
     def test_custom_model(self):
         """
@@ -318,3 +305,22 @@ class FilerApiTests(TestCase):
         image.save()
         canonical = image.canonical_url
         self.assertTrue(canonical.startswith('/filer/test-path/'))
+
+    def test_delete_user_who_owns_file(self):
+        """Tests if deleting users who own files works"""
+        from django.contrib.auth.models import User
+
+        user = User.objects.create(
+            username="test",
+            password="top-secret",
+            email="community-hero@django-cms.org",
+            is_staff=True,
+        )
+        image = self.create_filer_image(user)
+
+        user.delete()
+
+        # User needs to be gone
+        self.assertEqual(len(User.objects.filter(username="test")), 0)
+        # Image remains w/o owner
+        self.assertIsNone(File.objects.get(pk=image.pk).owner)

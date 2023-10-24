@@ -1,19 +1,15 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import os
 
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
-from tests.helpers import create_image, create_superuser
-
 from filer.models import tools
 from filer.models.clipboardmodels import Clipboard
 from filer.models.foldermodels import Folder
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
+from tests.helpers import create_image, create_superuser
 
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -39,6 +35,7 @@ class ToolsTestCase(TestCase):
         self.folder = Folder.objects.create(name='test_folder')
 
     def tearDown(self):
+        self.file.close()
         self.client.logout()
         os.remove(self.filename)
         for img in Image.objects.all():

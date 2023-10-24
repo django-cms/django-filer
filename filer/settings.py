@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import logging
 import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.files.storage import get_storage_class
+from django.utils.module_loading import import_string as get_storage_class
+from django.utils.translation import gettext_lazy as _
 
 from .utils.loader import load_object
 from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
@@ -38,7 +36,7 @@ FILER_ENABLE_PERMISSIONS = getattr(settings, 'FILER_ENABLE_PERMISSIONS', False)
 FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS = getattr(settings, 'FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS', False)
 FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
-FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 20)
+FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 100)
 
 _ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', ('16', '32', '48', '64'))
 if not _ICON_SIZES:
@@ -249,7 +247,75 @@ else:
     _uploader_connections = 3
 FILER_UPLOADER_CONNECTIONS = getattr(
     settings, 'FILER_UPLOADER_CONNECTIONS', _uploader_connections)
+FILER_UPLOADER_MAX_FILES = getattr(
+    settings, 'FILER_UPLOADER_MAX_FILES', 100)
+FILER_UPLOADER_MAX_FILE_SIZE = getattr(
+    settings, 'FILER_UPLOADER_MAX_FILE_SIZE', None)
+
 
 FILER_DUMP_PAYLOAD = getattr(settings, 'FILER_DUMP_PAYLOAD', False)  # Whether the filer shall dump the files payload
 
 FILER_CANONICAL_URL = getattr(settings, 'FILER_CANONICAL_URL', 'canonical/')
+
+TABLE_LIST_TYPE = 'tb'
+THUMBNAIL_LIST_TYPE = 'th'
+FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES = (
+    TABLE_LIST_TYPE,
+    THUMBNAIL_LIST_TYPE,
+)
+FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE = getattr(settings, 'FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE', TABLE_LIST_TYPE)
+if FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE not in FILER_FOLDER_ADMIN_LIST_TYPE_CHOICES:
+    FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE = TABLE_LIST_TYPE
+
+FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
+    TABLE_LIST_TYPE: {
+        'icon': 'th-list',
+        'tooltip_text': _('Show table view'),
+        'template': 'admin/filer/folder/directory_table_list.html',
+    },
+    THUMBNAIL_LIST_TYPE: {
+        'icon': 'th-large',
+        'tooltip_text': _('Show thumbnail view'),
+        'template': 'admin/filer/folder/directory_thumbnail_list.html',
+    },
+}
+
+DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
+IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
+
+FILE_VALIDATORS = {
+    "text/html": ["filer.validation.deny_html"],
+    "image/svg+xml": ["filer.validation.validate_svg"],
+}
+
+remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
+for mime_type in remove_mime_types:  # pragma: no cover
+    if mime_type in FILE_VALIDATORS:
+        del FILE_VALIDATORS[mime_type]
+
+for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).items():  # pragma: no cover
+    if mime_type in FILE_VALIDATORS:
+        FILE_VALIDATORS[mime_type] += list(validators)
+    else:
+        FILE_VALIDATORS[mime_type] = list(validators)
+
+FILER_MIME_TYPE_WHITELIST = getattr(settings, "FILER_MIME_TYPE_WHITELIST", [])
+
+
+# Determine if django CMS is installed and if it comes with its own iconset
+
+ICON_CSS_LIB = ("filer/css/admin_filer.fa.icons.css",)
+if "cms" in settings.INSTALLED_APPS:  # pragma: no cover
+    try:
+        from cms import __version__
+        from cms.utils.urlutils import static_with_version
+
+        if __version__ >= "4":
+            ICON_CSS_LIB = (
+                static_with_version("cms/css/cms.admin.css"),
+                "filer/css/admin_filer.cms.icons.css",
+            )
+    except (ModuleNotFoundError, ImportError):
+        # Import error? No django CMS used: stay with own icons
+        pass

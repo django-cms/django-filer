@@ -1,19 +1,15 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-
 import os
 import shutil
+from io import StringIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.module_loading import import_string
 
-from six import StringIO
-from tests.helpers import create_image
-
 from filer import settings as filer_settings
 from filer.models.filemodels import File
+from tests.helpers import create_image
 
 
 class FilerCheckTestCase(TestCase):

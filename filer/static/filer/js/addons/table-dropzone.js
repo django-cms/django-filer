@@ -65,7 +65,12 @@ if (django.jQuery) {
             baseUrl = dropzoneBase.data('url');
             baseFolderTitle = dropzoneBase.data('folder-name');
 
-            $('body').data('url', baseUrl).data('folder-name', baseFolderTitle).addClass('js-filer-dropzone');
+            $('body')
+                .data('url', baseUrl)
+                .data('folder-name', baseFolderTitle)
+                .data('max-files', dropzoneBase.data('max-files'))
+                .data('max-filesize', dropzoneBase.data('max-files'))
+                .addClass('js-filer-dropzone');
         }
 
         Cl.mediator.subscribe('filer-upload-in-progress', destroyDropzones);
@@ -80,9 +85,8 @@ if (django.jQuery) {
                 var dropzoneInstance = new Dropzone(this, {
                     url: dropzoneUrl,
                     paramName: 'file',
-                    maxFiles: 100,
-                    // for now disabled as we don't have the correct file size limit
-                    // maxFilesize: dropzone.data(dataMaxFileSize) || 20, // MB
+                    maxFiles: parseInt(dropzone.data('max-files')) || 100,
+                    maxFilesize: parseInt(dropzone.data('max-filesize')),  // no default
                     previewTemplate: '<div></div>',
                     clickable: false,
                     addRemoveLinks: false,
@@ -129,12 +133,16 @@ if (django.jQuery) {
                         var folderTitle = $(dragEvent.target).closest(dropzoneSelector).data('folder-name');
                         var dropzoneFolder = dropzone.hasClass('js-filer-dropzone-folder');
                         var dropzoneBoundingRect = dropzone[0].getBoundingClientRect();
-                        var borderSize = $('.drag-hover-border').css('border-top-width');
+                        var topBorderSize = $('.drag-hover-border').css('border-top-width');
+                        var leftBorderSize = $('.drag-hover-border').css('border-left-width');
                         var dropzonePosition = {
                             top: dropzoneBoundingRect.top,
                             bottom: dropzoneBoundingRect.bottom,
-                            width: dropzoneBoundingRect.width,
-                            height: dropzoneBoundingRect.height - (parseInt(borderSize, 10) * 2)
+                            left: dropzoneBoundingRect.left,
+                            right: dropzoneBoundingRect.right,
+                            width: dropzoneBoundingRect.width - parseInt(leftBorderSize, 10) * 2,
+                            height: dropzoneBoundingRect.height - parseInt(topBorderSize, 10) * 2,
+                            display: 'block'
                         };
                         if (dropzoneFolder) {
                             dragHoverBorder.css(dropzonePosition);
@@ -199,14 +207,14 @@ if (django.jQuery) {
                             window.location.reload();
                         }
                     },
-                    error: function (file, errorText) {
+                    error: function (file, error) {
                         updateUploadNumber();
-                        if (errorText === 'duplicate') {
+                        if (error === 'duplicate') {
                             return;
                         }
                         hasErrors = true;
                         if (window.filerShowError) {
-                            window.filerShowError(file.name + ': ' + errorText);
+                            window.filerShowError(file.name + ': ' + error.message);
                         }
                     }
                 });

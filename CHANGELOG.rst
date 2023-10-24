@@ -2,6 +2,236 @@
 CHANGELOG
 =========
 
+3.1.0 (2023-10-01)
+==================
+
+* feat: limit uploaded image area (width x height) to prevent decompression
+  bombs
+* feat: Canonical URL action button now copies canonical URL to the user's
+  clipboard
+* fix: Run validators on updated files in file change view
+* fix: Update mime type if uploading file in file change view
+* fix: Do not allow to remove the file field from an uplaoded file in
+  the admin interface
+* fix: refactor upload checks into running validators in the admin
+  and adding clean methods for file and (abstract) image models.
+* Fixed two more instances of javascript int overflow issue (#1335)
+* fix: ensure uniqueness of icon admin url names
+* fix: Crash with django-storage if filer file does not have a
+  storage file attached
+
+3.0.6 (2023-09-08)
+==================
+
+* Re-add alphabetical sorting as default (fixes #1415) by @filipweidemann in https://github.com/django-cms/django-filer/pull/1416
+* fix: django-storage 1.14 complains about files being opened twice when copying by @fsbraun in https://github.com/django-cms/django-filer/pull/1418
+
+3.0.5 (2023-08-22)
+==================
+
+* Fix bug that ignored thumbnail storage custom settings in directory view
+* remove Django 2.2, 3.0, and 3.1 classifiers in setup.py
+* remove tests for Django < 3.2 since those versions are not supported anymore
+
+3.0.4 (2023-08-04)
+==================
+
+* Fix bug when submitting permission admin form
+* Fix folder select field css of permission admin form
+* Fix requirements (Django>=3.2) in setup.py and docs
+* Update Dutch, Spanish and French locale
+
+3.0.3 (2023-07-21)
+==================
+
+* Fix copy folder being broken after django-mptt removal by @protoroto in https://github.com/django-cms/django-filer/pull/1393
+* fix: crash in the file detail view by @vinitkumar in https://github.com/django-cms/django-filer/pull/1395
+* Fix: actions.js error thrown in js console by @fsbraun in https://github.com/django-cms/django-filer/pull/1397
+
+3.0.2 (2023-07-17)
+==================
+
+* Fix another bug when the the thumbnailer in admin tags crashes because of
+  invalid or missing file
+* Ensure action buttons in directory listing do not get disabled after using
+  cancel or back button if files or folders are selected.
+
+3.0.1 (2023-07-13)
+==================
+
+* Fix a bug that creates a server error when requesting a thumbnail from an
+  invalid or missing file
+* Fix a bug that on some systems webp images were not recognized
+* Add missing css map files
+
+3.0.0 (2023-07-05)
+==================
+
+* Add validation framework to prevent XSS attacks using HTML or SVG files (see docs)
+* Only show uncategorized files to the owner or superuser if permissions are active
+* Add an edit button to the file widget which opens edit file pop-up
+* Refactored directory list view for significant performance increases
+* Remove thumbnail generation from the directory list view request response cycle
+* Support for upload of webp images
+* Optional support for upload of heif images
+* Add Django 4.2 support
+* Add thumbnail view for faster visual management of image libraries
+* Fix File.objects.only() query required for deleting user who own files.
+* Fix several CSS quirks
+* Fix folder widget
+* Remove unused css from delete confirmation view and move file view
+* Add Pillow 10 compatibility
+* Update translations (de/fr/nl)
+* Drop Django 2.2, 3.0, and 3.1 support
+
+2.2.5 (2023-06-11)
+==================
+
+* Security patch (https://github.com/django-cms/django-filer/pull/1352):
+  While admin options shown correctly represented the user rights, some admin
+  end-points were available directly. A staff user without any permissions
+  could browse the filer folder structure, list files in a folder, add files,
+  and move files and folders.
+
+2.2.4 (2023-01-13)
+==================
+* Add Django 4.1 support
+* Add python 3.11 tests
+* Fix thumbnail generation for SVG images when used as a Divio addon.
+
+2.2.3 (2022-08-08)
+==================
+* Fix CSS styles (Modified SCSS had to be recompiled).
+
+
+2.2.2 (2022-08-02)
+==================
+* Fix #1305: Install django-filer with easy-thumbnail's optional SVG support.
+
+
+2.2.1 (2022-06-05)
+==================
+
+* Fix: Define a ``default_auto_field`` as part of the app config.
+
+
+2.2 (2022-04-20)
+================
+
+* Improve the list view of Folder permissions.
+* Fix: Folder permissions were disabled for descendants, if parent folder
+  has type set to CHILDREN.
+* The input field for Folder changes from a standard HTML select element to
+  a very wide autocomplete field, showing the complete path in Filer.
+* Fix: Upload invalid SVG file.
+* Add support for Python-3.10.
+* Switch theme for readthedocs to Furo.
+* Fix: 404 error when serving thumbnail.
+* Experimental support for Django-4.
+
+
+2.1.2 (2021-11-09)
+==================
+
+* In Folder permissions, make user and group autocomplete fields.
+* Extent testing matrix to Python-3.10.
+
+
+2.1.1 (2021-11-03)
+==================
+
+* Pin dependency for easy-thumbnails to version 2.8.0.
+
+
+2.1 (2021-11-03)
+================
+
+* Remove unused legacy CSS from project.
+* Remove legacy code for compatibility of old Django versions.
+* Improve PermissionAdmin performance:
+
+  * PermissionAdmin: filter by groups instead of users
+  * PermissionAdmin: allow to search via user, group or folder names
+  * PermissionAdmin: use prefetch_related to decrease number of DB queries
+
+* Fix #1234: Directory listing template conflicts with djangocms-admin-style
+  sidebar style.
+* Fix minor styling regressions introduced in 2.1rc2.
+* Fix #1227: Some icons were not aligned in the dropzone layout.
+* All file/image fields render the field label.
+* Fix #1232: Drag & drop of empty files results into Internal Server Error.
+* Add support for SVG images. They now are handled by the model
+  ``filer.imagemodels.Image`` and can be used whereever a pixel based image
+  was used. This includes scaling and cropping using existing thumbnailing
+  functionality from the
+  `easy-thumbnails <https://easy-thumbnails.readthedocs.io/en/latest/index.html>`_
+  library.
+* Drop support for high resolution images and remove ``retina.js`` from project.
+  High resolution images are handled by the HTML standard attribute in
+  ``<img srcset="..." ... />``.
+* In model ``filer.imagemodels.Image`` change ``_width`` and ``_height`` to
+  Django's ``FloatFields``; this because SVG images specify their image
+  extensions as floats rather than integers.
+* All icons for displaying folders, files (not images) have been replaced by
+  nicer looking SVG variants from `PaoMedia <https://paomedia.github.io/small-n-flat/>`_.
+* Increase size of thumbnails in the admin backend's list view from 25x25 to
+  40x40 pixels.
+* For local development switched to NodeJS version 14.
+* Add templatetag ``file_icon`` to ``file_admin_tags.py``. It now handles the
+  rendering of all file types, including folders, zip-files and missing files.
+* Remove pre-thumbnailing of images. Up to version 2.0, all images were scaled
+  immediatly after upload into many different sizes, most of which never were
+  used. Thumbnailing in the admin backend now is perfomerd lazily.
+* Uploaded audio can be listened at in their detail view.
+* Uploaded video files can be previewed in their detail view.
+* Fix scaling of very wide but short images – causing a division by zero
+  exception: ceil height to integer.
+* Add method ``exists()`` to ``MultiStorageFieldFile``, which checks if a file
+  exists on disk.
+* Drop support of Python-3.5 (Reason: Third party requirement
+  `reportlabs <https://www.reportlab.com/>`_ requires Python>=3.6).
+* Fix dropzone error callback for admin fields.
+* Fix #1247: Not owned files in unfiled folder can not be listed if perms are ON.
+* Fix #1184: OSError close file before deletion on file move.
+
+2.0.2 (2020-09-10)
+==================
+
+* Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
+* Fix #1211: On upload MIME-type is not set correctly.
+
+
+2.0.1 (2020-09-04)
+==================
+
+* Fixed NotNullViolation: null value in column "mime_type" in migration
+  ``filer.0012_file_mime_type.py``.
+
+
+2.0.0 (2020-09-03)
+==================
+
+* Added support for Django 3.1
+* Dropped support for Python 2.7 and Python 3.4
+* Dropped support for Django < 2.2
+* Changed the preferred way to do model registration via model inheritance
+  and ``mptt.AlreadyRegistered``, which is deprecated since django-mptt 0.4
+* Use dashed name for django-polymorphic dependency in setup.py
+* In ``models.File``, add field ``mime_type`` to store the Content-Type as set by
+  the browser during file upload
+* For extended Django Filer models, adopt the classmethod ``matches_file_type`` to its
+  new signature, this is a breaking change
+* Add attribute ``download`` to the download link in order to offer the file
+  under its original name
+
+
+1.7.1 (2020-04-29)
+==================
+
+* Fix problem with loading jquery.js after jquery.min.js had been loaded.
+* Fix usability: Upload files into most recently used folder, instead of
+  root folder.
+
 
 1.7.0 (2020-02-20)
 ==================
