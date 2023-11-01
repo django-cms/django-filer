@@ -10,6 +10,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='File',
             name='file',
-            field=models.MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=1024),
+            field=models.CharField(null=True, blank=True, db_index=True, max_length=1024),
         ),
     ]
