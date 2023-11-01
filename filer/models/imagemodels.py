@@ -9,7 +9,6 @@ except ImportError:
     except ImportError:
         raise ImportError("The Python Imaging Library was not found.")
 from datetime import datetime
-from django.urls import reverse
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -17,7 +16,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.utils.filer_easy_thumbnails import FilerThumbnailer
 from filer.utils.pil_exif import get_exif_for_file
 import os
 
@@ -36,7 +34,7 @@ class Image(File):
     }
     file_type = 'Image'
     _icon = "image"
-    _filename_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.ico']
+    _filename_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.ico', '.svg', '.webp']
 
     _height = models.IntegerField(null=True, blank=True)
     _width = models.IntegerField(null=True, blank=True)
@@ -44,17 +42,17 @@ class Image(File):
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
                                       editable=False)
 
-    default_alt_text = models.CharField(
-        _('default alt text'), max_length=255, blank=True, null=True,
+    default_alt_text = models.TextField(
+        _('default alt text'), blank=True, null=True,
         help_text=_('Describes the essence of the image for users who have '
                     'images turned off in their browser, or are visually '
                     'impaired and using a screen reader; and it is used to '
                     'identify images to search engines.'))
-    default_caption = models.CharField(
-        _('default caption'), max_length=255, blank=True, null=True,
+    default_caption = models.TextField(
+        _('default caption'), blank=True, null=True,
         help_text=_('Caption text is displayed directly below an image '
-                    'plugin to add context; there is a 140-character limit,'
-                    ' including spaces; for images fewer than 200 pixels '
+                    'plugin to add context; there is no character limit;'
+                    'for images fewer than 200 pixels '
                     'wide, the caption text is only displayed on hover.'))
     default_credit = models.CharField(
         _('default credit text'), max_length=255, blank=True, null=True,
@@ -95,10 +93,6 @@ class Image(File):
             raise ValidationError(
                 "Ensure default credit text has at most 30 characters ("
                 "%s characters found)." % len(self.default_credit))
-        if int(len(self.default_caption or '')) > 140:
-            raise ValidationError(
-                "Ensure default caption text has at most 140 characters ("
-                "%s characters found)." % len(self.default_caption))
         super(Image, self).clean()
 
     def save(self, *args, **kwargs):
