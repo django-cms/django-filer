@@ -113,7 +113,7 @@ class File(PolymorphicModel,
     _icon = "file"
     folder = models.ForeignKey('filer.Folder', verbose_name=_('folder'), related_name='all_files',
         null=True, blank=True, on_delete=models.deletion.CASCADE)
-    file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=255)
+    file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=1024)
     _file_size = models.IntegerField(_('file size'), null=True, blank=True)
 
     sha1 = models.CharField(_('sha1'), max_length=40, blank=True, default='')
