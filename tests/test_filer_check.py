@@ -9,6 +9,7 @@ from django.utils.module_loading import import_string
 
 from filer import settings as filer_settings
 from filer.models.filemodels import File
+from filer.models.imagemodels import Image
 from tests.helpers import create_image
 
 
@@ -69,9 +70,19 @@ class FilerCheckTestCase(TestCase):
         self.assertFalse(os.path.exists(orphan_file))
 
     def test_image_dimensions(self):
-        self.filer_file._width = 0
-        self.filer_file.save()
+
+        original_filename = 'testimage.jpg'
+        file_obj = SimpleUploadedFile(
+            name=original_filename,
+            content=create_image().tobytes(),
+            content_type='image/jpeg')
+        self.filer_image = Image.objects.create(
+            file=file_obj,
+            original_filename=original_filename)
+
+        self.filer_image._width = 0
+        self.filer_image.save()
 
         call_command('filer_check', image_dimensions=True)
-        self.filer_file.refresh_from_db()
-        self.assertFalse(self.filer_file._width == 0)
+        self.filer_image.refresh_from_db()
+        self.assertNotEqual(self.filer_image._width, 0)

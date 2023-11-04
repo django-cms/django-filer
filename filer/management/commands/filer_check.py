@@ -123,7 +123,12 @@ class Command(BaseCommand):
         walk(filer_public['UPLOAD_TO_PREFIX'])
 
     def image_dimensions(self, options):
+        from tests.utils.custom_image.models import Image
         from filer.models.imagemodels import Image
+        from django.db.models import Q
+        from easy_thumbnails.VIL import Image as VILImage
+        from filer.utils.compatibility import PILImage
+        import easy_thumbnails
 
         no_dimensions = Image.objects.filter(
             Q(_width=0) | Q(_width__isnull=True)
@@ -135,6 +140,11 @@ class Command(BaseCommand):
             except ValueError:
                 imgfile = image.file_ptr.file
             imgfile.seek(0)
-            image._width, image._height = VILImage.load(imgfile).size
+            if image.file.name.endswith('.svg'):
+                image._width, image._height = VILImage.load(imgfile).size
+            else:
+                pil_image = PILImage.open(imgfile)
+                self._width, self._height = pil_image.size
+                self._transparent = easy_thumbnails.utils.is_transparent(pil_image)
             image.save()
         return
