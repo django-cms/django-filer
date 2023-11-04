@@ -67,3 +67,11 @@ class FilerCheckTestCase(TestCase):
 
         call_command('filer_check', delete_orphans=True, interactive=False, verbosity=0)
         self.assertFalse(os.path.exists(orphan_file))
+
+    def test_image_dimensions(self):
+        self.filer_file._width = 0
+        self.filer_file.save()
+
+        call_command('filer_check', image_dimensions=True)
+        self.filer_file.refresh_from_db()
+        self.assertFalse(self.filer_file._width == 0)

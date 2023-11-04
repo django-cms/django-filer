@@ -42,6 +42,13 @@ class Command(BaseCommand):
             help="Delete references in database if files are missing in media folder.",
         )
         parser.add_argument(
+            '--image-dimensions',
+            action='store_true',
+            dest='image_dimensions',
+            default=False,
+            help="Look for images without dimensions set, set them accordingly.",
+        )
+        parser.add_argument(
             '--noinput',
             '--no-input',
             action='store_false',
@@ -72,6 +79,8 @@ class Command(BaseCommand):
                     self.stdout.write("Aborted: Delete orphaned files from storage.")
                     return
             self.verify_storages(options)
+        if options['image_dimensions']:
+            self.image_dimensions(options)
 
     def verify_references(self, options):
         from filer.models.filemodels import File
@@ -112,3 +121,20 @@ class Command(BaseCommand):
         filer_public = filer_settings.FILER_STORAGES['public']['main']
         storage = import_string(filer_public['ENGINE'])()
         walk(filer_public['UPLOAD_TO_PREFIX'])
+
+    def image_dimensions(self, options):
+        from filer.models.filemodels import Image
+
+        no_dimensions = Image.objects.filter(
+            Q(_width=0) | Q(_width__isnull=True)
+        )
+        self.stdout.write(f"trying to set dimensions on {no_dimensions.count()} files")
+        for image in no_dimensions:
+            try:
+                imgfile = image.file.file
+            except ValueError:
+                imgfile = image.file_ptr.file
+            imgfile.seek(0)
+            image._width, image._height = VILImage.load(imgfile).size
+            image.save()
+        return
