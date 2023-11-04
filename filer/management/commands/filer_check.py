@@ -123,7 +123,7 @@ class Command(BaseCommand):
         walk(filer_public['UPLOAD_TO_PREFIX'])
 
     def image_dimensions(self, options):
-        from filer.models.filemodels import Image
+        from filer.models.imagemodels import Image
 
         no_dimensions = Image.objects.filter(
             Q(_width=0) | Q(_width__isnull=True)
