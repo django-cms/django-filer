@@ -144,7 +144,7 @@ class Command(BaseCommand):
                 image._width, image._height = VILImage.load(imgfile).size
             else:
                 pil_image = PILImage.open(imgfile)
-                self._width, self._height = pil_image.size
-                self._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                image._width, image._height = pil_image.size
+                image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
             image.save()
         return
