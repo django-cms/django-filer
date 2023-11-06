@@ -1,6 +1,7 @@
 import os
 import shutil
 from io import StringIO
+from io import BytesIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
@@ -72,13 +73,16 @@ class FilerCheckTestCase(TestCase):
     def test_image_dimensions(self):
 
         original_filename = 'testimage.jpg'
-        file_obj = SimpleUploadedFile(
-            name=original_filename,
-            content=create_image().tobytes(),
-            content_type='image/jpeg')
-        self.filer_image = Image.objects.create(
-            file=file_obj,
-            original_filename=original_filename)
+        with BytesIO() as jpg:
+            create_image().save(jpg, format='JPEG')
+            jpg.seek(0)
+            file_obj = SimpleUploadedFile(
+                name=original_filename,
+                content=jpg.read(),
+                content_type='image/jpeg')
+            self.filer_image = Image.objects.create(
+                file=file_obj,
+                original_filename=original_filename)
 
         self.filer_image._width = 0
         self.filer_image.save()

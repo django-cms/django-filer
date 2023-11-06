@@ -143,8 +143,8 @@ class Command(BaseCommand):
             if image.file.name.endswith('.svg'):
                 image._width, image._height = VILImage.load(imgfile).size
             else:
-                pil_image = PILImage.open(imgfile)
-                image._width, image._height = pil_image.size
-                image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                with PILImage.open(imgfile) as pil_image:
+                    image._width, image._height = pil_image.size
+                    image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
             image.save()
         return
