@@ -3,6 +3,7 @@ import os
 from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
+from PIL import UnidentifiedImageError
 
 from filer import settings as filer_settings
 
@@ -135,16 +136,24 @@ class Command(BaseCommand):
         )
         self.stdout.write(f"trying to set dimensions on {no_dimensions.count()} files")
         for image in no_dimensions:
+            imgfile = None
+            if image.file_ptr:
+                file_holder = image.file_ptr
+            else:
+                file_holder = image
             try:
                 imgfile = image.file.file
-            except ValueError:
-                imgfile = image.file_ptr.file
-            imgfile.seek(0)
+                imgfile.seek(0)
+            except (FileNotFoundError):
+                continue
             if image.file.name.endswith('.svg'):
                 image._width, image._height = VILImage.load(imgfile).size
             else:
-                with PILImage.open(imgfile) as pil_image:
-                    image._width, image._height = pil_image.size
-                    image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                try:
+                    with PILImage.open(imgfile) as pil_image:
+                        image._width, image._height = pil_image.size
+                        image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                except UnidentifiedImageError:
+                    continue
             image.save()
         return

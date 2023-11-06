@@ -70,6 +70,32 @@ class FilerCheckTestCase(TestCase):
         call_command('filer_check', delete_orphans=True, interactive=False, verbosity=0)
         self.assertFalse(os.path.exists(orphan_file))
 
+    def test_image_dimensions_corrupted_file(self):
+        original_filename = 'testimage.jpg'
+        file_obj = SimpleUploadedFile(
+            name=original_filename,
+            # corrupted!
+            content=create_image().tobytes(),
+            content_type='image/jpeg')
+        self.filer_image = Image.objects.create(
+            file=file_obj,
+            original_filename=original_filename)
+
+        self.filer_image._width = 0
+        self.filer_image.save()
+
+        call_command('filer_check', image_dimensions=True)
+        self.filer_image.refresh_from_db()
+        self.assertNotEqual(self.filer_image._width, 1)
+
+    def test_image_dimensions_file_not_found(self):
+        self.filer_image = Image.objects.create(
+            file="123.jpg",
+            original_filename="123.jpg")
+        call_command('filer_check', image_dimensions=True)
+        self.filer_image.refresh_from_db()
+        self.assertNotEqual(self.filer_image._width, 1)
+
     def test_image_dimensions(self):
 
         original_filename = 'testimage.jpg'
