@@ -1,7 +1,6 @@
 import os
 import shutil
-from io import StringIO
-from io import BytesIO
+from io import BytesIO, StringIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command

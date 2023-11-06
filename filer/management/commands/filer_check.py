@@ -3,6 +3,7 @@ import os
 from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
+
 from PIL import UnidentifiedImageError
 
 from filer import settings as filer_settings
@@ -124,12 +125,13 @@ class Command(BaseCommand):
         walk(filer_public['UPLOAD_TO_PREFIX'])
 
     def image_dimensions(self, options):
-        from tests.utils.custom_image.models import Image
-        from filer.models.imagemodels import Image
         from django.db.models import Q
-        from easy_thumbnails.VIL import Image as VILImage
-        from filer.utils.compatibility import PILImage
+
         import easy_thumbnails
+        from easy_thumbnails.VIL import Image as VILImage
+
+        from filer.models.imagemodels import Image
+        from filer.utils.compatibility import PILImage
 
         no_dimensions = Image.objects.filter(
             Q(_width=0) | Q(_width__isnull=True)
@@ -142,7 +144,7 @@ class Command(BaseCommand):
             else:
                 file_holder = image
             try:
-                imgfile = image.file.file
+                imgfile = file_holder.file
                 imgfile.seek(0)
             except (FileNotFoundError):
                 continue
