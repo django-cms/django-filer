@@ -148,8 +148,10 @@ class Command(BaseCommand):
                 imgfile.seek(0)
             except (FileNotFoundError):
                 continue
-            if image.file.name.endswith('.svg'):
-                image._width, image._height = VILImage.load(imgfile).size
+            if image.file.name.lower().endswith('.svg'):
+                with VILImage.load(imgfile) as vil_image:
+                    # invalid svg doesnt throw errors
+                    image._width, image._height = vil_image.size
             else:
                 try:
                     with PILImage.open(imgfile) as pil_image:

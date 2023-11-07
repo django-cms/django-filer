@@ -14,6 +14,16 @@ from tests.helpers import create_image
 
 
 class FilerCheckTestCase(TestCase):
+
+    svg_file_string = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "
+    http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+    <svg version="1.1" baseProfile="full" width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+       <polygon id="triangle" points="0,0 0,50 50,0" fill="#009900"
+    stroke="#004400"/>
+       {}
+    </svg>"""
+
     def setUp(self):
         # ensure that filer_public directory is empty from previous tests
         storage = import_string(filer_settings.FILER_STORAGES['public']['main']['ENGINE'])()
@@ -82,10 +92,7 @@ class FilerCheckTestCase(TestCase):
 
         self.filer_image._width = 0
         self.filer_image.save()
-
         call_command('filer_check', image_dimensions=True)
-        self.filer_image.refresh_from_db()
-        self.assertNotEqual(self.filer_image._width, 1)
 
     def test_image_dimensions_file_not_found(self):
         self.filer_image = Image.objects.create(
@@ -93,7 +100,7 @@ class FilerCheckTestCase(TestCase):
             original_filename="123.jpg")
         call_command('filer_check', image_dimensions=True)
         self.filer_image.refresh_from_db()
-        self.assertNotEqual(self.filer_image._width, 1)
+        self.assertEqual(self.filer_image._width, 0)
 
     def test_image_dimensions(self):
 
@@ -108,6 +115,41 @@ class FilerCheckTestCase(TestCase):
             self.filer_image = Image.objects.create(
                 file=file_obj,
                 original_filename=original_filename)
+
+        self.filer_image._width = 0
+        self.filer_image.save()
+
+        call_command('filer_check', image_dimensions=True)
+        self.filer_image.refresh_from_db()
+        self.assertNotEqual(self.filer_image._width, 0)
+
+    def test_image_dimensions_invalid_svg(self):
+
+        original_filename = 'test.svg'
+        svg_file = bytes("<asdva>" + self.svg_file_string, "utf-8")
+        file_obj = SimpleUploadedFile(
+            name=original_filename,
+            content=svg_file,
+            content_type='image/svg+xml')
+        self.filer_image = Image.objects.create(
+            file=file_obj,
+            original_filename=original_filename)
+
+        self.filer_image._width = 0
+        self.filer_image.save()
+        call_command('filer_check', image_dimensions=True)
+
+    def test_image_dimensions_svg(self):
+
+        original_filename = 'test.svg'
+        svg_file = bytes(self.svg_file_string, "utf-8")
+        file_obj = SimpleUploadedFile(
+            name=original_filename,
+            content=svg_file,
+            content_type='image/svg+xml')
+        self.filer_image = Image.objects.create(
+            file=file_obj,
+            original_filename=original_filename)
 
         self.filer_image._width = 0
         self.filer_image.save()
