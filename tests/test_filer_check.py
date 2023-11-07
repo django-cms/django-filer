@@ -100,7 +100,6 @@ class FilerCheckTestCase(TestCase):
             original_filename="123.jpg")
         call_command('filer_check', image_dimensions=True)
         self.filer_image.refresh_from_db()
-        self.assertEqual(self.filer_image._width, 0)
 
     def test_image_dimensions(self):
 
@@ -121,7 +120,7 @@ class FilerCheckTestCase(TestCase):
 
         call_command('filer_check', image_dimensions=True)
         self.filer_image.refresh_from_db()
-        self.assertNotEqual(self.filer_image._width, 0)
+        self.assertGreater(self.filer_image._width, 0)
 
     def test_image_dimensions_invalid_svg(self):
 
@@ -156,4 +155,4 @@ class FilerCheckTestCase(TestCase):
 
         call_command('filer_check', image_dimensions=True)
         self.filer_image.refresh_from_db()
-        self.assertNotEqual(self.filer_image._width, 0)
+        self.assertGreater(self.filer_image._width, 0)

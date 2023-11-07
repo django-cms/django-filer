@@ -138,7 +138,6 @@ class Command(BaseCommand):
         )
         self.stdout.write(f"trying to set dimensions on {no_dimensions.count()} files")
         for image in no_dimensions:
-            imgfile = None
             if image.file_ptr:
                 file_holder = image.file_ptr
             else:
@@ -147,17 +146,18 @@ class Command(BaseCommand):
                 imgfile = file_holder.file
                 imgfile.seek(0)
             except (FileNotFoundError):
-                continue
-            if image.file.name.lower().endswith('.svg'):
-                with VILImage.load(imgfile) as vil_image:
-                    # invalid svg doesnt throw errors
-                    image._width, image._height = vil_image.size
+                pass
             else:
-                try:
-                    with PILImage.open(imgfile) as pil_image:
-                        image._width, image._height = pil_image.size
-                        image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
-                except UnidentifiedImageError:
-                    continue
-            image.save()
+                if image.file.name.lower().endswith('.svg'):
+                    with VILImage.load(imgfile) as vil_image:
+                        # invalid svg doesnt throw errors
+                        image._width, image._height = vil_image.size
+                else:
+                    try:
+                        with PILImage.open(imgfile) as pil_image:
+                            image._width, image._height = pil_image.size
+                            image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                    except UnidentifiedImageError:
+                        continue
+                image.save()
         return
