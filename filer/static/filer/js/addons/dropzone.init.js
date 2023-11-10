@@ -163,7 +163,8 @@ djQuery(function ($) {
 
         // Handle initialization of the dropzone on dynamic formsets (i.e. Django admin inlines)
         $(document).on('formset:added', function (ev, row) {
-            if(ev.detail && ev.detail.formsetName) {
+            var dropzones, rowIdx, row_;
+            if (ev.detail && ev.detail.formsetName) {
                 /*
                     Django 4.1 changed the event type being fired when adding
                     a new formset from a jQuery to a vanilla JavaScript event.
@@ -172,16 +173,17 @@ djQuery(function ($) {
                     In this case we find the newly added row and initialize the
                     dropzone on any dropzoneSelector on that row.
                 */
-                let rowIdx = parseInt(
+
+                rowIdx = parseInt(
                     document.getElementById(
                         'id_' + event.detail.formsetName + '-TOTAL_FORMS'
                     ).value, 10
                 ) - 1;
-                let row_ = document.getElementById(event.detail.formsetName + '-' + rowIdx);
-                var dropzones = $(row_).find(dropzoneSelector)
+                row_ = document.getElementById(event.detail.formsetName + '-' + rowIdx);
+                dropzones = $(row_).find(dropzoneSelector);
 
             } else {
-                var dropzones = $(row).find(dropzoneSelector);
+                dropzones = $(row).find(dropzoneSelector);
             }
 
             dropzones.each(createDropzone);
