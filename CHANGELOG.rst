@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+3.1.1 (2023-11-18)
+==================
+
+* fix: Added compatibility code in aldryn_config go support setting THUMBNAIL_DEFAULT_STORAGE in django 4.2
+* fix: address failing gulp ci jobs
+* feat: Image dimensions update management command
+* ci: pre-commit autoupdate
+
 3.1.0 (2023-10-01)
 ==================
 
