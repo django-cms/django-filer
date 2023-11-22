@@ -47,7 +47,12 @@ class Form(forms.BaseForm):
         # If the DEFAULT_FILE_STORAGE has been set to a value known by
         # aldryn-django, then use that as THUMBNAIL_DEFAULT_STORAGE as well.
         for storage_backend in storage.SCHEMES.values():
-            if storage_backend == settings['DEFAULT_FILE_STORAGE']:
+            # Process before django 4.2
+            if storage_backend == settings.get('DEFAULT_FILE_STORAGE', None):
+                settings['THUMBNAIL_DEFAULT_STORAGE'] = storage_backend
+                break
+            # Process django 4.2 and after
+            if storage_backend == settings.get('STORAGES', {}).get('default', {}).get('BACKEND', None):
                 settings['THUMBNAIL_DEFAULT_STORAGE'] = storage_backend
                 break
         return settings

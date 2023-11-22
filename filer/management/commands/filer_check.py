@@ -4,6 +4,8 @@ from django.core.files.storage import DefaultStorage
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 
+from PIL import UnidentifiedImageError
+
 from filer import settings as filer_settings
 
 
@@ -42,6 +44,13 @@ class Command(BaseCommand):
             help="Delete references in database if files are missing in media folder.",
         )
         parser.add_argument(
+            '--image-dimensions',
+            action='store_true',
+            dest='image_dimensions',
+            default=False,
+            help="Look for images without dimensions set, set them accordingly.",
+        )
+        parser.add_argument(
             '--noinput',
             '--no-input',
             action='store_false',
@@ -72,6 +81,8 @@ class Command(BaseCommand):
                     self.stdout.write("Aborted: Delete orphaned files from storage.")
                     return
             self.verify_storages(options)
+        if options['image_dimensions']:
+            self.image_dimensions(options)
 
     def verify_references(self, options):
         from filer.models.filemodels import File
@@ -112,3 +123,41 @@ class Command(BaseCommand):
         filer_public = filer_settings.FILER_STORAGES['public']['main']
         storage = import_string(filer_public['ENGINE'])()
         walk(filer_public['UPLOAD_TO_PREFIX'])
+
+    def image_dimensions(self, options):
+        from django.db.models import Q
+
+        import easy_thumbnails
+        from easy_thumbnails.VIL import Image as VILImage
+
+        from filer.models.imagemodels import Image
+        from filer.utils.compatibility import PILImage
+
+        no_dimensions = Image.objects.filter(
+            Q(_width=0) | Q(_width__isnull=True)
+        )
+        self.stdout.write(f"trying to set dimensions on {no_dimensions.count()} files")
+        for image in no_dimensions:
+            if image.file_ptr:
+                file_holder = image.file_ptr
+            else:
+                file_holder = image
+            try:
+                imgfile = file_holder.file
+                imgfile.seek(0)
+            except (FileNotFoundError):
+                pass
+            else:
+                if image.file.name.lower().endswith('.svg'):
+                    with VILImage.load(imgfile) as vil_image:
+                        # invalid svg doesnt throw errors
+                        image._width, image._height = vil_image.size
+                else:
+                    try:
+                        with PILImage.open(imgfile) as pil_image:
+                            image._width, image._height = pil_image.size
+                            image._transparent = easy_thumbnails.utils.is_transparent(pil_image)
+                    except UnidentifiedImageError:
+                        continue
+                image.save()
+        return

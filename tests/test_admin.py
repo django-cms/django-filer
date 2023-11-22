@@ -348,7 +348,7 @@ class FilerImageAdminUrlsTests(TestCase):
 
         self.assertContains(
             response,
-            f"""<img id="img" src="{ original_url }" onclick="this.classList.toggle('zoom')"/>"""
+            f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
         )
 
 
