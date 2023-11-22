@@ -3,7 +3,7 @@ import SearchIcon from './icons/search.svg';
 import {FinderSettings} from './FinderSettings';
 import {useCookie} from './Storage';
 
-const useSearchRealm = initial => useCookie('django-filer-search-realm', initial);
+const useSearchRealm = initial => useCookie('django-finder-search-realm', initial);
 
 
 function useSearchParam(key) : [string, (value: string) => any] {
@@ -100,7 +100,7 @@ export function SearchField(props) {
 		<input ref={searchRef} type="search" defaultValue={searchQuery} placeholder={gettext("Search for …")} onChange={handleSearch} onKeyDown={handleSearch} />
 		<div>
 			<span className="search-icon" onClick={handleSearch}><SearchIcon /></span>
-			<span className="search-realm" onClick={() => searchRealmRef.current.setAttribute('aria-expanded', searchRealmRef.current.ariaExpanded === 'true' ? 'false': 'true')} aria-haspopup="true" data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Restrict search")}>
+			<span className="search-realm" onClick={() => searchRealmRef.current.setAttribute('aria-expanded', searchRealmRef.current.ariaExpanded === 'true' ? 'false': 'true')} aria-haspopup="true" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Restrict search")}>
 				{renderSearchRealmOptions()}
 			</span>
 		</div>

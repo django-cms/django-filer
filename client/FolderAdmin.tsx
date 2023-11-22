@@ -21,7 +21,7 @@ import DownloadIcon from './icons/download.svg';
 import TrashIcon from './icons/trash.svg';
 import MoreVerticalIcon from './icons/more-vertical.svg';
 
-const useLayout = (initial: string) => useCookie('django-filer-layout', initial);
+const useLayout = (initial: string) => useCookie('django-finder-layout', initial);
 
 
 export default function FolderAdmin(props) {
@@ -287,6 +287,7 @@ export default function FolderAdmin(props) {
 			folderTabsRef={folderTabsRef}
 			openUploader={() => uploaderRef.current.openUploader()}
 			downloadFiles={downloadFiles}
+			layout={layout}
 			setLayout={setLayout}
 			setSearchResult={setSearchResult}
 		/>
@@ -305,6 +306,6 @@ export default function FolderAdmin(props) {
 				</DragOverlay>
 			</div>
 		</DndContext>
-		<Tooltip id="django-filer-tooltip" place="bottom-start" />
+		<Tooltip id="django-finder-tooltip" place="bottom-start" />
 	</>);
 }

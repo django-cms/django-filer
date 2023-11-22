@@ -10,20 +10,18 @@ insert_final_newline = true
 max_line_length = 80
 
 [*.py]
-max_line_length = 120
+max_line_length = 119
 quote_type = single
 
 [*.{scss,js,html}]
 max_line_length = 120
-indent_style = space
 quote_type = double
 
 [*.js]
-max_line_length = 120
 quote_type = single
 
-[*.rst]
-max_line_length = 80
+[*.md]
+max_line_length = 100
 
 [*.yml]
 indent_size = 2

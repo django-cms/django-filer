@@ -18,12 +18,12 @@ import AddFolderIcon from './icons/add-folder.svg';
 import DownloadIcon from './icons/download.svg';
 import UploadIcon from './icons/upload.svg';
 
-const useSorting = () => useCookie('django-filer-sorting', '');
+const useSorting = () => useCookie('django-finder-sorting', '');
 
 
 export const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const settings = useContext(FinderSettings);
-	const {currentFolderId, columnRefs, folderTabsRef, openUploader, downloadFiles, setLayout, setSearchResult} = props;
+	const {currentFolderId, columnRefs, folderTabsRef, openUploader, downloadFiles, layout, setLayout, setSearchResult} = props;
 	const sortingRef = useRef(null);
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
@@ -217,6 +217,10 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
+	function isActive(value) {
+		return layout === value ? 'active' : null;
+	}
+
 	console.log('MenuBar', numSelectedInodes, numSelectedFiles);
 
 	return (
@@ -225,24 +229,24 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 				<li className="search-field">
 					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} />
 				</li>
-				<li style={{marginLeft: 'auto'}} onClick={() => setLayout('tiles')} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Tiles view")}><TilesIcon /></li>
-				<li onClick={() => setLayout('mosaic')} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon /></li>
-				<li onClick={() => setLayout('list')} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("List view")}><ListIcon /></li>
-				<li onClick={() => setLayout('columns')} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Columns view")}><ColumnsIcon /></li>
-				<li className="sorting-dropdown" onClick={() => sortingRef.current.setAttribute('aria-expanded', sortingRef.current.ariaExpanded === 'true' ? 'false': 'true')} aria-haspopup="true" data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Change sorting order")}>
+				<li style={{marginLeft: 'auto'}} className={isActive('tiles')} onClick={() => setLayout('tiles')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Tiles view")}><TilesIcon /></li>
+				<li className={isActive('mosaic')} onClick={() => setLayout('mosaic')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon /></li>
+				<li className={isActive('list')} onClick={() => setLayout('list')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("List view")}><ListIcon /></li>
+				<li className={isActive('columns')} onClick={() => setLayout('columns')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}><ColumnsIcon /></li>
+				<li className="sorting-dropdown" onClick={() => sortingRef.current.setAttribute('aria-expanded', sortingRef.current.ariaExpanded === 'true' ? 'false': 'true')} aria-haspopup="true" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change sorting order")}>
 					<SortingIcon />
 					{renderSortingOptions()}
 				</li>
-				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Cut selected to clipboard")}><CutIcon /></li>
+				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Cut selected to clipboard")}><CutIcon /></li>
 				{settings.is_trash ? (
-					<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Empty trash folder")}><EraseIcon /></li>
+					<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Empty trash folder")}><EraseIcon /></li>
 				) : (<>
-					<li className={numSelectedInodes ? null : "disabled"} onClick={copyInodes} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Copy selected to clipboard")}><CopyIcon /></li>
-					<li className={clipboard.length === 0 ? "disabled" : null} onClick={pasteInodes} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Paste from clipboard")}><PasteIcon /></li>
-					<li className={numSelectedInodes ? null : "disabled"} onClick={deleteInodes} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Move selected to trash folder")}><TrashIcon /></li>
-					<li onClick={addFolder} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Add new folder")}><AddFolderIcon /></li>
-					<li className={numSelectedFiles ? null : "disabled"} onClick={downloadSelectedFiles} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Download selected files")}><DownloadIcon /></li>
-					<li onClick={openUploader} data-tooltip-id="django-filer-tooltip" data-tooltip-content={gettext("Upload files from local host")}><UploadIcon /></li>
+					<li className={numSelectedInodes ? null : "disabled"} onClick={copyInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Copy selected to clipboard")}><CopyIcon /></li>
+					<li className={clipboard.length === 0 ? "disabled" : null} onClick={pasteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Paste from clipboard")}><PasteIcon /></li>
+					<li className={numSelectedInodes ? null : "disabled"} onClick={deleteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Move selected to trash folder")}><TrashIcon /></li>
+					<li onClick={addFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Add new folder")}><AddFolderIcon /></li>
+					<li className={numSelectedFiles ? null : "disabled"} onClick={downloadSelectedFiles} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Download selected files")}><DownloadIcon /></li>
+					<li onClick={openUploader} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Upload files from local host")}><UploadIcon /></li>
 				</>)}
 			</ul>
 		</nav>

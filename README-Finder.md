@@ -11,6 +11,7 @@ Apart from the maintainability issues, using the File and Folder models was not 
 Extending the file model with a more specialized implementation was possible in theory, but so complicated that apart
 from the `ImageModel` no other implementations ever have been created.
 
+
 ## Less third-party dependencies
 
 The "Finder" branch of django-filer has less third-party dependencies. It does not depend on
@@ -144,6 +145,8 @@ displayed.
 The permission system will also be implemented using a different model. This probaly will orient itself on the
 Access Control Lists (ACLs) of [NTFS](https://learn.microsoft.com/en-us/windows/win32/secauthz/access-control-lists).
 This will allow to grant permissions to users and groups for each folder (but not file) individually.
+
+A quota system will be implemented, which allows to limit the amount of disk space a user can use.
 
 
 ## License

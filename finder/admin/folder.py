@@ -83,7 +83,7 @@ class FolderAdmin(InodeAdmin):
         return False
 
     def changelist_view(self, request, extra_context=None):
-        # always redirect the list view to the detail view of either the last used, ot the root folder
+        # always redirect the list view to the detail view of either the last used, or the root folder
         fallback_folder = self.get_fallback_folder(request)
         return HttpResponseRedirect(reverse(
             'admin:finder_foldermodel_change',
@@ -136,7 +136,7 @@ class FolderAdmin(InodeAdmin):
                 is_trash=False,
                 parent_url=parent_url,
             )
-            if not obj.is_root and not next(filter(lambda f: f['id'] == obj.id and f.get('is_pinned'), favorite_folders), None):
+            if not next(filter(lambda f: f['id'] == obj.id and f.get('is_pinned'), favorite_folders), None):
                 request.session['finder_last_folder_id'] = str(obj.id)
         else:
             context['finder_settings'].update(
@@ -182,7 +182,10 @@ class FolderAdmin(InodeAdmin):
         sorting = request.COOKIES.get('django-finder-sorting')
         if query := request.GET.get('q'):
             search_realm = request.COOKIES.get('django-finder-search-realm')
-            starting_folder = FolderModel.objects.root_folder if search_realm == 'everywhere' else current_folder
+            if search_realm == 'everywhere':
+                starting_folder = FolderModel.objects.get_root_folder(self.admin_site.name)
+            else:
+                starting_folder = current_folder
             inodes = self.search_for_inodes(starting_folder, query, sorting=sorting)
         else:
             inodes = self.get_inodes(parent=current_folder, sorting=sorting)

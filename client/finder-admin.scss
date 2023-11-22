@@ -38,6 +38,10 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					background-color: #e6e6e6;
 				}
 
+				&.active {
+					background-color: rgb(255, 255, 204);
+				}
+
 				&.disabled {
 					opacity: 0.5;
 					cursor: not-allowed;
@@ -180,14 +184,10 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					line-height: 32px;
 					font-size: 16px;
 
-					&.active {
-						background-color: rgb(255, 255, 204);
-
-						&::after {
-							content: "✔";
-							position: absolute;
-							right: 10px;
-						}
+					&.active::after {
+						content: "✔";
+						position: absolute;
+						right: 10px;
 					}
 				}
 			}
