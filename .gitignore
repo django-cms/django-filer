@@ -43,3 +43,6 @@ share/
 .python-version
 data
 local.sqlite
+
+workdir/
+finder/static/admin/finder/
