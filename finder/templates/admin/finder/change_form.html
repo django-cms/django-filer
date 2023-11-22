@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+	<a href="{% url 'admin:index' %}" title="{% translate 'Go back to' %} {% translate 'admin homepage' %}">{% translate "Home" %}</a>
+	&rsaquo; <a href="{% url 'admin:app_list' app_label='finder' %}" title="{% translate 'Go back to' %} {% translate 'Finder' %}"> {% translate "Finder" %}</a>
+	{% for breadcrumb in breadcrumbs %}
+	&rsaquo; {% if forloop.last %}
+		{{ breadcrumb.name }}
+		{% else %}
+		<a href="{{ breadcrumb.link }}">{{ breadcrumb.name }}</a>
+		{% endif %}
+	{% endfor %}
+</div>
+{% endblock %}
+
+
+{% block extrahead %}{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block footer %}
+{{ finder_settings|json_script:"finder-settings" }}
+{% endblock %}

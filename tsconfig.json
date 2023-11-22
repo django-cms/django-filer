@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "strict": false,
+    "esModuleInterop": false,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": false,
+    "importHelpers": true,
+    "rootDir": "./",
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "client/*.tsx",
+    "**/*.ts"
+  ]
+}

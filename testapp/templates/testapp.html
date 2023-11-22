@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"/>
+	<title>Django-Filer</title>
+	<link rel="icon" href="data:,">
+	<link href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+	<link href="{% static 'filer/admin/css/FilerAdmin.css' %}" rel="stylesheet">
+	<script type="module" src="{% static 'filer/admin/js/filer.js' %}"></script>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col col-md-8 mx-auto my-5">
+				<h1>Django Filer Demo</h1>
+				<div id="filer-admin"></div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

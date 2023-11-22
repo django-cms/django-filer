@@ -1,6 +1,12 @@
 {
-  "name": "filer",
+  "name": "django-filer",
+  "license": "MIT",
   "private": true,
+  "scripts": {
+    "esbuild": "node client/esbuild.cjs",
+    "compilescss": "sass --load-path=. client:finder/static/admin/finder/css/",
+    "buildall": "concurrently \"npm run esbuild -- --debug \" \"npm run compilescss\""
+  },
   "devDependencies": {
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
@@ -22,6 +28,15 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "phantomjs-prebuilt": "^2.1.7",
     "request": "^2.88.2",
-    "sass": "^1.63.4"
+    "sass": "^1.63.4",
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/modifiers": "^6.0.1",
+    "@types/react-dom": "^18.2.15",
+    "concurrently": "^8.2.0",
+    "esbuild": "^0.19.2",
+    "esbuild-plugin-svgr": "^2.1.0",
+    "react-tooltip": "^5.22.0",
+    "typescript": "^5.1.6",
+    "yargs-parser": "^21.1.1"
   }
 }
