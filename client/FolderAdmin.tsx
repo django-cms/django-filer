@@ -141,7 +141,8 @@ export default function FolderAdmin(props) {
 			return;
 		const sourceFolderId = active.data.current.folderId;
 		let inodes = columnRefs[sourceFolderId].current?.inodes ?? [];
-		const [what, targetFolderId] = over.id.split(':');
+		let [what, targetFolderId] = over.id.split(':');
+		targetFolderId = targetFolderId === 'parent' ? settings.parent_id : targetFolderId;
 		if (!draggedInodes.some(inode => [inode.id, inode.parent].includes(targetFolderId))) {
 			overlayRef.current.hidden = true;
 			if (what === 'download') {

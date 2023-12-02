@@ -40,6 +40,12 @@ function FolderTab(props) {
 		return classes.join(' ');
 	}
 
+	if (folder.id === 'parent') return (
+		<li ref={setNodeRef} className={cssClasses(folder)} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change to parent folder")}>
+			<a href={settings.parent_url}><UpIcon /></a>
+		</li>
+	);
+
 	if (folder.is_root) return (
 		<li ref={setNodeRef} className={cssClasses(folder)} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Root folder")}>
 		{!isActive || isSearchResult ? <a href={folder.change_url}><RootIcon /></a> : <RootIcon />}
@@ -96,9 +102,7 @@ export const FolderTabs = forwardRef((props: any, forwardedRef) => {
 
 	return (
 		<ul className="folder-tabs">
-			{settings.parent_url ? <li data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change to parent folder")}>
-				<a href={settings.parent_url}><UpIcon /></a>
-			</li> : null}
+			{settings.parent_id ? <FolderTab key={'parent'} folder={{id: 'parent'}} /> : null}
 			{isSearchResult ? <li className="active">{gettext("Search results")}</li> : null}
 			{favoriteFolders.filter(
 				folder => !isSearchResult || folder.is_pinned || folder.id !== settings.folder_id
