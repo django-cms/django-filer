@@ -69,7 +69,8 @@ class InodeManagerMixin:
 
 class InodeManager(InodeManagerMixin, models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('parent')
+        queryset = super().get_queryset().select_related('parent')
+        return queryset.filter(self.model.mime_types_query())
 
 
 class InodeModel(models.Model, metaclass=InodeMetaModel):

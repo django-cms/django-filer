@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'filer',
     'finder',
     'finder.contrib.image',
+    'finder.contrib.image.svg',
     'testapp',
 ]
 

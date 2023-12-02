@@ -1,5 +1,7 @@
 import hashlib
 import mimetypes
+from functools import reduce
+from operator import or_
 from pathlib import Path
 
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -114,6 +116,20 @@ class AbstractFileModel(InodeModel):
     @classmethod
     def generate_filename(cls, filename):
         return default_storage.generate_filename(filename).lower()
+
+    @classmethod
+    def mime_types_query(cls):
+        queries = []
+        for accept_mimetype in cls.accept_mime_types:
+            if accept_mimetype == '*/*':
+                queries.clear()
+                break
+            accept_mimetype_main, accept_mimetype_sub = accept_mimetype.split('/')
+            if accept_mimetype_sub == '*':
+                queries.append(models.Q(mime_type__startswith=f'{accept_mimetype_main}/'))
+            else:
+                queries.append(models.Q(mime_type=accept_mimetype))
+        return reduce(or_, queries, models.Q())
 
     def get_download_url(self):
         """

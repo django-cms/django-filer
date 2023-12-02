@@ -15,7 +15,9 @@ from finder.models.file import AbstractFileModel
 class ImageModel(AbstractFileModel):
     accept_mime_types = ['image/jpeg', 'image/webp', 'image/png', 'image/gif']
     data_fields = AbstractFileModel.data_fields + ['width', 'height']
-    filer_public_thumbnails = Path(filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir'])
+    filer_public_thumbnails = Path(
+        filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
+    )
     exif_values = set(ExifTags.Base.__members__.values())  # TODO: some values can be removed
     thumbnail_size = (180, 180)
 
@@ -54,22 +56,25 @@ class ImageModel(AbstractFileModel):
                 kwargs['update_fields'].append('meta_data')
         super().save(**kwargs)
 
-    def get_thumbnail_url(self):
+    def get_thumbnail_path(self):
         id = str(self.id)
         thumbnail_folder = self.filer_public_thumbnails / f'{id[0:2]}/{id[2:4]}/{id}'
         thumbnail_path = Path(self.file_name)
-        thumbnail_path = thumbnail_folder / '{stem}__{width}x{height}{suffix}'.format(
+        return thumbnail_folder / '{stem}__{width}x{height}{suffix}'.format(
             stem=thumbnail_path.stem,
             width=self.thumbnail_size[0],
             height=self.thumbnail_size[1],
             suffix=thumbnail_path.suffix,
         )
+
+    def get_thumbnail_url(self):
+        thumbnail_path = self.get_thumbnail_path()
         if not default_storage.exists(thumbnail_path):
             image = Image.open(default_storage.open(self.file_path))
             image = self.orientate_top(image)
             image = self.crop_square(image)
             image.thumbnail(self.thumbnail_size)
-            (default_storage.base_location / thumbnail_folder).mkdir(parents=True, exist_ok=True)
+            (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
             image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
         return default_storage.url(thumbnail_path)
 
