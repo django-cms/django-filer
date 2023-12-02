@@ -3,6 +3,8 @@ import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {FinderSettings} from './FinderSettings';
 
 
+const dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {timeStyle: 'short', dateStyle: 'short'});
+
 export function Inode(props) {
 	const {
 		attributes,
@@ -71,7 +73,6 @@ export function Inode(props) {
 export function ListItem(props) {
 	const settings = useContext(FinderSettings);
 	const [focusHandler, setFocusHandler] = useState(null);
-	const [name, setName] = useState(props.name);
 
 	function swallowEvent(event) {
 		event.stopPropagation();
@@ -111,7 +112,7 @@ export function ListItem(props) {
 
 	function timestamp(dateTime: string) {
 		const date = new Date(dateTime);
-		return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+		return dateTimeFormatter.format(date);
 	}
 
 	switch (props.layout) {
