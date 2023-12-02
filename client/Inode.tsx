@@ -79,12 +79,12 @@ export function ListItem(props) {
 	}
 
 	function handleFocus(event) {
-		// enforce two slow clicks to focus the textarea
-		if (!(event.target instanceof HTMLTextAreaElement))
+		if (!(event.target.contentEditable))
 			return;
 		if (!focusHandler) {
 			event.target.blur();
 		}
+		// enforce two slow clicks to focus the contenteditable element
 		setFocusHandler(window.setTimeout(() => {
 			if (focusHandler) {
 				window.clearTimeout(focusHandler);
@@ -93,17 +93,14 @@ export function ListItem(props) {
 		}, 2000));
 	}
 
-	function changeName(event) {
-		setName(event.target.value);
-	}
-
 	async function updateName(event) {
+		if (!(event.target.contentEditable))
+			return;
 		const enterKey = event.type === 'keydown' && event.key === 'Enter';
 		if (event.type === 'blur' || enterKey) {
-			if (name !== props.name) {
-				if (!await props.updateInode({...props, name: name})) {
-					setName(props.name);
-				}
+			const editedName = event.target.innerText.trim();
+			if (editedName !== props.name) {
+				await props.updateInode({...props, name: editedName});
 			}
 			if (enterKey) {
 				event.preventDefault();
@@ -123,11 +120,9 @@ export function ListItem(props) {
 				<figure>
 					<img src={props.thumbnail_url} />
 					<figcaption>
-						{settings.is_trash ? (
-						<span>{props.name}</span>
-						) : (
-						<textarea name={`inode-${props.id}`} value={name} onClick={swallowEvent} onFocus={handleFocus} onChange={changeName} onBlur={updateName} onKeyDown={updateName}></textarea>
-						)}
+						<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+							{props.name}
+						</div>
 					</figcaption>
 				</figure>
 			);
@@ -137,11 +132,9 @@ export function ListItem(props) {
 					<img src={props.thumbnail_url} />
 				</div>
 				<div>
-				{settings.is_trash ? (
-					props.name
-				) : (
-					<textarea name={`inode-${props.id}`} value={name} onClick={swallowEvent} onFocus={handleFocus} onChange={changeName} onBlur={updateName} onKeyDown={updateName}></textarea>
-				)}
+					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+						{props.name}
+					</div>
 				</div>
 				<div>
 					{props.owner_name}
@@ -159,11 +152,9 @@ export function ListItem(props) {
 					<img src={props.thumbnail_url} />
 				</div>
 				<div>
-				{settings.is_trash ? (
-					props.name
-				) : (
-					<textarea name={`inode-${props.id}`} value={name} onClick={swallowEvent} onFocus={handleFocus} onChange={changeName} onBlur={updateName} onKeyDown={updateName}></textarea>
-				)}
+					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+						{props.name}
+					</div>
 				</div>
 			</>);
 	}
