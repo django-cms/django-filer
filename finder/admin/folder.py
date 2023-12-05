@@ -106,11 +106,10 @@ class FolderAdmin(InodeAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
         favorite_folders = self.get_favorite_folders(request, obj)
-        ancestors = self.get_ancestors(request, obj)
-        if isinstance(ancestors, QuerySet):
-            ancestor_ids = list(ancestors.values_list('id', flat=True))
+        if isinstance(obj.ancestors, QuerySet):
+            ancestor_ids = list(obj.ancestors.values_list('id', flat=True))
         else:
-            ancestor_ids = [ancestor.id for ancestor in ancestors]
+            ancestor_ids = [ancestor.id for ancestor in obj.ancestors]
         context.update(
             finder_settings=dict(
                 folder_id=obj.id,
@@ -194,47 +193,15 @@ class FolderAdmin(InodeAdmin):
         })
 
     def search_for_inodes(self, starting_folder, query, sorting=None):
-        def traverse(folder):
-            for inode in folder.listdir():
-                if inode.is_folder:
-                    yield from traverse(inode)
-            yield folder
-
-        def make_descendant_cte(cte):
-            return FolderModel.objects.filter(
-                id=starting_folder.id,
-            ).values('id').union(
-                cte.join(
-                    FolderModel,
-                    parent_id=cte.col.id
-                ).values('id'),
-                all=True,
-            )
-
-        try:
-            from django_cte import With
-        except ImportError:
-            # traversing the tree folder by folder (slow)
-            inodes = []
-            for folder in traverse(starting_folder):
-                inodes.extend(self.get_inodes(
-                    parent=folder,
-                    sorting=sorting,
-                    name__icontains=query,
-                ))
+        if isinstance(starting_folder.descendants, QuerySet):
+            parent_ids = Subquery(starting_folder.descendants.values('id'))
         else:
-            # traversing the tree using a recursive CTE (fast)
-            descendant_cte = With.recursive(make_descendant_cte)
-            folders_qs = descendant_cte.join(
-                FolderModel, id=descendant_cte.col.id
-            ).with_cte(descendant_cte)
-            inodes = self.get_inodes(
-                sorting=sorting,
-                parent_id__in=Subquery(folders_qs.values('id')),
-                name__icontains=query,
-            )
-
-        return inodes
+            parent_ids = [descendant.id for descendant in starting_folder.descendants]
+        return self.get_inodes(
+            sorting=sorting,
+            parent_id__in=parent_ids,
+            name__icontains=query,
+        )
 
     def upload_files(self, request, folder_id):
         if request.method != 'POST':

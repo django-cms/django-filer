@@ -125,3 +125,12 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     def __str__(self):
         return self.name
+
+    @cached_property
+    def pretty_path(self):
+        names = []
+        if self.parent:
+            names.extend(a.name for a in self.parent.ancestrors)
+        names.append(self.name)
+        return " / ".join(names)
+

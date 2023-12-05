@@ -124,35 +124,7 @@ class InodeAdmin(admin.ModelAdmin):
             inodes.sort(key=applicable_sorting[2], reverse=applicable_sorting[3])
         return inodes
 
-    def get_ancestors(self, request, folder):
-        def make_ascendant_cte(cte):
-            return FolderModel.objects.filter(
-                id=folder.id,
-            ).values('id', 'parent_id').union(
-                cte.join(
-                    FolderModel,
-                    id=cte.col.parent_id
-                ).values('id', 'parent_id'),
-                all=True,
-            )
-
-        try:
-            from django_cte import With
-        except ImportError:
-            ancestors = []
-            while folder:
-                ancestors.append(folder)
-                folder = folder.parent
-            return ancestors
-        else:
-            ascendant_cte = With.recursive(make_ascendant_cte)
-            ancestor_qs = ascendant_cte.join(
-                FolderModel, id=ascendant_cte.col.id
-            ).with_cte(ascendant_cte)
-            return ancestor_qs
-
-    def get_breadcrumbs(self, request, obj):
-        ancestors = self.get_ancestors(request, obj)
+    def get_breadcrumbs(self, obj):
         breadcrumbs = [{
             'link': reverse(
                 'admin:finder_foldermodel_change',
@@ -160,13 +132,13 @@ class InodeAdmin(admin.ModelAdmin):
                 current_app=self.admin_site.name,
             ),
             'name': str(folder),
-        } for folder in ancestors]
+        } for folder in obj.ancestors]
         breadcrumbs.reverse()
         return breadcrumbs
 
     def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
         context.update(
-            breadcrumbs=self.get_breadcrumbs(request, obj),
+            breadcrumbs=self.get_breadcrumbs(obj),
         )
         return TemplateResponse(
             request,

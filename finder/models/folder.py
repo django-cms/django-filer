@@ -57,6 +57,67 @@ class FolderModel(InodeModel):
         num_children = sum(inode_model.objects.filter(parent=self).count() for inode_model in InodeModel.all_models)
         return num_children
 
+    @cached_property
+    def ancestors(self):
+        def make_ascendant_cte(cte):
+            return self.__class__.objects.filter(
+                id=self.id,
+            ).values('id', 'parent_id').union(
+                cte.join(
+                    self.__class__,
+                    id=cte.col.parent_id
+                ).values('id', 'parent_id'),
+                all=True,
+            )
+
+        try:
+            from django_cte import With
+        except ImportError:
+            # traversing the tree folder by folder (slow)
+            folder, ancestors = self, []
+            while folder:
+                ancestors.append(folder)
+                folder = folder.parent
+            return ancestors
+        else:
+            # traversing the tree using a recursive CTE (fast)
+            ascendant_cte = With.recursive(make_ascendant_cte)
+            ancestor_qs = ascendant_cte.join(
+                FolderModel, id=ascendant_cte.col.id
+            ).with_cte(ascendant_cte)
+            return ancestor_qs
+
+    @cached_property
+    def descendants(self):
+        def traverse(folder):
+            for inode in folder.listdir():
+                if inode.is_folder:
+                    yield from traverse(inode)
+            yield folder
+
+        def make_descendant_cte(cte):
+            return self.__class__.objects.filter(
+                id=self.id,
+            ).values('id').union(
+                cte.join(
+                    self.__class__,
+                    parent_id=cte.col.id
+                ).values('id'),
+                all=True,
+            )
+
+        try:
+            from django_cte import With
+        except ImportError:
+            # traversing the tree folder by folder (slow)
+            return traverse(self)
+        else:
+            # traversing the tree using a recursive CTE (fast)
+            descendant_cte = With.recursive(make_descendant_cte)
+            return descendant_cte.join(
+                self.__class__, id=descendant_cte.col.id
+            ).with_cte(descendant_cte)
+
     @property
     def is_root(self):
         return self.parent is None and self.name == '__root__'
