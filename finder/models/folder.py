@@ -3,7 +3,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
 try:
     from django_cte import CTEManager as ModelManager
@@ -131,7 +131,10 @@ class FolderModel(InodeModel):
         num_inodes = self.num_children
         num_folders = self._meta.model.objects.filter(parent_id=self.id).count()
         num_files = num_inodes - num_folders
-        return gettext("{num_folders} Folders, {num_files} Files".format(num_folders=num_folders, num_files=num_files))
+        return ", ".join((
+            ngettext("{} Folder", "{} Folders", num_folders).format(num_folders),
+            ngettext("{} File", "{} Files", num_files).format(num_files),
+        ))
 
     def get_download_url(self):
         return None
