@@ -1,6 +1,6 @@
 import hashlib
 import mimetypes
-from functools import reduce
+from functools import lru_cache, reduce
 from operator import or_
 from pathlib import Path
 
@@ -64,7 +64,6 @@ class FileModelManager(InodeManager):
 
 
 class AbstractFileModel(InodeModel):
-    accept_mime_types = ['*/*']
     data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type']
     filer_public = Path(filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
 
@@ -118,6 +117,7 @@ class AbstractFileModel(InodeModel):
         return default_storage.generate_filename(filename).lower()
 
     @classmethod
+    @lru_cache
     def mime_types_query(cls):
         queries = []
         for accept_mimetype in cls.accept_mime_types:
@@ -185,120 +185,7 @@ class AbstractFileModel(InodeModel):
 
 
 class FileModel(AbstractFileModel):
-    def file_data_changed(self, post_init=False):
-        """
-        This is called whenever self.file changes (including initial set in __init__).
-        MultiStorageFileField has a custom descriptor which calls this function when
-        field value is changed.
-        Returns True if data related attributes were updated, False otherwise.
-        """
-        if self._file_data_changed_hint is not None:
-            data_changed_hint = self._file_data_changed_hint
-            self._file_data_changed_hint = None
-            if not data_changed_hint:
-                return False
-        if post_init and self._file_size and self.sha1:
-            # When called from __init__, only update if values are empty.
-            # This makes sure that nothing is done when instantiated from db.
-            return False
-        # cache the file size
-        try:
-            self._file_size = self.file.size
-        except:   # noqa
-            self._file_size = None
-        # generate SHA1 hash
-        try:
-            self.generate_sha1()
-        except Exception:
-            self.sha1 = ''
-        return True
-
-    def _move_file(self):
-        """
-        Move the file from src to dst.
-        """
-        src_file_name = self.file.name
-        dst_file_name = self._meta.get_field('file').generate_filename(
-            self, self.original_filename)
-
-        if self.is_public:
-            src_storage = self.file.storages['private']
-            dst_storage = self.file.storages['public']
-        else:
-            src_storage = self.file.storages['public']
-            dst_storage = self.file.storages['private']
-
-        # delete the thumbnail
-        # We are toggling the is_public to make sure that easy_thumbnails can
-        # delete the thumbnails
-        self.is_public = not self.is_public
-        self.file.delete_thumbnails()
-        self.is_public = not self.is_public
-        # This is needed because most of the remote File Storage backend do not
-        # open the file.
-        src_file = src_storage.open(src_file_name)
-        # Context manager closes file after reading contents
-        with src_file.open() as f:
-            content_file = ContentFile(f.read())
-        # hint file_data_changed callback that data is actually unchanged
-        self._file_data_changed_hint = False
-        self.file = dst_storage.save(dst_file_name, content_file)
-        src_storage.delete(src_file_name)
-
-    def _copy_file(self, destination, overwrite=False):
-        """
-        Copies the file to a destination files and returns it.
-        """
-
-        if overwrite:
-            # If the destination file already exists default storage backend
-            # does not overwrite it but generates another filename.
-            # TODO: Find a way to override this behavior.
-            raise NotImplementedError
-
-        src_file_name = self.file.name
-        storage = self.file.storages['public' if self.is_public else 'private']
-
-        # This is needed because most of the remote File Storage backend do not
-        # open the file.
-        src_file = storage.open(src_file_name)
-        src_file.open()
-        return storage.save(destination, ContentFile(src_file.read()))
-
-    @property
-    def label(self):
-        if self.name in ['', None]:
-            text = self.original_filename or 'unnamed file'
-        else:
-            text = self.name
-        text = "%s" % (text,)
-        return text
-
-    def __lt__(self, other):
-        return self.label.lower() < other.label.lower()
-
-    def has_edit_permission(self, request):
-        return self.has_generic_permission(request, 'edit')
-
-    def has_read_permission(self, request):
-        return self.has_generic_permission(request, 'read')
-
-    def has_add_children_permission(self, request):
-        return self.has_generic_permission(request, 'add_children')
-
-    def has_generic_permission(self, request, permission_type):
-        """
-        Return true if the current user has permission on this
-        image. Return the string 'ALL' if the user has all rights.
-        """
-        user = request.user
-        if not user.is_authenticated:
-            return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
-            return True
-        elif self.folder:
-            return self.folder.has_generic_permission(request, permission_type)
-        else:
-            return False
+    """
+    Fallback model for all files that do not match any other model.
+    """
+    accept_mime_types = ['*/*']
