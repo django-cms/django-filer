@@ -15,6 +15,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
+from finder.models.inode import DiscardedInode
 
 from .inode import InodeAdmin
 
@@ -281,6 +282,10 @@ class FolderAdmin(InodeAdmin):
         try:
             inode_ids = body.get('inode_ids', [])
             for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
+                try:
+                    DiscardedInode.objects.get(inode=inode.id).delete()
+                except DiscardedInode.DoesNotExist:
+                    pass
                 inode.parent = target_folder
                 inode.validate_constraints()
                 inode.save(update_fields=['parent'])
@@ -300,6 +305,10 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseBadRequest("Cannot move inodes from trash folder into itself.")
         inode_ids = body.get('inode_ids', [])
         for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
+            DiscardedInode.objects.create(
+                inode=inode.id,
+                previous_parent=inode.parent,
+            )
             inode.parent = trash_folder
             inode.save(update_fields=['parent'])
             if inode.is_folder:
@@ -313,6 +322,7 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
         trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
         for inode in trash_folder.listdir():
+            DiscardedInode.objects.get(inode=inode.id).delete()
             inode.delete()
         fallback_folder = self.get_fallback_folder(request)
         return JsonResponse({

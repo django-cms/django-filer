@@ -134,3 +134,17 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         names.append(self.name)
         return " / ".join(names)
 
+
+class DiscardedInode(models.Model):
+    inode = models.UUIDField(
+        primary_key=True,
+    )
+    previous_parent = models.ForeignKey(
+        'finder.FolderModel',
+        related_name='+',
+        on_delete=models.CASCADE,
+    )
+    deleted_at = models.DateTimeField(
+        _("Deleted at"),
+        auto_now_add=True,
+    )
