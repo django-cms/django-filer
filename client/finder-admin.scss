@@ -85,7 +85,6 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 							}
 
 							.search-icon {
-								margin-right: 15px;
 								svg {
 									transform: scale(0.8);
 								}
@@ -100,10 +99,6 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 										margin-bottom: 4px;
 									}
 								}
-
-								&::after {
-									right: 2px;
-								}
 							}
 						}
 					}
@@ -116,6 +111,7 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 				&.sorting-dropdown {
 					margin-left: auto;
 					margin-right: auto;
+					width: auto;
 
 					&::after {
 						right: -12px;
@@ -147,14 +143,12 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 
 			[aria-haspopup="true"] {
 				position: relative;
+				display: flex;
 				&::after {
-					content: "";
-					position: absolute;
-					top: calc(50% - 2px);
+					content: " ";
+					align-self: center;
 					border: 5px solid transparent;
 					border-top-color: black;
-					width: 0;
-					height: 0;
 				}
 			}
 
@@ -417,30 +411,23 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					color: rgb(255, 255, 204);
 					background-color: rgb(65, 118, 144);
 					outline: 1px solid darken(rgb(65, 118, 144), 50%);
-					textarea {
-						color: rgb(255, 255, 204);
-					}
 				}
 
-				textarea {
-					border: none;
-					background-color: transparent;
-					margin: 0;
-					width: 100%;
-					height: 100%;
-					overflow: hidden;
-					resize: none;
-					box-sizing: border-box;
-					font-size: inherit;
-					list-style: inherit;
+				div.inode-name {
+					margin-top: 2px;
+					padding: 3px 0 2px;
+					border-radius: 3px;
 
 					&:focus-visible {
 						background-color: white;
+						outline: 1px solid rgb(50, 150, 250);
+						box-shadow: rgb(50, 150, 250) 0 0 5px;
 					}
 				}
 			}
 
 			&.selected:nth-child(n) .inode {
+				box-shadow: rgb(210, 210, 112) 0 0 5px;
 				outline: 1px dotted rgb(210, 210, 112);
 				background-color: rgb(250, 250, 210);
 			}
@@ -593,6 +580,14 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					background-color: white;
 				}
 
+				&:has(>div>div.parent) {
+					border-top: $follow-folder-border;
+					border-left: $follow-folder-border;
+					border-bottom: $follow-folder-border;
+					border-top-left-radius: 5px;
+					border-bottom-left-radius: 5px;
+				}
+
 				.inode {
 					display: grid;
 					gap: 2px;
@@ -601,21 +596,14 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					position: relative;
 					box-sizing: border-box;
 
-					&.parent {
-						border-top: $follow-folder-border;
-						border-left: $follow-folder-border;
-						border-bottom: $follow-folder-border;
-						border-top-left-radius: 5px;
-						border-bottom-left-radius: 5px;
-						&::after {
-							position: absolute;
-							right: 0;
-							content: " ";
-							width: 32px;
-							height: 32px;
-							background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(192, 192, 192)"><path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z"></path></svg>');
-							background-repeat: no-repeat;
-						}
+					&.parent::after {
+						position: absolute;
+						right: 0;
+						content: " ";
+						width: 32px;
+						height: 32px;
+						background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(192, 192, 192)"><path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z"></path></svg>');
+						background-repeat: no-repeat;
 					}
 
 					div {
