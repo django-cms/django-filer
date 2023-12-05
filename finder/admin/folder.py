@@ -134,6 +134,7 @@ class FolderAdmin(InodeAdmin):
             context['finder_settings'].update(
                 is_root=obj.is_root,
                 is_trash=False,
+                parent_id=obj.parent_id,
                 parent_url=parent_url,
             )
             if not next(filter(lambda f: f['id'] == obj.id and f.get('is_pinned'), favorite_folders), None):
