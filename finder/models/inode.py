@@ -1,9 +1,11 @@
+import re
 import uuid
 from itertools import chain
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 
@@ -73,6 +75,13 @@ class InodeManager(InodeManagerMixin, models.Manager):
         return queryset.filter(self.model.mime_types_query())
 
 
+def filename_validator(value):
+    pattern = re.compile(r"/^(?!.{256,})(?!(aux|clock\$|con|nul|prn|com[1-9]|lpt[1-9])(?:$|\.))[^ ][ \.\w-$()+=[\];#@~,&amp;']+[^\. ]$/i")
+    if not pattern.match(value):
+        msg = "'{filename}' is not a valid filename."
+        raise ValidationError(msg.format(filename=value))
+
+
 class InodeModel(models.Model, metaclass=InodeMetaModel):
     is_folder = False
     data_fields = ['id', 'name', 'parent', 'created_at', 'last_modified_at']
@@ -104,6 +113,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         max_length=255,
         verbose_name=_("Name"),
         db_index=True,
+        validators=[filename_validator],
     )
     created_at = models.DateTimeField(
         _("Created at"),
