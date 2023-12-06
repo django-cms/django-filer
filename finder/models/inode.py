@@ -136,6 +136,13 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     def __str__(self):
         return self.name
 
+    @property
+    def ancestors(self):
+        """
+        Returns a queryset of all ancestor folders starting from the parent folder.
+        """
+        return self.parent.ancestors
+
     @cached_property
     def pretty_path(self):
         names = []

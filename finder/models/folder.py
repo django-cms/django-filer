@@ -59,6 +59,9 @@ class FolderModel(InodeModel):
 
     @cached_property
     def ancestors(self):
+        """
+        Returns a queryset of all ancestor folders including the current folder.
+        """
         def make_ascendant_cte(cte):
             return self.__class__.objects.filter(
                 id=self.id,
@@ -83,12 +86,15 @@ class FolderModel(InodeModel):
             # traversing the tree using a recursive CTE (fast)
             ascendant_cte = With.recursive(make_ascendant_cte)
             ancestor_qs = ascendant_cte.join(
-                FolderModel, id=ascendant_cte.col.id
+                self.__class__, id=ascendant_cte.col.id
             ).with_cte(ascendant_cte)
             return ancestor_qs
 
     @cached_property
     def descendants(self):
+        """
+        Returns a queryset of all descendant folders including the current folder.
+        """
         def traverse(folder):
             for inode in folder.listdir():
                 if inode.is_folder:
