@@ -16,6 +16,7 @@ import TrashIcon from './icons/trash.svg';
 import EraseIcon from './icons/erase.svg';
 import AddFolderIcon from './icons/add-folder.svg';
 import DownloadIcon from './icons/download.svg';
+import UndoIcon from './icons/undo.svg';
 import UploadIcon from './icons/upload.svg';
 
 const useSorting = () => useCookie('django-finder-sorting', '');
@@ -202,6 +203,28 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		current.deselectinodes();
 	}
 
+	async function undoDiscardInodes() {
+		const current = columnRefs[currentFolderId].current;
+		const inodeIds = current.inodes.filter(inode => inode.selected).map(inode => inode.id);
+		if (inodeIds.length === 0)
+			return;
+
+		const fetchUrl = `${settings.base_url}undo_discard`;
+		const response = await fetch(fetchUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': settings.csrf_token,
+			},
+			body: JSON.stringify({inode_ids: inodeIds}),
+		});
+		if (response.ok) {
+			current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+		} else {
+			console.error(response);
+		}
+	}
+
 	async function eraseTrashFolder() {
 		const fetchUrl = `${settings.base_url}erase_trash_folder`;
 		const response = await fetch(fetchUrl, {
@@ -238,9 +261,10 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 					{renderSortingOptions()}
 				</li>
 				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Cut selected to clipboard")}><CutIcon /></li>
-				{settings.is_trash ? (
+				{settings.is_trash ? (<>
+					<li className={numSelectedInodes ? null : "disabled"} onClick={undoDiscardInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Undo discarding files/folders")}><UndoIcon /></li>
 					<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Empty trash folder")}><EraseIcon /></li>
-				) : (<>
+				</>) : (<>
 					<li className={numSelectedInodes ? null : "disabled"} onClick={copyInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Copy selected to clipboard")}><CopyIcon /></li>
 					<li className={clipboard.length === 0 ? "disabled" : null} onClick={pasteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Paste from clipboard")}><PasteIcon /></li>
 					<li className={numSelectedInodes ? null : "disabled"} onClick={deleteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Move selected to trash folder")}><TrashIcon /></li>

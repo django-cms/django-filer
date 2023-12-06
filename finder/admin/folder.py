@@ -65,6 +65,10 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.delete_inodes),
             ),
             path(
+                'undo_discard',
+                self.admin_site.admin_view(self.undo_discarded_inodes),
+            ),
+            path(
                 'erase_trash_folder',
                 self.admin_site.admin_view(self.erase_trash_folder),
             ),
@@ -317,6 +321,18 @@ class FolderAdmin(InodeAdmin):
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
+
+    def undo_discarded_inodes(self, request):
+        if request.method != 'POST':
+            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
+        body = json.loads(request.body)
+        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
+        for inode in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):
+            inode.parent = discarded_inodes.get(inode=inode.id).previous_parent
+            inode.save(update_fields=['parent'])
+        discarded_inodes.delete()
+        return HttpResponse()
 
     def erase_trash_folder(self, request):
         if request.method != 'DELETE':
