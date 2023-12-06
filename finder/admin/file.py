@@ -23,8 +23,8 @@ class FileAdmin(InodeAdmin):
     def get_ancestors(self, request, obj):
         return super().get_ancestors(request, obj.folder)
 
-    def get_breadcrumbs(self, request, obj):
-        breadcrumbs = super().get_breadcrumbs(request, obj)
+    def get_breadcrumbs(self, obj):
+        breadcrumbs = super().get_breadcrumbs(obj)
         breadcrumbs.append({
             'link': None,
             'name': str(obj),
