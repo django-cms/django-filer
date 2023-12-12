@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {createRef, useContext, useEffect, useState} from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {FinderSettings} from './FinderSettings';
 
@@ -15,7 +15,28 @@ export function Inode(props) {
 		data: props,
 		disabled: props.disabled,
 	});
-	const [clickHandler, setClickHandler] = useState(null);
+	const [event, setEvent] = useState<PointerEvent>();
+
+	useEffect(
+		() => {
+			if (!event)
+				return;
+			const timer = setTimeout(() => {
+				if (event.detail === 1) {
+					props.listRef.current.selectInode(event, props);
+				} else if (event.detail === 2) {
+					props.listRef.current.selectInode(event, props);
+				} else {
+					// presumably a triple click, could be used to edit folder details
+					console.log('selectInode', event.detail);
+				}
+			}, 250);
+
+			return () => {
+				clearTimeout(timer);
+			};
+		}, [event]
+	);
 
 	function cssClasses() {
 		let classes = [];
@@ -35,36 +56,23 @@ export function Inode(props) {
 	}
 
 	function activateInode(event) {
-		if (event.detail === 1) {
-			setClickHandler(window.setTimeout(() => {
-				props.selectInode.bind(props)(event);
-				setClickHandler(null);
-			}, 250));
-		} else if (event.detail === 2) {
-			if (clickHandler) {
-				window.clearTimeout(clickHandler);
-				setClickHandler(null);
-			}
-			props.selectInode.bind(props)(event);
-		} else if (event.detail.selected) {
-			props.selectInode.bind(props)(event);
-		}
+		setEvent(event);
 		event.stopPropagation();
 		event.preventDefault();
 	}
 
-	if (props.selectInode)
+	if (props.isDragged)
+		return (
+			<li data-id={props.id}>
+				{props.children}
+			</li>
+		);
+	else
 		return (
 			<li ref={props.elementRef} data-id={props.id} className={cssClasses()} onClick={activateInode} {...listeners} {...attributes}>
 				<div ref={setNodeRef}>
 					{props.children}
 				</div>
-			</li>
-		);
-	else
-		return (
-			<li data-id={props.id}>
-				{props.children}
 			</li>
 		);
 }
@@ -101,12 +109,36 @@ export function ListItem(props) {
 		if (event.type === 'blur' || enterKey) {
 			const editedName = event.target.innerText.trim();
 			if (editedName !== props.name) {
-				await props.updateInode({...props, name: editedName});
+				await updateInode({...props, name: editedName});
 			}
 			if (enterKey) {
 				event.preventDefault();
 				event.target.blur();
 			}
+		}
+	}
+
+	async function updateInode(newInode) {
+		const fetchUrl = `${settings.base_url}${settings.folder_id}/update`;
+		const response = await fetch(fetchUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': settings.csrf_token,
+			},
+			body: JSON.stringify({id: newInode.id, name: newInode.name}),
+		});
+		if (response.ok) {
+			const current = props.listRef.current;
+			const body = await response.json();
+			current.setInodes(current.inodes.map(inode =>
+				inode.id === body.new_inode.id ? {...body.new_inode, elementRef: createRef()} : inode
+			));
+			props.folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
+		} else if (response.status === 409) {
+			alert(await response.text());
+		} else {
+			console.error(response);
 		}
 	}
 

@@ -570,7 +570,7 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 			display: block;
 			padding: 10px 0;
 
-			li {
+			> li {
 				width: 100%;
 				height: 72px;
 				box-sizing: border-box;
@@ -608,6 +608,10 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 
 					div {
 						padding: 5px 10px;
+
+						&:has(> .inode-name) {
+							overflow: hidden;
+						}
 
 						&:has(> img) {
 							padding-left: 20px;

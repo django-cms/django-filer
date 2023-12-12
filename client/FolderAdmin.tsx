@@ -243,6 +243,7 @@ export default function FolderAdmin(props) {
 									folderId={folderId}
 									previousFolderId={previousFolderId}
 									setCurrentFolder={setCurrentFolder}
+									listRef={columnRefs[folderId]}
 									menuBarRef={menuBarRef}
 									folderTabsRef={folderTabsRef}
 									layout={layout}
