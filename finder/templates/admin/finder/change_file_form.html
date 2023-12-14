@@ -1,0 +1,49 @@
+{% extends "./base_site.html" %}
+{% load i18n admin_modify %}
+
+{% block content_title %}{# {{ title }} must be rendered after id="content-react" #}{% endblock %}
+{% block content_subtitle %}{# {{ subtitle }} must be rendered after id="content-react" #}{% endblock %}
+
+{% block content %}
+{% if title %}<h1>{{ title }}</h1>{% endif %}
+<div id="content-react" class="file"></div>
+
+<div id="content-main">
+{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}
+
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+{% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+{% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+    </p>
+    {{ adminform.form.non_field_errors }}
+{% endif %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
+{% endblock %}
+
+{% block after_field_sets %}{% endblock %}
+
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+{% endblock %}
+
+{% block after_related_objects %}{% endblock %}
+
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+</form>
+
+</div>
+
+{% endblock %}
+
+{% block footer %}
+{{ finder_settings|json_script:"finder-settings" }}
+{% endblock %}

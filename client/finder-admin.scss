@@ -7,12 +7,25 @@ $follow-folder-border: 2px dashed rgb(192, 192, 192);
 $copied-inode-border: 2px dashed rgb(48, 164, 0);
 
 #content {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
 	padding: 0;
+	h1 {
+		margin: 10px 20px;
+	}
+}
+
+#content-react {
+	position: absolute;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	padding: 0;
+
+	&.folder {
+		top: 0;
+	}
+	&.file {
+		top: 36px;
+	}
 
 	nav[role="menubar"] {
 		margin: 4px 0;
@@ -251,7 +264,8 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 	.work-area {
 		position: relative;
 		width: 100%;
-		height: calc(100% - 80px);
+		height: calc(100% - 75px);
+		background-color: ghostwhite;
 
 		.column-droppable {
 			position: absolute;
@@ -372,7 +386,6 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 	ul.inode-list {
 		margin: 0;
 		overflow-y: scroll;
-		background-color: ghostwhite;
 
 		&.trash, &.trash > li {
 			background-image: $trash-background;
@@ -707,5 +720,9 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 				cursor: grabbing;
 			}
 		}
+	}
+
+	.detail-editor {
+		padding: 20px 40px;
 	}
 }

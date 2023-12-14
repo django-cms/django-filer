@@ -5,10 +5,15 @@ import {FinderSettings} from './FinderSettings';
 
 export default function loadFinderAdmin(children: React.ReactNode) {
 	window.addEventListener('DOMContentLoaded', () => {
-		const content = document.getElementById('content');
+		const reactContent = document.getElementById('content-react');
+		const mainContent = document.getElementById('content-main');
 		const settings = JSON.parse(document.getElementById('finder-settings').textContent);
-		settings.workAreaRect = content.getBoundingClientRect();
-		createRoot(content).render(<FinderSettings.Provider value={settings}>{children}</FinderSettings.Provider>);
+		settings.workAreaRect = reactContent.getBoundingClientRect();
+		if (mainContent) {
+			settings.mainContent = mainContent;
+			mainContent.remove();
+		}
+		createRoot(reactContent).render(<FinderSettings.Provider value={settings}>{children}</FinderSettings.Provider>);
 
 		// prevent browser from loading a drag-and-dropped file
 		window.addEventListener('dragover', function (event) {

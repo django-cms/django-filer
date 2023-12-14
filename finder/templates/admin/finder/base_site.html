@@ -15,11 +15,12 @@
 </div>
 {% endblock %}
 
-
 {% block extrahead %}{{ block.super }}
 <script src="{% url 'admin:jsi18n' %}"></script>
 {{ media }}
 {% endblock %}
+
+{% block coltype %}{% endblock %}
 
 {% block footer %}
 {{ finder_settings|json_script:"finder-settings" }}

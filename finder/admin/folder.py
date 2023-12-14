@@ -1,7 +1,6 @@
 import json
 
 from django.contrib import admin
-from django.contrib.admin.utils import unquote
 from django.core.exceptions import ValidationError
 from django.db.models import QuerySet, Subquery
 
@@ -9,7 +8,6 @@ from django.forms.widgets import Media
 from django.http.response import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 )
-from django.middleware.csrf import get_token
 from django.urls import path, reverse
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -22,6 +20,7 @@ from .inode import InodeAdmin
 
 @admin.register(FolderModel)
 class FolderAdmin(InodeAdmin):
+    form_template = 'admin/finder/change_folder_form.html'
     _model_admin_cache = {}
     _legends = {
         'name': _("Name"),
@@ -39,7 +38,14 @@ class FolderAdmin(InodeAdmin):
         )
 
     def get_urls(self):
+        filtered_views = ['finder.admin.folder.FolderAdmin.change_view', 'django.views.generic.base.RedirectView']
+        default_urls = filter(lambda p: p.lookup_str not in filtered_views, super().get_urls())
         urls = [
+            path(
+                '<uuid:inode_id>',
+                self.admin_site.admin_view(self.change_view),
+                name='finder_inodemodel_change',
+            ),
             path(
                 '<uuid:folder_id>/fetch',
                 self.admin_site.admin_view(self.fetch_inodes),
@@ -73,15 +79,11 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.erase_trash_folder),
             ),
             path(
-                '<uuid:folder_id>/toggle_pin',
-                self.admin_site.admin_view(self.toggle_pin),
-            ),
-            path(
                 '<uuid:folder_id>/add_folder',
                 self.admin_site.admin_view(self.add_folder),
             ),
         ]
-        urls.extend(super().get_urls())
+        urls.extend(default_urls)
         return urls
 
     def has_add_permission(self, request):
@@ -91,63 +93,32 @@ class FolderAdmin(InodeAdmin):
         # always redirect the list view to the detail view of either the last used, or the root folder
         fallback_folder = self.get_fallback_folder(request)
         return HttpResponseRedirect(reverse(
-            'admin:finder_foldermodel_change',
+            'admin:finder_inodemodel_change',
             args=(fallback_folder.id,),
             current_app=self.admin_site.name,
         ))
 
-    def change_view(self, request, object_id, **kwargs):
-        object_id = unquote(object_id)
-        inode_obj = self.get_object(request, object_id)
+    def change_view(self, request, inode_id, **kwargs):
+        inode_obj = self.get_object(request, inode_id)
         if inode_obj is None:
-            return self._get_obj_does_not_exist_redirect(request, self.model._meta, object_id)
+            return self._get_obj_does_not_exist_redirect(request, self.model._meta, inode_id)
         if inode_obj.is_folder:
-            return super().change_view(request, object_id, **kwargs)
+            return super().change_view(request, str(inode_id), **kwargs)
 
         # inode_obj is a file and hence we look for the specialized model admin
         model_admin = self.get_model_admin(inode_obj.mime_type)
-        return model_admin.change_view(request, object_id, **kwargs)
+        return model_admin.change_view(request, str(inode_id), **kwargs)
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
-        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
-        favorite_folders = self.get_favorite_folders(request, obj)
         if isinstance(obj.ancestors, QuerySet):
             ancestor_ids = list(obj.ancestors.values_list('id', flat=True))
         else:
             ancestor_ids = [ancestor.id for ancestor in obj.ancestors]
-        context.update(
-            finder_settings=dict(
-                folder_id=obj.id,
-                name=obj.name,
-                base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
-                ancestors=ancestor_ids,
-                favorite_folders=favorite_folders,
-                legends=self._legends,
-                csrf_token=get_token(request),
-            )
+        context.setdefault('finder_settings', {})
+        context['finder_settings'].update(
+            ancestors=ancestor_ids,
+            legends=self._legends,
         )
-        if obj.id != trash_folder.id:
-            if obj.parent_id:
-                parent_url = reverse(
-                    'admin:finder_foldermodel_change',
-                    args=(obj.parent_id,),
-                    current_app=self.admin_site.name,
-                )
-            else:
-                parent_url = None
-            context['finder_settings'].update(
-                is_root=obj.is_root,
-                is_trash=False,
-                parent_id=obj.parent_id,
-                parent_url=parent_url,
-            )
-            if not next(filter(lambda f: f['id'] == obj.id and f.get('is_pinned'), favorite_folders), None):
-                request.session['finder_last_folder_id'] = str(obj.id)
-        else:
-            context['finder_settings'].update(
-                is_root=False,
-                is_trash=True,
-            )
         return super().render_change_form(request, context, add, change, form_url, obj)
 
     def get_object(self, request, object_id, from_field=None):
@@ -344,35 +315,10 @@ class FolderAdmin(InodeAdmin):
         fallback_folder = self.get_fallback_folder(request)
         return JsonResponse({
             'success_url': reverse(
-                'admin:finder_foldermodel_change',
+                'admin:finder_inodemodel_change',
                 args=(fallback_folder.id,),
                 current_app=self.admin_site.name,
             ),
-        })
-
-    def toggle_pin(self, request, folder_id):
-        if response := self.check_for_valid_post_request(request, folder_id):
-            return response
-        body = json.loads(request.body)
-        current_folder = self.get_object(request, folder_id)
-        if not (pinned_id := body.get('pinned_id')):
-            return HttpResponseBadRequest("No pinned_id provided.")
-        pinned_folder, created = PinnedFolder.objects.get_or_create(owner=request.user, folder_id=pinned_id)
-        if created:
-            request.session['finder_last_folder_id'] = None
-        else:
-            parent_folder = pinned_folder.folder.parent
-            pinned_folder.delete()
-            if str(folder_id) == pinned_id:
-                return JsonResponse({
-                    'success_url': reverse(
-                        'admin:finder_foldermodel_change',
-                        args=(parent_folder.id,),
-                        current_app=self.admin_site.name,
-                    ),
-                })
-        return JsonResponse({
-            'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
     def add_folder(self, request, folder_id):
