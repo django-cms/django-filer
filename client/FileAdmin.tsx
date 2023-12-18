@@ -1,24 +1,24 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, lazy, Suspense} from 'react';
 import {FinderSettings} from './FinderSettings';
 import {FolderTabs} from "./FolderTabs";
 
 
 export default function FileAdmin(props) {
 	const settings = useContext(FinderSettings);
-	const formRef = useRef(null);
+	const editorRef = useRef(null);
+	const FileEditor = lazy(() => import(settings.react_component));
 
 	useEffect(() => {
-		formRef.current.insertAdjacentHTML('afterbegin', settings.mainContent.innerHTML);
+		editorRef.current.insertAdjacentHTML('afterbegin', settings.mainContent.innerHTML);
 	}, []);
-
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		const formData = new FormData(event.target);
-		console.log(formData);
-	};
 
 	return (<>
 		<FolderTabs />
-		<div className="detail-editor" ref={formRef}></div>
-	</>);
+		<div className="detail-editor">
+			<Suspense fallback={<span>Loading...</span>}>
+				<FileEditor editorRef={editorRef} />
+			</Suspense>
+			<div ref={editorRef}></div>
+		</div>
+ 	</>);
 }

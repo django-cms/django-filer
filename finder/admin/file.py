@@ -1,22 +1,23 @@
 from django.contrib import admin
 from django.forms.widgets import Media
-from django.urls import reverse
+from django.templatetags.static import static
+from django.utils.html import format_html
 
 from finder.models.file import FileModel
-from finder.models.folder import FolderModel
 from .inode import InodeAdmin
 
 
 @admin.register(FileModel)
 class FileAdmin(InodeAdmin):
     form_template = 'admin/finder/change_file_form.html'
-    fields = ['name']
 
     @property
     def media(self):
         return Media(
-            css={'all': ['admin/finder/css/finder-admin.css']},
-            js=['admin/finder/js/file-admin.js'],
+            css={'all': ['admin/finder/css/finder-admin.css', 'admin/css/forms.css']},
+            js=[format_html(
+                '<script type="module" src="{}"></script>', static('admin/finder/js/file-admin.js')
+            )],
         )
 
     def get_model_perms(self, *args, **kwargs):
@@ -50,5 +51,13 @@ class FileAdmin(InodeAdmin):
             has_editable_inline_admin_formsets=has_editable_inline_admin_formsets,
             opts=self.opts,
             save_as=self.save_as,
+            show_save_and_add_another=False,
         )
         return super().render_change_form(request, context, add, change, form_url, obj)
+
+    def get_settings(self, request, inode):
+        settings = super().get_settings(request, inode)
+        settings.update(
+            download_url=inode.get_download_url(),
+        )
+        return settings

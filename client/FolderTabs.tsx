@@ -1,5 +1,5 @@
 import {useDroppable} from '@dnd-kit/core';
-import React, {forwardRef, useContext, useImperativeHandle, useState, useTransition} from 'react';
+import React, {forwardRef, useContext, useImperativeHandle, useState} from 'react';
 import {FinderSettings} from './FinderSettings';
 import CloseIcon from './icons/close.svg';
 import PinIcon from './icons/pin.svg';
@@ -11,7 +11,6 @@ import UpIcon from './icons/folder-up.svg';
 function FolderTab(props) {
 	const settings = useContext(FinderSettings);
 	const {folder, isSearchResult} = props;
-	const [isPending, startTransition] = useTransition();
 	const {
 		isOver,
 		setNodeRef,
@@ -28,8 +27,12 @@ function FolderTab(props) {
 
 	function cssClasses(folder) {
 		const classes = [];
-		if (isActive && !isSearchResult) {
-			classes.push('active');
+		if (isActive) {
+			if (!settings.download_url && !isSearchResult) {
+				classes.push('active');
+			} else {
+				classes.push('current');
+			}
 		}
 		if (folder.is_trash) {
 			classes.push('trash');
@@ -60,7 +63,7 @@ function FolderTab(props) {
 
 	return (
 		<li ref={setNodeRef} className={cssClasses(folder)}>
-			{!isActive || isSearchResult ? <a href={folder.change_url}>{folder.name}</a> : folder.name}
+			{!isActive || isSearchResult || settings.download_url ? <a href={folder.change_url}>{folder.name}</a> : folder.name}
 			<span onClick={togglePin.bind(folder)}>{folder.is_pinned ? <CloseIcon /> : <PinIcon  data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Pin this folder")} />}</span>
 		</li>
 	);

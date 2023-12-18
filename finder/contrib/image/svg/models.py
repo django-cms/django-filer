@@ -1,12 +1,6 @@
-from pathlib import Path
-
 from django.core.files.storage import default_storage
-from django.db import models
-from django.utils.functional import cached_property
-from django.utils.timezone import datetime
 from django.utils.translation import gettext_lazy as _
 
-from filer import settings as filer_settings
 from finder.contrib.image.models import ImageModel
 from finder.exceptions import FileValidationError
 
@@ -70,7 +64,7 @@ class SVGImageModel(ImageModel):
                 canvas.svg.setAttribute('width', '{2}'.format(*bbox))
                 canvas.svg.setAttribute('height', '{3}'.format(*bbox))
                 renderSVG.draw(drawing, canvas)
-                xml = canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes ->  sanitation
+                xml = canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes -> sanitation
                 file.seek(0)  # Rewind file
                 file.write(xml)  # write to binary file with utf-8 encoding
         return default_storage.url(thumbnail_path)

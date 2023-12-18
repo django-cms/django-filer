@@ -82,7 +82,8 @@ class AbstractFileModel(InodeModel):
     )
     mime_type = models.CharField(
         max_length=255,
-        help_text="MIME type of uploaded content",
+        verbose_name=_("MIME-Type"),
+        help_text=_("MIME-type of uploaded content"),
         validators=[mimetype_validator],
         default='application/octet-stream',
     )

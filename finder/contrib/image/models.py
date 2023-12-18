@@ -56,23 +56,37 @@ class ImageModel(AbstractFileModel):
                 kwargs['update_fields'].append('meta_data')
         super().save(**kwargs)
 
-    def get_thumbnail_path(self):
+    def get_thumbnail_path(self, crop_x=None, crop_y=None, crop_size=None):
         id = str(self.id)
         thumbnail_folder = self.filer_public_thumbnails / f'{id[0:2]}/{id[2:4]}/{id}'
         thumbnail_path = Path(self.file_name)
-        return thumbnail_folder / '{stem}__{width}x{height}{suffix}'.format(
+        if crop_x is None or crop_y is None or crop_size is None:
+            thumbnail_path_template = '{stem}__{width}x{height}{suffix}'
+        else:
+            crop_x, crop_y, crop_size = int(crop_x), int(crop_y), int(crop_size)
+            thumbnail_path_template = '{stem}__{width}x{height}__{crop_x}_{crop_y}_{crop_size}{suffix}'
+        return thumbnail_folder / thumbnail_path_template.format(
             stem=thumbnail_path.stem,
             width=self.thumbnail_size[0],
             height=self.thumbnail_size[1],
+            crop_x=crop_x,
+            crop_y=crop_y,
+            crop_size=crop_size,
             suffix=thumbnail_path.suffix,
         )
 
     def get_thumbnail_url(self):
-        thumbnail_path = self.get_thumbnail_path()
+        crop_x, crop_y, crop_size = (
+            self.meta_data.get('crop_x'), self.meta_data.get('crop_y'), self.meta_data.get('crop_size')
+        )
+        thumbnail_path = self.get_thumbnail_path(crop_x, crop_y, crop_size)
         if not default_storage.exists(thumbnail_path):
             image = Image.open(default_storage.open(self.file_path))
             image = self.orientate_top(image)
-            image = self.crop_square(image)
+            if crop_x is None or crop_y is None or crop_size is None:
+                image = self.crop_centered(image)
+            else:
+                image = image.crop((crop_x, crop_y, crop_x + crop_size, crop_y + crop_size))
             image.thumbnail(self.thumbnail_size)
             (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
             image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
@@ -97,7 +111,7 @@ class ImageModel(AbstractFileModel):
                 image = image.transpose(Image.ROTATE_90)
         return image
 
-    def crop_square(self, image):
+    def crop_centered(self, image):
         width, height = image.size
         if width > height:
             left = (width - height) / 2

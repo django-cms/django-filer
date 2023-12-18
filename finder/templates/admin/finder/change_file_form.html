@@ -9,7 +9,7 @@
 <div id="content-react" class="file"></div>
 
 <div id="content-main">
-{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}
+{% if subtitle %}<h2 id="id_subtitle">{{ subtitle }}</h2>{% endif %}
 
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}

@@ -221,7 +221,7 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 			border-bottom: 1px solid ghostwhite;
 			background-color: white;
 
-			&.active {
+			&.active, &.current {
 				background-color: ghostwhite;
 			}
 			&:not(.active) {
@@ -723,6 +723,16 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 	}
 
 	.detail-editor {
-		padding: 20px 40px;
+		padding: 0 20px 40px;
+	}
+
+	.image-details {
+		width: 100%;
+
+		img {
+			max-height: 500px;
+		}
 	}
 }
+
+@import 'node_modules/react-image-crop/src/ReactCrop.scss';

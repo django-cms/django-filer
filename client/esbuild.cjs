@@ -5,12 +5,12 @@ const buildOptions = require('yargs-parser')(process.argv.slice(2), {
 });
 
 build({
-  entryPoints: ['client/folder-admin.tsx', 'client/file-admin.tsx'],
+  entryPoints: ['client/folder-admin.tsx', 'client/file-admin.tsx', 'client/contrib/*.tsx'],
   bundle: true,
   minify: !buildOptions.debug,
   sourcemap: buildOptions.debug,
   outdir: 'finder/static/admin/finder/js',
-  splitting: false,
+  splitting: true,
   format: 'esm',
   jsx: 'automatic',
   plugins: [svgr()],

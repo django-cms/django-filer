@@ -5,11 +5,11 @@ from django.core.exceptions import ValidationError
 from django.db.models import QuerySet, Subquery
 
 from django.forms.widgets import Media
-from django.http.response import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
-)
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
+from django.templatetags.static import static
 from django.urls import path, reverse
 from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.html import format_html
 
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
@@ -34,7 +34,9 @@ class FolderAdmin(InodeAdmin):
     def media(self):
         return Media(
             css={'all': ['admin/finder/css/finder-admin.css']},
-            js=['admin/finder/js/folder-admin.js'],
+            js=[format_html(
+                '<script type="module" src="{}"></script>', static('admin/finder/js/folder-admin.js')
+            )],
         )
 
     def get_urls(self):
@@ -89,15 +91,6 @@ class FolderAdmin(InodeAdmin):
     def has_add_permission(self, request):
         return False
 
-    def changelist_view(self, request, extra_context=None):
-        # always redirect the list view to the detail view of either the last used, or the root folder
-        fallback_folder = self.get_fallback_folder(request)
-        return HttpResponseRedirect(reverse(
-            'admin:finder_inodemodel_change',
-            args=(fallback_folder.id,),
-            current_app=self.admin_site.name,
-        ))
-
     def change_view(self, request, inode_id, **kwargs):
         inode_obj = self.get_object(request, inode_id)
         if inode_obj is None:
@@ -109,17 +102,17 @@ class FolderAdmin(InodeAdmin):
         model_admin = self.get_model_admin(inode_obj.mime_type)
         return model_admin.change_view(request, str(inode_id), **kwargs)
 
-    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
-        if isinstance(obj.ancestors, QuerySet):
-            ancestor_ids = list(obj.ancestors.values_list('id', flat=True))
+    def get_settings(self, request, inode):
+        settings = super().get_settings(request, inode)
+        if isinstance(inode.ancestors, QuerySet):
+            ancestor_ids = list(inode.ancestors.values_list('id', flat=True))
         else:
-            ancestor_ids = [ancestor.id for ancestor in obj.ancestors]
-        context.setdefault('finder_settings', {})
-        context['finder_settings'].update(
+            ancestor_ids = [ancestor.id for ancestor in inode.ancestors]
+        settings.update(
             ancestors=ancestor_ids,
             legends=self._legends,
         )
-        return super().render_change_form(request, context, add, change, form_url, obj)
+        return settings
 
     def get_object(self, request, object_id, from_field=None):
         for model in InodeModel.all_models:

@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.db.models.functions import Lower
-from django.http.response import HttpResponseBadRequest, JsonResponse
+from django.http.response import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -174,45 +174,57 @@ class InodeAdmin(admin.ModelAdmin):
             folders.append(inode_data)
         return folders
 
+    def changelist_view(self, request, extra_context=None):
+        # always redirect the list view to the detail view of either the last used, or the root folder
+        fallback_folder = self.get_fallback_folder(request)
+        return HttpResponseRedirect(reverse(
+            'admin:finder_inodemodel_change',
+            args=(fallback_folder.id,),
+            current_app=self.admin_site.name,
+        ))
+
     def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
         context.update(
             breadcrumbs=self.get_breadcrumbs(obj),
         )
-        context.setdefault('finder_settings', {})
-        favorite_folders = self.get_favorite_folders(request, obj.folder)
-        context['finder_settings'].update(
-            name=obj.name,
-            base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
-            folder_id=obj.folder.id,
-            favorite_folders=favorite_folders,
-            csrf_token=get_token(request),
-        )
-        if obj.is_folder:
-            trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
-            if obj.id != trash_folder.id:
-                if obj.parent_id:
-                    parent_url = reverse(
-                        'admin:finder_inodemodel_change',
-                        args=(obj.parent_id,),
-                        current_app=self.admin_site.name,
-                    )
-                else:
-                    parent_url = None
-                context['finder_settings'].update(
-                    is_root=obj.is_root,
-                    is_trash=False,
-                    parent_id=obj.parent_id,
-                    parent_url=parent_url,
-                )
-                if not next(filter(lambda f: f['id'] == obj.id and f.get('is_pinned'), favorite_folders), None):
-                    request.session['finder_last_folder_id'] = str(obj.id)
-            else:
-                context['finder_settings'].update(
-                    is_root=False,
-                    is_trash=True,
-                )
+        context['finder_settings'] = self.get_settings(request, obj)
         return TemplateResponse(
             request,
             self.form_template,
             context,
         )
+
+    def get_settings(self, request, inode):
+        favorite_folders = self.get_favorite_folders(request, inode.folder)
+        settings = {
+            'name': inode.name,
+            'base_url': reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
+            'folder_id': inode.folder.id,
+            'favorite_folders': favorite_folders,
+            'csrf_token': get_token(request),
+        }
+        if inode.is_folder:
+            trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+            if inode.id != trash_folder.id:
+                if inode.parent_id:
+                    parent_url = reverse(
+                        'admin:finder_inodemodel_change',
+                        args=(inode.parent_id,),
+                        current_app=self.admin_site.name,
+                    )
+                else:
+                    parent_url = None
+                settings.update(
+                    is_root=inode.is_root,
+                    is_trash=False,
+                    parent_id=inode.parent_id,
+                    parent_url=parent_url,
+                )
+                if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
+                    request.session['finder_last_folder_id'] = str(inode.id)
+            else:
+                settings.update(
+                    is_root=False,
+                    is_trash=True,
+                )
+        return settings
