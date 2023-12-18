@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import logging
 import botocore.exceptions
 import urllib.parse
@@ -10,7 +10,6 @@ try:
     from storages.backends.s3boto import S3BotoStorage
 except ImportError:
     from storages.backends.s3boto3 import S3Boto3Storage as S3BotoStorage
-
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +57,8 @@ class PatchedS3BotoStorage(S3BotoStorage):
             return False
         for right in old_acl:
             if (
-                'AllUsers' in right.get('Grantee', {}).get('URI', '') and
-                right.get('Permission', '').upper() == 'READ'
+                    'AllUsers' in right.get('Grantee', {}).get('URI', '') and
+                    right.get('Permission', '').upper() == 'READ'
             ):
                 return True
         return False
@@ -75,6 +74,7 @@ class PatchedS3BotoStorage(S3BotoStorage):
         try:
             extra_args = {
                 'ContentType': source_obj.content_type
+                'MetadataDirective': 'REPLACE',
             }
         except botocore.exceptions.ClientError as error:
             logger.warning("Copy: source error: %s", error)
