@@ -109,21 +109,11 @@ class FolderAdmin(InodeAdmin):
         else:
             ancestor_ids = [ancestor.id for ancestor in inode.ancestors]
         settings.update(
+            base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             ancestors=ancestor_ids,
             legends=self._legends,
         )
         return settings
-
-    def get_object(self, request, object_id, from_field=None):
-        for model in InodeModel.all_models:
-            try:
-                obj = model.objects.get(id=object_id)
-                if obj.is_folder and obj.site == self.admin_site.name:
-                    return obj
-                elif obj.folder.site == self.admin_site.name:
-                    return obj
-            except model.DoesNotExist:
-                pass
 
     def get_model_admin(self, mime_type):
         if model_admin := self._model_admin_cache.get(mime_type):

@@ -37,6 +37,17 @@ class InodeAdmin(admin.ModelAdmin):
         urls.extend(super().get_urls())
         return urls
 
+    def get_object(self, request, object_id, from_field=None):
+        for model in InodeModel.all_models:
+            try:
+                obj = model.objects.get(id=object_id)
+                if obj.is_folder and obj.site == self.admin_site.name:
+                    return obj
+                elif obj.folder.site == self.admin_site.name:
+                    return obj
+            except model.DoesNotExist:
+                pass
+
     def toggle_pin(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
@@ -198,7 +209,6 @@ class InodeAdmin(admin.ModelAdmin):
         favorite_folders = self.get_favorite_folders(request, inode.folder)
         settings = {
             'name': inode.name,
-            'base_url': reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             'folder_id': inode.folder.id,
             'favorite_folders': favorite_folders,
             'csrf_token': get_token(request),

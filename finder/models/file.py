@@ -35,16 +35,7 @@ class FileModelManager(InodeManager):
             file_size=uploaded_file.size,
         )
         obj = self.model(**kwargs)
-        (default_storage.base_location / obj.folder_path).mkdir(parents=True, exist_ok=True)
-        sha1 = hashlib.sha1()
-        with default_storage.open(obj.file_path, 'wb+') as destination:
-            for chunk in uploaded_file.chunks():
-                sha1.update(chunk)
-                destination.write(chunk)
-        if default_storage.size(obj.file_path) != obj.file_size:
-            raise IOError("File size mismatch between uploaded file and destination file")
-        obj.sha1 = sha1.hexdigest()
-        obj._for_write = True
+        obj.receive_file(uploaded_file)
         obj.save(force_insert=True)
         folder.refresh_from_db()
         return obj
@@ -70,22 +61,26 @@ class AbstractFileModel(InodeModel):
     file_name = models.CharField(
         _("File name"),
         max_length=255,
+        editable=False,
     )
     file_size = models.BigIntegerField(
         _("Size"),
+        editable=False,
     )
     sha1 = models.CharField(
-        _("sha1"),
+        _("SHA1-hash"),
         max_length=40,
         blank=True,
         default='',
+        editable=False,
     )
     mime_type = models.CharField(
         max_length=255,
-        verbose_name=_("MIME-Type"),
+        verbose_name=_("MIME-type"),
         help_text=_("MIME-type of uploaded content"),
         validators=[mimetype_validator],
         default='application/octet-stream',
+        editable=False,
     )
 
     class Meta:
@@ -154,6 +149,18 @@ class AbstractFileModel(InodeModel):
 
     def open(self, mode='rb'):
         return default_storage.open(self.file_path, mode)
+
+    def receive_file(self, uploaded_file):
+        (default_storage.base_location / self.folder_path).mkdir(parents=True, exist_ok=True)
+        sha1 = hashlib.sha1()
+        with self.open('wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                sha1.update(chunk)
+                destination.write(chunk)
+        if default_storage.size(self.file_path) != self.file_size:
+            raise IOError("File size mismatch between uploaded file and destination file")
+        self.sha1 = sha1.hexdigest()
+        self._for_write = True
 
     def copy_to(self, folder, **kwargs):
         """
