@@ -15,9 +15,11 @@ export default function FileAdmin(props) {
 	return (<>
 		<FolderTabs />
 		<div className="detail-editor">
+			{settings.react_component &&
 			<Suspense fallback={<span>Loading...</span>}>
 				<FileEditor editorRef={editorRef} />
 			</Suspense>
+			}
 			<div ref={editorRef}></div>
 		</div>
  	</>);

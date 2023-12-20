@@ -260,7 +260,7 @@ export default function FolderAdmin(props) {
 		return (<>
 			<div className={`work-area ${layout}`}>
 				{renderAncestors()}
-				{incomplete ? <div className="trimmed-column"><MoreVerticalIcon/></div> : null}
+				{incomplete && <div className="trimmed-column"><MoreVerticalIcon/></div>}
 			</div>
 			{renderDroppables()}
 		</>);

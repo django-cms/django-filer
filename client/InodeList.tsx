@@ -175,7 +175,7 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 
 	return (
 		<ul className={cssClasses()} onClick={deactivateInodes}>
-			{layout === 'list' ? (
+			{layout === 'list' &&
 			<li className="header">
 				<div className="inode">
 					<div></div>
@@ -187,7 +187,7 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 					<div>{gettext("Mime type")}</div>
 				</div>
 			</li>
-			) : null}
+			}
 			{renderInodes()}
 		</ul>
 	)

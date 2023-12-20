@@ -244,8 +244,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		return layout === value ? 'active' : null;
 	}
 
-	console.log('MenuBar', numSelectedInodes, numSelectedFiles);
-
 	return (
 		<nav role="menubar">
 			<ul>

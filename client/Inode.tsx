@@ -3,7 +3,10 @@ import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {FinderSettings} from './FinderSettings';
 
 
-const dateTimeFormatter = new Intl.DateTimeFormat(navigator.language, {timeStyle: 'short', dateStyle: 'short'});
+const dateTimeFormatter = new Intl.DateTimeFormat(
+	navigator.language,
+	{timeStyle: 'short', dateStyle: 'short'} as Intl.DateTimeFormatOptions,
+);
 
 export function Inode(props) {
 	const {

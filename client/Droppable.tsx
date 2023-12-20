@@ -23,8 +23,6 @@ export function DroppableArea(props) {
 		return classes.join(' ');
 	}
 
-	console.log('DroppableArea', id, currentId);
-
 	return (
 		<div ref={setNodeRef} className={cssClasses()}>
 			{children}
