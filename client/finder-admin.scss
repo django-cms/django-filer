@@ -316,55 +316,6 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 			position: relative;
 			width: 100%;
 			height: 100%;
-
-			input[type="file"] {
-				width: 0 !important;
-				height: 0 !important;
-				position: absolute;
-				bottom: 0;
-				padding: 0;
-			}
-
-			.progress-overlay {
-				position: absolute;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				left: 0;
-				background-color: rgba(255, 255, 255, 0.75);
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-
-				.progress-indicator {
-					width: calc(100% - 100px);
-					max-width: 500px;
-					background-color: rgba(50, 150, 250, 0.5);
-					border: 3px solid rgb(50, 150, 250);
-					padding: 20px;
-
-					p {
-						font-weight: bold;
-						font-size: 20px;
-					}
-
-					.progress-bar {
-						padding: 0;
-
-						li {
-							display: flex;
-							justify-content: space-between;
-							span {
-								text-overflow: ellipsis;
-							}
-							progress {
-								width: 50%;
-							}
-						}
-					}
-				}
-			}
 		}
 
 		.trimmed-column {
@@ -379,6 +330,55 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 			.select-rectangle {
 				position: absolute;
 				border: 1px dotted grey;
+			}
+		}
+	}
+
+	input[type="file"] {
+		width: 0 !important;
+		height: 0 !important;
+		position: absolute;
+		bottom: 0;
+		padding: 0;
+	}
+
+	.progress-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: rgba(255, 255, 255, 0.75);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		.progress-indicator {
+			width: calc(100% - 100px);
+			max-width: 500px;
+			background-color: rgba(50, 150, 250, 0.5);
+			border: 3px solid rgb(50, 150, 250);
+			padding: 20px;
+
+			p {
+				font-weight: bold;
+				font-size: 20px;
+			}
+
+			.progress-bar {
+				padding: 0;
+
+				li {
+					display: flex;
+					justify-content: space-between;
+					span {
+						text-overflow: ellipsis;
+					}
+					progress {
+						width: 50%;
+					}
+				}
 			}
 		}
 	}
@@ -402,6 +402,10 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 			cursor: pointer;
 			font-size: 15px;
 			line-height: 18px;
+
+			&:hover {
+				border: 1px dashed lightgrey;
+			}
 
 			&.disabled {
 				opacity: 0.5;
@@ -731,6 +735,34 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 
 		img {
 			max-height: 500px;
+		}
+
+		div.button-group {
+			margin-top: 10px;
+			margin-bottom: 10px;
+			display: flex;
+			button, a {
+				display: block;
+				appearance: none;
+				border: none;
+				font-weight: 400;
+				border-radius: 4px;
+				padding: 5px 15px;
+				line-height: 25px;
+				color: white;
+				background: var(--default-button-bg);
+				margin-right: 10px;
+				cursor: pointer;
+				&:hover {
+					background: var(--default-button-hover-bg);
+				}
+
+				svg {
+					margin-right: 0.5rem;
+					vertical-align: text-bottom;
+					width: 20px;
+				}
+			}
 		}
 	}
 }
