@@ -11,6 +11,7 @@
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^6.0.1",
     "@types/react-dom": "^18.2.15",
+    "@wavesurfer/react": "^1.0.3",
     "concurrently": "^8.2.0",
     "esbuild": "^0.19.2",
     "esbuild-plugin-svgr": "^2.1.0",

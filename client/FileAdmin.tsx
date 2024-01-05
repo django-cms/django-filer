@@ -6,7 +6,8 @@ import {FolderTabs} from "./FolderTabs";
 export default function FileAdmin(props) {
 	const settings = useContext(FinderSettings);
 	const editorRef = useRef(null);
-	const FileEditor = lazy(() => import(settings.react_component));
+	const component = `./components/${settings.editor_component}.js`;
+	const FileEditor = settings.editor_component ? lazy(() => import(component)) : null;
 
 	useEffect(() => {
 		editorRef.current.insertAdjacentHTML('afterbegin', settings.mainContent.innerHTML);
@@ -15,7 +16,7 @@ export default function FileAdmin(props) {
 	return (<>
 		<FolderTabs />
 		<div className="detail-editor">
-			{settings.react_component &&
+			{FileEditor &&
 			<Suspense fallback={<span>Loading...</span>}>
 				<FileEditor editorRef={editorRef} />
 			</Suspense>

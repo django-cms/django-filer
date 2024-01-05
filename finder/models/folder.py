@@ -49,12 +49,16 @@ class FolderModel(InodeModel):
         return self.name
 
     @property
+    def casted(self):
+        return self
+
+    @property
     def folder(self):
         return self
 
     @property
     def num_children(self):
-        num_children = sum(inode_model.objects.filter(parent=self).count() for inode_model in InodeModel.all_models)
+        num_children = sum(inode_model.objects.filter(parent=self).count() for inode_model in InodeModel.real_models)
         return num_children
 
     @cached_property

@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 class InodeMetaModel(models.base.ModelBase):
     _inode_models = {}
+    _mime_types_mapping = {}
 
     def __new__(cls, *args, **kwargs):
         new_class = super().__new__(cls, *args, **kwargs)
@@ -36,14 +37,23 @@ class InodeMetaModel(models.base.ModelBase):
                 if not other.is_folder and accept_mime_type in other.accept_mime_types:
                     msg = "Attribute accept_mime_types {} already defined in {}"
                     raise ImproperlyConfigured(msg.format(accept_mime_type, other))
+            new_class._mime_types_mapping[accept_mime_type] = new_class
 
     @property
-    def all_models(self):
+    def real_models(self):
+        """
+        Returns all real (excluding proxy models) that inherit from InodeModel.
+        """
+        yield self._inode_models['finder.FolderModel']
         for model in self._inode_models.values():
-            yield model
+            if not model.is_folder and not model._meta.proxy:
+                yield model
 
     @property
     def file_models(cls):
+        """
+        Returns all models (including proxy models) that inherit from AbstractFileModel.
+        """
         for model in cls._inode_models.values():
             if not model.is_folder:
                 yield model
@@ -55,7 +65,7 @@ class InodeManagerMixin:
 
         if lookup.pop('is_folder', False):
             return FolderModel.objects.filter(**lookup).iterator()
-        inodes = [inode_model.objects.filter(**lookup) for inode_model in InodeModel.all_models]
+        inodes = [inode_model.objects.filter(**lookup) for inode_model in InodeModel.real_models]
         return chain(*inodes)
 
     def get_inode(self, **lookup):
@@ -84,6 +94,7 @@ def filename_validator(value):
 
 class InodeModel(models.Model, metaclass=InodeMetaModel):
     is_folder = False
+    editor_component = None
     data_fields = ['id', 'name', 'parent', 'created_at', 'last_modified_at']
 
     id = models.UUIDField(
@@ -150,6 +161,12 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             names.extend(a.name for a in self.parent.ancestrors)
         names.append(self.name)
         return " / ".join(names)
+
+    def get_sample_url(self):
+        """
+        Hook to return a URL for a small sample file. Only used in list views.
+        """
+        return None
 
 
 class DiscardedInode(models.Model):

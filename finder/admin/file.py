@@ -4,6 +4,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.templatetags.static import static
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
 from finder.models.file import FileModel
 from .inode import InodeAdmin
@@ -12,6 +13,7 @@ from .inode import InodeAdmin
 @admin.register(FileModel)
 class FileAdmin(InodeAdmin):
     form_template = 'admin/finder/change_file_form.html'
+    readonly_fields = ['details', 'owner', 'created_at', 'last_modified_at', 'mime_type', 'sha1']
     exclude = ['meta_data']
 
     @property
@@ -32,6 +34,10 @@ class FileAdmin(InodeAdmin):
         ]
         urls.extend(super().get_urls())
         return urls
+
+    @admin.display(description=_("Details"))
+    def details(self, obj):
+        return obj.summary
 
     def get_model_perms(self, *args, **kwargs):
         """Prevent showing up in the admin index."""
@@ -90,8 +96,10 @@ class FileAdmin(InodeAdmin):
         settings.update(
             base_url=reverse('admin:finder_filemodel_changelist', current_app=self.admin_site.name),
             download_url=inode.get_download_url(),
+            thumbnail_url=inode.get_thumbnail_url(),
             filename=inode.file_name,
             file_id=inode.id,
             file_mime_type=inode.mime_type,
+            editor_component=inode.editor_component,
         )
         return settings

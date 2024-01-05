@@ -35,7 +35,9 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'filer',
     'finder',
-    'finder.contrib.image',
+    'finder.contrib.audio',
+    'finder.contrib.common',
+    'finder.contrib.image.pil',
     'finder.contrib.image.svg',
     'testapp',
 ]

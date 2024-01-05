@@ -204,6 +204,7 @@ export default function FolderAdmin(props) {
 						ref={columnRefs[settings.folder_id]}
 						folderId={settings.folder_id}
 						setCurrentFolder={setCurrentFolder}
+						listRef={columnRefs[settings.folder_id]}
 						menuBarRef={menuBarRef}
 						layout={layout}
 					/>
@@ -277,9 +278,6 @@ export default function FolderAdmin(props) {
 			</DroppableArea>
 		</>);
 	}
-
-	console.log("FilerAdmin", currentFolderId);
-	console.log("draggedInodesStyle", draggedInodesStyle);
 
 	return (<>
 		<MenuBar

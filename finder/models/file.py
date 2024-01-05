@@ -6,7 +6,6 @@ from pathlib import Path
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.template.defaultfilters import filesizeformat
@@ -57,6 +56,7 @@ class FileModelManager(InodeManager):
 class AbstractFileModel(InodeModel):
     data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type']
     filer_public = Path(filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
+    fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
 
     file_name = models.CharField(
         _("File name"),
@@ -81,6 +81,7 @@ class AbstractFileModel(InodeModel):
         validators=[mimetype_validator],
         default='application/octet-stream',
         editable=False,
+        db_index=True,
     )
 
     class Meta:
@@ -94,6 +95,11 @@ class AbstractFileModel(InodeModel):
     @property
     def folder(self):
         return self.parent
+
+    @classmethod
+    @lru_cache
+    def accept_mime_main_types(cls):
+        return [mime_type.split('/')[0] for mime_type in cls.accept_mime_types]
 
     @cached_property
     def folder_path(self):
@@ -127,6 +133,21 @@ class AbstractFileModel(InodeModel):
                 queries.append(models.Q(mime_type=accept_mimetype))
         return reduce(or_, queries, models.Q())
 
+    @cached_property
+    def casted(self):
+        """
+        Returns the object casted into the correct proxy model.
+        """
+        proxy_model = FileModel.objects.get_model_for(self.mime_type)
+        if not issubclass(proxy_model, self.__class__):
+            msg = (
+                f"File {self.id} is assigned to the wrong database model. "
+                "Consider to run `python manage.py reorganize_finder` to fix this."
+            )
+            raise RuntimeError(msg)
+        self.__class__ = proxy_model
+        return self
+
     def get_download_url(self):
         """
         Hook to return the download url for a given file.
@@ -137,7 +158,7 @@ class AbstractFileModel(InodeModel):
         """
         Hook to return the thumbnail url for a given file.
         """
-        return staticfiles_storage.url('filer/icons/file-unknown.svg')
+        return self.fallback_thumbnail_url
 
     @cached_property
     def mime_maintype(self):

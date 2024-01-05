@@ -5,6 +5,7 @@
 $trash-background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgb(248, 248, 248) 10px, rgb(248, 248, 248) 20px);
 $follow-folder-border: 2px dashed rgb(192, 192, 192);
 $copied-inode-border: 2px dashed rgb(48, 164, 0);
+$active-rectangle: rgb(210, 210, 112);
 
 #content {
 	padding: 0;
@@ -162,6 +163,7 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					align-self: center;
 					border: 5px solid transparent;
 					border-top-color: black;
+					margin-top: 10px;
 				}
 			}
 
@@ -265,7 +267,10 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 		position: relative;
 		width: 100%;
 		height: calc(100% - 75px);
-		background-color: ghostwhite;
+
+		&:not(:has(.inode-list.trash)) {
+			background-color: ghostwhite;
+		}
 
 		.column-droppable {
 			position: absolute;
@@ -329,7 +334,20 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 
 			.select-rectangle {
 				position: absolute;
-				border: 1px dotted grey;
+				background:
+					linear-gradient(90deg, $active-rectangle 66%, transparent 0) repeat-x,
+					linear-gradient(90deg, $active-rectangle 66%, transparent 0) repeat-x,
+					linear-gradient(0deg, $active-rectangle 66%, transparent 0) repeat-y,
+					linear-gradient(0deg, $active-rectangle 66%, transparent 0) repeat-y;
+				background-size: 8px 1px, 8px 1px, 1px 8px, 1px 8px;
+				background-position: 0 0, 0 100%, 0 0, 100% 0;
+				animation: border-animate 333ms infinite linear;
+			}
+
+			@keyframes border-animate {
+				100% {
+					background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px;
+				}
 			}
 		}
 	}
@@ -404,7 +422,7 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 			line-height: 18px;
 
 			&:hover {
-				border: 1px dashed lightgrey;
+				filter: brightness(1.2);
 			}
 
 			&.disabled {
@@ -434,19 +452,20 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					margin-top: 2px;
 					padding: 3px 0 2px;
 					border-radius: 3px;
+					user-select: none;
 
 					&:focus-visible {
 						background-color: white;
 						outline: 1px solid rgb(50, 150, 250);
-						box-shadow: rgb(50, 150, 250) 0 0 5px;
+						box-shadow: rgb(50, 150, 250) 0 0 0.5rem;
 					}
 				}
 			}
 
 			&.selected:nth-child(n) .inode {
-				box-shadow: rgb(210, 210, 112) 0 0 5px;
+				box-shadow: inset  0 0 0.5rem rgb(210, 210, 112);
 				outline: 1px dotted rgb(210, 210, 112);
-				background-color: rgb(250, 250, 210);
+				background-color: rgba(210, 210, 112, 0.25);
 			}
 		}
 	}
@@ -641,10 +660,6 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 					}
 				}
 			}
-
-			//&.drag-over, &.drag-over > li {
-			//	background-color: rgb(121, 174, 200);
-			//}
 		}
 	}
 
@@ -730,11 +745,14 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 		padding: 0 20px 40px;
 	}
 
-	.image-details {
+	.file-details {
 		width: 100%;
 
-		img {
+		img.editable {
 			max-height: 500px;
+		}
+		img:not(.editable) {
+			height: 150px;
 		}
 
 		div.button-group {
@@ -768,3 +786,4 @@ $copied-inode-border: 2px dashed rgb(48, 164, 0);
 }
 
 @import 'node_modules/react-image-crop/src/ReactCrop.scss';
+@import 'node_modules/react-h5-audio-player/src/styles.scss';

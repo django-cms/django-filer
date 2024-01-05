@@ -38,13 +38,13 @@ class InodeAdmin(admin.ModelAdmin):
         return urls
 
     def get_object(self, request, object_id, from_field=None):
-        for model in InodeModel.all_models:
+        for model in InodeModel.real_models:
             try:
                 obj = model.objects.get(id=object_id)
                 if obj.is_folder and obj.site == self.admin_site.name:
                     return obj
                 elif obj.folder.site == self.admin_site.name:
-                    return obj
+                    return obj.casted
             except model.DoesNotExist:
                 pass
 
@@ -103,7 +103,7 @@ class InodeAdmin(admin.ModelAdmin):
         Return a serialized list of file/folder-s for the given folder.
         """
         inodes, applicable_sorting = [], []
-        for inode_model in InodeModel.all_models:
+        for inode_model in InodeModel.real_models:
             queryset = inode_model.objects.select_related('owner') \
                 .filter(**lookup) \
                 .annotate(owner_name=F('owner__username')) \
@@ -121,8 +121,10 @@ class InodeAdmin(admin.ModelAdmin):
                         current_app=self.admin_site.name,
                     ),
                     'download_url': obj.get_download_url(),
-                    'thumbnail_url': obj.get_thumbnail_url(),
-                    'summary': obj.summary,
+                    'thumbnail_url': obj.casted.get_thumbnail_url(),
+                    'sample_url': obj.casted.get_sample_url(),
+                    'editor_component': obj.casted.editor_component,
+                    'summary': obj.casted.summary,
                 } for obj in queryset))
             )
         if applicable_sorting:
@@ -209,6 +211,7 @@ class InodeAdmin(admin.ModelAdmin):
         favorite_folders = self.get_favorite_folders(request, inode.folder)
         settings = {
             'name': inode.name,
+            'is_folder': inode.is_folder,
             'folder_id': inode.folder.id,
             'favorite_folders': favorite_folders,
             'csrf_token': get_token(request),

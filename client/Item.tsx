@@ -1,4 +1,4 @@
-import React, {createRef, useContext, useEffect, useState} from 'react';
+import React, {createRef, lazy, Suspense, useContext, useEffect, useMemo, useState} from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {FinderSettings} from './FinderSettings';
 
@@ -8,7 +8,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(
 	{timeStyle: 'short', dateStyle: 'short'} as Intl.DateTimeFormatOptions,
 );
 
-export function Inode(props) {
+export function DraggableItem(props) {
 	const {
 		attributes,
 		listeners,
@@ -18,7 +18,7 @@ export function Inode(props) {
 		data: props,
 		disabled: props.disabled,
 	});
-	const [event, setEvent] = useState<PointerEvent>();
+	const [event, setEvent] = useState<PointerEvent>(null);
 
 	useEffect(
 		() => {
@@ -59,6 +59,7 @@ export function Inode(props) {
 	}
 
 	function activateInode(event) {
+		console.log('activateInode', event, props.id);
 		setEvent(event);
 		event.stopPropagation();
 		event.preventDefault();
@@ -81,14 +82,22 @@ export function Inode(props) {
 }
 
 
+function StaticFigure(props) {
+	return (<>{props.children}</>);
+}
+
+
 export function ListItem(props) {
 	const settings = useContext(FinderSettings);
+	const FigBody = props.editor_component ? useMemo(
+		() => {
+			const component = `./components/${props.editor_component}.js`;
+			const LazyFigure = lazy(() => import(component));
+			return (props) => (<Suspense><LazyFigure {...props}>{props.children}</LazyFigure></Suspense>);
+		},
+		[]
+	) : StaticFigure;
 	const [focusHandler, setFocusHandler] = useState(null);
-
-	function swallowEvent(event) {
-		event.stopPropagation();
-		event.preventDefault();
-	}
 
 	function handleFocus(event) {
 		if (!(event.target.contentEditable))
@@ -154,7 +163,7 @@ export function ListItem(props) {
 		case 'tiles': case 'mosaic':
 			return (
 				<figure>
-					<img src={props.thumbnail_url} />
+					<FigBody sampleUrl={props.sample_url}><img src={props.thumbnail_url} /></FigBody>
 					<figcaption>
 						<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 							{props.name}
@@ -165,7 +174,7 @@ export function ListItem(props) {
 		case 'list':
 			return (<>
 				<div>
-					<img src={props.thumbnail_url} />
+					<FigBody sampleUrl={props.sample_url}><img src={props.thumbnail_url} /></FigBody>
 				</div>
 				<div>
 					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
@@ -185,7 +194,7 @@ export function ListItem(props) {
 		case 'columns':
 			return (<>
 				<div>
-					<img src={props.thumbnail_url} />
+					<FigBody sampleUrl={props.sample_url}><img src={props.thumbnail_url} /></FigBody>
 				</div>
 				<div>
 					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
@@ -199,11 +208,11 @@ export function ListItem(props) {
 
 export function File(props) {
 	return (
-		<Inode {...props}>
+		<DraggableItem {...props}>
 			<div className="inode">
 				<ListItem {...props} />
 			</div>
-		</Inode>
+		</DraggableItem>
 	);
 }
 
@@ -233,10 +242,10 @@ export function Folder(props) {
 	}
 
 	return (
-		<Inode {...props}>
+		<DraggableItem {...props}>
 			<div ref={setNodeRef} className={cssClasses()}>
 				<ListItem {...props} />
 			</div>
-		</Inode>
+		</DraggableItem>
 	);
 }

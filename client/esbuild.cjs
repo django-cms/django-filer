@@ -5,7 +5,7 @@ const buildOptions = require('yargs-parser')(process.argv.slice(2), {
 });
 
 build({
-  entryPoints: ['client/folder-admin.tsx', 'client/file-admin.tsx', 'client/contrib/*.tsx'],
+  entryPoints: ['client/folder-admin.tsx', 'client/file-admin.tsx', 'client/components/*.tsx'],
   bundle: true,
   minify: !buildOptions.debug,
   sourcemap: buildOptions.debug,

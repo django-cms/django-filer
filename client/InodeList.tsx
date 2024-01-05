@@ -1,13 +1,12 @@
 import React, {
 	createRef,
 	forwardRef,
-	SyntheticEvent,
 	useContext,
 	useEffect,
 	useImperativeHandle,
 	useState,
 } from 'react';
-import {Folder, File, Inode, ListItem} from './Inode';
+import {Folder, File, DraggableItem, ListItem} from './Item';
 import {FinderSettings} from './FinderSettings';
 
 
@@ -131,8 +130,13 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 		setSelectedInode(selectedInode);
 	}
 
-	function selectMultipleInodes(selectedInodeIds: Array<string>) {
-		const modifiedInodes = inodes.map(inode => ({...inode, selected: selectedInodeIds.includes(inode.id), cutted: false, copied: false}));
+	function selectMultipleInodes(selectedInodeIds: Array<string>, extend: boolean = false) {
+		const modifiedInodes = inodes.map(inode => ({
+			...inode,
+			selected: extend && inode.selected || selectedInodeIds.includes(inode.id),
+			cutted: false,
+			copied: false,
+		}));
 		setCurrentFolder(folderId);
 		setInodes(modifiedInodes);
 		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
@@ -143,12 +147,6 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 			setInodes(inodes.map(inode => ({...inode, selected: false, dragged: false})));
 		}
 	}
-
-	const deactivateInodes = (event: SyntheticEvent) => {
-		if (event.target instanceof Element && event.target.classList.contains('inode-list')) {
-			deselectInodes();
-		}
-	};
 
 	function cssClasses() {
 		const classes = ['inode-list'];
@@ -174,7 +172,7 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 	console.log('InodeList', folderId, inodes);
 
 	return (
-		<ul className={cssClasses()} onClick={deactivateInodes}>
+		<ul className={cssClasses()}>
 			{layout === 'list' &&
 			<li className="header">
 				<div className="inode">
@@ -200,11 +198,11 @@ export function DraggedInodes(props) {
 	return (
 		<ul className="inode-list" style={style}>{
 			inodes.map(inode =>
-			<Inode key={inode.id} {...inode} isDragged={true}>
+			<DraggableItem key={inode.id} {...inode} isDragged={true}>
 				<div className="inode">
 					<ListItem {...inode} layout={layout} />
 				</div>
-			</Inode>)
+			</DraggableItem>)
 		}</ul>
 	);
 }
