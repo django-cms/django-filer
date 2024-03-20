@@ -9,8 +9,12 @@ from django.utils.module_loading import import_string
 
 from filer import settings as filer_settings
 from filer.models.filemodels import File
-from filer.models.imagemodels import Image
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
 from tests.helpers import create_image
+
+
+Image = load_model(FILER_IMAGE_MODEL)
 
 
 class FilerCheckTestCase(TestCase):
