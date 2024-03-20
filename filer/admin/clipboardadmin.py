@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.urls import path
@@ -9,7 +10,7 @@ from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
 from ..utils.files import handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
-from ..validation import FileValidationError, validate_upload
+from ..validation import validate_upload
 from . import views
 
 
@@ -112,18 +113,17 @@ def ajax_upload(request, folder_id=None):
             break
     uploadform = FileForm({'original_filename': filename, 'owner': request.user.pk},
                           {'file': upload})
+    uploadform.request = request
     uploadform.instance.mime_type = mime_type
     if uploadform.is_valid():
         try:
             validate_upload(filename, upload, request.user, mime_type)
-        except FileValidationError as error:
-            from django.contrib.messages import ERROR, add_message
-            message = str(error)
-            add_message(request, ERROR, message)
-            return JsonResponse({'error': message})
-        file_obj = uploadform.save(commit=False)
-        # Enforce the FILER_IS_PUBLIC_DEFAULT
-        file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+            file_obj = uploadform.save(commit=False)
+            # Enforce the FILER_IS_PUBLIC_DEFAULT
+            file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
+        except ValidationError as error:
+            messages.error(request, str(error))
+            return JsonResponse({'error': str(error)})
         file_obj.folder = folder
         file_obj.save()
         # TODO: Deprecated/refactor
@@ -131,29 +131,35 @@ def ajax_upload(request, folder_id=None):
         #     clipboard=clipboard, file=file_obj)
         # clipboard_item.save()
 
-        thumbnail = None
-        data = {
-            'thumbnail': thumbnail,
-            'alt_text': '',
-            'label': str(file_obj),
-            'file_id': file_obj.pk,
-        }
-        # prepare preview thumbnail
-        if isinstance(file_obj, Image):
-            thumbnail_180_options = {
-                'size': (180, 180),
-                'crop': True,
-                'upscale': True,
+        try:
+            thumbnail = None
+            data = {
+                'thumbnail': thumbnail,
+                'alt_text': '',
+                'label': str(file_obj),
+                'file_id': file_obj.pk,
             }
-            thumbnail_180 = file_obj.file.get_thumbnail(
-                thumbnail_180_options)
-            data['thumbnail_180'] = thumbnail_180.url
-            data['original_image'] = file_obj.url
-        return JsonResponse(data)
+            # prepare preview thumbnail
+            if isinstance(file_obj, Image):
+                thumbnail_180_options = {
+                    'size': (180, 180),
+                    'crop': True,
+                    'upscale': True,
+                }
+                thumbnail_180 = file_obj.file.get_thumbnail(
+                    thumbnail_180_options)
+                data['thumbnail_180'] = thumbnail_180.url
+                data['original_image'] = file_obj.url
+            return JsonResponse(data)
+        except Exception as error:
+            messages.error(request, str(error))
+            return JsonResponse({"error": str(error)})
     else:
-        form_errors = '; '.join(['{}: {}'.format(
-            field,
-            ', '.join(errors)) for field, errors in list(
-                uploadform.errors.items())
+        for key, error_list in uploadform.errors.items():
+            for error in error_list:
+                messages.error(request, error)
+
+        form_errors = '; '.join(['{}'.format(
+            ', '.join(errors)) for errors in list(uploadform.errors.values())
         ])
-        return JsonResponse({'message': str(form_errors)}, status=422)
+        return JsonResponse({'error': str(form_errors)}, status=200)

@@ -17,6 +17,7 @@
     box-shadow: 0 0 10px rgba(black,.25);
     border-radius: 5px;
     z-index: 10;
+    cursor: default;
     &:before {
         position: absolute;
         top: -3px;

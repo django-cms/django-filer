@@ -10,11 +10,12 @@
                         <span class="icon fa fa-download filer-icon filer-icon-download"></span>&nbsp;
                         <span>{% translate "Download" %}</span>
                     </a>
-                    {% if original.mime_maintype == 'image' and "svg" not in original.mime_type %}
-                    <a href="{{ original.url }}" target="_blank" rel="noopener noreferrer" class="button">
-                        <span>{% translate "Expand" %}</span>&nbsp;
-                        <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
-                    </a>
+                    {% if original.mime_maintype == 'image' %}
+                        <a href="{% if 'svg' in original.mime_type %}{% url 'admin:filer_image_expand_view' original.pk %}{% else %}{{ original.file.url }}{% endif %}"
+                           target="_blank" rel="noopener noreferrer" class="button">
+                            <span>{% translate "Expand" %}</span>&nbsp;
+                            <span class="icon filer-icon filer-icon-expand fa fa-expand"></span>
+                        </a>
                     {% endif %}
                 {% else %}
                     <span class="warning">{% translate "File is missing" %}</span>

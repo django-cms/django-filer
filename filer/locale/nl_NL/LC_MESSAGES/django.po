@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django Filer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-20 10:11+0200\n"
+"POT-Creation-Date: 2023-09-30 18:10+0200\n"
 "PO-Revision-Date: 2012-07-13 15:50+0000\n"
 "Last-Translator: Stefan van den Eertwegh <stefan@corebyte.nl>, 2023\n"
 "Language-Team: Dutch (Netherlands) (http://app.transifex.com/divio/django-filer/language/nl_NL/)\n"
@@ -27,26 +27,26 @@ msgstr ""
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/clipboardadmin.py:16
+#: admin/clipboardadmin.py:17
 #| msgid ""
 #| "ccount doesn't have permissions to rename all of the selected files."
 msgid "You do not have permission to upload files."
 msgstr "Je hebt geen rechten om bestanden te uploaden."
 
-#: admin/clipboardadmin.py:17
+#: admin/clipboardadmin.py:18
 msgid "Can't find folder to upload. Please refresh and try again"
 msgstr "Kan map niet vinden om te uploaden. Herlaad de pagina en probeer het opnieuw."
 
-#: admin/clipboardadmin.py:19
+#: admin/clipboardadmin.py:20
 msgid ""
 "Can't use this folder, Permission Denied. Please select another folder."
 msgstr "Kan deze map niet gebruiken, rechten geweigerd. Kies een andere map."
 
-#: admin/fileadmin.py:49
+#: admin/fileadmin.py:73
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: admin/fileadmin.py:164
+#: admin/fileadmin.py:188
 msgid "canonical URL"
 msgstr "canonieke URL"
 
@@ -183,68 +183,68 @@ msgstr "Afmetingen aanpassen"
 msgid "Resize selected images"
 msgstr "Afmetingen aanpassen van geselecteerde afbeeldingen"
 
-#: admin/forms.py:25
+#: admin/forms.py:24
 msgid "Suffix which will be appended to filenames of copied files."
 msgstr "Achtervoegsel wordt toegevoegd aan bestandsnaam van gekopieerde bestanden"
 
-#: admin/forms.py:32
+#: admin/forms.py:31
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
 msgstr "Achtervoegsel moet een geldige waarde zijn in kleine letters, bv. \"%(valid)s\"."
 
-#: admin/forms.py:53
+#: admin/forms.py:52
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
 msgstr "Type \"%(key)s\" voor het hernoemen van bestandsnamen is ongeldig."
 
-#: admin/forms.py:55
+#: admin/forms.py:54
 #, python-format
 msgid "Invalid rename format: %(error)s."
 msgstr "Ongeldige waarde voor het hernoemen van bestandsnamen: %(error)s."
 
-#: admin/forms.py:69 models/thumbnailoptionmodels.py:37
+#: admin/forms.py:68 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
 msgstr "thumbnail optie"
 
-#: admin/forms.py:73 models/thumbnailoptionmodels.py:15
+#: admin/forms.py:72 models/thumbnailoptionmodels.py:15
 msgid "width"
 msgstr "breedte"
 
-#: admin/forms.py:74 models/thumbnailoptionmodels.py:20
+#: admin/forms.py:73 models/thumbnailoptionmodels.py:20
 msgid "height"
 msgstr "hoogte"
 
-#: admin/forms.py:75 models/thumbnailoptionmodels.py:25
+#: admin/forms.py:74 models/thumbnailoptionmodels.py:25
 msgid "crop"
 msgstr "uitsnijden"
 
-#: admin/forms.py:76 models/thumbnailoptionmodels.py:30
+#: admin/forms.py:75 models/thumbnailoptionmodels.py:30
 msgid "upscale"
 msgstr "opschalen"
 
-#: admin/forms.py:80
+#: admin/forms.py:79
 msgid "Thumbnail option or resize parameters must be choosen."
 msgstr "Thumbnail optie of afmetingsopties moet zijn geselecteerd"
 
-#: admin/imageadmin.py:18 admin/imageadmin.py:105
+#: admin/imageadmin.py:20 admin/imageadmin.py:112
 msgid "Subject location"
 msgstr "Locatie van onderwerp"
 
-#: admin/imageadmin.py:19
+#: admin/imageadmin.py:21
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
 msgstr "Locatie van het hoofdonderwerp van de scène. Formaat: \"x,y\"."
 
-#: admin/imageadmin.py:57
+#: admin/imageadmin.py:59
 msgid "Invalid subject location format. "
 msgstr "Ongeldig locatieformaat van het onderwerp"
 
-#: admin/imageadmin.py:65
+#: admin/imageadmin.py:67
 msgid "Subject location is outside of the image. "
 msgstr "Locatie van het onderwerp bevindt zich buiten de afbeelding."
 
-#: admin/imageadmin.py:74
+#: admin/imageadmin.py:76
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
 msgstr "Je invoer: \"{subject_location}\"."
@@ -271,25 +271,41 @@ msgstr "Bestandsbeheer"
 msgid "Media library"
 msgstr "Mediabibliotheek"
 
-#: models/abstract.py:49
+#: models/abstract.py:62
 msgid "default alt text"
 msgstr "standaard alt. tekst"
 
-#: models/abstract.py:56
+#: models/abstract.py:69
 msgid "default caption"
 msgstr "standaard titel"
 
-#: models/abstract.py:63
+#: models/abstract.py:76
 msgid "subject location"
 msgstr "locatie van onderwerp"
 
-#: models/abstract.py:78
+#: models/abstract.py:91
 msgid "image"
 msgstr "afbeelding"
 
-#: models/abstract.py:79
+#: models/abstract.py:92
 msgid "images"
 msgstr "afbeeldingen"
+
+#: models/abstract.py:148
+#, python-format
+msgid ""
+"Image format not recognized or image size exceeds limit of %(max_pixels)d "
+"million pixels by a factor of two or more. Before uploading again, check "
+"file format or resize image to %(width)d x %(height)d resolution or lower."
+msgstr "Afbeelding formaat niet herkend of afbeelding grootte overtreft limiet van %(max_pixels)d miljoen pixels bij een factor twee of meer. Voor opnieuw uploaden, check bestandsformaat of wijzig grootte afbeelding van %(width)d x %(height)d resolutie of lager."
+
+#: models/abstract.py:156
+#, python-format
+msgid ""
+"Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
+"million pixels. Before uploading again, resize image to %(width)d x "
+"%(height)d resolution or lower."
+msgstr "Afbeelding grootte (%(pixels)d miljoen pixels) overtreft limiet van %(max_pixels)d miljoen pixels. Voor het opnieuw uploaden, afbeelding grootte van %(width)d x %(height)d resolutie of lager."
 
 #: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
@@ -532,7 +548,7 @@ msgstr "thumbnail-opties"
 
 #: models/virtualitems.py:46
 #: templates/admin/filer/folder/directory_table_list.html:4
-#: templates/admin/filer/folder/directory_table_list.html:167
+#: templates/admin/filer/folder/directory_table_list.html:170
 #: templates/admin/filer/folder/directory_thumbnail_list.html:5
 #: templates/admin/filer/folder/directory_thumbnail_list.html:146
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
@@ -566,7 +582,7 @@ msgid "Go"
 msgstr "Uitvoeren"
 
 #: templates/admin/filer/actions.html:14
-#: templates/admin/filer/folder/directory_table_list.html:232
+#: templates/admin/filer/folder/directory_table_list.html:235
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 msgid "Click here to select the objects across all pages"
 msgstr "Klik hier om objecten over alle pagina's te selecteren"
@@ -577,7 +593,7 @@ msgid "Select all %(total_count)s files and/or folders"
 msgstr "Selecteer alle %(total_count)s bestanden en/of mappen"
 
 #: templates/admin/filer/actions.html:16
-#: templates/admin/filer/folder/directory_table_list.html:234
+#: templates/admin/filer/folder/directory_table_list.html:237
 #: templates/admin/filer/folder/directory_thumbnail_list.html:212
 msgid "Clear selection"
 msgstr "Selectie wissen"
@@ -673,7 +689,7 @@ msgstr "admin homepage"
 #: templates/admin/filer/folder/directory_listing.html:103
 #: templates/admin/filer/folder/directory_table_list.html:29
 #: templates/admin/filer/folder/directory_table_list.html:59
-#: templates/admin/filer/folder/directory_table_list.html:178
+#: templates/admin/filer/folder/directory_table_list.html:181
 #: templates/admin/filer/folder/directory_thumbnail_list.html:27
 #: templates/admin/filer/folder/directory_thumbnail_list.html:61
 #: templates/admin/filer/folder/directory_thumbnail_list.html:156
@@ -862,12 +878,12 @@ msgid "Name"
 msgstr "Naam"
 
 #: templates/admin/filer/folder/directory_table_list.html:17
-#: templates/admin/filer/tools/detail_info.html:49
+#: templates/admin/filer/tools/detail_info.html:50
 msgid "Owner"
 msgstr "Eigenaar"
 
 #: templates/admin/filer/folder/directory_table_list.html:18
-#: templates/admin/filer/tools/detail_info.html:33
+#: templates/admin/filer/tools/detail_info.html:34
 msgid "Size"
 msgstr "Grootte"
 
@@ -922,7 +938,7 @@ msgstr "Selecteer dit bestand"
 
 #: templates/admin/filer/folder/directory_table_list.html:107
 #: templates/admin/filer/folder/directory_table_list.html:122
-#: templates/admin/filer/folder/directory_table_list.html:151
+#: templates/admin/filer/folder/directory_table_list.html:154
 #: templates/admin/filer/folder/directory_thumbnail_list.html:107
 #: templates/admin/filer/folder/directory_thumbnail_list.html:122
 #, python-format
@@ -945,68 +961,73 @@ msgid "enabled"
 msgstr "ingeschakeld"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
+#| msgid "Move selected files to clipboard"
+msgid "URL copied to clipboard"
+msgstr "URL gekopieerd naar het klembord"
+
+#: templates/admin/filer/folder/directory_table_list.html:147
 #, python-format
 #| msgid "Change '%(item_label)s' details"
 msgid "Canonical url '%(item_label)s'"
 msgstr "Gebruikelijke url '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table_list.html:148
+#: templates/admin/filer/folder/directory_table_list.html:151
 #, python-format
 #| msgid "Change '%(item_label)s' details"
 msgid "Download '%(item_label)s'"
 msgstr "Download '%(item_label)s'"
 
-#: templates/admin/filer/folder/directory_table_list.html:152
+#: templates/admin/filer/folder/directory_table_list.html:155
 msgid "Remove file"
 msgstr "Verwijder bestand"
 
-#: templates/admin/filer/folder/directory_table_list.html:160
+#: templates/admin/filer/folder/directory_table_list.html:163
 #: templates/admin/filer/folder/directory_thumbnail_list.html:138
 msgid "Drop files here or use the \"Upload Files\" button"
 msgstr "Sleep hier bestanden naartoe of gebruik de \"Bestanden uploaden\"-knop"
 
-#: templates/admin/filer/folder/directory_table_list.html:175
+#: templates/admin/filer/folder/directory_table_list.html:178
 #: templates/admin/filer/folder/directory_thumbnail_list.html:153
 msgid "Drop your file to upload into:"
 msgstr "Sleep je bestand om te uploaden naar:"
 
-#: templates/admin/filer/folder/directory_table_list.html:185
+#: templates/admin/filer/folder/directory_table_list.html:188
 #: templates/admin/filer/folder/directory_thumbnail_list.html:163
 msgid "Upload"
 msgstr "Uploaden"
 
-#: templates/admin/filer/folder/directory_table_list.html:197
+#: templates/admin/filer/folder/directory_table_list.html:200
 #: templates/admin/filer/folder/directory_thumbnail_list.html:175
 msgid "cancel"
 msgstr "annuleer"
 
-#: templates/admin/filer/folder/directory_table_list.html:201
+#: templates/admin/filer/folder/directory_table_list.html:204
 #: templates/admin/filer/folder/directory_thumbnail_list.html:179
 msgid "Upload success!"
 msgstr "Upload succesvol!"
 
-#: templates/admin/filer/folder/directory_table_list.html:205
+#: templates/admin/filer/folder/directory_table_list.html:208
 #: templates/admin/filer/folder/directory_thumbnail_list.html:183
 msgid "Upload canceled!"
 msgstr "Upload geannuleerd!"
 
-#: templates/admin/filer/folder/directory_table_list.html:212
+#: templates/admin/filer/folder/directory_table_list.html:215
 #: templates/admin/filer/folder/directory_thumbnail_list.html:190
 msgid "previous"
 msgstr "vorige"
 
-#: templates/admin/filer/folder/directory_table_list.html:217
+#: templates/admin/filer/folder/directory_table_list.html:220
 #: templates/admin/filer/folder/directory_thumbnail_list.html:195
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
 msgstr "Pagina %(number)s van %(num_pages)s."
 
-#: templates/admin/filer/folder/directory_table_list.html:222
+#: templates/admin/filer/folder/directory_table_list.html:225
 #: templates/admin/filer/folder/directory_thumbnail_list.html:200
 msgid "next"
 msgstr "volgende"
 
-#: templates/admin/filer/folder/directory_table_list.html:232
+#: templates/admin/filer/folder/directory_table_list.html:235
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 #, python-format
 msgid "Select all %(total_count)s"
@@ -1078,30 +1099,30 @@ msgstr "upload mislukt"
 msgid "Download"
 msgstr "Download"
 
-#: templates/admin/filer/tools/detail_info.html:15
+#: templates/admin/filer/tools/detail_info.html:16
 msgid "Expand"
 msgstr "Uitvouwen"
 
-#: templates/admin/filer/tools/detail_info.html:20
+#: templates/admin/filer/tools/detail_info.html:21
 #: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:107
+#: templatetags/filer_admin_tags.py:108
 #| msgid "file missing"
 msgid "File is missing"
 msgstr "Bestand ontbreekt"
 
-#: templates/admin/filer/tools/detail_info.html:29
+#: templates/admin/filer/tools/detail_info.html:30
 msgid "Type"
 msgstr "Type"
 
-#: templates/admin/filer/tools/detail_info.html:37
+#: templates/admin/filer/tools/detail_info.html:38
 msgid "File-size"
 msgstr "Bestandsgrootte"
 
-#: templates/admin/filer/tools/detail_info.html:41
+#: templates/admin/filer/tools/detail_info.html:42
 msgid "Modified"
 msgstr "Gewijzigd"
 
-#: templates/admin/filer/tools/detail_info.html:45
+#: templates/admin/filer/tools/detail_info.html:46
 msgid "Created"
 msgstr "Aangemaakt"
 
@@ -1145,27 +1166,32 @@ msgstr "Kies bestand"
 msgid "Choose Folder"
 msgstr "Kies Map"
 
-#: validation.py:19
+#: validation.py:20
 #, python-brace-format
 msgid "File \"{file_name}\": Upload denied by site security policy"
 msgstr "Bestand \"{file_name}\": Upload geweigerd door het beveiligingsbeleid van de site"
 
-#: validation.py:22
+#: validation.py:23
 #, python-brace-format
 msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
 msgstr "Bestand \"{file_name}\": {file_type} upload geweigerd door het beveiligingsbeleid van de site"
 
-#: validation.py:33
+#: validation.py:34
 #, python-brace-format
 msgid "File \"{file_name}\": HTML upload denied by site security policy"
 msgstr "Bestand \"{file_name}\": HTML upload geweigerd door het beveiligingsbeleid van de site"
 
-#: validation.py:71
+#: validation.py:72
 #, python-brace-format
 msgid ""
 "File \"{file_name}\": Rejected due to potential cross site scripting "
 "vulnerability"
 msgstr "Bestand \"{file_name}\": Afgewezen wegens mogelijke kwetsbaarheid voor cross-site scripting"
+
+#: validation.py:84
+#, python-brace-format
+msgid "File \"{file_name}\": SVG file format not recognized"
+msgstr "Bestand \"{file_name}\": SVG bestandsformaat niet herkend"
 
 #~ msgid "Resize parameters must be choosen."
 #~ msgstr "Resize parameters must be choosen."

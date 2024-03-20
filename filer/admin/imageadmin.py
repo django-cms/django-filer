@@ -1,4 +1,6 @@
 from django import forms
+from django.shortcuts import get_object_or_404, render
+from django.urls import path
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
@@ -6,13 +8,13 @@ from ..settings import FILER_IMAGE_MODEL
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import string_concat
 from ..utils.loader import load_model
-from .fileadmin import FileAdmin
+from .fileadmin import FileAdmin, FileAdminChangeFrom
 
 
 Image = load_model(FILER_IMAGE_MODEL)
 
 
-class ImageAdminForm(forms.ModelForm):
+class ImageAdminForm(FileAdminChangeFrom):
     subject_location = forms.CharField(
         max_length=64, required=False,
         label=_('Subject location'),
@@ -58,8 +60,8 @@ class ImageAdminForm(forms.ModelForm):
             err_code = 'invalid_subject_format'
 
         elif (
-            coordinates[0] > self.instance.width
-            or coordinates[1] > self.instance.height
+            coordinates[0] > self.instance.width > 0
+            or coordinates[1] > self.instance.height > 0
         ):
             err_msg = gettext_lazy(
                 'Subject location is outside of the image. ')
@@ -80,18 +82,23 @@ class ImageAdminForm(forms.ModelForm):
         model = Image
         exclude = ()
 
-    class Media:
-        css = {
-            # 'all': (settings.MEDIA_URL + 'filer/css/focal_point.css',)
-        }
-        js = (
-
-        )
-
 
 class ImageAdmin(FileAdmin):
     change_form_template = 'admin/filer/image/change_form.html'
     form = ImageAdminForm
+
+    def get_urls(self):
+        return super().get_urls() + [
+            path("expand/<int:file_id>",
+                 self.admin_site.admin_view(self.expand_view),
+                 name=f"filer_{self.model._meta.model_name}_expand_view")
+        ]
+
+    def expand_view(self, request, file_id):
+        image = get_object_or_404(self.model, pk=file_id)
+        return render(request, "admin/filer/image/expand.html", context={
+            "original_url": image.url
+        })
 
 
 if FILER_IMAGE_MODEL == 'filer.Image':

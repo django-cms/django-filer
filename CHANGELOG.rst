@@ -2,11 +2,31 @@
 CHANGELOG
 =========
 
-unreleased
-==========
+3.1.1 (2023-11-18)
+==================
 
+* fix: Added compatibility code in aldryn_config go support setting THUMBNAIL_DEFAULT_STORAGE in django 4.2
+* fix: address failing gulp ci jobs
+* feat: Image dimensions update management command
+* ci: pre-commit autoupdate
+
+3.1.0 (2023-10-01)
+==================
+
+* feat: limit uploaded image area (width x height) to prevent decompression
+  bombs
+* feat: Canonical URL action button now copies canonical URL to the user's
+  clipboard
+* fix: Run validators on updated files in file change view
+* fix: Update mime type if uploading file in file change view
+* fix: Do not allow to remove the file field from an uplaoded file in
+  the admin interface
+* fix: refactor upload checks into running validators in the admin
+  and adding clean methods for file and (abstract) image models.
 * Fixed two more instances of javascript int overflow issue (#1335)
 * fix: ensure uniqueness of icon admin url names
+* fix: Crash with django-storage if filer file does not have a
+  storage file attached
 
 3.0.6 (2023-09-08)
 ==================

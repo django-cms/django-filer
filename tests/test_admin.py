@@ -1,3 +1,4 @@
+import json
 import os
 
 import django
@@ -7,6 +8,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.messages import ERROR, get_messages
 from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.test import RequestFactory, TestCase
@@ -18,12 +20,12 @@ from easy_thumbnails.options import ThumbnailOptions
 from filer import settings as filer_settings
 from filer.admin import tools
 from filer.admin.folderadmin import FolderAdmin
+from filer.models import abstract
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
 from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
 from filer.templatetags.filer_admin_tags import file_icon_url, get_aspect_ratio_and_download_url
-
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
@@ -336,6 +338,19 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertContains(response, 'height="210"')
         self.assertContains(response, 'alt="File is missing"')
 
+    def test_image_expand_view(self):
+        url = reverse("admin:filer_image_expand_view", kwargs={
+            'file_id': self.file_object.pk
+        })
+        original_url = self.file_object.url
+
+        response = self.client.get(url)
+
+        self.assertContains(
+            response,
+            f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
+        )
+
 
 class FilerClipboardAdminUrlsTests(TestCase):
     def setUp(self):
@@ -474,6 +489,51 @@ class FilerClipboardAdminUrlsTests(TestCase):
         stored_image = Image.objects.first()
         self.assertEqual(stored_image.original_filename, self.image_name)
         self.assertEqual(stored_image.mime_type, 'image/jpeg')
+
+    def test_filer_ajax_decompression_bomb(self):
+        DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
+        abstract.FILER_MAX_IMAGE_PIXELS = 800 * 200  # Triggers error
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            response = self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertIn("error", json.loads(response.content.decode("utf-8")))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level, ERROR)
+
+        abstract.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            response = self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(response.status_code, 200)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)  # One more message
+        self.assertEqual(messages[1].level, ERROR)
+        self.assertEqual(Image.objects.count(), 0)
+
+        abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
     def test_filer_ajax_upload_file_using_content_type(self):
         self.assertEqual(Image.objects.count(), 0)
@@ -1771,7 +1831,6 @@ class AdminToolsTests(TestCase):
 
 
 class FileIconContextTests(TestCase):
-
     def test_image_icon_with_size(self):
         """
         Image with get an aspect ratio and will be present in context

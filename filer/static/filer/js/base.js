@@ -1,6 +1,7 @@
 // #####################################################################################################################
 // #BASE#
 // Basic logic django filer
+/*jshint esversion: 6 */
 'use strict';
 
 var Cl = window.Cl || {};
@@ -264,5 +265,21 @@ Cl.mediator = new Mediator();
                 $allFilesToggle.prop('checked', false);
             });
         })();
+        $('.js-copy-url').on('click', function (e) {
+            const url = new URL(this.dataset.url, document.location.href);
+            const msg = this.dataset.msg || 'URL copied to clipboard';
+            let infobox = document.createElement('template');
+            e.preventDefault();
+            for (let el of document.getElementsByClassName('info filer-tooltip')) {
+                el.remove();
+            }
+            navigator.clipboard.writeText(url.href);
+            infobox.innerHTML = '<div class="info filer-tooltip">' + msg + '</div>';
+            this.classList.add('filer-tooltip-wrapper');
+            this.appendChild(infobox.content.firstChild);
+            setTimeout(() => {
+                this.getElementsByClassName('info')[0].remove();
+            }, 1200);
+        });
     });
 })(djQuery);

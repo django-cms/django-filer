@@ -1,11 +1,14 @@
 import logging
 
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 import easy_thumbnails.utils
 from easy_thumbnails.VIL import Image as VILImage
+from PIL.Image import MAX_IMAGE_PIXELS
 
 from .. import settings as filer_settings
 from ..utils.compatibility import PILImage
@@ -15,6 +18,16 @@ from .filemodels import File
 
 
 logger = logging.getLogger(__name__)
+
+
+# We can never exceed the max pixel value set by Pillow's PIL Image MAX_IMAGE_PIXELS
+# as if we allow it, it will fail while thumbnailing (first in the admin thumbnails
+# and then in the page itself.
+# Refer this https://github.com/python-pillow/Pillow/blob/b723e9e62e4706a85f7e44cb42b3d838dae5e546/src/PIL/Image.py#L3148
+FILER_MAX_IMAGE_PIXELS = min(
+    getattr(settings, "FILER_MAX_IMAGE_PIXELS", MAX_IMAGE_PIXELS),
+    MAX_IMAGE_PIXELS,
+)
 
 
 class BaseImage(File):
@@ -111,6 +124,41 @@ class BaseImage(File):
                     self._width, self._height = None, None
                     self._transparent = False
         return attrs_updated
+
+    def clean(self):
+        # We check the Image size and calculate the pixel before
+        # the image gets attached to a folder and saved. We also
+        # send the error msg in the JSON and also post the message
+        # so that they know what is wrong with the image they uploaded
+        if not self.file:
+            return
+
+        if self._width is None or self._height is None:
+            # If image size exceeds Pillow's max image size, Pillow will not return width or height
+            pixels = 2 * FILER_MAX_IMAGE_PIXELS + 1
+            aspect = 16 / 9
+        else:
+            width, height = max(1, self.width), max(1, self.height)
+            pixels: int = width * height
+            aspect: float = width / height
+        res_x: int = int((FILER_MAX_IMAGE_PIXELS * aspect) ** 0.5)
+        res_y: int = int(res_x / aspect)
+        if pixels > 2 * FILER_MAX_IMAGE_PIXELS:
+            msg = _(
+                "Image format not recognized or image size exceeds limit of %(max_pixels)d million "
+                "pixels by a factor of two or more. Before uploading again, check file format or resize "
+                "image to %(width)d x %(height)d resolution or lower."
+            ) % dict(max_pixels=FILER_MAX_IMAGE_PIXELS // 1000000, width=res_x, height=res_y)
+            raise ValidationError(str(msg), code="image_size")
+
+        if pixels > FILER_MAX_IMAGE_PIXELS:
+            msg = _(
+                "Image size (%(pixels)d million pixels) exceeds limit of %(max_pixels)d "
+                "million pixels. Before uploading again, resize image to %(width)d x %(height)d "
+                "resolution or lower."
+            ) % dict(pixels=pixels // 1000000, max_pixels=FILER_MAX_IMAGE_PIXELS // 1000000,
+                     width=res_x, height=res_y)
+            raise ValidationError(str(msg), code="image_size")
 
     def save(self, *args, **kwargs):
         self.has_all_mandatory_data = self._check_validity()
