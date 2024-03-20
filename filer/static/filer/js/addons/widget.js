@@ -9,7 +9,8 @@ if (django.jQuery) {
 }
 
 djQuery(function ($) {
-    var filer_clear = function () {
+    var filer_clear = function (ev) {
+        ev.preventDefault();
         var clearer = $(this);
         var container = clearer.closest('.filerFile');
         var input = container.find(':input');
