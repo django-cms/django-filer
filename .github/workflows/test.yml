@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11' ]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
         requirements-file: [
           django-3.2.txt,
           django-4.0.txt,
@@ -16,6 +16,7 @@ jobs:
           django-4.2.txt,
           django-5.0.txt,
         ]
+        custom-image-model: [false, true]
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.8
@@ -41,8 +42,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r tests/requirements/${{ matrix.requirements-file }}
         python setup.py install
+    - name: Enable the custom image model
+      run: echo "CUSTOM_IMAGE=custom_image.Image" >> $GITHUB_ENV
+      if: ${{ matrix.custom-image-model }}
     - name: Run coverage
       run: coverage run setup.py test
-
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
