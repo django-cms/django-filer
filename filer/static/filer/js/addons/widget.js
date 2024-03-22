@@ -9,7 +9,7 @@ if (django.jQuery) {
 }
 
 djQuery(function ($) {
-    var filer_clear = function () {
+    var filer_clear = function (ev) {
         var clearer = $(this);
         var container = clearer.closest('.filerFile');
         var input = container.find(':input');
@@ -20,6 +20,7 @@ djQuery(function ($) {
         var dropzoneMessage = container.siblings('.dz-message');
         var hiddenClass = 'hidden';
 
+        ev.preventDefault();
         clearer.addClass(hiddenClass);
         input.val('');
         thumbnail.addClass(hiddenClass);
