@@ -6,6 +6,7 @@ import django.core.files
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
@@ -327,7 +328,7 @@ class FilerImageAdminUrlsTests(TestCase):
         image._height = 200
         image.save()
 
-        url = reverse(f'admin:{image.__class__._meta.app_label}_image_change', kwargs={
+        url = reverse(admin_urlname(Image._meta, 'change'), kwargs={
             'object_id': image.pk,
         })
 
@@ -338,8 +339,36 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertContains(response, 'height="210"')
         self.assertContains(response, 'alt="File is missing"')
 
+    def test_image_expand_link_in_change_view(self):
+        files = [
+            # Files can use the same contents for this test - it's the mime type that counts
+            File.objects.create(owner=self.superuser, original_filename='some-file.txt', file=self.file_object.file),
+            Image.objects.create(owner=self.superuser, original_filename='some-image.jpg'),  # missing file
+            Image.objects.create(owner=self.superuser, original_filename='some-image.jpg', file=self.file_object.file),
+            Image.objects.create(owner=self.superuser, original_filename='some-image.svg', file=self.file_object.file),
+        ]
+        test_set = [
+            (files[0], 'text/plain', None),
+            (files[1], 'image/jpeg', None),
+            (files[2], 'image/jpeg', files[2].file.url),
+            (files[3], 'image/svg+xml', reverse(admin_urlname(Image._meta, 'expand'), args=(files[3].pk,))),
+        ]
+        for file, mime_type, expected_url in test_set:
+            file.mime_type = mime_type
+            file.save()
+            models = [File]
+            if isinstance(file, Image):
+                models.append(Image)
+            for model in models:
+                response = self.client.get(reverse(admin_urlname(model._meta, 'change'),
+                                                   kwargs={'object_id': file.pk}))
+                if expected_url:
+                    self.assertContains(response, f'href="{expected_url}"')
+                else:
+                    self.assertNotContains(response, 'filer-icon-expand')
+
     def test_image_expand_view(self):
-        url = reverse("admin:filer_image_expand_view", kwargs={
+        url = reverse(admin_urlname(Image._meta, 'expand'), kwargs={
             'file_id': self.file_object.pk
         })
         original_url = self.file_object.url

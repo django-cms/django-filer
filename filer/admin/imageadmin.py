@@ -91,7 +91,7 @@ class ImageAdmin(FileAdmin):
         return super().get_urls() + [
             path("expand/<int:file_id>",
                  self.admin_site.admin_view(self.expand_view),
-                 name=f"filer_{self.model._meta.model_name}_expand_view")
+                 name=f"{self.opts.app_label}_{self.opts.model_name}_expand")
         ]
 
     def expand_view(self, request, file_id):
