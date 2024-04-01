@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import polymorphic
 import hashlib
 import os
@@ -9,7 +9,7 @@ import operator
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
 from django.core.files.base import ContentFile
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from django.db import (models, IntegrityError, transaction)
 from django.utils.translation import ugettext_lazy as _
 from filer.fields.multistorage_file import MultiStorageFileField
@@ -35,7 +35,7 @@ def silence_error_if_missing_file(exception):
     """
     Ugly way of checking in an exception describes a 'missing file'.
     """
-    missing_files_errs = ('no such file', 'does not exist', )
+    missing_files_errs = ('no such file', 'does not exist',)
 
     def find_msg_in_error(msg):
         return msg in str(exception).lower()
@@ -84,7 +84,7 @@ class FileManager(PolymorphicManager):
     def find_all_duplicates(self):
         return {file_data['sha1']: file_data['count']
                 for file_data in self.get_queryset().values('sha1').annotate(
-                    count=Count('id')).filter(count__gt=1)}
+                count=Count('id')).filter(count__gt=1)}
 
 
 class AliveFileManager(FileManager):
@@ -108,11 +108,10 @@ class TrashFileManager(FileManager):
 @mixins.trashable
 class File(PolymorphicModel,
            mixins.IconsMixin):
-
     file_type = 'File'
     _icon = "file"
     folder = models.ForeignKey('filer.Folder', verbose_name=_('folder'), related_name='all_files',
-        null=True, blank=True, on_delete=models.deletion.CASCADE)
+                               null=True, blank=True, on_delete=models.deletion.CASCADE)
     file = MultiStorageFileField(_('file'), null=True, blank=True, db_index=True, max_length=1024)
     _file_size = models.IntegerField(_('file size'), null=True, blank=True)
 
@@ -137,8 +136,8 @@ class File(PolymorphicModel,
                     ' not displayed via the image plugin.'))
 
     owner = models.ForeignKey(auth_models.User,
-        related_name='owned_%(class)ss', on_delete=models.SET_NULL,
-        null=True, blank=True, verbose_name=_('owner'))
+                              related_name='owned_%(class)ss', on_delete=models.SET_NULL,
+                              null=True, blank=True, verbose_name=_('owner'))
 
     uploaded_at = models.DateTimeField(_('uploaded at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('modified at'), auto_now=True)
@@ -146,8 +145,8 @@ class File(PolymorphicModel,
     is_public = models.BooleanField(
         default=filer_settings.FILER_IS_PUBLIC_DEFAULT,
         verbose_name=_('Permissions disabled'),
-        help_text=_('Disable any permission checking for this ' +\
-                    'file. File will be publicly accessible ' +\
+        help_text=_('Disable any permission checking for this ' + \
+                    'file. File will be publicly accessible ' + \
                     'to anyone.'))
 
     restricted = models.BooleanField(
@@ -197,11 +196,11 @@ class File(PolymorphicModel,
                 if supported_extensions:
                     err_msg = "File name (%s) for this %s should preserve " \
                               "one of the supported extensions %s" % (
-                                self.name, old_file_type.file_type.lower(),
-                                ', '.join(supported_extensions))
+                                  self.name, old_file_type.file_type.lower(),
+                                  ', '.join(supported_extensions))
                 else:
                     err_msg = "Extension %s is not allowed for this file " \
-                              "type." % (extension, )
+                              "type." % (extension,)
                 raise ValidationError(err_msg)
 
         if self.folder:
@@ -209,7 +208,7 @@ class File(PolymorphicModel,
             if entries and any(entry.pk != self.pk for entry in entries):
                 raise ValidationError(
                     _('Current folder already contains a file named %s') % \
-                        self.actual_name)
+                    self.actual_name)
 
     def _move_file(self):
         """
@@ -237,7 +236,7 @@ class File(PolymorphicModel,
         src_file = src_storage.open(src_file_name)
         src_file.open()
         self.file = dst_storage.save(dst_file_name,
-            ContentFile(src_file.read()))
+                                     ContentFile(src_file.read()))
         src_file.close()
         src_storage.delete(src_file_name)
 
@@ -422,7 +421,7 @@ class File(PolymorphicModel,
             # if there are no more references to the file on storage delete it
             #   and all its thumbnails
             if not File.objects.exclude(pk=self.pk).filter(
-                file=old_location, is_public=self.is_public).exists():
+                    file=old_location, is_public=self.is_public).exists():
                 self.file.delete(False)
         finally:
             # even if `copy_file` fails, user is trying to delete this file so
@@ -448,6 +447,7 @@ class File(PolymorphicModel,
 
     def delete(self, *args, **kwargs):
         super(File, self).delete_restorable(*args, **kwargs)
+
     delete.alters_data = True
 
     def _set_valid_name_for_restore(self):
@@ -525,7 +525,7 @@ class File(PolymorphicModel,
         return text
 
     def _cmp(self, a, b):
-        return (a > b) - (a < b) 
+        return (a > b) - (a < b)
 
     def __lt__(self, other):
         return self._cmp(self.label.lower(), other.label.lower()) < 0
@@ -600,7 +600,7 @@ class File(PolymorphicModel,
 
     def get_admin_delete_url(self):
         return reverse(
-            'admin:{0}_{1}_delete'.format(self._meta.app_label, self._meta.model_name,),
+            'admin:{0}_{1}_delete'.format(self._meta.app_label, self._meta.model_name, ),
             args=(self.pk,))
 
     @property
@@ -673,8 +673,8 @@ class File(PolymorphicModel,
     def is_restricted_for_user(self, user):
         perm = 'filer.can_restrict_operations'
         return (self.restricted and (
-            not (user.has_perm(perm, self) or user.has_perm(perm)) or
-            not can_restrict_on_site(user, self.folder.site)))
+                not (user.has_perm(perm, self) or user.has_perm(perm)) or
+                not can_restrict_on_site(user, self.folder.site)))
 
     def can_change_restricted(self, user):
         """
@@ -725,7 +725,7 @@ class File(PolymorphicModel,
 
     def has_delete_permission(self, user):
         if not self.folder:
-             # clipboard and unfiled files
+            # clipboard and unfiled files
             return True
         # nobody can delete core files
         if self.is_readonly_for_user(user):
@@ -742,6 +742,7 @@ class File(PolymorphicModel,
 
     def __str__(self):
         return self.__unicode__()
+
     class Meta:
         app_label = 'filer'
         verbose_name = _('file')
