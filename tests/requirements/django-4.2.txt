@@ -1,7 +1,6 @@
 -r base.txt
 
 django-app-helper>=3.3.1
-packaging
 
 django>=4.2,<5
 django_polymorphic>=3.1
