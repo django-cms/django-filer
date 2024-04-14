@@ -201,34 +201,34 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             # we override the default list view with our own directory listing
             # of the root directories
             path('',
-                    self.admin_site.admin_view(self.directory_listing),
-                    name='filer-directory_listing-root'),
+                self.admin_site.admin_view(self.directory_listing),
+                name='filer-directory_listing-root'),
 
             path('last/',
-                    self.admin_site.admin_view(self.directory_listing),
-                    {'viewtype': 'last'},
-                    name='filer-directory_listing-last'),
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'last'},
+                name='filer-directory_listing-last'),
 
             path('<int:folder_id>/list/',
-                    self.admin_site.admin_view(self.directory_listing),
-                    name='filer-directory_listing'),
+                self.admin_site.admin_view(self.directory_listing),
+                name='filer-directory_listing'),
 
             path('<int:folder_id>/make_folder/',
-                    self.admin_site.admin_view(views.make_folder),
-                    name='filer-directory_listing-make_folder'),
+                self.admin_site.admin_view(views.make_folder),
+                name='filer-directory_listing-make_folder'),
             path('make_folder/',
-                    self.admin_site.admin_view(views.make_folder),
-                    name='filer-directory_listing-make_root_folder'),
+                self.admin_site.admin_view(views.make_folder),
+                name='filer-directory_listing-make_root_folder'),
 
             path('images_with_missing_data/',
-                    self.admin_site.admin_view(self.directory_listing),
-                    {'viewtype': 'images_with_missing_data'},
-                    name='filer-directory_listing-images_with_missing_data'),
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'images_with_missing_data'},
+                name='filer-directory_listing-images_with_missing_data'),
 
             path('unfiled_images/',
-                    self.admin_site.admin_view(self.directory_listing),
-                    {'viewtype': 'unfiled_images'},
-                    name='filer-directory_listing-unfiled_images'),
+                self.admin_site.admin_view(self.directory_listing),
+                {'viewtype': 'unfiled_images'},
+                name='filer-directory_listing-unfiled_images'),
         ] + super().get_urls()
 
     # custom views

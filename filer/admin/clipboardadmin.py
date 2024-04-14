@@ -36,20 +36,20 @@ class ClipboardAdmin(admin.ModelAdmin):
     def get_urls(self):
         return [
             path('operations/paste_clipboard_to_folder/',
-                    self.admin_site.admin_view(views.paste_clipboard_to_folder),
-                    name='filer-paste_clipboard_to_folder'),
+                self.admin_site.admin_view(views.paste_clipboard_to_folder),
+                name='filer-paste_clipboard_to_folder'),
             path('operations/discard_clipboard/',
-                    self.admin_site.admin_view(views.discard_clipboard),
-                    name='filer-discard_clipboard'),
+                self.admin_site.admin_view(views.discard_clipboard),
+                name='filer-discard_clipboard'),
             path('operations/delete_clipboard/',
-                    self.admin_site.admin_view(views.delete_clipboard),
-                    name='filer-delete_clipboard'),
+                self.admin_site.admin_view(views.delete_clipboard),
+                name='filer-delete_clipboard'),
             path('operations/upload/<int:folder_id>/',
-                    ajax_upload,
-                    name='filer-ajax_upload'),
+                ajax_upload,
+                name='filer-ajax_upload'),
             path('operations/upload/no_folder/',
-                    ajax_upload,
-                    name='filer-ajax_upload'),
+                ajax_upload,
+                name='filer-ajax_upload'),
         ] + super().get_urls()
 
     def get_model_perms(self, *args, **kwargs):
