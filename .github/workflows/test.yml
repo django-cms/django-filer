@@ -15,13 +15,16 @@ jobs:
           django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
-          django-4.1.txt
+          django-4.1.txt,
+          django-4.2.txt,
         ]
         exclude:
           - python-version: 3.7
             requirements-file: django-4.0.txt
           - python-version: 3.7
             requirements-file: django-4.1.txt
+          - python-version: 3.7
+            requirements-file: django-4.2.txt
           - python-version: 3.9
             requirements-file: django-2.2.txt
           - python-version: 3.10

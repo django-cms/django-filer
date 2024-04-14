@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
-from django.urls import re_path
+from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
@@ -35,19 +35,19 @@ class ClipboardAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         return [
-            re_path(r'^operations/paste_clipboard_to_folder/$',
+            path('operations/paste_clipboard_to_folder/',
                     self.admin_site.admin_view(views.paste_clipboard_to_folder),
                     name='filer-paste_clipboard_to_folder'),
-            re_path(r'^operations/discard_clipboard/$',
+            path('operations/discard_clipboard/',
                     self.admin_site.admin_view(views.discard_clipboard),
                     name='filer-discard_clipboard'),
-            re_path(r'^operations/delete_clipboard/$',
+            path('operations/delete_clipboard/',
                     self.admin_site.admin_view(views.delete_clipboard),
                     name='filer-delete_clipboard'),
-            re_path(r'^operations/upload/(?P<folder_id>[0-9]+)/$',
+            path('operations/upload/<int:folder_id>/',
                     ajax_upload,
                     name='filer-ajax_upload'),
-            re_path(r'^operations/upload/no_folder/$',
+            path('operations/upload/no_folder/',
                     ajax_upload,
                     name='filer-ajax_upload'),
         ] + super().get_urls()
@@ -123,7 +123,7 @@ def ajax_upload(request, folder_id=None):
             'file_id': file_obj.pk,
         }
         # prepare preview thumbnail
-        if type(file_obj) == Image:
+        if isinstance(file_obj, Image):
             thumbnail_180_options = {
                 'size': (180, 180),
                 'crop': True,

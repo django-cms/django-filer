@@ -15,7 +15,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import re_path, reverse
+from django.urls import path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -200,32 +200,32 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         return [
             # we override the default list view with our own directory listing
             # of the root directories
-            re_path(r'^$',
+            path('',
                     self.admin_site.admin_view(self.directory_listing),
                     name='filer-directory_listing-root'),
 
-            re_path(r'^last/$',
+            path('last/',
                     self.admin_site.admin_view(self.directory_listing),
                     {'viewtype': 'last'},
                     name='filer-directory_listing-last'),
 
-            re_path(r'^(?P<folder_id>\d+)/list/$',
+            path('<int:folder_id>/list/',
                     self.admin_site.admin_view(self.directory_listing),
                     name='filer-directory_listing'),
 
-            re_path(r'^(?P<folder_id>\d+)/make_folder/$',
+            path('<int:folder_id>/make_folder/',
                     self.admin_site.admin_view(views.make_folder),
                     name='filer-directory_listing-make_folder'),
-            re_path(r'^make_folder/$',
+            path('make_folder/',
                     self.admin_site.admin_view(views.make_folder),
                     name='filer-directory_listing-make_root_folder'),
 
-            re_path(r'^images_with_missing_data/$',
+            path('images_with_missing_data/',
                     self.admin_site.admin_view(self.directory_listing),
                     {'viewtype': 'images_with_missing_data'},
                     name='filer-directory_listing-images_with_missing_data'),
 
-            re_path(r'^unfiled_images/$',
+            path('unfiled_images/',
                     self.admin_site.admin_view(self.directory_listing),
                     {'viewtype': 'unfiled_images'},
                     name='filer-directory_listing-unfiled_images'),

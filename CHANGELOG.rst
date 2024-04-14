@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+Unreleased
+==========
+* Add Django 4.2 support
+* fix tests
+
 2.2.6 (2023-07-03)
 ==================
 
