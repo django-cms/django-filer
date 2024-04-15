@@ -6,3 +6,4 @@ django-mptt
 coverage
 isort
 flake8
+packaging
