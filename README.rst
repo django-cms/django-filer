@@ -7,6 +7,9 @@ Django Filer
 **django Filer** is a file management application for django that makes
 handling of files and images a breeze.
 
+.. warning::
+        django-filer 2.x is susceptible to SVG XSS attacks and we strongly recommend upgrading it to 3.x.
+
 .. note::
 
         This project is endorsed by the `django CMS Association <https://www.django-cms.org/en/about-us/>`_.
