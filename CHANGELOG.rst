@@ -4,6 +4,9 @@ CHANGELOG
 
 Unreleased
 ==========
+
+2.2.7 (Unreleased)
+==================
 * Add Django 4.2 support
 * fix tests
 
