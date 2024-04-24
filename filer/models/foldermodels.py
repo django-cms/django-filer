@@ -362,7 +362,7 @@ class FolderPermission(models.Model):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(pk={self.pk}): folder="{self.pretty_logical_path}", ' \
-               'who="{self.who}", what="{self.what}">'
+                'who="{self.who}", what="{self.what}">'
 
     def clean(self):
         if self.type == self.ALL and self.folder:
