@@ -7,6 +7,7 @@ from django.utils.module_loading import import_string
 from PIL import UnidentifiedImageError
 
 from filer import settings as filer_settings
+from filer.utils.loader import load_model
 
 
 class Command(BaseCommand):
@@ -130,10 +131,9 @@ class Command(BaseCommand):
         import easy_thumbnails
         from easy_thumbnails.VIL import Image as VILImage
 
-        from filer.models.imagemodels import Image
         from filer.utils.compatibility import PILImage
 
-        no_dimensions = Image.objects.filter(
+        no_dimensions = load_model(filer_settings.FILER_IMAGE_MODEL).objects.filter(
             Q(_width=0) | Q(_width__isnull=True)
         )
         self.stdout.write(f"trying to set dimensions on {no_dimensions.count()} files")
