@@ -46,8 +46,7 @@ class ImageAdminForm(FileAdminChangeFrom):
         for subject location widget to receive valid coordinates on field
         validation errors.
         """
-        cleaned_data = super().clean()
-        subject_location = cleaned_data['subject_location']
+        subject_location = self.cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it
             return subject_location
@@ -69,7 +68,7 @@ class ImageAdminForm(FileAdminChangeFrom):
         else:
             return subject_location
 
-        self._set_previous_subject_location(cleaned_data)
+        self._set_previous_subject_location(self.cleaned_data)
         raise forms.ValidationError(
             string_concat(
                 err_msg,
