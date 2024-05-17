@@ -11,13 +11,6 @@ form .form-row {
             display: none;
         }
     }
-    .filer-widget + .related-widget-wrapper-link,
-    .filer-widget + * + .related-widget-wrapper-link {
-        display: none;
-    }
-    .related-widget-wrapper:has(.filer-widget,.filer-dropzone) {
-        width: 100%;
-    }
     .filer-dropzone {
         @include clearfix;
         position: relative;
