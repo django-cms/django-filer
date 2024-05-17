@@ -48,7 +48,7 @@ class FileAdminChangeFrom(forms.ModelForm):
             validate_upload(
                 file_name=cleaned_data["file"].name,
                 file=file.file,
-                owner=cleaned_data["owner"],
+                owner=cleaned_data.get("owner"),
                 mime_type=mime_type,
             )
             file.open("r")
