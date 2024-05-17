@@ -3,6 +3,10 @@
 {% spaceless %}
     <div class="filer-dropzone filer-dropzone-folder">
         <span class="filerFile">
+            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}">
+                <span class="fa fa-search cms-icon cms-icon-search"></span>&nbsp;
+                {% trans "Choose Folder" %}
+            </a>
             <img src="{% static "filer/icons/folder.svg" %}" class="thumbnail_img{% if not object %} hidden{% endif %}"/>
             <span id="{{ span_id }}" style="margin-left: 15px;">
                 <span class="description_text">
@@ -11,10 +15,6 @@
                     {% endif %}
                 </span>
             </span>
-            <a href="{{ lookup_url }}" class="related-lookup{% if object %} hidden{% endif %}" id="{{ lookup_name }}" title="{% trans 'Lookup' %}">
-                <span class="fa fa-search cms-icon cms-icon-search"></span>&nbsp;
-                {% trans "Choose Folder" %}
-            </a>
             <a class="filerClearer {% if not object %}hidden{% endif %}" id="{{ clear_id }}" title="{% translate 'Clear' %}" href="#">
                 <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
             </a>

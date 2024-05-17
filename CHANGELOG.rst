@@ -7,7 +7,6 @@ CHANGELOG
 * Fix: Folder select widget did not render correctly with standard Django admin
   styles.
 
-
 3.1.2 (2025-05-17)
 ==================
 

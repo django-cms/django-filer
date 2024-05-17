@@ -47,7 +47,7 @@
                                 {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
                                     <a class="insertlink insertlinkButton"
                                         href="#" onclick="opener.dismissRelatedFolderLookupPopup(window, '{{ subfolder.pk|safe }}', '{{ subfolder.pretty_logical_path }}'); return false;" >
-                                        <span class="fa fa-arrow-left filer-icon cms-icon-select"></span>
+                                        <span class="fa fa-arrow-left filer-icon filer-icon-select"></span>
                                     </a>
                                 {% elif action_form and item.pk and not is_popup %}
                                     <input type="checkbox" class="action-select" value="folder-{{ item.pk|safe }}" name="_selected_action">
