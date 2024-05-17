@@ -13,4 +13,4 @@ Release logic:
  8. Publish the release and it will automatically release to pypi
 """
 
-__version__ = '3.1.1'
+__version__ = '3.1.2'
