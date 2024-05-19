@@ -158,9 +158,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     def __str__(self):
         if self.name in ('', None):
-            text = "{}".format(self.original_filename)
+            text = f"{self.original_filename}"
         else:
-            text = "{}".format(self.name)
+            text = f"{self.name}"
         return text
 
     @classmethod
@@ -312,7 +312,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
-        text = "{}".format(text)
+        text = f"{text}"
         return text
 
     def __lt__(self, other):
