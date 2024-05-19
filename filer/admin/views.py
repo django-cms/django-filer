@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBadRequest
-from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
@@ -58,7 +58,7 @@ def make_folder(request, folder_id=None):
                 new_folder.parent = folder
                 new_folder.owner = request.user
                 new_folder.save()
-                return render(request, 'admin/filer/dismiss_popup.html', context)
+                return TemplateResponse(request, 'admin/filer/dismiss_popup.html', context)
     else:
         new_folder_form = NewFolderForm()
 
@@ -69,7 +69,7 @@ def make_folder(request, folder_id=None):
         'is_popup': popup_status(request),
         'filer_admin_context': AdminContext(request),
     })
-    return render(request, 'admin/filer/folder/new_folder_form.html', context)
+    return TemplateResponse(request, 'admin/filer/folder/new_folder_form.html', context)
 
 
 @login_required
