@@ -344,19 +344,24 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             return False
 
-    def get_admin_change_url(self):
+    def get_admin_url(self, action):
         return reverse(
-            'admin:{}_{}_change'.format(
+            'admin:{}_{}_{}'.format(
                 self._meta.app_label,
                 self._meta.model_name,
+                action
             ),
             args=(self.pk,)
         )
 
+    def get_admin_change_url(self):
+        return self.get_admin_url("change")
+
+    def get_admin_expand_view_url(self):
+        return self.get_admin_url("expand")
+
     def get_admin_delete_url(self):
-        return reverse(
-            f'admin:{self._meta.app_label}_{self._meta.model_name}_delete',
-            args=(self.pk,))
+        return self.get_admin_url("delete")
 
     @property
     def url(self):

@@ -10,11 +10,9 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
         requirements-file: [
-          django-3.2.txt,
-          django-4.0.txt,
-          django-4.1.txt,
           django-4.2.txt,
           django-5.0.txt,
+          django-5.1.txt,
         ]
         custom-image-model: [false, true]
         exclude:
