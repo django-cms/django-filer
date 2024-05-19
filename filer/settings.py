@@ -59,7 +59,10 @@ FILER_FILE_MODELS = getattr(
     settings, 'FILER_FILE_MODELS',
     (FILER_IMAGE_MODEL, 'filer.File'))
 
-DEFAULT_FILE_STORAGE = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
+if hasattr(settings, "STORAGES") and 'default' in settings.STORAGES:
+    DEFAULT_FILE_STORAGE = settings.STORAGES['default'].get('BACKEND', 'django.core.files.storage.FileSystemStorage')
+else:
+    DEFAULT_FILE_STORAGE = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
 
 MINIMAL_FILER_STORAGES = {
     'public': {

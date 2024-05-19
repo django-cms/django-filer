@@ -38,7 +38,7 @@ class ThumbnailOption(models.Model):
         verbose_name_plural = _("thumbnail options")
 
     def __str__(self):
-        return '{} -- {} x {}'.format(self.name, self.width, self.height)
+        return f'{self.name} -- {self.width} x {self.height}'
 
     @property
     def as_dict(self):

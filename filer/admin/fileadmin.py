@@ -192,7 +192,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     def display_canonical(self, instance):
         canonical = instance.canonical_url
         if canonical:
-            return mark_safe('<a href="{}">{}</a>'.format(canonical, canonical))
+            return mark_safe(f'<a href="{canonical}">{canonical}</a>')
         else:
             return '-'
     display_canonical.allow_tags = True

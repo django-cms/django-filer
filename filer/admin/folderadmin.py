@@ -253,10 +253,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.get_queryset(request).get(id=last_folder_id)
             except self.model.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
-                url = "{}{}".format(url, admin_url_params_encoded(request))
+                url = f"{url}{admin_url_params_encoded(request)}"
             else:
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
-                url = "{}{}".format(url, admin_url_params_encoded(request))
+                url = f"{url}{admin_url_params_encoded(request)}"
             return HttpResponseRedirect(url)
         elif folder_id is None:
             folder = FolderRoot()
@@ -840,7 +840,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return '{}: {}'.format(capfirst(opts.verbose_name), force_str(obj))
+            return f'{capfirst(opts.verbose_name)}: {force_str(obj)}'
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -1073,7 +1073,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         count = itertools.count(1)
         original = name
         while destination.contains_folder(name):
-            name = "{}_{}".format(original, next(count))
+            name = f"{original}_{next(count)}"
         return name
 
     def _copy_folder(self, folder, destination, suffix, overwrite):

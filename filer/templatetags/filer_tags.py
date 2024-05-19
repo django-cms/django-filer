@@ -89,7 +89,7 @@ def filesize(bytes, format='auto1024'):
             unit = '{}{}'.format(base == 1024 and unit.upper() or unit,
                              base == 1024 and 'iB' or 'B')
 
-        return '{} {}'.format(bytes, unit)
+        return f'{bytes} {unit}'
 
     if bytes == 0:
         return bytes
