@@ -69,7 +69,9 @@ e.g::
 
 Defaults to FileSystemStorage in ``<MEDIA_ROOT>/filer_public/`` and ``<MEDIA_ROOT>/filer_public_thumbnails/`` for public files and
 ``<MEDIA_ROOT>/../smedia/filer_private/`` and ``<MEDIA_ROOT>/../smedia/filer_private_thumbnails/`` for private files.
-Public storage uses ``DEFAULT_FILE_STORAGE`` as default storage backend.
+Public storage uses the default storage's backend. This is taken from Django's ``STORAGES``
+setting if it exists or, if not, from the ``DEFAULT_FILE_STORAGE`` setting for compatibility
+with earlier Django versions (5.0 or below).
 
 ``UPLOAD_TO`` is the function to generate the path relative to the storage root. The
 default generates a random path like ``1d/a5/1da50fee-5003-46a1-a191-b547125053a8/filename.jpg``. This
