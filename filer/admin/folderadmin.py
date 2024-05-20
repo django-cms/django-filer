@@ -16,7 +16,8 @@ from django.db import models, router
 from django.db.models import Case, F, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
@@ -480,7 +481,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
             'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),
         })
-        return render(request, self.directory_listing_template, context)
+        return TemplateResponse(request, self.directory_listing_template, context)
 
     def filter_folder(self, qs, terms=()):
         # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947  flake8: noqa
@@ -814,7 +815,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the destination folder selection page
-        return render(
+        return TemplateResponse(
             request,
             "admin/filer/delete_selected_files_confirmation.html",
             context
@@ -954,7 +955,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the destination folder selection page
-        return render(request, "admin/filer/folder/choose_move_destination.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_move_destination.html", context)
 
     move_files_and_folders.short_description = _("Move selected files and/or folders")
 
@@ -1037,7 +1038,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the rename format selection page
-        return render(request, "admin/filer/folder/choose_rename_format.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_rename_format.html", context)
 
     rename_files.short_description = _("Rename files")
 
@@ -1169,7 +1170,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the destination folder selection page
-        return render(request, "admin/filer/folder/choose_copy_destination.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_copy_destination.html", context)
 
     copy_files_and_folders.short_description = _("Copy selected files and/or folders")
 
@@ -1298,6 +1299,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the resize options page
-        return render(request, "admin/filer/folder/choose_images_resize_options.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_images_resize_options.html", context)
 
     resize_images.short_description = _("Resize selected images")
