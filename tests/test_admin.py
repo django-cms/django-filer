@@ -375,6 +375,7 @@ class FilerImageAdminUrlsTests(TestCase):
 
         response = self.client.get(url)
 
+        self.assertEqual(url, self.file_object.get_admin_expand_view_url())
         self.assertContains(
             response,
             f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
