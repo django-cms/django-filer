@@ -139,7 +139,7 @@
                             </td>
                             <td class="column-action">
                                 {% if file.canonical_url %}
-                                    <a href="{% if 'svg' in file.mime_type %}{% url 'admin:filer_image_expand_view' file.pk %}{% else %}{{ file.canonical_url }}{% endif %}"
+                                    <a href="{% if 'svg' in file.mime_type %}{{ file.get_admin_expand_view_url }}{% else %}{{ file.canonical_url }}{% endif %}"
                                        data-url="{{ file.canonical_url }}"
                                        data-msg="{% trans 'URL copied to clipboard' %}"
                                        rel="noopener noreferrer"
