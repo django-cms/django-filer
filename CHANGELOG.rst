@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+3.2 (2025-05-21)
+================
+* Fix: Reverse match for 'filer_image_expand_view' not found.
+* Drop support for Python 3.8 and 3.9.
+* Add support for Python 3.12.
+
+
 3.1.3 (2025-05-17)
 ==================
 * Fix: Folder select widget did not render correctly with standard Django admin
