@@ -1,10 +1,12 @@
 import logging
 
 from django.conf import settings
+from django.core.checks import Warning, register
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+
 
 import easy_thumbnails.utils
 from easy_thumbnails.VIL import Image as VILImage
@@ -24,10 +26,22 @@ logger = logging.getLogger(__name__)
 # as if we allow it, it will fail while thumbnailing (first in the admin thumbnails
 # and then in the page itself.
 # Refer this https://github.com/python-pillow/Pillow/blob/b723e9e62e4706a85f7e44cb42b3d838dae5e546/src/PIL/Image.py#L3148
-FILER_MAX_IMAGE_PIXELS = min(
-    getattr(settings, "FILER_MAX_IMAGE_PIXELS", MAX_IMAGE_PIXELS),
-    MAX_IMAGE_PIXELS,
-)
+FILER_MAX_IMAGE_PIXELS = getattr(settings, "FILER_MAX_IMAGE_PIXELS", MAX_IMAGE_PIXELS)
+if MAX_IMAGE_PIXELS is not None:
+    FILER_MAX_IMAGE_PIXELS = min(FILER_MAX_IMAGE_PIXELS, MAX_IMAGE_PIXELS)
+
+
+@register()
+def example_check(app_configs, **kwargs):
+    if not getattr(settings, "FILER_MAX_IMAGE_PIXELS", True):
+        return [
+            Warning(
+                "FILER_MAX_IMAGE_PIXELS is set to 0 or None in your project settings.",
+                hint="Set FILER_MAX_IMAGE_PIXELS to a positive integer value",
+                obj=None,
+            )
+        ]
+    return []
 
 
 class BaseImage(File):
@@ -130,7 +144,7 @@ class BaseImage(File):
         # the image gets attached to a folder and saved. We also
         # send the error msg in the JSON and also post the message
         # so that they know what is wrong with the image they uploaded
-        if not self.file:
+        if not self.file or not FILER_MAX_IMAGE_PIXELS:
             return
 
         if self._width is None or self._height is None:
