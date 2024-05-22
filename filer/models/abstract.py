@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.core.checks import Warning, register
+from django.core.checks import Warning, register as register_check
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
@@ -31,16 +31,16 @@ if MAX_IMAGE_PIXELS is not None:
     FILER_MAX_IMAGE_PIXELS = min(FILER_MAX_IMAGE_PIXELS, MAX_IMAGE_PIXELS)
 
 
-@register()
-def example_check(app_configs, **kwargs):
-    if FILER_MAX_IMAGE_PIXELS:
+@register_check()
+def max_pixel_setting_check(app_configs, **kwargs):
+    if not FILER_MAX_IMAGE_PIXELS:
         return [
             Warning(
-                "FILER_MAX_IMAGE_PIXELS and PIL.Image.MAX_IMAGE_PIXELS are not set.",
-                hint="Set FILER_MAX_IMAGE_PIXELS to a positive integer value. "
+                "Both settings.FILER_MAX_IMAGE_PIXELS and PIL.Image.MAX_IMAGE_PIXELS are not set.",
+                hint="Set FILER_MAX_IMAGE_PIXELS to a positive integer value in your settings.py. "
                      "This setting is used to limit the maximum number of pixels an image can have "
                      "to protect your site from memory bombs.",
-                obj=None,
+                obj=settings,
             )
         ]
     return []

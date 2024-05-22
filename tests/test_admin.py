@@ -564,6 +564,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
         abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
+    def test_filer_max_pixel_deactivation(self):
+        from django.core.checks import Warning
+
+        DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
+        abstract.FILER_MAX_IMAGE_PIXELS = None  # Deactivate
+
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(Image.objects.count(), 1)  # Success
+        check_result = abstract.max_pixel_setting_check(None)
+        self.assertEqual(len(check_result), 1)
+        self.assertIsInstance(check_result[0], Warning)
+
+        abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
+
     def test_filer_ajax_upload_file_using_content_type(self):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
