@@ -33,11 +33,13 @@ if MAX_IMAGE_PIXELS is not None:
 
 @register()
 def example_check(app_configs, **kwargs):
-    if not getattr(settings, "FILER_MAX_IMAGE_PIXELS", True):
+    if FILER_MAX_IMAGE_PIXELS:
         return [
             Warning(
-                "FILER_MAX_IMAGE_PIXELS is set to 0 or None in your project settings.",
-                hint="Set FILER_MAX_IMAGE_PIXELS to a positive integer value",
+                "FILER_MAX_IMAGE_PIXELS and PIL.Image.MAX_IMAGE_PIXELS are not set.",
+                hint="Set FILER_MAX_IMAGE_PIXELS to a positive integer value. "
+                     "This setting is used to limit the maximum number of pixels an image can have "
+                     "to protect your site from memory bombs.",
                 obj=None,
             )
         ]
