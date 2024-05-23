@@ -1,15 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {SyntheticEvent, useEffect, useRef, useState} from 'react';
 
 
 function SelectRectangle(props) {
-	if (!props.style)
-		return;
-
+	const {rect, areaRef} = props;
+	const inodeList = areaRef.current.querySelector('.inode-list');
+	const offsetTop = rect.startScrollTop - inodeList.scrollTop;
+	const top = Math.max(rect.top + offsetTop, -1);
+	const bottom = Math.min(rect.bottom - offsetTop, areaRef.current.clientHeight);
 	const style = {
-		left: `${props.style.left}px`,
-		top: `${props.style.top}px`,
-		right: `${props.style.right}px`,
-		bottom: `${props.style.bottom}px`,
+		left: `${rect.left}px`,
+		top: `${top}px`,
+		right: `${rect.right}px`,
+		bottom: `${rect.bottom}px`,
 	};
 	return (
 		<div className="select-rectangle" style={style}></div>
@@ -18,15 +20,27 @@ function SelectRectangle(props) {
 
 
 export function SelectableArea(props) {
-	const {folderId, deselectAll, columnRef} = props;
+	const {columnRef} = props;
 	const areaRef = useRef(null);
 	const [selectionActive, setSelectionActive] = useState(false);
 	const [activeRect, setActiveRect] = useState(null);
+	//const [scrollTop, setScrollTop] = useState(0);
 
-	useEffect(() => {
-		const inodeList = areaRef.current.querySelector('.inode-list');
-		inodeList.style.overflowY = selectionActive ? 'hidden' : 'scroll';
-	}, [selectionActive]);
+	//useEffect(() => {
+		//const inodeList = areaRef.current.querySelector('.inode-list');
+
+		// function scrollArea(event: SyntheticEvent) {
+		// 	if (selectionActive) {
+		// 		console.log('scrollTop', inodeList.scrollTop);
+		// 	}
+		// }
+		//
+		// inodeList.addEventListener('scroll', scrollArea);
+		//
+		// return () => {
+		// 	areaRef.current.removeEventListener('scroll', scrollArea);
+		// };
+	//}, [selectionActive]);
 
 	const selectionStart = (event) => {
 		// check if the click was on an inode …
@@ -40,10 +54,6 @@ export function SelectableArea(props) {
 		}
 		const areaRect = areaRef.current.getBoundingClientRect();
 
-		// JavaScript doesn't offer any handler to detect if the mouse down event was triggered on the scroll bar …
-		if (event.clientX > areaRect.right - 16)
-			return;  // … and if so, do not start an area selection
-
 		console.log('areaRect', areaRect, 'event', event.clientX);
 		const rectangle = {
 			startX: event.clientX,
@@ -52,9 +62,9 @@ export function SelectableArea(props) {
 			top: event.clientY - areaRect.top,
 			right: areaRect.right - event.clientX,
 			bottom: areaRect.bottom - event.clientY,
-			// scrollTop: 0,
-			// scrollBottom: 0,
-		}
+			startScrollTop: areaRef.current.scrollTop,
+			startScrollLeft: areaRef.current.scrollLeft,
+		};
 		setActiveRect(rectangle);
 		console.log('selectionStart', rectangle);
 		setSelectionActive(true);
@@ -82,6 +92,13 @@ export function SelectableArea(props) {
 			nextRect.bottom = areaRect.bottom - event.clientY;
 			nextRect.invertedScroll = false;
 		}
+		const scrollableElem = areaRef.current.parentElement;
+		if (nextRect.top < scrollableElem.scrollTop) {
+			console.log('scroll up', nextRect.top);
+		}
+		if (nextRect.bottom > scrollableElem.scrollTop + scrollableElem.clientHeight) {
+			console.log('scroll down', nextRect.bottom);
+		}
 		setActiveRect(nextRect);
 	};
 
@@ -101,7 +118,6 @@ export function SelectableArea(props) {
 		if (!selectionActive)
 			return;
 		const areaRect = areaRef.current.getBoundingClientRect();
-		const inodeList = areaRef.current.querySelector('.inode-list');
 		const xMin = areaRect.left + activeRect.left;
 		const xMax = areaRect.right - activeRect.right;
 		const yMin = areaRect.top + activeRect.top; // - activeRect.scrollTop;
@@ -133,9 +149,16 @@ export function SelectableArea(props) {
 			onMouseDown={selectionStart}
 			onMouseMove={selectionExtend}
 			onMouseUp={selectionEnd}
+			onDragStart={(event) => console.log(event)}
+			onDrag={(event) => console.log(event)}
+			onDragEnter={(event) => console.log(event)}
+			onDragCapture={(event) => console.log(event)}
+			onDragStartCapture={(event) => console.log(event)}
+			onDragOver={(event) => console.log(event)}
+			onDragOverCapture={(event) => console.log(event)}
 		>
 			{props.children}
-			{selectionActive && <SelectRectangle style={activeRect} areaRef={areaRef} />}
+			{selectionActive && <SelectRectangle rect={activeRect} areaRef={areaRef} />}
 		</div>
 	);
 }
