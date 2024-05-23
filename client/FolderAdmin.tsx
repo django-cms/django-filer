@@ -236,9 +236,16 @@ export default function FolderAdmin(props) {
 						folderId={folderId}
 						handleUpload={id => columnRefs[id].current.fetchInodes()}
 					>
-						<SelectableArea folderId={folderId} deselectAll={deselectAll} columnRef={columnRefs[folderId]}>
-							<DroppableArea id={`column:${folderId}`} className="column-droppable"
-										   currentId={`column:${currentFolderId}`}>
+						<SelectableArea
+							folderId={folderId}
+							deselectAll={deselectAll}
+							columnRef={columnRefs[folderId]}
+						>
+							<DroppableArea
+								id={`column:${folderId}`}
+								className="column-droppable"
+								currentId={`column:${currentFolderId}`}
+							>
 								<InodeList
 									ref={columnRefs[folderId]}
 									folderId={folderId}
@@ -297,6 +304,7 @@ export default function FolderAdmin(props) {
 			onDragCancel={handleDragCancel}
 			sensors={sensors}
 			collisionDetection={pointerWithin}
+			autoScroll={true}
 		>
 			<FolderTabs ref={folderTabsRef} isSearchResult={isSearchResult} />
 			{settings.is_trash ? renderTrashArea() : renderWorkArea()}
