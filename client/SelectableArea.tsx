@@ -2,13 +2,33 @@ import React, {useEffect, useRef, useState} from 'react';
 
 
 function SelectionRectangle(props) {
-	const {rect} = props;
+	const {rect, discard} = props;
 	const style = {
 		top: `${rect.top}px`,
 		left: `${rect.left}px`,
 		right: `${rect.right}px`,
 		bottom: `${rect.bottom}px`,
 	};
+
+	useEffect(() => {
+		function handleMouseMove(event) {
+			if (event.buttons === 0) {
+				discard();
+			}
+		}
+
+		function handleMouseOut(event) {
+			if (event.target === window || event.target === document.documentElement || event.target === document.body) {
+				discard();
+			}
+		}
+
+		window.addEventListener('mousemove', handleMouseMove);
+		window.addEventListener('mouseout', handleMouseOut);
+		return () => {
+			window.removeEventListener('mouseout', handleMouseOut);
+		};
+	});
 
 	return (
 		<div className="selection-rectangle" style={style}></div>
@@ -17,30 +37,19 @@ function SelectionRectangle(props) {
 
 
 export function SelectableArea(props) {
+	const acceleration = 3;  // the lower, the faster
+	const edgeSize = 15;  // the size of the area near the edge where scrolling starts
 	const {columnRef} = props;
 	const areaRef = useRef(null);
 	const scrollableRef = useRef(null);
-	const [selectionActive, setSelectionActive] = useState(false);
-	const [activeRect, setActiveRect] = useState(null);
-
-	useEffect(() => {
-		function handleMouseOut(event) {
-			if (event.target === window || event.target === document.documentElement || event.target === document.body) {
-				selectionDiscard();
-			}
-		}
-
-		window.addEventListener('mouseout', handleMouseOut);
-		return () => {
-			window.removeEventListener('mouseout', handleMouseOut);
-		};
-	});
+	const [activeRectangle, setActiveRectangle] = useState(null);
+	const [timeoutHandler, setTimeoutHandler] = useState(null);
 
 	const selectionStart = (event) => {
 		// check if the click was on the image representation of an inode …
 		for (let element = event.target; element; element = element.parentElement) {
 			if (element instanceof HTMLImageElement) {
-				selectionDiscard();
+				setActiveRectangle(null);
 				return;  // … and if so, let the inode handle the click
 			}
 			if (element === areaRef.current)
@@ -59,64 +68,65 @@ export function SelectableArea(props) {
 			right: areaRect.right - event.clientX,
 			bottom: areaRect.bottom - event.clientY,
 		};
-		setActiveRect(rectangle);
+		setActiveRectangle(rectangle);
 		console.log('selectionStart', rectangle);
-		setSelectionActive(true);
 	}
 
 	function handleAutoScroll(event) {
 		// scroll the area if the mouse is near the edge
-		const edgeSize = 10;
 		const scrollableRect = scrollableRef.current.getBoundingClientRect();
-		let timeout = 0;
+		let timeout = edgeSize;
 		if (event.clientY < scrollableRect.top + edgeSize && scrollableRef.current.scrollTop > 0) {
 			timeout = event.clientY - scrollableRect.top;
 			scrollableRef.current.scrollTop--;
 		} else if (event.clientY > scrollableRect.bottom - edgeSize && scrollableRef.current.scrollTop < areaRef.current.clientHeight - scrollableRect.height) {
-			//console.log('scroll down', scrollableRef.current.scrollTop, areaRef.current.clientHeight - scrollableRect.height)
 			timeout = scrollableRect.bottom - event.clientY;
 			scrollableRef.current.scrollTop++;
 		}
-		if (timeout) {
+		if (timeout < edgeSize) {
 			console.log('timeout', timeout);
-			//setTimeout(() => handleAutoScroll(event), 25);
+			setTimeoutHandler(setTimeout(() => handleAutoScroll(event), acceleration * timeout));
 		}
 	}
 
 	const selectionExtend = (event) => {
-		if (!selectionActive)
+		if (timeoutHandler) {
+			clearTimeout(timeoutHandler);
+			setTimeoutHandler(null);
+		}
+		if (!activeRectangle)
 			return;
-		const scrollTop = scrollableRef.current.scrollTop - activeRect.scrollTop;
-		const areaRect = areaRef.current.getBoundingClientRect();
-
 		handleAutoScroll(event);
-		const nextRect = {...activeRect, lastX: event.clientX, lastY: event.clientY};
-		if (event.clientX < activeRect.startX) {
-			nextRect.left = event.clientX - areaRect.left;
+
+		const scrollTop = scrollableRef.current.scrollTop - activeRectangle.scrollTop;
+		const areaRect = areaRef.current.getBoundingClientRect();
+		const nextRectangle = {...activeRectangle, lastX: event.clientX, lastY: event.clientY};
+		if (event.clientX < activeRectangle.startX) {
+			nextRectangle.left = event.clientX - areaRect.left;
 		} else {
-			nextRect.right = areaRect.right - event.clientX;
+			nextRectangle.right = areaRect.right - event.clientX;
 		}
-		if (event.clientY < activeRect.startY - scrollTop) {
-			nextRect.top = event.clientY - areaRect.top;
+		if (event.clientY < activeRectangle.startY - scrollTop) {
+			nextRectangle.top = event.clientY - areaRect.top;
 		} else {
-			nextRect.bottom = areaRect.bottom - event.clientY;
+			nextRectangle.bottom = areaRect.bottom - event.clientY;
 		}
-		setActiveRect(nextRect);
+		setActiveRectangle(nextRectangle);
 	};
 
 	const handleScroll = () => {
-		if (!selectionActive)
+		if (!activeRectangle)
 			return;
-		const scrollTop = scrollableRef.current.scrollTop - activeRect.scrollTop;
+		const scrollTop = scrollableRef.current.scrollTop - activeRectangle.scrollTop;
 		const areaRect = areaRef.current.getBoundingClientRect();
-		const nextRect = {...activeRect};
-		if (activeRect.lastY < activeRect.startY - scrollTop) {
-			nextRect.top = activeRect.lastY - areaRect.top;
+		const nextRectangle = {...activeRectangle};
+		if (activeRectangle.lastY < activeRectangle.startY - scrollTop) {
+			nextRectangle.top = activeRectangle.lastY - areaRect.top;
 		} else {
-			nextRect.bottom = areaRect.bottom - activeRect.lastY;
+			nextRectangle.bottom = areaRect.bottom - activeRectangle.lastY;
 		}
-		console.log('handleScroll', nextRect, scrollTop);
-		setActiveRect(nextRect);
+		console.log('handleScroll', nextRectangle, scrollTop);
+		setActiveRectangle(nextRectangle);
 	};
 
 	const selectionEnd = (event) => {
@@ -132,13 +142,13 @@ export function SelectableArea(props) {
 			return true;
 		}
 
-		if (!selectionActive)
+		if (!activeRectangle)
 			return;
 		const areaRect = areaRef.current.getBoundingClientRect();
-		const xMin = areaRect.left + activeRect.left;
-		const xMax = areaRect.right - activeRect.right;
-		const yMin = areaRect.top + activeRect.top; // - activeRect.scrollTop;
-		const yMax = areaRect.bottom - activeRect.bottom;
+		const xMin = areaRect.left + activeRectangle.left;
+		const xMax = areaRect.right - activeRectangle.right;
+		const yMin = areaRect.top + activeRectangle.top;
+		const yMax = areaRect.bottom - activeRectangle.bottom;
 		const overlappingInodeIds = [];
 		for (let element of areaRef.current.querySelectorAll('.inode-list > li')) {
 			const elemRect = element.getBoundingClientRect();
@@ -148,14 +158,8 @@ export function SelectableArea(props) {
 		}
 		const extend = event.shiftKey || event.ctrlKey || event.metaKey;
 		columnRef.current.selectMultipleInodes(overlappingInodeIds, extend);
-		selectionDiscard();
+		setActiveRectangle(null);
 	};
-
-	function selectionDiscard() {
-		console.log('selectionDiscard');
-		setActiveRect(null);
-		setSelectionActive(false);
-	}
 
 	return (
 		<div className="scrollable-area" onScroll={handleScroll} ref={scrollableRef}>
@@ -167,7 +171,7 @@ export function SelectableArea(props) {
 				onMouseUp={selectionEnd}
 			>
 				{props.children}
-				{selectionActive && <SelectionRectangle rect={activeRect} />}
+				{activeRectangle && <SelectionRectangle rect={activeRectangle} discard={() => setActiveRectangle(null)} />}
 			</div>
 		</div>
 	);
