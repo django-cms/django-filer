@@ -26,6 +26,7 @@ function SelectionRectangle(props) {
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseout', handleMouseOut);
 		return () => {
+			window.removeEventListener('mousemove', handleMouseMove);
 			window.removeEventListener('mouseout', handleMouseOut);
 		};
 	});
@@ -150,10 +151,12 @@ export function SelectableArea(props) {
 		const yMin = areaRect.top + activeRectangle.top;
 		const yMax = areaRect.bottom - activeRectangle.bottom;
 		const overlappingInodeIds = [];
-		for (let element of areaRef.current.querySelectorAll('.inode-list > li')) {
-			const elemRect = element.getBoundingClientRect();
-			if (overlaps(elemRect)) {
-				overlappingInodeIds.push(element.dataset.id);
+		if (xMin !== xMax || yMin !== yMax) {
+			for (let element of areaRef.current.querySelectorAll('.inode-list > li')) {
+				const elemRect = element.getBoundingClientRect();
+				if (overlaps(elemRect)) {
+					overlappingInodeIds.push(element.dataset.id);
+				}
 			}
 		}
 		const extend = event.shiftKey || event.ctrlKey || event.metaKey;

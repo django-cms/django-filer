@@ -65,6 +65,16 @@ export function DraggableItem(props) {
 		event.preventDefault();
 	}
 
+	function renderChildren() {
+		return React.Children.map(props.children, child => {
+			return React.createElement(child.type, {className: child.props.className},
+				React.Children.map(child.props.children, grandChild => {
+					return React.cloneElement(grandChild, {listeners, attributes});
+				})
+			);
+		});
+	}
+
 	if (props.isDragged)
 		return (
 			<li data-id={props.id}>
@@ -73,9 +83,9 @@ export function DraggableItem(props) {
 		);
 	else
 		return (
-			<li ref={props.elementRef} data-id={props.id} className={cssClasses()} onClick={activateInode} {...listeners} {...attributes}>
+			<li ref={props.elementRef} data-id={props.id} className={cssClasses()} onClick={activateInode}>
 				<div ref={setNodeRef}>
-					{props.children}
+					{renderChildren()}
 				</div>
 			</li>
 		);
