@@ -119,8 +119,13 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 			if (inode.selected) {
 				modifier = f => ({...f, selected: false});
 			} else {
-				modifier = f => ({...f, selected: f.id === inode.id});
-				selectedInode = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
+				if (!(event.target as HTMLElement)?.classList.contains('inode-name')) {
+					// prevent selecting the inode when clicking on the name field to edit it
+					modifier = f => ({...f, selected: f.id === inode.id});
+					selectedInode = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
+				} else {
+					modifier = f => f;
+				}
 			}
 		}
 		const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
