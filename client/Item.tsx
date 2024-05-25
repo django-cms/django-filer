@@ -33,7 +33,7 @@ export function DraggableItem(props) {
 					// presumably a triple click, could be used to edit folder details
 					console.log('selectInode', event.detail);
 				}
-			}, 250);
+			}, 150);
 
 			return () => {
 				clearTimeout(timer);
