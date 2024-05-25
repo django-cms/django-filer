@@ -6,7 +6,7 @@ import DownloadIcon from '../icons/download.svg';
 import UploadIcon from '../icons/upload.svg';
 import PauseIcon from '../icons/pause.svg';
 import PlayIcon from '../icons/play.svg';
-import {ProgressBar, ProgressOverlay} from "../UploadProgress";
+import {ProgressBar, ProgressOverlay} from '../UploadProgress';
 
 
 export default function Audio(props) {
