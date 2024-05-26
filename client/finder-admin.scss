@@ -423,6 +423,12 @@ $active-rectangle: rgb(210, 210, 112);
 				filter: brightness(1.2);
 			}
 
+			&.selected {
+				box-shadow: inset  0 0 0.5rem rgb(210, 210, 112);
+				outline: 1px dotted rgb(210, 210, 112);
+				background-color: rgba(210, 210, 112, 0.25);
+			}
+
 			&.disabled {
 				opacity: 0.5;
 				cursor: not-allowed;
@@ -457,12 +463,6 @@ $active-rectangle: rgb(210, 210, 112);
 						box-shadow: inset rgb(50, 150, 250) 0 0 10px;
 					}
 				}
-			}
-
-			&.selected:nth-child(n) .inode {
-				box-shadow: inset  0 0 0.5rem rgb(210, 210, 112);
-				outline: 1px dotted rgb(210, 210, 112);
-				background-color: rgba(210, 210, 112, 0.25);
 			}
 		}
 	}
@@ -539,7 +539,7 @@ $active-rectangle: rgb(210, 210, 112);
 			width: 100%;
 			box-sizing: border-box;
 
-			&:nth-child(even) {
+			&:nth-child(even):not(.selected) {
 				background-color: white;
 			}
 
