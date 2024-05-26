@@ -285,15 +285,7 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 
 		.inode-list {
-			//position: absolute;
-			//top: 0;
-			//right: 0;
-			//bottom: 0;
-			//left: 0;
-
 			> li {
-				// position: relative;
-
 				&.dragging .inode, &.cutted .inode {
 					outline: 1px dashed grey;
 					filter: grayscale(100%);
@@ -421,7 +413,7 @@ $active-rectangle: rgb(210, 210, 112);
 		> li {
 			display: block;
 			list-style: none;
-			padding: 0;
+			padding: 5px;
 			border: 1px solid transparent;
 			cursor: pointer;
 			font-size: 15px;
@@ -447,7 +439,6 @@ $active-rectangle: rgb(210, 210, 112);
 			.inode {
 				height: 100%;
 				width: 100%;
-				padding: 5px;
 
 				&.drag-over {
 					color: rgb(255, 255, 204);
