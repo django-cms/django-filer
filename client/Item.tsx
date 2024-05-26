@@ -59,7 +59,6 @@ export function DraggableItem(props) {
 	}
 
 	function activateInode(event) {
-		console.log('activateInode', event, props.id);
 		setEvent(event);
 		event.stopPropagation();
 		event.preventDefault();

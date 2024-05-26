@@ -90,12 +90,7 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 			}
 			return;
 		}
-		if ((event.detail as any)?.selected) {
-			// this is a SelectableArea event
-			console.info('SelectableArea event');
-			debugger;
-			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
-		} else if (event.shiftKey) {
+		 if (event.shiftKey) {
 			// shift click
 			const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
 			if (selectedInodeIndex < lastSelectedInode) {

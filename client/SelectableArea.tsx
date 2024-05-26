@@ -70,7 +70,6 @@ export function SelectableArea(props) {
 			bottom: areaRect.bottom - event.clientY,
 		};
 		setActiveRectangle(rectangle);
-		console.log('selectionStart', rectangle);
 	}
 
 	function handleAutoScroll(event) {
@@ -85,7 +84,6 @@ export function SelectableArea(props) {
 			scrollableRef.current.scrollTop++;
 		}
 		if (timeout < edgeSize) {
-			console.log('timeout', timeout);
 			setTimeoutHandler(setTimeout(() => handleAutoScroll(event), acceleration * timeout));
 		}
 	}
@@ -126,7 +124,6 @@ export function SelectableArea(props) {
 		} else {
 			nextRectangle.bottom = areaRect.bottom - activeRectangle.lastY;
 		}
-		console.log('handleScroll', nextRectangle, scrollTop);
 		setActiveRectangle(nextRectangle);
 	};
 
