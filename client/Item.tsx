@@ -77,7 +77,7 @@ export function DraggableItem(props) {
 
 	if (props.isDragged)
 		return (
-			<li data-id={props.id}>
+			<li data-id={props.id} style={{zoom: props.zoom}}>
 				{props.children}
 			</li>
 		);
@@ -176,7 +176,9 @@ export function ListItem(props) {
 		case 'tiles': case 'mosaic':
 			return (
 				<figure>
-					<FigBody sampleUrl={props.sample_url}><img src={props.thumbnail_url} /></FigBody>
+					<FigBody sampleUrl={props.sample_url}>
+						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+					</FigBody>
 					<figcaption>
 						<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 							{props.name}
@@ -187,7 +189,9 @@ export function ListItem(props) {
 		case 'list':
 			return (<>
 				<div>
-					<FigBody sampleUrl={props.sample_url}><img src={props.thumbnail_url} /></FigBody>
+					<FigBody sampleUrl={props.sample_url}>
+						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+					</FigBody>
 				</div>
 				<div>
 					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
@@ -207,7 +211,9 @@ export function ListItem(props) {
 		case 'columns':
 			return (<>
 				<div>
-					<FigBody sampleUrl={props.sample_url}><img src={props.thumbnail_url} /></FigBody>
+					<FigBody sampleUrl={props.sample_url}>
+						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+					</FigBody>
 				</div>
 				<div>
 					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
