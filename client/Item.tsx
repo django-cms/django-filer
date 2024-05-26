@@ -131,7 +131,7 @@ export function ListItem(props) {
 		if (event.type === 'blur' || enterKey) {
 			const editedName = event.target.innerText.trim();
 			if (editedName !== props.name) {
-				await updateInode({...props, name: editedName});
+				await updateInode({name: editedName});
 			}
 			if (enterKey) {
 				event.preventDefault();
@@ -140,7 +140,7 @@ export function ListItem(props) {
 		}
 	}
 
-	async function updateInode(newInode) {
+	async function updateInode(changedFields) {
 		const fetchUrl = `${settings.base_url}${settings.folder_id}/update`;
 		const response = await fetch(fetchUrl, {
 			method: 'POST',
@@ -148,13 +148,16 @@ export function ListItem(props) {
 				'Content-Type': 'application/json',
 				'X-CSRFToken': settings.csrf_token,
 			},
-			body: JSON.stringify({id: newInode.id, name: newInode.name}),
+			body: JSON.stringify({id: props.id, ...changedFields}),
 		});
 		if (response.ok) {
 			const current = props.listRef.current;
 			const body = await response.json();
+			const updated = Object.fromEntries(
+				Object.keys(changedFields).map(key => [key, body.new_inode[key]])
+			);
 			current.setInodes(current.inodes.map(inode =>
-				inode.id === body.new_inode.id ? {...body.new_inode, elementRef: createRef()} : inode
+				inode.id === body.new_inode.id ? {...inode, ...updated} : inode
 			));
 			props.folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 		} else if (response.status === 409) {
