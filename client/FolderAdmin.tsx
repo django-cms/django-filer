@@ -41,7 +41,7 @@ export default function FolderAdmin(props) {
 		return params.get('q') !== null;
 	});
 	const [draggedInodesStyle, setDraggedInodesStyle] = useState({});
-
+	const [zoomWhenDragging, setZoomWhenDragging] = useState(1);
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
 			activationConstraint: {distance: 4},
@@ -56,14 +56,19 @@ export default function FolderAdmin(props) {
 	function modifyMovement(args) {
 		const {transform} = args;
 
-		// If we are dragging multiple elements, we want to offset the drag overlay
+		// when dragging elements, we want to offset the drag overlay
 		let offsetX = 0, offsetY = 0;
-		if (overlayRef.current && draggedInodes.length > 1) {
-			const firstDraggedElement = overlayRef.current.querySelector(`.inode-list [data-id="${draggedInodes[0].id}"]`);
+		if (overlayRef.current && activeInode) {
 			const activeDraggedElement = overlayRef.current.querySelector(`.inode-list [data-id="${activeInode.id}"]`);
-			if (firstDraggedElement && activeDraggedElement) {
-				offsetX = firstDraggedElement.getBoundingClientRect().left - activeDraggedElement.getBoundingClientRect().left;
-				offsetY = firstDraggedElement.getBoundingClientRect().top - activeDraggedElement.getBoundingClientRect().top;
+			if (draggedInodes.length > 1) {
+				const firstDraggedElement = overlayRef.current.querySelector(`.inode-list [data-id="${draggedInodes[0].id}"]`);
+				if (firstDraggedElement && activeDraggedElement) {
+					offsetX = (firstDraggedElement.getBoundingClientRect().left - activeDraggedElement.getBoundingClientRect().left) * zoomWhenDragging;
+					offsetY = (firstDraggedElement.getBoundingClientRect().top - activeDraggedElement.getBoundingClientRect().top) * zoomWhenDragging;
+				}
+			} else if (activeDraggedElement && ['tiles', 'mosaic'].includes(layout)) {
+				offsetX = -15;
+				offsetY = -15;
 			}
 		}
 
@@ -98,18 +103,31 @@ export default function FolderAdmin(props) {
 	}
 
 	function computeBoundingBox(inodes) {
+		let zoom = 1;
 		if (inodes.length === 0) {
 			setDraggedInodesStyle({width: 0, height: 0});
 		} else {
 			const workAreaRect = settings.workAreaRect;
 			const inodeBox = inodes[0].elementRef.current.getBoundingClientRect();
+			if (layout === 'tiles') {
+				if (inodes.length > 16) {
+					zoom = 0.1;
+				} else if (inodes.length > 1) {
+					zoom = 0.5;
+				}
+			} else if (layout === 'mosaic') {
+				if (inodes.length > 64) {
+					zoom = 0.1;
+				} else if (inodes.length > 4) {
+					zoom = 0.5;
+				}
+			}
 			if (['tiles', 'mosaic'].includes(layout)) {
 				const squareRoot = Math.sqrt(inodes.length);
-				const gap = layout === 'tiles' ? 15 : 8;
-				setDraggedInodesStyle({
-					width: Math.min(Math.ceil(squareRoot) * (inodeBox.width + gap) - gap, workAreaRect.width - 10),
-					height: Math.min(Math.floor(squareRoot + 0.5) * inodeBox.height, workAreaRect.height - 10),
-				});
+				const gap = (layout === 'tiles' ? 10 : 5);
+				const width = Math.min(Math.ceil(squareRoot) * (inodeBox.width * zoom + gap) - gap, workAreaRect.width - 10);
+				const height = Math.min(Math.floor(squareRoot + 0.5) * inodeBox.height * zoom, workAreaRect.height - 10);
+				setDraggedInodesStyle({width: width, height: height});
 			} else {
 				setDraggedInodesStyle({
 					width: inodeBox.width,
@@ -117,6 +135,7 @@ export default function FolderAdmin(props) {
 				});
 			}
 		}
+		setZoomWhenDragging(zoom);
 	}
 
 	function handleDragStart(event) {
@@ -311,7 +330,12 @@ export default function FolderAdmin(props) {
 			{settings.is_trash ? renderTrashArea() : renderWorkArea()}
 			<div ref={overlayRef} className="drag-overlay">
 				<DragOverlay className={layout} style={overlayStyle} modifiers={dragModifiers}>
-					<DraggedInodes inodes={draggedInodes} layout={layout} style={draggedInodesStyle} />
+					<DraggedInodes
+						inodes={draggedInodes}
+						layout={layout}
+						style={draggedInodesStyle}
+						zoom={zoomWhenDragging}
+					/>
 				</DragOverlay>
 			</div>
 		</DndContext>

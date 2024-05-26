@@ -81,7 +81,6 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 	function selectInode(event: PointerEvent, inode) {
 		if (inode.disabled)
 			return;
-		console.log('selectInode', inodes);
 		let modifier, selectedInode = -1;
 		if (event.detail === 2) {
 			// double click
@@ -174,8 +173,6 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 		);
 	}
 
-	console.log('InodeList', folderId, inodes);
-
 	return (
 		<ul className={cssClasses()}>
 			{layout === 'list' &&
@@ -198,12 +195,12 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 
 
 export function DraggedInodes(props) {
-	const {inodes, layout, style} = props;
+	const {inodes, layout, style, zoom} = props;
 
 	return (
 		<ul className="inode-list" style={style}>{
 			inodes.map(inode =>
-			<DraggableItem key={inode.id} {...inode} isDragged={true}>
+			<DraggableItem key={inode.id} {...inode} isDragged={true} zoom={zoom}>
 				<div className="inode">
 					<ListItem {...inode} layout={layout} />
 				</div>
