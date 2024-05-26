@@ -164,8 +164,11 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 		if (isLoading)
 			return (<li className="status">{gettext("Loading...")}</li>);
 
-		if (inodes.length === 0 && searchQuery)
-			return (<li className="status">{`No match while searching for “${searchQuery}”`}</li>);
+		if (inodes.length === 0) {
+			if (searchQuery)
+				return (<li className="status">{`No match while searching for “${searchQuery}”`}</li>);
+			return (<li className="status">{gettext("This folder is empty")}</li>);
+		}
 
 		return inodes.map(inode => inode.is_folder
 			? <Folder key={inode.id} {...inode} {...props} isParent={previousFolderId === inode.id} />
