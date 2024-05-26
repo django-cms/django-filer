@@ -101,8 +101,6 @@ export const FolderTabs = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	console.log('render FolderTabs');
-
 	return (
 		<ul className="folder-tabs">
 			{settings.parent_id && <FolderTab key={'parent'} folder={{id: 'parent'}} />}

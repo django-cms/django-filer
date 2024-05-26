@@ -67,7 +67,7 @@ export default function Audio(props) {
 				file.reject = reject;
 			});
 			setUploadFile(file);
-			promise.then((response) => {
+			promise.then(() => {
 				window.location.reload();
 			}).catch((error) => {
 				alert(error);
