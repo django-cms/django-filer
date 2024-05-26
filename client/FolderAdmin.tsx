@@ -137,50 +137,51 @@ export default function FolderAdmin(props) {
 
 	async function handleDragEnd(event) {
 		const {active, over} = event;
-		if (!over)
-			return;
 		const sourceFolderId = active.data.current.folderId;
 		let inodes = columnRefs[sourceFolderId].current?.inodes ?? [];
-		let [what, targetFolderId] = over.id.split(':');
-		targetFolderId = targetFolderId === 'parent' ? settings.parent_id : targetFolderId;
-		if (!draggedInodes.some(inode => [inode.id, inode.parent].includes(targetFolderId))) {
-			overlayRef.current.hidden = true;
-			if (what === 'download') {
-				downloadFiles(draggedInodes);
-				setTimeout(() => {
-					overlayRef.current.hidden = false;
-					setDraggedInodes([]);
-				}, 1000);
-				return;
-			}
-			let fetchUrl = `${settings.base_url}${settings.folder_id}/${what === 'discard' ? 'delete' : 'move'}`;
-			const response = await fetch(fetchUrl, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-CSRFToken': settings.csrf_token,
-				},
-				body: JSON.stringify({
-					inode_ids: draggedInodes.map(inode => inode.id),
-					target_folder: targetFolderId,
-				}),
-			});
-			if (response.ok) {
-				const body = await response.json();
-				if (body.inodes && columnRefs[targetFolderId]?.current) {
-					columnRefs[targetFolderId].current.setInodes(body.inodes);
+		if (over) {
+			let [what, targetFolderId] = over.id.split(':');
+			targetFolderId = targetFolderId === 'parent' ? settings.parent_id : targetFolderId;
+			if (!draggedInodes.some(inode => [inode.id, inode.parent].includes(targetFolderId))) {
+				overlayRef.current.hidden = true;
+				if (what === 'download') {
+					downloadFiles(draggedInodes);
+					setTimeout(() => {
+						overlayRef.current.hidden = false;
+						setDraggedInodes([]);
+					}, 1000);
+					return;
 				}
-				if (body.favorite_folders) {
-					folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
+				let fetchUrl = `${settings.base_url}${settings.folder_id}/${what === 'discard' ? 'delete' : 'move'}`;
+				const response = await fetch(fetchUrl, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': settings.csrf_token,
+					},
+					body: JSON.stringify({
+						inode_ids: draggedInodes.map(inode => inode.id),
+						target_folder: targetFolderId,
+					}),
+				});
+				if (response.ok) {
+					const body = await response.json();
+					if (body.inodes && columnRefs[targetFolderId]?.current) {
+						const inodes = body.inodes.map(inode => ({...inode, elementRef: createRef()}));
+						columnRefs[targetFolderId].current.setInodes(inodes);
+					}
+					if (body.favorite_folders) {
+						folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
+					}
+					inodes = inodes.filter(inode => !inode.dragged);
+					columnRefs[sourceFolderId].current.setInodes(inodes);
+				} else if (response.status === 409) {
+					alert(await response.text());
+				} else {
+					console.error(response);
 				}
-				inodes = inodes.filter(inode => !inode.dragged);
-				columnRefs[sourceFolderId].current.setInodes(inodes);
-			} else if (response.status === 409) {
-				alert(await response.text());
-			} else {
-				console.error(response);
+				overlayRef.current.hidden = false;
 			}
-			overlayRef.current.hidden = false;
 		}
 		columnRefs[sourceFolderId].current.setInodes(inodes.map(inode => ({...inode, dragged: false})));
 		setActiveInode(null);
