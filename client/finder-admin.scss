@@ -20,6 +20,7 @@ $active-rectangle: rgb(210, 210, 112);
 	left: 0;
 	bottom: 0;
 	padding: 0;
+	user-select: none;
 
 	&.folder {
 		top: 0;
@@ -264,10 +265,8 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.work-area {
-		//position: relative;
 		width: 100%;
 		height: calc(100% - 75px);
-		//overflow-y: scroll;
 		overflow: hidden;
 		display: flex;
 		flex-wrap: nowrap;
@@ -280,12 +279,6 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 
 		.column-droppable {
-			//position: absolute;
-			//top: 0;
-			//right: 0;
-			//bottom: 0;
-			//left: 0;
-
 			&.drag-over ul.inode-list, &.drag-over ul.inode-list > li {
 				background-color: rgb(121, 174, 200);
 			}
@@ -344,6 +337,8 @@ $active-rectangle: rgb(210, 210, 112);
 
 		.selectable-area {
 			position: absolute;
+			width: 100%;
+			min-height: 100%;
 
 			.selection-rectangle {
 				position: absolute;
@@ -354,13 +349,19 @@ $active-rectangle: rgb(210, 210, 112);
 					linear-gradient(0deg, $active-rectangle 66%, transparent 0) repeat-y;
 				background-size: 10px 2px, 10px 2px, 2px 10px, 2px 10px;
 				background-position: 0 0, 0 100%, 0 0, 100% 0;
-				animation: border-animate 1000ms infinite linear;
+				animation: border-animate 800ms infinite linear;
 			}
 
 			@keyframes border-animate {
 				100% {
-					background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px;
+					background-position: 10px 0, -10px 100%, 0 -10px, 100% 10px;
 				}
+			}
+
+			&:has(.trash) {
+				background-image: $trash-background;
+				background-color: transparent;
+				background-attachment: fixed;
 			}
 		}
 	}
@@ -416,20 +417,11 @@ $active-rectangle: rgb(210, 210, 112);
 
 	ul.inode-list {
 		margin: 0;
-		//overflow-y: scroll;
-		//scroll-snap-type: y mandatory;
-
-		&.trash, &.trash > li {
-			background-image: $trash-background;
-			background-color: transparent;
-			background-attachment: fixed;
-		}
 
 		> li {
 			display: block;
 			list-style: none;
 			padding: 0;
-			user-select: none;
 			border: 1px solid transparent;
 			cursor: pointer;
 			font-size: 15px;
@@ -455,6 +447,7 @@ $active-rectangle: rgb(210, 210, 112);
 			.inode {
 				height: 100%;
 				width: 100%;
+				padding: 5px;
 
 				&.drag-over {
 					color: rgb(255, 255, 204);
@@ -462,16 +455,15 @@ $active-rectangle: rgb(210, 210, 112);
 					outline: 1px solid darken(rgb(65, 118, 144), 50%);
 				}
 
-				div.inode-name {
-					margin-top: 2px;
-					padding: 3px 0 2px;
+				.inode-name {
+					padding: 5px;
 					border-radius: 3px;
-					user-select: none;
 
 					&:focus-visible {
 						background-color: white;
 						outline: 1px solid rgb(50, 150, 250);
-						box-shadow: rgb(50, 150, 250) 0 0 0.5rem;
+						outline-offset: -1px;
+						box-shadow: inset rgb(50, 150, 250) 0 0 10px;
 					}
 				}
 			}
@@ -517,16 +509,21 @@ $active-rectangle: rgb(210, 210, 112);
 				}
 
 				figcaption {
+					margin-top: 0.25rem;
 					text-align: center;
 					width: 100%;
 					word-break: break-all;
 				}
 			}
+
+			.inode-name {
+				margin-top: 2px;
+			}
 		}
 	}
 
 	.tiles ul.inode-list {
-		gap: 15px;
+		gap: 10px;
 
 		li:not(.status) {
 			min-height: 250px;
@@ -535,7 +532,7 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.mosaic ul.inode-list {
-		gap: 8px;
+		gap: 5px;
 
 		li:not(.status) {
 			min-height: 120px;
@@ -543,21 +540,13 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 	}
 
-	.list ul.inode-list {
+
+	.list ul.inode-list, .columns ul.inode-list {
 		display: block;
-		padding: 0 0 10px;
-
-		li {
+		padding: 0;
+		> li {
 			width: 100%;
-			height: 70px;
 			box-sizing: border-box;
-			margin: 5px 0 5px;
-
-			&.header {
-				height: auto;
-				font-weight: bold;
-				border-bottom: 1px solid lightgrey;
-			}
 
 			&:nth-child(even) {
 				background-color: white;
@@ -570,28 +559,47 @@ $active-rectangle: rgb(210, 210, 112);
 			.inode {
 				display: grid;
 				gap: 2px;
-				grid-template-columns: 75px 1fr 1fr 1fr;
-				@media (min-width: 992px) and (max-width: 1199.98px) {
-					grid-template-columns: 75px 1fr 1fr 1fr 1fr 1fr;
-				}
-				@media (min-width: 1200px) {
-					grid-template-columns: 75px 1fr 1fr 1fr 1fr 1fr 1fr;
-				}
 				align-items: center;
 
 				div {
-					padding: 5px 10px;
-					overflow: hidden;
-
 					&:has(> img) {
-						width: 65px;
-						padding-left: 20px;
+						text-align: center;
 
 						img {
 							width: 60px;
 							height: 60px;
 						}
 					}
+
+					&:has(> .inode-name) {
+						overflow: hidden;
+						padding-right: 1rem;
+					}
+
+				}
+			}
+		}
+	}
+
+	.list ul.inode-list {
+		> li {
+
+			&.header {
+				height: auto;
+				font-weight: bold;
+				border-bottom: 1px solid lightgrey;
+			}
+
+			.inode {
+				grid-template-columns: 90px 1fr 1fr 1fr;
+				@media (min-width: 992px) and (max-width: 1199.98px) {
+					grid-template-columns: 90px 1fr 1fr 1fr 1fr 1fr;
+				}
+				@media (min-width: 1200px) {
+					grid-template-columns: 90px 1fr 1fr 1fr 1fr 1fr 1fr;
+				}
+
+				div {
 					&:nth-child(6) {
 						display: none;
 						@media (min-width: 1200px) {
@@ -609,70 +617,28 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 	}
 
-	.columns {
-		//display: flex;
-		//flex-wrap: nowrap;
-		//flex-direction: row-reverse;
-		//justify-content: flex-start;
-		//align-items: stretch;
+	.columns ul.inode-list {
+		>li:has(>div>div.parent) {
+			border-top: $follow-folder-border;
+			border-left: $follow-folder-border;
+			border-bottom: $follow-folder-border;
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+		}
 
-		ul.inode-list {
-			display: block;
-			padding: 10px 0 0 0;
+		.inode {
+			grid-template-columns: 90px 1fr;
+			position: relative;
+			box-sizing: border-box;
 
-			> li {
-				width: 100%;
-				height: 72px;
-				box-sizing: border-box;
-				margin: 0 0 5px;
-
-				&:nth-child(even) {
-					background-color: white;
-				}
-
-				&:has(>div>div.parent) {
-					border-top: $follow-folder-border;
-					border-left: $follow-folder-border;
-					border-bottom: $follow-folder-border;
-					border-top-left-radius: 5px;
-					border-bottom-left-radius: 5px;
-				}
-
-				.inode {
-					display: grid;
-					gap: 2px;
-					grid-template-columns: 75px 1fr;
-					align-items: center;
-					position: relative;
-					box-sizing: border-box;
-
-					&.parent::after {
-						position: absolute;
-						right: 0;
-						content: " ";
-						width: 32px;
-						height: 32px;
-						background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(192, 192, 192)"><path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z"></path></svg>');
-						background-repeat: no-repeat;
-					}
-
-					div {
-						padding: 5px 10px;
-
-						&:has(> .inode-name) {
-							overflow: hidden;
-						}
-
-						&:has(> img) {
-							padding-left: 20px;
-
-							img {
-								width: 60px;
-								height: 60px;
-							}
-						}
-					}
-				}
+			&.parent::after {
+				position: absolute;
+				right: 0;
+				content: " ";
+				width: 32px;
+				height: 32px;
+				background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(192, 192, 192)"><path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z"></path></svg>');
+				background-repeat: no-repeat;
 			}
 		}
 	}
@@ -743,7 +709,6 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.drag-overlay {
-
 		ul.inode-list {
 			opacity: 0.75;
 			border: 1px dashed darkgrey;
