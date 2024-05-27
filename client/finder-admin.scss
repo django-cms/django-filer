@@ -1,3 +1,19 @@
+// messagelist appears after saving a file
+ul.messagelist {
+	position: relative;
+	z-index: 1;
+	&.fade-out {
+		opacity: 1;
+		animation: fade-out-animate 1s linear 4s 1;
+	}
+
+	@keyframes fade-out-animate {
+		100% {
+			opacity: 0;
+		}
+	}
+}
+
 .content {
 	position: relative;
 }
@@ -420,13 +436,13 @@ $active-rectangle: rgb(210, 210, 112);
 			line-height: 18px;
 
 			&:hover {
-				filter: brightness(1.2);
+				filter: brightness(1.125);
 			}
 
 			&.selected {
-				box-shadow: inset  0 0 0.5rem rgb(210, 210, 112);
-				outline: 1px dotted rgb(210, 210, 112);
-				background-color: rgba(210, 210, 112, 0.25);
+				box-shadow: inset  0 0 0.5rem var(--accent);
+				outline: 1px dotted var(--accent);
+				background-color: var(--selected-row);
 			}
 
 			&.disabled {
@@ -438,7 +454,7 @@ $active-rectangle: rgb(210, 210, 112);
 				font-size: 18px;
 				font-weight: bold;
 				line-height: 50px;
-				color: grey;
+				color: var(--body-quiet-color);
 				padding-left: 2em;
 			}
 
@@ -447,9 +463,9 @@ $active-rectangle: rgb(210, 210, 112);
 				width: 100%;
 
 				&.drag-over {
-					color: rgb(255, 255, 204);
-					background-color: rgb(65, 118, 144);
-					outline: 1px solid darken(rgb(65, 118, 144), 50%);
+					color: var(--selected-row);
+					background-color: var(--primary);
+					outline: 1px solid var(--link-hover-color);
 				}
 
 				.inode-name {
@@ -457,10 +473,10 @@ $active-rectangle: rgb(210, 210, 112);
 					border-radius: 3px;
 
 					&:focus-visible {
-						background-color: white;
-						outline: 1px solid rgb(50, 150, 250);
+						background-color: var(--body-bg);
+						outline: 1px solid var(--link-selected-fg);
 						outline-offset: -1px;
-						box-shadow: inset rgb(50, 150, 250) 0 0 10px;
+						box-shadow: inset var(--link-selected-fg) 0 0 10px;
 					}
 				}
 			}
@@ -491,7 +507,7 @@ $active-rectangle: rgb(210, 210, 112);
 					border-radius: 5px;
 
 					&:not([src$=".svg"]) {
-						box-shadow: grey 0 0 5px;
+						box-shadow: var(--border-color) 0 0 5px;
 					}
 
 					&[src$=".svg"] {
@@ -540,11 +556,11 @@ $active-rectangle: rgb(210, 210, 112);
 			box-sizing: border-box;
 
 			&:nth-child(even):not(.selected) {
-				background-color: white;
+				background-color: var(--body-bg);
 			}
 
 			&:last-child {
-				border-bottom: 1px solid lightgrey;
+				border-bottom: 1px solid var(--border-color);
 			}
 
 			.inode {
@@ -578,7 +594,7 @@ $active-rectangle: rgb(210, 210, 112);
 			&.header {
 				height: auto;
 				font-weight: bold;
-				border-bottom: 1px solid lightgrey;
+				border-bottom: 1px solid var(--border-color);
 			}
 
 			.inode {
@@ -650,8 +666,9 @@ $active-rectangle: rgb(210, 210, 112);
 			bottom: -75px;
 			width: 200px;
 			height: 150px;
-			background-color: rgba(50, 150, 250, 0.5);
-			border: 3px solid rgb(50, 150, 250);
+			color: var(--button-fg);
+			background-color: var(--button-bg);
+			border: 3px solid var(--default-button-bg);
 			border-radius: 50%;
 			transform: scale(0);
 			transition: transform 0.5s ease-in-out;
@@ -669,9 +686,8 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 
 		&.dragging.drag-over .quadrant {
-			background-color: rgb(65, 118, 144);
-			border-color: rgb(255, 255, 204);
-			color: rgb(255, 255, 204);
+			background-color: var(--default-button-bg);
+			color: var(--selected-row);
 		}
 	}
 
@@ -702,7 +718,7 @@ $active-rectangle: rgb(210, 210, 112);
 	.drag-overlay {
 		ul.inode-list {
 			opacity: 0.75;
-			border: 1px dashed darkgrey;
+			border: 1px dashed var(--body-quiet-color);
 			overflow: hidden;
 
 			> li {

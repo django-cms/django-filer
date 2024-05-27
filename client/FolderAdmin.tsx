@@ -1,6 +1,7 @@
 import React, {
 	createRef,
 	useContext,
+	useEffect,
 	useRef,
 	useState
 } from 'react';
@@ -57,6 +58,16 @@ export default function FolderAdmin(props) {
 		height: 'fit-content',
 		width: 'fit-content',
 	};
+
+	useEffect(() => {
+		const messagelist = document.querySelector('ul.messagelist') as HTMLUListElement;
+		if (messagelist) {
+			messagelist.classList.add('fade-out');
+			setTimeout(() => {
+				messagelist.remove();
+			}, 5000);
+		}
+	});
 
 	function modifyMovement(args) {
 		const {transform} = args;
