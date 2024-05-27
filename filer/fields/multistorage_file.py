@@ -159,7 +159,7 @@ class MultiStorageFileField(easy_thumbnails_fields.ThumbnailerField):
             encoded_string = base64.b64encode(payload_file.read()).decode('utf-8')
             return value, encoded_string
         except OSError:
-            warnings.warn('The payload for "{}" is missing. No such file on disk: {}!'.format(obj.original_filename, self.storage.location))
+            warnings.warn(f'The payload for "{obj.original_filename}" is missing. No such file on disk: {self.storage.location}!')
             return value
 
     def to_python(self, value):

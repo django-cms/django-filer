@@ -158,9 +158,9 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     def __str__(self):
         if self.name in ('', None):
-            text = "{}".format(self.original_filename)
+            text = f"{self.original_filename}"
         else:
-            text = "{}".format(self.name)
+            text = f"{self.name}"
         return text
 
     @classmethod
@@ -312,7 +312,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
             text = self.original_filename or 'unnamed file'
         else:
             text = self.name
-        text = "{}".format(text)
+        text = f"{text}"
         return text
 
     def __lt__(self, other):
@@ -344,19 +344,24 @@ class File(PolymorphicModel, mixins.IconsMixin):
         else:
             return False
 
-    def get_admin_change_url(self):
+    def get_admin_url(self, action):
         return reverse(
-            'admin:{}_{}_change'.format(
+            'admin:{}_{}_{}'.format(
                 self._meta.app_label,
                 self._meta.model_name,
+                action
             ),
             args=(self.pk,)
         )
 
+    def get_admin_change_url(self):
+        return self.get_admin_url("change")
+
+    def get_admin_expand_view_url(self):
+        return self.get_admin_url("expand")
+
     def get_admin_delete_url(self):
-        return reverse(
-            f'admin:{self._meta.app_label}_{self._meta.model_name}_delete',
-            args=(self.pk,))
+        return self.get_admin_url("delete")
 
     @property
     def url(self):

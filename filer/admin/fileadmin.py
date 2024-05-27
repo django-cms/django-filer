@@ -1,6 +1,7 @@
 import mimetypes
 
 from django import forms
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.utils import unquote
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -19,8 +20,12 @@ from easy_thumbnails.options import ThumbnailOptions
 from .. import settings
 from ..models import BaseImage, File
 from ..settings import DEFERRED_THUMBNAIL_SIZES
+from ..utils.loader import load_model
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
+
+
+Image = load_model(settings.FILER_IMAGE_MODEL)
 
 
 class FileAdminChangeFrom(forms.ModelForm):
@@ -43,7 +48,7 @@ class FileAdminChangeFrom(forms.ModelForm):
             validate_upload(
                 file_name=cleaned_data["file"].name,
                 file=file.file,
-                owner=cleaned_data["owner"],
+                owner=cleaned_data.get("owner"),
                 mime_type=mime_type,
             )
             file.open("r")
@@ -123,12 +128,18 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
 
     def render_change_form(self, request, context, add=False, change=False,
                            form_url='', obj=None):
-        info = self.model._meta.app_label, self.model._meta.model_name
-        extra_context = {'show_delete': True,
-                         'history_url': 'admin:%s_%s_history' % info,
-                         'is_popup': popup_status(request),
-                         'filer_admin_context': AdminContext(request)}
-        context.update(extra_context)
+        context.update({
+            'show_delete': True,
+            'history_url': admin_urlname(self.opts, 'history'),
+            'expand_image_url': None,
+            'is_popup': popup_status(request),
+            'filer_admin_context': AdminContext(request),
+        })
+        if obj and obj.mime_maintype == 'image' and obj.file.exists():
+            if 'svg' in obj.mime_type:
+                context['expand_image_url'] = reverse(admin_urlname(Image._meta, 'expand'), args=(obj.pk,))
+            else:
+                context['expand_image_url'] = obj.file.url
         return super().render_change_form(
             request=request, context=context, add=add, change=change,
             form_url=form_url, obj=obj)
@@ -181,7 +192,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     def display_canonical(self, instance):
         canonical = instance.canonical_url
         if canonical:
-            return mark_safe('<a href="{}">{}</a>'.format(canonical, canonical))
+            return mark_safe(f'<a href="{canonical}">{canonical}</a>')
         else:
             return '-'
     display_canonical.allow_tags = True

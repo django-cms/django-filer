@@ -16,7 +16,8 @@ from django.db import models, router
 from django.db.models import Case, F, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.encoding import force_str
 from django.utils.html import escape, format_html
@@ -253,10 +254,10 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 self.get_queryset(request).get(id=last_folder_id)
             except self.model.DoesNotExist:
                 url = reverse('admin:filer-directory_listing-root')
-                url = "{}{}".format(url, admin_url_params_encoded(request))
+                url = f"{url}{admin_url_params_encoded(request)}"
             else:
                 url = reverse('admin:filer-directory_listing', kwargs={'folder_id': last_folder_id})
-                url = "{}{}".format(url, admin_url_params_encoded(request))
+                url = f"{url}{admin_url_params_encoded(request)}"
             return HttpResponseRedirect(url)
         elif folder_id is None:
             folder = FolderRoot()
@@ -480,7 +481,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'enable_permissions': settings.FILER_ENABLE_PERMISSIONS,
             'can_make_folder': request.user.is_superuser or (folder.is_root and settings.FILER_ALLOW_REGULAR_USERS_TO_ADD_ROOT_FOLDERS) or permissions.get("has_add_children_permission"),
         })
-        return render(request, self.directory_listing_template, context)
+        return TemplateResponse(request, self.directory_listing_template, context)
 
     def filter_folder(self, qs, terms=()):
         # Source: https://github.com/django/django/blob/1.7.1/django/contrib/admin/options.py#L939-L947  flake8: noqa
@@ -814,7 +815,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the destination folder selection page
-        return render(
+        return TemplateResponse(
             request,
             "admin/filer/delete_selected_files_confirmation.html",
             context
@@ -840,7 +841,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return '{}: {}'.format(capfirst(opts.verbose_name), force_str(obj))
+            return f'{capfirst(opts.verbose_name)}: {force_str(obj)}'
 
     def _check_copy_perms(self, request, files_queryset, folders_queryset):
         try:
@@ -954,7 +955,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the destination folder selection page
-        return render(request, "admin/filer/folder/choose_move_destination.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_move_destination.html", context)
 
     move_files_and_folders.short_description = _("Move selected files and/or folders")
 
@@ -1037,7 +1038,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the rename format selection page
-        return render(request, "admin/filer/folder/choose_rename_format.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_rename_format.html", context)
 
     rename_files.short_description = _("Rename files")
 
@@ -1073,7 +1074,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         count = itertools.count(1)
         original = name
         while destination.contains_folder(name):
-            name = "{}_{}".format(original, next(count))
+            name = f"{original}_{next(count)}"
         return name
 
     def _copy_folder(self, folder, destination, suffix, overwrite):
@@ -1169,7 +1170,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the destination folder selection page
-        return render(request, "admin/filer/folder/choose_copy_destination.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_copy_destination.html", context)
 
     copy_files_and_folders.short_description = _("Copy selected files and/or folders")
 
@@ -1298,6 +1299,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         })
 
         # Display the resize options page
-        return render(request, "admin/filer/folder/choose_images_resize_options.html", context)
+        return TemplateResponse(request, "admin/filer/folder/choose_images_resize_options.html", context)
 
     resize_images.short_description = _("Resize selected images")

@@ -6,6 +6,7 @@ import django.core.files
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR, get_messages
@@ -327,7 +328,7 @@ class FilerImageAdminUrlsTests(TestCase):
         image._height = 200
         image.save()
 
-        url = reverse(f'admin:{image.__class__._meta.app_label}_image_change', kwargs={
+        url = reverse(admin_urlname(Image._meta, 'change'), kwargs={
             'object_id': image.pk,
         })
 
@@ -338,14 +339,43 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertContains(response, 'height="210"')
         self.assertContains(response, 'alt="File is missing"')
 
+    def test_image_expand_link_in_change_view(self):
+        files = [
+            # Files can use the same contents for this test - it's the mime type that counts
+            File.objects.create(owner=self.superuser, original_filename='some-file.txt', file=self.file_object.file),
+            Image.objects.create(owner=self.superuser, original_filename='some-image.jpg'),  # missing file
+            Image.objects.create(owner=self.superuser, original_filename='some-image.jpg', file=self.file_object.file),
+            Image.objects.create(owner=self.superuser, original_filename='some-image.svg', file=self.file_object.file),
+        ]
+        test_set = [
+            (files[0], 'text/plain', None),
+            (files[1], 'image/jpeg', None),
+            (files[2], 'image/jpeg', files[2].file.url),
+            (files[3], 'image/svg+xml', reverse(admin_urlname(Image._meta, 'expand'), args=(files[3].pk,))),
+        ]
+        for file, mime_type, expected_url in test_set:
+            file.mime_type = mime_type
+            file.save()
+            models = [File]
+            if isinstance(file, Image):
+                models.append(Image)
+            for model in models:
+                response = self.client.get(reverse(admin_urlname(model._meta, 'change'),
+                                                   kwargs={'object_id': file.pk}))
+                if expected_url:
+                    self.assertContains(response, f'href="{expected_url}"')
+                else:
+                    self.assertNotContains(response, 'filer-icon-expand')
+
     def test_image_expand_view(self):
-        url = reverse("admin:filer_image_expand_view", kwargs={
+        url = reverse(admin_urlname(Image._meta, 'expand'), kwargs={
             'file_id': self.file_object.pk
         })
         original_url = self.file_object.url
 
         response = self.client.get(url)
 
+        self.assertEqual(url, self.file_object.get_admin_expand_view_url())
         self.assertContains(
             response,
             f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
@@ -600,7 +630,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'admin:filer-ajax_upload',
                 kwargs={
                     'folder_id': folder.pk + 1}
-            ) + '?filename={0}'.format(self.image_name)
+            ) + f'?filename={self.image_name}'
             response = self.client.post(
                 url,
                 data=file_obj.read(),
@@ -664,7 +694,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'admin:filer-ajax_upload',
                 kwargs={
                     'folder_id': folder.pk}
-            ) + '?filename={0}'.format(self.image_name)
+            ) + f'?filename={self.image_name}'
             response = self.client.post(
                 url,
                 data=file_obj.read(),
@@ -730,7 +760,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                     'admin:filer-ajax_upload',
                     kwargs={
                         'folder_id': folder.pk}
-                ) + '?filename={0}'.format(self.image_name)
+                ) + f'?filename={self.image_name}'
                 response = self.client.post(
                     url,
                     data=file_obj.read(),
@@ -1074,10 +1104,10 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         'new_name' should be a plain string, no formatting supported.
         """
         if file_obj is not None:
-            checkbox_name = 'file-{}'.format(file_obj.id)
+            checkbox_name = f'file-{file_obj.id}'
             files = [file_obj]
         elif folder_obj is not None:
-            checkbox_name = 'folder-{}'.format(folder_obj.id)
+            checkbox_name = f'folder-{folder_obj.id}'
             # files inside this folder, non-recursive
             files = File.objects.filter(folder=folder_obj)
         else:
@@ -1293,9 +1323,9 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items: FOO, BAR, BAZ, SAMP
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
-                     self.spam_file.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk, self.spam_file.pk}
+            )
 
     def test_folder_ownership(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
@@ -1307,8 +1337,8 @@ class FolderListingTest(TestCase):
             # he doesn't see BAR, BAZ and SPAM because he doesn't own them
             # and no permission has been given
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk})
 
     def test_with_permission_given_to_folder(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
@@ -1326,8 +1356,8 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk, self.bar_folder.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk, self.bar_folder.pk})
 
     def test_with_permission_given_to_parent_folder(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
@@ -1344,9 +1374,9 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items because he has permissions on the parent folder
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
-                     self.spam_file.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk, self.spam_file.pk}
+            )
 
     def test_search_against_owner(self):
         url = reverse('admin:filer-directory_listing',
@@ -1387,7 +1417,7 @@ class FolderListingTest(TestCase):
 
         # Create a file with a problematic filename
         problematic_file = django.core.files.base.ContentFile('some data')
-        filename = u'christopher_eccleston'
+        filename = 'christopher_eccleston'
         problematic_file.name = filename
         self.spam_file = File.objects.create(
             owner=self.staff_user, original_filename=filename,

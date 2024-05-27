@@ -1,5 +1,6 @@
 from django import forms
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
@@ -46,8 +47,7 @@ class ImageAdminForm(FileAdminChangeFrom):
         for subject location widget to receive valid coordinates on field
         validation errors.
         """
-        cleaned_data = super().clean()
-        subject_location = cleaned_data['subject_location']
+        subject_location = self.cleaned_data['subject_location']
         if not subject_location:
             # if supplied subject location is empty, do not check it
             return subject_location
@@ -69,7 +69,7 @@ class ImageAdminForm(FileAdminChangeFrom):
         else:
             return subject_location
 
-        self._set_previous_subject_location(cleaned_data)
+        self._set_previous_subject_location(self.cleaned_data)
         raise forms.ValidationError(
             string_concat(
                 err_msg,
@@ -91,14 +91,18 @@ class ImageAdmin(FileAdmin):
         return super().get_urls() + [
             path("expand/<int:file_id>",
                  self.admin_site.admin_view(self.expand_view),
-                 name=f"filer_{self.model._meta.model_name}_expand_view")
+                 name=f"{self.opts.app_label}_{self.opts.model_name}_expand")
         ]
 
     def expand_view(self, request, file_id):
         image = get_object_or_404(self.model, pk=file_id)
-        return render(request, "admin/filer/image/expand.html", context={
-            "original_url": image.url
-        })
+        return TemplateResponse(
+            request,
+            "admin/filer/image/expand.html",
+            context={
+                "original_url": image.url
+            },
+        )
 
 
 if FILER_IMAGE_MODEL == 'filer.Image':
