@@ -233,8 +233,8 @@ class InodeAdmin(admin.ModelAdmin):
                     parent_id=inode.parent_id,
                     parent_url=parent_url,
                 )
-                if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
-                    request.session['finder_last_folder_id'] = str(inode.id)
+                # temporarily deactivated: if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
+                request.session['finder_last_folder_id'] = str(inode.id)
             else:
                 settings.update(
                     is_root=False,
