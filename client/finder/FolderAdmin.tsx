@@ -23,14 +23,14 @@ import {MenuBar} from './MenuBar';
 import {SelectableArea} from './SelectableArea';
 import {DraggedInodes, InodeList} from './InodeList';
 import {DroppableArea} from './Droppable';
-import DownloadIcon from './icons/download.svg';
-import TrashIcon from './icons/trash.svg';
-import MoreVerticalIcon from './icons/more-vertical.svg';
+import DownloadIcon from 'icons/download.svg';
+import TrashIcon from 'icons/trash.svg';
+import MoreVerticalIcon from 'icons/more-vertical.svg';
 
 const useLayout = (initial: string) => useCookie('django-finder-layout', initial);
 
 
-export default function FolderAdmin(props) {
+export function FolderAdmin(props) {
 	const settings = useContext(FinderSettings);
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
@@ -67,7 +67,7 @@ export default function FolderAdmin(props) {
 				messagelist.remove();
 			}, 5000);
 		}
-	});
+	}, []);
 
 	function modifyMovement(args) {
 		const {transform} = args;

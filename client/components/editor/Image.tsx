@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
-import {FinderSettings} from '../FinderSettings';
-import {FileDetails} from './Common';
+import {FinderSettings} from 'finder/FinderSettings';
+import FileDetails from './FileDetails';
 
 
 export default function Image(props) {
@@ -42,13 +42,11 @@ export default function Image(props) {
 		cropFields.size.value = String(crop.width / rect.width * parseInt(cropFields.width.value));
 	}
 
-	return props.editorRef ? (
+	return (
 		<FileDetails>
 			<ReactCrop crop={crop} aspect={1} onChange={handleChange}>
 				<img className="editable" src={settings.download_url} ref={ref} />
 			</ReactCrop>
 		</FileDetails>
-	) : (
-		<>{props.children}</>
 	);
 }

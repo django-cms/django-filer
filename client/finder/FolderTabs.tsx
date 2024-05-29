@@ -1,11 +1,11 @@
 import {useDroppable} from '@dnd-kit/core';
 import React, {forwardRef, useContext, useImperativeHandle, useState} from 'react';
 import {FinderSettings} from './FinderSettings';
-import CloseIcon from './icons/close.svg';
-import PinIcon from './icons/pin.svg';
-import RecycleIcon from './icons/recycle.svg';
-import RootIcon from './icons/root.svg';
-import UpIcon from './icons/folder-up.svg';
+import CloseIcon from 'icons/close.svg';
+import PinIcon from 'icons/pin.svg';
+import RecycleIcon from 'icons/recycle.svg';
+import RootIcon from 'icons/root.svg';
+import UpIcon from 'icons/folder-up.svg';
 
 
 function FolderTab(props) {

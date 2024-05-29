@@ -1,7 +1,7 @@
 import React, {useContext, useRef, useState} from 'react';
-import SearchIcon from './icons/search.svg';
 import {FinderSettings} from './FinderSettings';
 import {useCookie} from './Storage';
+import SearchIcon from 'icons/search.svg';
 
 const useSearchRealm = initial => useCookie('django-finder-search-realm', initial);
 

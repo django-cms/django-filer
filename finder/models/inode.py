@@ -94,7 +94,7 @@ def filename_validator(value):
 
 class InodeModel(models.Model, metaclass=InodeMetaModel):
     is_folder = False
-    editor_component = None
+    folder_component= editor_component = None
     data_fields = ['id', 'name', 'parent', 'created_at', 'last_modified_at']
 
     id = models.UUIDField(

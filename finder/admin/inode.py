@@ -123,7 +123,7 @@ class InodeAdmin(admin.ModelAdmin):
                     'download_url': obj.get_download_url(),
                     'thumbnail_url': obj.casted.get_thumbnail_url(),
                     'sample_url': obj.casted.get_sample_url(),
-                    'editor_component': obj.casted.editor_component,
+                    'folder_component': obj.casted.folder_component,
                     'summary': obj.casted.summary,
                 } for obj in queryset))
             )

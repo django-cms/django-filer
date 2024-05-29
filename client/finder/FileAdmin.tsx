@@ -3,10 +3,10 @@ import {FinderSettings} from './FinderSettings';
 import {FolderTabs} from "./FolderTabs";
 
 
-export default function FileAdmin(props) {
+export function FileAdmin(props) {
 	const settings = useContext(FinderSettings);
 	const editorRef = useRef(null);
-	const component = `./components/${settings.editor_component}.js`;
+	const component = `./components/editor/${settings.editor_component}.js`;
 	const FileEditor = settings.editor_component ? lazy(() => import(component)) : null;
 
 	useEffect(() => {

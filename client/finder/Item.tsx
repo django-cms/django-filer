@@ -88,9 +88,9 @@ function StaticFigure(props) {
 
 export function ListItem(props) {
 	const settings = useContext(FinderSettings);
-	const FigBody = props.editor_component ? useMemo(
+	const FigBody = props.folder_component ? useMemo(
 		() => {
-			const component = `./components/${props.editor_component}.js`;
+			const component = `./components/folder/${props.folder_component}.js`;
 			const LazyFigure = lazy(() => import(component));
 			return (props) => (<Suspense><LazyFigure {...props}>{props.children}</LazyFigure></Suspense>);
 		},

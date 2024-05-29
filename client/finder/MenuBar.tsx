@@ -2,22 +2,22 @@ import React, {useRef, useContext, forwardRef, useState, useImperativeHandle} fr
 import {useClipboard, useCookie} from './Storage';
 import {SearchField} from './Search';
 import {FinderSettings} from './FinderSettings';
-import CopyIcon from './icons/copy.svg';
-import TilesIcon from './icons/tiles.svg';
-import MosaicIcon from './icons/mosaic.svg';
-import ListIcon from './icons/list.svg';
-import ColumnsIcon from './icons/columns.svg';
-import SortingIcon from './icons/sorting.svg';
-import SortAscIcon from './icons/sort-asc.svg';
-import SortDescIcon from './icons/sort-desc.svg';
-import CutIcon from './icons/cut.svg';
-import PasteIcon from './icons/paste.svg';
-import TrashIcon from './icons/trash.svg';
-import EraseIcon from './icons/erase.svg';
-import AddFolderIcon from './icons/add-folder.svg';
-import DownloadIcon from './icons/download.svg';
-import UndoIcon from './icons/undo.svg';
-import UploadIcon from './icons/upload.svg';
+import CopyIcon from 'icons/copy.svg';
+import TilesIcon from 'icons/tiles.svg';
+import MosaicIcon from 'icons/mosaic.svg';
+import ListIcon from 'icons/list.svg';
+import ColumnsIcon from 'icons/columns.svg';
+import SortingIcon from 'icons/sorting.svg';
+import SortAscIcon from 'icons/sort-asc.svg';
+import SortDescIcon from 'icons/sort-desc.svg';
+import CutIcon from 'icons/cut.svg';
+import PasteIcon from 'icons/paste.svg';
+import TrashIcon from 'icons/trash.svg';
+import EraseIcon from 'icons/erase.svg';
+import AddFolderIcon from 'icons/add-folder.svg';
+import DownloadIcon from 'icons/download.svg';
+import UndoIcon from 'icons/undo.svg';
+import UploadIcon from 'icons/upload.svg';
 
 const useSorting = () => useCookie('django-finder-sorting', '');
 

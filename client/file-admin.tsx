@@ -1,5 +1,5 @@
 import React from 'react';
 import loadFinderAdmin from './loader';
-import FileAdmin from './FileAdmin';
+import {FileAdmin} from 'finder/FileAdmin';
 
 loadFinderAdmin(<FileAdmin />);

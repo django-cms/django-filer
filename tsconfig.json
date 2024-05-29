@@ -13,6 +13,7 @@
     "experimentalDecorators": false,
     "importHelpers": true,
     "rootDir": "./",
+    "baseUrl": "./client",
     "declaration": false,
     "declarationMap": false,
     "incremental": true,

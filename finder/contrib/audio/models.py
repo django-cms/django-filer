@@ -18,7 +18,7 @@ class AudioFileModel(FileModel):
     filer_public_thumbnails = Path(
         filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
     )
-    editor_component = 'Audio'
+    folder_component = editor_component = 'Audio'
 
     class Meta:
         proxy = True

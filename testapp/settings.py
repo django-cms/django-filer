@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'finder.contrib.common',
     'finder.contrib.image.pil',
     'finder.contrib.image.svg',
+    'finder.contrib.video',
     'testapp',
 ]
 
