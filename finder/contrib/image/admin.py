@@ -44,3 +44,11 @@ class ImageForm(EntangledModelForm):
 class ImageAdmin(FileAdmin):
     form = ImageForm
     exclude = None
+
+    def get_settings(self, request, inode):
+        settings = super().get_settings(request, inode)
+        settings.update(
+            original_url=settings['download_url'],
+            replacing_mime_type=settings['file_mime_type'],
+        )
+        return settings

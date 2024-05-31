@@ -34,3 +34,10 @@ class AudioForm(EntangledModelForm):
 class AudioAdmin(FileAdmin):
     form = AudioForm
     exclude = None
+
+    def get_settings(self, request, inode):
+        settings = super().get_settings(request, inode)
+        settings.update(
+            replacing_mime_type=settings['file_mime_type'],
+        )
+        return settings

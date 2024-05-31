@@ -6,7 +6,7 @@ from finder.models.file import FileModel
 class PDFFileModel(FileModel):
     accept_mime_types = ['application/pdf']
     fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-pdf.svg')
-    editor_component = 'FileDetails'
+    editor_component = 'Common'
 
     class Meta:
         proxy = True
@@ -21,7 +21,7 @@ class SpreadsheetModel(FileModel):
         'application/vnd.oasis.opendocument.spreadsheet',
     ]
     fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-spreadsheet.svg')
-    editor_component = 'FileDetails'
+    editor_component = 'Common'
 
     class Meta:
         proxy = True

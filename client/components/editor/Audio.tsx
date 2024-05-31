@@ -1,10 +1,8 @@
-import React, {useContext, useMemo, useRef, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import WavesurferPlayer from '@wavesurfer/react';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import {FinderSettings} from 'finder/FinderSettings';
-import {ProgressBar, ProgressOverlay} from 'finder/UploadProgress';
-import DownloadIcon from 'icons/download.svg';
-import UploadIcon from 'icons/upload.svg';
+import {FileDetails} from 'finder/FileDetails';
 import PauseIcon from 'icons/pause.svg';
 import PlayIcon from 'icons/play.svg';
 
@@ -15,17 +13,6 @@ export default function Audio(props) {
 		duration: document.getElementById('id_sample_duration') as HTMLInputElement,
 	};
 	const settings = useContext(FinderSettings);
-	const [uploadFile, setUploadFile] = useState<Promise<Response>>(null);
-	const downloadLinkRef = useRef(null);
-	const inputRef = useRef(null);
-	const subtitle = useMemo(
-		() => {
-			const subtitle = document.getElementById('id_subtitle');
-			subtitle.remove();
-			return subtitle.innerHTML;
-		},
-		[]
-	);
 	const [wavesurfer, setWavesurfer] = useState(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 
@@ -54,29 +41,12 @@ export default function Audio(props) {
 		wavesurfer && wavesurfer.playPause();
 	}
 
-	function replaceFile() {
-		inputRef.current.click();
-	}
+	const controlButton = isPlaying ?
+		<button onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
+		<button onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>;
 
-	function handleFileSelect(event) {
-		const file = event.target.files[0];
-		const promise = new Promise<Response>((resolve, reject) => {
-			file.resolve = resolve;
-			file.reject = reject;
-		});
-		setUploadFile(file);
-		promise.then(() => {
-			window.location.reload();
-		}).catch((error) => {
-			alert(error);
-		}).finally( () => {
-			setUploadFile(null);
-		});
-	}
-
-	return (<>
-		<div className="file-details">
-			<h2>{subtitle}</h2>
+	return (
+		<FileDetails controlButtons={[controlButton]}>
 			<WavesurferPlayer
 				url={settings.download_url}
 				onReady={onReady}
@@ -90,21 +60,6 @@ export default function Audio(props) {
 				waveColor='rgb(121, 174, 200)'
 				progressColor='rgb(65, 118, 144)'
 			/>
-			<div className="button-group">
-				{isPlaying ? <button onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
-					<button onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>}
-				<a download={settings.filename} href={settings.download_url}><DownloadIcon/>{gettext("Download")}
-				</a>
-				<button onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
-			</div>
-			<a ref={downloadLinkRef} download="download" hidden/>
-			<input type="file" name="replaceFile" ref={inputRef} accept={settings.file_mime_type}
-				   onChange={handleFileSelect}/>
-		</div>
-		{uploadFile &&
-			<ProgressOverlay>
-				<ProgressBar file={uploadFile} targetId={settings.file_id}/>
-			</ProgressOverlay>
-		}
-	</>);
+		</FileDetails>
+	);
 }

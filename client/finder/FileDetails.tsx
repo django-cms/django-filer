@@ -1,4 +1,4 @@
-import React, {forwardRef, useContext, useImperativeHandle, useMemo, useRef, useState} from 'react';
+import React, {Fragment, useContext, useMemo, useRef, useState} from 'react';
 import {ProgressBar, ProgressOverlay} from 'finder/UploadProgress';
 import {FinderSettings} from 'finder/FinderSettings';
 import DownloadIcon from 'icons/download.svg';
@@ -28,11 +28,9 @@ export function ViewOriginalButton() {
 }
 
 
-export const ReplaceFileButton = forwardRef((props, forwardedRef) => {
-	const settings = useContext(FinderSettings);
+export function ReplaceFileButton(props) {
+	const {acceptMimeType} = props;
 	const inputRef = useRef(null);
-	const [uploadFile, setUploadFile] = useState<Promise<Response>>(null);
-	useImperativeHandle(forwardedRef, () => ({uploadFile}));
 
 	function replaceFile() {
 		inputRef.current.click();
@@ -44,27 +42,27 @@ export const ReplaceFileButton = forwardRef((props, forwardedRef) => {
 			file.resolve = resolve;
 			file.reject = reject;
 		});
-		setUploadFile(file);
+		props.setUploadFile(file);
 		promise.then((response) => {
 			window.location.reload();
 		}).catch((error) => {
 			alert(error);
 		}).finally( () => {
-			setUploadFile(null);
+			props.setUploadFile(null);
 		});
 	}
 
 	return (<>
 		<button onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
-		<input type="file" name="replaceFile" ref={inputRef} accept={settings.file_mime_type} onChange={handleFileSelect} />
+		<input type="file" name="replaceFile" ref={inputRef} accept={acceptMimeType} onChange={handleFileSelect} />
 	</>);
-});
+}
 
 
-export default function FileDetails(props) {
+export function FileDetails(props) {
 	const settings = useContext(FinderSettings);
+	const controlButtons: Array<React.JSX.Element> = [...(props.controlButtons ?? [])];
 	const [uploadFile, setUploadFile] = useState<Promise<Response>>(null);
-	const replaceRef = useRef(null);
 	const subtitle = useMemo(
 		() => {
 			const subtitle = document.getElementById('id_subtitle');
@@ -76,40 +74,23 @@ export default function FileDetails(props) {
 		},
 		[]
 	);
-
-	// function viewOriginal() {
-	// 	window.open(settings.download_url, '_blank').focus();
-	// }
-	//
-	// function replaceFile() {
-	// 	inputRef.current.click();
-	// }
-	//
-	function handleFileSelect(event) {
-		const file = event.target.files[0];
-		const promise = new Promise<Response>((resolve, reject) => {
-			file.resolve = resolve;
-			file.reject = reject;
-		});
-		setUploadFile(file);
-		promise.then((response) => {
-			window.location.reload();
-		}).catch((error) => {
-			alert(error);
-		}).finally( () => {
-			setUploadFile(null);
-		});
+	if (settings.download_url) {
+		controlButtons.push(<DownloadFileButton />);
+	}
+	if (settings.original_url) {
+		controlButtons.push(<ViewOriginalButton />);
+	}
+	if (settings.replacing_mime_type) {
+		controlButtons.push(<ReplaceFileButton setUploadFile={setUploadFile} acceptMimeType={settings.replacing_mime_type} />);
 	}
 
 	return (<>
-		<div className="file-details">
+		<div className="file-details" style={props.style}>
 			<h2>{subtitle}</h2>
 			{props.children}
-			<div className="button-group">
-				<DownloadFileButton />
-				<ViewOriginalButton />
-				<ReplaceFileButton ref={replaceRef} />
-			</div>
+			<div className="button-group">{controlButtons.map((button, index) =>
+				<Fragment key={index}>{button}</Fragment>
+			)}</div>
 		</div>
 		{uploadFile &&
 		<ProgressOverlay>

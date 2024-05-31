@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
 import {FinderSettings} from 'finder/FinderSettings';
-import FileDetails from './FileDetails';
+import {FileDetails} from 'finder/FileDetails';
 
 
 export default function Image(props) {
