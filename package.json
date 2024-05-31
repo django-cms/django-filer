@@ -17,6 +17,7 @@
     "esbuild-plugin-svgr": "^2.1.0",
     "react-h5-audio-player": "^3.9.1",
     "react-image-crop": "^11.0.5",
+    "react-player": "^2.16.0",
     "react-tooltip": "^5.26.4",
     "request": "^2.88.2",
     "sass": "^1.77.2",

@@ -1,4 +1,4 @@
-const { build } = require('esbuild');
+const {build} = require('esbuild');
 const svgr = require('esbuild-plugin-svgr');
 const buildOptions = require('yargs-parser')(process.argv.slice(2), {
   boolean: ['debug'],
