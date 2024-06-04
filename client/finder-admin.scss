@@ -295,8 +295,11 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 
 		.column-droppable {
-			&.drag-over ul.inode-list, &.drag-over ul.inode-list > li {
+			&.drag-over ul.inode-list {
 				background-color: rgb(121, 174, 200);
+				> li:nth-child(even) {
+					background-color: inherit;
+				}
 			}
 		}
 
@@ -551,6 +554,7 @@ $active-rectangle: rgb(210, 210, 112);
 	.list ul.inode-list, .columns ul.inode-list {
 		display: block;
 		padding: 0;
+
 		> li {
 			width: 100%;
 			box-sizing: border-box;
