@@ -94,7 +94,7 @@ class FolderAdmin(InodeAdmin):
     def change_view(self, request, inode_id, **kwargs):
         inode_obj = self.get_object(request, inode_id)
         if inode_obj is None:
-            return self._get_obj_does_not_exist_redirect(request, self.model._meta, inode_id)
+            return self._get_obj_does_not_exist_redirect(request, self.model._meta, str(inode_id))
         if inode_obj.is_folder:
             return super().change_view(request, str(inode_id), **kwargs)
 
