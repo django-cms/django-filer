@@ -17,7 +17,7 @@ function FolderTab(props) {
 	} = useDroppable({
 		id: `tab:${folder.id}`,
 	});
-	const isActive = folder.id === settings.folder_id;
+	const isActive = settings.is_folder && folder.id === settings.folder_id;
 
 	function togglePin(event) {
 		props.togglePin(this.id);
