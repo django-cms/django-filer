@@ -44,5 +44,5 @@ share/
 data
 local.sqlite
 
-workdir/
+workdir*/
 finder/static/admin/finder/
