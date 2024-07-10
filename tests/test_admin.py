@@ -1368,6 +1368,8 @@ class FolderListingTest(TestCase):
                 can_edit=FolderPermission.ALLOW,
                 can_read=FolderPermission.ALLOW,
                 can_add_children=FolderPermission.ALLOW)
+            from filer.cache import clear_folder_permission_cache
+            clear_folder_permission_cache(self.staff_user)
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
