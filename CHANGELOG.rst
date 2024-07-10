@@ -2,6 +2,24 @@
 CHANGELOG
 =========
 
+3.1.3 (2025-05-17)
+==================
+* Fix: Folder select widget did not render correctly with standard Django admin
+  styles.
+
+3.1.2 (2025-05-17)
+==================
+
+* Made the filer check command compatible with custom image models.
+* Use the final image model's app label to determine the expand view URL.
+* Prepare the image expand URL in the admin code and pass it through to the template via context.
+* Fix #1377: Field `verbose_name` should use `gettext_lazy`.
+* Fix: styles for django 4.2+ admin.
+* Fix: Unintended scroll when clearing file widget.
+* Fix: Method `ImageAdminForm.clean_subject_location()` not implemented correctly causing invokation
+  of `clean()` twice.
+
+
 3.1.1 (2023-11-18)
 ==================
 

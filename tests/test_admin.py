@@ -375,6 +375,7 @@ class FilerImageAdminUrlsTests(TestCase):
 
         response = self.client.get(url)
 
+        self.assertEqual(url, self.file_object.get_admin_expand_view_url())
         self.assertContains(
             response,
             f"""<img id="img" src="{original_url}" onclick="this.classList.toggle('zoom')"/>"""
@@ -629,7 +630,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'admin:filer-ajax_upload',
                 kwargs={
                     'folder_id': folder.pk + 1}
-            ) + '?filename={0}'.format(self.image_name)
+            ) + f'?filename={self.image_name}'
             response = self.client.post(
                 url,
                 data=file_obj.read(),
@@ -693,7 +694,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'admin:filer-ajax_upload',
                 kwargs={
                     'folder_id': folder.pk}
-            ) + '?filename={0}'.format(self.image_name)
+            ) + f'?filename={self.image_name}'
             response = self.client.post(
                 url,
                 data=file_obj.read(),
@@ -759,7 +760,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                     'admin:filer-ajax_upload',
                     kwargs={
                         'folder_id': folder.pk}
-                ) + '?filename={0}'.format(self.image_name)
+                ) + f'?filename={self.image_name}'
                 response = self.client.post(
                     url,
                     data=file_obj.read(),
@@ -1103,10 +1104,10 @@ class FilerBulkOperationsTests(BulkOperationsMixin, TestCase):
         'new_name' should be a plain string, no formatting supported.
         """
         if file_obj is not None:
-            checkbox_name = 'file-{}'.format(file_obj.id)
+            checkbox_name = f'file-{file_obj.id}'
             files = [file_obj]
         elif folder_obj is not None:
-            checkbox_name = 'folder-{}'.format(folder_obj.id)
+            checkbox_name = f'folder-{folder_obj.id}'
             # files inside this folder, non-recursive
             files = File.objects.filter(folder=folder_obj)
         else:
@@ -1322,9 +1323,9 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items: FOO, BAR, BAZ, SAMP
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
-                     self.spam_file.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk, self.spam_file.pk}
+            )
 
     def test_folder_ownership(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
@@ -1336,8 +1337,8 @@ class FolderListingTest(TestCase):
             # he doesn't see BAR, BAZ and SPAM because he doesn't own them
             # and no permission has been given
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk})
 
     def test_with_permission_given_to_folder(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
@@ -1355,8 +1356,8 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees 2 folder : FOO, BAR
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk, self.bar_folder.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk, self.bar_folder.pk})
 
     def test_with_permission_given_to_parent_folder(self):
         with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
@@ -1373,9 +1374,9 @@ class FolderListingTest(TestCase):
             item_list = response.context['paginated_items'].object_list
             # user sees all items because he has permissions on the parent folder
             self.assertEqual(
-                set(folder.pk for folder in item_list),
-                set([self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk,
-                     self.spam_file.pk]))
+                {folder.pk for folder in item_list},
+                {self.foo_folder.pk, self.bar_folder.pk, self.baz_folder.pk, self.spam_file.pk}
+            )
 
     def test_search_against_owner(self):
         url = reverse('admin:filer-directory_listing',
@@ -1416,7 +1417,7 @@ class FolderListingTest(TestCase):
 
         # Create a file with a problematic filename
         problematic_file = django.core.files.base.ContentFile('some data')
-        filename = u'christopher_eccleston'
+        filename = 'christopher_eccleston'
         problematic_file.name = filename
         self.spam_file = File.objects.create(
             owner=self.staff_user, original_filename=filename,

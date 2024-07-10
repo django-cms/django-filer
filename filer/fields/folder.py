@@ -54,7 +54,7 @@ class AdminFolderWidget(ForeignKeyRawIdWidget):
         # API to determine the ID dynamically.
         context = {
             'hidden_input': hidden_input,
-            'lookup_url': '{}{}'.format(related_url, url),
+            'lookup_url': f'{related_url}{url}',
             'lookup_name': name,
             'span_id': css_id_description_txt,
             'object': obj,

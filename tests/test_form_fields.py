@@ -24,5 +24,5 @@ class AdminFileWidgetTests(TestCase):
         content = widget.render("foo", file.id, {})
 
         self.assertIn(
-            "/admin/filer/file/{}/change/?_edit_from_widget=1".format(file.id), content
+            f"/admin/filer/file/{file.id}/change/?_edit_from_widget=1", content
         )
