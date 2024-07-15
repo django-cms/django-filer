@@ -321,14 +321,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         order_by = request.GET.get('order_by', None)
         order_by_annotation = None
         if order_by is None:
-            file_qs = file_qs.annotate(coalesce_sort_field=Coalesce(
+            order_by_annotation = Lower(Coalesce(
                 Case(
                     When(name__exact='', then=None),
                     When(name__isnull=False, then='name')
                 ),
                 'original_filename'
             ))
-            order_by_annotation = Lower('coalesce_sort_field')
 
         order_by = order_by.split(',') if order_by else []
         order_by = [field for field in order_by
