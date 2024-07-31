@@ -54,7 +54,7 @@ for all the details on how to install, configure and use django-filer.
     :target: http://badge.fury.io/py/django-filer
 .. |coverage| image:: https://codecov.io/gh/django-cms/django-filer/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/django-cms/django-filer
-.. |python| image:: https://img.shields.io/badge/python-3.8+-blue.svg
+.. |python| image:: https://img.shields.io/badge/python-3.10+-blue.svg
     :target: https://pypi.org/project/django-filer/
 .. |django| image:: https://img.shields.io/badge/django-3.2+-blue.svg
     :target: https://www.djangoproject.com/
