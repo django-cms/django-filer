@@ -39,6 +39,6 @@ jobs:
       run: echo "CUSTOM_IMAGE=custom_image.Image" >> $GITHUB_ENV
       if: ${{ matrix.custom-image-model }}
     - name: Run coverage
-      run: coverage run setup.py test
+      run: coverage run tests/settings.py
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
