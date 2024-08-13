@@ -214,7 +214,7 @@ field.  You can override this behavior by subclassing the
 You can also override the search behavior for :py:class:`Folders<filer.models.foldermodels.Folder>`.
 Just override :py:attr:`~filer.admin.folderadmin.FolderAdmin.search_fields` by subclassing
 the :py:class:`filer.admin.folderadmin.FolderAdmin`. It works as described in
-`Django's docs <https://docs.djangoproject.com/en/1.8/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>`_. E.g.:
+`Django's docs <https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>`_. E.g.:
 
 
 .. code-block:: python
@@ -230,7 +230,7 @@ Providing custom Image model
 ----------------------------
 
 As the ``Image`` model is special, a different way to implement custom Image model is required, which uses the Django
-`swappable models <https://docs.djangoproject.com/en/2.0/topics/auth/customizing/#substituting-a-custom-user-model>`_ interface.
+`swappable models <https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#substituting-a-custom-user-model>`_ interface.
 
 Defining the model
 ..................
