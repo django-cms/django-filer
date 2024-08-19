@@ -68,6 +68,7 @@ HELPER_SETTINGS = {
             }
         }
     },
+    'THUMBNAIL_DEFAULT_STORAGE_ALIAS': 'default',  # for the lack of any other storage defined
     'SECRET_KEY': '__secret__',
     'DEFAULT_AUTO_FIELD': 'django.db.models.AutoField',
 }
