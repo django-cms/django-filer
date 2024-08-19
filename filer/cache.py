@@ -12,7 +12,11 @@ def get_folder_perm_cache_key(user: User, permission: str) -> str:
     """
     Generates a unique cache key for a given user and permission.
 
-    The key is a string in the format "filer:perm:<permission>".
+    The key is a string in the format "filer:perm:<permission>", i.e. it does not
+    contain the user id. This will be sufficient for most use cases.
+
+    Patch this method to include the user id in the cache key if necessary, e.g.,
+    for far more than 1,000 admin users to make the cached unit require less memory.
 
     Parameters:
     user (User): The user for whom the cache key is being generated.
