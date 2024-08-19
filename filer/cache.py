@@ -24,7 +24,7 @@ def get_folder_perm_cache_key(user: User, permission: str) -> str:
     return f"filer:perm:{permission}"
 
 
-def get_folder_permission_cache(user: User, permission:str) -> typing.Optional[dict]:
+def get_folder_permission_cache(user: User, permission: str) -> typing.Optional[dict]:
     """
     Retrieves the cached folder permissions for a given user and permission.
 
