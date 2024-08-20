@@ -2,7 +2,6 @@ import logging
 import os
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string as get_storage_class
 from django.utils.translation import gettext_lazy as _
 
@@ -38,9 +37,10 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 100)
 
+if hasattr(settings, "FILER_ADMIN_ICON_SIZES"):
+    logger.warning("FILER_ADMIN_ICON_SIZES is deprecated and will be removed in the future.")
+
 _ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', ('16', '32', '48', '64'))
-if not _ICON_SIZES:
-    raise ImproperlyConfigured('Please, configure FILER_ADMIN_ICON_SIZES')
 # Reliably sort by integer value, but keep icon size as string.
 # (There is some code in the wild that depends on this being strings.)
 FILER_ADMIN_ICON_SIZES = [str(i) for i in sorted([int(s) for s in _ICON_SIZES])]
