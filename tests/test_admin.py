@@ -273,7 +273,7 @@ class FilerImageAdminUrlsTests(TestCase):
     def test_icon_view_sizes(self):
         """Redirects are issued for accepted thumbnail sizes and 404 otherwise"""
         test_set = tuple((size, 302) for size in DEFERRED_THUMBNAIL_SIZES)
-        test_set += (50, 404), (90, 404), (320, 404)
+        test_set += (50, 404), (90, 404), (640, 404)
         for size, expected_status in test_set:
             url = reverse('admin:filer_file_fileicon', kwargs={
                 'file_id': self.file_object.pk,

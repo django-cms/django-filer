@@ -106,7 +106,7 @@
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                                   title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                       {% endif %}
-                                      {% file_icon file size="160x160" %}
+                                      {% file_icon file detail="thumbnail" %}
                                       {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                           </a>
                                       {% endif %}

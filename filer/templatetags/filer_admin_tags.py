@@ -17,8 +17,7 @@ from easy_thumbnails.options import ThumbnailOptions
 from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
-from filer.settings import DEFERRED_THUMBNAIL_SIZES
-
+from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE
 
 register = Library()
 
@@ -126,6 +125,7 @@ def file_icon_context(file, detail, width, height):
             else:
                 opts = {'size': (width, height), 'crop': True}
             thumbnail_options = ThumbnailOptions(opts)
+            add_attrs = {}
             # Optimize directory listing:
             if width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
                 # Get name of thumbnail from easy-thumbnail
@@ -135,6 +135,11 @@ def file_icon_context(file, detail, width, height):
                     icon_url = file.file.thumbnail_storage.url(configured_name)
                     if mime_subtype != 'svg+xml' and file.thumbnailx2_name:
                         context['highres_url'] = file.file.thumbnail_storage.url(file.thumbnailx2_name)
+                elif mime_subtype == 'svg+xml':
+                    icon_url = file.url
+                    add_attrs = {
+                        "object-fit": "cover",
+                    }
                 else:  # Probably does not exist, defer creation
                     icon_url = reverse("admin:filer_file_fileicon", args=(file.pk, width))
                 context['alt_text'] = file.default_alt_text
@@ -161,6 +166,8 @@ def file_icon_context(file, detail, width, height):
         icon_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
         height = width  # icon is a square
     context.update(width=width, height=height, icon_url=icon_url)
+    if add_attrs:
+        context.update(add_attrs=add_attrs)
     return context
 
 
@@ -187,16 +194,20 @@ def file_icon(file, detail=False, size=None):
     """
     if size:
         width, height = (int(s) for s in size.split('x'))
+    elif detail == "thumbnail":
+        width, height = FILER_THUMBNAIL_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE
+    elif detail is True:
+        width, height = 2 * FILER_TABLE_ICON_SIZE, 2 * FILER_TABLE_ICON_SIZE
     else:
-        width, height = (75, 75) if detail else (40, 40)
-    return file_icon_context(file, detail, width, height)
+        width, height = FILER_TABLE_ICON_SIZE, FILER_TABLE_ICON_SIZE
+    return file_icon_context(file, detail is True, width, height)
 
 
 @register.simple_tag
 def file_icon_url(file):
     # Cache since it is called repeatedly by templates
     if not hasattr(file, "_file_icon_url_cache"):
-        context = file_icon_context(file, False, 80, 80)
+        context = file_icon_context(file, False, 2 * FILER_TABLE_ICON_SIZE, 2 * FILER_TABLE_ICON_SIZE)
         file._file_icon_url_cache = escapejs(context.get('highres_url', context['icon_url']))
     return file._file_icon_url_cache
 

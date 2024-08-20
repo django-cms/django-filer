@@ -45,13 +45,16 @@ if not _ICON_SIZES:
 # (There is some code in the wild that depends on this being strings.)
 FILER_ADMIN_ICON_SIZES = [str(i) for i in sorted([int(s) for s in _ICON_SIZES])]
 
-# Filer admin templates have specific icon sizes hardcoded: 32 and 48.
-_ESSENTIAL_ICON_SIZES = ('32', '48')
-if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
-    logger.warn(
-        "FILER_ADMIN_ICON_SIZES has not all of the essential icon sizes "
-        "listed: {}. Some icons might be missing in admin templates.".format(
-            _ESSENTIAL_ICON_SIZES))
+# Currently, these two icon sizes are hard-coded into the admin and admin templates
+FILER_TABLE_ICON_SIZE = getattr(settings, "_FILER_TABLE_ICON_SIZE", 40)
+FILER_THUMBNAIL_ICON_SIZE = getattr(settings, "_FILER_THUMBNAIL_ICON_SIZE", 160)
+DEFERRED_THUMBNAIL_SIZES = (
+    FILER_TABLE_ICON_SIZE,
+    2 * FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
+    2 * FILER_THUMBNAIL_ICON_SIZE,
+)
+
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
@@ -283,7 +286,6 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
     },
 }
 
-DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
 IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
