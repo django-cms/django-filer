@@ -470,6 +470,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'show_result_count': show_result_count,
             'folder_children': folder_qs,
             'folder_files': file_qs,
+            'thumbnail_size': FILER_THUMBNAIL_ICON_SIZE,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),

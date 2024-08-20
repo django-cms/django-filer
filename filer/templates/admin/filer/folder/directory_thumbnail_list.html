@@ -1,6 +1,6 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags static thumbnail %}
 <div class="drag-hover-border thumbnail-drag-hover-border"></div>
-<section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list">
+<section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list" style="--thumbnail-size: {{ thumbnail_size }}px;">
 
     <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% translate 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}"
          data-max-files="{{ max_files|safe }}"
