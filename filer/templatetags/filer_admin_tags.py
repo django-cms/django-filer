@@ -112,6 +112,7 @@ def file_icon_context(file, detail, width, height):
     if file.file and isinstance(file.file.source_storage, FileSystemStorage) and not file.file.exists():
         return not_available_context
 
+    add_attrs = {}
     if isinstance(file, BaseImage):
         thumbnailer = get_thumbnailer(file)
 
@@ -125,7 +126,6 @@ def file_icon_context(file, detail, width, height):
             else:
                 opts = {'size': (width, height), 'crop': True}
             thumbnail_options = ThumbnailOptions(opts)
-            add_attrs = {}
             # Optimize directory listing:
             if width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
                 # Get name of thumbnail from easy-thumbnail
