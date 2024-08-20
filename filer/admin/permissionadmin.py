@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings
+from ..cache import clear_folder_permission_cache
 
 
 class PermissionAdmin(admin.ModelAdmin):
@@ -31,3 +32,11 @@ class PermissionAdmin(admin.ModelAdmin):
             'change': enable_permissions,
             'delete': enable_permissions,
         }
+
+    def save_model(self, request, obj, form, change):
+        clear_folder_permission_cache(request.user)
+        super().save_model(request, obj, form, change)
+
+    def delete_model(self, request, obj):
+        clear_folder_permission_cache(request.user)
+        super().delete_model(request, obj)
