@@ -30,8 +30,9 @@ from easy_thumbnails.models import Thumbnail
 from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
-from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY, TABLE_LIST_TYPE, FILER_TABLE_ICON_SIZE, \
-    FILER_THUMBNAIL_ICON_SIZE
+from ..settings import (
+    FILER_IMAGE_MODEL, FILER_PAGINATE_BY, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE, TABLE_LIST_TYPE,
+)
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer

@@ -17,7 +17,10 @@ from easy_thumbnails.options import ThumbnailOptions
 from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
-from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE
+from filer.settings import (
+    DEFERRED_THUMBNAIL_SIZES, FILER_MAX_SVG_THUMBNAIL_SIZE, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE,
+)
+
 
 register = Library()
 
@@ -136,7 +139,10 @@ def file_icon_context(file, detail, width, height):
                     if mime_subtype != 'svg+xml' and file.thumbnailx2_name:
                         context['highres_url'] = file.file.thumbnail_storage.url(file.thumbnailx2_name)
                 elif mime_subtype == 'svg+xml':
-                    icon_url = file.url
+                    if file.size < FILER_MAX_SVG_THUMBNAIL_SIZE:
+                        icon_url = file.url
+                    else:
+                        icon_url = staticfiles_storage.url('filer/icons/file-picture.svg')
                     add_attrs = {
                         "object-fit": "cover",
                     }

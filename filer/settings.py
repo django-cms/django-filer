@@ -324,3 +324,7 @@ if "cms" in settings.INSTALLED_APPS:  # pragma: no cover
     except (ModuleNotFoundError, ImportError):
         # Import error? No django CMS used: stay with own icons
         pass
+
+
+# SVG are their own thumbnails if their size is below this limit
+FILER_MAX_SVG_THUMBNAIL_SIZE = getattr(settings, "FILER_MAX_SVG_THUMBNAIL_SIZE", 1024 * 1024)  # 1MB default
