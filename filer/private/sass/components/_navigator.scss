@@ -728,8 +728,8 @@ body {
         float: left;
         display: inline-block;
         padding: 10px;
-        width: calc(var(--thumbnail-size, 125px) + 5px);
-        height: calc(var(--thumbnail-size, 125px) + 5px);
+        width: calc(var(--thumbnail-size, 120px) + 5px);
+        height: calc(var(--thumbnail-size, 120px) + 5px);
         border: 1px solid $gray-lighter;
         margin: 16px 12px;
         background-color: $white;
@@ -737,8 +737,8 @@ body {
         overflow: hidden;
         .thumbnail-file-item-box {
             padding: 10px;
-            width: calc(var(--thumbnail-size, 125px) + 5px);
-            height: calc(var(--thumbnail-size, 125px) + 5px);
+            width: calc(var(--thumbnail-size, 120px) + 5px);
+            height: calc(var(--thumbnail-size, 120px) + 5px);
             border: 1px solid $gray-lighter;
             margin: 16px 12px;
             background-color: $white;
@@ -787,8 +787,8 @@ body {
     }
     .thumbnail-file-item {
         float: none;
-        width: calc(var(--thumbnail-size, 125px) + 22px);
-        height: calc(var(--thumbnail-size, 125px) + 80px);
+        width: calc(var(--thumbnail-size, 120px) + 27px);
+        height: calc(var(--thumbnail-size, 120px) + 80px);
         border: 0;
         padding: 0;
         background-color: transparent;

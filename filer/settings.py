@@ -47,7 +47,7 @@ FILER_ADMIN_ICON_SIZES = [str(i) for i in sorted([int(s) for s in _ICON_SIZES])]
 
 # Currently, these two icon sizes are hard-coded into the admin and admin templates
 FILER_TABLE_ICON_SIZE = getattr(settings, "FILER_TABLE_ICON_SIZE", 40)
-FILER_THUMBNAIL_ICON_SIZE = getattr(settings, "FILER_THUMBNAIL_ICON_SIZE", 160)
+FILER_THUMBNAIL_ICON_SIZE = getattr(settings, "FILER_THUMBNAIL_ICON_SIZE", 120)
 DEFERRED_THUMBNAIL_SIZES = (
     FILER_TABLE_ICON_SIZE,
     2 * FILER_TABLE_ICON_SIZE,
