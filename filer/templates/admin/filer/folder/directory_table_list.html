@@ -56,7 +56,7 @@
                             <td class="column-icon">
                                 <a href="{{ subfolder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
                                     title="{% blocktrans with subfolder.name as item_label %}Change '{{ item_label }}' folder details{% endblocktrans %}">
-                                    <img src="{% static 'filer/icons/folder.svg' %}" alt="{% translate 'Folder Icon' %}" width="28" height="28">
+                                    <img src="{% static 'filer/icons/folder.svg' %}" alt="{% translate 'Folder Icon' %}" width="{% widthratio 7 10 thumbnail_size %}" height="{% widthratio 7 10 thumbnail_size %}" style="height: {{ thumbnail_size }}px;">
                                 </a>
                             </td>
                             <td class="column-name">
