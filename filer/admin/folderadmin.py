@@ -273,13 +273,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
         if list_type == TABLE_LIST_TYPE:
-            s = FILER_TABLE_ICON_SIZE  # Prefetch thumbnails for table view
-            size = f"{s}x{s}"
-            size_x2 = f"{2 * s}x{2 * s}"
+            # Prefetch thumbnails for table view
+            size = f"{FILER_TABLE_ICON_SIZE}x{FILER_TABLE_ICON_SIZE}"
+            size_x2 = f"{2 * FILER_TABLE_ICON_SIZE}x{2 * FILER_TABLE_ICON_SIZE}"
         else:
-            s = FILER_THUMBNAIL_ICON_SIZE  # Prefetch thumbnails for thumbnail view
-            size = f"{s}x{s}"
-            size_x2 = f"{2 * s}x{2 * s}"
+            # Prefetch thumbnails for thumbnail view
+            size = f"{FILER_THUMBNAIL_ICON_SIZE}x{FILER_THUMBNAIL_ICON_SIZE}"
+            size_x2 = f"{2 * FILER_THUMBNAIL_ICON_SIZE}x{2 * FILER_THUMBNAIL_ICON_SIZE}"
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
