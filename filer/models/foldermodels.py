@@ -10,8 +10,8 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
-from . import mixins
 from ..cache import get_folder_permission_cache, update_folder_permission_cache
+from . import mixins
 
 
 class FolderPermissionManager(models.Manager):

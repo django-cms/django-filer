@@ -30,7 +30,9 @@ from easy_thumbnails.models import Thumbnail
 from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
-from ..settings import FILER_IMAGE_MODEL, FILER_PAGINATE_BY, TABLE_LIST_TYPE
+from ..settings import (
+    FILER_IMAGE_MODEL, FILER_PAGINATE_BY, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE, TABLE_LIST_TYPE,
+)
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
 from ..utils.filer_easy_thumbnails import FilerActionThumbnailer
@@ -271,11 +273,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
 
         list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
         if list_type == TABLE_LIST_TYPE:
-            size = "40x40"  # Prefetch thumbnails for listing
-            size_x2 = "80x80"
+            # Prefetch thumbnails for table view
+            size = f"{FILER_TABLE_ICON_SIZE}x{FILER_TABLE_ICON_SIZE}"
+            size_x2 = f"{2 * FILER_TABLE_ICON_SIZE}x{2 * FILER_TABLE_ICON_SIZE}"
         else:
-            size = "160x160"  # Prefetch thumbnails for thumbnail view
-            size_x2 = "320x320"
+            # Prefetch thumbnails for thumbnail view
+            size = f"{FILER_THUMBNAIL_ICON_SIZE}x{FILER_THUMBNAIL_ICON_SIZE}"
+            size_x2 = f"{2 * FILER_THUMBNAIL_ICON_SIZE}x{2 * FILER_THUMBNAIL_ICON_SIZE}"
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -467,6 +471,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             'show_result_count': show_result_count,
             'folder_children': folder_qs,
             'folder_files': file_qs,
+            'thumbnail_size': FILER_TABLE_ICON_SIZE if list_type == TABLE_LIST_TYPE else FILER_THUMBNAIL_ICON_SIZE,
             'limit_search_to_folder': limit_search_to_folder,
             'is_popup': popup_status(request),
             'filer_admin_context': AdminContext(request),
