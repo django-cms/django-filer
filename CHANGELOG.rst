@@ -2,6 +2,18 @@
 CHANGELOG
 =========
 
+3.2.0 (2024-08-23)
+==================
+
+* feat: Add cache for permission checks by @fsbraun in https://github.com/django-cms/django-filer/pull/1486
+* fix: Reduce number of thumbnails created for admin, avoid admin thumbnails for svg files by @fsbraun in https://github.com/django-cms/django-filer/pull/1490
+* fix: Allow ``Image.MAX_IMAGE_PIXELS`` to be ``None`` by @fsbraun in https://github.com/django-cms/django-filer/pull/1475
+* docs: Update extending_filer.rst by @DmytroLitvinov in https://github.com/django-cms/django-filer/pull/1488
+
+**New contributor:**
+
+* @DmytroLitvinov made their first contribution in https://github.com/django-cms/django-filer/pull/1488
+
 3.1.4 (2024-07-15)
 ==================
 
