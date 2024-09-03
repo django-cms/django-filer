@@ -42,7 +42,7 @@ class InodeMetaModel(models.base.ModelBase):
     @property
     def real_models(self):
         """
-        Returns all real (excluding proxy models) that inherit from InodeModel.
+        Yields all real (excluding proxy models) that inherit from InodeModel.
         """
         yield self._inode_models['finder.FolderModel']
         for model in self._inode_models.values():

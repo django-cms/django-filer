@@ -87,7 +87,11 @@ ancestors. This allows to easily move files between those folders.
 ### Multiple Favrourite Folders
 
 Each user can have multiple favourite folders. This allows him to quickly access those folders from
-the navigation bar and move files and folders between them.
+the navigation bar. It also it pssoble to drag a file from the current view into one of the tabs for
+of the favorite folders.
+
+
+### Implementation Details
 
 The new user interface is based on the [React](https://reactjs.org/) framework with the
 [DnD-Kit](https://docs.dndkit.com/) as its main additional dependency.

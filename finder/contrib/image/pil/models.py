@@ -12,7 +12,7 @@ class PILImageModel(ImageModel):
     Model for image files which can be transformed by the PIL package.
     """
     accept_mime_types = ['image/jpeg', 'image/webp', 'image/png', 'image/gif']
-    exif_values = set(ExifTags.Base.__members__.values())  # TODO: some values can be removed
+    exif_values = set(ExifTags.Base.__members__.values())  # TODO: some EXIF values can be removed
 
     class Meta:
         app_label = 'finder'
