@@ -34,7 +34,7 @@ export default function Video(props) {
 		}
 	}
 
-	const createPosterFrame = () => {
+	const setPosterFrame = () => {
 		const currentTime = videoRef.current.getCurrentTime();
 		sampleFields.posterFrame.value = currentTime;
 	}
@@ -43,7 +43,7 @@ export default function Video(props) {
 		<button onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
 		<button onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
 	),
-		<button onClick={createPosterFrame}><CameraIcon/>{gettext("Create Poster Frame")}</button>
+		<button onClick={setPosterFrame}><CameraIcon/>{gettext("Use as Poster")}</button>
 	];
 	return (
 		<FileDetails controlButtons={controlButtons} style={style}>
@@ -51,7 +51,6 @@ export default function Video(props) {
 				url={settings.download_url}
 				controls={true}
 				controlsList="nofullscreen nodownload"
-				disablePictureInPicture={true}
 				onReady={onReady}
 				onPlay={() => setIsPlaying(true)}
 				onPause={() => setIsPlaying(false)}

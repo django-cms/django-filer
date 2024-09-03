@@ -517,6 +517,10 @@ $active-rectangle: rgb(210, 210, 112);
 						transform: scale(85%);
 					}
 				}
+				video {
+					border-radius: 5px;
+					box-shadow: var(--border-color) 0 0 5px;
+				}
 
 				figcaption {
 					margin-top: 0.25rem;
@@ -733,6 +737,10 @@ $active-rectangle: rgb(210, 210, 112);
 
 	.detail-editor {
 		padding: 0 20px 40px;
+
+		input[readonly] {
+			border: none;
+		}
 	}
 
 	.file-details {

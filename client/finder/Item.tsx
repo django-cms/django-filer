@@ -165,7 +165,7 @@ export function ListItem(props) {
 		case 'tiles': case 'mosaic':
 			return (
 				<figure>
-					<FigBody sampleUrl={props.sample_url}>
+					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
 						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 					</FigBody>
 					<figcaption>
@@ -178,7 +178,7 @@ export function ListItem(props) {
 		case 'list':
 			return (<>
 				<div>
-					<FigBody sampleUrl={props.sample_url}>
+					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
 						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 					</FigBody>
 				</div>
@@ -200,7 +200,7 @@ export function ListItem(props) {
 		case 'columns':
 			return (<>
 				<div>
-					<FigBody sampleUrl={props.sample_url}>
+					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
 						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 					</FigBody>
 				</div>

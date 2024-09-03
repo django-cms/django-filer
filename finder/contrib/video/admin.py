@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.forms.fields import CharField, IntegerField
-from django.forms.widgets import HiddenInput, TextInput
+from django.forms.fields import CharField, FloatField
+from django.forms.widgets import TextInput, NumberInput
 
 from entangled.forms import EntangledModelForm
 
@@ -12,9 +12,10 @@ class VideoForm(EntangledModelForm):
     name = CharField(
         widget=TextInput(attrs={'size': 100}),
     )
-    poster_frame = IntegerField(
-        widget=HiddenInput(),
+    poster_frame = FloatField(
         initial=0,
+        widget=NumberInput(attrs={'readonly': 'readonly'}),
+        required=False,
     )
 
     class Meta:
