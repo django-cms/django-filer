@@ -3,7 +3,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "esbuild": "node client/esbuild.cjs",
+    "esbuild": "node client/esbuild.config.mjs",
     "compilescss": "sass --load-path=. client:finder/static/admin/finder/css/",
     "buildall": "concurrently \"npm run esbuild -- --debug \" \"npm run compilescss\""
   },

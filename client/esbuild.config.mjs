@@ -1,10 +1,11 @@
-const {build} = require('esbuild');
-const svgr = require('esbuild-plugin-svgr');
-const buildOptions = require('yargs-parser')(process.argv.slice(2), {
-  boolean: ['debug'],
+import {build} from 'esbuild';
+import svgr from 'esbuild-plugin-svgr';
+import parser from 'yargs-parser';
+const buildOptions = parser(process.argv.slice(2), {
+  boolean: ['debug', 'minify'],
 });
 
-build({
+await build({
   entryPoints: [
     'client/folder-admin.tsx',
     'client/file-admin.tsx',
@@ -12,7 +13,7 @@ build({
     'client/components/folder/*.tsx',
   ],
   bundle: true,
-  minify: !buildOptions.debug,
+  minify: buildOptions.minify,
   sourcemap: buildOptions.debug,
   outdir: 'finder/static/admin/finder/js',
   splitting: true,
