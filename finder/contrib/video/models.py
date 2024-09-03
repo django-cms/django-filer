@@ -37,7 +37,6 @@ class VideoFileModel(FileModel):
             video_stream = ffmpeg.filter(video_stream, 'scale', self.thumbnail_size, -1)
             audio_stream = ffmpeg.filter(stream.audio, 'atrim', duration=SAMPLE_DURATION)
             stream = ffmpeg.concat(video_stream, audio_stream, v=1, a=1)
-            stream = ffmpeg.trim(stream, duration=SAMPLE_DURATION)
             stream = ffmpeg.output(stream, default_storage.path(sample_path))
             try:
                 ffmpeg.run(stream)

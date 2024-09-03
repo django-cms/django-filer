@@ -6,7 +6,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from filer import settings as filer_settings
 from finder.models.file import FileModel
 
-from pydub import AudioSegment
+import ffmpeg
 
 
 SAMPLE_DURATION = 5
@@ -30,12 +30,13 @@ class AudioFileModel(FileModel):
         sample_path = self.get_sample_path(sample_start, sample_duration)
         if not default_storage.exists(sample_path):
             (default_storage.base_location / sample_path.parent).mkdir(parents=True, exist_ok=True)
-            audio_sample = AudioSegment.from_file(
-                default_storage.path(self.file_path),
-                start_second=sample_start,
-                duration=sample_duration,
-            )
-            audio_sample.export(default_storage.path(sample_path))
+            stream = ffmpeg.input(default_storage.path(self.file_path))
+            stream = ffmpeg.filter(stream.audio, 'atrim', start=sample_start, duration=SAMPLE_DURATION)
+            stream = ffmpeg.output(stream, default_storage.path(sample_path))
+            try:
+                ffmpeg.run(stream)
+            except ffmpeg.Error as exp:
+                return self.fallback_thumbnail_url
         return default_storage.url(sample_path)
 
     def get_sample_path(self, sample_start, sample_duration):
