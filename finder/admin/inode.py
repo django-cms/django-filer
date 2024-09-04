@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.db.models.functions import Lower
-from django.http.response import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
+from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -47,6 +47,14 @@ class InodeAdmin(admin.ModelAdmin):
                     return obj.casted
             except model.DoesNotExist:
                 pass
+
+    def check_for_valid_post_request(self, request, folder_id):
+        if request.method != 'POST':
+            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
+        if request.content_type != 'application/json':
+            return HttpResponseBadRequest(f"Invalid content-type {request.content_type}. Only application/json is allowed.")
+        if self.get_object(request, folder_id) is None:
+            return HttpResponseNotFound(f"Folder with id “{folder_id}” not found.")
 
     def toggle_pin(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -215,29 +223,14 @@ class InodeAdmin(admin.ModelAdmin):
             'folder_id': inode.folder.id,
             'favorite_folders': favorite_folders,
             'csrf_token': get_token(request),
+            'parent_id': inode.parent_id,
         }
-        if inode.is_folder:
-            trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
-            if inode.id != trash_folder.id:
-                if inode.parent_id:
-                    parent_url = reverse(
-                        'admin:finder_inodemodel_change',
-                        args=(inode.parent_id,),
-                        current_app=self.admin_site.name,
-                    )
-                else:
-                    parent_url = None
-                settings.update(
-                    is_root=inode.is_root,
-                    is_trash=False,
-                    parent_id=inode.parent_id,
-                    parent_url=parent_url,
-                )
-                # temporarily deactivated: if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
-                request.session['finder_last_folder_id'] = str(inode.id)
-            else:
-                settings.update(
-                    is_root=False,
-                    is_trash=True,
-                )
+        if inode.parent_id:
+            settings['parent_url'] = reverse(
+                'admin:finder_inodemodel_change',
+                args=(inode.parent_id,),
+                current_app=self.admin_site.name,
+            )
+        else:
+            settings['parent_url'] = None
         return settings

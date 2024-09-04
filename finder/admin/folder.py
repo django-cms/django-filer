@@ -104,6 +104,19 @@ class FolderAdmin(InodeAdmin):
 
     def get_settings(self, request, inode):
         settings = super().get_settings(request, inode)
+        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        if inode.id != trash_folder.id:
+            settings.update(
+                is_root=inode.is_root,
+                is_trash=False,
+            )
+            # temporarily deactivated: if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
+            request.session['finder_last_folder_id'] = str(inode.id)
+        else:
+            settings.update(
+                is_root=False,
+                is_trash=True,
+            )
         if isinstance(inode.ancestors, QuerySet):
             ancestor_ids = list(inode.ancestors.values_list('id', flat=True))
         else:
@@ -176,14 +189,6 @@ class FolderAdmin(InodeAdmin):
                 owner=request.user,
             )
         return HttpResponse(f"Uploaded {new_file.name} successfully.")
-
-    def check_for_valid_post_request(self, request, folder_id):
-        if request.method != 'POST':
-            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
-        if request.content_type != 'application/json':
-            return HttpResponseBadRequest(f"Invalid content-type {request.content_type}. Only application/json is allowed.")
-        if self.get_object(request, folder_id) is None:
-            return HttpResponseNotFound(f"Folder with id “{folder_id}” not found.")
 
     def update_inode(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
