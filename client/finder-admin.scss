@@ -740,6 +740,11 @@ $active-rectangle: rgb(210, 210, 112);
 
 		input[readonly] {
 			border: none;
+			padding-left: 0;
+			padding-right: 0;
+			&:focus-visible {
+				outline: none;
+			}
 		}
 	}
 
