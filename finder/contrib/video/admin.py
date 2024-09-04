@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.forms.fields import CharField, FloatField
 from django.forms.widgets import TextInput, NumberInput
+from django.utils.translation import gettext_lazy as _
 
 from entangled.forms import EntangledModelForm
 
@@ -12,15 +13,15 @@ class VideoForm(EntangledModelForm):
     name = CharField(
         widget=TextInput(attrs={'size': 100}),
     )
-    poster_frame = FloatField(
-        initial=0,
+    sample_start = FloatField(
+        label=_("Poster timestamp"),
         widget=NumberInput(attrs={'readonly': 'readonly'}),
         required=False,
     )
 
     class Meta:
         model = VideoFileModel
-        entangled_fields = {'meta_data': ['poster_frame']}
+        entangled_fields = {'meta_data': ['sample_start']}
         untangled_fields = ['name']
 
     class Media:

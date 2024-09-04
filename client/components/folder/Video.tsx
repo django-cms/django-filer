@@ -16,6 +16,7 @@ export default function Video(props) {
 	}
 
 	return (
+		props.sampleUrl ?
 		<ReactPlayer
 			onMouseEnter={() => onPlayPause(false)}
 			onMouseLeave={() => onPlayPause(true)}
@@ -26,6 +27,7 @@ export default function Video(props) {
 			ref={videoRef}
 			width="100%"
 			height="100%"
-		/>
+		/> :
+		<img src={props.thumbnailUrl} />
 	);
 }

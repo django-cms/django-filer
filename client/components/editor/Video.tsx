@@ -9,7 +9,7 @@ import CameraIcon from 'icons/camera.svg';
 
 export default function Video(props) {
 	const sampleFields = {
-		posterFrame: document.getElementById('id_poster_frame') as HTMLInputElement,
+		sampleStart: document.getElementById('id_sample_start') as HTMLInputElement,
 	};
 	const settings = useContext(FinderSettings);
 	const style = {
@@ -36,7 +36,7 @@ export default function Video(props) {
 
 	const setPosterFrame = () => {
 		const currentTime = videoRef.current.getCurrentTime();
-		sampleFields.posterFrame.value = currentTime;
+		sampleFields.sampleStart.value = currentTime;
 	}
 
 	const controlButtons = [(isPlaying ?
