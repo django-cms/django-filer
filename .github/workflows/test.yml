@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
@@ -18,6 +18,15 @@ jobs:
         os: [
           ubuntu-20.04,
         ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.8
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-main.txt
+            python-version: 3.8
+          - requirements-file: django-main.txt
+            python-version: 3.9
 
     steps:
     - uses: actions/checkout@v1

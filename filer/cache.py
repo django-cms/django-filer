@@ -65,7 +65,7 @@ def clear_folder_permission_cache(user: User, permission: typing.Optional[str] =
         cache.delete(get_folder_perm_cache_key(user, permission))
 
 
-def update_folder_permission_cache(user: User, permission: str, id_list: list[int]) -> None:
+def update_folder_permission_cache(user: User, permission: str, id_list: typing.List[int]) -> None:
     """
     Updates the cached folder permissions for a given user and permission.
 

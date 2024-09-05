@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+3.2.1 (2024-09-05)
+==================
+
+* fix: Restore python 3.8 and python 3.9 compatibility
+
 3.2.0 (2024-08-23)
 ==================
 
