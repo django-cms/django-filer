@@ -2,12 +2,39 @@
 CHANGELOG
 =========
 
-3.1.3 (2025-05-17)
+3.2.1 (2024-09-05)
+==================
+
+* fix: Restore python 3.8 and python 3.9 compatibility
+
+3.2.0 (2024-08-23)
+==================
+
+* feat: Add cache for permission checks by @fsbraun in https://github.com/django-cms/django-filer/pull/1486
+* fix: Reduce number of thumbnails created for admin, avoid admin thumbnails for svg files by @fsbraun in https://github.com/django-cms/django-filer/pull/1490
+* fix: Allow ``Image.MAX_IMAGE_PIXELS`` to be ``None`` by @fsbraun in https://github.com/django-cms/django-filer/pull/1475
+* docs: Update extending_filer.rst by @DmytroLitvinov in https://github.com/django-cms/django-filer/pull/1488
+
+**New contributor:**
+
+* @DmytroLitvinov made their first contribution in https://github.com/django-cms/django-filer/pull/1488
+
+3.1.4 (2024-07-15)
+==================
+
+* feat: Accept new `STORAGES` setting, introduced in Django 4.2 by @fsbraun in https://github.com/django-cms/django-filer/pull/1472
+* feat: Replace `render` with `TemplateResponse` in admin views by @fsbraun in https://github.com/django-cms/django-filer/pull/1473
+* fix: File expand url incorrect and worked not with custom image models by @fsbraun in https://github.com/django-cms/django-filer/pull/1471
+* fix: Crash when moving files from a filtered directory listing by @W1ldPo1nter in https://github.com/django-cms/django-filer/pull/1482
+* ci: pre-commit autoupdate by @pre-commit-ci in https://github.com/django-cms/django-filer/pull/1477
+
+
+3.1.3 (2024-05-17)
 ==================
 * Fix: Folder select widget did not render correctly with standard Django admin
   styles.
 
-3.1.2 (2025-05-17)
+3.1.2 (2024-05-17)
 ==================
 
 * Made the filer check command compatible with custom image models.

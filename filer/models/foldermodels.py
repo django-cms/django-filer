@@ -10,6 +10,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
+from ..cache import get_folder_permission_cache, update_folder_permission_cache
 from . import mixins
 
 
@@ -34,6 +35,10 @@ class FolderPermissionManager(models.Manager):
     def __get_id_list(self, user, attr):
         if user.is_superuser or not filer_settings.FILER_ENABLE_PERMISSIONS:
             return 'All'
+        cached_id_list = get_folder_permission_cache(user, attr)
+        if cached_id_list:
+            return cached_id_list
+
         allow_list = set()
         deny_list = set()
         group_ids = user.groups.all().values_list('id', flat=True)
@@ -71,7 +76,9 @@ class FolderPermissionManager(models.Manager):
                     deny_list.update(perm.folder.get_descendants_ids())
 
         # Deny has precedence over allow
-        return allow_list - deny_list
+        id_list = allow_list - deny_list
+        update_folder_permission_cache(user, attr, id_list)
+        return id_list
 
 
 class Folder(models.Model, mixins.IconsMixin):

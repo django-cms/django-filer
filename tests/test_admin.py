@@ -273,7 +273,7 @@ class FilerImageAdminUrlsTests(TestCase):
     def test_icon_view_sizes(self):
         """Redirects are issued for accepted thumbnail sizes and 404 otherwise"""
         test_set = tuple((size, 302) for size in DEFERRED_THUMBNAIL_SIZES)
-        test_set += (50, 404), (90, 404), (320, 404)
+        test_set += (50, 404), (90, 404), (640, 404)
         for size, expected_status in test_set:
             url = reverse('admin:filer_file_fileicon', kwargs={
                 'file_id': self.file_object.pk,
@@ -562,6 +562,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(len(messages), 2)  # One more message
         self.assertEqual(messages[1].level, ERROR)
         self.assertEqual(Image.objects.count(), 0)
+
+        abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
+
+    def test_filer_max_pixel_deactivation(self):
+        from django.core.checks import Warning
+
+        DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
+        abstract.FILER_MAX_IMAGE_PIXELS = None  # Deactivate
+
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(Image.objects.count(), 1)  # Success
+        check_result = abstract.max_pixel_setting_check(None)
+        self.assertEqual(len(check_result), 1)
+        self.assertIsInstance(check_result[0], Warning)
 
         abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
@@ -1368,6 +1395,8 @@ class FolderListingTest(TestCase):
                 can_edit=FolderPermission.ALLOW,
                 can_read=FolderPermission.ALLOW,
                 can_add_children=FolderPermission.ALLOW)
+            from filer.cache import clear_folder_permission_cache
+            clear_folder_permission_cache(self.staff_user)
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
