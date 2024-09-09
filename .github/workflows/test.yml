@@ -24,6 +24,10 @@ jobs:
             python-version: 3.8
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.8
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
           - requirements-file: django-main.txt
             python-version: 3.8
           - requirements-file: django-main.txt
