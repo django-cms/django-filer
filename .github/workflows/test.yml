@@ -12,6 +12,7 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
+          django-5.1.txt,
           django-main.txt,
         ]
         custom-image-model: [false, true]
@@ -22,6 +23,10 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.8
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.8
+          - requirements-file: django-5.1.txt
             python-version: 3.9
           - requirements-file: django-main.txt
             python-version: 3.8
@@ -43,11 +48,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r tests/requirements/${{ matrix.requirements-file }}
-        python setup.py install
+        pip install -e .
     - name: Enable the custom image model
       run: echo "CUSTOM_IMAGE=custom_image.Image" >> $GITHUB_ENV
       if: ${{ matrix.custom-image-model }}
     - name: Run coverage
-      run: coverage run tests/settings.py
+      run: coverage run ./tests/settings.py 
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
