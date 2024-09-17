@@ -86,7 +86,7 @@ class InodeManager(InodeManagerMixin, models.Manager):
 
 
 def filename_validator(value):
-    pattern = re.compile(r"^[\w\s\d]+$")
+    pattern = re.compile(r"^[\w\d &%!()\[\]{}._#~+-]+$")
     if not pattern.match(value):
         msg = "'{filename}' is not a valid filename."
         raise ValidationError(msg.format(filename=value))
@@ -124,7 +124,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         max_length=255,
         verbose_name=_("Name"),
         db_index=True,
-        # validators=[filename_validator],
+        validators=[filename_validator],
     )
     created_at = models.DateTimeField(
         _("Created at"),
