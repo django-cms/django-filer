@@ -227,6 +227,9 @@ class FolderAdmin(InodeAdmin):
         current_folder = self.get_object(request, folder_id)
         inode_ids = body.get('inode_ids', [])
         for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
+            if next(current_folder.listdir(name=inode.name, is_folder=True), None):
+                msg = gettext("A folder named “{name}” already exists in destination folder.")
+                return HttpResponseBadRequest(msg.format(name=inode.name), status=409)
             inode.copy_to(current_folder, owner=request.user)
         return JsonResponse({
             'inodes': self.get_inodes(parent=current_folder),
