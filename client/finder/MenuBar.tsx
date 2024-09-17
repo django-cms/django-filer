@@ -39,13 +39,20 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 	}));
 
 	window.addEventListener('keydown', event => {
-		if (event.key === 'c' && (event.ctrlKey || event.metaKey || event.altKey)) {
+		if (event.key === 'a' && (event.ctrlKey || event.metaKey || event.altKey)) {
+			event.preventDefault();
+			selectAllInodes();
+		} else if (event.key === 'c' && (event.ctrlKey || event.metaKey || event.altKey)) {
+			event.preventDefault();
 			copyInodes();
 		} else if (event.key === 'x' && (event.ctrlKey || event.metaKey || event.altKey)) {
+			event.preventDefault();
 			cutInodes();
 		} else if (event.key === 'v' && (event.ctrlKey || event.metaKey || event.altKey)) {
+			event.preventDefault();
 			pasteInodes();
 		} else if (['Backspace', 'Delete'].includes(event.key) && event.shiftKey) {
+			event.preventDefault();
 			deleteInodes();
 		}
 	});
@@ -93,20 +100,41 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		setClipboard([]);
 	}
 
+	function selectAllInodes() {
+		const current = columnRefs[currentFolderId].current;
+		current.setInodes(current.inodes.map(inode => ({...inode, selected: true, copied: false})));
+		setNumSelectedInodes(current.selectedInodes.length);
+		setNumSelectedFiles(current.selectedInodes.filter(inode => !inode.is_folder).length);
+	}
+
 	function copyInodes() {
 		const current = columnRefs[currentFolderId].current;
-		setClipboard(current.inodes.filter(inode => inode.selected).map(inode => ({id: inode.id, parent: inode.parent, selected: false, copied: true})));
-		current.setInodes(current.inodes.map(inode => ({...inode, selected: false, copied: inode.selected})));
-		setNumSelectedInodes(0);
-		setNumSelectedFiles(0);
+		if (current.inodes.find(inode => inode.selected)) {
+			setClipboard(current.inodes.filter(inode => inode.selected).map(inode => ({
+				id: inode.id,
+				parent: inode.parent,
+				selected: false,
+				copied: true
+			})));
+			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, copied: inode.selected})));
+			setNumSelectedInodes(0);
+			setNumSelectedFiles(0);
+		}
 	}
 
 	function cutInodes() {
 		const current = columnRefs[currentFolderId].current;
-		setClipboard(current.inodes.filter(inode => inode.selected).map(inode => ({id: inode.id, parent: inode.parent, selected: false, cutted: true})));
-		current.setInodes(current.inodes.map(inode => ({...inode, selected: false, cutted: inode.selected})));
-		setNumSelectedInodes(0);
-		setNumSelectedFiles(0);
+		if (current.inodes.find(inode => inode.selected)) {
+			setClipboard(current.inodes.filter(inode => inode.selected).map(inode => ({
+				id: inode.id,
+				parent: inode.parent,
+				selected: false,
+				cutted: true
+			})));
+			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, cutted: inode.selected})));
+			setNumSelectedInodes(0);
+			setNumSelectedFiles(0);
+		}
 	}
 
 	async function pasteInodes() {
