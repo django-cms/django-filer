@@ -1,13 +1,13 @@
 import typing
 
-from django.contrib.auth import get_user_model
+from django.db.models import Model
 from django.core.cache import cache
 
 
-User = get_user_model()
+UserModel = typing.TypeVar('UserModel', bound=Model)
 
 
-def get_folder_perm_cache_key(user: User, permission: str) -> str:
+def get_folder_perm_cache_key(user: UserModel, permission: str) -> str:
     """
     Generates a unique cache key for a given user and permission.
 
@@ -18,7 +18,9 @@ def get_folder_perm_cache_key(user: User, permission: str) -> str:
     for far more than 1,000 admin users to make the cached unit require less memory.
 
     Parameters:
-    user (User): The user for whom the cache key is being generated.
+    user (UserModel): The user for whom the cache key is being generated.
+        The `user` can be an instance of the default `django.contrib.auth.models.User`
+        or any custom user model specified by `AUTH_USER_MODEL` in the settings.
     permission (str): The permission for which the cache key is being generated.
 
     Returns:
@@ -27,7 +29,7 @@ def get_folder_perm_cache_key(user: User, permission: str) -> str:
     return f"filer:perm:{permission}"
 
 
-def get_folder_permission_cache(user: User, permission: str) -> typing.Optional[dict]:
+def get_folder_permission_cache(user: UserModel, permission: str) -> typing.Optional[dict]:
     """
     Retrieves the cached folder permissions for a given user and permission.
 
@@ -35,7 +37,9 @@ def get_folder_permission_cache(user: User, permission: str) -> typing.Optional[
     If the cache value does not exist, it returns None.
 
     Parameters:
-    user (User): The user for whom the permissions are being retrieved.
+    user (UserModel): The user for whom the permissions are being retrieved.
+        The `user` can be an instance of the default `django.contrib.auth.models.User`
+        or any custom user model specified by `AUTH_USER_MODEL` in the settings.
     permission (str): The permission for which the permissions are being retrieved.
 
     Returns:
@@ -47,7 +51,7 @@ def get_folder_permission_cache(user: User, permission: str) -> typing.Optional[
     return None
 
 
-def clear_folder_permission_cache(user: User, permission: typing.Optional[str] = None) -> None:
+def clear_folder_permission_cache(user: UserModel, permission: typing.Optional[str] = None) -> None:
     """
     Clears the cached folder permissions for a given user.
 
@@ -55,7 +59,9 @@ def clear_folder_permission_cache(user: User, permission: typing.Optional[str] =
     If no specific permission is provided, it clears the cache for all permissions.
 
     Parameters:
-    user (User): The user for whom the permissions are being cleared.
+    user (UserModel): The user for whom the permissions are being cleared.
+        The `user` can be an instance of the default `django.contrib.auth.models.User`
+        or any custom user model specified by `AUTH_USER_MODEL` in the settings.
     permission (str, optional): The specific permission to clear. Defaults to None.
     """
     if permission is None:
@@ -65,7 +71,7 @@ def clear_folder_permission_cache(user: User, permission: typing.Optional[str] =
         cache.delete(get_folder_perm_cache_key(user, permission))
 
 
-def update_folder_permission_cache(user: User, permission: str, id_list: list[int]) -> None:
+def update_folder_permission_cache(user: UserModel, permission: str, id_list: typing.List[int]) -> None:
     """
     Updates the cached folder permissions for a given user and permission.
 
@@ -74,7 +80,9 @@ def update_folder_permission_cache(user: User, permission: str, id_list: list[in
     Finally, it sets the updated permissions back into the cache.
 
     Parameters:
-    user (User): The user for whom the permissions are being updated.
+    user (UserModel): The user for whom the permissions are being updated.
+        The `user` can be an instance of the default `django.contrib.auth.models.User`
+        or any custom user model specified by `AUTH_USER_MODEL` in the settings.
     permission (str): The permission to update.
     id_list (list): The list of IDs to set as the new permissions.
     """
