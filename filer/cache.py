@@ -1,7 +1,7 @@
 import typing
 
-from django.db.models import Model
 from django.core.cache import cache
+from django.db.models import Model
 
 
 UserModel = typing.TypeVar('UserModel', bound=Model)
