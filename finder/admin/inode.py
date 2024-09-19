@@ -112,17 +112,21 @@ class InodeAdmin(admin.ModelAdmin):
         """
         inodes, applicable_sorting = [], []
         for inode_model in InodeModel.real_models:
-            queryset = inode_model.objects.select_related('owner') \
-                .filter(**lookup) \
-                .annotate(owner_name=F('owner__username')) \
+            queryset = (
+                inode_model.objects.select_related('owner')
+                .filter(**lookup)
+                .annotate(owner_name=F('owner__username'))
                 .annotate(is_folder=Value(inode_model.is_folder, output_field=BooleanField()))
+            )
+            data_fields = inode_model.data_fields + self.extra_data_fields
+            if 'labels' in data_fields:
+                queryset = queryset.prefetch_related('labels')
             if applicable_sorting := self.sorting_map.get(sorting):
                 if issubclass(inode_model, applicable_sorting[0]):
                     queryset = queryset.order_by(applicable_sorting[1])
-            data_fields = inode_model.data_fields + self.extra_data_fields
-            inodes.extend(values | computed for values, computed in zip(
-                queryset.values(*data_fields),
-                ({
+            for obj in queryset:
+                values = {
+                    'parent': obj.parent.id,
                     'change_url': reverse(
                         'admin:finder_inodemodel_change',
                         args=(obj.id,),
@@ -133,8 +137,12 @@ class InodeAdmin(admin.ModelAdmin):
                     'sample_url': obj.casted.get_sample_url(),
                     'folder_component': obj.casted.folder_component,
                     'summary': obj.casted.summary,
-                } for obj in queryset))
-            )
+                }
+                if 'labels' in data_fields:
+                    values['labels'] = list(obj.labels.values('id', 'name', 'color'))
+                values.update({field: getattr(obj, field) for field in data_fields if field not in values})
+                inodes.append(values)
+
         if applicable_sorting:
             inodes.sort(key=applicable_sorting[2], reverse=applicable_sorting[3])
         return inodes
