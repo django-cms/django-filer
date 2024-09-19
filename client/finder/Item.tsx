@@ -25,9 +25,7 @@ export function DraggableItem(props) {
 			if (!event)
 				return;
 			const timer = setTimeout(() => {
-				if (event.detail === 1) {
-					props.listRef.current.selectInode(event, props);
-				} else if (event.detail === 2) {
+				if (event.detail === 1 || event.detail === 2) {
 					props.listRef.current.selectInode(event, props);
 				} else {
 					// presumably a triple click, could be used to edit folder details
@@ -86,13 +84,31 @@ function StaticFigure(props) {
 }
 
 
+function FigureLabels(props) {
+	return (
+		<div className="figure-labels">
+			<div>
+			{props.labels?.map(label => (
+				<span key={label.id} style={{backgroundColor: label.color}}>{label.label}</span>
+			))}
+			</div>
+			{props.children}
+		</div>
+	);
+}
+
+
 export function ListItem(props) {
 	const settings = useContext(FinderSettings);
 	const FigBody = props.folder_component ? useMemo(
 		() => {
 			const component = `./components/folder/${props.folder_component}.js`;
 			const LazyFigure = lazy(() => import(component));
-			return (props) => (<Suspense><LazyFigure {...props}>{props.children}</LazyFigure></Suspense>);
+			return (props) => (
+				<Suspense>
+					<LazyFigure {...props}>{props.children}</LazyFigure>
+				</Suspense>
+			);
 		},
 		[]
 	) : StaticFigure;
@@ -166,7 +182,9 @@ export function ListItem(props) {
 			return (
 				<figure>
 					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
-						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+						<FigureLabels labels={props.labels}>
+							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+						</FigureLabels>
 					</FigBody>
 					<figcaption>
 						<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
@@ -179,7 +197,9 @@ export function ListItem(props) {
 			return (<>
 				<div>
 					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
-						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+						<FigureLabels labels={props.labels}>
+							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+						</FigureLabels>
 					</FigBody>
 				</div>
 				<div>

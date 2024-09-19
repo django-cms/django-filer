@@ -1,17 +1,12 @@
 from django.contrib import admin
-from django.forms.fields import CharField, FloatField
-from django.forms.widgets import HiddenInput, TextInput
+from django.forms.fields import FloatField
+from django.forms.widgets import HiddenInput
 
-from entangled.forms import EntangledModelForm
-
-from finder.admin.file import FileAdmin
+from finder.admin.file import FileAdmin, FileModelForm
 from finder.contrib.audio.models import AudioFileModel, SAMPLE_DURATION
 
 
-class AudioForm(EntangledModelForm):
-    name = CharField(
-        widget=TextInput(attrs={'size': 100}),
-    )
+class AudioForm(FileModelForm):
     sample_start = FloatField(
         widget=HiddenInput(),
         initial=0,
@@ -24,7 +19,7 @@ class AudioForm(EntangledModelForm):
     class Meta:
         model = AudioFileModel
         entangled_fields = {'meta_data': ['sample_start', 'sample_duration']}
-        untangled_fields = ['name']
+        untangled_fields = ['name', 'labels']
 
     class Media:
         css = {'all': ['admin/css/forms.css']}

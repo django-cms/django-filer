@@ -497,6 +497,28 @@ $active-rectangle: rgb(210, 210, 112);
 		li .inode {
 			box-sizing: border-box;
 
+			.figure-labels {
+				position: relative;
+
+				> div {
+					position: absolute;
+					top: 5px;
+					left: 5px;
+					right: 5px;
+					float: left;
+					text-align: right;
+					overflow: hidden;
+
+					span {
+						width: 12px;
+						height: 12px;
+						display: inline-block;
+						border-radius: 50%;
+						margin-left: -4px;
+					}
+				}
+			}
+
 			figure {
 				height: 100%;
 				display: flex;
@@ -762,6 +784,7 @@ $active-rectangle: rgb(210, 210, 112);
 			margin-top: 10px;
 			margin-bottom: 10px;
 			display: flex;
+			flex-wrap: wrap;
 			button, a {
 				display: block;
 				appearance: none;
@@ -773,6 +796,7 @@ $active-rectangle: rgb(210, 210, 112);
 				color: white;
 				background: var(--default-button-bg);
 				margin-right: 10px;
+				margin-bottom: 10px;
 				cursor: pointer;
 				&:hover {
 					background: var(--default-button-hover-bg);
@@ -784,6 +808,33 @@ $active-rectangle: rgb(210, 210, 112);
 					width: 20px;
 				}
 			}
+		}
+
+		.select-labels {
+			flex-grow: 1;
+			min-width: 800px;
+		}
+		.select-labels-value {
+			border: 1px solid lightgrey;
+			border-radius: 2px;
+			box-sizing: border-box;
+			display: flex;
+			margin-right: 0.5rem;
+			padding: 0.25rem;
+		}
+		.select-labels-option {
+			padding: 0.5rem 1rem;
+			&:hover {
+				background-color: var(--selected-row);
+			}
+		}
+		span.select-labels-dot {
+			width: 12px;
+			height: 12px;
+			display: inline-block;
+			border-radius: 50%;
+			margin-left: 0.25rem;
+			margin-right: 0.5rem;
 		}
 	}
 }

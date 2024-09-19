@@ -1,12 +1,24 @@
-import React, {Fragment, useContext, useMemo, useRef, useState} from 'react';
+import React, {
+	forwardRef,
+	Fragment,
+	useCallback,
+	useContext,
+	useImperativeHandle,
+	useMemo,
+	useRef,
+	useState
+} from 'react';
+import Select from 'react-select';
 import {ProgressBar, ProgressOverlay} from 'finder/UploadProgress';
 import {FinderSettings} from 'finder/FinderSettings';
 import DownloadIcon from 'icons/download.svg';
 import FullSizeIcon from 'icons/full-size.svg';
 import UploadIcon from 'icons/upload.svg';
+import PauseIcon from "../icons/pause.svg";
+import PlayIcon from "../icons/play.svg";
 
 
-export function DownloadFileButton(props) {
+function DownloadFileButton(props) {
 	const settings = useContext(FinderSettings);
 
 	return (
@@ -15,7 +27,7 @@ export function DownloadFileButton(props) {
 }
 
 
-export function ViewOriginalButton() {
+function ViewOriginalButton() {
 	const settings = useContext(FinderSettings);
 
 	function viewOriginal() {
@@ -23,12 +35,12 @@ export function ViewOriginalButton() {
 	}
 
 	return (
-		<button onClick={viewOriginal}><FullSizeIcon/>{gettext("View Original")}</button>
+		<button type="button" onClick={viewOriginal}><FullSizeIcon/>{gettext("View Original")}</button>
 	);
 }
 
 
-export function ReplaceFileButton(props) {
+function ReplaceFileButton(props) {
 	const {acceptMimeType} = props;
 	const inputRef = useRef(null);
 
@@ -53,44 +65,128 @@ export function ReplaceFileButton(props) {
 	}
 
 	return (<>
-		<button onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
+		<button type="button" onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
 		<input type="file" name="replaceFile" ref={inputRef} accept={acceptMimeType} onChange={handleFileSelect} />
 	</>);
 }
 
 
+export function ControlButtons(props) {
+	const settings = useContext(FinderSettings);
+
+	const controlButtons = useMemo(() => {
+		const buttons: Array<React.JSX.Element> = [];
+		if (settings.download_url) {
+			buttons.push(<DownloadFileButton/>);
+		}
+		if (settings.original_url) {
+			buttons.push(<ViewOriginalButton/>);
+		}
+		if (settings.replacing_mime_type) {
+			buttons.push(
+				<ReplaceFileButton
+					setUploadFile={props.setUploadFile}
+					acceptMimeType={settings.replacing_mime_type}
+				/>
+			);
+		}
+		return buttons;
+	}, []);
+
+	return (
+		<div className="button-group">
+			{props.children}
+		{controlButtons.map((button, index) =>
+			<Fragment key={index}>{button}</Fragment>
+		)}
+		</div>
+	);
+}
+
+
+function SelectLabels() {
+	const settings = useContext(FinderSettings);
+	const LabelOption = ({innerProps, data}) => (
+		<div {...innerProps} className="select-labels-option">
+			<span style={{backgroundColor: data.color}} className="select-labels-dot" />
+			{data.label}
+		</div>
+	);
+	const MultiValueLabel = ({data}) => (
+		<div>
+			<span style={{backgroundColor: data.color}} className="select-labels-dot" />
+			{data.label}
+		</div>
+	);
+	const MultiValueContainer = ({children}) => (
+		<div className="select-labels-value">
+			{children}
+		</div>
+	);
+	const defaultValues = useMemo(() => {
+		const defaultValues = [];
+		if (settings.labels) {
+			let labelsElement = document.getElementById('id_labels');
+			if (labelsElement instanceof HTMLSelectElement) {
+				// extract selected values from the original <select multiple name="labels"> element
+				for (const option of labelsElement.selectedOptions) {
+					const found = settings.labels.find(label => label.value == option.value);
+					if (found) {
+						defaultValues.push(found);
+					}
+				}
+				// remove the original <select multiple name="labels"> element
+				while (labelsElement) {
+					if (labelsElement.classList.contains('field-labels')) {
+						labelsElement.remove();
+						break;
+					}
+					labelsElement = labelsElement.parentElement;
+				}
+			}
+		}
+		return defaultValues;
+	}, []);
+
+	if (settings.labels) return (
+		<div className="aligned">
+			<div className="form-row" style={{overflow: "visible"}}>
+				<div className="flex-container">
+					<label>{gettext("Labels")}:</label>
+					<Select
+						components={{Option: LabelOption, MultiValueLabel, MultiValueContainer}}
+						defaultValue={defaultValues}
+						options={settings.labels}
+						name="labels"
+						placeholder={gettext("Choose Labels")}
+						className="select-labels"
+						isMulti={true}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+
 export function FileDetails(props) {
 	const settings = useContext(FinderSettings);
-	const controlButtons: Array<React.JSX.Element> = [...(props.controlButtons ?? [])];
 	const [uploadFile, setUploadFile] = useState<Promise<Response>>(null);
-	const subtitle = useMemo(
-		() => {
-			const subtitle = document.getElementById('id_subtitle');
-			if (subtitle) {
-				subtitle.remove();
-				return subtitle.innerHTML;
-			}
-			return '';
-		},
-		[]
-	);
-	if (settings.download_url) {
-		controlButtons.push(<DownloadFileButton />);
-	}
-	if (settings.original_url) {
-		controlButtons.push(<ViewOriginalButton />);
-	}
-	if (settings.replacing_mime_type) {
-		controlButtons.push(<ReplaceFileButton setUploadFile={setUploadFile} acceptMimeType={settings.replacing_mime_type} />);
-	}
+	const subtitle = useMemo(() => {
+		const subtitle = document.getElementById('id_subtitle');
+		if (subtitle) {
+			subtitle.remove();
+			return subtitle.innerHTML;
+		}
+		return '';
+	},[]);
 
 	return (<>
 		<div className="file-details" style={props.style}>
 			<h2>{subtitle}</h2>
 			{props.children}
-			<div className="button-group">{controlButtons.map((button, index) =>
-				<Fragment key={index}>{button}</Fragment>
-			)}</div>
+			<ControlButtons setUploadFile={setUploadFile}>{props.controlButtons}</ControlButtons>
+			<SelectLabels />
 		</div>
 		{uploadFile &&
 		<ProgressOverlay>

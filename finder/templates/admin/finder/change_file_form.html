@@ -6,12 +6,12 @@
 
 {% block content %}
 {% if title %}<h1>{{ title }}</h1>{% endif %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 <div id="content-react" class="file"></div>
 
 <div id="content-main">
 {% if subtitle %}<h2 id="id_subtitle">{{ subtitle }}</h2>{% endif %}
 
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
 {% if errors %}
@@ -38,9 +38,8 @@
 {% block after_related_objects %}{% endblock %}
 
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
-</form>
-
 </div>
+</form>
 
 {% endblock %}
 

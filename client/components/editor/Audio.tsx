@@ -41,12 +41,13 @@ export default function Audio(props) {
 		wavesurfer && wavesurfer.playPause();
 	}
 
-	const controlButton = isPlaying ?
-		<button onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
-		<button onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>;
+	const controlButtons = [isPlaying ?
+		<button type="button" onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
+		<button type="button" onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
+	];
 
 	return (
-		<FileDetails controlButtons={[controlButton]}>
+		<FileDetails controlButtons={controlButtons}>
 			<WavesurferPlayer
 				url={settings.download_url}
 				onReady={onReady}

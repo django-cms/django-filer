@@ -2,16 +2,11 @@ from django.contrib import admin
 from django.forms.fields import CharField, FloatField, IntegerField
 from django.forms.widgets import HiddenInput, TextInput
 
-from entangled.forms import EntangledModelForm
-
-from finder.admin.file import FileAdmin
+from finder.admin.file import FileAdmin, FileModelForm
 from finder.contrib.image.models import ImageModel
 
 
-class ImageForm(EntangledModelForm):
-    name = CharField(
-        widget=TextInput(attrs={'size': 100}),
-    )
+class ImageForm(FileModelForm):
     crop_x = FloatField(
         widget=HiddenInput(),
         required=False,
@@ -34,7 +29,7 @@ class ImageForm(EntangledModelForm):
     class Meta:
         model = ImageModel
         entangled_fields = {'meta_data': ['crop_x', 'crop_y', 'crop_size', 'alt_text']}
-        untangled_fields = ['name', 'width', 'height']
+        untangled_fields = ['name', 'labels', 'width', 'height']
 
     class Media:
         css = {'all': ['admin/css/forms.css']}

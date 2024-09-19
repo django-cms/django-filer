@@ -1,18 +1,13 @@
 from django.contrib import admin
-from django.forms.fields import CharField, FloatField
-from django.forms.widgets import TextInput, NumberInput
+from django.forms.fields import FloatField
+from django.forms.widgets import NumberInput
 from django.utils.translation import gettext_lazy as _
 
-from entangled.forms import EntangledModelForm
-
-from finder.admin.file import FileAdmin
+from finder.admin.file import FileAdmin, FileModelForm
 from finder.contrib.video.models import VideoFileModel
 
 
-class VideoForm(EntangledModelForm):
-    name = CharField(
-        widget=TextInput(attrs={'size': 100}),
-    )
+class VideoForm(FileModelForm):
     sample_start = FloatField(
         label=_("Poster timestamp"),
         widget=NumberInput(attrs={'readonly': 'readonly'}),
@@ -22,7 +17,7 @@ class VideoForm(EntangledModelForm):
     class Meta:
         model = VideoFileModel
         entangled_fields = {'meta_data': ['sample_start']}
-        untangled_fields = ['name']
+        untangled_fields = ['name', 'labels']
 
     class Media:
         css = {'all': ['admin/css/forms.css']}

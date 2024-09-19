@@ -40,10 +40,10 @@ export default function Video(props) {
 	}
 
 	const controlButtons = [(isPlaying ?
-		<button onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
-		<button onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
+		<button type="button" onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
+		<button type="button" onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
 	),
-		<button onClick={setPosterFrame}><CameraIcon/>{gettext("Use as Poster")}</button>
+		<button type="button" onClick={setPosterFrame}><CameraIcon/>{gettext("Use as Poster")}</button>
 	];
 	return (
 		<FileDetails controlButtons={controlButtons} style={style}>

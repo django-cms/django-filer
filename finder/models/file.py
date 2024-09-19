@@ -13,6 +13,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from filer import settings as filer_settings
+from finder.models.label import Label
 
 from .inode import InodeManager, InodeModel
 
@@ -54,7 +55,7 @@ class FileModelManager(InodeManager):
 
 
 class AbstractFileModel(InodeModel):
-    data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type']
+    data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type', 'labels']
     filer_public = Path(filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
     fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
 
@@ -82,6 +83,12 @@ class AbstractFileModel(InodeModel):
         default='application/octet-stream',
         editable=False,
         db_index=True,
+    )
+    labels = models.ManyToManyField(
+        Label,
+        related_name='+',
+        blank=True,
+        verbose_name=_("Labels"),
     )
 
     class Meta:

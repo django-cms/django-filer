@@ -1,17 +1,43 @@
 from django.contrib import admin
-from django.forms.widgets import Media
+from django.forms.fields import CharField
+from django.forms.models import ModelMultipleChoiceField
+from django.forms.widgets import Media, TextInput
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.templatetags.static import static
 from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from entangled.forms import EntangledModelForm
+
 from finder.models.file import FileModel
+from finder.models.label import Label
 from .inode import InodeAdmin
+
+
+class LabelsChoiceField(ModelMultipleChoiceField):
+    def prepare_value(self, values):
+        values = super().prepare_value(values)
+        return [v for v in values if v] if hasattr(values, '__iter__') else values
+
+
+class FileModelForm(EntangledModelForm):
+    name = CharField(
+        widget=TextInput(attrs={'size': 100}),
+    )
+    labels = LabelsChoiceField(
+        queryset=Label.objects.all(),
+        required=False,
+    )
+
+    class Meta:
+        model = FileModel
+        exclude = ['meta_data']
 
 
 @admin.register(FileModel)
 class FileAdmin(InodeAdmin):
+    form = FileModelForm
     form_template = 'admin/finder/change_file_form.html'
     readonly_fields = ['details', 'owner', 'created_at', 'last_modified_at', 'mime_type', 'sha1']
     exclude = ['meta_data']
@@ -102,4 +128,9 @@ class FileAdmin(InodeAdmin):
             file_mime_type=inode.mime_type,
             editor_component=inode.editor_component,
         )
+        if inode.labels.model.objects.exists():
+            settings['labels'] = [
+                {'value': id, 'label': name, 'color': color}
+                for id, name, color in inode.labels.model.objects.values_list('id', 'name', 'color')
+            ]
         return settings
