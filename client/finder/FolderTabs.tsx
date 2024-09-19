@@ -74,9 +74,7 @@ export const FolderTabs = forwardRef((props: any, forwardedRef) => {
 	const {isSearchResult} = props;
 	const [favoriteFolders, setFavoriteFolders] = useState(settings.favorite_folders);
 
-	useImperativeHandle(forwardedRef, () => ({
-		setFavoriteFolders: setFavoriteFolders,
-	}));
+	useImperativeHandle(forwardedRef, () => ({setFavoriteFolders}));
 
 	async function togglePin(pinnedId) {
 		const togglePinUrl = `${settings.base_url}${settings.folder_id}/toggle_pin`;

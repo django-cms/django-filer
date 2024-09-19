@@ -26,12 +26,12 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 	}, [searchQuery]);
 
 	useImperativeHandle(forwardedRef, () => ({
-		inodes: inodes,
-		setInodes: setInodes,
-		deselectInodes: deselectInodes,
-		setSearchQuery: setSearchQuery,
-		selectInode: selectInode,
-		selectMultipleInodes: selectMultipleInodes,
+		inodes,
+		setInodes,
+		deselectInodes,
+		setSearchQuery,
+		selectInode,
+		selectMultipleInodes,
 		async fetchInodes() {
 			await fetchInodes();
 		},
@@ -90,7 +90,7 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 			}
 			return;
 		}
-		 if (event.shiftKey) {
+		if (event.shiftKey) {
 			// shift click
 			const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
 			if (selectedInodeIndex < lastSelectedInode) {
