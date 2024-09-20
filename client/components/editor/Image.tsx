@@ -17,9 +17,7 @@ export default function Image(props) {
 	const ref = useRef(null);
 
 	useEffect(() => {
-		if (!ref?.current)
-			return;
-		ref.current.addEventListener('load', () => {
+		const crop = () => {
 			if (!cropFields.size.value)
 				return;
 			const rect = ref.current.getBoundingClientRect();
@@ -31,7 +29,13 @@ export default function Image(props) {
 				width: size,
 				height: size,
 			});
-		}, {once: true});
+		};
+
+		if (ref.current.complete) {
+			crop();
+		} else {
+			ref.current.addEventListener('load', crop, {once: true});
+		}
 	}, []);
 
 	function handleChange(crop) {
