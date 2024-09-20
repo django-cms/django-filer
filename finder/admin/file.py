@@ -32,6 +32,7 @@ class FileModelForm(EntangledModelForm):
 
     class Meta:
         model = FileModel
+        untangled_fields = ['name', 'labels']
         exclude = ['meta_data']
 
 
@@ -40,7 +41,6 @@ class FileAdmin(InodeAdmin):
     form = FileModelForm
     form_template = 'admin/finder/change_file_form.html'
     readonly_fields = ['details', 'owner', 'created_at', 'last_modified_at', 'mime_type', 'sha1']
-    exclude = ['meta_data']
 
     @property
     def media(self):

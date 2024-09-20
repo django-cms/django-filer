@@ -38,7 +38,6 @@ class ImageForm(FileModelForm):
 @admin.register(ImageModel)
 class ImageAdmin(FileAdmin):
     form = ImageForm
-    exclude = None
 
     def get_settings(self, request, inode):
         settings = super().get_settings(request, inode)

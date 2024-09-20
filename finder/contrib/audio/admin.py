@@ -28,7 +28,6 @@ class AudioForm(FileModelForm):
 @admin.register(AudioFileModel)
 class AudioAdmin(FileAdmin):
     form = AudioForm
-    exclude = None
 
     def get_settings(self, request, inode):
         settings = super().get_settings(request, inode)

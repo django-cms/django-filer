@@ -26,7 +26,6 @@ class VideoForm(FileModelForm):
 @admin.register(VideoFileModel)
 class VideoAdmin(FileAdmin):
     form = VideoForm
-    exclude = None
 
     def get_settings(self, request, inode):
         settings = super().get_settings(request, inode)
