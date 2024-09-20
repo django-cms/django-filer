@@ -497,26 +497,15 @@ $active-rectangle: rgb(210, 210, 112);
 		li .inode {
 			box-sizing: border-box;
 
-			.figure-labels {
+			div:has(> .figure-labels) {
 				position: relative;
+			}
 
-				> div {
-					position: absolute;
-					top: 5px;
-					left: 5px;
-					right: 5px;
-					float: left;
-					text-align: right;
-					overflow: hidden;
-
-					span {
-						width: 12px;
-						height: 12px;
-						display: inline-block;
-						border-radius: 50%;
-						margin-left: -4px;
-					}
-				}
+			.figure-labels {
+				position: absolute;
+				float: left;
+				text-align: right;
+				overflow: hidden;
 			}
 
 			figure {
@@ -561,6 +550,19 @@ $active-rectangle: rgb(210, 210, 112);
 	.tiles ul.inode-list {
 		gap: 10px;
 
+		li .inode .figure-labels {
+			top: 5px;
+			left: 5px;
+			right: 5px;
+			span {
+				width: 12px;
+				height: 12px;
+				display: inline-block;
+				border-radius: 50%;
+				margin-left: -4px;
+			}
+		}
+
 		li:not(.status) {
 			min-height: 250px;
 			width: 190px;
@@ -569,6 +571,18 @@ $active-rectangle: rgb(210, 210, 112);
 
 	.mosaic ul.inode-list {
 		gap: 5px;
+
+		li .inode .figure-labels {
+			left: 3px;
+			right: 3px;
+			span {
+				width: 8px;
+				height: 8px;
+				display: inline-block;
+				border-radius: 50%;
+				margin-left: -3px;
+			}
+		}
 
 		li:not(.status) {
 			min-height: 120px;

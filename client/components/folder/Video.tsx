@@ -1,5 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import ReactPlayer from 'react-player/file';
+import {FigureLabels} from 'finder/Item';
 
 
 export default function Video(props) {
@@ -16,18 +17,22 @@ export default function Video(props) {
 	}
 
 	return (
-		props.sampleUrl ?
-		<ReactPlayer
-			onMouseEnter={() => onPlayPause(false)}
-			onMouseLeave={() => onPlayPause(true)}
-			url={props.sampleUrl}
-			config={{attributes: {poster: props.thumbnailUrl}}}
-			controls={false}
-			pip={false}
-			ref={videoRef}
-			width="100%"
-			height="100%"
-		/> :
-		<img src={props.thumbnailUrl} />
+		<FigureLabels labels={props.labels}>{
+		props.sample_url ? (
+			<ReactPlayer
+				onMouseEnter={() => onPlayPause(false)}
+				onMouseLeave={() => onPlayPause(true)}
+				url={props.sample_url}
+				config={{attributes: {poster: props.thumbnail_url}}}
+				controls={false}
+				pip={false}
+				ref={videoRef}
+				width="100%"
+				height="100%"
+			/>
+		) : (
+			<img src={props.thumbnail_url} />
+		)
+		}</FigureLabels>
 	);
 }

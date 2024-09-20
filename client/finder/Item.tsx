@@ -84,10 +84,10 @@ function StaticFigure(props) {
 }
 
 
-function FigureLabels(props) {
+export function FigureLabels(props) {
 	return (
-		<div className="figure-labels">
-			<div>
+		<div>
+			<div className="figure-labels">
 			{props.labels?.map(label => (
 				<span key={label.id} style={{backgroundColor: label.color}}>{label.label}</span>
 			))}
@@ -181,7 +181,7 @@ export function ListItem(props) {
 		case 'tiles': case 'mosaic':
 			return (
 				<figure>
-					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
+					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 						</FigureLabels>
@@ -196,7 +196,7 @@ export function ListItem(props) {
 		case 'list':
 			return (<>
 				<div>
-					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
+					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 						</FigureLabels>
@@ -220,7 +220,7 @@ export function ListItem(props) {
 		case 'columns':
 			return (<>
 				<div>
-					<FigBody sampleUrl={props.sample_url} thumbnailUrl={props.thumbnail_url}>
+					<FigBody {...props}>
 						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 					</FigBody>
 				</div>

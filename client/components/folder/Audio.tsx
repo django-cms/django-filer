@@ -7,7 +7,7 @@ export default function Audio(props) {
 	useEffect(() => {
 		if (!mouseOver)
 			return;
-		const audio = new window.Audio(props.sampleUrl);
+		const audio = new window.Audio(props.sample_url);
 		const playPromise = audio.play();
 
 		return () => {
