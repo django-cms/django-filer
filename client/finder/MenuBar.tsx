@@ -1,4 +1,4 @@
-import React, {useRef, useContext, forwardRef, useState, useImperativeHandle} from 'react';
+import React, {useRef, useContext, forwardRef, useState, useImperativeHandle, useEffect} from 'react';
 import {useClipboard, useCookie} from './Storage';
 import {SearchField} from './Search';
 import {FinderSettings} from './FinderSettings';
@@ -22,17 +22,66 @@ import UploadIcon from 'icons/upload.svg';
 const useSorting = () => useCookie('django-finder-sorting', '');
 
 
+const SortingOptions = forwardRef((props: any, forwardedRef) => {
+	const ref = useRef(null);
+	const [sorting, setSorting] = useSorting();
+
+	useEffect(() => {
+		const closeSorting = (event) => {
+			if (!ref.current?.parentElement?.contains(event.target)) {
+				ref.current.setAttribute('aria-expanded', 'false');
+			}
+		};
+		window.addEventListener('click', closeSorting);
+		return () => window.removeEventListener('click', closeSorting);
+	}, []);
+
+	useImperativeHandle(forwardedRef, () => ({
+		toggleSorting: (selectedInodes) => {
+			ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false': 'true');
+		},
+	}));
+
+	function isActive(value) {
+		return sorting === value ? 'active' : null;
+	}
+
+	function changeSorting(value) {
+		if (value !== sorting) {
+			setSorting(value);
+			Object.entries(props.columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
+				columnRef.current?.fetchInodes();
+			});
+		}
+	}
+
+	return (
+		<ul ref={ref} role="combobox" aria-expanded="false">
+			<li onClick={() => changeSorting('')} className={isActive('')}><span>{gettext("Unsorted")}</span></li>
+			<li onClick={() => changeSorting('name_asc')} className={isActive('name_asc')}><SortDescIcon /><span>{gettext("Name")}</span></li>
+			<li onClick={() => changeSorting('name_desc')} className={isActive('name_desc')}><SortAscIcon /><span>{gettext("Name")}</span></li>
+			<li onClick={() => changeSorting('date_asc')} className={isActive('date_asc')}><SortDescIcon /><span>{gettext("Date")}</span></li>
+			<li onClick={() => changeSorting('date_desc')} className={isActive('date_desc')}><SortAscIcon /><span>{gettext("Date")}</span></li>
+			<li onClick={() => changeSorting('size_asc')} className={isActive('size_asc')}><SortDescIcon /><span>{gettext("Size")}</span></li>
+			<li onClick={() => changeSorting('size_desc')} className={isActive('size_desc')}><SortAscIcon /><span>{gettext("Size")}</span></li>
+			<li onClick={() => changeSorting('type_asc')} className={isActive('type_asc')}><SortDescIcon /><span>{gettext("Type")}</span></li>
+			<li onClick={() => changeSorting('type_desc')} className={isActive('type_desc')}><SortAscIcon /><span>{gettext("Type")}</span></li>
+		</ul>
+	)
+});
+
+
+
 export const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const settings = useContext(FinderSettings);
 	const {currentFolderId, columnRefs, folderTabsRef, openUploader, downloadFiles, layout, setLayout, setSearchResult} = props;
 	const sortingRef = useRef(null);
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
-	const [sorting, setSorting] = useSorting();
 	const [clipboard, setClipboard] = useClipboard();
 
 	useImperativeHandle(forwardedRef, () => ({
-		setSelected: selectedInodes => {
+		setSelected: (selectedInodes) => {
 			setNumSelectedInodes(selectedInodes.length);
 			setNumSelectedFiles(selectedInodes.filter(inode => !inode.is_folder).length);
 		},
@@ -57,43 +106,10 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	});
 
-	window.addEventListener('click', event => {
-		if (!sortingRef.current?.parentElement?.contains(event.target)) {
-			sortingRef.current.setAttribute('aria-expanded', 'false');
-		}
-	});
-
 	function confirmEraseTrashFolder() {
 		if (window.confirm("Erase all files in the trash folder?")) {
 			eraseTrashFolder();
 		}
-	}
-
-	function changeSorting(value) {
-		if (value !== sorting) {
-			setSorting(value);
-			Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
-				columnRef.current?.fetchInodes();
-			});
-		}
-	}
-
-	function renderSortingOptions() {
-		const isActive = (value) => sorting === value ? 'active' : null;
-
-		return (
-			<ul ref={sortingRef} role="combobox" aria-expanded="false">
-				<li onClick={() => changeSorting('')} className={isActive('')}><span>{gettext("Unsorted")}</span></li>
-				<li onClick={() => changeSorting('name_asc')} className={isActive('name_asc')}><SortDescIcon /><span>{gettext("Name")}</span></li>
-				<li onClick={() => changeSorting('name_desc')} className={isActive('name_desc')}><SortAscIcon /><span>{gettext("Name")}</span></li>
-				<li onClick={() => changeSorting('date_asc')} className={isActive('date_asc')}><SortDescIcon /><span>{gettext("Date")}</span></li>
-				<li onClick={() => changeSorting('date_desc')} className={isActive('date_desc')}><SortAscIcon /><span>{gettext("Date")}</span></li>
-				<li onClick={() => changeSorting('size_asc')} className={isActive('size_asc')}><SortDescIcon /><span>{gettext("Size")}</span></li>
-				<li onClick={() => changeSorting('size_desc')} className={isActive('size_desc')}><SortAscIcon /><span>{gettext("Size")}</span></li>
-				<li onClick={() => changeSorting('type_asc')} className={isActive('type_asc')}><SortDescIcon /><span>{gettext("Type")}</span></li>
-				<li onClick={() => changeSorting('type_desc')} className={isActive('type_desc')}><SortAscIcon /><span>{gettext("Type")}</span></li>
-			</ul>
-		)
 	}
 
 	function clearClipboard() {
@@ -282,9 +298,9 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 				<li className={isActive('mosaic')} onClick={() => setLayout('mosaic')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon /></li>
 				<li className={isActive('list')} onClick={() => setLayout('list')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("List view")}><ListIcon /></li>
 				<li className={isActive('columns')} onClick={() => setLayout('columns')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}><ColumnsIcon /></li>
-				<li className="sorting-dropdown" onClick={() => sortingRef.current.setAttribute('aria-expanded', sortingRef.current.ariaExpanded === 'true' ? 'false': 'true')} aria-haspopup="true" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change sorting order")}>
+				<li className="sorting-dropdown" onClick={() => sortingRef.current.toggleSorting()} aria-haspopup="true" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change sorting order")}>
 					<SortingIcon />
-					{renderSortingOptions()}
+					<SortingOptions ref={sortingRef} columnRefs={columnRefs} />
 				</li>
 				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Cut selected to clipboard")}><CutIcon /></li>
 				{settings.is_trash ? (<>
