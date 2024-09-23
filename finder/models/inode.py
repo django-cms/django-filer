@@ -60,6 +60,10 @@ class InodeMetaModel(models.base.ModelBase):
 
 
 class InodeManagerMixin:
+    """
+    Mixin class to be added to managers for models ineriting from `Inode`.
+    """
+
     def filter_inodes(self, **lookup):
         from .folder import FolderModel
 

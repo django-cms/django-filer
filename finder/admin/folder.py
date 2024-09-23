@@ -175,7 +175,7 @@ class FolderAdmin(InodeAdmin):
             'inodes': inodes,
         })
 
-    def search_for_inodes(self, starting_folder, query, sorting=None):
+    def search_for_inodes(self, starting_folder, search_query, sorting=None):
         if isinstance(starting_folder.descendants, QuerySet):
             parent_ids = Subquery(starting_folder.descendants.values('id'))
         else:
@@ -183,7 +183,7 @@ class FolderAdmin(InodeAdmin):
         return self.get_inodes(
             sorting=sorting,
             parent_id__in=parent_ids,
-            name__icontains=query,
+            name__icontains=search_query,
         )
 
     def upload_files(self, request, folder_id):
