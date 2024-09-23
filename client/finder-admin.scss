@@ -326,6 +326,10 @@ $active-rectangle: rgb(210, 210, 112);
 					}
 				}
 			}
+
+			&.trash > li:nth-child(n):not(.selected) {
+				background-color: transparent;
+			}
 		}
 
 		.file-uploader {

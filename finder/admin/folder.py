@@ -109,6 +109,11 @@ class FolderAdmin(InodeAdmin):
             settings.update(
                 is_root=inode.is_root,
                 is_trash=False,
+                folder_url=reverse(
+                    'admin:finder_inodemodel_change',
+                    args=(inode.folder.id,),
+                    current_app=self.admin_site.name,
+                ),
             )
             # temporarily deactivated: if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
             request.session['finder_last_folder_id'] = str(inode.id)
@@ -116,6 +121,11 @@ class FolderAdmin(InodeAdmin):
             settings.update(
                 is_root=False,
                 is_trash=True,
+                folder_url=reverse(
+                    'admin:finder_inodemodel_change',
+                    args=(self.get_fallback_folder(request).id,),
+                    current_app=self.admin_site.name,
+                ),
             )
         if isinstance(inode.ancestors, QuerySet):
             ancestor_ids = list(inode.ancestors.values_list('id', flat=True))

@@ -188,14 +188,9 @@ class InodeAdmin(admin.ModelAdmin):
                     folders.append(self.serialize_inode(fallback_folder))
                 break
         else:
-            if current_folder.id == trash_folder.id:
-                if fallback_folder.parent_id == trash_folder.id:
-                    folders.insert(0, self.serialize_inode(root_folder))
-                elif fallback_folder.id != root_folder.id or len(folders) == 0:
-                    folders.insert(0, self.serialize_inode(fallback_folder))
-            elif current_folder.id == root_folder.id:
+            if current_folder.id == root_folder.id:
                 folders.insert(0, self.serialize_inode(current_folder))
-            else:
+            elif current_folder.id != trash_folder.id:
                 folders.append(self.serialize_inode(current_folder))
         if trash_folder.num_children > 0:
             inode_data = self.serialize_inode(trash_folder)
