@@ -159,6 +159,11 @@ class FolderModel(InodeModel):
         """
         Copies the folder to a destination folder and returns it.
         """
+        for ancestor in folder.ancestors:
+            if ancestor.id == self.id:
+                msg = "Folder named “{source}” can not become the descendant of destination folder “{target}”."
+                raise RecursionError(gettext(msg).format(source=self.name, target=folder.name))
+
         kwargs.setdefault('name', self.name)
         kwargs.setdefault('owner', self.owner)
         kwargs.update(parent=folder)
