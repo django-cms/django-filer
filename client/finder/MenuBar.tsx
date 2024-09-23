@@ -87,24 +87,28 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		},
 	}));
 
-	window.addEventListener('keydown', event => {
-		if (event.key === 'a' && (event.ctrlKey || event.metaKey || event.altKey)) {
-			event.preventDefault();
-			selectAllInodes();
-		} else if (event.key === 'c' && (event.ctrlKey || event.metaKey || event.altKey)) {
-			event.preventDefault();
-			copyInodes();
-		} else if (event.key === 'x' && (event.ctrlKey || event.metaKey || event.altKey)) {
-			event.preventDefault();
-			cutInodes();
-		} else if (event.key === 'v' && (event.ctrlKey || event.metaKey || event.altKey)) {
-			event.preventDefault();
-			pasteInodes();
-		} else if (['Backspace', 'Delete'].includes(event.key) && event.shiftKey) {
-			event.preventDefault();
-			deleteInodes();
-		}
-	});
+	useEffect(() => {
+		const handleKeyboardEvents = (event) => {
+			if (event.key === 'a' && (event.ctrlKey || event.metaKey || event.altKey)) {
+				event.preventDefault();
+				selectAllInodes();
+			} else if (event.key === 'c' && (event.ctrlKey || event.metaKey || event.altKey)) {
+				event.preventDefault();
+				copyInodes();
+			} else if (event.key === 'x' && (event.ctrlKey || event.metaKey || event.altKey)) {
+				event.preventDefault();
+				cutInodes();
+			} else if (event.key === 'v' && (event.ctrlKey || event.metaKey || event.altKey)) {
+				event.preventDefault();
+				pasteInodes();
+			} else if (['Backspace', 'Delete'].includes(event.key) && event.shiftKey) {
+				event.preventDefault();
+				deleteInodes();
+			}
+		};
+		window.addEventListener('keydown', handleKeyboardEvents);
+		return () => window.removeEventListener('click', handleKeyboardEvents);
+	}, []);
 
 	function confirmEraseTrashFolder() {
 		if (window.confirm("Erase all files in the trash folder?")) {

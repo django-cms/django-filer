@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {FinderSettings} from './FinderSettings';
 import {useCookie} from './Storage';
 import SearchIcon from 'icons/search.svg';
@@ -41,11 +41,15 @@ export function SearchField(props) {
 	const [searchQuery, setSearchQuery] = useSearchParam('q');
 	const [searchRealm, setSearchRealm] = useSearchRealm('current');
 
-	window.addEventListener('click', event => {
-		if (!searchRealmRef.current?.parentElement?.contains(event.target)) {
-			searchRealmRef.current.setAttribute('aria-expanded', 'false');
+	useEffect(() => {
+		const closeSearching = (event) => {
+			if (!searchRealmRef.current?.parentElement?.contains(event.target)) {
+				searchRealmRef.current.setAttribute('aria-expanded', 'false');
+			}
 		}
-	});
+		window.addEventListener('click', closeSearching);
+		return () => window.removeEventListener('click', closeSearching);
+	}, []);
 
 	function handleSearch(event) {
 		const performSearch = () => {
