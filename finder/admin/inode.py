@@ -135,8 +135,8 @@ class InodeAdmin(admin.ModelAdmin):
                     'download_url': obj.get_download_url(),
                     'thumbnail_url': obj.casted.get_thumbnail_url(),
                     'sample_url': obj.casted.get_sample_url(),
-                    'folder_component': obj.casted.folder_component,
                     'summary': obj.casted.summary,
+                    'extension': obj.casted.react_folder_extension,
                 }
                 if 'labels' in data_fields:
                     values['labels'] = list(obj.labels.values('id', 'name', 'color'))

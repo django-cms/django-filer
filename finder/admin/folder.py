@@ -135,6 +135,7 @@ class FolderAdmin(InodeAdmin):
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             ancestors=ancestor_ids,
             legends=self._legends,
+            menu_extensions=[model.react_menu_extension for model in InodeModel.file_models],
         )
         return settings
 

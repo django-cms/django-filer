@@ -100,19 +100,19 @@ export function FigureLabels(props) {
 
 export function ListItem(props) {
 	const settings = useContext(FinderSettings);
-	const FigBody = props.folder_component ? useMemo(
-		() => {
-			const component = `./components/folder/${props.folder_component}.js`;
-			const LazyFigure = lazy(() => import(component));
+	const [focusHandler, setFocusHandler] = useState(null);
+	const FigBody = useMemo(() => {
+		if (props.extension.component) {
+			const component = `./components/folder/${props.extension.component}.js`;
+			const LazyItem = lazy(() => import(component));
 			return (props) => (
 				<Suspense>
-					<LazyFigure {...props}>{props.children}</LazyFigure>
+					<LazyItem {...props}>{props.children}</LazyItem>
 				</Suspense>
 			);
-		},
-		[]
-	) : StaticFigure;
-	const [focusHandler, setFocusHandler] = useState(null);
+		}
+		return StaticFigure;
+	},[]);
 
 	function handleFocus(event) {
 		if (!(event.target.contentEditable))

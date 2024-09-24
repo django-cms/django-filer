@@ -11,8 +11,6 @@ import {FinderSettings} from 'finder/FinderSettings';
 import DownloadIcon from 'icons/download.svg';
 import FullSizeIcon from 'icons/full-size.svg';
 import UploadIcon from 'icons/upload.svg';
-import PauseIcon from "../icons/pause.svg";
-import PlayIcon from "../icons/play.svg";
 
 
 function DownloadFileButton(props) {

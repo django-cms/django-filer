@@ -126,7 +126,7 @@ class FileAdmin(InodeAdmin):
             filename=inode.file_name,
             file_id=inode.id,
             file_mime_type=inode.mime_type,
-            editor_component=inode.editor_component,
+            extension=inode.react_editor_extension,
         )
         if inode.labels.model.objects.exists():
             settings['labels'] = [

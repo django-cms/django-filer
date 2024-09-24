@@ -2,6 +2,7 @@ from pathlib import Path
 
 from django.core.files.storage import default_storage
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.utils.functional import classproperty
 
 from filer import settings as filer_settings
 from finder.models.file import FileModel
@@ -18,11 +19,23 @@ class AudioFileModel(FileModel):
     filer_public_thumbnails = Path(
         filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
     )
-    folder_component = editor_component = 'Audio'
 
     class Meta:
         proxy = True
         app_label = 'finder'
+
+    @classproperty
+    def react_folder_extension(cls):
+        return {'component': 'Audio'}
+
+    @classproperty
+    def react_editor_extension(cls):
+        return {'component': 'Audio'}
+
+    @classproperty
+    def react_menu_extension(cls):
+        # TODO: move this to ZIPFileModel
+        return {'component': 'Audio'}
 
     def get_sample_url(self):
         sample_start = self.meta_data.get('sample_start', 0)

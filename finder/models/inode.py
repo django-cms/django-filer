@@ -5,7 +5,7 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, classproperty
 from django.utils.translation import gettext_lazy as _
 
 
@@ -98,7 +98,6 @@ def filename_validator(value):
 
 class InodeModel(models.Model, metaclass=InodeMetaModel):
     is_folder = False
-    folder_component= editor_component = None
     data_fields = ['id', 'name', 'parent', 'created_at', 'last_modified_at']
 
     id = models.UUIDField(
@@ -165,6 +164,27 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             names.extend(a.name for a in self.parent.ancestrors)
         names.append(self.name)
         return " / ".join(names)
+
+    @classproperty
+    def react_folder_extension(cls):
+        """
+        Hook to return the React folder component for the given model.
+        """
+        return {'component': None}
+
+    @classproperty
+    def react_editor_extension(cls):
+        """
+        Hook to return the React editor component for the given model.
+        """
+        return {'component': None}
+
+    @classproperty
+    def react_menu_extension(cls):
+        """
+        Hook to return the React menu component for the given model.
+        """
+        return {'component': None}
 
     def get_sample_url(self):
         """

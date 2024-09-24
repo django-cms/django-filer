@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import models
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, classproperty
 
 from filer import settings as filer_settings
 
@@ -17,7 +17,6 @@ class ImageModel(AbstractFileModel):
     )
     thumbnail_size = 180
     fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-picture.svg')
-    editor_component = 'Image'
 
     width = models.SmallIntegerField(default=0)
     height = models.SmallIntegerField(default=0)
@@ -28,6 +27,10 @@ class ImageModel(AbstractFileModel):
     @cached_property
     def summary(self):
         return "{width}×{height}px ({size})".format(size=super().summary, width=self.width, height=self.height)
+
+    @classproperty
+    def react_editor_extension(cls):
+        return {'component': 'Image'}
 
     def get_thumbnail_path(self, crop_x=None, crop_y=None, crop_size=None):
         id = str(self.id)

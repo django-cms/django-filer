@@ -1,4 +1,14 @@
-import React, {useRef, useContext, forwardRef, useState, useImperativeHandle, useEffect} from 'react';
+import React, {
+	useRef,
+	useContext,
+	forwardRef,
+	useState,
+	useImperativeHandle,
+	useEffect,
+	lazy,
+	Suspense,
+	useMemo
+} from 'react';
 import {useClipboard, useCookie} from './Storage';
 import {SearchField} from './Search';
 import {FinderSettings} from './FinderSettings';
@@ -72,6 +82,24 @@ function SortingOptionsItem(props: any) {
 	)
 }
 
+
+function MenuExtension(props) {
+	console.log(props)
+
+	const MenuComponent = useMemo(() => {
+		const component = `./components/menu/${props.extension.component}.js`;
+		const LazyItem = lazy(() => import(component));
+		return (props) => (
+			<Suspense>
+				<LazyItem {...props} />
+			</Suspense>
+		);
+	},[]);
+
+	return (
+		<MenuComponent {...props} />
+	)
+}
 
 
 export const MenuBar = forwardRef((props: any, forwardedRef) => {
@@ -315,6 +343,9 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 					<li onClick={addFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Add new folder")}><AddFolderIcon /></li>
 					<li className={numSelectedFiles ? null : "disabled"} onClick={downloadSelectedFiles} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Download selected files")}><DownloadIcon /></li>
 					<li onClick={openUploader} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Upload files from local host")}><UploadIcon /></li>
+					{settings.menu_extensions.filter(extension => extension.component).map((extension, index) => (
+						<MenuExtension key={index} extension={extension} columnRefs={columnRefs} numSelectedInodes={numSelectedInodes} numSelectedFiles={numSelectedFiles} />
+					))}
 				</>)}
 			</ul>
 		</nav>

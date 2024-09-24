@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.template.defaultfilters import filesizeformat
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, classproperty
 from django.utils.translation import gettext_lazy as _
 
 from filer import settings as filer_settings
@@ -166,6 +166,11 @@ class AbstractFileModel(InodeModel):
         Hook to return the thumbnail url for a given file.
         """
         return self.fallback_thumbnail_url
+
+    @classproperty
+    def react_editor_extension(cls):
+        # TODO: refactor towards get_editor_context method
+        return {'component': 'Common'}
 
     @cached_property
     def mime_maintype(self):
