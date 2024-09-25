@@ -106,7 +106,7 @@ class InodeAdmin(admin.ModelAdmin):
         except (FolderModel.DoesNotExist, KeyError, ValidationError):
             return FolderModel.objects.get_root_folder(self.admin_site.name)
 
-    def get_inodes(self, sorting=None, **lookup):
+    def get_inodes(self, request, sorting=None, **lookup):
         """
         Return a serialized list of file/folder-s for the given folder.
         """
@@ -134,10 +134,15 @@ class InodeAdmin(admin.ModelAdmin):
                     ),
                     'download_url': obj.get_download_url(),
                     'thumbnail_url': obj.casted.get_thumbnail_url(),
-                    'sample_url': obj.casted.get_sample_url(),
                     'summary': obj.casted.summary,
-                    'extension': obj.casted.react_folder_extension,
                 }
+
+                # search model admin for current inode and get its rendering settings
+                for model in obj.__class__.__mro__:
+                    if model_admin := self.admin_site._registry.get(model):
+                        values.update(model_admin.get_folderitem_settings(request, obj))
+                        break
+
                 if 'labels' in data_fields:
                     values['labels'] = list(obj.labels.values('id', 'name', 'color'))
                 values.update({field: getattr(obj, field) for field in data_fields if field not in values})
@@ -210,15 +215,15 @@ class InodeAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
         context.update(
             breadcrumbs=self.get_breadcrumbs(obj),
+            finder_settings=self.get_editor_settings(request, obj),
         )
-        context['finder_settings'] = self.get_settings(request, obj)
         return TemplateResponse(
             request,
             self.form_template,
             context,
         )
 
-    def get_settings(self, request, inode):
+    def get_editor_settings(self, request, inode):
         favorite_folders = self.get_favorite_folders(request, inode.folder)
         settings = {
             'name': inode.name,
@@ -237,3 +242,6 @@ class InodeAdmin(admin.ModelAdmin):
         else:
             settings['parent_url'] = None
         return settings
+
+    def get_folderitem_settings(self, request, inode):
+        return {}

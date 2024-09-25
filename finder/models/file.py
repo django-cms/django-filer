@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.template.defaultfilters import filesizeformat
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from filer import settings as filer_settings
@@ -167,10 +167,12 @@ class AbstractFileModel(InodeModel):
         """
         return self.fallback_thumbnail_url
 
-    @classproperty
-    def react_editor_extension(cls):
-        # TODO: refactor towards get_editor_context method
-        return {'component': 'Common'}
+    @classmethod
+    def get_menu_extension(cls):
+        """
+        Hook to return the React context for extending menu items specific to this model.
+        """
+        return {}
 
     @cached_property
     def mime_maintype(self):

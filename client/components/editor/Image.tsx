@@ -1,11 +1,10 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
-import {FinderSettings} from 'finder/FinderSettings';
 import {FileDetails} from 'finder/FileDetails';
 
 
 export default function Image(props) {
-	const settings = useContext(FinderSettings);
+	const {settings} = props;
 	const cropFields = {
 		x: document.getElementById('id_crop_x') as HTMLInputElement,
 		y: document.getElementById('id_crop_y') as HTMLInputElement,
@@ -47,7 +46,7 @@ export default function Image(props) {
 	}
 
 	return (
-		<FileDetails>
+		<FileDetails {...props}>
 			<ReactCrop crop={crop} aspect={1} onChange={handleChange}>
 				<img className="editable" src={settings.download_url} ref={ref} />
 			</ReactCrop>

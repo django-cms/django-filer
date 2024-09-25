@@ -13,11 +13,18 @@ class CommonAdmin(FileAdmin):
     def get_settings(self, request, inode):
         settings = super().get_settings(request, inode)
         settings.update(
-            original_url=settings['download_url'],
-            replacing_mime_type=settings['file_mime_type'],
+            replace_file= True,
+            download_file=True,
         )
         return settings
 
 
-admin.site.register(PDFFileModel, CommonAdmin)
+class PDFFileAdmin(CommonAdmin):
+    def get_settings(self, request, inode):
+        settings = super().get_settings(request, inode)
+        settings.update(view_original= True)
+        return settings
+
+
 admin.site.register(SpreadsheetModel, CommonAdmin)
+admin.site.register(PDFFileModel, PDFFileAdmin)

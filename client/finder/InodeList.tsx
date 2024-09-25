@@ -1,18 +1,15 @@
 import React, {
 	createRef,
 	forwardRef,
-	useContext,
 	useEffect,
 	useImperativeHandle,
 	useState,
 } from 'react';
 import {Folder, File, DraggableItem, ListItem} from './Item';
-import {FinderSettings} from './FinderSettings';
 
 
 export const InodeList = forwardRef((props: any, forwardedRef) => {
-	const settings = useContext(FinderSettings);
-	const {folderId, previousFolderId, setCurrentFolder, menuBarRef, layout} = props;
+	const {folderId, previousFolderId, setCurrentFolder, menuBarRef, layout, settings} = props;
 	const [isLoading, setLoading] = useState(false);
 	const [inodes, setInodes] = useState([]);
 	const [lastSelectedInode, setSelectedInode] = useState(-1);

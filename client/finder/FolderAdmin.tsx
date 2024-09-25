@@ -243,6 +243,7 @@ export function FolderAdmin(props) {
 						listRef={columnRefs[settings.folder_id]}
 						menuBarRef={menuBarRef}
 						layout={layout}
+						settings={settings}
 					/>
 				</SelectableArea>
 			</div>
@@ -271,6 +272,7 @@ export function FolderAdmin(props) {
 						ref={folderId === settings.folder_id ? uploaderRef : null}
 						folderId={folderId}
 						handleUpload={id => columnRefs[id].current.fetchInodes()}
+						settings={settings}
 					>
 						<SelectableArea
 							folderId={folderId}
@@ -291,6 +293,7 @@ export function FolderAdmin(props) {
 									menuBarRef={menuBarRef}
 									folderTabsRef={folderTabsRef}
 									layout={layout}
+									settings={settings}
 								/>
 							</DroppableArea>
 						</SelectableArea>
@@ -333,6 +336,7 @@ export function FolderAdmin(props) {
 			layout={layout}
 			setLayout={setLayout}
 			setSearchResult={setSearchResult}
+			settings={settings}
 		/>
 		<DndContext
 			onDragStart={handleDragStart}
@@ -342,7 +346,7 @@ export function FolderAdmin(props) {
 			collisionDetection={pointerWithin}
 			autoScroll={true}
 		>
-			<FolderTabs ref={folderTabsRef} isSearchResult={isSearchResult} />
+			<FolderTabs ref={folderTabsRef} isSearchResult={isSearchResult} settings={settings} />
 			{settings.is_trash ? renderTrashArea() : renderWorkArea()}
 			<div ref={overlayRef} className="drag-overlay">
 				<DragOverlay className={layout} style={overlayStyle} modifiers={dragModifiers}>

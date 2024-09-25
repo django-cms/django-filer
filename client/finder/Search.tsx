@@ -1,5 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {FinderSettings} from './FinderSettings';
+import React, {useEffect, useRef, useState} from 'react';
 import {useCookie} from './Storage';
 import SearchIcon from 'icons/search.svg';
 
@@ -34,8 +33,7 @@ function useSearchParam(key) : [string, (value: string) => any] {
 
 
 export function SearchField(props) {
-	const settings = useContext(FinderSettings);
-	const {columnRefs, setSearchResult} = props;
+	const {columnRefs, setSearchResult, settings} = props;
 	const searchRef = useRef(null);
 	const searchRealmRef = useRef(null);
 	const [searchQuery, setSearchQuery] = useSearchParam('q');

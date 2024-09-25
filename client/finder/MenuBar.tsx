@@ -1,6 +1,5 @@
 import React, {
 	useRef,
-	useContext,
 	forwardRef,
 	useState,
 	useImperativeHandle,
@@ -103,8 +102,7 @@ function MenuExtension(props) {
 
 
 export const MenuBar = forwardRef((props: any, forwardedRef) => {
-	const settings = useContext(FinderSettings);
-	const {currentFolderId, columnRefs, folderTabsRef, openUploader, downloadFiles, layout, setLayout, setSearchResult} = props;
+	const {currentFolderId, columnRefs, folderTabsRef, openUploader, downloadFiles, layout, setLayout, setSearchResult, settings} = props;
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
 	const [clipboard, setClipboard] = useClipboard();
@@ -325,7 +323,7 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		<nav role="menubar">
 			<ul>
 				<li className="search-field">
-					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} />
+					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings} />
 				</li>
 				<li style={{marginLeft: 'auto'}} className={isActive('tiles')} onClick={() => setLayout('tiles')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Tiles view")}><TilesIcon /></li>
 				<li className={isActive('mosaic')} onClick={() => setLayout('mosaic')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon /></li>
@@ -343,7 +341,7 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 					<li onClick={addFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Add new folder")}><AddFolderIcon /></li>
 					<li className={numSelectedFiles ? null : "disabled"} onClick={downloadSelectedFiles} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Download selected files")}><DownloadIcon /></li>
 					<li onClick={openUploader} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Upload files from local host")}><UploadIcon /></li>
-					{settings.menu_extensions.filter(extension => extension.component).map((extension, index) => (
+					{settings.menu_extensions.map((extension, index) => (
 						<MenuExtension key={index} extension={extension} columnRefs={columnRefs} numSelectedInodes={numSelectedInodes} numSelectedFiles={numSelectedFiles} />
 					))}
 				</>)}

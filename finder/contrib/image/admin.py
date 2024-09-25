@@ -39,10 +39,12 @@ class ImageForm(FileModelForm):
 class ImageAdmin(FileAdmin):
     form = ImageForm
 
-    def get_settings(self, request, inode):
-        settings = super().get_settings(request, inode)
+    def get_editor_settings(self, request, inode):
+        settings = super().get_editor_settings(request, inode)
         settings.update(
-            original_url=settings['download_url'],
-            replacing_mime_type=settings['file_mime_type'],
+            react_component='Image',
+            replace_file= True,
+            download_file=True,
+            view_original=True,
         )
         return settings

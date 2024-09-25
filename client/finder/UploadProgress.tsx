@@ -1,5 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {FinderSettings} from './FinderSettings';
+import React, {useEffect, useState} from 'react';
 
 
 export function ProgressOverlay(props) {
@@ -7,12 +6,10 @@ export function ProgressOverlay(props) {
 		<div className="progress-overlay">
 			<div className="progress-indicator">{
 			props.dragging ? (
-				<p>Drop files here</p>
+				<p>{gettext("Drop files here")}</p>
 			) : (<>
-				<p>Uploading:</p>
-				<ul className="progress-bar">
-				{props.children}
-				</ul>
+				<p>{gettext("Uploading")}:</p>
+				<ul className="progress-bar">{props.children}</ul>
 			</>)
 			}</div>
 		</div>
@@ -21,8 +18,7 @@ export function ProgressOverlay(props) {
 
 
 export function ProgressBar(props) {
-	const settings = useContext(FinderSettings);
-	const {file, targetId} = props;
+	const {file, settings, targetId} = props;
 	const [complete, setComplete] = useState(0);
 
 	useEffect(() => {

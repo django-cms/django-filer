@@ -1,106 +1,11 @@
-import React, {
-	Fragment,
-	useContext,
-	useMemo,
-	useRef,
-	useState
-} from 'react';
+import React, {useMemo, useState} from 'react';
 import Select from 'react-select';
+import {ControlButtons} from 'finder/ControlButtons';
 import {ProgressBar, ProgressOverlay} from 'finder/UploadProgress';
-import {FinderSettings} from 'finder/FinderSettings';
-import DownloadIcon from 'icons/download.svg';
-import FullSizeIcon from 'icons/full-size.svg';
-import UploadIcon from 'icons/upload.svg';
 
 
-function DownloadFileButton(props) {
-	const settings = useContext(FinderSettings);
-
-	return (
-		<a download={settings.filename} href={settings.download_url}><DownloadIcon/>{gettext("Download")}</a>
-	);
-}
-
-
-function ViewOriginalButton() {
-	const settings = useContext(FinderSettings);
-
-	function viewOriginal() {
-		window.open(settings.download_url, '_blank').focus();
-	}
-
-	return (
-		<button type="button" onClick={viewOriginal}><FullSizeIcon/>{gettext("View Original")}</button>
-	);
-}
-
-
-function ReplaceFileButton(props) {
-	const {acceptMimeType} = props;
-	const inputRef = useRef(null);
-
-	function replaceFile() {
-		inputRef.current.click();
-	}
-
-	function handleFileSelect(event) {
-		const file = event.target.files[0];
-		const promise = new Promise<Response>((resolve, reject) => {
-			file.resolve = resolve;
-			file.reject = reject;
-		});
-		props.setUploadFile(file);
-		promise.then((response) => {
-			window.location.reload();
-		}).catch((error) => {
-			alert(error);
-		}).finally( () => {
-			props.setUploadFile(null);
-		});
-	}
-
-	return (<>
-		<button type="button" onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
-		<input type="file" name="replaceFile" ref={inputRef} accept={acceptMimeType} onChange={handleFileSelect} />
-	</>);
-}
-
-
-export function ControlButtons(props) {
-	const settings = useContext(FinderSettings);
-
-	const controlButtons = useMemo(() => {
-		const buttons: Array<React.JSX.Element> = [];
-		if (settings.download_url) {
-			buttons.push(<DownloadFileButton/>);
-		}
-		if (settings.original_url) {
-			buttons.push(<ViewOriginalButton/>);
-		}
-		if (settings.replacing_mime_type) {
-			buttons.push(
-				<ReplaceFileButton
-					setUploadFile={props.setUploadFile}
-					acceptMimeType={settings.replacing_mime_type}
-				/>
-			);
-		}
-		return buttons;
-	}, []);
-
-	return (
-		<div className="button-group">
-			{props.children}
-		{controlButtons.map((button, index) =>
-			<Fragment key={index}>{button}</Fragment>
-		)}
-		</div>
-	);
-}
-
-
-function SelectLabels() {
-	const settings = useContext(FinderSettings);
+function SelectLabels(props) {
+	const {settings} = props;
 	const LabelOption = ({innerProps, data}) => (
 		<div {...innerProps} className="select-labels-option">
 			<span style={{backgroundColor: data.color}} className="select-labels-dot" />
@@ -165,7 +70,7 @@ function SelectLabels() {
 
 
 export function FileDetails(props) {
-	const settings = useContext(FinderSettings);
+	const {settings} = props;
 	const [uploadFile, setUploadFile] = useState<Promise<Response>>(null);
 	const subtitle = useMemo(() => {
 		const subtitle = document.getElementById('id_subtitle');
@@ -180,12 +85,12 @@ export function FileDetails(props) {
 		<div className="file-details" style={props.style}>
 			<h2>{subtitle}</h2>
 			{props.children}
-			<ControlButtons setUploadFile={setUploadFile}>{props.controlButtons}</ControlButtons>
-			<SelectLabels />
+			<ControlButtons setUploadFile={setUploadFile} settings={settings}>{props.controlButtons}</ControlButtons>
+			<SelectLabels settings={settings} />
 		</div>
 		{uploadFile &&
 		<ProgressOverlay>
-			<ProgressBar file={uploadFile} targetId={settings.file_id} />
+			<ProgressBar file={uploadFile} targetId={settings.file_id} settings={settings} />
 		</ProgressOverlay>
 		}
 	</>);

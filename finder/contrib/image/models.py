@@ -28,10 +28,6 @@ class ImageModel(AbstractFileModel):
     def summary(self):
         return "{width}×{height}px ({size})".format(size=super().summary, width=self.width, height=self.height)
 
-    @classproperty
-    def react_editor_extension(cls):
-        return {'component': 'Image'}
-
     def get_thumbnail_path(self, crop_x=None, crop_y=None, crop_size=None):
         id = str(self.id)
         thumbnail_folder = self.filer_public_thumbnails / f'{id[0:2]}/{id[2:4]}/{id}'

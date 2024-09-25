@@ -1,6 +1,5 @@
 import {useDroppable} from '@dnd-kit/core';
-import React, {forwardRef, useContext, useImperativeHandle, useState} from 'react';
-import {FinderSettings} from './FinderSettings';
+import React, {forwardRef, useImperativeHandle, useState} from 'react';
 import CloseIcon from 'icons/close.svg';
 import PinIcon from 'icons/pin.svg';
 import RecycleIcon from 'icons/recycle.svg';
@@ -9,8 +8,7 @@ import UpIcon from 'icons/folder-up.svg';
 
 
 function FolderTab(props) {
-	const settings = useContext(FinderSettings);
-	const {folder, isSearchResult} = props;
+	const {folder, isSearchResult, settings} = props;
 	const {
 		isOver,
 		setNodeRef,
@@ -76,8 +74,7 @@ function FolderTab(props) {
 }
 
 export const FolderTabs = forwardRef((props: any, forwardedRef) => {
-	const settings = useContext(FinderSettings);
-	const {isSearchResult} = props;
+	const {isSearchResult, settings} = props;
 	const [favoriteFolders, setFavoriteFolders] = useState(settings.favorite_folders);
 
 	useImperativeHandle(forwardedRef, () => ({setFavoriteFolders}));
@@ -108,9 +105,9 @@ export const FolderTabs = forwardRef((props: any, forwardedRef) => {
 	return (
 		<ul className="folder-tabs">
 			{isSearchResult || settings.is_trash ? (<>
-				<FolderTab key={'return'} folder={{id: 'return'}} isSearchResult={isSearchResult}/>
+				<FolderTab key={'return'} folder={{id: 'return'}} isSearchResult={isSearchResult} settings={settings} />
 			</>) : (
-				settings.parent_id && (<FolderTab key={'parent'} folder={{id: 'parent'}} />)
+				settings.parent_id && (<FolderTab key={'parent'} folder={{id: 'parent'}} settings={settings} />)
 			)}
 			{favoriteFolders.filter(
 				folder => !isSearchResult || folder.is_pinned || folder.id !== settings.folder_id
@@ -120,6 +117,7 @@ export const FolderTabs = forwardRef((props: any, forwardedRef) => {
 					folder={folder}
 					togglePin={togglePin}
 					isSearchResult={isSearchResult}
+					settings={settings}
 				/>
 			)}
 		</ul>

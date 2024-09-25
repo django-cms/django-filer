@@ -2,7 +2,6 @@ from pathlib import Path
 
 from django.core.files.storage import default_storage
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.utils.functional import classproperty
 
 import ffmpeg
 
@@ -23,14 +22,6 @@ class VideoFileModel(FileModel):
     class Meta:
         proxy = True
         app_label = 'finder'
-
-    @classproperty
-    def react_folder_extension(cls):
-        return {'component': 'Video'}
-
-    @classproperty
-    def react_editor_extension(cls):
-        return {'component': 'Video'}
 
     def get_sample_url(self):
         sample_start = self.meta_data.get('sample_start')

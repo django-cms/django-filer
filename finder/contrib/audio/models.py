@@ -24,16 +24,8 @@ class AudioFileModel(FileModel):
         proxy = True
         app_label = 'finder'
 
-    @classproperty
-    def react_folder_extension(cls):
-        return {'component': 'Audio'}
-
-    @classproperty
-    def react_editor_extension(cls):
-        return {'component': 'Audio'}
-
-    @classproperty
-    def react_menu_extension(cls):
+    @classmethod
+    def get_menu_extension(cls):
         # TODO: move this to ZIPFileModel
         return {'component': 'Audio'}
 

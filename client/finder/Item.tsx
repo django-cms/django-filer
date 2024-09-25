@@ -102,8 +102,8 @@ export function ListItem(props) {
 	const settings = useContext(FinderSettings);
 	const [focusHandler, setFocusHandler] = useState(null);
 	const FigBody = useMemo(() => {
-		if (props.extension.component) {
-			const component = `./components/folder/${props.extension.component}.js`;
+		if (props.react_component) {
+			const component = `./components/folderitem/${props.react_component}.js`;
 			const LazyItem = lazy(() => import(component));
 			return (props) => (
 				<Suspense>

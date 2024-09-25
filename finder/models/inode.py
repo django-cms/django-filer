@@ -165,33 +165,6 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         names.append(self.name)
         return " / ".join(names)
 
-    @classproperty
-    def react_folder_extension(cls):
-        """
-        Hook to return the React folder component for the given model.
-        """
-        return {'component': None}
-
-    @classproperty
-    def react_editor_extension(cls):
-        """
-        Hook to return the React editor component for the given model.
-        """
-        return {'component': None}
-
-    @classproperty
-    def react_menu_extension(cls):
-        """
-        Hook to return the React menu component for the given model.
-        """
-        return {'component': None}
-
-    def get_sample_url(self):
-        """
-        Hook to return a URL for a small sample file. Only used in list views.
-        """
-        return None
-
 
 class DiscardedInode(models.Model):
     inode = models.UUIDField(

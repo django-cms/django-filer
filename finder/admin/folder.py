@@ -8,6 +8,7 @@ from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.templatetags.static import static
 from django.urls import path, reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
 from django.utils.html import format_html
 
@@ -102,8 +103,8 @@ class FolderAdmin(InodeAdmin):
         model_admin = self.get_model_admin(inode_obj.mime_type)
         return model_admin.change_view(request, str(inode_id), **kwargs)
 
-    def get_settings(self, request, inode):
-        settings = super().get_settings(request, inode)
+    def get_editor_settings(self, request, inode):
+        settings = super().get_editor_settings(request, inode)
         trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
         if inode.id != trash_folder.id:
             settings.update(
@@ -135,9 +136,18 @@ class FolderAdmin(InodeAdmin):
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             ancestors=ancestor_ids,
             legends=self._legends,
-            menu_extensions=[model.react_menu_extension for model in InodeModel.file_models],
+            menu_extensions=self.menu_extensions,
         )
         return settings
+
+    @cached_property
+    def menu_extensions(self):
+        extensions = []
+        for model in InodeModel.file_models:
+            extension = model.get_menu_extension()
+            if extension.get('component'):
+                extensions.append(extension)
+        return extensions
 
     def get_model_admin(self, mime_type):
         if model_admin := self._model_admin_cache.get(mime_type):
@@ -163,25 +173,26 @@ class FolderAdmin(InodeAdmin):
         if not (current_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
         sorting = request.COOKIES.get('django-finder-sorting')
-        if query := request.GET.get('q'):
-            search_realm = request.COOKIES.get('django-finder-search-realm')
-            if search_realm == 'everywhere':
-                starting_folder = FolderModel.objects.get_root_folder(self.admin_site.name)
-            else:
-                starting_folder = current_folder
-            inodes = self.search_for_inodes(starting_folder, query, sorting=sorting)
+        if search_query := request.GET.get('q'):
+            inodes = self.search_for_inodes(request, current_folder, search_query, sorting=sorting)
         else:
-            inodes = self.get_inodes(parent=current_folder, sorting=sorting)
+            inodes = self.get_inodes(request, parent=current_folder, sorting=sorting)
         return JsonResponse({
             'inodes': inodes,
         })
 
-    def search_for_inodes(self, starting_folder, search_query, sorting=None):
+    def search_for_inodes(self, request, current_folder, search_query, sorting=None):
+        search_realm = request.COOKIES.get('django-finder-search-realm')
+        if search_realm == 'everywhere':
+            starting_folder = FolderModel.objects.get_root_folder(self.admin_site.name)
+        else:
+            starting_folder = current_folder
         if isinstance(starting_folder.descendants, QuerySet):
             parent_ids = Subquery(starting_folder.descendants.values('id'))
         else:
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
         return self.get_inodes(
+            request,
             sorting=sorting,
             parent_id__in=parent_ids,
             name__icontains=search_query,
@@ -243,7 +254,7 @@ class FolderAdmin(InodeAdmin):
             except RecursionError as exc:
                 return HttpResponseBadRequest(str(exc), status=409)
         return JsonResponse({
-            'inodes': self.get_inodes(parent=current_folder),
+            'inodes': self.get_inodes(request, parent=current_folder),
         })
 
     def move_inodes(self, request, folder_id):
@@ -270,7 +281,7 @@ class FolderAdmin(InodeAdmin):
         except ValidationError as e:
             return HttpResponseBadRequest(e.message, status=409)
         return JsonResponse({
-            'inodes': self.get_inodes(parent=target_folder),
+            'inodes': self.get_inodes(request, parent=target_folder),
         })
 
     def delete_inodes(self, request, folder_id):

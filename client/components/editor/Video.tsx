@@ -1,6 +1,5 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {Fragment, useRef, useState} from 'react';
 import ReactPlayer from 'react-player/file';
-import {FinderSettings} from 'finder/FinderSettings';
 import {FileDetails} from 'finder/FileDetails';
 import PauseIcon from 'icons/pause.svg';
 import PlayIcon from 'icons/play.svg';
@@ -8,10 +7,10 @@ import CameraIcon from 'icons/camera.svg';
 
 
 export default function Video(props) {
+	const {settings} = props;
 	const sampleFields = {
 		sampleStart: document.getElementById('id_sample_start') as HTMLInputElement,
 	};
-	const settings = useContext(FinderSettings);
 	const style = {
 		width: '960px',
 		maxWidth: '100%',
@@ -39,14 +38,17 @@ export default function Video(props) {
 		sampleFields.sampleStart.value = currentTime;
 	}
 
-	const controlButtons = [(isPlaying ?
-		<button type="button" onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
-		<button type="button" onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
-	),
-		<button type="button" onClick={setPosterFrame}><CameraIcon/>{gettext("Use as Poster")}</button>
+	const controlButtons = [
+		<Fragment key="play-pause">{isPlaying ?
+			<button type="button" onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
+			<button type="button" onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
+		}</Fragment>,
+		<Fragment key="poster-frame">
+			<button type="button" onClick={setPosterFrame}><CameraIcon/>{gettext("Use as Poster")}</button>
+		</Fragment>,
 	];
 	return (
-		<FileDetails controlButtons={controlButtons} style={style}>
+		<FileDetails controlButtons={controlButtons} style={style} {...props}>
 			<ReactPlayer
 				url={settings.download_url}
 				controls={true}

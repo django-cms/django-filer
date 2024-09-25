@@ -29,9 +29,19 @@ class AudioForm(FileModelForm):
 class AudioAdmin(FileAdmin):
     form = AudioForm
 
-    def get_settings(self, request, inode):
-        settings = super().get_settings(request, inode)
+    def get_editor_settings(self, request, inode):
+        settings = super().get_editor_settings(request, inode)
         settings.update(
-            replacing_mime_type=settings['file_mime_type'],
+            react_component='Audio',
+            replace_file= True,
+            download_file=True,
+        )
+        return settings
+
+    def get_folderitem_settings(self, request, inode):
+        settings = super().get_folderitem_settings(request, inode)
+        settings.update(
+            react_component='Audio',
+            sample_url=inode.get_sample_url(),
         )
         return settings

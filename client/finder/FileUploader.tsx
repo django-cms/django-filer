@@ -68,14 +68,13 @@ export const FileUploader = forwardRef((props: any, forwardedRef) => {
 	return (
 		<div className="file-uploader" onDragEnter={handleDragEnter} onDragOver={swallowEvent} onDragLeave={handleDragLeave} onDrop={handleDrop}>
 			{props.children}
-			<input type="file" name={`file:${folderId}`} multiple ref={inputRef} onChange={handleFileSelect} />
-			{(dragging || uploading.length > 0) &&
+			<input type="file" name={`file:${folderId}`} multiple ref={inputRef} onChange={handleFileSelect} />{
+			(dragging || uploading.length > 0) &&
 			<ProgressOverlay dragging={dragging}>{
 				uploading.map((file, index) =>
-				<ProgressBar key={index} file={file} targetId={folderId} />
+				<ProgressBar key={index} file={file} targetId={folderId} settings={props.settings} />
 				)
 			}</ProgressOverlay>
-			}
-		</div>
+		}</div>
 	)
 });
