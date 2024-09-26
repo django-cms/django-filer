@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import ArchiveIcon from 'icons/archive.svg';
 
 
@@ -6,11 +6,12 @@ export default function Audio(props) {
 	console.log(props);
 
 	function archiveSelectedIcons() {
+		console.log("archiveSelectedIcons", props);
 	}
 
 	return (
-		<li onClick={() => archiveSelectedIcons()} className={props.numSelectedInodes ? null : "disabled"} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Create archive from selection")}>
-			<ArchiveIcon />
+		<li className={props.numSelectedInodes ? null : "disabled"} onClick={archiveSelectedIcons}>
+			<ArchiveIcon/><span>{gettext("Create archive from selection")}</span>
 		</li>
 	);
 }

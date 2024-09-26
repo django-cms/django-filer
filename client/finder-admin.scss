@@ -123,7 +123,6 @@ $active-rectangle: rgb(210, 210, 112);
 
 							.search-realm {
 								[role="combobox"] {
-									width: 225px;
 									li:nth-child(2) {
 										padding-bottom: 4px;
 										border-bottom: 1px solid lightgrey;
@@ -143,24 +142,11 @@ $active-rectangle: rgb(210, 210, 112);
 					margin-left: auto;
 					margin-right: auto;
 					width: auto;
+				}
 
-					&::after {
-						right: -12px;
-					}
-
-					[role="combobox"] {
-						width: 150px;
-
-						svg {
-							color: grey;
-						}
-						span {
-							margin-left: 40px;
-						}
-						svg + span {
-							margin-left: 10px;
-						}
-					}
+				&:last-of-type [role="combobox"] {
+					right: 0;
+					margin-inline-end: inherit;
 				}
 
 				svg {
@@ -169,13 +155,12 @@ $active-rectangle: rgb(210, 210, 112);
 					height: 30px;
 					margin: 1px;
 				}
-
 			}
 
-			[aria-haspopup="true"] {
+			[aria-haspopup="true"]:has([role="combobox"]) {
 				position: relative;
 				display: flex;
-				&::after {
+				&.with-caret::after {
 					content: " ";
 					align-self: center;
 					border: 5px solid transparent;
@@ -189,14 +174,19 @@ $active-rectangle: rgb(210, 210, 112);
 				z-index: 1;
 				background-color: white;
 				top: 100%;
-				left: calc(32px - 150px / 2);
+				left: -250px;
+				right:-250px;
+				margin-inline: auto;
 				border: 1px solid rgb(192, 192, 192);
 				border-radius: 4px;
 				box-shadow: 0 0 8px rgb(192, 192, 192);
 				display: flex;
 				flex-direction: column;
-				margin: 0;
-				padding: 3px 0;
+				width: max-content;
+				padding-top: 3px;
+				padding-bottom: 3px;
+				padding-inline-start: 3px;
+				padding-inline-end: 30px;
 
 				&[aria-expanded="false"] {
 					display: none;
@@ -215,6 +205,16 @@ $active-rectangle: rgb(210, 210, 112);
 						position: absolute;
 						right: 10px;
 					}
+				}
+
+				svg {
+					color: grey;
+				}
+				span {
+					margin-left: 40px;
+				}
+				svg + span {
+					margin-left: 10px;
 				}
 			}
 		}

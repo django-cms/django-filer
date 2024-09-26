@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useCookie} from './Storage';
+import DropDownMenu from './DropDownMenu';
 import SearchIcon from 'icons/search.svg';
 
 const useSearchRealm = initial => useCookie('django-finder-search-realm', initial);
@@ -35,19 +36,8 @@ function useSearchParam(key) : [string, (value: string) => any] {
 export function SearchField(props) {
 	const {columnRefs, setSearchResult, settings} = props;
 	const searchRef = useRef(null);
-	const searchRealmRef = useRef(null);
 	const [searchQuery, setSearchQuery] = useSearchParam('q');
 	const [searchRealm, setSearchRealm] = useSearchRealm('current');
-
-	useEffect(() => {
-		const closeSearching = (event) => {
-			if (!searchRealmRef.current?.parentElement?.contains(event.target)) {
-				searchRealmRef.current.setAttribute('aria-expanded', 'false');
-			}
-		}
-		window.addEventListener('click', closeSearching);
-		return () => window.removeEventListener('click', closeSearching);
-	}, []);
 
 	function handleSearch(event) {
 		const performSearch = () => {
@@ -85,26 +75,29 @@ export function SearchField(props) {
 		}
 	}
 
-	function renderSearchRealmOptions() {
-		const isActive = (value) => searchRealm === value ? 'active' : null;
-
-		return (
-			<ul ref={searchRealmRef} role="combobox" aria-expanded="false">
-				<li onClick={() => changeSearchRealm('current')} className={isActive('current')}>{gettext("From current folder")}</li>
-				<li onClick={() => changeSearchRealm('everywhere')} className={isActive('everywhere')}>{gettext("In all folders")}</li>
-				<li onClick={() => changeSearchRealm('filename')} className={isActive('filename')}>{gettext("Filename only")}</li>
-				<li onClick={() => changeSearchRealm('content')} className={isActive('content')}>{gettext("Also file content")}</li>
-			</ul>
-		)
+	function isActive(value) {
+		return searchRealm === value ? 'active' : null;
 	}
 
 	return (<>
 		<input ref={searchRef} type="search" defaultValue={searchQuery} placeholder={gettext("Search for …")} onChange={handleSearch} onKeyDown={handleSearch} />
 		<div>
-			<span className="search-icon" onClick={handleSearch}><SearchIcon /></span>
-			<span className="search-realm" onClick={() => searchRealmRef.current.setAttribute('aria-expanded', searchRealmRef.current.ariaExpanded === 'true' ? 'false': 'true')} aria-haspopup="true" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Restrict search")}>
-				{renderSearchRealmOptions()}
-			</span>
+			<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
+			<DropDownMenu wrapperElement="span" className="search-realm with-caret" tooltip={gettext("Restrict search")}>
+				<li onClick={() => changeSearchRealm('current')}
+					className={isActive('current')}>{gettext("From current folder")}
+				</li>
+				<li onClick={() => changeSearchRealm('everywhere')}
+					className={isActive('everywhere')}>{gettext("In all folders")}
+				</li>
+				<li onClick={() => changeSearchRealm('filename')}
+					className={isActive('filename')}>{gettext("Filename only")}
+				</li>
+				<li onClick={() => changeSearchRealm('content')}
+					className={isActive('content')}><s>{gettext("Also file content")}</s>
+				</li>
+			</DropDownMenu>
 		</div>
-	</>);
+	</>
+);
 }

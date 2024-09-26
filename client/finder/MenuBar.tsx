@@ -1,5 +1,4 @@
 import React, {
-	useRef,
 	forwardRef,
 	useState,
 	useImperativeHandle,
@@ -10,7 +9,8 @@ import React, {
 } from 'react';
 import {useClipboard, useCookie} from './Storage';
 import {SearchField} from './Search';
-import {FinderSettings} from './FinderSettings';
+import DropDownMenu from './DropDownMenu';
+import MoreVerticalIcon from 'icons/more-vertical.svg';
 import CopyIcon from 'icons/copy.svg';
 import TilesIcon from 'icons/tiles.svg';
 import MosaicIcon from 'icons/mosaic.svg';
@@ -32,22 +32,7 @@ const useSorting = () => useCookie('django-finder-sorting', '');
 
 
 function SortingOptionsItem(props: any) {
-	const ref = useRef(null);
 	const [sorting, setSorting] = useSorting();
-
-	useEffect(() => {
-		const closeSorting = (event) => {
-			if (!ref.current?.parentElement?.contains(event.target)) {
-				ref.current.setAttribute('aria-expanded', 'false');
-			}
-		};
-		window.addEventListener('click', closeSorting);
-		return () => window.removeEventListener('click', closeSorting);
-	}, []);
-
-	function toggleSorting() {
-		ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false': 'true');
-	}
 
 	function isActive(value) {
 		return sorting === value ? 'active' : null;
@@ -63,22 +48,34 @@ function SortingOptionsItem(props: any) {
 	}
 
 	return (
-		<li className="sorting-dropdown" onClick={toggleSorting} aria-haspopup="true" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change sorting order")}>
-			<SortingIcon/>
-			<ul ref={ref} role="combobox" aria-expanded="false">
-				<li onClick={() => changeSorting('')} className={isActive('')}><span>{gettext("Unsorted")}</span></li>
-				<li onClick={() => changeSorting('name_asc')} className={isActive('name_asc')}>
-					<SortDescIcon/><span>{gettext("Name")}</span></li>
-				<li onClick={() => changeSorting('name_desc')} className={isActive('name_desc')}><SortAscIcon /><span>{gettext("Name")}</span></li>
-				<li onClick={() => changeSorting('date_asc')} className={isActive('date_asc')}><SortDescIcon /><span>{gettext("Date")}</span></li>
-				<li onClick={() => changeSorting('date_desc')} className={isActive('date_desc')}><SortAscIcon /><span>{gettext("Date")}</span></li>
-				<li onClick={() => changeSorting('size_asc')} className={isActive('size_asc')}><SortDescIcon /><span>{gettext("Size")}</span></li>
-				<li onClick={() => changeSorting('size_desc')} className={isActive('size_desc')}><SortAscIcon /><span>{gettext("Size")}</span></li>
-				<li onClick={() => changeSorting('type_asc')} className={isActive('type_asc')}><SortDescIcon /><span>{gettext("Type")}</span></li>
-				<li onClick={() => changeSorting('type_desc')} className={isActive('type_desc')}><SortAscIcon /><span>{gettext("Type")}</span></li>
-			</ul>
-		</li>
-	)
+		<DropDownMenu icon={<SortingIcon/>} className="sorting-dropdown with-caret" tooltip={gettext("Change sorting order")}>
+			<li onClick={() => changeSorting('')} className={isActive('')}><span>{gettext("Unsorted")}</span></li>
+			<li onClick={() => changeSorting('name_asc')} className={isActive('name_asc')}>
+				<SortDescIcon/><span>{gettext("Name")}</span>
+			</li>
+			<li onClick={() => changeSorting('name_desc')} className={isActive('name_desc')}>
+				<SortAscIcon /><span>{gettext("Name")}</span>
+			</li>
+			<li onClick={() => changeSorting('date_asc')} className={isActive('date_asc')}>
+				<SortDescIcon /><span>{gettext("Date")}</span>
+			</li>
+			<li onClick={() => changeSorting('date_desc')} className={isActive('date_desc')}>
+				<SortAscIcon /><span>{gettext("Date")}</span>
+			</li>
+			<li onClick={() => changeSorting('size_asc')} className={isActive('size_asc')}>
+				<SortDescIcon /><span>{gettext("Size")}</span>
+			</li>
+			<li onClick={() => changeSorting('size_desc')} className={isActive('size_desc')}>
+				<SortAscIcon /><span>{gettext("Size")}</span>
+			</li>
+			<li onClick={() => changeSorting('type_asc')} className={isActive('type_asc')}>
+				<SortDescIcon /><span>{gettext("Type")}</span>
+			</li>
+			<li onClick={() => changeSorting('type_desc')} className={isActive('type_desc')}>
+				<SortAscIcon /><span>{gettext("Type")}</span>
+			</li>
+		</DropDownMenu>
+	);
 }
 
 
@@ -101,11 +98,91 @@ function MenuExtension(props) {
 }
 
 
+function ExtraMenu(props) {
+	const {
+		settings,
+		columnRefs,
+		openUploader,
+		downloadFiles,
+		numSelectedFiles,
+		numSelectedInodes,
+		numClippedInodes,
+		currentFolderId,
+		copyInodes,
+		clearClipboard,
+	} = props;
+
+	async function addFolder() {
+		const folderName = window.prompt("Enter folder name");
+		if (!folderName)
+			return;
+		const addFolderUrl = `${settings.base_url}${settings.folder_id}/add_folder`;
+		const response = await fetch(addFolderUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': settings.csrf_token,
+			},
+			body: JSON.stringify({
+				name: folderName,
+			}),
+		});
+		if (response.ok) {
+			const current = columnRefs[settings.folder_id].current;
+			const body = await response.json();
+			current.setInodes([...current.inodes, body.new_folder]);  // adds new folder to the end of the list
+		} else if (response.status === 409) {
+			alert(await response.text());
+		} else {
+			console.error(response);
+		}
+	}
+
+	function downloadSelectedFiles() {
+		const current = columnRefs[currentFolderId].current;
+		downloadFiles(current.inodes.filter(inode => !inode.is_folder && inode.selected));
+		current.deselectinodes();
+	}
+
+	return (
+		<DropDownMenu icon={<MoreVerticalIcon/>} tooltip={gettext("Extra options")}>
+			<li onClick={addFolder}>
+				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
+			</li>
+			<li className={numSelectedFiles ? null : "disabled"} onClick={downloadSelectedFiles}>
+				<DownloadIcon/><span>{gettext("Download selected files")}</span>
+			</li>
+			<li onClick={openUploader}>
+				<UploadIcon/><span>{gettext("Upload files from local host")}</span>
+			</li>
+			<li className={numSelectedInodes ? null : "disabled"} onClick={copyInodes}>
+				<CopyIcon/><span>{gettext("Copy selected to clipboard")}</span>
+			</li>
+			<li className={numClippedInodes ? null : "disabled"} onClick={clearClipboard}>
+				<CopyIcon/><span>{gettext("Clear clipboard")}</span>
+			</li>
+			{settings.menu_extensions.map((extension, index) => (
+				<MenuExtension key={index} extension={extension} {...props} />
+			))}
+		</DropDownMenu>
+	);
+}
+
+
 export const MenuBar = forwardRef((props: any, forwardedRef) => {
-	const {currentFolderId, columnRefs, folderTabsRef, openUploader, downloadFiles, layout, setLayout, setSearchResult, settings} = props;
+	const {
+		currentFolderId,
+		columnRefs,
+		folderTabsRef,
+		layout,
+		setLayout,
+		setSearchResult,
+		settings
+	} = props;
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
 	const [clipboard, setClipboard] = useClipboard();
+	//const [numClippedInodes, setNumClippedInodes] = useState(clipboard.length);
 
 	useImperativeHandle(forwardedRef, () => ({
 		setSelected: (selectedInodes) => {
@@ -145,24 +222,28 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 
 	function clearClipboard() {
 		setClipboard([]);
+		// setNumClippedInodes(0);
 	}
 
 	function selectAllInodes() {
 		const current = columnRefs[currentFolderId].current;
 		current.setInodes(current.inodes.map(inode => ({...inode, selected: true, copied: false})));
-		setNumSelectedInodes(current.selectedInodes.length);
-		setNumSelectedFiles(current.selectedInodes.filter(inode => !inode.is_folder).length);
+		setNumSelectedInodes(current.inodes.length);
+		setNumSelectedFiles(current.inodes.filter(inode => !inode.is_folder).length);
+		clearClipboard();
 	}
 
 	function copyInodes() {
 		const current = columnRefs[currentFolderId].current;
 		if (current.inodes.find(inode => inode.selected)) {
-			setClipboard(current.inodes.filter(inode => inode.selected).map(inode => ({
+			const clipboard = current.inodes.filter(inode => inode.selected).map(inode => ({
 				id: inode.id,
 				parent: inode.parent,
 				selected: false,
 				copied: true
-			})));
+			}));
+			setClipboard(clipboard);
+			// setNumClippedInodes(clipboard.length);
 			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, copied: inode.selected})));
 			setNumSelectedInodes(0);
 			setNumSelectedFiles(0);
@@ -172,12 +253,14 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 	function cutInodes() {
 		const current = columnRefs[currentFolderId].current;
 		if (current.inodes.find(inode => inode.selected)) {
-			setClipboard(current.inodes.filter(inode => inode.selected).map(inode => ({
+			const clipboard = current.inodes.filter(inode => inode.selected).map(inode => ({
 				id: inode.id,
 				parent: inode.parent,
 				selected: false,
 				cutted: true
-			})));
+			}));
+			setClipboard(clipboard);
+			// setNumClippedInodes(clipboard.length);
 			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, cutted: inode.selected})));
 			setNumSelectedInodes(0);
 			setNumSelectedFiles(0);
@@ -246,38 +329,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	async function addFolder() {
-		const folderName = window.prompt("Enter folder name");
-		if (!folderName)
-			return;
-		const addFolderUrl = `${settings.base_url}${settings.folder_id}/add_folder`;
-		const response = await fetch(addFolderUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': settings.csrf_token,
-			},
-			body: JSON.stringify({
-				name: folderName,
-			}),
-		});
-		if (response.ok) {
-			const current = columnRefs[settings.folder_id].current;
-			const body = await response.json();
-			current.setInodes([...current.inodes, body.new_folder]);  // adds new folder to the end of the list
-		} else if (response.status === 409) {
-			alert(await response.text());
-		} else {
-			console.error(response);
-		}
-	}
-
-	function downloadSelectedFiles() {
-		const current = columnRefs[currentFolderId].current;
-		downloadFiles(current.inodes.filter(inode => !inode.is_folder && inode.selected));
-		current.deselectinodes();
-	}
-
 	async function undoDiscardInodes() {
 		const current = columnRefs[currentFolderId].current;
 		const inodeIds = current.inodes.filter(inode => inode.selected).map(inode => inode.id);
@@ -335,15 +386,16 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 					<li className={numSelectedInodes ? null : "disabled"} onClick={undoDiscardInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Undo discarding files/folders")}><UndoIcon /></li>
 					<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Empty trash folder")}><EraseIcon /></li>
 				</>) : (<>
-					<li className={numSelectedInodes ? null : "disabled"} onClick={copyInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Copy selected to clipboard")}><CopyIcon /></li>
 					<li className={clipboard.length === 0 ? "disabled" : null} onClick={pasteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Paste from clipboard")}><PasteIcon /></li>
 					<li className={numSelectedInodes ? null : "disabled"} onClick={deleteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Move selected to trash folder")}><TrashIcon /></li>
-					<li onClick={addFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Add new folder")}><AddFolderIcon /></li>
-					<li className={numSelectedFiles ? null : "disabled"} onClick={downloadSelectedFiles} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Download selected files")}><DownloadIcon /></li>
-					<li onClick={openUploader} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Upload files from local host")}><UploadIcon /></li>
-					{settings.menu_extensions.map((extension, index) => (
-						<MenuExtension key={index} extension={extension} columnRefs={columnRefs} numSelectedInodes={numSelectedInodes} numSelectedFiles={numSelectedFiles} />
-					))}
+					<ExtraMenu
+						numSelectedFiles={numSelectedFiles}
+						numSelectedInodes={numSelectedInodes}
+						numClippedInodes={clipboard.length}
+						copyInodes={copyInodes}
+						clearClipboard={clearClipboard}
+						{...props}
+					/>
 				</>)}
 			</ul>
 		</nav>
