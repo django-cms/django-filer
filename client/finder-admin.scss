@@ -627,12 +627,13 @@ $active-rectangle: rgb(210, 210, 112);
 				align-items: center;
 
 				div {
-					&:has(> img) {
+					&:has(img, video) {
 						text-align: center;
 
-						img {
+						img,div:has(>div>video) {
 							width: 60px;
 							height: 60px;
+							display: inline-block;
 						}
 					}
 
