@@ -191,14 +191,14 @@ $active-rectangle: rgb(210, 210, 112);
 				padding-top: 3px;
 				padding-bottom: 3px;
 				padding-inline-start: 3px;
-				padding-inline-end: 30px;
+				padding-inline-end: 3px;
 
 				&[aria-expanded="false"] {
 					display: none;
 				}
 
 				li {
-					padding: 0 10px;
+					padding: 0 2rem 0 0.5rem;
 					width: auto;
 					cursor: pointer;
 					display: flex;
