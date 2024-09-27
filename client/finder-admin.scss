@@ -471,6 +471,10 @@ $active-rectangle: rgb(210, 210, 112);
 				padding-left: 2em;
 			}
 
+			[aria-roledescription="draggable"]:focus-visible {
+				outline: none;
+			}
+
 			.inode {
 				height: 100%;
 				width: 100%;
