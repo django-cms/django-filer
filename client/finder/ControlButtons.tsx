@@ -62,7 +62,6 @@ function ReplaceFileButton(props) {
 
 
 export function ControlButtons(props) {
-	//const settings = useContext(FinderSettings);
 	const {settings} = props;
 
 	const controlButtons = useMemo(() => {

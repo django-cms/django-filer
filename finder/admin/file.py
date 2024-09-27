@@ -126,7 +126,6 @@ class FileAdmin(InodeAdmin):
             file_id=inode.id,
             filename=inode.file_name,
             file_mime_type=inode.mime_type,
-            react_component='Common',
         )
         if inode.labels.model.objects.exists():
             settings['labels'] = [

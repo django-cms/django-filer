@@ -26,7 +26,7 @@ function SelectLabels(props) {
 	const defaultValues = useMemo(() => {
 		const defaultValues = [];
 		if (settings.labels) {
-			let labelsElement = document.getElementById('id_labels');
+			let labelsElement = document.getElementById('id_labels') ?? settings.mainContent.querySelector('#id_labels');
 			if (labelsElement instanceof HTMLSelectElement) {
 				// extract selected values from the original <select multiple name="labels"> element
 				for (const option of labelsElement.selectedOptions) {

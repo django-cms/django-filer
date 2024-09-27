@@ -1,17 +1,25 @@
 import React, {useContext, useEffect, useMemo, useRef, lazy, Suspense} from 'react';
 import {FinderSettings} from './FinderSettings';
 import {FolderTabs} from './FolderTabs';
+import {FileDetails} from './FileDetails';
 
 
 export function FileAdmin() {
 	const settings = useContext(FinderSettings);
 	const FileEditor = useMemo(() => {
-		const component = `./components/editor/${settings.react_component}.js`;
-		const LazyItem = lazy(() => import(component));
+		if (settings.react_component) {
+			const component = `./components/editor/${settings.react_component}.js`;
+			const LazyItem = lazy(() => import(component));
+			return (props) => (
+				<Suspense fallback={<span>{gettext("Loading...")}</span>}>
+					<LazyItem {...props} />
+				</Suspense>
+			);
+		}
 		return (props) => (
-			<Suspense fallback={<span>{gettext("Loading...")}</span>}>
-				<LazyItem {...props} />
-			</Suspense>
+			<FileDetails {...props}>
+				<img src={props.settings.thumbnail_url} />
+			</FileDetails>
 		);
 	}, []);
 	const editorRef = useRef(null);
