@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 
 
-function useSessionStorage(storageKey: string, initial) {
+export function useSessionStorage(storageKey: string, initial) {
 	return () => {
 		const [value, setValue] = useState(
 			JSON.parse(sessionStorage.getItem(storageKey)) ?? initial
@@ -15,7 +15,6 @@ function useSessionStorage(storageKey: string, initial) {
 	};
 }
 
-export const useClipboard = useSessionStorage('filer-clipboard', []);
 
 export function useCookie(key, initial) : [string, (value: string) => any] {
 	const [value, setValue] = useState(

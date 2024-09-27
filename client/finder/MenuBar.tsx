@@ -7,7 +7,7 @@ import React, {
 	Suspense,
 	useMemo
 } from 'react';
-import {useClipboard, useCookie} from './Storage';
+import {useCookie} from './Storage';
 import {SearchField} from './Search';
 import DropDownMenu from './DropDownMenu';
 import MoreVerticalIcon from 'icons/more-vertical.svg';
@@ -21,6 +21,7 @@ import SortAscIcon from 'icons/sort-asc.svg';
 import SortDescIcon from 'icons/sort-desc.svg';
 import CutIcon from 'icons/cut.svg';
 import PasteIcon from 'icons/paste.svg';
+import ClipboardIcon from 'icons/clipboard.svg';
 import TrashIcon from 'icons/trash.svg';
 import EraseIcon from 'icons/erase.svg';
 import AddFolderIcon from 'icons/add-folder.svg';
@@ -145,7 +146,7 @@ function ExtraMenu(props) {
 	}
 
 	return (
-		<DropDownMenu icon={<MoreVerticalIcon/>} tooltip={gettext("Extra options")}>
+		<DropDownMenu className="extra-menu" icon={<MoreVerticalIcon/>} tooltip={gettext("Extra options")}>
 			<li onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
 			</li>
@@ -153,13 +154,13 @@ function ExtraMenu(props) {
 				<DownloadIcon/><span>{gettext("Download selected files")}</span>
 			</li>
 			<li onClick={openUploader}>
-				<UploadIcon/><span>{gettext("Upload files from local host")}</span>
+				<UploadIcon/><span>{gettext("Upload local files")}</span>
 			</li>
 			<li className={numSelectedInodes ? null : "disabled"} onClick={copyInodes}>
 				<CopyIcon/><span>{gettext("Copy selected to clipboard")}</span>
 			</li>
 			<li className={numClippedInodes ? null : "disabled"} onClick={clearClipboard}>
-				<CopyIcon/><span>{gettext("Clear clipboard")}</span>
+				<ClipboardIcon/><span>{gettext("Clear clipboard")}</span>
 			</li>
 			{settings.menu_extensions.map((extension, index) => (
 				<MenuExtension key={index} extension={extension} {...props} />
@@ -176,13 +177,14 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		folderTabsRef,
 		layout,
 		setLayout,
+		clipboard,
+		setClipboard,
+		clearClipboard,
 		setSearchResult,
 		settings
 	} = props;
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
-	const [clipboard, setClipboard] = useClipboard();
-	//const [numClippedInodes, setNumClippedInodes] = useState(clipboard.length);
 
 	useImperativeHandle(forwardedRef, () => ({
 		setSelected: (selectedInodes) => {
@@ -220,11 +222,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	function clearClipboard() {
-		setClipboard([]);
-		// setNumClippedInodes(0);
-	}
-
 	function selectAllInodes() {
 		const current = columnRefs[currentFolderId].current;
 		current.setInodes(current.inodes.map(inode => ({...inode, selected: true, copied: false})));
@@ -243,7 +240,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 				copied: true
 			}));
 			setClipboard(clipboard);
-			// setNumClippedInodes(clipboard.length);
 			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, copied: inode.selected})));
 			setNumSelectedInodes(0);
 			setNumSelectedFiles(0);
@@ -260,7 +256,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 				cutted: true
 			}));
 			setClipboard(clipboard);
-			// setNumClippedInodes(clipboard.length);
 			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, cutted: inode.selected})));
 			setNumSelectedInodes(0);
 			setNumSelectedFiles(0);
@@ -272,12 +267,17 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		let inodeIds = clipboard.filter(inode => inode.copied).map(inode => inode.id);
 		if (inodeIds.length === 0) {
 			inodeIds = clipboard.filter(inode => inode.cutted).map(inode => inode.id);
-			if (inodeIds.length === 0)
+			if (inodeIds.length === 0) {
+				// nothing to paste from clipboard
 				return;
+			}
 			moveInodes = true;
 		}
-		if (inodeIds.length === 0 || clipboard[0].parent === currentFolderId)
+		if (clipboard[0].parent === settings.folder_id) {
+			// pasting into itself doesn't perform anything
 			return;
+		}
+		clearClipboard();
 
 		const fetchUrl = `${settings.base_url}${settings.folder_id}/${moveInodes ? 'move' : 'copy'}`;
 		const response = await fetch(fetchUrl, {
@@ -297,7 +297,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 				}
 			}
 			columnRefs[settings.folder_id].current.setInodes(body.inodes);
-			clearClipboard();
 		} else if (response.status === 409) {
 			alert(await response.text());
 		} else {

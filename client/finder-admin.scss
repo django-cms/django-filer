@@ -144,9 +144,14 @@ $active-rectangle: rgb(210, 210, 112);
 					width: auto;
 				}
 
-				&:last-of-type [role="combobox"] {
+				&.extra-menu [role="combobox"] {
 					right: 0;
 					margin-inline-end: inherit;
+					> li:nth-child(5):not(:last-child) {
+						padding-bottom: 4px;
+						border-bottom: 1px solid lightgrey;
+						margin-bottom: 4px;
+					}
 				}
 
 				svg {

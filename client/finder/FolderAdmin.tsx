@@ -15,7 +15,7 @@ import {
 	useSensors
 } from '@dnd-kit/core';
 import {restrictToWindowEdges} from '@dnd-kit/modifiers';
-import {useCookie} from './Storage';
+import {useCookie, useSessionStorage} from './Storage';
 import {FinderSettings} from './FinderSettings';
 import {FileUploader} from './FileUploader';
 import {FolderTabs} from './FolderTabs';
@@ -28,9 +28,10 @@ import TrashIcon from 'icons/trash.svg';
 import MoreVerticalIcon from 'icons/more-vertical.svg';
 
 const useLayout = (initial: string) => useCookie('django-finder-layout', initial);
+const useClipboard = useSessionStorage('filer-clipboard', []);
 
 
-export function FolderAdmin(props) {
+export function FolderAdmin() {
 	const settings = useContext(FinderSettings);
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
@@ -40,6 +41,7 @@ export function FolderAdmin(props) {
 	const downloadLinkRef = useRef(null);
 	const [currentFolderId, setCurrentFolderId] = useState(settings.folder_id);
 	const [layout, setLayout] = useLayout('tiles');
+	const [clipboard, setClipboard] = useClipboard();
 	const [activeInode, setActiveInode] = useState(null);
 	const [draggedInodes, setDraggedInodes] = useState([]);
 	const [isSearchResult, setSearchResult] = useState<boolean>(() => {
@@ -107,6 +109,15 @@ export function FolderAdmin(props) {
 			columnRef.current?.deselectInodes();
 		});
 		menuBarRef.current?.setSelected([]);
+	}
+
+	function clearClipboard() {
+		setClipboard([]);
+		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
+			columnRef.current?.setInodes(columnRef.current?.inodes.map(inode =>
+				({...inode, cutted: false, copied: false})
+			));
+		});
 	}
 
 	function downloadFiles(inodes) {
@@ -243,6 +254,9 @@ export function FolderAdmin(props) {
 						listRef={columnRefs[settings.folder_id]}
 						menuBarRef={menuBarRef}
 						layout={layout}
+						clipboard={clipboard}
+						setClipboard={setClipboard}
+						clearClipboard={clearClipboard}
 						settings={settings}
 					/>
 				</SelectableArea>
@@ -293,6 +307,9 @@ export function FolderAdmin(props) {
 									menuBarRef={menuBarRef}
 									folderTabsRef={folderTabsRef}
 									layout={layout}
+									clipboard={clipboard}
+									setClipboard={setClipboard}
+									clearClipboard={clearClipboard}
 									settings={settings}
 								/>
 							</DroppableArea>
@@ -335,6 +352,9 @@ export function FolderAdmin(props) {
 			downloadFiles={downloadFiles}
 			layout={layout}
 			setLayout={setLayout}
+			clipboard={clipboard}
+			setClipboard={setClipboard}
+			clearClipboard={clearClipboard}
 			setSearchResult={setSearchResult}
 			settings={settings}
 		/>
