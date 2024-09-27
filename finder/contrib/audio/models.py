@@ -24,11 +24,6 @@ class AudioFileModel(FileModel):
         proxy = True
         app_label = 'finder'
 
-    @classmethod
-    def get_menu_extension(cls):
-        # TODO: move this to ZIPFileModel
-        return {'component': 'Audio'}
-
     def get_sample_url(self):
         sample_start = self.meta_data.get('sample_start', 0)
         sample_duration = self.meta_data.get('sample_duration', SAMPLE_DURATION)

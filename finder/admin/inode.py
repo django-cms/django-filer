@@ -138,8 +138,8 @@ class InodeAdmin(admin.ModelAdmin):
                 }
 
                 # search model admin for current inode and get its rendering settings
-                for model in obj.__class__.__mro__:
-                    if model_admin := self.admin_site._registry.get(model):
+                for base_model in obj.__class__.__mro__:
+                    if model_admin := self.admin_site._registry.get(base_model):
                         values.update(model_admin.get_folderitem_settings(request, obj))
                         break
 
@@ -245,3 +245,10 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_folderitem_settings(self, request, inode):
         return {}
+
+    def get_menu_extension_settings(self, request):
+        """
+        Hook to return the React context for extending menu items specific to this model.
+        """
+        return {}
+

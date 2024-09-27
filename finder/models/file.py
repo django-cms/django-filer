@@ -167,13 +167,6 @@ class AbstractFileModel(InodeModel):
         """
         return self.fallback_thumbnail_url
 
-    @classmethod
-    def get_menu_extension(cls):
-        """
-        Hook to return the React context for extending menu items specific to this model.
-        """
-        return {}
-
     @cached_property
     def mime_maintype(self):
         return self.mime_type.split('/')[0]

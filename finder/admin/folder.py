@@ -136,17 +136,19 @@ class FolderAdmin(InodeAdmin):
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             ancestors=ancestor_ids,
             legends=self._legends,
-            menu_extensions=self.menu_extensions,
+            menu_extensions=self.get_menu_extension_settings(request),
         )
         return settings
 
-    @cached_property
-    def menu_extensions(self):
+    def get_menu_extension_settings(self, request):
         extensions = []
         for model in InodeModel.file_models:
-            extension = model.get_menu_extension()
-            if extension.get('component'):
-                extensions.append(extension)
+            for base_model in model.__mro__:
+                if model_admin := self.admin_site._registry.get(base_model):
+                    extension = model_admin.get_menu_extension_settings(request)
+                    if extension.get('component'):
+                        extensions.append(extension)
+                    break
         return extensions
 
     def get_model_admin(self, mime_type):
