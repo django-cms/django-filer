@@ -5,7 +5,7 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 
@@ -164,6 +164,22 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             names.extend(a.name for a in self.parent.ancestrors)
         names.append(self.name)
         return " / ".join(names)
+
+    def serializable_labels(self):
+        return [
+            {'value': id, 'label': name, 'color': color}
+            for id, name, color in self.labels.model.objects.values_list('id', 'name', 'color')
+        ]
+
+    def serializable_value(self, field_name):
+        data = super().serializable_value(field_name)
+        if field_name in ['id', 'parent']:
+            return str(data)
+        if field_name in ['created_at', 'last_modified_at']:
+            return data.isoformat()
+        if field_name == 'labels':
+            return self.serializable_labels()
+        return data
 
 
 class DiscardedInode(models.Model):
