@@ -11,7 +11,7 @@ await build({
     'client/file-admin.tsx',
     'client/components/editor/*.tsx',
     'client/components/folderitem/*.tsx',
-    'client/components/menu/*.tsx',
+    'client/components/menuextension/*.tsx',
   ],
   bundle: true,
   minify: buildOptions.minify,

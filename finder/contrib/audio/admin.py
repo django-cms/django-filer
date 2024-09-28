@@ -45,8 +45,3 @@ class AudioAdmin(FileAdmin):
             sample_url=inode.get_sample_url(),
         )
         return settings
-
-    def get_menu_extension_settings(self, request):
-        # TODO: move this to ZIPFileModel
-        return {'component': 'Audio'}
-

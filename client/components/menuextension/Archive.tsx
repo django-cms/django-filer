@@ -2,9 +2,7 @@ import React from 'react';
 import ArchiveIcon from 'icons/archive.svg';
 
 
-export default function Audio(props) {
-	console.log(props);
-
+export default function Archive(props) {
 	function archiveSelectedIcons() {
 		console.log("archiveSelectedIcons", props);
 	}
