@@ -300,15 +300,20 @@ $active-rectangle: rgb(210, 210, 112);
 		}
 
 		.column-droppable {
-			&.drag-over ul.inode-list {
-				background-color: rgb(121, 174, 200);
-				> li:nth-child(even) {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+
+			&.drag-over {
+				background-color: rgb(190, 221, 236);
+
+				ul.inode-list > li:nth-child(even) {
 					background-color: inherit;
 				}
 			}
 		}
 
-		.inode-list {
+		ul.inode-list {
 			> li {
 				&.dragging .inode, &.cutted .inode {
 					outline: 1px dashed grey;
