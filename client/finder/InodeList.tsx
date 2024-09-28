@@ -131,8 +131,8 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 		}
 		const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
 		setInodes(modifiedInodes);
-		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
 		setCurrentFolder(folderId);
+		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
 		setSelectedIndex(selectedIndex);
 	}
 
