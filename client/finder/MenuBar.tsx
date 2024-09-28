@@ -5,7 +5,7 @@ import React, {
 	useEffect,
 	lazy,
 	Suspense,
-	useMemo
+	useMemo, createRef
 } from 'react';
 import {useCookie} from './Storage';
 import {SearchField} from './Search';
@@ -81,10 +81,8 @@ function SortingOptionsItem(props: any) {
 
 
 function MenuExtension(props) {
-	console.log(props)
-
 	const MenuComponent = useMemo(() => {
-		const component = `./components/menu/${props.extension.component}.js`;
+		const component = `./components/menuextension/${props.extension.component}.js`;
 		const LazyItem = lazy(() => import(component));
 		return (props) => (
 			<Suspense>
@@ -117,8 +115,8 @@ function ExtraMenu(props) {
 		const folderName = window.prompt("Enter folder name");
 		if (!folderName)
 			return;
-		const addFolderUrl = `${settings.base_url}${settings.folder_id}/add_folder`;
-		const response = await fetch(addFolderUrl, {
+		const fetchUrl = `${settings.base_url}${settings.folder_id}/add_folder`;
+		const response = await fetch(fetchUrl, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -131,7 +129,7 @@ function ExtraMenu(props) {
 		if (response.ok) {
 			const current = columnRefs[settings.folder_id].current;
 			const body = await response.json();
-			current.setInodes([...current.inodes, body.new_folder]);  // adds new folder to the end of the list
+			current.setInodes([...current.inodes, {...body.new_folder, elementRef: createRef()}]);  // adds new folder to the end of the list
 		} else if (response.status === 409) {
 			alert(await response.text());
 		} else {
@@ -296,7 +294,9 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 					current.setInodes(current.inodes.filter(inode => inodeIds.find(id => id !== inode.id)));
 				}
 			}
-			columnRefs[settings.folder_id].current.setInodes(body.inodes);
+			columnRefs[settings.folder_id].current.setInodes(
+				body.inodes.map(inode => ({...inode, elementRef: createRef()}))
+			);
 		} else if (response.status === 409) {
 			alert(await response.text());
 		} else {
