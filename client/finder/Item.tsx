@@ -87,12 +87,12 @@ function StaticFigure(props) {
 export function FigureLabels(props) {
 	return (
 		<div>
-			<div className="figure-labels">
-			{props.labels?.map(label => (
-				<span key={label.id} style={{backgroundColor: label.color}}>{label.label}</span>
-			))}
-			</div>
 			{props.children}
+			<div className="figure-labels">
+				{props.labels?.map(label => (
+				<span key={label.id} style={{backgroundColor: label.color}}>{label.label}</span>
+				))}
+			</div>
 		</div>
 	);
 }
@@ -221,7 +221,9 @@ export function ListItem(props) {
 			return (<>
 				<div>
 					<FigBody {...props}>
-						<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+						<FigureLabels labels={props.labels}>
+							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+						</FigureLabels>
 					</FigBody>
 				</div>
 				<div>

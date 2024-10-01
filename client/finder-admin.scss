@@ -633,18 +633,35 @@ $active-rectangle: rgb(210, 210, 112);
 
 				div {
 					&:has(img, video) {
-						text-align: center;
+						display: flex;
+						justify-content: center;
 
-						img,div:has(>div>video) {
-							width: 60px;
+						img, div:has(>div>video) {
 							height: 60px;
-							display: inline-block;
 						}
 					}
 
 					&:has(> .inode-name) {
 						overflow: hidden;
 						padding-right: 1rem;
+					}
+				}
+
+				.figure-labels {
+					display: inline-flex;
+					width: 15px;
+					height: 60px;
+					overflow: hidden;
+					flex-direction: column;
+					align-items: end;
+					padding-top: 4px;
+
+					span {
+						width: 10px;
+						height: 10px;
+						display: block;
+						border-radius: 50%;
+						margin-top: -3px;
 					}
 
 				}
