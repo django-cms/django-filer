@@ -47,6 +47,7 @@ class FileModelManager(InodeManager):
                     return model
             return None
 
+        assert isinstance(mime_type, str) and '/' in mime_type, "MIME-Type must be in format “string/string”"
         if model := lookup(mime_type):
             return model
         if model := lookup('/'.join((mime_type.split('/')[0], '*'))):

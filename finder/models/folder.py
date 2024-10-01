@@ -153,6 +153,9 @@ class FolderModel(InodeModel):
         return staticfiles_storage.url('filer/icons/folder.svg')
 
     def listdir(self, **lookup):
+        """
+        List all inodes belonging to this folder.
+        """
         return self._meta.model.objects.filter_inodes(parent=self, **lookup)
 
     def copy_to(self, folder, **kwargs):
@@ -186,6 +189,19 @@ class FolderModel(InodeModel):
         if self.name in ['__root__', '__trash__']:
             msg = gettext("Folder name “{name}” is reserved.")
             raise ValidationError(msg.format(name=self.name))
+
+    def retrieve(self, path):
+        """
+        Retrieve an inode specified by the given path object.
+        """
+        if isinstance(path, str):
+            path = path.split('/')
+        for part in path:
+            if inodes := self.listdir(name=part):
+                return next(inodes).retrieve(path[1:])
+            return None
+        else:
+            return self
 
 
 class PinnedFolder(models.Model):

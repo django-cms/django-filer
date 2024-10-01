@@ -59,7 +59,18 @@ class FileAdmin(InodeAdmin):
             ),
         ]
         urls.extend(super().get_urls())
+        for model in FileModel.file_models:
+            if model_admin := self.admin_site._registry.get(model):
+                urls.extend(model_admin.get_editor_urls())
         return urls
+
+    def get_editor_urls(self):
+        # Hook to add custom endpoints for the editor view of the current file object.
+        return []
+
+    def get_menu_extension_urls(self):
+        # Hook to add custom endpoints for the folder view for all registered file models.
+        return []
 
     @admin.display(description=_("Details"))
     def details(self, obj):
@@ -97,7 +108,7 @@ class FileAdmin(InodeAdmin):
         file_obj.save()
         return HttpResponse(f"Replaced content of {file_obj.name} successfully.")
 
-    def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         has_editable_inline_admin_formsets = False
         for inline in context['inline_admin_formsets']:
             if inline.has_add_permission or inline.has_change_permission or inline.has_delete_permission:
