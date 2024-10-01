@@ -175,6 +175,7 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		folderTabsRef,
 		layout,
 		setLayout,
+		deselectAll,
 		clipboard,
 		setClipboard,
 		clearClipboard,
@@ -221,11 +222,12 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 	}
 
 	function selectAllInodes() {
+		clearClipboard();
+		deselectAll();
 		const current = columnRefs[currentFolderId].current;
 		current.setInodes(current.inodes.map(inode => ({...inode, selected: true, copied: false})));
 		setNumSelectedInodes(current.inodes.length);
 		setNumSelectedFiles(current.inodes.filter(inode => !inode.is_folder).length);
-		clearClipboard();
 	}
 
 	function copyInodes() {

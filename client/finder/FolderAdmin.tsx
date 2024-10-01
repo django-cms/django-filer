@@ -352,6 +352,7 @@ export function FolderAdmin() {
 			downloadFiles={downloadFiles}
 			layout={layout}
 			setLayout={setLayout}
+			deselectAll={deselectAll}
 			clipboard={clipboard}
 			setClipboard={setClipboard}
 			clearClipboard={clearClipboard}
