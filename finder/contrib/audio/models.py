@@ -2,7 +2,6 @@ from pathlib import Path
 
 from django.core.files.storage import default_storage
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.utils.functional import classproperty
 
 from filer import settings as filer_settings
 from finder.models.file import FileModel

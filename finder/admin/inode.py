@@ -138,10 +138,8 @@ class InodeAdmin(admin.ModelAdmin):
                 }
 
                 # search model admin for current inode and get its rendering settings
-                for base_model in obj.__class__.__mro__:
-                    if model_admin := self.admin_site._registry.get(base_model):
-                        values.update(model_admin.get_folderitem_settings(request, obj))
-                        break
+                if model_admin := self.admin_site._registry.get(obj.__class__):
+                    values.update(model_admin.get_folderitem_settings(request, obj))
 
                 if 'labels' in data_fields:
                     values['labels'] = list(obj.labels.values('id', 'name', 'color'))
