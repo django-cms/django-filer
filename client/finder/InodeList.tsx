@@ -32,9 +32,6 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 		async fetchInodes() {
 			await fetchInodes();
 		},
-		async addFolder() {
-			await addFolder();
-		},
 	}));
 
 	async function fetchInodes() {
@@ -56,30 +53,6 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 			console.error(response);
 		}
 		setLoading(false);
-	}
-
-	async function addFolder() {
-		const folderName = window.prompt("Enter folder name");
-		if (!folderName)
-			return;
-		const addFolderUrl = `${settings.base_url}${settings.folder_id}/add_folder`;
-		const response = await fetch(addFolderUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': settings.csrf_token,
-			},
-			body: JSON.stringify({
-				name: folderName,
-			}),
-		});
-		if (response.ok) {
-			const body = await response.json();
-			setInodes([...inodes, {...body.new_folder, elementRef: createRef()}]);
-		} else {
-			console.error(response);
-			return;
-		}
 	}
 
 	function selectInode(event: PointerEvent, inode) {
