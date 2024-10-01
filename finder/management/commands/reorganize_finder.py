@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.db.models.expressions import Value
-from django.db.models.fields import BooleanField
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from finder.models.file import FileModel
 from finder.models.inode import InodeModel
@@ -23,6 +22,11 @@ class Command(BaseCommand):
                 if not issubclass(file_model, file.__class__):
                     self.stdout.write(f"Reorganize file {file}")
                     if not file_model.objects.filter(id=file.id).exists():
-                        kwargs = {attr.name: getattr(file, attr.name) for attr in file._meta.get_fields()}
+                        kwargs = {}
+                        for attr in file._meta.get_fields():
+                            if isinstance(attr, ForeignKey):
+                                kwargs[attr.name] = getattr(file, attr.name)
+                            elif not isinstance(attr, ManyToManyField):
+                                kwargs[attr.name] = attr.value_from_object(file)
                         file_model.objects.create(**kwargs)
                     file.delete()
