@@ -87,6 +87,9 @@ class FolderAdmin(InodeAdmin):
             ),
         ]
         urls.extend(default_urls)
+        for model in InodeModel.file_models:
+            if model_admin := self.admin_site._registry.get(model):
+                urls.extend(model_admin.get_menu_extension_urls())
         return urls
 
     def has_add_permission(self, request):
@@ -143,12 +146,10 @@ class FolderAdmin(InodeAdmin):
     def get_menu_extension_settings(self, request):
         extensions = []
         for model in InodeModel.file_models:
-            for base_model in model.__mro__:
-                if model_admin := self.admin_site._registry.get(base_model):
+            if model_admin := self.admin_site._registry.get(model):
                     extension = model_admin.get_menu_extension_settings(request)
                     if extension.get('component'):
                         extensions.append(extension)
-                    break
         return extensions
 
     def get_model_admin(self, mime_type):
@@ -296,14 +297,17 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseBadRequest("Cannot move inodes from trash folder into itself.")
         inode_ids = body.get('inode_ids', [])
         for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
+            if inode.is_folder:
+                PinnedFolder.objects.filter(folder=inode).delete()
+                while next(trash_folder.listdir(name=inode.name, is_folder=True), None):
+                    inode.name = f"{inode.name}.renamed"
+                    inode.save(update_fields=['name'])
             DiscardedInode.objects.create(
                 inode=inode.id,
                 previous_parent=inode.parent,
             )
             inode.parent = trash_folder
             inode.save(update_fields=['parent'])
-            if inode.is_folder:
-                PinnedFolder.objects.filter(folder=inode).delete()
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
