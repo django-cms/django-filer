@@ -97,13 +97,15 @@ class FolderModel(InodeModel):
     @cached_property
     def descendants(self):
         """
-        Returns a queryset of all descendant folders including the current folder.
+        Returns an iterable of all descendant folders including the current folder.
+        If django-cte is installed return a CTE queryset. Otherwise, return a generator containing the descendant
+        folders of the current folder.
         """
-        def traverse(folder):
-            for inode in folder.listdir():
+        def traverse(parent):
+            yield parent
+            for inode in FolderModel.objects.filter(parent=parent):
                 if inode.is_folder:
                     yield from traverse(inode)
-            yield folder
 
         def make_descendant_cte(cte):
             return self.__class__.objects.filter(
