@@ -112,7 +112,7 @@ function ExtraMenu(props) {
 	} = props;
 
 	async function addFolder() {
-		const folderName = window.prompt("Enter folder name");
+		const folderName = window.prompt(gettext("Enter folder name"));
 		if (!folderName)
 			return;
 		const fetchUrl = `${settings.base_url}${settings.folder_id}/add_folder`;
@@ -212,8 +212,8 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 			}
 		};
 		window.addEventListener('keydown', handleKeyboardEvents);
-		return () => window.removeEventListener('click', handleKeyboardEvents);
-	}, []);
+		return () => window.removeEventListener('keydown', handleKeyboardEvents);
+	}, [currentFolderId]);
 
 	function confirmEraseTrashFolder() {
 		if (window.confirm("Erase all files in the trash folder?")) {
