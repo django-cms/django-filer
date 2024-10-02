@@ -638,6 +638,7 @@ $active-rectangle: rgb(210, 210, 112);
 
 						img, div:has(>div>video) {
 							height: 60px;
+							align-self: center;
 						}
 					}
 
