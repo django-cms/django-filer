@@ -12,7 +12,6 @@ export default function Archive(props) {
 			([_, colRef]) => colRef.current?.inodes.find(inode => inode.selected)
 		);
 		const selectedInodeIds = columnRef.current?.inodes.filter(inode => inode.selected).map(inode => inode.id) ?? [];
-		console.log("archiveSelectedIcons", selectedInodeIds);
 		if (selectedInodeIds.length > 0) {
 			const fetchUrl = `${settings.base_url}${folderId}/archive`;
 			const response = await fetch(fetchUrl, {

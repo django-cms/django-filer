@@ -29,7 +29,7 @@ export function DraggableItem(props) {
 					props.listRef.current.selectInode(event, props);
 				} else {
 					// presumably a triple click, could be used to edit folder details
-					console.log('selectInode', event.detail);
+					console.debug('selectInode', event.detail);
 				}
 			}, 150);
 
