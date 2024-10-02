@@ -206,7 +206,7 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 			} else if (event.key === 'v' && (event.ctrlKey || event.metaKey || event.altKey)) {
 				event.preventDefault();
 				pasteInodes();
-			} else if (['Backspace', 'Delete'].includes(event.key) && event.shiftKey) {
+			} else if (['Backspace', 'Delete'].includes(event.key)) {
 				event.preventDefault();
 				deleteInodes();
 			}
