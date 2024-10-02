@@ -8,7 +8,6 @@ from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.templatetags.static import static
 from django.urls import path, reverse
-from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
 from django.utils.html import format_html
 
