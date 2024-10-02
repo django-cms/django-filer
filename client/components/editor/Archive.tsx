@@ -7,7 +7,6 @@ export default function Archive(props) {
 	const {settings} = props;
 
 	async function extractArchive() {
-		console.log("extract archive", props);
 		const fetchUrl = `${settings.base_url}${settings.file_id}/unarchive`;
 		const response = await fetch(fetchUrl, {
 			method: 'POST',

@@ -1,11 +1,12 @@
 import hashlib
+import json
 import mimetypes
-from pathlib import Path
+import pathlib
 import zipfile
 
 from django.contrib import admin
 from django.core.files.storage import default_storage
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.urls import path
 from django.utils.translation import gettext
 
@@ -39,18 +40,60 @@ class ArchiveAdmin(FileAdmin):
         urls.extend(super().get_menu_extension_urls())
         return urls
 
-    # def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
-    #     context.update(
-    #         unarchive_url=reverse('admin:finder_archive_unarchive_file', args=[obj.pk]) if obj else '',
-    #     )
-    #     return super().render_change_form(request, context, add, change, form_url, obj)
-
     def archive_selected(self, request, folder_id):
         if request.method != 'POST':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if not (folder_obj := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
-        return HttpResponse(f"Archived successfully.")
+        body = json.loads(request.body)
+        if len(body.get('archive_name', '')) < 1 or len(body.get('inode_ids', [])) < 1:
+            return HttpResponseBadRequest("Archive name and inode IDs are required")
+
+        inode_objects = []
+        for inode_id in body['inode_ids']:
+            try:
+                inode_obj = FolderModel.objects.get_inode(id=inode_id)
+            except FolderModel.DoesNotExist:
+                return HttpResponseBadRequest(f"Inode with ID “{inode_id}” not found")
+            else:
+                inode_objects.append(inode_obj)
+                if inode_obj.is_folder:
+                    for descendant in inode_obj.descendants:
+                        inode_objects.extend(descendant.listdir())
+
+        filename = self.model.generate_filename(body['archive_name'])
+        filename = f'{filename}.zip' if not filename.endswith('.zip') else filename
+        zip_file_obj = self.model.objects.create(
+            name=body['archive_name'],
+            parent=folder_obj,
+            file_name=filename,
+            mime_type='application/zip',
+            owner=request.user,
+            file_size=0,
+        )
+        (default_storage.base_location / zip_file_obj.file_path.parent).mkdir(parents=True, exist_ok=True)
+        offset = len(folder_obj.ancestors)
+        with zipfile.ZipFile(default_storage.path(zip_file_obj.file_path), 'w') as zip_ref:
+            for inode_obj in inode_objects:
+                ancestors = list(inode_obj.ancestors)
+                ancestors.reverse()
+                parts = [inode.name for inode in ancestors[offset:]]
+                if inode_obj.is_folder:
+                    zip_ref.mkdir('/'.join(parts))
+                else:
+                    parts.append(inode_obj.name)
+                    zip_ref.write(default_storage.path(inode_obj.file_path), '/'.join(parts))
+        zip_path = pathlib.Path(zip_ref.filename)
+        zip_file_obj.file_size = zip_path.stat().st_size
+        sha1 = hashlib.sha1()
+        with zip_path.open('rb') as zip_file:
+            for chunk in iter(lambda: zip_file.read(4096), b''):
+                sha1.update(chunk)
+        zip_file_obj.sha1 = sha1.hexdigest()
+        zip_file_obj.save(update_fields=['file_size', 'sha1'])
+        return JsonResponse({
+            'new_file': self.serialize_inode(zip_file_obj),
+        })
 
     def unarchive_file(self, request, file_id):
         if request.method != 'POST':
@@ -60,7 +103,7 @@ class ArchiveAdmin(FileAdmin):
         if FolderModel.objects.filter(
             name=zip_file_obj.name,
             parent=zip_file_obj.folder,
-            site=self.admin_site.name
+            site=self.admin_site.name,
         ).exists():
             msg = gettext("Can not extract archive. A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=zip_file_obj.name), status=409)
