@@ -100,15 +100,15 @@ export function FolderAdmin() {
 	function setCurrentFolder(folderId) {
 		if (folderId !== currentFolderId) {
 			deselectAll();
+			setCurrentFolderId(folderId);
 		}
-		setCurrentFolderId(folderId);
 	}
 
 	function deselectAll(event?) {
 		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
 			columnRef.current?.deselectInodes();
 		});
-		menuBarRef.current?.setSelected([]);
+		menuBarRef.current.setSelected([]);
 	}
 
 	function clearClipboard() {
