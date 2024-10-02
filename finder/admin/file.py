@@ -139,5 +139,8 @@ class FileAdmin(InodeAdmin):
             file_mime_type=inode.mime_type,
         )
         if inode.labels.model.objects.exists():
-            settings['labels'] = inode.serializable_labels()
+            settings['labels'] = [
+                {'value': id, 'label': name, 'color': color}
+                for id, name, color in inode.labels.model.objects.values_list('id', 'name', 'color')
+            ]
         return settings

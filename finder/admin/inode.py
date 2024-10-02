@@ -141,9 +141,7 @@ class InodeAdmin(admin.ModelAdmin):
                 if model_admin := self.admin_site._registry.get(obj.__class__):
                     values.update(model_admin.get_folderitem_settings(request, obj))
 
-                if 'labels' in data_fields:
-                    values['labels'] = list(obj.labels.values('id', 'name', 'color'))
-                values.update({field: getattr(obj, field) for field in data_fields if field not in values})
+                values.update({field: obj.serializable_value(field) for field in data_fields if field not in values})
                 inodes.append(values)
 
         if applicable_sorting:

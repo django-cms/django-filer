@@ -153,7 +153,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     @property
     def ancestors(self):
         """
-        Returns a queryset of all ancestor folders starting from the parent folder.
+        Returns an iterable of all ancestor folders starting from the parent folder.
         """
         return self.parent.ancestors
 
@@ -161,15 +161,9 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     def pretty_path(self):
         names = []
         if self.parent:
-            names.extend(a.name for a in self.parent.ancestrors)
+            names.extend(a.name for a in self.parent.ancestors)
         names.append(self.name)
         return " / ".join(names)
-
-    def serializable_labels(self):
-        return [
-            {'value': id, 'label': name, 'color': color}
-            for id, name, color in self.labels.model.objects.values_list('id', 'name', 'color')
-        ]
 
     def serializable_value(self, field_name):
         data = super().serializable_value(field_name)
@@ -178,7 +172,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         if field_name in ['created_at', 'last_modified_at']:
             return data.isoformat()
         if field_name == 'labels':
-            return self.serializable_labels()
+            return list(self.labels.values('id', 'name', 'color'))
         return data
 
 
