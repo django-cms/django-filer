@@ -403,10 +403,7 @@ $active-rectangle: rgb(210, 210, 112);
 
 	.progress-overlay {
 		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+		inset: 0;
 		z-index: 1;
 		background-color: rgba(255, 255, 255, 0.75);
 		display: flex;
@@ -572,9 +569,7 @@ $active-rectangle: rgb(210, 210, 112);
 		gap: 10px;
 
 		li .inode .figure-labels {
-			top: 5px;
-			left: 5px;
-			right: 5px;
+			inset: 5px;
 			span {
 				width: 12px;
 				height: 12px;
@@ -594,8 +589,8 @@ $active-rectangle: rgb(210, 210, 112);
 		gap: 5px;
 
 		li .inode .figure-labels {
-			left: 3px;
-			right: 3px;
+			inset: -2px 2px auto 2px;
+
 			span {
 				width: 8px;
 				height: 8px;
