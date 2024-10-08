@@ -38,8 +38,8 @@ function SelectionRectangle(props) {
 
 
 export function SelectableArea(props) {
-	const acceleration = 3;  // the lower, the faster
-	const edgeSize = 15;  // the size of the area near the edge where scrolling starts
+	const edgeSize = 16;  // the size of the area near the upper and lower edge where scrolling starts
+	const acceleration = 40;  // accelerate scrolling the nearer the cursor reaches one of the edges
 	const {columnRef} = props;
 	const areaRef = useRef(null);
 	const scrollableRef = useRef(null);
@@ -84,7 +84,7 @@ export function SelectableArea(props) {
 			scrollableRef.current.scrollTop++;
 		}
 		if (timeout < edgeSize) {
-			setTimeoutHandler(setTimeout(() => handleAutoScroll(event), acceleration * timeout));
+			setTimeoutHandler(setTimeout(() => handleAutoScroll(event), 100 * timeout / acceleration));
 		}
 	}
 

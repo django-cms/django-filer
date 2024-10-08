@@ -297,6 +297,7 @@ export function FolderAdmin() {
 								id={`column:${folderId}`}
 								className="column-droppable"
 								currentId={`column:${currentFolderId}`}
+								dragging={draggedInodes.length !== 0}
 							>
 								<InodeList
 									ref={columnRefs[folderId]}
