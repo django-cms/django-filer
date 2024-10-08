@@ -462,7 +462,7 @@ $active-rectangle: rgb(210, 210, 112);
 			&.selected {
 				box-shadow: inset  0 0 0.5rem var(--accent);
 				outline: 1px dotted var(--accent);
-				background-color: var(--selected-row);
+				background-color: rgb(from var(--selected-row) r g b / 50%);
 			}
 
 			&.disabled {
