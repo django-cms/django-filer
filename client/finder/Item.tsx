@@ -20,24 +20,22 @@ export function DraggableItem(props) {
 	});
 	const [event, setEvent] = useState<PointerEvent>(null);
 
-	useEffect(
-		() => {
-			if (!event)
-				return;
-			const timer = setTimeout(() => {
-				if (event.detail === 1 || event.detail === 2) {
-					props.listRef.current.selectInode(event, props);
-				} else {
-					// presumably a triple click, could be used to edit folder details
-					console.debug('selectInode', event.detail);
-				}
-			}, 150);
+	useEffect(() => {
+		if (!event)
+			return;
+		const timer = setTimeout(() => {
+			if (event.detail === 1 || event.detail === 2) {
+				props.listRef.current.selectInode(event, props);
+			} else {
+				// presumably a triple click, could be used to edit folder details
+				console.debug('selectInode', event.detail);
+			}
+		}, 200);
 
-			return () => {
-				clearTimeout(timer);
-			};
-		}, [event]
-	);
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [event]);
 
 	function cssClasses() {
 		let classes = [];
