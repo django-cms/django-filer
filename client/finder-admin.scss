@@ -633,7 +633,7 @@ $active-rectangle: rgb(210, 210, 112);
 						display: flex;
 						justify-content: center;
 
-						img, div:has(>div>video) {
+						img, div:has(>video) {
 							height: 60px;
 							align-self: center;
 						}
@@ -704,6 +704,8 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.columns ul.inode-list {
+		margin-top: 0.25rem;
+
 		>li:has(>div>div.parent) {
 			border-top: $follow-folder-border;
 			border-left: $follow-folder-border;
