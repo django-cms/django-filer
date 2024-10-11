@@ -208,7 +208,6 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 				event.preventDefault();
 				pasteInodes();
 			} else if (['Backspace', 'Delete'].includes(event.key)) {
-				event.preventDefault();
 				deleteInodes();
 			}
 		};
