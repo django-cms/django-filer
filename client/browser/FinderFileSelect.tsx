@@ -9,6 +9,7 @@ import React, {
 	useState,
 } from 'react';
 import FigureLabels from '../finder/FigureLabels';
+import FileUploader	 from '../finder/FileUploader';
 import ArrowDownIcon from '../icons/arrow-down.svg';
 import ArrowRightIcon from '../icons/arrow-right.svg';
 import EmptyIcon from '../icons/empty.svg';
@@ -179,11 +180,18 @@ export default function FinderFileSelect(props) {
 		}
 	}
 
+	function handleUpload(folderId) {
+		folderListRef.current.fetchFiles
+	}
+
 	return structure.root_folder && (<>
 		<ul className="folder-structure">
 			<FolderStructure baseUrl={baseUrl} folder={structure.root_folder} folderListRef={folderListRef} refreshStructure={() => {
 				setStructure({...structure});
 			}}/>
 		</ul>
+		<FileUploader folderId={structure.root_folder} handleUpload={handleUpload}>
+			<FolderList baseUrl={baseUrl} files={structure.files} ref={folderListRef} />
+		</FileUploader>
 	</>);
 }

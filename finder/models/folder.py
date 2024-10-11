@@ -80,6 +80,10 @@ class FolderModel(InodeModel):
         return self
 
     @property
+    def subfolders(self):
+        return FolderModel.objects.filter(parent=self)
+
+    @property
     def num_children(self):
         num_children = sum(inode_model.objects.filter(parent=self).count() for inode_model in InodeModel.real_models)
         return num_children

@@ -18,9 +18,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import HttpResponse
 from django.template.loader import get_template
-from django.urls import path
+from django.urls import include, path
 
-from testapp.admin_site import admin_site
+from finder.api import urls as finder_urls
 
 
 def render_landing(request):
@@ -31,7 +31,7 @@ def render_landing(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('testapp/admin/', admin_site.urls),
+    path('finder-api/', include(finder_urls)),
     path('testapp/', render_landing),
 ]
 if settings.DEBUG:
