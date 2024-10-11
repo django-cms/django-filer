@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import admin
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
@@ -11,7 +12,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 
 from finder.models.file import AbstractFileModel, InodeModel
-from finder.models.folder import FolderModel, PinnedFolder
+from finder.models.folder import FolderModel, PinnedFolder, RealmModel
 
 
 class InodeAdmin(admin.ModelAdmin):
@@ -38,12 +39,13 @@ class InodeAdmin(admin.ModelAdmin):
         return urls
 
     def get_object(self, request, object_id, from_field=None):
+        site = get_current_site(request)
         for model in InodeModel.real_models:
             try:
                 obj = model.objects.get(id=object_id)
-                if obj.is_folder and obj.site == self.admin_site.name:
+                if obj.is_folder and obj.realm.site == site and obj.realm.slug == self.admin_site.name:
                     return obj
-                elif obj.folder.site == self.admin_site.name:
+                elif obj.folder.realm.site == site and obj.folder.realm.slug == self.admin_site.name:
                     return obj.casted
             except model.DoesNotExist:
                 pass
@@ -99,12 +101,23 @@ class InodeAdmin(admin.ModelAdmin):
             data.update(is_root=inode.is_root)
         return data
 
+    def get_realm(self, request):
+        realm, _ = RealmModel.objects.get_or_create(site=get_current_site(request), slug=self.admin_site.name)
+        return realm
+
+    def get_root_folder(self, request):
+        return FolderModel.objects.get_root_folder(self.get_realm(request))
+
+    def get_trash_folder(self, request):
+        return FolderModel.objects.get_trash_folder(self.get_realm(request), request.user)
+
     def get_fallback_folder(self, request):
+        realm = self.get_realm(request)
         try:
             last_folder_id = request.session['finder_last_folder_id']
-            return FolderModel.objects.get(id=last_folder_id, site=self.admin_site.name)
-        except (FolderModel.DoesNotExist, KeyError, ValidationError):
-            return FolderModel.objects.get_root_folder(self.admin_site.name)
+            return FolderModel.objects.get(id=last_folder_id, realm=realm)
+        except (FolderModel.DoesNotExist, KeyError):
+            return FolderModel.objects.get_root_folder(realm)
 
     def get_inodes(self, request, sorting=None, **lookup):
         """
@@ -161,9 +174,10 @@ class InodeAdmin(admin.ModelAdmin):
         return breadcrumbs
 
     def get_favorite_folders(self, request, current_folder):
+        realm = self.get_realm(request)
         folders = PinnedFolder.objects.filter(
             owner=request.user,
-            folder__site=self.admin_site.name,
+            folder__realm__id=realm.id,
         ).values(
             'folder__id',
             'folder__name',
@@ -181,8 +195,8 @@ class InodeAdmin(admin.ModelAdmin):
             ),
         ) for values in folders]
         fallback_folder = self.get_fallback_folder(request)
-        root_folder = FolderModel.objects.get_root_folder(self.admin_site.name)
-        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        root_folder = self.get_root_folder(request)
+        trash_folder = self.get_trash_folder(request)
         for folder in folders:
             if folder['id'] == current_folder.id:
                 if len(folders) == 0:

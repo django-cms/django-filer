@@ -100,10 +100,11 @@ class ArchiveAdmin(FileAdmin):
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if not (zip_file_obj := self.get_object(request, file_id)):
             return HttpResponseNotFound(f"File {file_id} not found.")
+        realm = self.get_realm(request)
         if FolderModel.objects.filter(
             name=zip_file_obj.name,
             parent=zip_file_obj.folder,
-            site=self.admin_site.name,
+            realm=realm,
         ).exists():
             msg = gettext("Can not extract archive. A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=zip_file_obj.name), status=409)
@@ -111,7 +112,7 @@ class ArchiveAdmin(FileAdmin):
             folder_obj = FolderModel.objects.create(
                 name=zip_file_obj.name,
                 parent=zip_file_obj.folder,
-                site=self.admin_site.name,
+                realm=realm,
                 owner=request.user,
             )
             zip_file_path = default_storage.path(zip_file_obj.file_path)
@@ -123,7 +124,7 @@ class ArchiveAdmin(FileAdmin):
                         FolderModel.objects.create(
                             name=parts[-1],
                             parent=folder_obj.retrieve(parts[:-1]),
-                            site=self.admin_site.name,
+                            realm=realm,
                             owner=request.user,
                         )
                         continue

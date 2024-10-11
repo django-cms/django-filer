@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -13,31 +14,53 @@ except ImportError:
 from .inode import InodeManagerMixin, InodeModel
 
 
+class RealmModel(models.Model):
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        verbose_name=_("Site"),
+    )
+
+    slug = models.SlugField(
+        _("Slug"),
+        max_length=200,
+        null=True,
+        editable=False,
+    )
+
+    class Meta:
+        ordering = ['site', 'slug']
+        constraints = [models.UniqueConstraint(fields=['site', 'slug'], name='unique_site')]
+
+    def __str__(self):
+        return f"{self.slug} @ {self.site.name}"
+
+
 class FolderModelManager(InodeManagerMixin, ModelManager):
-    def get_root_folder(self, current_site):
-        root_folder, _ = self.get_or_create(parent=None, site=current_site, name='__root__')
+    def get_root_folder(self, realm):
+        root_folder, _ = self.get_or_create(parent=None, realm=realm, name='__root__')
         return root_folder
 
-    def get_trash_folder(self, current_site, owner):
-        trash_folder, _ = self.get_or_create(parent=None, site=current_site, owner=owner, name='__trash__')
+    def get_trash_folder(self, realm, owner):
+        trash_folder, _ = self.get_or_create(parent=None, realm=realm, owner=owner, name='__trash__')
         return trash_folder
 
 
 class FolderModel(InodeModel):
     is_folder = True
 
-    site = models.CharField(
-        _("Site"),
-        default='admin',
+    realm = models.ForeignKey(
+        RealmModel,
+        verbose_name=_("Realm"),
         editable=False,
-        max_length=200,
+        on_delete=models.CASCADE,
     )
 
     class Meta:
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
         default_permissions = ['read', 'write']
-        unique_together = [('parent', 'name')]
+        constraints = [models.UniqueConstraint(fields=['parent', 'name'], name='unique_realm')]
 
     objects = FolderModelManager()
 

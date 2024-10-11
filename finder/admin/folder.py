@@ -107,7 +107,7 @@ class FolderAdmin(InodeAdmin):
 
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
-        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        trash_folder = self.get_trash_folder(request)
         if inode.id != trash_folder.id:
             settings.update(
                 is_root=inode.is_root,
@@ -186,7 +186,7 @@ class FolderAdmin(InodeAdmin):
     def search_for_inodes(self, request, current_folder, search_query, sorting=None):
         search_realm = request.COOKIES.get('django-finder-search-realm')
         if search_realm == 'everywhere':
-            starting_folder = FolderModel.objects.get_root_folder(self.admin_site.name)
+            starting_folder = FolderModel.objects.get_root_folder(self.get_realm(request))
         else:
             starting_folder = current_folder
         if isinstance(starting_folder.descendants, QuerySet):
@@ -291,7 +291,7 @@ class FolderAdmin(InodeAdmin):
             return response
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
-        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
             return HttpResponseBadRequest("Cannot move inodes from trash folder into itself.")
         inode_ids = body.get('inode_ids', [])
@@ -315,7 +315,7 @@ class FolderAdmin(InodeAdmin):
         if request.method != 'POST':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         body = json.loads(request.body)
-        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        trash_folder = self.get_trash_folder(request)
         discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
         for inode in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):
             inode.parent = discarded_inodes.get(inode=inode.id).previous_parent
@@ -326,7 +326,7 @@ class FolderAdmin(InodeAdmin):
     def erase_trash_folder(self, request):
         if request.method != 'DELETE':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
-        trash_folder = FolderModel.objects.get_trash_folder(self.admin_site.name, owner=request.user)
+        trash_folder = self.get_trash_folder(request)
         for inode in trash_folder.listdir():
             DiscardedInode.objects.get(inode=inode.id).delete()
             inode.delete()
@@ -351,7 +351,7 @@ class FolderAdmin(InodeAdmin):
         new_folder = FolderModel.objects.create(
             name=body['name'],
             parent=parent_folder,
-            site=self.admin_site.name,
+            realm=self.get_realm(request),
             owner=request.user,
         )
         return JsonResponse({'new_folder': self.serialize_inode(new_folder)})

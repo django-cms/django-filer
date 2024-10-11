@@ -22,6 +22,7 @@ DEBUG = os.getenv('DJANGO_DEBUG') in ['true', 'True', '1', 'yes', 'Yes', 'y', 'o
 
 ALLOWED_HOSTS = ['*']
 
+SITE_ID = 1
 
 # Application definition
 
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'easy_thumbnails',
     'filer',
