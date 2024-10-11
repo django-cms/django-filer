@@ -13,7 +13,7 @@ export default function Image(props) {
 		width: document.getElementById('id_width') as HTMLInputElement,
 		height: document.getElementById('id_height') as HTMLInputElement,
 	};
-	const [crop, setCrop] = useState<Crop>();
+	const [crop, setCrop] = useState<Crop>(null);
 	const ref = useRef(null);
 
 	useEffect(() => {
@@ -39,15 +39,25 @@ export default function Image(props) {
 	}, []);
 
 	function handleChange(crop) {
-		const rect = ref.current.getBoundingClientRect();
 		setCrop(crop);
-		cropFields.x.value = String(crop.x / rect.width * parseInt(cropFields.width.value));
-		cropFields.y.value = String(crop.y / rect.height * parseInt(cropFields.height.value));
-		cropFields.size.value = String(crop.width / rect.width * parseInt(cropFields.width.value));
+		if (crop) {
+			const rect = ref.current.getBoundingClientRect();
+			cropFields.x.value = String(crop.x / rect.width * parseInt(cropFields.width.value));
+			cropFields.y.value = String(crop.y / rect.height * parseInt(cropFields.height.value));
+			cropFields.size.value = String(crop.width / rect.width * parseInt(cropFields.width.value));
+		} else {
+			cropFields.x.value = '';
+			cropFields.y.value = '';
+			cropFields.size.value = '';
+		}
 	}
 
+	const controlButtons = [
+		<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
+	];
+
 	return (
-		<FileDetails {...props}>
+		<FileDetails controlButtons={controlButtons} {...props}>
 			<ReactCrop crop={crop} aspect={1} onChange={handleChange}>
 				<img className="editable" src={settings.download_url} ref={ref} />
 			</ReactCrop>
