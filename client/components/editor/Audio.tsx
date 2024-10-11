@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from 'react';
 import WavesurferPlayer from '@wavesurfer/react';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
-import {FileDetails} from 'finder/FileDetails';
+import FileDetails from 'finder/FileDetails';
 import PauseIcon from 'icons/pause.svg';
 import PlayIcon from 'icons/play.svg';
 

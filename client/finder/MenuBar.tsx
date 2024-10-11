@@ -1,11 +1,12 @@
 import React, {
+	createRef,
 	forwardRef,
-	useState,
-	useImperativeHandle,
-	useEffect,
 	lazy,
 	Suspense,
-	useMemo, createRef
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useState,
 } from 'react';
 import {useCookie} from './Storage';
 import {SearchField} from './Search';
@@ -168,7 +169,7 @@ function ExtraMenu(props) {
 }
 
 
-export const MenuBar = forwardRef((props: any, forwardedRef) => {
+const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const {
 		currentFolderId,
 		columnRefs,
@@ -402,3 +403,6 @@ export const MenuBar = forwardRef((props: any, forwardedRef) => {
 		</nav>
 	);
 });
+
+
+export default MenuBar;

@@ -37,7 +37,7 @@ function SelectionRectangle(props) {
 }
 
 
-export function SelectableArea(props) {
+export default function SelectableArea(props) {
 	const edgeSize = 16;  // the size of the area near the upper and lower edge where scrolling starts
 	const acceleration = 40;  // accelerate scrolling the nearer the cursor reaches one of the edges
 	const {columnRef} = props;

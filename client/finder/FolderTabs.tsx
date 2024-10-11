@@ -73,7 +73,7 @@ function FolderTab(props) {
 	);
 }
 
-export const FolderTabs = forwardRef((props: any, forwardedRef) => {
+const FolderTabs = forwardRef((props: any, forwardedRef) => {
 	const {isSearchResult, settings} = props;
 	const [favoriteFolders, setFavoriteFolders] = useState(settings.favorite_folders);
 
@@ -123,3 +123,6 @@ export const FolderTabs = forwardRef((props: any, forwardedRef) => {
 		</ul>
 	);
 });
+
+
+export default FolderTabs;

@@ -8,7 +8,7 @@ import React, {
 import {Folder, File, DraggableItem, ListItem} from './Item';
 
 
-export const InodeList = forwardRef((props: any, forwardedRef) => {
+const InodeList = forwardRef((props: any, forwardedRef) => {
 	const {folderId, previousFolderId, setCurrentFolder, menuBarRef, layout, clipboard, clearClipboard, settings} = props;
 	const [isLoading, setLoading] = useState(false);
 	const [inodes, setInodes] = useState([]);
@@ -169,21 +169,7 @@ export const InodeList = forwardRef((props: any, forwardedRef) => {
 			}
 			{renderInodes()}
 		</ul>
-	)
+	);
 });
 
-
-export function DraggedInodes(props) {
-	const {inodes, layout, style, zoom} = props;
-
-	return (
-		<ul className="inode-list" style={style}>{
-			inodes.map(inode =>
-			<DraggableItem key={inode.id} {...inode} isDragged={true} zoom={zoom}>
-				<div className="inode">
-					<ListItem {...inode} layout={layout} />
-				</div>
-			</DraggableItem>)
-		}</ul>
-	);
-}
+export default InodeList;

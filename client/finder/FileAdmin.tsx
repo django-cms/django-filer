@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useMemo, useRef, lazy, Suspense} from 'react';
-import {FinderSettings} from './FinderSettings';
-import {FolderTabs} from './FolderTabs';
-import {FileDetails} from './FileDetails';
+import FinderSettings from './FinderSettings';
+import FolderTabs from './FolderTabs';
+import FileDetails from './FileDetails';
 
 
 export function FileAdmin() {

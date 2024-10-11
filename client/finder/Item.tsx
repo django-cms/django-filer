@@ -1,6 +1,7 @@
 import React, {lazy, Suspense, useContext, useEffect, useMemo, useState} from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
-import {FinderSettings} from './FinderSettings';
+import FinderSettings from './FinderSettings';
+import FigureLabels from './FigureLabels';
 
 
 const dateTimeFormatter = new Intl.DateTimeFormat(
@@ -79,20 +80,6 @@ export function DraggableItem(props) {
 
 function StaticFigure(props) {
 	return (<>{props.children}</>);
-}
-
-
-export function FigureLabels(props) {
-	return (
-		<div>
-			{props.children}
-			<div className="figure-labels">
-				{props.labels?.map(label => (
-				<span key={label.id} style={{backgroundColor: label.color}}>{label.label}</span>
-				))}
-			</div>
-		</div>
-	);
 }
 
 

@@ -2,7 +2,7 @@ import React from 'react';
 import {useDroppable} from '@dnd-kit/core';
 
 
-export function DroppableArea(props) {
+export default function DroppableArea(props) {
 	const {id, className, currentId, dragging, children} = props;
 	const {
 		isOver,

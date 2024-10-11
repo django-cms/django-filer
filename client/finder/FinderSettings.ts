@@ -1,3 +1,4 @@
 import {createContext} from 'react';
 
-export const FinderSettings = createContext(undefined);
+const FinderSettings = createContext(undefined);
+export default FinderSettings;

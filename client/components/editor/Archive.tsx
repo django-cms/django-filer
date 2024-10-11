@@ -1,5 +1,5 @@
-import React, {createRef, Fragment} from 'react';
-import {FileDetails} from 'finder/FileDetails';
+import React, {Fragment} from 'react';
+import FileDetails from 'finder/FileDetails';
 import UnarchiveIcon from '../../icons/unarchive.svg';
 
 

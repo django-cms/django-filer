@@ -1,6 +1,5 @@
-import React, {useRef} from 'react';
-import ReactPlayer from 'react-player/file';
-import {FigureLabels} from 'finder/Item';
+import React, {useRef, useEffect} from 'react';
+import FigureLabels from 'finder/FigureLabels';
 
 
 export default function Video(props) {

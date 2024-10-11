@@ -2,7 +2,7 @@ import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import {ProgressOverlay, ProgressBar} from './UploadProgress';
 
 
-export const FileUploader = forwardRef((props: any, forwardedRef) => {
+const FileUploader = forwardRef((props: any, forwardedRef) => {
 	const {folderId, handleUpload} = props;
 	const inputRef = useRef(null);
 	const [dragging, setDragging] = useState(false);
@@ -78,3 +78,6 @@ export const FileUploader = forwardRef((props: any, forwardedRef) => {
 		}</div>
 	)
 });
+
+
+export default FileUploader;

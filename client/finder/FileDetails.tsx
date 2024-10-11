@@ -69,7 +69,7 @@ function SelectLabels(props) {
 }
 
 
-export function FileDetails(props) {
+export default function FileDetails(props) {
 	const {settings} = props;
 	const [uploadFile, setUploadFile] = useState<Promise<Response>>(null);
 	const subtitle = useMemo(() => {

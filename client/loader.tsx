@@ -1,6 +1,6 @@
 import {createRoot} from 'react-dom/client';
 import React from 'react';
-import {FinderSettings} from 'finder/FinderSettings';
+import FinderSettings from 'finder/FinderSettings';
 
 
 export default function loadFinderAdmin(children: React.ReactNode) {

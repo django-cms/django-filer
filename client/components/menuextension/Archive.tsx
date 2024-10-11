@@ -1,6 +1,5 @@
 import React, {createRef} from 'react';
 import ArchiveIcon from 'icons/archive.svg';
-import {bool} from "prop-types";
 
 
 export default function Archive(props) {
