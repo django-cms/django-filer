@@ -102,16 +102,16 @@ export function ListItem(props) {
 	function handleFocus(event) {
 		if (!(event.target.contentEditable))
 			return;
-		if (!focusHandler) {
+		// enforce two slow clicks to focus the contenteditable element
+		// they must be at least 333ms apart and the second click must be within 2s of the first
+		if (focusHandler === null) {
+			event.target.blur();
+			setFocusHandler([new Date().getTime(), window.setTimeout(() => {
+				setFocusHandler(null);
+			}, 2000)]);
+		} else if (focusHandler[0] + 333 > new Date().getTime()) {
 			event.target.blur();
 		}
-		// enforce two slow clicks to focus the contenteditable element
-		setFocusHandler(window.setTimeout(() => {
-			if (focusHandler) {
-				window.clearTimeout(focusHandler);
-			}
-			setFocusHandler(null);
-		}, 2000));
 	}
 
 	async function updateName(event) {
