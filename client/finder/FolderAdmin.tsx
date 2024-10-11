@@ -57,6 +57,7 @@ export function FolderAdmin() {
 		}),
 	);
 	const dragModifiers = [modifyMovement, restrictToWindowEdges];
+	const dragging = draggedInodes.length !== 0;
 	const overlayStyle = {
 		height: 'fit-content',
 		width: 'fit-content',
@@ -247,7 +248,11 @@ export function FolderAdmin() {
 	function renderTrashArea() {
 		return (
 			<div className={`work-area ${layout}`}>
-				<SelectableArea folderId={settings.folder_id} deselectAll={deselectAll} columnRef={columnRefs[settings.folder_id]}>
+				<SelectableArea
+					deselectAll={deselectAll}
+					columnRef={columnRefs[settings.folder_id]}
+					dragging={dragging}
+				>
 					<InodeList
 						ref={columnRefs[settings.folder_id]}
 						folderId={settings.folder_id}
@@ -293,12 +298,13 @@ export function FolderAdmin() {
 							folderId={folderId}
 							deselectAll={deselectAll}
 							columnRef={columnRefs[folderId]}
+							dragging={dragging}
 						>
 							<DroppableArea
 								id={`column:${folderId}`}
 								className="column-droppable"
 								currentId={`column:${currentFolderId}`}
-								dragging={draggedInodes.length !== 0}
+								dragging={dragging}
 							>
 								<InodeList
 									ref={columnRefs[folderId]}
@@ -334,11 +340,11 @@ export function FolderAdmin() {
 
 	function renderDroppables() {
 		return (<>
-			<DroppableArea id="download:droppable" className="download-droppable" dragging={draggedInodes.length !== 0}>
+			<DroppableArea id="download:droppable" className="download-droppable" dragging={dragging}>
 				<div className="quadrant"><DownloadIcon /></div>
 			</DroppableArea>
 			<a ref={downloadLinkRef} download="download" hidden />
-			<DroppableArea id="discard:droppable" className="discard-droppable" dragging={draggedInodes.length !== 0}>
+			<DroppableArea id="discard:droppable" className="discard-droppable" dragging={dragging}>
 				<div className="quadrant"><TrashIcon /></div>
 			</DroppableArea>
 		</>);
