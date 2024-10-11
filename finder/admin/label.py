@@ -18,4 +18,3 @@ class LabelForm(ModelForm):
 class LabelAdmin(admin.ModelAdmin):
     form = LabelForm
     list_display = ['name']
-

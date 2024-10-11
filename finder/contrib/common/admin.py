@@ -14,7 +14,7 @@ class CommonAdmin(FileAdmin):
         settings = super().get_editor_settings(request, inode)
         settings.update(
             react_component='Common',
-            replace_file= True,
+            replace_file=True,
             download_file=True,
         )
         return settings
@@ -23,7 +23,7 @@ class CommonAdmin(FileAdmin):
 class PDFFileAdmin(CommonAdmin):
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
-        settings.update(view_original= True)
+        settings.update(view_original=True)
         return settings
 
 
