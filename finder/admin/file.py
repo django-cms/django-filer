@@ -12,7 +12,7 @@ from entangled.forms import EntangledModelForm
 
 from finder.models.file import FileModel
 from finder.models.label import Label
-from .inode import InodeAdmin
+from finder.admin.inode import InodeAdmin
 
 
 class LabelsChoiceField(ModelMultipleChoiceField):
@@ -45,9 +45,9 @@ class FileAdmin(InodeAdmin):
     @property
     def media(self):
         return Media(
-            css={'all': ['admin/finder/css/finder-admin.css', 'admin/css/forms.css']},
+            css={'all': ['finder/css/finder-admin.css', 'admin/css/forms.css']},
             js=[format_html(
-                '<script type="module" src="{}"></script>', static('admin/finder/js/file-admin.js')
+                '<script type="module" src="{}"></script>', static('finder/js/admin/file-admin.js')
             )],
         )
 

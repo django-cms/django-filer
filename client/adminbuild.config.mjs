@@ -16,7 +16,7 @@ await build({
   bundle: true,
   minify: buildOptions.minify,
   sourcemap: buildOptions.debug,
-  outdir: 'finder/static/admin/finder/js',
+  outdir: 'finder/static/finder/js/admin',
   splitting: true,
   format: 'esm',
   jsx: 'automatic',

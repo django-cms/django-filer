@@ -33,9 +33,9 @@ class FolderAdmin(InodeAdmin):
     @property
     def media(self):
         return Media(
-            css={'all': ['admin/finder/css/finder-admin.css']},
+            css={'all': ['finder/css/finder-admin.css']},
             js=[format_html(
-                '<script type="module" src="{}"></script>', static('admin/finder/js/folder-admin.js')
+                '<script type="module" src="{}"></script>', static('finder/js/admin/folder-admin.js')
             )],
         )
 

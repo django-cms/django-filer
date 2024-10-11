@@ -45,4 +45,4 @@ data
 local.sqlite
 
 workdir*/
-finder/static/admin/finder/
+finder/static/finder/
