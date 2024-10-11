@@ -335,7 +335,6 @@ class FolderAdmin(InodeAdmin):
             'success_url': reverse(
                 'admin:finder_inodemodel_change',
                 args=(fallback_folder.id,),
-                current_app=self.admin_site.name,
             ),
         })
 
