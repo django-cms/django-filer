@@ -165,7 +165,7 @@ export function ListItem(props) {
 	switch (props.layout) {
 		case 'tiles': case 'mosaic':
 			return (
-				<figure>
+				<figure className="figure">
 					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
@@ -180,7 +180,7 @@ export function ListItem(props) {
 			);
 		case 'list':
 			return (<>
-				<div>
+				<div className="figure">
 					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
@@ -204,7 +204,7 @@ export function ListItem(props) {
 			</>);
 		case 'columns':
 			return (<>
-				<div>
+				<div className="figure">
 					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />

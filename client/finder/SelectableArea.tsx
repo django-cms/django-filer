@@ -2,34 +2,13 @@ import React, {useEffect, useRef, useState} from 'react';
 
 
 function SelectionRectangle(props) {
-	const {rect, discard} = props;
+	const {rect} = props;
 	const style = {
 		top: `${rect.top}px`,
 		left: `${rect.left}px`,
 		right: `${rect.right}px`,
 		bottom: `${rect.bottom}px`,
 	};
-
-	useEffect(() => {
-		function handleMouseMove(event) {
-			if (event.buttons === 0) {
-				discard();
-			}
-		}
-
-		function handleMouseOut(event) {
-			if (event.target === window || event.target === document.documentElement || event.target === document.body) {
-				discard();
-			}
-		}
-
-		window.addEventListener('mousemove', handleMouseMove);
-		window.addEventListener('mouseout', handleMouseOut);
-		return () => {
-			window.removeEventListener('mousemove', handleMouseMove);
-			window.removeEventListener('mouseout', handleMouseOut);
-		};
-	});
 
 	return (
 		<div className="selection-rectangle" style={style}></div>
@@ -40,16 +19,68 @@ function SelectionRectangle(props) {
 export default function SelectableArea(props) {
 	const edgeSize = 16;  // the size of the area near the upper and lower edge where scrolling starts
 	const acceleration = 40;  // accelerate scrolling the nearer the cursor reaches one of the edges
-	const {columnRef} = props;
+	const {deselectAll, columnRef, dragging} = props;
 	const areaRef = useRef(null);
 	const scrollableRef = useRef(null);
 	const [activeRectangle, setActiveRectangle] = useState(null);
 	const [timeoutHandler, setTimeoutHandler] = useState(null);
 
+	useEffect(() => {
+		setActiveRectangle(null);
+		if (dragging)
+			return;
+
+		areaRef.current.addEventListener('mousedown', selectionStart);
+		return () => {
+			areaRef.current.removeEventListener('mousedown', selectionStart);
+		};
+	}, [dragging]);
+
+	useEffect(() => {
+		if (activeRectangle === null)
+			return;
+
+		const areaRect = areaRef.current.getBoundingClientRect();
+
+		const handleMouseOut = (event) => {
+			if (event.clientX < areaRect.x - edgeSize
+			 || event.clientX > areaRect.x + areaRect.width
+			 || event.clientY < areaRect.y - edgeSize
+			 || event.clientY > areaRect.y + areaRect.height) {
+				setActiveRectangle(null);
+			}
+		};
+
+		const handleEscape = (event) => {
+			if (event.key === 'Escape') {
+				setActiveRectangle(null);
+			}
+		};
+
+		areaRef.current.addEventListener('mousemove', selectionExtend);
+		window.addEventListener('mouseout', handleMouseOut);
+		window.addEventListener('keydown', handleEscape);
+		return () => {
+			areaRef.current.removeEventListener('mousemove', selectionExtend);
+			window.removeEventListener('mouseout', handleMouseOut);
+			window.removeEventListener('keydown', handleEscape);
+		};
+	}, [activeRectangle !== null]);
+
+	useEffect(() => {
+		if (activeRectangle === null)
+			return;
+
+		areaRef.current.addEventListener('mouseup', selectionEnd);
+		return () => {
+			areaRef.current.removeEventListener('mouseup', selectionEnd);
+		};
+	}, [activeRectangle]);
+
 	const selectionStart = (event) => {
 		// check if the click was on the image representation of an inode …
 		for (let element = event.target; element; element = element.parentElement) {
-			if (element instanceof HTMLImageElement) {
+			if (element instanceof HTMLElement && element.classList.contains('figure')) {
 				setActiveRectangle(null);
 				return;  // … and if so, let the inode handle the click
 			}
@@ -70,6 +101,9 @@ export default function SelectableArea(props) {
 			bottom: areaRect.bottom - event.clientY,
 		};
 		setActiveRectangle(rectangle);
+		if (!(event.shiftKey || event.ctrlKey || event.metaKey)) {
+			deselectAll();
+		}
 	}
 
 	function handleAutoScroll(event) {
@@ -93,8 +127,6 @@ export default function SelectableArea(props) {
 			clearTimeout(timeoutHandler);
 			setTimeoutHandler(null);
 		}
-		if (!activeRectangle)
-			return;
 		handleAutoScroll(event);
 
 		const scrollTop = scrollableRef.current.scrollTop - activeRectangle.scrollTop;
@@ -140,8 +172,6 @@ export default function SelectableArea(props) {
 			return true;
 		}
 
-		if (!activeRectangle)
-			return;
 		const areaRect = areaRef.current.getBoundingClientRect();
 		const xMin = areaRect.left + activeRectangle.left;
 		const xMax = areaRect.right - activeRectangle.right;
@@ -166,12 +196,9 @@ export default function SelectableArea(props) {
 			<div
 				ref={areaRef}
 				className="selectable-area"
-				onMouseDown={selectionStart}
-				onMouseMove={selectionExtend}
-				onMouseUp={selectionEnd}
 			>
 				{props.children}
-				{activeRectangle && <SelectionRectangle rect={activeRectangle} discard={() => setActiveRectangle(null)} />}
+				{activeRectangle && <SelectionRectangle rect={activeRectangle} />}
 			</div>
 		</div>
 	);
