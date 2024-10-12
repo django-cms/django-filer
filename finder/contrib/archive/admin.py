@@ -101,16 +101,21 @@ class ArchiveAdmin(FileAdmin):
         if not (zip_file_obj := self.get_object(request, file_id)):
             return HttpResponseNotFound(f"File {file_id} not found.")
         realm = self.get_realm(request)
+        archive_name = pathlib.Path(zip_file_obj.name)
+        if archive_name.suffix in ['.zip', '.tar', '.tar.gz', '.gz']:
+            archive_name = archive_name.stem
+        else:
+            archive_name = str(archive_name)
         if FolderModel.objects.filter(
-            name=zip_file_obj.name,
+            name=archive_name,
             parent=zip_file_obj.folder,
             realm=realm,
         ).exists():
             msg = gettext("Can not extract archive. A folder named “{name}” already exists.")
-            return HttpResponseBadRequest(msg.format(name=zip_file_obj.name), status=409)
+            return HttpResponseBadRequest(msg.format(name=archive_name), status=409)
         try:
             folder_obj = FolderModel.objects.create(
-                name=zip_file_obj.name,
+                name=archive_name,
                 parent=zip_file_obj.folder,
                 realm=realm,
                 owner=request.user,
