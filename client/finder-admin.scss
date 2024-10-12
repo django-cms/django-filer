@@ -852,6 +852,10 @@ $active-rectangle: rgb(210, 210, 112);
 				&:hover {
 					background: var(--default-button-hover-bg);
 				}
+				&[disabled] {
+					opacity: 0.4;
+					cursor: not-allowed;
+				}
 
 				svg {
 					margin-right: 0.5rem;

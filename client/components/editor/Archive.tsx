@@ -1,12 +1,14 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useState} from 'react';
 import FileDetails from 'finder/FileDetails';
 import UnarchiveIcon from '../../icons/unarchive.svg';
 
 
 export default function Archive(props) {
 	const {settings} = props;
+	const [extracting, setExtracting] = useState(false);
 
 	async function extractArchive() {
+		setExtracting(true);
 		const fetchUrl = `${settings.base_url}${settings.file_id}/unarchive`;
 		const response = await fetch(fetchUrl, {
 			method: 'POST',
@@ -20,11 +22,12 @@ export default function Archive(props) {
 		} else {
 			console.error(response);
 		}
+		// setUnarchiving(false); // why would someone extract an archive twice?
 	}
 
 	const controlButtons = [
 		<Fragment key="extract-archive">
-			<button type="button" onClick={extractArchive}><UnarchiveIcon/>{gettext("Extract archive")}</button>
+			<button type="button" disabled={extracting} onClick={extractArchive}><UnarchiveIcon/>{gettext("Extract archive")}</button>
 		</Fragment>
 	];
 
