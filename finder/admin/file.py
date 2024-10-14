@@ -47,7 +47,7 @@ class FileAdmin(InodeAdmin):
         return Media(
             css={'all': ['finder/css/finder-admin.css', 'admin/css/forms.css']},
             js=[format_html(
-                '<script type="module" src="{}"></script>', static('finder/js/admin/file-admin.js')
+                '<script type="module" src="{}"></script>', static('finder/js/file-admin.js')
             )],
         )
 

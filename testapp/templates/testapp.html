@@ -8,8 +8,9 @@
 	<title>Django-Filer</title>
 	<link rel="icon" href="data:,">
 	<link href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'filer/admin/css/FilerAdmin.css' %}" rel="stylesheet">
-	<script type="module" src="{% static 'filer/admin/js/filer.js' %}"></script>
+	<link href="{% static 'finder/css/finder-browser.css' %}" rel="stylesheet">
+	<script src="{% url 'finder-api:javascript-catalog' %}"></script>
+	<script type="module" src="{% static 'finder/js/finder-browser.js' %}"></script>
 </head>
 
 <body>
