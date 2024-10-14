@@ -13,8 +13,8 @@ class InodeMetaModel(models.base.ModelBase):
     _inode_models = {}
     _mime_types_mapping = {}
 
-    def __new__(cls, *args, **kwargs):
-        new_class = super().__new__(cls, *args, **kwargs)
+    def __new__(cls, name, bases, attrs):
+        new_class = super().__new__(cls, name, bases, attrs)
         base_labels = [b._meta.label for b in new_class.mro() if hasattr(b, '_meta')]
         if new_class._meta.abstract is False and 'finder.InodeModel' in base_labels:
             if not new_class.is_folder:
