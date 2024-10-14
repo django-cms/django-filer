@@ -1,9 +1,5 @@
-from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _, ngettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 class Label(models.Model):
