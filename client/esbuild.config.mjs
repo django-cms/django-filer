@@ -7,6 +7,7 @@ const buildOptions = parser(process.argv.slice(2), {
 
 await build({
   entryPoints: [
+    'client/finder-browser.ts',
     'client/folder-admin.tsx',
     'client/file-admin.tsx',
     'client/components/editor/*.tsx',
@@ -16,7 +17,7 @@ await build({
   bundle: true,
   minify: buildOptions.minify,
   sourcemap: buildOptions.debug,
-  outdir: 'finder/static/finder/js/admin',
+  outdir: 'finder/static/finder/js',
   splitting: true,
   format: 'esm',
   jsx: 'automatic',
