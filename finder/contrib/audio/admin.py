@@ -41,7 +41,7 @@ class AudioAdmin(FileAdmin):
     def get_folderitem_settings(self, request, inode):
         settings = super().get_folderitem_settings(request, inode)
         settings.update(
-            react_component='Audio',
+            react_component=inode.browser_component,
             sample_url=inode.get_sample_url(),
         )
         return settings

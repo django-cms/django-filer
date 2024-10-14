@@ -13,6 +13,7 @@ SAMPLE_DURATION = 5
 
 class VideoFileModel(FileModel):
     accept_mime_types = ['video/mp4']
+    browser_component = 'Video'
     thumbnail_size = 180
     fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-video.svg')
     filer_public_thumbnails = Path(
