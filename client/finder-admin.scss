@@ -521,7 +521,7 @@ $active-rectangle: rgb(210, 210, 112);
 
 			.figure-labels {
 				position: absolute;
-				float: left;
+				line-height: 0;
 				text-align: right;
 				overflow: hidden;
 			}
@@ -589,7 +589,7 @@ $active-rectangle: rgb(210, 210, 112);
 		gap: 5px;
 
 		li .inode .figure-labels {
-			inset: -2px 2px auto 2px;
+			inset: 2px;
 
 			span {
 				width: 8px;
