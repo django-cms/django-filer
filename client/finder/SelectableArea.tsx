@@ -32,7 +32,7 @@ export default function SelectableArea(props) {
 
 		areaRef.current.addEventListener('mousedown', selectionStart);
 		return () => {
-			areaRef.current.removeEventListener('mousedown', selectionStart);
+			areaRef.current?.removeEventListener('mousedown', selectionStart);
 		};
 	}, [dragging]);
 
