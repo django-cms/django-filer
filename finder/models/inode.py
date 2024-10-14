@@ -45,6 +45,13 @@ class InodeMetaModel(models.base.ModelBase):
         Yields all real (excluding proxy models) that inherit from InodeModel.
         """
         yield self._inode_models['finder.FolderModel']
+        yield from self.real_file_models
+
+    @property
+    def real_file_models(self):
+        """
+        Yields all real (excluding proxy models) that inherit from AbstractFileModel.
+        """
         for model in self._inode_models.values():
             if not model.is_folder and not model._meta.proxy:
                 yield model
@@ -69,7 +76,7 @@ class InodeManagerMixin:
 
         if lookup.pop('is_folder', False):
             return FolderModel.objects.filter(**lookup).iterator()
-        inodes = [inode_model.objects.filter(**lookup) for inode_model in InodeModel.real_models]
+        inodes = [inode_model.objects.filter(**lookup) for inode_model in InodeModel.real_file_models]
         return chain(*inodes)
 
     def get_inode(self, **lookup):
