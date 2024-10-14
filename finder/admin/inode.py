@@ -132,8 +132,6 @@ class InodeAdmin(admin.ModelAdmin):
                 .annotate(is_folder=Value(inode_model.is_folder, output_field=BooleanField()))
             )
             data_fields = inode_model.data_fields + self.extra_data_fields
-            if 'labels' in data_fields:
-                queryset = queryset.prefetch_related('labels')
             if applicable_sorting := self.sorting_map.get(sorting):
                 if issubclass(inode_model, applicable_sorting[0]):
                     queryset = queryset.order_by(applicable_sorting[1])

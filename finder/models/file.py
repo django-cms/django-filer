@@ -54,6 +54,11 @@ class FileModelManager(InodeManager):
             return model
         return FileModel
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.prefetch_related('labels')
+        return queryset
+
 
 class AbstractFileModel(InodeModel):
     data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type', 'labels']
