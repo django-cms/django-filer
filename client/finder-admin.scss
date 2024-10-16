@@ -18,7 +18,7 @@ ul.messagelist {
 	position: relative;
 }
 
-$trash-background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgb(248, 248, 248) 10px, rgb(248, 248, 248) 20px);
+$trash-background: repeating-linear-gradient(45deg, transparent, transparent 10px, var(--darkened-bg) 10px, var(--darkened-bg) 20px);
 $follow-folder-border: 2px dashed var(--border-color);
 $copied-inode-border: 2px dashed rgb(48, 164, 0);
 $active-rectangle: rgb(210, 210, 112);
@@ -30,6 +30,10 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 }
 
+#content-start {
+	background: var(--darkened-bg);
+}
+
 #content-react {
 	position: absolute;
 	right: 0;
@@ -37,6 +41,7 @@ $active-rectangle: rgb(210, 210, 112);
 	bottom: 0;
 	padding: 0;
 	user-select: none;
+	background: var(--darkened-bg);
 
 	&.folder {
 		top: 0;
@@ -94,9 +99,11 @@ $active-rectangle: rgb(210, 210, 112);
 						min-width: 100px;
 						height: 100%;
 						display: block;
+						color: var(--body-fg);
+						background-color: var(--body-bg);
 						margin: 0;
 						padding: 2px 8px;
-						border: 1px solid lightgrey;
+						border: 1px solid var(--border-color);
 						border-right: none;
 						border-top-left-radius: 5px;
 						border-bottom-left-radius: 5px;
@@ -106,7 +113,7 @@ $active-rectangle: rgb(210, 210, 112);
 						}
 
 						& + div {
-							border: 1px solid lightgrey;
+							border: 1px solid var(--border-color);
 							border-left: none;
 							border-top-right-radius: 5px;
 							border-bottom-right-radius: 5px;
@@ -127,7 +134,7 @@ $active-rectangle: rgb(210, 210, 112);
 								[role="combobox"] {
 									li:nth-child(2) {
 										padding-bottom: 4px;
-										border-bottom: 1px solid lightgrey;
+										border-bottom: 1px solid var(--border-color);
 										margin-bottom: 4px;
 									}
 								}
@@ -192,7 +199,7 @@ $active-rectangle: rgb(210, 210, 112);
 					content: " ";
 					align-self: center;
 					border: 5px solid transparent;
-					border-top-color: black;
+					border-top-color: var(--body-fg);
 					margin-top: 10px;
 				}
 			}
@@ -200,7 +207,7 @@ $active-rectangle: rgb(210, 210, 112);
 			[role="combobox"] {
 				position: absolute;
 				z-index: 1;
-				background-color: white;
+				background-color: var(--body-bg);
 				top: 100%;
 				left: -250px;
 				right:-250px;
@@ -225,6 +232,7 @@ $active-rectangle: rgb(210, 210, 112);
 					width: auto;
 					cursor: pointer;
 					display: flex;
+					align-items: center;
 					line-height: 32px;
 					font-size: 16px;
 
@@ -237,9 +245,6 @@ $active-rectangle: rgb(210, 210, 112);
 
 				svg {
 					color: grey;
-				}
-				span {
-					margin-left: 40px;
 				}
 				svg + span {
 					margin-left: 10px;
@@ -265,11 +270,11 @@ $active-rectangle: rgb(210, 210, 112);
 			border: 1px solid var(--border-color);
 			border-top-left-radius: 4px;
 			border-top-right-radius: 4px;
-			border-bottom: 1px solid ghostwhite;
-			background-color: white;
+			border-bottom: 1px solid var(--body-bg);
+			background-color: var(--darkened-bg);
 
 			&.active, &.current {
-				background-color: ghostwhite;
+				background-color: var(--body-bg);
 			}
 			&:not(.active) {
 				cursor: pointer;
@@ -319,7 +324,7 @@ $active-rectangle: rgb(210, 210, 112);
 		align-items: stretch;
 
 		&:not(:has(.inode-list.trash)) {
-			background-color: ghostwhite;
+			background-color: var(--body-bg);
 		}
 
 		.column-droppable {
@@ -833,6 +838,8 @@ $active-rectangle: rgb(210, 210, 112);
 
 	.detail-editor {
 		padding: 0 20px 40px;
+		background-color: var(--body-bg);
+		margin-top: -15px;
 
 		input[readonly] {
 			border: none;
@@ -846,6 +853,11 @@ $active-rectangle: rgb(210, 210, 112);
 
 	.file-details {
 		width: 100%;
+
+		h2 {
+			padding-top: 1em;
+			padding-bottom: 0.5em;
+		}
 
 		img.editable {
 			max-height: 500px;
@@ -867,7 +879,7 @@ $active-rectangle: rgb(210, 210, 112);
 				border-radius: 4px;
 				padding: 5px 15px;
 				line-height: 25px;
-				color: white;
+				color: var(--button-fg);
 				background: var(--default-button-bg);
 				margin-right: 10px;
 				margin-bottom: 10px;
