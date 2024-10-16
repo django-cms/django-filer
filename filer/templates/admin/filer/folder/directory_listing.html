@@ -213,7 +213,7 @@
                                        data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}"
                                        data-max-uploader-connections="{{ uploader_connections }}"
                                        data-max-files="{{ max_files|safe }}"
-                                       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
+                                       {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
                                     >
                                         {% trans "Upload Files" %}
                                     </a>
@@ -223,7 +223,7 @@
                                        data-url="{% url 'admin:filer-ajax_upload' %}"
                                        data-max-uploader-connections="{{ uploader_connections }}"
                                        data-max-files="{{ max_files|safe }}"
-                                       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
+                                       {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
                                     >
                                         {% trans "Upload Files" %}
                                     </a>
