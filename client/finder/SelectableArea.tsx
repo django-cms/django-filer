@@ -78,6 +78,11 @@ export default function SelectableArea(props) {
 	}, [activeRectangle]);
 
 	const selectionStart = (event) => {
+		// only left mouse button is considered
+		if (event.button !== 0) {
+			return;
+		}
+
 		// check if the click was on the image representation of an inode …
 		for (let element = event.target; element; element = element.parentElement) {
 			if (element instanceof HTMLElement && element.classList.contains('figure')) {
