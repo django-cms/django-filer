@@ -29,6 +29,7 @@ if (django.jQuery) {
         var infoMessage = $('.js-filer-dropzone-info-message');
         var hiddenClass = 'hidden';
         var maxUploaderConnections = uploadButton.data('max-uploader-connections') || 3;
+        var maxFilesize = parseInt(uploadButton.data('max-filesize') || 0, 10) * 1048576;
         var hasErrors = false;
         var updateUploadNumber = function () {
             uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
@@ -59,6 +60,7 @@ if (django.jQuery) {
             action: uploadUrl,
             button: uploadButton[0],
             maxConnections: maxUploaderConnections,
+            sizeLimit: maxFilesize,
             onSubmit: function (id) {
                 Cl.mediator.remove('filer-upload-in-progress', removeButton);
                 Cl.mediator.publish('filer-upload-in-progress');
