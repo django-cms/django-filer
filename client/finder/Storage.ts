@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 
 export function useSessionStorage(storageKey: string, initial) {
@@ -16,13 +16,34 @@ export function useSessionStorage(storageKey: string, initial) {
 }
 
 
-export function useCookie(key, initial) : [string, (value: string) => any] {
-	const [value, setValue] = useState(
-		document.cookie.split('; ').find(row => row.startsWith(`${key}=`))?.split('=')[1] ?? initial
-	);
+export function useCookie(key, initial) : [any, (value: any) => any] {
+	const [toConverter, fromConverter] = useMemo(() => {
+		if (Array.isArray(initial)) {
+			return [
+				v => v.join(','),
+				v1 => v1.split(',').filter(v2 => isFinite(Number(v2))).map(v3 => Number(v3)),
+			];
+		}
+		if (typeof initial === 'number') {
+			return [
+				v => v,
+				v => Number(v),
+			];
+		}
+		return [
+			v => v,
+			v => v,
+		];
+	}, []);
+
+	const [value, setValue] = useState(() => {
+		const row = document.cookie.split('; ').find(row => row.startsWith(`${key}=`)); //?.split('=')[1] ?? initial
+		return row ? fromConverter(row.split('=')[1]) : initial;
+	});
 
 	function setCookie(value) {
-		document.cookie = `${key}=${value}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax;`;
+		const rhs = toConverter(value);
+		document.cookie = `${key}=${rhs}; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax;`;
 	}
 
 	useEffect(() => {
