@@ -60,10 +60,12 @@ $active-rectangle: rgb(210, 210, 112);
 				display: list-item;
 				list-style: none;
 				padding: 0;
-				cursor: pointer;
-				border-radius: 4px;
-				width: 32px;
-				height: 32px;
+				&:not(:empty) {
+					cursor: pointer;
+					border-radius: 4px;
+					width: 32px;
+					height: 32px;
+				}
 
 				&:hover:not(.disabled):not(.search-field) {
 					background-color: var(--selected-bg);
@@ -138,10 +140,31 @@ $active-rectangle: rgb(210, 210, 112);
 					}
 				}
 
-				&.sorting-dropdown {
-					margin-left: auto;
-					margin-right: auto;
+				&.dropdown-menu {
 					width: auto;
+					&.with-caret {
+						padding-right: 0.25rem;
+					}
+				}
+
+				&.filter-by-label {
+					ul {
+						li:not(:has(span.label-dot)) {
+							justify-content: center;
+							padding-bottom: 4px;
+							border-bottom: 1px solid var(--border-color);
+							margin-bottom: 4px;
+						}
+
+						li span.label-dot {
+							width: 12px;
+							height: 12px;
+							display: inline-block;
+							border-radius: 50%;
+							margin-left: 0.5rem;
+							margin-right: 0.5rem;
+						}
+					}
 				}
 
 				&.extra-menu [role="combobox"] {

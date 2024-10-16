@@ -124,6 +124,7 @@ class InodeAdmin(admin.ModelAdmin):
         Return a serialized list of file/folder-s for the given folder.
         """
         inodes, applicable_sorting = [], []
+        labels = lookup.pop('labels__in', None)
         for inode_model in InodeModel.real_models:
             queryset = (
                 inode_model.objects.select_related('owner')
@@ -135,7 +136,9 @@ class InodeAdmin(admin.ModelAdmin):
             if applicable_sorting := self.sorting_map.get(sorting):
                 if issubclass(inode_model, applicable_sorting[0]):
                     queryset = queryset.order_by(applicable_sorting[1])
-            for obj in queryset:
+            if labels and issubclass(inode_model, AbstractFileModel):
+                queryset = queryset.filter(labels__in=labels)
+            for obj in queryset.distinct():
                 values = {
                     'parent': obj.parent.id,
                     'change_url': reverse(

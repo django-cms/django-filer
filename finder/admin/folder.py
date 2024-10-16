@@ -14,6 +14,7 @@ from django.utils.html import format_html
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
 from finder.models.inode import DiscardedInode
+from finder.models.label import Label
 
 from .inode import InodeAdmin
 
@@ -118,7 +119,11 @@ class FolderAdmin(InodeAdmin):
                     current_app=self.admin_site.name,
                 ),
             )
-            # temporarily deactivated: if not next(filter(lambda f: f['id'] == inode.id and f.get('is_pinned'), favorite_folders), None):
+            if Label.objects.exists():
+                settings['labels'] = [
+                    {'value': id, 'label': name, 'color': color}
+                    for id, name, color in Label.objects.values_list('id', 'name', 'color')
+                ]
             request.session['finder_last_folder_id'] = str(inode.id)
         else:
             settings.update(
@@ -174,16 +179,24 @@ class FolderAdmin(InodeAdmin):
     def fetch_inodes(self, request, folder_id):
         if not (current_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
-        sorting = request.COOKIES.get('django-finder-sorting')
+        lookup = {}
+        if sorting := request.COOKIES.get('django-finder-sorting'):
+            lookup['sorting'] = sorting
+        if filter := request.COOKIES.get('django-finder-filter'):
+            allowed_labels = Label.objects.values_list('id', flat=True)
+            try:
+                lookup['labels__in'] = [int(v) for v in filter.split(',') if int(v) in allowed_labels]
+            except ValueError:
+                pass
         if search_query := request.GET.get('q'):
-            inodes = self.search_for_inodes(request, current_folder, search_query, sorting=sorting)
+            inodes = self.search_for_inodes(request, current_folder, search_query, **lookup)
         else:
-            inodes = self.get_inodes(request, parent=current_folder, sorting=sorting)
+            inodes = self.get_inodes(request, parent=current_folder, **lookup)
         return JsonResponse({
             'inodes': inodes,
         })
 
-    def search_for_inodes(self, request, current_folder, search_query, sorting=None):
+    def search_for_inodes(self, request, current_folder, search_query, **lookup):
         search_realm = request.COOKIES.get('django-finder-search-realm')
         if search_realm == 'everywhere':
             starting_folder = FolderModel.objects.get_root_folder(self.get_realm(request))
@@ -195,9 +208,9 @@ class FolderAdmin(InodeAdmin):
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
         return self.get_inodes(
             request,
-            sorting=sorting,
             parent_id__in=parent_ids,
             name__icontains=search_query,
+            **lookup,
         )
 
     def upload_files(self, request, folder_id):

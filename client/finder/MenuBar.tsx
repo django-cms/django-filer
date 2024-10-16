@@ -17,6 +17,7 @@ import TilesIcon from 'icons/tiles.svg';
 import MosaicIcon from 'icons/mosaic.svg';
 import ListIcon from 'icons/list.svg';
 import ColumnsIcon from 'icons/columns.svg';
+import FilterIcon from 'icons/filter.svg';
 import SortingIcon from 'icons/sorting.svg';
 import SortAscIcon from 'icons/sort-asc.svg';
 import SortDescIcon from 'icons/sort-desc.svg';
@@ -31,6 +32,7 @@ import UndoIcon from 'icons/undo.svg';
 import UploadIcon from 'icons/upload.svg';
 
 const useSorting = () => useCookie('django-finder-sorting', '');
+const useFilter = () => useCookie('django-finder-filter', []);
 
 
 function SortingOptionsItem(props: any) {
@@ -50,7 +52,7 @@ function SortingOptionsItem(props: any) {
 	}
 
 	return (
-		<DropDownMenu icon={<SortingIcon/>} className="sorting-dropdown with-caret" tooltip={gettext("Change sorting order")}>
+		<DropDownMenu icon={<SortingIcon/>} className="with-caret" tooltip={gettext("Change sorting order")}>
 			<li onClick={() => changeSorting('')} className={isActive('')}><span>{gettext("Unsorted")}</span></li>
 			<li onClick={() => changeSorting('name_asc')} className={isActive('name_asc')}>
 				<SortDescIcon/><span>{gettext("Name")}</span>
@@ -76,6 +78,50 @@ function SortingOptionsItem(props: any) {
 			<li onClick={() => changeSorting('type_desc')} className={isActive('type_desc')}>
 				<SortAscIcon /><span>{gettext("Type")}</span>
 			</li>
+		</DropDownMenu>
+	);
+}
+
+
+function FilterByLabel(props: any) {
+	const {columnRefs, labels} = props;
+	const [filter, setFilter] = useFilter();
+
+	function changeFilter(value) {
+		if (value === null) {
+			setFilter([]);
+		} else if (filter.includes(value)) {
+			setFilter(filter.filter(v => v !== value));
+		} else {
+			setFilter([...filter, value]);
+		}
+		Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
+			columnRef.current?.fetchInodes();
+		});
+	}
+
+	return (
+		<DropDownMenu
+			icon={<FilterIcon/>}
+			className={`filter-by-label with-caret${filter.length ? ' active' : ''}`}
+			tooltip={gettext("Filter by label")}
+		>
+			<li><span onClick={() => changeFilter(null)}>{gettext("Clear all")}</span></li>
+			{labels.map((label, index) => (
+				<li key={label.value}>
+					<label htmlFor={`filter-${label.value}`}>
+						<input
+							type="checkbox"
+							id={`filter-${label.value}`}
+							name={label.value}
+							checked={filter.includes(label.value)}
+							onChange={() => changeFilter(label.value)}
+						/>
+						<span className="label-dot" style={{backgroundColor: label.color}}></span>
+						{label.label}
+					</label>
+				</li>
+			))}
 		</DropDownMenu>
 	);
 }
@@ -375,20 +421,40 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		<nav role="menubar">
 			<ul>
 				<li className="search-field">
-					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings} />
+					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
 				</li>
-				<li style={{marginLeft: 'auto'}} className={isActive('tiles')} onClick={() => setLayout('tiles')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Tiles view")}><TilesIcon /></li>
-				<li className={isActive('mosaic')} onClick={() => setLayout('mosaic')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon /></li>
-				<li className={isActive('list')} onClick={() => setLayout('list')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("List view")}><ListIcon /></li>
-				<li className={isActive('columns')} onClick={() => setLayout('columns')} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}><ColumnsIcon /></li>
-				<SortingOptionsItem columnRefs={columnRefs} />
-				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Cut selected to clipboard")}><CutIcon /></li>
+				<li style={{marginLeft: 'auto'}} className={isActive('tiles')} onClick={() => setLayout('tiles')}
+					data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Tiles view")}><TilesIcon/>
+				</li>
+				<li className={isActive('mosaic')} onClick={() => setLayout('mosaic')}
+					data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon/>
+				</li>
+				<li className={isActive('list')} onClick={() => setLayout('list')}
+					data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("List view")}><ListIcon/>
+				</li>
+				<li className={isActive('columns')} onClick={() => setLayout('columns')}
+					data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}>
+					<ColumnsIcon/></li>
+				<li style={{marginLeft: 'auto'}}></li>
+				{settings.labels && <FilterByLabel columnRefs={columnRefs} labels={settings.labels}/>}
+				<SortingOptionsItem columnRefs={columnRefs}/>
+				<li style={{marginRight: 'auto'}}></li>
+				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes}
+					data-tooltip-id="django-finder-tooltip"
+					data-tooltip-content={gettext("Cut selected to clipboard")}><CutIcon/></li>
 				{settings.is_trash ? (<>
-					<li className={numSelectedInodes ? null : "disabled"} onClick={undoDiscardInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Undo discarding files/folders")}><UndoIcon /></li>
-					<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Empty trash folder")}><EraseIcon /></li>
+					<li className={numSelectedInodes ? null : "disabled"} onClick={undoDiscardInodes}
+						data-tooltip-id="django-finder-tooltip"
+						data-tooltip-content={gettext("Undo discarding files/folders")}><UndoIcon/></li>
+					<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-finder-tooltip"
+						data-tooltip-content={gettext("Empty trash folder")}><EraseIcon/></li>
 				</>) : (<>
-					<li className={clipboard.length === 0 ? "disabled" : null} onClick={pasteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Paste from clipboard")}><PasteIcon /></li>
-					<li className={numSelectedInodes ? null : "disabled"} onClick={deleteInodes} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Move selected to trash folder")}><TrashIcon /></li>
+					<li className={clipboard.length === 0 ? "disabled" : null} onClick={pasteInodes}
+						data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Paste from clipboard")}>
+						<PasteIcon/></li>
+					<li className={numSelectedInodes ? null : "disabled"} onClick={deleteInodes}
+						data-tooltip-id="django-finder-tooltip"
+						data-tooltip-content={gettext("Move selected to trash folder")}><TrashIcon/></li>
 					<ExtraMenu
 						numSelectedFiles={numSelectedFiles}
 						numSelectedInodes={numSelectedInodes}
