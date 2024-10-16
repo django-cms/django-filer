@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
 import FileDetails from 'finder/FileDetails';
 import ClearCropIcon from 'icons/clear-crop.svg';
@@ -53,7 +53,9 @@ export default function Image(props) {
 	}
 
 	const controlButtons = [
-		<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
+		<Fragment key="clear-crop">
+			<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
+		</Fragment>
 	];
 
 	return (
