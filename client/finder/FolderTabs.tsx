@@ -110,7 +110,7 @@ const FolderTabs = forwardRef((props: any, forwardedRef) => {
 				settings.parent_id && (<FolderTab key={'parent'} folder={{id: 'parent'}} settings={settings} />)
 			)}
 			{favoriteFolders.filter(
-				folder => !isSearchResult || folder.is_pinned || folder.id !== settings.folder_id
+				folder => !isSearchResult && !settings.file_id || folder.is_pinned || folder.id !== settings.folder_id
 			).map(folder =>
 				<FolderTab
 					key={folder.id}
