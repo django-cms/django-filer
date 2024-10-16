@@ -99,25 +99,27 @@ The new user interface is based on the [React](https://reactjs.org/) framework w
 
 ## Installation
 
-In `settings.py` of your project change
+In `settings.py` of your project, add these extra dependencies or those one you really need:
 
 ```python
     INSTALLED_APPS = [
         ...
         'finder',
-        'finder.contrib.audio',
-        'finder.contrib.common',
-        'finder.contrib.image.pil',
-        'finder.contrib.image.svg',
+        'finder.contrib.archive',  # supports zip, tar, tar.gz, tar.bz2, tar.xz
+        'finder.contrib.audio',  # supports mp3, ogg, flac, wav
+        'finder.contrib.common',  # supports pdf, spreadsheets
+        'finder.contrib.image.pil',  # supports bmp, gif, jpeg, png, tiff
+        'finder.contrib.image.svg',  # supports svg
+        'finder.contrib.video',  # supports mp4, webm, ogv
         ...
     ]
 ```
 
-Assure that Pillow is installed:
+If you use `finder.contrib.audio`, assure that `pydub` is installed.
+If you use `finder.contrib.image.pil`, assure that `Pillow` is installed.
+If you use `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
+If you use `finder.contrib.video`, assure that `ffmpeg-python` is installed.
 
-```shell
-pip install Pillow
-```
 
 Run the migrations for app `finder`:
 
@@ -125,20 +127,22 @@ Run the migrations for app `finder`:
 python manage.py migrate finder
 ```
 
-If you already have **django-filer** installed and that database is filled, you can migrate the meta-data of those
-files and folders into the new database tables. The pysical files on disk are not affected by this migration.
+If you already have **django-filer** installed and that database is filled, you can migrate the
+meta-data of those files and folders into the new database tables. The pysical files on disk are not
+affected by this migration.
 
 ```shell
 python manage.py filer_to_finder
 ```
 
-This does not affect the original database tables. You can still use the original **django-filer** codebase in parallel
-to the new "Finder" branch. They both share the same underlying file system, usually `media/filer_public` but store
-their meta information in completely independent database tables. The only cavat is that you should not erase files in
-the trash folder, because then they are also gone on disk.
+This does not affect the original database tables. You can still use the original **django-filer**
+codebase in parallel to the new "Finder" branch. They both share the same underlying file system,
+usually `media/filer_public` but store their meta information in completely independent database
+tables. The only cavat is that you should not erase files in the trash folder, because then they are
+also gone on disk.
 
-The client part of the new admin user must be compiled before it can be used. This requires a modern version (16 or
-later) of [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/), which usually are installed anyway.
+The client part of the new admin user must be compiled before it can be used. This requires a modern
+version (18 or later) of [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/), which usually are installed anyway.
 The following commands install the requirements all compiles the code:
 
 ```shell
@@ -151,26 +155,24 @@ npm run buildall
 ## Usage
 
 After restarting the development server, you can access the new admin user interface at the URL
-http://localhost:8000/admin/finder/foldermodel/ . Clicking on that link will redirect you to the root folder of the
-current site.
+http://localhost:8000/admin/finder/foldermodel/ . Clicking on that link will redirect you to the
+root folder of the current site.
 
 
 ## Limitations
 
-Currently only the admin views for the `FolderModel` are implemented. The detail views for the `FileModel`,
-`ImageModel` etc. are still missing. Those views will be implemented in a later stage of the project.
+Currently only the admin backend is implemented. I am currently working on a file selection widget
+which can be used in any frontend or backend application.
 
 
 ## Further Steps
 
-The next step will be to implement the detail views for the `FileModel`, `ImageModel` etc.
+The focal point of the `ImageModel` will take the resolution of the corresponsding image into
+consideration. This will allow to create different versions of the same canonical image, depending
+on the width of the device the image is displayed.
 
-The focal point of the `ImageModel` will take the resolution of the corresponsding image into consideration. This will
-allow to create different versions of the same canonical image, depending on the width of the device the image is
-displayed.
-
-The permission system will also be implemented using a different model. This probaly will orient itself on the
-Access Control Lists (ACLs) of [NTFS](https://learn.microsoft.com/en-us/windows/win32/secauthz/access-control-lists).
+The permission system will also be implemented using a different model. This probaly will orient
+itself on the Access Control Lists (ACLs) of [NTFS](https://learn.microsoft.com/en-us/windows/win32/secauthz/access-control-lists).
 This will allow to grant permissions to users and groups for each folder (but not file) individually.
 
 A quota system will be implemented, which allows to limit the amount of disk space a user can use.
