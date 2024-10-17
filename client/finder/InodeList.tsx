@@ -5,7 +5,7 @@ import React, {
 	useImperativeHandle,
 	useState,
 } from 'react';
-import {Folder, File, DraggableItem, ListItem} from './Item';
+import {Folder, File} from './Item';
 
 
 const InodeList = forwardRef((props: any, forwardedRef) => {
