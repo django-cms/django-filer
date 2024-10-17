@@ -239,7 +239,7 @@ export function Folder(props) {
 		setNodeRef,
 	} = useDroppable({
 		id: `folder:${props.id}`,
-		disabled: props.disabled,
+		disabled: props.disabled || props.settings.is_trash,
 	});
 
 	function cssClasses() {
