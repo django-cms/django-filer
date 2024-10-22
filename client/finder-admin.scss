@@ -18,7 +18,7 @@ ul.messagelist {
 	position: relative;
 }
 
-$trash-background: repeating-linear-gradient(45deg, transparent, transparent 10px, var(--darkened-bg) 10px, var(--darkened-bg) 20px);
+$trash-background: repeating-linear-gradient(45deg, var(--body-bg), var(--body-bg) 10px, var(--darkened-bg) 10px, var(--darkened-bg) 20px);
 $follow-folder-border: 2px dashed var(--border-color);
 $copied-inode-border: 2px dashed rgb(48, 164, 0);
 $active-rectangle: rgb(210, 210, 112);
@@ -58,13 +58,14 @@ $active-rectangle: rgb(210, 210, 112);
 			box-sizing: border-box;
 			display: flex;
 			flex-wrap: wrap;
-			margin: 0 15px;
+			margin: 0 14px;
 			padding: 0;
 
 			li {
 				display: list-item;
 				list-style: none;
 				padding: 0;
+
 				&:not(:empty) {
 					cursor: pointer;
 					border-radius: 4px;
@@ -257,13 +258,13 @@ $active-rectangle: rgb(210, 210, 112);
 		display: flex;
 		flex-wrap: wrap;
 		margin: 10px 0 0 0;
-		padding: 0 15px;
+		padding: 0 12px;
 		border-bottom: 1px solid var(--border-color);
 
 		li {
 			display: list-item;
 			list-style: none;
-			margin: -5px 1px -1px 1px;
+			margin: -5px 2px -1px 2px;
 			padding: 6px 14px;
 			font-size: 16px;
 			font-weight: bold;
@@ -271,7 +272,7 @@ $active-rectangle: rgb(210, 210, 112);
 			border-top-left-radius: 4px;
 			border-top-right-radius: 4px;
 			border-bottom: 1px solid var(--body-bg);
-			background-color: var(--darkened-bg);
+			background-color: var(--selected-bg);
 
 			&.active, &.current {
 				background-color: var(--body-bg);
@@ -280,23 +281,29 @@ $active-rectangle: rgb(210, 210, 112);
 				cursor: pointer;
 				border-bottom: 1px solid var(--border-color);
 			}
-			&.drag-over {
+			&.drag-over:not(.active) {
 				color: var(--selected-row);
 				background-color: var(--button-hover-bg);
 			}
 			&.trash {
-				background-image: $trash-background;
-				background-color: transparent;
-				background-attachment: fixed;
+				&.active {
+					background-image: $trash-background;
+					background-color: transparent;
+					background-attachment: fixed;
+				}
 				margin-left: auto;
 			}
 
 			span {
 				cursor: pointer;
 				margin-left: 10px;
-				:hover {
-					background-color: lightgrey;
+				color: var(--link-fg);
+				border-radius: 50%;
+				&:hover {
+					color: var(--link-hover-color);
+					background-color: var(--primary);
 				}
+
 				> svg {
 					height: 16px;
 					width: 16px;
@@ -341,6 +348,15 @@ $active-rectangle: rgb(210, 210, 112);
 					background-color: inherit;
 				}
 			}
+		}
+
+		.status {
+			font-size: 18px;
+			font-weight: bold;
+			line-height: 50px;
+			color: var(--body-quiet-color);
+			padding-left: 2em;
+			width: auto;
 		}
 
 		ul.inode-list {
@@ -476,9 +492,6 @@ $active-rectangle: rgb(210, 210, 112);
 			list-style: none;
 			padding: 5px;
 			border: 1px solid transparent;
-			cursor: pointer;
-			font-size: 15px;
-			line-height: 18px;
 
 			&:hover {
 				filter: brightness(1.125);
@@ -493,14 +506,6 @@ $active-rectangle: rgb(210, 210, 112);
 			&.disabled {
 				opacity: 0.5;
 				cursor: not-allowed;
-			}
-
-			&.status {
-				font-size: 18px;
-				font-weight: bold;
-				line-height: 50px;
-				color: var(--body-quiet-color);
-				padding-left: 2em;
 			}
 
 			[aria-roledescription="draggable"]:focus-visible {
@@ -596,44 +601,51 @@ $active-rectangle: rgb(210, 210, 112);
 	.tiles ul.inode-list {
 		gap: 10px;
 
-		li .inode .figure-labels {
-			inset: 5px;
-			span {
-				width: 12px;
-				height: 12px;
-				display: inline-block;
-				border-radius: 50%;
-				margin-left: -4px;
-			}
-		}
-
 		li:not(.status) {
 			min-height: 250px;
 			width: 190px;
+			cursor: pointer;
+			font-size: 15px;
+			line-height: 18px;
+
+			.inode .figure-labels {
+				inset: 5px;
+
+				span {
+					width: 12px;
+					height: 12px;
+					display: inline-block;
+					border-radius: 50%;
+					margin-left: -4px;
+				}
+			}
 		}
 	}
 
 	.mosaic ul.inode-list {
 		gap: 5px;
 
-		li .inode .figure-labels {
-			inset: 2px;
-
-			span {
-				width: 8px;
-				height: 8px;
-				display: inline-block;
-				border-radius: 50%;
-				margin-left: -3px;
-			}
-		}
-
 		li:not(.status) {
 			min-height: 120px;
 			width: 70px;
-		}
-	}
+			cursor: pointer;
+			font-size: 15px;
+			line-height: 18px;
 
+			.inode .figure-labels {
+				inset: 2px;
+
+				span {
+					width: 8px;
+					height: 8px;
+					display: inline-block;
+					border-radius: 50%;
+					margin-left: -3px;
+				}
+			}
+		}
+
+	}
 
 	.list ul.inode-list, .columns ul.inode-list {
 		display: block;
