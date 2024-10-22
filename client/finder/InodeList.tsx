@@ -8,10 +8,35 @@ import React, {
 import {Folder, File} from './Item';
 
 
+function InodeListHeader() {
+	return (
+		<li className="header">
+			<div className="inode">
+				<div></div>
+				<div>{gettext("Name")}</div>
+				<div>{gettext("Owner")}</div>
+				<div>{gettext("Details")}</div>
+				<div>{gettext("Created at")}</div>
+				<div>{gettext("Modified at")}</div>
+				<div>{gettext("Mime type")}</div>
+			</div>
+		</li>
+	);
+}
+
+
 const InodeList = forwardRef((props: any, forwardedRef) => {
-	const {folderId, previousFolderId, setCurrentFolder, menuBarRef, layout, clipboard, clearClipboard, settings} = props;
-	const [isLoading, setLoading] = useState(false);
-	const [inodes, setInodes] = useState([]);
+	const {
+		folderId,
+		previousFolderId,
+		setCurrentFolder,
+		menuBarRef,
+		layout,
+		clipboard,
+		clearClipboard,
+		settings
+	} = props;
+	const [inodes, setInodes] = useState(null);
 	const [lastSelectedIndex, setSelectedIndex] = useState(-1);
 	const [searchQuery, setSearchQuery] = useState(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -37,7 +62,7 @@ const InodeList = forwardRef((props: any, forwardedRef) => {
 	async function fetchInodes() {
 		const params = new URLSearchParams({q: searchQuery});
 		const fetchInodesUrl = `${settings.base_url}${folderId}/fetch${searchQuery ? `?${params.toString()}` : ''}`;
-		setLoading(true);
+		setInodes(null);
 		const response = await fetch(fetchInodesUrl);
 		if (response.ok) {
 			const body = await response.json();
@@ -52,7 +77,6 @@ const InodeList = forwardRef((props: any, forwardedRef) => {
 		} else {
 			console.error(response);
 		}
-		setLoading(false);
 	}
 
 	function selectInode(event: PointerEvent, inode) {
@@ -137,9 +161,6 @@ const InodeList = forwardRef((props: any, forwardedRef) => {
 	}
 
 	function renderInodes() {
-		if (isLoading)
-			return (<li className="status">{gettext("Loading...")}</li>);
-
 		if (inodes.length === 0) {
 			if (searchQuery)
 				return (<li className="status">{`No match while searching for “${searchQuery}”`}</li>);
@@ -152,21 +173,13 @@ const InodeList = forwardRef((props: any, forwardedRef) => {
 		);
 	}
 
-	return (
+	return inodes === null ? (
+		<div className="status">
+			{gettext("Loading...")}
+		</div>
+	) : (
 		<ul className={cssClasses()}>
-			{layout === 'list' &&
-			<li className="header">
-				<div className="inode">
-					<div></div>
-					<div>{gettext("Name")}</div>
-					<div>{gettext("Owner")}</div>
-					<div>{gettext("Details")}</div>
-					<div>{gettext("Created at")}</div>
-					<div>{gettext("Modified at")}</div>
-					<div>{gettext("Mime type")}</div>
-				</div>
-			</li>
-			}
+			{layout === 'list' && <InodeListHeader/>}
 			{renderInodes()}
 		</ul>
 	);

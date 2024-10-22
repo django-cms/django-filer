@@ -99,28 +99,28 @@ export function FolderAdmin() {
 		};
 	}
 
-	function setCurrentFolder(folderId) {
+	const setCurrentFolder = (folderId: string) => {
 		if (folderId !== currentFolderId) {
 			deselectAll();
 			setCurrentFolderId(folderId);
 		}
-	}
+	};
 
-	function deselectAll(event?) {
+	const deselectAll = (event?)=> {
 		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
 			columnRef.current?.deselectInodes();
 		});
 		menuBarRef.current.setSelected([]);
-	}
+	};
 
-	function clearClipboard() {
+	const clearClipboard = () => {
 		setClipboard([]);
 		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
 			columnRef.current?.setInodes(columnRef.current?.inodes.map(inode =>
 				({...inode, cutted: false, copied: false})
 			));
 		});
-	}
+	};
 
 	function downloadFiles(inodes) {
 		inodes.forEach(inode => {
@@ -236,6 +236,10 @@ export function FolderAdmin() {
 		setDraggedInodes([]);
 	}
 
+	const handleUpload = (folderId) => {
+		columnRefs[folderId].current.fetchInodes();
+	};
+
 	function handleDragCancel(event) {
 		const {active} = event;
 		const activeFolderId = active.data.current.folderId;
@@ -291,7 +295,7 @@ export function FolderAdmin() {
 						key={folderId}
 						ref={folderId === settings.folder_id ? uploaderRef : null}
 						folderId={folderId}
-						handleUpload={id => columnRefs[id].current.fetchInodes()}
+						handleUpload={handleUpload}
 						settings={settings}
 					>
 						<SelectableArea

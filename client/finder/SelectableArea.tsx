@@ -16,7 +16,7 @@ function SelectionRectangle(props) {
 }
 
 
-export default function SelectableArea(props) {
+const SelectableArea = (props: any)=> {
 	const edgeSize = 16;  // the size of the area near the upper and lower edge where scrolling starts
 	const acceleration = 40;  // accelerate scrolling the nearer the cursor reaches one of the edges
 	const {deselectAll, columnRef, dragging} = props;
@@ -198,13 +198,13 @@ export default function SelectableArea(props) {
 
 	return (
 		<div className="scrollable-area" onScroll={handleScroll} ref={scrollableRef}>
-			<div
-				ref={areaRef}
-				className="selectable-area"
-			>
+			<div ref={areaRef} className="selectable-area">
 				{props.children}
 				{activeRectangle && <SelectionRectangle rect={activeRectangle} />}
 			</div>
 		</div>
 	);
-}
+};
+
+
+export default SelectableArea;
