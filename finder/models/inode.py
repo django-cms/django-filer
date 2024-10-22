@@ -40,17 +40,17 @@ class InodeMetaModel(models.base.ModelBase):
             new_class._mime_types_mapping[accept_mime_type] = new_class
 
     @property
-    def real_models(self):
+    def concrete_inode_models(self):
         """
-        Yields all real (excluding proxy models) that inherit from InodeModel.
+        Yields all concrete (excluding proxy models) that inherit from InodeModel.
         """
         yield self._inode_models['finder.FolderModel']
-        yield from self.real_file_models
+        yield from self.concrete_file_models
 
     @property
-    def real_file_models(self):
+    def concrete_file_models(self):
         """
-        Yields all real (excluding proxy models) that inherit from AbstractFileModel.
+        Yields all concrete (excluding proxy models) that inherit from AbstractFileModel.
         """
         for model in self._inode_models.values():
             if not model.is_folder and not model._meta.proxy:
@@ -74,9 +74,11 @@ class InodeManagerMixin:
     def filter_inodes(self, **lookup):
         from .folder import FolderModel
 
-        if lookup.pop('is_folder', False):
+        is_folder = lookup.pop('is_folder', None)
+        if is_folder:
             return FolderModel.objects.filter(**lookup).iterator()
-        inodes = [inode_model.objects.filter(**lookup) for inode_model in InodeModel.real_file_models]
+        concrete_models = InodeModel.concrete_file_models if is_folder is False else InodeModel.concrete_inode_models
+        inodes = [inode_model.objects.filter(**lookup) for inode_model in concrete_models]
         return chain(*inodes)
 
     def get_inode(self, **lookup):

@@ -14,7 +14,7 @@ class Command(BaseCommand):
         self.reorganize()
 
     def reorganize(self):
-        for inode_model in InodeModel.real_models:
+        for inode_model in InodeModel.concrete_inode_models:
             if inode_model.is_folder:
                 continue
             for file in inode_model.objects.all():

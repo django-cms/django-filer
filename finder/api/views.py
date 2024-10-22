@@ -114,8 +114,6 @@ class BrowserView(View):
         folder = FolderModel.objects.get(id=folder_id)
         request.session['finder.last_folder'] = str(folder_id)
 
-        folder.listdir(is_folder=False)
-
         return {
             'files': [{
                 'id': str(file.id),
