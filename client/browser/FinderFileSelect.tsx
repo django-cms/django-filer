@@ -1,9 +1,9 @@
 import React, {
-	forwardRef,
 	lazy,
+	memo,
 	Suspense,
+	useCallback,
 	useEffect,
-	useImperativeHandle,
 	useMemo,
 	useRef,
 	useState,
@@ -14,6 +14,7 @@ import ArrowDownIcon from '../icons/arrow-down.svg';
 import ArrowRightIcon from '../icons/arrow-right.svg';
 import EmptyIcon from '../icons/empty.svg';
 import FolderIcon from '../icons/folder.svg';
+import FolderOpenIcon from '../icons/folder-open.svg';
 import RootIcon from '../icons/root.svg';
 
 
@@ -51,38 +52,17 @@ function Figure(props) {
 }
 
 
-const FolderList = forwardRef((props: any, forwardedRef) => {
-	const [files, setFiles] = useState(props.files);
-	const [isLoading, setLoading] = useState(false);
-	const [searchQuery, setSearchQuery] = useState(() => {
-		const params = new URLSearchParams(window.location.search);
-		return params.get('q');
-	});
-
-	useImperativeHandle(forwardedRef, () => ({fetchFiles}));
-
-	async function fetchFiles(folderId) {
-		const params = new URLSearchParams({q: searchQuery});
-		const listFilesUrl = `${props.baseUrl}list/${folderId}${searchQuery ? `?${params.toString()}` : ''}`;
-		setLoading(true);
-		const response = await fetch(listFilesUrl);
-		if (response.ok) {
-			const body = await response.json();
-			setFiles(body.files);
-		} else {
-			console.error(response);
-		}
-		setLoading(false);
-	}
+const FilesList = memo((props: any) => {
+	const {files, isLoading} = props;
 
 	function selectFile(file) {
 		console.log(file);
 	}
 
+	console.log('FolderList', files);
 	return (
 		<ul className="files-list">{
-		isLoading ?
-			<li className="status">{gettext("Loading…")}</li> : files.length === 0 ?
+		files.length === 0 ?
 			<li className="status">{gettext("Empty folder")}</li> :
 		files.map(file => (
 			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} /></li>
@@ -93,25 +73,28 @@ const FolderList = forwardRef((props: any, forwardedRef) => {
 
 
 function FolderEntry(props) {
-	const {folder, toggleOpen, listFolder} = props;
+	const {folder, toggleOpen, fetchFiles, isCurrent} = props;
 
 	if (folder.is_root) {
-		return (<span onClick={() => listFolder(folder.id)}><RootIcon/></span>);
+		return (<span onClick={() => fetchFiles(folder.id)}><RootIcon/></span>);
 	}
 
 	return (<>
 		<i onClick={toggleOpen}>{
 			folder.has_subfolders ? folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/> : <EmptyIcon/>
 		}</i>
-		<span onClick={() => listFolder(folder.id)}>
+		{isCurrent ?
+		<strong><FolderOpenIcon/>{folder.name}</strong> :
+		<span onClick={() => fetchFiles(folder.id)} role="button">
 			<FolderIcon/>{folder.name}
 		</span>
+		}
 	</>);
 }
 
 
 function FolderStructure(props) {
-	const {baseUrl, folder, refreshStructure, folderListRef} = props;
+	const {baseUrl, folder, lastFolderId, fetchFiles, refreshStructure} = props;
 
 	async function fetchChildren() {
 		const response = await fetch(`${baseUrl}fetch/${folder.id}`);
@@ -139,23 +122,26 @@ function FolderStructure(props) {
 		refreshStructure();
 	}
 
-	async function listFolder(folderId) {
-		await folderListRef.current.fetchFiles(folderId);
-	}
-
 	return folder ? (
 		<li>
-			<FolderEntry folder={folder} toggleOpen={toggleOpen} listFolder={listFolder} />
-			{folder.is_open && (<ul>
-				{folder.children.map(child => (
-					<FolderStructure
-						key={child.id}
-						folder={child}
-						baseUrl={baseUrl}
-						refreshStructure={refreshStructure}
-						folderListRef={folderListRef}
-					/>
-				))}
+			<FolderEntry
+				folder={folder}
+				toggleOpen={toggleOpen}
+				fetchFiles={fetchFiles}
+				isCurrent={lastFolderId === folder.id}
+			/>
+			{folder.is_open && (
+			<ul>
+			{folder.children.map(child => (
+				<FolderStructure
+					key={child.id}
+					baseUrl={baseUrl}
+					folder={child}
+					lastFolderId={lastFolderId}
+					fetchFiles={fetchFiles}
+					refreshStructure={refreshStructure}
+				/>
+			))}
 			</ul>)}
 		</li>
 	) : null;
@@ -164,7 +150,12 @@ function FolderStructure(props) {
 
 export default function FinderFileSelect(props) {
 	const baseUrl = props['base-url'];
-	const [structure, setStructure] = useState({root_folder: null, files: []});
+	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: []});
+	const [isLoading, setLoading] = useState(false);
+	const [searchQuery, setSearchQuery] = useState(() => {
+		const params = new URLSearchParams(window.location.search);
+		return params.get('q');
+	});
 	const folderListRef = useRef(null);
 
 	useEffect(() => {
@@ -180,18 +171,46 @@ export default function FinderFileSelect(props) {
 		}
 	}
 
+	async function fetchFiles(folderId){
+		const params = new URLSearchParams({q: searchQuery});
+		const listFilesUrl = `${baseUrl}list/${folderId}${searchQuery ? `?${params.toString()}` : ''}`;
+		setLoading(true);
+		const newStructure = {root_folder: structure.root_folder, last_folder: folderId, files: []};
+		const response = await fetch(listFilesUrl);
+		if (response.ok) {
+			const body = await response.json();
+			newStructure.files = body.files;
+		} else {
+			console.error(response);
+		}
+		setLoading(false);
+		setStructure(newStructure);
+	}
+
+	function refreshStructure() {
+		console.log('refreshStructure');
+		setStructure({...structure});
+	}
+
 	function handleUpload(folderId) {
 		folderListRef.current.fetchFiles
 	}
 
 	return structure.root_folder && (<>
 		<ul className="folder-structure">
-			<FolderStructure baseUrl={baseUrl} folder={structure.root_folder} folderListRef={folderListRef} refreshStructure={() => {
-				setStructure({...structure});
-			}}/>
+			<FolderStructure
+				baseUrl={baseUrl}
+				folder={structure.root_folder}
+				lastFolderId={structure.last_folder}
+				fetchFiles={fetchFiles}
+				// folderListRef={folderListRef}
+				refreshStructure={refreshStructure}
+			/>
 		</ul>
-		<FileUploader folderId={structure.root_folder} handleUpload={handleUpload}>
-			<FolderList baseUrl={baseUrl} files={structure.files} ref={folderListRef} />
-		</FileUploader>
+		<FileUploader folderId={structure.root_folder} handleUpload={handleUpload}>{
+			isLoading ?
+			<div className="status">{gettext("Loading…")}</div> :
+			<FilesList files={structure.files} />
+		}</FileUploader>
 	</>);
 }
