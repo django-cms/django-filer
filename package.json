@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "esbuild": "node client/esbuild.config.mjs",
-    "compilescss": "sass --load-path=. client:finder/static/finder/css/",
+    "compilescss": "sass --load-path=. client/scss:finder/static/finder/css/",
     "buildall": "concurrently \"npm run esbuild -- --debug \"  \"npm run compilescss\""
   },
   "devDependencies": {

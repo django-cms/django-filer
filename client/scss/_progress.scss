@@ -1,0 +1,40 @@
+@import "colors";
+
+@mixin progress-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background-color: rgb(from $progress-bg-color r g b / 75%);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	.progress-indicator {
+		width: calc(100% - 100px);
+		max-width: 500px;
+		background-color: $progress-indicator-color;
+		border: $progress-indicator-border;
+		padding: 20px;
+
+		p {
+			font-weight: bold;
+			font-size: 20px;
+		}
+
+		.progress-bar {
+			padding: 0;
+
+			li {
+				display: flex;
+				justify-content: space-between;
+				span {
+					text-overflow: ellipsis;
+				}
+				progress {
+					width: 50%;
+				}
+			}
+		}
+	}
+}

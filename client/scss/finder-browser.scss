@@ -1,17 +1,21 @@
+@import "colors";
+@import "menubar";
+@import "progress";
+
 finder-file-select {
 	display: flex;
+	gap: 1rem;
 
 	.folder-structure {
 		flex-shrink: 0;
-		padding-right: 1rem;
 
-		ul ul {
-			padding-left: 1.5rem;
-		}
-
-		&, ul {
+		ul {
 			padding-left: 0;
 			list-style: none;
+
+			ul ul {
+				padding-left: 1.5rem;
+			}
 		}
 
 		li {
@@ -42,8 +46,20 @@ finder-file-select {
 		}
 	}
 
-	.files-list {
-		&, ul {
+	.file-browser {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+
+		nav[role="menubar"] {
+			flex-shrink: 0;
+			padding: 0 1rem 0.5rem;
+			border-bottom: 1px solid #808080;
+
+			@include menubar;
+		}
+
+		ul.files-list {
 			list-style: none;
 			display: flex;
 			padding: 10px;
@@ -52,9 +68,8 @@ finder-file-select {
 			align-content: flex-start;
 			justify-content: flex-start;
 			gap: 10px;
-		}
 
-		li {
+			li:not(.status) {
 			min-height: 150px;
 			width: 125px;
 
@@ -104,6 +119,7 @@ finder-file-select {
 				}
 			}
 		}
+		}
 	}
 
 	.status {
@@ -117,5 +133,18 @@ finder-file-select {
 
 	.file-uploader {
 		width: 100%;
+		position: relative;
+
+		.progress-overlay {
+			@include progress-overlay;
+		}
+
+		input[type=file] {
+			width: 0 !important;
+			height: 0 !important;
+			position: absolute;
+			bottom: 0;
+			padding: 0;
+		}
 	}
 }

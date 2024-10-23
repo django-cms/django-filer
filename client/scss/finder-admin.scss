@@ -1,3 +1,7 @@
+@import "colors";
+@import "menubar";
+@import "progress";
+
 // messagelist appears after saving a file
 ul.messagelist {
 	position: relative;
@@ -17,11 +21,6 @@ ul.messagelist {
 .content {
 	position: relative;
 }
-
-$trash-background: repeating-linear-gradient(45deg, var(--body-bg), var(--body-bg) 10px, var(--darkened-bg) 10px, var(--darkened-bg) 20px);
-$follow-folder-border: 2px dashed var(--border-color);
-$copied-inode-border: 2px dashed rgb(48, 164, 0);
-$active-rectangle: rgb(210, 210, 112);
 
 #content {
 	padding: 0;
@@ -53,205 +52,7 @@ $active-rectangle: rgb(210, 210, 112);
 	nav[role="menubar"] {
 		margin: 4px 0;
 
-		ul {
-			list-style: none;
-			box-sizing: border-box;
-			display: flex;
-			flex-wrap: wrap;
-			margin: 0 14px;
-			padding: 0;
-
-			li {
-				display: list-item;
-				list-style: none;
-				padding: 0;
-
-				&:not(:empty) {
-					cursor: pointer;
-					border-radius: 4px;
-					width: 32px;
-					height: 32px;
-				}
-
-				&:hover:not(.disabled):not(.search-field) {
-					background-color: var(--selected-bg);
-				}
-
-				&.active {
-					background-color: var(--selected-row);
-				}
-
-				&.disabled {
-					opacity: 0.5;
-					cursor: not-allowed;
-				}
-
-				&.erase svg {
-					color: var(--delete-button-bg);
-				}
-
-				&.search-field {
-					display: inline-flex;
-					width: calc(100% - 400px);
-					max-width: 400px;
-
-					> input {
-						width: calc(100% - 48px);
-						min-width: 100px;
-						height: 100%;
-						display: block;
-						color: var(--body-fg);
-						background-color: var(--body-bg);
-						margin: 0;
-						padding: 2px 8px;
-						border: 1px solid var(--border-color);
-						border-right: none;
-						border-top-left-radius: 5px;
-						border-bottom-left-radius: 5px;
-
-						&:focus-visible {
-							outline: none;
-						}
-
-						& + div {
-							border: 1px solid var(--border-color);
-							border-left: none;
-							border-top-right-radius: 5px;
-							border-bottom-right-radius: 5px;
-							padding: 0 5px 0 10px;
-							display: flex;
-
-							span:hover {
-								background-color: lightgrey;
-							}
-
-							.search-icon {
-								svg {
-									transform: scale(0.8);
-								}
-							}
-
-							.search-realm {
-								[role="combobox"] {
-									li:nth-child(2) {
-										padding-bottom: 4px;
-										border-bottom: 1px solid var(--border-color);
-										margin-bottom: 4px;
-									}
-								}
-							}
-						}
-					}
-
-					&:has(> input:focus-visible) {
-						box-shadow: rgb(50, 150, 250) 0 0 5px;
-					}
-				}
-
-				&.dropdown-menu {
-					width: auto;
-					&.with-caret {
-						padding-right: 0.25rem;
-					}
-				}
-
-				&.filter-by-label {
-					ul {
-						li:not(:has(span.label-dot)) {
-							justify-content: center;
-							padding-bottom: 4px;
-							border-bottom: 1px solid var(--border-color);
-							margin-bottom: 4px;
-						}
-
-						li span.label-dot {
-							width: 12px;
-							height: 12px;
-							display: inline-block;
-							border-radius: 50%;
-							margin-left: 0.5rem;
-							margin-right: 0.5rem;
-						}
-					}
-				}
-
-				&.extra-menu [role="combobox"] {
-					right: 0;
-					margin-inline-end: inherit;
-					> li:nth-child(5):not(:last-child) {
-						padding-bottom: 4px;
-						border-bottom: 1px solid var(--border-color);
-						margin-bottom: 4px;
-					}
-				}
-
-				svg {
-					display: inline-block;
-					width: 30px;
-					height: 30px;
-					margin: 1px;
-				}
-			}
-
-			[aria-haspopup="true"]:has([role="combobox"]) {
-				position: relative;
-				display: flex;
-				&.with-caret::after {
-					content: " ";
-					align-self: center;
-					border: 5px solid transparent;
-					border-top-color: var(--body-fg);
-					margin-top: 10px;
-				}
-			}
-
-			[role="combobox"] {
-				position: absolute;
-				z-index: 1;
-				background-color: var(--body-bg);
-				top: 100%;
-				left: -250px;
-				right:-250px;
-				margin-inline: auto;
-				border: 1px solid var(--border-color);
-				border-radius: 4px;
-				box-shadow: 0 0 8px var(--border-color);
-				display: flex;
-				flex-direction: column;
-				width: max-content;
-				padding-top: 3px;
-				padding-bottom: 3px;
-				padding-inline-start: 3px;
-				padding-inline-end: 3px;
-
-				&[aria-expanded="false"] {
-					display: none;
-				}
-
-				li {
-					padding: 0 2rem 0 0.5rem;
-					width: auto;
-					cursor: pointer;
-					display: flex;
-					align-items: center;
-					line-height: 32px;
-					font-size: 16px;
-
-					&.active::after {
-						content: "✔";
-						position: absolute;
-						right: 10px;
-					}
-				}
-
-				svg {
-					color: grey;
-				}
-				svg + span {
-					margin-left: 10px;
-				}
-			}
-		}
+		@include menubar;
 	}
 
 	ul.folder-tabs {
@@ -259,7 +60,7 @@ $active-rectangle: rgb(210, 210, 112);
 		flex-wrap: wrap;
 		margin: 10px 0 0 0;
 		padding: 0 12px;
-		border-bottom: 1px solid var(--border-color);
+		border-bottom: 1px solid $border-color;
 
 		li {
 			display: list-item;
@@ -268,21 +69,21 @@ $active-rectangle: rgb(210, 210, 112);
 			padding: 6px 14px;
 			font-size: 16px;
 			font-weight: bold;
-			border: 1px solid var(--border-color);
+			border: 1px solid $border-color;
 			border-top-left-radius: 4px;
 			border-top-right-radius: 4px;
-			border-bottom: 1px solid var(--body-bg);
-			background-color: var(--selected-bg);
+			border-bottom: 1px solid $body-bg-color;
+			background-color: $selected-bg-color;
 
 			&.active, &.current {
-				background-color: var(--body-bg);
+				background-color: $body-bg-color;
 			}
 			&:not(.active) {
 				cursor: pointer;
-				border-bottom: 1px solid var(--border-color);
+				border-bottom: 1px solid $border-color;
 			}
 			&.drag-over:not(.active) {
-				color: var(--selected-row);
+				color: $selected-row-color;
 				background-color: var(--button-hover-bg);
 			}
 			&.trash {
@@ -331,7 +132,7 @@ $active-rectangle: rgb(210, 210, 112);
 		align-items: stretch;
 
 		&:not(:has(.inode-list.trash)) {
-			background-color: var(--body-bg);
+			background-color: $body-bg-color;
 		}
 
 		.column-droppable {
@@ -446,42 +247,7 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.progress-overlay {
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		background-color: rgba(255, 255, 255, 0.75);
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-
-		.progress-indicator {
-			width: calc(100% - 100px);
-			max-width: 500px;
-			background-color: rgba(50, 150, 250, 0.5);
-			border: 3px solid rgb(50, 150, 250);
-			padding: 20px;
-
-			p {
-				font-weight: bold;
-				font-size: 20px;
-			}
-
-			.progress-bar {
-				padding: 0;
-
-				li {
-					display: flex;
-					justify-content: space-between;
-					span {
-						text-overflow: ellipsis;
-					}
-					progress {
-						width: 50%;
-					}
-				}
-			}
-		}
+		@include progress-overlay;
 	}
 
 	ul.inode-list {
@@ -500,7 +266,7 @@ $active-rectangle: rgb(210, 210, 112);
 			&.selected {
 				box-shadow: inset  0 0 0.5rem var(--accent);
 				outline: 1px dotted var(--accent);
-				background-color: rgb(from var(--selected-row) r g b / 50%);
+				background-color: rgb(from $selected-row-color r g b / 50%);
 			}
 
 			&.disabled {
@@ -517,7 +283,7 @@ $active-rectangle: rgb(210, 210, 112);
 				width: 100%;
 
 				&.drag-over {
-					color: var(--selected-row);
+					color: $selected-row-color;
 					background-color: var(--primary);
 					outline: 1px solid var(--link-hover-color);
 				}
@@ -527,7 +293,7 @@ $active-rectangle: rgb(210, 210, 112);
 					border-radius: 3px;
 
 					&:focus-visible {
-						background-color: var(--body-bg);
+						background-color: $body-bg-color;
 						outline: 1px solid var(--link-selected-fg);
 						outline-offset: -1px;
 						box-shadow: inset var(--link-selected-fg) 0 0 10px;
@@ -572,7 +338,7 @@ $active-rectangle: rgb(210, 210, 112);
 					border-radius: 5px;
 
 					&:not([src$=".svg"]) {
-						box-shadow: var(--border-color) 0 0 5px;
+						box-shadow: $border-color 0 0 5px;
 					}
 
 					&[src$=".svg"] {
@@ -581,7 +347,7 @@ $active-rectangle: rgb(210, 210, 112);
 				}
 				video {
 					border-radius: 5px;
-					box-shadow: var(--border-color) 0 0 5px;
+					box-shadow: $border-color 0 0 5px;
 				}
 
 				figcaption {
@@ -599,7 +365,7 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.tiles ul.inode-list {
-		gap: 10px;
+		gap: 5px;
 
 		li:not(.status) {
 			min-height: 250px;
@@ -623,7 +389,7 @@ $active-rectangle: rgb(210, 210, 112);
 	}
 
 	.mosaic ul.inode-list {
-		gap: 5px;
+		gap: 2px;
 
 		li:not(.status) {
 			min-height: 120px;
@@ -656,11 +422,11 @@ $active-rectangle: rgb(210, 210, 112);
 			box-sizing: border-box;
 
 			&:nth-child(even):not(.selected) {
-				background-color: var(--body-bg);
+				background-color: $body-bg-color;
 			}
 
 			&:last-child {
-				border-bottom: 1px solid var(--border-color);
+				border-bottom: 1px solid $border-color;
 			}
 
 			.inode {
@@ -713,7 +479,7 @@ $active-rectangle: rgb(210, 210, 112);
 			&.header {
 				height: auto;
 				font-weight: bold;
-				border-bottom: 1px solid var(--border-color);
+				border-bottom: 1px solid $border-color;
 			}
 
 			.inode {
@@ -808,7 +574,7 @@ $active-rectangle: rgb(210, 210, 112);
 
 		&.dragging.drag-over .quadrant {
 			background-color: var(--default-button-bg);
-			color: var(--selected-row);
+			color: $selected-row-color;
 		}
 	}
 
@@ -850,7 +616,7 @@ $active-rectangle: rgb(210, 210, 112);
 
 	.detail-editor {
 		padding: 0 20px 40px;
-		background-color: var(--body-bg);
+		background-color: $body-bg-color;
 		margin-top: -15px;
 
 		input[readonly] {
@@ -927,7 +693,7 @@ $active-rectangle: rgb(210, 210, 112);
 		.select-labels-option {
 			padding: 0.5rem 1rem;
 			&:hover {
-				background-color: var(--selected-row);
+				background-color: $selected-row-color;
 			}
 		}
 		span.select-labels-dot {

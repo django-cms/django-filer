@@ -1,0 +1,14 @@
+$trash-background: repeating-linear-gradient(45deg, var(--body-bg), var(--body-bg) 10px, var(--darkened-bg) 10px, var(--darkened-bg) 20px);
+$follow-folder-border: 2px dashed var(--border-color);
+$copied-inode-border: 2px dashed rgb(48, 164, 0);
+$focus-visible-box-shadow: rgb(50, 150, 250) 0 0 5px;
+$active-rectangle: var(--accent, rgb(210, 210, 112));
+$body-fg-color: var(--body-fg, #000);
+$body-bg-color: var(--body-bg, #fff);
+$border-color: var(--border-color, #808080);
+$selected-bg-color: var(--selected-bg, #f0f0f0);
+$selected-row-color: var(--selected-row, #ffffcc);
+
+$progress-bg-color: var(--body-fg, #fff);
+$progress-indicator-color: var(--breadcrumbs-fg, #c8c8c8);
+$progress-indicator-border: 3px solid var(--header-bg, #888);
