@@ -207,6 +207,7 @@ function ExtraMenu(props) {
 			<li className={numClippedInodes ? null : "disabled"} onClick={clearClipboard}>
 				<ClipboardIcon/><span>{gettext("Clear clipboard")}</span>
 			</li>
+			{settings.menu_extensions.length && <hr/>}
 			{settings.menu_extensions.map((extension, index) => (
 				<MenuExtension key={index} extension={extension} {...props} />
 			))}
@@ -419,7 +420,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 
 	return (
 		<nav role="menubar">
-			<ul>
+			<menu>
 				<li className="search-field">
 					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
 				</li>
@@ -464,7 +465,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 						{...props}
 					/>
 				</>)}
-			</ul>
+			</menu>
 		</nav>
 	);
 });

@@ -23,7 +23,7 @@ export default function DropDownMenu(props) {
 		<Wrapper
 			aria-haspopup="true"
 			onClick={toggleSubmenu}
-			className={`dropdown-menu ${props.className}`}
+			className={props.className}
 			data-tooltip-id="django-finder-tooltip"
 			data-tooltip-content={props.tooltip}
 		>

@@ -1,9 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useCookie} from './Storage';
+import React, {useRef, useState} from 'react';
+import {useSearchRealm} from '../finder/Storage';
 import DropDownMenu from './DropDownMenu';
 import SearchIcon from 'icons/search.svg';
-
-const useSearchRealm = initial => useCookie('django-finder-search-realm', initial);
 
 
 function useSearchParam(key) : [string, (value: string) => any] {
@@ -80,7 +78,14 @@ export function SearchField(props) {
 	}
 
 	return (<>
-		<input ref={searchRef} type="search" defaultValue={searchQuery} placeholder={gettext("Search for …")} onChange={handleSearch} onKeyDown={handleSearch} />
+		<input
+			ref={searchRef}
+			type="search"
+			defaultValue={searchQuery}
+			placeholder={gettext("Search for …")}
+			onChange={handleSearch}
+			onKeyDown={handleSearch}
+		/>
 		<div>
 			<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
 			<DropDownMenu wrapperElement="span" className="search-realm with-caret" tooltip={gettext("Restrict search")}>
@@ -90,6 +95,7 @@ export function SearchField(props) {
 				<li onClick={() => changeSearchRealm('everywhere')}
 					className={isActive('everywhere')}>{gettext("In all folders")}
 				</li>
+				<hr/>
 				<li onClick={() => changeSearchRealm('filename')}
 					className={isActive('filename')}>{gettext("Filename only")}
 				</li>
