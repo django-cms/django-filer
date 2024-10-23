@@ -297,6 +297,7 @@ export function FolderAdmin() {
 						folderId={folderId}
 						handleUpload={handleUpload}
 						settings={settings}
+						multiple
 					>
 						<SelectableArea
 							folderId={folderId}

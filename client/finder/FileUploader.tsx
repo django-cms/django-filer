@@ -4,6 +4,7 @@ import {ProgressOverlay, ProgressBar} from './UploadProgress';
 
 const FileUploader = forwardRef((props: any, forwardedRef) => {
 	const {folderId, handleUpload} = props;
+	const multiple = 'multiple' in props;
 	const inputRef = useRef(null);
 	const [dragging, setDragging] = useState(false);
 	const [uploading, setUploading] = useState([]);
@@ -45,6 +46,10 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 	}
 
 	function uploadFiles(files: FileList) {
+		const uploadFile = file => new Promise<Response>((resolve, reject) => {
+			file.resolve = resolve;
+			file.reject = reject;
+		});
 		const promises: Array<Promise<Response>> = [];
 		for (let k = 0; k < files.length; k++) {
 			promises.push(uploadFile(files.item(k)));
@@ -58,17 +63,10 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 		});
 	}
 
-	function uploadFile(file) {
-		return new Promise<Response>((resolve, reject) => {
-			file.resolve = resolve;
-			file.reject = reject;
-		});
-	}
-
 	return (
 		<div className="file-uploader" onDragEnter={handleDragEnter} onDragOver={swallowEvent} onDragLeave={handleDragLeave} onDrop={handleDrop}>
 			{props.children}
-			<input type="file" name={`file:${folderId}`} multiple ref={inputRef} onChange={handleFileSelect} />{
+			<input type="file" name={`file:${folderId}`} multiple={multiple} ref={inputRef} onChange={handleFileSelect} />{
 			(dragging || uploading.length > 0) &&
 			<ProgressOverlay dragging={dragging}>{
 				uploading.map((file, index) =>
