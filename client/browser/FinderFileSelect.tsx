@@ -2,20 +2,16 @@ import React, {
 	lazy,
 	memo,
 	Suspense,
-	useCallback,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from 'react';
+import {Tooltip} from 'react-tooltip';
 import FigureLabels from '../finder/FigureLabels';
 import FileUploader	 from '../finder/FileUploader';
-import ArrowDownIcon from '../icons/arrow-down.svg';
-import ArrowRightIcon from '../icons/arrow-right.svg';
-import EmptyIcon from '../icons/empty.svg';
-import FolderIcon from '../icons/folder.svg';
-import FolderOpenIcon from '../icons/folder-open.svg';
-import RootIcon from '../icons/root.svg';
+import FolderStructure from './FolderStructure';
+import Menu from './Menu';
 
 
 function StaticFigure(props) {
@@ -53,13 +49,14 @@ function Figure(props) {
 
 
 const FilesList = memo((props: any) => {
-	const {files, isLoading} = props;
+	const {files} = props;
 
 	function selectFile(file) {
 		console.log(file);
 	}
 
 	console.log('FolderList', files);
+
 	return (
 		<ul className="files-list">{
 		files.length === 0 ?
@@ -72,91 +69,11 @@ const FilesList = memo((props: any) => {
 });
 
 
-function FolderEntry(props) {
-	const {folder, toggleOpen, fetchFiles, isCurrent} = props;
-
-	if (folder.is_root) {
-		return (<span onClick={() => fetchFiles(folder.id)}><RootIcon/></span>);
-	}
-
-	return (<>
-		<i onClick={toggleOpen}>{
-			folder.has_subfolders ? folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/> : <EmptyIcon/>
-		}</i>
-		{isCurrent ?
-		<strong><FolderOpenIcon/>{folder.name}</strong> :
-		<span onClick={() => fetchFiles(folder.id)} role="button">
-			<FolderIcon/>{folder.name}
-		</span>
-		}
-	</>);
-}
-
-
-function FolderStructure(props) {
-	const {baseUrl, folder, lastFolderId, fetchFiles, refreshStructure} = props;
-
-	async function fetchChildren() {
-		const response = await fetch(`${baseUrl}fetch/${folder.id}`);
-		if (response.ok) {
-			const reply = await response.json();
-			folder.name = reply.name;
-			folder.has_subfolders = reply.has_subfolders;
-			folder.children = reply.children;
-		} else {
-			console.error(response);
-		}
-	}
-
-	async function toggleOpen() {
-		folder.is_open = !folder.is_open;
-		if (folder.is_open) {
-			if (folder.children === null) {
-				await fetchChildren();
-			} else {
-				await fetch(`${baseUrl}open/${folder.id}`);
-			}
-		} else {
-			await fetch(`${baseUrl}close/${folder.id}`);
-		}
-		refreshStructure();
-	}
-
-	return folder ? (
-		<li>
-			<FolderEntry
-				folder={folder}
-				toggleOpen={toggleOpen}
-				fetchFiles={fetchFiles}
-				isCurrent={lastFolderId === folder.id}
-			/>
-			{folder.is_open && (
-			<ul>
-			{folder.children.map(child => (
-				<FolderStructure
-					key={child.id}
-					baseUrl={baseUrl}
-					folder={child}
-					lastFolderId={lastFolderId}
-					fetchFiles={fetchFiles}
-					refreshStructure={refreshStructure}
-				/>
-			))}
-			</ul>)}
-		</li>
-	) : null;
-}
-
-
 export default function FinderFileSelect(props) {
 	const baseUrl = props['base-url'];
-	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: []});
-	const [isLoading, setLoading] = useState(false);
-	const [searchQuery, setSearchQuery] = useState(() => {
-		const params = new URLSearchParams(window.location.search);
-		return params.get('q');
-	});
+	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: null});
 	const folderListRef = useRef(null);
+	const uploaderRef = useRef(null);
 
 	useEffect(() => {
 		getStructure();
@@ -171,19 +88,22 @@ export default function FinderFileSelect(props) {
 		}
 	}
 
-	async function fetchFiles(folderId){
-		const params = new URLSearchParams({q: searchQuery});
-		const listFilesUrl = `${baseUrl}list/${folderId}${searchQuery ? `?${params.toString()}` : ''}`;
-		setLoading(true);
-		const newStructure = {root_folder: structure.root_folder, last_folder: folderId, files: []};
-		const response = await fetch(listFilesUrl);
+	async function fetchFiles(folderId: string, searchQuery='') {
+		const fetchUrl = (() => {
+			if (searchQuery) {
+				const params = new URLSearchParams({q: searchQuery});
+				return `${baseUrl}${folderId}/search?${params.toString()}`;
+			}
+			return `${baseUrl}${folderId}/list`;
+		})();
+		const newStructure = {root_folder: structure.root_folder, last_folder: folderId, files: null};
+		const response = await fetch(fetchUrl);
 		if (response.ok) {
 			const body = await response.json();
 			newStructure.files = body.files;
 		} else {
 			console.error(response);
 		}
-		setLoading(false);
 		setStructure(newStructure);
 	}
 
@@ -193,24 +113,38 @@ export default function FinderFileSelect(props) {
 	}
 
 	function handleUpload(folderId) {
-		folderListRef.current.fetchFiles
+		fetchFiles(folderId);
 	}
 
 	return structure.root_folder && (<>
-		<ul className="folder-structure">
-			<FolderStructure
-				baseUrl={baseUrl}
-				folder={structure.root_folder}
+		<nav className="folder-structure">
+			<ul>
+				<FolderStructure
+					baseUrl={baseUrl}
+					folder={structure.root_folder}
+					lastFolderId={structure.last_folder}
+					fetchFiles={fetchFiles}
+					refreshStructure={refreshStructure}
+				/>
+			</ul>
+		</nav>
+		<div className="file-browser">
+			<Menu
 				lastFolderId={structure.last_folder}
 				fetchFiles={fetchFiles}
-				// folderListRef={folderListRef}
-				refreshStructure={refreshStructure}
+				openUploader={() => uploaderRef.current.openUploader()}
 			/>
-		</ul>
-		<FileUploader folderId={structure.root_folder} handleUpload={handleUpload}>{
-			isLoading ?
-			<div className="status">{gettext("Loading…")}</div> :
-			<FilesList files={structure.files} />
-		}</FileUploader>
+			<FileUploader
+				folderId={structure.last_folder}
+				handleUpload={handleUpload}
+				ref={uploaderRef}
+				settings={{csrf_token: props['csrf-token'], base_url: props['base-url']}}
+			>{
+				structure.files === null ?
+				<div className="status">{gettext("Loading files…")}</div> :
+				<FilesList files={structure.files} />
+			}</FileUploader>
+		</div>
+		<Tooltip id="django-finder-tooltip" place="bottom-start" />
 	</>);
 }

@@ -16,17 +16,15 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.http import HttpResponse
-from django.template.loader import get_template
+from django.shortcuts import render
 from django.urls import include, path
 
 from finder.api import urls as finder_urls
 
 
 def render_landing(request):
-    template = get_template('testapp.html')
     context = {}
-    return HttpResponse(template.render(context))
+    return render(request, 'testapp.html', context)
 
 
 urlpatterns = [

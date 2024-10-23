@@ -18,7 +18,7 @@
 		<div class="row">
 			<div class="col mx-auto my-5">
 				<h1>Django Filer Demo</h1>
-				<finder-file-select base-url="{% url 'finder-api:base-url' %}" realm="admin"></finder-file-select>
+				<finder-file-select base-url="{% url 'finder-api:base-url' %}" realm="admin" csrf-token="{{ csrf_token }}"></finder-file-select>
 			</div>
 		</div>
 	</div>

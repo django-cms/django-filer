@@ -4,6 +4,6 @@ import FinderFileSelect from 'browser/FinderFileSelect';
 
 window.addEventListener('DOMContentLoaded', (event) => {
 	window.customElements.define('finder-file-select', r2wc(FinderFileSelect, {
-		props: {'base-url': 'string', realm: 'string'}}
-	));
+		props: {'base-url': 'string', realm: 'string', 'csrf-token': 'string'},
+	}));
 });

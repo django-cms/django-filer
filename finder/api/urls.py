@@ -11,20 +11,28 @@ urlpatterns = [
         BrowserView.as_view(action='structure'),
     ),
     path(
-        'fetch/<uuid:folder_id>',
+        '<uuid:folder_id>/fetch',
         BrowserView.as_view(action='fetch'),
     ),
     path(
-        'open/<uuid:folder_id>',
+        '<uuid:folder_id>/open',
         BrowserView.as_view(action='open'),
     ),
     path(
-        'close/<uuid:folder_id>',
+        '<uuid:folder_id>/close',
         BrowserView.as_view(action='close'),
     ),
     path(
-        'list/<uuid:folder_id>',
+        '<uuid:folder_id>/list',
         BrowserView.as_view(action='list'),
+    ),
+    path(
+        '<uuid:folder_id>/search',
+        BrowserView.as_view(action='search'),
+    ),
+    path(
+        '<uuid:folder_id>/upload',
+        BrowserView.as_view(action='upload'),
     ),
     path(
         'jsi18n/',
