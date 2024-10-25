@@ -45,7 +45,7 @@ class InodeAdmin(admin.ModelAdmin):
                 if obj.is_folder and obj.realm.site == site and obj.realm.slug == self.admin_site.name:
                     return obj
                 elif obj.folder.realm.site == site and obj.folder.realm.slug == self.admin_site.name:
-                    return obj.casted
+                    return obj.cast
             except model.DoesNotExist:
                 pass
 
@@ -146,8 +146,8 @@ class InodeAdmin(admin.ModelAdmin):
                         current_app=self.admin_site.name,
                     ),
                     'download_url': obj.get_download_url(),
-                    'thumbnail_url': obj.casted.get_thumbnail_url(),
-                    'summary': obj.casted.summary,
+                    'thumbnail_url': obj.cast.get_thumbnail_url(),
+                    'summary': obj.cast.summary,
                 }
 
                 # search model admin for current inode and get its rendering settings

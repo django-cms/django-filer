@@ -148,9 +148,9 @@ class AbstractFileModel(InodeModel):
         return reduce(or_, queries, models.Q())
 
     @cached_property
-    def casted(self):
+    def cast(self):
         """
-        Returns the object casted into the correct proxy model.
+        Returns the object cast into the correct proxy model.
         """
         proxy_model = FileModel.objects.get_model_for(self.mime_type)
         if not issubclass(proxy_model, self.__class__):

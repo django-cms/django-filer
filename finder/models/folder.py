@@ -72,7 +72,7 @@ class FolderModel(InodeModel):
         return self.name
 
     @property
-    def casted(self):
+    def cast(self):
         return self
 
     @property

@@ -150,9 +150,9 @@ class BrowserView(View):
                 'id': str(file.id),
                 'name': file.name,
                 'mime_type': file.mime_type,
-                'browser_component': file.casted.browser_component,
-                'thumbnail_url': file.casted.get_thumbnail_url(),
-                'sample_url': getattr(file.casted, 'get_sample_url', lambda: None)(),
+                'browser_component': file.cast.browser_component,
+                'thumbnail_url': file.cast.get_thumbnail_url(),
+                'sample_url': getattr(file.cast, 'get_sample_url', lambda: None)(),
                 'labels': file.serializable_value('labels'),
             } for file in folder.listdir(is_folder=False, **lookup)]
         }
@@ -191,9 +191,9 @@ class BrowserView(View):
                 'name': file.name,
                 'mime_type': file.mime_type,
                 'last_modified_at': file.last_modified_at,
-                'browser_component': file.casted.browser_component,
-                'thumbnail_url': file.casted.get_thumbnail_url(),
-                'sample_url': getattr(file.casted, 'get_sample_url', lambda: None)(),
+                'browser_component': file.cast.browser_component,
+                'thumbnail_url': file.cast.get_thumbnail_url(),
+                'sample_url': getattr(file.cast, 'get_sample_url', lambda: None)(),
                 'labels': file.serializable_value('labels'),
             } for file in queryset.distinct()])
         if sorting:
@@ -221,9 +221,9 @@ class BrowserView(View):
                 'name': file.name,
                 'mime_type': file.mime_type,
                 'last_modified_at': file.last_modified_at,
-                'browser_component': file.casted.browser_component,
-                'thumbnail_url': file.casted.get_thumbnail_url(),
-                'sample_url': getattr(file.casted, 'get_sample_url', lambda: None)(),
+                'browser_component': file.cast.browser_component,
+                'thumbnail_url': file.cast.get_thumbnail_url(),
+                'sample_url': getattr(file.cast, 'get_sample_url', lambda: None)(),
                 'labels': file.serializable_value('labels'),
             }
         }
