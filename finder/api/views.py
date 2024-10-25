@@ -2,12 +2,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import BadRequest, ObjectDoesNotExist
 from django.db.models import QuerySet, Subquery
 from django.db.models.functions import Lower
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.views import View
-from django.views.decorators.http import require_GET, require_POST
 
-from finder.models.file import FileModel
-from finder.models.folder import FolderModel, InodeModel, RealmModel
+from finder.models.file import AbstractFileModel
+from finder.models.folder import FolderModel, RealmModel
 from finder.models.label import Label
 
 
@@ -183,7 +182,7 @@ class BrowserView(View):
         sorting = self.sorting_map.get(request.COOKIES.get('django-finder-sorting'))
 
         files = []
-        for file_model in InodeModel.concrete_file_models:
+        for file_model in AbstractFileModel.concrete_models:
             queryset = file_model.objects.filter(**lookup)
             if sorting:
                 queryset = queryset.order_by(sorting[0])
@@ -209,7 +208,7 @@ class BrowserView(View):
             raise BadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             raise BadRequest("Bad form encoding or missing payload.")
-        model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
+        model = AbstractFileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         folder = FolderModel.objects.get(id=folder_id)
         file = model.objects.create_from_upload(
             request.FILES['upload_file'],

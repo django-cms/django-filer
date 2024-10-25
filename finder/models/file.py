@@ -226,6 +226,15 @@ class AbstractFileModel(InodeModel):
             default_storage.delete(self.file_path)
         super().delete(using, keep_parents)
 
+    @property
+    def concrete_models(self):
+        """
+        Yields all concrete (excluding proxy models) that inherit from AbstractFileModel.
+        """
+        for model in self._inode_models.values():
+            if not model.is_folder and not model._meta.proxy:
+                yield model
+
 
 class FileModel(AbstractFileModel):
     """

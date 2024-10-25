@@ -19,7 +19,15 @@ class InodeMetaModel(models.base.ModelBase):
         if new_class._meta.abstract is False and 'finder.InodeModel' in base_labels:
             if not new_class.is_folder:
                 cls._validate_accept_mime_types(new_class)
-            cls._inode_models[new_class._meta.label] = new_class
+            if new_class.is_folder:
+                assert (
+                    all(not model.is_folder for model in cls._inode_models.values()),
+                    "Only one model is allowed to be the folder model.",
+                )
+                # always enforce that the folder model is the first one
+                cls._inode_models = dict(**{new_class._meta.label: new_class}, **cls._inode_models)
+            else:
+                cls._inode_models[new_class._meta.label] = new_class
         return new_class
 
     def _validate_accept_mime_types(new_class):
@@ -40,20 +48,12 @@ class InodeMetaModel(models.base.ModelBase):
             new_class._mime_types_mapping[accept_mime_type] = new_class
 
     @property
-    def concrete_inode_models(self):
+    def concrete_models(self):
         """
         Yields all concrete (excluding proxy models) that inherit from InodeModel.
         """
-        yield self._inode_models['finder.FolderModel']
-        yield from self.concrete_file_models
-
-    @property
-    def concrete_file_models(self):
-        """
-        Yields all concrete (excluding proxy models) that inherit from AbstractFileModel.
-        """
         for model in self._inode_models.values():
-            if not model.is_folder and not model._meta.proxy:
+            if not model._meta.proxy:
                 yield model
 
     @property
@@ -72,12 +72,14 @@ class InodeManagerMixin:
     """
 
     def filter_inodes(self, **lookup):
+        from .file import AbstractFileModel
         from .folder import FolderModel
 
         is_folder = lookup.pop('is_folder', None)
         if is_folder:
             return FolderModel.objects.filter(**lookup).iterator()
-        concrete_models = InodeModel.concrete_file_models if is_folder is False else InodeModel.concrete_inode_models
+        # `is_folder` may be None (all models) or False (only files)
+        concrete_models = AbstractFileModel.concrete_models if is_folder is False else InodeModel.concrete_models
         inodes = [inode_model.objects.filter(**lookup) for inode_model in concrete_models]
         return chain(*inodes)
 

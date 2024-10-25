@@ -39,7 +39,7 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_object(self, request, object_id, from_field=None):
         site = get_current_site(request)
-        for model in InodeModel.concrete_inode_models:
+        for model in InodeModel.concrete_models:
             try:
                 obj = model.objects.get(id=object_id)
                 if obj.is_folder and obj.realm.site == site and obj.realm.slug == self.admin_site.name:
@@ -124,7 +124,7 @@ class InodeAdmin(admin.ModelAdmin):
         """
         inodes, applicable_sorting = [], []
         labels = lookup.pop('labels__in', None)
-        for inode_model in InodeModel.concrete_inode_models:
+        for inode_model in InodeModel.concrete_models:
             queryset = (
                 inode_model.objects.select_related('owner')
                 .filter(**lookup)
