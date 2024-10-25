@@ -21,7 +21,7 @@ from .inode import InodeAdmin
 
 @admin.register(FolderModel)
 class FolderAdmin(InodeAdmin):
-    form_template = 'admin/finder/change_folder_form.html'
+    form_template = 'finder/admin/change_folder_form.html'
     _model_admin_cache = {}
     _legends = {
         'name': _("Name"),

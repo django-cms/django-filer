@@ -39,7 +39,7 @@ class FileModelForm(EntangledModelForm):
 @admin.register(FileModel)
 class FileAdmin(InodeAdmin):
     form = FileModelForm
-    form_template = 'admin/finder/change_file_form.html'
+    form_template = 'finder/admin/change_file_form.html'
     readonly_fields = ['details', 'owner', 'created_at', 'last_modified_at', 'mime_type', 'sha1']
 
     @property
