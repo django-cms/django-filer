@@ -55,7 +55,7 @@ class FolderAdmin(InodeAdmin):
             ),
             path(
                 '<uuid:folder_id>/upload',
-                self.admin_site.admin_view(self.upload_files),
+                self.admin_site.admin_view(self.upload_file),
             ),
             path(
                 '<uuid:folder_id>/update',
@@ -213,7 +213,7 @@ class FolderAdmin(InodeAdmin):
             **lookup,
         )
 
-    def upload_files(self, request, folder_id):
+    def upload_file(self, request, folder_id):
         if request.method != 'POST':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if not (folder := self.get_object(request, folder_id)):
