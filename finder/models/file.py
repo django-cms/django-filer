@@ -162,6 +162,22 @@ class AbstractFileModel(InodeModel):
         self.__class__ = proxy_model
         return self
 
+    @cached_property
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'file_name': self.file_name,
+            'file_size': self.file_size,
+            'sha1': self.sha1,
+            'mime_type': self.mime_type,
+            'last_modified_at': self.last_modified_at,
+            'browser_component': self.cast.browser_component,
+            'thumbnail_url': self.cast.get_thumbnail_url(),
+            'sample_url': getattr(self.cast, 'get_sample_url', lambda: None)(),
+            'labels': self.serializable_value('labels'),
+        }
+
     def get_download_url(self):
         """
         Hook to return the download url for a given file.

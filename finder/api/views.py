@@ -5,8 +5,9 @@ from django.db.models.functions import Lower
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views import View
 
-from finder.models.file import AbstractFileModel
+from finder.models.file import FileModel
 from finder.models.folder import FolderModel, RealmModel
+from finder.models.inode import InodeModel
 from finder.models.label import Label
 
 
@@ -145,17 +146,7 @@ class BrowserView(View):
         folder = FolderModel.objects.get(id=folder_id)
         lookup = self.filter_lookup(request)
         request.session['finder.last_folder'] = str(folder_id)
-        return {
-            'files': [{
-                'id': str(file.id),
-                'name': file.name,
-                'mime_type': file.mime_type,
-                'browser_component': file.cast.browser_component,
-                'thumbnail_url': file.cast.get_thumbnail_url(),
-                'sample_url': getattr(file.cast, 'get_sample_url', lambda: None)(),
-                'labels': file.serializable_value('labels'),
-            } for file in folder.listdir(is_folder=False, **lookup)]
-        }
+        return {'files': [file.as_dict for file in folder.listdir(is_folder=False, **lookup)]}
 
     def search(self, request, folder_id):
         """
@@ -186,16 +177,7 @@ class BrowserView(View):
             queryset = file_model.objects.filter(**lookup)
             if sorting:
                 queryset = queryset.order_by(sorting[0])
-            files.extend([{
-                'id': str(file.id),
-                'name': file.name,
-                'mime_type': file.mime_type,
-                'last_modified_at': file.last_modified_at,
-                'browser_component': file.cast.browser_component,
-                'thumbnail_url': file.cast.get_thumbnail_url(),
-                'sample_url': getattr(file.cast, 'get_sample_url', lambda: None)(),
-                'labels': file.serializable_value('labels'),
-            } for file in queryset.distinct()])
+            files.extend([file.as_dict for file in queryset.distinct()])
         if sorting:
             files.sort(key=sorting[1], reverse=sorting[2])
         return {'files': files}
@@ -215,15 +197,4 @@ class BrowserView(View):
             folder=folder,
             owner=request.user,
         )
-        return {
-            'uploaded_file': {
-                'id': str(file.id),
-                'name': file.name,
-                'mime_type': file.mime_type,
-                'last_modified_at': file.last_modified_at,
-                'browser_component': file.cast.browser_component,
-                'thumbnail_url': file.cast.get_thumbnail_url(),
-                'sample_url': getattr(file.cast, 'get_sample_url', lambda: None)(),
-                'labels': file.serializable_value('labels'),
-            }
-        }
+        return {'uploaded_file': file.as_dict}
