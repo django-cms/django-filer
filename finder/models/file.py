@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.template.defaultfilters import filesizeformat
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, classproperty
 from django.utils.translation import gettext_lazy as _
 
 from filer import settings as filer_settings
@@ -42,7 +42,7 @@ class FileModelManager(InodeManager):
 
     def get_model_for(self, mime_type):
         def lookup(mime_type):
-            for model in InodeModel.file_models:
+            for model in InodeModel.get_models(include_proxy=True):
                 if mime_type in model.accept_mime_types:
                     return model
             return None
@@ -174,6 +174,15 @@ class AbstractFileModel(InodeModel):
         """
         return self.fallback_thumbnail_url
 
+    # @classproperty
+    # def concrete_models(cls):
+    #     """
+    #     Yields all concrete (excluding proxy models) that inherit from AbstractFileModel.
+    #     """
+    #     for model in cls._inode_models.values():
+    #         if not model.is_folder and not model._meta.proxy:
+    #             yield model
+
     @cached_property
     def mime_maintype(self):
         return self.mime_type.split('/')[0]
@@ -225,15 +234,6 @@ class AbstractFileModel(InodeModel):
         if not self._meta.abstract and default_storage.exists(self.file_path):
             default_storage.delete(self.file_path)
         super().delete(using, keep_parents)
-
-    @property
-    def concrete_models(self):
-        """
-        Yields all concrete (excluding proxy models) that inherit from AbstractFileModel.
-        """
-        for model in self._inode_models.values():
-            if not model.is_folder and not model._meta.proxy:
-                yield model
 
 
 class FileModel(AbstractFileModel):

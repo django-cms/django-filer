@@ -182,7 +182,7 @@ class BrowserView(View):
         sorting = self.sorting_map.get(request.COOKIES.get('django-finder-sorting'))
 
         files = []
-        for file_model in AbstractFileModel.concrete_models:
+        for file_model in InodeModel.get_models():
             queryset = file_model.objects.filter(**lookup)
             if sorting:
                 queryset = queryset.order_by(sorting[0])
@@ -208,7 +208,7 @@ class BrowserView(View):
             raise BadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             raise BadRequest("Bad form encoding or missing payload.")
-        model = AbstractFileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
+        model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         folder = FolderModel.objects.get(id=folder_id)
         file = model.objects.create_from_upload(
             request.FILES['upload_file'],

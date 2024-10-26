@@ -14,9 +14,7 @@ class Command(BaseCommand):
         self.reorganize()
 
     def reorganize(self):
-        for inode_model in InodeModel.concrete_models:
-            if inode_model.is_folder:
-                continue
+        for inode_model in InodeModel.get_models():
             for file in inode_model.objects.all():
                 file_model = FileModel.objects.get_model_for(file.mime_type)
                 if not issubclass(file_model, file.__class__):

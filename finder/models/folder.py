@@ -87,7 +87,7 @@ class FolderModel(InodeModel):
     def num_children(self):
         num_children = sum(
             inode_model.objects.filter(parent=self).count()
-            for inode_model in InodeModel.concrete_models
+            for inode_model in InodeModel.get_models(include_folder=True)
         )
         return num_children
 

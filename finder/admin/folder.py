@@ -87,7 +87,7 @@ class FolderAdmin(InodeAdmin):
             ),
         ]
         urls.extend(default_urls)
-        for model in InodeModel.file_models:
+        for model in InodeModel.get_models(include_proxy=True):
             if model_admin := self.admin_site._registry.get(model):
                 urls.extend(model_admin.get_menu_extension_urls())
         return urls
@@ -149,7 +149,7 @@ class FolderAdmin(InodeAdmin):
 
     def get_menu_extension_settings(self, request):
         extensions = []
-        for model in InodeModel.file_models:
+        for model in InodeModel.get_models(include_proxy=True):
             if model_admin := self.admin_site._registry.get(model):
                     extension = model_admin.get_menu_extension_settings(request)
                     if extension.get('component'):
@@ -218,14 +218,15 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if not (folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
-        if request.content_type == 'multipart/form-data' and 'upload_file' in request.FILES:
-            model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
-            new_file = model.objects.create_from_upload(
-                request.FILES['upload_file'],
-                folder=folder,
-                owner=request.user,
-            )
-        return HttpResponse(f"Uploaded {new_file.name} successfully.")
+        if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
+            return HttpResponseBadRequest("Bad encoding type or missing payload.")
+        model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
+        new_file = model.objects.create_from_upload(
+            request.FILES['upload_file'],
+            folder=folder,
+            owner=request.user,
+        )
+        return JsonResponse({'uploaded_file': new_file.as_dict})
 
     def update_inode(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):

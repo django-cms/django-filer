@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from entangled.forms import EntangledModelForm
 
 from finder.models.file import FileModel
+from finder.models.inode import InodeModel
 from finder.models.label import Label
 from finder.admin.inode import InodeAdmin
 
@@ -59,7 +60,7 @@ class FileAdmin(InodeAdmin):
             ),
         ]
         urls.extend(super().get_urls())
-        for model in FileModel.file_models:
+        for model in InodeModel.get_models(include_proxy=True):
             if model_admin := self.admin_site._registry.get(model):
                 urls.extend(model_admin.get_editor_urls())
         return urls

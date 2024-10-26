@@ -47,22 +47,14 @@ class InodeMetaModel(models.base.ModelBase):
                     raise ImproperlyConfigured(msg.format(accept_mime_type, other))
             new_class._mime_types_mapping[accept_mime_type] = new_class
 
-    @property
-    def concrete_models(self):
+    def get_models(self, include_proxy=False, include_folder=False):
         """
-        Yields all concrete (excluding proxy models) that inherit from InodeModel.
+        Yields all models that inherit from InodeModel.
+        If `include_proxy` is True, all proxy models are included.
+        If `include_folder` is True, the `FolderModel` is included.
         """
         for model in self._inode_models.values():
-            if not model._meta.proxy:
-                yield model
-
-    @property
-    def file_models(cls):
-        """
-        Returns all models (including proxy models) that inherit from AbstractFileModel.
-        """
-        for model in cls._inode_models.values():
-            if not model.is_folder:
+            if (not model._meta.proxy or include_proxy) and (not model.is_folder or include_folder):
                 yield model
 
 
@@ -72,14 +64,11 @@ class InodeManagerMixin:
     """
 
     def filter_inodes(self, **lookup):
-        from .file import AbstractFileModel
         from .folder import FolderModel
 
-        is_folder = lookup.pop('is_folder', None)
-        if is_folder:
+        if is_folder := lookup.pop('is_folder', None):
             return FolderModel.objects.filter(**lookup).iterator()
-        # `is_folder` may be None (all models) or False (only files)
-        concrete_models = AbstractFileModel.concrete_models if is_folder is False else InodeModel.concrete_models
+        concrete_models = InodeModel.get_models(include_folder=is_folder is None)
         inodes = [inode_model.objects.filter(**lookup) for inode_model in concrete_models]
         return chain(*inodes)
 
