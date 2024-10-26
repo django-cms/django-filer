@@ -16,21 +16,17 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.shortcuts import render
 from django.urls import include, path
 
 from finder.api import urls as finder_urls
 
-
-def render_landing(request):
-    context = {}
-    return render(request, 'testapp.html', context)
+from testapp.views import TestAppView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('finder-api/', include(finder_urls)),
-    path('testapp/', render_landing),
+    path('testapp/', TestAppView.as_view(), name='testapp'),
 ]
 if settings.DEBUG:
     urlpatterns.extend(static(

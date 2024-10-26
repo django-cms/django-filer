@@ -8,9 +8,8 @@
 	<title>Django-Filer</title>
 	<link rel="icon" href="data:,">
 	<link href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'finder/css/finder-browser.css' %}" rel="stylesheet">
 	<script src="{% url 'finder-api:javascript-catalog' %}"></script>
-	<script type="module" src="{% static 'finder/js/finder-browser.js' %}"></script>
+	{{ form.media }}
 </head>
 
 <body>
@@ -18,7 +17,13 @@
 		<div class="row">
 			<div class="col mx-auto my-5">
 				<h1>Django Filer Demo</h1>
-				<finder-file-select base-url="{% url 'finder-api:base-url' %}" realm="admin" csrf-token="{{ csrf_token }}"></finder-file-select>
+				<form method="post">
+					{% csrf_token %}
+					{{ form }}
+					<p>
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</p>
+				</form>
 			</div>
 		</div>
 	</div>
