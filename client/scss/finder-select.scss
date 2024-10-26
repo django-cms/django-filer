@@ -1,0 +1,10 @@
+finder-file-select {
+	// hide the original input field without loosing the ability to focus it
+	input {
+		width: 0 !important;
+		height: 0 !important;
+		position: absolute;
+		bottom: 0;
+		padding: 0;
+	}
+}

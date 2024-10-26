@@ -2,64 +2,147 @@
 @import "menubar";
 @import "progress";
 
-finder-file-select {
-	display: flex;
-	gap: 1rem;
 
-	.folder-structure {
-		flex-shrink: 0;
+.finder-file-select {
+	figure {
+		display: inline-flex;
+		margin: 0.25rem 0;
+		padding: 0;
+		outline: gray thin dotted;
 
-		ul {
-			padding-left: 0;
-			list-style: none;
-
-			ul ul {
-				padding-left: 1.5rem;
-			}
+		>img, >span {
+			width: 180px;
+			height: 180px;
+			border-radius: 0.125rem;
+			background-color: #f5f5f5;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 
-		li {
-			i {
-				display: inline-block;
-				cursor: pointer;
-				width: 1.5rem;
-				color: #808080;
-				&:hover {
-					color: inherit;
-				}
+		>figcaption {
+			display: flex;
+			flex-direction: column;
+			padding: .25rem .5rem;
+			background-color: #fff;
+			overflow-x: hidden;
+			min-width: 12rem;
+
+			dl {
+				font-size: small;
+				margin: 0 0 .25rem 0;
+			}
+			dt {
+				font-weight: bold;
+				display: inline;
+			}
+			dd {
+				margin: 0;
 			}
 
-			svg {
-				height: 20px;
-				vertical-align: text-bottom;
-				margin-right: 0.5em;
-			}
+			div:last-child {
+				display: flex;
+				flex-grow: 1;
+				justify-content: flex-end;
+				padding: 0.25rem;
 
-			span[role="button"] {
-				cursor: pointer;
-				&:hover {
-					text-decoration: underline;
-					text-decoration-style: dashed;
-					text-decoration-color: #808080;
+				>button {
+					margin: 0;
+					padding: 0.25rem 0.5rem;
+					color: $delete-button-fg-color;
+					background-color: $delete-button-bg-color;
+					border: none;
+					border-radius: 0.125rem;
+					opacity: 0.9;
+					align-self: flex-end;
+
+					&:hover {
+						opacity: 1;
+					}
 				}
 			}
 		}
 	}
+}
 
-	.file-browser {
-		flex-grow: 1;
+dialog {
+	position: relative;
+	border: 1px solid #a0a0a0;
+	border-radius: 0.5rem;
+	box-shadow: 0 0 0.5rem #c8c8c8;
+	width: 80%;
+	height: 80%;
+	max-width: 900px;
+	padding: 1rem;
+
+	.wrapper {
 		display: flex;
 		flex-direction: column;
+		height: 100%;
+		width: 100%;
 
 		nav[role="menubar"] {
 			flex-shrink: 0;
-			padding: 0 1rem 0.5rem;
 			border-bottom: 1px solid #808080;
-
+			padding-bottom: 0.5rem;
+			margin: 0.25rem 1rem;
 			@include menubar;
 		}
 
-		ul.files-list {
+		> .browser-body {
+			flex-grow: 1;
+			display: flex;
+			height: calc(100% - 45px);  // 45px is the height of the menubar
+		}
+
+		.folder-structure {
+			flex-shrink: 0;
+			overflow-y: auto;
+			direction: rtl;
+			padding: 0.5rem;
+
+			ul {
+				margin: 0;
+				padding-left: 0;
+				list-style: none;
+				direction: initial;
+
+				ul ul {
+					padding-left: 1.5rem;
+				}
+			}
+
+			li {
+				i {
+					display: inline-block;
+					cursor: pointer;
+					width: 1.5rem;
+					color: #808080;
+
+					&:hover {
+						color: inherit;
+					}
+				}
+
+				svg {
+					height: 20px;
+					vertical-align: text-bottom;
+					margin-right: 0.5em;
+				}
+
+				span[role="button"] {
+					cursor: pointer;
+
+					&:hover {
+						text-decoration: underline;
+						text-decoration-style: dashed;
+						text-decoration-color: #808080;
+					}
+				}
+			}
+		}
+
+		ul.files-browser {
 			list-style: none;
 			display: flex;
 			padding: 10px;
@@ -70,81 +153,95 @@ finder-file-select {
 			gap: 10px;
 
 			li:not(.status) {
-			min-height: 150px;
-			width: 125px;
+				min-height: 150px;
+				width: 125px;
 
-			.figure {
-				width: 100%;
-				height: 100%;
-				margin: 0;
-				cursor: pointer;
+				.figure {
+					width: 100%;
+					height: 100%;
+					margin: 0;
+					cursor: pointer;
 
-				div:has(> .figure-labels) {
-					position: relative;
-				}
-
-				.figure-labels {
-					position: absolute;
-					line-height: 0;
-					text-align: right;
-					overflow: hidden;
-					inset: 4px;
-
-					span {
-						width: 10px;
-						height: 10px;
-						display: inline-block;
-						border-radius: 50%;
-						margin-left: -4px;
+					div:has(> .figure-labels) {
+						position: relative;
 					}
 
-				}
+					.figure-labels {
+						position: absolute;
+						line-height: 0;
+						text-align: right;
+						overflow: hidden;
+						inset: 4px;
 
-				img, video {
-					width: 100%;
-					border-radius: 0.25rem;
-				}
+						span {
+							width: 10px;
+							height: 10px;
+							display: inline-block;
+							border-radius: 50%;
+							margin-left: -4px;
+						}
 
-				img:not([src$=".svg"]), video {
+					}
+
+					img, video {
+						width: 100%;
+						border-radius: 0.25rem;
+					}
+
+					img:not([src$=".svg"]), video {
 						box-shadow: 0 0 0.5rem #808080;
-				}
+					}
 
-				figcaption {
-					text-align: center;
-					line-height: 1.5rem;
-					font-size: 0.8em;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
+					figcaption {
+						text-align: center;
+						line-height: 1.5rem;
+						font-size: 0.8em;
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
 				}
 			}
 		}
+
+		.status {
+			font-size: 18px;
+			font-weight: bold;
+			line-height: 50px;
+			color: #808080;
+			padding-left: 2em;
+			width: auto;
+		}
+
+		.file-uploader {
+			width: 100%;
+			position: relative;
+			overflow-y: auto;
+			flex-grow: 1;
+
+			input[type="file"] {
+				width: 0 !important;
+				height: 0 !important;
+				position: absolute;
+				bottom: 0;
+				padding: 0;
+			}
+
+			.progress-overlay {
+				@include progress-overlay;
+			}
 		}
 	}
 
-	.status {
-		font-size: 18px;
-		font-weight: bold;
-		line-height: 50px;
-		color: #808080;
-		padding-left: 2em;
-		width: auto;
-	}
-
-	.file-uploader {
-		width: 100%;
-		position: relative;
-
-		.progress-overlay {
-			@include progress-overlay;
-		}
-
-		input[type=file] {
-			width: 0 !important;
-			height: 0 !important;
-			position: absolute;
-			bottom: 0;
-			padding: 0;
+	.close-button {
+		position: absolute;
+		top: 6px;
+		right: 6px;
+		width: 24px;
+		height: 24px;
+		opacity: 0.7;
+		&:hover {
+			opacity: 1;
 		}
 	}
 }

@@ -55,16 +55,24 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 			promises.push(uploadFile(files.item(k)));
 		}
 		setUploading([...uploading, ...files]);
-		Promise.all(promises).catch((error) => {
+		Promise.all(promises).then(responses => {
+			const uploadedFiles = responses.map(response => (response as any).uploaded_file);
+			handleUpload(folderId, uploadedFiles);
+		}).catch((error) => {
 			alert(error);
-		}).finally( () => {
+		}).finally(() => {
 			setUploading([]);
-			handleUpload(folderId);
 		});
 	}
 
 	return (
-		<div className="file-uploader" onDragEnter={handleDragEnter} onDragOver={swallowEvent} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+		<div
+			className="file-uploader"
+			onDragEnter={handleDragEnter}
+			onDragOver={swallowEvent}
+			onDragLeave={handleDragLeave}
+			onDrop={handleDrop}
+		>
 			{props.children}
 			<input type="file" name={`file:${folderId}`} multiple={multiple} ref={inputRef} onChange={handleFileSelect} />{
 			(dragging || uploading.length > 0) &&

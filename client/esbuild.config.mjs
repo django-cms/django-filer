@@ -1,13 +1,14 @@
 import {build} from 'esbuild';
 import svgr from 'esbuild-plugin-svgr';
 import parser from 'yargs-parser';
+
 const buildOptions = parser(process.argv.slice(2), {
   boolean: ['debug', 'minify'],
 });
 
 await build({
   entryPoints: [
-    'client/finder-browser.ts',
+    'client/finder-select.ts',
     'client/folder-admin.tsx',
     'client/file-admin.tsx',
     'client/components/editor/*.tsx',
@@ -21,7 +22,9 @@ await build({
   splitting: true,
   format: 'esm',
   jsx: 'automatic',
-  plugins: [svgr()],
+  plugins: [
+    svgr(),
+  ],
   loader: {'.svg': 'text', '.jsx': 'jsx' },
   target: ['es2020', 'chrome84', 'firefox84', 'safari14', 'edge84']
 }).catch(() => process.exit(1));
