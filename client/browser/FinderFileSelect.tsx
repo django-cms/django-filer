@@ -27,9 +27,19 @@ export default function FinderFileSelect(props) {
 				closeDialog();
 			}
 		};
+		const preventDefault = (event) => {
+			event.preventDefault();
+		}
 		window.addEventListener('keydown', handleEscape);
+
+		// prevent browser from loading a drag-and-dropped file
+		window.addEventListener('dragover', preventDefault, false);
+		window.addEventListener('drop', preventDefault, false);
+
 		return () => {
 			window.removeEventListener('keydown', handleEscape);
+			window.removeEventListener('dragover', preventDefault);
+			window.removeEventListener('drop', preventDefault);
 		}
 	}, []);
 

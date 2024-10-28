@@ -131,6 +131,12 @@ export function FolderAdmin() {
 		deselectAll();
 	}
 
+	function refreshColumns() {
+		Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
+			columnRef.current?.fetchInodes();
+		});
+	}
+
 	function computeBoundingBox(inodes) {
 		let zoom = 1;
 		if (inodes.length === 0) {
@@ -366,6 +372,7 @@ export function FolderAdmin() {
 			layout={layout}
 			setLayout={setLayout}
 			deselectAll={deselectAll}
+			refreshColumns={refreshColumns}
 			clipboard={clipboard}
 			setClipboard={setClipboard}
 			clearClipboard={clearClipboard}

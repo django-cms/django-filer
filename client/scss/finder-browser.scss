@@ -87,6 +87,10 @@ dialog {
 			padding-bottom: 0.5rem;
 			margin: 0.25rem 1rem;
 			@include menubar;
+
+			.search-field {
+				margin-left: -14px;
+			}
 		}
 
 		> .browser-body {

@@ -1,6 +1,7 @@
 import React, {useRef} from 'react';
 import DropDownMenu from '../finder/DropDownMenu';
 import {useSearchRealm} from '../finder/Storage';
+import {SortingOptionsItem, FilterByLabel} from '../finder/MenuBar';
 import SearchIcon from '../icons/search.svg';
 import UploadIcon from '../icons/upload.svg';
 
@@ -80,6 +81,7 @@ export default function Menu(props) {
 						</DropDownMenu>
 					</div>
 				</li>
+				<SortingOptionsItem/>
 				<li onClick={openUploader} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Upload file")}>
 					<UploadIcon/>
 				</li>

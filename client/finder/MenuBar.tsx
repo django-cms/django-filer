@@ -35,7 +35,8 @@ const useSorting = () => useCookie('django-finder-sorting', '');
 const useFilter = () => useCookie('django-finder-filter', []);
 
 
-function SortingOptionsItem(props: any) {
+export function SortingOptionsItem(props: any) {
+	const {refreshColumns} = props;
 	const [sorting, setSorting] = useSorting();
 
 	function isActive(value) {
@@ -45,9 +46,7 @@ function SortingOptionsItem(props: any) {
 	function changeSorting(value) {
 		if (value !== sorting) {
 			setSorting(value);
-			Object.entries(props.columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
-				columnRef.current?.fetchInodes();
-			});
+			refreshColumns();
 		}
 	}
 
@@ -83,8 +82,8 @@ function SortingOptionsItem(props: any) {
 }
 
 
-function FilterByLabel(props: any) {
-	const {columnRefs, labels} = props;
+export function FilterByLabel(props: any) {
+	const {labels, refreshFilesList} = props;
 	const [filter, setFilter] = useFilter();
 
 	function changeFilter(value) {
@@ -95,9 +94,7 @@ function FilterByLabel(props: any) {
 		} else {
 			setFilter([...filter, value]);
 		}
-		Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
-			columnRef.current?.fetchInodes();
-		});
+		refreshFilesList();
 	}
 
 	return (
@@ -224,6 +221,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		layout,
 		setLayout,
 		deselectAll,
+		refreshColumns,
 		clipboard,
 		setClipboard,
 		clearClipboard,
@@ -437,8 +435,8 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}>
 					<ColumnsIcon/></li>
 				<li style={{marginLeft: 'auto'}}></li>
-				{settings.labels && <FilterByLabel columnRefs={columnRefs} labels={settings.labels}/>}
-				<SortingOptionsItem columnRefs={columnRefs}/>
+				{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels}/>}
+				<SortingOptionsItem refreshColumns={refreshColumns} />
 				<li style={{marginRight: 'auto'}}></li>
 				<li className={numSelectedInodes ? null : "disabled"} onClick={cutInodes}
 					data-tooltip-id="django-finder-tooltip"

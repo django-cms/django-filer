@@ -11,12 +11,13 @@ export default function DropDownMenu(props) {
 				ref.current.setAttribute('aria-expanded', 'false');
 			}
 		};
-		window.addEventListener('click', closeSubmenu);
-		return () => window.removeEventListener('click', closeSubmenu);
+		const rootNode = ref.current.getRootNode();
+		rootNode.addEventListener('click', closeSubmenu);
+		return () => rootNode.removeEventListener('click', closeSubmenu);
 	}, []);
 
 	function toggleSubmenu() {
-		ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false': 'true');
+		ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false' : 'true');
 	}
 
 	return (
