@@ -160,10 +160,7 @@ class ArchiveAdmin(FileAdmin):
 
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
-        settings.update(
-            react_component='Archive',
-            download_file=True,
-        )
+        settings.update(download_file=True)
         return settings
 
     def get_menu_extension_settings(self, request):

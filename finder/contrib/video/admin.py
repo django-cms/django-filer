@@ -30,13 +30,13 @@ class VideoAdmin(FileAdmin):
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
         settings.update(
-            react_component='Video',
             replace_file= True,
             download_file=True,
         )
         return settings
 
     def get_folderitem_settings(self, request, inode):
+        raise NotImplementedError()
         settings = super().get_folderitem_settings(request, inode)
         settings.update(
             react_component=inode.browser_component,

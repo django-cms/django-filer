@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import models
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import cached_property
 
 from filer import settings as filer_settings
 
@@ -11,6 +11,7 @@ from finder.models.file import AbstractFileModel
 
 class ImageModel(AbstractFileModel):
     accept_mime_types = ['image/*']
+    editor_component = 'Image'
     data_fields = AbstractFileModel.data_fields + ['width', 'height']
     filer_public_thumbnails = Path(
         filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']

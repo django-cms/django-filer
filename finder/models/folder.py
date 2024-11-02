@@ -48,6 +48,7 @@ class FolderModelManager(InodeManagerMixin, ModelManager):
 
 class FolderModel(InodeModel):
     is_folder = True
+    folderitem_component = None
 
     realm = models.ForeignKey(
         RealmModel,
@@ -73,6 +74,7 @@ class FolderModel(InodeModel):
 
     @property
     def cast(self):
+        raise NotImplementedError
         return self
 
     @property
@@ -188,7 +190,7 @@ class FolderModel(InodeModel):
         """
         List all inodes belonging to this folder.
         """
-        return self._meta.model.objects.filter_inodes(parent=self, **lookup)
+        return self._meta.model.objects.filter_unified(parent=self, **lookup)
 
     def copy_to(self, folder, **kwargs):
         """

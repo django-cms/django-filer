@@ -21,8 +21,8 @@ function StaticFigure(props) {
 
 function Figure(props) {
 	const FigBody = useMemo(() => {
-		if (props.browser_component) {
-			const component = `./components/folderitem/${props.browser_component}.js`;
+		if (props.folderitem_component) {
+			const component = `./components/folderitem/${props.folderitem_component}.js`;
 			const LazyItem = lazy(() => import(component));
 			return (props) => (
 				<Suspense>

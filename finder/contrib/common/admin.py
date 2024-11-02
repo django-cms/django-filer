@@ -13,7 +13,6 @@ class CommonAdmin(FileAdmin):
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
         settings.update(
-            react_component='Common',
             replace_file=True,
             download_file=True,
         )

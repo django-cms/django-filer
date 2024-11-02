@@ -7,8 +7,8 @@ import FileDetails from './FileDetails';
 export function FileAdmin() {
 	const settings = useContext(FinderSettings);
 	const FileEditor = useMemo(() => {
-		if (settings.react_component) {
-			const component = `./components/editor/${settings.react_component}.js`;
+		if (settings.editor_component) {
+			const component = `./components/editor/${settings.editor_component}.js`;
 			const LazyItem = lazy(() => import(component));
 			return (props) => (
 				<Suspense fallback={<span>{gettext("Loading...")}</span>}>
