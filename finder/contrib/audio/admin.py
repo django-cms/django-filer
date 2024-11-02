@@ -39,6 +39,7 @@ class AudioAdmin(FileAdmin):
         return settings
 
     def get_folderitem_settings(self, request, inode):
+        raise NotImplementedError()
         settings = super().get_folderitem_settings(request, inode)
         settings.update(
             react_component=inode.browser_component,

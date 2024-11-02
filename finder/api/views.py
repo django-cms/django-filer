@@ -1,14 +1,13 @@
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import BadRequest, ObjectDoesNotExist
 from django.db.models import QuerySet, Subquery
-from django.db.models.functions import Lower
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views import View
 
+from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, RealmModel
 from finder.models.inode import InodeModel
-from finder.models.label import Label
 
 
 class BrowserView(View):
@@ -16,16 +15,6 @@ class BrowserView(View):
     The view for web component <finder-browser>.
     """
     action = None
-    sorting_map = {
-        'name_asc': (Lower('name').asc(), lambda file: file['name'].lower(), False),
-        'name_desc': (Lower('name').desc(), lambda file: file['name'].lower(), True),
-        'date_asc': ('last_modified_at', lambda file: file['last_modified_at'], False),
-        'date_desc': ('-last_modified_at', lambda file: file['last_modified_at'], True),
-        'size_asc': ('file_size', lambda file: file.get('file_size', 0), False),
-        'size_desc': ('-file_size', lambda file: file.get('file_size', 0), True),
-        'type_asc': ('mime_type', lambda file: file.get('mime_type', ''), False),
-        'type_desc': ('-mime_type', lambda file: file.get('mime_type', ''), True),
-    }
 
     def dispatch(self, request, *args, **kwargs):
         action = getattr(self, self.action, None)
@@ -122,31 +111,17 @@ class BrowserView(View):
         else:
             request.session.modified = True
 
-    def filter_lookup(self, request):
-        """
-        Get the lookup for filtering files by labels.
-        """
-        lookup = {}
-        if filter := request.COOKIES.get('django-finder-filter'):
-            allowed_labels = Label.objects.values_list('id', flat=True)
-            try:
-                if label_ids := [int(v) for v in filter.split(',') if int(v) in allowed_labels]:
-                    lookup['labels__in'] = label_ids
-                    request.COOKIES['django-finder-filter'] = ','.join(map(str, label_ids))
-                else:
-                    raise ValueError
-            except ValueError:
-                request.COOKIES.pop('django-finder-filter', None)
-        return lookup
-
     def list(self, request, folder_id):
         """
         List all the files of the given folder.
         """
         folder = FolderModel.objects.get(id=folder_id)
-        lookup = self.filter_lookup(request)
         request.session['finder.last_folder'] = str(folder_id)
-        return {'files': [file.as_dict for file in folder.listdir(is_folder=False, **lookup)]}
+        lookup = lookup_by_label(request)
+        unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
+        unified_queryset = sort_by_attribute(request, unified_queryset)
+        annotate_unified_queryset(unified_queryset, folder.realm.slug)
+        return {'files': list(unified_queryset)}
 
     def search(self, request, folder_id):
         """
@@ -166,21 +141,11 @@ class BrowserView(View):
 
         lookup = {
             'parent_id__in': parent_ids,
-            'name__icontains': search_query,
-            **self.filter_lookup(request),
+            'name_lower__icontains': search_query,
         }
-
-        sorting = self.sorting_map.get(request.COOKIES.get('django-finder-sorting'))
-
-        files = []
-        for file_model in InodeModel.get_models():
-            queryset = file_model.objects.filter(**lookup)
-            if sorting:
-                queryset = queryset.order_by(sorting[0])
-            files.extend([file.as_dict for file in queryset.distinct()])
-        if sorting:
-            files.sort(key=sorting[1], reverse=sorting[2])
-        return {'files': files}
+        unified_queryset = FileModel.objects.filter_unified(is_folder=False, **lookup)
+        annotate_unified_queryset(unified_queryset, starting_folder.realm.slug)
+        return {'files': list(unified_queryset)}
 
     def upload(self, request, folder_id):
         """

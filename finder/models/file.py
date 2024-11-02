@@ -152,6 +152,7 @@ class AbstractFileModel(InodeModel):
         """
         Returns the object cast into the correct proxy model.
         """
+        raise NotImplementedError
         proxy_model = FileModel.objects.get_model_for(self.mime_type)
         if not issubclass(proxy_model, self.__class__):
             msg = (
@@ -164,6 +165,7 @@ class AbstractFileModel(InodeModel):
 
     @cached_property
     def as_dict(self):
+        raise NotImplementedError
         return {
             'id': self.id,
             'name': self.name,
@@ -172,7 +174,7 @@ class AbstractFileModel(InodeModel):
             'sha1': self.sha1,
             'mime_type': self.mime_type,
             'last_modified_at': self.last_modified_at,
-            'browser_component': self.cast.browser_component,
+            'folderitem_component': self.cast.folderitem_component,
             'thumbnail_url': self.cast.get_thumbnail_url(),
             'sample_url': getattr(self.cast, 'get_sample_url', lambda: None)(),
             'labels': self.serializable_value('labels'),

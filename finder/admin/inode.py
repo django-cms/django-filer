@@ -4,28 +4,17 @@ from django.contrib import admin
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
-from django.db.models.functions import Lower
 from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 
-from finder.models.file import AbstractFileModel, InodeModel
+from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder, RealmModel
 
 
 class InodeAdmin(admin.ModelAdmin):
     extra_data_fields = ['owner_name', 'is_folder', 'parent']
-    sorting_map = {
-        'name_asc': (InodeModel, Lower('name').asc(), lambda inode: inode['name'].lower(), False),
-        'name_desc': (InodeModel, Lower('name').desc(), lambda inode: inode['name'].lower(), True),
-        'date_asc': (InodeModel, 'last_modified_at', lambda inode: inode['last_modified_at'], False),
-        'date_desc': (InodeModel, '-last_modified_at', lambda inode: inode['last_modified_at'], True),
-        'size_asc': (AbstractFileModel, 'file_size', lambda inode: inode.get('file_size', 0), False),
-        'size_desc': (AbstractFileModel, '-file_size', lambda inode: inode.get('file_size', 0), True),
-        'type_asc': (AbstractFileModel, 'mime_type', lambda inode: inode.get('mime_type', ''), False),
-        'type_desc': (AbstractFileModel, '-mime_type', lambda inode: inode.get('mime_type', ''), True),
-    }
 
     def get_urls(self):
         urls = [
@@ -37,17 +26,9 @@ class InodeAdmin(admin.ModelAdmin):
         urls.extend(super().get_urls())
         return urls
 
-    def get_object(self, request, object_id, from_field=None):
+    def get_object(self, request, inode_id, *args):
         site = get_current_site(request)
-        for model in InodeModel.get_models(include_folder=True):
-            try:
-                obj = model.objects.get(id=object_id)
-                if obj.is_folder and obj.realm.site == site and obj.realm.slug == self.admin_site.name:
-                    return obj
-                elif obj.folder.realm.site == site and obj.folder.realm.slug == self.admin_site.name:
-                    return obj.cast
-            except model.DoesNotExist:
-                pass
+        return FolderModel.objects.get_inode(id=inode_id)
 
     def check_for_valid_post_request(self, request, folder_id):
         if request.method != 'POST':
@@ -118,48 +99,15 @@ class InodeAdmin(admin.ModelAdmin):
         except (FolderModel.DoesNotExist, KeyError):
             return FolderModel.objects.get_root_folder(realm)
 
-    def get_inodes(self, request, sorting=None, **lookup):
+    def get_inodes(self, request, **lookup):
         """
         Return a serialized list of file/folder-s for the given folder.
         """
-        inodes, applicable_sorting = [], []
-        labels = lookup.pop('labels__in', None)
-        for inode_model in InodeModel.get_models(include_folder=True):
-            queryset = (
-                inode_model.objects.select_related('owner')
-                .filter(**lookup)
-                .annotate(owner_name=F('owner__username'))
-                .annotate(is_folder=Value(inode_model.is_folder, output_field=BooleanField()))
-            )
-            data_fields = inode_model.data_fields + self.extra_data_fields
-            if applicable_sorting := self.sorting_map.get(sorting):
-                if issubclass(inode_model, applicable_sorting[0]):
-                    queryset = queryset.order_by(applicable_sorting[1])
-            if labels and issubclass(inode_model, AbstractFileModel):
-                queryset = queryset.filter(labels__in=labels)
-            for obj in queryset.distinct():
-                values = {
-                    'parent': obj.parent.id,
-                    'change_url': reverse(
-                        'admin:finder_inodemodel_change',
-                        args=(obj.id,),
-                        current_app=self.admin_site.name,
-                    ),
-                    'download_url': obj.get_download_url(),
-                    'thumbnail_url': obj.cast.get_thumbnail_url(),
-                    'summary': obj.cast.summary,
-                }
-
-                # search model admin for current inode and get its rendering settings
-                if model_admin := self.admin_site._registry.get(obj.__class__):
-                    values.update(model_admin.get_folderitem_settings(request, obj))
-
-                values.update({field: obj.serializable_value(field) for field in data_fields if field not in values})
-                inodes.append(values)
-
-        if applicable_sorting:
-            inodes.sort(key=applicable_sorting[2], reverse=applicable_sorting[3])
-        return inodes
+        lookup = dict(lookup_by_label(request), **lookup)
+        unified_queryset = FolderModel.objects.filter_unified(**lookup)
+        unified_queryset = sort_by_attribute(request, unified_queryset)
+        annotate_unified_queryset(unified_queryset, self.admin_site.name)
+        return unified_queryset
 
     def get_breadcrumbs(self, obj):
         breadcrumbs = [{
@@ -254,6 +202,7 @@ class InodeAdmin(admin.ModelAdmin):
         return settings
 
     def get_folderitem_settings(self, request, inode):
+        raise NotImplementedError()
         return {}
 
     def get_menu_extension_settings(self, request):

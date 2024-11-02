@@ -180,20 +180,12 @@ class FolderAdmin(InodeAdmin):
         if not (current_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
         lookup = {}
-        if sorting := request.COOKIES.get('django-finder-sorting'):
-            lookup['sorting'] = sorting
-        if filter := request.COOKIES.get('django-finder-filter'):
-            allowed_labels = Label.objects.values_list('id', flat=True)
-            try:
-                lookup['labels__in'] = [int(v) for v in filter.split(',') if int(v) in allowed_labels]
-            except ValueError:
-                pass
         if search_query := request.GET.get('q'):
-            inodes = self.search_for_inodes(request, current_folder, search_query, **lookup)
+            inode_qs = self.search_for_inodes(request, current_folder, search_query)
         else:
-            inodes = self.get_inodes(request, parent=current_folder, **lookup)
+            inode_qs = self.get_inodes(request, parent=current_folder)
         return JsonResponse({
-            'inodes': inodes,
+            'inodes': list(inode_qs),
         })
 
     def search_for_inodes(self, request, current_folder, search_query, **lookup):
@@ -264,13 +256,14 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
         inode_ids = body.get('inode_ids', [])
-        for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
+        for values in FolderModel.objects.filter_unified(id__in=inode_ids):
+            inode = FolderModel.objects.get_inode(id=values['id'])
             try:
                 inode.copy_to(current_folder, owner=request.user)
             except RecursionError as exc:
                 return HttpResponseBadRequest(str(exc), status=409)
         return JsonResponse({
-            'inodes': self.get_inodes(request, parent=current_folder),
+            'inodes': list(self.get_inodes(request, parent=current_folder)),
         })
 
     def move_inodes(self, request, folder_id):
@@ -286,18 +279,19 @@ class FolderAdmin(InodeAdmin):
             target_folder = current_folder
         try:
             inode_ids = body.get('inode_ids', [])
-            for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
+            for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
                 try:
-                    DiscardedInode.objects.get(inode=inode.id).delete()
+                    DiscardedInode.objects.get(inode=entry['id']).delete()
                 except DiscardedInode.DoesNotExist:
                     pass
-                inode.parent = target_folder
-                inode.validate_constraints()
-                inode.save(update_fields=['parent'])
+                dummy_obj = FolderModel.objects.get_proxy_object(entry)
+                dummy_obj.parent = target_folder
+                dummy_obj.validate_constraints()
+                dummy_obj._meta.model.objects.filter(id=entry['id']).update(parent=target_folder)
         except ValidationError as e:
             return HttpResponseBadRequest(e.message, status=409)
         return JsonResponse({
-            'inodes': self.get_inodes(request, parent=target_folder),
+            'inodes': list(self.get_inodes(request, parent=target_folder)),
         })
 
     def delete_inodes(self, request, folder_id):
@@ -309,8 +303,9 @@ class FolderAdmin(InodeAdmin):
         if current_folder.id == trash_folder.id:
             return HttpResponseBadRequest("Cannot move inodes from trash folder into itself.")
         inode_ids = body.get('inode_ids', [])
-        for inode in FolderModel.objects.filter_inodes(id__in=inode_ids):
-            if inode.is_folder:
+        for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
+            inode = FolderModel.objects.get_inode(id=entry['id'])
+            if entry['is_folder']:
                 PinnedFolder.objects.filter(folder=inode).delete()
                 while next(trash_folder.listdir(name=inode.name, is_folder=True), None):
                     inode.name = f"{inode.name}.renamed"
@@ -331,7 +326,8 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         trash_folder = self.get_trash_folder(request)
         discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
-        for inode in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):
+        for entry in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):
+            inode = FolderModel.objects.get_inode(id=entry['id'])
             inode.parent = discarded_inodes.get(inode=inode.id).previous_parent
             inode.save(update_fields=['parent'])
         discarded_inodes.delete()

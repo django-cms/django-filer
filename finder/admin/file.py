@@ -138,6 +138,7 @@ class FileAdmin(InodeAdmin):
             file_id=inode.id,
             filename=inode.file_name,
             file_mime_type=inode.mime_type,
+            editor_component=inode.editor_component,
         )
         if inode.labels.model.objects.exists():
             settings['labels'] = [

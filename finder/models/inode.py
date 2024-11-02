@@ -1,12 +1,32 @@
 import re
 import uuid
-from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models.aggregates import Aggregate
+from django.db.models.expressions import F, Value
+from django.db.models.fields import BooleanField, CharField
+from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+
+
+class GroupConcat(Aggregate):
+    function = 'GROUP_CONCAT'
+    template = '%(function)s(%(distinct)s %(expressions)s)'
+    # template = '%(function)s(%(distinct)s %(expressions)s%(separator)s)'
+    allow_distinct = True
+
+    def __init__(self, expression, distinct=False, ordering=None, separator=',', output_field=None, **extra):
+        super().__init__(
+            expression,
+            distinct='DISTINCT ' if distinct else '',
+            ordering=f' ORDER BY {ordering}' if ordering is not None else '',
+            separator=f",'{separator}'",
+            output_field=CharField() if output_field is None else output_field,
+            **extra
+        )
 
 
 class InodeMetaModel(models.base.ModelBase):
@@ -63,24 +83,79 @@ class InodeManagerMixin:
     Mixin class to be added to managers for models ineriting from `Inode`.
     """
 
-    def filter_inodes(self, **lookup):
+    def filter_unified(self, **lookup):
+        """
+        Returns a unified QuerySet of all folders and files with fields from all involved models inheriting
+        from InodeModel. The QuerySet is filtered by the given lookup parameters.
+        Entries are represented as dictionaries rather than model instances.
+        """
+        from .file import FileModel
         from .folder import FolderModel
 
-        if is_folder := lookup.pop('is_folder', None):
-            return FolderModel.objects.filter(**lookup).iterator()
-        concrete_models = InodeModel.get_models(include_folder=is_folder is None)
-        inodes = [inode_model.objects.filter(**lookup) for inode_model in concrete_models]
-        return chain(*inodes)
+        def get_queryset(model):
+            concrete_fields = list(unified_fields.keys())
+            model_field_names = [field.name for field in model._meta.get_fields()]
+            annotations = dict(
+                is_folder=Value(model.is_folder, output_field=BooleanField()),
+                **unified_annotations,
+            )
+            expressions = {'label_ids':
+                Value(None, output_field=CharField()) if model.is_folder
+                else GroupConcat('labels__id', distinct=True)
+            }
+            for name, field in unified_fields.items():
+                if name in annotations:
+                    concrete_fields.remove(name)
+                elif name not in model_field_names:
+                    expressions[name] = Value(None, output_field=field)
+            queryset = model.objects.values(*concrete_fields, **expressions).annotate(**annotations)
+            model_lookup = dict(lookup)
+            labels = model_lookup.pop('labels__in', None)
+            if labels and 'labels' in model_field_names:
+                model_lookup['labels__in'] = labels
+            return queryset.filter(**model_lookup)
+
+        unified_fields = {
+            field.name: field for field in FolderModel._meta.get_fields()
+            if field.concrete and not field.many_to_many and field.name is not 'realm'
+        }
+        for model in FileModel.get_models():
+            for field in model._meta.get_fields():
+                if field.concrete and not field.many_to_many:
+                    unified_fields.setdefault(field.name, field)
+        unified_annotations = {'owner': F('owner__username'), 'name_lower': Lower('name')}
+        unified_queryset = get_queryset(FolderModel).union(*[
+            get_queryset(model) for model in FileModel.get_models()
+        ])
+        return unified_queryset
 
     def get_inode(self, **lookup):
-        querychain = self.filter_inodes(**lookup)
-        try:
-            inode = next(querychain)
-        except StopIteration:
-            raise self.model.DoesNotExist
-        if next(querychain, None):
-            raise self.model.MultipleObjectsReturned
-        return inode
+        from .file import FileModel
+        from .folder import FolderModel
+
+        if lookup.pop('is_folder', None) is False:
+            folder_qs = FolderModel.objects.none()
+        elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
+            return folder_qs.get()
+        values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
+            model.objects.values('id', 'mime_type').filter(**lookup) for model in FileModel.get_models()
+        ]).get()
+        return FileModel.objects.get_model_for(values['mime_type']).objects.get(id=values['id'])
+
+    def get_proxy_object(self, entry):
+        """
+        Returns a proxy model instance for the given entry. This can be useful for entries returned by
+        `filter_unified` since they are dictionaries and not model instances. It hence is an alternative
+        to the `get_inode` method but without querying the database.
+        Please note that such an object does not dereference related fields and can only be used
+        to access their model methods
+        """
+        from .file import FileModel
+        from .folder import FolderModel
+
+        model = FolderModel if entry['is_folder'] else FileModel.objects.get_model_for(entry['mime_type'])
+        field_names = [field.name for field in model._meta.get_fields() if not field.is_relation]
+        return model(**{field: entry[field] for field in field_names})
 
 
 class InodeManager(InodeManagerMixin, models.Manager):
@@ -90,7 +165,7 @@ class InodeManager(InodeManagerMixin, models.Manager):
 
 
 def filename_validator(value):
-    pattern = re.compile(r"^[\w\d &%!()\[\]{}._#~+-]+$")
+    pattern = re.compile(r"^[\w\d &%!/\\()\[\]{}._#~+-]+$")
     if not pattern.match(value):
         msg = "'{filename}' is not a valid filename."
         raise ValidationError(msg.format(filename=value))
