@@ -81,7 +81,7 @@ export default function Menu(props) {
 						</DropDownMenu>
 					</div>
 				</li>
-				<SortingOptionsItem/>
+				<SortingOptionsItem refreshColumns={() => fetchFiles(lastFolderId)}/>
 				<li onClick={openUploader} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Upload file")}>
 					<UploadIcon/>
 				</li>
