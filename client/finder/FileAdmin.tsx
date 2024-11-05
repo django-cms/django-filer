@@ -34,5 +34,5 @@ export function FileAdmin() {
 			<FileEditor editorRef={editorRef} settings={settings} />
 			<div ref={editorRef}></div>
 		</div>
- 	</>);
+	</>);
 }

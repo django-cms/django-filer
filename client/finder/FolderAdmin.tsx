@@ -242,7 +242,7 @@ export function FolderAdmin() {
 		setDraggedInodes([]);
 	}
 
-	const handleUpload = (folderId, files) => {
+	const handleUpload = (folderId, uploadedFiles) => {
 		columnRefs[folderId].current.fetchInodes();
 	};
 

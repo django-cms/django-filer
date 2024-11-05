@@ -56,8 +56,7 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 		}
 		setUploading([...uploading, ...files]);
 		Promise.all(promises).then(responses => {
-			const uploadedFiles = responses.map(response => (response as any).uploaded_file);
-			handleUpload(folderId, uploadedFiles);
+			handleUpload(folderId, responses);
 		}).catch((error) => {
 			alert(error);
 		}).finally(() => {
