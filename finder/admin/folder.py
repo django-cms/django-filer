@@ -218,7 +218,7 @@ class FolderAdmin(InodeAdmin):
             folder=folder,
             owner=request.user,
         )
-        return JsonResponse({'uploaded_file': new_file.as_dict})
+        return JsonResponse({'file_info': new_file.as_dict})
 
     def update_inode(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -307,9 +307,9 @@ class FolderAdmin(InodeAdmin):
             inode = FolderModel.objects.get_inode(id=entry['id'])
             if entry['is_folder']:
                 PinnedFolder.objects.filter(folder=inode).delete()
-                while next(trash_folder.listdir(name=inode.name, is_folder=True), None):
+                while trash_folder.listdir(name=inode.name, is_folder=True).exists():
                     inode.name = f"{inode.name}.renamed"
-                    inode.save(update_fields=['name'])
+                inode.save(update_fields=['name'])
             DiscardedInode.objects.create(
                 inode=inode.id,
                 previous_parent=inode.parent,
