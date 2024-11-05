@@ -64,7 +64,7 @@ class AbstractFileModel(InodeModel):
     data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type', 'labels']
     filer_public = Path(filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
     fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
-    folderitem_component = None
+    browser_component = editor_component = folderitem_component = None
 
     file_name = models.CharField(
         _("File name"),
@@ -165,7 +165,6 @@ class AbstractFileModel(InodeModel):
 
     @cached_property
     def as_dict(self):
-        raise NotImplementedError
         return {
             'id': self.id,
             'name': self.name,
@@ -174,9 +173,11 @@ class AbstractFileModel(InodeModel):
             'sha1': self.sha1,
             'mime_type': self.mime_type,
             'last_modified_at': self.last_modified_at,
-            'folderitem_component': self.cast.folderitem_component,
-            'thumbnail_url': self.cast.get_thumbnail_url(),
-            'sample_url': getattr(self.cast, 'get_sample_url', lambda: None)(),
+            'folderitem_component': self.folderitem_component,
+            'browser_component': self.browser_component,
+            'download_url': self.get_download_url(),
+            'thumbnail_url': self.get_thumbnail_url(),
+            'sample_url': getattr(self, 'get_sample_url', lambda: None)(),
             'labels': self.serializable_value('labels'),
         }
 

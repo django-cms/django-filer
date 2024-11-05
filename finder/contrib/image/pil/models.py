@@ -4,10 +4,10 @@ from django.core.files.storage import default_storage
 from django.utils.timezone import datetime
 from django.utils.translation import gettext_lazy as _
 
-from finder.contrib.image.models import ImageModel
+from finder.contrib.image.models import ImageFileModel
 
 
-class PILImageModel(ImageModel):
+class PILImageModel(ImageFileModel):
     """
     Model for image files which can be transformed by the PIL package.
     """

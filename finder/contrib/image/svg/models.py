@@ -1,14 +1,14 @@
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 
-from finder.contrib.image.models import ImageModel
+from finder.contrib.image.models import ImageFileModel
 from finder.exceptions import FileValidationError
 
 from reportlab.graphics import renderSVG
 from svglib.svglib import svg2rlg
 
 
-class SVGImageModel(ImageModel):
+class SVGImageModel(ImageFileModel):
     accept_mime_types = ['image/svg+xml']
 
     class Meta:

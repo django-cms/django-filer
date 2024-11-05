@@ -12,7 +12,7 @@ from django.utils.translation import gettext
 
 from finder.admin.file import FileAdmin
 from finder.contrib.archive.models import ArchiveModel
-from finder.models.file import FileModel, AbstractFileModel
+from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 
 

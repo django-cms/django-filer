@@ -40,10 +40,8 @@ class InodeMetaModel(models.base.ModelBase):
             if not new_class.is_folder:
                 cls._validate_accept_mime_types(new_class)
             if new_class.is_folder:
-                assert (
-                    all(not model.is_folder for model in cls._inode_models.values()),
-                    "Only one model is allowed to be the folder model.",
-                )
+                assert all(not model.is_folder for model in cls._inode_models.values()), \
+                    "Only one model is allowed to be the folder model."
                 # always enforce that the folder model is the first one
                 cls._inode_models = dict(**{new_class._meta.label: new_class}, **cls._inode_models)
             else:
