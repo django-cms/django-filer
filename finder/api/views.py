@@ -1,13 +1,25 @@
+from django.apps import apps
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import BadRequest, ObjectDoesNotExist
 from django.db.models import QuerySet, Subquery
+from django.forms.renderers import DjangoTemplates
 from django.http import JsonResponse, HttpResponseBadRequest
+from django.utils.html import strip_spaces_between_tags
+from django.utils.safestring import mark_safe
 from django.views import View
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, RealmModel
-from finder.models.inode import InodeModel
+from finder.models.label import Label
+
+
+class FormRenderer(DjangoTemplates):
+    def render(self, template_name, context, request=None):
+        if template_name == 'django/forms/div.html':
+            template_name = 'finder/forms/div.html'
+        template = self.get_template(template_name)
+        return template.render(context, request=request).strip()
 
 
 class BrowserView(View):
@@ -162,4 +174,16 @@ class BrowserView(View):
             folder=folder,
             owner=request.user,
         )
-        return {'uploaded_file': file.as_dict}
+        app = apps.get_app_config('finder')
+        form_class = app.model_forms[file.__class__]
+        form = form_class(instance=file, renderer=FormRenderer())
+        response = {
+            'file_info': file.as_dict,
+            'form_html': mark_safe(strip_spaces_between_tags(form.as_div())),
+        }
+        if Label.objects.exists():
+            response['labels'] = [
+                {'value': id, 'label': name, 'color': color}
+                for id, name, color in Label.objects.values_list('id', 'name', 'color')
+            ]
+        return response
