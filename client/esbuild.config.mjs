@@ -11,6 +11,7 @@ await build({
     'client/finder-select.ts',
     'client/folder-admin.tsx',
     'client/file-admin.tsx',
+    'client/components/browser/*.tsx',
     'client/components/editor/*.tsx',
     'client/components/folderitem/*.tsx',
     'client/components/menuextension/*.tsx',

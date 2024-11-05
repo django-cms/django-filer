@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import {Tooltip} from 'react-tooltip';
 import FigureLabels from '../finder/FigureLabels';
+import BrowserEditor from './BrowserEditor';
 import FileUploader	 from '../finder/FileUploader';
 import FolderStructure from './FolderStructure';
 import Menu from './Menu';
@@ -68,6 +69,8 @@ const FilesList = memo((props: any) => {
 export default function FileSelectDialog(props) {
 	const {baseUrl, csrfToken, realm, selectFile} = props;
 	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: null});
+	const [uploadedFile, setUploadedFile] = useState(null);
+	const ref = useRef(null);
 	const uploaderRef = useRef(null);
 
 	useEffect(() => {
@@ -107,13 +110,12 @@ export default function FileSelectDialog(props) {
 		setStructure({...structure});
 	}
 
-	function handleUpload(folderId, files) {
-		fetchFiles(folderId);
-		selectFile(files[0]);
+	function handleUpload(folderId, uploadedFiles) {
+		setUploadedFile(uploadedFiles[0]);
 	}
 
 	return structure.root_folder && (<>
-		<div className="wrapper">
+		<div className="wrapper" ref={ref}>
 			<Menu
 				lastFolderId={structure.last_folder}
 				fetchFiles={fetchFiles}
@@ -131,6 +133,8 @@ export default function FileSelectDialog(props) {
 						/>
 					</ul>
 				</nav>
+				{uploadedFile ?
+				<BrowserEditor uploadedFile={uploadedFile} mainContent={ref.current} /> :
 				<FileUploader
 					folderId={structure.last_folder}
 					handleUpload={handleUpload}
@@ -140,7 +144,7 @@ export default function FileSelectDialog(props) {
 					structure.files === null ?
 					<div className="status">{gettext("Loading files…")}</div> :
 					<FilesList files={structure.files} selectFile={selectFile} />
-				}</FileUploader>
+				}</FileUploader>}
 			</div>
 		</div>
 		<Tooltip id="django-finder-tooltip" place="bottom-start" />
