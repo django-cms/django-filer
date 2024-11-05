@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
             name='rght',
             field=models.PositiveIntegerField(editable=False),
         ),
-        migrations.AlterIndexTogether(
-            name='folder',
-            index_together={('tree_id', 'lft')},
-        ),
+        # migrations.AlterIndexTogether(
+        #     name='folder',
+        #     index_together={('tree_id', 'lft')},
+        # ),
     ]

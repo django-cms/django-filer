@@ -10,10 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterIndexTogether(
-            name='folder',
-            index_together=set(),
-        ),
+        # migrations.AlterIndexTogether(
+        #     name='folder',
+        #     index_together=set(),
+        # ),
         migrations.RemoveField(
             model_name='folder',
             name='level',
