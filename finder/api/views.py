@@ -187,3 +187,21 @@ class BrowserView(View):
                 for id, name, color in Label.objects.values_list('id', 'name', 'color')
             ]
         return response
+
+    def change(self, request, file_id):
+        """
+        Change some fields after uploading a single file.
+        """
+        if request.method != 'POST':
+            raise BadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
+        if request.content_type != 'multipart/form-data':
+            raise BadRequest("Bad form encoding or missing payload.")
+        file = FileModel.objects.get_inode(id=file_id)
+        app = apps.get_app_config('finder')
+        form_class = app.model_forms[file.__class__]
+        form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
+        if form.is_valid():
+            form.save()
+            return {'file_info': file.as_dict}
+        else:
+            return {'form_html': mark_safe(strip_spaces_between_tags(form.as_div()))}

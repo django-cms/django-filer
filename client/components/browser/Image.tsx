@@ -9,8 +9,9 @@ export default function Image(props) {
 
 	function handleChange(crop) {
 		const shadowRoot = ref.current?.getRootNode();
-		if (!shadowRoot)
+		if (!(shadowRoot instanceof ShadowRoot))
 			return;
+
 		const cropFields = {
 			x: shadowRoot.getElementById('id_crop_x') as HTMLInputElement,
 			y: shadowRoot.getElementById('id_crop_y') as HTMLInputElement,

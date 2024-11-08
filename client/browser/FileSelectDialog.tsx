@@ -12,7 +12,7 @@ import FigureLabels from '../finder/FigureLabels';
 import BrowserEditor from './BrowserEditor';
 import FileUploader	 from '../finder/FileUploader';
 import FolderStructure from './FolderStructure';
-import Menu from './Menu';
+import MenuBar from './MenuBar';
 
 
 function StaticFigure(props) {
@@ -67,15 +67,30 @@ const FilesList = memo((props: any) => {
 
 
 export default function FileSelectDialog(props) {
-	const {baseUrl, csrfToken, realm, selectFile} = props;
+	const {realm, baseUrl, csrfToken, selectFile} = props;
 	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: null});
 	const [uploadedFile, setUploadedFile] = useState(null);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
+	const dialog = ref.current?.closest('dialog');
 
 	useEffect(() => {
 		getStructure();
 	}, []);
+
+	useEffect(() => {
+		if (!dialog) {
+			return;
+		}
+		const dialogClosed = () => {
+			setUploadedFile(null);
+		};
+
+		dialog.addEventListener('close', dialogClosed);
+		return () => {
+			dialog.removeEventListener('close', dialogClosed);
+		};
+	}, [dialog]);
 
 	async function getStructure() {
 		const response = await fetch(`${baseUrl}structure/${realm}`);
@@ -114,27 +129,31 @@ export default function FileSelectDialog(props) {
 		setUploadedFile(uploadedFiles[0]);
 	}
 
-	return structure.root_folder && (<>
+	return (<>
 		<div className="wrapper" ref={ref}>
-			<Menu
+			{uploadedFile ?
+			<BrowserEditor
+				uploadedFile={uploadedFile}
+				mainContent={ref.current}
+				settings={{csrfToken, baseUrl, selectFile, labels: uploadedFile.labels}}
+			/> : <>
+			<MenuBar
 				lastFolderId={structure.last_folder}
 				fetchFiles={fetchFiles}
 				openUploader={() => uploaderRef.current.openUploader()}
 			/>
 			<div className="browser-body">
 				<nav className="folder-structure">
-					<ul>
-						<FolderStructure
+					<ul role="navigation">
+						{structure.root_folder && <FolderStructure
 							baseUrl={baseUrl}
 							folder={structure.root_folder}
 							lastFolderId={structure.last_folder}
 							fetchFiles={fetchFiles}
 							refreshStructure={refreshStructure}
-						/>
+						/>}
 					</ul>
 				</nav>
-				{uploadedFile ?
-				<BrowserEditor uploadedFile={uploadedFile} mainContent={ref.current} /> :
 				<FileUploader
 					folderId={structure.last_folder}
 					handleUpload={handleUpload}
@@ -144,8 +163,9 @@ export default function FileSelectDialog(props) {
 					structure.files === null ?
 					<div className="status">{gettext("Loading files…")}</div> :
 					<FilesList files={structure.files} selectFile={selectFile} />
-				}</FileUploader>}
+				}</FileUploader>
 			</div>
+			</>}
 		</div>
 		<Tooltip id="django-finder-tooltip" place="bottom-start" />
 	</>);

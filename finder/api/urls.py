@@ -35,6 +35,10 @@ urlpatterns = [
         BrowserView.as_view(action='upload'),
     ),
     path(
+        '<uuid:file_id>/change',
+        BrowserView.as_view(action='change'),
+    ),
+    path(
         'jsi18n/',
         JavaScriptCatalog.as_view(packages=['finder']),
         name="javascript-catalog",

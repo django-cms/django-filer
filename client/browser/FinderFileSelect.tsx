@@ -49,6 +49,7 @@ export default function FinderFileSelect(props) {
 
 	function closeDialog() {
 		dialogRef.current.close();
+		dialogRef.current.dispatchEvent(new CustomEvent('close'));
 	}
 
 	function deleteFile() {
@@ -99,9 +100,9 @@ export default function FinderFileSelect(props) {
 		</div>
 		<dialog ref={dialogRef}>
 			<FileSelectDialog
+				realm={props.realm}
 				baseUrl={baseUrl}
 				csrfToken={csrfToken}
-				realm={props.realm}
 				selectFile={selectFile}
 			/>
 			<div

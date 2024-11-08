@@ -37,7 +37,7 @@ export default function Archive(props) {
 	}
 
 	return (
-		<li className={props.numSelectedInodes ? null : "disabled"} onClick={archiveSelectedInodes}>
+		<li role="option" aria-disabled={props.numSelectedInodes === 0} onClick={archiveSelectedInodes}>
 			<ArchiveIcon/><span>{gettext("Create archive from selection")}</span>
 		</li>
 	);
