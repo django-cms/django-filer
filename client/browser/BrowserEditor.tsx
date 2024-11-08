@@ -67,7 +67,19 @@ function EditorForm(props) {
 	}
 
 	function handleDismiss() {
-		window.location.reload();
+		const changeUrl = `${settings.baseUrl}${file_info.id}/change`;
+		fetch(changeUrl, {
+			method: 'DELETE',
+			headers: {
+				'X-CSRFToken': settings.csrfToken,
+			},
+		}).then(async response => {
+			if (response.ok) {
+				settings.selectFile(null);
+			} else {
+				alert(response.statusText);
+			}
+		});
 	}
 
 	return (

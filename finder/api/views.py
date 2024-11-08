@@ -189,11 +189,14 @@ class BrowserView(View):
         """
         Change some fields after uploading a single file.
         """
-        if request.method != 'POST':
-            raise BadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
-        if request.content_type != 'multipart/form-data':
+        if request.method not in ['DELETE', 'POST']:
+            raise BadRequest(f"Method {request.method} not allowed. Only POST and DELETE requests are allowed.")
+        if request.method == 'POST' and request.content_type != 'multipart/form-data':
             raise BadRequest("Bad form encoding or missing payload.")
         file = FileModel.objects.get_inode(id=file_id)
+        if request.method == 'DELETE':
+            file.delete()
+            return {'file_info': None}
         form_class = file.get_form_class()
         form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
         if form.is_valid():

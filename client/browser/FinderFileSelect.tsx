@@ -57,10 +57,12 @@ export default function FinderFileSelect(props) {
 	}
 
 	function selectFile(file) {
-		setSelectedFile(file);
-		const inputElement = slotRef.current.assignedElements()[0];
-		if (inputElement instanceof HTMLInputElement) {
-			inputElement.value = file.id;
+		if (file) {
+			setSelectedFile(file);
+			const inputElement = slotRef.current.assignedElements()[0];
+			if (inputElement instanceof HTMLInputElement) {
+				inputElement.value = file.id;
+			}
 		}
 		closeDialog();
 	}
