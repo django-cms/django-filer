@@ -75,8 +75,10 @@ export default function FileSelectDialog(props) {
 	const dialog = ref.current?.closest('dialog');
 
 	useEffect(() => {
-		getStructure();
-	}, []);
+		if (!uploadedFile) {
+			getStructure();
+		}
+	}, [uploadedFile]);
 
 	useEffect(() => {
 		if (!dialog) {

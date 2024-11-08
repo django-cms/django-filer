@@ -200,7 +200,7 @@ class BrowserView(View):
         form_class = file.get_form_class()
         form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
         if form.is_valid():
-            form.save()
+            file = form.save()
             return {'file_info': file.as_dict}
         else:
             return {'form_html': mark_safe(strip_spaces_between_tags(form.as_div()))}

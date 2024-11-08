@@ -54,7 +54,7 @@ function EditorForm(props) {
 			if (response.ok) {
 				const content = await response.json();
 				if ('file_info' in content) {
-					settings.selectFile(file_info);
+					settings.selectFile(content.file_info);
 				} else if ('form_html' in content) {
 					setFormHtml(content.form_html);
 				} else {
