@@ -15,6 +15,16 @@ function EditorForm(props) {
 		if (!(labelsElement instanceof HTMLSelectElement))
 			return;
 		if (settings.labels) {
+			// extract selected values from the original <select multiple name="labels"> element
+			// this only happens if a user sets a label but the form is rejected by the server
+			const initial = [];
+			for (const option of labelsElement.selectedOptions) {
+				const found = settings.labels.find(label => label.value == option.value);
+				if (found) {
+					initial.push(found);
+				}
+			}
+
 			// replace the original <select multiple name="labels"> element with the "downshift" component
 			if (labelsElement.nextElementSibling?.classList.contains('select-labels-container')) {
 				labelsElement.nextElementSibling.remove();
@@ -23,7 +33,7 @@ function EditorForm(props) {
 			divElement.classList.add('select-labels-container');
 			labelsElement.insertAdjacentElement('afterend', divElement);
 			const root = createRoot(divElement);
-			root.render(<SelectLabels labels={settings.labels} initial={[]} original={labelsElement}/>);
+			root.render(<SelectLabels labels={settings.labels} initial={initial} original={labelsElement}/>);
 		}
 		labelsElement.style.display = 'none';
 	}, [formHtml]);
