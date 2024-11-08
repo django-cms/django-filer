@@ -89,7 +89,7 @@ export default function BrowserEditor(props) {
 		}
 		return (props) => (
 			<div className="browser-editor">
-				<img src={props.file_info.thumbnail_url} />
+				<img className="thumbnail" src={props.file_info.thumbnail_url} />
 				<EditorForm {...props} />
 			</div>
 		);
