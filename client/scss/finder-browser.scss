@@ -74,7 +74,7 @@ dialog {
 	width: 80%;
 	height: 80%;
 	max-width: 900px;
-	padding: 1rem;
+	padding: 2rem;
 
 	.wrapper {
 		display: flex;
@@ -313,8 +313,8 @@ dialog {
 						}
 
 						&.dismiss {
-							background-color: #f39450;
-							color: #666;
+							background-color: #b15107;
+							color: #fff;
 						}
 					}
 				}
@@ -325,10 +325,10 @@ dialog {
 
 	.close-button {
 		position: absolute;
-		top: 6px;
-		right: 6px;
-		width: 24px;
-		height: 24px;
+		top: 0.5rem;
+		right: 0.5rem;
+		width: 1.5rem;
+		height: 1.5rem;
 		opacity: 0.7;
 		&:hover {
 			opacity: 1;
