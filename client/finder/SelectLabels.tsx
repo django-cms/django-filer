@@ -87,7 +87,7 @@ export default function SelectLabels(props) {
 					</div>
 				)
 			})}
-			<div className="caret" {...getToggleButtonProps(getDropdownProps({preventKeyAction: isOpen}))}></div>
+			<div className="toggle-dropdown" {...getToggleButtonProps(getDropdownProps({preventKeyAction: isOpen}))}></div>
 			<ul {...getMenuProps()}>{
 				isOpen && items.map((item, index) => (
 				<li key={`item-${index}`} {...getItemProps({item, index})}>

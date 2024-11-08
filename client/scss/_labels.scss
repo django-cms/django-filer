@@ -11,20 +11,27 @@
 			position: relative;
 			border: 1px solid $border-color;
 			border-radius: 4px;
-			height: 1rem;
-			padding: 6px 4px;
-			margin-top: 0;
+			height: 28px;
 			color: $body-fg-color;
 			background-color: $body-bg-color;
 
-			.caret {
+			.toggle-dropdown {
 				position: absolute;
-				align-self: center;
-				right: 0.5rem;
-				border: 5px solid transparent;
-				border-top-color: $body-fg-color;
-				margin-top: 5px;
+				display: inline-flex;
+				align-self: stretch;
+				justify-content: center;
+				inset: 0 0 0 auto;
+				width: 2rem;
 				cursor: pointer;
+
+				&::after {
+					display: inline;
+					content: " ";
+					align-self: center;
+					border: 5px solid transparent;
+					border-top-color: $body-fg-color;
+					margin-top: 5px;
+				}
 			}
 		}
 
@@ -35,7 +42,7 @@
 			display: inline-flex;
 			align-self: center;
 			line-height: 16px;
-			margin-right: 6px;
+			margin-left: 6px;
 			padding: 0.125rem 0.25rem;
 		}
 
