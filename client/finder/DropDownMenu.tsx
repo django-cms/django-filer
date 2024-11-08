@@ -22,14 +22,17 @@ export default function DropDownMenu(props) {
 
 	return (
 		<Wrapper
-			aria-haspopup="true"
+			ref={ref}
+			role={props.role ? `combobox ${props.role}` : 'combobox'}
+			aria-haspopup="listbox"
+			aria-expanded="false"
 			onClick={toggleSubmenu}
 			className={props.className}
 			data-tooltip-id="django-finder-tooltip"
 			data-tooltip-content={props.tooltip}
 		>
 			{props.icon}
-			<ul ref={ref} role="combobox" aria-expanded="false">
+			<ul role="listbox">
 				{props.children}
 			</ul>
 		</Wrapper>

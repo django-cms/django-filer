@@ -31,7 +31,7 @@ function useSearchParam(key) : [string, (value: string) => any] {
 }
 
 
-export function SearchField(props) {
+export default function SearchField(props) {
 	const {columnRefs, setSearchResult, settings} = props;
 	const searchRef = useRef(null);
 	const [searchQuery, setSearchQuery] = useSearchParam('q');
@@ -73,8 +73,12 @@ export function SearchField(props) {
 		}
 	}
 
-	function isActive(value) {
-		return searchRealm === value ? 'active' : null;
+	function getItemProps(value: string) {
+		return {
+			role: 'option',
+			'aria-selected': searchRealm === value,
+			onClick: () => changeSearchRealm(value),
+		};
 	}
 
 	return (<>
@@ -88,20 +92,17 @@ export function SearchField(props) {
 		/>
 		<div>
 			<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
-			<DropDownMenu wrapperElement="span" className="search-realm with-caret" tooltip={gettext("Restrict search")}>
-				<li onClick={() => changeSearchRealm('current')}
-					className={isActive('current')}>{gettext("From current folder")}
-				</li>
-				<li onClick={() => changeSearchRealm('everywhere')}
-					className={isActive('everywhere')}>{gettext("In all folders")}
-				</li>
+			<DropDownMenu
+				wrapperElement="span"
+				role="menuitem"
+				className="search-realm with-caret"
+				tooltip={gettext("Restrict search")}
+			>
+				<li {...getItemProps('current')}>{gettext("From current folder")}</li>
+				<li {...getItemProps('everywhere')}>{gettext("In all folders")}</li>
 				<hr/>
-				<li onClick={() => changeSearchRealm('filename')}
-					className={isActive('filename')}>{gettext("Filename only")}
-				</li>
-				<li onClick={() => changeSearchRealm('content')}
-					className={isActive('content')}><s>{gettext("Also file content")}</s>
-				</li>
+				<li {...getItemProps('filename')}>{gettext("Filename only")}</li>
+				<li {...getItemProps('content')}><s>{gettext("Also file content")}</s></li>
 			</DropDownMenu>
 		</div>
 	</>
