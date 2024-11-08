@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import BadRequest, ObjectDoesNotExist
 from django.db.models import QuerySet, Subquery
@@ -174,8 +173,7 @@ class BrowserView(View):
             folder=folder,
             owner=request.user,
         )
-        app = apps.get_app_config('finder')
-        form_class = app.model_forms[file.__class__]
+        form_class = file.get_form_class()
         form = form_class(instance=file, renderer=FormRenderer())
         response = {
             'file_info': file.as_dict,
@@ -197,8 +195,7 @@ class BrowserView(View):
         if request.content_type != 'multipart/form-data':
             raise BadRequest("Bad form encoding or missing payload.")
         file = FileModel.objects.get_inode(id=file_id)
-        app = apps.get_app_config('finder')
-        form_class = app.model_forms[file.__class__]
+        form_class = file.get_form_class()
         form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
         if form.is_valid():
             form.save()

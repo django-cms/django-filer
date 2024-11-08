@@ -4,12 +4,14 @@ from functools import lru_cache, reduce
 from operator import or_
 from pathlib import Path
 
+from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.template.defaultfilters import filesizeformat
 from django.utils.functional import cached_property, classproperty
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 
 from filer import settings as filer_settings
@@ -114,6 +116,20 @@ class AbstractFileModel(InodeModel):
     @lru_cache
     def accept_mime_main_types(cls):
         return [mime_type.split('/')[0] for mime_type in cls.accept_mime_types]
+
+    @classmethod
+    @lru_cache
+    def get_form_class(cls):
+        for app in settings.INSTALLED_APPS:
+            if not app.startswith('finder.'):
+                continue
+            try:
+                return import_string(f'{app}.forms.{cls.__name__[:-5]}Form')
+            except ImportError:
+                pass
+        # as fallback, the default FileForm matches the default fields
+        from finder.forms.file import FileForm
+        return FileForm
 
     @cached_property
     def folder_path(self):
