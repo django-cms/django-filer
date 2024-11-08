@@ -77,6 +77,10 @@ class BrowserView(View):
                 'children': children,
                 'has_subfolders': is_open,
             },
+            'labels': [
+                {'value': id, 'label': name, 'color': color}
+                for id, name, color in Label.objects.values_list('id', 'name', 'color')
+            ],
             'last_folder': request.session['finder.last_folder'],
             **self.list(request, request.session['finder.last_folder']),
         }
@@ -179,11 +183,6 @@ class BrowserView(View):
             'file_info': file.as_dict,
             'form_html': mark_safe(strip_spaces_between_tags(form.as_div())),
         }
-        if Label.objects.exists():
-            response['labels'] = [
-                {'value': id, 'label': name, 'color': color}
-                for id, name, color in Label.objects.values_list('id', 'name', 'color')
-            ]
         return response
 
     def change(self, request, file_id):

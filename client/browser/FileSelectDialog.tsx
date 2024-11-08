@@ -68,7 +68,7 @@ const FilesList = memo((props: any) => {
 
 export default function FileSelectDialog(props) {
 	const {realm, baseUrl, csrfToken, selectFile} = props;
-	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: null});
+	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: null, labels: []});
 	const [uploadedFile, setUploadedFile] = useState(null);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
@@ -109,7 +109,12 @@ export default function FileSelectDialog(props) {
 			}
 			return `${baseUrl}${folderId}/list`;
 		})();
-		const newStructure = {root_folder: structure.root_folder, last_folder: folderId, files: null};
+		const newStructure = {
+			root_folder: structure.root_folder,
+			last_folder: folderId,
+			files: null,
+			labels: structure.labels,
+		};
 		const response = await fetch(fetchUrl);
 		if (response.ok) {
 			const body = await response.json();
@@ -135,12 +140,13 @@ export default function FileSelectDialog(props) {
 			<BrowserEditor
 				uploadedFile={uploadedFile}
 				mainContent={ref.current}
-				settings={{csrfToken, baseUrl, selectFile, labels: uploadedFile.labels}}
+				settings={{csrfToken, baseUrl, selectFile, labels: structure.labels}}
 			/> : <>
 			<MenuBar
 				lastFolderId={structure.last_folder}
 				fetchFiles={fetchFiles}
 				openUploader={() => uploaderRef.current.openUploader()}
+				labels={structure.labels}
 			/>
 			<div className="browser-body">
 				<nav className="folder-structure">

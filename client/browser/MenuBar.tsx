@@ -7,7 +7,7 @@ import UploadIcon from '../icons/upload.svg';
 
 
 export default function MenuBar(props) {
-	const {lastFolderId, fetchFiles, openUploader} = props;
+	const {lastFolderId, fetchFiles, openUploader, labels} = props;
 	const searchRef = useRef(null);
 	const [searchRealm, setSearchRealm] = useSearchRealm('current');
 
@@ -74,8 +74,8 @@ export default function MenuBar(props) {
 					</DropDownMenu>
 				</div>
 			</li>
-			// TODO: <FilterByLabel />
-			<SortingOptionsItem refreshColumns={() => fetchFiles(lastFolderId)}/>
+			<SortingOptionsItem refreshFilesList={() => fetchFiles(lastFolderId)}/>
+			{labels && <FilterByLabel refreshFilesList={() => fetchFiles(lastFolderId)} labels={labels} />}
 			<li role="menuitem" onClick={openUploader} data-tooltip-id="django-finder-tooltip"
 				data-tooltip-content={gettext("Upload file")}>
 				<UploadIcon/>

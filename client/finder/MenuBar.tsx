@@ -36,13 +36,13 @@ const useFilter = () => useCookie('django-finder-filter', []);
 
 
 export function SortingOptionsItem(props: any) {
-	const {refreshColumns} = props;
+	const {refreshFilesList} = props;
 	const [sorting, setSorting] = useSorting();
 
 	function changeSorting(value) {
 		if (value !== sorting) {
 			setSorting(value);
-			refreshColumns();
+			refreshFilesList();
 		}
 	}
 
@@ -450,7 +450,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					role="menuitem" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}>
 					<ColumnsIcon/>
 				</li>
-				<SortingOptionsItem refreshColumns={refreshColumns} />
+				<SortingOptionsItem refreshFilesList={refreshColumns} />
 				{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
 				<li aria-disabled={numSelectedInodes === 0} onClick={cutInodes}
 					role="menuitem" data-tooltip-id="django-finder-tooltip"
