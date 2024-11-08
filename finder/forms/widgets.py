@@ -1,7 +1,7 @@
 import json
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.forms.widgets import TextInput
+from django.forms.widgets import TextInput, SelectMultiple
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import format_html

@@ -179,7 +179,6 @@ class FolderAdmin(InodeAdmin):
     def fetch_inodes(self, request, folder_id):
         if not (current_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
-        lookup = {}
         if search_query := request.GET.get('q'):
             inode_qs = self.search_for_inodes(request, current_folder, search_query)
         else:
