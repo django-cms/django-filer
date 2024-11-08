@@ -54,6 +54,10 @@ export default function FinderFileSelect(props) {
 
 	function deleteFile() {
 		setSelectedFile(null);
+		const inputElement = slotRef.current.assignedElements()[0];
+		if (inputElement instanceof HTMLInputElement) {
+			inputElement.value = '';
+		}
 	}
 
 	function selectFile(file) {
