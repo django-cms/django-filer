@@ -38,7 +38,6 @@ export function FileAdmin() {
 						initial.push(found);
 					}
 				}
-				console.log('initialValues', initial);
 
 				// replace the original <select multiple name="labels"> element with the "downshift" component
 				const divElement = document.createElement('div');
