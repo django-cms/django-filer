@@ -8,7 +8,7 @@ from filer.models.imagemodels import Image as FilerImage
 
 from finder.models.file import FileModel as FinderFile
 from finder.models.folder import FolderModel as FinderFolder
-from finder.contrib.image.models import ImageModel as FinderImage
+from finder.contrib.image.models import ImageFileModel as FinderImage
 
 
 class Command(BaseCommand):
