@@ -1,0 +1,72 @@
+@import "colors";
+
+@mixin dropdown {
+	[aria-haspopup="listbox"]:has(>[role~="listbox"]) {
+		position: relative;
+		display: flex;
+
+		&.with-caret::after {
+			content: " ";
+			align-self: center;
+			border: 5px solid transparent;
+			border-top-color: $body-fg-color;
+			margin-top: 5px;
+		}
+	}
+
+	[role~="listbox"] {
+		position: absolute;
+		z-index: 1;
+		background-color: $body-bg-color;
+		top: 100%;
+		margin-inline: auto;
+		border: 1px solid $border-color;
+		border-radius: 4px;
+		box-shadow: 0 0 8px $border-color;
+		display: flex;
+		flex-direction: column;
+		width: max-content;
+		padding-top: 3px;
+		padding-bottom: 3px;
+		padding-inline-start: 3px;
+		padding-inline-end: 3px;
+
+		li {
+			list-style: none;
+		}
+
+		[role~="option"] {
+			padding: 0 2rem 0 0.5rem;
+			width: auto;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			line-height: 32px;
+			font-size: 16px;
+
+			&[aria-selected="true"] {
+				background-color: $selected-row-color;
+
+				&::after {
+					content: "✔";
+					position: absolute;
+					right: 10px;
+				}
+			}
+
+			&[aria-disabled="true"] {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			&:hover:not(.disabled) {
+				background-color: $selected-bg-color;
+			}
+		}
+	}
+	[aria-haspopup="listbox"][aria-expanded="false"] {
+		>[role~="listbox"], +[role~="listbox"] {
+			display: none;
+		}
+	}
+}

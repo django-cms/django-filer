@@ -1,6 +1,8 @@
+@use "dropdown";
+@use "menubar";
 @import "colors";
-@import "menubar";
 @import "progress";
+@import "labels";
 
 // messagelist appears after saving a file
 ul.messagelist {
@@ -49,11 +51,11 @@ ul.messagelist {
 		top: 36px;
 	}
 
-	nav[role="menubar"] {
-		margin: 4px 0;
+	//nav {
+		//margin: 4px 0;
 
-		@include menubar;
-	}
+		@include menubar.menubar;
+	//}
 
 	ul.folder-tabs {
 		display: flex;
@@ -627,6 +629,10 @@ ul.messagelist {
 				outline: none;
 			}
 		}
+
+		.form-row.field-labels {
+			overflow: visible;  // allow the dropdown to overflow the container
+		}
 	}
 
 	.file-details {
@@ -677,34 +683,10 @@ ul.messagelist {
 				}
 			}
 		}
-
-		.select-labels {
-			flex-grow: 1;
-			min-width: 800px;
-		}
-		.select-labels-value {
-			border: 1px solid lightgrey;
-			border-radius: 2px;
-			box-sizing: border-box;
-			display: flex;
-			margin-right: 0.5rem;
-			padding: 0.25rem;
-		}
-		.select-labels-option {
-			padding: 0.5rem 1rem;
-			&:hover {
-				background-color: $selected-row-color;
-			}
-		}
-		span.select-labels-dot {
-			width: 12px;
-			height: 12px;
-			display: inline-block;
-			border-radius: 50%;
-			margin-left: 0.25rem;
-			margin-right: 0.5rem;
-		}
 	}
+
+	@include labels;
+	@include dropdown.dropdown;
 }
 
 @import 'node_modules/react-image-crop/src/ReactCrop.scss';

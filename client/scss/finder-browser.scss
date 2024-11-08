@@ -1,7 +1,8 @@
+@use "dropdown";
+@use "labels";
+@use "menubar";
 @import "colors";
-@import "menubar";
 @import "progress";
-
 
 .finder-file-select {
 	figure {
@@ -80,26 +81,23 @@ dialog {
 		flex-direction: column;
 		height: 100%;
 		width: 100%;
+	}
 
-		nav[role="menubar"] {
-			flex-shrink: 0;
-			border-bottom: 1px solid #808080;
-			padding-bottom: 0.5rem;
-			margin: 0.25rem 0.5rem;
-			@include menubar;
+	@include menubar.menubar;
 
-			.search-field {
-				margin-left: -14px;
-			}
-		}
+	ul[role="menubar"] {
+		flex-shrink: 0;
+		border-bottom: 1px solid #808080;
+		padding-bottom: 0.5rem;
+	}
 
-		> .browser-body {
+	.browser-body {
 			flex-grow: 1;
 			display: flex;
 			height: calc(100% - 45px);  // 45px is the height of the menubar
 		}
 
-		.folder-structure {
+	.folder-structure {
 			flex-shrink: 0;
 			overflow-y: auto;
 			direction: rtl;
@@ -146,7 +144,7 @@ dialog {
 			}
 		}
 
-		ul.files-browser {
+	ul.files-browser {
 			list-style: none;
 			display: flex;
 			margin: 0;
@@ -208,7 +206,7 @@ dialog {
 			}
 		}
 
-		.status {
+	.status {
 			font-size: 18px;
 			font-weight: bold;
 			line-height: 50px;
@@ -217,13 +215,15 @@ dialog {
 			width: auto;
 		}
 
-		.file-uploader {
-			display: flex;
-			width: 100%;
-			position: relative;
-			overflow-y: auto;
-			flex-grow: 1;
+	.file-uploader, .browser-editor {
+		display: flex;
+		width: 100%;
+		position: relative;
+		overflow-y: auto;
+		flex-grow: 1;
+	}
 
+	.file-uploader {
 			input[type="file"] {
 				width: 0 !important;
 				height: 0 !important;
@@ -236,7 +236,89 @@ dialog {
 				@include progress-overlay;
 			}
 		}
-	}
+
+	.browser-editor {
+			flex-direction: column;
+
+			img {
+				width: 100%;
+			}
+
+			form {
+				display: block;
+				margin: 0.5rem 1rem;
+				.form-row {
+					label {
+						display: inline-block;
+						&:has(~ [required]) {
+							font-weight: bold;
+						}
+					}
+
+					.errorlist {
+						display: inline-block;
+						color: $error-color;
+						list-style: none;
+						margin: 0;
+					}
+
+					input, select, textarea {
+						display: block;
+						color: $body-fg-color;
+						background-color: $body-bg-color;
+						margin-bottom: 0.5rem;
+						padding: 4px 8px;
+						border: 1px solid $border-color;
+						border-radius: 5px;
+						max-width: calc(100% - 2rem);
+
+						&:focus-visible {
+							outline: none;
+							box-shadow: $focus-visible-box-shadow;
+						}
+					}
+
+					@include labels.labels;
+
+					.select-labels-field [role="listbox"] {
+						top: auto;
+						bottom: 100%;
+						margin-block-end: 2px;
+					}
+				}
+
+				.button-row {
+					display: flex;
+					justify-content: flex-end;
+					margin: 2rem 1rem 1rem;
+
+					button {
+						margin-left: 1rem;
+						border: none;
+						border-radius: 5px;
+						padding: 0.5rem 1rem;
+						opacity: 0.9;
+
+						&:hover {
+							opacity: 1;
+							cursor: pointer;
+						}
+
+						&.default {
+							background-color: #065fc8;
+							color: #fff;
+						}
+
+						&.dismiss {
+							background-color: #ddd;
+							color: #666;
+						}
+					}
+				}
+			}
+		}
+
+	@include dropdown.dropdown;
 
 	.close-button {
 		position: absolute;
@@ -250,3 +332,5 @@ dialog {
 		}
 	}
 }
+
+@import 'node_modules/react-image-crop/src/ReactCrop.scss';

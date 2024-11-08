@@ -15,3 +15,9 @@ $progress-indicator-border: 3px solid var(--header-bg, #888);
 
 $delete-button-fg-color: var(--delete-button-fg-color, #fff);
 $delete-button-bg-color: var(--delete-button-bg-color, #ed5712);
+
+$error-color: var(--error-color, #c00000);
+
+$font-size-root: null !default;
+$enable-smooth-scroll: true !default;
+$prefix: null !default;
