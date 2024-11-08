@@ -1,7 +1,7 @@
 import React, {Fragment, useMemo, useRef} from 'react';
-import DownloadIcon from 'icons/download.svg';
-import FullSizeIcon from 'icons/full-size.svg';
-import UploadIcon from 'icons/upload.svg';
+import DownloadIcon from '../icons/download.svg';
+import FullSizeIcon from '../icons/full-size.svg';
+import UploadIcon from '../icons/upload.svg';
 
 
 function DownloadFileButton(props) {

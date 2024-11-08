@@ -1,9 +1,9 @@
 import React, {Fragment, useRef, useState} from 'react';
 import ReactPlayer from 'react-player/file';
-import FileDetails from 'finder/FileDetails';
-import PauseIcon from 'icons/pause.svg';
-import PlayIcon from 'icons/play.svg';
-import CameraIcon from 'icons/camera.svg';
+import FileDetails from '../../admin/FileDetails';
+import PauseIcon from '../../icons/pause.svg';
+import PlayIcon from '../../icons/play.svg';
+import CameraIcon from '../../icons/camera.svg';
 
 
 export default function Video(props) {

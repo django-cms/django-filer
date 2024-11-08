@@ -3,10 +3,10 @@ import {createRoot} from 'react-dom/client';
 import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
 import FileDetails from './FileDetails';
-import SelectLabels from "./SelectLabels";
+import SelectLabels from '../common/SelectLabels';
 
 
-export function FileAdmin() {
+export default function FileAdmin() {
 	const settings = useContext(FinderSettings);
 	const FileEditor = useMemo(() => {
 		if (settings.editor_component) {

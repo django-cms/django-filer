@@ -15,24 +15,24 @@ import {
 	useSensors
 } from '@dnd-kit/core';
 import {restrictToWindowEdges} from '@dnd-kit/modifiers';
-import {useCookie, useSessionStorage} from './Storage';
+import {useCookie, useSessionStorage} from '../common/Storage';
+import FileUploader from '../common/FileUploader';
 import FinderSettings from './FinderSettings';
-import FileUploader from './FileUploader';
 import FolderTabs from './FolderTabs';
 import MenuBar from './MenuBar';
 import SelectableArea from './SelectableArea';
 import InodeList from './InodeList';
 import DraggedInodes from './DraggedInodes';
 import DroppableArea from './DroppableArea';
-import DownloadIcon from 'icons/download.svg';
-import TrashIcon from 'icons/trash.svg';
-import MoreVerticalIcon from 'icons/more-vertical.svg';
+import DownloadIcon from '../icons/download.svg';
+import TrashIcon from '../icons/trash.svg';
+import MoreVerticalIcon from '../icons/more-vertical.svg';
 
 const useLayout = (initial: string) => useCookie('django-finder-layout', initial);
 const useClipboard = useSessionStorage('filer-clipboard', []);
 
 
-export function FolderAdmin() {
+export default function FolderAdmin() {
 	const settings = useContext(FinderSettings);
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);

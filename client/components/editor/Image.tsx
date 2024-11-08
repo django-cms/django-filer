@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
-import FileDetails from 'finder/FileDetails';
-import ClearCropIcon from 'icons/clear-crop.svg';
+import FileDetails from '../../admin/FileDetails';
+import ClearCropIcon from '../../icons/clear-crop.svg';
 
 
 export default function Image(props) {

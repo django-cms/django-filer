@@ -1,5 +1,5 @@
 import React, {Fragment, useState} from 'react';
-import FileDetails from 'finder/FileDetails';
+import FileDetails from '../../admin/FileDetails';
 import UnarchiveIcon from '../../icons/unarchive.svg';
 
 

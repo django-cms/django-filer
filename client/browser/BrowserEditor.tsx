@@ -1,6 +1,6 @@
 import React, {lazy, Suspense, useEffect, useMemo, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import SelectLabels from '../finder/SelectLabels';
+import SelectLabels from '../common/SelectLabels';
 
 
 function EditorForm(props) {

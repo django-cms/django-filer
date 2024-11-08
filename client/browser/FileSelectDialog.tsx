@@ -8,9 +8,9 @@ import React, {
 	useState,
 } from 'react';
 import {Tooltip} from 'react-tooltip';
-import FigureLabels from '../finder/FigureLabels';
+import FigureLabels from '../common/FigureLabels';
+import FileUploader	 from '../common/FileUploader';
 import BrowserEditor from './BrowserEditor';
-import FileUploader	 from '../finder/FileUploader';
 import FolderStructure from './FolderStructure';
 import MenuBar from './MenuBar';
 

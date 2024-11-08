@@ -1,7 +1,7 @@
 import React, {lazy, Suspense, useContext, useEffect, useMemo, useState} from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import FinderSettings from './FinderSettings';
-import FigureLabels from './FigureLabels';
+import FigureLabels from '../common/FigureLabels';
 
 
 const dateTimeFormatter = new Intl.DateTimeFormat(

@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
-import {ControlButtons} from 'finder/ControlButtons';
-import {ProgressBar, ProgressOverlay} from 'finder/UploadProgress';
+import {ControlButtons} from './ControlButtons';
+import {ProgressBar, ProgressOverlay} from '../common/UploadProgress';
 
 
 export default function FileDetails(props) {

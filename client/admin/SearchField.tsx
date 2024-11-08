@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
-import {useSearchRealm} from '../finder/Storage';
-import DropDownMenu from './DropDownMenu';
-import SearchIcon from 'icons/search.svg';
+import {useSearchRealm} from '../common/Storage';
+import DropDownMenu from '../common/DropDownMenu';
+import SearchIcon from '../icons/search.svg';
 
 
 function useSearchParam(key) : [string, (value: string) => any] {

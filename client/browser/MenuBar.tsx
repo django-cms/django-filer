@@ -1,7 +1,8 @@
 import React, {useRef} from 'react';
-import DropDownMenu from '../finder/DropDownMenu';
-import {useSearchRealm} from '../finder/Storage';
-import {SortingOptionsItem, FilterByLabel} from '../finder/MenuBar';
+import DropDownMenu from '../common/DropDownMenu';
+import {useSearchRealm} from '../common/Storage';
+import SortingOptions from '../common/SortingOptions';
+import FilterByLabel from '../common/FilterByLabel';
 import SearchIcon from '../icons/search.svg';
 import UploadIcon from '../icons/upload.svg';
 
@@ -74,7 +75,7 @@ export default function MenuBar(props) {
 					</DropDownMenu>
 				</div>
 			</li>
-			<SortingOptionsItem refreshFilesList={() => fetchFiles(lastFolderId)}/>
+			<SortingOptions refreshFilesList={() => fetchFiles(lastFolderId)}/>
 			{labels && <FilterByLabel refreshFilesList={() => fetchFiles(lastFolderId)} labels={labels} />}
 			<li role="menuitem" onClick={openUploader} data-tooltip-id="django-finder-tooltip"
 				data-tooltip-content={gettext("Upload file")}>

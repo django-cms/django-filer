@@ -1,5 +1,5 @@
 import React from 'react';
-import FileDetails from 'finder/FileDetails';
+import FileDetails from '../../admin/FileDetails';
 
 
 export default function Common(props) {

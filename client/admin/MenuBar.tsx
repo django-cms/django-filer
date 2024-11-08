@@ -8,133 +8,26 @@ import React, {
 	useMemo,
 	useState,
 } from 'react';
-import {useCookie} from './Storage';
 import SearchField from './SearchField';
-import DropDownMenu from './DropDownMenu';
-import MoreVerticalIcon from 'icons/more-vertical.svg';
-import CopyIcon from 'icons/copy.svg';
-import TilesIcon from 'icons/tiles.svg';
-import MosaicIcon from 'icons/mosaic.svg';
-import ListIcon from 'icons/list.svg';
-import ColumnsIcon from 'icons/columns.svg';
-import FilterIcon from 'icons/filter.svg';
-import SortingIcon from 'icons/sorting.svg';
-import SortAscIcon from 'icons/sort-asc.svg';
-import SortDescIcon from 'icons/sort-desc.svg';
-import CutIcon from 'icons/cut.svg';
-import PasteIcon from 'icons/paste.svg';
-import ClipboardIcon from 'icons/clipboard.svg';
-import TrashIcon from 'icons/trash.svg';
-import EraseIcon from 'icons/erase.svg';
-import AddFolderIcon from 'icons/add-folder.svg';
-import DownloadIcon from 'icons/download.svg';
-import UndoIcon from 'icons/undo.svg';
-import UploadIcon from 'icons/upload.svg';
+import DropDownMenu from '../common/DropDownMenu';
+import FilterByLabel from '../common/FilterByLabel';
+import SortingOptions from '../common/SortingOptions';
+import MoreVerticalIcon from '../icons/more-vertical.svg';
+import CopyIcon from '../icons/copy.svg';
+import TilesIcon from '../icons/tiles.svg';
+import MosaicIcon from '../icons/mosaic.svg';
+import ListIcon from '../icons/list.svg';
+import ColumnsIcon from '../icons/columns.svg';
+import CutIcon from '../icons/cut.svg';
+import PasteIcon from '../icons/paste.svg';
+import ClipboardIcon from '../icons/clipboard.svg';
+import TrashIcon from '../icons/trash.svg';
+import EraseIcon from '../icons/erase.svg';
+import AddFolderIcon from '../icons/add-folder.svg';
+import DownloadIcon from '../icons/download.svg';
+import UndoIcon from '../icons/undo.svg';
+import UploadIcon from '../icons/upload.svg';
 
-const useSorting = () => useCookie('django-finder-sorting', '');
-const useFilter = () => useCookie('django-finder-filter', []);
-
-
-export function SortingOptionsItem(props: any) {
-	const {refreshFilesList} = props;
-	const [sorting, setSorting] = useSorting();
-
-	function changeSorting(value) {
-		if (value !== sorting) {
-			setSorting(value);
-			refreshFilesList();
-		}
-	}
-
-	function getItemProps(value: string) {
-		return {
-			role: 'option',
-			'aria-selected': sorting === value,
-			onClick: () => changeSorting(value),
-		};
-	}
-
-	return (
-		<DropDownMenu
-			icon={<SortingIcon/>}
-			role="menuitem"
-			className="sorting-options with-caret"
-			tooltip={gettext("Change sorting order")}
-		>
-			<li {...getItemProps('')}>
-				<span>{gettext("Unsorted")}</span>
-			</li>
-			<li {...getItemProps('name_asc')}>
-				<SortDescIcon/><span>{gettext("Name")}</span>
-			</li>
-			<li {...getItemProps('name_desc')}>
-				<SortAscIcon /><span>{gettext("Name")}</span>
-			</li>
-			<li {...getItemProps('date_asc')}>
-				<SortDescIcon /><span>{gettext("Date")}</span>
-			</li>
-			<li {...getItemProps('date_desc')}>
-				<SortAscIcon /><span>{gettext("Date")}</span>
-			</li>
-			<li {...getItemProps('size_asc')}>
-				<SortDescIcon /><span>{gettext("Size")}</span>
-			</li>
-			<li {...getItemProps('size_desc')}>
-				<SortAscIcon /><span>{gettext("Size")}</span>
-			</li>
-			<li {...getItemProps('type_asc')}>
-				<SortDescIcon /><span>{gettext("Type")}</span>
-			</li>
-			<li {...getItemProps('type_desc')}>
-				<SortAscIcon /><span>{gettext("Type")}</span>
-			</li>
-		</DropDownMenu>
-	);
-}
-
-
-export function FilterByLabel(props: any) {
-	const {labels, refreshFilesList} = props;
-	const [filter, setFilter] = useFilter();
-
-	function changeFilter(value) {
-		if (value === null) {
-			setFilter([]);
-		} else if (filter.includes(value)) {
-			setFilter(filter.filter(v => v !== value));
-		} else {
-			setFilter([...filter, value]);
-		}
-		refreshFilesList();
-	}
-
-	return (
-		<DropDownMenu
-			icon={<FilterIcon/>}
-			role="menuitem"
-			aria-selected={filter.length}
-			className="filter-by-label with-caret"
-			tooltip={gettext("Filter by label")}
-		>
-			<li role="option"><span onClick={() => changeFilter(null)}>{gettext("Clear all")}</span></li>
-			<hr/>{labels.map((label, index) => (
-			<li key={label.value} role="option">
-				<label htmlFor={`filter-${label.value}`}>
-					<input
-						type="checkbox"
-						id={`filter-${label.value}`}
-						name={label.value}
-						checked={filter.includes(label.value)}
-						onChange={() => changeFilter(label.value)}
-					/>
-					<span className="label-dot" style={{backgroundColor: label.color}}></span>
-					{label.label}
-				</label>
-			</li>
-			))}
-		</DropDownMenu>
-	);
-}
 
 
 function MenuExtension(props) {
@@ -450,7 +343,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					role="menuitem" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}>
 					<ColumnsIcon/>
 				</li>
-				<SortingOptionsItem refreshFilesList={refreshColumns} />
+				<SortingOptions refreshFilesList={refreshColumns} />
 				{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
 				<li aria-disabled={numSelectedInodes === 0} onClick={cutInodes}
 					role="menuitem" data-tooltip-id="django-finder-tooltip"

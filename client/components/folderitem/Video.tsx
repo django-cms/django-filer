@@ -1,5 +1,5 @@
 import React, {useRef, useEffect} from 'react';
-import FigureLabels from 'finder/FigureLabels';
+import FigureLabels from '../../common/FigureLabels';
 
 
 export default function Video(props) {
