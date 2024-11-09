@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.i18n import JavaScriptCatalog
 
-from finder.api.views import BrowserView
+from finder.browser.views import BrowserView
 
 
 app_name = 'finder-api'
