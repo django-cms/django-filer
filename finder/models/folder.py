@@ -219,7 +219,7 @@ class FolderModel(InodeModel):
             path = path.split('/')
         for part in path:
             if entry := self.listdir(name=part).first():
-                proxy_obj = InodeModel.objects.get_proxy_object(entry)
+                proxy_obj = InodeManagerMixin.get_proxy_object(entry)
                 return proxy_obj.retrieve(path[1:])
             return None
         else:

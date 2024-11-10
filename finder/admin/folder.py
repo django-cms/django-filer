@@ -13,7 +13,7 @@ from django.utils.html import format_html
 
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
-from finder.models.inode import DiscardedInode
+from finder.models.inode import DiscardedInode, InodeManager
 from finder.models.label import Label
 
 from .inode import InodeAdmin
@@ -283,10 +283,10 @@ class FolderAdmin(InodeAdmin):
                     DiscardedInode.objects.get(inode=entry['id']).delete()
                 except DiscardedInode.DoesNotExist:
                     pass
-                dummy_obj = FolderModel.objects.get_proxy_object(entry)
-                dummy_obj.parent = target_folder
-                dummy_obj.validate_constraints()
-                dummy_obj._meta.model.objects.filter(id=entry['id']).update(parent=target_folder)
+                proxy_obj = InodeManager.get_proxy_object(entry)
+                proxy_obj.parent = target_folder
+                proxy_obj.validate_constraints()
+                proxy_obj._meta.model.objects.filter(id=entry['id']).update(parent=target_folder)
         except ValidationError as e:
             return HttpResponseBadRequest(e.message, status=409)
         return JsonResponse({
@@ -339,8 +339,8 @@ class FolderAdmin(InodeAdmin):
         DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
         for entry in trash_folder_entries:
             # bulk delete does not work here because file must be erased from disk
-            dummy_obj = FolderModel.objects.get_proxy_object(entry)
-            dummy_obj.delete()
+            proxy_obj = InodeManager.get_proxy_object(entry)
+            proxy_obj.delete()
         fallback_folder = self.get_fallback_folder(request)
         return JsonResponse({
             'success_url': reverse(

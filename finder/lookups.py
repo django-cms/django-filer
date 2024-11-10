@@ -1,6 +1,4 @@
-from django.urls import reverse
-
-from finder.models.folder import FolderModel
+from finder.models.inode import InodeManager
 from finder.models.label import Label
 
 
@@ -11,13 +9,13 @@ def annotate_unified_queryset(queryset):
     """
     labels = Label.objects.values_list('id', 'name', 'color')
     for entry in queryset:
-        dummy_obj = FolderModel.objects.get_proxy_object(entry)
+        proxy_obj = InodeManager.get_proxy_object(entry)
         entry.update(
-            download_url=dummy_obj.get_download_url(),
-            thumbnail_url=dummy_obj.get_thumbnail_url(),
-            sample_url=getattr(dummy_obj, 'get_sample_url', lambda: None)(),
-            summary=dummy_obj.summary,
-            folderitem_component=dummy_obj.folderitem_component,
+            download_url=proxy_obj.get_download_url(),
+            thumbnail_url=proxy_obj.get_thumbnail_url(),
+            sample_url=getattr(proxy_obj, 'get_sample_url', lambda: None)(),
+            summary=proxy_obj.summary,
+            folderitem_component=proxy_obj.folderitem_component,
         )
         if label_ids := entry.pop('label_ids', None):
             label_ids = list(map(int, label_ids.split(',')))

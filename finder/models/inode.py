@@ -140,13 +140,14 @@ class InodeManagerMixin:
         ]).get()
         return FileModel.objects.get_model_for(values['mime_type']).objects.get(id=values['id'])
 
+    @classmethod
     def get_proxy_object(self, entry):
         """
         Returns a proxy model instance for the given entry. This can be useful for entries returned by
-        `filter_unified` since they are dictionaries and not model instances. It hence is an alternative
-        to the `get_inode` method but without querying the database.
-        Please note that such an object does not dereference related fields and can only be used
-        to access their model methods
+        `filter_unified` since they are dictionaries and not model instances. It hence is a faster
+        alternative to the `get_inode` method because it does not query the database.
+        Note that such an object does not dereference related fields and can only be used
+        to access their model members and methods.
         """
         from .file import FileModel
         from .folder import FolderModel
