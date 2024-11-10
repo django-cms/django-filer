@@ -59,7 +59,10 @@ class ArchiveAdmin(FileAdmin):
                 inode_objects.append(inode_obj)
                 if inode_obj.is_folder:
                     for descendant in inode_obj.descendants:
-                        inode_objects.extend(descendant.listdir())
+                        inode_objects.extend(
+                            FileModel.objects.get_inode(id=entry['id'])
+                            for entry in descendant.listdir()
+                        )
 
         filename = self.model.generate_filename(body['archive_name'])
         filename = f'{filename}.zip' if not filename.endswith('.zip') else filename

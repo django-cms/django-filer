@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
+
 try:
     from django_cte import CTEManager as ModelManager
 except ImportError:
@@ -217,8 +218,9 @@ class FolderModel(InodeModel):
         if isinstance(path, str):
             path = path.split('/')
         for part in path:
-            if inodes := self.listdir(name=part):
-                return next(inodes).retrieve(path[1:])
+            if entry := self.listdir(name=part).first():
+                proxy_obj = InodeModel.objects.get_proxy_object(entry)
+                return proxy_obj.retrieve(path[1:])
             return None
         else:
             return self
