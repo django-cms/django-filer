@@ -335,10 +335,12 @@ class FolderAdmin(InodeAdmin):
     def erase_trash_folder(self, request):
         if request.method != 'DELETE':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
-        trash_folder = self.get_trash_folder(request)
-        for inode in trash_folder.listdir():
-            DiscardedInode.objects.get(inode=inode.id).delete()
-            inode.delete()
+        trash_folder_entries = self.get_trash_folder(request).listdir()
+        DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
+        for entry in trash_folder_entries:
+            # bulk delete does not work here because file must be erased from disk
+            dummy_obj = FolderModel.objects.get_proxy_object(entry)
+            dummy_obj.delete()
         fallback_folder = self.get_fallback_folder(request)
         return JsonResponse({
             'success_url': reverse(
@@ -359,7 +361,6 @@ class FolderAdmin(InodeAdmin):
         new_folder = FolderModel.objects.create(
             name=body['name'],
             parent=parent_folder,
-            realm=self.get_realm(request),
             owner=request.user,
         )
         return JsonResponse({'new_folder': self.serialize_inode(new_folder)})

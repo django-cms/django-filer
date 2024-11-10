@@ -1,5 +1,6 @@
+from functools import lru_cache
+
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -12,50 +13,29 @@ except ImportError:
     ModelManager = models.Manager
 
 from .inode import InodeManagerMixin, InodeModel
-
-
-class RealmModel(models.Model):
-    site = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-        verbose_name=_("Site"),
-    )
-
-    slug = models.SlugField(
-        _("Slug"),
-        max_length=200,
-        null=True,
-        editable=False,
-    )
-
-    class Meta:
-        ordering = ['site', 'slug']
-        constraints = [models.UniqueConstraint(fields=['site', 'slug'], name='unique_site')]
-
-    def __str__(self):
-        return f"{self.slug} @ {self.site.name}"
+from.realm import RealmModel
 
 
 class FolderModelManager(InodeManagerMixin, ModelManager):
     def get_root_folder(self, realm):
-        root_folder, _ = self.get_or_create(parent=None, realm=realm, name='__root__')
-        return root_folder
+        try:
+            return realm.root_folder
+        except FolderModel.DoesNotExist:
+            realm.root_folder = self.create(parent=None, name='__root__')
+            return realm.root_folder
 
     def get_trash_folder(self, realm, owner):
-        trash_folder, _ = self.get_or_create(parent=None, realm=realm, owner=owner, name='__trash__')
+        try:
+            trash_folder = realm.trash_folders.get(owner=owner)
+        except FolderModel.DoesNotExist:
+            trash_folder = self.create(parent=None, owner=owner, name='__trash__')
+            realm.trash_folders.add(trash_folder)
         return trash_folder
 
 
 class FolderModel(InodeModel):
     is_folder = True
     folderitem_component = None
-
-    realm = models.ForeignKey(
-        RealmModel,
-        verbose_name=_("Realm"),
-        editable=False,
-        on_delete=models.CASCADE,
-    )
 
     class Meta:
         verbose_name = _("Folder")
@@ -76,6 +56,12 @@ class FolderModel(InodeModel):
     def cast(self):
         raise NotImplementedError
         return self
+
+    @lru_cache
+    def get_realm(self):
+        if isinstance(self.ancestors, models.QuerySet):
+            return self.ancestors.last().realm
+        return list(self.ancestors)[-1].realm
 
     @property
     def folder(self):
@@ -239,6 +225,12 @@ class FolderModel(InodeModel):
 
 
 class PinnedFolder(models.Model):
+    realm = models.ForeignKey(
+        RealmModel,
+        related_name='+',
+        on_delete=models.CASCADE,
+        editable=False,
+    )
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='+',

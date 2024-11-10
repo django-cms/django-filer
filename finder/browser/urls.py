@@ -7,7 +7,7 @@ from finder.browser.views import BrowserView
 app_name = 'finder-api'
 urlpatterns = [
     path(
-        'structure/<slug:realm>',
+        'structure/<slug:slug>',
         BrowserView.as_view(action='structure'),
     ),
     path(

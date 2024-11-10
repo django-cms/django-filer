@@ -9,8 +9,9 @@ from django.views import View
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.file import FileModel
-from finder.models.folder import FolderModel, RealmModel
+from finder.models.folder import FolderModel
 from finder.models.label import Label
+from finder.models.realm import RealmModel
 
 
 class FormRenderer(DjangoTemplates):
@@ -53,12 +54,15 @@ class BrowserView(View):
             })
         return children
 
-    def structure(self, request, realm):
+    def _get_realm(self, request, slug):
         site = get_current_site(request)
         try:
-            realm = RealmModel.objects.get(site=site, slug=realm)
+            return RealmModel.objects.get(site=site, slug=slug)
         except RealmModel.DoesNotExist:
-            raise ObjectDoesNotExist(f"Realm {realm} not found for {site.domain}.")
+            raise ObjectDoesNotExist(f"Realm named {slug} not found for {site.domain}.")
+
+    def structure(self, request, slug):
+        realm = self._get_realm(request, slug)
         root_folder = FolderModel.objects.get_root_folder(realm)
         root_folder_id = str(root_folder.id)
         request.session.setdefault('finder.open_folders', [])
@@ -135,7 +139,7 @@ class BrowserView(View):
         lookup = lookup_by_label(request)
         unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
         unified_queryset = sort_by_attribute(request, unified_queryset)
-        annotate_unified_queryset(unified_queryset, folder.realm.slug)
+        annotate_unified_queryset(unified_queryset)
         return {'files': list(unified_queryset)}
 
     def search(self, request, folder_id):
@@ -159,7 +163,7 @@ class BrowserView(View):
             'name_lower__icontains': search_query,
         }
         unified_queryset = FileModel.objects.filter_unified(is_folder=False, **lookup)
-        annotate_unified_queryset(unified_queryset, starting_folder.realm.slug)
+        annotate_unified_queryset(unified_queryset)
         return {'files': list(unified_queryset)}
 
     def upload(self, request, folder_id):

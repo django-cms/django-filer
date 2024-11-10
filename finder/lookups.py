@@ -4,7 +4,7 @@ from finder.models.folder import FolderModel
 from finder.models.label import Label
 
 
-def annotate_unified_queryset(queryset, realm):
+def annotate_unified_queryset(queryset):
     """
     Annotates the given queryset with additional fields for the frontend.
     This step must be applied after filtering and sorting.
@@ -13,11 +13,6 @@ def annotate_unified_queryset(queryset, realm):
     for entry in queryset:
         dummy_obj = FolderModel.objects.get_proxy_object(entry)
         entry.update(
-            change_url=reverse(
-                'admin:finder_inodemodel_change',
-                args=(entry['id'],),
-                current_app=realm,
-            ),
             download_url=dummy_obj.get_download_url(),
             thumbnail_url=dummy_obj.get_thumbnail_url(),
             sample_url=getattr(dummy_obj, 'get_sample_url', lambda: None)(),

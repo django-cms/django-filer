@@ -10,7 +10,8 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
-from finder.models.folder import FolderModel, PinnedFolder, RealmModel
+from finder.models.folder import FolderModel, PinnedFolder
+from finder.models.realm import RealmModel
 
 
 class InodeAdmin(admin.ModelAdmin):
@@ -45,7 +46,12 @@ class InodeAdmin(admin.ModelAdmin):
         current_folder = self.get_object(request, folder_id)
         if not (pinned_id := body.get('pinned_id')):
             return HttpResponseBadRequest("No pinned_id provided.")
-        pinned_folder, created = PinnedFolder.objects.get_or_create(owner=request.user, folder_id=pinned_id)
+        realm = self.get_realm(request)
+        pinned_folder, created = PinnedFolder.objects.get_or_create(
+            realm=realm,
+            owner=request.user,
+            folder_id=pinned_id,
+        )
         if created:
             request.session['finder_last_folder_id'] = None
         else:
@@ -86,18 +92,19 @@ class InodeAdmin(admin.ModelAdmin):
         return realm
 
     def get_root_folder(self, request):
-        return FolderModel.objects.get_root_folder(self.get_realm(request))
+        realm = self.get_realm(request)
+        return FolderModel.objects.get_root_folder(realm)
 
     def get_trash_folder(self, request):
-        return FolderModel.objects.get_trash_folder(self.get_realm(request), request.user)
+        realm = self.get_realm(request)
+        return FolderModel.objects.get_trash_folder(realm, request.user)
 
     def get_fallback_folder(self, request):
-        realm = self.get_realm(request)
         try:
             last_folder_id = request.session['finder_last_folder_id']
-            return FolderModel.objects.get(id=last_folder_id, realm=realm)
+            return FolderModel.objects.get(id=last_folder_id)
         except (FolderModel.DoesNotExist, KeyError):
-            return FolderModel.objects.get_root_folder(realm)
+            return self.get_root_folder(request)
 
     def get_inodes(self, request, **lookup):
         """
@@ -106,7 +113,7 @@ class InodeAdmin(admin.ModelAdmin):
         lookup = dict(lookup_by_label(request), **lookup)
         unified_queryset = FolderModel.objects.filter_unified(**lookup)
         unified_queryset = sort_by_attribute(request, unified_queryset)
-        annotate_unified_queryset(unified_queryset, self.admin_site.name)
+        self.annotate_unified_queryset(unified_queryset)
         return unified_queryset
 
     def get_breadcrumbs(self, obj):
@@ -122,10 +129,11 @@ class InodeAdmin(admin.ModelAdmin):
         return breadcrumbs
 
     def get_favorite_folders(self, request, current_folder):
-        realm = self.get_realm(request)
+        site = get_current_site(request)
         folders = PinnedFolder.objects.filter(
+            realm__site=site,
+            realm__slug=self.admin_site.name,
             owner=request.user,
-            folder__realm__id=realm.id,
         ).values(
             'folder__id',
             'folder__name',
@@ -211,3 +219,13 @@ class InodeAdmin(admin.ModelAdmin):
         """
         return {}
 
+    def annotate_unified_queryset(self, queryset):
+        annotate_unified_queryset(queryset)
+        for entry in queryset:
+            entry.update(
+                change_url=reverse(
+                    'admin:finder_inodemodel_change',
+                    args=(entry['id'],),
+                    current_app=self.admin_site.name,
+                )
+            )

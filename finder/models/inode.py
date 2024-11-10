@@ -115,7 +115,7 @@ class InodeManagerMixin:
 
         unified_fields = {
             field.name: field for field in FolderModel._meta.get_fields()
-            if field.concrete and not field.many_to_many and field.name is not 'realm'
+            if field.concrete and not field.many_to_many and field.name != 'realm'
         }
         for model in FileModel.get_models():
             for field in model._meta.get_fields():
@@ -250,6 +250,9 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
 
 class DiscardedInode(models.Model):
+    """
+    Store information about inodes that have been moved to the trash folder so that they can be restored again.
+    """
     inode = models.UUIDField(
         primary_key=True,
     )
