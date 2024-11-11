@@ -228,7 +228,7 @@ class FolderAdmin(InodeAdmin):
         except (InodeModel.DoesNotExist, KeyError):
             return HttpResponseNotFound(f"Inode(id={body.get('id', '<missing>')}) not found.")
         current_folder = self.get_object(request, folder_id)
-        if next(current_folder.listdir(name=body['name'], is_folder=True), None):
+        if current_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=body['name']), status=409)
         update_values = {}
