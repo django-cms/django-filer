@@ -19,9 +19,14 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+
+			&:hover {
+				cursor: pointer;
+			}
 		}
 
 		>figcaption {
+			position: relative;
 			display: flex;
 			flex-direction: column;
 			padding: .25rem .5rem;
@@ -32,6 +37,7 @@
 			dl {
 				font-size: small;
 				margin: 0 0 .25rem 0;
+				line-height: 18px;
 			}
 			dt {
 				font-weight: bold;
@@ -41,14 +47,11 @@
 				margin: 0;
 			}
 
-			div:last-child {
-				display: flex;
-				flex-grow: 1;
-				justify-content: flex-end;
-				padding: 0.25rem;
-
-				>button {
+			.delete-file-button {
 					margin: 0;
+					position: absolute;
+					right: 0.5rem;
+					bottom: 0.5rem;
 					padding: 0.25rem 0.5rem;
 					color: $delete-button-fg-color;
 					background-color: $delete-button-bg-color;
@@ -59,9 +62,10 @@
 
 					&:hover {
 						opacity: 1;
+						cursor: pointer;
 					}
 				}
-			}
+
 		}
 	}
 }
@@ -238,88 +242,88 @@ dialog {
 		}
 
 	.browser-editor {
-			flex-direction: column;
+		flex-direction: column;
 
-			img {
-				width: 100%;
-				&.thumbnail {
-					max-width: 175px;
+		img {
+			width: 100%;
+			&.thumbnail {
+				max-width: 175px;
+			}
+		}
+
+		form {
+			display: block;
+			margin: 0.5rem 1rem;
+			.form-row {
+				label {
+					display: inline-block;
+					&:has(~ [required]) {
+						font-weight: bold;
+					}
+				}
+
+				.errorlist {
+					display: inline-block;
+					color: $error-color;
+					list-style: none;
+					margin: 0;
+				}
+
+				input, select, textarea {
+					display: block;
+					color: $body-fg-color;
+					background-color: $body-bg-color;
+					margin-bottom: 0.5rem;
+					padding: 4px 8px;
+					border: 1px solid $border-color;
+					border-radius: 5px;
+					max-width: calc(100% - 2rem);
+
+					&:focus-visible {
+						outline: none;
+						box-shadow: $focus-visible-box-shadow;
+					}
+				}
+
+				@include labels.labels;
+
+				.select-labels-field [role="listbox"] {
+					top: auto;
+					bottom: 100%;
+					margin-block-end: 2px;
 				}
 			}
 
-			form {
-				display: block;
-				margin: 0.5rem 1rem;
-				.form-row {
-					label {
-						display: inline-block;
-						&:has(~ [required]) {
-							font-weight: bold;
-						}
+			.button-row {
+				display: flex;
+				justify-content: flex-end;
+				margin: 2rem 1rem 1rem;
+
+				button {
+					margin-left: 1rem;
+					border: none;
+					border-radius: 5px;
+					padding: 0.5rem 1rem;
+					opacity: 0.9;
+
+					&:hover {
+						opacity: 1;
+						cursor: pointer;
 					}
 
-					.errorlist {
-						display: inline-block;
-						color: $error-color;
-						list-style: none;
-						margin: 0;
+					&.default {
+						background-color: #065fc8;
+						color: #fff;
 					}
 
-					input, select, textarea {
-						display: block;
-						color: $body-fg-color;
-						background-color: $body-bg-color;
-						margin-bottom: 0.5rem;
-						padding: 4px 8px;
-						border: 1px solid $border-color;
-						border-radius: 5px;
-						max-width: calc(100% - 2rem);
-
-						&:focus-visible {
-							outline: none;
-							box-shadow: $focus-visible-box-shadow;
-						}
-					}
-
-					@include labels.labels;
-
-					.select-labels-field [role="listbox"] {
-						top: auto;
-						bottom: 100%;
-						margin-block-end: 2px;
-					}
-				}
-
-				.button-row {
-					display: flex;
-					justify-content: flex-end;
-					margin: 2rem 1rem 1rem;
-
-					button {
-						margin-left: 1rem;
-						border: none;
-						border-radius: 5px;
-						padding: 0.5rem 1rem;
-						opacity: 0.9;
-
-						&:hover {
-							opacity: 1;
-							cursor: pointer;
-						}
-
-						&.default {
-							background-color: #065fc8;
-							color: #fff;
-						}
-
-						&.dismiss {
-							background-color: #b15107;
-							color: #fff;
-						}
+					&.dismiss {
+						background-color: #b15107;
+						color: #fff;
 					}
 				}
 			}
 		}
+	}
 
 	@include dropdown.dropdown;
 

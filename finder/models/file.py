@@ -189,6 +189,7 @@ class AbstractFileModel(InodeModel):
             'sha1': self.sha1,
             'mime_type': self.mime_type,
             'last_modified_at': self.last_modified_at,
+            'summary': self.summary,
             'folderitem_component': self.folderitem_component,
             'browser_component': self.browser_component,
             'download_url': self.get_download_url(),

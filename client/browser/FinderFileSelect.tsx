@@ -87,16 +87,18 @@ export default function FinderFileSelect(props) {
 						<dd>{selectedFile.name}</dd>
 					</dl>
 					<dl>
-						<dt>{gettext("Content-Type (Size)")}:</dt>
-						<dd>{selectedFile.mime_type} ({selectedFile.file_size})</dd>
+						<dt>{gettext("Details")}:</dt>
+						<dd>{selectedFile.summary}</dd>
 					</dl>
 					<dl>
 						<dt>{gettext("Modified at")}:</dt>
 						<dd>{renderTimestamp(selectedFile.last_modified_at)}</dd>
 					</dl>
-					<div>
-						<button type="button" onClick={deleteFile}>{gettext("Delete")}</button>
-					</div>
+					<dl>
+						<dt>{gettext("Content-Type")}:</dt>
+						<dd>{selectedFile.mime_type}</dd>
+					</dl>
+					<button className="delete-file-button" type="button" onClick={deleteFile}>{gettext("Delete")}</button>
 				</figcaption>
 			</> :
 				<span onClick={openDialog} onDragEnter={openDialog}>
