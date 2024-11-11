@@ -7,6 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
+import {InView} from 'react-intersection-observer';
 import {Tooltip} from 'react-tooltip';
 import FigureLabels from '../common/FigureLabels';
 import FileUploader	 from '../common/FileUploader';
@@ -50,25 +51,40 @@ function Figure(props) {
 
 
 const FilesList = memo((props: any) => {
-	const {files, selectFile} = props;
+	const {files, numFiles, selectFile} = props;
+	const [{offset, limit}, setOffset] = useState({offset: 0, limit: 10});
 
-	console.log('FolderList', files);
+	console.log('FolderList', numFiles, files);
+
+	function loadMore(inView, entry) {
+		if (inView) {
+			console.log('load more:', entry.target);
+		}
+	}
 
 	return (
 		<ul className="files-browser">{
 		files.length === 0 ?
-			<li className="status">{gettext("Empty folder")}</li> :
-		files.map(file => (
+			<li className="status">{gettext("Empty folder")}</li> : (
+			<>{files.map(file => (
 			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} /></li>
-		))}
-		</ul>
+			))}
+			{numFiles > files.length && <InView as="li" onChange={loadMore} />}
+			</>
+		)}</ul>
 	);
 });
 
 
 export default function FileSelectDialog(props) {
 	const {realm, baseUrl, csrfToken, selectFile} = props;
-	const [structure, setStructure] = useState({root_folder: null, last_folder: null, files: null, labels: []});
+	const [structure, setStructure] = useState({
+		root_folder: null,
+		last_folder: null,
+		files: null,
+		num_files: 0,
+		labels: [],
+	});
 	const [uploadedFile, setUploadedFile] = useState(null);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
@@ -115,6 +131,7 @@ export default function FileSelectDialog(props) {
 			root_folder: structure.root_folder,
 			last_folder: folderId,
 			files: null,
+			num_files: 0,
 			labels: structure.labels,
 		};
 		const response = await fetch(fetchUrl);
@@ -170,7 +187,7 @@ export default function FileSelectDialog(props) {
 				>{
 					structure.files === null ?
 					<div className="status">{gettext("Loading files…")}</div> :
-					<FilesList files={structure.files} selectFile={selectFile} />
+					<FilesList files={structure.files} numFiles={structure.num_files} selectFile={selectFile} />
 				}</FileUploader>
 			</div>
 			</>}

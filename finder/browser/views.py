@@ -134,13 +134,18 @@ class BrowserView(View):
         """
         List all the files of the given folder.
         """
-        folder = FolderModel.objects.get(id=folder_id)
         request.session['finder.last_folder'] = str(folder_id)
+        offset = int(request.GET.get('offset', 0))
+        limit = int(request.GET.get('limit', 10))
         lookup = lookup_by_label(request)
         unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
+        num_files = unified_queryset.count()
         unified_queryset = sort_by_attribute(request, unified_queryset)
         annotate_unified_queryset(unified_queryset)
-        return {'files': list(unified_queryset)}
+        return {
+            'files': list(unified_queryset),  # [offset:limit]
+            'num_files': num_files,
+        }
 
     def search(self, request, folder_id):
         """
