@@ -424,7 +424,7 @@ ul.messagelist {
 			box-sizing: border-box;
 
 			&:nth-child(even):not(.selected) {
-				background-color: $body-bg-color;
+				background-color: $darkened-bg;
 			}
 
 			&:last-child {
