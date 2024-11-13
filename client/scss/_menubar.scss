@@ -48,8 +48,6 @@
 					min-width: 100px;
 					height: 100%;
 					display: block;
-					color: $body-fg-color;
-					background-color: $body-bg-color;
 					margin: 0;
 					padding: 2px 8px;
 					border: 1px solid $border-color;
@@ -86,14 +84,14 @@
 
 						.search-realm {
 							display: flex;
-						//	[role="combobox"] {
-						//		li:nth-child(2) {
-						//			padding-bottom: 4px;
-						//			border-bottom: 1px solid $border-color;
-						//			margin-bottom: 4px;
-						//		}
-						//	}
 						}
+					}
+				}
+
+				&:not(:has(> input:placeholder-shown)) {
+					background-color: $selected-row-color;
+					> input {
+						background-color: $selected-row-color;
 					}
 				}
 
@@ -104,10 +102,6 @@
 
 			&[aria-haspopup="listbox"]:has(>[role~="listbox"]) {
 				width: auto;
-
-				//&.with-caret {
-				//	padding-right: 0.25rem;
-				//}
 			}
 
 			&.sorting-options {
@@ -119,6 +113,7 @@
 
 			&.filter-by-label {
 				margin-right: auto;
+
 				ul > li {
 					input[type="checkbox"] {
 						vertical-align: initial;
@@ -132,21 +127,15 @@
 						margin-right: 0.5rem;
 					}
 				}
-			}
 
-			//&.filter-by-label + &.sorting-options {
-			//	margin-left: auto;
-			//}
+				&:has(input:checked) {
+					background-color: $selected-row-color;
+				}
+			}
 
 			&.extra-menu [role~="listbox"] {
 				right: 0;
 				margin-inline-end: inherit;
-
-				//> li:nth-child(5):not(:last-child) {
-				//	padding-bottom: 4px;
-				//	border-bottom: 1px solid $border-color;
-				//	margin-bottom: 4px;
-				//}
 			}
 
 			svg {
@@ -164,22 +153,6 @@
 		[role~="listbox"] {
 			left: -250px;
 			right: -250px;
-
-			//li {
-			//	padding: 0 2rem 0 0.5rem;
-			//	width: auto;
-			//	cursor: pointer;
-			//	display: flex;
-			//	align-items: center;
-			//	line-height: 32px;
-			//	font-size: 16px;
-			//
-			//	&.active::after {
-			//		content: "✔";
-			//		position: absolute;
-			//		right: 10px;
-			//	}
-			//}
 
 			svg {
 				color: $body-fg-color;

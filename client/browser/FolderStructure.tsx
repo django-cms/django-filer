@@ -8,10 +8,10 @@ import RootIcon from '../icons/root.svg';
 
 
 function FolderEntry(props) {
-	const {folder, toggleOpen, fetchFiles, isCurrent} = props;
+	const {folder, toggleOpen, setCurrentFolder, isCurrent} = props;
 
 	if (folder.is_root) {
-		return (<span onClick={() => fetchFiles(folder.id)}><RootIcon/></span>);
+		return (<span onClick={() => setCurrentFolder(folder.id)}><RootIcon/></span>);
 	}
 
 	return (<>
@@ -20,7 +20,7 @@ function FolderEntry(props) {
 		}</i>
 		{isCurrent ?
 		<strong><FolderOpenIcon/>{folder.name}</strong> :
-		<span onClick={() => fetchFiles(folder.id)} role="button">
+		<span onClick={() => setCurrentFolder(folder.id)} role="button">
 			<FolderIcon/>{folder.name}
 		</span>
 		}
@@ -29,7 +29,7 @@ function FolderEntry(props) {
 
 
 export default function FolderStructure(props) {
-	const {baseUrl, folder, lastFolderId, fetchFiles, refreshStructure} = props;
+	const {baseUrl, folder, lastFolderId, setCurrentFolder, refreshStructure} = props;
 
 	async function fetchChildren() {
 		const response = await fetch(`${baseUrl}${folder.id}/fetch`);
@@ -62,7 +62,7 @@ export default function FolderStructure(props) {
 			<FolderEntry
 				folder={folder}
 				toggleOpen={toggleOpen}
-				fetchFiles={fetchFiles}
+				setCurrentFolder={setCurrentFolder}
 				isCurrent={lastFolderId === folder.id}
 			/>
 			{folder.is_open && (
@@ -73,7 +73,7 @@ export default function FolderStructure(props) {
 					baseUrl={baseUrl}
 					folder={child}
 					lastFolderId={lastFolderId}
-					fetchFiles={fetchFiles}
+					setCurrentFolder={setCurrentFolder}
 					refreshStructure={refreshStructure}
 				/>
 			))}

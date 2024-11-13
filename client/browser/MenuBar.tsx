@@ -8,17 +8,17 @@ import UploadIcon from '../icons/upload.svg';
 
 
 export default function MenuBar(props) {
-	const {lastFolderId, fetchFiles, openUploader, labels} = props;
+	const {refreshFilesList, setSearchQuery, openUploader, labels} = props;
 	const searchRef = useRef(null);
 	const [searchRealm, setSearchRealm] = useSearchRealm('current');
 
 	function handleSearch(event) {
 		const performSearch = () => {
 			const searchQuery = searchRef.current.value || '';
-			fetchFiles(lastFolderId, searchQuery);
+			setSearchQuery(searchQuery);
 		};
 		const resetSearch = () => {
-			fetchFiles(lastFolderId);
+			setSearchQuery('');
 		};
 
 		if (event.type === 'change' && searchRef.current.value.length === 0) {
@@ -47,8 +47,6 @@ export default function MenuBar(props) {
 		};
 	}
 
-	console.log('Menu', lastFolderId);
-
 	return (
 		<ul role="menubar">
 			<li role="menuitem" className="search-field">
@@ -75,8 +73,8 @@ export default function MenuBar(props) {
 					</DropDownMenu>
 				</div>
 			</li>
-			<SortingOptions refreshFilesList={() => fetchFiles(lastFolderId)}/>
-			{labels && <FilterByLabel refreshFilesList={() => fetchFiles(lastFolderId)} labels={labels} />}
+			<SortingOptions refreshFilesList={refreshFilesList}/>
+			{labels && <FilterByLabel refreshFilesList={refreshFilesList} labels={labels} />}
 			<li role="menuitem" onClick={openUploader} data-tooltip-id="django-finder-tooltip"
 				data-tooltip-content={gettext("Upload file")}>
 				<UploadIcon/>

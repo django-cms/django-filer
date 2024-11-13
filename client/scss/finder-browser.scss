@@ -158,7 +158,7 @@ dialog {
 			flex-direction: row;
 			gap: 10px;
 
-			li:not(.status) {
+			li:has(> .figure) {
 				min-height: 150px;
 				width: 125px;
 
@@ -207,6 +207,12 @@ dialog {
 						text-overflow: ellipsis;
 					}
 				}
+			}
+
+			.scroll-spy {
+				display: block;
+				width: 125px;  // force to a new line
+				height: 1px;
 			}
 		}
 

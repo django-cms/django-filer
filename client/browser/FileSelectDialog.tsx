@@ -7,7 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import {InView} from 'react-intersection-observer';
+import {useInView} from 'react-intersection-observer';
 import {Tooltip} from 'react-tooltip';
 import FigureLabels from '../common/FigureLabels';
 import FileUploader	 from '../common/FileUploader';
@@ -50,26 +50,41 @@ function Figure(props) {
 }
 
 
-const FilesList = memo((props: any) => {
-	const {files, numFiles, selectFile} = props;
-	const [{offset, limit}, setOffset] = useState({offset: 0, limit: 10});
-
-	console.log('FolderList', numFiles, files);
-
-	function loadMore(inView, entry) {
-		if (inView) {
-			console.log('load more:', entry.target);
-		}
+const ScrollSpy = (props) => {
+	const {fetchFiles} = props;
+	const {ref, inView} = useInView({
+		triggerOnce: true,
+		onChange: (loadMore) => {
+			if (loadMore && !inView) {
+				fetchFiles();
+			}
+		},
+	});
+	console.log('ScrollSpy', inView);
+	if (inView) {
+		console.log('already visible');
+		fetchFiles();
 	}
 
 	return (
+		<div className="scroll-spy" ref={ref}></div>
+	);
+};
+
+
+const FilesList = memo((props: any) => {
+	const {structure, fetchFiles, selectFile} = props;
+
+	console.log('FolderList', structure);
+
+	return (
 		<ul className="files-browser">{
-		files.length === 0 ?
+		structure.files.length === 0 ?
 			<li className="status">{gettext("Empty folder")}</li> : (
-			<>{files.map(file => (
+			<>{structure.files.map(file => (
 			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} /></li>
 			))}
-			{numFiles > files.length && <InView as="li" onChange={loadMore} />}
+			{structure.offset !== null && <ScrollSpy fetchFiles={fetchFiles} />}
 			</>
 		)}</ul>
 	);
@@ -82,7 +97,8 @@ export default function FileSelectDialog(props) {
 		root_folder: null,
 		last_folder: null,
 		files: null,
-		num_files: 0,
+		offset: null,
+		search_query: '',
 		labels: [],
 	});
 	const [uploadedFile, setUploadedFile] = useState(null);
@@ -110,6 +126,48 @@ export default function FileSelectDialog(props) {
 		};
 	}, [dialog]);
 
+	const setCurrentFolder = (folderId) => {
+		setStructure(prevStructure => {
+			const newStructure = Object.assign(structure, {
+				...prevStructure,
+				last_folder: folderId,
+				files: [],
+				offset: null,
+				search_query: '',
+			});
+			fetchFiles();
+			return newStructure;
+		});
+	};
+
+	const setSearchQuery = (query) => {
+		setStructure(prevStructure => {
+			const newStructure = Object.assign(structure, {
+				...prevStructure,
+				files: [],
+				offset: null,
+				search_query: query,
+			});
+			fetchFiles();
+			return newStructure;
+		});
+	};
+
+	const refreshFilesList = () => {
+		setStructure(prevStructure => {
+			const newStructure = Object.assign(structure, {
+				root_folder: prevStructure.root_folder,
+				files: [],
+				last_folder: prevStructure.last_folder,
+				offset: null,
+				search_query: prevStructure.search_query,
+				labels: prevStructure.labels,
+			});
+			fetchFiles();
+			return newStructure;
+		});
+	};
+
 	async function getStructure() {
 		const response = await fetch(`${baseUrl}structure/${realm}`);
 		if (response.ok) {
@@ -119,29 +177,29 @@ export default function FileSelectDialog(props) {
 		}
 	}
 
-	async function fetchFiles(folderId: string, searchQuery='') {
+	async function fetchFiles() {
 		const fetchUrl = (() => {
-			if (searchQuery) {
-				const params = new URLSearchParams({q: searchQuery});
-				return `${baseUrl}${folderId}/search?${params.toString()}`;
+			const params = new URLSearchParams();
+			if (structure.offset !== null) {
+				params.set('offset', String(structure.offset));
 			}
-			return `${baseUrl}${folderId}/list`;
+			if (structure.search_query) {
+				params.set('q', structure.search_query);
+				return `${baseUrl}${structure.last_folder}/search?${params.toString()}`;
+			}
+			return `${baseUrl}${structure.last_folder}/list?${params.toString()}`;
 		})();
-		const newStructure = {
-			root_folder: structure.root_folder,
-			last_folder: folderId,
-			files: null,
-			num_files: 0,
-			labels: structure.labels,
-		};
 		const response = await fetch(fetchUrl);
 		if (response.ok) {
 			const body = await response.json();
-			newStructure.files = body.files;
+			setStructure({
+				...structure,
+				files: structure.files.concat(body.files),
+				offset: body.offset,
+			});
 		} else {
 			console.error(response);
 		}
-		setStructure(newStructure);
 	}
 
 	function refreshStructure() {
@@ -162,8 +220,8 @@ export default function FileSelectDialog(props) {
 				settings={{csrfToken, baseUrl, selectFile, labels: structure.labels}}
 			/> : <>
 			<MenuBar
-				lastFolderId={structure.last_folder}
-				fetchFiles={fetchFiles}
+				refreshFilesList={refreshFilesList}
+				setSearchQuery={setSearchQuery}
 				openUploader={() => uploaderRef.current.openUploader()}
 				labels={structure.labels}
 			/>
@@ -174,7 +232,7 @@ export default function FileSelectDialog(props) {
 							baseUrl={baseUrl}
 							folder={structure.root_folder}
 							lastFolderId={structure.last_folder}
-							fetchFiles={fetchFiles}
+							setCurrentFolder={setCurrentFolder}
 							refreshStructure={refreshStructure}
 						/>}
 					</ul>
@@ -187,7 +245,11 @@ export default function FileSelectDialog(props) {
 				>{
 					structure.files === null ?
 					<div className="status">{gettext("Loading files…")}</div> :
-					<FilesList files={structure.files} numFiles={structure.num_files} selectFile={selectFile} />
+					<FilesList
+						structure={structure}
+						fetchFiles={fetchFiles}
+						selectFile={selectFile}
+					/>
 				}</FileUploader>
 			</div>
 			</>}

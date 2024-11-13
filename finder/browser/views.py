@@ -27,6 +27,7 @@ class BrowserView(View):
     The view for web component <finder-browser>.
     """
     action = None
+    limit = 25
 
     def dispatch(self, request, *args, **kwargs):
         action = getattr(self, self.action, None)
@@ -117,6 +118,7 @@ class BrowserView(View):
         if folder_id not in request.session['finder.open_folders']:
             request.session['finder.open_folders'].append(folder_id)
             request.session.modified = True
+        return {'id': folder_id}
 
     def close(self, request, folder_id):
         """
@@ -129,6 +131,7 @@ class BrowserView(View):
             pass
         else:
             request.session.modified = True
+        return {'id': folder_id}
 
     def list(self, request, folder_id):
         """
@@ -136,15 +139,17 @@ class BrowserView(View):
         """
         request.session['finder.last_folder'] = str(folder_id)
         offset = int(request.GET.get('offset', 0))
-        limit = int(request.GET.get('limit', 10))
         lookup = lookup_by_label(request)
         unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
-        num_files = unified_queryset.count()
+        next_offset = offset + self.limit
+        if next_offset >= unified_queryset.count():
+            next_offset = None
         unified_queryset = sort_by_attribute(request, unified_queryset)
         annotate_unified_queryset(unified_queryset)
         return {
-            'files': list(unified_queryset),  # [offset:limit]
-            'num_files': num_files,
+            'files': list(unified_queryset[offset:offset + self.limit]),
+            'offset': next_offset,
+            'search_query': '',
         }
 
     def search(self, request, folder_id):
@@ -154,6 +159,7 @@ class BrowserView(View):
         search_query = request.GET.get('q')
         if not search_query:
             return HttpResponseBadRequest("No search query provided.")
+        offset = int(request.GET.get('offset', 0))
         starting_folder = FolderModel.objects.get(id=folder_id)
         search_realm = request.COOKIES.get('django-finder-search-realm')
         if search_realm == 'everywhere':
@@ -168,8 +174,16 @@ class BrowserView(View):
             'name_lower__icontains': search_query,
         }
         unified_queryset = FileModel.objects.filter_unified(is_folder=False, **lookup)
+        if offset + self.limit < unified_queryset.count():
+            next_offset = offset + self.limit
+        else:
+            next_offset = None
         annotate_unified_queryset(unified_queryset)
-        return {'files': list(unified_queryset)}
+        return {
+            'files': list(unified_queryset),
+            'offset': next_offset,
+            'search_query': search_query,
+        }
 
     def upload(self, request, folder_id):
         """
