@@ -97,12 +97,10 @@ class Folder(models.Model, mixins.IconsMixin):
         related_name='children',
         on_delete=models.CASCADE,
     )
-
     name = models.CharField(
         _('name'),
         max_length=255,
     )
-
     owner = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
         verbose_name=_('owner'),
@@ -111,17 +109,14 @@ class Folder(models.Model, mixins.IconsMixin):
         null=True,
         blank=True,
     )
-
     uploaded_at = models.DateTimeField(
         _('uploaded at'),
         auto_now_add=True,
     )
-
     created_at = models.DateTimeField(
         _('created at'),
         auto_now_add=True,
     )
-
     modified_at = models.DateTimeField(
         _('modified at'),
         auto_now=True,

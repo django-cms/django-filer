@@ -1,14 +1,17 @@
 from pathlib import Path
 
-from django.contrib.admin import site
+from django.contrib.admin import site as admin_site
+from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from easy_thumbnails.conf import settings
 
 from filer.models.filemodels import Folder as FilerFolder
 from filer.models.imagemodels import Image as FilerImage
 
+from finder.contrib.image.models import ImageFileModel as FinderImage
 from finder.models.file import FileModel as FinderFile
 from finder.models.folder import FolderModel as FinderFolder
-from finder.contrib.image.models import ImageFileModel as FinderImage
+from finder.models.realm import RealmModel as FinderRealmModel
 
 
 class Command(BaseCommand):
@@ -20,13 +23,20 @@ class Command(BaseCommand):
         self.forward()
 
     def forward(self):
+        site = Site.objects.get(id=settings.SITE_ID)
+        owner = FilerFolder.objects.filter(parent__isnull=True, owner__isnull=False).first().owner
+        try:
+            realm = FinderRealmModel.objects.get(site=site, slug=admin_site.name)
+        except FinderRealmModel.DoesNotExist:
+            root_folder = FinderFolder.objects.create(name='__root__', owner=owner)
+            realm = FinderRealmModel.objects.create(site=site, slug=admin_site.name, root_folder=root_folder)
+
         for filer_folder in FilerFolder.objects.filter(parent__isnull=True):
-            self.migrate_folder(filer_folder, FinderFolder.objects.get_root_folder(site))
+            self.migrate_folder(filer_folder, FinderFolder.objects.get_root_folder(realm))
 
     def migrate_folder(self, filer_folder, finder_parent):
-        try:
-            finder_folder = next(finder_parent.listdir(name=filer_folder.name, is_folder=True))
-        except StopIteration:
+        finder_folder = finder_parent.listdir(name=filer_folder.name, is_folder=True).first()
+        if finder_folder is None:
             finder_folder = FinderFolder.objects.create(
                 name=filer_folder.name,
                 parent=finder_parent,
@@ -50,8 +60,8 @@ class Command(BaseCommand):
         path = Path(filer_file.file.name)
         inode_id = path.parent.stem
         try:
-            finder_file = next(FinderFile.objects.filter_inodes(id=inode_id))
-        except StopIteration:
+            finder_file = FinderFile.objects.get_inode(id=inode_id)
+        except FinderFile.DoesNotExist:
             FinderFile.objects.create(
                 id=inode_id,
                 name=filer_file.name if filer_file.name else filer_file.original_filename,
@@ -88,8 +98,8 @@ class Command(BaseCommand):
         except ValueError:
             pass
         try:
-            finder_image = next(FinderImage.objects.filter_inodes(id=inode_id))
-        except StopIteration:
+            finder_image = FinderImage.objects.get_inode(id=inode_id)
+        except FinderFile.DoesNotExist:
             FinderImage.objects.create(
                 id=inode_id,
                 name=filer_image.name if filer_image.name else filer_image.original_filename,
@@ -106,7 +116,7 @@ class Command(BaseCommand):
                 meta_data=meta_data,
             )
         else:
-            if True or filer_image.modified_at > finder_image.last_modified_at:
+            if filer_image.modified_at > finder_image.last_modified_at:
                 finder_image.name = filer_image.name if filer_image.name else filer_image.original_filename
                 finder_image.file_name = path.name
                 finder_image.last_modified_at = filer_image.modified_at

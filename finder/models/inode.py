@@ -135,9 +135,12 @@ class InodeManagerMixin:
             folder_qs = FolderModel.objects.none()
         elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
             return folder_qs.get()
-        values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
-            model.objects.values('id', 'mime_type').filter(**lookup) for model in FileModel.get_models()
-        ]).get()
+        try:
+            values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
+                model.objects.values('id', 'mime_type').filter(**lookup) for model in FileModel.get_models()
+            ]).get()
+        except FolderModel.DoesNotExist as exc:
+            raise FileModel.DoesNotExist(exc)
         return FileModel.objects.get_model_for(values['mime_type']).objects.get(id=values['id'])
 
     @classmethod
