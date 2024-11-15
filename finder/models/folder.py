@@ -204,7 +204,7 @@ class FolderModel(InodeModel):
                 msg = gettext("A parent folder can not become the descendant of a destination folder.")
                 raise ValidationError(msg)
             parent = parent.parent
-        if next(self.parent.listdir(name=self.name), None):
+        if self.parent.listdir(name=self.name).exists():
             msg = gettext("Folder named “{name}” already exists in destination folder.")
             raise ValidationError(msg.format(name=self.name))
         if self.name in ['__root__', '__trash__']:
