@@ -86,9 +86,16 @@ export default function FolderAdmin() {
 					offsetX = (firstDraggedElement.getBoundingClientRect().left - activeDraggedElement.getBoundingClientRect().left) * zoomWhenDragging;
 					offsetY = (firstDraggedElement.getBoundingClientRect().top - activeDraggedElement.getBoundingClientRect().top) * zoomWhenDragging;
 				}
-			} else if (activeDraggedElement && ['tiles', 'mosaic'].includes(layout)) {
-				offsetX = -15;
-				offsetY = -15;
+			} else if (activeDraggedElement) {
+				if (layout === 'tiles') {
+					if (activeDraggedElement.querySelector('figure img')?.getAttribute('src').endsWith('svg')) {
+						offsetX = offsetY = -30;
+					} else {
+						offsetX = offsetY = -20;
+					}
+				} else if (layout === 'mosaic') {
+					offsetX = offsetY = -23;
+				}
 			}
 		}
 

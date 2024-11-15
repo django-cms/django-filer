@@ -313,7 +313,7 @@ ul.messagelist {
 		align-content: flex-start;
 		justify-content: flex-start;
 
-		li .inode {
+		> li .inode {
 			box-sizing: border-box;
 
 			div:has(> .figure-labels) {
@@ -342,10 +342,6 @@ ul.messagelist {
 					&:not([src$=".svg"]) {
 						box-shadow: $border-color 0 0 5px;
 					}
-
-					&[src$=".svg"] {
-						transform: scale(85%);
-					}
 				}
 				video {
 					border-radius: 5px;
@@ -353,7 +349,6 @@ ul.messagelist {
 				}
 
 				figcaption {
-					margin-top: 0.25rem;
 					text-align: center;
 					width: 100%;
 					word-break: break-all;
@@ -370,11 +365,16 @@ ul.messagelist {
 		gap: 5px;
 
 		li:not(.status) {
-			min-height: 250px;
-			width: 190px;
+			min-height: 248px;
+			width: 192px;
+			box-sizing: border-box;
 			cursor: pointer;
 			font-size: 15px;
 			line-height: 18px;
+
+			&:has(figure img[src$=".svg"]) {
+				padding: 15px;  // this reduced the size of SVG images
+			}
 
 			.inode .figure-labels {
 				inset: 5px;
