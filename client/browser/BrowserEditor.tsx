@@ -66,28 +66,12 @@ function EditorForm(props) {
 		});
 	}
 
-	function handleDismiss() {
-		const changeUrl = `${settings.baseUrl}${file_info.id}/change`;
-		fetch(changeUrl, {
-			method: 'DELETE',
-			headers: {
-				'X-CSRFToken': settings.csrfToken,
-			},
-		}).then(async response => {
-			if (response.ok) {
-				settings.selectFile(null);
-			} else {
-				alert(response.statusText);
-			}
-		});
-	}
-
 	return (
 		<form>
 			<div dangerouslySetInnerHTML={{__html: formHtml}}/>
 			<div className="button-row">
 				<button type="button" className="default" onClick={handleSave}>{gettext("Save")}</button>
-				<button type="button" className="dismiss" onClick={handleDismiss}>{gettext("Dismiss")}</button>
+				<button type="button" className="dismiss" onClick={settings.dismissAndClose}>{gettext("Dismiss Upload")}</button>
 			</div>
 		</form>
 	);

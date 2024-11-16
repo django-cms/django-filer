@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
-import CloseIcon from '../icons/close.svg';
 
 
 export default function FinderFileSelect(props) {
@@ -8,6 +7,7 @@ export default function FinderFileSelect(props) {
 	const baseUrl = props['base-url'];
 	const styleUrl = props['style-url'];
 	const [selectedFile, setSelectedFile] = useState(props['selected-file']);
+	const selectRef = useRef(null);
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
 	const csrfToken = shadowRoot.host.closest('form')?.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
@@ -24,7 +24,7 @@ export default function FinderFileSelect(props) {
 	useEffect(() => {
 		const handleEscape = (event) => {
 			if (event.key === 'Escape') {
-				closeDialog();
+				selectRef.current.dismissAndClose();
 			}
 		};
 		const preventDefault = (event) => {
@@ -47,11 +47,6 @@ export default function FinderFileSelect(props) {
 		dialogRef.current.showModal();
 	}
 
-	function closeDialog() {
-		dialogRef.current.close();
-		dialogRef.current.dispatchEvent(new CustomEvent('close'));
-	}
-
 	function removeFile() {
 		setSelectedFile(null);
 		const inputElement = slotRef.current.assignedElements()[0];
@@ -68,7 +63,6 @@ export default function FinderFileSelect(props) {
 				inputElement.value = file.id;
 			}
 		}
-		closeDialog();
 	}
 
 	function renderTimestamp(timestamp) {
@@ -108,19 +102,13 @@ export default function FinderFileSelect(props) {
 		</div>
 		<dialog ref={dialogRef}>
 			<FileSelectDialog
+				ref={selectRef}
 				realm={props.realm}
 				baseUrl={baseUrl}
 				csrfToken={csrfToken}
 				selectFile={selectFile}
+				closeDialog={() => dialogRef.current.close()}
 			/>
-			<div
-				className="close-button"
-				role="button"
-				onClick={closeDialog}
-				aria-label={gettext("Close dialog")}
-			>
-				<CloseIcon/>
-			</div>
 		</dialog>
 	</>);
 }

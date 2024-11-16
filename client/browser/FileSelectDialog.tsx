@@ -1,8 +1,10 @@
 import React, {
+	forwardRef,
 	lazy,
 	memo,
 	Suspense,
 	useEffect,
+	useImperativeHandle,
 	useMemo,
 	useRef,
 	useState,
@@ -14,6 +16,7 @@ import FileUploader	 from '../common/FileUploader';
 import BrowserEditor from './BrowserEditor';
 import FolderStructure from './FolderStructure';
 import MenuBar from './MenuBar';
+import CloseIcon from '../icons/close.svg';
 
 
 function StaticFigure(props) {
@@ -91,19 +94,20 @@ const FilesList = memo((props: any) => {
 });
 
 
-export default function FileSelectDialog(props) {
-	const {realm, baseUrl, csrfToken, selectFile} = props;
+const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
+	const {realm, baseUrl, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
 		last_folder: null,
 		files: null,
 		offset: null,
+		recursive: false,
 		search_query: '',
 		labels: [],
 	});
-	const [uploadedFile, setUploadedFile] = useState(null);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
+	const [uploadedFile, setUploadedFile] = useState(null);
 	const dialog = ref.current?.closest('dialog');
 
 	useEffect(() => {
@@ -112,19 +116,7 @@ export default function FileSelectDialog(props) {
 		}
 	}, [uploadedFile]);
 
-	useEffect(() => {
-		if (!dialog) {
-			return;
-		}
-		const dialogClosed = () => {
-			setUploadedFile(null);
-		};
-
-		dialog.addEventListener('close', dialogClosed);
-		return () => {
-			dialog.removeEventListener('close', dialogClosed);
-		};
-	}, [dialog]);
+	useImperativeHandle(forwardedRef, () => ({dismissAndClose}));
 
 	const setCurrentFolder = (folderId) => {
 		setStructure(prevStructure => {
@@ -230,49 +222,87 @@ export default function FileSelectDialog(props) {
 		setUploadedFile(uploadedFiles[0]);
 	}
 
+	function selectFile(fileInfo) {
+		props.selectFile(fileInfo);
+		setUploadedFile(null);
+		props.closeDialog();
+	}
+
+	function dismissAndClose() {
+		if (uploadedFile?.file_info) {
+			const changeUrl = `${baseUrl}${uploadedFile.file_info.id}/change`;
+			fetch(changeUrl, {
+				method: 'DELETE',
+				headers: {
+					'X-CSRFToken': csrfToken,
+				},
+			}).then(async response => {
+				if (response.ok) {
+					props.selectFile(null);
+				} else {
+					alert(response.statusText);
+				}
+			});
+		}
+		setUploadedFile(null);
+		props.closeDialog();
+	}
+
 	return (<>
 		<div className="wrapper" ref={ref}>
 			{uploadedFile ?
-			<BrowserEditor
-				uploadedFile={uploadedFile}
-				mainContent={ref.current}
-				settings={{csrfToken, baseUrl, selectFile, labels: structure.labels}}
-			/> : <>
-			<MenuBar
-				refreshFilesList={refreshFilesList}
-				setSearchQuery={setSearchQuery}
-				openUploader={() => uploaderRef.current.openUploader()}
-				labels={structure.labels}
-			/>
-			<div className="browser-body">
-				<nav className="folder-structure">
-					<ul role="navigation">
-						{structure.root_folder && <FolderStructure
-							baseUrl={baseUrl}
-							folder={structure.root_folder}
-							lastFolderId={structure.last_folder}
-							setCurrentFolder={setCurrentFolder}
-							refreshStructure={refreshStructure}
-						/>}
-					</ul>
-				</nav>
-				<FileUploader
-					folderId={structure.last_folder}
-					handleUpload={handleUpload}
-					ref={uploaderRef}
-					settings={{csrf_token: csrfToken, base_url: baseUrl}}
-				>{
-					structure.files === null ?
-					<div className="status">{gettext("Loading files…")}</div> :
-					<FilesList
-						structure={structure}
-						fetchFiles={fetchFiles}
-						selectFile={selectFile}
+				<BrowserEditor
+					uploadedFile={uploadedFile}
+					mainContent={ref.current}
+					settings={{csrfToken, baseUrl, selectFile, dismissAndClose, labels: structure.labels}}
+				/> : <>
+					<MenuBar
+						refreshFilesList={refreshFilesList}
+						setSearchQuery={setSearchQuery}
+						openUploader={() => uploaderRef.current.openUploader()}
+						labels={structure.labels}
 					/>
-				}</FileUploader>
-			</div>
-			</>}
+					<div className="browser-body">
+						<nav className="folder-structure">
+							<ul role="navigation">
+								{structure.root_folder && <FolderStructure
+									baseUrl={baseUrl}
+									folder={structure.root_folder}
+									lastFolderId={structure.last_folder}
+									setCurrentFolder={setCurrentFolder}
+									toggleRecursive={toggleRecursive}
+									refreshStructure={refreshStructure}
+									isListed={structure.recursive ? false : null}
+								/>}
+							</ul>
+						</nav>
+						<FileUploader
+							folderId={structure.last_folder}
+							handleUpload={handleUpload}
+							ref={uploaderRef}
+							settings={{csrf_token: csrfToken, base_url: baseUrl}}
+						>{
+							structure.files === null ?
+								<div className="status">{gettext("Loading files…")}</div> :
+								<FilesList
+									structure={structure}
+									fetchFiles={fetchFiles}
+									selectFile={selectFile}
+								/>
+						}</FileUploader>
+					</div>
+				</>}
 		</div>
-		<Tooltip id="django-finder-tooltip" place="bottom-start" />
+		<div
+			className="close-button"
+			role="button"
+			onClick={dismissAndClose}
+			aria-label={gettext("Close dialog")}
+		>
+			<CloseIcon/>
+		</div>
+		<Tooltip id="django-finder-tooltip" place="bottom-start"/>
 	</>);
-}
+});
+
+export default FileSelectDialog;
