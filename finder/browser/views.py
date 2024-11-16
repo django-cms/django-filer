@@ -139,8 +139,17 @@ class BrowserView(View):
         """
         request.session['finder.last_folder'] = str(folder_id)
         offset = int(request.GET.get('offset', 0))
+        recursive = 'recursive' in request.GET
         lookup = lookup_by_label(request)
-        unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
+        if recursive:
+            descendants = FolderModel.objects.get(id=folder_id).descendants
+            if isinstance(descendants, QuerySet):
+                parent_ids = Subquery(descendants.values('id'))
+            else:
+                parent_ids = [descendant.id for descendant in descendants]
+            unified_queryset = FileModel.objects.filter_unified(parent_id__in=parent_ids, is_folder=False, **lookup)
+        else:
+            unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
         next_offset = offset + self.limit
         if next_offset >= unified_queryset.count():
             next_offset = None
@@ -149,6 +158,7 @@ class BrowserView(View):
         return {
             'files': list(unified_queryset[offset:offset + self.limit]),
             'offset': next_offset,
+            'recursive': recursive,
             'search_query': '',
         }
 

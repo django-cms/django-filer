@@ -8,28 +8,28 @@ import RootIcon from '../icons/root.svg';
 
 
 function FolderEntry(props) {
-	const {folder, toggleOpen, setCurrentFolder, isCurrent} = props;
+	const {folder, toggleOpen, setCurrentFolder, openRecursive, isCurrent, isListed} = props;
 
 	if (folder.is_root) {
-		return (<span onClick={() => setCurrentFolder(folder.id)}><RootIcon/></span>);
+		return (<i onClick={() => setCurrentFolder(folder.id)}><RootIcon/></i>);
 	}
 
-	return (<>
-		<i onClick={toggleOpen}>{
-			folder.has_subfolders ? folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/> : <EmptyIcon/>
-		}</i>
-		{isCurrent ?
-		<strong><FolderOpenIcon/>{folder.name}</strong> :
-		<span onClick={() => setCurrentFolder(folder.id)} role="button">
-			<FolderIcon/>{folder.name}
-		</span>
+	return (<>{
+		folder.has_subfolders ? <i onClick={toggleOpen}>{
+			folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/>
+		}</i> : <i><EmptyIcon/></i>}
+		<i onClick={openRecursive} role="button">{isListed || isCurrent ? <FolderOpenIcon/> : <FolderIcon/>}</i>
+		{isCurrent
+			? <strong>{folder.name}</strong>
+			: <span onClick={() => setCurrentFolder(folder.id)} role="button">{folder.name}</span>
 		}
 	</>);
 }
 
 
 export default function FolderStructure(props) {
-	const {baseUrl, folder, lastFolderId, setCurrentFolder, refreshStructure} = props;
+	const {baseUrl, folder, lastFolderId, setCurrentFolder, toggleRecursive, refreshStructure} = props;
+	const isListed = props.isListed === false ? lastFolderId === folder.id : props.isListed;
 
 	async function fetchChildren() {
 		const response = await fetch(`${baseUrl}${folder.id}/fetch`);
@@ -44,17 +44,34 @@ export default function FolderStructure(props) {
 	}
 
 	async function toggleOpen() {
-		folder.is_open = !folder.is_open;
 		if (folder.is_open) {
+			folder.is_open = false;
+			await fetch(`${baseUrl}${folder.id}/close`);
+		} else {
+			folder.is_open = true;
 			if (folder.children === null) {
 				await fetchChildren();
 			} else {
 				await fetch(`${baseUrl}${folder.id}/open`);
 			}
-		} else {
-			await fetch(`${baseUrl}${folder.id}/close`);
 		}
 		refreshStructure();
+	}
+
+	async function openRecursive() {
+		if (lastFolderId === folder.id) {
+			if (folder.is_open === false) {
+				folder.is_open = true;
+				if (folder.children === null) {
+					await fetchChildren();
+				} else {
+					await fetch(`${baseUrl}${folder.id}/open`);
+				}
+			}
+			toggleRecursive(folder.id);
+		} else {
+			setCurrentFolder(folder.id);
+		}
 	}
 
 	return folder ? (
@@ -63,9 +80,11 @@ export default function FolderStructure(props) {
 				folder={folder}
 				toggleOpen={toggleOpen}
 				setCurrentFolder={setCurrentFolder}
+				openRecursive={openRecursive}
 				isCurrent={lastFolderId === folder.id}
+				isListed={isListed}
 			/>
-			{folder.is_open && (
+			{folder.is_open && folder.children && (
 			<ul>
 			{folder.children.map(child => (
 				<FolderStructure
@@ -74,7 +93,9 @@ export default function FolderStructure(props) {
 					folder={child}
 					lastFolderId={lastFolderId}
 					setCurrentFolder={setCurrentFolder}
+					toggleRecursive={toggleRecursive}
 					refreshStructure={refreshStructure}
+					isListed={isListed}
 				/>
 			))}
 			</ul>)}

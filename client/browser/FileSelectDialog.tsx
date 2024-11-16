@@ -133,6 +133,7 @@ export default function FileSelectDialog(props) {
 				last_folder: folderId,
 				files: [],
 				offset: null,
+				recursive: false,
 				search_query: '',
 			});
 			fetchFiles();
@@ -140,12 +141,28 @@ export default function FileSelectDialog(props) {
 		});
 	};
 
+	async function toggleRecursive(folderId: string) {
+		setStructure(prevStructure => {
+			const newStructure = Object.assign(structure, {
+				...prevStructure,
+				last_folder: folderId,
+				files: [],
+				offset: null,
+				recursive: prevStructure.recursive ? false : true,
+				search_query: '',
+			});
+			fetchFiles();
+			return newStructure;
+		});
+	}
+
 	const setSearchQuery = (query) => {
 		setStructure(prevStructure => {
 			const newStructure = Object.assign(structure, {
 				...prevStructure,
 				files: [],
 				offset: null,
+				recursive: false,
 				search_query: query,
 			});
 			fetchFiles();
@@ -180,6 +197,9 @@ export default function FileSelectDialog(props) {
 	async function fetchFiles() {
 		const fetchUrl = (() => {
 			const params = new URLSearchParams();
+			if (structure.recursive) {
+				params.set('recursive', '');
+			}
 			if (structure.offset !== null) {
 				params.set('offset', String(structure.offset));
 			}
@@ -203,7 +223,6 @@ export default function FileSelectDialog(props) {
 	}
 
 	function refreshStructure() {
-		console.log('refreshStructure');
 		setStructure({...structure});
 	}
 
