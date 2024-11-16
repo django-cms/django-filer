@@ -52,7 +52,7 @@ export default function FinderFileSelect(props) {
 		dialogRef.current.dispatchEvent(new CustomEvent('close'));
 	}
 
-	function deleteFile() {
+	function removeFile() {
 		setSelectedFile(null);
 		const inputElement = slotRef.current.assignedElements()[0];
 		if (inputElement instanceof HTMLInputElement) {
@@ -98,7 +98,7 @@ export default function FinderFileSelect(props) {
 						<dt>{gettext("Content-Type")}:</dt>
 						<dd>{selectedFile.mime_type}</dd>
 					</dl>
-					<button className="delete-file-button" type="button" onClick={deleteFile}>{gettext("Delete")}</button>
+					<button className="remove-file-button" type="button" onClick={removeFile}>{gettext("Remove")}</button>
 				</figcaption>
 			</> :
 				<span onClick={openDialog} onDragEnter={openDialog}>

@@ -47,7 +47,7 @@
 				margin: 0;
 			}
 
-			.delete-file-button {
+			.remove-file-button {
 					margin: 0;
 					position: absolute;
 					right: 0.5rem;
@@ -106,6 +106,8 @@ dialog {
 			overflow-y: auto;
 			direction: rtl;
 			padding: 0.5rem;
+			max-width: 50%;
+			white-space: nowrap;
 
 			ul {
 				margin: 0;
