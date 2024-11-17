@@ -166,8 +166,9 @@ class InodeManager(InodeManagerMixin, models.Manager):
         return queryset.filter(self.model.mime_types_query())
 
 
+
 def filename_validator(value):
-    pattern = re.compile(r"^[\w\d &%!/\\()\[\]{}._#~+-]+$")
+    pattern = re.compile(r"^[\w\d\s\.&%!_#~+-]+$")
     if not pattern.match(value):
         msg = "'{filename}' is not a valid filename."
         raise ValidationError(msg.format(filename=value))

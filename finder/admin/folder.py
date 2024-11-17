@@ -13,7 +13,7 @@ from django.utils.html import format_html
 
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
-from finder.models.inode import DiscardedInode, InodeManager
+from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.label import Label
 
 from .inode import InodeAdmin
@@ -228,9 +228,14 @@ class FolderAdmin(InodeAdmin):
         except (InodeModel.DoesNotExist, KeyError):
             return HttpResponseNotFound(f"Inode(id={body.get('id', '<missing>')}) not found.")
         current_folder = self.get_object(request, folder_id)
-        if current_folder.listdir(name=body['name'], is_folder=True).exists():
+        inode_name = body['name']
+        try:
+            filename_validator(inode_name)
+        except ValidationError as exc:
+            return HttpResponseBadRequest(exc.message, status=409)
+        if current_folder.listdir(name=inode_name, is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
-            return HttpResponseBadRequest(msg.format(name=body['name']), status=409)
+            return HttpResponseBadRequest(msg.format(name=inode_name), status=409)
         update_values = {}
         for field in self.get_fields(request, obj):
             if field in body and body[field] != getattr(obj, field):

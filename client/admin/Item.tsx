@@ -152,6 +152,7 @@ export function ListItem(props) {
 			props.folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 		} else if (response.status === 409) {
 			alert(await response.text());
+			props.elementRef.current.querySelector('.inode-name').innerText = props.name;
 		} else {
 			console.error(response);
 		}
