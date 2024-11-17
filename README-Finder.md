@@ -22,8 +22,10 @@ The "Finder" branch of django-filer has less third-party dependencies. It does n
 
 For large datasets [django-cte](https://github.com/dimagi/django-cte) is reccomended, in order to improve the speed when searching.
 
-The client part of the new admin user interface has no runtime dependencies. It is compiled into a
-single JavaScript file, which is included by the corresponding admin views.
+The client part of the new admin user interface has no runtime dependencies. It is compiled into two
+JavaScript files, which are included by the corresponding admin views. One of them is used for the
+django-admin interface, the other one for the frontend. The frontend part is also used for the new
+file selection widget.
 
 
 ## Extensibility
@@ -99,6 +101,9 @@ The new user interface is based on the [React](https://reactjs.org/) framework w
 
 ## Installation
 
+The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
+released, you have to install the current development version of Django from GitHub.
+
 In `settings.py` of your project, add these extra dependencies or those one you really need:
 
 ```python
@@ -115,7 +120,7 @@ In `settings.py` of your project, add these extra dependencies or those one you 
     ]
 ```
 
-If you use `finder.contrib.audio`, assure that `pydub` is installed.
+If you use `finder.contrib.audio`, assure that `ffmpeg-python` is installed.
 If you use `finder.contrib.image.pil`, assure that `Pillow` is installed.
 If you use `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
 If you use `finder.contrib.video`, assure that `ffmpeg-python` is installed.
@@ -128,8 +133,8 @@ python manage.py migrate finder
 ```
 
 If you already have **django-filer** installed and that database is filled, you can migrate the
-meta-data of those files and folders into the new database tables. The pysical files on disk are not
-affected by this migration.
+meta-data of those files and folders into the new database tables. The physical files on disk are
+not affected by this migration.
 
 ```shell
 python manage.py filer_to_finder
@@ -159,10 +164,61 @@ http://localhost:8000/admin/finder/foldermodel/ . Clicking on that link will red
 root folder of the current site.
 
 
-## Limitations
+## Admin Backend
 
-Currently only the admin backend is implemented. I am currently working on a file selection widget
-which can be used in any frontend or backend application.
+The admin backend is implemented as a web interface mimicking the features of the Finder app of your
+operating system's graphical user interface. It is possible to …
+
+* Download, upload files and to view them as thumbnailed images.
+* Navigate through the folder tree by double-clicking on a folder.
+* Move files and folders by drag and drop.
+* Select multiple files and folders by a rectangular selection with the mouse.
+* Cut or copy files and folders to a clipboard and paste them into another folder.
+* Delete files and folders, which are moved to a trash folder.
+* Restore files and folders from the trash folder or to delete them permanently.
+* Create new folders and to upload files.
+* Rename files and folders by slowly double-clicking on their name.
+* Create multiple tabs for favourite folders quick access. They also can be used to drag files from
+  the current view into one of the tabs.
+* Search for files and folders.
+* Tag files and filter them by their tags.
+
+
+## Interface to external Django projects
+
+**django-filer** (Finder branch) ships with a new file selection field. This field can be used in
+any Django model. It allows to select a file from the files stored inside **django-filer**. It also
+allows to upload a local file and use it immediatly.
+
+Example:
+
+```python
+from django.db import models
+from finder.models.fields import FinderFileField
+
+class MyModel(models.Model):
+    my_file = FinderFileField(
+        null=True,
+        blank=True,
+    )
+```
+
+Forms generated from this model will have a file selection widget for the `my_file` field. When
+rendered as HTML, this widget is the webcomponent `<finder-file-select …></finder-file-select>`
+with a few additional attributes. The JavaScript part of the widget must be included using the
+script tag `<script src="{% static 'finder/js/finder-select.js' %}"></script>`.
+
+## Extendibility
+
+**django-filer** Finder branch can be extended by adding new models inheriting from either
+``finder.models.file.AbstractFileModel`` or from ``finder.models.folder.FileModel``. If you inherit
+from the latter, then create a proxy model sharing the same database table across different file
+types.
+
+. This allows to create specialized models for different``
+
+file types. This is done by creating a
+
 
 
 ## Further Steps
@@ -171,9 +227,9 @@ The focal point of the `ImageModel` will take the resolution of the corresponsdi
 consideration. This will allow to create different versions of the same canonical image, depending
 on the width of the device the image is displayed.
 
-The permission system will also be implemented using a different model. This probaly will orient
-itself on the Access Control Lists (ACLs) of [NTFS](https://learn.microsoft.com/en-us/windows/win32/secauthz/access-control-lists).
-This will allow to grant permissions to users and groups for each folder (but not file) individually.
+The permission system will be implemented using a model based on the idea of Access Control Lists
+(ACLs) of [NTFS](https://learn.microsoft.com/en-us/windows/win32/secauthz/access-control-lists). This will allow to grant permissions to users and groups for each folder
+(but not file) individually.
 
 A quota system will be implemented, which allows to limit the amount of disk space a user can use.
 
