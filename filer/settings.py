@@ -292,6 +292,7 @@ IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
     "image/svg+xml": ["filer.validation.validate_svg"],
+    "application/octet-stream": ["filer.validation.deny"],
 }
 
 remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
