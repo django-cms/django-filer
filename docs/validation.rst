@@ -272,6 +272,7 @@ you can add a validator that checks for viruses in uploaded files.
 
 .. code-block:: python
 
+    FILER_REMOVE_FILE_VALIDATORS = ["application/octet-stream"]
     FILER_ADD_FILE_VALIDATORS = {
         "application/octet-stream": ["my_validator_app.validators.validate_octet_stream"],
     }
