@@ -208,18 +208,6 @@ rendered as HTML, this widget is the webcomponent `<finder-file-select …></fin
 with a few additional attributes. The JavaScript part of the widget must be included using the
 script tag `<script src="{% static 'finder/js/finder-select.js' %}"></script>`.
 
-## Extendibility
-
-**django-filer** Finder branch can be extended by adding new models inheriting from either
-``finder.models.file.AbstractFileModel`` or from ``finder.models.folder.FileModel``. If you inherit
-from the latter, then create a proxy model sharing the same database table across different file
-types.
-
-. This allows to create specialized models for different``
-
-file types. This is done by creating a
-
-
 
 ## Further Steps
 
