@@ -3,6 +3,7 @@ import os
 
 import django
 import django.core.files
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
@@ -484,6 +485,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
             self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
     def test_filer_upload_binary_data(self, extra_headers={}):
+        config = apps.get_app_config("filer")
+
+        validators = config.FILE_VALIDATORS  # Remember the validators
+        config.FILE_VALIDATORS = {}  # Remove deny for application/octet-stream
         self.assertEqual(File.objects.count(), 0)
         with open(self.binary_filename, 'rb') as fh:
             file_obj = django.core.files.File(fh)
@@ -494,6 +499,8 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'jsessionid': self.client.session.session_key
             }
             self.client.post(url, post_data, **extra_headers)
+            config.FILE_VALIDATORS = validators  # Reset validators
+
             self.assertEqual(Image.objects.count(), 0)
             self.assertEqual(File.objects.count(), 1)
             stored_file = File.objects.first()
