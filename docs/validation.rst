@@ -267,7 +267,7 @@ validator function for all relevant mime types.
 Checking uploads for viruses using ClamAV
 -----------------------------------------
 
-If you have ClamAV installed an use `django-clamd <https://github.com/vstoykov/django-clamd>`_
+If you have ClamAV installed and use `django-clamd <https://github.com/vstoykov/django-clamd>`_
 you can add a validator that checks for viruses in uploaded files.
 
 .. code-block:: python
