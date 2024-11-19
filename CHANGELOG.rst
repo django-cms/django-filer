@@ -2,6 +2,16 @@
 CHANGELOG
 =========
 
+3.2.3 (2024-09-18)
+==================
+
+* fix: Use TypeVar for type-hinting of the user parameter by @payamnj in https://github.com/django-cms/django-filer/pull/1496
+
+** New contributor**
+
+* @payamnj made their first contribution in https://github.com/django-cms/django-filer/pull/1496
+
+
 3.2.2 (2024-09-09)
 ==================
 

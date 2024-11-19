@@ -4,7 +4,7 @@
     <table class="js-filer-dropzone js-filer-dropzone-base navigator-table" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% translate 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
            data-max-uploader-connections="{{ uploader_connections }}"
            data-max-files="{{ max_files|safe }}"
-           {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+           {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
         <thead>
             <tr>
                 <th class="column-checkbox">
@@ -170,7 +170,7 @@
          data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
          data-max-uploader-connections="{{ uploader_connections }}"
          data-max-files="{{ max_files|safe }}"
-         {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+         {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
 
         <div class="icon"><span class="filer-icon filer-upload fa fa-cloud-upload"></span></div>
 
