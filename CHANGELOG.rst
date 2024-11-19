@@ -754,7 +754,7 @@ CHANGELOG
 
 
 0.5.4a1
-=======
+========
 
 * Adds description field.
 
