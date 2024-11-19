@@ -11,8 +11,18 @@ REQUIREMENTS = [
 
 
 EXTRA_REQUIREMENTS = {
-    "heif": [
-        "pillow-heif",
+    "audio": [
+        "ffmpeg-python",
+    ],
+    "image": [
+        "Pillow",
+    ],
+    "svg": [
+        "reportlab",
+        "svglib",
+    ],
+    "video": [
+        "ffmpeg-python",
     ],
 }
 
