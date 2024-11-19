@@ -507,6 +507,21 @@ class FilerClipboardAdminUrlsTests(TestCase):
             self.assertEqual(stored_file.original_filename, self.binary_name)
             self.assertEqual(stored_file.mime_type, 'application/octet-stream')
 
+    def test_filer_upload_binary_data_fails_by_default(self, extra_headers={}):
+        self.assertEqual(File.objects.count(), 0)
+        with open(self.binary_filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload')
+            post_data = {
+                'Filename': self.binary_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            self.client.post(url, post_data, **extra_headers)
+
+            self.assertEqual(Image.objects.count(), 0)
+            self.assertEqual(File.objects.count(), 0)
+
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
