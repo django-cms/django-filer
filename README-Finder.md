@@ -101,8 +101,21 @@ The new user interface is based on the [React](https://reactjs.org/) framework w
 
 ## Installation
 
+The new version of **django-filer** is not yet available on PyPI. Therefore, you have to install it
+from GitHub:
+
+```shell
+git clone django-filer
+cd django-filer
+git switch finder
+pip install --no-deps -e .
+```
+
 The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
-released, you have to install the current development version of Django from GitHub.
+released, you have to install the current development version of Django from GitHub as well.
+
+The new version of **django-filer** currently only works with SQLite. This will of course change in
+the future.
 
 In `settings.py` of your project, add these extra dependencies or those one you really need:
 
