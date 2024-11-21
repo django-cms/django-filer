@@ -360,7 +360,7 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         if not (parent_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
-        if next(parent_folder.listdir(name=body['name'], is_folder=True), None):
+        if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=body['name']), status=409)
         new_folder = FolderModel.objects.create(
