@@ -35,7 +35,8 @@ class FileAdminChangeFrom(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["file"].widget = forms.FileInput()
+        if "file" in self.fields:
+            self.fields["file"].widget = forms.FileInput()
 
     def clean(self):
         from ..validation import validate_upload
