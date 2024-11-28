@@ -64,13 +64,18 @@ class BrowserView(View):
 
     def structure(self, request, slug):
         realm = self._get_realm(request, slug)
-        root_folder = FolderModel.objects.get_root_folder(realm)
-        root_folder_id = str(root_folder.id)
+        root_folder_id = str(realm.root_folder.id)
         request.session.setdefault('finder.open_folders', [])
         request.session.setdefault('finder.last_folder', root_folder_id)
-        if is_open := root_folder.subfolders.exists():
+        last_folder_id = request.session['finder.last_folder']
+        if is_open := realm.root_folder.subfolders.exists():
             # direct children of the root folder are open regardless of the `open_folders` session
-            children = self._get_children(request.session['finder.open_folders'], root_folder)
+            # in addition to that, also open all ancestors of the last opened folder
+            open_folders = set(request.session['finder.open_folders'])
+            open_folders.update(
+                map(str, FolderModel.objects.get(id=last_folder_id).ancestors.values_list('id', flat=True))
+            )
+            children = self._get_children(open_folders, realm.root_folder)
         else:
             children = None
         return {
@@ -172,11 +177,13 @@ class BrowserView(View):
         offset = int(request.GET.get('offset', 0))
         starting_folder = FolderModel.objects.get(id=folder_id)
         search_realm = request.COOKIES.get('django-finder-search-realm')
-        if search_realm == 'everywhere':
-            starting_folder = starting_folder.ancestors[-1]
         if isinstance(starting_folder.descendants, QuerySet):
+            if search_realm == 'everywhere':
+                starting_folder = starting_folder.ancestors.last()
             parent_ids = Subquery(starting_folder.descendants.values('id'))
-        else:
+        else:  # django-cte not installed (slow)
+            if search_realm == 'everywhere':
+                starting_folder = starting_folder.ancestors[-1]
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
 
         lookup = {

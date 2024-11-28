@@ -18,13 +18,6 @@ from.realm import RealmModel
 
 
 class FolderModelManager(InodeManagerMixin, ModelManager):
-    def get_root_folder(self, realm):
-        try:
-            return realm.root_folder
-        except FolderModel.DoesNotExist:
-            realm.root_folder = self.create(parent=None, name='__root__')
-            return realm.root_folder
-
     def get_trash_folder(self, realm, owner):
         try:
             trash_folder = realm.trash_folders.get(owner=owner)

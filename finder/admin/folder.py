@@ -190,7 +190,7 @@ class FolderAdmin(InodeAdmin):
     def search_for_inodes(self, request, current_folder, search_query, **lookup):
         search_realm = request.COOKIES.get('django-finder-search-realm')
         if search_realm == 'everywhere':
-            starting_folder = FolderModel.objects.get_root_folder(self.get_realm(request))
+            starting_folder = self.get_realm(request).root_folder
         else:
             starting_folder = current_folder
         if isinstance(starting_folder.descendants, QuerySet):

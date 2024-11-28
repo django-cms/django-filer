@@ -88,12 +88,13 @@ class InodeAdmin(admin.ModelAdmin):
         return data
 
     def get_realm(self, request):
+        site = get_current_site(request)
         try:
-            realm = RealmModel.objects.get(site=get_current_site(request), slug=self.admin_site.name)
+            realm = RealmModel.objects.get(site=site, slug=self.admin_site.name)
         except RealmModel.DoesNotExist:
             root_folder = FolderModel.objects.create(owner=request.user, name='__root__')
             realm = RealmModel.objects.create(
-                site=get_current_site(request),
+                site=site,
                 slug=self.admin_site.name,
                 root_folder=root_folder,
             )
@@ -101,7 +102,7 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_root_folder(self, request):
         realm = self.get_realm(request)
-        return FolderModel.objects.get_root_folder(realm)
+        return realm.root_folder
 
     def get_trash_folder(self, request):
         realm = self.get_realm(request)

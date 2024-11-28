@@ -32,7 +32,7 @@ class Command(BaseCommand):
             realm = FinderRealmModel.objects.create(site=site, slug=admin_site.name, root_folder=root_folder)
 
         for filer_folder in FilerFolder.objects.filter(parent__isnull=True):
-            self.migrate_folder(filer_folder, FinderFolder.objects.get_root_folder(realm))
+            self.migrate_folder(filer_folder, realm.root_folder)
 
     def migrate_folder(self, filer_folder, finder_parent):
         finder_folder = finder_parent.listdir(name=filer_folder.name, is_folder=True).first()
