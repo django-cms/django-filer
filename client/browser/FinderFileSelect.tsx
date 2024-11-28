@@ -45,6 +45,7 @@ export default function FinderFileSelect(props) {
 
 	function openDialog() {
 		dialogRef.current.showModal();
+		selectRef.current.scrollToCurrentFolder();
 	}
 
 	function removeFile() {
@@ -69,6 +70,8 @@ export default function FinderFileSelect(props) {
 		const date = new Date(timestamp);
 		return date.toLocaleString();
 	}
+
+	console.log('FinderFileSelect', selectedFile);
 
 	return (<>
 		<slot ref={slotRef} />

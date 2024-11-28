@@ -177,13 +177,11 @@ class BrowserView(View):
         offset = int(request.GET.get('offset', 0))
         starting_folder = FolderModel.objects.get(id=folder_id)
         search_realm = request.COOKIES.get('django-finder-search-realm')
+        if search_realm == 'everywhere':
+            starting_folder = list(starting_folder.ancestors)[-1]
         if isinstance(starting_folder.descendants, QuerySet):
-            if search_realm == 'everywhere':
-                starting_folder = starting_folder.ancestors.last()
             parent_ids = Subquery(starting_folder.descendants.values('id'))
         else:  # django-cte not installed (slow)
-            if search_realm == 'everywhere':
-                starting_folder = starting_folder.ancestors[-1]
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
 
         lookup = {
@@ -197,9 +195,8 @@ class BrowserView(View):
             next_offset = None
         annotate_unified_queryset(unified_queryset)
         return {
-            'files': list(unified_queryset),
+            'files': unified_queryset[offset:next_offset],
             'offset': next_offset,
-            'search_query': search_query,
         }
 
     def upload(self, request, folder_id):

@@ -3,6 +3,7 @@ import React, {
 	lazy,
 	memo,
 	Suspense,
+	useCallback,
 	useEffect,
 	useImperativeHandle,
 	useMemo,
@@ -12,7 +13,8 @@ import React, {
 import {useInView} from 'react-intersection-observer';
 import {Tooltip} from 'react-tooltip';
 import FigureLabels from '../common/FigureLabels';
-import FileUploader	 from '../common/FileUploader';
+import FileUploader from '../common/FileUploader';
+import {useSearchRealm} from '../common/Storage';
 import BrowserEditor from './BrowserEditor';
 import FolderStructure from './FolderStructure';
 import MenuBar from './MenuBar';
@@ -53,32 +55,27 @@ function Figure(props) {
 }
 
 
-const ScrollSpy = (props) => {
-	const {fetchFiles} = props;
+function ScrollSpy(props) {
+	const {setDirty} = props;
 	const {ref, inView} = useInView({
 		triggerOnce: true,
-		onChange: (loadMore) => {
+		onChange: async (loadMore) => {
 			if (loadMore && !inView) {
-				fetchFiles();
+				setDirty(true);
 			}
 		},
 	});
 	console.log('ScrollSpy', inView);
-	if (inView) {
-		console.log('already visible');
-		fetchFiles();
-	}
-
 	return (
 		<div className="scroll-spy" ref={ref}></div>
 	);
-};
+}
 
 
 const FilesList = memo((props: any) => {
-	const {structure, fetchFiles, selectFile} = props;
+	const {structure, setDirty, selectFile} = props;
 
-	console.log('FolderList', structure);
+	console.log('FilesList', structure);
 
 	return (
 		<ul className="files-browser">{
@@ -87,14 +84,14 @@ const FilesList = memo((props: any) => {
 			<>{structure.files.map(file => (
 			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} /></li>
 			))}
-			{structure.offset !== null && <ScrollSpy fetchFiles={fetchFiles} />}
+			{structure.offset !== null && <ScrollSpy key={structure.offset} setDirty={setDirty} />}
 			</>
 		)}</ul>
 	);
 });
 
 
-const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
+const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 	const {realm, baseUrl, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
@@ -105,79 +102,82 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		search_query: '',
 		labels: [],
 	});
+	const [isDirty, setDirty] = useState(false);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
+	const menuBarRef = useRef(null);
 	const [uploadedFile, setUploadedFile] = useState(null);
-	const dialog = ref.current?.closest('dialog');
+	const [currentFolderElement, setCurrentFolderElement] = useState(null);
+	const [searchRealm, setSearchRealm] = useSearchRealm('current');
+
+	useImperativeHandle(forwardedRef, () => ({scrollToCurrentFolder, dismissAndClose}));
 
 	useEffect(() => {
-		if (!uploadedFile) {
-			getStructure();
+		if (structure.root_folder === null) {
+			initializeStructure();
+		} else if (isDirty) {
+			fetchFiles();
 		}
-	}, [uploadedFile]);
+	}, [isDirty]);
 
-	useImperativeHandle(forwardedRef, () => ({dismissAndClose}));
-
-	const setCurrentFolder = (folderId) => {
-		setStructure(prevStructure => {
-			const newStructure = Object.assign(structure, {
-				...prevStructure,
-				last_folder: folderId,
-				files: [],
-				offset: null,
-				recursive: false,
-				search_query: '',
-			});
-			fetchFiles();
-			return newStructure;
+	function setCurrentFolder(folderId){
+		setStructure({
+			...structure,
+			last_folder: folderId,
+			files: [],
+			offset: null,
+			recursive: false,
+			search_query: '',
 		});
-	};
-
-	async function toggleRecursive(folderId: string) {
-		setStructure(prevStructure => {
-			const newStructure = Object.assign(structure, {
-				...prevStructure,
-				last_folder: folderId,
-				files: [],
-				offset: null,
-				recursive: prevStructure.recursive ? false : true,
-				search_query: '',
-			});
-			fetchFiles();
-			return newStructure;
-		});
+		setDirty(true);
+		menuBarRef.current.clearSearch();
 	}
 
-	const setSearchQuery = (query) => {
-		setStructure(prevStructure => {
-			const newStructure = Object.assign(structure, {
-				...prevStructure,
+	function refreshFilesList() {
+		setStructure({
+			...structure,
+			files: [],
+			offset: null,
+		});
+		setDirty(true);
+	}
+
+	function changeSearchRealm(value) {
+		if (value !== searchRealm) {
+			setSearchRealm(value);
+			setStructure({
+				...structure,
 				files: [],
 				offset: null,
-				recursive: false,
-				search_query: query,
 			});
-			fetchFiles();
-			return newStructure;
-		});
-	};
+			setDirty(true);
+		}
+	}
 
-	const refreshFilesList = () => {
-		setStructure(prevStructure => {
-			const newStructure = Object.assign(structure, {
-				root_folder: prevStructure.root_folder,
-				files: [],
-				last_folder: prevStructure.last_folder,
-				offset: null,
-				search_query: prevStructure.search_query,
-				labels: prevStructure.labels,
-			});
-			fetchFiles();
-			return newStructure;
+	 function toggleRecursive(folderId: string) {
+		setStructure({
+			...structure,
+			last_folder: folderId,
+			files: [],
+			offset: null,
+			recursive: structure.recursive ? false : true,
 		});
-	};
+		setDirty(true);
+	}
 
-	async function getStructure() {
+	function setSearchQuery(query) {
+		setStructure({
+			...structure,
+			files: [],
+			offset: null,
+			recursive: false,
+			search_query: query,
+		});
+		setDirty(true);
+	}
+
+	async function initializeStructure() {
+		setDirty(false);
 		const response = await fetch(`${baseUrl}structure/${realm}`);
 		if (response.ok) {
 			setStructure(await response.json());
@@ -199,7 +199,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 				params.set('q', structure.search_query);
 				return `${baseUrl}${structure.last_folder}/search?${params.toString()}`;
 			}
-			return `${baseUrl}${structure.last_folder}/list?${params.toString()}`;
+			return `${baseUrl}${structure.last_folder}/list${params.size === 0 ? '' : `?${params.toString()}`}`;
 		})();
 		const response = await fetch(fetchUrl);
 		if (response.ok) {
@@ -209,23 +209,29 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 				files: structure.files.concat(body.files),
 				offset: body.offset,
 			});
+			setDirty(false);
 		} else {
 			console.error(response);
 		}
 	}
 
-	function refreshStructure() {
-		setStructure({...structure});
-	}
-
-	function handleUpload(folderId, uploadedFiles) {
+	function handleUpload(folderId, uploadedFiles){
+		if (structure.last_folder !== folderId)
+			throw new Error('Folder mismatch');
 		setUploadedFile(uploadedFiles[0]);
 	}
 
-	function selectFile(fileInfo) {
+	const selectFile = useCallback(fileInfo => {
 		props.selectFile(fileInfo);
 		setUploadedFile(null);
+		refreshFilesList();
 		props.closeDialog();
+	}, []);
+
+	function scrollToCurrentFolder() {
+		if (currentFolderElement) {
+			currentFolderElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+		}
 	}
 
 	function dismissAndClose() {
@@ -248,50 +254,57 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		props.closeDialog();
 	}
 
+	console.log('FileSelectDialog', isDirty, structure);
+
 	return (<>
 		<div className="wrapper" ref={ref}>
 			{uploadedFile ?
-				<BrowserEditor
-					uploadedFile={uploadedFile}
-					mainContent={ref.current}
-					settings={{csrfToken, baseUrl, selectFile, dismissAndClose, labels: structure.labels}}
-				/> : <>
-					<MenuBar
-						refreshFilesList={refreshFilesList}
-						setSearchQuery={setSearchQuery}
-						openUploader={() => uploaderRef.current.openUploader()}
-						labels={structure.labels}
-					/>
-					<div className="browser-body">
-						<nav className="folder-structure">
-							<ul role="navigation">
-								{structure.root_folder && <FolderStructure
-									baseUrl={baseUrl}
-									folder={structure.root_folder}
-									lastFolderId={structure.last_folder}
-									setCurrentFolder={setCurrentFolder}
-									toggleRecursive={toggleRecursive}
-									refreshStructure={refreshStructure}
-									isListed={structure.recursive ? false : null}
-								/>}
-							</ul>
-						</nav>
-						<FileUploader
-							folderId={structure.last_folder}
-							handleUpload={handleUpload}
-							ref={uploaderRef}
-							settings={{csrf_token: csrfToken, base_url: baseUrl}}
-						>{
-							structure.files === null ?
-								<div className="status">{gettext("Loading files…")}</div> :
-								<FilesList
-									structure={structure}
-									fetchFiles={fetchFiles}
-									selectFile={selectFile}
-								/>
-						}</FileUploader>
-					</div>
-				</>}
+			<BrowserEditor
+				uploadedFile={uploadedFile}
+				mainContent={ref.current}
+				settings={{csrfToken, baseUrl, selectFile, dismissAndClose, labels: structure.labels}}
+			/> : <>
+				<MenuBar
+					ref={menuBarRef}
+					openUploader={() => uploaderRef.current.openUploader()}
+					labels={structure.labels}
+					refreshFilesList={refreshFilesList}
+					setDirty={setDirty}
+					setSearchQuery={setSearchQuery}
+					searchRealm={searchRealm}
+					setSearchRealm={changeSearchRealm}
+				/>
+				<div className="browser-body">
+					<nav className="folder-structure">
+						<ul role="navigation">
+							{structure.root_folder && <FolderStructure
+								baseUrl={baseUrl}
+								folder={structure.root_folder}
+								lastFolderId={structure.last_folder}
+								setCurrentFolder={setCurrentFolder}
+								toggleRecursive={toggleRecursive}
+								refreshStructure={() => setStructure({...structure})}
+								isListed={structure.recursive ? false : null}
+								setCurrentFolderElement={setCurrentFolderElement}
+							/>}
+						</ul>
+					</nav>
+					<FileUploader
+						folderId={structure.last_folder}
+						handleUpload={handleUpload}
+						ref={uploaderRef}
+						settings={{csrf_token: csrfToken, base_url: baseUrl}}
+					>{
+						structure.files === null ?
+						<div className="status">{gettext("Loading files…")}</div> :
+						<FilesList
+							structure={structure}
+							setDirty={setDirty}
+							selectFile={selectFile}
+						/>
+					}</FileUploader>
+				</div>
+			</>}
 		</div>
 		<div
 			className="close-button"

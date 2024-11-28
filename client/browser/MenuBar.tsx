@@ -1,41 +1,36 @@
-import React, {useRef} from 'react';
+import React, {forwardRef, useImperativeHandle, useRef} from 'react';
 import DropDownMenu from '../common/DropDownMenu';
-import {useSearchRealm} from '../common/Storage';
 import SortingOptions from '../common/SortingOptions';
 import FilterByLabel from '../common/FilterByLabel';
 import SearchIcon from '../icons/search.svg';
 import UploadIcon from '../icons/upload.svg';
 
 
-export default function MenuBar(props) {
-	const {refreshFilesList, setSearchQuery, openUploader, labels} = props;
+const MenuBar = forwardRef((props: any, forwardedRef) => {
+	const {openUploader, labels, refreshFilesList, setDirty, setSearchQuery, searchRealm, setSearchRealm} = props;
 	const searchRef = useRef(null);
-	const [searchRealm, setSearchRealm] = useSearchRealm('current');
+
+	useImperativeHandle(forwardedRef, () => ({
+		clearSearch: () => searchRef.current.value = '',
+	}));
 
 	function handleSearch(event) {
-		const performSearch = () => {
-			const searchQuery = searchRef.current.value || '';
-			setSearchQuery(searchQuery);
-		};
-		const resetSearch = () => {
-			setSearchQuery('');
-		};
-
 		if (event.type === 'change' && searchRef.current.value.length === 0) {
 			// clicked on the X button
-			resetSearch();
+			setSearchQuery('');
 		} else if (event.type === 'keydown' && event.key === 'Enter') {
 			// pressed Enter
-			searchRef.current.value.length === 0 ? resetSearch() : performSearch();
+			setSearchQuery(searchRef.current.value.length === 0 ? '' : searchRef.current.value);
 		} else if (event.type === 'click' && searchRef.current.value.length > 2) {
 			// clicked on the search button
-			performSearch();
+			setSearchQuery(searchRef.current.value.length === 0 ? '' : searchRef.current.value);
 		}
 	}
 
 	function changeSearchRealm(value) {
 		if (value !== searchRealm) {
 			setSearchRealm(value);
+			setDirty(true);
 		}
 	}
 
@@ -43,7 +38,7 @@ export default function MenuBar(props) {
 		return {
 			role: 'option',
 			'aria-selected': searchRealm === value,
-			onClick: () => setSearchRealm(value),
+			onClick: () => changeSearchRealm(value),
 		};
 	}
 
@@ -73,7 +68,7 @@ export default function MenuBar(props) {
 					</DropDownMenu>
 				</div>
 			</li>
-			<SortingOptions refreshFilesList={refreshFilesList}/>
+			<SortingOptions refreshFilesList={refreshFilesList} />
 			{labels && <FilterByLabel refreshFilesList={refreshFilesList} labels={labels} />}
 			<li role="menuitem" onClick={openUploader} data-tooltip-id="django-finder-tooltip"
 				data-tooltip-content={gettext("Upload file")}>
@@ -81,4 +76,6 @@ export default function MenuBar(props) {
 			</li>
 		</ul>
 	);
-}
+});
+
+export default MenuBar;
