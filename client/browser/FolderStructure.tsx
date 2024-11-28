@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import ArrowDownIcon from '../icons/arrow-down.svg';
 import ArrowRightIcon from '../icons/arrow-right.svg';
 import EmptyIcon from '../icons/empty.svg';
@@ -8,19 +8,26 @@ import RootIcon from '../icons/root.svg';
 
 
 function FolderEntry(props) {
-	const {folder, toggleOpen, setCurrentFolder, openRecursive, isCurrent, isListed} = props;
+	const {folder, toggleOpen, setCurrentFolder, openRecursive, isCurrent, isListed, setCurrentFolderElement} = props;
+	const ref = useRef(null);
 
 	if (folder.is_root) {
 		return (<i onClick={() => setCurrentFolder(folder.id)}><RootIcon/></i>);
 	}
 
+	useEffect(() => {
+		if (isCurrent) {
+			setCurrentFolderElement(ref.current);
+		}
+	}, []);
+
 	return (<>{
 		folder.has_subfolders ? <i onClick={toggleOpen}>{
 			folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/>
 		}</i> : <i><EmptyIcon/></i>}
-		<i onClick={openRecursive} role="button">{isListed || isCurrent ? <FolderOpenIcon/> : <FolderIcon/>}</i>
+		<i onClick={() => openRecursive()} role="button">{isListed || isCurrent ? <FolderOpenIcon/> : <FolderIcon/>}</i>
 		{isCurrent
-			? <strong>{folder.name}</strong>
+			? <strong ref={ref}>{folder.name}</strong>
 			: <span onClick={() => setCurrentFolder(folder.id)} role="button">{folder.name}</span>
 		}
 	</>);
@@ -28,8 +35,9 @@ function FolderEntry(props) {
 
 
 export default function FolderStructure(props) {
-	const {baseUrl, folder, lastFolderId, setCurrentFolder, toggleRecursive, refreshStructure} = props;
+	const {baseUrl, folder, lastFolderId, setCurrentFolder, toggleRecursive, refreshStructure, setCurrentFolderElement} = props;
 	const isListed = props.isListed === false ? lastFolderId === folder.id : props.isListed;
+	const isCurrent = lastFolderId === folder.id;
 
 	async function fetchChildren() {
 		const response = await fetch(`${baseUrl}${folder.id}/fetch`);
@@ -68,9 +76,9 @@ export default function FolderStructure(props) {
 					await fetch(`${baseUrl}${folder.id}/open`);
 				}
 			}
-			toggleRecursive(folder.id);
+			await toggleRecursive(folder.id);
 		} else {
-			setCurrentFolder(folder.id);
+			await setCurrentFolder(folder.id);
 		}
 	}
 
@@ -81,8 +89,9 @@ export default function FolderStructure(props) {
 				toggleOpen={toggleOpen}
 				setCurrentFolder={setCurrentFolder}
 				openRecursive={openRecursive}
-				isCurrent={lastFolderId === folder.id}
+				isCurrent={isCurrent}
 				isListed={isListed}
+				setCurrentFolderElement={setCurrentFolderElement}
 			/>
 			{folder.is_open && folder.children && (
 			<ul>
@@ -96,6 +105,7 @@ export default function FolderStructure(props) {
 					toggleRecursive={toggleRecursive}
 					refreshStructure={refreshStructure}
 					isListed={isListed}
+					setCurrentFolderElement={setCurrentFolderElement}
 				/>
 			))}
 			</ul>)}

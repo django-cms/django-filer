@@ -8,14 +8,14 @@ import UploadIcon from '../icons/upload.svg';
 
 
 export default function MenuBar(props) {
-	const {refreshFilesList, setSearchQuery, openUploader, labels} = props;
+	const {refreshFilesList, setSearchQuery, openUploader, labels, searchQuery} = props;
 	const searchRef = useRef(null);
 	const [searchRealm, setSearchRealm] = useSearchRealm('current');
 
-	function handleSearch(event) {
-		const performSearch = () => {
+	async function handleSearch(event) {
+		const performSearch = async () => {
 			const searchQuery = searchRef.current.value || '';
-			setSearchQuery(searchQuery);
+			await setSearchQuery(searchQuery);
 		};
 		const resetSearch = () => {
 			setSearchQuery('');
@@ -26,10 +26,10 @@ export default function MenuBar(props) {
 			resetSearch();
 		} else if (event.type === 'keydown' && event.key === 'Enter') {
 			// pressed Enter
-			searchRef.current.value.length === 0 ? resetSearch() : performSearch();
+			searchRef.current.value.length === 0 ? resetSearch() : await performSearch();
 		} else if (event.type === 'click' && searchRef.current.value.length > 2) {
 			// clicked on the search button
-			performSearch();
+			await performSearch();
 		}
 	}
 
@@ -52,6 +52,7 @@ export default function MenuBar(props) {
 			<li role="menuitem" className="search-field">
 				<input
 					ref={searchRef}
+					defaultValue={searchQuery}
 					type="search"
 					placeholder={gettext("Search for …")}
 					onChange={handleSearch}
