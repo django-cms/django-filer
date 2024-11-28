@@ -84,7 +84,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'workdir/db.sqlite3',
-    }
+    },
+    'default_': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'finder',
+        'USER': 'finder',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': 5432,
+        # 'CONN_MAX_AGE': 900,
+    },
 }
 
 

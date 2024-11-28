@@ -3,27 +3,33 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import models
+from django.db import connections, models
 from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField, CharField
-from django.db.models.functions import Lower
+from django.db.models.functions import Cast, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+try:
+    from django.contrib.postgres.aggregates import StringAgg
+except ImportError:  # psycopg2 is not installed
+    pass
+
 
 class GroupConcat(Aggregate):
+    """
+    To be used on SQLite, MySQL and MariaDB databases. For Postgres, use `StringAgg`.
+    """
     function = 'GROUP_CONCAT'
     template = '%(function)s(%(distinct)s %(expressions)s)'
-    # template = '%(function)s(%(distinct)s %(expressions)s%(separator)s)'
     allow_distinct = True
 
-    def __init__(self, expression, distinct=False, ordering=None, separator=',', output_field=None, **extra):
+    def __init__(self, expression, distinct=False, ordering=None, output_field=None, **extra):
         super().__init__(
             expression,
             distinct='DISTINCT ' if distinct else '',
             ordering=f' ORDER BY {ordering}' if ordering is not None else '',
-            separator=f",'{separator}'",
             output_field=CharField() if output_field is None else output_field,
             **extra
         )
@@ -97,15 +103,21 @@ class InodeManagerMixin:
                 is_folder=Value(model.is_folder, output_field=BooleanField()),
                 **unified_annotations,
             )
-            expressions = {'label_ids':
-                Value(None, output_field=CharField()) if model.is_folder
-                else GroupConcat('labels__id', distinct=True)
-            }
+            if model.is_folder:
+                expressions = {'label_ids': Value('', output_field=CharField())}
+            else:
+                vendor = connections[model.objects.db].vendor
+                if vendor == 'postgresql':
+                    concatenated = Cast('labels__id', output_field=CharField())
+                    expressions = {'label_ids': StringAgg(concatenated, ',', distinct=True)}
+                else:
+                    expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
             for name, field in unified_fields.items():
                 if name in annotations:
                     concrete_fields.remove(name)
                 elif name not in model_field_names:
-                    expressions[name] = Value(None, output_field=field)
+                    value = None if field.default is models.NOT_PROVIDED else field.default
+                    expressions[name] = Value(value, output_field=field)
             queryset = model.objects.values(*concrete_fields, **expressions).annotate(**annotations)
             model_lookup = dict(lookup)
             labels = model_lookup.pop('labels__in', None)
