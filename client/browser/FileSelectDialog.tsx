@@ -186,7 +186,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		}
 	}
 
-	async function fetchFiles() {
+	const fetchFiles = useCallback(async () => {
 		const fetchUrl = (() => {
 			const params = new URLSearchParams();
 			if (structure.recursive) {
@@ -213,13 +213,13 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		} else {
 			console.error(response);
 		}
-	}
+	}, [structure.last_folder, structure.recursive, structure.search_query, structure.offset]);
 
 	function handleUpload(folderId, uploadedFiles){
 		if (structure.last_folder !== folderId)
 			throw new Error('Folder mismatch');
 		setUploadedFile(uploadedFiles[0]);
-	}
+	};
 
 	const selectFile = useCallback(fileInfo => {
 		props.selectFile(fileInfo);
@@ -251,6 +251,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 			});
 		}
 		setUploadedFile(null);
+		refreshFilesList();
 		props.closeDialog();
 	}
 
