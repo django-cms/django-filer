@@ -72,9 +72,12 @@ class BrowserView(View):
             # direct children of the root folder are open regardless of the `open_folders` session
             # in addition to that, also open all ancestors of the last opened folder
             open_folders = set(request.session['finder.open_folders'])
-            open_folders.update(
-                map(str, FolderModel.objects.get(id=last_folder_id).ancestors.values_list('id', flat=True))
-            )
+            try:
+                open_folders.update(
+                    map(str, FolderModel.objects.get(id=last_folder_id).ancestors.values_list('id', flat=True))
+                )
+            except FolderModel.DoesNotExist:
+                pass
             children = self._get_children(open_folders, realm.root_folder)
         else:
             children = None
