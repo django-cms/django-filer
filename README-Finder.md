@@ -111,8 +111,8 @@ git switch finder
 pip install --no-deps -e .
 ```
 
-The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
-released, you have to install the current development version of Django from GitHub as well.
+The new version of **django-filer** requires Django-5.2 or later. Since this hasn't been
+released yet, you have to install the latest development version of Django from GitHub as well.
 
 The new version of **django-filer** currently has only been tested with SQLite and Postgres, but
 should also work on MariaDB and MySQL.
