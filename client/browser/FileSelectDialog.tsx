@@ -186,7 +186,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		}
 	}
 
-	const fetchFiles = useCallback(async () => {
+	async function fetchFiles() {
 		const fetchUrl = (() => {
 			const params = new URLSearchParams();
 			if (structure.recursive) {
@@ -213,7 +213,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		} else {
 			console.error(response);
 		}
-	}, [structure.last_folder, structure.recursive, structure.search_query, structure.offset]);
+	}
 
 	function handleUpload(folderId, uploadedFiles){
 		if (structure.last_folder !== folderId)
