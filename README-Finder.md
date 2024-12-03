@@ -105,7 +105,7 @@ The new version of **django-filer** is not yet available on PyPI. Therefore, you
 from GitHub:
 
 ```shell
-git clone django-filer
+git clone https://github.com/django-cms/django-filer.git
 cd django-filer
 git switch finder
 pip install --no-deps -e .
@@ -114,10 +114,10 @@ pip install --no-deps -e .
 The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
 released, you have to install the current development version of Django from GitHub as well.
 
-The new version of **django-filer** currently has been tested with SQLite and Postgres, but should
-also work on MariaDB and MySQL.
+The new version of **django-filer** currently has only been tested with SQLite and Postgres, but
+should also work on MariaDB and MySQL.
 
-In `settings.py` of your project, add these extra dependencies or those one you really need:
+In `settings.py` of your project, add these extra dependencies or those you really need:
 
 ```python
     INSTALLED_APPS = [
@@ -157,12 +157,12 @@ python manage.py filer_to_finder
 This does not affect the original database tables. You can still use the original **django-filer**
 codebase in parallel to the new "Finder" branch. They both share the same underlying file system,
 usually `media/filer_public` but store their meta information in completely independent database
-tables. The only cavat is that you should not erase files in the trash folder, because then they are
-also gone on disk.
+tables. The only caveat is that you should not erase files in the trash folder, because then they
+are also gone on disk.
 
 The client part of the new admin user must be compiled before it can be used. This requires a modern
 version (18 or later) of [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/), which usually are installed anyway.
-The following commands installs the requirements all compiles the code:
+The following commands installs the requirements and compiles the code:
 
 ```shell
 cd django-filer
@@ -198,7 +198,7 @@ operating system's graphical user interface. It is possible to …
 * Tag files and filter them by their tags.
 
 
-## Interface to external Django projects
+## Interface to other Django projects
 
 **django-filer** (Finder branch) ships with a new file selection field. This field can be used in
 any Django model. It allows to select a file from the files stored inside **django-filer**. It also
@@ -218,9 +218,13 @@ class MyModel(models.Model):
 ```
 
 Forms generated from this model will have a file selection widget for the `my_file` field. When
-rendered as HTML, this widget is the webcomponent `<finder-file-select …></finder-file-select>`
+rendered as HTML, this widget becomes the webcomponent `<finder-file-select …></finder-file-select>`
 with a few additional attributes. The JavaScript part of the widget must be included using the
 script tag `<script src="{% static 'finder/js/finder-select.js' %}"></script>`.
+
+The testapp provides an example how this field can be used in a form. Just vist the URL
+http://localhost:8000/admin/finder/foldermodel/ and click on the blank area to either select an
+existing file or upload a  new one.
 
 
 ## Further Steps
