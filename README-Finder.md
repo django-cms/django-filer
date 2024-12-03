@@ -114,8 +114,8 @@ pip install --no-deps -e .
 The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
 released, you have to install the current development version of Django from GitHub as well.
 
-The new version of **django-filer** currently only works with SQLite. This will of course change in
-the future.
+The new version of **django-filer** currently has been tested with SQLite and Postgres, but should
+also work on MariaDB and MySQL.
 
 In `settings.py` of your project, add these extra dependencies or those one you really need:
 
@@ -133,11 +133,12 @@ In `settings.py` of your project, add these extra dependencies or those one you 
     ]
 ```
 
-If you use `finder.contrib.audio`, assure that `ffmpeg-python` is installed.
-If you use `finder.contrib.image.pil`, assure that `Pillow` is installed.
-If you use `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
-If you use `finder.contrib.video`, assure that `ffmpeg-python` is installed.
-
+If you use:
+* `finder.contrib.audio`, assure that `ffmpeg-python` is installed.
+* `finder.contrib.image.pil`, assure that `Pillow` is installed.
+* `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
+* `finder.contrib.video`, assure that `ffmpeg-python` is installed.
+* Postgres as database, install `psycopg2` or `psycopg2-binary` if available for your platform.
 
 Run the migrations for app `finder`:
 
@@ -147,7 +148,7 @@ python manage.py migrate finder
 
 If you already have **django-filer** installed and that database is filled, you can migrate the
 meta-data of those files and folders into the new database tables. The physical files on disk are
-not affected by this migration.
+not affected by this migration. Remember to leave the `filer` app in `INSTALLED_APPS`.
 
 ```shell
 python manage.py filer_to_finder
@@ -161,7 +162,7 @@ also gone on disk.
 
 The client part of the new admin user must be compiled before it can be used. This requires a modern
 version (18 or later) of [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/), which usually are installed anyway.
-The following commands install the requirements all compiles the code:
+The following commands installs the requirements all compiles the code:
 
 ```shell
 cd django-filer
