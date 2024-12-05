@@ -26,7 +26,7 @@
         <span class="filerFile js-file-selector">
             {% if object %}
                 {% if object.file.exists %}
-                    <a href="{{ object.url }}" target="_blank">{% file_icon object detail=True %}</a>
+                    <a href="{{ object.url }}" target="_blank">{% file_icon object detail="thumbnail" %}</a>
                     &nbsp;<span class="description_text">{{ object.label }}</span>
                 {% else %}
                     {% file_icon object %}
