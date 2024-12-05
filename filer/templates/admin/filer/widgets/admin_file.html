@@ -14,7 +14,7 @@
         </span>
     </div>
 
-    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}"
+    <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %} "
          data-url="{% url 'admin:filer-ajax_upload' %}"
          data-max-files="1"
          {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
@@ -26,7 +26,7 @@
         <span class="filerFile js-file-selector">
             {% if object %}
                 {% if object.file.exists %}
-                    <a href="{{ object.url }}" target="_blank">{% file_icon object detail=True %}</a>
+                    <a href="{{ object.url }}" target="_blank">{% file_icon object detail="thumbnail" %}</a>
                     &nbsp;<span class="description_text">{{ object.label }}</span>
                 {% else %}
                     {% file_icon object %}
