@@ -261,6 +261,12 @@ Each file and folder has a foreign key named `owner`, pointing onto the `User` m
 file or folder can change its permissions if he has the global permission to do so. When creating a
 new file or folder, the currently loggedin user is set as the owner of that file or folder.
 
+Only the superuser and the owner of a file or folder can change its permissions. The superuser can
+change the permissions of any file or folder. The owner can change the permissions only of his files
+owned by himself.
+
+Only the superuser can change the owner of a file or folder.
+
 
 ## Further Steps
 
