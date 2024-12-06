@@ -111,7 +111,7 @@ git switch finder
 pip install --no-deps -e .
 ```
 
-The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
+The new version of **django-filer** requires Django-5.2 or later. Since this hasn't been
 released, you have to install the current development version of Django from GitHub rather than PyPI
 using:
 
