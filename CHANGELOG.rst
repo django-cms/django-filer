@@ -2,6 +2,17 @@
 CHANGELOG
 =========
 
+3.3.1 (2024-12-07)
+==================
+
+* fix: editing buttons missing in admin when file present by @pajowu in https://github.com/django-cms/django-filer/pull/1511
+* fix: incompatibility with djangocms-versioning-filer 1.3 was fixed by @fscherf in https://github.com/django-cms/django-filer/pull/1509
+
+**New Contributors**
+
+* @pajowu made their first contribution in https://github.com/django-cms/django-filer/pull/1511
+* @fscherf made their first contribution in https://github.com/django-cms/django-filer/pull/1509
+
 3.3.0 (2024-11-19)
 ==================
 
