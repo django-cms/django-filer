@@ -112,7 +112,12 @@ pip install --no-deps -e .
 ```
 
 The new version of **django-filer** requires Django-5.2 or later. Since this currently is not
-released, you have to install the current development version of Django from GitHub as well.
+released, you have to install the current development version of Django from GitHub rather than PyPI
+using:
+
+```shell
+pip install https://github.com/django/django/archive/refs/heads/main.zip
+```
 
 The new version of **django-filer** currently has only been tested with SQLite and Postgres, but
 should also work on MariaDB and MySQL.
@@ -227,15 +232,44 @@ http://localhost:8000/admin/finder/foldermodel/ and click on the blank area to e
 existing file or upload a  new one.
 
 
+## Permission System (Proposal)
+
+The permission system of django-filer is based on the idea of Access Control Lists (ACLs) similar
+to Posix or NTFS ACSs. This allows to grant fine-grained permissions to everybody, individual users
+and/or groups for each file and folder.
+
+Permissions are controlled through the model named `AccessControlEntry`. This model has a foreign
+key onto `FolderModel` and a nullable foreign key onto `User` and `Group`. Either of them can be
+set, but not both. If both are unset, the used permissions are applied to everybody and the
+anonymous user.
+
+By using a separate model `AccessControlEntry`, **django-filer** now can compute the permissions
+using just one database query. Until version 3, the permissions had to be computed traversing all
+ancestors starting from the current folder up to the root of the folder tree. This is a
+time-consuming opertaion and made **django-filer** slow for large datasets.
+
+Each `AccessControlEntry` has a these fields:
+* `write`: If set for a folder, it allows the currently loggedin user to upload a file. If set for a
+  file, it allows the currently loggedin user to edit that file.
+* `read`: If set for a folder, it allows the currently loggedin user to open that folder. If set for
+  a file, it allows the currently loggedin user to view and use that file.
+
+If a folder has `write` but no `read` permission, the user can upload files into that folder, but
+doesn't see files from other users.
+
+Each file and folder has a foreign key named `owner`, pointing onto the `User` model. The owner of a
+file or folder can change its permissions if he has the global permission to do so. When creating a
+new file or folder, the currently loggedin user is set as the owner of that file or folder.
+
+
 ## Further Steps
 
 The focal point of the `ImageModel` will take the resolution of the corresponsding image into
 consideration. This will allow to create different versions of the same canonical image, depending
 on the width of the device the image is displayed.
 
-The permission system will be implemented using a model based on the idea of Access Control Lists
-(ACLs) of [NTFS](https://learn.microsoft.com/en-us/windows/win32/secauthz/access-control-lists). This will allow to grant permissions to users and groups for each folder
-(but not file) individually.
+The permission system will be implemented using a model based on the idea of Access Control Lists,
+see above.
 
 A quota system will be implemented, which allows to limit the amount of disk space a user can use.
 
