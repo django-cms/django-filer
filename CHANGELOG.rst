@@ -2,12 +2,73 @@
 CHANGELOG
 =========
 
-3.1.3 (2025-05-17)
+3.3.1 (2024-12-07)
+==================
+
+* fix: editing buttons missing in admin when file present by @pajowu in https://github.com/django-cms/django-filer/pull/1511
+* fix: incompatibility with djangocms-versioning-filer 1.3 was fixed by @fscherf in https://github.com/django-cms/django-filer/pull/1509
+
+**New Contributors**
+
+* @pajowu made their first contribution in https://github.com/django-cms/django-filer/pull/1511
+* @fscherf made their first contribution in https://github.com/django-cms/django-filer/pull/1509
+
+3.3.0 (2024-11-19)
+==================
+
+* fix: Restrict upload of binary or unknown file types by default by @fsbraun in https://github.com/django-cms/django-filer/pull/1507
+* fix: remove extra brace in generated HTML of data-max-filesize attribute by @fabien-michel in https://github.com/django-cms/django-filer/pull/1502
+* fix: uploadButton data-max-filesize attribute is not passed to file-uploader by @fabien-michel in https://github.com/django-cms/django-filer/pull/1503
+* docs: Update for on_delete requirement in Filer fields
+
+3.2.3 (2024-09-18)
+==================
+
+* fix: Use TypeVar for type-hinting of the user parameter by @payamnj in https://github.com/django-cms/django-filer/pull/1496
+
+** New contributor**
+
+* @payamnj made their first contribution in https://github.com/django-cms/django-filer/pull/1496
+
+
+3.2.2 (2024-09-09)
+==================
+
+* fix: Remove version pin to Django<5.1
+
+3.2.1 (2024-09-05)
+==================
+
+* fix: Restore python 3.8 and python 3.9 compatibility
+
+3.2.0 (2024-08-23)
+==================
+
+* feat: Add cache for permission checks by @fsbraun in https://github.com/django-cms/django-filer/pull/1486
+* fix: Reduce number of thumbnails created for admin, avoid admin thumbnails for svg files by @fsbraun in https://github.com/django-cms/django-filer/pull/1490
+* fix: Allow ``Image.MAX_IMAGE_PIXELS`` to be ``None`` by @fsbraun in https://github.com/django-cms/django-filer/pull/1475
+* docs: Update extending_filer.rst by @DmytroLitvinov in https://github.com/django-cms/django-filer/pull/1488
+
+**New contributor:**
+
+* @DmytroLitvinov made their first contribution in https://github.com/django-cms/django-filer/pull/1488
+
+3.1.4 (2024-07-15)
+==================
+
+* feat: Accept new `STORAGES` setting, introduced in Django 4.2 by @fsbraun in https://github.com/django-cms/django-filer/pull/1472
+* feat: Replace `render` with `TemplateResponse` in admin views by @fsbraun in https://github.com/django-cms/django-filer/pull/1473
+* fix: File expand url incorrect and worked not with custom image models by @fsbraun in https://github.com/django-cms/django-filer/pull/1471
+* fix: Crash when moving files from a filtered directory listing by @W1ldPo1nter in https://github.com/django-cms/django-filer/pull/1482
+* ci: pre-commit autoupdate by @pre-commit-ci in https://github.com/django-cms/django-filer/pull/1477
+
+
+3.1.3 (2024-05-17)
 ==================
 * Fix: Folder select widget did not render correctly with standard Django admin
   styles.
 
-3.1.2 (2025-05-17)
+3.1.2 (2024-05-17)
 ==================
 
 * Made the filer check command compatible with custom image models.
@@ -712,7 +773,7 @@ CHANGELOG
 
 
 0.5.4a1
-=======
+========
 
 * Adds description field.
 

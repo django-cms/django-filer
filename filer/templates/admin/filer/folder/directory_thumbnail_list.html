@@ -1,10 +1,10 @@
 {% load i18n l10n admin_list filer_tags filer_admin_tags static thumbnail %}
 <div class="drag-hover-border thumbnail-drag-hover-border"></div>
-<section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list">
+<section class="navigator{% if is_popup %} navigator-popup{% endif %} navigator-thumbnail-list" style="--thumbnail-size: {{ thumbnail_size }}px;">
 
     <div class="js-filer-dropzone js-filer-dropzone-base navigator-list" id="result_list" data-url="{% if folder.id %}{% url 'admin:filer-ajax_upload' folder_id=folder.id %}{% else %}{% url 'admin:filer-ajax_upload' %}{% endif %}" data-folder-name="{% if folder.is_root %}{% translate 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}" data-max-uploader-connections="{{ uploader_connections }}"
          data-max-files="{{ max_files|safe }}"
-         {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+         {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
 
         <input type="checkbox" id="all-items-action-toggle">
 
@@ -43,7 +43,7 @@
                      data-folder-name="{{ subfolder.name }}"
                      data-max-uploader-connections="{{ uploader_connections }}"
                      data-max-files="{{ max_files|safe }}"
-                     {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+                     {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
 
                     <div class="navigator-checkbox">
                         {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
@@ -106,7 +106,7 @@
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
                                                   title="{% blocktrans with file.label as item_label %}Change '{{ item_label }}' details{% endblocktrans %}">
                                       {% endif %}
-                                      {% file_icon file size="160x160" %}
+                                      {% file_icon file detail="thumbnail" %}
                                       {% if has_change_permission or is_popup and filer_admin_context.pick_file %}
                                           </a>
                                       {% endif %}
@@ -146,7 +146,7 @@
        data-folder-name="{% if folder.is_root %}{% trans 'Unsorted Uploads' %}{% else %}{{ folder.name }}{% endif %}"
        data-max-uploader-connections="{{ uploader_connections }}"
        data-max-files="{{ max_files|safe }}"
-       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
+       {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}>
   <div class="icon"><span class="filer-icon filer-icon-upload fa fa-cloud-upload"></span></div>
 
       <div class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">

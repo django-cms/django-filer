@@ -54,9 +54,9 @@ files with the mime type ``image/svg+xml``. Those files are dangerous since
 they are executed by a browser without any warnings.
 
 Validation hooks do not restrict the upload of other executable files
-(like ``*.exe`` or shell scripts). Those are not automatically executed
+(like ``*.exe`` or shell scripts). **Those are not automatically executed
 by the browser but still present a point of attack, if a user saves them
-to disk and executes them locally.
+to disk and executes them locally.**
 
 You can release validation restrictions by setting
 ``FILER_REMOVE_FILE_VALIDATORS`` to a list of mime types to be removed from
@@ -111,7 +111,7 @@ This just rejects any file for upload. By default this happens for HTML files
 
 This validator rejects any SVG file that contains the bytes ``<script`` or
 ``javascript:``. This probably is a too strict criteria, since those bytes
-might be part of a legitimate say string. The above code is a simplification
+might be part of a legitimate string. The above code is a simplification
 the actual code also checks for occurrences of event attribute like
 ``onclick="..."``.
 
@@ -144,10 +144,11 @@ a malicious file unknowingly.
     FILER_REMOVE_FILE_VALIDATORS = [
         "text/html",
         "image/svg+xml",
+        "application/octet-stream",
     ]
 
-No HTML upload and restricted SVG upload
-........................................
+No HTML upload and restricted SVG upload, no binary or unknown file upload
+...........................................................................
 
 This is the default setting. It will deny any SVG file that might contain
 Javascript. It is prone to false positives (i.e. files being rejected that
@@ -175,6 +176,8 @@ in the user's browser.
         "text/html": ["filer.validation.deny_html"],
         "image/svg+xml": ["filer.validation.deny"],
     }
+
+(Still not binary or unknown file upload)
 
 Experimental SVG sanitization
 .............................
@@ -259,3 +262,40 @@ You can use it to distinguish validation for certain user groups if needed.
 
 If you distinguish validation by the mime type, remember to register the
 validator function for all relevant mime types.
+
+
+.. _check_virus:
+
+Checking uploads for viruses using ClamAV
+-----------------------------------------
+
+If you have ClamAV installed and use `django-clamd <https://github.com/vstoykov/django-clamd>`_
+you can add a validator that checks for viruses in uploaded files.
+
+.. code-block:: python
+
+    FILER_REMOVE_FILE_VALIDATORS = ["application/octet-stream"]
+    FILER_ADD_FILE_VALIDATORS = {
+        "application/octet-stream": ["my_validator_app.validators.validate_octet_stream"],
+    }
+
+
+.. code-block:: python
+
+    def validate_octet_stream(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
+        """Octet streams are binary files without a specific mime type. They are run through
+        a virus check."""
+        try:
+            from django_clamd.validators import validate_file_infection
+
+            validate_file_infection(file)
+        except (ModuleNotFoundError, ImportError):
+            raise FileValidationError(
+                _('File "{file_name}": Virus check for binary/unknown file not available').format(file_name=file_name)
+            )
+
+.. note::
+
+    Virus-checked files still might contain executable code. While the code is not
+    executed by the browser, a user might still download the file and execute it
+    manually.
