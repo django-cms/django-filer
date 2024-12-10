@@ -24,7 +24,7 @@ For large datasets [django-cte](https://github.com/dimagi/django-cte) is reccome
 of tree travesals, which is important while searching.
 
 Since each `FileModel` contains a `JSONField` to store arbitrary data, [django-entangled](https://github.com/jrief/django-entangled)
-is reccomended, in order to give users the opportunity to edit the the contents of that field.
+is reccomended, in order to give users the opportunity to edit the contents of that field.
 
 The client part of the new admin user interface has no runtime dependencies. It is compiled into two
 JavaScript files, which are included by the corresponding admin views. One of them is used for the
