@@ -20,7 +20,11 @@ The "Finder" branch of django-filer has less third-party dependencies. It does n
 [django-mptt](https://django-mptt.readthedocs.io/en/latest/) and
 [easy-thumbnails](https://easy-thumbnails.readthedocs.io/en/latest/) anymore.
 
-For large datasets [django-cte](https://github.com/dimagi/django-cte) is reccomended, in order to improve the speed when searching.
+For large datasets [django-cte](https://github.com/dimagi/django-cte) is reccomended, in order to improve the speed
+of tree travesals, which is important while searching.
+
+Since each `FileModel` contains a `JSONField` to store arbitrary data, [django-entangled](https://github.com/jrief/django-entangled)
+is reccomended, in order to give users the opportunity to edit the the contents of that field.
 
 The client part of the new admin user interface has no runtime dependencies. It is compiled into two
 JavaScript files, which are included by the corresponding admin views. One of them is used for the
@@ -234,18 +238,18 @@ existing file or upload a  new one.
 
 ## Permission System (Proposal)
 
-The permission system of django-filer is based on the idea of Access Control Lists (ACLs) similar
+The permission system of **django-filer** is based on the idea of Access Control Lists (ACLs) similar
 to Posix or NTFS ACSs. This allows to grant fine-grained permissions to everybody, individual users
 and/or groups for each file and folder.
 
 Permissions are controlled through the model named `AccessControlEntry`. This model has a foreign
-key onto `FolderModel` and a nullable foreign key onto `User` and `Group`. Either of them can be
-set, but not both. If both are unset, the used permissions are applied to everybody and the
+key onto `InodeModel` and a nullable foreign key onto `User` and `Group`. Either of them can be
+set, but not both. If both are unset, the chosen permissions are applied to everybody including the
 anonymous user.
 
-By using a separate model `AccessControlEntry`, **django-filer** now can compute the permissions
-using just one database query. Until version 3, the permissions had to be computed traversing all
-ancestors starting from the current folder up to the root of the folder tree. This is a
+By using a separate model `AccessControlEntry`, **django-filer** can now compute the permissions
+using just one database query per inode. Until version 3, the permissions had to be computed traversing
+all ancestors starting from the current folder up to the root of the folder tree. This is a
 time-consuming opertaion and made **django-filer** slow for large datasets.
 
 Each `AccessControlEntry` has a these fields:
@@ -253,19 +257,31 @@ Each `AccessControlEntry` has a these fields:
   file, it allows the currently loggedin user to edit that file.
 * `read`: If set for a folder, it allows the currently loggedin user to open that folder. If set for
   a file, it allows the currently loggedin user to view and use that file.
+* A generic foreign key pointing onto the `InodeModel`. This creates a one-to-many relation between
+  different file types and folders on one side and the access control list on the other.
+* A foreign key onto the folder model to set a permission template. Read below for details. 
+* The `execute` flag as seen in Unix file systems and other ACL implementations does not make sense
+  in this context and is not implemented.
 
 If a folder has `write` but no `read` permission, the user can upload files into that folder, but
-doesn't see files from other users.
+doesn't see files from other users. This is named "Dropbox" functionality.
 
 Each file and folder has a foreign key named `owner`, pointing onto the `User` model. The owner of a
 file or folder can change its permissions if he has the global permission to do so. When creating a
 new file or folder, the currently loggedin user is set as the owner of that file or folder.
 
-Only the superuser and the owner of a file or folder can change its permissions. The superuser can
-change the permissions of any file or folder. The owner can change the permissions only of his files
+Only a superuser and the owner of a file or folder can change its permissions. The superuser can
+change the permissions of any file or folder. The owner can change the permissions only of files
 owned by himself.
 
-Only the superuser can change the owner of a file or folder.
+Only a superuser can change the owner of a file or folder.
+
+In addition to the file and folder permissions, each folder requires a template of permissions on how to
+inherit them to files and folders created as children of that specific folder. This can be achieved with
+a separate foreign key in model `AccessControlEntry` pointing onto the `FolderModel`.
+
+Microsoft gives a good explanation on the implementation of
+[ACLs in their Data-Lake implementation](https://learn.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-access-control).
 
 
 ## Further Steps
