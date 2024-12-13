@@ -273,8 +273,8 @@ file or folder can change its permissions if he has the global permission to do 
 new file or folder, the currently loggedin user is set as the owner of that file or folder.
 
 Only a superuser and the owner of a file or folder can change its permissions. The superuser can
-change the permissions of any file or folder. The owner can change the permissions only of files
-owned by himself.
+change the permissions of any file or folder. Staff users can change the permissions only of files
+they own themselves.
 
 Only a superuser can change the owner of a file or folder.
 
