@@ -1,11 +1,12 @@
 # Django-Filer ("Finder" branch)
 
 The "Finder" branch of django-filer is a complete rewrite of the original **django-filer** project.
-It is a work in progress and is not yet ready for production use. However, the code is in a state
+It is 'work in progress' and is not yet ready for production use. However, the code is in a state
 where it can be used for testing and development purposes.
 
 A rewrite was necessary because the original codebase was not maintainable anymore. Please read this
-[discussion](https://github.com/django-cms/django-filer/discussions/1348) for details on why a rewrite was necessary.
+[discussion](https://github.com/django-cms/django-filer/discussions/1348) for details on why rewriting
+this library was necessary.
 
 Apart from the maintainability issues, using the File and Folder models was not possible in a
 multi-tenant environment. Extending the file model with a more specialized implementation was
@@ -15,7 +16,7 @@ ever have been created.
 
 ## Less third-party dependencies
 
-The "Finder" branch of django-filer has less third-party dependencies. It does not depend on
+The "Finder" branch of **django-filer** has less third-party dependencies. It does not depend on
 [django-polymorphic](https://django-polymorphic.readthedocs.io/en/stable/),
 [django-mptt](https://django-mptt.readthedocs.io/en/latest/) and
 [easy-thumbnails](https://easy-thumbnails.readthedocs.io/en/latest/) anymore.
@@ -36,7 +37,8 @@ file selection widget.
 
 The "Finder" branch of django-filer is designed to be extensible for every MIME-type one desires.
 Therefore, those extensions might need their own dependencies in order to extract or visualize a
-certain type of file. A "vanilla" installation can only distinguish between files and folders.
+certain type of file. A minimal installation can be configured to only distinguish between files
+and folders.
 
 
 ## New Model Features
@@ -271,8 +273,8 @@ file or folder can change its permissions if he has the global permission to do 
 new file or folder, the currently loggedin user is set as the owner of that file or folder.
 
 Only a superuser and the owner of a file or folder can change its permissions. The superuser can
-change the permissions of any file or folder. The owner can change the permissions only of files
-owned by himself.
+change the permissions of any file or folder. Staff users can change the permissions only of files
+they own themselves.
 
 Only a superuser can change the owner of a file or folder.
 
