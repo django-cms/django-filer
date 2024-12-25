@@ -5,14 +5,15 @@ import {ProgressOverlay, ProgressBar} from './UploadProgress';
 const FileUploader = forwardRef((props: any, forwardedRef) => {
 	const {folderId, handleUpload} = props;
 	const multiple = 'multiple' in props;
-	const inputRef = useRef(null);
+	const fileUploadRef = useRef(null);
+	const folderUploadRef = useRef(null);
 	const [dragging, setDragging] = useState(false);
 	const [uploading, setUploading] = useState([]);
 
 	useImperativeHandle(forwardedRef, () => ({
-		openUploader() {
-			inputRef.current.click();
-		}
+		openUploader(isFolder?: boolean) {
+			(isFolder === true ? folderUploadRef : fileUploadRef).current.click();
+		},
 	}));
 
 	function swallowEvent(event) {
@@ -64,6 +65,8 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 		});
 	}
 
+	const directory = {directory: '', webkitdirectory: '', mozdirectory: ''};
+
 	return (
 		<div
 			className="file-uploader"
@@ -73,11 +76,12 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 			onDrop={handleDrop}
 		>
 			{props.children}
-			<input type="file" name={`file:${folderId}`} multiple={multiple} ref={inputRef} onChange={handleFileSelect} />{
-			(dragging || uploading.length > 0) &&
+			<input type="file" name={`file:${folderId}`} multiple={multiple} ref={fileUploadRef} onChange={handleFileSelect} />
+			{multiple && <input type="file" name={`folder:${folderId}`} {...directory} ref={folderUploadRef} onChange={handleFileSelect}/>}
+			{(dragging || uploading.length > 0) &&
 			<ProgressOverlay dragging={dragging}>{
 				uploading.map((file, index) =>
-				<ProgressBar key={index} file={file} targetId={folderId} settings={props.settings} />
+					<ProgressBar key={index} file={file} targetId={folderId} settings={props.settings} />
 				)
 			}</ProgressOverlay>
 		}</div>

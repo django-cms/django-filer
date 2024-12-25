@@ -85,6 +85,10 @@ class FolderAdmin(InodeAdmin):
                 '<uuid:folder_id>/add_folder',
                 self.admin_site.admin_view(self.add_folder),
             ),
+            path(
+                '<uuid:folder_id>/get_or_create_folder',
+                self.admin_site.admin_view(self.get_or_create_folder),
+            ),
         ]
         urls.extend(default_urls)
         for model in InodeModel.get_models(include_proxy=True):
@@ -357,9 +361,9 @@ class FolderAdmin(InodeAdmin):
     def add_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        body = json.loads(request.body)
         if not (parent_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"Folder {folder_id} not found.")
+        body = json.loads(request.body)
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=body['name']), status=409)
@@ -369,3 +373,16 @@ class FolderAdmin(InodeAdmin):
             owner=request.user,
         )
         return JsonResponse({'new_folder': self.serialize_inode(new_folder)})
+
+    def get_or_create_folder(self, request, folder_id):
+        if response := self.check_for_valid_post_request(request, folder_id):
+            return response
+        if not (parent_folder := self.get_object(request, folder_id)):
+            return HttpResponseNotFound(f"Folder {folder_id} not found.")
+        body = json.loads(request.body)
+        folder, _ = FolderModel.objects.get_or_create(
+            name=body['name'],
+            parent=parent_folder,
+            defaults={'owner': request.user},
+        )
+        return JsonResponse({'folder': self.serialize_inode(folder)})

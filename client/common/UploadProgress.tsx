@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 
 
 export function ProgressOverlay(props) {
@@ -22,24 +22,54 @@ export function ProgressBar(props) {
 	const [complete, setComplete] = useState(0);
 
 	useEffect(() => {
-		const uploadFilesURL = `${settings.base_url}${targetId}/upload`;
-		const request = new XMLHttpRequest();
-		request.addEventListener('loadstart', transferStart);
-		request.upload.addEventListener('progress', transferProgress, false);
-		request.addEventListener('loadend', transferComplete);
-		request.open('POST', uploadFilesURL, true);
-		request.setRequestHeader('X-CSRFToken', settings.csrf_token);
-		request.responseType = 'json';
-		const body = new FormData();
-		body.append('upload_file', file);
-		request.send(body);
+		(async () => {
+			let uploadFilesURL = `${settings.base_url}${targetId}/upload`;
+			let relativePath = file.webkitRelativePath ?? file.mozRelativePath ?? file.relativePath;
+			if (typeof relativePath === 'string') {
+				relativePath = relativePath.slice(0, relativePath.lastIndexOf('/'));
+				if (relativePath.length > 0) {
+					const folder = await getOrCreateFolder(relativePath);
+					uploadFilesURL = `${settings.base_url}${folder.id}/upload`;
+				}
+			}
+			const request = new XMLHttpRequest();
+			request.addEventListener('loadstart', transferStart);
+			request.upload.addEventListener('progress', transferProgress, false);
+			request.addEventListener('loadend', transferComplete);
+			request.open('POST', uploadFilesURL, true);
+			request.setRequestHeader('X-CSRFToken', settings.csrf_token);
+			request.responseType = 'json';
+			const body = new FormData();
+			body.append('upload_file', file);
+			request.send(body);
 
-		return () => {
-			request.removeEventListener('loadstart', transferStart);
-			request.removeEventListener('progress', transferProgress);
-			request.removeEventListener('loadend', transferComplete);
-		};
+			return () => {
+				request.removeEventListener('loadstart', transferStart);
+				request.removeEventListener('progress', transferProgress);
+				request.removeEventListener('loadend', transferComplete);
+			};
+		})();
 	}, [file]);
+
+	async function getOrCreateFolder(folderName: string) {
+		const fetchUrl = `${settings.base_url}${settings.folder_id}/get_or_create_folder`;
+		const response = await fetch(fetchUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': settings.csrf_token,
+			},
+			body: JSON.stringify({
+				name: folderName,
+			}),
+		});
+		if (response.ok) {
+			const body = await response.json();
+			return body.folder;
+		} else {
+			console.error(response);
+		}
+	}
 
 	function transferStart() {
 		setComplete(0);

@@ -6,6 +6,7 @@ import React, {
 	useEffect,
 	useImperativeHandle,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import SearchField from './SearchField';
@@ -27,6 +28,7 @@ import AddFolderIcon from '../icons/add-folder.svg';
 import DownloadIcon from '../icons/download.svg';
 import UndoIcon from '../icons/undo.svg';
 import UploadIcon from '../icons/upload.svg';
+import FolderUploadIcon from '../icons/folder-upload.svg';
 
 
 
@@ -60,6 +62,7 @@ function ExtraMenu(props) {
 		copyInodes,
 		clearClipboard,
 	} = props;
+	const extraMenuRef = useRef(null);
 
 	async function addFolder() {
 		const folderName = window.prompt(gettext("Enter folder name"));
@@ -85,6 +88,17 @@ function ExtraMenu(props) {
 		} else {
 			console.error(response);
 		}
+		extraMenuRef.current.toggleSubmenu(false);
+	}
+
+	function uploadLocalFiles(event) {
+		openUploader(false);
+		extraMenuRef.current.toggleSubmenu(false);
+	}
+
+	function uploadLocalFolder(event) {
+		openUploader(true);
+		extraMenuRef.current.toggleSubmenu(false);
 	}
 
 	function downloadSelectedFiles() {
@@ -99,15 +113,19 @@ function ExtraMenu(props) {
 			className="extra-menu"
 			icon={<MoreVerticalIcon/>}
 			tooltip={gettext("Extra options")}
+			ref={extraMenuRef}
 		>
 			<li role="option" onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
 			</li>
+			<li role="option" onClick={uploadLocalFiles}>
+				<UploadIcon/><span>{gettext("Upload local files")}</span>
+			</li>
+			<li role="option" onClick={uploadLocalFolder}>
+				<FolderUploadIcon/><span>{gettext("Upload local folder")}</span>
+			</li>
 			<li role="option" aria-disabled={numSelectedFiles === 0} onClick={downloadSelectedFiles}>
 				<DownloadIcon/><span>{gettext("Download selected files")}</span>
-			</li>
-			<li role="option" onClick={openUploader}>
-				<UploadIcon/><span>{gettext("Upload local files")}</span>
 			</li>
 			<li role="option" aria-disabled={numSelectedInodes === 0} onClick={copyInodes}>
 				<CopyIcon/><span>{gettext("Copy selected to clipboard")}</span>

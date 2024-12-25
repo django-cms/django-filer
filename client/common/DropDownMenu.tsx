@@ -1,7 +1,9 @@
-import React, {useEffect, useRef} from 'react';
+import React, {forwardRef, useEffect, useImperativeHandle, useRef} from 'react';
+import {types} from "sass";
+import Boolean = types.Boolean;
 
 
-export default function DropDownMenu(props) {
+const DropDownMenu = forwardRef((props: any, forwardedRef)=> {
 	const ref = useRef(null);
 	const Wrapper = props.wrapperElement ?? 'li';
 
@@ -16,8 +18,14 @@ export default function DropDownMenu(props) {
 		return () => rootNode.removeEventListener('click', closeSubmenu);
 	}, []);
 
-	function toggleSubmenu() {
-		ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false' : 'true');
+	useImperativeHandle(forwardedRef, () => ({toggleSubmenu}));
+
+	function toggleSubmenu(force?: boolean) {
+		if (force === undefined) {
+			ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false' : 'true');
+		} else {
+			ref.current.setAttribute('aria-expanded', (!force).toString());
+		}
 	}
 
 	return (
@@ -26,7 +34,7 @@ export default function DropDownMenu(props) {
 			role={props.role ? `combobox ${props.role}` : 'combobox'}
 			aria-haspopup="listbox"
 			aria-expanded="false"
-			onClick={toggleSubmenu}
+			onClick={() => toggleSubmenu()}
 			className={props.className}
 			data-tooltip-id="django-finder-tooltip"
 			data-tooltip-content={props.tooltip}
@@ -37,4 +45,7 @@ export default function DropDownMenu(props) {
 			</ul>
 		</Wrapper>
 	)
-}
+});
+
+
+export default DropDownMenu;

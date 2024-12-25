@@ -374,7 +374,7 @@ export default function FolderAdmin() {
 			currentFolderId={currentFolderId}
 			columnRefs={columnRefs}
 			folderTabsRef={folderTabsRef}
-			openUploader={() => uploaderRef.current.openUploader()}
+			openUploader={(isFolder: boolean) => uploaderRef.current.openUploader(isFolder)}
 			downloadFiles={downloadFiles}
 			layout={layout}
 			setLayout={setLayout}
