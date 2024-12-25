@@ -1,14 +1,13 @@
 from django.forms.fields import CharField
+from django.forms.models import ModelForm
 from django.forms.widgets import TextInput
-
-from entangled.forms import EntangledModelForm
 
 from finder.forms.fields import LabelsChoiceField
 from finder.models.file import FileModel
 from finder.models.label import Label
 
 
-class FileForm(EntangledModelForm):
+class FileForm(ModelForm):
     name = CharField(
         widget=TextInput(attrs={'size': 100}),
     )
@@ -19,5 +18,4 @@ class FileForm(EntangledModelForm):
 
     class Meta:
         model = FileModel
-        untangled_fields = ['name', 'labels']
         exclude = ['meta_data']

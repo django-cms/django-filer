@@ -6,23 +6,27 @@ from filer import __version__
 
 REQUIREMENTS = [
     'django>=5.2',
-    'django-entangled',
+    'django-cte',
 ]
 
 
 EXTRA_REQUIREMENTS = {
     "audio": [
         "ffmpeg-python",
+        'django-entangled',
     ],
     "image": [
         "Pillow",
+        'django-entangled',
     ],
     "svg": [
         "reportlab",
         "svglib",
+        'django-entangled',
     ],
     "video": [
         "ffmpeg-python",
+        'django-entangled',
     ],
 }
 

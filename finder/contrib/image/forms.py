@@ -1,11 +1,13 @@
 from django.forms.fields import CharField, FloatField, IntegerField
 from django.forms.widgets import HiddenInput, TextInput
 
+from entangled.forms import EntangledModelFormMixin
+
 from finder.contrib.image.models import ImageFileModel
 from finder.forms.file import FileForm
 
 
-class ImageFileForm(FileForm):
+class ImageFileForm(EntangledModelFormMixin, FileForm):
     crop_x = FloatField(
         widget=HiddenInput(),
         required=False,

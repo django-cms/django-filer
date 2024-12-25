@@ -1,11 +1,13 @@
 from django.forms.fields import FloatField
 from django.forms.widgets import HiddenInput
 
+from entangled.forms import EntangledModelFormMixin
+
 from finder.contrib.audio.models import AudioFileModel, SAMPLE_DURATION
 from finder.forms.file import FileForm
 
 
-class AudioFileForm(FileForm):
+class AudioFileForm(EntangledModelFormMixin, FileForm):
     sample_start = FloatField(
         widget=HiddenInput(),
         initial=0,
