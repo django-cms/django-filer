@@ -1,32 +1,41 @@
-import React, {forwardRef, useEffect, useImperativeHandle, useRef} from 'react';
-import {types} from "sass";
-import Boolean = types.Boolean;
+import React, {useEffect, useRef} from 'react';
 
 
-const DropDownMenu = forwardRef((props: any, forwardedRef)=> {
+export default function DropDownMenu(props){
 	const ref = useRef(null);
 	const Wrapper = props.wrapperElement ?? 'li';
 
 	useEffect(() => {
-		const closeSubmenu = (event) => {
-			if (!ref.current?.parentElement?.contains(event.target)) {
-				ref.current.setAttribute('aria-expanded', 'false');
+		const handleClick = (event) => {
+			const current = ref.current as HTMLElement;
+			let target = event.target;
+			if (!current.contains(target)) {
+				current.setAttribute('aria-expanded', 'false');
+				return;
+			}
+			if (current.ariaExpanded === 'false') {
+				for (let target = event.target; target; target = target.parentElement) {
+					if (target.role === 'listbox') {
+						return;
+					}
+				}
+				current.setAttribute('aria-expanded', 'true');
+			} else {
+				for (let target = event.target; target; target = target.parentElement) {
+					if (target.ariaMultiSelectable) {
+						return;
+					}
+					if (target === current) {
+						current.setAttribute('aria-expanded', 'false');
+						break;
+					}
+				}
 			}
 		};
 		const rootNode = ref.current.getRootNode();
-		rootNode.addEventListener('click', closeSubmenu);
-		return () => rootNode.removeEventListener('click', closeSubmenu);
+		rootNode.addEventListener('click', handleClick);
+		return () => rootNode.removeEventListener('click', handleClick);
 	}, []);
-
-	useImperativeHandle(forwardedRef, () => ({toggleSubmenu}));
-
-	function toggleSubmenu(force?: boolean) {
-		if (force === undefined) {
-			ref.current.setAttribute('aria-expanded', ref.current.ariaExpanded === 'true' ? 'false' : 'true');
-		} else {
-			ref.current.setAttribute('aria-expanded', (!force).toString());
-		}
-	}
 
 	return (
 		<Wrapper
@@ -34,7 +43,6 @@ const DropDownMenu = forwardRef((props: any, forwardedRef)=> {
 			role={props.role ? `combobox ${props.role}` : 'combobox'}
 			aria-haspopup="listbox"
 			aria-expanded="false"
-			onClick={() => toggleSubmenu()}
 			className={props.className}
 			data-tooltip-id="django-finder-tooltip"
 			data-tooltip-content={props.tooltip}
@@ -45,7 +53,4 @@ const DropDownMenu = forwardRef((props: any, forwardedRef)=> {
 			</ul>
 		</Wrapper>
 	)
-});
-
-
-export default DropDownMenu;
+}

@@ -31,7 +31,7 @@ export default function FilterByLabel(props: any) {
 		>
 			<li role="option"><span onClick={() => changeFilter(null)}>{gettext("Clear all")}</span></li>
 			<hr/>{labels.map((label, index) => (
-			<li key={label.value} role="option">
+			<li key={label.value} role="option" aria-multiselectable={true}>
 				<label htmlFor={`filter-${label.value}`}>
 					<input
 						type="checkbox"

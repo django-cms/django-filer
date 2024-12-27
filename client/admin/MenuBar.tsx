@@ -61,8 +61,8 @@ function ExtraMenu(props) {
 		currentFolderId,
 		copyInodes,
 		clearClipboard,
+		deselectAll,
 	} = props;
-	const extraMenuRef = useRef(null);
 
 	async function addFolder() {
 		const folderName = window.prompt(gettext("Enter folder name"));
@@ -88,23 +88,12 @@ function ExtraMenu(props) {
 		} else {
 			console.error(response);
 		}
-		extraMenuRef.current.toggleSubmenu(false);
-	}
-
-	function uploadLocalFiles(event) {
-		openUploader(false);
-		extraMenuRef.current.toggleSubmenu(false);
-	}
-
-	function uploadLocalFolder(event) {
-		openUploader(true);
-		extraMenuRef.current.toggleSubmenu(false);
 	}
 
 	function downloadSelectedFiles() {
 		const current = columnRefs[currentFolderId].current;
 		downloadFiles(current.inodes.filter(inode => !inode.is_folder && inode.selected));
-		current.deselectinodes();
+		deselectAll();
 	}
 
 	return (
@@ -113,15 +102,14 @@ function ExtraMenu(props) {
 			className="extra-menu"
 			icon={<MoreVerticalIcon/>}
 			tooltip={gettext("Extra options")}
-			ref={extraMenuRef}
 		>
 			<li role="option" onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
 			</li>
-			<li role="option" onClick={uploadLocalFiles}>
+			<li role="option" onClick={() => openUploader(false)}>
 				<UploadIcon/><span>{gettext("Upload local files")}</span>
 			</li>
-			<li role="option" onClick={uploadLocalFolder}>
+			<li role="option" onClick={() => openUploader(true)}>
 				<FolderUploadIcon/><span>{gettext("Upload local folder")}</span>
 			</li>
 			<li role="option" aria-disabled={numSelectedFiles === 0} onClick={downloadSelectedFiles}>
@@ -395,6 +383,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 						numClippedInodes={clipboard.length}
 						copyInodes={copyInodes}
 						clearClipboard={clearClipboard}
+						deselectAll={deselectAll}
 						{...props}
 					/>
 				</>)}
