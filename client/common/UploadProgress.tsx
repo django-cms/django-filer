@@ -51,7 +51,7 @@ export function ProgressBar(props) {
 		})();
 	}, [file]);
 
-	async function getOrCreateFolder(folderName: string) {
+	async function getOrCreateFolder(relativePath: string) {
 		const fetchUrl = `${settings.base_url}${settings.folder_id}/get_or_create_folder`;
 		const response = await fetch(fetchUrl, {
 			method: 'POST',
@@ -60,7 +60,7 @@ export function ProgressBar(props) {
 				'X-CSRFToken': settings.csrf_token,
 			},
 			body: JSON.stringify({
-				name: folderName,
+				relative_path: relativePath,
 			}),
 		});
 		if (response.ok) {
