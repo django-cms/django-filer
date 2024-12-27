@@ -11,7 +11,6 @@ import React, {
 	useState,
 } from 'react';
 import {useInView} from 'react-intersection-observer';
-import {Tooltip} from 'react-tooltip';
 import FigureLabels from '../common/FigureLabels';
 import FileUploader from '../common/FileUploader';
 import {useSearchRealm} from '../common/Storage';
@@ -315,7 +314,6 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		>
 			<CloseIcon/>
 		</div>
-		<Tooltip id="django-finder-tooltip" place="bottom-start"/>
 	</>);
 });
 
