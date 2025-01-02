@@ -10,6 +10,7 @@
   "devDependencies": {
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^6.0.1",
+    "@floating-ui/react": "^1.6.12",
     "@r2wc/react-to-web-component": "^2.0.3",
     "@types/react-dom": "^18.3.1",
     "@wavesurfer/react": "^1.0.7",
@@ -22,10 +23,12 @@
     "react-image-crop": "^11.0.7",
     "react-intersection-observer": "^9.13.1",
     "react-player": "^2.16.0",
-    "react-tooltip": "^5.28.0",
     "request": "^2.88.2",
     "sass": "^1.80.4",
     "typescript": "^5.6.3",
     "yargs-parser": "^21.1.1"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.27.2"
   }
 }

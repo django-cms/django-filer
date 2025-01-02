@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		'finder-file-select',
 		r2wc(FinderFileSelect, {
 			props: {'base-url': 'string', 'selected-file': 'json', 'style-url': 'string', realm: 'string'},
-			shadow: 'closed',
+			shadow: 'open',
 		}),
 	);
 });

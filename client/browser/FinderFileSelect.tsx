@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
-import {Tooltip} from 'react-tooltip';
 
 
 export default function FinderFileSelect(props) {
@@ -111,9 +110,8 @@ export default function FinderFileSelect(props) {
 				baseUrl={baseUrl}
 				csrfToken={csrfToken}
 				selectFile={selectFile}
-				closeDialog={() => dialogRef.current.close()}
+				dialogRef={dialogRef}
 			/>
 		</dialog>
-		<Tooltip id="django-finder-tooltip" place="bottom-start" />
 	</>);
 }

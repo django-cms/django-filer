@@ -1,14 +1,20 @@
-import React, {forwardRef, useImperativeHandle, useRef} from 'react';
+import React, {forwardRef, useImperativeHandle, useMemo, useRef} from 'react';
 import DropDownMenu from '../common/DropDownMenu';
 import SortingOptions from '../common/SortingOptions';
 import FilterByLabel from '../common/FilterByLabel';
 import SearchIcon from '../icons/search.svg';
 import UploadIcon from '../icons/upload.svg';
+import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
 const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const {openUploader, labels, refreshFilesList, setDirty, setSearchQuery, searchRealm, setSearchRealm} = props;
+	const ref = useRef(null);
 	const searchRef = useRef(null);
+
+	const rootNode = useMemo(() => {
+		return ref.current?.getRootNode().querySelector('dialog');
+	}, [ref.current]);
 
 	useImperativeHandle(forwardedRef, () => ({
 		clearSearch: () => searchRef.current.value = '',
@@ -43,7 +49,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	}
 
 	return (
-		<ul role="menubar">
+		<ul role="menubar" ref={ref}>
 			<li role="menuitem" className="search-field">
 				<input
 					ref={searchRef}
@@ -53,12 +59,17 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					onKeyDown={handleSearch}
 				/>
 				<div>
-					<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
+					<Tooltip>
+						<TooltipTrigger>
+							<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
+						</TooltipTrigger>
+						<TooltipContent root={rootNode}>{gettext("Search for file")}</TooltipContent>
+					</Tooltip>
 					<DropDownMenu
 						role="menuitem"
 						wrapperElement="span"
 						className="search-realm with-caret"
-						tooltip={gettext("Restrict search")}
+						root={rootNode}
 					>
 						<li {...getItemProps('current')}>{gettext("From current folder")}</li>
 						<li {...getItemProps('everywhere')}>{gettext("In all folders")}</li>
@@ -68,12 +79,16 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					</DropDownMenu>
 				</div>
 			</li>
-			<SortingOptions refreshFilesList={refreshFilesList} />
-			{labels && <FilterByLabel refreshFilesList={refreshFilesList} labels={labels} />}
-			<li role="menuitem" onClick={openUploader} data-tooltip-id="django-finder-tooltip"
-				data-tooltip-content={gettext("Upload file")}>
-				<UploadIcon/>
-			</li>
+			<SortingOptions refreshFilesList={refreshFilesList} root={rootNode} />
+			{labels && <FilterByLabel refreshFilesList={refreshFilesList} labels={labels} root={rootNode} />}
+			<Tooltip>
+				<TooltipTrigger>
+					<li role="menuitem" onClick={openUploader}>
+						<UploadIcon/>
+					</li>
+				</TooltipTrigger>
+				<TooltipContent root={rootNode}>{gettext("Upload file")}</TooltipContent>
+			</Tooltip>
 		</ul>
 	);
 });

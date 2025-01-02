@@ -6,13 +6,13 @@ import React, {
 	useEffect,
 	useImperativeHandle,
 	useMemo,
-	useRef,
 	useState,
 } from 'react';
 import SearchField from './SearchField';
 import DropDownMenu from '../common/DropDownMenu';
 import FilterByLabel from '../common/FilterByLabel';
 import SortingOptions from '../common/SortingOptions';
+import {Tooltip, TooltipContent, TooltipTrigger} from '../common/Tooltip';
 import MoreVerticalIcon from '../icons/more-vertical.svg';
 import CopyIcon from '../icons/copy.svg';
 import TilesIcon from '../icons/tiles.svg';
@@ -126,6 +126,23 @@ function ExtraMenu(props) {
 				<MenuExtension key={index} extension={extension} {...props} />
 			))}
 		</DropDownMenu>
+	);
+}
+
+
+function MenuItem(props) {
+	const {children, tooltip} = props;
+	const itemProps = Object.fromEntries(Object.entries(props).filter(([key]) => !['children', 'tooltip'].includes(key)));
+
+	return (
+		<Tooltip>
+			<TooltipTrigger>
+				<li {...itemProps} role="menuitem">
+					{children}
+				</li>
+			</TooltipTrigger>
+			<TooltipContent>{tooltip}</TooltipContent>
+		</Tooltip>
 	);
 }
 
@@ -335,48 +352,37 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 				<li className="search-field" role="menuitem" style={{marginRight: 'auto'}}>
 					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
 				</li>
-				<li aria-selected={layout === 'tiles'} onClick={() => setLayout('tiles')}
-					role="menuitem" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Tiles view")}>
+				<MenuItem aria-selected={layout === 'tiles'} onClick={() => setLayout('tiles')} tooltip={gettext("Tiles view")}>
 					<TilesIcon/>
-				</li>
-				<li aria-selected={layout === 'mosaic'} onClick={() => setLayout('mosaic')}
-					role="menuitem" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Mosaic view")}><MosaicIcon/>
-				</li>
-				<li aria-selected={layout === 'list'} onClick={() => setLayout('list')}
-					role="menuitem" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("List view")}><ListIcon/>
-				</li>
-				<li aria-selected={layout === 'columns'} onClick={() => setLayout('columns')}
-					role="menuitem" data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Columns view")}>
+				</MenuItem>
+				<MenuItem aria-selected={layout === 'mosaic'} onClick={() => setLayout('mosaic')} tooltip={gettext("Mosaic view")}>
+					<MosaicIcon/>
+				</MenuItem>
+				<MenuItem aria-selected={layout === 'list'} onClick={() => setLayout('list')} tooltip={gettext("List view")}>
+					<ListIcon/>
+				</MenuItem>
+				<MenuItem aria-selected={layout === 'columns'} onClick={() => setLayout('columns')} tooltip={gettext("Columns view")}>
 					<ColumnsIcon/>
-				</li>
+				</MenuItem>
 				<SortingOptions refreshFilesList={refreshColumns} />
 				{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
-				<li aria-disabled={numSelectedInodes === 0} onClick={cutInodes}
-					role="menuitem" data-tooltip-id="django-finder-tooltip"
-					data-tooltip-content={gettext("Cut selected to clipboard")}>
+				<MenuItem aria-disabled={numSelectedInodes === 0} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
 					<CutIcon/>
-				</li>
+				</MenuItem>
 				{settings.is_trash ? (<>
-				<li aria-disabled={numSelectedInodes === 0} onClick={undoDiscardInodes}
-					role="menuitem" data-tooltip-id="django-finder-tooltip"
-					data-tooltip-content={gettext("Undo discarding files/folders")}>
-					<UndoIcon/>
-				</li>
-				<li className="erase" onClick={confirmEraseTrashFolder} data-tooltip-id="django-finder-tooltip"
-					role="menuitem" data-tooltip-content={gettext("Empty trash folder")}>
-					<EraseIcon/>
-				</li>
+					<MenuItem aria-disabled={numSelectedInodes === 0} onClick={undoDiscardInodes} tooltip={gettext("Undo discarding files/folders")}>
+						<UndoIcon/>
+					</MenuItem>
+					<MenuItem className="erase" onClick={confirmEraseTrashFolder} tooltip={gettext("Empty trash folder")}>
+						<EraseIcon/>
+					</MenuItem>
 				</>) : (<>
-					<li aria-disabled={clipboard.length === 0} onClick={pasteInodes}
-						role="menuitem" data-tooltip-id="django-finder-tooltip"
-						data-tooltip-content={gettext("Paste from clipboard")}>
+					<MenuItem aria-disabled={clipboard.length === 0} onClick={pasteInodes} tooltip={gettext("Paste from clipboard")}>
 						<PasteIcon/>
-					</li>
-					<li aria-disabled={numSelectedInodes === 0} onClick={deleteInodes}
-						role="menuitem" data-tooltip-id="django-finder-tooltip"
-						data-tooltip-content={gettext("Move selected to trash folder")}>
+					</MenuItem>
+					<MenuItem aria-disabled={numSelectedInodes === 0} onClick={deleteInodes} tooltip={gettext("Move selected to trash folder")}>
 						<TrashIcon/>
-					</li>
+					</MenuItem>
 					<ExtraMenu
 						numSelectedFiles={numSelectedFiles}
 						numSelectedInodes={numSelectedInodes}

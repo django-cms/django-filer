@@ -1,9 +1,10 @@
 import React, {useEffect, useRef} from 'react';
+import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 
 
 export default function DropDownMenu(props){
 	const ref = useRef(null);
-	const Wrapper = props.wrapperElement ?? 'li';
+	const WrapperElement = props.wrapperElement ?? 'li';
 
 	useEffect(() => {
 		const handleClick = (event) => {
@@ -38,19 +39,20 @@ export default function DropDownMenu(props){
 	}, []);
 
 	return (
-		<Wrapper
+		<WrapperElement
 			ref={ref}
 			role={props.role ? `combobox ${props.role}` : 'combobox'}
 			aria-haspopup="listbox"
 			aria-expanded="false"
 			className={props.className}
-			data-tooltip-id="django-finder-tooltip"
-			data-tooltip-content={props.tooltip}
 		>
-			{props.icon}
+			<Tooltip>
+				<TooltipTrigger><i>{props.icon}</i></TooltipTrigger>
+				<TooltipContent root={props.root}>{props.tooltip}</TooltipContent>
 			<ul role="listbox">
 				{props.children}
 			</ul>
-		</Wrapper>
+			</Tooltip>
+		</WrapperElement>
 	)
 }
