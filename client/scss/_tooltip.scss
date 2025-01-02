@@ -1,0 +1,12 @@
+@import "colors";
+
+.django-finder-tooltip {
+	background-color: $body-fg-color;
+	opacity: 0.9;
+	color: $body-bg-color;
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.25rem;
+	box-sizing: border-box;
+	width: max-content;
+	max-width: calc(100vw - 10px);
+}

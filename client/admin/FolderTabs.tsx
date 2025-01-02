@@ -1,5 +1,6 @@
 import {useDroppable} from '@dnd-kit/core';
 import React, {forwardRef, useImperativeHandle, useState} from 'react';
+import {Tooltip, TooltipContent, TooltipTrigger} from '../common/Tooltip';
 import CloseIcon from '../icons/close.svg';
 import PinIcon from '../icons/pin.svg';
 import RecycleIcon from '../icons/recycle.svg';
@@ -42,33 +43,61 @@ function FolderTab(props) {
 	}
 
 	if (folder.id === 'return') return (
-		<li ref={setNodeRef} className={cssClasses(folder)} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change to folder view")}>
-			<a href={settings.folder_url}><UpIcon /></a>
-		</li>
+		<Tooltip placement="top-start">
+			<TooltipTrigger>
+				<li ref={setNodeRef} className={cssClasses(folder)}>
+					<a href={settings.folder_url}><UpIcon /></a>
+				</li>
+			</TooltipTrigger>
+			<TooltipContent>{gettext("Change to folder view")}</TooltipContent>
+		</Tooltip>
 	);
 
 	if (folder.id === 'parent') return (
-		<li ref={setNodeRef} className={cssClasses(folder)} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Change to parent folder")}>
-			<a href={settings.parent_url}><UpIcon /></a>
-		</li>
+		<Tooltip placement="top-start">
+			<TooltipTrigger>
+				<li ref={setNodeRef} className={cssClasses(folder)}>
+					<a href={settings.parent_url}><UpIcon /></a>
+				</li>
+			</TooltipTrigger>
+			<TooltipContent>{gettext("Change to parent folder")}</TooltipContent>
+		</Tooltip>
 	);
 
 	if (folder.is_root) return (
-		<li ref={setNodeRef} className={cssClasses(folder)} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Root folder")}>
-		{!isActive || isSearchResult ? <a href={folder.change_url}><RootIcon /></a> : <RootIcon />}
-		</li>
+		<Tooltip placement="top-start">
+			<TooltipTrigger>
+				<li ref={setNodeRef} className={cssClasses(folder)}>
+				{!isActive || isSearchResult ? <a href={folder.change_url}><RootIcon /></a> : <RootIcon />}
+				</li>
+			</TooltipTrigger>
+			<TooltipContent>{gettext("Root folder")}</TooltipContent>
+		</Tooltip>
+	);
+
+	const TrashFolder = () => (
+		<Tooltip placement="top-end">
+			<TooltipTrigger><RecycleIcon /></TooltipTrigger>
+			<TooltipContent root={settings.rootNode}>{gettext("Trash folder")}</TooltipContent>
+		</Tooltip>
 	);
 
 	if (folder.is_trash) return (
-		<li ref={setNodeRef} className={cssClasses(folder)} data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Trash folder")}>
-			{!isActive || isSearchResult ? <a href={folder.change_url}><RecycleIcon /></a> : <RecycleIcon />}
+		<li ref={setNodeRef} className={cssClasses(folder)}>
+			{!isActive || isSearchResult ? <a href={folder.change_url}><TrashFolder /></a> : <TrashFolder />}
 		</li>
 	);
 
 	return (
 		<li ref={setNodeRef} className={cssClasses(folder)}>
 			{!isActive || isSearchResult || settings.download_url ? <a href={folder.change_url}>{folder.name}</a> : folder.name}
-			<span onClick={togglePin.bind(folder)}>{folder.is_pinned ? <CloseIcon /> : <PinIcon  data-tooltip-id="django-finder-tooltip" data-tooltip-content={gettext("Pin this folder")} />}</span>
+			<span onClick={togglePin.bind(folder)}>{folder.is_pinned ?
+				<CloseIcon /> :
+				<Tooltip placement="top">
+					<TooltipTrigger><PinIcon /></TooltipTrigger>
+					<TooltipContent>{gettext("Pin this folder")}</TooltipContent>
+				</Tooltip>
+			}</span>
 		</li>
 	);
 }

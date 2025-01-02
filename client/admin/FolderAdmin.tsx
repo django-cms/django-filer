@@ -5,7 +5,6 @@ import React, {
 	useRef,
 	useState
 } from 'react';
-import {Tooltip} from 'react-tooltip';
 import {
 	DndContext,
 	DragOverlay,
@@ -407,6 +406,5 @@ export default function FolderAdmin() {
 				</DragOverlay>
 			</div>
 		</DndContext>
-		<Tooltip id="django-finder-tooltip" place="bottom-start" />
 	</>);
 }

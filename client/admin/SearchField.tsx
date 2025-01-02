@@ -1,6 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {useSearchRealm} from '../common/Storage';
 import DropDownMenu from '../common/DropDownMenu';
+import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 import SearchIcon from '../icons/search.svg';
 
 
@@ -91,12 +92,16 @@ export default function SearchField(props) {
 			onKeyDown={handleSearch}
 		/>
 		<div>
-			<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
+			<Tooltip>
+				<TooltipTrigger>
+					<span className="search-icon" onClick={handleSearch}><SearchIcon/></span>
+				</TooltipTrigger>
+				<TooltipContent>{gettext("Search for file")}</TooltipContent>
+			</Tooltip>
 			<DropDownMenu
 				wrapperElement="span"
 				role="menuitem"
 				className="search-realm with-caret"
-				tooltip={gettext("Restrict search")}
 			>
 				<li {...getItemProps('current')}>{gettext("From current folder")}</li>
 				<li {...getItemProps('everywhere')}>{gettext("In all folders")}</li>

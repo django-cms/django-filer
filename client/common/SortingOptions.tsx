@@ -34,6 +34,7 @@ export default function SortingOptions(props: any) {
 			role="menuitem"
 			className="sorting-options with-caret"
 			tooltip={gettext("Change sorting order")}
+			root={props.root}
 		>
 			<li {...getItemProps('')}>
 				<span>{gettext("Unsorted")}</span>

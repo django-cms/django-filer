@@ -28,6 +28,7 @@ export default function FilterByLabel(props: any) {
 			aria-selected={filter.length}
 			className="filter-by-label with-caret"
 			tooltip={gettext("Filter by label")}
+			root={props.root}
 		>
 			<li role="option"><span onClick={() => changeFilter(null)}>{gettext("Clear all")}</span></li>
 			<hr/>{labels.map((label, index) => (

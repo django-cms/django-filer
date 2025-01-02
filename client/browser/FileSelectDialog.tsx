@@ -90,7 +90,7 @@ const FilesList = memo((props: any) => {
 });
 
 
-const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
+const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	const {realm, baseUrl, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
@@ -218,13 +218,13 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		if (structure.last_folder !== folderId)
 			throw new Error('Folder mismatch');
 		setUploadedFile(uploadedFiles[0]);
-	};
+	}
 
 	const selectFile = useCallback(fileInfo => {
 		props.selectFile(fileInfo);
 		setUploadedFile(null);
 		refreshFilesList();
-		props.closeDialog();
+		props.dialogRef.current.close();
 	}, []);
 
 	function scrollToCurrentFolder() {
@@ -251,7 +251,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef)=> {
 		}
 		setUploadedFile(null);
 		refreshFilesList();
-		props.closeDialog();
+		props.dialogRef.current.close();
 	}
 
 	console.log('FileSelectDialog', isDirty, structure);

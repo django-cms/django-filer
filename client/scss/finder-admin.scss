@@ -3,6 +3,7 @@
 @import "colors";
 @import "progress";
 @import "labels";
+@import "tooltip";
 
 // messagelist appears after saving a file
 ul.messagelist {
@@ -107,14 +108,18 @@ ul.messagelist {
 					background-color: var(--primary);
 				}
 
-				> svg {
+				> div {
+					display: inline-block;
+				}
+
+				svg {
 					height: 16px;
 					width: 16px;
 					margin: -2px 0;
 				}
 			}
 
-			> svg, > a > svg {
+			svg {
 				display: inline-block;
 				width: 24px;
 				height: 24px;
