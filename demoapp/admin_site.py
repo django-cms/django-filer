@@ -4,9 +4,11 @@ from finder.admin.folder import FolderAdmin
 from finder.models.folder import FolderModel
 
 
-class DempappAdminSite(admin.AdminSite):
-    pass
+class DemoappAdminSite(admin.AdminSite):
+    """
+    Test if django-filer also works in with multiple tennants.
+    """
 
 
-admin_site = DempappAdminSite(name="demoapp_admin")
+admin_site = DemoappAdminSite(name="demoapp_admin")
 admin_site.register(FolderModel, FolderAdmin)
