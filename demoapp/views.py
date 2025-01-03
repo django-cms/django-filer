@@ -1,17 +1,17 @@
 from django.views.generic.edit import UpdateView
 
-from testapp.models import TestAppModel
+from demoapp.models import DemoAppModel
 
 
-class TestAppView(UpdateView):
-    model = TestAppModel
+class DemoAppView(UpdateView):
+    model = DemoAppModel
     fields = '__all__'
-    template_name = 'testapp.html'
+    template_name = 'demoapp.html'
 
     def get_object(self, queryset=None):
-        if obj := TestAppModel.objects.first():
+        if obj := DemoAppModel.objects.first():
             return obj
-        return TestAppModel.objects.create()
+        return DemoAppModel.objects.create()
 
     def get_success_url(self):
         return self.request.path

@@ -4,9 +4,9 @@ from finder.admin.folder import FolderAdmin
 from finder.models.folder import FolderModel
 
 
-class TestappAdminSite(admin.AdminSite):
+class DempappAdminSite(admin.AdminSite):
     pass
 
 
-admin_site = TestappAdminSite(name="testapp_admin")
+admin_site = DempappAdminSite(name="demoapp_admin")
 admin_site.register(FolderModel, FolderAdmin)

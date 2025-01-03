@@ -43,20 +43,18 @@ INSTALLED_APPS = [
     'finder.contrib.image.pil',
     'finder.contrib.image.svg',
     'finder.contrib.video',
-    'testapp',
+    'demoapp',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'demoapp.middleware.AutoLoginMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
-ROOT_URLCONF = 'testapp.urls'
+ROOT_URLCONF = 'demoapp.urls'
 
 TEMPLATES = [
     {
@@ -103,19 +101,9 @@ USE_TZ = True
 
 TIME_ZONE = 'UTC'
 
-MIDDLEWARE = [
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'testapp.middleware.AutoLoginMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-]
-
 SILENCED_SYSTEM_CHECKS = ['admin.E408']  # required for AutoLoginMiddleware
 
 USE_I18N = True
-
-ROOT_URLCONF = 'testapp.urls'
 
 STATICFILES_DIRS = [
     ('node_modules', BASE_DIR / 'node_modules'),
@@ -126,8 +114,6 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = Path(os.getenv('DJANGO_MEDIA_ROOT', BASE_DIR / 'workdir/media'))
 
 MEDIA_URL = '/media/'
-
-WSGI_APPLICATION = 'wsgi.application'
 
 LOGGING = {
     'version': 1,

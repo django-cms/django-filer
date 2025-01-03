@@ -1,4 +1,4 @@
-"""testapp URL Configuration
+"""demoapp URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -20,13 +20,13 @@ from django.urls import include, path
 
 from finder.browser import urls as browser_urls
 
-from testapp.views import TestAppView
+from demoapp.views import DemoAppView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('finder-api/', include(browser_urls)),
-    path('testapp/', TestAppView.as_view(), name='testapp'),
+    path('finder-api/', include(browser_urls)),  # endpoints for demoapp
+    path('demoapp/', DemoAppView.as_view(), name='demoapp'),
 ]
 if settings.DEBUG:
     urlpatterns.extend(static(

@@ -1,7 +1,7 @@
 # Django-Filer ("Finder" branch)
 
 The "Finder" branch of django-filer is a complete rewrite of the original **django-filer** project.
-It is 'work in progress' and is not yet ready for production use. However, the code is in a state
+It is 'work in progress' and not yet ready for production use. However, the code is in a state
 where it can be used for testing and development purposes.
 
 A rewrite was necessary because the original codebase was not maintainable anymore. Please read this
@@ -136,7 +136,7 @@ In `settings.py` of your project, add these extra dependencies or those you real
         'finder',
         'finder.contrib.archive',  # supports zip, tar, tar.gz, tar.bz2, tar.xz
         'finder.contrib.audio',  # supports mp3, ogg, flac, wav
-        'finder.contrib.common',  # supports pdf, spreadsheets
+        'finder.contrib.common',  # supports PDF, spreadsheets
         'finder.contrib.image.pil',  # supports bmp, gif, jpeg, png, tiff
         'finder.contrib.image.svg',  # supports svg
         'finder.contrib.video',  # supports mp4, webm, ogv
@@ -145,10 +145,9 @@ In `settings.py` of your project, add these extra dependencies or those you real
 ```
 
 If you use:
-* `finder.contrib.audio`, assure that `ffmpeg-python` is installed.
+* `finder.contrib.audio` or `finder.contrib.video`, assure that `ffmpeg-python` is installed.
 * `finder.contrib.image.pil`, assure that `Pillow` is installed.
 * `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
-* `finder.contrib.video`, assure that `ffmpeg-python` is installed.
 * Postgres as database, install `psycopg2` or `psycopg2-binary` if available for your platform.
 
 Run the migrations for app `finder`:
@@ -233,9 +232,9 @@ rendered as HTML, this widget becomes the webcomponent `<finder-file-select …>
 with a few additional attributes. The JavaScript part of the widget must be included using the
 script tag `<script src="{% static 'finder/js/finder-select.js' %}"></script>`.
 
-The testapp provides an example how this field can be used in a form. Just vist the URL
-http://localhost:8000/admin/finder/foldermodel/ and click on the blank area to either select an
-existing file or upload a  new one.
+The demonstration app provides an example how this field can be used in a form. Just vist the URL
+http://localhost:8000/demoapp/ and click on the blank area to either select an existing file or
+upload a new one.
 
 
 ## Permission System (Proposal)
@@ -261,7 +260,7 @@ Each `AccessControlEntry` has a these fields:
   a file, it allows the currently loggedin user to view and use that file.
 * A generic foreign key pointing onto the `InodeModel`. This creates a one-to-many relation between
   different file types and folders on one side and the access control list on the other.
-* A foreign key onto the folder model to set a permission template. Read below for details. 
+* A foreign key onto the folder model to set a permission template. Read below for details.
 * The `execute` flag as seen in Unix file systems and other ACL implementations does not make sense
   in this context and is not implemented.
 
