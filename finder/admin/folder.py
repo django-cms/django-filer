@@ -236,7 +236,7 @@ class FolderAdmin(InodeAdmin):
         try:
             filename_validator(inode_name)
         except ValidationError as exc:
-            return HttpResponseBadRequest(exc.message, status=409)
+            return HttpResponseBadRequest(exc.messages[0], status=409)
         if current_folder.listdir(name=inode_name, is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=inode_name), status=409)
@@ -296,8 +296,8 @@ class FolderAdmin(InodeAdmin):
                 proxy_obj.parent = target_folder
                 proxy_obj.validate_constraints()
                 proxy_obj._meta.model.objects.filter(id=entry['id']).update(parent=target_folder)
-        except ValidationError as e:
-            return HttpResponseBadRequest(e.message, status=409)
+        except ValidationError as exc:
+            return HttpResponseBadRequest(exc.messages[0], status=409)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_folder)),
         })
