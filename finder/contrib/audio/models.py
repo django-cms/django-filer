@@ -35,7 +35,7 @@ class AudioFileModel(FileModel):
             stream = ffmpeg.output(stream, default_storage.path(sample_path))
             try:
                 ffmpeg.run(stream)
-            except ffmpeg.Error as exp:
+            except ffmpeg.Error:
                 return self.fallback_thumbnail_url
         return default_storage.url(sample_path)
 

@@ -1,14 +1,14 @@
 import json
 
 from django.contrib import admin
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import QuerySet, Subquery
 
 from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.templatetags.static import static
 from django.urls import path, reverse
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
 from django.utils.html import format_html
 
 from finder.models.file import InodeModel, FileModel
@@ -23,13 +23,6 @@ from .inode import InodeAdmin
 class FolderAdmin(InodeAdmin):
     form_template = 'finder/admin/change_folder_form.html'
     _model_admin_cache = {}
-    _legends = {
-        'name': _("Name"),
-        'owner_name': _("Owner"),
-        'details': _("Details"),
-        'created_at': _("Created at"),
-        'mime_type': _("Mime type"),
-    }
 
     @property
     def media(self):
@@ -100,9 +93,11 @@ class FolderAdmin(InodeAdmin):
         return False
 
     def change_view(self, request, inode_id, **kwargs):
-        inode_obj = self.get_object(request, inode_id)
-        if inode_obj is None:
-            return self._get_obj_does_not_exist_redirect(request, self.model._meta, str(inode_id))
+        try:
+            inode_obj = self.get_object(request, inode_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound(f"InodeModel<{inode_id}> not found.")
+
         if inode_obj.is_folder:
             return super().change_view(request, str(inode_id), **kwargs)
 
@@ -146,7 +141,6 @@ class FolderAdmin(InodeAdmin):
         settings.update(
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             ancestors=ancestor_ids,
-            legends=self._legends,
             menu_extensions=self.get_menu_extension_settings(request),
         )
         return settings
@@ -155,9 +149,9 @@ class FolderAdmin(InodeAdmin):
         extensions = []
         for model in InodeModel.get_models(include_proxy=True):
             if model_admin := self.admin_site._registry.get(model):
-                    extension = model_admin.get_menu_extension_settings(request)
-                    if extension.get('component'):
-                        extensions.append(extension)
+                extension = model_admin.get_menu_extension_settings(request)
+                if extension.get('component'):
+                    extensions.append(extension)
         return extensions
 
     def get_model_admin(self, mime_type):
@@ -361,8 +355,8 @@ class FolderAdmin(InodeAdmin):
     def add_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        if not (parent_folder := self.get_object(request, folder_id)):
-            return HttpResponseNotFound(f"Folder {folder_id} not found.")
+        parent_folder = self.get_object(request, folder_id)
+        assert parent_folder.is_folder
         body = json.loads(request.body)
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
@@ -378,7 +372,7 @@ class FolderAdmin(InodeAdmin):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         if not (folder := self.get_object(request, folder_id)):
-            return HttpResponseNotFound(f"Folder {folder_id} not found.")
+            return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         body = json.loads(request.body)
         for folder_name in body['relative_path'].split('/'):
             folder, _ = FolderModel.objects.get_or_create(

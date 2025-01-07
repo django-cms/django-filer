@@ -4,6 +4,11 @@ from django.utils.translation import gettext_lazy as _
 
 
 class RealmModel(models.Model):
+    """
+    The RealmModel is the top-level container for each tennant. This usually is associated with a
+    Django Admin Site.
+    Each RealmModel has one root folder and a trash folder per user.
+    """
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,

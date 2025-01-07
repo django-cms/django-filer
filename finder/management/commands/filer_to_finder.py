@@ -1,9 +1,9 @@
 from pathlib import Path
 
+from django.conf import settings
 from django.contrib.admin import site as admin_site
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from easy_thumbnails.conf import settings
 
 from filer.models.filemodels import Folder as FilerFolder
 from filer.models.imagemodels import Image as FilerImage

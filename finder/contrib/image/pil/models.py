@@ -87,7 +87,7 @@ class PILImageModel(ImageFileModel):
                 image.thumbnail((self.thumbnail_size, self.thumbnail_size))
                 (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
                 image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
-            except Exception as exception:
+            except Exception:
                 # thumbnail image could not be created
                 return self.fallback_thumbnail_url
         return default_storage.url(thumbnail_path)

@@ -1,7 +1,7 @@
 import json
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.forms.widgets import TextInput, SelectMultiple
+from django.forms.widgets import TextInput
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import format_html
@@ -13,7 +13,7 @@ class FinderFileSelect(TextInput):
     template_name = 'finder/widgets/finder_file_select.html'
 
     class Media:
-        css={'all': ['finder/css/finder-select.css']}
+        css = {'all': ['finder/css/finder-select.css']}
         js = [format_html(
             '<script type="module" src="{}"></script>',
             static('finder/js/finder-select.js')

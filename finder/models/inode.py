@@ -89,8 +89,8 @@ class InodeManagerMixin:
 
     def filter_unified(self, **lookup):
         """
-        Returns a unified QuerySet of all folders and files with fields from all involved models inheriting
-        from InodeModel. The QuerySet is filtered by the given lookup parameters.
+        Returns a unified QuerySet of all folders and files with fields from all involved models
+        inheriting from InodeModel. The QuerySet is filtered by the given lookup parameters.
         Entries are represented as dictionaries rather than model instances.
         """
         from .file import FileModel
@@ -147,12 +147,9 @@ class InodeManagerMixin:
             folder_qs = FolderModel.objects.none()
         elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
             return folder_qs.get()
-        try:
-            values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
-                model.objects.values('id', 'mime_type').filter(**lookup) for model in FileModel.get_models()
-            ]).get()
-        except FolderModel.DoesNotExist as exc:
-            raise FileModel.DoesNotExist(exc)
+        values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
+            model.objects.values('id', 'mime_type').filter(**lookup) for model in FileModel.get_models()
+        ]).get()
         return FileModel.objects.get_model_for(values['mime_type']).objects.get(id=values['id'])
 
     @classmethod
@@ -176,7 +173,6 @@ class InodeManager(InodeManagerMixin, models.Manager):
     def get_queryset(self):
         queryset = super().get_queryset().select_related('parent')
         return queryset.filter(self.model.mime_types_query())
-
 
 
 def filename_validator(value):

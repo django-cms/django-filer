@@ -1,6 +1,8 @@
 [run]
 branch = True
-source = filer
+source =
+    finder
+    demoapp/unittests
 omit =
     migrations/*
     tests/*

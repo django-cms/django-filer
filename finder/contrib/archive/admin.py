@@ -31,13 +31,13 @@ class ArchiveAdmin(FileAdmin):
         return urls
 
     def get_menu_extension_urls(self):
-        urls = [
+        urls = super().get_menu_extension_urls()
+        urls.append(
             path(
                 '<uuid:folder_id>/archive',
                 self.admin_site.admin_view(self.archive_selected),
             ),
-        ]
-        urls.extend(super().get_menu_extension_urls())
+        )
         return urls
 
     def archive_selected(self, request, folder_id):
@@ -165,14 +165,5 @@ class ArchiveAdmin(FileAdmin):
     def get_menu_extension_settings(self, request):
         return {'component': 'Archive'}
 
-    def get_menu_extension_urls(self):
-        urls = super().get_menu_extension_urls()
-        urls.append(
-            path(
-                '<uuid:folder_id>/archive',
-                self.admin_site.admin_view(self.archive_selected),
-            ),
-        )
-        return urls
 
 admin.site.register(ArchiveModel, ArchiveAdmin)

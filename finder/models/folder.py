@@ -14,7 +14,7 @@ except ImportError:
     ModelManager = models.Manager
 
 from .inode import InodeManagerMixin, InodeModel
-from.realm import RealmModel
+from .realm import RealmModel
 
 
 class FolderModelManager(InodeManagerMixin, ModelManager):
