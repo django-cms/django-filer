@@ -2,10 +2,8 @@
 branch = True
 source =
     finder
-    demoapp/unittests
 omit =
     migrations/*
-    tests/*
 
 [report]
 exclude_lines =

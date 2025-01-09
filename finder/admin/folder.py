@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import QuerySet, Subquery
 
 from django.forms.widgets import Media
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
+from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.templatetags.static import static
 from django.urls import path, reverse
 from django.utils.translation import gettext
@@ -175,8 +175,12 @@ class FolderAdmin(InodeAdmin):
         return self._model_admin_cache[mime_type]
 
     def fetch_inodes(self, request, folder_id):
-        if not (current_folder := self.get_object(request, folder_id)):
-            return HttpResponseNotFound(f"Folder {folder_id} not found.")
+        if request.method != 'GET':
+            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
+        try:
+            current_folder = self.get_object(request, folder_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if search_query := request.GET.get('q'):
             inode_qs = self.search_for_inodes(request, current_folder, search_query)
         else:
@@ -204,11 +208,13 @@ class FolderAdmin(InodeAdmin):
 
     def upload_file(self, request, folder_id):
         if request.method != 'POST':
-            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
-        if not (folder := self.get_object(request, folder_id)):
-            return HttpResponseNotFound(f"Folder {folder_id} not found.")
+            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
+        try:
+            folder = self.get_object(request, folder_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
-            return HttpResponseBadRequest("Bad encoding type or missing payload.")
+            return HttpResponse("Bad encoding type or missing payload.", status=415)
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         new_file = model.objects.create_from_upload(
             request.FILES['upload_file'],
@@ -223,17 +229,17 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         try:
             obj = self.get_object(request, body['id'])
-        except (InodeModel.DoesNotExist, KeyError):
-            return HttpResponseNotFound(f"Inode(id={body.get('id', '<missing>')}) not found.")
+        except (ObjectDoesNotExist, KeyError):
+            return HttpResponseNotFound(f"InodeModel<id={body.get('id', '<missing>')}> not found.")
         current_folder = self.get_object(request, folder_id)
         inode_name = body['name']
         try:
             filename_validator(inode_name)
         except ValidationError as exc:
-            return HttpResponseBadRequest(exc.messages[0], status=409)
+            return HttpResponse(exc.messages[0], status=409)
         if current_folder.listdir(name=inode_name, is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
-            return HttpResponseBadRequest(msg.format(name=inode_name), status=409)
+            return HttpResponse(msg.format(name=inode_name), status=409)
         update_values = {}
         for field in self.get_fields(request, obj):
             if field in body and body[field] != getattr(obj, field):
@@ -241,15 +247,9 @@ class FolderAdmin(InodeAdmin):
                 update_values[field] = body[field]
         if update_values:
             obj.save(update_fields=list(update_values.keys()))
-        favorite_folders = self.get_favorite_folders(request, current_folder)
-        if update_values:
-            for folder in favorite_folders:
-                if folder['id'] == obj.id:
-                    folder.update(update_values)
-                    break
         return JsonResponse({
             'new_inode': self.serialize_inode(obj),
-            'favorite_folders': favorite_folders,
+            'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
     def copy_inodes(self, request, folder_id):
@@ -263,7 +263,7 @@ class FolderAdmin(InodeAdmin):
             try:
                 inode.copy_to(current_folder, owner=request.user)
             except RecursionError as exc:
-                return HttpResponseBadRequest(str(exc), status=409)
+                return HttpResponse(str(exc), status=409)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=current_folder)),
         })
@@ -291,7 +291,7 @@ class FolderAdmin(InodeAdmin):
                 proxy_obj.validate_constraints()
                 proxy_obj._meta.model.objects.filter(id=entry['id']).update(parent=target_folder)
         except ValidationError as exc:
-            return HttpResponseBadRequest(exc.messages[0], status=409)
+            return HttpResponse(exc.messages[0], status=409)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_folder)),
         })
@@ -303,7 +303,7 @@ class FolderAdmin(InodeAdmin):
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
-            return HttpResponseBadRequest("Cannot move inodes from trash folder into itself.")
+            return HttpResponse("Cannot move inodes from trash folder into itself.", status=409)
         inode_ids = body.get('inode_ids', [])
         for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
             inode = FolderModel.objects.get_inode(id=entry['id'])
@@ -324,7 +324,7 @@ class FolderAdmin(InodeAdmin):
 
     def undo_discarded_inodes(self, request):
         if request.method != 'POST':
-            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
+            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
         body = json.loads(request.body)
         trash_folder = self.get_trash_folder(request)
         discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
@@ -337,7 +337,7 @@ class FolderAdmin(InodeAdmin):
 
     def erase_trash_folder(self, request):
         if request.method != 'DELETE':
-            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
+            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
         trash_folder_entries = self.get_trash_folder(request).listdir()
         DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
         for entry in trash_folder_entries:
@@ -360,7 +360,7 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
-            return HttpResponseBadRequest(msg.format(name=body['name']), status=409)
+            return HttpResponse(msg.format(name=body['name']), status=409)
         new_folder = FolderModel.objects.create(
             name=body['name'],
             parent=parent_folder,

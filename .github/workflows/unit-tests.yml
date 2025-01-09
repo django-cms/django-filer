@@ -23,29 +23,22 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12"]
         django-version: ["5.2.*"]
-        node-version: ["18.x"]
+        with-cte: [true, false]
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        npm install --include=dev
         python -m pip install --upgrade pip
         python -m pip install https://github.com/django/django/archive/refs/heads/main.zip
-        python -m pip install django-cte django-entangled ffmpeg-python pillow reportlab svglib
+        python -m pip install django-entangled ffmpeg-python pillow reportlab svglib
         python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov
-    - name: Build Client
-      run: |
-        npm run compilescss
-        npm run esbuild
+    - if: ${{ matrix.with-cte }}
+      run: python -m pip install django-cte
     - name: Test with pytest
       run: |
-        python -m pytest -v demoapp/unittests
+        python -m pytest -v unittests

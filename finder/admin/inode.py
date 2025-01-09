@@ -1,10 +1,15 @@
 import json
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from django.contrib import admin
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
-from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
+from django.http.response import (
+    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect,
+    JsonResponse,
+)
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -32,10 +37,15 @@ class InodeAdmin(admin.ModelAdmin):
 
     def check_for_valid_post_request(self, request, folder_id):
         if request.method != 'POST':
-            return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
+            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if request.content_type != 'application/json':
-            return HttpResponseBadRequest(f"Invalid content-type {request.content_type}. Only application/json is allowed.")
-        if self.get_object(request, folder_id) is None:
+            return HttpResponse(
+                f"Invalid content-type {request.content_type}. Only application/json is allowed.",
+                status=415,
+            )
+        try:
+            self.get_object(request, folder_id)
+        except ObjectDoesNotExist:
             return HttpResponseNotFound(f"Folder with id “{folder_id}” not found.")
 
     def toggle_pin(self, request, folder_id):

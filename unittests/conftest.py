@@ -6,10 +6,9 @@ from django.core.management import call_command
 from django.contrib.admin.sites import site as admin_site
 from django.urls import reverse
 
-from finder.models.realm import RealmModel
 from finder.models.folder import FolderModel
 
-from ..utils import create_random_image
+from .utils import create_random_image
 
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
@@ -17,9 +16,8 @@ os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 @pytest.fixture(autouse=True, scope='session')
 def create_assets():
     os.makedirs(settings.BASE_DIR / 'workdir/assets', exist_ok=True)
-    for counter in range(10):
-        image = create_random_image()
-        image.save(settings.BASE_DIR / 'workdir/assets' / f'image_{counter:01d}.png')
+    image = create_random_image()
+    image.save(settings.BASE_DIR / 'workdir/assets/demo_image.png')
 
 
 @pytest.fixture(scope='session')
