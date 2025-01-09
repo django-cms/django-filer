@@ -77,6 +77,8 @@
 						}
 
 						.search-icon {
+							display: inline-block;
+							height: 100%;
 							svg {
 								transform: scale(0.8);
 							}

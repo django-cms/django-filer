@@ -100,9 +100,12 @@ ul.messagelist {
 
 			span {
 				cursor: pointer;
-				margin-left: 10px;
+				margin-left: 5px;
 				color: var(--link-fg);
 				border-radius: 50%;
+				display: inline-block;
+				width: 20px;
+
 				&:hover {
 					color: var(--link-hover-color);
 					background-color: var(--primary);
@@ -115,7 +118,7 @@ ul.messagelist {
 				svg {
 					height: 16px;
 					width: 16px;
-					margin: -2px 0;
+					margin: -2px 2px;
 				}
 			}
 
