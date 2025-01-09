@@ -13,7 +13,7 @@ from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
 from filer import settings as filer_settings
-from finder.contrib.image.models import ImageFileModel
+from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 from finder.models.realm import RealmModel
 
@@ -72,13 +72,14 @@ def test_access_folder_not_found(admin_client):
 
 
 @pytest.mark.django_db
-def test_folder_upload_file(realm, admin_client):
+@pytest.mark.parametrize('binary_file', ['small_file.bin', 'huge_file.bin'])
+def test_folder_upload_file(realm, admin_client, binary_file):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': realm.root_folder.id})
     sha1 = hashlib.sha1()
-    with open(settings.BASE_DIR / 'workdir/assets/demo_image.png', 'rb') as file_handle:
+    with open(settings.BASE_DIR / 'workdir/assets' / binary_file, 'rb') as file_handle:
         response = admin_client.post(
             f'{admin_url}/upload',
-            {'upload_file': file_handle, 'filename': 'demo_image.png'},
+            {'upload_file': file_handle, 'filename': binary_file},
             content_type=MULTIPART_CONTENT % {'boundary': 'BoUnDaRyStRiNg'},
         )
         file_handle.seek(0)
@@ -87,15 +88,14 @@ def test_folder_upload_file(realm, admin_client):
     assert response.status_code == 200
     file_info = response.json()['file_info']
     id = file_info['id']
-    assert file_info['name'] == 'demo_image.png'
-    assert file_info['file_size'] == os.stat(settings.BASE_DIR / 'workdir/assets/demo_image.png').st_size
+    assert file_info['name'] == binary_file
+    assert file_info['file_size'] == os.stat(settings.BASE_DIR / 'workdir/assets' / binary_file).st_size
     assert file_info['sha1'] == sha1.hexdigest()
-    assert file_info['mime_type'] == 'image/png'
+    assert file_info['mime_type'] == 'application/octet-stream'
     filer_public = filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX']
-    assert file_info['download_url'] == f'{settings.MEDIA_URL}{filer_public}/{id[0:2]}/{id[2:4]}/{id}/demo_image.png'
-    filer_public_thumbnails = filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
-    assert file_info['thumbnail_url'] == f'{settings.MEDIA_URL}{filer_public_thumbnails}/{id[0:2]}/{id[2:4]}/{id}/demo_image__180x180.png'
-    assert ImageFileModel.objects.filter(id=id).exists()
+    assert file_info['download_url'] == f'{settings.MEDIA_URL}{filer_public}/{id[0:2]}/{id[2:4]}/{id}/{binary_file}'
+    assert file_info['thumbnail_url'] == f'{settings.STATIC_URL}filer/icons/file-unknown.svg'
+    assert FileModel.objects.filter(id=id).exists()
 
     # with wrong method
     response = admin_client.get(admin_url + '/upload')
@@ -114,11 +114,11 @@ def test_folder_upload_file(realm, admin_client):
 
 
 @pytest.fixture
-def uploaded_image(realm, admin_user):
-    file_name = 'demo_image.png'
+def uploaded_file(realm, admin_user):
+    file_name = 'small_file.bin'
     with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
-        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='image/png')
-    return ImageFileModel.objects.create_from_upload(
+        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
+    return FileModel.objects.create_from_upload(
         uploaded_file,
         folder=realm.root_folder,
         owner=admin_user,
@@ -135,21 +135,21 @@ def sub_folder(realm, admin_user):
 
 
 @pytest.mark.django_db
-def test_folder_fetch(realm, uploaded_image, admin_client):
+def test_folder_fetch(realm, uploaded_file, admin_client):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': realm.root_folder.id})
     response = admin_client.get(f'{admin_url}/fetch')
     assert response.status_code == 200
     inodes = response.json()['inodes']
-    assert ImageFileModel.objects.filter(parent=realm.root_folder, id=inodes[0]['id']).exists()
+    assert FileModel.objects.filter(parent=realm.root_folder, id=inodes[0]['id']).exists()
 
     # found using search query
-    response = admin_client.get(f'{admin_url}/fetch?q=demo')
+    response = admin_client.get(f'{admin_url}/fetch?q=small')
     assert response.status_code == 200
     inodes = response.json()['inodes']
-    assert ImageFileModel.objects.filter(parent=realm.root_folder, id=inodes[0]['id']).exists()
+    assert FileModel.objects.filter(parent=realm.root_folder, id=inodes[0]['id']).exists()
 
     # not found using search query
-    response = admin_client.get(f'{admin_url}/fetch?q=nemo')
+    response = admin_client.get(f'{admin_url}/fetch?q=foobar')
     assert response.status_code == 200
     inodes = response.json()['inodes']
     assert len(inodes) == 0
@@ -172,42 +172,42 @@ def update_inode_url(realm):
 
 
 @pytest.mark.django_db
-def test_update_inode_nothing_changed(update_inode_url, uploaded_image, admin_client):
+def test_update_inode_change_nothing(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
-        {'id': str(uploaded_image.id), 'name': 'demo_image.png'},
+        {'id': str(uploaded_file.id), 'name': uploaded_file.name},
         content_type='application/json',
     )
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_update_inode_update_filename(update_inode_url, uploaded_image, admin_client):
+def test_update_inode_rename_file(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
-        {'id': str(uploaded_image.id), 'name': 'renamed_image.png'},
+        {'id': str(uploaded_file.id), 'name': "renamed_file.bin"},
         content_type='application/json',
     )
     assert response.status_code == 200
-    uploaded_image.refresh_from_db()
-    assert uploaded_image.name == 'renamed_image.png'
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.name == "renamed_file.bin"
 
 
 @pytest.mark.django_db
-def test_update_inode_update_using_invalid_filename(update_inode_url, uploaded_image, admin_client):
+def test_update_inode_update_using_invalid_filename(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
-        {'id': str(uploaded_image.id), 'name': 'invalid:name'},
+        {'id': str(uploaded_file.id), 'name': 'invalid:name'},
         content_type='application/json',
     )
     assert response.status_code == 409
 
 
 @pytest.mark.django_db
-def test_update_inode_using_existing_folder_name(update_inode_url, uploaded_image, sub_folder, admin_client):
+def test_update_inode_using_existing_folder_name(update_inode_url, uploaded_file, sub_folder, admin_client):
     response = admin_client.post(
         update_inode_url,
-        {'id': str(uploaded_image.id), 'name': "Sub Folder"},
+        {'id': str(uploaded_file.id), 'name': "Sub Folder"},
         content_type='application/json',
     )
     assert response.status_code == 409
@@ -226,10 +226,10 @@ def test_update_inode_rename_folder(update_inode_url, sub_folder, admin_client):
 
 
 @pytest.mark.django_db
-def test_update_inode_update_with_missing_content_type(update_inode_url, uploaded_image, admin_client):
+def test_update_inode_update_with_missing_content_type(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
-        {'id': str(uploaded_image.id), 'name': 'renamed_image.png'},
+        {'id': str(uploaded_file.id), 'name': 'renamed_file.bin'},
     )
     assert response.status_code == 415
 

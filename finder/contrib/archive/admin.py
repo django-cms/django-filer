@@ -53,7 +53,7 @@ class ArchiveAdmin(FileAdmin):
         for inode_id in body['inode_ids']:
             try:
                 inode_obj = FolderModel.objects.get_inode(id=inode_id)
-            except FolderModel.DoesNotExist:
+            except ObjectDoesNotExist:
                 return HttpResponseBadRequest(f"Inode with ID “{inode_id}” not found")
             else:
                 inode_objects.append(inode_obj)

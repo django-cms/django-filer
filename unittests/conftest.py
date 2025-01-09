@@ -1,5 +1,6 @@
 import os
 import pytest
+import random
 
 from django.conf import settings
 from django.core.management import call_command
@@ -16,6 +17,10 @@ os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 @pytest.fixture(autouse=True, scope='session')
 def create_assets():
     os.makedirs(settings.BASE_DIR / 'workdir/assets', exist_ok=True)
+    with open(settings.BASE_DIR / 'workdir/assets/small_file.bin', 'wb') as handle:
+        handle.write(random.randbytes(1000))
+    with open(settings.BASE_DIR / 'workdir/assets/huge_file.bin', 'wb') as handle:
+        handle.write(random.randbytes(100000))
     image = create_random_image()
     image.save(settings.BASE_DIR / 'workdir/assets/demo_image.png')
 
@@ -23,6 +28,10 @@ def create_assets():
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_blocker):
     database_file = settings.BASE_DIR / 'workdir/test_db.sqlite3'
+    try:
+        os.remove(database_file)
+    except FileNotFoundError:
+        pass
     settings.DATABASES['default']['NAME'] = database_file
     with django_db_blocker.unblock():
         call_command('migrate', verbosity=0)

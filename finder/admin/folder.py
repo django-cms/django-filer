@@ -228,7 +228,7 @@ class FolderAdmin(InodeAdmin):
             return response
         body = json.loads(request.body)
         try:
-            obj = self.get_object(request, body['id'])
+            inode_obj = self.get_object(request, body['id'])
         except (ObjectDoesNotExist, KeyError):
             return HttpResponseNotFound(f"InodeModel<id={body.get('id', '<missing>')}> not found.")
         current_folder = self.get_object(request, folder_id)
@@ -241,14 +241,14 @@ class FolderAdmin(InodeAdmin):
             msg = gettext("A folder named “{name}” already exists.")
             return HttpResponse(msg.format(name=inode_name), status=409)
         update_values = {}
-        for field in self.get_fields(request, obj):
-            if field in body and body[field] != getattr(obj, field):
-                setattr(obj, field, body[field])
+        for field in self.get_fields(request, inode_obj):
+            if field in body and body[field] != getattr(inode_obj, field):
+                setattr(inode_obj, field, body[field])
                 update_values[field] = body[field]
         if update_values:
-            obj.save(update_fields=list(update_values.keys()))
+            inode_obj.save(update_fields=list(update_values.keys()))
         return JsonResponse({
-            'new_inode': self.serialize_inode(obj),
+            'new_inode': self.serialize_inode(inode_obj),
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
