@@ -15,7 +15,7 @@ SAMPLE_DURATION = 5
 class AudioFileModel(FileModel):
     accept_mime_types = ['audio/mpeg', 'audio/ogg', 'audio/wav', 'audio/x-wav', 'audio/opus']
     editor_component = folderitem_component = 'Audio'
-    fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-audio.svg')
+    fallback_thumbnail_url = staticfiles_storage.url('finder/icons/file-audio.svg')
     filer_public_thumbnails = Path(
         filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
     )

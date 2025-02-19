@@ -15,7 +15,7 @@ class VideoFileModel(FileModel):
     accept_mime_types = ['video/mp4']
     editor_component = folderitem_component = 'Video'
     thumbnail_size = 180
-    fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-video.svg')
+    fallback_thumbnail_url = staticfiles_storage.url('finder/icons/file-video.svg')
     filer_public_thumbnails = Path(
         filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
     )

@@ -45,4 +45,5 @@ data
 local.sqlite
 
 workdir*/
-finder/static/finder/
+finder/static/finder/css/
+finder/static/finder/js/

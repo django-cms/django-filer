@@ -17,7 +17,7 @@ class ImageFileModel(AbstractFileModel):
         filer_settings.FILER_STORAGES['public']['thumbnails']['THUMBNAIL_OPTIONS']['base_dir']
     )
     thumbnail_size = 180
-    fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-picture.svg')
+    fallback_thumbnail_url = staticfiles_storage.url('finder/icons/file-picture.svg')
 
     width = models.SmallIntegerField(default=0)
     height = models.SmallIntegerField(default=0)

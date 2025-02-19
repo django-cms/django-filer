@@ -164,7 +164,7 @@ class FolderModel(InodeModel):
         return None
 
     def get_thumbnail_url(self):
-        return staticfiles_storage.url('filer/icons/folder.svg')
+        return staticfiles_storage.url('finder/icons/folder.svg')
 
     def listdir(self, **lookup):
         """

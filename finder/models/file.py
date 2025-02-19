@@ -65,7 +65,7 @@ class FileModelManager(InodeManager):
 class AbstractFileModel(InodeModel):
     data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type', 'labels']
     filer_public = Path(filer_settings.FILER_STORAGES['public']['main']['UPLOAD_TO_PREFIX'])
-    fallback_thumbnail_url = staticfiles_storage.url('filer/icons/file-unknown.svg')
+    fallback_thumbnail_url = staticfiles_storage.url('finder/icons/file-unknown.svg')
     browser_component = editor_component = folderitem_component = None
 
     file_name = models.CharField(
