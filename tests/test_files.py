@@ -1,7 +1,5 @@
 import string
-
 from django.test import TestCase
-
 from filer.utils.files import get_valid_filename
 
 
@@ -17,17 +15,13 @@ class GetValidFilenameTest(TestCase):
     def test_long_filename_is_truncated_and_suffix_appended(self):
         """
         Test that a filename longer than the maximum allowed length is truncated and a random
-        hexadecimal suffix is appended. The final filename must not exceed 255 characters.
+        hexadecimal suffix of length 16 is appended, resulting in exactly 255 characters.
         """
-        # Create a filename that is much longer than 255 characters.
-        base = "a" * 300  # 300 characters
+        base = "a" * 300  # 300 characters base
         original = f"{base}.jpg"
         result = get_valid_filename(original)
-        # Assert that the result is within the maximum allowed length.
-        self.assertTrue(len(result) <= 255, "Filename exceeds 255 characters.")
-
-        # When truncated, the filename should end with a random hexadecimal suffix of length 16.
-        # We check that the suffix contains only hexadecimal digits.
+        self.assertEqual(len(result), 255, "Filename length should be exactly 255 characters.")
+        # Verify that the last 16 characters form a valid hexadecimal string.
         random_suffix = result[-16:]
         valid_hex_chars = set(string.hexdigits)
         self.assertTrue(all(c in valid_hex_chars for c in random_suffix),
@@ -39,33 +33,65 @@ class GetValidFilenameTest(TestCase):
         """
         original = "This is a test IMAGE.JPG"
         result = get_valid_filename(original)
-        # Since slugification converts characters to lowercase, we expect ".jpg"
         self.assertTrue(result.endswith(".jpg"),
                         "File extension was not preserved correctly.")
 
     def test_unicode_characters(self):
         """
-        Test that filenames with Unicode characters are handled correctly and result in a valid filename.
+        Test that filenames with Unicode characters are handled correctly.
         """
         original = "fiłęñâmé_üñîçødé.jpeg"
         result = get_valid_filename(original)
-        # Verify that the result ends with the expected extension and contains only allowed characters.
-        self.assertTrue(result.endswith(".jpeg"), "File extension is not preserved for unicode filename.")
-        # Optionally, check that no unexpected characters remain (depends on your slugify behavior).
+        self.assertTrue(result.endswith(".jpeg"),
+                        "File extension is not preserved for unicode filename.")
+        # Verify that the resulting filename contains only allowed characters.
+        allowed_chars = set(string.ascii_lowercase + string.digits + "._-")
         for char in result:
-            # Allow only alphanumeric characters, underscores, dashes, and the dot.
-            self.assertIn(char, string.ascii_lowercase + string.digits + "._-",
+            self.assertIn(char, allowed_chars,
                           f"Unexpected character '{char}' found in filename.")
 
     def test_edge_case_exact_length(self):
         """
-        Test an edge case where the filename is exactly the maximum allowed length.
-        The function should leave such a filename unchanged.
+        Test that a filename exactly at the maximum allowed length remains unchanged.
         """
-        # Create a filename that is exactly 255 characters long.
-        base = "b" * 251  # 251 characters for base
-        original = f"{base}.png"  # This may reach exactly or slightly above 255 depending on slugification
+        extension = ".png"
+        base_length = 255 - len(extension)
+        base = "b" * base_length
+        original = f"{base}{extension}"
         result = get_valid_filename(original)
-        # We check that the final result does not exceed 255 characters.
-        self.assertTrue(len(result) <= 255,
-                        "Edge case filename exceeds the maximum allowed length.")
+        self.assertEqual(len(result), 255,
+                         "Filename with length exactly 255 should remain unchanged.")
+        self.assertEqual(result, original,
+                         "Filename with length exactly 255 should not be modified.")
+
+    def test_edge_case_filenames(self):
+        """
+        Test filenames at various boundary conditions to ensure correct behavior.
+        """
+        max_length = 255
+        random_suffix_length = 16
+        extension = ".jpg"
+
+        # Test case 1: Filename with length exactly max_length - 1.
+        base_length = max_length - 1 - len(extension)
+        base = "c" * base_length
+        original = f"{base}{extension}"
+        result = get_valid_filename(original)
+        self.assertEqual(result, original,
+                         "Filename with length max_length-1 should remain unchanged.")
+
+        # Test case 2: Filename with length exactly equal to max_length - random_suffix_length.
+        base_length = max_length - random_suffix_length - len(extension)
+        base = "d" * base_length
+        original = f"{base}{extension}"
+        result = get_valid_filename(original)
+        self.assertEqual(result, original,
+                         "Filename with length equal to max_length - random_suffix_length should remain unchanged.")
+
+        # Test case 3: Filename with length exactly equal to max_length - random_suffix_length - 1.
+        base_length = max_length - random_suffix_length - 1 - len(extension)
+        base = "e" * base_length
+        original = f"{base}{extension}"
+        result = get_valid_filename(original)
+        self.assertEqual(result, original,
+                         "Filename with length equal to max_length - random_suffix_length - 1 should remain unchanged.")
