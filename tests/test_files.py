@@ -63,7 +63,7 @@ class GetValidFilenameTest(TestCase):
         The function should leave such a filename unchanged.
         """
         # Create a filename that is exactly 255 characters long.
-        base = "b" * 250  # 250 characters for base
+        base = "b" * 251  # 250 characters for base
         original = f"{base}.png"  # This may reach exactly or slightly above 255 depending on slugification
         result = get_valid_filename(original)
         # We check that the final result does not exceed 255 characters.
