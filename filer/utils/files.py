@@ -1,5 +1,6 @@
 import mimetypes
 import os
+import uuid
 
 from django.http.multipartparser import ChunkIter, SkipFile, StopFutureHandlers, StopUpload, exhaust
 from django.template.defaultfilters import slugify as slugify_django
@@ -121,6 +122,32 @@ def slugify(string):
     return slugify_django(force_str(string))
 
 
+def _ensure_safe_length(filename, max_length=255, random_suffix_length=16):
+    """
+    Ensures that the filename does not exceed the maximum allowed length.
+    If it does, the function truncates the filename and appends a random hexadecimal
+    suffix of length `random_suffix_length` to ensure uniqueness and compliance with
+    database constraints.
+
+    Parameters:
+        filename (str): The filename to check.
+        max_length (int): The maximum allowed length for the filename.
+        random_suffix_length (int): The length of the random suffix to append.
+
+    Returns:
+        str: The safe filename.
+
+
+    Reference issue: https://github.com/django-cms/django-filer/issues/1270
+    """
+    if len(filename) <= max_length:
+        return filename
+
+    keep_length = max_length - random_suffix_length
+    random_suffix = uuid.uuid4().hex[:random_suffix_length]
+    return filename[:keep_length] + random_suffix
+
+
 def get_valid_filename(s):
     """
     like the regular get_valid_filename, but also slugifies away
@@ -131,6 +158,9 @@ def get_valid_filename(s):
     filename = slugify(filename)
     ext = slugify(ext)
     if ext:
-        return "{}.{}".format(filename, ext)
+        valid_filename = "{}.{}".format(filename, ext)
     else:
-        return "{}".format(filename)
+        valid_filename = "{}".format(filename)
+
+    # Ensure the filename meets the maximum length requirements.
+    return _ensure_safe_length(valid_filename)
