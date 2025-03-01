@@ -1,9 +1,19 @@
 import string
+
+from django.conf import settings
 from django.test import TestCase
 from filer.utils.files import get_valid_filename
 
 
 class GetValidFilenameTest(TestCase):
+
+    def setUp(self):
+        """
+        Set up the test case by reading the configuration settings for the maximum filename length.
+        """
+        self.max_length = getattr(settings, "FILER_MAX_FILENAME_LENGTH", 255)
+        self.random_suffix_length = getattr(settings, "FILER_RANDOM_SUFFIX_LENGTH", 16)
+
     def test_short_filename_remains_unchanged(self):
         """
         Test that a filename under the maximum length remains unchanged.
@@ -20,7 +30,11 @@ class GetValidFilenameTest(TestCase):
         base = "a" * 300  # 300 characters base
         original = f"{base}.jpg"
         result = get_valid_filename(original)
-        self.assertEqual(len(result), 255, "Filename length should be exactly 255 characters.")
+        self.assertEqual(
+            len(result),
+            self.max_length,
+            "Filename length should be exactly 255 characters."
+        )
         # Verify that the last 16 characters form a valid hexadecimal string.
         random_suffix = result[-16:]
         valid_hex_chars = set(string.hexdigits)
@@ -59,8 +73,11 @@ class GetValidFilenameTest(TestCase):
         base = "b" * base_length
         original = f"{base}{extension}"
         result = get_valid_filename(original)
-        self.assertEqual(len(result), 255,
-                         "Filename with length exactly 255 should remain unchanged.")
+        self.assertEqual(
+            len(result),
+            self.max_length,
+            "Filename with length exactly 255 should remain unchanged."
+        )
         self.assertEqual(result, original,
                          "Filename with length exactly 255 should not be modified.")
 
@@ -68,8 +85,8 @@ class GetValidFilenameTest(TestCase):
         """
         Test filenames at various boundary conditions to ensure correct behavior.
         """
-        max_length = 255
-        random_suffix_length = 16
+        max_length = self.max_length
+        random_suffix_length = self.random_suffix_length
         extension = ".jpg"
 
         # Test case 1: Filename with length exactly max_length - 1.
