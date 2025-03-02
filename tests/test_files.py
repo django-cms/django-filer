@@ -11,8 +11,8 @@ class GetValidFilenameTest(TestCase):
         """
         Set up the test case by reading the configuration settings for the maximum filename length.
         """
-        self.max_length = getattr(settings, "FILER_MAX_FILENAME_LENGTH", 255)
-        self.random_suffix_length = getattr(settings, "FILER_RANDOM_SUFFIX_LENGTH", 16)
+        self.max_length = 155
+        self.random_suffix_length = 16
 
     def test_short_filename_remains_unchanged(self):
         """
@@ -69,7 +69,7 @@ class GetValidFilenameTest(TestCase):
         Test that a filename exactly at the maximum allowed length remains unchanged.
         """
         extension = ".png"
-        base_length = 255 - len(extension)
+        base_length = 155 - len(extension)
         base = "b" * base_length
         original = f"{base}{extension}"
         result = get_valid_filename(original)

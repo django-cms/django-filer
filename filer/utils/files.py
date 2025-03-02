@@ -123,7 +123,7 @@ def slugify(string):
     return slugify_django(force_str(string))
 
 
-def _ensure_safe_length(filename, max_length=None, random_suffix_length=None):
+def _ensure_safe_length(filename, max_length=155, random_suffix_length=16):
     """
     Ensures that the filename does not exceed the maximum allowed length.
     If it does, the function truncates the filename and appends a random hexadecimal
@@ -141,9 +141,6 @@ def _ensure_safe_length(filename, max_length=None, random_suffix_length=None):
 
     Reference issue: https://github.com/django-cms/django-filer/issues/1270
     """
-
-    max_length = max_length or getattr(settings, "FILER_MAX_FILENAME_LENGTH", 255)
-    random_suffix_length = random_suffix_length or getattr(settings, "FILER_RANDOM_SUFFIX_LENGTH", 16)
 
     if len(filename) <= max_length:
         return filename
