@@ -128,7 +128,7 @@ def _ensure_safe_length(filename, max_length=155, random_suffix_length=16):
     Ensures that the filename does not exceed the maximum allowed length.
     If it does, the function truncates the filename and appends a random hexadecimal
     suffix of length `random_suffix_length` to ensure uniqueness and compliance with
-    database constraints.
+    database constraints - even after markers for a thumbnail are added.
 
     Parameters:
         filename (str): The filename to check.
