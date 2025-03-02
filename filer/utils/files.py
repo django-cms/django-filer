@@ -2,7 +2,6 @@ import mimetypes
 import os
 import uuid
 
-from django.conf import settings
 from django.http.multipartparser import ChunkIter, SkipFile, StopFutureHandlers, StopUpload, exhaust
 from django.template.defaultfilters import slugify as slugify_django
 from django.utils.encoding import force_str

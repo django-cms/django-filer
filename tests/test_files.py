@@ -1,6 +1,5 @@
 import string
 
-from django.conf import settings
 from django.test import TestCase
 from filer.utils.files import get_valid_filename
 
