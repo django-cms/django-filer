@@ -264,6 +264,8 @@ If you distinguish validation by the mime type, remember to register the
 validator function for all relevant mime types.
 
 
+.. _check_virus:
+
 Checking uploads for viruses using ClamAV
 -----------------------------------------
 

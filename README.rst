@@ -49,26 +49,6 @@ Documentation
 Please head over to the separate `documentation <https://django-filer.readthedocs.io/en/latest/index.html>`_
 for all the details on how to install, configure and use django-filer.
 
-Upgrading
-=========
-
-Version 3.3
------------
-
-django-filer version 3 contains a change in security policy for file uploads.
-**By default, binary file or files of unknown type are not allowed to be uploaded.**
-To allow upload of binary files in your project, add
-
-.. code-block:: python
-
-    FILER_REMOVE_FILE_VALIDATORS = [
-        "application/octet-stream",
-    ]
-
-to your project's settings. Be aware that binary files always are a security risk.
-See the documentation for more information on how to configure file upload validators,
-e.g., running files through a virus checker.
-
 
 .. |pypi| image:: https://badge.fury.io/py/django-filer.svg
     :target: http://badge.fury.io/py/django-filer
