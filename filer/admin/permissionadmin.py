@@ -1,4 +1,4 @@
-from django import __version__ as django_version
+from django import VERSION as django_version
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
