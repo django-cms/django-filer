@@ -2,6 +2,25 @@
 CHANGELOG
 =========
 
+3.3.1 (2024-12-07)
+==================
+
+* fix: editing buttons missing in admin when file present by @pajowu in https://github.com/django-cms/django-filer/pull/1511
+* fix: incompatibility with djangocms-versioning-filer 1.3 was fixed by @fscherf in https://github.com/django-cms/django-filer/pull/1509
+
+**New Contributors**
+
+* @pajowu made their first contribution in https://github.com/django-cms/django-filer/pull/1511
+* @fscherf made their first contribution in https://github.com/django-cms/django-filer/pull/1509
+
+3.3.0 (2024-11-19)
+==================
+
+* fix: Restrict upload of binary or unknown file types by default by @fsbraun in https://github.com/django-cms/django-filer/pull/1507
+* fix: remove extra brace in generated HTML of data-max-filesize attribute by @fabien-michel in https://github.com/django-cms/django-filer/pull/1502
+* fix: uploadButton data-max-filesize attribute is not passed to file-uploader by @fabien-michel in https://github.com/django-cms/django-filer/pull/1503
+* docs: Update for on_delete requirement in Filer fields
+
 3.2.3 (2024-09-18)
 ==================
 
