@@ -1,8 +1,22 @@
+from django import VERSION as django_version
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
+    def get_autocomplete_fields(self, request):
+        """Remove "owner" from autocomplete_fields is User model has no search_fields"""
+
+        autocomplete_fields = super().get_autocomplete_fields(request)
+        if django_version >= (5, 0):
+            user_admin = self.admin_site.get_model_admin(get_user_model())
+        else:
+            user_admin = self.admin_site._registry[get_user_model()]
+        if not user_admin.get_search_fields(request) and 'owner' in autocomplete_fields:
+            autocomplete_fields.remove('owner')
+        return autocomplete_fields
+
     def has_add_permission(self, request):
         # we don't have a "add" permission... but all adding is handled
         # by special methods that go around these permissions anyway

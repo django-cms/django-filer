@@ -22,6 +22,8 @@ class PermissionAdmin(admin.ModelAdmin):
         css = {'all': ['filer/css/admin_folderpermissions.css']}
 
     def get_autocomplete_fields(self, request):
+        """Remove "owner" from autocomplete_fields is User model has no search_fields"""
+
         autocomplete_fields = super().get_autocomplete_fields(request)
         if django_version >= (5, 0):
             user_admin = self.admin_site.get_model_admin(get_user_model())
