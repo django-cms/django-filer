@@ -17,7 +17,7 @@ jobs:
         ]
         custom-image-model: [false, true]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -53,6 +53,6 @@ jobs:
       run: echo "CUSTOM_IMAGE=custom_image.Image" >> $GITHUB_ENV
       if: ${{ matrix.custom-image-model }}
     - name: Run coverage
-      run: coverage run ./tests/settings.py 
+      run: coverage run ./tests/settings.py
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1

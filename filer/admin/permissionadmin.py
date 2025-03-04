@@ -1,3 +1,4 @@
+from django import __version__ as django_version
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -22,7 +23,10 @@ class PermissionAdmin(admin.ModelAdmin):
 
     def get_autocomplete_fields(self, request):
         autocomplete_fields = super().get_autocomplete_fields(request)
-        user_admin = self.admin_site.get_model_admin(get_user_model())
+        if django_version >= (5, 0):
+            user_admin = self.admin_site.get_model_admin(get_user_model())
+        else:
+            user_admin = self.admin_site._registry[get_user_model()]
         if not user_admin.get_search_fields(request):
             autocomplete_fields.remove('user')
         return autocomplete_fields
