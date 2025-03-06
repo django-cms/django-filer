@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='folder',
-            unique_together=set([('parent', 'name')]),
+            unique_together={('parent', 'name')},
         ),
         migrations.AddField(
             model_name='file',

@@ -40,7 +40,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
         has_admin = obj.__class__ in admin_site._registry
         opts = obj._meta
 
-        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name),
+        no_edit_link = '{}: {}'.format(capfirst(opts.verbose_name),
                                    force_str(obj))
 
         if has_admin:
@@ -54,7 +54,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link
 
-            p = '%s.%s' % (opts.app_label,
+            p = '{}.{}'.format(opts.app_label,
                            get_permission_codename('delete', opts))
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)

@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-filer"
+description = "A file management application for django that makes handling of files and images a breeze."
+requires-python = ">=3.8"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Divio AG", email = "info@divio.ch"},
+]
+maintainers = [
+    {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django CMS",
+    "Framework :: Django CMS :: 3.8",
+    "Framework :: Django CMS :: 3.9",
+    "Framework :: Django CMS :: 3.10",
+    "Framework :: Django CMS :: 3.11",
+    "Framework :: Django CMS :: 4.0",
+    "Framework :: Django CMS :: 4.1",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+]
+dynamic = ["version", "readme"]
+dependencies = [
+    "django>=3.2",
+    "django-polymorphic",
+    "easy-thumbnails[svg]",
+]
+[project.urls]
+Homepage = "https://github.com/django-cms/django-filer"
+
+
+[project.optional-dependencies]
+heif = ["pillow-heif"]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["filer*"]
+exclude = ["tests*"]
+namespaces = false
+
+[tool.setuptools.dynamic]
+version = {attr = "filer.__version__"}
+readme = {file = ["README.rst"]}
+
+[tool.flake8]
+max-line-length = 119
+exclude = [
+    "*.egg-info",
+    ".eggs",
+    ".env",
+    ".git",
+    ".settings",
+    ".tox",
+    ".venv",
+    "build",
+    "data",
+    "dist",
+    "docs",
+    "*migrations*",
+    "tmp",
+    "node_modules",
+]
+ignore = ["E251", "E128", "E501", "W503"]
+
+[tool.isort]
+line_length = 119
+skip = ["manage.py", "*migrations*", ".tox", ".eggs", "data", ".env", ".venv"]
+include_trailing_comma = true
+multi_line_output = 5
+lines_after_imports = 2
+default_section = "THIRDPARTY"
+sections = ["FUTURE", "STDLIB", "DJANGO", "CMS", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+known_first_party = ["filer"]
+known_cms = ["cms", "menus"]
+known_django = ["django"]

@@ -24,7 +24,7 @@ class Form(forms.BaseForm):
         settings.setdefault('MEDIA_HEADERS', []).insert(0, (
             r'filer_public(?:_thumbnails)?/.*',
             {
-                'Cache-Control': 'public, max-age={}'.format(86400 * 365),
+                'Cache-Control': f'public, max-age={86400 * 365}',
             },
         ))
 
@@ -34,12 +34,12 @@ class Form(forms.BaseForm):
         settings['THUMBNAIL_CACHE_DIMENSIONS'] = True
 
         # Swap scale and crop for django-filer version
-        settings['THUMBNAIL_PROCESSORS'] = tuple([
+        settings['THUMBNAIL_PROCESSORS'] = tuple(
             processor
             if processor != 'easy_thumbnails.processors.scale_and_crop'
             else 'filer.thumbnail_processors.scale_and_crop_with_subject_location'
             for processor in EasyThumbnailSettings.THUMBNAIL_PROCESSORS
-        ])
+        )
 
         # easy_thumbnails uses django's default storage backend (local file
         # system storage) by default, even if the DEFAULT_FILE_STORAGE setting

@@ -40,6 +40,7 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
         server = DefaultServer()
         request = Mock()
         request.META = {}
+        request.headers = {}
         response = server.serve(request, self.filer_file)
         self.assertTrue(response.has_header('Last-Modified'))
 
@@ -47,6 +48,7 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
         server = DefaultServer()
         request = Mock()
         request.META = {}
+        request.headers = {}
         response = server.serve(request, self.filer_file, save_as=True)
         self.assertEqual(response['Content-Disposition'], 'attachment; filename=testimage.jpg')
 
@@ -60,6 +62,7 @@ class DefaultServerTestCase(BaseServerBackendTestCase):
         server = DefaultServer()
         request = Mock()
         request.META = {'HTTP_IF_MODIFIED_SINCE': http_date(time.time())}
+        request.headers = {'if-modified-since': http_date(time.time())}
         response = server.serve(request, self.filer_file)
         self.assertTrue(isinstance(response, HttpResponseNotModified))
 

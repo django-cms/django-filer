@@ -47,7 +47,7 @@ class FileImporter:
             if created:
                 self.file_created += 1
         if self.verbosity >= 2:
-            print("file_created #%s / image_created #%s -- file : %s -- created : %s" % (self.file_created,
+            print("file_created #{} / image_created #{} -- file : {} -- created : {}".format(self.file_created,
                                                         self.image_created,
                                                         obj, created))
         return obj
@@ -70,7 +70,7 @@ class FileImporter:
             if created:
                 self.folder_created += 1
                 if self.verbosity >= 2:
-                    print("folder_created #%s folder : %s -- created : %s" % (self.folder_created, current_parent, created))
+                    print(f"folder_created #{self.folder_created} folder : {current_parent} -- created : {created}")
         return current_parent
 
     def walker(self, path=None, base_folder=None):
@@ -84,9 +84,9 @@ class FileImporter:
         path = os.path.normpath(path)
         if base_folder:
             base_folder = os.path.normpath(base_folder)
-            print("The directory structure will be imported in %s" % (base_folder,))
+            print(f"The directory structure will be imported in {base_folder}")
         if self.verbosity >= 1:
-            print("Import the folders and files in %s" % (path,))
+            print(f"Import the folders and files in {path}")
         root_folder_name = os.path.basename(path)
         for root, dirs, files in os.walk(path):
             rel_folders = root.partition(path)[2].strip(os.path.sep).split(os.path.sep)
