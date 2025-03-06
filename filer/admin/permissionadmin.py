@@ -1,4 +1,6 @@
+from django import VERSION as django_version
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings
@@ -18,6 +20,18 @@ class PermissionAdmin(admin.ModelAdmin):
 
     class Media:
         css = {'all': ['filer/css/admin_folderpermissions.css']}
+
+    def get_autocomplete_fields(self, request):
+        """Remove "owner" from autocomplete_fields is User model has no search_fields"""
+
+        autocomplete_fields = super().get_autocomplete_fields(request)
+        if django_version >= (5, 0):
+            user_admin = self.admin_site.get_model_admin(get_user_model())
+        else:
+            user_admin = self.admin_site._registry[get_user_model()]
+        if not user_admin.get_search_fields(request):
+            autocomplete_fields.remove('user')
+        return autocomplete_fields
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

@@ -8,30 +8,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
+          django-5.2.txt,
           django-main.txt,
         ]
         custom-image-model: [false, true]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
-            python-version: 3.8
-          - requirements-file: django-5.0.txt
             python-version: 3.9
           - requirements-file: django-5.1.txt
-            python-version: 3.8
-          - requirements-file: django-5.1.txt
+            python-version: 3.9
+          - requirements-file: django-5.2.txt
             python-version: 3.9
           - requirements-file: django-main.txt
-            python-version: 3.8
-          - requirements-file: django-main.txt
             python-version: 3.9
+          - requirements-file: django-main.txt
+            python-version: 3.10
+          - requirements-file: django-main.txt
+            python-version: 3.11
 
     steps:
     - uses: actions/checkout@v1
@@ -40,7 +41,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: library prerequisites
-      run: sudo apt-get install python-dev libpq-dev libmagic1 gcc libxml2-dev libxslt1-dev libjpeg62 libopenjp2-7 -y
+      run: sudo apt-get install python-dev-is-python3 libpq-dev libmagic1 gcc libxml2-dev libxslt1-dev libjpeg62 libopenjp2-7 -y
     - name: Install extra dependencies
       run: pip install lxml
       if: matrix.python-version == '3.10'
@@ -53,6 +54,6 @@ jobs:
       run: echo "CUSTOM_IMAGE=custom_image.Image" >> $GITHUB_ENV
       if: ${{ matrix.custom-image-model }}
     - name: Run coverage
-      run: coverage run ./tests/settings.py 
+      run: coverage run ./tests/settings.py
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
