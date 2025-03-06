@@ -5,6 +5,7 @@ from collections import OrderedDict
 from urllib.parse import quote as urlquote
 from urllib.parse import unquote as urlunquote
 
+from django import VERSION as DJANGO_VERSION
 from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
@@ -777,9 +778,14 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             n = files_queryset.count() + folders_queryset.count()
             if n:
                 # delete all explicitly selected files
-                for f in files_queryset:
-                    self.log_deletion(request, f, force_str(f))
-                    f.delete()
+                if DJANGO_VERSION >= (5,1):
+                    self.log_deletions(request, files_queryset)
+                    for f in files_queryset:
+                        f.delete()
+                else:
+                    for f in files_queryset:
+                        self.log_deletion(request, f, force_str(f))
+                        f.delete()
                 # delete all files in all selected folders and their children
                 # This would happen automatically by ways of the delete
                 # cascade, but then the individual .delete() methods won't be
