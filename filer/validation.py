@@ -91,19 +91,6 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     file.write(xml)  # write to binary file with utf-8 encoding
 
 
-def validate_octet(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-    """Octet streams are binary files without a specific mime type. They are run through
-    a virus check."""
-    try:
-        from django_clamd.validators import validate_file_infection
-
-        validate_file_infection(file)
-    except (ModuleNotFoundError, ImportError):
-        raise FileValidationError(
-            _('File "{file_name}": Virus check for binary/unknown file not available').format(file_name=file_name)
-        )
-
-
 def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     """Actual validation: Call all validators for the given mime type. The app config reads
     the validators from the settings and replaces dotted paths by callables."""
