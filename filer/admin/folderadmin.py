@@ -780,6 +780,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # delete all explicitly selected files
                 if DJANGO_VERSION >= (5, 1):
                     self.log_deletions(request, files_queryset)
+                    # Still need to delete files individually (not only the database entries)
                     for f in files_queryset:
                         f.delete()
                 else:
@@ -797,6 +798,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 if DJANGO_VERSION >= (5, 1):
                     qs = File.objects.filter(folder__in=folder_ids)
                     self.log_deletions(request, qs)
+                    # Still need to delete files individually (not only the database entries)
                     for f in qs:
                         f.delete()
                 else:
@@ -806,8 +808,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 # delete all folders
                 if DJANGO_VERSION >= (5, 1):
                     self.log_deletions(request, files_queryset)
-                    for f in folders_queryset:
-                        f.delete()
+                    folders_queryset.delete()
                 else:
                     for f in folders_queryset:
                         self.log_deletion(request, f, force_str(f))
