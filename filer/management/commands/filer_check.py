@@ -67,7 +67,8 @@ class Command(BaseCommand):
                     "\nThis will delete missing file references from the database.\n"
                     "Type 'yes' to continue, or 'no' to cancel: "
                 ) != 'yes':
-                    self.stdout.write("Aborted: Missing file references were not deleted.")
+                    self.stdout.write("Aborted: Missing file references were not deleted.\n")
+                    self.stdout.flush()
                     return
             self.verify_references(options)
 
@@ -77,7 +78,8 @@ class Command(BaseCommand):
                     "\nThis will delete orphaned files from storage.\n"
                     "Type 'yes' to continue, or 'no' to cancel: "
                 ) != 'yes':
-                    self.stdout.write("Aborted: Orphaned files were not deleted.")
+                    self.stdout.write("Aborted: Orphaned files were not deleted.\n")
+                    self.stdout.flush()
                     return
             self.verify_storages(options)
 
@@ -86,7 +88,7 @@ class Command(BaseCommand):
 
     def verify_references(self, options):
         """
-        Checks that every file reference in the database exists in the storage.
+        Checks that every file reference in the database exists in storage.
         If a file is missing, either report it or delete the reference based on the provided options.
         """
         for file in File.objects.all():
@@ -95,21 +97,24 @@ class Command(BaseCommand):
                     file.delete()
                     verbose_msg = f"Deleted missing file reference '{file.folder}/{file}' from the database."
                 else:
-                    verbose_msg = f"File reference '{file.folder}/{file}' is missing in the storage."
-                # For higher verbosity, print the full verbose message.
+                    verbose_msg = f"File reference '{file.folder}/{file}' is missing in storage."
                 if options.get('verbosity', 1) > 2:
-                    self.stdout.write(verbose_msg)
-                # Otherwise, just output the relative file path.
+                    self.stdout.write(verbose_msg + "\n")
+                    self.stdout.flush()
                 elif options.get('verbosity'):
-                    self.stdout.write(os.path.join(str(file.folder), str(file)))
+                    self.stdout.write(os.path.join(str(file.folder), str(file)) + "\n")
+                    self.stdout.flush()
 
     def verify_storages(self, options):
         """
-        Scans all storages defined in FILER_STORAGES (e.g. public and private)
+        Scans all storages defined in FILER_STORAGES (e.g., public and private)
         for orphaned files, then reports or deletes them based on the options.
         """
 
         def walk(storage, prefix, label_prefix):
+            # If the directory does not exist, there is nothing to scan
+            if not storage.exists(prefix):
+                return
             child_dirs, files = storage.listdir(prefix)
             for filename in files:
                 actual_path = os.path.join(prefix, filename)
@@ -121,13 +126,15 @@ class Command(BaseCommand):
                     else:
                         message = f"Found orphaned file '{relfilename}'"
                     if options.get('verbosity', 1) > 2:
-                        self.stdout.write(message)
+                        self.stdout.write(message + "\n")
+                        self.stdout.flush()
                     elif options.get('verbosity'):
-                        self.stdout.write(relfilename)
+                        self.stdout.write(relfilename + "\n")
+                        self.stdout.flush()
             for child in child_dirs:
                 walk(storage, os.path.join(prefix, child), os.path.join(label_prefix, child))
 
-        # Loop through each storage configuration (e.g. public, private, etc.)
+        # Loop through each storage configuration (e.g., public, private, etc.)
         for storage_name, storage_config in filer_settings.FILER_STORAGES.items():
             storage_settings = storage_config.get('main')
             if not storage_settings:
@@ -135,12 +142,9 @@ class Command(BaseCommand):
             storage = import_string(storage_settings['ENGINE'])()
             if storage_settings.get('OPTIONS', {}).get('location'):
                 storage.location = storage_settings['OPTIONS']['location']
-            # Use a label prefix: for public and private storages, use their names.
-            if storage_name in ['public', 'private']:
-                label_prefix = storage_name
-            else:
-                label_prefix = storage_settings['UPLOAD_TO_PREFIX']
-            walk(storage, storage_settings['UPLOAD_TO_PREFIX'], label_prefix)
+            # Set label_prefix: for public and private storages, use their names.
+            label_prefix = storage_name if storage_name in ['public', 'private'] else storage_settings.get('UPLOAD_TO_PREFIX', '')
+            walk(storage, storage_settings.get('UPLOAD_TO_PREFIX', ''), label_prefix)
 
     def image_dimensions(self, options):
         """
@@ -154,9 +158,10 @@ class Command(BaseCommand):
 
         ImageModel = load_model(filer_settings.FILER_IMAGE_MODEL)
         images_without_dimensions = ImageModel.objects.filter(Q(_width=0) | Q(_width__isnull=True))
-        self.stdout.write(f"Setting dimensions for {images_without_dimensions.count()} images")
+        self.stdout.write(f"Setting dimensions for {images_without_dimensions.count()} images" + "\n")
+        self.stdout.flush()
         for image in images_without_dimensions:
-            file_holder = image.file_ptr if hasattr(image, 'file_ptr') and image.file_ptr else image
+            file_holder = image.file_ptr if getattr(image, 'file_ptr', None) else image
             try:
                 imgfile = file_holder.file
                 imgfile.seek(0)
