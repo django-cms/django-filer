@@ -282,4 +282,3 @@ class FilerCheckTestCase(TestCase):
         call_command('filer_check', image_dimensions=True)
         self.filer_image.refresh_from_db()
         self.assertGreater(self.filer_image._width, 0)
-
