@@ -35,13 +35,14 @@ class FilerApiTests(TestCase):
         for f in File.objects.all():
             f.delete()
 
-    def create_filer_image(self, owner=None):
+    def create_filer_image(self, owner=None, is_public=True):
         if owner is None:
             owner = self.superuser
         file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         image = Image.objects.create(owner=owner,
                                      original_filename=self.image_name,
-                                     file=file_obj)
+                                     file=file_obj,
+                                     is_public=is_public)
         return image
 
     def test_create_folder_structure(self):
@@ -80,7 +81,7 @@ class FilerApiTests(TestCase):
         self.assertEqual(Clipboard.objects.count(), 1)
 
     def test_create_icons(self):
-        image = self.create_filer_image()
+        image = self.create_filer_image(is_public=False)
         image.save()
         icons = image.icons
         file_basename = os.path.basename(image.file.path)

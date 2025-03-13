@@ -27,8 +27,19 @@ class ThumbnailerNameMixin:
         """
         A version of ``Thumbnailer.get_thumbnail_name`` that produces a
         reproducible thumbnail name that can be converted back to the original
-        filename.
+        filename. For public files, it uses easy_thumbnails default naming.
         """
+        is_public = False
+        if hasattr(self, "thumbnail_storage"):
+            is_public = "PrivateFileSystemStorage" not in str(
+                self.thumbnail_storage.__class__
+            )
+
+        if is_public:
+            return super(ThumbnailerNameMixin, self).get_thumbnail_name(
+                thumbnail_options, transparent
+            )
+        
         path, source_filename = os.path.split(self.name)
         source_extension = os.path.splitext(source_filename)[1][1:].lower()
         preserve_extensions = self.thumbnail_preserve_extensions
