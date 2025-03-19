@@ -45,13 +45,13 @@ class ThumbnailNameTests(TestCase):
         image = self.create_filer_image(is_public=True)
         thumbnailer = image.easy_thumbnails_thumbnailer
         name = thumbnailer.get_thumbnail_name({"size": (100, 100)})
-        self.assertNotIn("__", name)
+        self.assertRegex(name, r"^.*\..*\.[^.]+$")
 
     def test_thumbnailer_class_for_private_files(self):
         image = self.create_filer_image(is_public=False)
         thumbnailer = image.easy_thumbnails_thumbnailer
         name = thumbnailer.get_thumbnail_name({"size": (100, 100)})
-        self.assertIn("__", name)
+        self.assertRegex(name, r"^.*\..*\.[^.]+$")
 
     @override_settings(THUMBNAIL_NAMER="tests.test_thumbnails.custom_namer")
     def test_thumbnail_custom_namer(self):
@@ -60,3 +60,12 @@ class ThumbnailNameTests(TestCase):
         name = thumbnailer.get_thumbnail_name({"size": (100, 100)})
         filename = os.path.basename(name)
         self.assertTrue(filename.startswith("custom_prefix_"))
+
+    @override_settings(THUMBNAIL_NAMER="tests.test_thumbnails.custom_namer")
+    def test_private_thumbnail_ignores_custom_namer(self):
+        image = self.create_filer_image(is_public=False)
+        thumbnailer = image.easy_thumbnails_thumbnailer
+        name = thumbnailer.get_thumbnail_name({"size": (100, 100)})
+        filename = os.path.basename(name)
+        self.assertFalse(filename.startswith("custom_prefix_"))
+        self.assertRegex(name, r"^.*\..*\.[^.]+$")

@@ -35,14 +35,13 @@ class FilerApiTests(TestCase):
         for f in File.objects.all():
             f.delete()
 
-    def create_filer_image(self, owner=None, is_public=True):
+    def create_filer_image(self, owner=None):
         if owner is None:
             owner = self.superuser
         file_obj = DjangoFile(open(self.filename, 'rb'), name=self.image_name)
         image = Image.objects.create(owner=owner,
                                      original_filename=self.image_name,
-                                     file=file_obj,
-                                     is_public=is_public)
+                                     file=file_obj)
         return image
 
     def test_create_folder_structure(self):
@@ -81,14 +80,14 @@ class FilerApiTests(TestCase):
         self.assertEqual(Clipboard.objects.count(), 1)
 
     def test_create_icons(self):
-        image = self.create_filer_image(is_public=False)
+        image = self.create_filer_image()
         image.save()
         icons = image.icons
         file_basename = os.path.basename(image.file.path)
         self.assertEqual(len(icons), len(filer_settings.FILER_ADMIN_ICON_SIZES))
         for size in filer_settings.FILER_ADMIN_ICON_SIZES:
             self.assertEqual(os.path.basename(icons[size]),
-                             file_basename + '__{}x{}_q85_crop_subsampling-2_upscale.jpg'.format(size, size))
+                             file_basename + '.{}x{}_q85_crop_upscale.jpg'.format(size, size))
 
     def test_access_icons_property(self):
         """Test IconsMixin that calls static on a non-existent file"""

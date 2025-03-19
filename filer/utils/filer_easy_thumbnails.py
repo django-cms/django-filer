@@ -3,12 +3,11 @@ import re
 
 from easy_thumbnails.files import Thumbnailer
 
-
-# match the source filename using `__` as the seperator. ``opts_and_ext`` is non
-# greedy so it should match the last occurence of `__`.
-# in ``ThumbnailerNameMixin.get_thumbnail_name`` we ensure that there is no `__`
-# in the opts part.
-RE_ORIGINAL_FILENAME = re.compile(r"^(?P<source_filename>.*)__(?P<opts_and_ext>.*?)$")
+# easy-thumbnails default pattern
+# e.g: source.jpg.100x100_q80_crop_upscale.jpg
+RE_ORIGINAL_FILENAME = re.compile(
+    r"^(?P<source_filename>.*?)\.(?P<opts_and_ext>[^.]+\.[^.]+)$"
+)
 
 
 def thumbnail_to_original_filename(thumbnail_name):
@@ -19,15 +18,15 @@ def thumbnail_to_original_filename(thumbnail_name):
 
 
 class ThumbnailerNameMixin:
-    thumbnail_basedir = ''
-    thumbnail_subdir = ''
-    thumbnail_prefix = ''
+    thumbnail_basedir = ""
+    thumbnail_subdir = ""
+    thumbnail_prefix = ""
 
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
-        A version of ``Thumbnailer.get_thumbnail_name`` that produces a
-        reproducible thumbnail name that can be converted back to the original
-        filename. For public files, it uses easy_thumbnails default naming.
+        Get thumbnail name using easy-thumbnails pattern.
+        For public files: Uses configurable naming via THUMBNAIL_NAMER
+        For private files: Uses easy-thumbnails default naming pattern regardless of THUMBNAIL_NAMER
         """
         is_public = False
         if hasattr(self, "thumbnail_storage"):
@@ -35,53 +34,26 @@ class ThumbnailerNameMixin:
                 self.thumbnail_storage.__class__
             )
 
-        if is_public:
-            return super(ThumbnailerNameMixin, self).get_thumbnail_name(
-                thumbnail_options, transparent
-            )
-        
         path, source_filename = os.path.split(self.name)
-        source_extension = os.path.splitext(source_filename)[1][1:].lower()
-        preserve_extensions = self.thumbnail_preserve_extensions
-        if preserve_extensions is True or source_extension == 'svg' or \
-                isinstance(preserve_extensions, (list, tuple)) and source_extension in preserve_extensions:
-            extension = source_extension
-        elif transparent:
-            extension = self.thumbnail_transparency_extension
-        else:
-            extension = self.thumbnail_extension
-        extension = extension or 'jpg'
+        thumbnail_name = super(ThumbnailerNameMixin, self).get_thumbnail_name(
+            thumbnail_options, transparent
+        )
+        if is_public:
+            return thumbnail_name
 
-        thumbnail_options = thumbnail_options.copy()
-        size = tuple(thumbnail_options.pop('size'))
-        initial_opts = ['{}x{}'.format(*size)]
-        quality = thumbnail_options.pop('quality', self.thumbnail_quality)
-        if extension == 'jpg':
-            initial_opts.append(f'q{quality}')
-        elif extension == 'svg':
-            thumbnail_options.pop('subsampling', None)
-            thumbnail_options.pop('upscale', None)
-
-        opts = list(thumbnail_options.items())
-        opts.sort()   # Sort the options so the file name is consistent.
-        opts = ['{}'.format(v is not True and f'{k}-{v}' or k)
-                for k, v in opts if v]
-        all_opts = '_'.join(initial_opts + opts)
-
-        basedir = self.thumbnail_basedir
-        subdir = self.thumbnail_subdir
-
-        # make sure our magic delimiter is not used in all_opts
-        all_opts = all_opts.replace('__', '_')
-        filename = f'{source_filename}__{all_opts}.{extension}'
-
-        return os.path.join(basedir, path, subdir, filename)
+        base_thumb_name = os.path.basename(thumbnail_name)
+        return os.path.join(
+            self.thumbnail_basedir,
+            path,
+            self.thumbnail_subdir,
+            f"{source_filename}.{base_thumb_name}",
+        )
 
 
 class ActionThumbnailerMixin:
-    thumbnail_basedir = ''
-    thumbnail_subdir = ''
-    thumbnail_prefix = ''
+    thumbnail_basedir = ""
+    thumbnail_subdir = ""
+    thumbnail_prefix = ""
 
     def get_thumbnail_name(self, thumbnail_options, transparent=False):
         """
@@ -101,7 +73,7 @@ class ActionThumbnailerMixin:
 
 class FilerThumbnailer(ThumbnailerNameMixin, Thumbnailer):
     def __init__(self, *args, **kwargs):
-        self.thumbnail_basedir = kwargs.pop('thumbnail_basedir', '')
+        self.thumbnail_basedir = kwargs.pop("thumbnail_basedir", "")
         super().__init__(*args, **kwargs)
 
 
