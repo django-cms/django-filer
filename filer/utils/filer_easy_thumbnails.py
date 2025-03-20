@@ -30,9 +30,8 @@ class ThumbnailerNameMixin:
         """
         is_public = False
         if hasattr(self, "thumbnail_storage"):
-            is_public = "PrivateFileSystemStorage" not in str(
-                self.thumbnail_storage.__class__
-            )
+            from filer.storage import PrivateFileSystemStorage
+            is_public = not isinstance(self.thumbnail_storage, PrivateFileSystemStorage)
 
         path, source_filename = os.path.split(self.name)
         thumbnail_name = super(ThumbnailerNameMixin, self).get_thumbnail_name(
