@@ -1,7 +1,9 @@
 import os
 import re
+from contextlib import contextmanager
 
 from easy_thumbnails.files import Thumbnailer
+from easy_thumbnails.namers import default
 
 # easy-thumbnails default pattern
 # e.g: source.jpg.100x100_q80_crop_upscale.jpg
@@ -17,6 +19,19 @@ def thumbnail_to_original_filename(thumbnail_name):
     return None
 
 
+@contextmanager
+def use_default_namer(thumbnailer):
+    """
+    Context manager to use the default easy-thumbnails namer for private files.
+    """
+    original_namer = thumbnailer.thumbnail_namer
+    thumbnailer.thumbnail_namer = default
+    try:
+        yield
+    finally:
+        thumbnailer.thumbnail_namer = original_namer
+
+
 class ThumbnailerNameMixin:
     thumbnail_basedir = ""
     thumbnail_subdir = ""
@@ -30,23 +45,19 @@ class ThumbnailerNameMixin:
         """
         is_public = False
         if hasattr(self, "thumbnail_storage"):
-            from filer.storage import PrivateFileSystemStorage
-            is_public = not isinstance(self.thumbnail_storage, PrivateFileSystemStorage)
+            is_public = "PrivateFileSystemStorage" not in str(
+                self.thumbnail_storage.__class__
+            )
 
-        path, source_filename = os.path.split(self.name)
-        thumbnail_name = super(ThumbnailerNameMixin, self).get_thumbnail_name(
-            thumbnail_options, transparent
-        )
         if is_public:
-            return thumbnail_name
+            return super(ThumbnailerNameMixin, self).get_thumbnail_name(
+                thumbnail_options, transparent
+            )
 
-        base_thumb_name = os.path.basename(thumbnail_name)
-        return os.path.join(
-            self.thumbnail_basedir,
-            path,
-            self.thumbnail_subdir,
-            f"{source_filename}.{base_thumb_name}",
-        )
+        with use_default_namer(self):
+            return super(ThumbnailerNameMixin, self).get_thumbnail_name(
+                thumbnail_options, transparent
+            )
 
 
 class ActionThumbnailerMixin:
