@@ -71,7 +71,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
-    directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    if DJANGO_VERSION >= (5, 2):
+        directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    else:  # Remove this when Django 5.2 is the minimum version
+        directory_listing_template = 'admin/filer/folder/legacy_listing.html'
+
     order_by_file_fields = ['_file_size', 'original_filename', 'name', 'owner',
                             'uploaded_at', 'modified_at']
 
