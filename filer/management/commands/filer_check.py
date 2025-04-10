@@ -3,11 +3,11 @@ import os
 from django.core.management.base import BaseCommand
 from django.utils.module_loading import import_string
 
+from PIL import UnidentifiedImageError
+
 from filer import settings as filer_settings
 from filer.models.filemodels import File
 from filer.utils.loader import load_model
-
-from PIL import UnidentifiedImageError
 
 
 class Command(BaseCommand):
@@ -152,8 +152,10 @@ class Command(BaseCommand):
         and save them, handling SVG files and possible image errors.
         """
         from django.db.models import Q
+
         import easy_thumbnails
         from easy_thumbnails.VIL import Image as VILImage
+
         from filer.utils.compatibility import PILImage
 
         ImageModel = load_model(filer_settings.FILER_IMAGE_MODEL)
