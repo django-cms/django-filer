@@ -64,7 +64,7 @@ copyright = "%s, Stefan Foulis" % (datetime.date.today().year,)
 # built documents.
 #
 # The short X.Y version.
-version = ".".join(__version__.split(".")[0:2])
+version = ".".join(__version__.split(".")[:2])
 # The full version, including alpha/beta/rc tags.
 release = __version__
 
