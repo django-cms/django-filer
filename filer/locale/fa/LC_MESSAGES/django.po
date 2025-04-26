@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
+# Dimacodev Team ddmc.ir <dev@ddmc.ir>, 2025
 # Translators:
 # Translators:
 # Fariman Ghaedi <farimanghaedi@gmail.com>, 2019
@@ -23,15 +24,15 @@ msgstr ""
 
 #: admin/clipboardadmin.py:17
 msgid "You do not have permission to upload files."
-msgstr ""
+msgstr "شما مجوز آپلود فایل ها را ندارید."
 
 #: admin/clipboardadmin.py:18
 msgid "Can't find folder to upload. Please refresh and try again"
-msgstr ""
+msgstr "پوشه ای برای آپلود یافت نشد. لطفاً صفحه را رفرش کرده و دوباره تلاش کنید"
 
 #: admin/clipboardadmin.py:20
 msgid "Can't use this folder, Permission Denied. Please select another folder."
-msgstr ""
+msgstr "استفاده از این پوشه امکان پذیر نیست، دسترسی رد شد. لطفاً پوشه دیگری انتخاب کنید."
 
 #: admin/fileadmin.py:73
 msgid "Advanced"
@@ -53,18 +54,18 @@ msgstr ""
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s انتخاب شده"
+msgstr[1] "همه %(total_count)s انتخاب شده"
 
 #: admin/folderadmin.py:460
 #, python-format
 msgid "Directory listing for %(folder_name)s"
-msgstr ""
+msgstr "لیست دایرکتوری برای %(folder_name)s"
 
 #: admin/folderadmin.py:475
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 از %(cnt)s انتخاب شده"
 
 #: admin/folderadmin.py:612
 msgid "No action selected."
@@ -73,7 +74,7 @@ msgstr "هیچ اقدامی انتخاب نشده است."
 #: admin/folderadmin.py:664
 #, python-format
 msgid "Successfully moved %(count)d files to clipboard."
-msgstr ""
+msgstr "%(count)d فایل با موفقیت به کلیپ برد منتقل شد."
 
 #: admin/folderadmin.py:669
 msgid "Move selected files to clipboard"
@@ -82,29 +83,29 @@ msgstr "انتقال فایل های انتخاب شده به کلیپ برد"
 #: admin/folderadmin.py:709
 #, python-format
 msgid "Successfully disabled permissions for %(count)d files."
-msgstr ""
+msgstr "مجوزهای %(count)d فایل با موفقیت غیرفعال شد."
 
 #: admin/folderadmin.py:711
 #, python-format
 msgid "Successfully enabled permissions for %(count)d files."
-msgstr ""
+msgstr "مجوزهای %(count)d فایل با موفقیت فعال شد."
 
 #: admin/folderadmin.py:719
 msgid "Enable permissions for selected files"
-msgstr ""
+msgstr "فعال کردن مجوزها برای فایل های انتخاب شده"
 
 #: admin/folderadmin.py:725
 msgid "Disable permissions for selected files"
-msgstr ""
+msgstr "غیرفعال کردن مجوزها برای فایل های انتخاب شده"
 
 #: admin/folderadmin.py:789
 #, python-format
 msgid "Successfully deleted %(count)d files and/or folders."
-msgstr ""
+msgstr "%(count)d فایل و/یا پوشه با موفقیت حذف شد."
 
 #: admin/folderadmin.py:794
 msgid "Cannot delete files and/or folders"
-msgstr ""
+msgstr "امکان حذف فایل ها و/یا پوشه ها وجود ندارد"
 
 #: admin/folderadmin.py:796
 msgid "Are you sure?"
@@ -112,177 +113,177 @@ msgstr "آیا مطمئن هستید؟"
 
 #: admin/folderadmin.py:802
 msgid "Delete files and/or folders"
-msgstr "پاک کردن فایل ها و/یا پوشه ها"
+msgstr "حذف فایل ها و/یا پوشه ها"
 
 #: admin/folderadmin.py:823
 msgid "Delete selected files and/or folders"
-msgstr "پاک کردن فایل ها و/یا پوشه های انتخاب شده"
+msgstr "حذف فایل ها و/یا پوشه های انتخاب شده"
 
 #: admin/folderadmin.py:930
 #, python-format
 msgid "Folders with names %s already exist at the selected destination"
-msgstr ""
+msgstr "پوشه هایی با نام %s در مقصد انتخاب شده از قبل وجود دارند"
 
 #: admin/folderadmin.py:934
 #, python-format
 msgid ""
 "Successfully moved %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
+msgstr "%(count)d فایل و/یا پوشه با موفقیت به پوشه '%(destination)s' منتقل شد."
 
 #: admin/folderadmin.py:942 admin/folderadmin.py:944
 msgid "Move files and/or folders"
-msgstr ""
+msgstr "انتقال فایل ها و/یا پوشه ها"
 
 #: admin/folderadmin.py:959
 msgid "Move selected files and/or folders"
-msgstr ""
+msgstr "انتقال فایل ها و/یا پوشه های انتخاب شده"
 
 #: admin/folderadmin.py:1016
 #, python-format
 msgid "Successfully renamed %(count)d files."
-msgstr ""
+msgstr "%(count)d فایل با موفقیت تغییر نام داده شد."
 
 #: admin/folderadmin.py:1025 admin/folderadmin.py:1027
 #: admin/folderadmin.py:1042
 msgid "Rename files"
-msgstr ""
+msgstr "تغییر نام فایل ها"
 
 #: admin/folderadmin.py:1137
 #, python-format
 msgid ""
 "Successfully copied %(count)d files and/or folders to folder "
 "'%(destination)s'."
-msgstr ""
+msgstr "%(count)d فایل و/یا پوشه با موفقیت به پوشه '%(destination)s' کپی شد."
 
 #: admin/folderadmin.py:1155 admin/folderadmin.py:1157
 msgid "Copy files and/or folders"
-msgstr ""
+msgstr "کپی فایل ها و/یا پوشه ها"
 
 #: admin/folderadmin.py:1174
 msgid "Copy selected files and/or folders"
-msgstr ""
+msgstr "کپی فایل ها و/یا پوشه های انتخاب شده"
 
 #: admin/folderadmin.py:1279
 #, python-format
 msgid "Successfully resized %(count)d images."
-msgstr ""
+msgstr "%(count)d تصویر با موفقیت تغییر اندازه داده شد."
 
 #: admin/folderadmin.py:1286 admin/folderadmin.py:1288
 msgid "Resize images"
-msgstr ""
+msgstr "تغییر اندازه تصاویر"
 
 #: admin/folderadmin.py:1303
 msgid "Resize selected images"
-msgstr ""
+msgstr "تغییر اندازه تصاویر انتخاب شده"
 
 #: admin/forms.py:24
 msgid "Suffix which will be appended to filenames of copied files."
-msgstr ""
+msgstr "پسوندی که به نام فایل های کپی شده اضافه خواهد شد."
 
 #: admin/forms.py:31
 #, python-format
 msgid ""
 "Suffix should be a valid, simple and lowercase filename part, like "
 "\"%(valid)s\"."
-msgstr ""
+msgstr "پسوند باید بخشی معتبر، ساده و با حروف کوچک از نام فایل باشد، مانند \"%(valid)s\"."
 
 #: admin/forms.py:52
 #, python-format
 msgid "Unknown rename format value key \"%(key)s\"."
-msgstr ""
+msgstr "کلید مقدار فرمت تغییر نام ناشناخته \"%(key)s\"."
 
 #: admin/forms.py:54
 #, python-format
 msgid "Invalid rename format: %(error)s."
-msgstr ""
+msgstr "فرمت تغییر نام نامعتبر: %(error)s."
 
 #: admin/forms.py:68 models/thumbnailoptionmodels.py:37
 msgid "thumbnail option"
-msgstr ""
+msgstr "گزینه تصویر بندانگشتی"
 
 #: admin/forms.py:72 models/thumbnailoptionmodels.py:15
 msgid "width"
-msgstr ""
+msgstr "عرض"
 
 #: admin/forms.py:73 models/thumbnailoptionmodels.py:20
 msgid "height"
-msgstr ""
+msgstr "ارتفاع"
 
 #: admin/forms.py:74 models/thumbnailoptionmodels.py:25
 msgid "crop"
-msgstr ""
+msgstr "برش"
 
 #: admin/forms.py:75 models/thumbnailoptionmodels.py:30
 msgid "upscale"
-msgstr ""
+msgstr "بزرگنمایی"
 
 #: admin/forms.py:79
 msgid "Thumbnail option or resize parameters must be choosen."
-msgstr ""
+msgstr "باید گزینه تصویر بندانگشتی یا پارامترهای تغییر اندازه انتخاب شود."
 
 #: admin/imageadmin.py:20 admin/imageadmin.py:112
 msgid "Subject location"
-msgstr ""
+msgstr "موقعیت موضوع"
 
 #: admin/imageadmin.py:21
 msgid "Location of the main subject of the scene. Format: \"x,y\"."
-msgstr ""
+msgstr "موقعیت موضوع اصلی صحنه. فرمت: \"x,y\"."
 
 #: admin/imageadmin.py:59
 msgid "Invalid subject location format. "
-msgstr ""
+msgstr "فرمت موقعیت موضوع نامعتبر است. "
 
 #: admin/imageadmin.py:67
 msgid "Subject location is outside of the image. "
-msgstr ""
+msgstr "موقعیت موضوع خارج از تصویر است. "
 
 #: admin/imageadmin.py:76
 #, python-brace-format
 msgid "Your input: \"{subject_location}\". "
-msgstr ""
+msgstr "ورودی شما: \"{subject_location}\". "
 
 #: admin/permissionadmin.py:10 models/foldermodels.py:380
 msgid "Who"
-msgstr ""
+msgstr "چه کسی"
 
 #: admin/permissionadmin.py:11 models/foldermodels.py:401
 msgid "What"
-msgstr ""
+msgstr "چه چیزی"
 
 #: admin/views.py:55
 msgid "Folder with this name already exists."
-msgstr ""
+msgstr "پوشه با این نام از قبل وجود دارد."
 
 #: apps.py:11 templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/directory_listing.html:33
 msgid "Filer"
-msgstr ""
+msgstr "فایلر"
 
 #: contrib/django_cms/cms_toolbars.py:44
 msgid "Media library"
-msgstr ""
+msgstr "کتابخانه رسانه"
 
 #: models/abstract.py:62
 msgid "default alt text"
-msgstr ""
+msgstr "متن جایگزین پیش‌فرض"
 
 #: models/abstract.py:69
 msgid "default caption"
-msgstr ""
+msgstr "عنوان پیش‌فرض"
 
 #: models/abstract.py:76
 msgid "subject location"
-msgstr ""
+msgstr "موقعیت موضوع"
 
 #: models/abstract.py:91
 msgid "image"
-msgstr ""
+msgstr "تصویر"
 
 #: models/abstract.py:92
 msgid "images"
-msgstr ""
+msgstr "تصاویر"
 
 #: models/abstract.py:148
 #, python-format
@@ -291,6 +292,9 @@ msgid ""
 "million pixels by a factor of two or more. Before uploading again, check "
 "file format or resize image to %(width)d x %(height)d resolution or lower."
 msgstr ""
+"فرمت تصویر تشخیص داده نشد یا اندازه تصویر از حد مجاز %(max_pixels)d میلیون پیکسل "
+"دو برابر یا بیشتر است. قبل از آپلود مجدد، فرمت فایل را بررسی کنید یا تصویر را "
+"به اندازه %(width)d x %(height)d پیکسل یا کمتر تغییر اندازه دهید."
 
 #: models/abstract.py:156
 #, python-format
@@ -299,35 +303,38 @@ msgid ""
 "million pixels. Before uploading again, resize image to %(width)d x "
 "%(height)d resolution or lower."
 msgstr ""
+"اندازه تصویر (%(pixels)d میلیون پیکسل) از حد مجاز %(max_pixels)d میلیون پیکسل "
+"فراتر رفته است. قبل از آپلود مجدد، تصویر را به اندازه %(width)d x %(height)d "
+"پیکسل یا کمتر تغییر اندازه دهید."
 
 #: models/clipboardmodels.py:11 models/foldermodels.py:289
 msgid "user"
-msgstr ""
+msgstr "کاربر"
 
 #: models/clipboardmodels.py:17 models/filemodels.py:157
 msgid "files"
-msgstr ""
+msgstr "فایل ها"
 
 #: models/clipboardmodels.py:24 models/clipboardmodels.py:50
 msgid "clipboard"
-msgstr ""
+msgstr "کلیپ برد"
 
 #: models/clipboardmodels.py:25
 msgid "clipboards"
-msgstr ""
+msgstr "کلیپ بردها"
 
 #: models/clipboardmodels.py:44 models/filemodels.py:74
 #: models/filemodels.py:156
 msgid "file"
-msgstr ""
+msgstr "فایل"
 
 #: models/clipboardmodels.py:56
 msgid "clipboard item"
-msgstr ""
+msgstr "آیتم کلیپ برد"
 
 #: models/clipboardmodels.py:57
 msgid "clipboard items"
-msgstr ""
+msgstr "آیتم های کلیپ برد"
 
 #: models/filemodels.py:66 templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:102
@@ -335,206 +342,206 @@ msgstr ""
 #: templates/admin/filer/folder/new_folder_form.html:7
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "folder"
-msgstr ""
+msgstr "پوشه"
 
 #: models/filemodels.py:81
 msgid "file size"
-msgstr ""
+msgstr "اندازه فایل"
 
 #: models/filemodels.py:87
 msgid "sha1"
-msgstr ""
+msgstr "sha1"
 
 #: models/filemodels.py:94
 msgid "has all mandatory data"
-msgstr ""
+msgstr "دارای تمام داده های اجباری است"
 
 #: models/filemodels.py:100
 msgid "original filename"
-msgstr ""
+msgstr "نام فایل اصلی"
 
 #: models/filemodels.py:110 models/foldermodels.py:102
 #: models/thumbnailoptionmodels.py:10
 msgid "name"
-msgstr ""
+msgstr "نام"
 
 #: models/filemodels.py:116
 msgid "description"
-msgstr ""
+msgstr "توضیحات"
 
 #: models/filemodels.py:125 models/foldermodels.py:108
 msgid "owner"
-msgstr ""
+msgstr "مالک"
 
 #: models/filemodels.py:129 models/foldermodels.py:116
 msgid "uploaded at"
-msgstr ""
+msgstr "آپلود شده در"
 
 #: models/filemodels.py:134 models/foldermodels.py:126
 msgid "modified at"
-msgstr ""
+msgstr "تغییر یافته در"
 
 #: models/filemodels.py:140
 msgid "Permissions disabled"
-msgstr ""
+msgstr "مجوزها غیرفعال شده"
 
 #: models/filemodels.py:141
 msgid ""
 "Disable any permission checking for this file. File will be publicly "
 "accessible to anyone."
-msgstr ""
+msgstr "بررسی هرگونه مجوز برای این فایل را غیرفعال کنید. فایل برای همه به صورت عمومی قابل دسترسی خواهد بود."
 
 #: models/foldermodels.py:94
 msgid "parent"
-msgstr ""
+msgstr "والد"
 
 #: models/foldermodels.py:121
 msgid "created at"
-msgstr ""
+msgstr "ایجاد شده در"
 
 #: models/foldermodels.py:136 templates/admin/filer/breadcrumbs.html:6
 #: templates/admin/filer/folder/directory_listing.html:35
 msgid "Folder"
-msgstr ""
+msgstr "پوشه"
 
 #: models/foldermodels.py:137
 #: templates/admin/filer/folder/directory_thumbnail_list.html:12
 msgid "Folders"
-msgstr ""
+msgstr "پوشه ها"
 
 #: models/foldermodels.py:260
 msgid "all items"
-msgstr ""
+msgstr "همه آیتم ها"
 
 #: models/foldermodels.py:261
 msgid "this item only"
-msgstr ""
+msgstr "فقط این آیتم"
 
 #: models/foldermodels.py:262
 msgid "this item and all children"
-msgstr ""
+msgstr "این آیتم و تمام فرزندان"
 
 #: models/foldermodels.py:266
 msgid "inherit"
-msgstr ""
+msgstr "به ارث بردن"
 
 #: models/foldermodels.py:267
 msgid "allow"
-msgstr ""
+msgstr "اجازه دادن"
 
 #: models/foldermodels.py:268
 msgid "deny"
-msgstr ""
+msgstr "رد کردن"
 
 #: models/foldermodels.py:280
 msgid "type"
-msgstr ""
+msgstr "نوع"
 
 #: models/foldermodels.py:297
 msgid "group"
-msgstr ""
+msgstr "گروه"
 
 #: models/foldermodels.py:304
 msgid "everybody"
-msgstr ""
+msgstr "همه"
 
 #: models/foldermodels.py:309
 msgid "can read"
-msgstr ""
+msgstr "می تواند بخواند"
 
 #: models/foldermodels.py:317
 msgid "can edit"
-msgstr ""
+msgstr "می تواند ویرایش کند"
 
 #: models/foldermodels.py:325
 msgid "can add children"
-msgstr ""
+msgstr "می تواند فرزند اضافه کند"
 
 #: models/foldermodels.py:333
 msgid "folder permission"
-msgstr ""
+msgstr "مجوز پوشه"
 
 #: models/foldermodels.py:334
 msgid "folder permissions"
-msgstr ""
+msgstr "مجوزهای پوشه"
 
 #: models/foldermodels.py:348
 msgid "Folder cannot be selected with type \"all items\"."
-msgstr ""
+msgstr "پوشه نمی تواند با نوع \"همه آیتم ها\" انتخاب شود."
 
 #: models/foldermodels.py:350
 msgid "Folder has to be selected when type is not \"all items\"."
-msgstr ""
+msgstr "هنگامی که نوع \"همه آیتم ها\" نیست، باید پوشه انتخاب شود."
 
 #: models/foldermodels.py:352
 msgid "User or group cannot be selected together with \"everybody\"."
-msgstr ""
+msgstr "کاربر یا گروه نمی تواند همراه با \"همه\" انتخاب شود."
 
 #: models/foldermodels.py:354
 msgid "At least one of user, group, or \"everybody\" has to be selected."
-msgstr ""
+msgstr "حداقل یکی از کاربر، گروه یا \"همه\" باید انتخاب شود."
 
 #: models/foldermodels.py:360
 msgid "All Folders"
-msgstr ""
+msgstr "همه پوشه ها"
 
 #: models/foldermodels.py:362
 msgid "Logical Path"
-msgstr ""
+msgstr "مسیر منطقی"
 
 #: models/foldermodels.py:371
 #, python-brace-format
 msgid "User: {user}"
-msgstr ""
+msgstr "کاربر: {user}"
 
 #: models/foldermodels.py:373
 #, python-brace-format
 msgid "Group: {group}"
-msgstr ""
+msgstr "گروه: {group}"
 
 #: models/foldermodels.py:375
 msgid "Everybody"
-msgstr ""
+msgstr "همه"
 
 #: models/foldermodels.py:388 templates/admin/filer/widgets/admin_file.html:45
 msgid "Edit"
-msgstr ""
+msgstr "ویرایش"
 
 #: models/foldermodels.py:389
 msgid "Read"
-msgstr ""
+msgstr "خواندن"
 
 #: models/foldermodels.py:390
 msgid "Add children"
-msgstr ""
+msgstr "افزودن فرزند"
 
 #: models/imagemodels.py:18
 msgid "date taken"
-msgstr ""
+msgstr "تاریخ گرفته شده"
 
 #: models/imagemodels.py:25
 msgid "author"
-msgstr ""
+msgstr "نویسنده"
 
 #: models/imagemodels.py:32
 msgid "must always publish author credit"
-msgstr ""
+msgstr "همیشه باید اعتبار نویسنده منتشر شود"
 
 #: models/imagemodels.py:37
 msgid "must always publish copyright"
-msgstr ""
+msgstr "همیشه باید حق چاپ منتشر شود"
 
 #: models/thumbnailoptionmodels.py:16
 msgid "width in pixel."
-msgstr ""
+msgstr "عرض بر حسب پیکسل."
 
 #: models/thumbnailoptionmodels.py:21
 msgid "height in pixel."
-msgstr ""
+msgstr "ارتفاع بر حسب پیکسل."
 
 #: models/thumbnailoptionmodels.py:38
 msgid "thumbnail options"
-msgstr ""
+msgstr "گزینه های تصویر بندانگشتی"
 
 #: models/virtualitems.py:46
 #: templates/admin/filer/folder/directory_table_list.html:4
@@ -543,70 +550,70 @@ msgstr ""
 #: templates/admin/filer/folder/directory_thumbnail_list.html:146
 #: templates/admin/filer/tools/clipboard/clipboard.html:27
 msgid "Unsorted Uploads"
-msgstr ""
+msgstr "آپلودهای مرتب نشده"
 
 #: models/virtualitems.py:73
 msgid "files with missing metadata"
-msgstr ""
+msgstr "فایل های با متادیتای از دست رفته"
 
 #: models/virtualitems.py:87 templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:102
 msgid "root"
-msgstr ""
+msgstr "ریشه"
 
 #: settings.py:273
 msgid "Show table view"
-msgstr ""
+msgstr "نمایش نمای جدولی"
 
 #: settings.py:278
 msgid "Show thumbnail view"
-msgstr ""
+msgstr "نمایش نمای بندانگشتی"
 
 #: templates/admin/filer/actions.html:5
 msgid "Run the selected action"
-msgstr ""
+msgstr "اجرای عمل انتخاب شده"
 
 #: templates/admin/filer/actions.html:5
 msgid "Go"
-msgstr ""
+msgstr "برو"
 
 #: templates/admin/filer/actions.html:14
 #: templates/admin/filer/folder/directory_table_list.html:235
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "برای انتخاب اشیاء در تمام صفحات اینجا کلیک کنید"
 
 #: templates/admin/filer/actions.html:14
 #, python-format
 msgid "Select all %(total_count)s files and/or folders"
-msgstr ""
+msgstr "انتخاب همه %(total_count)s فایل ها و/یا پوشه ها"
 
 #: templates/admin/filer/actions.html:16
 #: templates/admin/filer/folder/directory_table_list.html:237
 #: templates/admin/filer/folder/directory_thumbnail_list.html:212
 msgid "Clear selection"
-msgstr ""
+msgstr "پاک کردن انتخاب"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/directory_listing.html:28
 msgid "Go back to admin homepage"
-msgstr ""
+msgstr "بازگشت به صفحه اصلی مدیریت"
 
 #: templates/admin/filer/breadcrumbs.html:4
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/directory_listing.html:29
 msgid "Home"
-msgstr ""
+msgstr "خانه"
 
 #: templates/admin/filer/breadcrumbs.html:5
 #: templates/admin/filer/folder/directory_listing.html:32
 msgid "Go back to Filer app"
-msgstr ""
+msgstr "بازگشت به برنامه فایلر"
 
 #: templates/admin/filer/breadcrumbs.html:6
 #: templates/admin/filer/folder/directory_listing.html:35
 msgid "Go back to root folder"
-msgstr ""
+msgstr "بازگشت به پوشه ریشه"
 
 #: templates/admin/filer/breadcrumbs.html:8
 #: templates/admin/filer/breadcrumbs.html:18
@@ -615,11 +622,11 @@ msgstr ""
 #: templates/admin/filer/folder/directory_listing.html:47
 #, python-format
 msgid "Go back to '%(folder_name)s' folder"
-msgstr ""
+msgstr "بازگشت به پوشه '%(folder_name)s'"
 
 #: templates/admin/filer/change_form.html:26
 msgid "Duplicates"
-msgstr ""
+msgstr "تکرارها"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:11
 msgid ""
@@ -627,51 +634,56 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"حذف فایل ها و/یا پوشه های انتخاب شده منجر به حذف اشیاء مرتبط می شود، اما حساب "
+"شما مجوز حذف انواع زیر از اشیاء را ندارد:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:19
 msgid ""
 "Deleting the selected files and/or folders would require deleting the "
 "following protected related objects:"
 msgstr ""
+"حذف فایل ها و/یا پوشه های انتخاب شده مستلزم حذف اشیاء محافظت شده مرتبط زیر است:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:27
 msgid ""
 "Are you sure you want to delete the selected files and/or folders? All of "
 "the following objects and their related items will be deleted:"
 msgstr ""
+"آیا مطمئن هستید که می خواهید فایل ها و/یا پوشه های انتخاب شده را حذف کنید؟ همه "
+"اشیاء زیر و آیتم های مرتبط با آنها حذف خواهند شد:"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:46
 #: templates/admin/filer/folder/choose_copy_destination.html:64
 #: templates/admin/filer/folder/choose_move_destination.html:72
 msgid "No, take me back"
-msgstr ""
+msgstr "خیر، مرا برگردان"
 
 #: templates/admin/filer/delete_selected_files_confirmation.html:47
 msgid "Yes, I&#39;m sure"
-msgstr ""
+msgstr "بله، مطمئنم"
 
 #: templates/admin/filer/file/change_form.html:35
 #: templates/admin/filer/folder/change_form.html:21
 #: templates/admin/filer/image/change_form.html:35
 msgid "History"
-msgstr ""
+msgstr "تاریخچه"
 
 #: templates/admin/filer/file/change_form.html:37
 #: templates/admin/filer/folder/change_form.html:23
 #: templates/admin/filer/image/change_form.html:37
 msgid "View on site"
-msgstr ""
+msgstr "مشاهده در سایت"
 
 #: templates/admin/filer/folder/change_form.html:6
 #: templates/admin/filer/folder/change_form.html:7
 #: templates/admin/filer/folder/change_form.html:8
 #: templates/admin/filer/folder/directory_listing.html:102
 msgid "Go back to"
-msgstr ""
+msgstr "بازگشت به"
 
 #: templates/admin/filer/folder/change_form.html:6
 msgid "admin homepage"
-msgstr ""
+msgstr "صفحه اصلی مدیریت"
 
 #: templates/admin/filer/folder/change_form.html:37
 #: templates/admin/filer/folder/directory_listing.html:95
@@ -683,13 +695,13 @@ msgstr ""
 #: templates/admin/filer/folder/directory_thumbnail_list.html:61
 #: templates/admin/filer/folder/directory_thumbnail_list.html:156
 msgid "Folder Icon"
-msgstr ""
+msgstr "آیکون پوشه"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:23
 msgid ""
 "Your account doesn't have permissions to copy all of the selected files and/"
 "or folders."
-msgstr ""
+msgstr "حساب شما مجوز کپی کردن همه فایل ها و/یا پوشه های انتخاب شده را ندارد."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:25
 #: templates/admin/filer/folder/choose_copy_destination.html:31
@@ -698,157 +710,159 @@ msgstr ""
 #: templates/admin/filer/folder/choose_move_destination.html:43
 #: templates/admin/filer/folder/choose_move_destination.html:49
 msgid "Take me back"
-msgstr ""
+msgstr "مرا برگردان"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:29
 #: templates/admin/filer/folder/choose_move_destination.html:41
 msgid "There are no destination folders available."
-msgstr ""
+msgstr "هیچ پوشه مقصدی در دسترس نیست."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:35
 msgid "There are no files and/or folders available to copy."
-msgstr ""
+msgstr "هیچ فایل و/یا پوشه ای برای کپی کردن در دسترس نیست."
 
 #: templates/admin/filer/folder/choose_copy_destination.html:40
 msgid ""
 "The following files and/or folders will be copied to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
+msgstr "فایل ها و/یا پوشه های زیر به یک پوشه مقصد کپی خواهند شد (ساختار درختی آنها حفظ می شود):"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:54
 #: templates/admin/filer/folder/choose_move_destination.html:64
 msgid "Destination folder:"
-msgstr ""
+msgstr "پوشه مقصد:"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:65
 #: templates/admin/filer/folder/choose_copy_destination.html:68
 #: templates/admin/filer/folder/directory_listing.html:178
 msgid "Copy"
-msgstr ""
+msgstr "کپی"
 
 #: templates/admin/filer/folder/choose_copy_destination.html:67
 msgid "It is not allowed to copy files into same folder"
-msgstr ""
+msgstr "کپی کردن فایل ها به همان پوشه مجاز نیست"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:15
 msgid ""
 "Your account doesn't have permissions to resize all of the selected images."
-msgstr ""
+msgstr "حساب شما مجوز تغییر اندازه همه تصاویر انتخاب شده را ندارد."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:18
 msgid "There are no images available to resize."
-msgstr ""
+msgstr "هیچ تصویری برای تغییر اندازه در دسترس نیست."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:20
 msgid "The following images will be resized:"
-msgstr ""
+msgstr "تصاویر زیر تغییر اندازه داده خواهند شد:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:32
 msgid "Choose an existing thumbnail option or enter resize parameters:"
-msgstr ""
+msgstr "یک گزینه تصویر بندانگشتی موجود را انتخاب کنید یا پارامترهای تغییر اندازه را وارد کنید:"
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:36
 msgid ""
 "Warning: Images will be resized in-place and originals will be lost. Maybe "
 "first make a copy of them to retain the originals."
 msgstr ""
+"هشدار: تصاویر در جای خود تغییر اندازه داده می شوند و نسخه های اصلی از بین می "
+"روند. شاید بهتر است ابتدا یک کپی از آنها تهیه کنید تا نسخه های اصلی حفظ شوند."
 
 #: templates/admin/filer/folder/choose_images_resize_options.html:39
 msgid "Resize"
-msgstr ""
+msgstr "تغییر اندازه"
 
 #: templates/admin/filer/folder/choose_move_destination.html:35
 msgid ""
 "Your account doesn't have permissions to move all of the selected files and/"
 "or folders."
-msgstr ""
+msgstr "حساب شما مجوز جابجایی همه فایل ها و/یا پوشه های انتخاب شده را ندارد."
 
 #: templates/admin/filer/folder/choose_move_destination.html:47
 msgid "There are no files and/or folders available to move."
-msgstr ""
+msgstr "هیچ فایل و/یا پوشه ای برای جابجایی در دسترس نیست."
 
 #: templates/admin/filer/folder/choose_move_destination.html:52
 msgid ""
 "The following files and/or folders will be moved to a destination folder "
 "(retaining their tree structure):"
-msgstr ""
+msgstr "فایل ها و/یا پوشه های زیر به یک پوشه مقصد منتقل خواهند شد (ساختار درختی آنها حفظ می شود):"
 
 #: templates/admin/filer/folder/choose_move_destination.html:73
 #: templates/admin/filer/folder/choose_move_destination.html:76
 #: templates/admin/filer/folder/directory_listing.html:181
 msgid "Move"
-msgstr ""
+msgstr "انتقال"
 
 #: templates/admin/filer/folder/choose_move_destination.html:75
 msgid "It is not allowed to move files into same folder"
-msgstr ""
+msgstr "انتقال فایل ها به همان پوشه مجاز نیست"
 
 #: templates/admin/filer/folder/choose_rename_format.html:15
 msgid ""
 "Your account doesn't have permissions to rename all of the selected files."
-msgstr ""
+msgstr "حساب شما مجوز تغییر نام همه فایل های انتخاب شده را ندارد."
 
 #: templates/admin/filer/folder/choose_rename_format.html:18
 msgid "There are no files available to rename."
-msgstr ""
+msgstr "هیچ فایلی برای تغییر نام در دسترس نیست."
 
 #: templates/admin/filer/folder/choose_rename_format.html:20
 msgid ""
 "The following files will be renamed (they will stay in their folders and "
 "keep original filename, only displayed filename will be changed):"
-msgstr ""
+msgstr "فایل های زیر تغییر نام داده خواهند شد (در پوشه های خود باقی می مانند و نام فایل اصلی حفظ می شود، فقط نام نمایش داده شده تغییر می کند):"
 
 #: templates/admin/filer/folder/choose_rename_format.html:59
 msgid "Rename"
-msgstr ""
+msgstr "تغییر نام"
 
 #: templates/admin/filer/folder/directory_listing.html:94
 msgid "Go back to the parent folder"
-msgstr ""
+msgstr "بازگشت به پوشه والد"
 
 #: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change current folder details"
-msgstr ""
+msgstr "تغییر جزئیات پوشه فعلی"
 
 #: templates/admin/filer/folder/directory_listing.html:131
 msgid "Change"
-msgstr ""
+msgstr "تغییر"
 
 #: templates/admin/filer/folder/directory_listing.html:141
 msgid "Click here to run search for entered phrase"
-msgstr ""
+msgstr "برای جستجوی عبارت وارد شده اینجا کلیک کنید"
 
 #: templates/admin/filer/folder/directory_listing.html:144
 msgid "Search"
-msgstr ""
+msgstr "جستجو"
 
 #: templates/admin/filer/folder/directory_listing.html:151
 msgid "Close"
-msgstr ""
+msgstr "بستن"
 
 #: templates/admin/filer/folder/directory_listing.html:153
 msgid "Limit"
-msgstr ""
+msgstr "محدودیت"
 
 #: templates/admin/filer/folder/directory_listing.html:158
 msgid "Check it to limit the search to current folder"
-msgstr ""
+msgstr "برای محدود کردن جستجو به پوشه فعلی آن را بررسی کنید"
 
 #: templates/admin/filer/folder/directory_listing.html:159
 msgid "Limit the search to current folder"
-msgstr ""
+msgstr "محدود کردن جستجو به پوشه فعلی"
 
 #: templates/admin/filer/folder/directory_listing.html:175
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: templates/admin/filer/folder/directory_listing.html:203
 msgid "Adds a new Folder"
-msgstr ""
+msgstr "افزودن یک پوشه جدید"
 
 #: templates/admin/filer/folder/directory_listing.html:206
 msgid "New Folder"
-msgstr ""
+msgstr "پوشه جدید"
 
 #: templates/admin/filer/folder/directory_listing.html:211
 #: templates/admin/filer/folder/directory_listing.html:218
@@ -856,29 +870,29 @@ msgstr ""
 #: templates/admin/filer/folder/directory_listing.html:228
 #: templates/admin/filer/folder/directory_listing.html:235
 msgid "Upload Files"
-msgstr ""
+msgstr "بارگذاری فایل‌ها"
 
 #: templates/admin/filer/folder/directory_listing.html:233
 msgid "You have to select a folder first"
-msgstr ""
+msgstr "ابتدا باید یک پوشه انتخاب کنید"
 
 #: templates/admin/filer/folder/directory_table_list.html:16
 msgid "Name"
-msgstr ""
+msgstr "نام"
 
 #: templates/admin/filer/folder/directory_table_list.html:17
 #: templates/admin/filer/tools/detail_info.html:50
 msgid "Owner"
-msgstr ""
+msgstr "مالک"
 
 #: templates/admin/filer/folder/directory_table_list.html:18
 #: templates/admin/filer/tools/detail_info.html:34
 msgid "Size"
-msgstr ""
+msgstr "اندازه"
 
 #: templates/admin/filer/folder/directory_table_list.html:19
 msgid "Action"
-msgstr ""
+msgstr "عملیات"
 
 #: templates/admin/filer/folder/directory_table_list.html:28
 #: templates/admin/filer/folder/directory_table_list.html:35
@@ -890,31 +904,31 @@ msgstr ""
 #: templates/admin/filer/folder/directory_thumbnail_list.html:66
 #, python-format
 msgid "Change '%(item_label)s' folder details"
-msgstr ""
+msgstr "تغییر جزئیات پوشه '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:76
 #: templates/admin/filer/tools/search_form.html:5
 #, python-format
 msgid "%(counter)s folder"
 msgid_plural "%(counter)s folders"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s پوشه"
+msgstr[1] "%(counter)s پوشه"
 
 #: templates/admin/filer/folder/directory_table_list.html:77
 #: templates/admin/filer/tools/search_form.html:6
 #, python-format
 msgid "%(counter)s file"
 msgid_plural "%(counter)s files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s فایل"
+msgstr[1] "%(counter)s فایل"
 
 #: templates/admin/filer/folder/directory_table_list.html:83
 msgid "Change folder details"
-msgstr ""
+msgstr "تغییر جزئیات پوشه"
 
 #: templates/admin/filer/folder/directory_table_list.html:84
 msgid "Remove folder"
-msgstr ""
+msgstr "حذف پوشه"
 
 #: templates/admin/filer/folder/directory_table_list.html:96
 #: templates/admin/filer/folder/directory_table_list.html:104
@@ -923,7 +937,7 @@ msgstr ""
 #: templates/admin/filer/folder/directory_thumbnail_list.html:104
 #: templates/admin/filer/folder/directory_thumbnail_list.html:119
 msgid "Select this file"
-msgstr ""
+msgstr "انتخاب این فایل"
 
 #: templates/admin/filer/folder/directory_table_list.html:107
 #: templates/admin/filer/folder/directory_table_list.html:122
@@ -932,298 +946,100 @@ msgstr ""
 #: templates/admin/filer/folder/directory_thumbnail_list.html:122
 #, python-format
 msgid "Change '%(item_label)s' details"
-msgstr ""
+msgstr "تغییر جزئیات '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:131
 #: templates/admin/filer/folder/directory_thumbnail_list.html:130
 msgid "Permissions"
-msgstr ""
+msgstr "مجوزها"
 
 #: templates/admin/filer/folder/directory_table_list.html:131
 #: templates/admin/filer/folder/directory_thumbnail_list.html:130
 msgid "disabled"
-msgstr ""
+msgstr "غیرفعال"
 
 #: templates/admin/filer/folder/directory_table_list.html:131
 #: templates/admin/filer/folder/directory_thumbnail_list.html:130
 msgid "enabled"
-msgstr ""
+msgstr "فعال"
 
 #: templates/admin/filer/folder/directory_table_list.html:144
 #, fuzzy
 #| msgid "Move selected files to clipboard"
 msgid "URL copied to clipboard"
-msgstr "انتقال فایل های انتخاب شده به کلیپ برد"
+msgstr "آدرس URL به کلیپ‌بورد کپی شد"
 
 #: templates/admin/filer/folder/directory_table_list.html:147
 #, python-format
 msgid "Canonical url '%(item_label)s'"
-msgstr ""
+msgstr "آدرس اصلی '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:151
 #, python-format
 msgid "Download '%(item_label)s'"
-msgstr ""
+msgstr "دانلود '%(item_label)s'"
 
 #: templates/admin/filer/folder/directory_table_list.html:155
 msgid "Remove file"
-msgstr ""
+msgstr "حذف فایل"
 
 #: templates/admin/filer/folder/directory_table_list.html:163
 #: templates/admin/filer/folder/directory_thumbnail_list.html:138
 msgid "Drop files here or use the \"Upload Files\" button"
-msgstr ""
+msgstr "فایل‌ها را اینجا رها کنید یا از دکمه «بارگذاری فایل‌ها» استفاده کنید"
 
 #: templates/admin/filer/folder/directory_table_list.html:178
 #: templates/admin/filer/folder/directory_thumbnail_list.html:153
 msgid "Drop your file to upload into:"
-msgstr ""
+msgstr "فایل خود را برای بارگذاری اینجا رها کنید:"
 
 #: templates/admin/filer/folder/directory_table_list.html:188
 #: templates/admin/filer/folder/directory_thumbnail_list.html:163
 msgid "Upload"
-msgstr ""
+msgstr "بارگذاری"
 
 #: templates/admin/filer/folder/directory_table_list.html:200
 #: templates/admin/filer/folder/directory_thumbnail_list.html:175
 msgid "cancel"
-msgstr ""
+msgstr "لغو"
 
 #: templates/admin/filer/folder/directory_table_list.html:204
 #: templates/admin/filer/folder/directory_thumbnail_list.html:179
 msgid "Upload success!"
-msgstr ""
+msgstr "بارگذاری موفقیت‌آمیز بود!"
 
 #: templates/admin/filer/folder/directory_table_list.html:208
 #: templates/admin/filer/folder/directory_thumbnail_list.html:183
 msgid "Upload canceled!"
-msgstr ""
+msgstr "بارگذاری لغو شد!"
 
 #: templates/admin/filer/folder/directory_table_list.html:215
 #: templates/admin/filer/folder/directory_thumbnail_list.html:190
 msgid "previous"
-msgstr ""
+msgstr "قبلی"
 
 #: templates/admin/filer/folder/directory_table_list.html:220
 #: templates/admin/filer/folder/directory_thumbnail_list.html:195
 #, python-format
 msgid "Page %(number)s of %(num_pages)s."
-msgstr ""
+msgstr "صفحه %(number)s از %(num_pages)s."
 
 #: templates/admin/filer/folder/directory_table_list.html:225
 #: templates/admin/filer/folder/directory_thumbnail_list.html:200
 msgid "next"
-msgstr ""
+msgstr "بعدی"
 
 #: templates/admin/filer/folder/directory_table_list.html:235
 #: templates/admin/filer/folder/directory_thumbnail_list.html:210
 #, python-format
 msgid "Select all %(total_count)s"
-msgstr ""
+msgstr "انتخاب همه %(total_count)s"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:15
 #: templates/admin/filer/folder/directory_thumbnail_list.html:80
 msgid "Select all"
-msgstr ""
+msgstr "انتخاب همه"
 
 #: templates/admin/filer/folder/directory_thumbnail_list.html:77
 msgid "Files"
-msgstr ""
-
-#: templates/admin/filer/folder/new_folder_form.html:4
-#: templates/admin/filer/folder/new_folder_form.html:7
-msgid "Add new"
-msgstr ""
-
-#: templates/admin/filer/folder/new_folder_form.html:4
-msgid "Django site admin"
-msgstr ""
-
-#: templates/admin/filer/folder/new_folder_form.html:15
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/admin/filer/folder/new_folder_form.html:30
-msgid "Save"
-msgstr ""
-
-#: templates/admin/filer/templatetags/file_icon.html:9
-msgid "Your browser does not support audio."
-msgstr ""
-
-#: templates/admin/filer/templatetags/file_icon.html:14
-msgid "Your browser does not support video."
-msgstr ""
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:9
-msgid "Clipboard"
-msgstr ""
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:21
-msgid "Paste all items here"
-msgstr ""
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
-msgid "Move all clipboard files to"
-msgstr ""
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:27
-msgid "Empty Clipboard"
-msgstr ""
-
-#: templates/admin/filer/tools/clipboard/clipboard.html:50
-msgid "the clipboard is empty"
-msgstr ""
-
-#: templates/admin/filer/tools/clipboard/clipboard_item_rows.html:16
-msgid "upload failed"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:11
-msgid "Download"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:16
-msgid "Expand"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:21
-#: templates/admin/filer/widgets/admin_file.html:32
-#: templatetags/filer_admin_tags.py:108
-msgid "File is missing"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:30
-msgid "Type"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:38
-msgid "File-size"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:42
-msgid "Modified"
-msgstr ""
-
-#: templates/admin/filer/tools/detail_info.html:46
-msgid "Created"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:5
-msgid "found"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:5
-msgid "and"
-msgstr ""
-
-#: templates/admin/filer/tools/search_form.html:7
-msgid "cancel search"
-msgstr ""
-
-#: templates/admin/filer/widgets/admin_file.html:10
-#: templates/admin/filer/widgets/admin_file.html:39
-#: templates/admin/filer/widgets/admin_folder.html:18
-msgid "Clear"
-msgstr ""
-
-#: templates/admin/filer/widgets/admin_file.html:22
-msgid "or drop your file here"
-msgstr ""
-
-#: templates/admin/filer/widgets/admin_file.html:35
-msgid "no file selected"
-msgstr ""
-
-#: templates/admin/filer/widgets/admin_file.html:50
-#: templates/admin/filer/widgets/admin_folder.html:14
-msgid "Lookup"
-msgstr ""
-
-#: templates/admin/filer/widgets/admin_file.html:51
-msgid "Choose File"
-msgstr ""
-
-#: templates/admin/filer/widgets/admin_folder.html:16
-msgid "Choose Folder"
-msgstr ""
-
-#: validation.py:20
-#, python-brace-format
-msgid "File \"{file_name}\": Upload denied by site security policy"
-msgstr ""
-
-#: validation.py:23
-#, python-brace-format
-msgid "File \"{file_name}\": {file_type} upload denied by site security policy"
-msgstr ""
-
-#: validation.py:34
-#, python-brace-format
-msgid "File \"{file_name}\": HTML upload denied by site security policy"
-msgstr ""
-
-#: validation.py:72
-#, python-brace-format
-msgid ""
-"File \"{file_name}\": Rejected due to potential cross site scripting "
-"vulnerability"
-msgstr ""
-
-#: validation.py:84
-#, python-brace-format
-msgid "File \"{file_name}\": SVG file format not recognized"
-msgstr ""
-
-#~ msgid "Resize parameters must be choosen."
-#~ msgstr "Resize parameters must be choosen."
-
-#~ msgid "Choose resize parameters:"
-#~ msgstr "Choose resize parameters:"
-
-#~ msgid "Open file"
-#~ msgstr "Open file"
-
-#~ msgid "Full size preview"
-#~ msgstr "Full size preview"
-
-#~ msgid "Add Description"
-#~ msgstr "Add Description"
-
-#~ msgid "Author"
-#~ msgstr "Author"
-
-#~ msgid "Add Alt-Text"
-#~ msgstr "Add Alt-Text"
-
-#~ msgid "Add caption"
-#~ msgstr "Add caption"
-
-#~ msgid "Add Tags"
-#~ msgstr "Add Tags"
-
-#~ msgid "Change File"
-#~ msgstr "Change File"
-
-#~ msgid "none selected"
-#~ msgstr "none selected"
-
-#~ msgid "Add Folder"
-#~ msgstr "Add Folder"
-
-#~ msgid "Subject Location"
-#~ msgstr "Subject location"
-
-#~ msgid ""
-#~ "\n"
-#~ "            %(counter)s file"
-#~ msgid_plural ""
-#~ "%(counter)s files\n"
-#~ "        "
-#~ msgstr[0] "15c0f2d28d6dab1af1f6d94906beb627_pl_0"
-#~ msgstr[1] "15c0f2d28d6dab1af1f6d94906beb627_pl_1"
-
-#~ msgid "Upload File"
-#~ msgstr "Upload File"
+msgstr "فایل‌ها"
