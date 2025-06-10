@@ -2,8 +2,10 @@
 CHANGELOG
 =========
 
-Unreleased
-==========
+2.2.8 (2025-06-10)
+==================
+
+* fix(2.2.x backport): respect upload and directory listing permissions by @fdintino in https://github.com/django-cms/django-filer/pull/1527
 
 2.2.7 (2024-05-16)
 ==================
