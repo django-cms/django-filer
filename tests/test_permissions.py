@@ -1,7 +1,7 @@
 import os
 
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 
@@ -33,8 +33,11 @@ class FolderPermissionsTestCase(TestCase):
 
         self.owner = User.objects.create(username='owner')
 
+        perms = Permission.objects.filter(codename="change_folder")
         self.test_user1 = User.objects.create(username='test1', password='secret')
         self.test_user2 = User.objects.create(username='test2', password='secret')
+        self.test_user1.user_permissions.add(*perms)
+        self.test_user2.user_permissions.add(*perms)
 
         self.group1 = Group.objects.create(name='name1')
         self.group2 = Group.objects.create(name='name2')
