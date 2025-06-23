@@ -20,6 +20,10 @@ class FinderFileSelect(TextInput):
         )]
 
     def get_context(self, name, value, attrs):
+        attrs = attrs or {}
+        css_classes = attrs.get('class', '').split()
+        css_classes.append('finder-file-field')
+        attrs['class'] = ' '.join(css_classes)
         context = super().get_context(name, value, attrs)
         context.update(
             base_url=reverse('finder-api:base-url'),
