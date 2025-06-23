@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.widgets import TextInput
@@ -6,7 +7,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import format_html
 
-from finder.models.file import AbstractFileModel
+from finder.models.file import AbstractFileModel, FileModel
 
 
 class FinderFileSelect(TextInput):
@@ -30,6 +31,12 @@ class FinderFileSelect(TextInput):
             realm='admin',
             style_url=static('finder/css/finder-browser.css'),
         )
+        if isinstance(value, str):
+            # file reference has not been stored using a `finder.models.fields.FinderFileField`
+            try:
+                value = FileModel.objects.get_inode(id=uuid.UUID(value), is_folder=False)
+            except (ValueError, FileModel.DoesNotExist):
+                pass
         if isinstance(value, AbstractFileModel):
             context['selected_file'] = json.dumps(value.as_dict, cls=DjangoJSONEncoder)
         return context
@@ -37,4 +44,6 @@ class FinderFileSelect(TextInput):
     def format_value(self, value):
         if value == "" or value is None:
             return None
-        return value.id
+        if isinstance(value, AbstractFileModel):
+            return value.id
+        return value

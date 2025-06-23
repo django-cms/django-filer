@@ -73,11 +73,13 @@ class BrowserView(View):
             # in addition to that, also open all ancestors of the last opened folder
             open_folders = set(request.session['finder.open_folders'])
             try:
-                open_folders.update(
-                    map(str, FolderModel.objects.get(id=last_folder_id).ancestors.values_list('id', flat=True))
-                )
+                ancestors = FolderModel.objects.get(id=last_folder_id).ancestors
             except FolderModel.DoesNotExist:
                 pass
+            if isinstance(ancestors, QuerySet):
+                open_folders.update(map(str, ancestors.values_list('id', flat=True)))
+            else:  # django-cte not installed
+                open_folders.update(str(ancestor.id) for ancestor in ancestors)
             children = self._get_children(open_folders, realm.root_folder)
         else:
             children = None

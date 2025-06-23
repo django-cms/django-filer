@@ -5,8 +5,10 @@ finder-file-select {
 	input.finder-file-field {
 		width: 0 !important;
 		height: 0 !important;
+		border: none !important;
+		outline: none !important;
 		position: absolute;
 		bottom: 0;
-		padding: 0;
+		padding: 0 !important;
 	}
 }

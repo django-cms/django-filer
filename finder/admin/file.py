@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from finder.forms.file import FileForm
 from finder.models.file import FileModel
 from finder.models.inode import InodeModel
+from finder.models.label import Label
 from finder.admin.inode import InodeAdmin
 
 
@@ -83,6 +84,12 @@ class FileAdmin(InodeAdmin):
         file_obj.receive_file(uploaded_file)
         file_obj.save()
         return HttpResponse(f"Replaced content of {file_obj.name} successfully.")
+
+    def get_fields(self, request, obj=None):
+        fields = list(super().get_fields(request, obj))
+        if 'labels' in fields and not Label.objects.exists():
+            fields.remove('labels')
+        return fields
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         has_editable_inline_admin_formsets = False
