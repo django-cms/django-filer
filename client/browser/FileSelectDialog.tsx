@@ -214,7 +214,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	function handleUpload(folderId, uploadedFiles){
+	function handleUpload(folderId, uploadedFiles) {
 		if (structure.last_folder !== folderId)
 			throw new Error('Folder mismatch');
 		setUploadedFile(uploadedFiles[0]);

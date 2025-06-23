@@ -10,7 +10,7 @@ export default function FinderFileSelect(props) {
 	const selectRef = useRef(null);
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
-	const csrfToken = shadowRoot.host.closest('form')?.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+	const csrfToken = getCSRFToken();
 
 	useEffect(() => {
 		// Create a styles element for the shadow DOM
@@ -29,7 +29,7 @@ export default function FinderFileSelect(props) {
 		};
 		const preventDefault = (event) => {
 			event.preventDefault();
-		}
+		};
 		window.addEventListener('keydown', handleEscape);
 
 		// prevent browser from loading a drag-and-dropped file
@@ -42,6 +42,15 @@ export default function FinderFileSelect(props) {
 			window.removeEventListener('drop', preventDefault);
 		}
 	}, []);
+
+	function getCSRFToken() {
+		const csrfToken = shadowRoot.host.closest('form')?.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+		if (csrfToken)
+			return csrfToken;
+		const parts = `; ${document.cookie}`.split('; csrftoken=');
+		if (parts.length === 2)
+			return parts.pop().split(';').shift();
+	}
 
 	function openDialog() {
 		dialogRef.current.showModal();
