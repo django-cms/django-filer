@@ -1,7 +1,6 @@
 import React, {
 	createContext,
 	forwardRef,
-	isValidElement,
 	HTMLProps,
 	ReactNode,
 	useContext,
@@ -104,30 +103,17 @@ export function Tooltip({children, ...options}: { children: ReactNode } & Toolti
 
 export const TooltipTrigger = forwardRef<
 	HTMLElement,
-	HTMLProps<HTMLElement> & {asChild?: boolean}
->(({children, asChild = false, ...props}, forwardedRef) => {
+	HTMLProps<HTMLElement>
+>(({children, ...props}, forwardedRef) => {
 	const context = useTooltipContext();
 	const childrenRef = (children as any).ref;
 	const ref = useMergeRefs([context.refs.setReference, forwardedRef, childrenRef]);
 
-	// `asChild` allows the user to pass any element as the anchor
-	if (asChild && isValidElement(children)) {
-		return React.cloneElement(
-			children,
-			context.getReferenceProps({
-				ref,
-				...props,
-				...children.props,
-				'data-state': context.open ? 'open' : 'closed'
-			})
-		);
-	}
-
-	return (
+		return (
 		<div
 			ref={ref}
 			// The user can style the trigger based on the state
-			data-state={context.open ? "open" : "closed"}
+			data-state={context.open ? 'open' : 'closed'}
 			{...context.getReferenceProps(props)}
 		>
 			{children}
