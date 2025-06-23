@@ -10,9 +10,6 @@ from finder.models.file import FileModel
 class FinderFileField(UUIDField):
     description = _("Reference to a file in the finder app.")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def formfield(self, **kwargs):
         return super().formfield(
             **{

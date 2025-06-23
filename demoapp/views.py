@@ -15,7 +15,3 @@ class DemoAppView(UpdateView):
 
     def get_success_url(self):
         return self.request.path
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
