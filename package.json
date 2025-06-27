@@ -10,7 +10,7 @@
   "devDependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^6.0.1",
-    "@floating-ui/react": "^0.27.4",
+    "@floating-ui/react": "^0.27.12",
     "@r2wc/react-to-web-component": "^2.0.3",
     "@types/react-dom": "^18.3.5",
     "@wavesurfer/react": "^1.0.9",
@@ -26,8 +26,5 @@
     "sass": "^1.78.0",
     "typescript": "^5.6.3",
     "yargs-parser": "^21.1.1"
-  },
-  "dependencies": {
-    "@floating-ui/react": "^0.27.2"
   }
 }
