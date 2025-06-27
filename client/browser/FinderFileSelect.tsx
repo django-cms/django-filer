@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
+import {useMutationObserver} from '../common/MutationObserver';
 
 
 export default function FinderFileSelect(props) {
