@@ -1,10 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {RefObject, useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
 import {useMutationObserver} from '../common/MutationObserver';
 
 
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
+	const hostRef = useRef(shadowRoot.host);
 	const baseUrl = props['base-url'];
 	const styleUrl = props['style-url'];
 	const [selectedFile, setSelectedFile] = useState(props['selected-file']);
@@ -12,6 +13,12 @@ export default function FinderFileSelect(props) {
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
 	const csrfToken = getCSRFToken();
+
+	useMutationObserver(hostRef, (mutationList) => {
+		for (const mutation of mutationList) {
+			console.log(`The ${mutation.attributeName} attribute was modified.`);
+		}
+	}, {attributes: true});
 
 	useEffect(() => {
 		// Create a styles element for the shadow DOM
