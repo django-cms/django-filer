@@ -1,16 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
-import {useMutationObserver} from '../common/MutationObserver';
 
 
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
 	const baseUrl = props['base-url'];
 	const styleUrl = props['style-url'];
-	const [selectedFile, setSelectedFile] = useState(props['selected-file']);
 	const selectRef = useRef(null);
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
+	const [selectedFile, setSelectedFile] = useState({});
 	const csrfToken = getCSRFToken();
 
 	useEffect(() => {
@@ -20,6 +19,15 @@ export default function FinderFileSelect(props) {
 		link.media = 'all';
 		link.rel = 'stylesheet';
 		shadowRoot.insertBefore(link, shadowRoot.firstChild);
+		const observer = new MutationObserver(attributesChanged);
+		const inputElement = slotRef.current.assignedElements()[0];
+		if (inputElement instanceof HTMLInputElement) {
+			setSelectedFile(JSON.parse(inputElement.getAttribute('data-selected_file')));
+			observer.observe(inputElement, {attributes: true});
+		}
+		return () => {
+			observer.disconnect();
+		};
 	}, []);
 
 	useEffect(() => {
@@ -43,6 +51,21 @@ export default function FinderFileSelect(props) {
 			window.removeEventListener('drop', preventDefault);
 		}
 	}, []);
+
+	async function attributesChanged(mutationList) {
+		for (const mutation of mutationList) {
+			if (mutation.type === 'attributes' && mutation.attributeName === 'data-file_id') {
+				const fileId = mutation.target.dataset.file_id;
+				const response = await fetch(`${baseUrl}${fileId}/fetch`);
+				if (response.ok) {
+					setSelectedFile(await response.json());
+				} else {
+					console.error(`Failed to fetch file info for ID ${fileId}:`, response.statusText);
+				}
+
+			}
+		}
+	}
 
 	function getCSRFToken() {
 		const csrfToken = shadowRoot.host.closest('form')?.querySelector('input[name="csrfmiddlewaretoken"]')?.value;

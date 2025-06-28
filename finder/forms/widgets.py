@@ -25,12 +25,6 @@ class FinderFileSelect(TextInput):
         css_classes = attrs.get('class', '').split()
         css_classes.append('finder-file-field')
         attrs['class'] = ' '.join(css_classes)
-        context = super().get_context(name, value, attrs)
-        context.update(
-            base_url=reverse('finder-api:base-url'),
-            realm='admin',
-            style_url=static('finder/css/finder-browser.css'),
-        )
         if isinstance(value, str):
             # file reference has not been stored using a `finder.models.fields.FinderFileField`
             try:
@@ -38,7 +32,13 @@ class FinderFileSelect(TextInput):
             except (ValueError, FileModel.DoesNotExist):
                 pass
         if isinstance(value, AbstractFileModel):
-            context['selected_file'] = json.dumps(value.as_dict, cls=DjangoJSONEncoder)
+            attrs['data-selected_file'] = json.dumps(value.as_dict, cls=DjangoJSONEncoder)
+        context = super().get_context(name, value, attrs)
+        context.update(
+            base_url=reverse('finder-api:base-url'),
+            realm='admin',
+            style_url=static('finder/css/finder-browser.css'),
+        )
         return context
 
     def format_value(self, value):

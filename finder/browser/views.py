@@ -6,6 +6,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
 from django.views import View
+from django.views.decorators.http import last_modified
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.file import FileModel
@@ -100,24 +101,26 @@ class BrowserView(View):
             **self.list(request, request.session['finder.last_folder']),
         }
 
-    def fetch(self, request, folder_id):
+    def fetch(self, request, inode_id):
         """
         Open the given folder and fetch children data for the folder.
         """
-        folder = FolderModel.objects.get(id=folder_id)
-        folder_id = str(folder_id)
-        request.session.setdefault('finder.open_folders', [])
-        if folder_id not in request.session['finder.open_folders']:
-            request.session['finder.open_folders'].append(folder_id)
-            request.session.modified = True
-
-        return {
-            'id': folder_id,
-            'name': folder.name,
-            'children': self._get_children(request.session['finder.open_folders'], folder),
-            'is_open': True,
-            'has_subfolders': folder.subfolders.exists(),
-        }
+        inode = FileModel.objects.get_inode(id=inode_id)
+        inode_id = str(inode_id)
+        if inode.is_folder:
+            request.session.setdefault('finder.open_folders', [])
+            if inode_id not in request.session['finder.open_folders']:
+                request.session['finder.open_folders'].append(inode_id)
+                request.session.modified = True
+            return {
+                'id': inode_id,
+                'name': inode.name,
+                'children': self._get_children(request.session['finder.open_folders'], inode),
+                'is_open': True,
+                'has_subfolders': inode.subfolders.exists(),
+            }
+        else:
+            return inode.as_dict
 
     def open(self, request, folder_id):
         """
