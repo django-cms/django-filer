@@ -19,14 +19,13 @@ export default function FinderFileSelect(props) {
 		link.media = 'all';
 		link.rel = 'stylesheet';
 		shadowRoot.insertBefore(link, shadowRoot.firstChild);
-		const observer = new MutationObserver(attributesChanged);
 		const inputElement = slotRef.current.assignedElements()[0];
 		if (inputElement instanceof HTMLInputElement) {
 			setSelectedFile(JSON.parse(inputElement.getAttribute('data-selected_file')));
-			observer.observe(inputElement, {attributes: true});
+			inputElement.addEventListener('change', valueChanged);
 		}
 		return () => {
-			observer.disconnect();
+			inputElement.removeEventListener('change', valueChanged);
 		};
 	}, []);
 
@@ -52,18 +51,13 @@ export default function FinderFileSelect(props) {
 		}
 	}, []);
 
-	async function attributesChanged(mutationList) {
-		for (const mutation of mutationList) {
-			if (mutation.type === 'attributes' && mutation.attributeName === 'data-file_id') {
-				const fileId = mutation.target.dataset.file_id;
-				const response = await fetch(`${baseUrl}${fileId}/fetch`);
-				if (response.ok) {
-					setSelectedFile(await response.json());
-				} else {
-					console.error(`Failed to fetch file info for ID ${fileId}:`, response.statusText);
-				}
-
-			}
+	async function valueChanged(event) {
+		const fileId = event.target.value;
+		const response = await fetch(`${baseUrl}${fileId}/fetch`);
+		if (response.ok) {
+			setSelectedFile(await response.json());
+		} else {
+			console.error(`Failed to fetch file info for ID ${fileId}:`, response.statusText);
 		}
 	}
 
