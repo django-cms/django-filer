@@ -11,7 +11,7 @@ urlpatterns = [
         BrowserView.as_view(action='structure'),
     ),
     path(
-        '<uuid:folder_id>/fetch',
+        '<uuid:inode_id>/fetch',
         BrowserView.as_view(action='fetch'),
     ),
     path(
