@@ -47,11 +47,11 @@ export default function DropDownMenu(props){
 			className={props.className}
 		>
 			<Tooltip>
-				<TooltipTrigger><i>{props.icon}</i></TooltipTrigger>
+				<TooltipTrigger>{props.label ? props.label : ''}{props.icon && <i>{props.icon}</i>}</TooltipTrigger>
 				<TooltipContent root={props.root}>{props.tooltip}</TooltipContent>
-			<ul role="listbox">
-				{props.children}
-			</ul>
+				<ul role="listbox">
+					{props.children}
+				</ul>
 			</Tooltip>
 		</WrapperElement>
 	)
