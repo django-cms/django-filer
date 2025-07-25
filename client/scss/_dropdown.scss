@@ -48,7 +48,7 @@
 				background-color: $selected-row-color;
 
 				&::after {
-					content: "✔";
+					content: "✓";
 					position: absolute;
 					right: 10px;
 				}
