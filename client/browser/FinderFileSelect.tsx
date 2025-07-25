@@ -11,6 +11,7 @@ export default function FinderFileSelect(props) {
 	const dialogRef = useRef(null);
 	const [selectedFile, setSelectedFile] = useState({});
 	const csrfToken = getCSRFToken();
+	const uuid5Regex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 	useEffect(() => {
 		// Create a styles element for the shadow DOM
@@ -53,6 +54,10 @@ export default function FinderFileSelect(props) {
 
 	async function valueChanged(event) {
 		const fileId = event.target.value;
+		if (!uuid5Regex.test(fileId)) {
+			setSelectedFile({});
+			return;
+		}
 		const response = await fetch(`${baseUrl}${fileId}/fetch`);
 		if (response.ok) {
 			setSelectedFile(await response.json());
