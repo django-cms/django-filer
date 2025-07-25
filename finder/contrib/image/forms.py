@@ -22,6 +22,10 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
     )
     width = IntegerField(widget=HiddenInput())
     height = IntegerField(widget=HiddenInput())
+    gravity = CharField(
+        widget=HiddenInput(),
+        required=False,
+    )
     alt_text = CharField(
         widget=TextInput(attrs={'size': 100}),
         required=False,
@@ -29,5 +33,5 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
 
     class Meta:
         model = ImageFileModel
-        entangled_fields = {'meta_data': ['crop_x', 'crop_y', 'crop_size', 'alt_text']}
+        entangled_fields = {'meta_data': ['crop_x', 'crop_y', 'crop_size', 'gravity', 'alt_text']}
         untangled_fields = ['name', 'labels', 'width', 'height']

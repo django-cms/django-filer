@@ -1,5 +1,6 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
+import DropDownMenu from '../../common/DropDownMenu';
 import FileDetails from '../../admin/FileDetails';
 import ClearCropIcon from '../../icons/clear-crop.svg';
 
@@ -13,8 +14,15 @@ export default function Image(props) {
 		width: document.getElementById('id_width') as HTMLInputElement,
 		height: document.getElementById('id_height') as HTMLInputElement,
 	};
+	const gravityField = document.getElementById('id_gravity') as HTMLInputElement;
 	const [crop, setCrop] = useState<Crop>(null);
+	const [gravity, setGravity] = useState<string>(gravityField.value);
 	const ref = useRef(null);
+	const gravityOptions = {
+		'': gettext("Center"), 'n': gettext("North"), 'ne': gettext("Northeast"),
+		 'e': gettext("East"), 'se': gettext("Southeast"), 's': gettext("South"),
+		 'sw': gettext("Southwest"), 'w': gettext("West"), 'nw': gettext("Northwest"),
+	};
 
 	useEffect(() => {
 		const crop = () => {
@@ -52,9 +60,23 @@ export default function Image(props) {
 		}
 	}
 
+	function getItemProps(value: string) {
+		return {
+			role: 'option',
+			'aria-selected': gravity === value,
+			onClick: () => {
+				setGravity(value);
+				gravityField.value = value;
+			},
+		};
+	}
+
 	const controlButtons = [
 		<Fragment key="clear-crop">
 			<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
+			<DropDownMenu className="with-caret" wrapperElement="div" label={gettext("Gravity") + ": " + gravityOptions[gravity]} tooltip={gettext("Align image before cropping")}>
+				{Object.entries(gravityOptions).map(([value, label]) => (<li {...getItemProps(value)}>{label}</li>))}
+			</DropDownMenu>
 		</Fragment>
 	];
 
