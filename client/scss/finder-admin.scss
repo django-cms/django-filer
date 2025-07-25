@@ -690,6 +690,46 @@ ul.messagelist {
 					width: 20px;
 				}
 			}
+			[role="combobox"] {
+				font-weight: 400;
+				border-radius: 4px;
+				padding: 5px 15px;
+				line-height: 25px;
+				color: var(--button-fg);
+				background: var(--default-button-bg);
+				margin-right: 10px;
+				margin-bottom: 10px;
+				&[aria-expanded="false"] {
+					cursor: pointer;
+					&:hover {
+						background: var(--default-button-hover-bg);
+					}
+				}
+				&::after {
+					margin-left: 10px;
+					border-top-color: var(--button-fg);
+				}
+				[role="listbox"] {
+					color: inherit;
+					background-color: inherit;
+					padding: 5px;
+					> li {
+						padding: 0 30px 0 10px;
+						cursor: pointer;
+						&:hover {
+							background-color: var(--default-button-hover-bg);
+						}
+						&[aria-selected=true] {
+							color: $selected-row-color;
+							background-color: inherit;
+
+							&::after {
+								content: "✓";
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 

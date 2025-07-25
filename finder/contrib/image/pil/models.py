@@ -44,10 +44,11 @@ class PILImageModel(ImageFileModel):
         super().save(**kwargs)
 
     def get_thumbnail_url(self):
-        crop_x, crop_y, crop_size = (
-            self.meta_data.get('crop_x'), self.meta_data.get('crop_y'), self.meta_data.get('crop_size')
+        crop_x, crop_y, crop_size, gravity = (
+            self.meta_data.get('crop_x'), self.meta_data.get('crop_y'), self.meta_data.get('crop_size'),
+            self.meta_data.get('gravity')
         )
-        thumbnail_path = self.get_thumbnail_path(crop_x, crop_y, crop_size)
+        thumbnail_path = self.get_thumbnail_path(crop_x, crop_y, crop_size, gravity)
         if not default_storage.exists(thumbnail_path):
             try:
                 image = Image.open(default_storage.open(self.file_path))
@@ -55,35 +56,7 @@ class PILImageModel(ImageFileModel):
                 if crop_x is None or crop_y is None or crop_size is None:
                     image = self.crop_centered(image)
                 else:
-                    # with cropping, the expected resizing could be done using:
-                    # `image = image.crop((crop_x, crop_y, crop_x + crop_size, crop_y + crop_size))`
-                    # however, for small selections or images in low resolution this might result
-                    # in blurry preview images. We therefore want to use at least `thumbnail_size`
-                    # pixels from the original image
-                    min_size = max(crop_size, self.thumbnail_size)
-                    off_size = min_size / 2 - crop_size / 2
-                    min_x = max(crop_x - off_size, 0)
-                    min_y = max(crop_y - off_size, 0)
-                    if min_x + min_size > image.width:
-                        min_x = max(image.width - min_size, 0)
-                        max_x = image.width
-                    else:
-                        max_x = min_x + min_size
-                    if min_y + min_size > image.height:
-                        min_y = max(image.height - min_size, 0)
-                        max_y = image.height
-                    else:
-                        max_y = min_y + min_size
-                    # correct thumbnailing for low resolution images with an aspect ratio unequal to 1
-                    if round(max_x - min_x) > round(max_y - min_y):
-                        off_size = (max_x - min_x - max_y + min_y) / 2
-                        min_x += off_size
-                        max_x -= off_size
-                    elif round(max_x - min_x) < round(max_y - min_y):
-                        off_size = (max_y - min_y - max_x + min_x) / 2
-                        min_y += off_size
-                        max_y -= off_size
-                    image = image.crop((min_x, min_y, max_x, max_y))
+                    image = self.crop_eccentric(image, crop_x, crop_y, crop_size, gravity)
                 image.thumbnail((self.thumbnail_size, self.thumbnail_size))
                 (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
                 image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
@@ -124,3 +97,54 @@ class PILImageModel(ImageFileModel):
             right = width
             bottom = (height + width) / 2
         return image.crop((left, top, right, bottom))
+
+    def crop_eccentric(self, image, crop_x, crop_y, crop_size, gravity):
+        """
+        with cropping, the expected resizing could be done using:
+        `image = image.crop((crop_x, crop_y, crop_x + crop_size, crop_y + crop_size))`
+        however, for small selections or images in low resolution this might result
+        in blurry preview images. We therefore want to use at least `thumbnail_size`
+        pixels from the original image
+        """
+        min_size = max(crop_size, self.thumbnail_size)
+        off_size = min_size - crop_size
+
+        # horizontal thumbnailing
+        if gravity in ('e', 'ne', 'se'):
+            max_x = min(crop_x + min_size, image.width)
+            min_x = max(max_x - min_size, 0)
+        elif gravity in ('w', 'nw', 'sw'):
+            min_x = max(crop_x - off_size, 0)
+        else:
+            min_x = max(crop_x - off_size / 2, 0)
+        if min_x + min_size > image.width:
+            min_x = max(image.width - min_size, 0)
+            max_x = image.width
+        else:
+            max_x = min_x + min_size
+
+        # vertical thumbnailing
+        if gravity in ('s', 'se', 'sw'):
+            max_y = min(crop_y + min_size, image.height)
+            min_y = max(max_y - min_size, 0)
+        elif gravity in ('n', 'ne', 'nw'):
+            min_y = max(crop_y - off_size, 0)
+        else:
+            min_y = max(crop_y - off_size / 2, 0)
+        if min_y + min_size > image.height:
+            min_y = max(image.height - min_size, 0)
+            max_y = image.height
+        else:
+            max_y = min_y + min_size
+
+        # correct thumbnailing for low resolution images with an aspect ratio unequal to 1
+        if round(max_x - min_x) > round(max_y - min_y):
+            off_size = (max_x - min_x - max_y + min_y) / 2
+            min_x += off_size
+            max_x -= off_size
+        elif round(max_x - min_x) < round(max_y - min_y):
+            off_size = (max_y - min_y - max_x + min_x) / 2
+            min_y += off_size
+            max_y -= off_size
+
+        return image.crop((min_x, min_y, max_x, max_y))

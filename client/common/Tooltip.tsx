@@ -106,10 +106,9 @@ export const TooltipTrigger = forwardRef<
 	HTMLProps<HTMLElement>
 >(({children, ...props}, forwardedRef) => {
 	const context = useTooltipContext();
-	const childrenRef = (children as any).ref;
-	const ref = useMergeRefs([context.refs.setReference, forwardedRef, childrenRef]);
+	const ref = useMergeRefs([context.refs.setReference, forwardedRef]);
 
-		return (
+	return (
 		<div
 			ref={ref}
 			// The user can style the trigger based on the state
