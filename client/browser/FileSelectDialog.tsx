@@ -74,8 +74,6 @@ function ScrollSpy(props) {
 const FilesList = memo((props: any) => {
 	const {structure, setDirty, selectFile} = props;
 
-	console.log('FilesList', structure);
-
 	return (
 		<ul className="files-browser">{
 		structure.files.length === 0 ?
@@ -254,8 +252,6 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		refreshFilesList();
 		props.dialogRef.current.close();
 	}
-
-	console.log('FileSelectDialog', isDirty, structure);
 
 	return (<>
 		<div className="wrapper" ref={ref}>

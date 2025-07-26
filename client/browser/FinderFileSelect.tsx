@@ -2,6 +2,21 @@ import React, {useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
 
 
+interface SelectedFile {
+	id: string;
+	name: string;
+	file_name: string;
+	file_size: number;
+	sha1: string;
+	mime_type: string;
+	last_modified_at: string;
+	summary: string;
+	download_url: string;
+	thumbnail_url: string;
+	labels: string[];
+}
+
+
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
 	const baseUrl = props['base-url'];
@@ -10,7 +25,7 @@ export default function FinderFileSelect(props) {
 	const selectRef = useRef(null);
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
-	const [selectedFile, setSelectedFile] = useState({});
+	const [selectedFile, setSelectedFile] = useState<SelectedFile>(null);
 	const csrfToken = getCSRFToken();
 	const uuid5Regex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
@@ -56,7 +71,7 @@ export default function FinderFileSelect(props) {
 	async function valueChanged(event) {
 		const fileId = event.target.value;
 		if (!uuid5Regex.test(fileId)) {
-			setSelectedFile({});
+			setSelectedFile(null);
 			return;
 		}
 		const response = await fetch(`${baseUrl}${fileId}/fetch`);
@@ -103,8 +118,6 @@ export default function FinderFileSelect(props) {
 		const date = new Date(timestamp);
 		return date.toLocaleString();
 	}
-
-	console.log('FinderFileSelect', selectedFile);
 
 	return (<>
 		<slot ref={slotRef} />
