@@ -1,1 +1,1 @@
-<finder-file-select base-url="{{ base_url }}" style-url="{{ style_url }}" realm="{{ realm }}">{% include "django/forms/widgets/input.html" %}</finder-file-select>
+<finder-file-select base-url="{{ base_url }}" style-url="{{ style_url }}" realm="{{ realm }}"{% if mime_types %} mime-types="{{ mime_types }}"{% endif %}>{% include "django/forms/widgets/input.html" %}</finder-file-select>

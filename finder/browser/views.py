@@ -6,7 +6,6 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
 from django.views import View
-from django.views.decorators.http import last_modified
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.file import FileModel
@@ -154,6 +153,8 @@ class BrowserView(View):
         offset = int(request.GET.get('offset', 0))
         recursive = 'recursive' in request.GET
         lookup = lookup_by_label(request)
+        if mime_types := request.GET.getlist('mimetypes'):
+            lookup['mime_types'] = mime_types
         if recursive:
             descendants = FolderModel.objects.get(id=folder_id).descendants
             if isinstance(descendants, QuerySet):

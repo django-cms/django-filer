@@ -12,6 +12,8 @@ from finder.models.file import AbstractFileModel, FileModel
 
 class FinderFileSelect(TextInput):
     template_name = 'finder/widgets/finder_file_select.html'
+    mime_types = None
+    realm = 'admin'
 
     class Media:
         css = {'all': ['finder/css/finder-select.css']}
@@ -39,6 +41,8 @@ class FinderFileSelect(TextInput):
             realm='admin',
             style_url=static('finder/css/finder-browser.css'),
         )
+        if isinstance(self.mime_types, (list, tuple)) and self.mime_types:
+            context['mime_types'] = ','.join(self.mime_types)
         return context
 
     def format_value(self, value):

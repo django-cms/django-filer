@@ -1,24 +1,18 @@
-import React, {RefObject, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import FileSelectDialog from './FileSelectDialog';
 
 
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
-	const hostRef = useRef(shadowRoot.host);
 	const baseUrl = props['base-url'];
 	const styleUrl = props['style-url'];
+	const mimeTypes = props['mime-types'] ? props['mime-types'].split(',') : [];
 	const selectRef = useRef(null);
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
 	const [selectedFile, setSelectedFile] = useState({});
 	const csrfToken = getCSRFToken();
 	const uuid5Regex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-
-	useMutationObserver(hostRef, (mutationList) => {
-		for (const mutation of mutationList) {
-			console.log(`The ${mutation.attributeName} attribute was modified.`);
-		}
-	}, {attributes: true});
 
 	useEffect(() => {
 		// Create a styles element for the shadow DOM
@@ -147,6 +141,7 @@ export default function FinderFileSelect(props) {
 				ref={selectRef}
 				realm={props.realm}
 				baseUrl={baseUrl}
+				mimeTypes={mimeTypes}
 				csrfToken={csrfToken}
 				selectFile={selectFile}
 				dialogRef={dialogRef}
