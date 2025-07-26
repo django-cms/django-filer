@@ -8,4 +8,5 @@ class DemoAppModel(models.Model):
         verbose_name="Demo File",
         null=True,
         blank=True,
+        accept_mime_types=['image/*'],
     )

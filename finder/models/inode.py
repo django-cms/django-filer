@@ -1,11 +1,13 @@
 import re
 import uuid
+from functools import reduce
+from operator import and_, or_
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
-from django.db.models.expressions import F, Value
+from django.db.models.expressions import F, Value, Q
 from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
 from django.utils.functional import cached_property
@@ -87,6 +89,27 @@ class InodeManagerMixin:
     Mixin class to be added to managers for models ineriting from `Inode`.
     """
 
+    def get_query(self, model, lookup):
+        lookup = dict(lookup)  # copy to avoid modifying the original
+        model_field_names = [field.name for field in model._meta.get_fields()]
+        mime_types = lookup.pop('mime_types', None)
+        labels = lookup.pop('labels__in', None)
+        query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
+        if mime_types and 'mime_type' in model_field_names:
+            queries = []
+            for mime_type in mime_types:
+                main_type, sub_type = mime_type.split('/', 1)
+                if main_type == '*':
+                    return Q()
+                if sub_type == '*':
+                    queries.append(Q(mime_type__startswith=f'{main_type}/'))
+                else:
+                    queries.append(Q(mime_type=mime_type))
+            query &= reduce(or_, queries, Q())
+        if labels and 'labels' in model_field_names:
+            query &= Q(labels__in=labels)
+        return query
+
     def filter_unified(self, **lookup):
         """
         Returns a unified QuerySet of all folders and files with fields from all involved models
@@ -118,12 +141,8 @@ class InodeManagerMixin:
                 elif name not in model_field_names:
                     value = None if field.default is models.NOT_PROVIDED else field.default
                     expressions[name] = Value(value, output_field=field)
-            queryset = model.objects.values(*concrete_fields, **expressions).annotate(**annotations)
-            model_lookup = dict(lookup)
-            labels = model_lookup.pop('labels__in', None)
-            if labels and 'labels' in model_field_names:
-                model_lookup['labels__in'] = labels
-            return queryset.filter(**model_lookup)
+            query = self.get_query(model, lookup)
+            return model.objects.values(*concrete_fields, **expressions).annotate(**annotations).filter(query)
 
         unified_fields = {
             field.name: field for field in FolderModel._meta.get_fields()
@@ -148,7 +167,8 @@ class InodeManagerMixin:
         elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
             return folder_qs.get()
         values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
-            model.objects.values('id', 'mime_type').filter(**lookup) for model in FileModel.get_models()
+            model.objects.values('id', 'mime_type').filter(self.get_query(model, lookup))
+            for model in FileModel.get_models()
         ]).get()
         return FileModel.objects.get_model_for(values['mime_type']).objects.get(id=values['id'])
 

@@ -153,8 +153,7 @@ class BrowserView(View):
         offset = int(request.GET.get('offset', 0))
         recursive = 'recursive' in request.GET
         lookup = lookup_by_label(request)
-        if mime_types := request.GET.getlist('mimetypes'):
-            lookup['mime_types'] = mime_types
+        lookup['mime_types'] = request.GET.getlist('mimetypes')
         if recursive:
             descendants = FolderModel.objects.get(id=folder_id).descendants
             if isinstance(descendants, QuerySet):
