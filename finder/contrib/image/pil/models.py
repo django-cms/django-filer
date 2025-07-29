@@ -44,22 +44,10 @@ class PILImageModel(ImageFileModel):
         super().save(**kwargs)
 
     def get_thumbnail_url(self):
-        crop_x, crop_y, crop_size, gravity = (
-            self.meta_data.get('crop_x'), self.meta_data.get('crop_y'), self.meta_data.get('crop_size'),
-            self.meta_data.get('gravity')
-        )
-        thumbnail_path = self.get_thumbnail_path(crop_x, crop_y, crop_size, gravity)
-        if not default_storage.exists(thumbnail_path):
+        thumbnail_path = self.get_thumbnail_path(self.thumbnail_size, self.thumbnail_size)
+        if str(self.id) == 'XXX-561d6907-5fd7-40b9-a6f2-5db45a67eda6' or not default_storage.exists(thumbnail_path):
             try:
-                image = Image.open(default_storage.open(self.file_path))
-                image = self.orientate_top(image)
-                if crop_x is None or crop_y is None or crop_size is None:
-                    image = self.crop_centered(image)
-                else:
-                    image = self.crop_eccentric(image, crop_x, crop_y, crop_size, gravity)
-                image.thumbnail((self.thumbnail_size, self.thumbnail_size))
-                (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
-                image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
+                self.crop(thumbnail_path, self.thumbnail_size, self.thumbnail_size * 0.75)
             except Exception:
                 # thumbnail image could not be created
                 return self.fallback_thumbnail_url
@@ -84,19 +72,96 @@ class PILImageModel(ImageFileModel):
                 image = image.transpose(Image.ROTATE_90)
         return image
 
+    def crop(self, thumbnail_path, width, height):
+        aspect_ratio = width / height
+        image = Image.open(default_storage.open(self.file_path))
+        image = self.orientate_top(image)
+        print(f"Wanted site: width={width}, height={height}, aspect_ratio={aspect_ratio} orig={image.size}")
+        orig_width, orig_height = image.size
+        crop_x, crop_y, crop_size, gravity = (
+            self.meta_data.get('crop_x'),
+            self.meta_data.get('crop_y'),
+            self.meta_data.get('crop_size'),
+            self.meta_data.get('gravity'),
+        )
+        if crop_x is None or crop_y is None or crop_size is None:
+            # crop in the center of the image
+            if orig_width > orig_height:
+                crop_x = (orig_width - orig_height) / 2
+                crop_y = 0
+                crop_size = orig_height
+            else:
+                crop_x = 0
+                crop_y = (orig_height - orig_width) / 2
+                crop_size = orig_width
+
+        print(f"Crop parameters: crop_x={crop_x}, crop_y={crop_y}, crop_size={crop_size}, gravity={gravity}")
+
+        # horizontal thumbnailing
+        if aspect_ratio < 1:
+            min_width = max(crop_size * aspect_ratio * 3 / 2, width)
+        else:
+            min_width = max(crop_size, width)
+        if aspect_ratio < 1:
+            min_x = crop_x + (crop_size - min_width) / 2
+        elif crop_size < min_width:
+            min_x = crop_y - (min_width - crop_size) / 2
+        else:
+            min_x = crop_x
+        if crop_size < min_width:
+            if gravity in ('e', 'ne', 'se'):
+                max_x = min(crop_x + min_width, image.width)
+                min_x = max(max_x - min_width, 0)
+            elif gravity in ('w', 'nw', 'sw'):
+                min_x = max(crop_x - min_width + crop_size, 0)
+        if min_x + min_width > image.width:
+            min_x = max(image.width - min_width, 0)
+            max_x = image.width
+        else:
+            max_x = min_x + min_width
+
+        # vertical thumbnailing
+        if orig_width < orig_height:
+            min_height = max(crop_size / aspect_ratio, height)
+        else:
+            min_height = max(min_width / aspect_ratio, height)
+        if aspect_ratio > 1:
+            min_y = crop_y + (crop_size - min_height) / 2
+        elif crop_size < min_height:
+            min_y = crop_y - (min_height - crop_size) / 2
+        else:
+            min_y = crop_y
+        if crop_size < min_height:
+            if gravity in ('s', 'se', 'sw'):
+                max_y = min(crop_y + min_height, image.height)
+                min_y = max(max_y - min_height, 0)
+            elif gravity in ('n', 'ne', 'nw'):
+                min_y = max(crop_y - min_height + crop_size, 0)
+        if min_y + min_height > image.height:
+            min_y = max(image.height - min_height, 0)
+            max_y = image.height
+        else:
+            max_y = min_y + min_height
+
+        print(f"Crop area: ({min_x}, {min_y}) to ({max_x}, {max_y}) = {max_x - min_x} x {max_y - min_y}")
+        image = image.crop((min_x, min_y, max_x, max_y))
+        image.thumbnail((width, height))
+        (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
+        image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
+
     def crop_centered(self, image):
         width, height = image.size
         if width > height:
-            left = (width - height) / 2
-            top = 0
-            right = (width + height) / 2
-            bottom = height
+            min_x = (width - height) / 2
+            min_y = 0
+            max_x = (width + height) / 2
+            max_y = height
         else:
-            left = 0
-            top = (height - width) / 2
-            right = width
-            bottom = (height + width) / 2
-        return image.crop((left, top, right, bottom))
+            min_x = 0
+            min_y = (height - width) / 2
+            max_x = width
+            max_y = (height + width) / 2
+        return image.crop((min_x, min_y, max_x, max_y))
 
     def crop_eccentric(self, image, crop_x, crop_y, crop_size, gravity):
         """

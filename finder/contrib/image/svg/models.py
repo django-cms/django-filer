@@ -41,10 +41,7 @@ class SVGImageModel(ImageFileModel):
         super().save(**kwargs)
 
     def get_thumbnail_url(self):
-        crop_x, crop_y, crop_size = (
-            self.meta_data.get('crop_x'), self.meta_data.get('crop_y'), self.meta_data.get('crop_size')
-        )
-        thumbnail_path = self.get_thumbnail_path(crop_x, crop_y, crop_size)
+        thumbnail_path = self.get_thumbnail_path(self.thumbnail_size, self.thumbnail_size)
         if not default_storage.exists(thumbnail_path):
             drawing = svg2rlg(default_storage.path(self.file_path))
             if not drawing:
