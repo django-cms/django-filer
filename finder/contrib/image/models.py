@@ -46,8 +46,8 @@ class ImageFileModel(AbstractFileModel):
             thumbnail_path_template = '{stem}__{width}x{height}__{crop_x}_{crop_y}_{crop_size}{gravity}{suffix}'
         return thumbnail_folder / thumbnail_path_template.format(
             stem=thumbnail_path.stem,
-            width=width,
-            height=height,
+            width=int(width),
+            height=int(height),
             crop_x=crop_x,
             crop_y=crop_y,
             crop_size=crop_size,

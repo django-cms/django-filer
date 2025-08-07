@@ -45,9 +45,9 @@ class PILImageModel(ImageFileModel):
 
     def get_thumbnail_url(self):
         thumbnail_path = self.get_thumbnail_path(self.thumbnail_size, self.thumbnail_size)
-        if str(self.id) == '4d4d9ae9-3120-4f24-8d57-9d15fa6edfc4' or not default_storage.exists(thumbnail_path):
+        if not default_storage.exists(thumbnail_path):
             try:
-                self.crop(thumbnail_path, self.thumbnail_size, self.thumbnail_size * .5)
+                self.crop(thumbnail_path, self.thumbnail_size, self.thumbnail_size)
             except Exception:
                 # thumbnail image could not be created
                 return self.fallback_thumbnail_url
@@ -76,7 +76,6 @@ class PILImageModel(ImageFileModel):
         aspect_ratio = width / height
         image = Image.open(default_storage.open(self.file_path))
         image = self.orientate_top(image)
-        print(f"Wanted size: width={width}, height={height}, aspect_ratio={aspect_ratio} orig={image.size}")
         orig_aspect_ratio = image.width / image.height
         crop_x, crop_y, crop_size, gravity = (
             self.meta_data.get('crop_x'),
@@ -94,203 +93,65 @@ class PILImageModel(ImageFileModel):
                 crop_x = 0
                 crop_y = (image.height - image.width) / 2
                 crop_resize = crop_size = image.width
-        # elif width > height:
-        #     if width > crop_size * aspect_ratio:
-        #         # extend the crop size to prevent blurry images
-        #         crop_x = max(crop_x - (width - crop_size) / 2, 0)
-        #         crop_y = max(crop_y - (height - crop_size) / 2, 0)
-        #         crop_size = width
         elif aspect_ratio > 1:
+            # optionally enlarge the crop size to the image height to prevent blurry images
             if height > crop_size:
                 crop_resize = min(image.height, height)
             else:
                 crop_resize = crop_size
         else:
+            # optionally enlarge the crop size to the image width to prevent blurry images
             if width > crop_size:
                 crop_resize = min(image.width, width)
             else:
                 crop_resize = crop_size
 
-        # calculate the cropped area in image coordinates
+        # compute the cropped area in image coordinates
         if aspect_ratio > 1:
             if aspect_ratio > orig_aspect_ratio:
-                min_width = max(min(crop_size * aspect_ratio, image.width), width)
-                min_height = max(min_width / aspect_ratio, height)
+                crop_width = max(min(crop_size * aspect_ratio, image.width), width)
+                crop_height = max(crop_width / aspect_ratio, height)
             else:
-                min_width = max(min(crop_size, image.height) * aspect_ratio, width)
-                min_height = max(min_width / aspect_ratio, height)
+                crop_width = max(min(crop_size, image.height) * aspect_ratio, width)
+                crop_height = max(crop_width / aspect_ratio, height)
         else:
             if aspect_ratio < orig_aspect_ratio:
-                min_height = max(min(crop_size / aspect_ratio, image.height), height)
-                min_width = max(min_height * aspect_ratio, width)
+                crop_height = max(min(crop_size / aspect_ratio, image.height), height)
+                crop_width = max(crop_height * aspect_ratio, width)
             else:
-                min_height = max(min(crop_size, image.width) / aspect_ratio, height)
-                min_width = max(min_height * aspect_ratio, width)
+                crop_height = max(min(crop_size, image.width) / aspect_ratio, height)
+                crop_width = max(crop_height * aspect_ratio, width)
 
         # extend the horizontal crop size to prevent blurry images
         if gravity in ('e', 'ne', 'se'):
-            # if crop_resize > crop_size:
-            #     crop_x # += (width - crop_resize) / 2
-            # elif aspect_ratio > 1:
-            #     if aspect_ratio > orig_aspect_ratio:
-            #         crop_x = max(crop_x - crop_resize * (aspect_ratio - 1), 0)
-            # if aspect_ratio < 1:
-            #     if aspect_ratio < orig_aspect_ratio:
-            #         crop_x = max(crop_x + crop_size - image.height * aspect_ratio, 0)
-            # else:
-            #     crop_x = max(crop_x + crop_resize - min_width, 0)
-            # minax = max if aspect_ratio > 1 else min
-            crop_x = max(crop_x + max(crop_resize - min_width, 0), 0)
+            crop_x = max(crop_x + max(crop_resize - crop_width, 0), 0)
         elif gravity in ('w', 'nw', 'sw'):
-            # if crop_resize > crop_size:
-            #     crop_x = max(crop_x + crop_size - width, 0)
-            # elif aspect_ratio > 1:
-            crop_x = max(crop_x - max(min(min_width - crop_size, min_width), 0), 0)
+            crop_x = max(crop_x - max(min(crop_width - crop_size, crop_width), 0), 0)
         else:  # centered crop
-            # if crop_resize > crop_size:
-            #     crop_x = max(crop_x - max(aspect_ratio, 1) * (crop_resize - crop_size) / 2, 0)
-            # else:
-            crop_x = max(crop_x - (min_width - crop_size) / 2, 0)
-
-            # if aspect_ratio < orig_aspect_ratio and crop_resize / aspect_ratio > image.height:
-            #     crop_x = max(crop_x + (crop_size - image.height * aspect_ratio) / 2, 0)
-            # elif False and aspect_ratio > orig_aspect_ratio and crop_resize * aspect_ratio < image.width:
-            #     crop_x = max(crop_x - crop_resize * (aspect_ratio - 1) / 2, 0)
-            # elif crop_resize > crop_size:
-            #     crop_x = max(crop_x - offset_x / 2, 0)
+            crop_x = max(crop_x - (crop_width - crop_size) / 2, 0)
 
         # extend the vertical crop size to prevent blurry images
         if gravity in ('s', 'se', 'sw'):
-            # if aspect_ratio > 1:
-            #     if aspect_ratio > orig_aspect_ratio:
-            #         crop_y = max(crop_y + crop_size - image.width / aspect_ratio, 0)
-            # else:
-            #     crop_y = max(crop_y + min_height - crop_resize, 0)
-
-            # if crop_resize > crop_size:
-            #     crop_y = max(crop_y + crop_size - height, 0)
-            # elif aspect_ratio < 1:
-            #     crop_y = max(crop_y + crop_resize - min_height, 0)
-            crop_y = max(crop_y + max(crop_resize - min_height, 0), 0)
+            crop_y = max(crop_y + max(crop_resize - crop_height, 0), 0)
         elif gravity in ('n', 'ne', 'nw'):
-            # if crop_resize >= crop_size:
-            #     crop_y # += (height - crop_resize) / 2
-            # elif aspect_ratio < 1:
-            #     if aspect_ratio < orig_aspect_ratio:
-            #         crop_y = max(crop_y + crop_resize * (1 - 1 / aspect_ratio), 0)
-            #     else:
-            #         crop_y
-            # else:
-            #     crop_y = max(crop_y + (crop_size - image.width / aspect_ratio), 0)
-            crop_y = max(crop_y - max(min(min_height - crop_size, min_height), 0), 0)
+            crop_y = max(crop_y - max(min(crop_height - crop_size, crop_height), 0), 0)
         else:  # centered crop
-            # if crop_resize > crop_size:
-            #     crop_y = max(crop_y - (crop_resize - crop_size) / min(aspect_ratio, 1) / 2, 0)
-            # else:
-            crop_y = max(crop_y - (min_height - crop_size) / 2, 0)
-
-            # if aspect_ratio < orig_aspect_ratio and crop_resize / aspect_ratio > image.height:
-            #     crop_x = max(crop_x + (crop_size - image.height * aspect_ratio) / 2, 0)
-            # elif aspect_ratio > orig_aspect_ratio and crop_resize * aspect_ratio < image.width:
-            #     crop_x = max(crop_x - crop_resize * (aspect_ratio - 1) / 2, 0)
-            # if aspect_ratio > orig_aspect_ratio and crop_resize * aspect_ratio > image.width:
-            #     crop_y = max(crop_y + crop_resize * (1 - 1 / aspect_ratio) / 2, 0)
-            # elif False and aspect_ratio < orig_aspect_ratio and crop_resize / aspect_ratio < image.height:
-            #     crop_y = max(crop_y + (crop_size - image.width / aspect_ratio) / 2, 0)
-            # elif crop_resize > crop_size:
-            #     crop_y = max(crop_y - offset_y / 2, 0)
+            crop_y = max(crop_y - (crop_height - crop_size) / 2, 0)
         crop_size = crop_resize
 
-        print(f"Crop parameters: crop_x={crop_x}, crop_y={crop_y}, crop_size={crop_size}, gravity={gravity}")
-
-        if False:
-            min_x = max(crop_x + (crop_size - min_width) / 2, 0)
-        else:
-            min_x = crop_x
-
-        if min_x + min_width > image.width:
-            min_x = max(image.width - min_width, 0)
+        min_x = crop_x
+        if min_x + crop_width > image.width:
+            min_x = max(image.width - crop_width, 0)
             max_x = image.width
         else:
-            max_x = min_x + min_width
-        if False:
-            min_y = max(crop_y + (crop_size - min_height) / 2, 0)
-        else:
-            min_y = crop_y
-        if min_y + min_height > image.height:
-            min_y = max(image.height - min_height, 0)
+            max_x = min_x + crop_width
+        min_y = crop_y
+        if min_y + crop_height > image.height:
+            min_y = max(image.height - crop_height, 0)
             max_y = image.height
         else:
-            max_y = min_y + min_height
+            max_y = min_y + crop_height
 
-        if False:
-            # horizontal thumbnailing
-            if orig_height / crop_size < aspect_ratio:
-                # we can't fill the thumbnailed image with the cropped part
-                min_width = orig_width * crop_size / orig_height
-                min_x = (orig_width - min_width) / 2
-            elif aspect_ratio < 1:
-                min_width = max(crop_size * aspect_ratio * 3 / 2, width)
-                min_x = crop_x + (crop_size - min_width) / 2
-            else:
-                min_width = max(crop_size, width)
-                if crop_size < min_width:
-                    min_x = max(crop_x - (min_width - crop_size) / 2, 0)
-                else:
-                    min_x = crop_x
-            if crop_size < min_width:
-                # thumbnail would be smaller than the crop size, avoid blurry image
-                if gravity in ('e', 'ne', 'se'):
-                    max_x = min(crop_x + min_width, image.width)
-                    min_x = max(max_x - min_width, 0)
-                elif gravity in ('w', 'nw', 'sw'):
-                    min_x = max(crop_x - min_width + crop_size, 0)
-            if min_x + min_width > image.width:
-                min_x = max(image.width - min_width, 0)
-                max_x = image.width
-            else:
-                max_x = min_x + min_width
-
-            # vertical thumbnailing
-
-            # if False and orig_width / crop_size < aspect_ratio:
-            #     # we can't fill the thumbnailed image with the cropped part
-            #     min_height = orig_height
-            #     min_y = 0
-            if aspect_ratio > 1:
-                min_height = max(crop_size * aspect_ratio * 3 / 2, height)
-                min_y = crop_y + (crop_size - min_height) / 2
-            else:
-                min_height = max(crop_size / aspect_ratio, height)
-                if crop_size < min_height:
-                    min_y = max(crop_y - (min_height - crop_size) / 2, 0)
-                else:
-                    min_y = crop_y
-
-            # if orig_width < orig_height:
-            #     min_height = max(crop_size / aspect_ratio, height)
-            # else:
-            #     min_height = max(min_width / aspect_ratio, height)
-            # if aspect_ratio > 1:
-            #     min_y = crop_y + (crop_size - min_height) / 2
-            # elif crop_size < min_height:
-            #     min_y = crop_y - (min_height - crop_size) / 2
-            # else:
-            #     min_y = crop_y
-
-            if crop_size < min_height:
-                if gravity in ('s', 'se', 'sw'):
-                    max_y = min(crop_y + min_height, image.height)
-                    min_y = max(max_y - min_height, 0)
-                elif gravity in ('n', 'ne', 'nw'):
-                    min_y = max(crop_y - min_height + crop_size, 0)
-            if min_y + min_height > image.height:
-                min_y = max(image.height - min_height, 0)
-                max_y = image.height
-            else:
-                max_y = min_y + min_height
-
-        print(f"Crop area: ({min_x}, {min_y}) to ({max_x}, {max_y}) = {max_x - min_x} x {max_y - min_y}")
         image = image.crop((min_x, min_y, max_x, max_y))
         image.thumbnail((width, height))
         (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
