@@ -13,6 +13,7 @@ class PILImageModel(ImageFileModel):
     """
     accept_mime_types = ['image/jpeg', 'image/webp', 'image/png', 'image/gif']
     exif_values = set(ExifTags.Base.__members__.values())  # TODO: some EXIF values can be removed
+    MAX_STORED_IMAGE_WIDTH = 3840
 
     class Meta:
         app_label = 'finder'
@@ -23,6 +24,15 @@ class PILImageModel(ImageFileModel):
     def save(self, **kwargs):
         try:
             image = Image.open(default_storage.open(self.file_path))
+            image = self.orientate_top(image)
+            if self.MAX_STORED_IMAGE_WIDTH and image.width > self.MAX_STORED_IMAGE_WIDTH:
+                # limit the width of the stored image to prevent excessive disk usage
+                height = round(self.MAX_STORED_IMAGE_WIDTH * image.height / image.width)
+                image = image.resize((self.MAX_STORED_IMAGE_WIDTH, height))
+                image.save(default_storage.open(self.file_path, 'wb'), image.format)
+                # recompute the file size and SHA1 hash
+                self.file_size = default_storage.size(self.file_path)
+                self.sha1 = self.digest_sha1()
             self.width = image.width
             self.height = image.height
         except Exception:
@@ -75,7 +85,9 @@ class PILImageModel(ImageFileModel):
     def crop(self, thumbnail_path, width, height):
         aspect_ratio = width / height
         image = Image.open(default_storage.open(self.file_path))
-        image = self.orientate_top(image)
+        assert width <= image.width and height <= image.height, \
+            "The requested thumbnail size ({width}x{height}) is larger than the original image " \
+            "({0}x{1})".format(*image.size, width=width, height=height)
         orig_aspect_ratio = image.width / image.height
         crop_x, crop_y, crop_size, gravity = (
             self.meta_data.get('crop_x'),
@@ -137,7 +149,6 @@ class PILImageModel(ImageFileModel):
             crop_y = max(crop_y - max(min(crop_height - crop_size, crop_height), 0), 0)
         else:  # centered crop
             crop_y = max(crop_y - (crop_height - crop_size) / 2, 0)
-        crop_size = crop_resize
 
         min_x = crop_x
         if min_x + crop_width > image.width:

@@ -188,7 +188,7 @@ class InodeAdmin(admin.ModelAdmin):
         return folders
 
     def changelist_view(self, request, extra_context=None):
-        # always redirect the list view to the detail view of either the last used, or the root folder
+        # always redirect the list view to the detail view of either the latest used, or the root folder
         fallback_folder = self.get_fallback_folder(request)
         return HttpResponseRedirect(reverse(
             'admin:finder_inodemodel_change',
@@ -228,8 +228,10 @@ class InodeAdmin(admin.ModelAdmin):
         return settings
 
     def get_folderitem_settings(self, request, inode):
+        """
+        Hook to return the context for the folder item.
+        """
         raise NotImplementedError()
-        return {}
 
     def get_menu_extension_settings(self, request):
         """
