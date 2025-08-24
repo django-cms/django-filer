@@ -190,7 +190,7 @@ def get_aspect_ratio_and_download_url(context, detail, file, height, width):
             # because they don't really have width or height
             if file.width:
                 width, height = 210, ceil(210 / file.width * file.height)
-                context['sidebar_image_ratio'] = file.width / 210
+                context['sidebar_image_ratio'] = '%.6F' % (file.width / 210)
     return height, width, context
 
 
