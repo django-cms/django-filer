@@ -16,10 +16,37 @@ interface SelectedFile {
 	labels: string[];
 }
 
-function parseDataset(dataset: string|object) : SelectedFile {
+function parseDataset(dataset: string|object) : SelectedFile|null {
 	const data = typeof dataset === 'string' ? JSON.parse(dataset) : dataset;
-	const {id, name, file_name, file_size, sha1, mime_type, last_modified_at, summary, download_url, thumbnail_url, labels} = data;
-	return {id, name, file_name, file_size, sha1, mime_type, last_modified_at, summary, download_url, thumbnail_url, labels};
+	if (data) {
+		const {
+			id,
+			name,
+			file_name,
+			file_size,
+			sha1,
+			mime_type,
+			last_modified_at,
+			summary,
+			download_url,
+			thumbnail_url,
+			labels
+		} = data;
+		return {
+			id,
+			name,
+			file_name,
+			file_size,
+			sha1,
+			mime_type,
+			last_modified_at,
+			summary,
+			download_url,
+			thumbnail_url,
+			labels
+		};
+	}
+	return null;
 }
 
 
@@ -112,6 +139,8 @@ export default function FinderFileSelect(props) {
 		const inputElement = slotRef.current.assignedElements()[0];
 		if (inputElement instanceof HTMLInputElement) {
 			inputElement.value = '';
+			inputElement.dataset.selected_file = null;
+			inputElement.checkValidity();
 		}
 	}
 
@@ -122,6 +151,7 @@ export default function FinderFileSelect(props) {
 			if (inputElement instanceof HTMLInputElement) {
 				inputElement.value = file.id;
 				inputElement.dataset.selected_file = JSON.stringify(parseDataset(file));
+				inputElement.checkValidity();
 			}
 		}
 	}
