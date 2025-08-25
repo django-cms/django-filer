@@ -237,6 +237,33 @@ http://localhost:8000/demoapp/ and click on the blank area to either select an e
 upload a new one.
 
 
+## Thumbnailing
+
+In addition to the x- and y-coordinates of the focal point, the `ImageModel` now also stores the
+main area of interest as a square. This information then is used to create thumbnails using
+[Art Direction](https://www.smashingmagazine.com/2016/01/responsive-image-breakpoints-generation/).
+
+The method `finder.contrib.image.pil.models.ImageModel.crop()` creates a thumbnail of the given
+image taking the focal point and the resolution into account. The following rules apply when
+cropping and thumbnailing an image:
+
+* The thumbnailed image always contains at least the main area of interrest, except for this
+  situation: If the thumbnail is narrower than the main area of interest, the thumbnail will be
+  cropped to the center of that area.
+* The resolution of the area to be thumbnailed is always at least the same as the resolution of the
+  original image.
+
+
+will take the resolution of the corresponsding image into
+consideration. This will allow to create different versions of the same canonical image, depending
+on the width of the device the image is displayed.
+
+By extending the focal point to three degrees of freedom, it is possible to create a thumbnail
+taking the resolution into account. This allows us to create thumbnails taking art direction into
+consideration. For instance, if a user uploads a portrait image, the focal point can be set to the
+head of the person in that image.
+
+
 ## Permission System (Proposal)
 
 The permission system of **django-filer** is based on the idea of Access Control Lists (ACLs) similar
@@ -287,14 +314,9 @@ Microsoft gives a good explanation on the implementation of
 
 ## Further Steps
 
-The focal point of the `ImageModel` will take the resolution of the corresponding image into
-consideration. This will allow to create different versions of the same canonical image, depending
-on the width of the device the image is displayed.
-
-The permission system will be implemented using a model based on the idea of Access Control Lists,
-see above.
-
-A quota system will be implemented, which allows to limit the amount of disk space a user can use.
+* A permission system based on the idea of Access Control Lists, see above.
+* A quota system, which allows to limit the amount of disk space a user can use.
+* Thumbnailing, see above.
 
 
 ## Further Readings
