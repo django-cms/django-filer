@@ -16,6 +16,12 @@ interface SelectedFile {
 	labels: string[];
 }
 
+function parseDataset(dataset: string|object) : SelectedFile {
+	const data = typeof dataset === 'string' ? JSON.parse(dataset) : dataset;
+	const {id, name, file_name, file_size, sha1, mime_type, last_modified_at, summary, download_url, thumbnail_url, labels} = data;
+	return {id, name, file_name, file_size, sha1, mime_type, last_modified_at, summary, download_url, thumbnail_url, labels};
+}
+
 
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
@@ -38,7 +44,7 @@ export default function FinderFileSelect(props) {
 		shadowRoot.insertBefore(link, shadowRoot.firstChild);
 		const inputElement = slotRef.current.assignedElements()[0];
 		if (inputElement instanceof HTMLInputElement) {
-			setSelectedFile(JSON.parse(inputElement.getAttribute('data-selected_file')));
+			setSelectedFile(parseDataset(inputElement.dataset.selected_file));
 			inputElement.addEventListener('change', valueChanged);
 		}
 		return () => {
@@ -76,7 +82,12 @@ export default function FinderFileSelect(props) {
 		}
 		const response = await fetch(`${baseUrl}${fileId}/fetch`);
 		if (response.ok) {
-			setSelectedFile(await response.json());
+			const dataset = parseDataset(await response.json());
+			const inputElement = slotRef.current.assignedElements()[0];
+			if (inputElement instanceof HTMLInputElement) {
+				inputElement.dataset.selected_file = JSON.stringify(dataset);
+			}
+			setSelectedFile(dataset);
 		} else {
 			console.error(`Failed to fetch file info for ID ${fileId}:`, response.statusText);
 		}
@@ -110,6 +121,7 @@ export default function FinderFileSelect(props) {
 			const inputElement = slotRef.current.assignedElements()[0];
 			if (inputElement instanceof HTMLInputElement) {
 				inputElement.value = file.id;
+				inputElement.dataset.selected_file = JSON.stringify(parseDataset(file));
 			}
 		}
 	}
