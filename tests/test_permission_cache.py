@@ -45,3 +45,9 @@ class PermissionCacheTests(TestCase):
         update_folder_permission_cache(self.user, self.permission, self.id_list)
         permissions = get_folder_permission_cache(self.user, self.permission)
         self.assertEqual(permissions, self.id_list)
+
+    def test_update_folder_permission_cache_overwrites_existing_cache_value(self):
+        update_folder_permission_cache(self.user, self.permission, {2})
+        update_folder_permission_cache(self.user, self.permission, self.id_list)
+        permissions = get_folder_permission_cache(self.user, self.permission)
+        self.assertEqual(permissions, self.id_list)
