@@ -13,6 +13,7 @@ class PILImageModel(ImageFileModel):
     """
     accept_mime_types = ['image/jpeg', 'image/webp', 'image/png', 'image/gif']
     exif_values = set(ExifTags.Base.__members__.values())  # TODO: some EXIF values can be removed
+    MAX_STORED_IMAGE_WIDTH = 3840
 
     class Meta:
         app_label = 'finder'
@@ -23,6 +24,15 @@ class PILImageModel(ImageFileModel):
     def save(self, **kwargs):
         try:
             image = Image.open(default_storage.open(self.file_path))
+            image = self.orientate_top(image)
+            if self.MAX_STORED_IMAGE_WIDTH and image.width > self.MAX_STORED_IMAGE_WIDTH:
+                # limit the width of the stored image to prevent excessive disk usage
+                height = round(self.MAX_STORED_IMAGE_WIDTH * image.height / image.width)
+                image = image.resize((self.MAX_STORED_IMAGE_WIDTH, height))
+                image.save(default_storage.open(self.file_path, 'wb'), image.format)
+                # recompute the file size and SHA1 hash
+                self.file_size = default_storage.size(self.file_path)
+                self.sha1 = self.digest_sha1()
             self.width = image.width
             self.height = image.height
         except Exception:
@@ -44,22 +54,10 @@ class PILImageModel(ImageFileModel):
         super().save(**kwargs)
 
     def get_thumbnail_url(self):
-        crop_x, crop_y, crop_size, gravity = (
-            self.meta_data.get('crop_x'), self.meta_data.get('crop_y'), self.meta_data.get('crop_size'),
-            self.meta_data.get('gravity')
-        )
-        thumbnail_path = self.get_thumbnail_path(crop_x, crop_y, crop_size, gravity)
+        thumbnail_path = self.get_thumbnail_path(self.thumbnail_size, self.thumbnail_size)
         if not default_storage.exists(thumbnail_path):
             try:
-                image = Image.open(default_storage.open(self.file_path))
-                image = self.orientate_top(image)
-                if crop_x is None or crop_y is None or crop_size is None:
-                    image = self.crop_centered(image)
-                else:
-                    image = self.crop_eccentric(image, crop_x, crop_y, crop_size, gravity)
-                image.thumbnail((self.thumbnail_size, self.thumbnail_size))
-                (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
-                image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
+                self.crop(thumbnail_path, self.thumbnail_size, self.thumbnail_size)
             except Exception:
                 # thumbnail image could not be created
                 return self.fallback_thumbnail_url
@@ -84,19 +82,106 @@ class PILImageModel(ImageFileModel):
                 image = image.transpose(Image.ROTATE_90)
         return image
 
+    def crop(self, thumbnail_path, width, height):
+        aspect_ratio = width / height
+        image = Image.open(default_storage.open(self.file_path))
+        assert width <= image.width and height <= image.height, \
+            "The requested thumbnail size ({width}x{height}) is larger than the original image " \
+            "({0}x{1})".format(*image.size, width=width, height=height)
+        orig_aspect_ratio = image.width / image.height
+        crop_x, crop_y, crop_size, gravity = (
+            self.meta_data.get('crop_x'),
+            self.meta_data.get('crop_y'),
+            self.meta_data.get('crop_size'),
+            self.meta_data.get('gravity'),
+        )
+        if crop_x is None or crop_y is None or crop_size is None:
+            # crop in the center of the image
+            if image.width > image.height:
+                crop_x = (image.width - image.height) / 2
+                crop_y = 0
+                crop_resize = crop_size = image.height
+            else:
+                crop_x = 0
+                crop_y = (image.height - image.width) / 2
+                crop_resize = crop_size = image.width
+        elif aspect_ratio > 1:
+            # optionally enlarge the crop size to the image height to prevent blurry images
+            if height > crop_size:
+                crop_resize = min(image.height, height)
+            else:
+                crop_resize = crop_size
+        else:
+            # optionally enlarge the crop size to the image width to prevent blurry images
+            if width > crop_size:
+                crop_resize = min(image.width, width)
+            else:
+                crop_resize = crop_size
+
+        # compute the cropped area in image coordinates
+        if aspect_ratio > 1:
+            if aspect_ratio > orig_aspect_ratio:
+                crop_width = max(min(crop_size * aspect_ratio, image.width), width)
+                crop_height = max(crop_width / aspect_ratio, height)
+            else:
+                crop_width = max(min(crop_size, image.height) * aspect_ratio, width)
+                crop_height = max(crop_width / aspect_ratio, height)
+        else:
+            if aspect_ratio < orig_aspect_ratio:
+                crop_height = max(min(crop_size / aspect_ratio, image.height), height)
+                crop_width = max(crop_height * aspect_ratio, width)
+            else:
+                crop_height = max(min(crop_size, image.width) / aspect_ratio, height)
+                crop_width = max(crop_height * aspect_ratio, width)
+
+        # extend the horizontal crop size to prevent blurry images
+        if gravity in ('e', 'ne', 'se'):
+            crop_x = max(crop_x + max(crop_resize - crop_width, 0), 0)
+        elif gravity in ('w', 'nw', 'sw'):
+            crop_x = max(crop_x - max(min(crop_width - crop_size, crop_width), 0), 0)
+        else:  # centered crop
+            crop_x = max(crop_x - (crop_width - crop_size) / 2, 0)
+
+        # extend the vertical crop size to prevent blurry images
+        if gravity in ('s', 'se', 'sw'):
+            crop_y = max(crop_y + max(crop_resize - crop_height, 0), 0)
+        elif gravity in ('n', 'ne', 'nw'):
+            crop_y = max(crop_y - max(min(crop_height - crop_size, crop_height), 0), 0)
+        else:  # centered crop
+            crop_y = max(crop_y - (crop_height - crop_size) / 2, 0)
+
+        min_x = crop_x
+        if min_x + crop_width > image.width:
+            min_x = max(image.width - crop_width, 0)
+            max_x = image.width
+        else:
+            max_x = min_x + crop_width
+        min_y = crop_y
+        if min_y + crop_height > image.height:
+            min_y = max(image.height - crop_height, 0)
+            max_y = image.height
+        else:
+            max_y = min_y + crop_height
+
+        image = image.crop((min_x, min_y, max_x, max_y))
+        image.thumbnail((width, height))
+        (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
+        image.save(default_storage.open(thumbnail_path, 'wb'), image.format)
+        return image
+
     def crop_centered(self, image):
         width, height = image.size
         if width > height:
-            left = (width - height) / 2
-            top = 0
-            right = (width + height) / 2
-            bottom = height
+            min_x = (width - height) / 2
+            min_y = 0
+            max_x = (width + height) / 2
+            max_y = height
         else:
-            left = 0
-            top = (height - width) / 2
-            right = width
-            bottom = (height + width) / 2
-        return image.crop((left, top, right, bottom))
+            min_x = 0
+            min_y = (height - width) / 2
+            max_x = width
+            max_y = (height + width) / 2
+        return image.crop((min_x, min_y, max_x, max_y))
 
     def crop_eccentric(self, image, crop_x, crop_y, crop_size, gravity):
         """

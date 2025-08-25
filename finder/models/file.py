@@ -242,6 +242,16 @@ class AbstractFileModel(InodeModel):
         self.sha1 = sha1.hexdigest()
         self._for_write = True
 
+    def digest_sha1(self):
+        """
+        Generate the SHA1 hash for the file.
+        """
+        sha1 = hashlib.sha1()
+        with self.open('rb') as readhandle:
+            for chunk in readhandle.chunks():
+                sha1.update(chunk)
+        return sha1.hexdigest()
+
     def copy_to(self, folder, **kwargs):
         """
         Copy the file to a destination folder and returns it.

@@ -287,7 +287,7 @@ Microsoft gives a good explanation on the implementation of
 
 ## Further Steps
 
-The focal point of the `ImageModel` will take the resolution of the corresponsding image into
+The focal point of the `ImageModel` will take the resolution of the corresponding image into
 consideration. This will allow to create different versions of the same canonical image, depending
 on the width of the device the image is displayed.
 
@@ -296,6 +296,17 @@ see above.
 
 A quota system will be implemented, which allows to limit the amount of disk space a user can use.
 
+
+## Further Readings
+
+https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Responsive_images
+https://www.smashingmagazine.com/2014/05/responsive-images-done-right-guide-picture-srcset/
+https://www.smashingmagazine.com/2016/01/responsive-image-breakpoints-generation/
+https://www.smashingmagazine.com/2016/09/automating-art-direction-with-the-responsive-image-breakpoints-generator/
+https://cloudfour.com/thinks/responsive-images-101-part-9-image-breakpoints/
+https://cloudfour.com/thinks/sensible-jumps-in-responsive-image-file-sizes/
+
+https://cloudfour.com/thinks/the-real-conflict-behind-picture-and-srcset/
 
 ## License
 
