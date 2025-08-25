@@ -86,4 +86,4 @@ def update_folder_permission_cache(user: UserModel, permission: str, id_list: ty
     permission (str): The permission to update.
     id_list (list): The list of IDs to set as the new permissions.
     """
-    cache.set(get_folder_perm_cache_key(user, permission), {user.pk: set(id_list)})
+    cache.set(get_folder_perm_cache_key(user, permission), {user.pk: id_list})
