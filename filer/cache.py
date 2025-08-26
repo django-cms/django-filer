@@ -29,7 +29,7 @@ def get_folder_perm_cache_key(user: UserModel, permission: str) -> str:
     return f"filer:perm:{permission}"
 
 
-def get_folder_permission_cache(user: UserModel, permission: str) -> typing.Optional[dict]:
+def get_folder_permission_cache(user: UserModel, permission: str) -> typing.Optional[typing.Set[int]]:
     """
     Retrieves the cached folder permissions for a given user and permission.
 
@@ -43,7 +43,7 @@ def get_folder_permission_cache(user: UserModel, permission: str) -> typing.Opti
     permission (str): The permission for which the permissions are being retrieved.
 
     Returns:
-    dict or None: The permissions for the user, or None if no cache value exists.
+    set or None: The permissions for the user, or None if no cache value exists.
     """
     cache_value = cache.get(get_folder_perm_cache_key(user, permission))
     if cache_value:
@@ -71,7 +71,7 @@ def clear_folder_permission_cache(user: UserModel, permission: typing.Optional[s
         cache.delete(get_folder_perm_cache_key(user, permission))
 
 
-def update_folder_permission_cache(user: UserModel, permission: str, id_list: typing.List[int]) -> None:
+def update_folder_permission_cache(user: UserModel, permission: str, id_list: typing.Set[int]) -> None:
     """
     Updates the cached folder permissions for a given user and permission.
 
@@ -84,8 +84,8 @@ def update_folder_permission_cache(user: UserModel, permission: str, id_list: ty
         The `user` can be an instance of the default `django.contrib.auth.models.User`
         or any custom user model specified by `AUTH_USER_MODEL` in the settings.
     permission (str): The permission to update.
-    id_list (list): The list of IDs to set as the new permissions.
+    id_list (set): The set of IDs to set as the new permissions.
     """
-    perms = get_folder_permission_cache(user, permission) or {}
+    perms = cache.get(get_folder_perm_cache_key(user, permission)) or {}
     perms[user.pk] = id_list
     cache.set(get_folder_perm_cache_key(user, permission), perms)
