@@ -15,12 +15,11 @@
     "jasmine-core": "^2.3.2",
     "jshint-stylish": "^2.2.1",
     "karma": "^0.13.22",
+    "karma-chrome-launcher": "^3.2.0",
     "karma-fixture": "^0.2.6",
     "karma-html2js-preprocessor": "^0.1.0",
     "karma-jasmine": "^0.3.8",
     "karma-json-fixtures-preprocessor": "^0.0.6",
-    "karma-phantomjs-launcher": "^1.0.4",
-    "phantomjs-prebuilt": "^2.1.7",
     "request": "^2.88.2",
     "sass": "^1.63.4"
   }
