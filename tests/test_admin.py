@@ -1935,6 +1935,22 @@ class FileIconContextTests(TestCase):
         self.assertNotIn('sidebar_image_ratio', context.keys())
         self.assertIn('download_url', context.keys())
 
+    def test_sidebar_image_ratio_format(self):
+        """
+        Test that sidebar_image_ratio is formatted as a string with 6 decimal places
+        to ensure consistent formatting regardless of locale settings
+        """
+        image = Image.objects.create(name='test.jpg')
+        image._width = 100
+        image._height = 200
+        image.save()
+        context = {}
+        height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=image, height=40, width=40)
+        self.assertIsInstance(context['sidebar_image_ratio'], str)
+        expected_ratio = '%.6f' % (image.width / 210)
+        self.assertEqual(context['sidebar_image_ratio'], expected_ratio)
+        self.assertEqual(context['sidebar_image_ratio'], '0.476190')
+
 
 class AdditionalAdminFormsTests(TestCase):
     def setUp(self):
