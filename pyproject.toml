@@ -1,0 +1,113 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-filer"
+dynamic = ["version"]
+authors = [
+    {name = "Divio AG", email = "info@divio.ch"},
+]
+maintainers = [
+    {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
+]
+description = "A file management application for django that makes handling of files and images a breeze."
+readme = "README.rst"
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.8"
+dependencies = [
+    "django>=3.2",
+    "django-polymorphic",
+    "easy-thumbnails[svg]",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django CMS",
+    "Framework :: Django CMS :: 3.11",
+    "Framework :: Django CMS :: 4.0",
+    "Framework :: Django CMS :: 4.1",
+    "Framework :: Django CMS :: 5.0",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.optional-dependencies]
+heif = ["pillow-heif"]
+
+[project.urls]
+Homepage = "https://github.com/django-cms/django-filer"
+
+[tool.setuptools]
+packages = ["filer"]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = {attr = "filer.__version__"}
+
+[tool.flake8]
+max-line-length = 119
+exclude = [
+    "*.egg-info",
+    ".eggs",
+    ".env",
+    ".git",
+    ".settings",
+    ".tox",
+    ".venv",
+    "build",
+    "data",
+    "dist",
+    "docs",
+    "*migrations*",
+    "tmp",
+    "node_modules",
+]
+ignore = ["E251", "E128", "E501", "W503"]
+
+[tool.isort]
+line_length = 119
+skip = [
+    "manage.py",
+    "*migrations*",
+    ".tox",
+    ".eggs",
+    "data",
+    ".env",
+    ".venv",
+]
+include_trailing_comma = true
+multi_line_output = 5
+lines_after_imports = 2
+default_section = "THIRDPARTY"
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "DJANGO",
+    "CMS",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "LOCALFOLDER",
+]
+known_first_party = ["filer"]
+known_cms = ["cms", "menus"]
+known_django = ["django"]
