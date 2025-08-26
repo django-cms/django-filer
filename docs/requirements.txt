@@ -30,7 +30,7 @@ docutils==0.17.1
     # via
     #   restructuredtext-lint
     #   sphinx
-furo==2021.6.24b37
+furo==2025.7.19
     # via -r requirements.in
 idna==3.3
     # via requests
