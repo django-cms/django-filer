@@ -21,12 +21,11 @@ repos:
 #        args: [--target-version, "2.2"]
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
+    rev: 7.0.0
     hooks:
       - id: flake8
-    additional_dependencies:
-      - flake8-pyproject
-
+        entry: pflake8
+        additional_dependencies: [pyproject-flake8]
   - repo: https://github.com/asottile/yesqa
     rev: v1.5.0
     hooks:
