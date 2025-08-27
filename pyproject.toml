@@ -114,3 +114,7 @@ sections = [
 known_first_party = ["filer"]
 known_cms = ["cms", "menus"]
 known_django = ["django"]
+
+[tool.ruff]
+src = ["filer"]
+exclude = ["*/migrations/*"]
