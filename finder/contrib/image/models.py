@@ -29,7 +29,7 @@ class ImageFileModel(AbstractFileModel):
     def summary(self):
         return "{width}×{height}px ({size})".format(size=super().summary, width=self.width, height=self.height)
 
-    def get_thumbnail_path(self, width, height):
+    def get_cropped_path(self, width, height):
         id = str(self.id)
         thumbnail_folder = self.filer_public_thumbnails / f'{id[0:2]}/{id[2:4]}/{id}'
         thumbnail_path = Path(self.file_name)
