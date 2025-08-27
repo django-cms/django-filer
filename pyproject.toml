@@ -62,7 +62,7 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["filer*"]
+include = ["filer*", "LICENSE"]
 
 [tool.setuptools.dynamic]
 version = {attr = "filer.__version__"}
