@@ -57,7 +57,7 @@ heif = ["pillow-heif"]
 Homepage = "https://github.com/django-cms/django-filer"
 
 [tool.setuptools]
-packages = ["filer"]
+packages = ["filer", "filer.*"]
 include-package-data = true
 zip-safe = false
 
