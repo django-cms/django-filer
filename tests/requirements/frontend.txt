@@ -1,4 +1,4 @@
 -r base.txt
 
-django>=3.2,<5
+django>=4.2,<6
 django_polymorphic>=3

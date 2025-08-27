@@ -6,7 +6,7 @@
 // rake spec:javascript loads specs relative to the tmp/jasmine/runner.html, need to override:
 module.exports = function (config) {
     var browsers = {
-        'PhantomJS': 'used for local testing'
+        'ChromeHeadless': 'used for local testing'
     };
 
     var settings = {
@@ -81,7 +81,13 @@ module.exports = function (config) {
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: Object.keys(browsers),
 
-        // Continuous Integration mode
+        // Custom Chrome configuration
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox', '--disable-web-security']
+            }
+        },        // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false
     };

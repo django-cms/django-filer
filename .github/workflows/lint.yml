@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Install flake8
-        run: pip install --upgrade flake8
+        run: pip install --upgrade flake8 flake8-pyproject
       - name: Run flake8
         uses: liskin/gh-problem-matcher-wrap@v1
         with:

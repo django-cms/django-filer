@@ -5,6 +5,7 @@ from collections import OrderedDict
 from urllib.parse import quote as urlquote
 from urllib.parse import unquote as urlunquote
 
+from django import VERSION as DJANGO_VERSION
 from django import forms
 from django.conf import settings as django_settings
 from django.contrib import messages
@@ -70,7 +71,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
-    directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    if DJANGO_VERSION >= (5, 2):
+        directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    else:  # Remove this when Django 5.2 is the minimum version
+        directory_listing_template = 'admin/filer/folder/legacy_listing.html'
+
     order_by_file_fields = ['_file_size', 'original_filename', 'name', 'owner',
                             'uploaded_at', 'modified_at']
 
@@ -777,9 +782,15 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             n = files_queryset.count() + folders_queryset.count()
             if n:
                 # delete all explicitly selected files
-                for f in files_queryset:
-                    self.log_deletion(request, f, force_str(f))
-                    f.delete()
+                if DJANGO_VERSION >= (5, 1):
+                    self.log_deletions(request, files_queryset)
+                    # Still need to delete files individually (not only the database entries)
+                    for f in files_queryset:
+                        f.delete()
+                else:
+                    for f in files_queryset:
+                        self.log_deletion(request, f, force_str(f))
+                        f.delete()
                 # delete all files in all selected folders and their children
                 # This would happen automatically by ways of the delete
                 # cascade, but then the individual .delete() methods won't be
@@ -788,13 +799,24 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                 for folder in folders_queryset:
                     folder_ids.add(folder.id)
                     folder_ids.update(folder.get_descendants_ids())
-                for f in File.objects.filter(folder__in=folder_ids):
-                    self.log_deletion(request, f, force_str(f))
-                    f.delete()
+                if DJANGO_VERSION >= (5, 1):
+                    qs = File.objects.filter(folder__in=folder_ids)
+                    self.log_deletions(request, qs)
+                    # Still need to delete files individually (not only the database entries)
+                    for f in qs:
+                        f.delete()
+                else:
+                    for f in File.objects.filter(folder__in=folder_ids):
+                        self.log_deletion(request, f, force_str(f))
+                        f.delete()
                 # delete all folders
-                for f in folders_queryset:
-                    self.log_deletion(request, f, force_str(f))
-                    f.delete()
+                if DJANGO_VERSION >= (5, 1):
+                    self.log_deletions(request, files_queryset)
+                    folders_queryset.delete()
+                else:
+                    for f in folders_queryset:
+                        self.log_deletion(request, f, force_str(f))
+                        f.delete()
                 self.message_user(request, _("Successfully deleted %(count)d files and/or folders.") % {"count": n, })
             # Return None to display the change list page again.
             return None
