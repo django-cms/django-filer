@@ -87,5 +87,5 @@ def update_folder_permission_cache(user: UserModel, permission: str, id_list: ty
     id_list (set): The set of IDs to set as the new permissions.
     """
     perms = cache.get(get_folder_perm_cache_key(user, permission)) or {}
-    perms[user.pk] = id_list
+    perms[user.pk] = set(id_list)
     cache.set(get_folder_perm_cache_key(user, permission), perms)
