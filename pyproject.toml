@@ -57,9 +57,12 @@ heif = ["pillow-heif"]
 Homepage = "https://github.com/django-cms/django-filer"
 
 [tool.setuptools]
-packages = ["filer"]
 include-package-data = true
 zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["filer*", "LICENSE"]
 
 [tool.setuptools.dynamic]
 version = {attr = "filer.__version__"}
@@ -111,3 +114,7 @@ sections = [
 known_first_party = ["filer"]
 known_cms = ["cms", "menus"]
 known_django = ["django"]
+
+[tool.ruff]
+src = ["filer"]
+exclude = ["*/migrations/*"]
