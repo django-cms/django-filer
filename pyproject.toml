@@ -64,6 +64,15 @@ zip-safe = false
 where = ["."]
 include = ["filer*", "LICENSE"]
 
+[tool.setuptools.package-data]
+"*" = [
+    "templates/**/*.html",
+    "static/**/*",
+    "locale/**/*",
+    "*.po",
+    "*.mo",
+]
+
 [tool.setuptools.dynamic]
 version = {attr = "filer.__version__"}
 
