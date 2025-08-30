@@ -380,8 +380,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             .order_by("-modified")
         )
         file_qs = file_qs.annotate(
-            thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size}_").values_list("name")[:1]),
-            thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f"__{size_x2}_").values_list("name")[:1])
+            thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f".{size}_").values_list("name")[:1]),
+            thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f".{size_x2}_").values_list("name")[:1])
         ).select_related("owner")
 
         try:
