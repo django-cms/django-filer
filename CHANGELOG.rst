@@ -2,6 +2,27 @@
 CHANGELOG
 =========
 
+3.3.2 (2025-09-01)
+==================
+
+* fix: add filename length safety check with random suffix by @Baraff24 in https://github.com/django-cms/django-filer/pull/1515
+* fix: Remove user from autocomplete fields if (swapped) user model does not have search fields by @fsbraun in https://github.com/django-cms/django-filer/pull/1517
+* Fix: Include Private Storage in Orphan File Scanning for filer_check Command by @Baraff24 in https://github.com/django-cms/django-filer/pull/1518
+* fix: Relect template block structure of Django 5.2+ by @fsbraun in https://github.com/django-cms/django-filer/pull/1523
+* chore: Added Full Persian (Farsi) Translate by @dimacodev in https://github.com/django-cms/django-filer/pull/1524
+* fix: Update directory_table_list.html by @AliAkbarSobhanpoor in https://github.com/django-cms/django-filer/pull/1528
+* fix: Avoid locale-dependent ratio by @albanbochsler in https://github.com/django-cms/django-filer/pull/1536
+* fix: docs GitHub action built by @fsbraun in https://github.com/django-cms/django-filer/pull/1540
+* fix: Folder permission cache update sometimes raised TypeError by @fsbraun in https://github.com/django-cms/django-filer/pull/1539
+* fix: Failed to install submodules of filer by @fsbraun in https://github.com/django-cms/django-filer/pull/1544
+
+**New Contributors**
+
+* @Baraff24 made their first contribution in https://github.com/django-cms/django-filer/pull/1515
+* @dimacodev made their first contribution in https://github.com/django-cms/django-filer/pull/1524
+* @AliAkbarSobhanpoor made their first contribution in https://github.com/django-cms/django-filer/pull/1528
+* @albanbochsler made their first contribution in https://github.com/django-cms/django-filer/pull/1536
+
 3.3.1 (2024-12-07)
 ==================
 
