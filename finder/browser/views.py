@@ -266,11 +266,10 @@ class BrowserView(View):
         cropped_image_path = image.get_cropped_path(width, height)
         if not default_storage.exists(cropped_image_path):
             image.crop(cropped_image_path, width, height)
-        cropped_image_url = default_storage.url(cropped_image_path)
         return {
             'image_id': image_id,
-            'alt_text': image.meta_data.get('alt_text', image.name),
-            'cropped_image_url': cropped_image_url,
+            'cropped_image_url': default_storage.url(cropped_image_path),
             'width': width,
             'height': height,
+            'meta_data': image.get_meta_data(),
         }

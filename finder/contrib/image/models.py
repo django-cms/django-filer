@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import models
 from django.utils.functional import cached_property
@@ -56,8 +57,14 @@ class ImageFileModel(AbstractFileModel):
         )
 
     def get_meta_data(self):
-        return {
+        alt_text = self.meta_data.get('alt_text', self.name)
+        data = {
             'orig_width': self.width,
             'orig_height': self.height,
-            'alt_text': self.meta_data.get('alt_text', self.name),
+            'alt_text': alt_text,
         }
+        for code, language in settings.LANGUAGES:
+            if code != settings.LANGUAGE_CODE:
+                key = f'alt_text_{code}'
+                data[key] = self.meta_data.get(key, alt_text)
+        return data
