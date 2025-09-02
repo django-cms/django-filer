@@ -1,5 +1,6 @@
 from django.forms.fields import CharField, FloatField, IntegerField
 from django.forms.widgets import HiddenInput, TextInput
+from django.utils.translation import gettext_lazy as _
 
 from entangled.forms import EntangledModelFormMixin
 
@@ -27,11 +28,17 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
         required=False,
     )
     alt_text = CharField(
+        label=_("Alternative Text"),
+        widget=TextInput(attrs={'size': 100}),
+        required=False,
+    )
+    credit = CharField(
+        label=_("Image Credit"),
         widget=TextInput(attrs={'size': 100}),
         required=False,
     )
 
     class Meta:
         model = ImageFileModel
-        entangled_fields = {'meta_data': ['crop_x', 'crop_y', 'crop_size', 'gravity', 'alt_text']}
+        entangled_fields = {'meta_data': ['crop_x', 'crop_y', 'crop_size', 'gravity', 'alt_text', 'credit']}
         untangled_fields = ['name', 'labels', 'width', 'height']
