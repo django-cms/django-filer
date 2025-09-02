@@ -144,6 +144,9 @@ class AbstractFileModel(InodeModel):
     def summary(self):
         return filesizeformat(self.file_size)
 
+    def get_meta_data(self):
+        return {}
+
     @classmethod
     def generate_filename(cls, filename):
         return default_storage.generate_filename(filename).lower()
@@ -190,6 +193,7 @@ class AbstractFileModel(InodeModel):
             'mime_type': self.mime_type,
             'last_modified_at': self.last_modified_at,
             'summary': self.summary,
+            'meta_data': self.get_meta_data(),
             'folderitem_component': self.folderitem_component,
             'browser_component': self.browser_component,
             'download_url': self.get_download_url(),

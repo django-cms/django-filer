@@ -11,6 +11,7 @@ interface SelectedFile {
 	mime_type: string;
 	last_modified_at: string;
 	summary: string;
+	meta_data: object;
 	download_url: string;
 	thumbnail_url: string;
 	labels: string[];
@@ -28,6 +29,7 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 			mime_type,
 			last_modified_at,
 			summary,
+			meta_data,
 			download_url,
 			thumbnail_url,
 			labels
@@ -41,10 +43,11 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 			mime_type,
 			last_modified_at,
 			summary,
+			meta_data,
 			download_url,
 			thumbnail_url,
 			labels
-		};
+		} as SelectedFile;
 	}
 	return null;
 }
