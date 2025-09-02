@@ -32,7 +32,7 @@ class ImageFileModel(AbstractFileModel):
     def get_cropped_path(self, width, height):
         id = str(self.id)
         thumbnail_folder = self.filer_public_thumbnails / f'{id[0:2]}/{id[2:4]}/{id}'
-        thumbnail_path = Path(self.file_name)
+        file_name = Path(self.file_name)
         crop_x, crop_y, crop_size, gravity = (
             self.meta_data.get('crop_x'),
             self.meta_data.get('crop_y'),
@@ -40,17 +40,24 @@ class ImageFileModel(AbstractFileModel):
             self.meta_data.get('gravity'),
         )
         if crop_x is None or crop_y is None or crop_size is None:
-            thumbnail_path_template = '{stem}__{width}x{height}{suffix}'
+            cropped_path_template = '{stem}__{width}x{height}{suffix}'
         else:
             crop_x, crop_y, crop_size = int(crop_x), int(crop_y), int(crop_size)
-            thumbnail_path_template = '{stem}__{width}x{height}__{crop_x}_{crop_y}_{crop_size}{gravity}{suffix}'
-        return thumbnail_folder / thumbnail_path_template.format(
-            stem=thumbnail_path.stem,
+            cropped_path_template = '{stem}__{width}x{height}__{crop_x}_{crop_y}_{crop_size}{gravity}{suffix}'
+        return thumbnail_folder / cropped_path_template.format(
+            stem=file_name.stem,
             width=round(width),
             height=round(height),
             crop_x=crop_x,
             crop_y=crop_y,
             crop_size=crop_size,
             gravity=gravity or '',
-            suffix=thumbnail_path.suffix,
+            suffix=file_name.suffix,
         )
+
+    def get_meta_data(self):
+        return {
+            'orig_width': self.width,
+            'orig_height': self.height,
+            'alt_text': self.meta_data.get('alt_text', self.name),
+        }
