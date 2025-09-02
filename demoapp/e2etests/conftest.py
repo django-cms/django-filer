@@ -9,7 +9,6 @@ from django.urls import reverse
 
 from finder.models.realm import RealmModel
 
-from ..utils import create_random_image
 
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 

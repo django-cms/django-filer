@@ -1,6 +1,8 @@
+import colorsys
 import os
 import pytest
 import random
+from collections import namedtuple
 
 from django.conf import settings
 from django.core.management import call_command
@@ -9,9 +11,37 @@ from django.urls import reverse
 
 from finder.models.folder import FolderModel
 
-from .utils import create_random_image
+from PIL import Image, ImageDraw, ImageFont
 
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
+
+
+class ColorRGBA(namedtuple('ColorRGBA', ['red', 'green', 'blue', 'alpha'])):
+    def __new__(cls, red=0, green=0, blue=0, alpha=255):
+        return super(ColorRGBA, cls).__new__(cls, red, green, blue, alpha)
+
+    def rotate_hue(self, degrees: float):
+        hue, lum, sat = colorsys.rgb_to_hls(self.red, self.blue, self.green)
+        hue = (hue + degrees / 360.0) % 1.0
+        lum = 255.0 - lum
+        red, green, blue = map(int, colorsys.hls_to_rgb(hue, lum, sat))
+        return self._replace(red=red, green=green, blue=blue)
+
+
+@pytest.fixture(autouse=True, scope='session')
+def random_image() -> Image:
+    background_color = ColorRGBA(red=255, green=255, blue=255)
+    image = Image.new('RGB', (4000, 3000), color=background_color)
+    drawing = ImageDraw.Draw(image)
+    color = ColorRGBA(red=255)
+    drawing.rectangle([(10, 10), (130, 130)], fill=color)
+    color = color.rotate_hue(25)
+    drawing.rectangle([(150, 10), (270, 130)], fill=color)
+
+    # foreground_color = rotate_hue(background_color, 180)
+    # font = ImageFont.truetype(Path(__file__).parent / 'fonts/Courier.ttf', 20)
+    # drawing.text((10, 90), faker.text(15), fill=foreground_color, font=font)
+    image.save(settings.BASE_DIR / 'workdir/assets/demo_image.png')
 
 
 @pytest.fixture(autouse=True, scope='session')
@@ -21,8 +51,8 @@ def create_assets():
         handle.write(random.randbytes(1000))
     with open(settings.BASE_DIR / 'workdir/assets/huge_file.bin', 'wb') as handle:
         handle.write(random.randbytes(100000))
-    image = create_random_image()
-    image.save(settings.BASE_DIR / 'workdir/assets/demo_image.png')
+    # image = create_random_image()
+    # image.save(settings.BASE_DIR / 'workdir/assets/demo_image.png')
 
 
 @pytest.fixture(scope='session')
