@@ -1,11 +1,14 @@
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import BadRequest, ObjectDoesNotExist
+from django.core.files.storage import default_storage
 from django.db.models import QuerySet, Subquery
 from django.forms.renderers import DjangoTemplates
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
 from django.views import View
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.file import FileModel
@@ -30,6 +33,8 @@ class BrowserView(View):
     limit = 25
 
     def dispatch(self, request, *args, **kwargs):
+        if self.action is None:
+            return HttpResponseNotFound()
         action = getattr(self, self.action, None)
         if not callable(action):
             return HttpResponseBadRequest(f"Action {self.action} not allowed.")
@@ -62,6 +67,7 @@ class BrowserView(View):
         except RealmModel.DoesNotExist:
             raise ObjectDoesNotExist(f"Realm named {slug} not found for {site.domain}.")
 
+    @method_decorator(require_GET)
     def structure(self, request, slug):
         realm = self._get_realm(request, slug)
         root_folder_id = str(realm.root_folder.id)
@@ -100,6 +106,7 @@ class BrowserView(View):
             **self.list(request, request.session['finder.last_folder']),
         }
 
+    @method_decorator(require_GET)
     def fetch(self, request, inode_id):
         """
         Open the given folder and fetch children data for the folder.
@@ -121,6 +128,7 @@ class BrowserView(View):
         else:
             return inode.as_dict
 
+    @method_decorator(require_GET)
     def open(self, request, folder_id):
         """
         Just open the folder.
@@ -132,6 +140,7 @@ class BrowserView(View):
             request.session.modified = True
         return {'id': folder_id}
 
+    @method_decorator(require_GET)
     def close(self, request, folder_id):
         """
         Just close the folder.
@@ -145,6 +154,7 @@ class BrowserView(View):
             request.session.modified = True
         return {'id': folder_id}
 
+    @method_decorator(require_GET)
     def list(self, request, folder_id):
         """
         List all the files of the given folder.
@@ -175,6 +185,7 @@ class BrowserView(View):
             'search_query': '',
         }
 
+    @method_decorator(require_GET)
     def search(self, request, folder_id):
         """
         Search for files in either the descendants of given folder or in all folders.
@@ -207,12 +218,11 @@ class BrowserView(View):
             'offset': next_offset,
         }
 
+    @method_decorator(require_POST)
     def upload(self, request, folder_id):
         """
         Upload a single file into the given folder.
         """
-        if request.method != 'POST':
-            raise BadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             raise BadRequest("Bad form encoding or missing payload.")
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
@@ -230,18 +240,17 @@ class BrowserView(View):
         }
         return response
 
+    @method_decorator(require_http_methods(['DELETE', 'POST']))
     def change(self, request, file_id):
         """
         Change some fields after uploading a single file.
         """
-        if request.method not in ['DELETE', 'POST']:
-            raise BadRequest(f"Method {request.method} not allowed. Only POST and DELETE requests are allowed.")
-        if request.method == 'POST' and request.content_type != 'multipart/form-data':
-            raise BadRequest("Bad form encoding or missing payload.")
         file = FileModel.objects.get_inode(id=file_id)
         if request.method == 'DELETE':
             file.delete()
             return {'file_info': None}
+        if request.content_type != 'multipart/form-data':
+            raise BadRequest("Bad form encoding or missing payload.")
         form_class = file.get_form_class()
         form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
         if form.is_valid():
@@ -249,3 +258,19 @@ class BrowserView(View):
             return {'file_info': file.as_dict}
         else:
             return {'form_html': mark_safe(strip_spaces_between_tags(form.as_div()))}
+
+    @method_decorator(require_POST)
+    def crop(self, request, image_id):
+        image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
+        width, height = int(request.POST.get('width')), int(request.POST.get('height'))
+        cropped_image_path = image.get_cropped_path(width, height)
+        if not default_storage.exists(cropped_image_path):
+            image.crop(cropped_image_path, width, height)
+        cropped_image_url = default_storage.url(cropped_image_path)
+        return {
+            'image_id': image_id,
+            'alt_text': image.meta_data.get('alt_text', image.name),
+            'cropped_image_url': cropped_image_url,
+            'width': width,
+            'height': height,
+        }
