@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+3.3.3 / 2025-11-07
+==================
+
+  * Pin svglib to a version below 1.6.0 by @payamnj (#1550) in https://github.com/django-cms/django-filer/pull/1551
+
 3.3.2 (2025-09-01)
 ==================
 
