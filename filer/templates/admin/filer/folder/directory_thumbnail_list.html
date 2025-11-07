@@ -186,7 +186,7 @@
 
     <div class="nav-pages paginator">
         {% if paginated_items.has_previous %}
-            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q }}{% endif %}{% filer_admin_context_url_params '&' %}">
+            <a href="?page={{ paginated_items.previous_page_number }}{% if q %}&amp;q={{ q }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% filer_admin_context_url_params '&' %}">
                 {% trans "previous" %}
             </a>
         {% endif %}
@@ -196,7 +196,7 @@
         </span>
 
         {% if paginated_items.has_next %}
-            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&amp;q={{ q }}{% endif %}{% filer_admin_context_url_params '&' %}">
+            <a href="?page={{ paginated_items.next_page_number }}{% if q %}&amp;q={{ q }}{% endif %}{% if request.GET.limit_search_to_folder %}&amp;limit_search_to_folder=on{% endif %}{% filer_admin_context_url_params '&' %}">
                 {% trans "next" %}
             </a>
         {% endif %}
