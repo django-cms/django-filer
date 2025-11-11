@@ -50,6 +50,5 @@ def sort_by_attribute(request, unified_queryset):
         'type_desc': '-mime_type',
     }
 
-    if sorting := sorting_map.get(request.COOKIES.get('django-finder-sorting')):
-        return unified_queryset.order_by(sorting)
-    return unified_queryset
+    sorting = sorting_map.get(request.COOKIES.get('django-finder-sorting'), 'ordering')
+    return unified_queryset.order_by(sorting)

@@ -245,6 +245,12 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         auto_now=True,
         editable=False,
     )
+    ordering = models.PositiveIntegerField(
+        _("Ordering index"),
+        default=0,
+        editable=False,
+        db_index=True,
+    )
     meta_data = models.JSONField(
         default=dict,
         blank=True,

@@ -3,7 +3,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
@@ -13,7 +13,7 @@ try:
 except ImportError:
     ModelManager = models.Manager
 
-from .inode import InodeManagerMixin, InodeModel
+from .inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
 from .realm import RealmModel
 
 
@@ -172,6 +172,32 @@ class FolderModel(InodeModel):
         """
         return self._meta.model.objects.filter_unified(parent=self, **lookup)
 
+    def move_inodes(self, inode_ids):
+        """
+        Move all Inodes with the given IDs to the end of this folder.
+        """
+        parent_ids = set()
+        update_inodes = {}
+        entries = FolderModel.objects.filter_unified(id__in=inode_ids)
+        for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
+            parent_ids.add(entry['parent'])
+            try:
+                DiscardedInode.objects.get(inode=entry['id']).delete()
+            except DiscardedInode.DoesNotExist:
+                pass
+            proxy_obj = InodeManager.get_proxy_object(entry)
+            proxy_obj.parent = self
+            proxy_obj.ordering = ordering
+            proxy_obj.validate_constraints()
+            update_inodes.setdefault(proxy_obj._meta.concrete_model, []).append(proxy_obj)
+
+        with transaction.atomic():
+            for concrete_model, proxy_objects in update_inodes.items():
+                concrete_model.objects.bulk_update(proxy_objects, ['parent', 'ordering'])
+
+        for folder in FolderModel.objects.filter(id__in=parent_ids):
+            folder.reorder()
+
     def copy_to(self, folder, **kwargs):
         """
         Copies the folder to a destination folder and returns it.
@@ -203,6 +229,59 @@ class FolderModel(InodeModel):
         if self.name in ['__root__', '__trash__']:
             msg = gettext("Folder name “{name}” is reserved.")
             raise ValidationError(msg.format(name=self.name))
+
+    def reorder(self, target_id=None, inode_ids=[], insert_after=True):
+        """
+        Set `ordering` index based on their natural ordering index.
+        Returns the number of reorderings performed.
+        """
+
+        def insert(new_order):
+            inodes_order.update({id: nord for nord, id in enumerate(inode_ids, new_order)})
+            return new_order + len(inode_ids)
+
+        inodes_order, new_order = {}, 1
+        target_id = str(target_id) if target_id else None
+        for inode in self.listdir().order_by('ordering'):
+            inode_id = str(inode['id'])
+            if not insert_after and inode_id == target_id:
+                new_order = insert(new_order)
+            if inode_id not in inode_ids:
+                inodes_order[inode_id] = new_order
+                new_order += 1
+            if insert_after and inode_id == target_id:
+                new_order = insert(new_order)
+
+        former_parents = set()
+        num_reorders = 0
+        with transaction.atomic():
+            for inode_model in InodeModel.get_models(include_folder=True):
+                update_inodes = []
+                for inode in inode_model.objects.filter(pk__in=inodes_order.keys()):
+                    ordering = inodes_order[str(inode.id)]
+                    if inode.parent != self:
+                        former_parents.add(inode.parent)
+                        inode.parent = self
+                        update_inodes.append(inode)
+                    if inode.ordering != ordering:
+                        inode.ordering = ordering
+                        update_inodes.append(inode)
+                        num_reorders += 1
+                inode_model.objects.bulk_update(update_inodes, ['parent', 'ordering'])
+
+        for folder in former_parents:
+            folder.reorder()
+
+        return num_reorders
+
+    def get_max_ordering(self):
+        """
+        Get the maximum ordering index of all inodes in this folder.
+        """
+        queryset = FolderModel.objects.filter(parent=self).values_list('ordering', flat=True).union(*[
+            model.objects.filter(parent=self).values_list('ordering', flat=True) for model in InodeModel.get_models()
+        ])
+        return max(queryset) if queryset.exists() else 0
 
     def retrieve(self, path):
         """

@@ -175,7 +175,7 @@ ul.messagelist {
 				&.dragging .inode, &.cutted .inode {
 					outline: 1px dashed grey;
 					filter: grayscale(100%);
-					opacity: 0.35;
+					opacity: 0.4;
 				}
 
 				&.copied .inode {
@@ -266,8 +266,8 @@ ul.messagelist {
 		> li {
 			display: block;
 			list-style: none;
-			padding: 5px;
 			border: 1px solid transparent;
+			position: relative;
 
 			&:hover {
 				filter: brightness(1.125);
@@ -289,9 +289,6 @@ ul.messagelist {
 			}
 
 			.inode {
-				height: 100%;
-				width: 100%;
-
 				&.drag-over {
 					color: $selected-row-color;
 					background-color: var(--primary);
@@ -321,58 +318,64 @@ ul.messagelist {
 		align-content: flex-start;
 		justify-content: flex-start;
 
-		> li .inode {
-			box-sizing: border-box;
+		> li {
+			padding: 5px;
 
-			div:has(> .figure-labels) {
-				position: relative;
-			}
+			.inode {
+				box-sizing: border-box;
 
-			.figure-labels {
-				position: absolute;
-				line-height: 0;
-				text-align: right;
-				overflow: hidden;
-			}
+				div:has(> .figure-labels) {
+					position: relative;
+				}
 
-			figure {
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-				flex-wrap: nowrap;
-				justify-content: space-between;
-				margin: 0;
+				.figure-labels {
+					position: absolute;
+					line-height: 0;
+					text-align: right;
+					overflow: hidden;
+				}
 
-				img {
-					width: 100%;
-					border-radius: 5px;
+				figure, .figure {
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+					flex-wrap: nowrap;
+					justify-content: space-between;
+					margin: 0;
 
-					&:not([src$=".svg"]) {
+					img {
+						width: 100%;
+						border-radius: 5px;
+
+						&:not([src$=".svg"]) {
+							box-shadow: $border-color 0 0 5px;
+						}
+					}
+
+					video {
+						border-radius: 5px;
 						box-shadow: $border-color 0 0 5px;
 					}
-				}
-				video {
-					border-radius: 5px;
-					box-shadow: $border-color 0 0 5px;
+
+					figcaption {
+						text-align: center;
+						width: 180px;
+						margin: 0 auto;
+						word-break: break-all;
+					}
 				}
 
-				figcaption {
-					text-align: center;
-					width: 100%;
-					word-break: break-all;
+				.inode-name {
+					margin-top: 2px;
 				}
-			}
-
-			.inode-name {
-				margin-top: 2px;
 			}
 		}
 	}
 
-	.tiles ul.inode-list {
-		gap: 5px;
+	.tiles ul.inode-list li {
+		margin-bottom: 5px;
 
-		li:not(.status) {
+		&:not(.status) {
 			min-height: 248px;
 			width: 192px;
 			box-sizing: border-box;
@@ -380,33 +383,69 @@ ul.messagelist {
 			font-size: 15px;
 			line-height: 18px;
 
-			&:has(figure img[src$=".svg"]) {
-				padding: 15px;  // this reduced the size of SVG images
+			> .reordering {
+				position: absolute;
+				top: 0;
+				right: -5px;
+				bottom: 0;
+
+				> div {
+					height: 188px;
+					width: 4px;
+					margin: 2px;
+					border-radius: 2px;
+				}
+
+				&.drag-over > div {
+					background-color: var(--primary);
+				}
 			}
 
-			.inode .figure-labels {
-				inset: 5px;
+			.inode figure {
+				> div:has(img[src$=".svg"]) {
+					padding: 15px; // reduce the size of SVG images
+				}
 
-				span {
-					width: 12px;
-					height: 12px;
-					display: inline-block;
-					border-radius: 50%;
-					margin-left: -4px;
+				.figure-labels {
+					inset: 5px;
+
+					span {
+						width: 12px;
+						height: 12px;
+						display: inline-block;
+						border-radius: 50%;
+						margin-left: -4px;
+					}
 				}
 			}
 		}
 	}
 
-	.mosaic ul.inode-list {
-		gap: 2px;
+	.mosaic ul.inode-list li {
+		margin-bottom: 8px;
+		line-height: 10px;
 
-		li:not(.status) {
-			min-height: 120px;
+		&:not(.status) {
 			width: 70px;
 			cursor: pointer;
-			font-size: 15px;
-			line-height: 18px;
+
+			> .reordering {
+				position: absolute;
+				top: 0;
+				right: -5px;
+				bottom: 0;
+
+				> div {
+					height: 100%;
+					width: 4px;
+					margin: 2px;
+					border-radius: 2px;
+				}
+
+				&.drag-over > div {
+					background-color: var(--primary);
+				}
+			}
 
 			.inode .figure-labels {
 				inset: 2px;
@@ -420,7 +459,6 @@ ul.messagelist {
 				}
 			}
 		}
-
 	}
 
 	.list ul.inode-list, .columns ul.inode-list {
@@ -430,6 +468,7 @@ ul.messagelist {
 		> li {
 			width: 100%;
 			box-sizing: border-box;
+			padding: 5px;
 
 			&:nth-child(even):not(.selected) {
 				background-color: $darkened-bg;
@@ -438,6 +477,25 @@ ul.messagelist {
 			&:last-child {
 				border-bottom: 1px solid $border-color;
 			}
+
+			> .reordering {
+				position: absolute;
+				top: -3px;
+				left: 0;
+				right: 0;
+				height: 5px;
+
+				> div {
+					height: 3px;
+					margin: 2px;
+					border-radius: 2px;
+				}
+
+				&.drag-over > div {
+					background-color: var(--primary);
+				}
+			}
+
 
 			.inode {
 				display: grid;
@@ -614,7 +672,7 @@ ul.messagelist {
 
 	.drag-overlay {
 		ul.inode-list {
-			opacity: 0.75;
+			opacity: 0.7;
 			border: 1px dashed var(--body-quiet-color);
 			overflow: hidden;
 

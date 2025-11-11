@@ -38,6 +38,7 @@ class FileModelManager(InodeManager):
         )
         obj = self.model(**kwargs)
         obj.receive_file(uploaded_file)
+        obj.ordering = folder.get_max_ordering() + 1
         obj.save(force_insert=True)
         folder.refresh_from_db()
         return obj

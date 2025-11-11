@@ -5,7 +5,7 @@ import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 import SearchIcon from '../icons/search.svg';
 
 
-function useSearchParam(key) : [string, (value: string) => any] {
+export function useSearchParam(key) : [string, (value: string) => any] {
 	const params = new URLSearchParams(window.location.search);
 	const [value, setValue] = useState(
 		params.get(key) || ''

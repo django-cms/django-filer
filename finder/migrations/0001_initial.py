@@ -43,6 +43,7 @@ class Migration(migrations.Migration):
                 ('sha1', models.CharField(blank=True, default='', editable=False, max_length=40, verbose_name='SHA1-hash')),
                 ('mime_type', models.CharField(db_index=True, default='application/octet-stream', editable=False, help_text='MIME-type of uploaded content', max_length=255, validators=[finder.models.file.mimetype_validator], verbose_name='MIME-type')),
                 ('owner', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='Owner')),
+                ('ordering', models.PositiveIntegerField(db_index=True, default=0, editable=False, verbose_name='Ordering index')),
             ],
             options={
                 'verbose_name': 'File',
@@ -116,6 +117,7 @@ class Migration(migrations.Migration):
                 ('meta_data', models.JSONField(blank=True, default=dict)),
                 ('owner', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='Owner')),
                 ('parent', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='finder.foldermodel', verbose_name='Folder')),
+                ('ordering', models.PositiveIntegerField(db_index=True, default=0, editable=False, verbose_name='Ordering index')),
             ],
             options={
                 'verbose_name': 'Folder',
@@ -152,6 +154,7 @@ class Migration(migrations.Migration):
                 ('height', models.SmallIntegerField(default=0)),
                 ('owner', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL, verbose_name='Owner')),
                 ('parent', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='finder.foldermodel', verbose_name='Folder')),
+                ('ordering', models.PositiveIntegerField(db_index=True, default=0, editable=False, verbose_name='Ordering index')),
                 ('labels', models.ManyToManyField(blank=True, related_name='+', to='finder.label', verbose_name='Labels')),
             ],
         ),
