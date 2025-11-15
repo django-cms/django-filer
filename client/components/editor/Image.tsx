@@ -3,6 +3,21 @@ import ReactCrop, {Crop} from 'react-image-crop';
 import DropDownMenu from '../../common/DropDownMenu';
 import FileDetails from '../../admin/FileDetails';
 import ClearCropIcon from '../../icons/clear-crop.svg';
+import GravityCenterIcon from '../../icons/gravity-center.svg';
+import GravityNorthIcon from '../../icons/gravity-north.svg';
+import GravityNorthEastIcon from '../../icons/gravity-north-east.svg';
+import GravityEastIcon from '../../icons/gravity-east.svg';
+import GravitySouthEastIcon from '../../icons/gravity-south-east.svg';
+import GravitySouthIcon from '../../icons/gravity-south.svg';
+import GravitySouthWestIcon from '../../icons/gravity-south-west.svg';
+import GravityWestIcon from '../../icons/gravity-west.svg';
+import GravityNorthWestIcon from '../../icons/gravity-north-west.svg';
+
+
+interface GravityOption {
+	label: string,
+	icon: JSX.Element,
+}
 
 
 export default function Image(props) {
@@ -18,10 +33,16 @@ export default function Image(props) {
 	const [crop, setCrop] = useState<Crop>(null);
 	const [gravity, setGravity] = useState<string>(gravityField.value);
 	const ref = useRef(null);
-	const gravityOptions = {
-		'': gettext("Center"), 'n': gettext("North"), 'ne': gettext("Northeast"),
-		 'e': gettext("East"), 'se': gettext("Southeast"), 's': gettext("South"),
-		 'sw': gettext("Southwest"), 'w': gettext("West"), 'nw': gettext("Northwest"),
+	const gravityOptions: Record<string, GravityOption> = {
+		'': {label: gettext("Center"), icon: <GravityCenterIcon/>},
+		'n': {label: gettext("North"), icon: <GravityNorthIcon/>},
+		'ne': {label: gettext("Northeast"), icon: <GravityNorthEastIcon/>},
+		 'e': {label: gettext("East"), icon: <GravityEastIcon/>},
+		 'se': {label: gettext("Southeast"), icon: <GravitySouthEastIcon/>},
+		 's': {label: gettext("South"), icon: <GravitySouthIcon/>},
+		 'sw': {label: gettext("Southwest"), icon: <GravitySouthWestIcon/>},
+		 'w': {label: gettext("West"), icon: <GravityWestIcon/>},
+		 'nw': {label: gettext("Northwest"), icon: <GravityNorthWestIcon/>},
 	};
 
 	useEffect(() => {
@@ -60,22 +81,20 @@ export default function Image(props) {
 		}
 	}
 
-	function getItemProps(value: string) {
-		return {
-			role: 'option',
-			'aria-selected': gravity === value,
-			onClick: () => {
-				setGravity(value);
-				gravityField.value = value;
-			},
-		};
+	function setGravityOption(value) {
+		setGravity(value);
+		gravityField.value = value;
 	}
 
 	const controlButtons = [
 		<Fragment key="clear-crop">
 			<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
-			<DropDownMenu className="with-caret" wrapperElement="div" label={gettext("Gravity") + ": " + gravityOptions[gravity]} tooltip={gettext("Align image before cropping")}>
-				{Object.entries(gravityOptions).map(([value, label]) => (<li {...getItemProps(value)}>{label}</li>))}
+			<DropDownMenu className="with-caret" wrapperElement="div" label={<Fragment>{gettext("Gravity")}: {gravityOptions[gravity].label}</Fragment>} tooltip={gettext("Align image before cropping")}>
+				{Object.entries(gravityOptions).map(([value, record]) => (
+					<li key={value} value={value} role="option" aria-selected={gravity === value} onClick={() => setGravityOption(value)}>
+						{record.icon}{record.label}
+					</li>
+				))}
 			</DropDownMenu>
 		</Fragment>
 	];

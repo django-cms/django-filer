@@ -62,6 +62,12 @@
 			&:hover:not(.disabled) {
 				background-color: $selected-bg-color;
 			}
+
+			svg {
+				margin-inline-end: 0.5rem;
+				vertical-align: text-bottom;
+				width: 24px;
+			}
 		}
 	}
 	[aria-haspopup="listbox"][aria-expanded="false"] {
