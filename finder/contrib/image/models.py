@@ -1,3 +1,4 @@
+from logging import getLogger
 from pathlib import Path
 
 from django.conf import settings
@@ -7,6 +8,8 @@ from django.utils.functional import cached_property
 
 from finder.models.file import AbstractFileModel
 
+
+logger = getLogger(__name__)
 
 GravityChoices = {
     '': "Center",
@@ -44,8 +47,8 @@ class ImageFileModel(AbstractFileModel):
         if not realm.sample_storage.exists(thumbnail_path):
             try:
                 self.crop(realm, thumbnail_path, self.thumbnail_size, self.thumbnail_size)
-            except Exception:
-                # no thumbnail image could not be created
+            except Exception as exception:
+                logger.warning(f"Thumbnail generation failed for image {self.pk}: {exception}")
                 return self.fallback_thumbnail_url
         return realm.sample_storage.url(thumbnail_path)
 
