@@ -197,6 +197,8 @@ class Migration(migrations.Migration):
                 ('root_folder', models.OneToOneField(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='realm', to='finder.foldermodel')),
                 ('site', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='sites.site', verbose_name='Site')),
                 ('trash_folders', models.ManyToManyField(editable=False, related_name='+', to='finder.foldermodel')),
+                ('_original_storage', models.CharField(default='finder_public')),
+                ('_sample_storage', models.CharField(default='finder_public_samples')),
             ],
             options={
                 'ordering': ['site', 'slug'],

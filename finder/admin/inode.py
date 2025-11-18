@@ -78,7 +78,7 @@ class InodeAdmin(admin.ModelAdmin):
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
-    def serialize_inode(self, inode):
+    def serialize_inode(self, realm, inode):
         data = {field: inode.serializable_value(field) for field in inode.data_fields}
         data.update(
             owner_name=inode.owner.username if inode.owner else None,
@@ -88,8 +88,8 @@ class InodeAdmin(admin.ModelAdmin):
                 args=(inode.id,),
                 current_app=self.admin_site.name,
             ),
-            download_url=inode.get_download_url(),
-            thumbnail_url=inode.get_thumbnail_url(),
+            download_url=inode.get_download_url(realm),
+            thumbnail_url=inode.get_thumbnail_url(realm),
             summary=inode.summary,
         )
         if (inode.is_folder):
@@ -129,9 +129,10 @@ class InodeAdmin(admin.ModelAdmin):
         Return a serialized list of file/folder-s for the given folder.
         """
         lookup = dict(lookup_by_label(request), **lookup)
+        realm = self.get_realm(request)
         unified_queryset = FolderModel.objects.filter_unified(**lookup)
         unified_queryset = sort_by_attribute(request, unified_queryset)
-        self.annotate_unified_queryset(unified_queryset)
+        self.annotate_unified_queryset(realm, unified_queryset)
         return unified_queryset
 
     def get_breadcrumbs(self, obj):
@@ -147,9 +148,9 @@ class InodeAdmin(admin.ModelAdmin):
         return breadcrumbs
 
     def get_favorite_folders(self, request, current_folder):
-        site = get_current_site(request)
+        realm = self.get_realm(request)
         folders = PinnedFolder.objects.filter(
-            realm__site=site,
+            realm__site=realm.site,
             realm__slug=self.admin_site.name,
             owner=request.user,
         ).values(
@@ -174,15 +175,15 @@ class InodeAdmin(admin.ModelAdmin):
         for folder in folders:
             if folder['id'] == current_folder.id:
                 if len(folders) == 0:
-                    folders.append(self.serialize_inode(fallback_folder))
+                    folders.append(self.serialize_inode(realm, fallback_folder))
                 break
         else:
             if current_folder.id == root_folder.id:
-                folders.insert(0, self.serialize_inode(current_folder))
+                folders.insert(0, self.serialize_inode(realm, current_folder))
             elif current_folder.id != trash_folder.id:
-                folders.append(self.serialize_inode(current_folder))
+                folders.append(self.serialize_inode(realm, current_folder))
         if trash_folder.num_children > 0:
-            inode_data = self.serialize_inode(trash_folder)
+            inode_data = self.serialize_inode(realm, trash_folder)
             inode_data.update(is_trash=True)
             folders.append(inode_data)
         return folders
@@ -239,8 +240,8 @@ class InodeAdmin(admin.ModelAdmin):
         """
         return {}
 
-    def annotate_unified_queryset(self, queryset):
-        annotate_unified_queryset(queryset)
+    def annotate_unified_queryset(self, realm, queryset):
+        annotate_unified_queryset(realm, queryset)
         for entry in queryset:
             entry.update(
                 change_url=reverse(

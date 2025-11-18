@@ -7,7 +7,6 @@ from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
-
 try:
     from django_cte import CTEManager as ModelManager
 except ImportError:
@@ -54,7 +53,8 @@ class FolderModel(InodeModel):
     @lru_cache
     def get_realm(self):
         if isinstance(self.ancestors, models.QuerySet):
-            return self.ancestors.last().realm
+            count = self.ancestors.count()
+            return self.ancestors[count - 1].realm
         return list(self.ancestors)[-1].realm
 
     @property
@@ -160,11 +160,14 @@ class FolderModel(InodeModel):
             ngettext("{} File", "{} Files", num_files).format(num_files),
         ))
 
-    def get_download_url(self):
+    def get_download_url(self, realm):
         return None
 
-    def get_thumbnail_url(self):
+    def get_thumbnail_url(self, realm):
         return staticfiles_storage.url('finder/icons/folder.svg')
+
+    def get_sample_url(self, realm):
+        return None
 
     def listdir(self, **lookup):
         """

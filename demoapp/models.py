@@ -9,4 +9,5 @@ class DemoAppModel(models.Model):
         null=True,
         blank=True,
         accept_mime_types=['image/*'],
+        realm='admin',
     )

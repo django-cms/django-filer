@@ -1,0 +1,20 @@
+from django.core.files.storage import FileSystemStorage
+
+
+class FinderSystemStorage(FileSystemStorage):
+    template = '{id02}/{id24}/{id}/{filename}'
+
+    def __init__(self, template=None, **kwargs):
+        if template:
+            self.template = template
+        super().__init__(**kwargs)
+
+    def path(self, name):
+        id, filename = name.split('/', 1)
+        name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
+        return super().path(name)
+
+    def url(self, name):
+        id, filename = name.split('/', 1)
+        name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
+        return super().url(name)

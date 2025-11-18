@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from django.core.files.temp import NamedTemporaryFile
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 
@@ -28,9 +31,9 @@ class SVGImageModel(ImageFileModel):
                 .format(path=self.pretty_path)
             )
 
-    def save(self, **kwargs):
+    def store_and_save(self, realm, **kwargs):
         try:
-            drawing = svg2rlg(default_storage.path(self.file_path))
+            drawing = svg2rlg(realm.original_storage.path(self.file_path))
             self.width = drawing.width
             self.height = drawing.height
         except Exception:
@@ -38,40 +41,25 @@ class SVGImageModel(ImageFileModel):
         else:
             if 'update_fields' in kwargs:
                 kwargs['update_fields'].extend(['width', 'height'])
-        super().save(**kwargs)
+        super().store_and_save(realm, **kwargs)
 
-    def get_thumbnail_url(self):
-        thumbnail_path = self.get_cropped_path(self.thumbnail_size, self.thumbnail_size)
-        if not default_storage.exists(thumbnail_path):
-            drawing = svg2rlg(default_storage.path(self.file_path))
-            if not drawing:
-                raise FileValidationError(
-                    _('File "{path}": SVG format not recognized')
-                    .format(path=self.pretty_path)
-                )
-            canvas = renderSVG.SVGCanvas(size=(drawing.width, drawing.height), useClip=True)
-            (default_storage.base_location / thumbnail_path.parent).mkdir(parents=True, exist_ok=True)
-            with default_storage.open(thumbnail_path, 'wb') as file:
-                if crop_x is None or crop_y is None or crop_size is None:
-                    bbox = self.centered_bounding_box(canvas)
-                else:
-                    bbox = crop_x, crop_y, crop_size, crop_size
-                canvas.svg.setAttribute('viewBox', '{0} {1} {2} {3}'.format(*bbox))
-                canvas.svg.setAttribute('width', '{2}'.format(*bbox))
-                canvas.svg.setAttribute('height', '{3}'.format(*bbox))
-                renderSVG.draw(drawing, canvas)
-                xml = canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes -> sanitation
-                file.seek(0)  # Rewind file
-                file.write(xml)  # write to binary file with utf-8 encoding
-        return default_storage.url(thumbnail_path)
-
-    def centered_bounding_box(self, canvas):
-        bbox = [float(b) for b in canvas.svg.getAttribute('viewBox').split()]
-        current_aspect_ratio = (bbox[2] - bbox[0]) / (bbox[3] - bbox[1])
-        if current_aspect_ratio > 1:
-            bbox[0] += (bbox[2] - bbox[3]) / 2
-            bbox[2] = bbox[3]
-        else:
-            bbox[1] += (bbox[3] - bbox[2]) / 2
-            bbox[3] = bbox[2]
-        return bbox
+    def crop(self, realm, thumbnail_path, width, height):
+        drawing = svg2rlg(realm.original_storage.path(self.file_path))
+        if not drawing:
+            raise FileValidationError(
+                _('File "{path}": SVG format not recognized')
+                .format(path=self.pretty_path)
+            )
+        crop_box = self.compute_crop_box(drawing.width, drawing.height, width, height)
+        crop_w = crop_box[2] - crop_box[0]
+        crop_h = crop_box[3] - crop_box[1]
+        min_y = crop_box[3] - drawing.height
+        canvas = renderSVG.SVGCanvas(size=(crop_w, crop_h), useClip=True)
+        canvas.svg.setAttribute('viewBox', '{0} {1} {2} {3}'.format(crop_box[0], min_y, crop_w, crop_h))
+        canvas.svg.setAttribute('width', '{}'.format(crop_w))
+        canvas.svg.setAttribute('height', '{}'.format(crop_h))
+        renderSVG.draw(drawing, canvas)
+        xml = canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes -> sanitation
+        with NamedTemporaryFile(suffix=Path(self.file_path).suffix) as tempfile:
+            tempfile.write(xml)  # write to binary file with utf-8 encoding
+            realm.sample_storage.save(thumbnail_path, tempfile)

@@ -75,13 +75,14 @@ class FileAdmin(InodeAdmin):
             return HttpResponseNotFound(f"File {file_id} not found.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             return HttpResponseBadRequest(f"Content-Type {request.content_type} invalid for file upload.")
+        realm = self.get_realm(request)
         uploaded_file = request.FILES['upload_file']
         if uploaded_file.content_type != file_obj.mime_type:
             return HttpResponseBadRequest(f"Can not replace file {file_obj.name} with different mime type.")
         # the payload of the file_obj is not replaced and remains orphaned, it may be deleted
         file_obj.file_name = file_obj.generate_filename(uploaded_file.name)
         file_obj.file_size = uploaded_file.size
-        file_obj.receive_file(uploaded_file)
+        file_obj.receive_file(realm, uploaded_file)
         file_obj.save()
         return HttpResponse(f"Replaced content of {file_obj.name} successfully.")
 
@@ -113,10 +114,11 @@ class FileAdmin(InodeAdmin):
 
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
+        realm = self.get_realm(request)
         settings.update(
             base_url=reverse('admin:finder_filemodel_changelist', current_app=self.admin_site.name),
-            download_url=inode.get_download_url(),
-            thumbnail_url=inode.get_thumbnail_url(),
+            download_url=inode.get_download_url(realm),
+            thumbnail_url=inode.get_thumbnail_url(realm),
             file_id=inode.id,
             filename=inode.file_name,
             file_mime_type=inode.mime_type,
