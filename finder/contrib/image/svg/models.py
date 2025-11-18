@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from django.core.files.temp import NamedTemporaryFile
-from django.core.files.storage import default_storage
 from django.utils.translation import gettext_lazy as _
 
 from finder.contrib.image.models import ImageFileModel
@@ -20,20 +19,10 @@ class SVGImageModel(ImageFileModel):
         verbose_name = _("SVG Image")
         verbose_name_plural = _("SVG Images")
 
-    def clean_(self):
-        try:
-            drawing = svg2rlg(default_storage.path(self.file_path))
-            self.width = drawing.width
-            self.height = drawing.height
-        except Exception:
-            raise FileValidationError(
-                _('File "{path}": SVG format not recognized')
-                .format(path=self.pretty_path)
-            )
-
     def store_and_save(self, realm, **kwargs):
         try:
-            drawing = svg2rlg(realm.original_storage.path(self.file_path))
+            with realm.original_storage.open(self.file_path, 'rb') as handle:
+                drawing = svg2rlg(handle)
             self.width = drawing.width
             self.height = drawing.height
         except Exception:
@@ -44,7 +33,8 @@ class SVGImageModel(ImageFileModel):
         super().store_and_save(realm, **kwargs)
 
     def crop(self, realm, thumbnail_path, width, height):
-        drawing = svg2rlg(realm.original_storage.path(self.file_path))
+        with realm.original_storage.open(self.file_path, 'rb') as handle:
+            drawing = svg2rlg(handle)
         if not drawing:
             raise FileValidationError(
                 _('File "{path}": SVG format not recognized')
