@@ -64,7 +64,6 @@ function ScrollSpy(props) {
 			}
 		},
 	});
-	console.log('ScrollSpy', inView);
 	return (
 		<div className="scroll-spy" ref={ref}></div>
 	);

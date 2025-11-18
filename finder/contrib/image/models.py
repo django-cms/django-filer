@@ -45,7 +45,7 @@ class ImageFileModel(AbstractFileModel):
             try:
                 self.crop(realm, thumbnail_path, self.thumbnail_size, self.thumbnail_size)
             except Exception:
-                # thumbnail image could not be created
+                # no thumbnail image could not be created
                 return self.fallback_thumbnail_url
         return realm.sample_storage.url(thumbnail_path)
 
