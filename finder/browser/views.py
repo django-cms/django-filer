@@ -195,8 +195,8 @@ class BrowserView(View):
             return HttpResponseBadRequest("No search query provided.")
         offset = int(request.GET.get('offset', 0))
         starting_folder = FolderModel.objects.get(id=folder_id)
-        search_realm = request.COOKIES.get('django-finder-search-realm')
-        if search_realm == 'everywhere':
+        search_zone = request.COOKIES.get('django-finder-search-zone')
+        if search_zone == 'everywhere':
             starting_folder = list(starting_folder.ancestors)[-1]
         if isinstance(starting_folder.descendants, QuerySet):
             parent_ids = Subquery(starting_folder.descendants.values('id'))

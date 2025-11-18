@@ -60,4 +60,4 @@ export function useCookie(key, initial) : [any, (value: any) => any] {
 }
 
 
-export const useSearchRealm = initial => useCookie('django-finder-search-realm', initial);
+export const useSearchZone = initial => useCookie('django-finder-search-zone', initial);

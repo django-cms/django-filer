@@ -13,7 +13,7 @@ import React, {
 import {useInView} from 'react-intersection-observer';
 import FigureLabels from '../common/FigureLabels';
 import FileUploader from '../common/FileUploader';
-import {useSearchRealm} from '../common/Storage';
+import {useSearchZone} from '../common/Storage';
 import BrowserEditor from './BrowserEditor';
 import FolderStructure from './FolderStructure';
 import MenuBar from './MenuBar';
@@ -105,7 +105,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	const menuBarRef = useRef(null);
 	const [uploadedFile, setUploadedFile] = useState(null);
 	const [currentFolderElement, setCurrentFolderElement] = useState(null);
-	const [searchRealm, setSearchRealm] = useSearchRealm('current');
+	const [searchZone, setSearchZone] = useSearchZone('current');
 
 	useImperativeHandle(forwardedRef, () => ({scrollToCurrentFolder, dismissAndClose}));
 
@@ -139,9 +139,9 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		setDirty(true);
 	}
 
-	function changeSearchRealm(value) {
-		if (value !== searchRealm) {
-			setSearchRealm(value);
+	function changeSearchZone(value) {
+		if (value !== searchZone) {
+			setSearchZone(value);
 			setStructure({
 				...structure,
 				files: [],
@@ -268,8 +268,8 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 					refreshFilesList={refreshFilesList}
 					setDirty={setDirty}
 					setSearchQuery={setSearchQuery}
-					searchRealm={searchRealm}
-					setSearchRealm={changeSearchRealm}
+					searchZone={searchZone}
+					setSearchZone={changeSearchZone}
 				/>
 				<div className="browser-body">
 					<nav className="folder-structure">

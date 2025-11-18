@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {useSearchRealm} from '../common/Storage';
+import {useSearchZone} from '../common/Storage';
 import DropDownMenu from '../common/DropDownMenu';
 import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 import SearchIcon from '../icons/search.svg';
@@ -36,7 +36,7 @@ export default function SearchField(props) {
 	const {columnRefs, setSearchResult, settings} = props;
 	const searchRef = useRef(null);
 	const [searchQuery, setSearchQuery] = useSearchParam('q');
-	const [searchRealm, setSearchRealm] = useSearchRealm('current');
+	const [searchZone, setSearchZone] = useSearchZone('current');
 
 	function handleSearch(event) {
 		const performSearch = () => {
@@ -65,9 +65,9 @@ export default function SearchField(props) {
 		}
 	}
 
-	function changeSearchRealm(value) {
-		if (value !== searchRealm) {
-			setSearchRealm(value);
+	function changeSearchZone(value) {
+		if (value !== searchZone) {
+			setSearchZone(value);
 			 Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
 			 	columnRef.current?.fetchInodes();
 			});
@@ -77,8 +77,8 @@ export default function SearchField(props) {
 	function getItemProps(value: string) {
 		return {
 			role: 'option',
-			'aria-selected': searchRealm === value,
-			onClick: () => changeSearchRealm(value),
+			'aria-selected': searchZone === value,
+			onClick: () => changeSearchZone(value),
 		};
 	}
 
@@ -101,7 +101,7 @@ export default function SearchField(props) {
 			<DropDownMenu
 				wrapperElement="span"
 				role="menuitem"
-				className="search-realm with-caret"
+				className="search-zone with-caret"
 			>
 				<li {...getItemProps('current')}>{gettext("From current folder")}</li>
 				<li {...getItemProps('everywhere')}>{gettext("In all folders")}</li>
