@@ -99,6 +99,7 @@ dialog {
 	.browser-body {
 			flex-grow: 1;
 			display: flex;
+			position: relative;
 			height: calc(100% - 45px);  // 45px is the height of the menubar
 		}
 
@@ -228,29 +229,29 @@ dialog {
 			width: auto;
 		}
 
-	.file-uploader, .browser-editor {
+	.file-uploader {
+		flex-grow: 1;
+		overflow-y: auto;
+
+		input[type="file"] {
+			width: 0 !important;
+			height: 0 !important;
+			position: absolute;
+			bottom: 0;
+			padding: 0;
+		}
+
+		.progress-overlay {
+			@include progress-overlay;
+		}
+	}
+
+	.browser-editor {
 		display: flex;
 		width: 100%;
 		position: relative;
 		overflow-y: auto;
 		flex-grow: 1;
-	}
-
-	.file-uploader {
-			input[type="file"] {
-				width: 0 !important;
-				height: 0 !important;
-				position: absolute;
-				bottom: 0;
-				padding: 0;
-			}
-
-			.progress-overlay {
-				@include progress-overlay;
-			}
-		}
-
-	.browser-editor {
 		flex-direction: column;
 
 		img {
