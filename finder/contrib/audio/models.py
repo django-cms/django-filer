@@ -28,23 +28,26 @@ class AudioFileModel(FileModel):
         sample_path = f'{self.id}/{self.get_sample_path(sample_start, sample_duration)}'
         if not realm.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
-            with realm.original_storage.open(self.file_path) as handle, NamedTemporaryFile(suffix=suffix) as tempfile:
-                process = (
-                    ffmpeg.input('pipe:0').audio
-                    .filter('atrim', start=sample_start, duration=sample_duration)
-                    .output(tempfile.name)
-                    .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
-                )
-                for chunk in handle.chunks():
-                    try:
-                        process.stdin.write(chunk)
-                    except BrokenPipeError:
-                        break  # end of sample reached
-                process.stdin.close()
-                process.wait()
-                tempfile.flush()
-                realm.sample_storage.save(sample_path, tempfile)
-
+            try:
+                with NamedTemporaryFile(suffix=suffix) as tempfile:
+                    process = (
+                        ffmpeg.input('pipe:0').audio
+                        .filter('atrim', start=sample_start, duration=sample_duration)
+                        .output(tempfile.name)
+                        .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
+                    )
+                    with realm.original_storage.open(self.file_path) as handle:
+                        for chunk in handle.chunks():
+                            try:
+                                process.stdin.write(chunk)
+                            except BrokenPipeError:
+                                break  # end of sample reached
+                        process.stdin.close()
+                    process.wait()
+                    tempfile.flush()
+                    realm.sample_storage.save(sample_path, tempfile)
+            except Exception:
+                return
         return realm.sample_storage.url(sample_path)
 
     def get_sample_path(self, sample_start, sample_duration):

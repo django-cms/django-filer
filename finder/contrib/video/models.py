@@ -32,31 +32,35 @@ class VideoFileModel(FileModel):
         sample_path = f'{self.id}/{self.get_sample_path(sample_start)}'
         if not realm.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
-            with (realm.original_storage.open(self.file_path) as handle, NamedTemporaryFile(suffix=suffix) as tempfile):
-                in_stream = ffmpeg.input('pipe:0')
-                video_stream = (
-                    in_stream.video
-                    .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
-                    .filter('scale', self.thumbnail_size, -1)
-                )
-                process = (
-                    ffmpeg.concat(video_stream, in_stream.audio, v=1, a=1)
-                    .output(
-                        tempfile.name,
-                        ss=sample_start,
-                        t=sample_duration,
+            try:
+                with NamedTemporaryFile(suffix=suffix) as tempfile:
+                    in_stream = ffmpeg.input('pipe:0')
+                    video_stream = (
+                        in_stream.video
+                        .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
+                        .filter('scale', self.thumbnail_size, -1)
                     )
-                    .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
-                )
-                for chunk in handle.chunks():
-                    try:
-                        process.stdin.write(chunk)
-                    except BrokenPipeError:
-                        break  # sample frame found
-                process.stdin.close()
-                process.wait()
-                tempfile.flush()
-                realm.sample_storage.save(sample_path, tempfile)
+                    process = (
+                        ffmpeg.concat(video_stream, in_stream.audio, v=1, a=1)
+                        .output(
+                            tempfile.name,
+                            ss=sample_start,
+                            t=sample_duration,
+                        )
+                        .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
+                    )
+                    with realm.original_storage.open(self.file_path) as handle:
+                        for chunk in handle.chunks():
+                            try:
+                                process.stdin.write(chunk)
+                            except BrokenPipeError:
+                                break  # sample frame found
+                        process.stdin.close()
+                    process.wait()
+                    tempfile.flush()
+                    realm.sample_storage.save(sample_path, tempfile)
+            except Exception:
+                return
         return realm.sample_storage.url(sample_path)
 
     def get_thumbnail_url(self, realm):
@@ -66,23 +70,27 @@ class VideoFileModel(FileModel):
         suffix = '.jpg'
         poster_path = f'{self.id}/{self.get_sample_path(sample_start, suffix=suffix)}'
         if not realm.sample_storage.exists(poster_path):
-            with realm.original_storage.open(self.file_path) as handle, NamedTemporaryFile(suffix=suffix) as tempfile:
-                process = (
-                    ffmpeg.input('pipe:0').video
-                    .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
-                    .filter('scale', self.thumbnail_size, -1)
-                    .output(tempfile.name, ss=sample_start, vframes=1)
-                    .run_async(pipe_stdin=True, overwrite_output=True, quiet=False)
-                )
-                for chunk in handle.chunks():
-                    try:
-                        process.stdin.write(chunk)
-                    except BrokenPipeError:
-                        break  # sample frame found
-                process.stdin.close()
-                process.wait()
-                tempfile.flush()
-                realm.sample_storage.save(poster_path, tempfile)
+            try:
+                with NamedTemporaryFile(suffix=suffix) as tempfile:
+                    process = (
+                        ffmpeg.input('pipe:0').video
+                        .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
+                        .filter('scale', self.thumbnail_size, -1)
+                        .output(tempfile.name, ss=sample_start, vframes=1)
+                        .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
+                    )
+                    with realm.original_storage.open(self.file_path) as handle:
+                        for chunk in handle.chunks():
+                            try:
+                                process.stdin.write(chunk)
+                            except BrokenPipeError:
+                                break  # sample frame found
+                        process.stdin.close()
+                    process.wait()
+                    tempfile.flush()
+                    realm.sample_storage.save(poster_path, tempfile)
+            except Exception:
+                return self.fallback_thumbnail_url
         return realm.sample_storage.url(poster_path)
 
     def get_sample_path(self, sample_start, suffix=None):
