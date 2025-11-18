@@ -286,7 +286,8 @@ dialog {
 					padding: 4px 8px;
 					border: 1px solid $border-color;
 					border-radius: 5px;
-					max-width: calc(100% - 2rem);
+					width: calc(100% - 1rem);
+					box-sizing: border-box;
 
 					&:focus-visible {
 						outline: none;

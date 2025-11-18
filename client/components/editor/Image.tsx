@@ -60,6 +60,14 @@ export default function Image(props) {
 			});
 		};
 
+		// replace gravity field with a nicer dropdown
+		gravityField.hidden = true;
+		const gravityParentDiv = gravityField.closest('div.field-gravity');
+		if (gravityParentDiv) {
+			gravityField.form.insertAdjacentElement('afterbegin', gravityField);
+			gravityParentDiv.remove();
+		}
+
 		if (ref.current.complete) {
 			crop();
 		} else {
