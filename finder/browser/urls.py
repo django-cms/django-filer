@@ -39,10 +39,6 @@ urlpatterns = [
         BrowserView.as_view(action='change'),
     ),
     path(
-        '<uuid:image_id>/crop',
-        BrowserView.as_view(action='crop'),
-    ),
-    path(
         'jsi18n/',
         JavaScriptCatalog.as_view(packages=['finder']),
         name="javascript-catalog",

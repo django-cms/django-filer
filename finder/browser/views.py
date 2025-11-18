@@ -259,17 +259,3 @@ class BrowserView(View):
         else:
             return {'form_html': mark_safe(strip_spaces_between_tags(form.as_div()))}
 
-    @method_decorator(require_POST)
-    def crop(self, request, image_id):
-        image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
-        width, height = int(request.POST.get('width')), int(request.POST.get('height'))
-        cropped_image_path = image.get_cropped_path(width, height)
-        if not default_storage.exists(cropped_image_path):
-            image.crop(cropped_image_path, width, height)
-        return {
-            'image_id': image_id,
-            'cropped_image_url': default_storage.url(cropped_image_path),
-            'width': width,
-            'height': height,
-            'meta_data': image.get_meta_data(),
-        }
