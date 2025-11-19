@@ -1,26 +1,46 @@
 {
   "name": "filer",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "webpack": "webpack",
+    "webpack:watch": "webpack --watch",
+    "lint": "gulp lint",
+    "lint:fix": "gulp eslint:fix",
+    "test": "gulp tests:unit"
+  },
   "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^8.0.0",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "babel-loader": "^10.0.0",
+    "eslint": "^9.15.0",
+    "fancy-log": "^2.0.0",
+    "gulp": "^5.0.0",
+    "gulp-autoprefixer": "^9.0.0",
+    "gulp-eslint-new": "^2.3.0",
     "gulp-iconfont": "^11.0.1",
     "gulp-iconfont-css": "^3.0.0",
-    "gulp-jscs": "^4.1.0",
-    "gulp-jshint": "^1.12.0",
     "gulp-sass": "^5.1.0",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-sync": "^0.1.4",
-    "gulp-util": "^3.0.6",
+    "gulp-sourcemaps": "^3.0.0",
     "jasmine-core": "^5.9.0",
-    "jshint-stylish": "^2.2.1",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-fixture": "^0.2.6",
     "karma-html2js-preprocessor": "^1.1.0",
     "karma-jasmine": "^5.1.0",
     "karma-json-fixtures-preprocessor": "^0.0.6",
-    "request": "^2.88.2",
-    "sass": "^1.63.4"
+    "plugin-error": "^2.0.1",
+    "sass": "^1.80.7",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-merge": "^6.0.1"
+  },
+  "dependencies": {
+    "dropzone": "^5.9.3",
+    "mediator-js": "^0.11.0"
   }
 }

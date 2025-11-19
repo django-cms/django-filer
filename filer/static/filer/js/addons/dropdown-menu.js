@@ -7,185 +7,243 @@
  * ======================================================================== */
 'use strict';
 
-// as of Django 2.x we need to check where jQuery is
-var djQuery = window.$;
-
-if (django.jQuery) {
-    djQuery = django.jQuery;
-}
-
-/* global django */
-(function ($) {
-
+(() => {
     // DROPDOWN CLASS DEFINITION
     // =========================
 
-    var backdrop = '.filer-dropdown-backdrop';
-    var toggle   = '[data-toggle="filer-dropdown"]';
-    var Dropdown = function (element) {
-        $(element).on('click.bs.filer-dropdown', this.toggle);
-    };
-    var old = $.fn.dropdown;
+    const backdropClass = 'filer-dropdown-backdrop';
+    const toggleSelector = '[data-toggle="filer-dropdown"]';
 
-    function getParent($this) {
-        var selector = $this.attr('data-target');
-        var $parent = selector && $(selector);
-
-        if (!selector) {
-            selector = $this.attr('href');
-            selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); // strip for ie7
+    class Dropdown {
+        constructor(element) {
+            this.element = element;
+            element.addEventListener('click', (e) => this.toggle(e));
         }
 
-        return $parent && $parent.length ? $parent : $this.parent(); // jshint ignore:line
+        toggle(e) {
+            const element = this.element;
+            const parent = getParent(element);
+            const isActive = parent.classList.contains('open');
+            const relatedTarget = { relatedTarget: element };
+
+            if (element.disabled || element.classList.contains('disabled')) {
+                return false;
+            }
+
+            clearMenus();
+
+            if (!isActive) {
+                if ('ontouchstart' in document.documentElement && !parent.closest('.navbar-nav')) {
+                    // if mobile we use a backdrop because click events don't delegate
+                    const backdrop = document.createElement('div');
+                    backdrop.className = backdropClass;
+                    element.parentNode.insertBefore(backdrop, element.nextSibling);
+                    backdrop.addEventListener('click', clearMenus);
+                }
+
+                const showEvent = new CustomEvent('show.bs.filer-dropdown', {
+                    bubbles: true,
+                    cancelable: true,
+                    detail: relatedTarget
+                });
+                parent.dispatchEvent(showEvent);
+
+                if (showEvent.defaultPrevented) {
+                    return false;
+                }
+
+                element.focus();
+                element.setAttribute('aria-expanded', 'true');
+                parent.classList.add('open');
+
+                const shownEvent = new CustomEvent('shown.bs.filer-dropdown', {
+                    bubbles: true,
+                    detail: relatedTarget
+                });
+                parent.dispatchEvent(shownEvent);
+            }
+
+            return false;
+        }
+
+        keydown(e) {
+            const element = this.element;
+            const parent = getParent(element);
+            const isActive = parent.classList.contains('open');
+            const desc = ' li:not(.disabled):visible a';
+            const items = Array.from(parent.querySelectorAll(`.filer-dropdown-menu${desc}`))
+                .filter(item => item.offsetParent !== null); // visible check
+            const index = items.indexOf(e.target);
+
+            if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (element.disabled || element.classList.contains('disabled')) {
+                return;
+            }
+
+            if ((!isActive && e.which !== 27) || (isActive && e.which === 27)) {
+                if (e.which === 27) {
+                    parent.querySelector(toggleSelector)?.focus();
+                }
+                return element.click();
+            }
+
+            if (!items.length) {
+                return;
+            }
+
+            let newIndex = index;
+            if (e.which === 38 && index > 0) {
+                newIndex--; // up
+            }
+            if (e.which === 40 && index < items.length - 1) {
+                newIndex++; // down
+            }
+            if (newIndex === -1) {
+                newIndex = 0;
+            }
+
+            items[newIndex]?.focus();
+        }
+    }
+
+    function getParent(element) {
+        let selector = element.getAttribute('data-target');
+        let parent = selector ? document.querySelector(selector) : null;
+
+        if (!selector) {
+            selector = element.getAttribute('href');
+            selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); // strip for ie7
+            parent = selector ? document.querySelector(selector) : null;
+        }
+
+        return parent && parent.parentNode ? parent : element.parentNode;
     }
 
     function clearMenus(e) {
         if (e && e.which === 3) {
             return;
         }
-        $(backdrop).remove();
-        $(toggle).each(function () {
-            var $this = $(this);
-            var $parent = getParent($this);
-            var relatedTarget = { relatedTarget: this };
 
-            if (!$parent.hasClass('open')) {
+        // Remove all backdrops
+        document.querySelectorAll(`.${backdropClass}`).forEach(el => el.remove());
+
+        document.querySelectorAll(toggleSelector).forEach((toggle) => {
+            const parent = getParent(toggle);
+            const relatedTarget = { relatedTarget: toggle };
+
+            if (!parent.classList.contains('open')) {
                 return;
             }
 
-            if (e && e.type === 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) { // jshint ignore:line
+            if (e && e.type === 'click' && /input|textarea/i.test(e.target.tagName) && parent.contains(e.target)) {
                 return;
             }
 
-            $parent.trigger(e = $.Event('hide.bs.filer-dropdown', relatedTarget));
+            const hideEvent = new CustomEvent('hide.bs.filer-dropdown', {
+                bubbles: true,
+                cancelable: true,
+                detail: relatedTarget
+            });
+            parent.dispatchEvent(hideEvent);
 
-            if (e.isDefaultPrevented()) {
+            if (hideEvent.defaultPrevented) {
                 return;
             }
 
-            $this.attr('aria-expanded', 'false');
-            $parent.removeClass('open').trigger($.Event('hidden.bs.filer-dropdown', relatedTarget));
+            toggle.setAttribute('aria-expanded', 'false');
+            parent.classList.remove('open');
+
+            const hiddenEvent = new CustomEvent('hidden.bs.filer-dropdown', {
+                bubbles: true,
+                detail: relatedTarget
+            });
+            parent.dispatchEvent(hiddenEvent);
         });
     }
-
-    Dropdown.prototype.toggle = function (e) {
-        var $this = $(this);
-        var $parent  = getParent($this);
-        var isActive = $parent.hasClass('open');
-        var relatedTarget = { relatedTarget: this };
-
-        if ($this.is('.disabled, :disabled')) {
-            return;
-        }
-
-        clearMenus();
-
-        if (!isActive) {
-            if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-                // if mobile we use a backdrop because click events don't delegate
-                $(document.createElement('div')).addClass('filer-dropdown-backdrop')
-                    .insertAfter($(this)).on('click', clearMenus);
-            }
-
-            $parent.trigger(e = $.Event('show.bs.filer-dropdown', relatedTarget));
-
-            if (e.isDefaultPrevented()) {
-                return;
-            }
-
-            $this.trigger('focus').attr('aria-expanded', 'true');
-
-            $parent.toggleClass('open').trigger($.Event('shown.bs.filer-dropdown', relatedTarget));
-        }
-
-        return false;
-    };
-
-    Dropdown.prototype.keydown = function (e) {
-        var $this = $(this);
-        var $parent  = getParent($this);
-        var isActive = $parent.hasClass('open');
-        var desc = ' li:not(.disabled):visible a';
-        var $items = $parent.find('.dropdown-menu' + desc);
-        var index = $items.index(e.target);
-
-        if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) {
-            return;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        if ($this.is('.disabled, :disabled')) {
-            return;
-        }
-
-        if (!isActive && e.which !== 27 || isActive && e.which === 27) {
-            if (e.which === 27) {
-                $parent.find(toggle).trigger('focus');
-            }
-            return $this.trigger('click');
-        }
-
-        if (!$items.length) {
-            return;
-        }
-
-        if (e.which === 38 && index > 0) {
-            index--; // up
-        }
-        if (e.which === 40 && index < $items.length - 1) {
-            index++; // down
-        }
-        if (!~index) { // jshint ignore:line
-            index = 0;
-        }
-
-        $items.eq(index).trigger('focus');
-    };
-
 
     // DROPDOWN PLUGIN DEFINITION
     // ==========================
 
     function Plugin(option) {
-        return this.each(function () {
-            var $this = $(this);
-            var data = $this.data('bs.filer-dropdown');
+        this.forEach((element) => {
+            let data = element._filerDropdownInstance;
 
             if (!data) {
-                $this.data('bs.filer-dropdown', (data = new Dropdown(this)));
+                data = new Dropdown(element);
+                element._filerDropdownInstance = data;
             }
             if (typeof option === 'string') {
-                data[option].call($this);
+                data[option].call(element);
             }
         });
+        return this;
     }
 
-
-    $.fn.dropdown = Plugin;
-    $.fn.dropdown.Constructor = Dropdown;
-
-
-    // DROPDOWN NO CONFLICT
-    // ====================
-
-    $.fn.dropdown.noConflict = function () {
-        $.fn.dropdown = old;
-        return this;
-    };
-
+    // Extend NodeList and HTMLCollection with dropdown method
+    if (!NodeList.prototype.dropdown) {
+        NodeList.prototype.dropdown = function(option) {
+            return Plugin.call(this, option);
+        };
+    }
+    if (!HTMLCollection.prototype.dropdown) {
+        HTMLCollection.prototype.dropdown = function(option) {
+            return Plugin.call(this, option);
+        };
+    }
 
     // APPLY TO STANDARD DROPDOWN ELEMENTS
     // ===================================
 
-    $(document)
-        .on('click.bs.filer-dropdown.data-api', clearMenus)
-        .on('click.bs.filer-dropdown.data-api', '.filer-dropdown form', function (e) {
-                e.stopPropagation();
-            })
-        .on('click.bs.filer-dropdown.data-api', toggle, Dropdown.prototype.toggle)
-        .on('keydown.bs.filer-dropdown.data-api', toggle, Dropdown.prototype.keydown)
-        .on('keydown.bs.filer-dropdown.data-api', '.filer-dropdown-menu', Dropdown.prototype.keydown);
+    document.addEventListener('click', clearMenus);
 
-})(djQuery);
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.filer-dropdown form')) {
+            e.stopPropagation();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const toggle = e.target.closest(toggleSelector);
+        if (toggle) {
+            const instance = toggle._filerDropdownInstance || new Dropdown(toggle);
+            if (!toggle._filerDropdownInstance) {
+                toggle._filerDropdownInstance = instance;
+            }
+            instance.toggle(e);
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        const toggle = e.target.closest(toggleSelector);
+        if (toggle) {
+            const instance = toggle._filerDropdownInstance || new Dropdown(toggle);
+            if (!toggle._filerDropdownInstance) {
+                toggle._filerDropdownInstance = instance;
+            }
+            instance.keydown(e);
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        const menu = e.target.closest('.filer-dropdown-menu');
+        if (menu) {
+            const toggle = menu.parentNode.querySelector(toggleSelector);
+            if (toggle) {
+                const instance = toggle._filerDropdownInstance || new Dropdown(toggle);
+                if (!toggle._filerDropdownInstance) {
+                    toggle._filerDropdownInstance = instance;
+                }
+                instance.keydown(e);
+            }
+        }
+    });
+
+    // Export for compatibility
+    window.FilerDropdown = Dropdown;
+})();

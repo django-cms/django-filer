@@ -21,23 +21,4 @@
             <div class="hidden">{{ hidden_input }}</div>
         </span>
     </div>
-    <script type="text/javascript">
-        'use strict';
-        /* globals django */
-
-        (function ($) {
-            var clearButton = $('#{{ clear_id }}');
-            var input = $('#{{ id }}');
-            var folderName = $('#{{ descid }} .description_text');
-            var addFolderButton = $('#{{ lookup_name }}');
-
-            clearButton.on('click', function () {
-                folderName.text('');
-                input.removeAttr('value');
-                folderName.closest('.filerFile').find('img').addClass('hidden');
-                clearButton.addClass('hidden');
-                addFolderButton.removeClass('hidden');
-            });
-        }(django.jQuery));
-    </script>
 {% endspaceless %}

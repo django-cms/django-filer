@@ -4,7 +4,7 @@
 <div class="filer-widget">
     <div class="clearfix"></div>
 
-    <div class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
+    <template class="dz-preview dz-file-preview hidden js-filer-dropzone-template">
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
@@ -12,7 +12,7 @@
                  data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}"></span>
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
-    </div>
+    </template>
 
     <div class="js-filer-dropzone filer-dropzone{% if object %} js-object-attached{% endif %}"
          data-url="{% url 'admin:filer-ajax_upload' %}"
@@ -56,16 +56,6 @@
             <br>
 
             <div class="hidden">{{ hidden_input }}</div>
-            <script type="text/javascript" id="{{id}}_javascript">
-                django.jQuery(document).ready(function(){
-                    var plus = django.jQuery('#add_{{ id }}');
-                    if (plus.length){
-                        plus.remove();
-                    }
-                    // Delete this javascript once loaded to avoid the "add new" link duplicates it
-                    django.jQuery('#{{id}}_javascript').remove();
-                });
-            </script>
         </span>
     </div>
 </div>
