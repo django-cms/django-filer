@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-      - id: ruff-format
+      - id: ruff
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
