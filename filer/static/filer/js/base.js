@@ -401,4 +401,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1200);
         });
     });
+
+    // Initialize FocalPoint
+    const focalPoint = new FocalPoint();
+    focalPoint.initialize();
+
+    // Initialize Toggler (auto-initializes in constructor)
+    new Toggler();
 });

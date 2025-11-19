@@ -115,15 +115,19 @@ window.Cl = window.Cl || {};
             event.preventDefault();
             this.isDragging = true;
 
-            const clientX = event.type === 'touchstart' ? event.touches[0].clientX : event.clientX;
-            const clientY = event.type === 'touchstart' ? event.touches[0].clientY : event.clientY;
+            const touch = event.type === 'touchstart' ? event.touches[0] : event;
 
-            this.dragStartX = clientX;
-            this.dragStartY = clientY;
+            // Get container bounds
+            const containerRect = this.container.getBoundingClientRect();
 
-            const rect = this.circle.getBoundingClientRect();
-            this.circleStartX = rect.left;
-            this.circleStartY = rect.top;
+            // Calculate mouse position relative to container
+            this.dragStartX = touch.clientX - containerRect.left;
+            this.dragStartY = touch.clientY - containerRect.top;
+
+            // Get current circle position (center)
+            const circleRect = this.circle.getBoundingClientRect();
+            this.circleStartX = circleRect.left - containerRect.left + circleRect.width;
+            this.circleStartY = circleRect.top - containerRect.top + circleRect.height;
 
             document.addEventListener('mousemove', this._onMouseMove);
             document.addEventListener('mouseup', this._onMouseUp);
@@ -136,33 +140,36 @@ window.Cl = window.Cl || {};
 
             event.preventDefault();
 
-            const clientX = event.type === 'touchmove' ? event.touches[0].clientX : event.clientX;
-            const clientY = event.type === 'touchmove' ? event.touches[0].clientY : event.clientY;
+            const touch = event.type === 'touchmove' ? event.touches[0] : event;
 
-            const deltaX = clientX - this.dragStartX;
-            const deltaY = clientY - this.dragStartY;
-
+            // Get container bounds
             const containerRect = this.container.getBoundingClientRect();
+
+            // Calculate current mouse position relative to container
+            const currentX = touch.clientX - containerRect.left;
+            const currentY = touch.clientY - containerRect.top;
+
+            // Calculate how much the mouse moved
+            const deltaX = currentX - this.dragStartX;
+            const deltaY = currentY - this.dragStartY;
+
+            // Calculate new center position
+            let centerX = this.circleStartX + deltaX;
+            let centerY = this.circleStartY + deltaY;
+
+            // Get circle dimensions
             const circleRect = this.circle.getBoundingClientRect();
+            const halfCircle = circleRect.width / 2;
 
-            let newX = this.circleStartX - containerRect.left + deltaX;
-            let newY = this.circleStartY - containerRect.top + deltaY;
+            // Constrain center to container bounds
+            centerX = Math.max(halfCircle, Math.min(containerRect.width + halfCircle, centerX));
+            centerY = Math.max(halfCircle, Math.min(containerRect.height + halfCircle, centerY));
 
-            // Constrain to container bounds
-            const minX = 0;
-            const minY = 0;
-            const maxX = containerRect.width - circleRect.width;
-            const maxY = containerRect.height - circleRect.height;
+            // Position circle by its top-left corner (center - radius)
+            this.circle.style.left = `${centerX - halfCircle}px`;
+            this.circle.style.top = `${centerY - halfCircle}px`;
 
-            newX = Math.max(minX, Math.min(maxX, newX));
-            newY = Math.max(minY, Math.min(maxY, newY));
-
-            this.circle.style.left = `${newX}px`;
-            this.circle.style.top = `${newY}px`;
-
-            // Update location value (center of circle)
-            const centerX = newX + circleRect.width / 2;
-            const centerY = newY + circleRect.height / 2;
+            // Update location value with center coordinates
             this._updateLocationValue(centerX, centerY);
         }
 
@@ -237,4 +244,11 @@ window.Cl = window.Cl || {};
 
     window.Cl.FocalPoint = FocalPoint;
     window.Cl.FocalPointConstructor = FocalPointConstructor;
+
+    // Export for ES6 module usage
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = FocalPoint;
+    }
 })();
+
+export default window.Cl.FocalPoint;

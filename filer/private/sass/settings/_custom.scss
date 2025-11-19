@@ -60,9 +60,9 @@ $btn-default-color: var(--dca-gray-light, var(--button-fg, #999));
 $btn-default-bgcolor: var(--dca-white, var(--button-bg, #fff));
 $btn-default-border: var(--dca-gray-lighter, transparent);
 
-$btn-action-color: var(--dca-white, var(--button-fg, #fff));
-$btn-action-bgcolor: $color-primary;
-$btn-action-border: $color-primary;
+$btn-action-color: var(--default-button-fg, var(--button-fg, #fff));
+$btn-action-bgcolor: var(--default-button-bg);
+$btn-action-border: $black;
 
 //##############################################################################
 // #SHADOW

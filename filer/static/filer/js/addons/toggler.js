@@ -78,3 +78,5 @@ class TogglerConstructor {
 
 Cl.Toggler = Toggler;
 Cl.TogglerConstructor = TogglerConstructor;
+
+export default Toggler;
