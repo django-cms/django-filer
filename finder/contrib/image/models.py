@@ -79,10 +79,10 @@ class ImageFileModel(AbstractFileModel):
 
     def compute_crop_box(self, orig_width, orig_height, out_width, out_height):
         aspect_ratio = out_width / out_height
-        assert out_width <= orig_width and out_height <= orig_height, (
-            "The requested thumbnail size ({2}x{3}) is larger than the original image "
-            "({0}x{1})".format(orig_width, orig_height, out_width, out_height)
-        )
+        # assert out_width <= orig_width and out_height <= orig_height, (
+        #     "The requested thumbnail size ({2}x{3}) is larger than the original image "
+        #     "({0}x{1})".format(orig_width, orig_height, out_width, out_height)
+        # )
         orig_aspect_ratio = orig_width / orig_height
         crop_x, crop_y, crop_size, gravity = (
             self.meta_data.get('crop_x'),
