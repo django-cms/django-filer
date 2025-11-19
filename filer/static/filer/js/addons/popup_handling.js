@@ -100,3 +100,37 @@ window.dismissRelatedFolderLookupPopup = (win, chosenId, chosenName) => {
     }
     win.close();
 };
+
+// Handle popup dismiss links (for folder/image selection in popups)
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.js-dismiss-popup').forEach((link) => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const fileId = this.dataset.fileId;
+            const iconUrl = this.dataset.iconUrl;
+            const label = this.dataset.label;
+
+            if (this.classList.contains('js-dismiss-image')) {
+                const changeUrl = this.dataset.changeUrl || '';
+                window.opener.dismissRelatedImageLookupPopup(
+                    window,
+                    fileId,
+                    iconUrl,
+                    label,
+                    changeUrl
+                );
+            } else if (this.classList.contains('js-dismiss-folder')) {
+                window.opener.dismissRelatedFolderLookupPopup(window, fileId, label);
+            }
+        });
+    });
+
+    // Auto-dismiss popup on page load (for dismiss_popup.html)
+    const popupData = document.getElementById('popup-dismiss-data');
+    if (popupData && window.opener) {
+        const pk = popupData.dataset.pk;
+        const label = popupData.dataset.label;
+        window.opener.dismissRelatedPopup(window, pk, label);
+    }
+});

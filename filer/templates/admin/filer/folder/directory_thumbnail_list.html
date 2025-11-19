@@ -47,8 +47,10 @@
 
                     <div class="navigator-checkbox">
                         {% if filer_admin_context.pick_folder and item.file_type == 'Folder' %}
-                            <a class="insertlink insertlinkButton"
-                                href="#" onclick="opener.dismissRelatedFolderLookupPopup(window, '{{ subfolder.pk|safe }}', '{{ subfolder.quoted_logical_path }}'); return false;" >
+                            <a class="insertlink insertlinkButton js-dismiss-popup js-dismiss-folder"
+                                href="#"
+                                data-file-id="{{ subfolder.pk|safe }}"
+                                data-label="{{ subfolder.quoted_logical_path }}">
                                 &nbsp;
                             </a>
                         {% elif action_form and item.pk and not is_popup %}
@@ -91,7 +93,10 @@
                           <div class="list-item thumbnail-item thumbnail-file-item">
                               <div class="navigator-checkbox">
                                   {% if is_popup and filer_admin_context.pick_file %}
-                                      <a class="insertlink insertlinkButton" href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                      <a class="insertlink insertlinkButton js-dismiss-popup js-dismiss-image" href="#"
+                                          data-file-id="{{ file.id|unlocalize }}"
+                                          data-icon-url="{% file_icon_url file %}"
+                                          data-label="{{ file.label }}"
                                           title="{% translate 'Select this file' %}">&nbsp;</a>
                                   {% elif action_form and not is_popup %}
                                       <input type="checkbox" class="action-select" value="file-{{ item.pk|safe }}" name="_selected_action">
@@ -100,7 +105,10 @@
                               <div class="thumbnail-file-item-box">
                                   <div class="item-thumbnail">
                                       {% if is_popup and filer_admin_context.pick_file %}
-                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                          <a href="#" class="js-dismiss-popup js-dismiss-image"
+                                              data-file-id="{{ file.id|unlocalize }}"
+                                              data-icon-url="{% file_icon_url file %}"
+                                              data-label="{{ file.label }}"
                                               title="{% translate 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"
@@ -115,7 +123,10 @@
                               <div class="item-name">
                                   <div>
                                       {% if is_popup and filer_admin_context.pick_file %}
-                                          <a href="#" onclick="opener.dismissRelatedImageLookupPopup(window, '{{ file.id|unlocalize }}', '{% file_icon_url file %}', '{{ file.label|escapejs }}'); return false;"
+                                          <a href="#" class="js-dismiss-popup js-dismiss-image"
+                                              data-file-id="{{ file.id|unlocalize }}"
+                                              data-icon-url="{% file_icon_url file %}"
+                                              data-label="{{ file.label }}"
                                               title="{% translate 'Select this file' %}">
                                       {% elif has_change_permission %}
                                           <a href="{{ file.get_admin_change_url }}{% filer_admin_context_url_params %}"

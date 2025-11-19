@@ -13,6 +13,7 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
     <script src="{% static 'filer/js/addons/tooltip.js' %}"></script>
     <script src="{% static 'filer/js/addons/copy-move-files.js' %}"></script>
 {% endblock %}
@@ -21,19 +22,19 @@
     {% if perms_lacking %}
         <p>{% blocktrans %}Your account doesn't have permissions to copy all of the selected files and/or folders.{% endblocktrans %}</p>
         <div class="text-right clearfix">
-            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% translate "Take me back" %}</a>
+            <a href="#" class="button cancel-link js-history-back">{% translate "Take me back" %}</a>
         </div>
     {% else %}
         {% if not destination_folders %}
             <p>{% blocktrans %}There are no destination folders available.{% endblocktrans %}</p>
             <div class="text-right clearfix">
-                <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% translate "Take me back" %}</a>
+                <a href="#" class="button cancel-link js-history-back">{% translate "Take me back" %}</a>
             </div>
         {% else %}
             {% if not to_copy %}
                 <p>{% blocktrans %}There are no files and/or folders available to copy.{% endblocktrans %}</p>
                 <div class="text-right clearfix">
-                    <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% translate "Take me back" %}</a>
+                    <a href="#" class="button cancel-link">{% translate "Take me back" %}</a>
                 </div>
             {% else %}
                 <p>{% blocktrans %}The following files and/or folders will be copied to a destination folder (retaining their tree structure):{% endblocktrans %}</p>
@@ -60,7 +61,7 @@
                         {{ copy_form.as_p }}
 
                         <div class="submit-row text-right clearfix">
-                            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% translate "No, take me back" %}</a>
+                            <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
                             <input type="submit" value="{% translate 'Copy' %}" class="default js-submit-copy-move">
                             <span class="js-disabled-btn-tooltip disabled-btn-tooltip js-filer-tooltip filer-tooltip-wrapper"
                                 title="{% translate 'It is not allowed to copy files into same folder' %}" tabindex="-1">
