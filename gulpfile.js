@@ -36,12 +36,22 @@ var PROJECT_PATTERNS = {
 // #############################################################################
 // sass
 gulp.task('sass', function () {
-    return gulp.src(PROJECT_PATTERNS.sass)
-        .pipe(sourcemaps.init())
+    var isDebug = process.argv.includes('--debug');
+    var stream = gulp.src(PROJECT_PATTERNS.sass);
+
+    if (isDebug) {
+        stream = stream.pipe(sourcemaps.init());
+    }
+
+    stream = stream
         .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-        .pipe(autoprefixer())
-        .pipe(sourcemaps.write('/maps'))
-        .pipe(gulp.dest(PROJECT_PATH.css));
+        .pipe(autoprefixer());
+
+    if (isDebug) {
+        stream = stream.pipe(sourcemaps.write('/maps'));
+    }
+
+    return stream.pipe(gulp.dest(PROJECT_PATH.css));
 });
 
 gulp.task('sass:watch', function () {
