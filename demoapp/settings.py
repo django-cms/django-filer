@@ -75,7 +75,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'wsgi.application'
 
 
-if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
+if os.getenv('USE_POSTGRES', False) in ['1', 'TRUE', 'True', 'true']:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -120,7 +120,7 @@ STORAGES = {
     },
 }
 
-if False:
+if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
     STORAGES['finder_public'] = {
         'BACKEND': 'storages.backends.s3.S3Storage',
         'OPTIONS': {
