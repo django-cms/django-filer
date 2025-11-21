@@ -135,3 +135,4 @@ known_django = ["django"]
 [tool.ruff]
 src = ["filer"]
 exclude = ["*/migrations/*"]
+line-length = 119
