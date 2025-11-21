@@ -1,4 +1,4 @@
-@import "colors";
+@use "colors";
 
 @mixin labels {
 	.select-labels-container {
@@ -9,11 +9,11 @@
 		.select-labels-field {
 			display: flex;
 			position: relative;
-			border: 1px solid $border-color;
+			border: 1px solid colors.$border-color;
 			border-radius: 4px;
 			height: 28px;
-			color: $body-fg-color;
-			background-color: $body-bg-color;
+			color: colors.$body-fg-color;
+			background-color: colors.$body-bg-color;
 
 			.toggle-dropdown {
 				position: absolute;
@@ -29,7 +29,7 @@
 					content: " ";
 					align-self: center;
 					border: 5px solid transparent;
-					border-top-color: $body-fg-color;
+					border-top-color: colors.$body-fg-color;
 					margin-top: 5px;
 				}
 			}
@@ -50,7 +50,7 @@
 			cursor: pointer;
 			margin-left: 0.25rem;
 			padding-left: 0.25rem;
-			border-left: 1px solid $border-color;
+			border-left: 1px solid colors.$border-color;
 			&:hover {
 				font-weight: bold;
 			}
@@ -58,7 +58,7 @@
 
 		.select-labels-option {
 			&:hover {
-				background-color: $selected-row-color;
+				background-color: colors.$selected-row-color;
 			}
 		}
 
