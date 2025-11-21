@@ -1,7 +1,5 @@
 'use strict';
 
-var Cl = window.Cl || {};
-
 window.gettext = function (text) {
     return text;
 };

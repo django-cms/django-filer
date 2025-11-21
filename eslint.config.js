@@ -20,6 +20,7 @@ export default [
                 alert: 'readonly',
                 Event: 'readonly',
                 CustomEvent: 'readonly',
+                MouseEvent: 'readonly',
                 MutationObserver: 'readonly',
                 setTimeout: 'readonly',
                 clearTimeout: 'readonly',
