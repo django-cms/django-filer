@@ -17,10 +17,10 @@
     class Dropdown {
         constructor(element) {
             this.element = element;
-            element.addEventListener('click', (e) => this.toggle(e));
+            element.addEventListener('click', () => this.toggle());
         }
 
-        toggle(e) {
+        toggle() {
             const element = this.element;
             const parent = getParent(element);
             const isActive = parent.classList.contains('open');

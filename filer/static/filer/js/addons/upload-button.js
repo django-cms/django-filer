@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         autoProcessQueue: true
     });
 
-    dropzone.on('addedfile', (file) => {
+    dropzone.on('addedfile', () => {
         Cl.mediator.remove('filer-upload-in-progress', removeButton);
         Cl.mediator.publish('filer-upload-in-progress');
         submitNum++;

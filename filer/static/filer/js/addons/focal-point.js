@@ -104,7 +104,9 @@ window.Cl = window.Cl || {};
         }
 
         _makeDraggable() {
-            if (!this.circle) return;
+            if (!this.circle) {
+                return;
+            }
 
             this.circle.classList.add(this.options.draggableClass);
             this.circle.addEventListener('mousedown', this._onMouseDown);
@@ -136,7 +138,9 @@ window.Cl = window.Cl || {};
         }
 
         _onMouseMove(event) {
-            if (!this.isDragging) return;
+            if (!this.isDragging) {
+                return;
+            }
 
             event.preventDefault();
 

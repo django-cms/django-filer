@@ -105,7 +105,7 @@ gulp.task('icons', function () {
             normalize: true,
             formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
         }))
-        .on('glyphs', function (glyphs, options) {
+        .on('glyphs', function (glyphs) {
             log.info('Generated', glyphs.length, 'glyphs');
         })
         .pipe(gulp.dest(PROJECT_PATH.icons));
@@ -113,20 +113,25 @@ gulp.task('icons', function () {
 
 // #############################################################################
 // LINTING
-gulp.task('eslint', function () {
-    return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError());
-});
+gulp.task('lint', function () {
+    var fix = process.argv.includes('--fix');
+    var stream = gulp.src(PROJECT_PATTERNS.lint, { allowEmpty: true });
 
-gulp.task('eslint:fix', function () {
-    return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(eslint({fix: true}))
-        .pipe(eslint.format())
-        .pipe(gulp.dest(function(file) {
-            return file.base;
-        }));
+    if (fix) {
+        stream = stream
+            .pipe(eslint({fix: true}))
+            .pipe(eslint.format())
+            .pipe(gulp.dest(function(file) {
+                return file.base;
+            }));
+    } else {
+        stream = stream
+            .pipe(eslint())
+            .pipe(eslint.format())
+            .pipe(eslint.failAfterError());
+    }
+
+    return stream;
 });
 
 // #############################################################################
@@ -144,14 +149,13 @@ gulp.task('tests:watch', function () {
 // #############################################################################
 // TASKS
 gulp.task('build', gulp.series('sass', 'bundle'));
-gulp.task('js', gulp.series('eslint' /* ,'tests:unit'*/));
+gulp.task('js', gulp.series('lint' /* ,'tests:unit'*/));
 gulp.task('js:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, gulp.series('js'));
 });
 gulp.task('watch', gulp.parallel('sass:watch', 'js:watch'));
-gulp.task('lint', gulp.series('eslint'));
 gulp.task('lint:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, gulp.series('lint'));
 });
-gulp.task('ci', gulp.series('sass', 'bundle', 'eslint', 'lint', 'tests:unit'));
+gulp.task('ci', gulp.series('sass', 'bundle', 'lint', 'tests:unit'));
 gulp.task('default', gulp.parallel('sass:watch', 'js:watch', 'lint:watch'));

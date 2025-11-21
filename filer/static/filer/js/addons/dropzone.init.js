@@ -9,7 +9,6 @@ if (Dropzone) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const dropzoneTemplateSelector = '.js-filer-dropzone-template';
     const previewImageSelector = '.js-img-preview';
     const dropzoneSelector = '.js-filer-dropzone';
     const dropzones = document.querySelectorAll(dropzoneSelector);
@@ -41,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.parent.CMS.API.Messages.open({
                 message: message
             });
-        } catch (e) {
+        } catch {
             if (window.filerShowError) {
                 window.filerShowError(message);
             } else {
@@ -99,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (clearButton) {
                     clearButton.addEventListener('click', () => {
                         dropzone.classList.remove(objectAttachedClass);
-                        const changeEvent = new Event('change', { bubbles: true });
+                        // const changeEvent = new Event('change', { bubbles: true });
                         // inputId?.dispatchEvent(changeEvent);
                     });
                 }
