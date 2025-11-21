@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.contrib.admin import helpers
 from django.contrib.auth.models import Group, Permission
+from django.core.cache import cache
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 from django.urls import reverse
@@ -163,6 +164,7 @@ class FolderPermissionsTestCase(TestCase):
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
             delattr(self.folder_perm, 'permission_cache')
+            cache.clear()
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_read_permission(request2), True)
@@ -172,6 +174,7 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder_perm.pretty_logical_path, "/test_folder2")
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups_deny1(self):
         # Tests overlapped groups with explicit deny
@@ -216,6 +219,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups_deny2(self):
         # Tests overlapped groups with explicit deny
@@ -261,6 +265,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups1(self):
         # Tests overlapped groups without explicit deny
@@ -305,6 +310,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups2(self):
         # Tests overlapped groups without explicit deny
@@ -350,6 +356,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_folder_who_owner(self):
         perm = FolderPermission.objects.create(

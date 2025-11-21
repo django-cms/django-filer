@@ -2,12 +2,13 @@ from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import path, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
+from ..settings import FILER_THUMBNAIL_ICON_SIZE
 from ..utils.files import handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
 from ..validation import validate_upload
@@ -141,14 +142,10 @@ def ajax_upload(request, folder_id=None):
             }
             # prepare preview thumbnail
             if isinstance(file_obj, Image):
-                thumbnail_180_options = {
-                    'size': (180, 180),
-                    'crop': True,
-                    'upscale': True,
-                }
-                thumbnail_180 = file_obj.file.get_thumbnail(
-                    thumbnail_180_options)
-                data['thumbnail_180'] = thumbnail_180.url
+                data['thumbnail_180'] = reverse(
+                    f"admin:filer_{file_obj._meta.model_name}_fileicon",
+                    args=(file_obj.pk, FILER_THUMBNAIL_ICON_SIZE),
+                )
                 data['original_image'] = file_obj.url
             return JsonResponse(data)
         except Exception as error:

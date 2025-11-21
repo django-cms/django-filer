@@ -35,7 +35,8 @@ class FileAdminChangeFrom(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["file"].widget = forms.FileInput()
+        if "file" in self.fields:
+            self.fields["file"].widget = forms.FileInput()
 
     def clean(self):
         from ..validation import validate_upload
@@ -59,7 +60,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
     list_display = ('label',)
     list_per_page = 10
     search_fields = ['name', 'original_filename', 'sha1', 'description']
-    autocomplete_fields = ('owner',)
+    autocomplete_fields = ['owner']
     readonly_fields = ('sha1', 'display_canonical')
 
     form = FileAdminChangeFrom

@@ -2,7 +2,6 @@ import logging
 import os
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string as get_storage_class
 from django.utils.translation import gettext_lazy as _
 
@@ -38,20 +37,24 @@ FILER_IS_PUBLIC_DEFAULT = getattr(settings, 'FILER_IS_PUBLIC_DEFAULT', True)
 
 FILER_PAGINATE_BY = getattr(settings, 'FILER_PAGINATE_BY', 100)
 
+if hasattr(settings, "FILER_ADMIN_ICON_SIZES"):
+    logger.warning("FILER_ADMIN_ICON_SIZES is deprecated and will be removed in the future.")
+
 _ICON_SIZES = getattr(settings, 'FILER_ADMIN_ICON_SIZES', ('16', '32', '48', '64'))
-if not _ICON_SIZES:
-    raise ImproperlyConfigured('Please, configure FILER_ADMIN_ICON_SIZES')
 # Reliably sort by integer value, but keep icon size as string.
 # (There is some code in the wild that depends on this being strings.)
 FILER_ADMIN_ICON_SIZES = [str(i) for i in sorted([int(s) for s in _ICON_SIZES])]
 
-# Filer admin templates have specific icon sizes hardcoded: 32 and 48.
-_ESSENTIAL_ICON_SIZES = ('32', '48')
-if not all(x in FILER_ADMIN_ICON_SIZES for x in _ESSENTIAL_ICON_SIZES):
-    logger.warn(
-        "FILER_ADMIN_ICON_SIZES has not all of the essential icon sizes "
-        "listed: {}. Some icons might be missing in admin templates.".format(
-            _ESSENTIAL_ICON_SIZES))
+# Currently, these two icon sizes are hard-coded into the admin and admin templates
+FILER_TABLE_ICON_SIZE = getattr(settings, "FILER_TABLE_ICON_SIZE", 40)
+FILER_THUMBNAIL_ICON_SIZE = getattr(settings, "FILER_THUMBNAIL_ICON_SIZE", 120)
+DEFERRED_THUMBNAIL_SIZES = (
+    FILER_TABLE_ICON_SIZE,
+    2 * FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
+    2 * FILER_THUMBNAIL_ICON_SIZE,
+)
+
 
 # This is an ordered iterable that describes a list of
 # classes that I should check for when adding files
@@ -283,13 +286,13 @@ FILER_FOLDER_ADMIN_LIST_TYPE_SWITCHER_SETTINGS = {
     },
 }
 
-DEFERRED_THUMBNAIL_SIZES = (40, 80, 160)
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
 IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
     "image/svg+xml": ["filer.validation.validate_svg"],
+    "application/octet-stream": ["filer.validation.deny"],
 }
 
 remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
@@ -322,3 +325,7 @@ if "cms" in settings.INSTALLED_APPS:  # pragma: no cover
     except (ModuleNotFoundError, ImportError):
         # Import error? No django CMS used: stay with own icons
         pass
+
+
+# SVG are their own thumbnails if their size is below this limit
+FILER_MAX_SVG_THUMBNAIL_SIZE = getattr(settings, "FILER_MAX_SVG_THUMBNAIL_SIZE", 1024 * 1024)  # 1MB default

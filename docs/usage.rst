@@ -42,9 +42,11 @@ Simple example ``models.py``::
     class Company(models.Model):
         name = models.CharField(max_length=255)
         logo = FilerImageField(null=True, blank=True,
-                               related_name="logo_company")
+                             related_name="logo_company",
+                             on_delete=models.SET_NULL)
         disclaimer = FilerFileField(null=True, blank=True,
-                                    related_name="disclaimer_company")
+                                  related_name="disclaimer_company",
+                                  on_delete=models.SET_NULL)
 
 multiple file fields on the same model::
 
@@ -53,12 +55,21 @@ multiple file fields on the same model::
 
     class Book(models.Model):
         title = models.CharField(max_length=255)
-        cover = FilerImageField(related_name="book_covers")
-        back = FilerImageField(related_name="book_backs")
+        cover = FilerImageField(related_name="book_covers",
+                              on_delete=models.CASCADE)
+        back = FilerImageField(related_name="book_backs",
+                             on_delete=models.CASCADE)
 
-As with `django.db.models.ForeignKey`_ in general, you have to define a
-non-clashing ``related_name`` if there are multiple ``ForeignKey`` s to the
-same model.
+As with `django.db.models.ForeignKey`_ in general:
+
+* You must specify an ``on_delete`` parameter to define what happens when the referenced file is deleted
+* You have to define a non-clashing ``related_name`` if there are multiple ``ForeignKey`` s to the same model
+
+Common ``on_delete`` options:
+
+* ``models.CASCADE`` - Delete the model containing the FilerFileField when the referenced file is deleted
+* ``models.SET_NULL`` - Set the reference to NULL when the file is deleted (requires ``null=True``)
+* ``models.PROTECT`` - Prevent deletion of the referenced file
 
 templates
 .........

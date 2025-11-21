@@ -1,4 +1,5 @@
 -r base.txt
 
 git+https://github.com/django/django@main#egg=Django
+git+https://github.com/SmileyChris/easy-thumbnails@master#egg=easy-thumbnails
 django_polymorphic>=3.1

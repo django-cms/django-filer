@@ -3,6 +3,7 @@ import os
 
 import django
 import django.core.files
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
@@ -273,7 +274,7 @@ class FilerImageAdminUrlsTests(TestCase):
     def test_icon_view_sizes(self):
         """Redirects are issued for accepted thumbnail sizes and 404 otherwise"""
         test_set = tuple((size, 302) for size in DEFERRED_THUMBNAIL_SIZES)
-        test_set += (50, 404), (90, 404), (320, 404)
+        test_set += (50, 404), (90, 404), (640, 404)
         for size, expected_status in test_set:
             url = reverse('admin:filer_file_fileicon', kwargs={
                 'file_id': self.file_object.pk,
@@ -484,6 +485,10 @@ class FilerClipboardAdminUrlsTests(TestCase):
             self.assertEqual(stored_image.mime_type, 'image/jpeg')
 
     def test_filer_upload_binary_data(self, extra_headers={}):
+        config = apps.get_app_config("filer")
+
+        validators = config.FILE_VALIDATORS  # Remember the validators
+        config.FILE_VALIDATORS = {}  # Remove deny for application/octet-stream
         self.assertEqual(File.objects.count(), 0)
         with open(self.binary_filename, 'rb') as fh:
             file_obj = django.core.files.File(fh)
@@ -494,11 +499,28 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 'jsessionid': self.client.session.session_key
             }
             self.client.post(url, post_data, **extra_headers)
+            config.FILE_VALIDATORS = validators  # Reset validators
+
             self.assertEqual(Image.objects.count(), 0)
             self.assertEqual(File.objects.count(), 1)
             stored_file = File.objects.first()
             self.assertEqual(stored_file.original_filename, self.binary_name)
             self.assertEqual(stored_file.mime_type, 'application/octet-stream')
+
+    def test_filer_upload_binary_data_fails_by_default(self, extra_headers={}):
+        self.assertEqual(File.objects.count(), 0)
+        with open(self.binary_filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload')
+            post_data = {
+                'Filename': self.binary_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key
+            }
+            self.client.post(url, post_data, **extra_headers)
+
+            self.assertEqual(Image.objects.count(), 0)
+            self.assertEqual(File.objects.count(), 0)
 
     def test_filer_ajax_upload_file(self):
         self.assertEqual(Image.objects.count(), 0)
@@ -562,6 +584,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(len(messages), 2)  # One more message
         self.assertEqual(messages[1].level, ERROR)
         self.assertEqual(Image.objects.count(), 0)
+
+        abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
+
+    def test_filer_max_pixel_deactivation(self):
+        from django.core.checks import Warning
+
+        DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
+        abstract.FILER_MAX_IMAGE_PIXELS = None  # Deactivate
+
+        self.assertEqual(Image.objects.count(), 0)
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse(
+                'admin:filer-ajax_upload',
+                kwargs={'folder_id': folder.pk}
+            ) + '?filename=%s' % self.image_name
+            self.client.post(
+                url,
+                data=file_obj.read(),
+                content_type='image/jpeg',
+                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+            )
+        self.assertEqual(Image.objects.count(), 1)  # Success
+        check_result = abstract.max_pixel_setting_check(None)
+        self.assertEqual(len(check_result), 1)
+        self.assertIsInstance(check_result[0], Warning)
 
         abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
@@ -1368,6 +1417,8 @@ class FolderListingTest(TestCase):
                 can_edit=FolderPermission.ALLOW,
                 can_read=FolderPermission.ALLOW,
                 can_add_children=FolderPermission.ALLOW)
+            from filer.cache import clear_folder_permission_cache
+            clear_folder_permission_cache(self.staff_user)
             response = self.client.get(
                 reverse('admin:filer-directory_listing',
                         kwargs={'folder_id': self.parent.id}))
@@ -1883,6 +1934,22 @@ class FileIconContextTests(TestCase):
         height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=file, height=40, width=40)
         self.assertNotIn('sidebar_image_ratio', context.keys())
         self.assertIn('download_url', context.keys())
+
+    def test_sidebar_image_ratio_format(self):
+        """
+        Test that sidebar_image_ratio is formatted as a string with 6 decimal places
+        to ensure consistent formatting regardless of locale settings
+        """
+        image = Image.objects.create(name='test.jpg')
+        image._width = 100
+        image._height = 200
+        image.save()
+        context = {}
+        height, width, context = get_aspect_ratio_and_download_url(context=context, detail=True, file=image, height=40, width=40)
+        self.assertIsInstance(context['sidebar_image_ratio'], str)
+        expected_ratio = '%.6f' % (image.width / 210)
+        self.assertEqual(context['sidebar_image_ratio'], expected_ratio)
+        self.assertEqual(context['sidebar_image_ratio'], '0.476190')
 
 
 class AdditionalAdminFormsTests(TestCase):
