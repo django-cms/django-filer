@@ -156,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const actionsSelect = document.querySelector('.actions select[name="action"]');
         const actionsSelectOptions = actionsSelect?.querySelectorAll('option') || [];
         const actionsGo = document.querySelector('.actions button[type="submit"]');
-        let html = '';
         const actionDelete = document.querySelector('.js-action-delete');
         const actionCopy = document.querySelector('.js-action-copy');
         const actionMove = document.querySelector('.js-action-move');
@@ -196,16 +195,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // mocking the action buttons to work in frontend UI
         actionsSelectOptions.forEach((option, index) => {
-            let className = '';
             if (index !== 0) {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = option.textContent;
+
                 if (option.value === valueDelete || option.value === valueCopy || option.value === valueMove) {
-                    className = 'class="hidden"';
+                    a.classList.add('hidden');
                 }
-                html += `<li><a href="#"${className}>${option.textContent}</a></li>`;
+
+                li.appendChild(a);
+                if (dropdown) {
+                    dropdown.appendChild(li);
+                }
             }
         });
         if (dropdown) {
-            dropdown.insertAdjacentHTML('beforeend', html);
 
             dropdown.addEventListener('click', (clickEvent) => {
                 if (clickEvent.target.tagName === 'A') {
