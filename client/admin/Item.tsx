@@ -1,13 +1,19 @@
 import React, {lazy, Suspense, useContext, useEffect, useMemo, useState} from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import FinderSettings from './FinderSettings';
+import DroppableArea from './DroppableArea';
+import {useSearchParam} from './SearchField';
+import {useSorting} from '../common/SortingOptions';
+import {useFilter} from '../common/FilterByLabel';
 import FigureLabels from '../common/FigureLabels';
+import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
 const dateTimeFormatter = new Intl.DateTimeFormat(
 	navigator.language,
 	{timeStyle: 'short', dateStyle: 'short'} as Intl.DateTimeFormatOptions,
 );
+
 
 export function DraggableItem(props) {
 	const {
@@ -20,6 +26,24 @@ export function DraggableItem(props) {
 		disabled: props.disabled,
 	});
 	const [event, setEvent] = useState<PointerEvent>(null);
+	const [sorting] = useSorting();
+	const [filter] = useFilter();
+	const [searchQuery] = useSearchParam('q');
+	const ReOrdering = useMemo(() => {
+		return (props) => {
+			if (searchQuery || sorting || filter.some(v => v))
+				return <div className="reordering"></div>;
+			return (
+				<DroppableArea
+					id={`reorder:${props.id}:${props.folderId}`}
+					dragging={props.dragging}
+					className="reordering"
+				>
+					<div></div>
+				</DroppableArea>
+			);
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!event)
@@ -73,6 +97,7 @@ export function DraggableItem(props) {
 				<div ref={setNodeRef} {...listeners} {...attributes}>
 					{props.children}
 				</div>
+				<ReOrdering {...props}></ReOrdering>
 			</li>
 		);
 }
@@ -164,7 +189,7 @@ export function ListItem(props) {
 	}
 
 	switch (props.layout) {
-		case 'tiles': case 'mosaic':
+		case 'tiles':
 			return (
 				<figure className="figure">
 					<FigBody {...props}>
@@ -178,6 +203,21 @@ export function ListItem(props) {
 						</div>
 					</figcaption>
 				</figure>
+			);
+		case 'mosaic':
+			return (
+				<Tooltip>
+					<TooltipTrigger>
+						<div className="figure">
+							<FigBody {...props}>
+								<FigureLabels labels={props.labels}>
+									<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+								</FigureLabels>
+							</FigBody>
+						</div>
+					</TooltipTrigger>
+					<TooltipContent>{props.name}</TooltipContent>
+				</Tooltip>
 			);
 		case 'list':
 			return (<>

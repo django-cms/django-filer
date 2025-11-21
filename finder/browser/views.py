@@ -1,6 +1,5 @@
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import BadRequest, ObjectDoesNotExist, ValidationError
-from django.core.files.storage import default_storage
 from django.db.models import QuerySet, Subquery
 from django.forms.renderers import DjangoTemplates
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
@@ -71,7 +70,7 @@ class BrowserView(View):
             raise ObjectDoesNotExist(f"Realm named {slug} not found for {site.domain}.")
 
     @method_decorator(require_GET)
-    def structure(self, request, slug):
+    def structure(self, request, slug=None):
         realm = self._get_realm(request, slug)
         root_folder_id = str(realm.root_folder.id)
         request.session.setdefault('finder.open_folders', [])
@@ -129,7 +128,8 @@ class BrowserView(View):
                 'has_subfolders': inode.subfolders.exists(),
             }
         else:
-            return inode.as_dict
+            realm = inode.folder.get_realm()
+            return inode.as_dict(realm)
 
     @method_decorator(require_GET)
     def open(self, request, folder_id):
@@ -167,20 +167,22 @@ class BrowserView(View):
         recursive = 'recursive' in request.GET
         lookup = lookup_by_label(request)
         lookup['mime_types'] = request.GET.getlist('mimetypes')
+        current_folder = FolderModel.objects.get(id=folder_id)
         if recursive:
-            descendants = FolderModel.objects.get(id=folder_id).descendants
-            if isinstance(descendants, QuerySet):
-                parent_ids = Subquery(descendants.values('id'))
+            if isinstance(current_folder.descendants, QuerySet):
+                parent_ids = Subquery(current_folder.descendants.values('id'))
             else:
-                parent_ids = [descendant.id for descendant in descendants]
+                parent_ids = [descendant.id for descendant in current_folder.descendants]
             unified_queryset = FileModel.objects.filter_unified(parent_id__in=parent_ids, is_folder=False, **lookup)
         else:
             unified_queryset = FileModel.objects.filter_unified(parent_id=folder_id, is_folder=False, **lookup)
         next_offset = offset + self.limit
         if next_offset >= unified_queryset.count():
             next_offset = None
+
+        realm = current_folder.get_realm()
         unified_queryset = sort_by_attribute(request, unified_queryset)
-        annotate_unified_queryset(unified_queryset)
+        annotate_unified_queryset(realm, unified_queryset)
         return {
             'files': list(unified_queryset[offset:offset + self.limit]),
             'offset': next_offset,
@@ -198,14 +200,15 @@ class BrowserView(View):
             return HttpResponseBadRequest("No search query provided.")
         offset = int(request.GET.get('offset', 0))
         starting_folder = FolderModel.objects.get(id=folder_id)
-        search_realm = request.COOKIES.get('django-finder-search-realm')
-        if search_realm == 'everywhere':
+        search_zone = request.COOKIES.get('django-finder-search-zone')
+        if search_zone == 'everywhere':
             starting_folder = list(starting_folder.ancestors)[-1]
         if isinstance(starting_folder.descendants, QuerySet):
             parent_ids = Subquery(starting_folder.descendants.values('id'))
         else:  # django-cte not installed (slow)
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
 
+        realm = starting_folder.get_realm()
         lookup = {
             'parent_id__in': parent_ids,
             'name_lower__icontains': search_query,
@@ -215,7 +218,7 @@ class BrowserView(View):
             next_offset = offset + self.limit
         else:
             next_offset = None
-        annotate_unified_queryset(unified_queryset)
+        annotate_unified_queryset(realm, unified_queryset)
         return {
             'files': unified_queryset[offset:next_offset],
             'offset': next_offset,
@@ -229,16 +232,18 @@ class BrowserView(View):
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             raise BadRequest("Bad form encoding or missing payload.")
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
-        folder = FolderModel.objects.get(id=folder_id)
+        current_folder = FolderModel.objects.get(id=folder_id)
+        realm = current_folder.get_realm()
         file = model.objects.create_from_upload(
+            realm,
             request.FILES['upload_file'],
-            folder=folder,
+            folder=current_folder,
             owner=request.user,
         )
         form_class = file.get_form_class()
         form = form_class(instance=file, renderer=FormRenderer())
         response = {
-            'file_info': file.as_dict,
+            'file_info': file.as_dict(realm),
             'form_html': mark_safe(strip_spaces_between_tags(form.as_div())),
         }
         return response
@@ -254,11 +259,13 @@ class BrowserView(View):
             return {'file_info': None}
         if request.content_type != 'multipart/form-data':
             raise BadRequest("Bad form encoding or missing payload.")
+        realm = file.folder.get_realm()
         form_class = file.get_form_class()
         form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
         if form.is_valid():
             file = form.save()
-            return {'file_info': file.as_dict}
+            file.as_dict.cache_clear()
+            return {'file_info': file.as_dict(realm)}
         else:
             return {'form_html': mark_safe(strip_spaces_between_tags(form.as_div()))}
 

@@ -14,10 +14,21 @@
         {% translate 'Your browser does not support video.' %}
     </video>
     {% else %}
-    <img src="{{ icon_url }}" loading="lazy" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}{% if sidebar_image_ratio %} data-ratio="{{ sidebar_image_ratio }}" class="js-focal-point-image"{% endif %} />
+    <img src="{{ icon_url }}"
+         loading="lazy" width="{{ width }}" height="{{ height }}"
+         {% if alt_text %} alt="{{ alt_text }}"{% endif %}
+         {% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %}
+         {% if sidebar_image_ratio %} data-ratio="{{ sidebar_image_ratio }}"
+         class="js-focal-point-image"{% endif %}
+         {{ add_styles|safe }}
+    />
     {% endif %}
 {% else %}
-    <img src="{{ icon_url }}" loading="lazy" width="{{ width }}" height="{{ height }}"{% if alt_text %} alt="{{ alt_text }}"{% endif %}{% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %} class="thumbnail_img" />
+    <img src="{{ icon_url }}" loading="lazy" width="{{ width }}" height="{{ height }}"
+         {% if alt_text %} alt="{{ alt_text }}"{% endif %}
+         {% if highres_url %} srcset="{{ icon_url }} 1x, {{ highres_url }} 2x"{% endif %} class="thumbnail_img"
+         {{ add_styles|safe }}
+    />
 {% endif %}
 {% if sidebar_image_ratio %}
     <div class="image-preview-field">

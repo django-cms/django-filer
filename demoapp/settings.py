@@ -75,7 +75,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'wsgi.application'
 
 
-if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
+if os.getenv('USE_POSTGRES', False) in ['1', 'TRUE', 'True', 'true']:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -95,6 +95,50 @@ else:
         },
     }
 
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+    'finder_public': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/filer_public',
+            'base_url': '/media/filer_public/',
+            'allow_overwrite': True,
+        },
+    },
+    'finder_public_samples': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/filer_public_thumbnails',
+            'base_url': '/media/filer_public_thumbnails/',
+            'allow_overwrite': True,
+        },
+    },
+}
+
+if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
+    STORAGES['finder_public'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'access_key': 'finder',
+            'secret_key': 'finderadmin',
+            'bucket_name': 'finder-public',
+            'endpoint_url': 'http://localhost:9000',
+        },
+    }
+    STORAGES['finder_public_samples'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'access_key': 'finder',
+            'secret_key': 'finderadmin',
+            'bucket_name': 'finder-public-samples',
+            'endpoint_url': 'http://localhost:9000',
+        },
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

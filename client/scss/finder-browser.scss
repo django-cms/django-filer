@@ -1,9 +1,10 @@
 @use "dropdown";
 @use "labels";
 @use "menubar";
-@import "colors";
-@import "progress";
-@import "tooltip";
+@use "sass:meta";
+@use "colors";
+@use "progress";
+@use "tooltip";
 
 .finder-file-select {
 	figure {
@@ -54,8 +55,8 @@
 					right: 0.5rem;
 					bottom: 0.5rem;
 					padding: 0.25rem 0.5rem;
-					color: $delete-button-fg-color;
-					background-color: $delete-button-bg-color;
+					color: colors.$delete-button-fg-color;
+					background-color: colors.$delete-button-bg-color;
 					border: none;
 					border-radius: 0.125rem;
 					opacity: 0.9;
@@ -99,6 +100,7 @@ dialog {
 	.browser-body {
 			flex-grow: 1;
 			display: flex;
+			position: relative;
 			height: calc(100% - 45px);  // 45px is the height of the menubar
 		}
 
@@ -228,29 +230,29 @@ dialog {
 			width: auto;
 		}
 
-	.file-uploader, .browser-editor {
+	.file-uploader {
+		flex-grow: 1;
+		overflow-y: auto;
+
+		input[type="file"] {
+			width: 0 !important;
+			height: 0 !important;
+			position: absolute;
+			bottom: 0;
+			padding: 0;
+		}
+
+		.progress-overlay {
+			@include progress.progress-overlay;
+		}
+	}
+
+	.browser-editor {
 		display: flex;
 		width: 100%;
 		position: relative;
 		overflow-y: auto;
 		flex-grow: 1;
-	}
-
-	.file-uploader {
-			input[type="file"] {
-				width: 0 !important;
-				height: 0 !important;
-				position: absolute;
-				bottom: 0;
-				padding: 0;
-			}
-
-			.progress-overlay {
-				@include progress-overlay;
-			}
-		}
-
-	.browser-editor {
 		flex-direction: column;
 
 		img {
@@ -273,24 +275,25 @@ dialog {
 
 				.errorlist {
 					display: inline-block;
-					color: $error-color;
+					color: colors.$error-color;
 					list-style: none;
 					margin: 0;
 				}
 
 				input, select, textarea {
 					display: block;
-					color: $body-fg-color;
-					background-color: $body-bg-color;
+					color: colors.$body-fg-color;
+					background-color: colors.$body-bg-color;
 					margin-bottom: 0.5rem;
 					padding: 4px 8px;
-					border: 1px solid $border-color;
+					border: 1px solid colors.$border-color;
 					border-radius: 5px;
-					max-width: calc(100% - 2rem);
+					width: calc(100% - 1rem);
+					box-sizing: border-box;
 
 					&:focus-visible {
 						outline: none;
-						box-shadow: $focus-visible-box-shadow;
+						box-shadow: colors.$focus-visible-box-shadow;
 					}
 				}
 
@@ -358,4 +361,4 @@ dialog {
 	--rc-border-color: rgba(255, 255, 255, 0.7);
 	--rc-focus-color: #0088ff;
 }
-@import 'node_modules/react-image-crop/src/ReactCrop.scss';
+@include meta.load-css('node_modules/react-image-crop/src/ReactCrop.scss');

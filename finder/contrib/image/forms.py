@@ -1,10 +1,10 @@
-from django.forms.fields import CharField, FloatField, IntegerField
+from django.forms.fields import CharField, ChoiceField, FloatField, IntegerField
 from django.forms.widgets import HiddenInput, TextInput
 from django.utils.translation import gettext_lazy as _
 
 from entangled.forms import EntangledModelFormMixin
 
-from finder.contrib.image.models import ImageFileModel
+from finder.contrib.image.models import ImageFileModel, GravityChoices
 from finder.forms.file import FileForm
 
 
@@ -23,8 +23,8 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
     )
     width = IntegerField(widget=HiddenInput())
     height = IntegerField(widget=HiddenInput())
-    gravity = CharField(
-        widget=HiddenInput(),
+    gravity = ChoiceField(
+        choices=GravityChoices.items(),
         required=False,
     )
     alt_text = CharField(

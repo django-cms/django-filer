@@ -63,6 +63,10 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.move_inodes),
             ),
             path(
+                '<uuid:folder_id>/reorder',
+                self.admin_site.admin_view(self.reorder_inodes),
+            ),
+            path(
                 '<uuid:folder_id>/delete',
                 self.admin_site.admin_view(self.delete_inodes),
             ),
@@ -190,8 +194,8 @@ class FolderAdmin(InodeAdmin):
         })
 
     def search_for_inodes(self, request, current_folder, search_query, **lookup):
-        search_realm = request.COOKIES.get('django-finder-search-realm')
-        if search_realm == 'everywhere':
+        search_zone = request.COOKIES.get('django-finder-search-zone')
+        if search_zone == 'everywhere':
             starting_folder = self.get_realm(request).root_folder
         else:
             starting_folder = current_folder
@@ -215,17 +219,20 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             return HttpResponse("Bad encoding type or missing payload.", status=415)
+        realm = self.get_realm(request)
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         new_file = model.objects.create_from_upload(
+            realm,
             request.FILES['upload_file'],
             folder=folder,
             owner=request.user,
         )
-        return JsonResponse({'file_info': new_file.as_dict})
+        return JsonResponse({'file_info': new_file.as_dict(realm)})
 
     def update_inode(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
+        realm = self.get_realm(request)
         body = json.loads(request.body)
         try:
             inode_obj = self.get_object(request, body['id'])
@@ -248,7 +255,7 @@ class FolderAdmin(InodeAdmin):
         if update_values:
             inode_obj.save(update_fields=list(update_values.keys()))
         return JsonResponse({
-            'new_inode': self.serialize_inode(inode_obj),
+            'new_inode': self.serialize_inode(realm, inode_obj),
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
@@ -257,11 +264,13 @@ class FolderAdmin(InodeAdmin):
             return response
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
+        ordering = current_folder.get_max_ordering()
         inode_ids = body.get('inode_ids', [])
         for values in FolderModel.objects.filter_unified(id__in=inode_ids):
             inode = FolderModel.objects.get_inode(id=values['id'])
             try:
-                inode.copy_to(current_folder, owner=request.user)
+                ordering += 1
+                inode.copy_to(current_folder, ordering=ordering, owner=request.user)
             except RecursionError as exc:
                 return HttpResponse(str(exc), status=409)
         return JsonResponse({
@@ -273,27 +282,35 @@ class FolderAdmin(InodeAdmin):
             return response
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
-        if 'target_folder' in body:
-            if not (target_folder := self.get_object(request, body['target_folder'])):
+        if 'target_id' in body:
+            if body['target_id'] == 'parent':
+                target_folder = current_folder.parent
+            else:
+                target_folder = self.get_object(request, body['target_id'])
+            if not target_folder:
                 msg = gettext("Folder named “{folder}” not found.")
-                return HttpResponseNotFound(msg.format(folder=body['target_folder']))
+                return HttpResponseNotFound(msg.format(folder=body['target_id']))
         else:
             target_folder = current_folder
+        inode_ids = body.get('inode_ids', [])
         try:
-            inode_ids = body.get('inode_ids', [])
-            for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
-                try:
-                    DiscardedInode.objects.get(inode=entry['id']).delete()
-                except DiscardedInode.DoesNotExist:
-                    pass
-                proxy_obj = InodeManager.get_proxy_object(entry)
-                proxy_obj.parent = target_folder
-                proxy_obj.validate_constraints()
-                proxy_obj._meta.model.objects.filter(id=entry['id']).update(parent=target_folder)
+            target_folder.move_inodes(inode_ids)
         except ValidationError as exc:
             return HttpResponse(exc.messages[0], status=409)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_folder)),
+        })
+
+    def reorder_inodes(self, request, folder_id):
+        if response := self.check_for_valid_post_request(request, folder_id):
+            return response
+        insert_after = request.COOKIES.get('django-finder-layout') in ['tiles', 'mosaic']
+        body = json.loads(request.body)
+        target_inode = FolderModel.objects.get_inode(id=body.get('target_id'))
+        inode_ids = body.get('inode_ids', [])
+        target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
+        return JsonResponse({
+            'inodes': list(self.get_inodes(request, parent=target_inode.parent)),
         })
 
     def delete_inodes(self, request, folder_id):
@@ -304,20 +321,26 @@ class FolderAdmin(InodeAdmin):
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
             return HttpResponse("Cannot move inodes from trash folder into itself.", status=409)
+        realm = self.get_realm(request)
+        trash_ordering = trash_folder.get_max_ordering()
         inode_ids = body.get('inode_ids', [])
         for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
             inode = FolderModel.objects.get_inode(id=entry['id'])
+            update_fields = ['parent', 'ordering']
             if entry['is_folder']:
                 PinnedFolder.objects.filter(folder=inode).delete()
                 while trash_folder.listdir(name=inode.name, is_folder=True).exists():
                     inode.name = f"{inode.name}.renamed"
-                inode.save(update_fields=['name'])
+                update_fields.append('name')
             DiscardedInode.objects.create(
                 inode=inode.id,
                 previous_parent=inode.parent,
             )
+            trash_ordering += 1
+            inode.ordering = trash_ordering
             inode.parent = trash_folder
-            inode.save(update_fields=['parent'])
+            inode.save(update_fields=update_fields)
+        current_folder.reorder()
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
@@ -332,18 +355,23 @@ class FolderAdmin(InodeAdmin):
             inode = FolderModel.objects.get_inode(id=entry['id'])
             inode.parent = discarded_inodes.get(inode=inode.id).previous_parent
             inode.save(update_fields=['parent'])
+            inode.parent.reorder()  # TODO: optimize by grouping
         discarded_inodes.delete()
         return HttpResponse()
 
     def erase_trash_folder(self, request):
         if request.method != 'DELETE':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
+        realm = self.get_realm(request)
         trash_folder_entries = self.get_trash_folder(request).listdir()
         DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
         for entry in trash_folder_entries:
-            # bulk delete does not work here because file must be erased from disk
+            # bulk delete does not work here because each file must be erased from disk
             proxy_obj = InodeManager.get_proxy_object(entry)
-            proxy_obj.delete()
+            if proxy_obj.is_folder:
+                proxy_obj.delete()
+            else:
+                proxy_obj.erase_and_delete(realm)
         fallback_folder = self.get_fallback_folder(request)
         return JsonResponse({
             'success_url': reverse(
@@ -357,6 +385,7 @@ class FolderAdmin(InodeAdmin):
             return response
         parent_folder = self.get_object(request, folder_id)
         assert parent_folder.is_folder
+        realm = self.get_realm(request)
         body = json.loads(request.body)
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
@@ -365,19 +394,24 @@ class FolderAdmin(InodeAdmin):
             name=body['name'],
             parent=parent_folder,
             owner=request.user,
+            ordering=parent_folder.get_max_ordering() + 1,
         )
-        return JsonResponse({'new_folder': self.serialize_inode(new_folder)})
+        return JsonResponse({'new_folder': self.serialize_inode(realm, new_folder)})
 
     def get_or_create_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         if not (folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
+        realm = self.get_realm(request)
+        ordering = folder.get_max_ordering() + 1
         body = json.loads(request.body)
         for folder_name in body['relative_path'].split('/'):
-            folder, _ = FolderModel.objects.get_or_create(
+            folder, created = FolderModel.objects.get_or_create(
                 name=folder_name,
                 parent=folder,
-                defaults={'owner': request.user},
+                defaults={'owner': request.user, 'ordering': ordering},
             )
-        return JsonResponse({'folder': self.serialize_inode(folder)})
+            if created:
+                ordering += 1
+        return JsonResponse({'folder': self.serialize_inode(realm, folder)})

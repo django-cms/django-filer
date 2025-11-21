@@ -8,7 +8,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
 const MenuBar = forwardRef((props: any, forwardedRef) => {
-	const {openUploader, labels, refreshFilesList, setDirty, setSearchQuery, searchRealm, setSearchRealm} = props;
+	const {openUploader, labels, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone} = props;
 	const ref = useRef(null);
 	const searchRef = useRef(null);
 
@@ -33,9 +33,9 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	function changeSearchRealm(value) {
-		if (value !== searchRealm) {
-			setSearchRealm(value);
+	function changeSearchZone(value) {
+		if (value !== searchZone) {
+			setSearchZone(value);
 			setDirty(true);
 		}
 	}
@@ -43,8 +43,8 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	function getItemProps(value: string) {
 		return {
 			role: 'option',
-			'aria-selected': searchRealm === value,
-			onClick: () => changeSearchRealm(value),
+			'aria-selected': searchZone === value,
+			onClick: () => changeSearchZone(value),
 		};
 	}
 
@@ -68,7 +68,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					<DropDownMenu
 						role="menuitem"
 						wrapperElement="span"
-						className="search-realm with-caret"
+						className="search-zone with-caret"
 						root={rootNode}
 					>
 						<li {...getItemProps('current')}>{gettext("From current folder")}</li>

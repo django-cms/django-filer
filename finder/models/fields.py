@@ -1,6 +1,5 @@
 import uuid
 
-from django.core.exceptions import ValidationError
 from django.db.models.fields import UUIDField
 from django.utils.translation import gettext_lazy as _
 
@@ -13,6 +12,7 @@ class FinderFileField(UUIDField):
 
     def __init__(self, *args, **kwargs):
         self.accept_mime_types = kwargs.pop('accept_mime_types', None)
+        self.realm = kwargs.pop('realm', None)
         super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
@@ -20,6 +20,7 @@ class FinderFileField(UUIDField):
             **{
                 'form_class': FormFileField,
                 'accept_mime_types': self.accept_mime_types,
+                'realm': self.realm,
                 **kwargs,
             }
         )

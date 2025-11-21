@@ -200,19 +200,35 @@ export default function FolderAdmin() {
 		const sourceFolderId = active.data.current.folderId;
 		let inodes = columnRefs[sourceFolderId].current?.inodes ?? [];
 		if (over) {
-			let [what, targetFolderId] = over.id.split(':');
-			targetFolderId = targetFolderId === 'parent' ? settings.parent_id : targetFolderId;
-			if (!draggedInodes.some(inode => [inode.id, inode.parent].includes(targetFolderId))) {
+			let [what, targetInodeId, targetFolderId] = over.id.split(':');
+			if (targetFolderId === undefined) {
+				targetFolderId = targetInodeId === 'parent' ? settings.parent_id : targetInodeId;
+			}
+			if (!draggedInodes.some(inode => [inode.id, inode.parent].includes(targetInodeId))) {
 				overlayRef.current.hidden = true;
-				if (what === 'download') {
-					downloadFiles(draggedInodes);
-					setTimeout(() => {
-						overlayRef.current.hidden = false;
-						setDraggedInodes([]);
-					}, 1000);
-					return;
+				let action: string;
+				switch (what) {
+					case 'download':
+						downloadFiles(draggedInodes);
+						setTimeout(() => {
+							overlayRef.current.hidden = false;
+							setDraggedInodes([]);
+						}, 1000);
+						return;
+					case 'folder': case 'column': case 'tab':
+						action = 'move';
+						break;
+					case 'discard':
+						action = 'delete';
+						break;
+					case 'reorder':
+						action = 'reorder';
+						break;
+					default:
+						console.error(`Unknown drop target: ${what}`);
+						return;
 				}
-				let fetchUrl = `${settings.base_url}${settings.folder_id}/${what === 'discard' ? 'delete' : 'move'}`;
+				let fetchUrl = `${settings.base_url}${settings.folder_id}/${action}`;
 				const response = await fetch(fetchUrl, {
 					method: 'POST',
 					headers: {
@@ -221,20 +237,24 @@ export default function FolderAdmin() {
 					},
 					body: JSON.stringify({
 						inode_ids: draggedInodes.map(inode => inode.id),
-						target_folder: targetFolderId,
+						target_id: targetInodeId,
 					}),
 				});
 				if (response.ok) {
 					const body = await response.json();
 					if (body.inodes && columnRefs[targetFolderId]?.current) {
-						const inodes = body.inodes.map(inode => ({...inode, elementRef: createRef()}));
-						columnRefs[targetFolderId].current.setInodes(inodes);
+						const targetInodes = body.inodes.map(inode => ({...inode, elementRef: createRef()}));
+						columnRefs[targetFolderId].current.setInodes(targetInodes);
+						if (sourceFolderId === targetFolderId) {
+							inodes = targetInodes;
+						}
 					}
 					if (body.favorite_folders) {
 						folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 					}
-					inodes = inodes.filter(inode => !inode.dragged);
-					columnRefs[sourceFolderId].current.setInodes(inodes);
+					if (sourceFolderId !== targetFolderId) {
+						inodes = inodes.filter(inode => !inode.dragged);
+					}
 				} else if (response.status === 409) {
 					alert(await response.text());
 				} else {

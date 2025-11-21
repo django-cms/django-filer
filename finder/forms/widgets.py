@@ -13,7 +13,6 @@ from finder.models.file import AbstractFileModel, FileModel
 class FinderFileSelect(TextInput):
     template_name = 'finder/widgets/finder_file_select.html'
     accept_mime_types = None
-    realm = 'admin'
 
     class Media:
         css = {'all': ['finder/css/finder-select.css']}
@@ -34,11 +33,11 @@ class FinderFileSelect(TextInput):
             except (ValueError, FileModel.DoesNotExist):
                 pass
         if isinstance(value, AbstractFileModel):
-            attrs['data-selected_file'] = json.dumps(value.as_dict, cls=DjangoJSONEncoder)
+            attrs['data-selected_file'] = json.dumps(value.as_dict(self.realm), cls=DjangoJSONEncoder)
         context = super().get_context(name, value, attrs)
         context.update(
             base_url=reverse('finder-api:base-url'),
-            realm=self.realm,
+            realm=self.realm.slug,
             style_url=static('finder/css/finder-browser.css'),
         )
         if isinstance(self.accept_mime_types, (list, tuple)) and self.accept_mime_types:

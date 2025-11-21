@@ -2,11 +2,12 @@ import React from 'react';
 import DropDownMenu from '../common/DropDownMenu';
 import {useCookie} from '../common/Storage';
 import SortingIcon from '../icons/sorting.svg';
+import SortNumberIcon from '../icons/sort-number.svg';
 import SortDescIcon from '../icons/sort-desc.svg';
 import SortAscIcon from '../icons/sort-asc.svg';
 
 
-const useSorting = () => useCookie('django-finder-sorting', '');
+export const useSorting = () => useCookie('django-finder-sorting', '');
 
 
 export default function SortingOptions(props: any) {
@@ -37,10 +38,10 @@ export default function SortingOptions(props: any) {
 			root={props.root}
 		>
 			<li {...getItemProps('')}>
-				<span>{gettext("Unsorted")}</span>
+				<SortNumberIcon /><span>{gettext("Explicit")}</span>
 			</li>
 			<li {...getItemProps('name_asc')}>
-				<SortDescIcon/><span>{gettext("Name")}</span>
+				<SortDescIcon /><span>{gettext("Name")}</span>
 			</li>
 			<li {...getItemProps('name_desc')}>
 				<SortAscIcon /><span>{gettext("Name")}</span>

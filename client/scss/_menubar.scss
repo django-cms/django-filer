@@ -1,4 +1,4 @@
-@import "colors";
+@use "colors";
 
 @mixin menubar {
 	[role="menubar"] {
@@ -22,11 +22,11 @@
 			}
 
 			&:not(.search-field):hover {
-				background-color: $selected-bg-color;
+				background-color: colors.$selected-bg-color;
 			}
 
 			&[aria-selected="true"] {
-				background-color: $selected-row-color;
+				background-color: colors.$selected-row-color;
 			}
 
 			&[aria-disabled="true"] {
@@ -50,7 +50,7 @@
 					display: block;
 					margin: 0;
 					padding: 2px 8px;
-					border: 1px solid $border-color;
+					border: 1px solid colors.$border-color;
 					border-right: none;
 					border-top-left-radius: 5px;
 					border-bottom-left-radius: 5px;
@@ -62,17 +62,17 @@
 					& + div {
 						position: relative;
 						display: flex;
-						border: 1px solid $border-color;
+						border: 1px solid colors.$border-color;
 						border-left: none;
 						border-top-right-radius: 5px;
 						border-bottom-right-radius: 5px;
 						padding: 0 5px 0 10px;
 
 						span {
-							color: $body-fg-color;
+							color: colors.$body-fg-color;
 
 							&:hover {
-								background-color: $selected-bg-color;
+								background-color: colors.$selected-bg-color;
 							}
 						}
 
@@ -84,21 +84,21 @@
 							}
 						}
 
-						.search-realm {
+						.search-zone {
 							display: flex;
 						}
 					}
 				}
 
 				&:not(:has(> input:placeholder-shown)) {
-					background-color: $selected-row-color;
+					background-color: colors.$selected-row-color;
 					> input {
-						background-color: $selected-row-color;
+						background-color: colors.$selected-row-color;
 					}
 				}
 
 				&:has(> input:focus-visible) {
-					box-shadow: $focus-visible-box-shadow;
+					box-shadow: colors.$focus-visible-box-shadow;
 				}
 			}
 
@@ -131,7 +131,7 @@
 				}
 
 				&:has(input:checked) {
-					background-color: $selected-row-color;
+					background-color: colors.$selected-row-color;
 				}
 			}
 
@@ -157,7 +157,7 @@
 			right: -250px;
 
 			svg {
-				color: $body-fg-color;
+				color: colors.$body-fg-color;
 			}
 
 			svg + span {

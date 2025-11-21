@@ -3,7 +3,7 @@ import DropDownMenu from './DropDownMenu';
 import {useCookie} from './Storage';
 import FilterIcon from '../icons/filter.svg';
 
-const useFilter = () => useCookie('django-finder-filter', []);
+export const useFilter = () => useCookie('django-finder-filter', []);
 
 
 export default function FilterByLabel(props: any) {

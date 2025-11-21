@@ -28,6 +28,9 @@ EXTRA_REQUIREMENTS = {
         "ffmpeg-python",
         'django-entangled',
     ],
+    "s3": [
+        "django-storages[s3]",
+    ],
 }
 
 

@@ -73,6 +73,9 @@
     <h2>&nbsp;</h2>
 {% endblock %}
 
+{% block object-tools %}
+{% endblock %}
+
 {% block content %}
     <div class="navigator-top-nav clearfix">
         <div class="breadcrumbs-container-wrapper">
@@ -166,7 +169,7 @@
                 </div>
             </div>
             <div class="tools-container">
-                {% block object-tools %}
+                {% block filer-tools %}
                     <div class="navigator-tools">
                         {% if not is_popup %}
                             <div class="actions-wrapper">
@@ -196,7 +199,7 @@
                                 <li>{% filer_folder_list_type_switcher %}</li>
                             </ul>
                         </div>
-                        {% block object-tools-items %}
+                        {% block filer-tools-items %}
                             <div class="navigator-button-wrapper">
                                 {% if folder.can_have_subfolders and can_make_folder %}
                                     <a href="{% url 'admin:filer-directory_listing-make_root_folder' %}?parent_id={{ folder.pk|safe }}{% if is_popup %}&amp;_popup=1{% endif %}"
@@ -209,28 +212,28 @@
 
                                 {% if permissions.has_add_children_permission and not folder.is_root %}
                                     <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
-                                       class="navigator-button navigator-button-upload js-upload-button"
-                                       data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}"
-                                       data-max-uploader-connections="{{ uploader_connections }}"
-                                       data-max-files="{{ max_files|safe }}"
-                                       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
+                                        class="navigator-button navigator-button-upload js-upload-button"
+                                        data-url="{% url 'admin:filer-ajax_upload' folder_id=folder.id %}"
+                                        data-max-uploader-connections="{{ uploader_connections }}"
+                                        data-max-files="{{ max_files|safe }}"
+                                        {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
                                     >
                                         {% trans "Upload Files" %}
                                     </a>
                                 {% elif folder.is_unsorted_uploads %}
                                     <a href="#" id="id_upload_button" title="{% trans 'Upload Files' %}"
-                                       class="navigator-button navigator-button-upload js-upload-button"
-                                       data-url="{% url 'admin:filer-ajax_upload' %}"
-                                       data-max-uploader-connections="{{ uploader_connections }}"
-                                       data-max-files="{{ max_files|safe }}"
-                                       {% if max_filesize %}}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
+                                        class="navigator-button navigator-button-upload js-upload-button"
+                                        data-url="{% url 'admin:filer-ajax_upload' %}"
+                                        data-max-uploader-connections="{{ uploader_connections }}"
+                                        data-max-files="{{ max_files|safe }}"
+                                        {% if max_filesize %}data-max-filesize="{{ max_filesize|safe }}"{% endif %}
                                     >
                                         {% trans "Upload Files" %}
                                     </a>
                                 {% endif %}
                                 {% if folder.is_root and not folder.is_unsorted_uploads %}
                                     <span class="js-upload-button-disabled upload-button-disabled js-filer-tooltip filer-tooltip-wrapper"
-                                          title="{% trans 'You have to select a folder first' %}">
+                                            title="{% trans 'You have to select a folder first' %}">
                                         <a href="#" class="navigator-button navigator-button-upload" disabled>
                                             {% trans "Upload Files" %}
                                         </a>

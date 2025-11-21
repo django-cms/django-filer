@@ -1,6 +1,17 @@
 from django.contrib.sites.models import Site
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+
+from django.core.files.storage import storages
+
+
+class RealmModelManager(models.Manager):
+    def get_default(self, slug=None):
+        site = Site.objects.get_current()
+        if slug is None:
+            slug = 'admin'
+        return self.get(site=site, slug=slug)
 
 
 class RealmModel(models.Model):
@@ -31,10 +42,26 @@ class RealmModel(models.Model):
         related_name='+',
         editable=False,
     )
+    _original_storage = models.CharField(
+        default='finder_public',
+    )
+    _sample_storage = models.CharField(
+        default='finder_public_samples',
+    )
 
     class Meta:
         ordering = ['site', 'slug']
         constraints = [models.UniqueConstraint(fields=['site', 'slug'], name='unique_site')]
 
+    objects = RealmModelManager()
+
     def __str__(self):
         return f"{self.slug} @ {self.site.name}"
+
+    @cached_property
+    def original_storage(self):
+        return storages[self._original_storage]
+
+    @cached_property
+    def sample_storage(self):
+        return storages[self._sample_storage]

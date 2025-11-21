@@ -15,7 +15,7 @@ import os
 import sys
 
 
-sys.path.append(os.path.abspath('../'))
+sys.path.append(os.path.abspath("../"))
 
 from filer import __version__  # NOQA
 
@@ -33,38 +33,38 @@ from filer import __version__  # NOQA
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinxcontrib.spelling',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinxcontrib.spelling",
     "sphinx_copybutton",
     "sphinxext.opengraph",
-    'sphinxcontrib.images',
+    "sphinxcontrib.images",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'django-filer'
-copyright = '%s, Stefan Foulis' % (datetime.date.today().year,)
+project = "django-filer"
+copyright = "%s, Stefan Foulis" % (datetime.date.today().year,)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '.'.join(__version__.split('.')[0:2])
+version = ".".join(__version__.split(".")[:2])
 # The full version, including alpha/beta/rc tags.
 release = __version__
 
@@ -80,7 +80,7 @@ release = __version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '_images', 'README.rst']
+exclude_patterns = ["_build", "_images", "README.rst"]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -97,7 +97,7 @@ exclude_patterns = ['_build', '_images', 'README.rst']
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -107,7 +107,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'furo'
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -138,7 +138,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -182,7 +182,7 @@ html_static_path = ['_static']
 # html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'django-filerdoc'
+htmlhelp_basename = "django-filerdoc"
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -196,7 +196,13 @@ htmlhelp_basename = 'django-filerdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'django-filer.tex', 'django-filer Documentation', 'Stefan Foulis', 'manual'),
+    (
+        "index",
+        "django-filer.tex",
+        "django-filer Documentation",
+        "Stefan Foulis",
+        "manual",
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -228,13 +234,19 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-filer', 'django-filer Documentation', ['Stefan Foulis'], 1)
+    ("index", "django-filer", "django-filer Documentation", ["Stefan Foulis"], 1)
 ]
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "django": (
+        "https://docs.djangoproject.com/en/stable/",
+        "https://docs.djangoproject.com/en/stable/objects.inv",
+    ),
+}
 
 images_config = {
-    'override_image_directive': True,
+    "override_image_directive": True,
 }
