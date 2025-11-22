@@ -287,6 +287,9 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             return list(self.labels.values('id', 'name', 'color'))
         return data
 
+    def get_meta_data(self):
+        return {}
+
 
 class DiscardedInode(models.Model):
     """

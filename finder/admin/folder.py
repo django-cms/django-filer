@@ -1,12 +1,11 @@
 import json
 
 from django.contrib import admin
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import QuerySet, Subquery
-
 from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
-from django.templatetags.static import static
 from django.urls import path, reverse
 from django.utils.translation import gettext
 from django.utils.html import format_html
@@ -29,7 +28,8 @@ class FolderAdmin(InodeAdmin):
         return Media(
             css={'all': ['finder/css/finder-admin.css']},
             js=[format_html(
-                '<script type="module" src="{}"></script>', static('finder/js/folder-admin.js')
+                '<script type="module" src="{}"></script>',
+                staticfiles_storage.url('finder/js/folder-admin.js')
             )],
         )
 

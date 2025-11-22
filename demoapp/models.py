@@ -1,6 +1,6 @@
 from django.db import models
 
-from finder.models.fields import FinderFileField
+from finder.models.fields import FinderFileField, FinderFolderField
 
 
 class DemoAppModel(models.Model):
@@ -9,5 +9,11 @@ class DemoAppModel(models.Model):
         null=True,
         blank=True,
         accept_mime_types=['image/*'],
+        realm='admin',
+    )
+    folder = FinderFolderField(
+        verbose_name="Demo Folder",
+        null=True,
+        blank=True,
         realm='admin',
     )
