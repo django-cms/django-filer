@@ -1,5 +1,6 @@
 import r2wc from '@r2wc/react-to-web-component';
 import FinderFileSelect from './browser/FinderFileSelect';
+import FinderFolderSelect from './browser/FinderFolderSelect';
 
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -7,6 +8,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		'finder-file-select',
 		r2wc(FinderFileSelect, {
 			props: {'base-url': 'string', 'style-url': 'string', realm: 'string', 'mime-types': 'string'},
+			shadow: 'open',
+		}),
+	);
+	window.customElements.define(
+		'finder-folder-select',
+		r2wc(FinderFolderSelect, {
+			props: {'base-url': 'string', 'style-url': 'string', realm: 'string', 'folder-icon-url': 'string'},
 			shadow: 'open',
 		}),
 	);

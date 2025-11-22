@@ -144,6 +144,10 @@ dialog {
 				span[role="button"] {
 					cursor: pointer;
 
+					&[aria-current="true"] {
+						font-weight: bold;
+					}
+
 					&:hover {
 						text-decoration: underline;
 						text-decoration-style: dashed;

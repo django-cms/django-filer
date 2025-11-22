@@ -116,7 +116,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		}
 	}, [isDirty]);
 
-	function setCurrentFolder(folderId){
+	function setCurrentFolderId(folderId){
 		setStructure({
 			...structure,
 			last_folder: folderId,
@@ -185,7 +185,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	async function fetchFiles() {
 		const fetchUrl = (() => {
 			const params = new URLSearchParams();
-			mimeTypes.forEach(type => params.append('mimetypes', type));
+			mimeTypes?.forEach(type => params.append('mimetypes', type));
 			if (structure.recursive) {
 				params.set('recursive', '');
 			}
@@ -219,11 +219,21 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	}
 
 	const selectFile = useCallback(fileInfo => {
-		props.selectFile(fileInfo);
-		setUploadedFile(null);
-		refreshFilesList();
-		props.dialogRef.current.close();
+		if (props.selectFile) {
+			props.selectFile(fileInfo);
+			setUploadedFile(null);
+			refreshFilesList();
+			props.dialogRef.current.close();
+		}
 	}, []);
+
+	const selectFolder = useCallback(folder => {
+		setCurrentFolderId(folder.id);
+		if (props.selectFolder) {
+			props.selectFolder(folder);
+			props.dialogRef.current.close();
+		}
+	}, [structure.last_folder]);
 
 	function scrollToCurrentFolder() {
 		if (currentFolderElement) {
@@ -277,10 +287,11 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 								baseUrl={baseUrl}
 								folder={structure.root_folder}
 								lastFolderId={structure.last_folder}
-								setCurrentFolder={setCurrentFolder}
+								selectFolder={selectFolder}
 								toggleRecursive={toggleRecursive}
 								refreshStructure={() => setStructure({...structure})}
 								isListed={structure.recursive ? false : null}
+								setCurrentFolderId={setCurrentFolderId}
 								setCurrentFolderElement={setCurrentFolderElement}
 							/>}
 						</ul>

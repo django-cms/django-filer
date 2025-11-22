@@ -1,8 +1,8 @@
 @use "tooltip";
 
-finder-file-select {
+finder-file-select, finder-folder-select {
 	// hide the original input field without loosing the ability to focus it
-	input.finder-file-field {
+	input.finder-hidden-input {
 		width: 0 !important;
 		height: 0 !important;
 		border: none !important;
