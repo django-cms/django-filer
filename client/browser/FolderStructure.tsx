@@ -8,11 +8,11 @@ import RootIcon from '../icons/root.svg';
 
 
 function FolderEntry(props) {
-	const {folder, toggleOpen, setCurrentFolder, openRecursive, isCurrent, isListed, setCurrentFolderElement} = props;
+	const {folder, toggleOpen, selectFolder, setCurrentFolderId, openRecursive, isCurrent, isListed, setCurrentFolderElement} = props;
 	const ref = useRef(null);
 
 	if (folder.is_root) {
-		return (<i onClick={() => setCurrentFolder(folder.id)}><RootIcon/></i>);
+		return (<i onClick={() => selectFolder(folder)}><RootIcon/></i>);
 	}
 
 	useEffect(() => {
@@ -26,16 +26,15 @@ function FolderEntry(props) {
 			folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/>
 		}</i> : <i><EmptyIcon/></i>}
 		<i onClick={() => openRecursive()} role="button">{isListed || isCurrent ? <FolderOpenIcon/> : <FolderIcon/>}</i>
-		{isCurrent
-			? <strong ref={ref}>{folder.name}</strong>
-			: <span onClick={() => setCurrentFolder(folder.id)} role="button">{folder.name}</span>
-		}
+		<span onClick={() => selectFolder(folder)} ref={isCurrent ? ref : null} aria-current={isCurrent} role="button">
+			{folder.name}
+		</span>
 	</>);
 }
 
 
 export default function FolderStructure(props) {
-	const {baseUrl, folder, lastFolderId, setCurrentFolder, toggleRecursive, refreshStructure, setCurrentFolderElement} = props;
+	const {baseUrl, folder, lastFolderId, selectFolder, toggleRecursive, refreshStructure, setCurrentFolderId, setCurrentFolderElement} = props;
 	const isListed = props.isListed === false ? lastFolderId === folder.id : props.isListed;
 	const isCurrent = lastFolderId === folder.id;
 
@@ -78,7 +77,7 @@ export default function FolderStructure(props) {
 			}
 			await toggleRecursive(folder.id);
 		} else {
-			await setCurrentFolder(folder.id);
+			await setCurrentFolderId(folder.id);
 		}
 	}
 
@@ -87,10 +86,11 @@ export default function FolderStructure(props) {
 			<FolderEntry
 				folder={folder}
 				toggleOpen={toggleOpen}
-				setCurrentFolder={setCurrentFolder}
+				selectFolder={selectFolder}
 				openRecursive={openRecursive}
 				isCurrent={isCurrent}
 				isListed={isListed}
+				setCurrentFolderId={setCurrentFolderId}
 				setCurrentFolderElement={setCurrentFolderElement}
 			/>
 			{folder.is_open && folder.children && (
@@ -101,10 +101,11 @@ export default function FolderStructure(props) {
 					baseUrl={baseUrl}
 					folder={child}
 					lastFolderId={lastFolderId}
-					setCurrentFolder={setCurrentFolder}
+					selectFolder={selectFolder}
 					toggleRecursive={toggleRecursive}
 					refreshStructure={refreshStructure}
 					isListed={isListed}
+					setCurrentFolderId={setCurrentFolderId}
 					setCurrentFolderElement={setCurrentFolderElement}
 				/>
 			))}
