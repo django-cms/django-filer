@@ -1,7 +1,7 @@
 from django.contrib import admin
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
-from django.templatetags.static import static
 from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -24,7 +24,8 @@ class FileAdmin(InodeAdmin):
         return Media(
             css={'all': ['finder/css/finder-admin.css', 'admin/css/forms.css']},
             js=[format_html(
-                '<script type="module" src="{}"></script>', static('finder/js/file-admin.js')
+                '<script type="module" src="{}"></script>',
+                 staticfiles_storage.url('finder/js/file-admin.js')
             )],
         )
 

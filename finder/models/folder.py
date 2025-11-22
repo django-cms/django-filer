@@ -160,6 +160,17 @@ class FolderModel(InodeModel):
             ngettext("{} File", "{} Files", num_files).format(num_files),
         ))
 
+    @lru_cache
+    def as_dict(self, realm=None):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'has_subfolders': self.subfolders.exists(),
+            'last_modified_at': self.last_modified_at.replace(microsecond=0, tzinfo=None),
+            'summary': self.summary,
+            'meta_data': self.get_meta_data(),
+        }
+
     def get_download_url(self, realm):
         return None
 

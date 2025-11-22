@@ -47,19 +47,13 @@ class BrowserView(View):
 
     def _get_children(cls, open_folders, parent):
         children = []
-        for child in parent.subfolders:
-            child_id = str(child.id)
-            if child_id in open_folders:
-                grandchildren = cls._get_children(open_folders, child)
+        for subfolder in parent.subfolders:
+            child = subfolder.as_dict()
+            if str(subfolder.id) in open_folders:
+                child.update(children=cls._get_children(open_folders, subfolder), is_open=True)
             else:
-                grandchildren = None
-            children.append({
-                'id': child_id,
-                'name': child.name,
-                'children': grandchildren,
-                'is_open': grandchildren is not None,
-                'has_subfolders': child.subfolders.exists(),
-            })
+                child.update(children=None, is_open=False)
+            children.append(child)
         return children
 
     def _get_realm(self, request, slug):
@@ -72,9 +66,8 @@ class BrowserView(View):
     @method_decorator(require_GET)
     def structure(self, request, slug=None):
         realm = self._get_realm(request, slug)
-        root_folder_id = str(realm.root_folder.id)
         request.session.setdefault('finder.open_folders', [])
-        request.session.setdefault('finder.last_folder', root_folder_id)
+        request.session.setdefault('finder.last_folder', str(realm.root_folder.id))
         last_folder_id = request.session['finder.last_folder']
         if is_open := realm.root_folder.subfolders.exists():
             # direct children of the root folder are open regardless of the `open_folders` session
@@ -93,12 +86,11 @@ class BrowserView(View):
             children = None
         return {
             'root_folder': {
-                'id': root_folder_id,
+                **realm.root_folder.as_dict(),
                 'name': None,  # the root folder has no readable name
                 'is_root': True,
                 'is_open': is_open,
                 'children': children,
-                'has_subfolders': is_open,
             },
             'labels': [
                 {'value': id, 'label': name, 'color': color}
@@ -271,6 +263,7 @@ class BrowserView(View):
 
     @method_decorator(require_POST)
     def crop(self, request, image_id):
+        raise NotImplementedError
         image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
         width, height = request.POST.get('width'), request.POST.get('height')
         width = int(width) if str(width).isdigit() else None
