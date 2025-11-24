@@ -14,7 +14,7 @@ import {
 	useSensors
 } from '@dnd-kit/core';
 import {restrictToWindowEdges} from '@dnd-kit/modifiers';
-import {useCookie, useSessionStorage} from '../common/Storage';
+import {useAudioSettings, useCookie, useSessionStorage} from '../common/Storage';
 import FileUploader from '../common/FileUploader';
 import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
@@ -33,6 +33,8 @@ const useClipboard = useSessionStorage('filer-clipboard', []);
 
 export default function FolderAdmin() {
 	const settings = useContext(FinderSettings);
+	const [audioSettings] = useAudioSettings();
+	const [webAudio, setWebAudio] = useState(null);
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
 	const uploaderRef = useRef(null);
@@ -70,6 +72,18 @@ export default function FolderAdmin() {
 				messagelist.remove();
 			}, 5000);
 		}
+
+		const context = new window.AudioContext();
+		const gainNode = context.createGain();
+		gainNode.connect(context.destination);
+		gainNode.gain.value = audioSettings.volume;
+		setWebAudio({context, gainNode});
+
+		return () => {
+			if (webAudio) {
+				webAudio.context.close();
+			}
+		};
 	}, []);
 
 	function modifyMovement(args) {
@@ -352,6 +366,7 @@ export default function FolderAdmin() {
 									menuBarRef={menuBarRef}
 									folderTabsRef={folderTabsRef}
 									layout={layout}
+									webAudio={webAudio}
 									clipboard={clipboard}
 									setClipboard={setClipboard}
 									clearClipboard={clearClipboard}
@@ -397,6 +412,7 @@ export default function FolderAdmin() {
 			downloadFiles={downloadFiles}
 			layout={layout}
 			setLayout={setLayout}
+			webAudio={webAudio}
 			deselectAll={deselectAll}
 			refreshColumns={refreshColumns}
 			clipboard={clipboard}

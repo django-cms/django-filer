@@ -10,6 +10,7 @@ import React, {
 } from 'react';
 import SearchField from './SearchField';
 import DropDownMenu from '../common/DropDownMenu';
+import VolumeControl from '../common/VolumeControl';
 import FilterByLabel from '../common/FilterByLabel';
 import SortingOptions from '../common/SortingOptions';
 import {Tooltip, TooltipContent, TooltipTrigger} from '../common/Tooltip';
@@ -349,9 +350,10 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	return (
 		// <nav aria-label={gettext("Finder List View")}>
 			<ul role="menubar">
-				<li className="search-field" role="menuitem" style={{marginRight: 'auto'}}>
+				<li className="search-field" role="menuitem">
 					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
 				</li>
+				<VolumeControl {...props} />
 				<MenuItem aria-selected={layout === 'tiles'} onClick={() => setLayout('tiles')} tooltip={gettext("Tiles view")}>
 					<TilesIcon/>
 				</MenuItem>

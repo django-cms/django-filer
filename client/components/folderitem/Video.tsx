@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import FigureLabels from '../../common/FigureLabels';
 
 
@@ -6,13 +6,17 @@ export default function Video(props) {
 	const videoRef = useRef(null);
 
 	useEffect(() => {
-		if (!(videoRef.current?.parentElement instanceof HTMLElement))
+		if (!(videoRef.current?.parentElement instanceof HTMLElement) || !props.webAudio)
 			return;
+
 		const wrapper = videoRef.current.parentElement;
 		let timeout = null;
 
 		const play = () => {
 			timeout && clearTimeout(timeout);
+			if (props.webAudio.context.state === 'suspended') {
+				props.webAudio.context.resume();
+			}
 			videoRef.current.play();
 		};
 
@@ -23,6 +27,9 @@ export default function Video(props) {
 				videoRef.current.currentTime = 0;
 			}, 1000);
 		};
+
+		const track = props.webAudio.context.createMediaElementSource(videoRef.current);
+		track.connect(props.webAudio.gainNode).connect(props.webAudio.context.destination);
 
 		wrapper.addEventListener('mouseenter', play);
 		wrapper.addEventListener('mouseleave', pause);

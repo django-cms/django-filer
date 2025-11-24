@@ -102,12 +102,29 @@
 				}
 			}
 
+			&.volume-control {
+				margin-left: 1rem;
+				margin-right: auto;
+
+				ul > li {
+					padding: 0.5rem 0.75rem;
+
+					label {
+						display: block;
+					}
+
+					input[type="range"] {
+						vertical-align: initial;
+						padding: 0;
+					}
+				}
+			}
+
 			&[aria-haspopup="listbox"]:has(>[role~="listbox"]) {
 				width: auto;
 			}
 
 			&.sorting-options {
-				margin-left: auto;
 				&:not(:has(+.filter-by-label)) {
 					margin-right: auto;
 				}

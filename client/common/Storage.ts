@@ -61,3 +61,4 @@ export function useCookie(key, initial) : [any, (value: any) => any] {
 
 
 export const useSearchZone = initial => useCookie('django-finder-search-zone', initial);
+export const useAudioSettings = useSessionStorage('filer-audio-settings', {volume: 0.5});

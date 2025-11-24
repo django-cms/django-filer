@@ -1,0 +1,42 @@
+import React from 'react';
+import {useAudioSettings} from '../common/Storage';
+import DropDownMenu from '../common/DropDownMenu';
+import SpeakerLoudIcon from '../icons/speaker-loud.svg';
+import SpeakerSilentIcon from '../icons/speaker-silent.svg';
+import SpeakerMutedicon from '../icons/speaker-muted.svg';
+
+
+export default function VolumeControl(props: any) {
+	const [audioSettings, setAudioSettings] = useAudioSettings();
+
+	function handleChange(event) {
+		const volume = parseFloat(event.target.value);
+		setAudioSettings({volume: volume});
+		props.webAudio.gainNode.gain.setValueAtTime(volume, props.webAudio.context.currentTime);
+	}
+
+	function renderSpeakerIcon() {
+		if (audioSettings.volume === 0.0) {
+			return <SpeakerMutedicon/>;
+		}
+		if (audioSettings.volume < 0.33) {
+			return <SpeakerSilentIcon/>;
+		}
+		return <SpeakerLoudIcon/>;
+	}
+
+	return (
+		<DropDownMenu
+			icon={renderSpeakerIcon()}
+			role="menuitem"
+			className="volume-control"
+			tooltip={gettext("Change volume level")}
+			root={props.root}
+		>
+			<li>
+				<label htmlFor="volume_level">{gettext("Volume level")}:</label>
+				<input name="volume_level" type="range" min="0.0" max="1.0" step="0.001" value={audioSettings.volume} onChange={handleChange}/>
+			</li>
+		</DropDownMenu>
+	);
+}
