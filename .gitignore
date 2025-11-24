@@ -15,7 +15,7 @@
 .tox/
 __pycache__/
 docs/_build/
-dist/
+/dist
 env/
 .venv/
 /*docs/env*/

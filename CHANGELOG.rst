@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+3.4.1 (2025-11-24)
+==================
+
+* fix: Add missing JS bundles and LICENSE file
+
 3.4.0 (2025-11-21)
 ==================
 
