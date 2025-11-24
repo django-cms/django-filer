@@ -50,7 +50,7 @@ Please head over to the separate `documentation <https://django-filer.readthedoc
 for all the details on how to install, configure and use django-filer.
 
 
-.. |PyPiVersion| image:: https://img.shields.io/pypi/v/ngo-fil.svg?style=flat-square
+.. |PyPiVersion| image:: https://img.shields.io/pypi/v/django-filer.svg?style=flat-square
     :target: https://pypi.python.org/pypi/django-filer
     :alt: Latest PyPI version
 
