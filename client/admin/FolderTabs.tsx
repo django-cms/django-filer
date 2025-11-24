@@ -43,36 +43,36 @@ function FolderTab(props) {
 	}
 
 	if (folder.id === 'return') return (
-		<Tooltip placement="top-start">
-			<TooltipTrigger>
-				<li ref={setNodeRef} className={cssClasses(folder)}>
+		<li ref={setNodeRef} className={cssClasses(folder)}>
+			<Tooltip placement="top-start">
+				<TooltipTrigger>
 					<a href={settings.folder_url}><UpIcon /></a>
-				</li>
-			</TooltipTrigger>
-			<TooltipContent>{gettext("Change to folder view")}</TooltipContent>
-		</Tooltip>
+				</TooltipTrigger>
+				<TooltipContent>{gettext("Change to folder view")}</TooltipContent>
+			</Tooltip>
+		</li>
 	);
 
 	if (folder.id === 'parent') return (
-		<Tooltip placement="top-start">
-			<TooltipTrigger>
-				<li ref={setNodeRef} className={cssClasses(folder)}>
+		<li ref={setNodeRef} className={cssClasses(folder)}>
+			<Tooltip placement="top-start">
+				<TooltipTrigger>
 					<a href={settings.parent_url}><UpIcon /></a>
-				</li>
-			</TooltipTrigger>
-			<TooltipContent>{gettext("Change to parent folder")}</TooltipContent>
-		</Tooltip>
+				</TooltipTrigger>
+				<TooltipContent>{gettext("Change to parent folder")}</TooltipContent>
+			</Tooltip>
+		</li>
 	);
 
 	if (folder.is_root) return (
-		<Tooltip placement="top-start">
-			<TooltipTrigger>
-				<li ref={setNodeRef} className={cssClasses(folder)}>
+		<li ref={setNodeRef} className={cssClasses(folder)}>
+			<Tooltip placement="top-start">
+				<TooltipTrigger>
 				{!isActive || isSearchResult ? <a href={folder.change_url}><RootIcon /></a> : <RootIcon />}
-				</li>
-			</TooltipTrigger>
-			<TooltipContent>{gettext("Root folder")}</TooltipContent>
-		</Tooltip>
+				</TooltipTrigger>
+				<TooltipContent>{gettext("Root folder")}</TooltipContent>
+			</Tooltip>
+		</li>
 	);
 
 	const TrashFolder = () => (
