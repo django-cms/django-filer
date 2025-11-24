@@ -37,7 +37,7 @@ function Figure(props) {
 			);
 		}
 		return StaticFigure;
-	},[]);
+	}, []);
 
 	return (
 		<figure className="figure">

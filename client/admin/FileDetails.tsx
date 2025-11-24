@@ -13,7 +13,7 @@ export default function FileDetails(props) {
 			return subtitle.innerHTML;
 		}
 		return '';
-	},[]);
+	}, []);
 
 	return (<>
 		<div className="file-details" style={props.style}>

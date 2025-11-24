@@ -122,7 +122,7 @@ export function ListItem(props) {
 			);
 		}
 		return StaticFigure;
-	},[]);
+	}, []);
 
 	function handleFocus(event) {
 		if (!(event.target.contentEditable))

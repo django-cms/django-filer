@@ -41,7 +41,7 @@ function MenuExtension(props) {
 				<LazyItem {...props} />
 			</Suspense>
 		);
-	},[]);
+	}, []);
 
 	return (
 		<MenuComponent {...props} />
