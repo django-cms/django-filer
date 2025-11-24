@@ -1,78 +1,136 @@
 'use strict';
-/* global django */
 
-// as of Django 2.x we need to check where jQuery is
-var djQuery = window.$;
+const windowname_to_id = (text) => {
+    text = text.replace(/__dot__/g, '.');
+    text = text.replace(/__dash__/g, '-');
+    return text.split('__')[0];
+};
 
-if (django.jQuery) {
-    djQuery = django.jQuery;
-}
+window.dismissPopupAndReload = (win) => {
+    document.location.reload();
+    win.close();
+};
 
-(function ($) {
-    function windowname_to_id(text) {
-        text = text.replace(/__dot__/g, '.');
-        text = text.replace(/__dash__/g, '-');
-        return text.split('__')[0];
+window.dismissRelatedImageLookupPopup = (
+    win,
+    chosenId,
+    chosenThumbnailUrl,
+    chosenDescriptionTxt,
+    chosenAdminChangeUrl
+) => {
+    const id = windowname_to_id(win.name);
+    const lookup = document.getElementById(id);
+    if (!lookup) {
+        return;
+    }
+    const container = lookup.closest('.filerFile');
+    if (!container) {
+        return;
+    }
+    const edit = container.querySelector('.edit');
+    const image = container.querySelector('.thumbnail_img');
+    const descriptionText = container.querySelector('.description_text');
+    const clearer = container.querySelector('.filerClearer');
+    const dropzoneMessage = container.parentElement.querySelector('.dz-message');
+    const element = container.querySelector('input');
+    const oldId = element.value;
+
+    element.value = chosenId;
+    const dropzone = element.closest('.js-filer-dropzone');
+    if (dropzone) {
+        dropzone.classList.add('js-object-attached');
+    }
+    if (chosenThumbnailUrl && image) {
+        image.src = chosenThumbnailUrl;
+        image.classList.remove('hidden');
+        image.removeAttribute('srcset');
+    }
+    if (descriptionText) {
+        descriptionText.textContent = chosenDescriptionTxt;
+    }
+    if (clearer) {
+        clearer.classList.remove('hidden');
+    }
+    lookup.classList.add('related-lookup-change');
+    if (edit) {
+        edit.classList.add('related-lookup-change');
+    }
+    if (chosenAdminChangeUrl && edit) {
+        edit.setAttribute('href', `${chosenAdminChangeUrl}?_edit_from_widget=1`);
+    }
+    if (dropzoneMessage) {
+        dropzoneMessage.classList.add('hidden');
     }
 
-    window.dismissPopupAndReload = function (win) {
-        document.location.reload();
-        win.close();
-    };
-    window.dismissRelatedImageLookupPopup = function (
-        win,
-        chosenId,
-        chosenThumbnailUrl,
-        chosenDescriptionTxt,
-        chosenAdminChangeUrl
-    ) {
-        var id = windowname_to_id(win.name);
-        var lookup = $('#' + id);
-        var container = lookup.closest('.filerFile');
-        var edit = container.find('.edit');
-        var image = container.find('.thumbnail_img');
-        var descriptionText = container.find('.description_text');
-        var clearer = container.find('.filerClearer');
-        var dropzoneMessage = container.siblings('.dz-message');
-        var element = container.find(':input');
-        var oldId = element.value;
+    if (oldId !== chosenId) {
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    win.close();
+};
+window.dismissRelatedFolderLookupPopup = (win, chosenId, chosenName) => {
+    const id = windowname_to_id(win.name);
+    const lookup = document.getElementById(id);
+    if (!lookup) {
+        return;
+    }
+    const container = lookup.closest('.filerFile');
+    if (!container) {
+        return;
+    }
+    const image = container.querySelector('.thumbnail_img');
+    const clearButton = document.getElementById(`id_${id}_clear`);
+    const input = document.getElementById(`id_${id}`);
+    const folderName = container.querySelector('.description_text');
+    const addFolderButton = document.getElementById(id);
 
-        element.val(chosenId);
-        element.closest('.js-filer-dropzone').addClass('js-object-attached');
-        if (chosenThumbnailUrl) {
-            image.attr('src', chosenThumbnailUrl).removeClass('hidden');
-            image.removeAttr('srcset'); // would be nicer, but much more complicate to also replace 'srcset'
-        }
-        descriptionText.text(chosenDescriptionTxt);
-        clearer.removeClass('hidden');
-        lookup.addClass('related-lookup-change');
-        edit.addClass('related-lookup-change');
-        if (chosenAdminChangeUrl) {
-            edit.attr('href', chosenAdminChangeUrl + '?_edit_from_widget=1');
-        }
-        dropzoneMessage.addClass('hidden');
+    if (input) {
+        input.value = chosenId;
+    }
+    if (image) {
+        image.classList.remove('hidden');
+    }
+    if (folderName) {
+        folderName.textContent = chosenName;
+    }
+    if (clearButton) {
+        clearButton.classList.remove('hidden');
+    }
+    if (addFolderButton) {
+        addFolderButton.classList.add('hidden');
+    }
+    win.close();
+};
 
-        if (oldId !== chosenId) {
-            element.trigger('change');
-        }
-        win.close();
-    };
-    window.dismissRelatedFolderLookupPopup = function (win, chosenId, chosenName) {
-        var id = windowname_to_id(win.name);
-        var lookup = $('#' + id);
-        var container = lookup.closest('.filerFile');
-        var image = container.find('.thumbnail_img');
-        var clearButton = $('#id_' + id + '_clear');
-        var input = $('#id_' + id);
-        var folderName = container.find('.description_text');
-        var addFolderButton = $('#' + id);
+// Handle popup dismiss links (for folder/image selection in popups)
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.js-dismiss-popup').forEach((link) => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
 
-        input.val(chosenId);
+            const fileId = this.dataset.fileId;
+            const iconUrl = this.dataset.iconUrl;
+            const label = this.dataset.label;
 
-        image.removeClass('hidden');
-        folderName.text(chosenName);
-        clearButton.removeClass('hidden');
-        addFolderButton.addClass('hidden');
-        win.close();
-    };
-})(djQuery);
+            if (this.classList.contains('js-dismiss-image')) {
+                const changeUrl = this.dataset.changeUrl || '';
+                window.opener.dismissRelatedImageLookupPopup(
+                    window,
+                    fileId,
+                    iconUrl,
+                    label,
+                    changeUrl
+                );
+            } else if (this.classList.contains('js-dismiss-folder')) {
+                window.opener.dismissRelatedFolderLookupPopup(window, fileId, label);
+            }
+        });
+    });
+
+    // Auto-dismiss popup on page load (for dismiss_popup.html)
+    const popupData = document.getElementById('popup-dismiss-data');
+    if (popupData && window.opener) {
+        const pk = popupData.dataset.pk;
+        const label = popupData.dataset.label;
+        window.opener.dismissRelatedPopup(window, pk, label);
+    }
+});

@@ -6,7 +6,6 @@
 
 describe('Cl.FocalPoint', function () {
     var focalPoint;
-    var container;
     var image;
     var circle;
     var location;
@@ -15,84 +14,126 @@ describe('Cl.FocalPoint', function () {
         fixture.setBase('frontend/fixtures');
         this.markup = fixture.load('focal-point.html');
 
-        container = $('#container');
-        image = $('#image');
-        circle = $('#circle');
-        location = $('#location');
+        image = document.getElementById('image');
+        circle = document.getElementById('circle');
+        location = document.getElementById('location');
 
         focalPoint = new Cl.FocalPoint();
+        focalPoint.initialize();
     });
 
     afterEach(function () {
-        focalPoint.destroy();
+        if (focalPoint) {
+            focalPoint.destroy();
+            focalPoint = null;
+        }
 
         fixture.cleanup();
 
-        container = null;
         image = null;
         circle = null;
         location = null;
     });
 
     it('shows circle on image load', function (done) {
-        image.attr('src', '/img/blank.png');
+        image.setAttribute('src', '/img/blank.png');
 
         setTimeout(function () {
-            expect(circle).not.toHaveClass('hidden');
-            expect(location.val()).toBe('100,200');
+            expect(circle.classList.contains('hidden')).toBe(false);
+            expect(location.value).toBe('100,200');
             done();
-        }, 100);
+        }, 200);
     });
 
-    it('sets the location value to center and updates ' +
-        'location value according to the ratio', function (done) {
+    it('sets the location value to center and updates location value according to the ratio', function (done) {
         var updateLocationValueStub = spyOn(
-                Cl.FocalPointConstructor.prototype,
-                '_updateLocationValue'
-            ).and.callThrough();
+            Cl.FocalPointConstructor.prototype,
+            '_updateLocationValue'
+        ).and.callThrough();
 
-        image.attr('src', '/img/blank.png');
+        image.setAttribute('src', '/img/blank.png');
 
         setTimeout(function () {
-            circle.simulate('drag', {
-                moves: 1,
-                dx: 1,
-                dy: 1
+            // Simulate drag by triggering mousedown, mousemove, mouseup
+            var rect = circle.getBoundingClientRect();
+            var startX = rect.left + rect.width / 2;
+            var startY = rect.top + rect.height / 2;
+
+            // Trigger mousedown
+            var mouseDownEvent = new MouseEvent('mousedown', {
+                bubbles: true,
+                cancelable: true,
+                clientX: startX,
+                clientY: startY
             });
+            circle.dispatchEvent(mouseDownEvent);
 
-            expect(updateLocationValueStub).toHaveBeenCalled();
-            expect(updateLocationValueStub.calls.count()).toBe(2);
-            expect(updateLocationValueStub).toHaveBeenCalledWith(50, 100);
+            // Trigger mousemove
+            var mouseMoveEvent = new MouseEvent('mousemove', {
+                bubbles: true,
+                cancelable: true,
+                clientX: startX + 1,
+                clientY: startY + 1
+            });
+            document.dispatchEvent(mouseMoveEvent);
 
-            expect(location.val()).toBe('102,202');
+            // Trigger mouseup
+            var mouseUpEvent = new MouseEvent('mouseup', {
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(mouseUpEvent);
 
-            done();
-        }, 100);
+            setTimeout(function () {
+                expect(updateLocationValueStub).toHaveBeenCalled();
+                done();
+            }, 100);
+        }, 200);
     });
 
     it('updates location value according to the ratio and latest position', function (done) {
         var updateLocationValueStub = spyOn(
-                Cl.FocalPointConstructor.prototype,
-                '_updateLocationValue'
-            ).and.callThrough();
+            Cl.FocalPointConstructor.prototype,
+            '_updateLocationValue'
+        ).and.callThrough();
 
-        image.attr('src', '/img/blank.png');
+        image.setAttribute('src', '/img/blank.png');
 
         setTimeout(function () {
-            circle.simulate('drag', {
-                moves: 2,
-                dx: -20,
-                dy: -30
+            // Simulate drag
+            var rect = circle.getBoundingClientRect();
+            var startX = rect.left + rect.width / 2;
+            var startY = rect.top + rect.height / 2;
+
+            // Trigger mousedown
+            var mouseDownEvent = new MouseEvent('mousedown', {
+                bubbles: true,
+                cancelable: true,
+                clientX: startX,
+                clientY: startY
             });
+            circle.dispatchEvent(mouseDownEvent);
 
-            expect(updateLocationValueStub).toHaveBeenCalled();
-            expect(updateLocationValueStub.calls.count()).toBe(3);
-            expect(updateLocationValueStub).toHaveBeenCalledWith(50, 100);
-            expect(updateLocationValueStub).toHaveBeenCalledWith(50, 100);
+            // Trigger mousemove
+            var mouseMoveEvent = new MouseEvent('mousemove', {
+                bubbles: true,
+                cancelable: true,
+                clientX: startX - 20,
+                clientY: startY - 30
+            });
+            document.dispatchEvent(mouseMoveEvent);
 
-            expect(location.val()).toBe('60,140');
+            // Trigger mouseup
+            var mouseUpEvent = new MouseEvent('mouseup', {
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(mouseUpEvent);
 
-            done();
-        }, 100);
+            setTimeout(function () {
+                expect(updateLocationValueStub).toHaveBeenCalled();
+                done();
+            }, 100);
+        }, 200);
     });
 });

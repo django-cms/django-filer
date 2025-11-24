@@ -19,7 +19,7 @@ dependencies = [
     "django>=3.2",
     "django-polymorphic",
     "easy-thumbnails[svg]",
-    
+
     # Pin svglib to a version below 1.6.0.
     # The latest version (1.6.0) adds pycairo as a dependency,
     # which requires system-level libraries and fails to install in the container.
@@ -35,17 +35,18 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Framework :: Django",
     "Framework :: Django :: 3.2",
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "Framework :: Django CMS",
     "Framework :: Django CMS :: 3.11",
     "Framework :: Django CMS :: 4.0",
@@ -134,3 +135,4 @@ known_django = ["django"]
 [tool.ruff]
 src = ["filer"]
 exclude = ["*/migrations/*"]
+line-length = 119

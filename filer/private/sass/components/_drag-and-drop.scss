@@ -23,7 +23,7 @@ form .form-row {
         position: relative;
         min-width: 215px;
         border: solid 1px $gray-lighter;
-        border-radius: $border-radius-base;
+        border-radius: $border-radius-normal;
         background-color: $gray-lightest;
         box-sizing: border-box !important;
         .z-index-fix {
@@ -171,7 +171,7 @@ form .form-row {
             margin-right: 10px;
         }
         .filerFile .related-lookup {
-            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
+            @include button-variant($btn-action-color, var(--primary), $btn-action-border, true);
             float: left !important;
             overflow: hidden;
             // makes true that button has correct height #668
@@ -265,13 +265,13 @@ form .form-row {
                 height: 80px;
                 margin-right: 10px;
                 border: solid 1px $gray-lighter;
-                border-radius: $border-radius-base;
+                border-radius: 0;
                 vertical-align: top;
                 &[src*="nofile"] {
                     box-sizing: border-box;
                     margin-right: 0;
                     border: solid 1px $gray-lighter;
-                    border-radius: $border-radius-base;
+                    border-radius: 0;
                 }
             }
             // required for django CMS <= 3.1

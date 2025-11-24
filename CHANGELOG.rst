@@ -2,6 +2,14 @@
 CHANGELOG
 =========
 
+3.4.0 (2025-11-21)
+==================
+
+* feat: Add Django 6.0 support
+* feat: Add CSP support by collecting all JS code in bundles
+* fix: preserve "limit search to folder" state in pagination links #1553 by @benzkji in https://github.com/django-cms/django-filer/pull/1555
+
+
 3.3.3 / 2025-11-07
 ==================
 
