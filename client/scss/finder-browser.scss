@@ -13,7 +13,7 @@
 		padding: 0;
 		outline: gray thin dotted;
 
-		>img, >span {
+		>div {
 			width: 180px;
 			height: 180px;
 			border-radius: 0.125rem;
@@ -24,6 +24,11 @@
 
 			&:hover {
 				cursor: pointer;
+			}
+
+			img[src$=".svg"] {
+				width: 80%;
+				height: 80%;
 			}
 		}
 

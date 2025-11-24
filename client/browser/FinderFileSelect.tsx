@@ -168,7 +168,9 @@ export default function FinderFileSelect(props) {
 		<slot ref={slotRef} />
 		<div className="finder-file-select">
 			<figure>{selectedFile ? <>
-				<img src={selectedFile.thumbnail_url} onClick={openDialog} onDragEnter={openDialog} />
+				<div>
+					<img src={selectedFile.thumbnail_url} onClick={openDialog} onDragEnter={openDialog} />
+				</div>
 				<figcaption>
 					<dl>
 						<dt>{gettext("Name")}:</dt>
@@ -189,9 +191,9 @@ export default function FinderFileSelect(props) {
 					<button className="remove-file-button" type="button" onClick={removeFile}>{gettext("Remove")}</button>
 				</figcaption>
 			</> :
-				<span onClick={openDialog} onDragEnter={openDialog}>
+				<div onClick={openDialog} onDragEnter={openDialog}>
 					<p>{gettext("Select File")}</p>
-				</span>
+				</div>
 			}</figure>
 		</div>
 		<dialog ref={dialogRef}>
