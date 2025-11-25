@@ -13,7 +13,7 @@ import React, {
 import {useInView} from 'react-intersection-observer';
 import FigureLabels from '../common/FigureLabels';
 import FileUploader from '../common/FileUploader';
-import {useSearchZone} from '../common/Storage';
+import {useAudioSettings, useSearchZone} from '../common/Storage';
 import BrowserEditor from './BrowserEditor';
 import FolderStructure from './FolderStructure';
 import MenuBar from './MenuBar';
@@ -71,14 +71,14 @@ function ScrollSpy(props) {
 
 
 const FilesList = memo((props: any) => {
-	const {structure, setDirty, selectFile} = props;
+	const {structure, setDirty, selectFile, webAudio} = props;
 
 	return (
 		<ul className="files-browser">{
 		structure.files.length === 0 ?
 			<li className="status">{gettext("Empty folder")}</li> : (
 			<>{structure.files.map(file => (
-			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} /></li>
+			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} webAudio={webAudio} /></li>
 			))}
 			{structure.offset !== null && <ScrollSpy key={structure.offset} setDirty={setDirty} />}
 			</>
@@ -101,12 +101,28 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	const [isDirty, setDirty] = useState(false);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
+	const [audioSettings] = useAudioSettings();
+	const [webAudio, setWebAudio] = useState(null);
 	const menuBarRef = useRef(null);
 	const [uploadedFile, setUploadedFile] = useState(null);
 	const [currentFolderElement, setCurrentFolderElement] = useState(null);
 	const [searchZone, setSearchZone] = useSearchZone('current');
 
 	useImperativeHandle(forwardedRef, () => ({scrollToCurrentFolder, dismissAndClose}));
+
+	useEffect(() => {
+		const context = new window.AudioContext();
+		const gainNode = context.createGain();
+		gainNode.connect(context.destination);
+		gainNode.gain.value = audioSettings.volume;
+		setWebAudio({context, gainNode});
+
+		return () => {
+			if (webAudio) {
+				webAudio.context.close();
+			}
+		};
+	}, []);
 
 	useEffect(() => {
 		if (structure.root_folder === null) {
@@ -279,6 +295,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 					setSearchQuery={setSearchQuery}
 					searchZone={searchZone}
 					setSearchZone={changeSearchZone}
+					webAudio={webAudio}
 				/>
 				<div className="browser-body">
 					<nav className="folder-structure">
@@ -308,6 +325,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 							structure={structure}
 							setDirty={setDirty}
 							selectFile={selectFile}
+							webAudio={webAudio}
 						/>
 					}</FileUploader>
 				</div>
