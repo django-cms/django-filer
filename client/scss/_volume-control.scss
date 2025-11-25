@@ -1,0 +1,15 @@
+@mixin volume-control {
+	ul > li {
+		padding: 0.5rem 0.75rem;
+
+		label {
+			display: block;
+			color: inherit;
+		}
+
+		input[type="range"] {
+			vertical-align: initial;
+			padding: 0;
+		}
+	}
+}

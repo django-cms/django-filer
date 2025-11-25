@@ -1,4 +1,5 @@
 @use "colors";
+@use "volume-control";
 
 @mixin menubar {
 	[role="menubar"] {
@@ -106,18 +107,7 @@
 				margin-left: 1rem;
 				margin-right: auto;
 
-				ul > li {
-					padding: 0.5rem 0.75rem;
-
-					label {
-						display: block;
-					}
-
-					input[type="range"] {
-						vertical-align: initial;
-						padding: 0;
-					}
-				}
+				@include volume-control.volume-control;
 			}
 
 			&[aria-haspopup="listbox"]:has(>[role~="listbox"]) {
@@ -125,6 +115,7 @@
 			}
 
 			&.sorting-options {
+				margin-left: auto;
 				&:not(:has(+.filter-by-label)) {
 					margin-right: auto;
 				}

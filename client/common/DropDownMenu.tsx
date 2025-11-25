@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 
 
-export default function DropDownMenu(props){
+export default function DropDownMenu(props) {
 	const ref = useRef(null);
 	const WrapperElement = props.wrapperElement ?? 'li';
 
@@ -45,7 +45,8 @@ export default function DropDownMenu(props){
 			aria-haspopup="listbox"
 			aria-expanded="false"
 			className={props.className}
-		>
+		>{
+		props.tooltip ? (
 			<Tooltip>
 				<TooltipTrigger>{props.label ? props.label : ''}{props.icon && <i>{props.icon}</i>}</TooltipTrigger>
 				<TooltipContent root={props.root}>{props.tooltip}</TooltipContent>
@@ -53,6 +54,14 @@ export default function DropDownMenu(props){
 					{props.children}
 				</ul>
 			</Tooltip>
-		</WrapperElement>
+		) : (
+			<>
+				<div>{props.label ? props.label : ''}{props.icon && <i>{props.icon}</i>}</div>
+				<ul role="listbox">
+					{props.children}
+				</ul>
+			</>
+		)
+		}</WrapperElement>
 	)
 }

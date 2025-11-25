@@ -5,6 +5,7 @@
 @use "progress";
 @use "labels";
 @use "tooltip";
+@use "volume-control";
 
 // messagelist appears after saving a file
 ul.messagelist {
@@ -759,20 +760,27 @@ ul.messagelist {
 				background: var(--default-button-bg);
 				margin-right: 10px;
 				margin-bottom: 10px;
+
 				&[aria-expanded="false"] {
 					cursor: pointer;
 					&:hover {
 						background: var(--default-button-hover-bg);
 					}
 				}
+
 				&::after {
 					margin-left: 10px;
 					border-top-color: var(--button-fg);
 				}
+				&.volume-control {
+					@include volume-control.volume-control;
+				}
+
 				[role="listbox"] {
 					color: inherit;
 					background-color: inherit;
 					padding: 5px;
+
 					> li {
 						padding: 0 30px 0 10px;
 						cursor: pointer;

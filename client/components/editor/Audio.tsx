@@ -2,6 +2,8 @@ import React, {Fragment, useState} from 'react';
 import WavesurferPlayer from '@wavesurfer/react';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import FileDetails from '../../admin/FileDetails';
+import {useAudioSettings} from '../../common/Storage';
+import DropDownMenu from '../../common/DropDownMenu';
 import PauseIcon from '../../icons/pause.svg';
 import PlayIcon from '../../icons/play.svg';
 
@@ -14,6 +16,7 @@ export default function Audio(props) {
 	};
 	const [wavesurfer, setWavesurfer] = useState(null);
 	const [isPlaying, setIsPlaying] = useState(false);
+	const [audioSettings, setAudioSettings] = useAudioSettings();
 
 	const onReady = (ws) => {
 		document.getElementById('wavesurfer-initializing')?.remove();
@@ -42,11 +45,23 @@ export default function Audio(props) {
 		wavesurfer && wavesurfer.playPause();
 	};
 
+	function setVolume(event) {
+		const volume = parseFloat(event.target.value);
+		setAudioSettings({volume: volume});
+		wavesurfer && wavesurfer.setVolume(volume);
+	}
+
 	const controlButtons = [
 		<Fragment key="play-pause">{isPlaying ?
 			<button type="button" onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
 			<button type="button" onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
-		}</Fragment>
+		}</Fragment>,
+		<DropDownMenu key="volume-control" className="volume-control with-caret" label={gettext("Set Volume")}>
+			<li>
+				<label htmlFor="volume_level">{gettext("Volume level")}:</label>
+				<input name="volume_level" type="range" min="0.0" max="1.0" step="0.001" value={audioSettings.volume} onChange={setVolume}/>
+			</li>
+		</DropDownMenu>,
 	];
 
 	const placeholderStyle: React.CSSProperties = {
