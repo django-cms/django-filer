@@ -5,6 +5,7 @@ import FileSelectDialog from './FileSelectDialog';
 interface SelectedFolder {
 	id: string;
 	name: string;
+	created_at: string;
 	last_modified_at: string;
 	summary: string;
 	meta_data: object;
@@ -16,6 +17,7 @@ function parseDataset(dataset: string|object) : SelectedFolder|null {
 		const {
 			id,
 			name,
+			created_at,
 			last_modified_at,
 			summary,
 			meta_data,
@@ -23,6 +25,7 @@ function parseDataset(dataset: string|object) : SelectedFolder|null {
 		return {
 			id,
 			name,
+			created_at,
 			last_modified_at,
 			summary,
 			meta_data,
@@ -158,6 +161,10 @@ export default function FinderFolderSelect(props) {
 					<dl>
 						<dt>{gettext("Details")}:</dt>
 						<dd>{selectedFolder.summary}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Created at")}:</dt>
+						<dd>{renderTimestamp(selectedFolder.created_at)}</dd>
 					</dl>
 					<dl>
 						<dt>{gettext("Modified at")}:</dt>

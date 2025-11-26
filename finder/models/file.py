@@ -171,6 +171,7 @@ class AbstractFileModel(InodeModel):
             'file_size': self.file_size,
             'sha1': self.sha1,
             'mime_type': self.mime_type,
+            'created_at': self.created_at.replace(microsecond=0, tzinfo=None),
             'last_modified_at': self.last_modified_at.replace(microsecond=0, tzinfo=None),
             'summary': self.summary,
             'meta_data': self.get_meta_data(),
