@@ -6,6 +6,17 @@ import SpeakerSilentIcon from '../icons/speaker-silent.svg';
 import SpeakerMutedicon from '../icons/speaker-muted.svg';
 
 
+export function renderSpeakerIcon(volume) {
+	if (volume === 0.0) {
+		return <SpeakerMutedicon/>;
+	}
+	if (volume < 0.33) {
+		return <SpeakerSilentIcon/>;
+	}
+	return <SpeakerLoudIcon/>;
+}
+
+
 export default function VolumeControl(props: any) {
 	const [audioSettings, setAudioSettings] = useAudioSettings();
 
@@ -15,19 +26,9 @@ export default function VolumeControl(props: any) {
 		props.webAudio.gainNode.gain.setValueAtTime(volume, props.webAudio.context.currentTime);
 	}
 
-	function renderSpeakerIcon() {
-		if (audioSettings.volume === 0.0) {
-			return <SpeakerMutedicon/>;
-		}
-		if (audioSettings.volume < 0.33) {
-			return <SpeakerSilentIcon/>;
-		}
-		return <SpeakerLoudIcon/>;
-	}
-
 	return (
 		<DropDownMenu
-			icon={renderSpeakerIcon()}
+			icon={renderSpeakerIcon(audioSettings.volume)}
 			role="menuitem"
 			className="volume-control"
 			tooltip={gettext("Change volume level")}

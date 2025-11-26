@@ -724,8 +724,8 @@ ul.messagelist {
 			margin-bottom: 10px;
 			display: flex;
 			flex-wrap: wrap;
-			button, a {
-				display: block;
+			button, a, [role="combobox"] {
+				display: flex;
 				appearance: none;
 				border: none;
 				font-weight: 400;
@@ -743,6 +743,10 @@ ul.messagelist {
 				&[disabled] {
 					opacity: 0.4;
 					cursor: not-allowed;
+				}
+
+				i {
+					vertical-align: middle;
 				}
 
 				svg {

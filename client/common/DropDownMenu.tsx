@@ -48,7 +48,7 @@ export default function DropDownMenu(props) {
 		>{
 		props.tooltip ? (
 			<Tooltip>
-				<TooltipTrigger>{props.label ? props.label : ''}{props.icon && <i>{props.icon}</i>}</TooltipTrigger>
+				<TooltipTrigger>{props.icon && <i>{props.icon}</i>}{props.label ? props.label : ''}</TooltipTrigger>
 				<TooltipContent root={props.root}>{props.tooltip}</TooltipContent>
 				<ul role="listbox">
 					{props.children}
@@ -56,7 +56,7 @@ export default function DropDownMenu(props) {
 			</Tooltip>
 		) : (
 			<>
-				<div>{props.label ? props.label : ''}{props.icon && <i>{props.icon}</i>}</div>
+				<div>{props.icon && <i>{props.icon}</i>}{props.label ? props.label : ''}</div>
 				<ul role="listbox">
 					{props.children}
 				</ul>

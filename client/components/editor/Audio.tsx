@@ -4,6 +4,7 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
 import FileDetails from '../../admin/FileDetails';
 import {useAudioSettings} from '../../common/Storage';
 import DropDownMenu from '../../common/DropDownMenu';
+import {renderSpeakerIcon} from '../../common/VolumeControl';
 import PauseIcon from '../../icons/pause.svg';
 import PlayIcon from '../../icons/play.svg';
 
@@ -56,7 +57,13 @@ export default function Audio(props) {
 			<button type="button" onClick={onPlayPause}><PauseIcon/>{gettext("Pause")}</button> :
 			<button type="button" onClick={onPlayPause}><PlayIcon/>{gettext("Play")}</button>
 		}</Fragment>,
-		<DropDownMenu key="volume-control" className="volume-control with-caret" label={gettext("Set Volume")}>
+		<DropDownMenu
+			key="volume-control"
+			className="volume-control with-caret"
+			label={gettext("Set Volume")}
+			icon={renderSpeakerIcon(audioSettings.volume)}
+			wrapperElement="div"
+		>
 			<li>
 				<label htmlFor="volume_level">{gettext("Volume level")}:</label>
 				<input name="volume_level" type="range" min="0.0" max="1.0" step="0.001" value={audioSettings.volume} onChange={setVolume}/>
