@@ -4,6 +4,7 @@ import FileSelectDialog from './FileSelectDialog';
 
 interface SelectedFile {
 	id: string;
+	parent: string;
 	name: string;
 	file_name: string;
 	file_size: number;
@@ -22,6 +23,7 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 	if (data) {
 		const {
 			id,
+			parent,
 			name,
 			file_name,
 			file_size,
@@ -36,6 +38,7 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 		} = data;
 		return {
 			id,
+			parent,
 			name,
 			file_name,
 			file_size,
@@ -204,6 +207,8 @@ export default function FinderFileSelect(props) {
 				mimeTypes={mimeTypes}
 				csrfToken={csrfToken}
 				selectFile={selectFile}
+				selectedFileId={selectedFile?.id}
+				selectedFolderId={selectedFile?.parent}
 				dialogRef={dialogRef}
 			/>
 		</dialog>
