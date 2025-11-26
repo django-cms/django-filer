@@ -8,7 +8,7 @@ import RootIcon from '../icons/root.svg';
 
 
 function FolderEntry(props) {
-	const {folder, toggleOpen, selectFolder, setCurrentFolderId, openRecursive, isCurrent, isListed, setCurrentFolderElement} = props;
+	const {folder, toggleOpen, selectFolder, openRecursive, isCurrent, isSelected, isListed, setCurrentFolderElement} = props;
 	const ref = useRef(null);
 
 	if (folder.is_root) {
@@ -26,7 +26,7 @@ function FolderEntry(props) {
 			folder.is_open ? <ArrowDownIcon/> : <ArrowRightIcon/>
 		}</i> : <i><EmptyIcon/></i>}
 		<i onClick={() => openRecursive()} role="button">{isListed || isCurrent ? <FolderOpenIcon/> : <FolderIcon/>}</i>
-		<span onClick={() => selectFolder(folder)} ref={isCurrent ? ref : null} aria-current={isCurrent} role="button">
+		<span onClick={() => selectFolder(folder)} ref={isCurrent ? ref : null} aria-current={isCurrent} aria-selected={isSelected} role="button">
 			{folder.name}
 		</span>
 	</>);
@@ -34,7 +34,7 @@ function FolderEntry(props) {
 
 
 export default function FolderStructure(props) {
-	const {baseUrl, folder, lastFolderId, selectFolder, toggleRecursive, refreshStructure, setCurrentFolderId, setCurrentFolderElement} = props;
+	const {baseUrl, folder, lastFolderId, selectFolder, selectedFolderId, toggleRecursive, refreshStructure, setCurrentFolderId, setCurrentFolderElement} = props;
 	const isListed = props.isListed === false ? lastFolderId === folder.id : props.isListed;
 	const isCurrent = lastFolderId === folder.id;
 
@@ -90,6 +90,7 @@ export default function FolderStructure(props) {
 				openRecursive={openRecursive}
 				isCurrent={isCurrent}
 				isListed={isListed}
+				isSelected={folder.id === selectedFolderId}
 				setCurrentFolderId={setCurrentFolderId}
 				setCurrentFolderElement={setCurrentFolderElement}
 			/>
@@ -102,6 +103,7 @@ export default function FolderStructure(props) {
 					folder={child}
 					lastFolderId={lastFolderId}
 					selectFolder={selectFolder}
+					selectedFolderId={selectedFolderId}
 					toggleRecursive={toggleRecursive}
 					refreshStructure={refreshStructure}
 					isListed={isListed}

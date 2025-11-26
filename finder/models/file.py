@@ -165,6 +165,7 @@ class AbstractFileModel(InodeModel):
     def as_dict(self, realm):
         return {
             'id': self.id,
+            'parent': self.folder.id,
             'name': self.name,
             'file_name': self.file_name,
             'file_size': self.file_size,

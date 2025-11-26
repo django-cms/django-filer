@@ -43,7 +43,7 @@ function Figure(props) {
 		<figure className="figure">
 			<FigBody {...props}>
 				<FigureLabels labels={props.labels}>
-					<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+					<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} aria-selected={props.isSelected} />
 				</FigureLabels>
 			</FigBody>
 			<figcaption>
@@ -71,14 +71,16 @@ function ScrollSpy(props) {
 
 
 const FilesList = memo((props: any) => {
-	const {structure, setDirty, selectFile, webAudio} = props;
+	const {structure, setDirty, selectFile, selectedFileId, webAudio} = props;
 
 	return (
 		<ul className="files-browser">{
 		structure.files.length === 0 ?
 			<li className="status">{gettext("Empty folder")}</li> : (
 			<>{structure.files.map(file => (
-			<li key={file.id} onClick={() => selectFile(file)}><Figure {...file} webAudio={webAudio} /></li>
+			<li key={file.id} onClick={() => selectFile(file)}>
+				<Figure {...file} webAudio={webAudio} isSelected={file.id === selectedFileId} />
+			</li>
 			))}
 			{structure.offset !== null && <ScrollSpy key={structure.offset} setDirty={setDirty} />}
 			</>
@@ -189,8 +191,10 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	}
 
 	async function initializeStructure() {
+		const params = new URLSearchParams();
+		mimeTypes?.forEach(type => params.append('mimetypes', type));
 		setDirty(false);
-		const response = await fetch(`${baseUrl}structure/${realm}`);
+		const response = await fetch(`${baseUrl}structure/${realm}${params.size === 0 ? '' : `?${params.toString()}`}`);
 		if (response.ok) {
 			setStructure(await response.json());
 		} else {
@@ -244,10 +248,11 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 	}, []);
 
 	const selectFolder = useCallback(folder => {
-		setCurrentFolderId(folder.id);
 		if (props.selectFolder) {
 			props.selectFolder(folder);
 			props.dialogRef.current.close();
+		} else if (structure.last_folder !== folder.id) {
+			setCurrentFolderId(folder.id);
 		}
 	}, [structure.last_folder]);
 
@@ -299,19 +304,20 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 				/>
 				<div className="browser-body">
 					<nav className="folder-structure">
-						<ul role="navigation">
-							{structure.root_folder && <FolderStructure
+						<ul role="navigation">{
+							structure.root_folder && <FolderStructure
 								baseUrl={baseUrl}
 								folder={structure.root_folder}
 								lastFolderId={structure.last_folder}
 								selectFolder={selectFolder}
+								selectedFolderId={props.selectedFolderId}
 								toggleRecursive={toggleRecursive}
 								refreshStructure={() => setStructure({...structure})}
 								isListed={structure.recursive ? false : null}
 								setCurrentFolderId={setCurrentFolderId}
 								setCurrentFolderElement={setCurrentFolderElement}
-							/>}
-						</ul>
+							/>
+						}</ul>
 					</nav>
 					<FileUploader
 						folderId={structure.last_folder}
@@ -325,6 +331,7 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 							structure={structure}
 							setDirty={setDirty}
 							selectFile={selectFile}
+							selectedFileId={props.selectedFileId}
 							webAudio={webAudio}
 						/>
 					}</FileUploader>

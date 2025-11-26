@@ -178,6 +178,7 @@ export default function FinderFolderSelect(props) {
 				baseUrl={baseUrl}
 				csrfToken={csrfToken}
 				selectFolder={selectFolder}
+				selectedFolderId={selectedFolder?.id}
 				dialogRef={dialogRef}
 			/>
 		</dialog>

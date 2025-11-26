@@ -149,11 +149,17 @@ dialog {
 				span[role="button"] {
 					cursor: pointer;
 
-					&[aria-current="true"] {
+					&[aria-selected="true"] {
 						font-weight: bold;
 					}
 
-					&:hover {
+					&[aria-current="true"] {
+						text-decoration: underline;
+						text-decoration-style: solid;
+						text-decoration-color: #000000;
+					}
+
+					&:not([aria-current="true"]):hover {
 						text-decoration: underline;
 						text-decoration-style: dashed;
 						text-decoration-color: #808080;
@@ -208,7 +214,12 @@ dialog {
 						border-radius: 0.25rem;
 					}
 
-					img:not([src$=".svg"]), video {
+					img[aria-selected="true"] {
+						box-shadow: 0 0 0.5rem colors.$active-rectangle;
+						border: 1px solid colors.$active-rectangle;
+					}
+
+					img[aria-selected="false"]:not([src$=".svg"]), video {
 						box-shadow: 0 0 0.5rem #808080;
 					}
 
