@@ -30,7 +30,7 @@ class BrowserView(View):
     The view for web component <finder-browser>.
     """
     action = None
-    limit = 25
+    limit = 50
 
     def dispatch(self, request, *args, **kwargs):
         if self.action is None:
