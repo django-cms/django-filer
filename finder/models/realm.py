@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.functional import cached_property
@@ -6,12 +8,18 @@ from django.utils.translation import gettext_lazy as _
 from django.core.files.storage import storages
 
 
+logger = logging.getLogger(__name__)
+
+
 class RealmModelManager(models.Manager):
     def get_default(self, slug=None):
-        site = Site.objects.get_current()
         if slug is None:
             slug = 'admin'
-        return self.get(site=site, slug=slug)
+        try:
+            site = Site.objects.get_current()
+            return self.get(site=site, slug=slug)
+        except Exception:
+            logger.warning("Failed to get default realm")
 
 
 class RealmModel(models.Model):
