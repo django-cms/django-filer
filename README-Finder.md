@@ -50,13 +50,16 @@ while preserving the possibility to perform queries across all tables. This allo
 models inheriting from the `AbstractFileModel` without the need of **django-polymorphic**, and thus
 a join between two or more tables for each query.
 
-The Admin interface has also been completely rewritten and allows multi-tenant usage out of the box.
-For instance, there is no more list view for the `FolderModel` and the `FileModel` (or any
-specialized implementation). Instead, there are only details views for each of those models. This is
-much nearer to what a user would expect from a file system. Therefore, if a user wants to access the
-list view of a folder, he is redirected immediately to the detail view of the root folder of the
-given tenant. From there, he can traverse the folder tree in the same manner he's used to from his
-operating system.
+Each root folder is associated with a *realm*. A realm is a named area inside the file system, which
+can be used to separate files and folders of different tenants. Each realm has its own root folder.
+By using realms, it is possible to use **django-filer** in a multi-tenant environment.
+
+The Admin interface has also been completely rewritten. For instance, there is no more list view for
+the `FolderModel` and the `FileModel` (or any specialized implementation). Instead, there are only
+details views for each of those models. This is much nearer to what a user would expect from a file
+system. Therefore, if a user wants to access the list view of a folder, he is redirected immediately
+to the detail view of the root folder of the given tenant. From there, he can traverse the folder
+tree in the same manner he's used to from his operating system.
 
 
 ## New User Interface
@@ -95,8 +98,8 @@ ancestors. This allows to easily move files between those folders.
 ### Multiple Favrourite Folders
 
 Each user can have multiple favourite folders. This allows him to quickly access those folders from
-the navigation bar. It also it pssoble to drag a file from the current view into one of the tabs for
-of the favorite folders.
+the navigation bar. It is also possible to drag a file from the current view into one of the tabs
+for of the favorite folders.
 
 
 ### Implementation Details
@@ -142,7 +145,56 @@ If you use:
 * `finder.contrib.audio` or `finder.contrib.video`, assure that `ffmpeg-python` is installed.
 * `finder.contrib.image.pil`, assure that `Pillow` is installed.
 * `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
-* Postgres as database, install `psycopg2` or `psycopg2-binary` if available for your platform.
+* Postgres as a database, install `psycopg2` or `psycopg2-binary` if available for your platform.
+
+Each realm requires two storage backends. One for the public files and one for their thumbnails
+and/or samples. Add these storage backends to the `STORAGES` setting in your `settings.py`:
+
+```python
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+    'finder_public': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': '/path/to/your/media/filer_public',
+            'base_url': '/media/filer_public/',
+            'allow_overwrite': True,
+        },
+    },
+    'finder_public_samples': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': '/path/to/your/media/filer_public_thumbnails',
+            'base_url': '/media/filer_public_thumbnails/',
+            'allow_overwrite': True,
+        },
+    },
+}
+```
+
+If instead of using the local file system you want to use another storage backend, such as Amazon S3
+or Google Cloud Storage, configure the corresponding storage backend in the `STORAGES` setting as:
+
+```python
+STORAGES = {
+    ...
+    'finder_public': {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {...},
+    },
+    'finder_public_samples': {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {...},
+    },
+}
+```
+
+Note that multiple realms can share the same storage location or bucket.
 
 Run the migrations for app `finder`:
 

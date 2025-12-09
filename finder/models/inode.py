@@ -4,7 +4,7 @@ from functools import reduce
 from operator import and_, or_
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError, ObjectDoesNotExist
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import F, Value, Q
@@ -166,10 +166,13 @@ class InodeManagerMixin:
             folder_qs = FolderModel.objects.none()
         elif (folder_qs := FolderModel.objects.filter(**lookup)).exists():
             return folder_qs.get()
-        values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
-            model.objects.values('id', 'mime_type').filter(self.get_query(model, lookup))
-            for model in FileModel.get_models()
-        ]).get()
+        try:
+            values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
+                model.objects.values('id', 'mime_type').filter(self.get_query(model, lookup))
+                for model in FileModel.get_models()
+            ]).get()
+        except FolderModel.DoesNotExist:
+            raise self.model.DoesNotExist(f"No inode found matching the given lookup: {lookup}.")
         return FileModel.objects.get_model_for(values['mime_type']).objects.get(id=values['id'])
 
     @classmethod

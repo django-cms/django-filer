@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def forward(self):
         site = Site.objects.get(id=settings.SITE_ID)
-        owner = FilerFolder.objects.filter(parent__isnull=True, owner__isnull=False).first().owner
+        owner = FilerFolder.objects.filter(parent__isnull=True).first().owner
         try:
             realm = FinderRealmModel.objects.get(site=site, slug=admin_site.name)
         except FinderRealmModel.DoesNotExist:
@@ -35,8 +35,9 @@ class Command(BaseCommand):
             self.migrate_folder(filer_folder, realm.root_folder)
 
     def migrate_folder(self, filer_folder, finder_parent):
-        finder_folder = finder_parent.listdir(name=filer_folder.name, is_folder=True).first()
-        if finder_folder is None:
+        if finder_folder := finder_parent.listdir(name=filer_folder.name, is_folder=True).first():
+            finder_folder = FinderFolder.objects.get(id=finder_folder['id'])
+        else:
             finder_folder = FinderFolder.objects.create(
                 name=filer_folder.name,
                 parent=finder_parent,
@@ -44,7 +45,7 @@ class Command(BaseCommand):
                 last_modified_at=filer_folder.modified_at,
                 owner_id=filer_folder.owner_id,
             )
-            self.stdout.write(f"Create folder {finder_folder} in {finder_parent}")
+            self.stdout.write(f"Create folder “{finder_folder}” in “{finder_parent}”.")
 
         allowed_image_types = ['image/gif', 'image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
         for filer_file in filer_folder.files.all():
@@ -60,8 +61,11 @@ class Command(BaseCommand):
         path = Path(filer_file.file.name)
         inode_id = path.parent.stem
         try:
-            finder_file = FinderFile.objects.get_inode(id=inode_id)
+            finder_file = FinderFile.objects.get(id=inode_id)
         except FinderFile.DoesNotExist:
+            if not filer_file._file_size:
+                self.stderr.write(f"File {filer_file} has no file size.")
+                return
             FinderFile.objects.create(
                 id=inode_id,
                 name=filer_file.name if filer_file.name else filer_file.original_filename,
@@ -91,15 +95,19 @@ class Command(BaseCommand):
         meta_data = {'alt_text': getattr(filer_image, 'default_alt_text', '')}
         try:
             center_x, center_y = map(float, filer_image.subject_location.split(','))
-            # since Filer does not store the area of interest, we assume it is 10px
-            meta_data['crop_x'] = center_x - 5
-            meta_data['crop_y'] = center_y - 5
-            meta_data['crop_size'] = 10
+            # since Filer does not store the area of interest, we assume it's 20% of its width or height
+            crop_size = int(round(max(filer_image.width, filer_image.height) * 0.2))
+            meta_data['crop_x'] = center_x - crop_size / 2
+            meta_data['crop_y'] = center_y - crop_size / 2
+            meta_data['crop_size'] = crop_size
         except ValueError:
             pass
         try:
-            finder_image = FinderImage.objects.get_inode(id=inode_id)
-        except FinderFile.DoesNotExist:
+            finder_image = FinderImage.objects.get(id=inode_id)
+        except FinderImage.DoesNotExist:
+            if not filer_image._file_size:
+                self.stderr.write(f"Image {filer_image} has no file size.")
+                return
             FinderImage.objects.create(
                 id=inode_id,
                 name=filer_image.name if filer_image.name else filer_image.original_filename,
