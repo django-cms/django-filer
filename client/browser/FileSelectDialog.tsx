@@ -71,12 +71,12 @@ function ScrollSpy(props) {
 
 
 const FilesList = memo((props: any) => {
-	const {structure, setDirty, selectFile, selectedFileId, webAudio} = props;
+	const {structure, setDirty, isDirty, selectFile, selectedFileId, webAudio} = props;
 
 	return (
 		<ul className="files-browser">{
 		structure.files.length === 0 ?
-			<li className="status">{gettext("Empty folder")}</li> : (
+			(!isDirty && <li className="status">{gettext("Empty folder")}</li>) : (
 			<>{structure.files.map(file => (
 			<li key={file.id} onClick={() => selectFile(file)}>
 				<Figure {...file} webAudio={webAudio} isSelected={file.id === selectedFileId} />
@@ -197,6 +197,13 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		const response = await fetch(`${baseUrl}structure/${realm}${params.size === 0 ? '' : `?${params.toString()}`}`);
 		if (response.ok) {
 			setStructure(await response.json());
+			window.setTimeout(() => {
+				// first show the structure from the root for orientation, then scroll to the current folder
+				const currentListItem = ref.current.querySelector('ul[role="navigation"] li:has(>[aria-current="true"]');
+				if (currentListItem) {
+					currentListItem.scrollIntoView({behavior: 'smooth', block: 'center'});
+				}
+			}, 999);
 		} else {
 			console.error(response);
 		}
@@ -324,17 +331,20 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 						handleUpload={handleUpload}
 						ref={uploaderRef}
 						settings={{csrf_token: csrfToken, base_url: baseUrl}}
-					>{
-						structure.files === null ?
-						<div className="status">{gettext("Loading files…")}</div> :
+					>{Array.isArray(structure.files) ?
 						<FilesList
 							structure={structure}
 							setDirty={setDirty}
+							isDirty={isDirty}
 							selectFile={selectFile}
 							selectedFileId={props.selectedFileId}
 							webAudio={webAudio}
 						/>
-					}</FileUploader>
+						:
+						<div className="status">{gettext("Loading structure…")}</div>
+					}
+					{isDirty && <div className="status">{gettext("Loading files…")}</div>}
+					</FileUploader>
 				</div>
 			</>}
 		</div>
