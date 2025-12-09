@@ -20,8 +20,6 @@ class Command(BaseCommand):
                 self.reorganize()
             elif subcmd == 'reorder':
                 self.reorder()
-            elif subcmd == 'migrate-filer':
-                call_command('filer_to_finder', verbosity=verbosity)
             else:
                 self.stderr.write(f"Unknown subcommand ‘{subcmd}’")
 
