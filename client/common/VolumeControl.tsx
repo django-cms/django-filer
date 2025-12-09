@@ -1,9 +1,10 @@
 import React from 'react';
 import {useAudioSettings} from '../common/Storage';
 import DropDownMenu from '../common/DropDownMenu';
-import SpeakerLoudIcon from '../icons/speaker-loud.svg';
-import SpeakerSilentIcon from '../icons/speaker-silent.svg';
 import SpeakerMutedicon from '../icons/speaker-muted.svg';
+import SpeakerSilentIcon from '../icons/speaker-silent.svg';
+import SpeakerMediumIcon from '../icons/speaker-medium.svg';
+import SpeakerLoudIcon from '../icons/speaker-loud.svg';
 
 
 export function renderSpeakerIcon(volume) {
@@ -12,6 +13,9 @@ export function renderSpeakerIcon(volume) {
 	}
 	if (volume < 0.33) {
 		return <SpeakerSilentIcon/>;
+	}
+	if (volume < 0.66) {
+		return <SpeakerMediumIcon/>;
 	}
 	return <SpeakerLoudIcon/>;
 }
