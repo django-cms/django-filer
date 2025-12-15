@@ -27,7 +27,7 @@ ul.messagelist {
 	position: relative;
 }
 
-#content {
+#content:has(#content-react) {
 	padding: 0;
 	h1 {
 		margin: 10px 20px;
@@ -71,7 +71,7 @@ ul.messagelist {
 			display: list-item;
 			list-style: none;
 			margin: -5px 2px -1px 2px;
-			padding: 6px 14px;
+			padding: 6px 12px;
 			font-size: 16px;
 			font-weight: bold;
 			border: 1px solid colors.$border-color;
@@ -103,6 +103,7 @@ ul.messagelist {
 			span {
 				cursor: pointer;
 				margin-left: 5px;
+				margin-right: -5px;
 				color: var(--link-fg);
 				border-radius: 50%;
 				display: inline-block;
