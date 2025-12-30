@@ -35,9 +35,9 @@ jobs:
             python-version: 3.14
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: library prerequisites
@@ -56,4 +56,4 @@ jobs:
     - name: Run coverage
       run: coverage run ./tests/settings.py
     - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v5
