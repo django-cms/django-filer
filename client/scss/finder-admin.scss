@@ -1,9 +1,9 @@
 @use "dropdown";
 @use "menubar";
+@use "downshift";
 @use "sass:meta";
 @use "colors";
 @use "progress";
-@use "labels";
 @use "tooltip";
 @use "volume-control";
 
@@ -806,7 +806,7 @@ ul.messagelist {
 		}
 	}
 
-	@include labels.labels;
+	@include downshift.select;
 	@include dropdown.dropdown;
 }
 

@@ -26,11 +26,11 @@ function EditorForm(props) {
 			}
 
 			// replace the original <select multiple name="labels"> element with the "downshift" component
-			if (labelsElement.nextElementSibling?.classList.contains('select-labels-container')) {
+			if (labelsElement.nextElementSibling?.classList.contains('select-container')) {
 				labelsElement.nextElementSibling.remove();
 			}
 			const divElement = document.createElement('div');
-			divElement.classList.add('select-labels-container');
+			divElement.classList.add('select-container');
 			labelsElement.insertAdjacentElement('afterend', divElement);
 			const root = createRoot(divElement);
 			root.render(<SelectLabels labels={settings.labels} initial={initial} original={labelsElement}/>);

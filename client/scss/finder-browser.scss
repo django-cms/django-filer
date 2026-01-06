@@ -1,5 +1,5 @@
 @use "dropdown";
-@use "labels";
+@use "downshift";
 @use "menubar";
 @use "sass:meta";
 @use "colors";
@@ -317,9 +317,9 @@ dialog {
 					}
 				}
 
-				@include labels.labels;
+				@include downshift.select;
 
-				.select-labels-field [role="listbox"] {
+				.select-field [role="listbox"] {
 					top: auto;
 					bottom: 100%;
 					margin-block-end: 2px;

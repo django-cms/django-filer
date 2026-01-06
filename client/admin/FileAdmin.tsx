@@ -41,7 +41,7 @@ export default function FileAdmin() {
 
 				// replace the original <select multiple name="labels"> element with the "downshift" component
 				const divElement = document.createElement('div');
-				divElement.classList.add('select-labels-container');
+				divElement.classList.add('select-container');
 				labelsElement.insertAdjacentElement('afterend', divElement);
 				labelsElement.style.display = 'none';
 				const root = createRoot(divElement);
