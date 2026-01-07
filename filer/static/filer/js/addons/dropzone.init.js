@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropzones = row?.querySelectorAll(dropzoneSelector) || [];
             }
 
-            dropzones.forEach?.(createDropzone);
+            dropzones?.forEach(createDropzone);
         });
     }
 });
