@@ -33,7 +33,7 @@ class FolderModel(InodeModel):
     class Meta:
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
-        default_permissions = ['read', 'write']
+        default_permissions = []
         constraints = [models.UniqueConstraint(fields=['parent', 'name'], name='unique_realm')]
 
     objects = FolderModelManager()

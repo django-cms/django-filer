@@ -36,6 +36,7 @@ class ImageFileModel(AbstractFileModel):
 
     class Meta:
         app_label = 'finder'
+        default_permissions = []
 
     @cached_property
     def summary(self):

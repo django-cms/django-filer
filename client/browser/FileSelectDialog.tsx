@@ -90,7 +90,7 @@ const FilesList = memo((props: any) => {
 
 
 const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
-	const {realm, baseUrl, mimeTypes, csrfToken} = props;
+	const {realm, baseUrl, selectedFolderId, mimeTypes, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
 		last_folder: null,
@@ -192,6 +192,9 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 
 	async function initializeStructure() {
 		const params = new URLSearchParams();
+		if (selectedFolderId) {
+			params.append('folder', selectedFolderId);
+		}
 		mimeTypes?.forEach(type => params.append('mimetypes', type));
 		setDirty(false);
 		const response = await fetch(`${baseUrl}structure/${realm}${params.size === 0 ? '' : `?${params.toString()}`}`);

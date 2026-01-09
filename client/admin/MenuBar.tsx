@@ -6,9 +6,11 @@ import React, {
 	useEffect,
 	useImperativeHandle,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import SearchField from './SearchField';
+import PermissionDialog from './PermissionDialog';
 import DropDownMenu from '../common/DropDownMenu';
 import VolumeControl from '../common/VolumeControl';
 import FilterByLabel from '../common/FilterByLabel';
@@ -26,11 +28,11 @@ import ClipboardIcon from '../icons/clipboard.svg';
 import TrashIcon from '../icons/trash.svg';
 import EraseIcon from '../icons/erase.svg';
 import AddFolderIcon from '../icons/add-folder.svg';
+import LockIcon from '../icons/lock.svg';
 import DownloadIcon from '../icons/download.svg';
 import UndoIcon from '../icons/undo.svg';
 import UploadIcon from '../icons/upload.svg';
 import FolderUploadIcon from '../icons/folder-upload.svg';
-
 
 
 function MenuExtension(props) {
@@ -63,6 +65,7 @@ function ExtraMenu(props) {
 		copyInodes,
 		clearClipboard,
 		deselectAll,
+		permissionDialogRef,
 	} = props;
 
 	async function addFolder() {
@@ -106,6 +109,9 @@ function ExtraMenu(props) {
 		>
 			<li role="option" onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
+			</li>
+			<li role="option" onClick={() => permissionDialogRef.current.show()}>
+				<LockIcon/><span>{gettext("Edit folder permissions")}</span>
 			</li>
 			<li role="option" onClick={() => openUploader(false)}>
 				<UploadIcon/><span>{gettext("Upload local files")}</span>
@@ -165,6 +171,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	} = props;
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
+	const permissionDialogRef = useRef(null);
 
 	useImperativeHandle(forwardedRef, () => ({
 		setSelected: (selectedInodes) => {
@@ -347,8 +354,8 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	return (
-		// <nav aria-label={gettext("Finder List View")}>
+	return (<>
+		<nav aria-label={gettext("Finder List View")}>
 			<ul role="menubar">
 				<li className="search-field" role="menuitem">
 					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
@@ -392,13 +399,14 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 						copyInodes={copyInodes}
 						clearClipboard={clearClipboard}
 						deselectAll={deselectAll}
+						permissionDialogRef={permissionDialogRef}
 						{...props}
 					/>
 				</>)}
 			</ul>
-		//</nav>
-	);
+		</nav>
+		<PermissionDialog ref={permissionDialogRef} settings={settings} />
+	</>);
 });
-
 
 export default MenuBar;

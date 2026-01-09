@@ -22,6 +22,7 @@ except ImportError:  # psycopg2 is not installed
 class GroupConcat(Aggregate):
     """
     To be used on SQLite, MySQL and MariaDB databases. For Postgres, use `StringAgg`.
+    In Django-6.0, use StringAgg
     """
     function = 'GROUP_CONCAT'
     template = '%(function)s(%(distinct)s %(expressions)s)'
@@ -261,6 +262,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     class Meta:
         abstract = True
+        default_permissions = []
 
     def __str__(self):
         return self.name

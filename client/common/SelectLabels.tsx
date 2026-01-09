@@ -59,7 +59,7 @@ export default function SelectLabels(props) {
 					break;
 			}
 		},
-	})
+	});
 
 	function removeLabel(event: React.MouseEvent, label: Label) {
 		event.stopPropagation();

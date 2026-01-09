@@ -1,0 +1,103 @@
+@use "colors";
+
+@mixin dialog {
+	dialog {
+		z-index: 1;
+		border: 1px solid colors.$border-color;
+		border-radius: 4px;
+		box-shadow: 0 0 8px colors.$border-color;
+		display: flex;
+		flex-direction: column;
+		width: max-content;
+		top: 100px;
+		padding-top: 3px;
+		padding-bottom: 3px;
+		padding-inline-start: 3px;
+		padding-inline-end: 3px;
+
+		&:not([open]) {
+			display: none;
+		}
+
+		h3 {
+			margin: 0;
+			padding: 0.5rem;
+			font-size: 1.25rem;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		table {
+			td {
+				font-size: 1rem;
+				line-height: 1rem;
+				vertical-align: middle;
+				border-bottom: 1px solid var(--hairline-color);
+				padding: 8px;
+
+				svg {
+					vertical-align: middle;
+					width: 24px;
+				}
+
+				&:last-child svg {
+					padding-inline-start: 0.5rem;
+					cursor: pointer;
+				}
+			}
+
+			tbody {
+				// display: block;
+				max-height: 150px;
+				overflow-y: auto;
+
+				//tr {
+				//	display: table;
+				//	width: 100%;
+				//	table-layout: fixed;
+				//}
+
+				td:first-child svg {
+					padding-inline-end: 0.5rem;
+				}
+			}
+
+			tfoot {
+				td:first-child {
+					.select-field {
+						min-width: 216px;
+					}
+
+					svg {
+						padding-inline-start: 0.25rem;
+						padding-inline-end: 0.25rem;
+					}
+
+					input {
+						flex-grow: 1;
+					}
+				}
+			}
+		}
+
+		[aria-disabled="true"] {
+			opacity: 0.5;
+			pointer-events: none;
+			cursor: not-allowed;
+		}
+
+		[role~="listbox"] {
+			[role~="option"][aria-selected="true"]::after {
+				content: none;
+			}
+
+			li {
+				padding: 0 2rem 0 0.5rem;
+			}
+		}
+
+		.button-group {
+			justify-content: flex-end;
+		}
+	}
+}

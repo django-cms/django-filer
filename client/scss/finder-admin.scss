@@ -1,5 +1,6 @@
 @use "dropdown";
 @use "menubar";
+@use "dialog";
 @use "downshift";
 @use "sass:meta";
 @use "colors";
@@ -54,11 +55,7 @@ ul.messagelist {
 		top: 36px;
 	}
 
-	//nav {
-		//margin: 4px 0;
-
-		@include menubar.menubar;
-	//}
+	@include menubar.menubar;
 
 	ul.folder-tabs {
 		display: flex;
@@ -133,6 +130,8 @@ ul.messagelist {
 			}
 		}
 	}
+
+	@include dialog.dialog;
 
 	.work-area {
 		width: 100%;
@@ -721,11 +720,17 @@ ul.messagelist {
 		}
 
 		div.button-group {
-			margin-top: 10px;
 			margin-bottom: 10px;
+		}
+
+	}
+
+	div.button-group {
 			display: flex;
 			flex-wrap: wrap;
-			button, a, [role="combobox"] {
+			margin-top: 10px;
+
+			button, a, [role~="combobox"] {
 				display: flex;
 				appearance: none;
 				border: none;
@@ -745,6 +750,9 @@ ul.messagelist {
 					opacity: 0.4;
 					cursor: not-allowed;
 				}
+				&.with-caret::after {
+					border-top-color: colors.$body-bg-color;
+				}
 
 				i {
 					vertical-align: middle;
@@ -756,7 +764,7 @@ ul.messagelist {
 					width: 20px;
 				}
 			}
-			[role="combobox"] {
+			[role~="combobox"] {
 				font-weight: 400;
 				border-radius: 4px;
 				padding: 5px 15px;
@@ -781,7 +789,7 @@ ul.messagelist {
 					@include volume-control.volume-control;
 				}
 
-				[role="listbox"] {
+				[role~="listbox"] {
 					color: inherit;
 					background-color: inherit;
 					padding: 5px;
@@ -804,7 +812,6 @@ ul.messagelist {
 				}
 			}
 		}
-	}
 
 	@include downshift.select;
 	@include dropdown.dropdown;

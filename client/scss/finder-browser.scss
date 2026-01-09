@@ -96,7 +96,7 @@ dialog {
 
 	@include menubar.menubar;
 
-	ul[role="menubar"] {
+	ul[role~="menubar"] {
 		flex-shrink: 0;
 		border-bottom: 1px solid #808080;
 		padding-bottom: 0.5rem;
@@ -146,7 +146,7 @@ dialog {
 					margin-right: 0.5em;
 				}
 
-				span[role="button"] {
+				span[role~="button"] {
 					cursor: pointer;
 
 					&[aria-selected="true"] {
@@ -319,7 +319,7 @@ dialog {
 
 				@include downshift.select;
 
-				.select-field [role="listbox"] {
+				.select-field [role~="listbox"] {
 					top: auto;
 					bottom: 100%;
 					margin-block-end: 2px;

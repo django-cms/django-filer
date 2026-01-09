@@ -3,7 +3,6 @@
 @mixin select {
 	.select-container {
 		flex-grow: 1;
-		margin-right: 1rem;
 		box-sizing: border-box;
 
 		.select-field {
@@ -15,13 +14,26 @@
 			color: colors.$body-fg-color;
 			background-color: colors.$body-bg-color;
 
+			&:has(input:focus-visible) {
+				outline-width: 1px;
+			}
+
+			input {
+				height: 18px;
+				border: none;
+
+				&:focus-visible {
+					outline-width: 0;
+				}
+			}
+
 			.toggle-dropdown {
 				position: absolute;
 				display: inline-flex;
 				align-self: stretch;
 				justify-content: center;
 				inset: 0 0 0 auto;
-				width: 2rem;
+				width: 1rem;
 				cursor: pointer;
 
 				&::after {
@@ -30,6 +42,7 @@
 					align-self: center;
 					transform: rotate(180deg);
 					margin-top: -3px;
+					font-size: 12px;
 				}
 
 				&[aria-expanded="true"]::after {
