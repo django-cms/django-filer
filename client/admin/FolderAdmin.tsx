@@ -126,7 +126,7 @@ export default function FolderAdmin() {
 		}
 	};
 
-	const deselectAll = (event?)=> {
+	const deselectAll = (event?) => {
 		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
 			columnRef.current?.deselectInodes();
 		});
