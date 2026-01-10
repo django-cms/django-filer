@@ -2,7 +2,6 @@ import React, {
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
-	useLayoutEffect,
 	useRef,
 	useState,
 } from 'react';
@@ -144,6 +143,7 @@ function PrivilegeTypeIcon(props) {
 const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 	const {settings} = props;
 	const dialogRef = useRef<HTMLDialogElement>(null);
+	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const selectPrincipalRef = useRef(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const [newPrincipal, setNewPrincipal] = useState(null);
@@ -154,13 +154,17 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 		show: () => setIsOpen(true),
 	}));
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (dialogRef.current?.open && !isOpen) {
 			dialogRef.current.close();
 		} else if (!dialogRef.current?.open && isOpen) {
 			fetchPermissions().then(() => dialogRef.current.show());
 		}
-	}, [isOpen])
+	}, [isOpen]);
+
+	useEffect(() => {
+		tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
+	}, [acl]);
 
 	async function fetchPermissions() {
 		const url = `${settings.base_url}${settings.folder_id}/permissions`;
@@ -226,7 +230,7 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 						<th>{gettext("Privilege")}</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody ref={tbodyRef}>
 				{acl.map((ace, index) => (
 					<tr key={`ace-${index}`}>
 						<td aria-label={`${ace.type}: ${ace.name}`}>
