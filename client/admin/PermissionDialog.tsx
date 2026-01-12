@@ -1,10 +1,12 @@
 import React, {
 	forwardRef,
+	useCallback,
 	useEffect,
 	useImperativeHandle,
 	useRef,
 	useState,
 } from 'react';
+import {useDraggable, DragStartEvent, DragMoveEvent, DragEndEvent} from '@dnd-kit/core';
 import {useCombobox} from 'downshift';
 import AddEntryIcon from '../icons/add-entry.svg';
 import EveryoneIcon from '../icons/everyone.svg';
@@ -42,7 +44,6 @@ const SelectPrincipal = forwardRef((props: any, forwardedRef) => {
 			return item ? item.name : ''
 		},
 		onInputValueChange({inputValue, type}) {
-			console.log(type, inputValue);
 			setInputValue(inputValue);
 			if (type === useCombobox.stateChangeTypes.InputChange) {
 				fetchPrincipals(new URLSearchParams({q: inputValue}));
@@ -81,9 +82,6 @@ const SelectPrincipal = forwardRef((props: any, forwardedRef) => {
 			console.error(response);
 		}
 	}
-
-	console.log(isOpen);
-	console.log(selectedItem);
 
 	return (
 		<div className="select-field">
@@ -149,10 +147,27 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 	const [newPrincipal, setNewPrincipal] = useState(null);
 	const [newPrivilege, setNewPrivilege] = useState('r');
 	const [acl, setAcl] = useState<AccessControlEntry[]>([]);
+	const [offset, setOffset] = useState({x: 0, y: 0});
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+	} = useDraggable({
+		id: 'permission-dialog',
+	});
 
 	useImperativeHandle(forwardedRef, () => ({
 		show: () => setIsOpen(true),
+		handleDragStart: () => setOffset({x: offset.x, y: offset.y}),
+		handleDragEnd: () => setOffset({x: transform.x + offset.x, y: transform.y + offset.y}),
 	}));
+
+	// combined ref: assign dialog element to both dialogRef and dnd-kit setNodeRef
+	const combinedRef = useCallback((element: HTMLDialogElement) => {
+		dialogRef.current = element;
+		setNodeRef(element);
+	}, [setNodeRef]);
 
 	useEffect(() => {
 		if (dialogRef.current?.open && !isOpen) {
@@ -191,6 +206,7 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 		setNewPrincipal(null);
 		setNewPrivilege('r');
 		setIsOpen(false);
+		setOffset({x: 0, y: 0});
 	}
 
 	async function applyACL() {
@@ -220,9 +236,15 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 		};
 	}
 
+	const dialogStyle : React.CSSProperties = {
+		transform: transform
+			? `translate(${transform.x + offset.x}px, ${transform.y + offset.y}px)`
+			: `translate(${offset.x}px, ${offset.y}px)`,
+	};
+
 	return (
-		<dialog ref={dialogRef}>
-			<h3>{gettext("Folder Permissions")}</h3>
+		<dialog ref={combinedRef} style={dialogStyle}>
+			<h3 {...listeners} {...attributes}>{gettext("Folder Permissions")}</h3>
 			<table>
 				<thead>
 					<tr>

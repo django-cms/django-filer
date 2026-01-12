@@ -9,6 +9,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
+import {DndContext} from '@dnd-kit/core';
 import SearchField from './SearchField';
 import PermissionDialog from './PermissionDialog';
 import DropDownMenu from '../common/DropDownMenu';
@@ -354,59 +355,65 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		}
 	}
 
-	return (<>
-		<nav aria-label={gettext("Finder List View")}>
-			<ul role="menubar">
-				<li className="search-field" role="menuitem">
-					<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
-				</li>
-				<VolumeControl {...props} />
-				<MenuItem aria-selected={layout === 'tiles'} onClick={() => setLayout('tiles')} tooltip={gettext("Tiles view")}>
-					<TilesIcon/>
-				</MenuItem>
-				<MenuItem aria-selected={layout === 'mosaic'} onClick={() => setLayout('mosaic')} tooltip={gettext("Mosaic view")}>
-					<MosaicIcon/>
-				</MenuItem>
-				<MenuItem aria-selected={layout === 'list'} onClick={() => setLayout('list')} tooltip={gettext("List view")}>
-					<ListIcon/>
-				</MenuItem>
-				<MenuItem aria-selected={layout === 'columns'} onClick={() => setLayout('columns')} tooltip={gettext("Columns view")}>
-					<ColumnsIcon/>
-				</MenuItem>
-				<SortingOptions refreshFilesList={refreshColumns} />
-				{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
-				<MenuItem aria-disabled={numSelectedInodes === 0} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
-					<CutIcon/>
-				</MenuItem>
-				{settings.is_trash ? (<>
-					<MenuItem aria-disabled={numSelectedInodes === 0} onClick={undoDiscardInodes} tooltip={gettext("Undo discarding files/folders")}>
-						<UndoIcon/>
+	return (
+		<DndContext
+			onDragStart={event => permissionDialogRef.current.handleDragStart(event)}
+			onDragEnd={event => permissionDialogRef.current.handleDragEnd(event)}
+			autoScroll={false}
+		>
+			<nav aria-label={gettext("Finder List View")}>
+				<ul role="menubar">
+					<li className="search-field" role="menuitem">
+						<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
+					</li>
+					<VolumeControl {...props} />
+					<MenuItem aria-selected={layout === 'tiles'} onClick={() => setLayout('tiles')} tooltip={gettext("Tiles view")}>
+						<TilesIcon/>
 					</MenuItem>
-					<MenuItem className="erase" onClick={confirmEraseTrashFolder} tooltip={gettext("Empty trash folder")}>
-						<EraseIcon/>
+					<MenuItem aria-selected={layout === 'mosaic'} onClick={() => setLayout('mosaic')} tooltip={gettext("Mosaic view")}>
+						<MosaicIcon/>
 					</MenuItem>
-				</>) : (<>
-					<MenuItem aria-disabled={clipboard.length === 0} onClick={pasteInodes} tooltip={gettext("Paste from clipboard")}>
-						<PasteIcon/>
+					<MenuItem aria-selected={layout === 'list'} onClick={() => setLayout('list')} tooltip={gettext("List view")}>
+						<ListIcon/>
 					</MenuItem>
-					<MenuItem aria-disabled={numSelectedInodes === 0} onClick={deleteInodes} tooltip={gettext("Move selected to trash folder")}>
-						<TrashIcon/>
+					<MenuItem aria-selected={layout === 'columns'} onClick={() => setLayout('columns')} tooltip={gettext("Columns view")}>
+						<ColumnsIcon/>
 					</MenuItem>
-					<ExtraMenu
-						numSelectedFiles={numSelectedFiles}
-						numSelectedInodes={numSelectedInodes}
-						numClippedInodes={clipboard.length}
-						copyInodes={copyInodes}
-						clearClipboard={clearClipboard}
-						deselectAll={deselectAll}
-						permissionDialogRef={permissionDialogRef}
-						{...props}
-					/>
-				</>)}
-			</ul>
-		</nav>
-		<PermissionDialog ref={permissionDialogRef} settings={settings} />
-	</>);
+					<SortingOptions refreshFilesList={refreshColumns} />
+					{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
+					<MenuItem aria-disabled={numSelectedInodes === 0} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
+						<CutIcon/>
+					</MenuItem>
+					{settings.is_trash ? (<>
+						<MenuItem aria-disabled={numSelectedInodes === 0} onClick={undoDiscardInodes} tooltip={gettext("Undo discarding files/folders")}>
+							<UndoIcon/>
+						</MenuItem>
+						<MenuItem className="erase" onClick={confirmEraseTrashFolder} tooltip={gettext("Empty trash folder")}>
+							<EraseIcon/>
+						</MenuItem>
+					</>) : (<>
+						<MenuItem aria-disabled={clipboard.length === 0} onClick={pasteInodes} tooltip={gettext("Paste from clipboard")}>
+							<PasteIcon/>
+						</MenuItem>
+						<MenuItem aria-disabled={numSelectedInodes === 0} onClick={deleteInodes} tooltip={gettext("Move selected to trash folder")}>
+							<TrashIcon/>
+						</MenuItem>
+						<ExtraMenu
+							numSelectedFiles={numSelectedFiles}
+							numSelectedInodes={numSelectedInodes}
+							numClippedInodes={clipboard.length}
+							copyInodes={copyInodes}
+							clearClipboard={clearClipboard}
+							deselectAll={deselectAll}
+							permissionDialogRef={permissionDialogRef}
+							{...props}
+						/>
+					</>)}
+				</ul>
+			</nav>
+			<PermissionDialog ref={permissionDialogRef} settings={settings} />
+		</DndContext>
+	);
 });
 
 export default MenuBar;
