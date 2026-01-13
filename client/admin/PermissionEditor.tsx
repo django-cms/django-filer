@@ -6,8 +6,8 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import {useDraggable, DragStartEvent, DragMoveEvent, DragEndEvent} from '@dnd-kit/core';
 import {useCombobox} from 'downshift';
+import Dialog from './Dialog';
 import AddEntryIcon from '../icons/add-entry.svg';
 import EveryoneIcon from '../icons/everyone.svg';
 import GroupIcon from '../icons/group.svg';
@@ -138,46 +138,24 @@ function PrivilegeTypeIcon(props) {
 }
 
 
-const PermissionDialog = forwardRef((props: any, forwardedRef) => {
+const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	const {settings} = props;
-	const dialogRef = useRef<HTMLDialogElement>(null);
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const selectPrincipalRef = useRef(null);
-	const [isOpen, setIsOpen] = useState(false);
 	const [newPrincipal, setNewPrincipal] = useState(null);
 	const [newPrivilege, setNewPrivilege] = useState('r');
 	const [acl, setAcl] = useState<AccessControlEntry[]>([]);
+	const [isOpen, setIsOpen] = useState(false);
 	const [offset, setOffset] = useState({x: 0, y: 0});
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		transform,
-	} = useDraggable({
-		id: 'permission-dialog',
-	});
 
 	useImperativeHandle(forwardedRef, () => ({
-		show: () => setIsOpen(true),
-		handleDragStart: () => setOffset({x: offset.x, y: offset.y}),
-		handleDragEnd: () => setOffset({x: transform.x + offset.x, y: transform.y + offset.y}),
+		show: () => fetchPermissions().then(() => setIsOpen(true)),
+		handleDragStart: (event) => {},
+		handleDragEnd: (event) => setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));
 
-	// combined ref: assign dialog element to both dialogRef and dnd-kit setNodeRef
-	const combinedRef = useCallback((element: HTMLDialogElement) => {
-		dialogRef.current = element;
-		setNodeRef(element);
-	}, [setNodeRef]);
-
 	useEffect(() => {
-		if (dialogRef.current?.open && !isOpen) {
-			dialogRef.current.close();
-		} else if (!dialogRef.current?.open && isOpen) {
-			fetchPermissions().then(() => dialogRef.current.show());
-		}
-	}, [isOpen]);
-
-	useEffect(() => {
+		// after adding a permission, scroll to bottom of tbody to make it appear
 		tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
 	}, [acl]);
 
@@ -236,15 +214,8 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 		};
 	}
 
-	const dialogStyle : React.CSSProperties = {
-		transform: transform
-			? `translate(${transform.x + offset.x}px, ${transform.y + offset.y}px)`
-			: `translate(${offset.x}px, ${offset.y}px)`,
-	};
-
 	return (
-		<dialog ref={combinedRef} style={dialogStyle}>
-			<h3 {...listeners} {...attributes}>{gettext("Folder Permissions")}</h3>
+		<Dialog id="permission-dialog" label={gettext("Folder Permissions")} isOpen={isOpen} offset={offset}>
 			<table>
 				<thead>
 					<tr>
@@ -269,7 +240,7 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 				))}
 				{acl.length === 0 && (
 					<tr>
-						<td colSpan={2}><em>{gettext("Permissions haven't been set.")}</em></td>
+						<td colSpan={3}><em>{gettext("Permissions haven't been set.")}</em></td>
 					</tr>
 				)}
 				</tbody>
@@ -297,8 +268,8 @@ const PermissionDialog = forwardRef((props: any, forwardedRef) => {
 				<button onClick={() => dismissDialog()}>{gettext("Dismiss")}</button>
 				<button onClick={() => applyACL()}>{gettext("Apply")}</button>
 			</div>
-		</dialog>
+		</Dialog>
 	);
 });
 
-export default PermissionDialog;
+export default PermissionEditor;

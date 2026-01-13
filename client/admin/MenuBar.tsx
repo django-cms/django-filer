@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import {DndContext} from '@dnd-kit/core';
 import SearchField from './SearchField';
-import PermissionDialog from './PermissionDialog';
+import PermissionEditor from './PermissionEditor';
 import DropDownMenu from '../common/DropDownMenu';
 import VolumeControl from '../common/VolumeControl';
 import FilterByLabel from '../common/FilterByLabel';
@@ -411,7 +411,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					</>)}
 				</ul>
 			</nav>
-			<PermissionDialog ref={permissionDialogRef} settings={settings} />
+			<PermissionEditor ref={permissionDialogRef} settings={settings} />
 		</DndContext>
 	);
 });
