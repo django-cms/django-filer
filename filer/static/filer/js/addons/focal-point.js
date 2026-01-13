@@ -14,7 +14,7 @@ window.Cl = window.Cl || {};
                 locationSelector: '.js-focal-point-location',
                 draggableClass: 'draggable',
                 hiddenClass: 'hidden',
-                dataLocation: 'location-selector',
+                dataLocation: 'locationSelector',
                 ...options
             };
             this.focalPointInstances = [];
@@ -24,6 +24,7 @@ window.Cl = window.Cl || {};
         _init(container) {
             const focalPointInstance = new FocalPointConstructor(container, this.options);
             this.focalPointInstances.push(focalPointInstance);
+            console.log(this.options);
         }
 
         initialize() {
@@ -58,7 +59,7 @@ window.Cl = window.Cl || {};
                 locationSelector: '.js-focal-point-location',
                 draggableClass: 'draggable',
                 hiddenClass: 'hidden',
-                dataLocation: 'location-selector',
+                dataLocation: 'locationSelector',
                 ...options
             };
 
