@@ -14,7 +14,7 @@ window.Cl = window.Cl || {};
                 locationSelector: '.js-focal-point-location',
                 draggableClass: 'draggable',
                 hiddenClass: 'hidden',
-                dataLocation: 'location-selector',
+                dataLocation: 'locationSelector',
                 ...options
             };
             this.focalPointInstances = [];
@@ -24,6 +24,7 @@ window.Cl = window.Cl || {};
         _init(container) {
             const focalPointInstance = new FocalPointConstructor(container, this.options);
             this.focalPointInstances.push(focalPointInstance);
+            console.log(this.options);
         }
 
         initialize() {
@@ -58,7 +59,7 @@ window.Cl = window.Cl || {};
                 locationSelector: '.js-focal-point-location',
                 draggableClass: 'draggable',
                 hiddenClass: 'hidden',
-                dataLocation: 'location-selector',
+                dataLocation: 'locationSelector',
                 ...options
             };
 
@@ -128,8 +129,8 @@ window.Cl = window.Cl || {};
 
             // Get current circle position (center)
             const circleRect = this.circle.getBoundingClientRect();
-            this.circleStartX = circleRect.left - containerRect.left + circleRect.width;
-            this.circleStartY = circleRect.top - containerRect.top + circleRect.height;
+            this.circleStartX = circleRect.left - containerRect.left + circleRect.width / 2;
+            this.circleStartY = circleRect.top - containerRect.top + circleRect.height / 2;
 
             document.addEventListener('mousemove', this._onMouseMove);
             document.addEventListener('mouseup', this._onMouseUp);
@@ -161,17 +162,13 @@ window.Cl = window.Cl || {};
             let centerX = this.circleStartX + deltaX;
             let centerY = this.circleStartY + deltaY;
 
-            // Get circle dimensions
-            const circleRect = this.circle.getBoundingClientRect();
-            const halfCircle = circleRect.width / 2;
-
             // Constrain center to container bounds
-            centerX = Math.max(halfCircle, Math.min(containerRect.width + halfCircle, centerX));
-            centerY = Math.max(halfCircle, Math.min(containerRect.height + halfCircle, centerY));
+            centerX = Math.max(0, Math.min(containerRect.width - 1, centerX));
+            centerY = Math.max(0, Math.min(containerRect.height - 1, centerY));
 
             // Position circle by its top-left corner (center - radius)
-            this.circle.style.left = `${centerX - halfCircle}px`;
-            this.circle.style.top = `${centerY - halfCircle}px`;
+            this.circle.style.left = `${centerX}px`;
+            this.circle.style.top = `${centerY}px`;
 
             // Update location value with center coordinates
             this._updateLocationValue(centerX, centerY);
@@ -213,9 +210,8 @@ window.Cl = window.Cl || {};
 
             // Position circle (accounting for circle size)
             if (this.circle) {
-                const circleRect = this.circle.getBoundingClientRect();
-                this.circle.style.left = `${x - circleRect.width / 2}px`;
-                this.circle.style.top = `${y - circleRect.height / 2}px`;
+                this.circle.style.left = `${x}px`;
+                this.circle.style.top = `${y}px`;
             }
 
             this._makeDraggable();
