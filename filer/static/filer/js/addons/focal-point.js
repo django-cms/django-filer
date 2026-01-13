@@ -210,7 +210,6 @@ window.Cl = window.Cl || {};
 
             // Position circle (accounting for circle size)
             if (this.circle) {
-                const circleRect = this.circle.getBoundingClientRect();
                 this.circle.style.left = `${x}px`;
                 this.circle.style.top = `${y}px`;
             }
