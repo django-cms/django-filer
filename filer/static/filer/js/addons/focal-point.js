@@ -128,8 +128,8 @@ window.Cl = window.Cl || {};
 
             // Get current circle position (center)
             const circleRect = this.circle.getBoundingClientRect();
-            this.circleStartX = circleRect.left - containerRect.left + circleRect.width;
-            this.circleStartY = circleRect.top - containerRect.top + circleRect.height;
+            this.circleStartX = circleRect.left - containerRect.left + circleRect.width / 2;
+            this.circleStartY = circleRect.top - containerRect.top + circleRect.height / 2;
 
             document.addEventListener('mousemove', this._onMouseMove);
             document.addEventListener('mouseup', this._onMouseUp);
