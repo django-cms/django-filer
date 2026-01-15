@@ -24,7 +24,6 @@ window.Cl = window.Cl || {};
         _init(container) {
             const focalPointInstance = new FocalPointConstructor(container, this.options);
             this.focalPointInstances.push(focalPointInstance);
-            console.log(this.options);
         }
 
         initialize() {
