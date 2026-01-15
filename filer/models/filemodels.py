@@ -155,6 +155,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         app_label = 'filer'
         verbose_name = _("file")
         verbose_name_plural = _("files")
+        base_manager_name = 'objects'
 
     def __str__(self):
         if self.name in ('', None):
