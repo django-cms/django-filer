@@ -17,7 +17,7 @@ license = {text = "BSD-3-Clause"}
 requires-python = ">=3.8"
 dependencies = [
     "django>=3.2",
-    "django-polymorphic!=4.9.0",
+    "django-polymorphic<4.9.0",
     "easy-thumbnails[svg]",
 
     # Pin svglib to a version below 1.6.0.
