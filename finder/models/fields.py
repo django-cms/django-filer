@@ -13,7 +13,7 @@ class FinderFileField(UUIDField):
 
     def __init__(self, *args, **kwargs):
         self.accept_mime_types = kwargs.pop('accept_mime_types', None)
-        self.realm = kwargs.pop('realm', None)
+        self.ambit = kwargs.pop('ambit', None)
         super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
@@ -21,7 +21,7 @@ class FinderFileField(UUIDField):
             **{
                 'form_class': FormFileField,
                 'accept_mime_types': self.accept_mime_types,
-                'realm': self.realm,
+                'ambit': self.ambit,
                 **kwargs,
             }
         )
@@ -39,14 +39,14 @@ class FinderFolderField(UUIDField):
     description = _("Reference to a folder in the finder app.")
 
     def __init__(self, *args, **kwargs):
-        self.realm = kwargs.pop('realm', None)
+        self.ambit = kwargs.pop('ambit', None)
         super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         return super().formfield(
             **{
                 'form_class': FormFolderField,
-                'realm': self.realm,
+                'ambit': self.ambit,
                 **kwargs,
             }
         )

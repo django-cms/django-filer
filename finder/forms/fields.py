@@ -2,7 +2,7 @@ from django.forms.fields import UUIDField
 from django.forms.models import ModelMultipleChoiceField
 
 from finder.forms.widgets import FinderFileSelect, FinderFolderSelect
-from finder.models.realm import RealmModel
+from finder.models.ambit import AmbitModel
 
 
 class FinderFileField(UUIDField):
@@ -10,15 +10,13 @@ class FinderFileField(UUIDField):
 
     def __init__(self, *args, **kwargs):
         self.accept_mime_types = kwargs.pop('accept_mime_types', None)
-        self.realm = kwargs.pop('realm', None)
+        self.ambit = kwargs.pop('ambit', None)
         super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
         widget.accept_mime_types = self.accept_mime_types
-        if isinstance(self.realm, RealmModel):
-            widget.realm = self.realm
-        else:
-            widget.realm = RealmModel.objects.get_default(self.realm)
+        assert isinstance(self.ambit, AmbitModel)
+        widget.ambit = self.ambit
         return super().widget_attrs(widget)
 
 
@@ -26,14 +24,12 @@ class FinderFolderField(UUIDField):
     widget = FinderFolderSelect
 
     def __init__(self, *args, **kwargs):
-        self.realm = kwargs.pop('realm', None)
+        self.ambit = kwargs.pop('ambit', None)
         super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
-        if isinstance(self.realm, RealmModel):
-            widget.realm = self.realm
-        else:
-            widget.realm = RealmModel.objects.get_default(self.realm)
+        assert isinstance(self.ambit, AmbitModel)
+        widget.ambit = self.ambit
         return super().widget_attrs(widget)
 
 

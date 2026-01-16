@@ -1,9 +1,10 @@
 import json
-
-from django.core.exceptions import ObjectDoesNotExist
+from functools import lru_cache
 
 from django.contrib import admin
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib import messages
+from django.contrib.admin.options import IS_POPUP_VAR
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.http.response import (
@@ -12,15 +13,19 @@ from django.http.response import (
 )
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import path, reverse, reverse_lazy
+from django.utils.translation import gettext
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder
-from finder.models.realm import RealmModel
 
 
 class InodeAdmin(admin.ModelAdmin):
     extra_data_fields = ['owner_name', 'is_folder', 'parent']
+
+    def __init__(self, model, admin_site):
+        super().__init__(model, admin_site)
+        self.base_url = reverse_lazy('admin:finder_foldermodel_changelist', current_app=admin_site.name)
 
     def get_urls(self):
         urls = [
@@ -32,11 +37,21 @@ class InodeAdmin(admin.ModelAdmin):
         urls.extend(super().get_urls())
         return urls
 
+    @lru_cache
+    def get_inode_url(self, slug, inode_id):
+        parts = self.base_url.split('/')
+        parts = [slug if part == 'foldermodel' else part for part in parts]
+        if parts[-1] == '':
+            parts[-1] = inode_id
+        else:
+            parts.append(inode_id)
+        return '/'.join(parts)
+
     def get_object(self, request, inode_id, *args):
         return FolderModel.objects.get_inode(id=inode_id)
 
     def check_for_valid_post_request(self, request, folder_id):
-        if request.method != 'POST':
+        if request.method not in ['POST', 'PUT']:
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if request.content_type != 'application/json':
             return HttpResponse(
@@ -44,7 +59,8 @@ class InodeAdmin(admin.ModelAdmin):
                 status=415,
             )
         try:
-            self.get_object(request, folder_id)
+            folder = self.get_object(request, folder_id)
+            request._ambit = folder.get_ambit()
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"Folder with id “{folder_id}” not found.")
 
@@ -55,9 +71,8 @@ class InodeAdmin(admin.ModelAdmin):
         current_folder = self.get_object(request, folder_id)
         if not (pinned_id := body.get('pinned_id')):
             return HttpResponseBadRequest("No pinned_id provided.")
-        realm = self.get_realm(request)
         pinned_folder, created = PinnedFolder.objects.get_or_create(
-            realm=realm,
+            ambit=request._ambit,
             owner=request.user,
             folder_id=pinned_id,
         )
@@ -67,91 +82,60 @@ class InodeAdmin(admin.ModelAdmin):
             parent_folder = pinned_folder.folder.parent
             pinned_folder.delete()
             if str(folder_id) == pinned_id:
-                return JsonResponse({
-                    'success_url': reverse(
-                        'admin:finder_inodemodel_change',
-                        args=(parent_folder.id,),
-                        current_app=self.admin_site.name,
-                    ),
-                })
+                success_url = self.get_inode_url(request._ambit.slug, str(parent_folder.id))
+                return JsonResponse({'success_url': success_url})
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
-    def serialize_inode(self, realm, inode):
+    def serialize_inode(self, ambit, inode):
         data = {field: inode.serializable_value(field) for field in inode.data_fields}
+        change_url = self.get_inode_url(ambit.slug, str(inode.id))
         data.update(
             owner_name=inode.owner.username if inode.owner else None,
             is_folder=inode.is_folder,
-            change_url=reverse(
-                'admin:finder_inodemodel_change',
-                args=(inode.id,),
-                current_app=self.admin_site.name,
-            ),
-            download_url=inode.get_download_url(realm),
-            thumbnail_url=inode.get_thumbnail_url(realm),
+            change_url=change_url,
+            download_url=inode.get_download_url(ambit),
+            thumbnail_url=inode.get_thumbnail_url(ambit),
             summary=inode.summary,
         )
         if (inode.is_folder):
             data.update(is_root=inode.is_root)
         return data
 
-    def get_realm(self, request):
-        site = get_current_site(request)
-        try:
-            realm = RealmModel.objects.get(site=site, slug=self.admin_site.name)
-        except RealmModel.DoesNotExist:
-            root_folder = FolderModel.objects.create(owner=request.user, name='__root__')
-            realm = RealmModel.objects.create(
-                site=site,
-                slug=self.admin_site.name,
-                root_folder=root_folder,
-            )
-        return realm
-
-    def get_root_folder(self, request):
-        realm = self.get_realm(request)
-        return realm.root_folder
-
     def get_trash_folder(self, request):
-        realm = self.get_realm(request)
-        return FolderModel.objects.get_trash_folder(realm, request.user)
+        return FolderModel.objects.get_trash_folder(request._ambit, request.user)
 
     def get_fallback_folder(self, request):
         try:
             last_folder_id = request.session['finder_last_folder_id']
             return FolderModel.objects.get(id=last_folder_id)
         except (FolderModel.DoesNotExist, KeyError):
-            return self.get_root_folder(request)
+            return request._ambit.root_folder
 
     def get_inodes(self, request, **lookup):
         """
         Return a serialized list of file/folder-s for the given folder.
         """
         lookup = dict(lookup_by_label(request), **lookup)
-        realm = self.get_realm(request)
         unified_queryset = FolderModel.objects.filter_unified(**lookup)
         unified_queryset = sort_by_attribute(request, unified_queryset)
-        self.annotate_unified_queryset(realm, unified_queryset)
+        self.annotate_unified_queryset(request._ambit, unified_queryset)
         return unified_queryset
 
     def get_breadcrumbs(self, obj):
+        ambit = obj.folder.get_ambit()
         breadcrumbs = [{
-            'link': reverse(
-                'admin:finder_inodemodel_change',
-                args=(folder.id,),
-                current_app=self.admin_site.name,
-            ),
+            'link': self.get_inode_url(ambit.slug, str(folder.id)),
             'name': str(folder),
         } for folder in obj.ancestors]
         breadcrumbs.reverse()
         return breadcrumbs
 
     def get_favorite_folders(self, request, current_folder):
-        realm = self.get_realm(request)
+        ambit = request._ambit
         folders = PinnedFolder.objects.filter(
-            realm__site=realm.site,
-            realm__slug=self.admin_site.name,
+            ambit=ambit,
             owner=request.user,
         ).values(
             'folder__id',
@@ -163,41 +147,31 @@ class InodeAdmin(admin.ModelAdmin):
         ).values('id', 'name', 'is_pinned')
         folders = [dict(
             **values,
-            change_url=reverse(
-                'admin:finder_inodemodel_change',
-                args=(values['id'],),
-                current_app=self.admin_site.name,
-            ),
+            change_url=self.get_inode_url(ambit.slug, str(values['id'])),
         ) for values in folders]
         fallback_folder = self.get_fallback_folder(request)
-        root_folder = self.get_root_folder(request)
+        root_folder = ambit.root_folder
         trash_folder = self.get_trash_folder(request)
         for folder in folders:
             if folder['id'] == current_folder.id:
-                if len(folders) == 0:
-                    folders.append(self.serialize_inode(realm, fallback_folder))
+                if len(folders) == 0:  # TODO: is this ever possible?
+                    folders.append(self.serialize_inode(ambit, fallback_folder))
                 break
         else:
             if current_folder.id == root_folder.id:
-                folders.insert(0, self.serialize_inode(realm, current_folder))
+                folders.insert(0, self.serialize_inode(ambit, current_folder))
             elif current_folder.id != trash_folder.id:
-                folders.append(self.serialize_inode(realm, current_folder))
+                folders.append(self.serialize_inode(ambit, current_folder))
         if trash_folder.num_children > 0:
-            inode_data = self.serialize_inode(realm, trash_folder)
+            inode_data = self.serialize_inode(ambit, trash_folder)
             inode_data.update(is_trash=True)
             folders.append(inode_data)
         return folders
 
     def changelist_view(self, request, extra_context=None):
-        # always redirect the list view to the detail view of either the latest used, or the root folder
-        fallback_folder = self.get_fallback_folder(request)
-        return HttpResponseRedirect(reverse(
-            'admin:finder_inodemodel_change',
-            args=(fallback_folder.id,),
-            current_app=self.admin_site.name,
-        ))
+        return HttpResponseBadRequest(f"{request.path} must be converted to ambit.")
 
-    def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         context.update(
             breadcrumbs=self.get_breadcrumbs(obj),
             finder_settings=self.get_editor_settings(request, obj),
@@ -219,11 +193,7 @@ class InodeAdmin(admin.ModelAdmin):
             'parent_id': inode.parent_id,
         }
         if inode.parent_id:
-            settings['parent_url'] = reverse(
-                'admin:finder_inodemodel_change',
-                args=(inode.parent_id,),
-                current_app=self.admin_site.name,
-            )
+            settings['parent_url'] = self.get_inode_url(request._ambit.slug, str(inode.parent_id))
         else:
             settings['parent_url'] = None
         return settings
@@ -240,13 +210,40 @@ class InodeAdmin(admin.ModelAdmin):
         """
         return {}
 
-    def annotate_unified_queryset(self, realm, queryset):
-        annotate_unified_queryset(realm, queryset)
+    def annotate_unified_queryset(self, ambit, queryset):
+        annotate_unified_queryset(ambit, queryset)
         for entry in queryset:
             entry.update(
-                change_url=reverse(
-                    'admin:finder_inodemodel_change',
-                    args=(entry['id'],),
-                    current_app=self.admin_site.name,
-                )
+                change_url=self.get_inode_url(ambit.slug, str(entry['id'])),
+                # change_url=reverse(
+                #     'admin:finder_inodemodel_change',
+                #     args=(entry['id'],),
+                #     current_app=self.admin_site.name,
+                # )
             )
+
+    def response_post_save_change(self, request, obj):
+        ambit = obj.folder.get_ambit()
+        post_url = self.get_inode_url(ambit.slug, str(obj.folder.id))
+        return HttpResponseRedirect(post_url)
+
+    def delete_model(self, request, obj):
+        request._ambit = obj.folder.get_ambit()
+        request.session['finder_last_folder_id'] = str(obj.folder.id)
+        obj.delete()
+
+    def response_delete(self, request, obj_display, obj_id):
+        if IS_POPUP_VAR in request.POST:
+            raise NotImplementedError("Popup delete response is not implemented yet.")
+
+        self.message_user(
+            request,
+            gettext("The {name} “{obj}” was deleted successfully.").format(
+                name=self.opts.verbose_name,
+                obj=obj_display,
+            ),
+            messages.SUCCESS,
+        )
+
+        post_url = self.get_inode_url(request._ambit.slug, str(request.session['finder_last_folder_id']))
+        return HttpResponseRedirect(post_url)

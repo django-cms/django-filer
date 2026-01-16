@@ -42,16 +42,16 @@ class ImageFileModel(AbstractFileModel):
     def summary(self):
         return "{width}×{height}px ({size})".format(size=super().summary, width=self.width, height=self.height)
 
-    def get_thumbnail_url(self, realm):
+    def get_thumbnail_url(self, ambit):
         thumbnail_filename = self.get_cropped_filename(self.thumbnail_size, self.thumbnail_size)
         thumbnail_path = f'{self.id}/{thumbnail_filename}'
-        if not realm.sample_storage.exists(thumbnail_path):
+        if not ambit.sample_storage.exists(thumbnail_path):
             try:
-                self.crop(realm, thumbnail_path, self.thumbnail_size, self.thumbnail_size)
+                self.crop(ambit, thumbnail_path, self.thumbnail_size, self.thumbnail_size)
             except Exception as exception:
                 logger.warning(f"Thumbnail generation failed for image {self.pk}: {exception}")
                 return self.fallback_thumbnail_url
-        return realm.sample_storage.url(thumbnail_path)
+        return ambit.sample_storage.url(thumbnail_path)
 
     def get_cropped_filename(self, width, height):
         file_name = Path(self.file_name)

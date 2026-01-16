@@ -13,16 +13,16 @@ except ImportError:
     ModelManager = models.Manager
 
 from .inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
-from .realm import RealmModel
+from .ambit import AmbitModel
 
 
 class FolderModelManager(InodeManagerMixin, ModelManager):
-    def get_trash_folder(self, realm, owner):
+    def get_trash_folder(self, ambit, owner):
         try:
-            trash_folder = realm.trash_folders.get(owner=owner)
+            trash_folder = ambit.trash_folders.get(owner=owner)
         except FolderModel.DoesNotExist:
             trash_folder = self.create(parent=None, owner=owner, name='__trash__')
-            realm.trash_folders.add(trash_folder)
+            ambit.trash_folders.add(trash_folder)
         return trash_folder
 
 
@@ -34,7 +34,7 @@ class FolderModel(InodeModel):
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
         default_permissions = []
-        constraints = [models.UniqueConstraint(fields=['parent', 'name'], name='unique_realm')]
+        constraints = [models.UniqueConstraint(fields=['parent', 'name'], name='unique_subfolder')]
 
     objects = FolderModelManager()
 
@@ -51,11 +51,19 @@ class FolderModel(InodeModel):
         return self
 
     @lru_cache
-    def get_realm(self):
+    def get_ambit(self):
+        if self.is_trash:
+            return AmbitModel.objects.get(trash_folders=self)
+        return self.get_root_folder().ambit
+
+    @lru_cache
+    def get_root_folder(self):
+        if self.is_root:
+            return self
         if isinstance(self.ancestors, models.QuerySet):
             count = self.ancestors.count()
-            return self.ancestors[count - 1].realm
-        return list(self.ancestors)[-1].realm
+            return self.ancestors[count - 1]
+        return list(self.ancestors)[-1]
 
     @property
     def folder(self):
@@ -161,7 +169,7 @@ class FolderModel(InodeModel):
         ))
 
     @lru_cache
-    def as_dict(self, realm=None):
+    def as_dict(self, ambit=None):
         return {
             'id': self.id,
             'name': self.name,
@@ -172,13 +180,13 @@ class FolderModel(InodeModel):
             'meta_data': self.get_meta_data(),
         }
 
-    def get_download_url(self, realm):
+    def get_download_url(self, ambit):
         return None
 
-    def get_thumbnail_url(self, realm):
+    def get_thumbnail_url(self, ambit):
         return staticfiles_storage.url('finder/icons/folder.svg')
 
-    def get_sample_url(self, realm):
+    def get_sample_url(self, ambit):
         return None
 
     def listdir(self, **lookup):
@@ -314,8 +322,8 @@ class FolderModel(InodeModel):
 
 
 class PinnedFolder(models.Model):
-    realm = models.ForeignKey(
-        RealmModel,
+    ambit = models.ForeignKey(
+        AmbitModel,
         related_name='+',
         on_delete=models.CASCADE,
         editable=False,

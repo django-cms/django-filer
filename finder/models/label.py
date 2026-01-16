@@ -1,12 +1,19 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from finder.models.ambit import AmbitModel
+
 
 class Label(models.Model):
+    ambit = models.ForeignKey(
+        AmbitModel,
+        on_delete=models.CASCADE,
+        related_name='labels',
+        editable=False,
+    )
     name = models.CharField(
         _("Name"),
         max_length=255,
-        unique=True,
     )
     color = models.CharField(
         _("Color"),

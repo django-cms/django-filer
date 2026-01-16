@@ -9,11 +9,11 @@ class DemoAppModel(models.Model):
         null=True,
         blank=True,
         accept_mime_types=['image/*'],
-        realm='admin',
+        ambit='admin',
     )
     folder = FinderFolderField(
         verbose_name="Demo Folder",
         null=True,
         blank=True,
-        realm='admin',
+        ambit='admin',
     )

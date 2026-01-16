@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import transaction
 from django.db.models import QuerySet, Subquery
 from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
@@ -35,6 +36,9 @@ class FolderAdmin(InodeAdmin):
                 staticfiles_storage.url('finder/js/folder-admin.js')
             )],
         )
+
+    def has_module_permission(self, request):
+        return False
 
     def get_urls(self):
         filtered_views = ['finder.admin.folder.FolderAdmin.change_view', 'django.views.generic.base.RedirectView']
@@ -78,6 +82,10 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.dispatch_permissions),
             ),
             path(
+                '<uuid:folder_id>/labels',
+                self.admin_site.admin_view(self.update_labels),
+            ),
+            path(
                 'principals',
                 self.admin_site.admin_view(self.lookup_principals),
             ),
@@ -86,7 +94,7 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.undo_discarded_inodes),
             ),
             path(
-                'erase_trash_folder',
+                '<uuid:trash_folder_id>/erase_trash_folder',
                 self.admin_site.admin_view(self.erase_trash_folder),
             ),
             path(
@@ -123,31 +131,26 @@ class FolderAdmin(InodeAdmin):
     def get_editor_settings(self, request, inode):
         settings = super().get_editor_settings(request, inode)
         trash_folder = self.get_trash_folder(request)
+        ambit = request._ambit
         if inode.id != trash_folder.id:
+            folder_url = self.get_inode_url(request._ambit.slug, str(inode.folder.id))
             settings.update(
                 is_root=inode.is_root,
                 is_trash=False,
-                folder_url=reverse(
-                    'admin:finder_inodemodel_change',
-                    args=(inode.folder.id,),
-                    current_app=self.admin_site.name,
-                ),
+                folder_url=folder_url,
             )
             if Label.objects.exists():
                 settings['labels'] = [
-                    {'value': id, 'label': name, 'color': color}
-                    for id, name, color in Label.objects.values_list('id', 'name', 'color')
+                    {'value': id, 'name': name, 'color': color}
+                    for id, name, color in Label.objects.filter(ambit=ambit).values_list('id', 'name', 'color')
                 ]
             request.session['finder_last_folder_id'] = str(inode.id)
         else:
+            folder_url = self.get_inode_url(ambit.slug, str(self.get_fallback_folder(request).id))
             settings.update(
                 is_root=False,
                 is_trash=True,
-                folder_url=reverse(
-                    'admin:finder_inodemodel_change',
-                    args=(self.get_fallback_folder(request).id,),
-                    current_app=self.admin_site.name,
-                ),
+                folder_url=folder_url,
             )
         if isinstance(inode.ancestors, QuerySet):
             ancestor_ids = list(inode.ancestors.values_list('id', flat=True))
@@ -194,6 +197,7 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
         try:
             current_folder = self.get_object(request, folder_id)
+            request._ambit = current_folder.get_ambit()
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if search_query := request.GET.get('q'):
@@ -207,7 +211,7 @@ class FolderAdmin(InodeAdmin):
     def search_for_inodes(self, request, current_folder, search_query, **lookup):
         search_zone = request.COOKIES.get('django-finder-search-zone')
         if search_zone == 'everywhere':
-            starting_folder = self.get_realm(request).root_folder
+            starting_folder = current_folder.get_root_folder()
         else:
             starting_folder = current_folder
         if isinstance(starting_folder.descendants, QuerySet):
@@ -230,26 +234,26 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             return HttpResponse("Bad encoding type or missing payload.", status=415)
-        realm = self.get_realm(request)
+        ambit = folder.get_ambit()
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         new_file = model.objects.create_from_upload(
-            realm,
+            ambit,
             request.FILES['upload_file'],
             folder=folder,
             owner=request.user,
         )
-        return JsonResponse({'file_info': new_file.as_dict(realm)})
+        return JsonResponse({'file_info': new_file.as_dict(ambit)})
 
     def update_inode(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        realm = self.get_realm(request)
         body = json.loads(request.body)
         try:
             inode_obj = self.get_object(request, body['id'])
         except (ObjectDoesNotExist, KeyError):
             return HttpResponseNotFound(f"InodeModel<id={body.get('id', '<missing>')}> not found.")
         current_folder = self.get_object(request, folder_id)
+        ambit = current_folder.get_ambit()
         inode_name = body['name']
         try:
             filename_validator(inode_name)
@@ -266,7 +270,7 @@ class FolderAdmin(InodeAdmin):
         if update_values:
             inode_obj.save(update_fields=list(update_values.keys()))
         return JsonResponse({
-            'new_inode': self.serialize_inode(realm, inode_obj),
+            'new_inode': self.serialize_inode(ambit, inode_obj),
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
@@ -332,7 +336,6 @@ class FolderAdmin(InodeAdmin):
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
             return HttpResponse("Cannot move inodes from trash folder into itself.", status=409)
-        realm = self.get_realm(request)
         trash_ordering = trash_folder.get_max_ordering()
         inode_ids = body.get('inode_ids', [])
         for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
@@ -408,6 +411,40 @@ class FolderAdmin(InodeAdmin):
         AccessControlEntry.objects.filter(inode=current_folder.id).exclude(id__in=preserved_ace_ids).delete()
         return self.get_permissions(request, current_folder)
 
+    def update_labels(self, request, folder_id):
+        if response := self.check_for_valid_post_request(request, folder_id):
+            return response
+        ambit = request._ambit
+        CREATE_LABEL = object()
+        body = json.loads(request.body)
+        preserved_label_ids = []
+        with transaction.atomic():
+            for label in body['labels']:
+                id = label.get('value', CREATE_LABEL)
+                if id is CREATE_LABEL:
+                    create_kwargs = {'ambit': ambit, 'name': label['name'], 'color': label['color']}
+                    created_entry = Label.objects.create(**create_kwargs)
+                    preserved_label_ids.append(created_entry.id)
+                else:
+                    update_entry = Label.objects.get(id=id, ambit=ambit)
+                    update_fields = []
+                    if update_entry.name != label['name']:
+                        update_entry.name = label['name']
+                        update_fields.append('name')
+                    if update_entry.color != label['color']:
+                        update_entry.color = label['color']
+                        update_fields.append('color')
+                    if update_fields:
+                        update_entry.save(update_fields=update_fields)
+                    preserved_label_ids.append(update_entry.id)
+            Label.objects.filter(ambit=ambit).exclude(id__in=preserved_label_ids).delete()
+        return JsonResponse({
+            'labels': [
+                {'value': id, 'name': name, 'color': color}
+                for id, name, color in Label.objects.filter(ambit=ambit).values_list('id', 'name', 'color')
+            ],
+        })
+
     def lookup_principals(self, request):
         if request.method != 'GET':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
@@ -443,33 +480,30 @@ class FolderAdmin(InodeAdmin):
         discarded_inodes.delete()
         return HttpResponse()
 
-    def erase_trash_folder(self, request):
+    def erase_trash_folder(self, request, trash_folder_id):
         if request.method != 'DELETE':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
-        realm = self.get_realm(request)
-        trash_folder_entries = self.get_trash_folder(request).listdir()
-        DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
-        for entry in trash_folder_entries:
-            # bulk delete does not work here because each file must be erased from disk
-            proxy_obj = InodeManager.get_proxy_object(entry)
-            if proxy_obj.is_folder:
-                proxy_obj.delete()
-            else:
-                proxy_obj.erase_and_delete(realm)
+        trash_folder = FolderModel.objects.get(id=trash_folder_id, owner=request.user)
+        request._ambit = trash_folder.get_ambit()
+        trash_folder_entries = trash_folder.listdir()
+        with transaction.atomic():
+            DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
+            for entry in trash_folder_entries:
+                # bulk delete does not work here because each file must be erased from disk
+                proxy_obj = InodeManager.get_proxy_object(entry)
+                if proxy_obj.is_folder:
+                    proxy_obj.delete()
+                else:
+                    proxy_obj.erase_and_delete(request._ambit)
         fallback_folder = self.get_fallback_folder(request)
-        return JsonResponse({
-            'success_url': reverse(
-                'admin:finder_inodemodel_change',
-                args=(fallback_folder.id,),
-            ),
-        })
+        success_url = self.get_inode_url(request._ambit.slug, str(fallback_folder.id))
+        return JsonResponse({'success_url': success_url})
 
     def add_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         parent_folder = self.get_object(request, folder_id)
         assert parent_folder.is_folder
-        realm = self.get_realm(request)
         body = json.loads(request.body)
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
@@ -480,14 +514,14 @@ class FolderAdmin(InodeAdmin):
             owner=request.user,
             ordering=parent_folder.get_max_ordering() + 1,
         )
-        return JsonResponse({'new_folder': self.serialize_inode(realm, new_folder)})
+        return JsonResponse({'new_folder': self.serialize_inode(request._ambit, new_folder)})
 
     def get_or_create_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         if not (folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
-        realm = self.get_realm(request)
+        ambit = folder.get_ambit()
         ordering = folder.get_max_ordering() + 1
         body = json.loads(request.body)
         for folder_name in body['relative_path'].split('/'):
@@ -498,4 +532,4 @@ class FolderAdmin(InodeAdmin):
             )
             if created:
                 ordering += 1
-        return JsonResponse({'folder': self.serialize_inode(realm, folder)})
+        return JsonResponse({'folder': self.serialize_inode(ambit, folder)})

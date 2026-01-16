@@ -20,13 +20,13 @@ class AudioFileModel(FileModel):
         proxy = True
         app_label = 'finder'
 
-    def get_sample_url(self, realm):
-        if not realm.original_storage.exists(self.file_path):
+    def get_sample_url(self, ambit):
+        if not ambit.original_storage.exists(self.file_path):
             return
         sample_start = self.meta_data.get('sample_start', 0)
         sample_duration = self.meta_data.get('sample_duration', SAMPLE_DURATION)
         sample_path = f'{self.id}/{self.get_sample_path(sample_start, sample_duration)}'
-        if not realm.sample_storage.exists(sample_path):
+        if not ambit.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
             try:
                 with NamedTemporaryFile(suffix=suffix) as tempfile:
@@ -36,7 +36,7 @@ class AudioFileModel(FileModel):
                         .output(tempfile.name)
                         .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
                     )
-                    with realm.original_storage.open(self.file_path) as handle:
+                    with ambit.original_storage.open(self.file_path) as handle:
                         for chunk in handle.chunks():
                             try:
                                 process.stdin.write(chunk)
@@ -45,10 +45,10 @@ class AudioFileModel(FileModel):
                         process.stdin.close()
                     process.wait()
                     tempfile.flush()
-                    realm.sample_storage.save(sample_path, tempfile)
+                    ambit.sample_storage.save(sample_path, tempfile)
             except Exception:
                 return
-        return realm.sample_storage.url(sample_path)
+        return ambit.sample_storage.url(sample_path)
 
     def get_sample_path(self, sample_start, sample_duration):
         sample_path = Path(self.file_name)

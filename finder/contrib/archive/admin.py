@@ -50,7 +50,7 @@ class ArchiveAdmin(FileAdmin):
         if len(body.get('archive_name', '')) < 1 or len(body.get('inode_ids', [])) < 1:
             return HttpResponseBadRequest("Archive name and inode IDs are required")
 
-        realm = self.get_realm(request)
+        ambit = folder_obj.get_ambit()
         inode_objects = []
         for inode_id in body['inode_ids']:
             try:
@@ -68,7 +68,7 @@ class ArchiveAdmin(FileAdmin):
 
         archive_name = body['archive_name']
         filename = f'{archive_name}.zip' if not archive_name.endswith('.zip') else archive_name
-        filename = realm.original_storage.generate_filename(filename)
+        filename = ambit.original_storage.generate_filename(filename)
         zip_file_obj = self.model.objects.create(
             name=archive_name,
             parent=folder_obj,
@@ -89,9 +89,9 @@ class ArchiveAdmin(FileAdmin):
                         zip_ref.mkdir('/'.join(parts))
                     else:
                         parts.append(inode_obj.name)
-                        with realm.original_storage.open(inode_obj.file_path) as handle:
+                        with ambit.original_storage.open(inode_obj.file_path) as handle:
                             zip_ref.writestr('/'.join(parts), handle.read())
-            realm.original_storage.save(zip_file_obj.file_path, tempfile)
+            ambit.original_storage.save(zip_file_obj.file_path, tempfile)
             zip_file_obj.file_size = tempfile.file.tell()
             sha1 = hashlib.sha1()
             tempfile.seek(0)
@@ -100,7 +100,7 @@ class ArchiveAdmin(FileAdmin):
 
         zip_file_obj.save(update_fields=['file_size', 'sha1'])
         return JsonResponse({
-            'new_file': self.serialize_inode(realm, zip_file_obj),
+            'new_file': self.serialize_inode(ambit, zip_file_obj),
         })
 
     def unarchive_file(self, request, file_id):
@@ -119,14 +119,15 @@ class ArchiveAdmin(FileAdmin):
         ).exists():
             msg = gettext("Can not extract archive. A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=archive_name), status=409)
-        realm = self.get_realm(request)
+
+        ambit = zip_file_obj.folder.get_ambit()
         try:
             folder_obj = FolderModel.objects.create(
                 name=archive_name,
                 parent=zip_file_obj.folder,
                 owner=request.user,
             )
-            with zipfile.ZipFile(realm.original_storage.open(zip_file_obj.file_path)) as zip_ref:
+            with zipfile.ZipFile(ambit.original_storage.open(zip_file_obj.file_path)) as zip_ref:
                 for ordering, zip_info in enumerate(zip_ref.infolist(), 1):
                     parts = zip_info.filename.split('/')
                     if zip_info.is_dir():
@@ -145,14 +146,14 @@ class ArchiveAdmin(FileAdmin):
                     extracted_file_obj = proxy_model.objects.create(
                         name=filename,
                         parent=folder_obj.retrieve(parts[:-1]),
-                        file_name=realm.original_storage.generate_filename(filename),
+                        file_name=ambit.original_storage.generate_filename(filename),
                         mime_type=mime_type,
                         file_size=zip_info.file_size,
                         ordering=ordering,
                     )
                     sha1 = hashlib.sha1()
                     with zip_ref.open(zip_info.filename) as zip_entry:
-                        realm.original_storage.save(extracted_file_obj.file_path, zip_entry)
+                        ambit.original_storage.save(extracted_file_obj.file_path, zip_entry)
                         zip_entry.seek(0)
                         sha1.update(zip_entry.read())
                     extracted_file_obj.sha1 = sha1.hexdigest()

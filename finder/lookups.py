@@ -2,7 +2,7 @@ from finder.models.inode import InodeManager
 from finder.models.label import Label
 
 
-def annotate_unified_queryset(realm, queryset):
+def annotate_unified_queryset(ambit, queryset):
     """
     Annotates the given queryset with additional fields for the frontend.
     This step must be applied after filtering and sorting.
@@ -11,9 +11,9 @@ def annotate_unified_queryset(realm, queryset):
     for entry in queryset:
         proxy_obj = InodeManager.get_proxy_object(entry)
         entry.update(
-            download_url=proxy_obj.get_download_url(realm),
-            thumbnail_url=proxy_obj.get_thumbnail_url(realm),
-            sample_url=proxy_obj.get_sample_url(realm),
+            download_url=proxy_obj.get_download_url(ambit),
+            thumbnail_url=proxy_obj.get_thumbnail_url(ambit),
+            sample_url=proxy_obj.get_sample_url(ambit),
             summary=proxy_obj.summary,
             folderitem_component=proxy_obj.folderitem_component,
         )

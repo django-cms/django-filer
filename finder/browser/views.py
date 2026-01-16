@@ -11,10 +11,10 @@ from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
+from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 from finder.models.label import Label
-from finder.models.realm import RealmModel
 
 
 class FormRenderer(DjangoTemplates):
@@ -56,20 +56,20 @@ class BrowserView(View):
             children.append(child)
         return children
 
-    def _get_realm(self, request, slug):
-        site = get_current_site(request)
-        try:
-            return RealmModel.objects.get(site=site, slug=slug)
-        except RealmModel.DoesNotExist:
-            raise ObjectDoesNotExist(f"Realm named {slug} not found for {site.domain}.")
+    # def _get_realm(self, request, slug):
+    #     site = get_current_site(request)
+    #     try:
+    #         return RealmModel.objects.get(site=site, slug=slug)
+    #     except RealmModel.DoesNotExist:
+    #         raise ObjectDoesNotExist(f"Realm named {slug} not found for {site.domain}.")
 
     @method_decorator(require_GET)
     def structure(self, request, slug=None):
-        realm = self._get_realm(request, slug)
+        ambit = AmbitModel.objects.get(slug=slug)
         request.session.setdefault('finder.open_folders', [])
-        request.session.setdefault('finder.last_folder', str(realm.root_folder.id))
+        request.session.setdefault('finder.last_folder', str(ambit.root_folder.id))
         last_folder_id = request.session['finder.last_folder']
-        if is_open := realm.root_folder.subfolders.exists():
+        if is_open := ambit.root_folder.subfolders.exists():
             # direct children of the root folder are open regardless of the `open_folders` session
             # in addition to that, also open all ancestors of the last opened folder
             open_folders = set(request.session['finder.open_folders'])
@@ -81,19 +81,19 @@ class BrowserView(View):
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
             else:  # django-cte not installed
                 open_folders.update(str(ancestor.id) for ancestor in ancestors)
-            children = self._get_children(open_folders, realm.root_folder)
+            children = self._get_children(open_folders, ambit.root_folder)
         else:
             children = None
         return {
             'root_folder': {
-                **realm.root_folder.as_dict(),
+                **ambit.root_folder.as_dict(),
                 'name': None,  # the root folder has no readable name
                 'is_root': True,
                 'is_open': is_open,
                 'children': children,
             },
             'labels': [
-                {'value': id, 'label': name, 'color': color}
+                {'value': id, 'name': name, 'color': color}
                 for id, name, color in Label.objects.values_list('id', 'name', 'color')
             ],
             'last_folder': request.session['finder.last_folder'],
@@ -120,8 +120,8 @@ class BrowserView(View):
                 'has_subfolders': inode.subfolders.exists(),
             }
         else:
-            realm = inode.folder.get_realm()
-            return inode.as_dict(realm)
+            ambit = inode.folder.get_ambit()
+            return inode.as_dict(ambit)
 
     @method_decorator(require_GET)
     def open(self, request, folder_id):
@@ -172,9 +172,9 @@ class BrowserView(View):
         if next_offset >= unified_queryset.count():
             next_offset = None
 
-        realm = current_folder.get_realm()
+        ambit = current_folder.get_ambit()
         unified_queryset = sort_by_attribute(request, unified_queryset)
-        annotate_unified_queryset(realm, unified_queryset)
+        annotate_unified_queryset(ambit, unified_queryset)
         return {
             'files': list(unified_queryset[offset:offset + self.limit]),
             'offset': next_offset,
@@ -200,7 +200,7 @@ class BrowserView(View):
         else:  # django-cte not installed (slow)
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
 
-        realm = starting_folder.get_realm()
+        ambit = starting_folder.get_ambit()
         lookup = {
             'parent_id__in': parent_ids,
             'name_lower__icontains': search_query,
@@ -210,7 +210,7 @@ class BrowserView(View):
             next_offset = offset + self.limit
         else:
             next_offset = None
-        annotate_unified_queryset(realm, unified_queryset)
+        annotate_unified_queryset(ambit, unified_queryset)
         return {
             'files': unified_queryset[offset:next_offset],
             'offset': next_offset,
@@ -225,9 +225,9 @@ class BrowserView(View):
             raise BadRequest("Bad form encoding or missing payload.")
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         current_folder = FolderModel.objects.get(id=folder_id)
-        realm = current_folder.get_realm()
+        ambit = current_folder.get_ambit()
         file = model.objects.create_from_upload(
-            realm,
+            ambit,
             request.FILES['upload_file'],
             folder=current_folder,
             owner=request.user,
@@ -235,7 +235,7 @@ class BrowserView(View):
         form_class = file.get_form_class()
         form = form_class(instance=file, renderer=FormRenderer())
         response = {
-            'file_info': file.as_dict(realm),
+            'file_info': file.as_dict(ambit),
             'form_html': mark_safe(strip_spaces_between_tags(form.as_div())),
         }
         return response
@@ -251,13 +251,13 @@ class BrowserView(View):
             return {'file_info': None}
         if request.content_type != 'multipart/form-data':
             raise BadRequest("Bad form encoding or missing payload.")
-        realm = file.folder.get_realm()
+        ambit = file.folder.get_ambit()
         form_class = file.get_form_class()
         form = form_class(instance=file, data=request.POST, renderer=FormRenderer())
         if form.is_valid():
             file = form.save()
             file.as_dict.cache_clear()
-            return {'file_info': file.as_dict(realm)}
+            return {'file_info': file.as_dict(ambit)}
         else:
             return {'form_html': mark_safe(strip_spaces_between_tags(form.as_div()))}
 

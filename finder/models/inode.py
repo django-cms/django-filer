@@ -4,7 +4,7 @@ from functools import reduce
 from operator import and_, or_
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import F, Value, Q
@@ -147,7 +147,7 @@ class InodeManagerMixin:
 
         unified_fields = {
             field.name: field for field in FolderModel._meta.get_fields()
-            if field.concrete and not field.many_to_many and field.name != 'realm'
+            if field.concrete and not field.many_to_many and field.name != 'ambit'
         }
         for model in FileModel.get_models():
             for field in model._meta.get_fields():

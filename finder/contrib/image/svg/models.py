@@ -19,9 +19,9 @@ class SVGImageModel(ImageFileModel):
         verbose_name = _("SVG Image")
         verbose_name_plural = _("SVG Images")
 
-    def store_and_save(self, realm, **kwargs):
+    def store_and_save(self, ambit, **kwargs):
         try:
-            with realm.original_storage.open(self.file_path, 'rb') as handle:
+            with ambit.original_storage.open(self.file_path, 'rb') as handle:
                 drawing = svg2rlg(handle)
             self.width = drawing.width
             self.height = drawing.height
@@ -30,10 +30,10 @@ class SVGImageModel(ImageFileModel):
         else:
             if 'update_fields' in kwargs:
                 kwargs['update_fields'].extend(['width', 'height'])
-        super().store_and_save(realm, **kwargs)
+        super().store_and_save(ambit, **kwargs)
 
-    def crop(self, realm, thumbnail_path, width, height):
-        with realm.original_storage.open(self.file_path, 'rb') as handle:
+    def crop(self, ambit, thumbnail_path, width, height):
+        with ambit.original_storage.open(self.file_path, 'rb') as handle:
             drawing = svg2rlg(handle)
         if not drawing:
             raise FileValidationError(
@@ -52,4 +52,4 @@ class SVGImageModel(ImageFileModel):
         xml = canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes -> sanitation
         with NamedTemporaryFile(suffix=Path(self.file_path).suffix) as tempfile:
             tempfile.write(xml)  # write to binary file with utf-8 encoding
-            realm.sample_storage.save(thumbnail_path, tempfile)
+            ambit.sample_storage.save(thumbnail_path, tempfile)
