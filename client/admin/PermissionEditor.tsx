@@ -1,6 +1,5 @@
 import React, {
 	forwardRef,
-	useCallback,
 	useEffect,
 	useImperativeHandle,
 	useRef,
@@ -9,9 +8,9 @@ import React, {
 import {useCombobox} from 'downshift';
 import Dialog from './Dialog';
 import AddEntryIcon from '../icons/add-entry.svg';
+import TrashIcon from '../icons/trash.svg';
 import EveryoneIcon from '../icons/everyone.svg';
 import GroupIcon from '../icons/group.svg';
-import TrashIcon from '../icons/trash.svg';
 import UserIcon from '../icons/user.svg';
 import UserMeIcon from '../icons/user-me.svg';
 
@@ -151,13 +150,13 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	useImperativeHandle(forwardedRef, () => ({
 		show: () => fetchPermissions().then(() => setIsOpen(true)),
 		handleDragStart: (event) => {},
-		handleDragEnd: (event) => setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
+		handleDragEnd: (event) => event.active.id === 'permission-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));
 
-	useEffect(() => {
-		// after adding a permission, scroll to bottom of tbody to make it appear
-		tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
-	}, [acl]);
+	// useEffect(() => {
+	// 	// after adding a permission, scroll to bottom of tbody to make it appear
+	// 	tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
+	// }, [acl]);
 
 	async function fetchPermissions() {
 		const url = `${settings.base_url}${settings.folder_id}/permissions`;
@@ -176,6 +175,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 			selectPrincipalRef.current.clearInput();
 			setNewPrincipal(null);
 			setNewPrivilege('r');
+			tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
 		}
 	}
 
@@ -221,6 +221,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 					<tr>
 						<th>{gettext("Principal")}</th>
 						<th>{gettext("Privilege")}</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody ref={tbodyRef}>
@@ -232,6 +233,8 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 						</td>
 						<td>
 							<SelectPrivilege value={ace.privilege} setValue={updatePrivilege(index)} />
+						</td>
+						<td>
 							<span onClick={() => setAcl(acl.toSpliced(index, 1))}>
 								<TrashIcon />
 							</span>
@@ -243,6 +246,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 						<td colSpan={3}><em>{gettext("Permissions haven't been set.")}</em></td>
 					</tr>
 				)}
+
 				</tbody>
 				<tfoot>
 					<tr>
@@ -257,6 +261,8 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 						</td>
 						<td>
 							<SelectPrivilege value={newPrivilege} setValue={setNewPrivilege} />
+						</td>
+						<td>
 							<span onClick={() => addToACL()} aria-disabled={!newPrincipal} >
 								<AddEntryIcon />
 							</span>

@@ -47,7 +47,10 @@ ul.messagelist {
 	padding: 0;
 	user-select: none;
 	background: var(--darkened-bg);
-	overflow: hidden;
+
+	&:has(.work-area) {
+		overflow: hidden;
+	}
 
 	&.folder {
 		top: 0;

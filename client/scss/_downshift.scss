@@ -3,7 +3,9 @@
 @mixin select {
 	.select-container {
 		flex-grow: 1;
+		display: block;
 		box-sizing: border-box;
+		align-self: center;
 
 		.select-field {
 			display: flex;

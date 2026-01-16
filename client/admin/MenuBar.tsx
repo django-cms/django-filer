@@ -12,6 +12,7 @@ import React, {
 import {DndContext} from '@dnd-kit/core';
 import SearchField from './SearchField';
 import PermissionEditor from './PermissionEditor';
+import LabelEditor from './LabelEditor';
 import DropDownMenu from '../common/DropDownMenu';
 import VolumeControl from '../common/VolumeControl';
 import FilterByLabel from '../common/FilterByLabel';
@@ -30,6 +31,7 @@ import TrashIcon from '../icons/trash.svg';
 import EraseIcon from '../icons/erase.svg';
 import AddFolderIcon from '../icons/add-folder.svg';
 import LockIcon from '../icons/lock.svg';
+import LabelIcon from '../icons/label.svg';
 import DownloadIcon from '../icons/download.svg';
 import UndoIcon from '../icons/undo.svg';
 import UploadIcon from '../icons/upload.svg';
@@ -67,6 +69,7 @@ function ExtraMenu(props) {
 		clearClipboard,
 		deselectAll,
 		permissionDialogRef,
+		labelDialogRef,
 	} = props;
 
 	async function addFolder() {
@@ -114,6 +117,11 @@ function ExtraMenu(props) {
 			<li role="option" onClick={() => permissionDialogRef.current.show()}>
 				<LockIcon/><span>{gettext("Edit folder permissions")}</span>
 			</li>
+			{settings.is_root &&
+			<li role="option" onClick={() => labelDialogRef.current.show()}>
+				<LabelIcon/><span>{gettext("Edit labels")}</span>
+			</li>
+			}
 			<li role="option" onClick={() => openUploader(false)}>
 				<UploadIcon/><span>{gettext("Upload local files")}</span>
 			</li>
@@ -173,6 +181,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
 	const permissionDialogRef = useRef(null);
+	const labelDialogRef = useRef(null);
 
 	useImperativeHandle(forwardedRef, () => ({
 		setSelected: (selectedInodes) => {
@@ -341,7 +350,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	}
 
 	async function eraseTrashFolder() {
-		const fetchUrl = `${settings.base_url}erase_trash_folder`;
+		const fetchUrl = `${settings.base_url}${settings.folder_id}/erase_trash_folder`;
 		const response = await fetch(fetchUrl, {
 			method: 'DELETE',
 			headers: {
@@ -357,8 +366,18 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 
 	return (
 		<DndContext
-			onDragStart={event => permissionDialogRef.current.handleDragStart(event)}
-			onDragEnd={event => permissionDialogRef.current.handleDragEnd(event)}
+			onDragStart={
+				event => {
+					permissionDialogRef.current.handleDragStart(event);
+					labelDialogRef.current?.handleDragStart(event);
+				}
+			}
+			onDragEnd={
+				event => {
+					permissionDialogRef.current.handleDragEnd(event);
+					labelDialogRef.current?.handleDragEnd(event);
+				}
+			}
 			autoScroll={false}
 		>
 			<nav aria-label={gettext("Finder List View")}>
@@ -406,12 +425,14 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 							clearClipboard={clearClipboard}
 							deselectAll={deselectAll}
 							permissionDialogRef={permissionDialogRef}
+							labelDialogRef={labelDialogRef}
 							{...props}
 						/>
 					</>)}
 				</ul>
 			</nav>
 			<PermissionEditor ref={permissionDialogRef} settings={settings} />
+			{settings.is_root && <LabelEditor ref={labelDialogRef} settings={settings} />}
 		</DndContext>
 	);
 });
