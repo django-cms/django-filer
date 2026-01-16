@@ -7,6 +7,7 @@ from django.forms.widgets import TextInput
 from django.urls import reverse
 from django.utils.html import format_html
 
+from finder.models.ambit import AmbitModel
 from finder.models.file import AbstractFileModel, FileModel
 from finder.models.folder import FolderModel
 
@@ -36,11 +37,12 @@ class FinderFileSelect(FinderInodeSelect):
             except (ValueError, FileModel.DoesNotExist):
                 pass
         if isinstance(value, AbstractFileModel):
-            attrs['data-selected_file'] = json.dumps(value.as_dict(self.realm), cls=DjangoJSONEncoder)
+            ambit = AmbitModel.objects.get(slug=self.ambit)
+            attrs['data-selected_file'] = json.dumps(value.as_dict(ambit), cls=DjangoJSONEncoder)
         context = super().get_context(name, value, attrs)
         context.update(
             base_url=reverse('finder-api:base-url'),
-            realm=self.realm.slug,
+            ambit=self.ambit,
             style_url=staticfiles_storage.url('finder/css/finder-browser.css'),
         )
         if isinstance(self.accept_mime_types, (list, tuple)) and self.accept_mime_types:
@@ -70,11 +72,12 @@ class FinderFolderSelect(FinderInodeSelect):
             except (ValueError, FolderModel.DoesNotExist):
                 pass
         if isinstance(value, FolderModel):
-            attrs['data-selected_folder'] = json.dumps(value.as_dict(self.realm), cls=DjangoJSONEncoder)
+            ambit = AmbitModel.objects.get(slug=self.ambit)
+            attrs['data-selected_folder'] = json.dumps(value.as_dict(ambit), cls=DjangoJSONEncoder)
         context = super().get_context(name, value, attrs)
         context.update(
             base_url=reverse('finder-api:base-url'),
-            realm=self.realm.slug,
+            ambit=self.ambit,
             style_url=staticfiles_storage.url('finder/css/finder-browser.css'),
             folder_icon_url=staticfiles_storage.url('finder/icons/folder.svg'),
         )

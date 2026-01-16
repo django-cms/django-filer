@@ -7,14 +7,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
 	window.customElements.define(
 		'finder-file-select',
 		r2wc(FinderFileSelect, {
-			props: {'base-url': 'string', 'style-url': 'string', realm: 'string', 'mime-types': 'string'},
+			props: {'base-url': 'string', 'style-url': 'string', ambit: 'string', 'mime-types': 'string'},
 			shadow: 'open',
 		}),
 	);
 	window.customElements.define(
 		'finder-folder-select',
 		r2wc(FinderFolderSelect, {
-			props: {'base-url': 'string', 'style-url': 'string', realm: 'string', 'folder-icon-url': 'string'},
+			props: {'base-url': 'string', 'style-url': 'string', ambit: 'string', 'folder-icon-url': 'string'},
 			shadow: 'open',
 		}),
 	);

@@ -90,7 +90,7 @@ const FilesList = memo((props: any) => {
 
 
 const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
-	const {realm, baseUrl, selectedFolderId, mimeTypes, csrfToken} = props;
+	const {ambit, baseUrl, selectedFolderId, mimeTypes, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
 		last_folder: null,
@@ -197,12 +197,12 @@ const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
 		}
 		mimeTypes?.forEach(type => params.append('mimetypes', type));
 		setDirty(false);
-		const response = await fetch(`${baseUrl}structure/${realm}${params.size === 0 ? '' : `?${params.toString()}`}`);
+		const response = await fetch(`${baseUrl}structure/${ambit}${params.size === 0 ? '' : `?${params.toString()}`}`);
 		if (response.ok) {
 			setStructure(await response.json());
 			window.setTimeout(() => {
 				// first show the structure from the root for orientation, then scroll to the current folder
-				const currentListItem = ref.current.querySelector('ul[role="navigation"] li:has(>[aria-current="true"]');
+				const currentListItem = ref.current.querySelector('ul[role="navigation"] li:has(>[aria-current="true"])');
 				if (currentListItem) {
 					currentListItem.scrollIntoView({behavior: 'smooth', block: 'center'});
 				}

@@ -15,7 +15,6 @@ class FinderFileField(UUIDField):
 
     def widget_attrs(self, widget):
         widget.accept_mime_types = self.accept_mime_types
-        assert isinstance(self.ambit, AmbitModel)
         widget.ambit = self.ambit
         return super().widget_attrs(widget)
 
@@ -28,7 +27,6 @@ class FinderFolderField(UUIDField):
         super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
-        assert isinstance(self.ambit, AmbitModel)
         widget.ambit = self.ambit
         return super().widget_attrs(widget)
 

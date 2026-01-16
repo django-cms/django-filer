@@ -181,7 +181,7 @@ export default function FinderFolderSelect(props) {
 		<dialog ref={dialogRef}>
 			<FileSelectDialog
 				ref={selectRef}
-				realm={props.realm}
+				ambit={props.ambit}
 				baseUrl={baseUrl}
 				csrfToken={csrfToken}
 				selectFolder={selectFolder}

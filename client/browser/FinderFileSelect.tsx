@@ -202,7 +202,7 @@ export default function FinderFileSelect(props) {
 		<dialog ref={dialogRef}>
 			<FileSelectDialog
 				ref={selectRef}
-				realm={props.realm}
+				ambit={props.ambit}
 				baseUrl={baseUrl}
 				mimeTypes={mimeTypes}
 				csrfToken={csrfToken}
