@@ -44,7 +44,7 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 		const labelsList = newLabel.name ? [...labels, {name: newLabel.name, color: newLabel.color}] : labels;
 		const url = `${settings.base_url}${settings.folder_id}/labels`;
 		const response = await fetch(url, {
-			method: 'PUT',
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'X-CSRFToken': settings.csrf_token,

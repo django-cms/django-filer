@@ -153,11 +153,6 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 		handleDragEnd: (event) => event.active.id === 'permission-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));
 
-	// useEffect(() => {
-	// 	// after adding a permission, scroll to bottom of tbody to make it appear
-	// 	tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
-	// }, [acl]);
-
 	async function fetchPermissions() {
 		const url = `${settings.base_url}${settings.folder_id}/permissions`;
 		const response = await fetch(url);
@@ -191,7 +186,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 		const accessControlList = newPrincipal ? [...acl, {...newPrincipal, privilege: newPrivilege}] : acl;
 		const url = `${settings.base_url}${settings.folder_id}/permissions`;
 		const response = await fetch(url, {
-			method: 'PUT',
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'X-CSRFToken': settings.csrf_token,

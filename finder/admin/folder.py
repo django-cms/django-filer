@@ -366,7 +366,7 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if request.method == 'GET':
             return self.get_permissions(request, current_folder)
-        if request.method == 'PUT':
+        if request.method == 'POST':
             try:
                 return self.set_permissions(request, current_folder)
             except (KeyError, json.JSONDecodeError):
@@ -379,8 +379,6 @@ class FolderAdmin(InodeAdmin):
             entry = ace.as_dict()
             entry['is_current_user'] = entry['type'] == 'user' and entry['id'] == request.user.id
             access_control_list.append(entry)
-        # for ace in current_folder.default_access_control_list.all():
-        #     default_access_control_list.extend(ace)
         return JsonResponse({
             'access_control_list': access_control_list,
             'default_access_control_list': default_access_control_list,

@@ -51,7 +51,7 @@ class InodeAdmin(admin.ModelAdmin):
         return FolderModel.objects.get_inode(id=inode_id)
 
     def check_for_valid_post_request(self, request, folder_id):
-        if request.method not in ['POST', 'PUT']:
+        if request.method != 'POST':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if request.content_type != 'application/json':
             return HttpResponse(
