@@ -13,23 +13,6 @@ from django.views.decorators.common import no_append_slash
 from finder.models.ambit import AmbitModel
 
 
-# class XXXAmbitAdmin(ModelAdmin):
-#     def XXXhas_add_permission(self, request):
-#         return False
-#
-#     def change_view(self, request, object_id, form_url=None, extra_context=None):
-#         return super().change_view(request, object_id, form_url, extra_context)
-#
-#     def changelist_view(self, request, extra_context=None):
-#         ambit = AmbitModel.objects.get(name=self.model._meta.model_name)
-#         # always redirect the list view to the detail view of either the latest used, or the root folder
-#         return HttpResponsePermanentRedirect(reverse(
-#             'admin:finder_inodemodel_change',
-#             args=(ambit.root_folder.id,),
-#             current_app=self.admin_site.name,
-#         ))
-
-
 def get_ambit_queryset(admin_name, current_site):
     return AmbitModel.objects.filter(
         Q(site=current_site) | Q(site__isnull=True),
