@@ -2,6 +2,21 @@
 CHANGELOG
 =========
 
+3.4.3 (2026-01-17)
+==================
+
+* fix: django-app-helper link in the docs by @bckohan in https://github.com/django-cms/django-filer/pull/1570
+* fix: infinite recursion bug on django-polymorphic >=4.9 by @bckohan in https://github.com/django-cms/django-filer/pull/1571
+
+@bckohan made their first contribution in https://github.com/django-cms/django-filer/pull/1570
+
+3.4.2 (2026-01-13)
+==================
+
+* fix: invalid JS in `dropzone.init.js` by @PeterW-LWL in https://github.com/django-cms/django-filer/pull/1565
+* fix: Subject location only worked on Safari, incorrect subject location upscaling by @fsbraun in https://github.com/django-cms/django-filer/pull/1566
+
+
 3.4.1 (2025-11-24)
 ==================
 
