@@ -30,10 +30,10 @@ CHANGELOG
 * fix: preserve "limit search to folder" state in pagination links #1553 by @benzkji in https://github.com/django-cms/django-filer/pull/1555
 
 
-3.3.3 / 2025-11-07
+3.3.3 (2025-11-07)
 ==================
 
-  * Pin svglib to a version below 1.6.0 by @payamnj (#1550) in https://github.com/django-cms/django-filer/pull/1551
+* Pin svglib to a version below 1.6.0 by @payamnj (#1550) in https://github.com/django-cms/django-filer/pull/1551
 
 3.3.2 (2025-09-01)
 ==================
