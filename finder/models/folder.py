@@ -199,6 +199,21 @@ class FolderModel(InodeModel):
         """
         Move all Inodes with the given IDs to the end of the current folder.
         """
+        def storage_transfer(entry):
+            if entry['is_folder']:
+                for child_entry in FolderModel.objects.get(id=entry['id']).listdir():
+                    storage_transfer(child_entry)
+            else:
+                if not (source_ambit := cache_ambits.get(entry['parent'])):
+                    source_ambit = FolderModel.objects.get(id=entry['parent']).get_ambit()
+                    cache_ambits[entry['parent']] = source_ambit
+                if target_ambit.original_storage is not source_ambit.original_storage:
+                    # move payload from source_ambit to target_ambit and delete from source_ambit
+                    file_path = '{id}/{file_name}'.format(**entry)
+                    with source_ambit.original_storage.open(file_path, 'rb') as readhandle:
+                        target_ambit.original_storage.save(file_path, readhandle)
+                    source_ambit.original_storage.delete(file_path)
+
         parent_ids = set()
         update_inodes = {}
         target_ambit, cache_ambits = self.get_ambit(), {}
@@ -214,15 +229,7 @@ class FolderModel(InodeModel):
             proxy_obj.ordering = ordering
             proxy_obj.validate_constraints()
             update_inodes.setdefault(proxy_obj._meta.concrete_model, []).append(proxy_obj)
-            if entry['is_folder'] is False:
-                if not (source_ambit := cache_ambits.get(entry['parent'])):
-                    source_ambit = FolderModel.objects.get(id=entry['parent']).get_ambit()
-                    cache_ambits[entry['parent']] = source_ambit
-                if target_ambit.id is not source_ambit.id:
-                    # move payload from source_ambit to target_ambit and delete from source_ambit
-                    with source_ambit.original_storage.open(proxy_obj.file_path, 'rb') as readhandle:
-                        target_ambit.original_storage.save(proxy_obj.file_path, readhandle)
-                    source_ambit.original_storage.delete(proxy_obj.file_path)
+            storage_transfer(entry)
 
         with transaction.atomic():
             for concrete_model, proxy_objects in update_inodes.items():
