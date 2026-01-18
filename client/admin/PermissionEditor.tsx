@@ -149,6 +149,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 
 	useImperativeHandle(forwardedRef, () => ({
 		show: () => fetchPermissions().then(() => setIsOpen(true)),
+		close: () => setIsOpen(false),
 		handleDragStart: (event) => {},
 		handleDragEnd: (event) => event.active.id === 'permission-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));

@@ -104,6 +104,16 @@ function ExtraMenu(props) {
 		deselectAll();
 	}
 
+	function openPermissionEditorDialog() {
+		labelDialogRef.current?.close();
+		permissionDialogRef.current.show();
+	}
+
+	function openLabelEditorDialog() {
+		permissionDialogRef.current.close();
+		labelDialogRef.current.show();
+	}
+
 	return (
 		<DropDownMenu
 			role="menuitem"
@@ -114,11 +124,11 @@ function ExtraMenu(props) {
 			<li role="option" onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
 			</li>
-			<li role="option" onClick={() => permissionDialogRef.current.show()}>
+			<li role="option" onClick={() => openPermissionEditorDialog()}>
 				<LockIcon/><span>{gettext("Edit folder permissions")}</span>
 			</li>
 			{settings.is_root &&
-			<li role="option" onClick={() => labelDialogRef.current.show()}>
+			<li role="option" onClick={() => openLabelEditorDialog()}>
 				<LabelIcon/><span>{gettext("Edit labels")}</span>
 			</li>
 			}

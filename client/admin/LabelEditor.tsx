@@ -20,6 +20,7 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 
 	useImperativeHandle(forwardedRef, () => ({
 		show: () => setIsOpen(true),
+		close: () => setIsOpen(false),
 		handleDragStart: (event) => {},
 		handleDragEnd: (event) => event.active.id === 'labels-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));
