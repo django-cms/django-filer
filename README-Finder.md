@@ -50,9 +50,9 @@ while preserving the possibility to perform queries across all tables. This allo
 models inheriting from the `AbstractFileModel` without the need of **django-polymorphic**, and thus
 a join between two or more tables for each query.
 
-Each root folder is associated with a *realm*. A realm is a named area inside the file system, which
-can be used to separate files and folders of different tenants. Each realm has its own root folder.
-By using realms, it is possible to use **django-filer** in a multi-tenant environment.
+Multiple root folder are allowed. They can be used side by side in the Django admin and are listed
+in the sidebar. For each root folder, a different Django storage can be configured. It also is
+possible to restrict a root folder to a Site and/or to an AdminSite.
 
 The Admin interface has also been completely rewritten. For instance, there is no more list view for
 the `FolderModel` and the `FileModel` (or any specialized implementation). Instead, there are only
@@ -147,8 +147,9 @@ If you use:
 * `finder.contrib.image.svg`, assure that `reportlab` and `svglib` are installed.
 * Postgres as a database, install `psycopg2` or `psycopg2-binary` if available for your platform.
 
-Each realm requires two storage backends. One for the public files and one for their thumbnails
-and/or samples. Add these storage backends to the `STORAGES` setting in your `settings.py`:
+Each root folder requires two storage backends. One for the public files and one for their
+thumbnails and/or samples. Add these storage backends to the `STORAGES` setting in your
+`settings.py`:
 
 ```python
 STORAGES = {
@@ -194,12 +195,18 @@ STORAGES = {
 }
 ```
 
-Note that multiple realms can share the same storage location or bucket.
+Note that multiple root folders can share the same storage location or bucket.
 
 Run the migrations for app `finder`:
 
 ```shell
 python manage.py migrate finder
+```
+
+Create a root folder using the above configuration:
+
+```shell
+python manage.py finder add-root public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
 ```
 
 If you already have **django-filer** installed and that database is filled, you can migrate the

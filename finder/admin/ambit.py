@@ -82,11 +82,12 @@ def get_app_list(self, request, app_label=None):
     register_ambit_admins(ambit_models)
     app_dict = self._build_app_dict(request)
     url_parts = reverse('admin:finder_foldermodel_changelist', current_app=self.name).split('/')
-    for model_dict in app_dict['finder']['models']:
-        parts = [model_dict['object_name'] if part == 'foldermodel' else part for part in url_parts]
-        if parts[-1] != '':
-            parts.append('')
-        model_dict['admin_url'] = '/'.join(parts)
+    if 'finder' in app_dict:
+        for model_dict in app_dict['finder']['models']:
+            parts = [model_dict['object_name'] if part == 'foldermodel' else part for part in url_parts]
+            if parts[-1] != '':
+                parts.append('')
+            model_dict['admin_url'] = '/'.join(parts)
     app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
     for app in app_list:
         app['models'].sort(key=lambda x: x['name'])
