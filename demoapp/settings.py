@@ -121,7 +121,7 @@ STORAGES = {
 }
 
 if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
-    STORAGES['finder_public'] = {
+    STORAGES['finder_private'] = {
         'BACKEND': 'storages.backends.s3.S3Storage',
         'OPTIONS': {
             'access_key': 'finder',
@@ -130,7 +130,7 @@ if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
             'endpoint_url': 'http://localhost:9000',
         },
     }
-    STORAGES['finder_public_samples'] = {
+    STORAGES['finder_private_samples'] = {
         'BACKEND': 'storages.backends.s3.S3Storage',
         'OPTIONS': {
             'access_key': 'finder',
