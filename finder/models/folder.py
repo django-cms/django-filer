@@ -16,12 +16,16 @@ from .inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
 from .ambit import AmbitModel
 
 
+ROOT_FOLDER_NAME = '__root__'
+TRASH_FOLDER_NAME = '__trash__'
+
+
 class FolderModelManager(InodeManagerMixin, ModelManager):
     def get_trash_folder(self, ambit, owner):
         try:
             trash_folder = ambit.trash_folders.get(owner=owner)
         except FolderModel.DoesNotExist:
-            trash_folder = self.create(parent=None, owner=owner, name='__trash__')
+            trash_folder = self.create(parent=None, owner=owner, name=TRASH_FOLDER_NAME)
             ambit.trash_folders.add(trash_folder)
         return trash_folder
 
@@ -152,11 +156,11 @@ class FolderModel(InodeModel):
 
     @property
     def is_root(self):
-        return self.parent is None and self.name == '__root__'
+        return self.parent is None and self.name == ROOT_FOLDER_NAME
 
     @property
     def is_trash(self):
-        return self.parent is None and self.name == '__trash__'
+        return self.parent is None and self.name == TRASH_FOLDER_NAME
 
     @cached_property
     def summary(self):
@@ -266,7 +270,7 @@ class FolderModel(InodeModel):
         if self.parent.listdir(name=self.name).exists():
             msg = gettext("Folder named “{name}” already exists in destination folder.")
             raise ValidationError(msg.format(name=self.name))
-        if self.name in ['__root__', '__trash__']:
+        if self.name in [ROOT_FOLDER_NAME, TRASH_FOLDER_NAME]:
             msg = gettext("Folder name “{name}” is reserved.")
             raise ValidationError(msg.format(name=self.name))
 

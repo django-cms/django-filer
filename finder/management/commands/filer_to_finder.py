@@ -10,8 +10,7 @@ from filer.models.imagemodels import Image as FilerImage
 
 from finder.contrib.image.models import ImageFileModel as FinderImage
 from finder.models.file import FileModel as FinderFile
-from finder.models.folder import FolderModel as FinderFolder
-from finder.models.realm import RealmModel as FinderRealmModel
+from finder.models.folder import FolderModel as FinderFolder, ROOT_FOLDER_NAME
 
 
 class Command(BaseCommand):
@@ -28,7 +27,7 @@ class Command(BaseCommand):
         try:
             realm = FinderRealmModel.objects.get(site=site, slug=admin_site.name)
         except FinderRealmModel.DoesNotExist:
-            root_folder = FinderFolder.objects.create(name='__root__', owner=owner)
+            root_folder = FinderFolder.objects.create(name=ROOT_FOLDER_NAME, owner=owner)
             realm = FinderRealmModel.objects.create(site=site, slug=admin_site.name, root_folder=root_folder)
 
         for filer_folder in FilerFolder.objects.filter(parent__isnull=True):
