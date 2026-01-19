@@ -13,7 +13,7 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 	const {settings} = props;
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const newLabelInputRef = useRef<HTMLInputElement>(null);
-	const [labels, setLabels] = useState(settings.labels);
+	const [labels, setLabels] = useState(settings.labels ?? []);
 	const [newLabel, setNewLabel] = useState({name: '', color: '#f0f0f0'});
 	const [isOpen, setIsOpen] = useState(false);
 	const [offset, setOffset] = useState({x: 0, y: 0});
