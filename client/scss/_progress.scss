@@ -13,6 +13,8 @@
 	.progress-indicator {
 		width: calc(100% - 100px);
 		max-width: 500px;
+		max-height: calc(100% - 100px);
+		overflow-y: auto;
 		background-color: colors.$progress-indicator-color;
 		border: colors.$progress-indicator-border;
 		padding: 20px;
@@ -22,7 +24,7 @@
 			font-size: 20px;
 		}
 
-		.progress-bar {
+		.progress-bars {
 			padding: 0;
 
 			li {

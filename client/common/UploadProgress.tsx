@@ -9,7 +9,7 @@ export function ProgressOverlay(props) {
 				<p>{gettext("Drop files here")}</p>
 			) : (<>
 				<p>{gettext("Uploading")}:</p>
-				<ul className="progress-bar">{props.children}</ul>
+				<ul className="progress-bars">{props.children}</ul>
 			</>)
 			}</div>
 		</div>
