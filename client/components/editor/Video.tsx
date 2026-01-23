@@ -7,7 +7,7 @@ import CameraIcon from '../../icons/camera.svg';
 
 
 export default function Video(props) {
-	const {settings} = props;
+	const {settings, children} = props;
 	const sampleFields = {
 		sampleStart: document.getElementById('id_sample_start') as HTMLInputElement,
 	};
@@ -47,7 +47,8 @@ export default function Video(props) {
 			<button type="button" onClick={setPosterFrame}><CameraIcon/>{gettext("Use as Poster")}</button>
 		</Fragment>,
 	];
-	return (
+	return (<>
+		{children}
 		<FileDetails controlButtons={controlButtons} style={style} {...props}>
 			<ReactPlayer
 				url={settings.download_url}
@@ -62,5 +63,5 @@ export default function Video(props) {
 				height="100%"
 			/>
 		</FileDetails>
-	);
+	</>);
 }

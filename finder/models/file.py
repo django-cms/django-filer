@@ -13,8 +13,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 
 from finder.models.label import Label
-
-from .inode import InodeManager, InodeModel
+from finder.models.inode import InodeManager, InodeModel
 
 
 def mimetype_validator(value):
@@ -47,6 +46,7 @@ class FileModelManager(InodeManager):
         obj.receive_file(ambit, uploaded_file)
         obj.ordering = folder.get_max_ordering() + 1
         obj.store_and_save(ambit, force_insert=True)
+        obj.transfer_access_control_list(folder)
         folder.refresh_from_db()
         return obj
 

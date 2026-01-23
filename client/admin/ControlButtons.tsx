@@ -1,4 +1,4 @@
-import React, {Fragment, useMemo, useRef} from 'react';
+import React, {Fragment, ReactElement, useMemo, useRef} from 'react';
 import DownloadIcon from '../icons/download.svg';
 import FullSizeIcon from '../icons/full-size.svg';
 import UploadIcon from '../icons/upload.svg';
@@ -65,7 +65,7 @@ export function ControlButtons(props) {
 	const {settings} = props;
 
 	const controlButtons = useMemo(() => {
-		const buttons: Array<React.JSX.Element> = [];
+		const buttons: Array<ReactElement> = [];
 		if (settings.download_file) {
 			buttons.push(<DownloadFileButton {...props} />);
 		}

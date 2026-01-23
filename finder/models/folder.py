@@ -12,8 +12,9 @@ try:
 except ImportError:
     ModelManager = models.Manager
 
-from .inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
-from .ambit import AmbitModel
+from finder.models.ambit import AmbitModel
+from finder.models.inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
+from finder.models.permission import DefaultAccessControlEntry as DefaultACE
 
 
 ROOT_FOLDER_NAME = '__root__'
@@ -48,11 +49,6 @@ class FolderModel(InodeModel):
         if self.is_trash:
             return gettext("Trash")
         return self.name
-
-    @property
-    def cast(self):
-        raise NotImplementedError
-        return self
 
     @lru_cache
     def get_ambit(self):
@@ -199,7 +195,7 @@ class FolderModel(InodeModel):
         """
         return self._meta.model.objects.filter_unified(parent=self, **lookup)
 
-    def move_inodes(self, inode_ids):
+    def move_inodes(self, user, inode_ids):
         """
         Move all Inodes with the given IDs to the end of the current folder.
         """
@@ -221,7 +217,7 @@ class FolderModel(InodeModel):
         parent_ids = set()
         update_inodes = {}
         target_ambit, cache_ambits = self.get_ambit(), {}
-        entries = FolderModel.objects.filter_unified(id__in=inode_ids)
+        entries = FolderModel.objects.filter_unified(id__in=inode_ids, user=user, has_write_permission=True)
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
             parent_ids.add(entry['parent'])
             try:
@@ -340,6 +336,13 @@ class FolderModel(InodeModel):
             return None
         else:
             return self
+
+    def transfer_access_control_list(self, parent_folder):
+        super().transfer_access_control_list(parent_folder)
+        DefaultACE.objects.bulk_create([
+            DefaultACE(folder=self, user=a.user, group=a.group, everyone=a.everyone, privilege=a.privilege)
+            for a in parent_folder.default_access_control_list.all()
+        ])
 
 
 class PinnedFolder(models.Model):

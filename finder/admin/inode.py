@@ -4,12 +4,15 @@ from functools import lru_cache
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.http.response import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseRedirect,
-    JsonResponse,
+    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseForbidden,
+    HttpResponseRedirect, JsonResponse,
 )
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
@@ -18,6 +21,7 @@ from django.utils.translation import gettext
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry
 
 
 class InodeAdmin(admin.ModelAdmin):
@@ -29,6 +33,14 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = [
+            path(
+                'principals',
+                self.admin_site.admin_view(self.lookup_principals),
+            ),
+            path(
+                '<uuid:inode_id>/permissions',
+                self.admin_site.admin_view(self.dispatch_permissions),
+            ),
             path(
                 '<uuid:folder_id>/toggle_pin',
                 self.admin_site.admin_view(self.toggle_pin),
@@ -63,6 +75,112 @@ class InodeAdmin(admin.ModelAdmin):
             request._ambit = folder.get_ambit()
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"Folder with id “{folder_id}” not found.")
+
+    def lookup_principals(self, request):
+        if request.method != 'GET':
+            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
+        lookup = request.GET.get('q', '')
+        results = [{'type': 'everyone', 'principal': None, 'name': gettext("Everyone"), 'is_current_user': False}]
+        for obj in get_user_model().objects.filter(username__icontains=lookup)[:10]:
+            results.append({
+                'type': 'user',
+                'principal': obj.id,
+                'name': str(obj),
+                'is_current_user': obj.id == request.user.id,
+            })
+        for obj in Group.objects.filter(name__icontains=lookup)[:10]:
+            results.append({
+                'type': 'group',
+                'principal': obj.id,
+                'name': str(obj),
+                'is_current_user': False,
+            })
+        return JsonResponse({'access_control_results': results})
+
+    def dispatch_permissions(self, request, inode_id):
+        try:
+            current_inode = self.get_object(request, inode_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound(f"InodeModel<{inode_id}> not found.")
+        if request.method == 'GET':
+            to_default = 'default' in request.GET
+            return self.get_permissions(current_inode, request.user, to_default)
+        if request.method == 'POST':
+            if not current_inode.is_admin(request.user):
+                return HttpResponseForbidden("Not allowed to change permissions for this inode.")
+            try:
+                body = json.loads(request.body)
+                access_control_list = body['access_control_list']
+                to_default = body.get('to_default', False)
+                with transaction.atomic():
+                    if to_default:
+                        assert current_inode.is_folder, "Default permission setting is only allowed on folders."
+                        self.set_default_permissions(current_inode, access_control_list)
+                    elif body.get('recursive'):
+                        assert current_inode.is_folder, "Recursive permission setting is only allowed on folders."
+                        self.set_permissions_recursive(current_inode, access_control_list)
+                    else:
+                        self.set_permissions(current_inode.id, access_control_list)
+            except (KeyError, json.JSONDecodeError):
+                return HttpResponse("Invalid JSON payload.", status=400)
+            else:
+                return self.get_permissions(current_inode, request.user, to_default)
+        return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET and POST requests are allowed.")
+
+    def get_permissions(self, current_inode, current_user, to_default):
+        access_control_list = []
+        if to_default:
+            acl_qs = DefaultAccessControlEntry.objects.filter(folder=current_inode)
+        else:
+            acl_qs = AccessControlEntry.objects.filter(inode=current_inode.id)
+        for ace in acl_qs:
+            entry = ace.as_dict()
+            entry['is_current_user'] = entry['type'] == 'user' and entry['id'] == current_user.id
+            access_control_list.append(entry)
+        return JsonResponse({
+            'access_control_list': access_control_list,
+        })
+
+    def set_permissions(self, current_inode_id, access_control_list):
+        current_acl_qs = AccessControlEntry.objects.filter(inode=current_inode_id)
+        self.update_access_control_list(current_acl_qs, access_control_list, inode=current_inode_id)
+
+    def set_default_permissions(self, current_folder, access_control_list):
+        current_acl_qs = DefaultAccessControlEntry.objects.filter(folder=current_folder)
+        self.update_access_control_list(current_acl_qs, access_control_list, folder=current_folder)
+
+    def update_access_control_list(self, current_acl_qs, next_acl, **kwargs):
+        def compare(ace, entry):
+            entry = entry.as_dict()
+            return ace['type'] == entry['type'] and ace['principal'] == entry['principal']
+
+        entry_ids, update_entries, create_entries = [], [], []
+        for ace in next_acl:
+            if entry := next(filter(lambda entry: compare(ace, entry), current_acl_qs), None):
+                if entry.privilege != ace['privilege']:
+                    entry.privilege = ace['privilege']
+                    update_entries.append(entry)
+                else:
+                    entry_ids.append(entry.id)
+            else:
+                create_kwargs = {'inode': kwargs['inode'], 'privilege': ace['privilege']}
+                if ace['type'] == 'everyone':
+                    create_kwargs['everyone'] = True
+                elif ace['type'] == 'group':
+                    create_kwargs['group'] = Group.objects.get(id=ace['principal'])
+                elif ace['type'] == 'user':
+                    create_kwargs['user'] = get_user_model().objects.get(id=ace['principal'])
+                create_entries.append(current_acl_qs.model(**create_kwargs))
+        current_acl_qs.model.objects.bulk_update(update_entries, ['privilege'])
+        current_acl_qs.model.objects.bulk_create(create_entries)
+        entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
+        current_acl_qs.exclude(id__in=entry_ids).delete()
+
+    def set_permissions_recursive(self, folder, access_control_list):
+        for inode in folder.listdir():
+            self.set_permissions(inode['id'], access_control_list)
+            if inode['is_folder']:
+                self.set_permissions_recursive(FolderModel.objects.get_inode(id=inode['id']), access_control_list)
 
     def toggle_pin(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -115,7 +233,7 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_inodes(self, request, **lookup):
         """
-        Return a serialized list of file/folder-s for the given folder.
+        Return a serialized list of files and folder for the given folder.
         """
         lookup = dict(lookup_by_label(request), **lookup)
         unified_queryset = FolderModel.objects.filter_unified(**lookup)
@@ -184,6 +302,7 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_editor_settings(self, request, inode):
         favorite_folders = self.get_favorite_folders(request, inode.folder)
+        parent_url = self.get_inode_url(request._ambit.slug, str(inode.parent_id)) if inode.parent_id else None
         settings = {
             'name': inode.name,
             'is_folder': inode.is_folder,
@@ -191,11 +310,9 @@ class InodeAdmin(admin.ModelAdmin):
             'favorite_folders': favorite_folders,
             'csrf_token': get_token(request),
             'parent_id': inode.parent_id,
+            'parent_url': parent_url,
+            'is_admin': inode.is_admin(request.user),
         }
-        if inode.parent_id:
-            settings['parent_url'] = self.get_inode_url(request._ambit.slug, str(inode.parent_id))
-        else:
-            settings['parent_url'] = None
         return settings
 
     def get_folderitem_settings(self, request, inode):

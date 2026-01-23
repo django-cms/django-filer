@@ -691,7 +691,14 @@ ul.messagelist {
 	.detail-editor {
 		padding: 0 20px 40px;
 		background-color: colors.$body-bg-color;
-		margin-top: -15px;
+		margin-top: -10px;
+
+		> .button-group {
+			justify-content: flex-end;
+			padding-top: 10px;
+			margin-bottom: -60px;
+			height: 45px;
+		}
 
 		input[readonly] {
 			border: none;

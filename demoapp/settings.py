@@ -118,10 +118,26 @@ STORAGES = {
             'allow_overwrite': True,
         },
     },
+    'finder_demo': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/finder_demo',
+            'base_url': '/media/finder_demo/',
+            'allow_overwrite': True,
+        },
+    },
+    'finder_demo_samples': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/finder_demo_samples',
+            'base_url': '/media/finder_demo_samples/',
+            'allow_overwrite': True,
+        },
+    },
 }
 
 if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
-    STORAGES['finder_private'] = {
+    STORAGES['finder_bucket'] = {
         'BACKEND': 'storages.backends.s3.S3Storage',
         'OPTIONS': {
             'access_key': 'finder',
@@ -130,7 +146,7 @@ if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
             'endpoint_url': 'http://localhost:9000',
         },
     }
-    STORAGES['finder_private_samples'] = {
+    STORAGES['finder_bucket_samples'] = {
         'BACKEND': 'storages.backends.s3.S3Storage',
         'OPTIONS': {
             'access_key': 'finder',

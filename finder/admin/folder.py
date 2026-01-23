@@ -1,8 +1,6 @@
 import json
 
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
@@ -17,7 +15,6 @@ from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.label import Label
-from finder.models.permission import AccessControlEntry
 
 from .inode import InodeAdmin
 
@@ -78,16 +75,8 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.delete_inodes),
             ),
             path(
-                '<uuid:folder_id>/permissions',
-                self.admin_site.admin_view(self.dispatch_permissions),
-            ),
-            path(
                 '<uuid:folder_id>/labels',
                 self.admin_site.admin_view(self.update_labels),
-            ),
-            path(
-                'principals',
-                self.admin_site.admin_view(self.lookup_principals),
             ),
             path(
                 'undo_discard',
@@ -203,6 +192,7 @@ class FolderAdmin(InodeAdmin):
         if search_query := request.GET.get('q'):
             inode_qs = self.search_for_inodes(request, current_folder, search_query)
         else:
+            # inode_qs = self.get_inodes(request, parent=current_folder, has_view_permission=True)
             inode_qs = self.get_inodes(request, parent=current_folder)
         return JsonResponse({
             'inodes': list(inode_qs),
@@ -309,7 +299,7 @@ class FolderAdmin(InodeAdmin):
             target_folder = current_folder
         inode_ids = body.get('inode_ids', [])
         try:
-            target_folder.move_inodes(inode_ids)
+            target_folder.move_inodes(request.user, inode_ids)
         except ValidationError as exc:
             return HttpResponse(exc.messages[0], status=409)
         return JsonResponse({
@@ -359,56 +349,6 @@ class FolderAdmin(InodeAdmin):
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
-    def dispatch_permissions(self, request, folder_id):
-        try:
-            current_folder = self.get_object(request, folder_id)
-        except ObjectDoesNotExist:
-            return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
-        if request.method == 'GET':
-            return self.get_permissions(request, current_folder)
-        if request.method == 'POST':
-            try:
-                return self.set_permissions(request, current_folder)
-            except (KeyError, json.JSONDecodeError):
-                return HttpResponse("Invalid JSON payload.", status=400)
-        return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET and PUT requests are allowed.")
-
-    def get_permissions(self, request, current_folder):
-        access_control_list, default_access_control_list = [], []
-        for ace in AccessControlEntry.objects.filter(inode=current_folder.id):
-            entry = ace.as_dict()
-            entry['is_current_user'] = entry['type'] == 'user' and entry['id'] == request.user.id
-            access_control_list.append(entry)
-        return JsonResponse({
-            'access_control_list': access_control_list,
-            'default_access_control_list': default_access_control_list,
-        })
-
-    def set_permissions(self, request, current_folder):
-        CREATE_ACE = object()
-        body = json.loads(request.body)
-        preserved_ace_ids = []
-        for ace in body['access_control_list']:
-            id = ace.get('id', CREATE_ACE)
-            everyone = ace['type'] == 'everyone'
-            if id is CREATE_ACE:
-                create_kwargs = {'inode': current_folder.id, 'privilege': ace['privilege'], 'everyone': everyone}
-                if not everyone:
-                    if ace['type'] == 'user':
-                        create_kwargs['user'] = get_user_model().objects.get(id=ace['principal'])
-                    elif ace['type'] == 'group':
-                        create_kwargs['group'] = Group.objects.get(id=ace['principal'])
-                created_ace = AccessControlEntry.objects.create(**create_kwargs)
-                preserved_ace_ids.append(created_ace.id)
-            else:
-                update_ace = AccessControlEntry.objects.get(id=id)
-                if update_ace.privilege != ace['privilege']:
-                    update_ace.privilege = ace['privilege']
-                    update_ace.save(update_fields=['privilege'])
-                preserved_ace_ids.append(update_ace.id)
-        AccessControlEntry.objects.filter(inode=current_folder.id).exclude(id__in=preserved_ace_ids).delete()
-        return self.get_permissions(request, current_folder)
-
     def update_labels(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
@@ -442,27 +382,6 @@ class FolderAdmin(InodeAdmin):
                 for id, name, color in Label.objects.filter(ambit=ambit).values_list('id', 'name', 'color')
             ],
         })
-
-    def lookup_principals(self, request):
-        if request.method != 'GET':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
-        lookup = request.GET.get('q', '')
-        results = [{'type': 'everyone', 'principal': None, 'name': gettext("Everyone"), 'is_current_user': False}]
-        for obj in get_user_model().objects.filter(username__icontains=lookup)[:10]:
-            results.append({
-                'type': 'user',
-                'principal': obj.id,
-                'name': str(obj),
-                'is_current_user': obj.id == request.user.id,
-            })
-        for obj in Group.objects.filter(name__icontains=lookup)[:10]:
-            results.append({
-                'type': 'group',
-                'principal': obj.id,
-                'name': str(obj),
-                'is_current_user': False,
-            })
-        return JsonResponse({'access_control_results': results})
 
     def undo_discarded_inodes(self, request):
         if request.method != 'POST':
@@ -512,6 +431,7 @@ class FolderAdmin(InodeAdmin):
             owner=request.user,
             ordering=parent_folder.get_max_ordering() + 1,
         )
+        new_folder.transfer_access_control_list(parent_folder)
         return JsonResponse({'new_folder': self.serialize_inode(request._ambit, new_folder)})
 
     def get_or_create_folder(self, request, folder_id):

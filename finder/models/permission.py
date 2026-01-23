@@ -1,23 +1,23 @@
+from functools import lru_cache
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from finder.models.folder import FolderModel
-
 
 class Privilege(models.TextChoices):
     NONE = '', _("None")
     READ = 'r', _("Read")
     READ_WRITE = 'rw', _("Read & Write")
-    READ_EXECUTE = 'rx', _("Read & Execute")
-    READ_WRITE_EXECUTE = 'rwx', _("Read, Write & Execute")
+    WRITE_ONLY = 'w', _("Write (Dropbox)")
+    ADMIN = 'admin', _("Administrator")
 
 
 class AccessControlBase(models.Model):
     privilege = models.CharField(
-        max_length=3,
+        max_length=8,
         choices=Privilege.choices,
         default=Privilege.NONE,
     )
@@ -69,7 +69,7 @@ class AccessControlBase(models.Model):
 
 
 class AccessControlEntry(AccessControlBase):
-    inode = models.UUIDField()
+    inode = models.UUIDField(db_index=True)
 
     class Meta:
         verbose_name = _("Access Control Entry")
@@ -106,7 +106,7 @@ class AccessControlEntry(AccessControlBase):
 
 class DefaultAccessControlEntry(AccessControlBase):
     folder = models.ForeignKey(
-        FolderModel,
+        'finder.FolderModel',
         on_delete=models.CASCADE,
         related_name='default_access_control_list',
     )

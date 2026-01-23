@@ -4,7 +4,7 @@ import UnarchiveIcon from '../../icons/unarchive.svg';
 
 
 export default function Archive(props) {
-	const {settings} = props;
+	const {settings, children} = props;
 	const [extracting, setExtracting] = useState(false);
 
 	async function extractArchive() {
@@ -31,9 +31,10 @@ export default function Archive(props) {
 		</Fragment>
 	];
 
-	return (
+	return (<>
+		{children}
 		<FileDetails {...props} controlButtons={controlButtons}>
 			<img src={props.settings.thumbnail_url} />
 		</FileDetails>
-	);
+	</>);
 }

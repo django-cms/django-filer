@@ -10,7 +10,7 @@ import PlayIcon from '../../icons/play.svg';
 
 
 export default function Audio(props) {
-	const {settings} = props;
+	const {settings, children} = props;
 	const sampleFields = {
 		start: document.getElementById('id_sample_start') as HTMLInputElement,
 		duration: document.getElementById('id_sample_duration') as HTMLInputElement,
@@ -80,7 +80,8 @@ export default function Audio(props) {
 		cursor: 'wait',
 	};
 
-	return (
+	return (<>
+		{children}
 		<FileDetails controlButtons={controlButtons} {...props}>
 			<div id="wavesurfer-initializing" style={placeholderStyle}>
 				{gettext("Initializing audio player, please wait ...")}
@@ -100,5 +101,5 @@ export default function Audio(props) {
 				progressColor='rgb(65, 118, 144)'
 			/>
 		</FileDetails>
-	);
+	</>);
 }

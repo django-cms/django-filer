@@ -2,7 +2,7 @@
 
 @mixin dialog {
 	dialog {
-		z-index: 1;
+		z-index: 3;
 		border: 1px solid colors.$border-color;
 		border-radius: 4px;
 		box-shadow: 0 0 8px colors.$border-color;
@@ -31,17 +31,22 @@
 
 			thead, tbody, tfoot, tr {
 				display: grid;
-				grid-template-columns: 200px 175px 35px;
+				grid-template-columns: 3fr 2fr 35px;
 				grid-column: 1 / 4;
+			}
+
+			tr {
+				border-bottom: 1px solid var(--hairline-color);
 			}
 
 			td {
 				display: flex;
 				font-size: 1rem;
+				height: 2rem;
 				line-height: 2rem;
-				vertical-align: middle;
-				border-bottom: 1px solid var(--hairline-color);
+				align-items: center;
 				padding: 2px;
+				border: none;
 
 				&[colspan="3"] {
 					grid-column: span 3;
@@ -50,6 +55,10 @@
 				svg {
 					vertical-align: middle;
 					width: 24px;
+				}
+
+				select {
+					margin-top: 4px;
 				}
 
 				&:last-child svg {
@@ -91,6 +100,7 @@
 		}
 
 		.button-group {
+			margin-left: 5px;
 			justify-content: flex-end;
 		}
 	}
