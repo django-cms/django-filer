@@ -30,7 +30,8 @@ import ClipboardIcon from '../icons/clipboard.svg';
 import TrashIcon from '../icons/trash.svg';
 import EraseIcon from '../icons/erase.svg';
 import AddFolderIcon from '../icons/add-folder.svg';
-import LockIcon from '../icons/lock.svg';
+import ShieldUserIcon from '../icons/shield-user.svg';
+import FolderShieldIcon from '../icons/folder-shield.svg';
 import LabelIcon from '../icons/label.svg';
 import DownloadIcon from '../icons/download.svg';
 import UndoIcon from '../icons/undo.svg';
@@ -104,13 +105,13 @@ function ExtraMenu(props) {
 		deselectAll();
 	}
 
-	function openPermissionEditorDialog() {
+	function openPermissionEditorDialog(asDefault: boolean) {
 		labelDialogRef.current?.close();
-		permissionDialogRef.current.show();
+		permissionDialogRef.current.show(asDefault);
 	}
 
 	function openLabelEditorDialog() {
-		permissionDialogRef.current.close();
+		permissionDialogRef.current?.close();
 		labelDialogRef.current.show();
 	}
 
@@ -124,14 +125,6 @@ function ExtraMenu(props) {
 			<li role="option" onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
 			</li>
-			<li role="option" onClick={() => openPermissionEditorDialog()}>
-				<LockIcon/><span>{gettext("Edit folder permissions")}</span>
-			</li>
-			{settings.is_root &&
-			<li role="option" onClick={() => openLabelEditorDialog()}>
-				<LabelIcon/><span>{gettext("Edit labels")}</span>
-			</li>
-			}
 			<li role="option" onClick={() => openUploader(false)}>
 				<UploadIcon/><span>{gettext("Upload local files")}</span>
 			</li>
@@ -147,6 +140,20 @@ function ExtraMenu(props) {
 			<li role="option" aria-disabled={numClippedInodes === 0} onClick={clearClipboard}>
 				<ClipboardIcon/><span>{gettext("Clear clipboard")}</span>
 			</li>
+			{settings.is_admin && <>
+			<hr/>
+			<li role="option" onClick={() => openPermissionEditorDialog(false)}>
+				<ShieldUserIcon/><span>{gettext("Edit folder/files permissions")}</span>
+			</li>
+			<li role="option" onClick={() => openPermissionEditorDialog(true)}>
+				<FolderShieldIcon/><span>{gettext("Edit default permissions")}</span>
+			</li>
+				{settings.is_root &&
+			<li role="option" onClick={() => openLabelEditorDialog()}>
+				<LabelIcon/><span>{gettext("Edit labels")}</span>
+			</li>
+				}
+			</>}
 			{settings.menu_extensions.length && <hr/>}
 			{settings.menu_extensions.map((extension, index) => (
 				<MenuExtension key={index} extension={extension} {...props} />
@@ -378,13 +385,13 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		<DndContext
 			onDragStart={
 				event => {
-					permissionDialogRef.current.handleDragStart(event);
+					permissionDialogRef.current?.handleDragStart(event);
 					labelDialogRef.current?.handleDragStart(event);
 				}
 			}
 			onDragEnd={
 				event => {
-					permissionDialogRef.current.handleDragEnd(event);
+					permissionDialogRef.current?.handleDragEnd(event);
 					labelDialogRef.current?.handleDragEnd(event);
 				}
 			}
@@ -441,8 +448,10 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					</>)}
 				</ul>
 			</nav>
+			{settings.is_admin && <>
 			<PermissionEditor ref={permissionDialogRef} settings={settings} />
-			{settings.is_root && <LabelEditor ref={labelDialogRef} settings={settings} />}
+				{settings.is_root && <LabelEditor ref={labelDialogRef} settings={settings} />}
+			</>}
 		</DndContext>
 	);
 });

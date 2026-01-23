@@ -114,8 +114,8 @@ function SelectPrivilege(props) {
 		<select onChange={event => setValue(event.target.value)} value={value}>
 			<option value="r">{gettext("Read")}</option>
 			<option value="rw">{gettext("Read & Write")}</option>
-			<option value="rx">{gettext("Read & Execute")}</option>
-			<option value="rwx">{gettext("Read, Write & Execute")}</option>
+			<option value="w">{gettext("Write (Dropbox)")}</option>
+			<option value="admin">{gettext("Administrator")}</option>
 		</select>
 	);
 }
@@ -141,6 +141,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	const {settings} = props;
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const selectPrincipalRef = useRef(null);
+	const [toDefault, setToDefault] = useState(false);
 	const [newPrincipal, setNewPrincipal] = useState(null);
 	const [newPrivilege, setNewPrivilege] = useState('r');
 	const [acl, setAcl] = useState<AccessControlEntry[]>([]);
@@ -148,14 +149,15 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	const [offset, setOffset] = useState({x: 0, y: 0});
 
 	useImperativeHandle(forwardedRef, () => ({
-		show: () => fetchPermissions().then(() => setIsOpen(true)),
+		show: (toDefault) => fetchPermissions(toDefault).then(() => setIsOpen(true)),
 		close: () => setIsOpen(false),
 		handleDragStart: (event) => {},
 		handleDragEnd: (event) => event.active.id === 'permission-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));
 
-	async function fetchPermissions() {
-		const url = `${settings.base_url}${settings.folder_id}/permissions`;
+	async function fetchPermissions(toDefault: boolean) {
+		setToDefault(toDefault);
+		const url = `${settings.base_url}${settings.is_folder ? settings.folder_id : settings.file_id}/permissions${toDefault ? '?default' : ''}`;
 		const response = await fetch(url);
 		if (response.ok) {
 			const body = await response.json();
@@ -183,9 +185,9 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 		setOffset({x: 0, y: 0});
 	}
 
-	async function applyACL() {
+	async function applyACL(recursive: boolean = false) {
 		const accessControlList = newPrincipal ? [...acl, {...newPrincipal, privilege: newPrivilege}] : acl;
-		const url = `${settings.base_url}${settings.folder_id}/permissions`;
+		const url = `${settings.base_url}${settings.is_folder ? settings.folder_id : settings.file_id}/permissions`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
@@ -194,6 +196,8 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 			},
 			body: JSON.stringify({
 				access_control_list: accessControlList,
+				recursive: recursive,
+				to_default: toDefault,
 			}),
 		});
 		if (response.ok) {
@@ -210,8 +214,17 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 		};
 	}
 
+	function renderLabel() {
+		if (settings.is_folder) {
+			if (toDefault)
+				return gettext("Default Folder Permissions");
+			return gettext("Folder and File Permissions");
+		}
+		return gettext("File Permissions");
+	}
+
 	return (
-		<Dialog id="permission-dialog" label={gettext("Folder Permissions")} isOpen={isOpen} offset={offset}>
+		<Dialog id="permission-dialog" label={renderLabel()} isOpen={isOpen} offset={offset}>
 			<table>
 				<thead>
 					<tr>
@@ -267,8 +280,9 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 				</tfoot>
 			</table>
 			<div className="button-group">
-				<button onClick={() => dismissDialog()}>{gettext("Dismiss")}</button>
-				<button onClick={() => applyACL()}>{gettext("Apply")}</button>
+				<button type="button" onClick={() => dismissDialog()}>{gettext("Dismiss")}</button>
+				{settings.is_folder && !toDefault && <button type="button" onClick={() => applyACL(true)}>{gettext("Apply recursively")}</button>}
+				<button type="button" onClick={() => applyACL()}>{toDefault ? gettext("Set as default") : gettext("Apply")}</button>
 			</div>
 		</Dialog>
 	);

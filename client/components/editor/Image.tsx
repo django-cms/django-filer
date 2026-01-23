@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, ReactElement, useEffect, useRef, useState} from 'react';
 import ReactCrop, {Crop} from 'react-image-crop';
 import DropDownMenu from '../../common/DropDownMenu';
 import FileDetails from '../../admin/FileDetails';
@@ -16,12 +16,12 @@ import GravityNorthWestIcon from '../../icons/gravity-north-west.svg';
 
 interface GravityOption {
 	label: string,
-	icon: JSX.Element,
+	icon: ReactElement,
 }
 
 
 export default function Image(props) {
-	const {settings} = props;
+	const {settings, children} = props;
 	const cropFields = {
 		x: document.getElementById('id_crop_x') as HTMLInputElement,
 		y: document.getElementById('id_crop_y') as HTMLInputElement,
@@ -107,11 +107,12 @@ export default function Image(props) {
 		</Fragment>
 	];
 
-	return (
+	return (<>
+		{children}
 		<FileDetails controlButtons={controlButtons} {...props}>
 			<ReactCrop crop={crop} aspect={1} onChange={handleChange}>
 				<img className="editable" src={settings.download_url} ref={ref} />
 			</ReactCrop>
 		</FileDetails>
-	);
+	</>);
 }

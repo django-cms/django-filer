@@ -7,11 +7,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
-from django.db.models.expressions import F, Value, Q
+from django.db.models.expressions import Exists, F, OuterRef, Q, Subquery, Value
 from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from finder.models.permission import AccessControlEntry
 
 try:
     from django.contrib.postgres.aggregates import StringAgg
@@ -90,12 +91,23 @@ class InodeManagerMixin:
     Mixin class to be added to managers for models ineriting from `Inode`.
     """
 
-    def get_query(self, model, lookup):
-        lookup = dict(lookup)  # copy to avoid modifying the original
+    def get_query(self, model, **lookup):
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
         labels = lookup.pop('labels__in', None)
         query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
+
+        # query to filter by read/write permissions
+        privilege_exists = lookup.pop('has_read_permission', None) or lookup.pop('has_write_permission', None)
+        owner = lookup.pop('owner', None)
+        if privilege_exists and owner:
+            query &= Q(privilege_exists=True) | Q(owner_id=owner.id)
+        elif privilege_exists:
+            query &= Q(privilege_exists=True)
+        elif owner:
+            query &= Q(owner_id=owner.id)
+
+        # query to filter by mime types
         if mime_types and 'mime_type' in model_field_names:
             queries = []
             for mime_type in mime_types:
@@ -107,8 +119,11 @@ class InodeManagerMixin:
                 else:
                     queries.append(Q(mime_type=mime_type))
             query &= reduce(or_, queries, Q())
+
+        # query to filter by labels
         if labels and 'labels' in model_field_names:
             query &= Q(labels__in=labels)
+
         return query
 
     def filter_unified(self, **lookup):
@@ -119,6 +134,17 @@ class InodeManagerMixin:
         """
         from .file import FileModel
         from .folder import FolderModel
+
+        def has_privileges_subquery(privileges):
+            try:
+                user = lookup.pop('user')
+            except KeyError:
+                raise RuntimeError("When using `has_read/write_permission`, the `user` object is required as well.")
+            group_ids = user.groups.values_list('id', flat=True)
+            return AccessControlEntry.objects.filter(
+                Q(privilege__in=privileges) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
+                inode=OuterRef('id'),
+            )
 
         def get_queryset(model):
             concrete_fields = list(unified_fields.keys())
@@ -136,13 +162,17 @@ class InodeManagerMixin:
                     expressions = {'label_ids': StringAgg(concatenated, ',', distinct=True)}
                 else:
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
+            if lookup.get('has_read_permission') is True:
+                annotations['privilege_exists'] = Exists(has_privileges_subquery(['r', 'rw']))
+            if lookup.get('has_write_permission') is True:
+                annotations['privilege_exists'] = Exists(has_privileges_subquery(['w', 'rw']))
             for name, field in unified_fields.items():
                 if name in annotations:
                     concrete_fields.remove(name)
                 elif name not in model_field_names:
                     value = None if field.default is models.NOT_PROVIDED else field.default
                     expressions[name] = Value(value, output_field=field)
-            query = self.get_query(model, lookup)
+            query = self.get_query(model, **lookup)
             return model.objects.values(*concrete_fields, **expressions).annotate(**annotations).filter(query)
 
         unified_fields = {
@@ -169,7 +199,7 @@ class InodeManagerMixin:
             return folder_qs.get()
         try:
             values = folder_qs.values('id', mime_type=Value(None, output_field=models.CharField())).union(*[
-                model.objects.values('id', 'mime_type').filter(self.get_query(model, lookup))
+                model.objects.values('id', 'mime_type').filter(self.get_query(model, **lookup))
                 for model in FileModel.get_models()
             ]).get()
         except FolderModel.DoesNotExist:
@@ -294,6 +324,25 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     def get_meta_data(self):
         return {}
+
+    def is_admin(self, user):
+        query = Q(inode=self.id, privilege='admin') & (
+            Q(user_id=user.id) | Q(group_id__in=user.groups.values_list('id', flat=True))
+        )
+        return AccessControlEntry.objects.filter(query).exists()
+
+    def delete(self, *args):
+        AccessControlEntry.objects.filter(inode=self.id).delete(*args)
+        super().delete(*args)
+
+    def transfer_access_control_list(self, parent_folder):
+        """
+        Transfer the default access control list from the given folder to this inode.
+        """
+        AccessControlEntry.objects.bulk_create([
+            AccessControlEntry(inode=self.id, user=a.user, group=a.group, everyone=a.everyone, privilege=a.privilege)
+            for a in parent_folder.default_access_control_list.all()
+        ])
 
 
 class DiscardedInode(models.Model):
