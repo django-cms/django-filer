@@ -1,13 +1,16 @@
+from django.contrib.auth import get_user_model
+
 from django.contrib.admin.sites import all_sites
 from django.contrib.sites.models import Site
 from django.core.files.storage import storages
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFileModel
 from finder.models.folder import FolderModel as FinderFolderModel, ROOT_FOLDER_NAME
-from finder.models.inode import InodeModel
+from finder.models.inode import InodeManager, InodeModel
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry
 
 
 class Command(BaseCommand):
@@ -25,6 +28,7 @@ class Command(BaseCommand):
         edit_ambit_parser.add_argument('--values', action='store', nargs='*', type=str)
         delete_ambit_parser = subparsers.add_parser('delete-root', help="Delete named tree root.")
         delete_ambit_parser.add_argument('slug', action='store', type=str)
+        delete_ambit_parser.add_argument('--erase-files', action='store_true', help="Erase files from storage.")
 
     def handle(self, verbosity, *args, **options):
         self.verbosity = verbosity
@@ -46,7 +50,7 @@ class Command(BaseCommand):
                 self.stderr.write(f"Error while change tree root: ‘{exc}’")
         elif subcommand == 'delete-root':
             try:
-                self.edit_ambit(**options)
+                self.delete_ambit(**options)
             except Exception as exc:
                 self.stderr.write(f"Error while deleting tree root: ‘{exc}’")
         else:
@@ -83,7 +87,7 @@ class Command(BaseCommand):
     def add_ambit(self, **options):
         slug = options.pop('slug')
         values = dict(keyval.split('=') for keyval in options['values'])
-        values['verbose_name'] = values.pop('name')
+        values['verbose_name'] = values.pop('name', slug.capitalize())
         if 'site' in values:
             values['site'] = Site.objects.get(id=values['site'])
         if admin_name := values.pop('admin', None):
@@ -92,14 +96,29 @@ class Command(BaseCommand):
                     values['admin_name'] = admin_name
                     break
             else:
-                raise KeyError(f"No such admin site ‘{admin_name}’.")
-        storage_name = values.pop('storage')
-        if storage_name in storages.backends:
-            values['_original_storage'] = storage_name
-        storage_name = values.pop('sample_storage')
-        if storage_name in storages.backends:
-            values['_sample_storage'] = storage_name
+                raise CommandError(f"No such admin site ‘{admin_name}’.")
+        storage_name = values.pop('storage', None)
+        if storage_name not in storages.backends:
+            raise CommandError(f"Storage backend ‘{storage_name}’ is not configured.")
+        values['_original_storage'] = storage_name
+        storage_name = values.pop('sample_storage', None)
+        if storage_name not in storages.backends:
+            raise CommandError(f"Storage backend ‘{storage_name}’ is not configured.")
+        values['_sample_storage'] = storage_name
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
+        # create default ACLs for root folder
+        AccessControlEntry.objects.bulk_create([
+            AccessControlEntry(inode=root_folder.id, everyone=True, privilege='rw'), *[
+                AccessControlEntry(inode=root_folder.id, user=user, privilege='admin')
+                for user in get_user_model().objects.filter(is_superuser=True)
+            ],
+        ])
+        DefaultAccessControlEntry.objects.bulk_create([
+            DefaultAccessControlEntry(folder=root_folder, everyone=True, privilege='rw'), *[
+                DefaultAccessControlEntry(folder=root_folder, user=user, privilege='admin')
+                for user in get_user_model().objects.filter(is_superuser=True)
+            ],
+        ])
         AmbitModel.objects.create(root_folder=root_folder, slug=slug, **values)
         self.stdout.write(f"Successfully created tree root with slug ‘{slug}’.")
 
@@ -116,7 +135,7 @@ class Command(BaseCommand):
                     values['admin_name'] = admin_name
                     break
             else:
-                raise KeyError(f"No such admin site ‘{admin_name}’.")
+                raise CommandError(f"No such admin site ‘{admin_name}’.")
         if storage_name := values.pop('storage', None):
             if storage_name in storages.backends:
                 values['_original_storage'] = storage_name
@@ -127,6 +146,20 @@ class Command(BaseCommand):
             self.stdout.write(f"Successfully updated tree root with slug ‘{slug}’.")
 
     def delete_ambit(self, **options):
+        def delete_recursive(folder):
+            for subfolder in folder.subfolders.all():
+                delete_recursive(subfolder)
+            for file in folder.listdir(is_folder=False):
+                proxy_obj = InodeManager.get_proxy_object(file)
+                if erase_files:
+                    proxy_obj.erase_and_delete(ambit)
+                else:
+                    proxy_obj.delete()
+            folder.delete()
+
         slug = options.pop('slug')
-        if AmbitModel.objects.filter(slug=slug).delete() == 1:
-            self.stdout.write(f"Successfully deleted tree root with slug ‘{slug}’.")
+        ambit = AmbitModel.objects.get(slug=slug)
+        erase_files = options.get('erase_files', False)
+        delete_recursive(ambit.root_folder)
+        ambit.delete()
+        self.stdout.write(f"Successfully deleted tree root with slug ‘{slug}’.")
