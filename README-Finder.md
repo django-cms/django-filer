@@ -209,6 +209,9 @@ Create a root folder using the above configuration:
 python manage.py finder add-root public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
 ```
 
+You can create multiple root folders, each with their own unique slug and name. You may configure a
+storage backend for each root folder or share them between multiple root folders.
+
 If you already have **django-filer** installed and that database is filled, you can migrate the
 meta-data of those files and folders into the new database tables. The physical files on disk are
 not affected by this migration. Remember to leave the `filer` app in `INSTALLED_APPS`.
