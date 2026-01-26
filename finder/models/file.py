@@ -238,6 +238,7 @@ class AbstractFileModel(InodeModel):
             target_ambit.original_storage.save(obj.file_path, readhandle)
         obj._for_write = True
         obj.store_and_save(target_ambit, force_insert=True)
+        obj.transfer_access_control_list(folder)
         folder.refresh_from_db()
         return obj
 

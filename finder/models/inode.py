@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
-from django.db.models.expressions import Exists, F, OuterRef, Q, Subquery, Value
+from django.db.models.expressions import Exists, F, OuterRef, Q, Value
 from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
 from django.utils.functional import cached_property
@@ -136,9 +136,7 @@ class InodeManagerMixin:
         from .folder import FolderModel
 
         def has_privileges_subquery(privileges):
-            try:
-                user = lookup.pop('user')
-            except KeyError:
+            if user is None:
                 raise RuntimeError("When using `has_read/write_permission`, the `user` object is required as well.")
             group_ids = user.groups.values_list('id', flat=True)
             return AccessControlEntry.objects.filter(
@@ -162,9 +160,9 @@ class InodeManagerMixin:
                     expressions = {'label_ids': StringAgg(concatenated, ',', distinct=True)}
                 else:
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
-            if lookup.get('has_read_permission') is True:
+            if has_read_permission:
                 annotations['privilege_exists'] = Exists(has_privileges_subquery(['r', 'rw']))
-            if lookup.get('has_write_permission') is True:
+            if has_write_permission:
                 annotations['privilege_exists'] = Exists(has_privileges_subquery(['w', 'rw']))
             for name, field in unified_fields.items():
                 if name in annotations:
@@ -184,6 +182,9 @@ class InodeManagerMixin:
                 if field.concrete and not field.many_to_many:
                     unified_fields.setdefault(field.name, field)
         unified_annotations = {'owner': F('owner__username'), 'name_lower': Lower('name')}
+        has_read_permission = lookup.pop('has_read_permission', False)
+        has_write_permission = lookup.pop('has_write_permission', False)
+        user = lookup.pop('user', None)
         unified_queryset = get_queryset(FolderModel).union(*[
             get_queryset(model) for model in FileModel.get_models()
         ])
@@ -334,6 +335,32 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     def delete(self, *args):
         AccessControlEntry.objects.filter(inode=self.id).delete()
         super().delete(*args)
+
+    def update_access_control_list(self, next_acl):
+        current_acl_qs = AccessControlEntry.objects.filter(inode=self.id)
+        entry_ids, update_entries, create_entries = [], [], []
+        for ace in next_acl:
+            if entry := next(filter(lambda entry: entry == ace, current_acl_qs), None):
+                if entry.privilege != ace['privilege']:
+                    entry.privilege = ace['privilege']
+                    update_entries.append(entry)
+                else:
+                    entry_ids.append(entry.id)
+            else:
+                create_kwargs = {'inode': self.id, 'privilege': ace['privilege']}
+                if ace['type'] == 'everyone':
+                    create_kwargs['everyone'] = True
+                elif ace['type'] == 'group':
+                    create_kwargs['group_id'] = ace['principal']
+                elif ace['type'] == 'user':
+                    create_kwargs['user_id'] = ace['principal']
+                else:
+                    raise ValueError(f"Unknown access control type {ace['type']}")
+                create_entries.append(AccessControlEntry(**create_kwargs))
+        AccessControlEntry.objects.bulk_update(update_entries, ['privilege'])
+        AccessControlEntry.objects.bulk_create(create_entries)
+        entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
+        current_acl_qs.exclude(id__in=entry_ids).delete()
 
     def transfer_access_control_list(self, parent_folder):
         """

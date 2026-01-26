@@ -437,17 +437,18 @@ class FolderAdmin(InodeAdmin):
     def get_or_create_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        if not (folder := self.get_object(request, folder_id)):
+        if not (parent_folder := self.get_object(request, folder_id)):
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
-        ambit = folder.get_ambit()
-        ordering = folder.get_max_ordering() + 1
+        ambit = parent_folder.get_ambit()
+        ordering = parent_folder.get_max_ordering() + 1
         body = json.loads(request.body)
         for folder_name in body['relative_path'].split('/'):
             folder, created = FolderModel.objects.get_or_create(
                 name=folder_name,
-                parent=folder,
+                parent=parent_folder,
                 defaults={'owner': request.user, 'ordering': ordering},
             )
             if created:
                 ordering += 1
+                folder.transfer_access_control_list(parent_folder)
         return JsonResponse({'folder': self.serialize_inode(ambit, folder)})

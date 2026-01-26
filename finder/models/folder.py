@@ -218,6 +218,7 @@ class FolderModel(InodeModel):
         update_inodes = {}
         target_ambit, cache_ambits = self.get_ambit(), {}
         entries = FolderModel.objects.filter_unified(id__in=inode_ids, user=user, has_write_permission=True)
+        default_access_control_list =  [ace.as_dict() for ace in self.default_access_control_list.all()]
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
             parent_ids.add(entry['parent'])
             try:
@@ -230,6 +231,7 @@ class FolderModel(InodeModel):
             proxy_obj.validate_constraints()
             update_inodes.setdefault(proxy_obj._meta.concrete_model, []).append(proxy_obj)
             storage_transfer(entry)
+            proxy_obj.update_access_control_list(default_access_control_list)
 
         with transaction.atomic():
             for concrete_model, proxy_objects in update_inodes.items():
@@ -336,6 +338,32 @@ class FolderModel(InodeModel):
             return None
         else:
             return self
+
+    def update_default_access_control_list(self, next_acl):
+        default_acl_qs = self.default_access_control_list.all()
+        entry_ids, update_entries, create_entries = [], [], []
+        for ace in next_acl:
+            if entry := next(filter(lambda entry: entry == ace, default_acl_qs), None):
+                if entry.privilege != ace['privilege']:
+                    entry.privilege = ace['privilege']
+                    update_entries.append(entry)
+                else:
+                    entry_ids.append(entry.id)
+            else:
+                create_kwargs = {'folder': self, 'privilege': ace['privilege']}
+                if ace['type'] == 'everyone':
+                    create_kwargs['everyone'] = True
+                elif ace['type'] == 'group':
+                    create_kwargs['group_id'] = ace['principal']
+                elif ace['type'] == 'user':
+                    create_kwargs['user_id'] = ace['principal']
+                else:
+                    raise ValueError(f"Unknown access control type {ace['type']}")
+                create_entries.append(default_acl_qs.model(**create_kwargs))
+        DefaultACE.objects.bulk_update(update_entries, ['privilege'])
+        DefaultACE.objects.bulk_create(create_entries)
+        entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
+        default_acl_qs.exclude(id__in=entry_ids).delete()
 
     def transfer_access_control_list(self, parent_folder):
         super().transfer_access_control_list(parent_folder)

@@ -41,6 +41,12 @@ class AccessControlBase(models.Model):
     class Meta:
         abstract = True
 
+    def __eq__(self, other):
+        entry = self.as_dict()
+        if isinstance(other, AccessControlBase):
+            other = other.as_dict()
+        return entry['type']  == other['type'] and entry['principal'] == other['principal']
+
     def as_dict(self):
         if self.user:
             return {

@@ -16,7 +16,7 @@ from django.http.response import (
 )
 from django.middleware.csrf import get_token
 from django.template.response import TemplateResponse
-from django.urls import path, reverse, reverse_lazy
+from django.urls import path, reverse_lazy
 from django.utils.translation import gettext
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
@@ -115,12 +115,12 @@ class InodeAdmin(admin.ModelAdmin):
                 with transaction.atomic():
                     if to_default:
                         assert current_inode.is_folder, "Default permission setting is only allowed on folders."
-                        self.set_default_permissions(current_inode, access_control_list)
+                        current_inode.update_default_access_control_list(access_control_list)
                     elif body.get('recursive'):
                         assert current_inode.is_folder, "Recursive permission setting is only allowed on folders."
                         self.set_permissions_recursive(current_inode, access_control_list)
                     else:
-                        self.set_permissions(current_inode.id, access_control_list)
+                        current_inode.update_access_control_list(access_control_list)
             except (KeyError, json.JSONDecodeError):
                 return HttpResponse("Invalid JSON payload.", status=400)
             else:
@@ -141,49 +141,12 @@ class InodeAdmin(admin.ModelAdmin):
             'access_control_list': access_control_list,
         })
 
-    def set_permissions(self, current_inode_id, access_control_list):
-        current_acl_qs = AccessControlEntry.objects.filter(inode=current_inode_id)
-        self.update_access_control_list(current_acl_qs, access_control_list, inode=current_inode_id)
-
-    def set_default_permissions(self, current_folder, access_control_list):
-        current_acl_qs = DefaultAccessControlEntry.objects.filter(folder=current_folder)
-        self.update_access_control_list(current_acl_qs, access_control_list, folder=current_folder)
-
-    def update_access_control_list(self, current_acl_qs, next_acl, **kwargs):
-        def compare(ace, entry):
-            entry = entry.as_dict()
-            return ace['type'] == entry['type'] and ace['principal'] == entry['principal']
-
-        entry_ids, update_entries, create_entries = [], [], []
-        for ace in next_acl:
-            if entry := next(filter(lambda entry: compare(ace, entry), current_acl_qs), None):
-                if entry.privilege != ace['privilege']:
-                    entry.privilege = ace['privilege']
-                    update_entries.append(entry)
-                else:
-                    entry_ids.append(entry.id)
-            else:
-                create_kwargs = {k: v for k, v in kwargs.items() if k in {'inode', 'folder'}}
-                if ace['type'] == 'everyone':
-                    create_kwargs['everyone'] = True
-                elif ace['type'] == 'group':
-                    create_kwargs['group'] = Group.objects.get(id=ace['principal'])
-                elif ace['type'] == 'user':
-                    create_kwargs['user'] = get_user_model().objects.get(id=ace['principal'])
-                else:
-                    raise ValueError(f"Unknown access control type {ace['type']}")
-                create_kwargs['privilege'] = ace['privilege']
-                create_entries.append(current_acl_qs.model(**create_kwargs))
-        current_acl_qs.model.objects.bulk_update(update_entries, ['privilege'])
-        current_acl_qs.model.objects.bulk_create(create_entries)
-        entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
-        current_acl_qs.exclude(id__in=entry_ids).delete()
-
     def set_permissions_recursive(self, folder, access_control_list):
-        for inode in folder.listdir():
-            self.set_permissions(inode['id'], access_control_list)
-            if inode['is_folder']:
-                self.set_permissions_recursive(FolderModel.objects.get_inode(id=inode['id']), access_control_list)
+        for entry in folder.listdir():
+            inode = FolderModel.objects.get_inode(id=entry['id'])
+            inode.update_access_control_list(access_control_list)
+            if inode.is_folder:
+                self.set_permissions_recursive(inode, access_control_list)
 
     def toggle_pin(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
