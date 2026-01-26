@@ -10,8 +10,10 @@ class FinderSystemStorage(FileSystemStorage):
         super().__init__(**kwargs)
 
     def path(self, name):
-        id, filename = name.split('/', 1)
-        name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
+        parts = name.split('/', 1)
+        if len(parts) == 1:
+            parts.append('')
+        name = self.template.format(id=parts[0], id02=parts[0][0:2], id24=parts[0][2:4], filename=parts[1])
         return super().path(name)
 
     def url(self, name):

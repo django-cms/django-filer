@@ -245,8 +245,17 @@ class AbstractFileModel(InodeModel):
         return self.save(**kwargs)
 
     def erase_and_delete(self, ambit, using=None, keep_parents=False):
-        if not self._meta.abstract and ambit.original_storage.exists(self.file_path):
-            ambit.original_storage.delete(self.file_path)
+        if not self._meta.abstract:
+            if ambit.original_storage.exists(self.file_path):
+                ambit.original_storage.delete(self.file_path)
+            # delete samples and thumbnails if any
+            dir_path = str(self.id)
+            try:
+                dir, files = ambit.sample_storage.listdir(dir_path)
+            except FileNotFoundError:
+                files = []
+            for file_name in files:
+                ambit.sample_storage.delete(f'{dir_path}/{file_name}')
         self.delete(using, keep_parents)
 
 

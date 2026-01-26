@@ -332,7 +332,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         return AccessControlEntry.objects.filter(query).exists()
 
     def delete(self, *args):
-        AccessControlEntry.objects.filter(inode=self.id).delete(*args)
+        AccessControlEntry.objects.filter(inode=self.id).delete()
         super().delete(*args)
 
     def transfer_access_control_list(self, parent_folder):
