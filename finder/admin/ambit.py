@@ -81,13 +81,35 @@ def get_app_list(self, request, app_label=None):
     ambit_models = get_ambit_queryset(self.name, current_site)
     register_ambit_admins(ambit_models)
     app_dict = self._build_app_dict(request)
+
+    # override the 'Finder' app to only show the ambit proxy models
+    app_dict['finder'] = {
+        'name': 'Finder',
+        'app_label': 'finder',
+        'app_url': reverse('admin:app_list', kwargs={'app_label': 'finder'}, current_app=self.name),
+        'has_module_perms': True,
+        'models': [],
+    }
     url_parts = reverse('admin:finder_foldermodel_changelist', current_app=self.name).split('/')
-    if 'finder' in app_dict:
-        for model_dict in app_dict['finder']['models']:
-            parts = [model_dict['object_name'] if part == 'foldermodel' else part for part in url_parts]
-            if parts[-1] != '':
-                parts.append('')
-            model_dict['admin_url'] = '/'.join(parts)
+    for model, model_admin in self._registry.items():
+        if model._meta.proxy_for_model is not AmbitModel:
+            continue
+        root_folder = AmbitModel.objects.get(slug=model._meta.model_name).root_folder
+        if not root_folder.has_read_permission(request.user):
+            continue
+        parts = [model._meta.model_name if part == 'foldermodel' else part for part in url_parts]
+        if parts[-1] != '':
+            parts.append('')
+        app_dict[model._meta.app_label]['models'].append({
+            'model': model,
+            'name': model._meta.verbose_name,
+            'object_name': model._meta.model_name,
+            'perms': {'add': False, 'change': False, 'delete': False, 'view': True},
+            'add_url': None,
+            'admin_url': '/'.join(parts),
+            'view_only': True,
+        })
+
     app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
     for app in app_list:
         app['models'].sort(key=lambda x: x['name'])

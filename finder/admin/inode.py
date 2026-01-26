@@ -31,6 +31,15 @@ class InodeAdmin(admin.ModelAdmin):
         super().__init__(model, admin_site)
         self.base_url = reverse_lazy('admin:finder_foldermodel_changelist', current_app=admin_site.name)
 
+    def has_module_perms(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return obj and obj.has_write_permission(request.user)
+
+    def has_view_permission(self, request, obj=None):
+        return obj and obj.has_read_permission(request.user)
+
     def get_urls(self):
         urls = [
             path(
@@ -106,7 +115,7 @@ class InodeAdmin(admin.ModelAdmin):
             to_default = 'default' in request.GET
             return self.get_permissions(current_inode, request.user, to_default)
         if request.method == 'POST':
-            if not current_inode.is_admin(request.user):
+            if not current_inode.has_admin_permission(request.user):
                 return HttpResponseForbidden("Not allowed to change permissions for this inode.")
             try:
                 body = json.loads(request.body)
@@ -277,7 +286,7 @@ class InodeAdmin(admin.ModelAdmin):
             'csrf_token': get_token(request),
             'parent_id': inode.parent_id,
             'parent_url': parent_url,
-            'is_admin': inode.is_admin(request.user),
+            'is_admin': inode.has_admin_permission(request.user),
         }
         return settings
 

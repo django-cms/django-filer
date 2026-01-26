@@ -34,9 +34,6 @@ class FolderAdmin(InodeAdmin):
             )],
         )
 
-    def has_module_permission(self, request):
-        return False
-
     def get_urls(self):
         filtered_views = ['finder.admin.folder.FolderAdmin.change_view', 'django.views.generic.base.RedirectView']
         default_urls = filter(lambda p: p.lookup_str not in filtered_views, super().get_urls())
@@ -100,9 +97,6 @@ class FolderAdmin(InodeAdmin):
             if model_admin := self.admin_site._registry.get(model):
                 urls.extend(model_admin.get_menu_extension_urls())
         return urls
-
-    def has_add_permission(self, request):
-        return False
 
     def change_view(self, request, inode_id, **kwargs):
         try:

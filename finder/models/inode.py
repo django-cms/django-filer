@@ -326,9 +326,32 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     def get_meta_data(self):
         return {}
 
-    def is_admin(self, user):
+    def has_admin_permission(self, user):
+        if user.is_superuser:
+            return True
         query = Q(inode=self.id, privilege='admin') & (
-            Q(user_id=user.id) | Q(group_id__in=user.groups.values_list('id', flat=True))
+            Q(everyone=True) | Q(user_id=user.id) |
+            Q(group_id__in=user.groups.values_list('id', flat=True))
+        )
+        return AccessControlEntry.objects.filter(query).exists()
+
+    def has_write_permission(self, user):
+        if user.is_superuser:
+            return True
+        query = Q(inode=self.id, privilege__in=['admin', 'rw']) & (
+            Q(everyone=True) | Q(user_id=user.id) |
+            Q(group_id__in=user.groups.values_list('id', flat=True))
+
+        )
+        return AccessControlEntry.objects.filter(query).exists()
+
+    def has_read_permission(self, user):
+        if user.is_superuser:
+            return True
+        query = Q(inode=self.id, privilege__in=['admin', 'rw', 'r']) & (
+            Q(everyone=True) | Q(user_id=user.id) |
+            Q(group_id__in=user.groups.values_list('id', flat=True))
+
         )
         return AccessControlEntry.objects.filter(query).exists()
 
