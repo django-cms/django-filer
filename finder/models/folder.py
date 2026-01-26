@@ -14,8 +14,7 @@ except ImportError:
 
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
-from finder.models.permission import DefaultAccessControlEntry as DefaultACE
-
+from finder.models.permission import DefaultAccessControlEntry as DefaultACE, AccessControlEntry
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
@@ -231,11 +230,12 @@ class FolderModel(InodeModel):
             proxy_obj.validate_constraints()
             update_inodes.setdefault(proxy_obj._meta.concrete_model, []).append(proxy_obj)
             storage_transfer(entry)
-            proxy_obj.update_access_control_list(default_access_control_list)
 
         with transaction.atomic():
             for concrete_model, proxy_objects in update_inodes.items():
                 concrete_model.objects.bulk_update(proxy_objects, ['parent', 'ordering'])
+                for obj in proxy_objects:
+                    obj.update_access_control_list(default_access_control_list)
 
         for folder in FolderModel.objects.filter(id__in=parent_ids):
             folder.reorder()
