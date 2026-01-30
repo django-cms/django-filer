@@ -184,10 +184,9 @@ class FolderAdmin(InodeAdmin):
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if search_query := request.GET.get('q'):
-            inode_qs = self.search_for_inodes(request, current_folder, search_query)
+            inode_qs = self.search_for_inodes(request, current_folder, search_query, has_read_permission=True)
         else:
-            # inode_qs = self.get_inodes(request, parent=current_folder, has_view_permission=True)
-            inode_qs = self.get_inodes(request, parent=current_folder)
+            inode_qs = self.get_inodes(request, parent=current_folder, has_read_permission=True)
         return JsonResponse({
             'inodes': list(inode_qs),
         })

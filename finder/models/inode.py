@@ -95,11 +95,11 @@ class InodeManagerMixin:
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
         labels = lookup.pop('labels__in', None)
+        privilege_exists = lookup.pop('has_read_permission', None) or lookup.pop('has_write_permission', None)
+        owner = lookup.pop('owner', None)
         query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
 
         # query to filter by read/write permissions
-        privilege_exists = lookup.pop('has_read_permission', None) or lookup.pop('has_write_permission', None)
-        owner = lookup.pop('owner', None)
         if privilege_exists and owner:
             query &= Q(privilege_exists=True) | Q(owner_id=owner.id)
         elif privilege_exists:
@@ -160,10 +160,12 @@ class InodeManagerMixin:
                     expressions = {'label_ids': StringAgg(concatenated, ',', distinct=True)}
                 else:
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
-            if has_read_permission:
+            if lookup.get('has_read_permission'):
                 annotations['privilege_exists'] = Exists(has_privileges_subquery(['r', 'rw']))
-            if has_write_permission:
+            if lookup.get('has_write_permission'):
                 annotations['privilege_exists'] = Exists(has_privileges_subquery(['w', 'rw']))
+            if user:
+                lookup['owner'] = user
             for name, field in unified_fields.items():
                 if name in annotations:
                     concrete_fields.remove(name)
@@ -182,8 +184,6 @@ class InodeManagerMixin:
                 if field.concrete and not field.many_to_many:
                     unified_fields.setdefault(field.name, field)
         unified_annotations = {'owner': F('owner__username'), 'name_lower': Lower('name')}
-        has_read_permission = lookup.pop('has_read_permission', False)
-        has_write_permission = lookup.pop('has_write_permission', False)
         user = lookup.pop('user', None)
         unified_queryset = get_queryset(FolderModel).union(*[
             get_queryset(model) for model in FileModel.get_models()
@@ -327,7 +327,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         return {}
 
     def has_admin_permission(self, user):
-        if user.is_superuser:
+        if user.is_superuser or self.owner == user:
             return True
         query = Q(inode=self.id, privilege='admin') & (
             Q(everyone=True) | Q(user_id=user.id) |
@@ -336,7 +336,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         return AccessControlEntry.objects.filter(query).exists()
 
     def has_write_permission(self, user):
-        if user.is_superuser:
+        if user.is_superuser or self.owner == user:
             return True
         query = Q(inode=self.id, privilege__in=['admin', 'rw']) & (
             Q(everyone=True) | Q(user_id=user.id) |
@@ -346,7 +346,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         return AccessControlEntry.objects.filter(query).exists()
 
     def has_read_permission(self, user):
-        if user.is_superuser:
+        if user.is_superuser or self.owner == user:
             return True
         query = Q(inode=self.id, privilege__in=['admin', 'rw', 'r']) & (
             Q(everyone=True) | Q(user_id=user.id) |
