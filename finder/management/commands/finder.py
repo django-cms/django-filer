@@ -10,7 +10,7 @@ from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFileModel
 from finder.models.folder import FolderModel as FinderFolderModel, ROOT_FOLDER_NAME
 from finder.models.inode import InodeManager, InodeModel
-from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 
 
 class Command(BaseCommand):
@@ -108,14 +108,14 @@ class Command(BaseCommand):
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
         # create default ACLs for root folder
         AccessControlEntry.objects.bulk_create([
-            AccessControlEntry(inode=root_folder.id, everyone=True, privilege='rw'), *[
-                AccessControlEntry(inode=root_folder.id, user=user, privilege='admin')
+            AccessControlEntry(inode=root_folder.id, everyone=True, privilege=Privilege.READ_WRITE), *[
+                AccessControlEntry(inode=root_folder.id, user=user, privilege=Privilege.FULL)
                 for user in get_user_model().objects.filter(is_superuser=True)
             ],
         ])
         DefaultAccessControlEntry.objects.bulk_create([
-            DefaultAccessControlEntry(folder=root_folder, everyone=True, privilege='rw'), *[
-                DefaultAccessControlEntry(folder=root_folder, user=user, privilege='admin')
+            DefaultAccessControlEntry(folder=root_folder, everyone=True, privilege=Privilege.READ_WRITE), *[
+                DefaultAccessControlEntry(folder=root_folder, user=user, privilege=Privilege.FULL)
                 for user in get_user_model().objects.filter(is_superuser=True)
             ],
         ])

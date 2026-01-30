@@ -21,7 +21,7 @@ from django.utils.translation import gettext
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder
-from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 
 
 class InodeAdmin(admin.ModelAdmin):
@@ -35,10 +35,10 @@ class InodeAdmin(admin.ModelAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return obj and obj.has_write_permission(request.user)
+        return obj and obj.has_permission(request.user, Privilege.WRITE)
 
     def has_view_permission(self, request, obj=None):
-        return obj and obj.has_read_permission(request.user)
+        return obj and obj.has_permission(request.user, Privilege.READ)
 
     def get_urls(self):
         urls = [
@@ -115,7 +115,7 @@ class InodeAdmin(admin.ModelAdmin):
             to_default = 'default' in request.GET
             return self.get_permissions(current_inode, request.user, to_default)
         if request.method == 'POST':
-            if not current_inode.has_admin_permission(request.user):
+            if not current_inode.has_permission(request.user, Privilege.ADMIN):
                 return HttpResponseForbidden("Not allowed to change permissions for this inode.")
             try:
                 body = json.loads(request.body)
@@ -286,7 +286,7 @@ class InodeAdmin(admin.ModelAdmin):
             'csrf_token': get_token(request),
             'parent_id': inode.parent_id,
             'parent_url': parent_url,
-            'is_admin': inode.has_admin_permission(request.user),
+            'is_admin': inode.has_permission(request.user, Privilege.ADMIN),
         }
         return settings
 

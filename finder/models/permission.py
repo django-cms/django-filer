@@ -7,17 +7,17 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
-class Privilege(models.TextChoices):
-    NONE = '', _("None")
-    READ = 'r', _("Read")
-    READ_WRITE = 'rw', _("Read & Write")
-    WRITE_ONLY = 'w', _("Write (Dropbox)")
-    ADMIN = 'admin', _("Administrator")
+class Privilege(models.IntegerChoices):
+    NONE = 0, _("None")
+    READ = 1, _("Read")
+    WRITE = 2, _("Write (Dropbox)")
+    READ_WRITE = 3, _("Read & Write")
+    ADMIN = 4, _("Administrator")
+    FULL = 7, _("Full Control")
 
 
 class AccessControlBase(models.Model):
-    privilege = models.CharField(
-        max_length=8,
+    privilege = models.PositiveSmallIntegerField(
         choices=Privilege.choices,
         default=Privilege.NONE,
     )
@@ -104,6 +104,10 @@ class AccessControlEntry(AccessControlBase):
                 condition=Q(everyone=True),
                 name='acl_inode_everyone_unique',
             ),
+            models.CheckConstraint(
+                check=(Q(privilege__in=[Privilege.READ, Privilege.WRITE, Privilege.READ_WRITE, Privilege.FULL])),
+                name='acl_valid_privilege',
+            ),
         ]
 
     def __repr__(self):
@@ -128,5 +132,9 @@ class DefaultAccessControlEntry(AccessControlBase):
                     (Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True))
                 ),
                 name='dacl_single_principal',
+            ),
+            models.CheckConstraint(
+                check=(Q(privilege__in=[Privilege.READ, Privilege.WRITE, Privilege.READ_WRITE, Privilege.FULL])),
+                name='dacl_valid_privilege',
             ),
         ]

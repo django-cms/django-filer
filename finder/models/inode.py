@@ -12,7 +12,8 @@ from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from finder.models.permission import AccessControlEntry
+
+from finder.models.permission import AccessControlEntry, Privilege
 
 try:
     from django.contrib.postgres.aggregates import StringAgg
@@ -135,12 +136,12 @@ class InodeManagerMixin:
         from .file import FileModel
         from .folder import FolderModel
 
-        def has_privileges_subquery(privileges):
+        def has_privilege_subquery(privilege):
             if user is None:
                 raise RuntimeError("When using `has_read/write_permission`, the `user` object is required as well.")
             group_ids = user.groups.values_list('id', flat=True)
-            return AccessControlEntry.objects.filter(
-                Q(privilege__in=privileges) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
+            return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
+                Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
                 inode=OuterRef('id'),
             )
 
@@ -161,9 +162,9 @@ class InodeManagerMixin:
                 else:
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
             if lookup.get('has_read_permission'):
-                annotations['privilege_exists'] = Exists(has_privileges_subquery(['r', 'rw']))
+                annotations['privilege_exists'] = Exists(has_privilege_subquery(Privilege.READ))
             if lookup.get('has_write_permission'):
-                annotations['privilege_exists'] = Exists(has_privileges_subquery(['w', 'rw']))
+                annotations['privilege_exists'] = Exists(has_privilege_subquery(Privilege.WRITE))
             if user:
                 lookup['owner'] = user
             for name, field in unified_fields.items():
@@ -326,34 +327,15 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     def get_meta_data(self):
         return {}
 
-    def has_admin_permission(self, user):
+    def has_permission(self, user, privilege):
+        assert (privilege & Privilege.FULL) != 0, "Invalid privilege value."
         if user.is_superuser or self.owner == user:
             return True
-        query = Q(inode=self.id, privilege='admin') & (
-            Q(everyone=True) | Q(user_id=user.id) |
-            Q(group_id__in=user.groups.values_list('id', flat=True))
-        )
-        return AccessControlEntry.objects.filter(query).exists()
-
-    def has_write_permission(self, user):
-        if user.is_superuser or self.owner == user:
-            return True
-        query = Q(inode=self.id, privilege__in=['admin', 'rw']) & (
-            Q(everyone=True) | Q(user_id=user.id) |
-            Q(group_id__in=user.groups.values_list('id', flat=True))
-
-        )
-        return AccessControlEntry.objects.filter(query).exists()
-
-    def has_read_permission(self, user):
-        if user.is_superuser or self.owner == user:
-            return True
-        query = Q(inode=self.id, privilege__in=['admin', 'rw', 'r']) & (
-            Q(everyone=True) | Q(user_id=user.id) |
-            Q(group_id__in=user.groups.values_list('id', flat=True))
-
-        )
-        return AccessControlEntry.objects.filter(query).exists()
+        group_ids = user.groups.values_list('id', flat=True)
+        return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
+            Q(privilege_mask__gt=0, inode=self.id) &
+            (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
+        ).exists()
 
     def delete(self, *args):
         AccessControlEntry.objects.filter(inode=self.id).delete()

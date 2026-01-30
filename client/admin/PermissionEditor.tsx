@@ -15,12 +15,20 @@ import UserIcon from '../icons/user.svg';
 import UserMeIcon from '../icons/user-me.svg';
 
 
+enum Privilege {
+	READ = 1,
+	WRITE = 2,
+	READ_WRITE = 3,
+	FULL = 7,
+}
+
+
 type AccessControlEntry = {
 	id: string,
 	type: 'user'|'group'|'everyone',
 	principal: number|null,
 	name: string,
-	privilege: ''|'r'|'rw'|'rx'|'rwx',
+	privilege: Privilege,
 	is_current_user: boolean,
 };
 
@@ -111,11 +119,11 @@ function SelectPrivilege(props) {
 	const {value, setValue} = props;
 
 	return (
-		<select onChange={event => setValue(event.target.value)} value={value}>
-			<option value="r">{gettext("Read")}</option>
-			<option value="rw">{gettext("Read & Write")}</option>
-			<option value="w">{gettext("Write (Dropbox)")}</option>
-			<option value="admin">{gettext("Administrator")}</option>
+		<select onChange={event => setValue(parseInt(event.target.value))} value={value}>
+			<option value={Privilege.READ}>{gettext("Read")}</option>
+			<option value={Privilege.READ_WRITE}>{gettext("Read & Write")}</option>
+			<option value={Privilege.WRITE}>{gettext("Write (Dropbox)")}</option>
+			<option value={Privilege.FULL}>{gettext("Full Control")}</option>
 		</select>
 	);
 }
@@ -143,7 +151,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	const selectPrincipalRef = useRef(null);
 	const [toDefault, setToDefault] = useState(false);
 	const [newPrincipal, setNewPrincipal] = useState(null);
-	const [newPrivilege, setNewPrivilege] = useState('r');
+	const [newPrivilege, setNewPrivilege] = useState(Privilege.READ);
 	const [acl, setAcl] = useState<AccessControlEntry[]>([]);
 	const [isOpen, setIsOpen] = useState(false);
 	const [offset, setOffset] = useState({x: 0, y: 0});
@@ -172,7 +180,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 			setAcl([...acl, {...newPrincipal, privilege: newPrivilege}]);
 			selectPrincipalRef.current.clearInput();
 			setNewPrincipal(null);
-			setNewPrivilege('r');
+			setNewPrivilege(Privilege.READ);
 			tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
 		}
 	}
@@ -180,7 +188,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	function dismissDialog() {
 		selectPrincipalRef.current.clearInput();
 		setNewPrincipal(null);
-		setNewPrivilege('r');
+		setNewPrivilege(Privilege.READ);
 		setIsOpen(false);
 		setOffset({x: 0, y: 0});
 	}
@@ -208,7 +216,7 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 	}
 
 	function updatePrivilege(index: number) {
-		return (privilege: string) => {
+		return (privilege: Privilege) => {
 			const updatedAce = {...acl[index], privilege} as AccessControlEntry;
 			setAcl(acl.toSpliced(index, 1, updatedAce));
 		};

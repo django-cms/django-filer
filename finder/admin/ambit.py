@@ -11,6 +11,7 @@ from django.urls import Resolver404, resolve, reverse
 from django.views.decorators.common import no_append_slash
 
 from finder.models.ambit import AmbitModel
+from finder.models.permission import Privilege
 
 
 def get_ambit_queryset(admin_name, current_site):
@@ -95,7 +96,7 @@ def get_app_list(self, request, app_label=None):
         if model._meta.proxy_for_model is not AmbitModel:
             continue
         root_folder = AmbitModel.objects.get(slug=model._meta.model_name).root_folder
-        if not root_folder.has_read_permission(request.user):
+        if not root_folder.has_permission(request.user, Privilege.READ):
             continue
         parts = [model._meta.model_name if part == 'foldermodel' else part for part in url_parts]
         if parts[-1] != '':
