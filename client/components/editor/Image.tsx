@@ -31,21 +31,23 @@ export default function Image(props) {
 	};
 	const gravityField = document.getElementById('id_gravity') as HTMLInputElement;
 	const [crop, setCrop] = useState<Crop>(null);
-	const [gravity, setGravity] = useState<string>(gravityField.value);
+	const [gravity, setGravity] = useState<string>(gravityField?.value);
 	const ref = useRef(null);
 	const gravityOptions: Record<string, GravityOption> = {
 		'': {label: gettext("Center"), icon: <GravityCenterIcon/>},
 		'n': {label: gettext("North"), icon: <GravityNorthIcon/>},
 		'ne': {label: gettext("Northeast"), icon: <GravityNorthEastIcon/>},
-		 'e': {label: gettext("East"), icon: <GravityEastIcon/>},
-		 'se': {label: gettext("Southeast"), icon: <GravitySouthEastIcon/>},
-		 's': {label: gettext("South"), icon: <GravitySouthIcon/>},
-		 'sw': {label: gettext("Southwest"), icon: <GravitySouthWestIcon/>},
-		 'w': {label: gettext("West"), icon: <GravityWestIcon/>},
-		 'nw': {label: gettext("Northwest"), icon: <GravityNorthWestIcon/>},
+		'e': {label: gettext("East"), icon: <GravityEastIcon/>},
+		'se': {label: gettext("Southeast"), icon: <GravitySouthEastIcon/>},
+		's': {label: gettext("South"), icon: <GravitySouthIcon/>},
+		'sw': {label: gettext("Southwest"), icon: <GravitySouthWestIcon/>},
+		'w': {label: gettext("West"), icon: <GravityWestIcon/>},
+		'nw': {label: gettext("Northwest"), icon: <GravityNorthWestIcon/>},
 	};
 
 	useEffect(() => {
+		if (!gravityField || !cropFields)
+			return;
 		const crop = () => {
 			if (!cropFields.size.value)
 				return;
@@ -86,6 +88,7 @@ export default function Image(props) {
 			cropFields.x.value = '';
 			cropFields.y.value = '';
 			cropFields.size.value = '';
+			setGravityOption('');
 		}
 	}
 
@@ -97,7 +100,7 @@ export default function Image(props) {
 	const controlButtons = [
 		<Fragment key="clear-crop">
 			<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
-			<DropDownMenu className="with-caret" wrapperElement="div" label={<Fragment>{gettext("Gravity")}: {gravityOptions[gravity].label}</Fragment>} tooltip={gettext("Align image before cropping")}>
+			<DropDownMenu className="with-caret" wrapperElement="div" label={<Fragment>{gettext("Gravity")}: {gravityOptions[gravity]?.label}</Fragment>} tooltip={gettext("Align image before cropping")}>
 				{Object.entries(gravityOptions).map(([value, record]) => (
 					<li key={value} value={value} role="option" aria-selected={gravity === value} onClick={() => setGravityOption(value)}>
 						{record.icon}{record.label}

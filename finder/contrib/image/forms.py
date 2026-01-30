@@ -4,11 +4,13 @@ from django.utils.translation import gettext_lazy as _
 
 from entangled.forms import EntangledModelFormMixin
 
-from finder.contrib.image.models import ImageFileModel, GravityChoices
+from finder.contrib.image.models import ImageFileModel, Gravity
 from finder.forms.file import FileForm
 
 
 class ImageFileForm(EntangledModelFormMixin, FileForm):
+    width = IntegerField(widget=HiddenInput())
+    height = IntegerField(widget=HiddenInput())
     crop_x = FloatField(
         widget=HiddenInput(),
         required=False,
@@ -19,12 +21,6 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
     )
     crop_size = FloatField(
         widget=HiddenInput(),
-        required=False,
-    )
-    width = IntegerField(widget=HiddenInput())
-    height = IntegerField(widget=HiddenInput())
-    gravity = ChoiceField(
-        choices=GravityChoices.items(),
         required=False,
     )
     alt_text = CharField(
@@ -40,5 +36,5 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
 
     class Meta:
         model = ImageFileModel
-        entangled_fields = {'meta_data': ['crop_x', 'crop_y', 'crop_size', 'gravity', 'alt_text', 'credit']}
-        untangled_fields = ['name', 'labels', 'width', 'height']
+        entangled_fields = {'meta_data': ['alt_text', 'credit']}
+        untangled_fields = ['name', 'labels', 'width', 'height', 'crop_x', 'crop_y', 'crop_size', 'gravity']

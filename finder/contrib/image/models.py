@@ -5,23 +5,23 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from finder.models.file import AbstractFileModel
 
 
 logger = getLogger(__name__)
 
-GravityChoices = {
-    '': "Center",
-    'n': "North",
-    'ne': "Northeast",
-    'e': "East",
-    'se': "Southeast",
-    's': "South",
-    'sw': "Southwest",
-    'w': "West",
-    'nw': "Northwest",
-}
+class Gravity(models.TextChoices):
+    CENTER = '', _("Center")
+    NORTH = 'n', _("North")
+    NORTHEAST = 'ne', _("Northeast")
+    EAST = 'e', _("East")
+    SOUTHEAST = 'se', _("Southeast")
+    SOUTH = 's', _("South")
+    SOUTHWEST = 'sw', _("Southwest")
+    WEST = 'w', _("West")
+    NORTHWEST = 'nw', _("Northwest")
 
 
 class ImageFileModel(AbstractFileModel):
@@ -33,6 +33,24 @@ class ImageFileModel(AbstractFileModel):
 
     width = models.SmallIntegerField(default=0)
     height = models.SmallIntegerField(default=0)
+    crop_x = models.FloatField(
+        blank=True,
+        null=True,
+    )
+    crop_y = models.FloatField(
+        blank=True,
+        null=True,
+    )
+    crop_size = models.FloatField(
+        blank=True,
+        null=True,
+    )
+    gravity = models.CharField(
+        choices=Gravity.choices,
+        default=Gravity.CENTER,
+        max_length=2,
+        blank=True,
+    )
 
     class Meta:
         app_label = 'finder'
@@ -55,18 +73,12 @@ class ImageFileModel(AbstractFileModel):
 
     def get_cropped_filename(self, width, height):
         file_name = Path(self.file_name)
-        crop_x, crop_y, crop_size, gravity = (
-            self.meta_data.get('crop_x'),
-            self.meta_data.get('crop_y'),
-            self.meta_data.get('crop_size'),
-            self.meta_data.get('gravity'),
-        )
+        crop_x, crop_y, crop_size, gravity = self.crop_x, self.crop_y, self.crop_size, self.gravity
         if crop_x is None or crop_y is None or crop_size is None:
             cropped_path_template = '{stem}__{width}x{height}{suffix}'
         else:
             crop_x, crop_y, crop_size = int(crop_x), int(crop_y), int(crop_size)
             cropped_path_template = '{stem}__{width}x{height}__{crop_x}_{crop_y}_{crop_size}{gravity}{suffix}'
-        gravity = gravity if gravity in GravityChoices else ''
         return cropped_path_template.format(
             stem=file_name.stem,
             width=round(width),
@@ -85,12 +97,7 @@ class ImageFileModel(AbstractFileModel):
         #     "({0}x{1})".format(orig_width, orig_height, out_width, out_height)
         # )
         orig_aspect_ratio = orig_width / orig_height
-        crop_x, crop_y, crop_size, gravity = (
-            self.meta_data.get('crop_x'),
-            self.meta_data.get('crop_y'),
-            self.meta_data.get('crop_size'),
-            self.meta_data.get('gravity'),
-        )
+        crop_x, crop_y, crop_size, gravity = self.crop_x, self.crop_y, self.crop_size, self.gravity
         if crop_x is None or crop_y is None or crop_size is None:
             # crop in the center of the image
             if orig_width > orig_height:
@@ -131,17 +138,17 @@ class ImageFileModel(AbstractFileModel):
                 crop_width = max(crop_height * aspect_ratio, out_width)
 
         # extend the horizontal crop size to prevent blurry images
-        if gravity in ('e', 'ne', 'se'):
+        if gravity in (Gravity.EAST, Gravity.NORTHEAST, Gravity.SOUTHEAST):
             crop_x = max(crop_x + max(crop_resize - crop_width, 0), 0)
-        elif gravity in ('w', 'nw', 'sw'):
+        elif gravity in (Gravity.WEST, Gravity.NORTHWEST, Gravity.SOUTHWEST):
             crop_x = max(crop_x - max(min(crop_width - crop_size, crop_width), 0), 0)
         else:  # centered crop
             crop_x = max(crop_x - (crop_width - crop_size) / 2, 0)
 
         # extend the vertical crop size to prevent blurry images
-        if gravity in ('s', 'se', 'sw'):
+        if gravity in (Gravity.SOUTH, Gravity.SOUTHEAST, Gravity.SOUTHWEST):
             crop_y = max(crop_y + max(crop_resize - crop_height, 0), 0)
-        elif gravity in ('n', 'ne', 'nw'):
+        elif gravity in (Gravity.NORTH, Gravity.NORTHEAST, Gravity.NORTHWEST):
             crop_y = max(crop_y - max(min(crop_height - crop_size, crop_height), 0), 0)
         else:  # centered crop
             crop_y = max(crop_y - (crop_height - crop_size) / 2, 0)
