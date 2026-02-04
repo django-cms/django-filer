@@ -305,11 +305,16 @@ ul.messagelist {
 					padding: 5px;
 					border-radius: 3px;
 
-					&:focus-visible {
+					&[contenteditable="true"]:focus-visible {
 						background-color: colors.$body-bg-color;
 						outline: 1px solid var(--link-selected-fg);
 						outline-offset: -1px;
 						box-shadow: inset var(--link-selected-fg) 0 0 10px;
+					}
+
+					&[contenteditable="false"] {
+						font-style: italic;
+						cursor: default;
 					}
 				}
 			}
@@ -514,7 +519,7 @@ ul.messagelist {
 						justify-content: center;
 
 						img, div:has(>video) {
-							height: 60px;
+							width: 60px;
 							align-self: center;
 						}
 					}
@@ -757,8 +762,8 @@ ul.messagelist {
 				&:hover {
 					background: var(--default-button-hover-bg);
 				}
-				&[disabled] {
-					opacity: 0.4;
+				&[disabled], &[aria-disabled="true"] {
+					opacity: 0.6;
 					cursor: not-allowed;
 				}
 				&.with-caret::after {

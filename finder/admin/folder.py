@@ -2,21 +2,25 @@ import json
 
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import transaction
 from django.db.models import QuerySet, Subquery
+from django.db.models.expressions import Exists, Value
+from django.db.models.fields import BooleanField
 from django.forms.widgets import Media
-from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
+from django.http.response import (
+    HttpResponse, HttpResponseNotAllowed, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
+)
 from django.urls import path, reverse
 from django.utils.translation import gettext
 from django.utils.html import format_html
 
+from finder.admin.inode import InodeAdmin
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.label import Label
-
-from .inode import InodeAdmin
+from finder.models.permission import Privilege, has_privilege_subquery
 
 
 @admin.register(FolderModel)
@@ -136,12 +140,25 @@ class FolderAdmin(InodeAdmin):
                 folder_url=folder_url,
             )
         if isinstance(inode.ancestors, QuerySet):
-            ancestor_ids = list(inode.ancestors.values_list('id', flat=True))
+            if request.user.is_superuser:
+                can_change = Value(True, output_field=BooleanField())
+                can_view = Value(True, output_field=BooleanField())
+            else:
+                can_change = Exists(has_privilege_subquery(request.user, Privilege.WRITE))
+                can_view = Exists(has_privilege_subquery(request.user, Privilege.READ))
+            values = 'id', 'can_change', 'can_view'
+            ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
         else:
-            ancestor_ids = [ancestor.id for ancestor in inode.ancestors]
+            ancestors = [
+                {
+                    'id': ancestor.id,
+                    'can_change': ancestor.has_permission(request.user, Privilege.WRITE),
+                    'can_view': ancestor.has_permission(request.user, Privilege.READ),
+                } for ancestor in inode.ancestors
+            ]
         settings.update(
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
-            ancestors=ancestor_ids,
+            ancestors=ancestors,
             menu_extensions=self.get_menu_extension_settings(request),
         )
         return settings
@@ -184,9 +201,9 @@ class FolderAdmin(InodeAdmin):
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         if search_query := request.GET.get('q'):
-            inode_qs = self.search_for_inodes(request, current_folder, search_query, has_read_permission=True)
+            inode_qs = self.search_for_inodes(request, current_folder, search_query)
         else:
-            inode_qs = self.get_inodes(request, parent=current_folder, has_read_permission=True)
+            inode_qs = self.get_inodes(request, parent=current_folder)
         return JsonResponse({
             'inodes': list(inode_qs),
         })
@@ -219,13 +236,17 @@ class FolderAdmin(InodeAdmin):
             return HttpResponse("Bad encoding type or missing payload.", status=415)
         ambit = folder.get_ambit()
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
-        new_file = model.objects.create_from_upload(
-            ambit,
-            request.FILES['upload_file'],
-            folder=folder,
-            owner=request.user,
-        )
-        return JsonResponse({'file_info': new_file.as_dict(ambit)})
+        try:
+            new_file = model.objects.create_from_upload(
+                ambit,
+                request.FILES['upload_file'],
+                folder=folder,
+                owner=request.user,
+            )
+        except PermissionDenied as exc:
+            return HttpResponseForbidden(str(exc))
+        else:
+            return JsonResponse({'file_info': new_file.as_dict(ambit)})
 
     def update_inode(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -268,9 +289,11 @@ class FolderAdmin(InodeAdmin):
             inode = FolderModel.objects.get_inode(id=values['id'])
             try:
                 ordering += 1
-                inode.copy_to(current_folder, ordering=ordering, owner=request.user)
+                inode.copy_to(request.user, current_folder, ordering=ordering)
             except RecursionError as exc:
                 return HttpResponse(str(exc), status=409)
+            except PermissionDenied as exc:
+                return HttpResponseForbidden(str(exc))
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=current_folder)),
         })
@@ -295,9 +318,12 @@ class FolderAdmin(InodeAdmin):
             target_folder.move_inodes(request.user, inode_ids)
         except ValidationError as exc:
             return HttpResponse(exc.messages[0], status=409)
-        return JsonResponse({
-            'inodes': list(self.get_inodes(request, parent=target_folder)),
-        })
+        except PermissionDenied as exc:
+            return HttpResponseForbidden(str(exc))
+        else:
+            return JsonResponse({
+                'inodes': list(self.get_inodes(request, parent=target_folder)),
+            })
 
     def reorder_inodes(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -306,7 +332,10 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         target_inode = FolderModel.objects.get_inode(id=body.get('target_id'))
         inode_ids = body.get('inode_ids', [])
-        target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
+        try:
+            target_inode.parent.reorder(request.user, target_inode.id, inode_ids, insert_after)
+        except PermissionDenied as exc:
+            return HttpResponseForbidden(str(exc))
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_inode.parent)),
         })

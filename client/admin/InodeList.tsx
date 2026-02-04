@@ -28,7 +28,7 @@ function InodeListHeader() {
 const InodeList = forwardRef((props: any, forwardedRef) => {
 	const {
 		folderId,
-		previousFolderId,
+		ancestorFolderId,
 		setCurrentFolder,
 		menuBarRef,
 		layout,
@@ -168,7 +168,7 @@ const InodeList = forwardRef((props: any, forwardedRef) => {
 		}
 
 		return inodes.map(inode => inode.is_folder
-			? <Folder key={inode.id} {...inode} {...props} isParent={previousFolderId === inode.id} />
+			? <Folder key={inode.id} {...inode} {...props} isParent={ancestorFolderId === inode.id} />
 			: <File key={inode.id} {...inode} {...props} />
 		);
 	}

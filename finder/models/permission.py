@@ -3,12 +3,11 @@ from functools import lru_cache
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.models import Q
+from django.db.models.expressions import F, OuterRef, Q
 from django.utils.translation import gettext_lazy as _
 
 
 class Privilege(models.IntegerChoices):
-    NONE = 0, _("None")
     READ = 1, _("Read")
     WRITE = 2, _("Write (Dropbox)")
     READ_WRITE = 3, _("Read & Write")
@@ -16,10 +15,18 @@ class Privilege(models.IntegerChoices):
     FULL = 7, _("Full Control")
 
 
+def has_privilege_subquery(user, privilege):
+    group_ids = user.groups.values_list('id', flat=True)
+    return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
+        Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
+        inode=OuterRef('id'),
+    )
+
+
 class AccessControlBase(models.Model):
     privilege = models.PositiveSmallIntegerField(
         choices=Privilege.choices,
-        default=Privilege.NONE,
+        default=Privilege.READ,
     )
     user = models.ForeignKey(
         get_user_model(),

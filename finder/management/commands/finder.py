@@ -80,7 +80,7 @@ class Command(BaseCommand):
             num_reorders = folder.reorder()
             if num_reorders > 0:
                 sum_reorders += num_reorders
-                self.stdout.write(f"Reordered {num_reorders} inodes in folder ‘{folder}’.")
+                self.stdout.write(f"Reordered {num_reorders} items in folder ‘{folder}’.")
         if sum_reorders == 0:
             self.stdout.write("No folder required any reordering.")
 

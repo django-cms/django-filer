@@ -210,7 +210,7 @@ class InodeAdmin(admin.ModelAdmin):
         """
         Return a serialized list of files and folder for the given folder.
         """
-        lookup = dict(lookup_by_label(request), user=request.user, **lookup)
+        lookup = dict(lookup_by_label(request), user=request.user, has_read_permission=True, **lookup)
         unified_queryset = FolderModel.objects.filter_unified(**lookup)
         unified_queryset = sort_by_attribute(request, unified_queryset)
         self.annotate_unified_queryset(request._ambit, unified_queryset)
@@ -287,6 +287,7 @@ class InodeAdmin(admin.ModelAdmin):
             'parent_id': inode.parent_id,
             'parent_url': parent_url,
             'is_admin': inode.has_permission(request.user, Privilege.ADMIN),
+            'can_change': inode.has_permission(request.user, Privilege.WRITE),
         }
         return settings
 

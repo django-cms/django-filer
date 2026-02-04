@@ -3,10 +3,13 @@ import {Tooltip, TooltipTrigger, TooltipContent} from '../common/Tooltip';
 
 
 export default function DropDownMenu(props) {
+	const {disabled} = props;
 	const ref = useRef(null);
 	const WrapperElement = props.wrapperElement ?? 'li';
 
 	useEffect(() => {
+		if (disabled)
+			return;
 		const handleClick = (event) => {
 			const current = ref.current as HTMLElement;
 			let target = event.target;
@@ -36,7 +39,7 @@ export default function DropDownMenu(props) {
 		const rootNode = ref.current.getRootNode();
 		rootNode.addEventListener('click', handleClick);
 		return () => rootNode.removeEventListener('click', handleClick);
-	}, []);
+	}, [disabled]);
 
 	return (
 		<WrapperElement
@@ -44,6 +47,7 @@ export default function DropDownMenu(props) {
 			role={props.role ? `combobox ${props.role}` : 'combobox'}
 			aria-haspopup="listbox"
 			aria-expanded="false"
+			aria-disabled={disabled ? 'true' : 'false'}
 			className={props.className}
 		>{
 		props.tooltip ? (

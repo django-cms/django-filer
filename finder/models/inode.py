@@ -4,16 +4,17 @@ from functools import reduce
 from operator import and_, or_
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
-from django.db.models.expressions import Exists, F, OuterRef, Q, Value
+from django.db.models.expressions import Exists, F, Q, Value
 from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from finder.models.permission import AccessControlEntry, Privilege
+from finder.models.permission import AccessControlEntry, Privilege, has_privilege_subquery
 
 try:
     from django.contrib.postgres.aggregates import StringAgg
@@ -96,17 +97,17 @@ class InodeManagerMixin:
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
         labels = lookup.pop('labels__in', None)
-        privilege_exists = lookup.pop('has_read_permission', None) or lookup.pop('has_write_permission', None)
-        owner = lookup.pop('owner', None)
+        can_view = lookup.pop('has_read_permission', None)
+        can_change = lookup.pop('has_write_permission', None)
         query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
 
         # query to filter by read/write permissions
-        if privilege_exists and owner:
-            query &= Q(privilege_exists=True) | Q(owner_id=owner.id)
-        elif privilege_exists:
-            query &= Q(privilege_exists=True)
-        elif owner:
-            query &= Q(owner_id=owner.id)
+        if can_view and can_change:
+            query &= Q(can_view=True) & Q(can_change=True)
+        elif can_view:
+            query &= Q(can_view=True)
+        elif can_change:
+            query &= Q(can_change=True)
 
         # query to filter by mime types
         if mime_types and 'mime_type' in model_field_names:
@@ -136,15 +137,6 @@ class InodeManagerMixin:
         from .file import FileModel
         from .folder import FolderModel
 
-        def has_privilege_subquery(privilege):
-            if user is None:
-                raise RuntimeError("When using `has_read/write_permission`, the `user` object is required as well.")
-            group_ids = user.groups.values_list('id', flat=True)
-            return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
-                Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
-                inode=OuterRef('id'),
-            )
-
         def get_queryset(model):
             concrete_fields = list(unified_fields.keys())
             model_field_names = [field.name for field in model._meta.get_fields()]
@@ -161,12 +153,18 @@ class InodeManagerMixin:
                     expressions = {'label_ids': StringAgg(concatenated, ',', distinct=True)}
                 else:
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
-            if lookup.get('has_read_permission'):
-                annotations['privilege_exists'] = Exists(has_privilege_subquery(Privilege.READ))
-            if lookup.get('has_write_permission'):
-                annotations['privilege_exists'] = Exists(has_privilege_subquery(Privilege.WRITE))
             if user:
-                lookup['owner'] = user
+                assert isinstance(user, get_user_model()), "`user` must be an instance of AUTH_USER_MODEL."
+                if user.is_superuser:
+                    annotations.update(
+                        can_view=Value(True, output_field=BooleanField()),
+                        can_change=Value(True, output_field=BooleanField()),
+                    )
+                else:
+                    annotations.update(
+                        can_view=Exists(has_privilege_subquery(user, Privilege.READ)),
+                        can_change=Exists(has_privilege_subquery(user, Privilege.WRITE)),
+                    )
             for name, field in unified_fields.items():
                 if name in annotations:
                     concrete_fields.remove(name)
@@ -329,7 +327,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     def has_permission(self, user, privilege):
         assert (privilege & Privilege.FULL) != 0, "Invalid privilege value."
-        if user.is_superuser or self.owner == user:
+        if user.is_superuser:
             return True
         group_ids = user.groups.values_list('id', flat=True)
         return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(

@@ -3,7 +3,7 @@ import {ProgressOverlay, ProgressBar} from './UploadProgress';
 
 
 const FileUploader = forwardRef((props: any, forwardedRef) => {
-	const {folderId, handleUpload} = props;
+	const {folderId, disabled, handleUpload} = props;
 	const multiple = 'multiple' in props;
 	const fileUploadRef = useRef(null);
 	const folderUploadRef = useRef(null);
@@ -47,6 +47,8 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 	}
 
 	function uploadFiles(files: FileList) {
+		if (disabled)
+			return;
 		const uploadFile = file => new Promise<Response>((resolve, reject) => {
 			file.resolve = resolve;
 			file.reject = reject;
@@ -59,7 +61,8 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 		Promise.all(promises).then(responses => {
 			handleUpload(folderId, responses);
 		}).catch((error) => {
-			alert(error);
+			alert(gettext("An error occurred during file upload."));
+			console.error(error);
 		}).finally(() => {
 			setUploading([]);
 		});
@@ -78,12 +81,20 @@ const FileUploader = forwardRef((props: any, forwardedRef) => {
 			{props.children}
 			<input type="file" name={`file:${folderId}`} multiple={multiple} ref={fileUploadRef} onChange={handleFileSelect} />
 			{multiple && <input type="file" name={`folder:${folderId}`} {...directory} ref={folderUploadRef} onChange={handleFileSelect}/>}
-			{(dragging || uploading.length > 0) &&
+			{(dragging || uploading.length > 0) && (
+			disabled ?
+			<div className="progress-overlay">
+				<div className="progress-indicator">
+					<p>{gettext("You don't have permission to upload files to this folder.")}</p>
+				</div>
+			</div>
+			:
 			<ProgressOverlay dragging={dragging}>{
 				uploading.map((file, index) =>
 					<ProgressBar key={index} file={file} targetId={folderId} settings={props.settings} />
 				)
 			}</ProgressOverlay>
+			)
 		}</div>
 	)
 });
