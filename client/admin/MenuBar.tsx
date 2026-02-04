@@ -39,6 +39,9 @@ import UploadIcon from '../icons/upload.svg';
 import FolderUploadIcon from '../icons/folder-upload.svg';
 
 
+export const VERBOSE_HTTP_ERROR_CODES = new Set([403, 409]);
+
+
 function MenuExtension(props) {
 	const MenuComponent = useMemo(() => {
 		const component = `./components/menuextension/${props.extension.component}.js`;
@@ -92,7 +95,7 @@ function ExtraMenu(props) {
 			const current = columnRefs[settings.folder_id].current;
 			const body = await response.json();
 			current.setInodes([...current.inodes, {...body.new_folder, elementRef: createRef()}]);  // adds new folder to the end of the list
-		} else if (response.status === 409) {
+		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
 			alert(await response.text());
 		} else {
 			console.error(response);
@@ -122,13 +125,13 @@ function ExtraMenu(props) {
 			icon={<MoreVerticalIcon/>}
 			tooltip={gettext("Extra options")}
 		>
-			<li role="option" onClick={addFolder}>
+			<li role="option" aria-disabled={!settings.can_change} onClick={addFolder}>
 				<AddFolderIcon/><span>{gettext("Add new folder")}</span>
 			</li>
-			<li role="option" onClick={() => openUploader(false)}>
+			<li role="option" aria-disabled={!settings.can_change} onClick={() => openUploader(false)}>
 				<UploadIcon/><span>{gettext("Upload local files")}</span>
 			</li>
-			<li role="option" onClick={() => openUploader(true)}>
+			<li role="option" aria-disabled={!settings.can_change} onClick={() => openUploader(true)}>
 				<FolderUploadIcon/><span>{gettext("Upload local folder")}</span>
 			</li>
 			<li role="option" aria-disabled={numSelectedFiles === 0} onClick={downloadSelectedFiles}>
@@ -262,15 +265,15 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 
 	function cutInodes() {
 		const current = columnRefs[currentFolderId].current;
-		if (current.inodes.find(inode => inode.selected)) {
-			const clipboard = current.inodes.filter(inode => inode.selected).map(inode => ({
+		if (current.inodes.find(inode => inode.selected && inode.can_change)) {
+			const clipboard = current.inodes.filter(inode => inode.selected && inode.can_change).map(inode => ({
 				id: inode.id,
 				parent: inode.parent,
 				selected: false,
-				cutted: true
+				cutted: true,
 			}));
 			setClipboard(clipboard);
-			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, cutted: inode.selected})));
+			current.setInodes(current.inodes.map(inode => ({...inode, selected: false, cutted: inode.selected && inode.can_change})));
 			setNumSelectedInodes(0);
 			setNumSelectedFiles(0);
 		}
@@ -313,7 +316,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 			columnRefs[settings.folder_id].current.setInodes(
 				body.inodes.map(inode => ({...inode, elementRef: createRef()}))
 			);
-		} else if (response.status === 409) {
+		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
 			alert(await response.text());
 		} else {
 			console.error(response);
@@ -417,7 +420,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 					</MenuItem>
 					<SortingOptions refreshFilesList={refreshColumns} />
 					{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
-					<MenuItem aria-disabled={numSelectedInodes === 0} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
+					<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
 						<CutIcon/>
 					</MenuItem>
 					{settings.is_trash ? (<>
@@ -428,10 +431,10 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 							<EraseIcon/>
 						</MenuItem>
 					</>) : (<>
-						<MenuItem aria-disabled={clipboard.length === 0} onClick={pasteInodes} tooltip={gettext("Paste from clipboard")}>
+						<MenuItem aria-disabled={clipboard.length === 0 || !settings.can_change} onClick={pasteInodes} tooltip={gettext("Paste from clipboard")}>
 							<PasteIcon/>
 						</MenuItem>
-						<MenuItem aria-disabled={numSelectedInodes === 0} onClick={deleteInodes} tooltip={gettext("Move selected to trash folder")}>
+						<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={deleteInodes} tooltip={gettext("Move selected to trash folder")}>
 							<TrashIcon/>
 						</MenuItem>
 						<ExtraMenu

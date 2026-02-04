@@ -22,6 +22,7 @@ interface GravityOption {
 
 export default function Image(props) {
 	const {settings, children} = props;
+	const disabled = !settings.can_change;
 	const cropFields = {
 		x: document.getElementById('id_crop_x') as HTMLInputElement,
 		y: document.getElementById('id_crop_y') as HTMLInputElement,
@@ -31,7 +32,7 @@ export default function Image(props) {
 	};
 	const gravityField = document.getElementById('id_gravity') as HTMLInputElement;
 	const [crop, setCrop] = useState<Crop>(null);
-	const [gravity, setGravity] = useState<string>(gravityField?.value);
+	const [gravity, setGravity] = useState<string>(disabled ? '' : gravityField.value);
 	const ref = useRef(null);
 	const gravityOptions: Record<string, GravityOption> = {
 		'': {label: gettext("Center"), icon: <GravityCenterIcon/>},
@@ -99,8 +100,8 @@ export default function Image(props) {
 
 	const controlButtons = [
 		<Fragment key="clear-crop">
-			<button type="button" onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
-			<DropDownMenu className="with-caret" wrapperElement="div" label={<Fragment>{gettext("Gravity")}: {gravityOptions[gravity]?.label}</Fragment>} tooltip={gettext("Align image before cropping")}>
+			<button type="button" disabled={disabled} onClick={() => handleChange(null)}><ClearCropIcon/>{gettext("Clear selection")}</button>
+			<DropDownMenu className="with-caret" disabled={disabled} wrapperElement="div" label={<Fragment>{gettext("Gravity")}: {gravityOptions[gravity]?.label}</Fragment>} tooltip={gettext("Align image before cropping")}>
 				{Object.entries(gravityOptions).map(([value, record]) => (
 					<li key={value} value={value} role="option" aria-selected={gravity === value} onClick={() => setGravityOption(value)}>
 						{record.icon}{record.label}
@@ -113,7 +114,7 @@ export default function Image(props) {
 	return (<>
 		{children}
 		<FileDetails controlButtons={controlButtons} {...props}>
-			<ReactCrop crop={crop} aspect={1} onChange={handleChange}>
+			<ReactCrop crop={crop} aspect={1} disabled={disabled} onChange={handleChange}>
 				<img className="editable" src={settings.download_url} ref={ref} />
 			</ReactCrop>
 		</FileDetails>

@@ -5,20 +5,21 @@ from operator import or_
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 from django.template.defaultfilters import filesizeformat
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from finder.models.label import Label
 from finder.models.inode import InodeManager, InodeModel
+from finder.models.permission import Privilege
 
 
 def mimetype_validator(value):
     if not mimetypes.guess_extension(value):
-        msg = "'{mimetype}' is not a recognized MIME-Type."
+        msg = gettext("'{mimetype}' is not a recognized MIME-Type.")
         raise ValidationError(msg.format(mimetype=value))
 
 
@@ -35,6 +36,9 @@ def digest_sha1(readhandle):
 class FileModelManager(InodeManager):
     def create_from_upload(self, ambit, uploaded_file, **kwargs):
         folder = kwargs.pop('folder')
+        if not folder.has_permission(kwargs['owner'], Privilege.WRITE):
+            msg = gettext("You don't have permission to upload a file to folder “{folder}”.")
+            raise PermissionDenied(msg.format(folder=folder.name))
         kwargs.update(
             parent=folder,
             name=uploaded_file.name,
@@ -216,13 +220,16 @@ class AbstractFileModel(InodeModel):
         self.sha1 = digest_sha1(uploaded_file)
         self._for_write = True
 
-    def copy_to(self, folder, **kwargs):
+    def copy_to(self, user, folder, **kwargs):
         """
         Copy the file to a destination folder and returns it.
         """
+        if not folder.has_permission(user, Privilege.WRITE):
+            msg = gettext("You do not have permission to copy file “{source}” to folder “{target}”.")
+            raise PermissionDenied(msg.format(source=self.name, target=folder.name))
+
         model = self._meta.model
         kwargs.setdefault('name', self.name)
-        kwargs.setdefault('owner', self.owner)
         kwargs.update(
             parent=folder,
             file_size=self.file_size,
@@ -230,6 +237,7 @@ class AbstractFileModel(InodeModel):
             mime_type=self.mime_type,
             file_name=self.file_name,
             meta_data=self.meta_data,
+            owner=user,
         )
         source_ambit = self.folder.get_ambit()
         target_ambit = folder.get_ambit()

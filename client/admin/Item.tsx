@@ -16,6 +16,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(
 
 
 export function DraggableItem(props) {
+	const {sortingDisabled} = props;
 	const {
 		attributes,
 		listeners,
@@ -31,7 +32,7 @@ export function DraggableItem(props) {
 	const [searchQuery] = useSearchParam('q');
 	const ReOrdering = useMemo(() => {
 		return (props) => {
-			if (searchQuery || sorting || filter.some(v => v))
+			if (sortingDisabled || searchQuery || sorting || filter.some(v => v))
 				return <div className="reordering"></div>;
 			return (
 				<DroppableArea
@@ -188,6 +189,7 @@ export function ListItem(props) {
 		return dateTimeFormatter.format(date);
 	}
 
+	const contenteditable = !settings.is_trash && props.can_change;
 	switch (props.layout) {
 		case 'tiles':
 			return (
@@ -198,7 +200,7 @@ export function ListItem(props) {
 						</FigureLabels>
 					</FigBody>
 					<figcaption>
-						<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+						<div className="inode-name" contentEditable={contenteditable} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 							{props.name}
 						</div>
 					</figcaption>
@@ -229,7 +231,7 @@ export function ListItem(props) {
 					</FigBody>
 				</div>
 				<div>
-					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+					<div className="inode-name" contentEditable={contenteditable} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 						{props.name}
 					</div>
 				</div>
@@ -253,7 +255,7 @@ export function ListItem(props) {
 					</FigBody>
 				</div>
 				<div>
-					<div className="inode-name" contentEditable={!settings.is_trash} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+					<div className="inode-name" contentEditable={contenteditable} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 						{props.name}
 					</div>
 				</div>

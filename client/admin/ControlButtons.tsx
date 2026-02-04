@@ -32,6 +32,7 @@ function ViewOriginalButton(props) {
 
 function ReplaceFileButton(props) {
 	const {settings} = props;
+	const disabled = !settings.can_change;
 	const inputRef = useRef(null);
 
 	function replaceFile() {
@@ -55,7 +56,7 @@ function ReplaceFileButton(props) {
 	}
 
 	return (<>
-		<button type="button" onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
+		<button type="button" disabled={disabled} onClick={replaceFile}><UploadIcon/>{gettext("Replace File")}</button>
 		<input type="file" name="replaceFile" ref={inputRef} accept={settings.file_mime_type} onChange={handleFileSelect} />
 	</>);
 }

@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
@@ -14,7 +14,7 @@ except ImportError:
 
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
-from finder.models.permission import DefaultAccessControlEntry as DefaultACE, AccessControlEntry
+from finder.models.permission import DefaultAccessControlEntry as DefaultACE, Privilege
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
@@ -179,6 +179,11 @@ class FolderModel(InodeModel):
             'meta_data': self.get_meta_data(),
         }
 
+    def has_permission(self, user, privilege):
+        if self.is_trash and self.owner == user:
+            return True
+        return super().has_permission(user, privilege)
+
     def get_download_url(self, ambit):
         return None
 
@@ -206,13 +211,16 @@ class FolderModel(InodeModel):
                 if not (source_ambit := cache_ambits.get(entry['parent'])):
                     source_ambit = FolderModel.objects.get(id=entry['parent']).get_ambit()
                     cache_ambits[entry['parent']] = source_ambit
-                if target_ambit.original_storage is not source_ambit.original_storage:
+                if target_ambit.original_storage.deconstruct() != source_ambit.original_storage.deconstruct():
                     # move payload from source_ambit to target_ambit and delete from source_ambit
                     file_path = '{id}/{file_name}'.format(**entry)
                     with source_ambit.original_storage.open(file_path, 'rb') as readhandle:
                         target_ambit.original_storage.save(file_path, readhandle)
                     source_ambit.original_storage.delete(file_path)
 
+        if not self.has_permission(user, Privilege.WRITE):
+            msg = gettext("You do not have permission to move these items to folder “{folder}”.")
+            raise PermissionDenied(msg.format(folder=self.name))
         parent_ids = set()
         update_inodes = {}
         target_ambit, cache_ambits = self.get_ambit(), {}
@@ -238,23 +246,28 @@ class FolderModel(InodeModel):
                     obj.update_access_control_list(default_access_control_list)
 
         for folder in FolderModel.objects.filter(id__in=parent_ids):
-            folder.reorder()
+            folder.reorder(user)
 
-    def copy_to(self, folder, **kwargs):
+    def copy_to(self, user, folder, **kwargs):
         """
         Copies the folder to a destination folder and returns it.
         """
+        if not folder.has_permission(user, Privilege.WRITE):
+            msg = gettext("You do not have permission to copy folder “{source}” to folder “{target}”.")
+            raise PermissionDenied(msg.format(source=self.name, target=folder.name))
+
         for ancestor in folder.ancestors:
             if ancestor.id == self.id:
-                msg = "Folder named “{source}” can not become the descendant of destination folder “{target}”."
-                raise RecursionError(gettext(msg).format(source=self.name, target=folder.name))
+                msg = gettext(
+                    "Folder named “{source}” can not become the descendant of destination folder “{target}”."
+                )
+                raise RecursionError(msg.format(source=self.name, target=folder.name))
 
         kwargs.setdefault('name', self.name)
-        kwargs.setdefault('owner', self.owner)
-        kwargs.update(parent=folder)
+        kwargs.update(parent=folder, owner=user)
         obj = self._meta.model.objects.create(**kwargs)
         for inode in self.listdir():
-            inode.copy_to(obj, owner=obj.owner)
+            inode.copy_to(user, obj, owner=obj.owner)
         return obj
 
     def validate_constraints(self):
@@ -272,7 +285,7 @@ class FolderModel(InodeModel):
             msg = gettext("Folder name “{name}” is reserved.")
             raise ValidationError(msg.format(name=self.name))
 
-    def reorder(self, target_id=None, inode_ids=[], insert_after=True):
+    def reorder(self, user, target_id=None, inode_ids=[], insert_after=True):
         """
         Set `ordering` index based on their natural ordering index.
         Returns the number of reorderings performed.
@@ -282,6 +295,9 @@ class FolderModel(InodeModel):
             inodes_order.update({id: nord for nord, id in enumerate(inode_ids, new_order)})
             return new_order + len(inode_ids)
 
+        if not self.has_permission(user, Privilege.WRITE):
+            msg = gettext("You do not have permission to reorder items in folder “{folder}”.")
+            raise PermissionDenied(msg.format(folder=self.name))
         inodes_order, new_order = {}, 1
         target_id = str(target_id) if target_id else None
         for inode in self.listdir().order_by('ordering'):
@@ -312,7 +328,7 @@ class FolderModel(InodeModel):
                 inode_model.objects.bulk_update(update_inodes, ['parent', 'ordering'])
 
         for folder in former_parents:
-            folder.reorder()
+            folder.reorder(user)
 
         return num_reorders
 

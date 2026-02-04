@@ -18,7 +18,7 @@ import {useAudioSettings, useCookie, useSessionStorage} from '../common/Storage'
 import FileUploader from '../common/FileUploader';
 import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
-import MenuBar from './MenuBar';
+import MenuBar, {VERBOSE_HTTP_ERROR_CODES} from './MenuBar';
 import SelectableArea from './SelectableArea';
 import InodeList from './InodeList';
 import DraggedInodes from './DraggedInodes';
@@ -38,7 +38,7 @@ export default function FolderAdmin() {
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
 	const uploaderRef = useRef(null);
-	const columnRefs = Object.fromEntries(settings.ancestors.map(id => [id, useRef(null)]));
+	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)]));
 	const overlayRef = useRef(null);
 	const downloadLinkRef = useRef(null);
 	const [currentFolderId, setCurrentFolderId] = useState(settings.folder_id);
@@ -267,9 +267,9 @@ export default function FolderAdmin() {
 						folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 					}
 					if (sourceFolderId !== targetFolderId) {
-						inodes = inodes.filter(inode => !inode.dragged);
+						inodes = inodes.filter(inode => !(inode.can_change && inode.dragged));
 					}
-				} else if (response.status === 409) {
+				} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
 					alert(await response.text());
 				} else {
 					console.error(response);
@@ -306,6 +306,7 @@ export default function FolderAdmin() {
 					<InodeList
 						ref={columnRefs[settings.folder_id]}
 						folderId={settings.folder_id}
+						sortingDisabled={true}
 						setCurrentFolder={setCurrentFolder}
 						listRef={columnRefs[settings.folder_id]}
 						menuBarRef={menuBarRef}
@@ -334,35 +335,37 @@ export default function FolderAdmin() {
 				}
 				incomplete = ancestors.length < settings.ancestors.length;
 			}
-			let previousFolderId = null;
-			return ancestors.map(folderId => {
+			let previousAncestorId = null;
+			return ancestors.map(ancestor => {
 				const snippet = (
 					<FileUploader
-						key={folderId}
-						ref={folderId === settings.folder_id ? uploaderRef : null}
-						folderId={folderId}
+						key={ancestor.id}
+						ref={ancestor.id === settings.folder_id ? uploaderRef : null}
+						folderId={ancestor.id}
+						disabled={!ancestor.can_change}
 						handleUpload={handleUpload}
 						settings={settings}
 						multiple
 					>
 						<SelectableArea
-							folderId={folderId}
+							folderId={ancestor.id}
 							deselectAll={deselectAll}
-							columnRef={columnRefs[folderId]}
+							columnRef={columnRefs[ancestor.id]}
 							dragging={dragging}
 						>
 							<DroppableArea
-								id={`column:${folderId}`}
+								id={`column:${ancestor.id}`}
 								className="column-droppable"
 								currentId={`column:${currentFolderId}`}
 								dragging={dragging}
 							>
 								<InodeList
-									ref={columnRefs[folderId]}
-									folderId={folderId}
-									previousFolderId={previousFolderId}
+									ref={columnRefs[ancestor.id]}
+									folderId={ancestor.id}
+									ancestorFolderId={previousAncestorId}
+									sortingDisabled={!ancestor.can_change}
 									setCurrentFolder={setCurrentFolder}
-									listRef={columnRefs[folderId]}
+									listRef={columnRefs[ancestor.id]}
 									menuBarRef={menuBarRef}
 									folderTabsRef={folderTabsRef}
 									layout={layout}
@@ -376,7 +379,7 @@ export default function FolderAdmin() {
 						</SelectableArea>
 					</FileUploader>
 				);
-				previousFolderId = folderId;
+				previousAncestorId = ancestor.id;
 				return snippet;
 			});
 		}
