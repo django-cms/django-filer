@@ -30,7 +30,7 @@ import ClipboardIcon from '../icons/clipboard.svg';
 import TrashIcon from '../icons/trash.svg';
 import EraseIcon from '../icons/erase.svg';
 import AddFolderIcon from '../icons/add-folder.svg';
-import ShieldUserIcon from '../icons/shield-user.svg';
+import ShieldFileIcon from '../icons/shield-file.svg';
 import FolderShieldIcon from '../icons/folder-shield.svg';
 import LabelIcon from '../icons/label.svg';
 import DownloadIcon from '../icons/download.svg';
@@ -146,7 +146,7 @@ function ExtraMenu(props) {
 			{settings.is_admin && <>
 			<hr/>
 			<li role="option" onClick={() => openPermissionEditorDialog(false)}>
-				<ShieldUserIcon/><span>{gettext("Edit folder/files permissions")}</span>
+				<ShieldFileIcon/><span>{gettext("Edit folder/files permissions")}</span>
 			</li>
 			<li role="option" onClick={() => openPermissionEditorDialog(true)}>
 				<FolderShieldIcon/><span>{gettext("Edit default permissions")}</span>

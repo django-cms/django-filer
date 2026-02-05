@@ -6,7 +6,7 @@ import FolderTabs from './FolderTabs';
 import FileDetails from './FileDetails';
 import PermissionEditor from './PermissionEditor';
 import SelectLabels from '../common/SelectLabels';
-import ShieldUserIcon from '../icons/shield-user.svg';
+import ShieldFileIcon from '../icons/shield-file.svg';
 
 
 export default function FileAdmin() {
@@ -16,7 +16,7 @@ export default function FileAdmin() {
 		const PermissionDialogButton = () => (
 			<div className="button-group">{settings.is_admin &&
 				<button type="button" onClick={() => permissionDialogRef.current.show()}>
-					<ShieldUserIcon/><span>{gettext("Edit file permissions")}</span>
+					<ShieldFileIcon/><span>{gettext("Edit file permissions")}</span>
 				</button>
 			}</div>
 		);
