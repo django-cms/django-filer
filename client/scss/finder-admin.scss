@@ -298,12 +298,12 @@ ul.messagelist {
 			}
 
 			.inode {
-				&.drag-over > :not(.readonly) {
+				&.drag-over:has(.figure:not(.readonly)) {
 					color: colors.$selected-row-color;
 					background-color: var(--primary);
 					outline: 1px solid var(--link-hover-color);
 
-					img[src$="folder.svg"] {
+					.figure img[src$="folder.svg"] {
 						content: var(--open-folder-url);
 					}
 				}
@@ -527,7 +527,6 @@ ul.messagelist {
 				}
 			}
 
-
 			.inode {
 				display: grid;
 				gap: 2px;
@@ -541,6 +540,7 @@ ul.messagelist {
 						img, div:has(>video) {
 							width: 60px;
 							align-self: center;
+							border-radius: 3px;
 						}
 					}
 
