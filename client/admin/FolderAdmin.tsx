@@ -73,6 +73,8 @@ export default function FolderAdmin() {
 			}, 5000);
 		}
 
+		document.documentElement.style.setProperty('--open-folder-url', `url("${settings.open_folder_icon_url}")`);
+
 		const context = new window.AudioContext();
 		const gainNode = context.createGain();
 		gainNode.connect(context.destination);

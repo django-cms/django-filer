@@ -33,6 +33,9 @@ function FolderTab(props) {
 				classes.push('current');
 			}
 		}
+		if (folder.can_change === false) {
+			classes.push('readonly');
+		}
 		if (folder.is_trash) {
 			classes.push('trash');
 		}

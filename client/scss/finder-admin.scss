@@ -88,9 +88,12 @@ ul.messagelist {
 				cursor: pointer;
 				border-bottom: 1px solid colors.$border-color;
 			}
-			&.drag-over:not(.active) {
+			&.drag-over:not(.active):not(.readonly) {
 				color: colors.$selected-row-color;
 				background-color: var(--button-hover-bg);
+			}
+			&.readonly {
+				font-style: italic;
 			}
 			&.trash {
 				&.active {
@@ -295,10 +298,24 @@ ul.messagelist {
 			}
 
 			.inode {
-				&.drag-over {
+				&.drag-over > :not(.readonly) {
 					color: colors.$selected-row-color;
 					background-color: var(--primary);
 					outline: 1px solid var(--link-hover-color);
+
+					img[src$="folder.svg"] {
+						content: var(--open-folder-url);
+					}
+				}
+
+				.figure {
+					&:not(.readonly) > div {
+						cursor: pointer;
+					}
+
+					&.readonly > div {
+						cursor: default;
+					}
 				}
 
 				.inode-name {
@@ -310,11 +327,11 @@ ul.messagelist {
 						outline: 1px solid var(--link-selected-fg);
 						outline-offset: -1px;
 						box-shadow: inset var(--link-selected-fg) 0 0 10px;
+						cursor: text;
 					}
 
 					&[contenteditable="false"] {
 						font-style: italic;
-						cursor: default;
 					}
 				}
 			}
@@ -390,7 +407,6 @@ ul.messagelist {
 			min-height: 248px;
 			width: 192px;
 			box-sizing: border-box;
-			cursor: pointer;
 			font-size: 15px;
 			line-height: 18px;
 
@@ -438,7 +454,6 @@ ul.messagelist {
 
 		&:not(.status) {
 			width: 70px;
-			cursor: pointer;
 
 			> .reordering {
 				position: absolute;

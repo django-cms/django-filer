@@ -189,18 +189,18 @@ export function ListItem(props) {
 		return dateTimeFormatter.format(date);
 	}
 
-	const contenteditable = !settings.is_trash && props.can_change;
+	const readonly = settings.is_trash || !props.can_change;
 	switch (props.layout) {
 		case 'tiles':
 			return (
-				<figure className="figure">
+				<figure className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 						</FigureLabels>
 					</FigBody>
 					<figcaption>
-						<div className="inode-name" contentEditable={contenteditable} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+						<div className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 							{props.name}
 						</div>
 					</figcaption>
@@ -210,7 +210,7 @@ export function ListItem(props) {
 			return (
 				<Tooltip>
 					<TooltipTrigger>
-						<div className="figure">
+						<div className={`figure${readonly ? ' readonly' : ''}`}>
 							<FigBody {...props}>
 								<FigureLabels labels={props.labels}>
 									<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
@@ -223,7 +223,7 @@ export function ListItem(props) {
 			);
 		case 'list':
 			return (<>
-				<div className="figure">
+				<div className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
@@ -231,7 +231,7 @@ export function ListItem(props) {
 					</FigBody>
 				</div>
 				<div>
-					<div className="inode-name" contentEditable={contenteditable} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+					<div className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 						{props.name}
 					</div>
 				</div>
@@ -247,7 +247,7 @@ export function ListItem(props) {
 			</>);
 		case 'columns':
 			return (<>
-				<div className="figure">
+				<div className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
 						<FigureLabels labels={props.labels}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
@@ -255,7 +255,7 @@ export function ListItem(props) {
 					</FigBody>
 				</div>
 				<div>
-					<div className="inode-name" contentEditable={contenteditable} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
+					<div className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
 						{props.name}
 					</div>
 				</div>

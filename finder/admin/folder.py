@@ -160,6 +160,7 @@ class FolderAdmin(InodeAdmin):
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
             ancestors=ancestors,
             menu_extensions=self.get_menu_extension_settings(request),
+            open_folder_icon_url=staticfiles_storage.url('finder/icons/folder-open.svg'),
         )
         return settings
 
