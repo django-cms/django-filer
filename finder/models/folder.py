@@ -122,7 +122,7 @@ class FolderModel(InodeModel):
         """
         def traverse(parent):
             yield parent
-            for inode in FolderModel.objects.filter(parent=parent):
+            for inode in parent.subfolders:
                 if inode.is_folder:
                     yield from traverse(inode)
 
@@ -336,7 +336,7 @@ class FolderModel(InodeModel):
         """
         Get the maximum ordering index of all inodes in this folder.
         """
-        queryset = FolderModel.objects.filter(parent=self).values_list('ordering', flat=True).union(*[
+        queryset = self.subfolders.values_list('ordering', flat=True).union(*[
             model.objects.filter(parent=self).values_list('ordering', flat=True) for model in InodeModel.get_models()
         ])
         return max(queryset) if queryset.exists() else 0
@@ -413,3 +413,10 @@ class PinnedFolder(models.Model):
         auto_now_add=True,
         editable=False,
     )
+
+    class Meta:
+        verbose_name = _("Pinned Folder")
+        verbose_name_plural = _("Pinned Folders")
+        constraints = [
+            models.UniqueConstraint(fields=['owner', 'folder'], name='unique_pinned_folder')
+        ]

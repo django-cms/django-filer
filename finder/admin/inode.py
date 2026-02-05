@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.db.models.expressions import F, Value
+from django.db.models.expressions import Exists, F, Value
 from django.db.models.fields import BooleanField
 from django.http.response import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseForbidden,
@@ -21,7 +21,7 @@ from django.utils.translation import gettext
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder
-from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege, has_privilege_subquery
 
 
 class InodeAdmin(admin.ModelAdmin):
@@ -121,6 +121,7 @@ class InodeAdmin(admin.ModelAdmin):
                 body = json.loads(request.body)
                 access_control_list = body['access_control_list']
                 to_default = body.get('to_default', False)
+                recursive = body.get('recursive')
                 with transaction.atomic():
                     if to_default:
                         assert current_inode.is_folder, "Default permission setting is only allowed on folders."
@@ -231,17 +232,26 @@ class InodeAdmin(admin.ModelAdmin):
 
     def get_favorite_folders(self, request, current_folder):
         ambit = request._ambit
-        folders = PinnedFolder.objects.filter(
-            ambit=ambit,
-            owner=request.user,
-        ).values(
+        if request.user.is_superuser:
+            can_change = Value(True, output_field=BooleanField())
+            can_view = Value(True, output_field=BooleanField())
+        else:
+            can_change = Exists(has_privilege_subquery(request.user, Privilege.WRITE))
+            can_view = Exists(has_privilege_subquery(request.user, Privilege.READ))
+        folders = PinnedFolder.objects.values(
             'folder__id',
             'folder__name',
         ).annotate(
             id=F('folder__id'),
             name=F('folder__name'),
             is_pinned=Value(True, output_field=BooleanField()),
-        ).values('id', 'name', 'is_pinned')
+            can_change=can_change,
+            can_view=can_view,
+        ).filter(
+            ambit=ambit,
+            owner=request.user,
+            can_view=True,
+        ).values('id', 'name', 'is_pinned', 'can_change')
         folders = [dict(
             **values,
             change_url=self.get_inode_url(ambit.slug, str(values['id'])),
