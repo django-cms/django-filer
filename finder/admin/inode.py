@@ -124,11 +124,15 @@ class InodeAdmin(admin.ModelAdmin):
                 with transaction.atomic():
                     if to_default:
                         assert current_inode.is_folder, "Default permission setting is only allowed on folders."
-                        current_inode.update_default_access_control_list(access_control_list)
-                    elif body.get('recursive'):
-                        assert current_inode.is_folder, "Recursive permission setting is only allowed on folders."
-                        self.set_permissions_recursive(current_inode, access_control_list)
+                        if recursive:
+                            for subfolder in current_inode.descendants:
+                                subfolder.update_default_access_control_list(access_control_list)
+                        else:
+                            current_inode.update_default_access_control_list(access_control_list)
                     else:
+                        if recursive:
+                            assert current_inode.is_folder, "Recursive permission setting is only allowed on folders."
+                            self.set_permissions_recursive(current_inode, access_control_list)
                         current_inode.update_access_control_list(access_control_list)
             except (KeyError, json.JSONDecodeError):
                 return HttpResponse("Invalid JSON payload.", status=400)

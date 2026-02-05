@@ -231,6 +231,9 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 		return gettext("File Permissions");
 	}
 
+	const applyLabel = toDefault ? gettext("Apply as default") : gettext("Apply permissions");
+	const recursiveLabel = gettext("Apply recursively");
+
 	return (
 		<Dialog id="permission-dialog" label={renderLabel()} isOpen={isOpen} offset={offset}>
 			<table>
@@ -289,8 +292,8 @@ const PermissionEditor = forwardRef((props: any, forwardedRef) => {
 			</table>
 			<div className="button-group">
 				<button type="button" onClick={() => dismissDialog()}>{gettext("Dismiss")}</button>
-				{settings.is_folder && !toDefault && <button type="button" onClick={() => applyACL(true)}>{gettext("Apply recursively")}</button>}
-				<button type="button" onClick={() => applyACL()}>{toDefault ? gettext("Set as default") : gettext("Apply")}</button>
+				{settings.is_folder && <button type="button" onClick={() => applyACL(true)}>{recursiveLabel}</button>}
+				<button type="button" onClick={() => applyACL()}>{applyLabel}</button>
 			</div>
 		</Dialog>
 	);
