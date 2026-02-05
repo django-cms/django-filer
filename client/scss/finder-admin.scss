@@ -333,6 +333,11 @@ ul.messagelist {
 					&[contenteditable="false"] {
 						font-style: italic;
 					}
+
+					&[contenteditable="false"] {
+						font-style: italic;
+						cursor: default;
+					}
 				}
 			}
 		}
