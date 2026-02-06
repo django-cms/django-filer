@@ -89,7 +89,7 @@ class AccessControlEntry(AccessControlBase):
         verbose_name_plural = _("Access Control Entries")
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     (Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)) |
                     (Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)) |
                     (Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True))
@@ -112,7 +112,7 @@ class AccessControlEntry(AccessControlBase):
                 name='acl_inode_everyone_unique',
             ),
             models.CheckConstraint(
-                check=(Q(privilege__in=[Privilege.READ, Privilege.WRITE, Privilege.READ_WRITE, Privilege.FULL])),
+                condition=(Q(privilege__in=[Privilege.READ, Privilege.WRITE, Privilege.READ_WRITE, Privilege.FULL])),
                 name='acl_valid_privilege',
             ),
         ]
@@ -133,7 +133,7 @@ class DefaultAccessControlEntry(AccessControlBase):
         verbose_name_plural = _("Default Access Control Entries")
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     (Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)) |
                     (Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)) |
                     (Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True))
@@ -141,7 +141,7 @@ class DefaultAccessControlEntry(AccessControlBase):
                 name='dacl_single_principal',
             ),
             models.CheckConstraint(
-                check=(Q(privilege__in=[Privilege.READ, Privilege.WRITE, Privilege.READ_WRITE, Privilege.FULL])),
+                condition=(Q(privilege__in=[Privilege.READ, Privilege.WRITE, Privilege.READ_WRITE, Privilege.FULL])),
                 name='dacl_valid_privilege',
             ),
         ]

@@ -35,14 +35,14 @@ def catch_all_view(self, request, url):
                     request.get_full_path(force_append_slash=True)
                 )
     current_site = get_current_site(request)
-    if m := re.match(r'finder/([A-Za-z0-9_]+)/$', url):
+    if m := re.match(r'finder/([-a-zA-Z0-9_]+)/$', url):
         try:
             ambit = get_ambit_queryset(self.name, current_site).get(slug=m.group(1))
         except AmbitModel.DoesNotExist:
             raise Http404
         return HttpResponsePermanentRedirect(f'{request.path_info}{ambit.root_folder.id}')
     if m := re.match(
-        r'finder/([A-Za-z0-9_]+)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(.*)$',
+        r'finder/([-a-zA-Z0-9_]+)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(.*)$',
         url
     ):
         try:

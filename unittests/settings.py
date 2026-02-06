@@ -62,10 +62,34 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'workdir/db.sqlite3',
+            'NAME': BASE_DIR / 'workdir/testdb.sqlite3',
         },
     }
 
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+    'finder_test': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/filer_test',
+            'base_url': '/media/filer/',
+            'allow_overwrite': True,
+        },
+    },
+    'finder_test_samples': {
+        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/filer_test_samples',
+            'base_url': '/media/filer_samples/',
+            'allow_overwrite': True,
+        },
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

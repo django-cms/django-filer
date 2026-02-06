@@ -47,6 +47,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.12',
     'Framework :: Django',
     'Framework :: Django :: 5.2',
+    'Framework :: Django :: 6.0',
     'Topic :: Internet :: WWW/HTTP',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     'Topic :: Software Development',
