@@ -35,7 +35,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
-        npm ci --include=dev
+        npm install --include=dev
         python -m pip install --upgrade pip
         python -m pip install --upgrade setuptools wheel
         python -m pip install "Django==${{ matrix.django-version }}"
