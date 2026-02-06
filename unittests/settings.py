@@ -59,10 +59,18 @@ if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
         },
     }
 else:
+    os.makedirs(BASE_DIR / 'workdir', exist_ok=False)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'workdir/testdb.sqlite3',
+            'TEST': {
+                'NAME': BASE_DIR / 'workdir/testdb.sqlite3',
+                # live_server requires a file rather than :memory:
+                'OPTIONS': {
+                    'timeout': 20,
+                },
+            },
         },
     }
 
