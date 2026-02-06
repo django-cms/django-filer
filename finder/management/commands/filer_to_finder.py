@@ -9,6 +9,7 @@ from filer.models.filemodels import Folder as FilerFolder
 from filer.models.imagemodels import Image as FilerImage
 
 from finder.contrib.image.models import ImageFileModel as FinderImage
+from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel as FinderFile
 from finder.models.folder import FolderModel as FinderFolder, ROOT_FOLDER_NAME
 
@@ -25,13 +26,13 @@ class Command(BaseCommand):
         site = Site.objects.get(id=settings.SITE_ID)
         owner = FilerFolder.objects.filter(parent__isnull=True).first().owner
         try:
-            realm = FinderRealmModel.objects.get(site=site, slug=admin_site.name)
-        except FinderRealmModel.DoesNotExist:
+            ambit = AmbitModel.objects.get(site=site, slug=admin_site.name)
+        except AmbitModel.DoesNotExist:
             root_folder = FinderFolder.objects.create(name=ROOT_FOLDER_NAME, owner=owner)
-            realm = FinderRealmModel.objects.create(site=site, slug=admin_site.name, root_folder=root_folder)
+            ambit = AmbitModel.objects.create(site=site, slug=admin_site.name, root_folder=root_folder)
 
         for filer_folder in FilerFolder.objects.filter(parent__isnull=True):
-            self.migrate_folder(filer_folder, realm.root_folder)
+            self.migrate_folder(filer_folder, ambit.root_folder)
 
     def migrate_folder(self, filer_folder, finder_parent):
         if finder_folder := finder_parent.listdir(name=filer_folder.name, is_folder=True).first():

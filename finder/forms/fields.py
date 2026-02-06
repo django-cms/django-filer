@@ -2,7 +2,6 @@ from django.forms.fields import UUIDField
 from django.forms.models import ModelMultipleChoiceField
 
 from finder.forms.widgets import FinderFileSelect, FinderFolderSelect
-from finder.models.ambit import AmbitModel
 
 
 class FinderFileField(UUIDField):

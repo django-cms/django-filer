@@ -7,10 +7,13 @@ from django.conf import settings
 from django.core.management import call_command
 from django.urls import reverse
 
-from finder.models.realm import RealmModel
-
+from finder.models.ambit import AmbitModel
 
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
+
+
+def create_random_image():
+    pass
 
 
 @pytest.fixture(autouse=True, scope='session')
@@ -33,11 +36,11 @@ def django_db_setup(django_db_blocker):
 
 @pytest.fixture
 def realm(admin_client):
-    if realm := RealmModel.objects.first():
+    if realm := AmbitModel.objects.first():
         return realm
     response = admin_client.get(reverse('admin:finder_foldermodel_changelist'))
     assert response.status_code == 302
-    realm = RealmModel.objects.first()
+    realm = AmbitModel.objects.first()
     assert realm is not None
     redirected = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': realm.root_folder.id})
     assert response.url == redirected

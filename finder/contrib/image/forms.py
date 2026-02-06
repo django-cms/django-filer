@@ -1,10 +1,10 @@
-from django.forms.fields import CharField, ChoiceField, FloatField, IntegerField
+from django.forms.fields import CharField, FloatField, IntegerField
 from django.forms.widgets import HiddenInput, TextInput
 from django.utils.translation import gettext_lazy as _
 
 from entangled.forms import EntangledModelFormMixin
 
-from finder.contrib.image.models import ImageFileModel, Gravity
+from finder.contrib.image.models import ImageFileModel
 from finder.forms.file import FileForm
 
 

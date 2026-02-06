@@ -12,6 +12,7 @@ from finder.models.file import AbstractFileModel
 
 logger = getLogger(__name__)
 
+
 class Gravity(models.TextChoices):
     CENTER = '', _("Center")
     NORTH = 'n', _("North")

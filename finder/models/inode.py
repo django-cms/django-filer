@@ -331,8 +331,8 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             return True
         group_ids = user.groups.values_list('id', flat=True)
         return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
-            Q(privilege_mask__gt=0, inode=self.id) &
-            (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
+            Q(privilege_mask__gt=0, inode=self.id)
+            & (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
         ).exists()
 
     def delete(self, *args):

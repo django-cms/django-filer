@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
@@ -52,7 +50,7 @@ class AccessControlBase(models.Model):
         entry = self.as_dict()
         if isinstance(other, AccessControlBase):
             other = other.as_dict()
-        return entry['type']  == other['type'] and entry['principal'] == other['principal']
+        return entry['type'] == other['type'] and entry['principal'] == other['principal']
 
     def as_dict(self):
         if self.user:
@@ -90,9 +88,9 @@ class AccessControlEntry(AccessControlBase):
         constraints = [
             models.CheckConstraint(
                 condition=(
-                    (Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)) |
-                    (Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)) |
-                    (Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True))
+                    Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)
+                    | Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)
+                    | Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True)
                 ),
                 name='acl_single_principal',
             ),
@@ -134,9 +132,9 @@ class DefaultAccessControlEntry(AccessControlBase):
         constraints = [
             models.CheckConstraint(
                 condition=(
-                    (Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)) |
-                    (Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)) |
-                    (Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True))
+                    Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)
+                    | Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)
+                    | Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True)
                 ),
                 name='dacl_single_principal',
             ),

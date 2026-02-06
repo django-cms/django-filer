@@ -1,12 +1,10 @@
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import BadRequest, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import BadRequest, ValidationError
 from django.db.models import QuerySet, Subquery
 from django.forms.renderers import DjangoTemplates
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -264,23 +262,23 @@ class BrowserView(View):
     @method_decorator(require_POST)
     def crop(self, request, image_id):
         raise NotImplementedError
-        image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
-        width, height = request.POST.get('width'), request.POST.get('height')
-        width = int(width) if str(width).isdigit() else None
-        height = int(height) if str(height).isdigit() else None
-        if width is None and height is None:
-            raise ValidationError(_("At least one of width or height must be given."))
-        if width is None:
-            width = round(height * image.width / image.height)
-        if height is None:
-            height = round(width / image.width * image.height)
-        cropped_image_path = image.get_cropped_path(width, height)
-        if not default_storage.exists(cropped_image_path):
-            image.crop(cropped_image_path, width, height)
-        return {
-            'image_id': image_id,
-            'cropped_image_url': default_storage.url(cropped_image_path),
-            'width': width,
-            'height': height,
-            'meta_data': image.get_meta_data(),
-        }
+        # image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
+        # width, height = request.POST.get('width'), request.POST.get('height')
+        # width = int(width) if str(width).isdigit() else None
+        # height = int(height) if str(height).isdigit() else None
+        # if width is None and height is None:
+        #     raise ValidationError(_("At least one of width or height must be given."))
+        # if width is None:
+        #     width = round(height * image.width / image.height)
+        # if height is None:
+        #     height = round(width / image.width * image.height)
+        # cropped_image_path = image.get_cropped_path(width, height)
+        # if not default_storage.exists(cropped_image_path):
+        #     image.crop(cropped_image_path, width, height)
+        # return {
+        #     'image_id': image_id,
+        #     'cropped_image_url': default_storage.url(cropped_image_path),
+        #     'width': width,
+        #     'height': height,
+        #     'meta_data': image.get_meta_data(),
+        # }
