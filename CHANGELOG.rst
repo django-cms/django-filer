@@ -2,6 +2,11 @@
 CHANGELOG
 =========
 
+3.4.4 (2026-02-06)
+==================
+
+* fix: Popup window failed with django CMS' GrouperAdmin forms by @fsbraun in https://github.com/django-cms/django-filer/pull/1575
+
 3.4.3 (2026-01-17)
 ==================
 
