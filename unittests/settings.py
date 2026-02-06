@@ -59,7 +59,7 @@ if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
         },
     }
 else:
-    os.makedirs(BASE_DIR / 'workdir', exist_ok=False)
+    os.makedirs(BASE_DIR / 'workdir', exist_ok=True)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

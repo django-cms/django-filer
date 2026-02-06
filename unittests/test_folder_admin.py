@@ -13,7 +13,7 @@ from django.urls import reverse
 
 # from filer import settings as filer_settings
 from finder.models.file import FileModel
-from finder.models.folder import ROOT_FOLDER_NAME
+from finder.models.folder import FolderModel, ROOT_FOLDER_NAME
 
 
 def test_root_folder_exists(admin_client, ambit):
@@ -120,13 +120,13 @@ def uploaded_file(ambit, admin_user):
     )
 
 
-# @pytest.fixture
-# def sub_folder(realm, admin_user):
-#     return FolderModel.objects.create(
-#         parent=realm.root_folder,
-#         name='Sub Folder',
-#         owner=admin_user,
-#     )
+@pytest.fixture
+def sub_folder(ambit, admin_user):
+    return FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name='Sub Folder',
+        owner=admin_user,
+    )
 
 
 @pytest.mark.django_db
@@ -159,117 +159,106 @@ def test_folder_fetch(ambit, uploaded_file, admin_client, missing_inode_id):
     assert response.status_code == 405
 
 
-# @pytest.fixture
-# def update_inode_url(realm):
-#     return reverse('admin:finder_inodemodel_change', kwargs={'inode_id': realm.root_folder.id}) + '/update'
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_change_nothing(update_inode_url, uploaded_file, admin_client):
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(uploaded_file.id), 'name': uploaded_file.name},
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 200
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_rename_file(update_inode_url, uploaded_file, admin_client):
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(uploaded_file.id), 'name': "renamed_file.bin"},
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 200
-#     uploaded_file.refresh_from_db()
-#     assert uploaded_file.name == "renamed_file.bin"
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_update_using_invalid_filename(update_inode_url, uploaded_file, admin_client):
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(uploaded_file.id), 'name': 'invalid:name'},
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 409
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_using_existing_folder_name(update_inode_url, uploaded_file, sub_folder, admin_client):
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(uploaded_file.id), 'name': "Sub Folder"},
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 409
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_rename_folder(update_inode_url, sub_folder, admin_client):
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(sub_folder.id), 'name': "Renamed Folder"},
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 200
-#     sub_folder.refresh_from_db()
-#     assert sub_folder.name == "Renamed Folder"
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_update_with_missing_content_type(update_inode_url, uploaded_file, admin_client):
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(uploaded_file.id), 'name': 'renamed_file.bin'},
-#     )
-#     assert response.status_code == 415
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_update_with_missing_folder(admin_client):
-#     missing_folder_id = uuid5(NAMESPACE_DNS, 'missing-folder')
-#     response = admin_client.post(
-#         reverse('admin:finder_inodemodel_change', kwargs={'inode_id': missing_folder_id}) + '/update',
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 404
-#
-#
-# @pytest.mark.django_db
-# def test_update_inode_update_with_missing_file(update_inode_url, admin_client):
-#     missing_file_id = uuid5(NAMESPACE_DNS, 'missing-file')
-#     response = admin_client.post(
-#         update_inode_url,
-#         {'id': str(missing_file_id)},
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 404
-#
-#
-# @pytest.mark.django_db
-# def test_create_sub_folder(realm, admin_client):
-#     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': realm.root_folder.id})
-#     response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
-#     assert response.status_code == 200
-#     new_folder = response.json()['new_folder']
-#     assert new_folder['name'] == "Sub Folder"
-#     sub_folder = FolderModel.objects.get(id=new_folder['id'])
-#     response = admin_client.get(f'{admin_url}/fetch')
-#     assert response.status_code == 200
-#     inodes = response.json()['inodes']
-#     assert inodes[0]['id'] == str(sub_folder.id)
-#     assert inodes[0]['name'] == "Sub Folder"
-#     assert inodes[0]['is_folder'] is True
-#     assert inodes[0]['parent'] == str(realm.root_folder.id)
-#     assert inodes[0]['thumbnail_url'] == f'{settings.STATIC_URL}filer/icons/folder.svg'
-#
-#     # with missing Content-Type
-#     response = admin_client.post(f'{admin_url}/add_folder')
-#     assert response.status_code == 415
-#
-#     # add a second folder with the same name
-#     response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
-#     assert response.status_code == 409
-#     assert response.content.decode() == "A folder named “Sub Folder” already exists."
+@pytest.fixture
+def update_inode_url(ambit):
+    return reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id}) + '/update'
+
+
+def test_update_inode_change_nothing(update_inode_url, uploaded_file, admin_client):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(uploaded_file.id), 'name': uploaded_file.name},
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+
+
+def test_update_inode_rename_file(update_inode_url, uploaded_file, admin_client):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(uploaded_file.id), 'name': "renamed_file.bin"},
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.name == "renamed_file.bin"
+
+
+def test_update_inode_update_using_invalid_filename(update_inode_url, uploaded_file, admin_client):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(uploaded_file.id), 'name': 'invalid:name'},
+        content_type='application/json',
+    )
+    assert response.status_code == 409
+
+
+def test_update_inode_using_existing_folder_name(update_inode_url, uploaded_file, sub_folder, admin_client):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(uploaded_file.id), 'name': "Sub Folder"},
+        content_type='application/json',
+    )
+    assert response.status_code == 409
+
+
+def test_update_inode_rename_folder(update_inode_url, sub_folder, admin_client):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(sub_folder.id), 'name': "Renamed Folder"},
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    sub_folder.refresh_from_db()
+    assert sub_folder.name == "Renamed Folder"
+
+
+def test_update_inode_update_with_missing_content_type(update_inode_url, uploaded_file, admin_client):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(uploaded_file.id), 'name': 'renamed_file.bin'},
+    )
+    assert response.status_code == 415
+
+
+def test_update_inode_update_with_missing_folder(admin_client, missing_inode_id):
+    response = admin_client.post(
+        reverse('admin:finder_inodemodel_change', kwargs={'inode_id': missing_inode_id}) + '/update',
+        content_type='application/json',
+    )
+    assert response.status_code == 404
+
+
+def test_update_inode_update_with_missing_file(update_inode_url, admin_client, missing_inode_id):
+    response = admin_client.post(
+        update_inode_url,
+        {'id': str(missing_inode_id)},
+        content_type='application/json',
+    )
+    assert response.status_code == 404
+
+
+def test_create_sub_folder(admin_client, ambit):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
+    assert response.status_code == 200
+    new_folder = response.json()['new_folder']
+    assert new_folder['name'] == "Sub Folder"
+    sub_folder = FolderModel.objects.get(id=new_folder['id'])
+    response = admin_client.get(f'{admin_url}/fetch')
+    assert response.status_code == 200
+    inodes = response.json()['inodes']
+    assert inodes[0]['id'] == str(sub_folder.id)
+    assert inodes[0]['name'] == "Sub Folder"
+    assert inodes[0]['is_folder'] is True
+    assert inodes[0]['parent'] == str(ambit.root_folder.id)
+    assert inodes[0]['thumbnail_url'] == f'{settings.STATIC_URL}finder/icons/folder.svg'
+
+    # with missing Content-Type
+    response = admin_client.post(f'{admin_url}/add_folder')
+    assert response.status_code == 415
+
+    # add a second folder with the same name
+    response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
+    assert response.status_code == 409
+    assert response.content.decode() == "A folder named “Sub Folder” already exists."
