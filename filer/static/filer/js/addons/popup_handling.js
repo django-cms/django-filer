@@ -3,7 +3,8 @@
 const windowname_to_id = (text) => {
     text = text.replace(/__dot__/g, '.');
     text = text.replace(/__dash__/g, '-');
-    return text.split('__')[0];
+    const last = text.lastIndexOf('__');
+    return last === -1 ? text : text.substring(0, last);
 };
 
 window.dismissPopupAndReload = (win) => {
