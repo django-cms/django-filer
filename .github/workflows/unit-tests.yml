@@ -22,9 +22,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
-        django-version: ["5.2.*"]
+        django-version: ["5.2.*", "6.0.*"]
         node-version: ["22.x"]
-        with-cte: [true, false]
+        optional-dependencies: ["", "django-cte"]
+        exclude:
+          - python-version: "3.10"
+            django-version: "6.0.*"
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -42,9 +45,7 @@ jobs:
         python -m pip install --upgrade setuptools wheel
         python -m pip install "Django==${{ matrix.django-version }}"
         python -m pip install django-entangled ffmpeg-python pillow reportlab svglib pycairo
-        python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov
-    - if: ${{ matrix.with-cte }}
-      run: python -m pip install django-cte
+        python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov ${{ matrix.optional-dependencies }}
     - name: Test with pytest
       run: |
         python -m pytest -v unittests
