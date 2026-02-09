@@ -262,3 +262,132 @@ def test_create_sub_folder(admin_client, ambit):
     response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
     assert response.status_code == 409
     assert response.content.decode() == "A folder named “Sub Folder” already exists."
+
+
+def test_move_file_into_subfolder(admin_client, ambit, uploaded_file, sub_folder):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': str(sub_folder.id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == sub_folder
+
+
+def test_keep_file_in_subfolder(admin_client, ambit, uploaded_file, sub_folder):
+    uploaded_file.parent = sub_folder
+    uploaded_file.save()
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': str(sub_folder.id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == sub_folder
+
+
+def test_move_file_to_parent(admin_client, ambit, uploaded_file, sub_folder):
+    uploaded_file.parent = sub_folder
+    uploaded_file.save()
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': 'parent'}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == ambit.root_folder
+
+
+def test_move_file_to_self(admin_client, ambit, uploaded_file, sub_folder):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == sub_folder
+
+
+def test_move_file_to_missing_parent(admin_client, ambit, uploaded_file):
+    assert uploaded_file.parent == ambit.root_folder
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': 'parent'}),
+        content_type='application/json',
+    )
+    assert response.status_code == 404
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == ambit.root_folder
+
+
+def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_inode_id):
+    assert uploaded_file.parent == ambit.root_folder
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': str(missing_inode_id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 404
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == ambit.root_folder
+
+
+def test_reorder_inodes_insert_before(admin_client, uploaded_file, sub_folder):
+    created_files = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"File #{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 10)
+    ])
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/reorder',
+        json.dumps({
+            'target_id': str(created_files[3].id),
+            'inode_ids': [str(created_file.id) for created_file in created_files[6:]]
+        }),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    for file, expected in zip(sub_folder.listdir().order_by('ordering'), [1, 2, 3, 7, 8, 9, 4, 5, 6]):
+        assert file['name'] == f"File #{expected}"
+
+
+def test_reorder_inodes_insert_after(admin_client, uploaded_file, sub_folder):
+    created_files = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"File #{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 10)
+    ])
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    admin_client.cookies['django-finder-layout'] = 'tiles'  # inserts after target
+    response = admin_client.post(
+        f'{admin_url}/reorder',
+        json.dumps({
+            'target_id': str(created_files[3].id),
+            'inode_ids': [str(created_file.id) for created_file in created_files[6:]]
+        }),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    for file, expected in zip(sub_folder.listdir().order_by('ordering'), [1, 2, 3, 4, 7, 8, 9, 5, 6]):
+        assert file['name'] == f"File #{expected}"
