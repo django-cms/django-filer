@@ -3,6 +3,7 @@ import uuid
 from functools import reduce
 from operator import and_, or_
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -16,16 +17,19 @@ from django.utils.translation import gettext_lazy as _
 
 from finder.models.permission import AccessControlEntry, Privilege, has_privilege_subquery
 
-try:
-    from django.contrib.postgres.aggregates import StringAgg
-except ImportError:  # psycopg2 is not installed
-    pass
+if DJANGO_VERSION < (6, 0):
+    try:
+        from django.contrib.postgres.aggregates import StringAgg
+    except ImportError:  # psycopg2 is not installed
+        pass
+else:
+    from django.db.models.aggregates import StringAgg
 
 
 class GroupConcat(Aggregate):
     """
     To be used on SQLite, MySQL and MariaDB databases. For Postgres, use `StringAgg`.
-    In Django-6.0, use StringAgg
+    In Django-6.0 and later, use StringAgg if it supports the DISTINCT keyword with multiple arguments.
     """
     function = 'GROUP_CONCAT'
     template = '%(function)s(%(distinct)s %(expressions)s)'
@@ -39,6 +43,12 @@ class GroupConcat(Aggregate):
             output_field=CharField() if output_field is None else output_field,
             **extra
         )
+
+
+NUMERIC_FIELD_TYPES = [
+    'IntegerField', 'FloatField', 'DecimalField', 'BigIntegerField', 'SmallIntegerField',
+    'PositiveIntegerField', 'PositiveSmallIntegerField', 'PositiveBigIntegerField'
+]
 
 
 class InodeMetaModel(models.base.ModelBase):
@@ -147,12 +157,17 @@ class InodeManagerMixin:
             if model.is_folder:
                 expressions = {'label_ids': Value('', output_field=CharField())}
             else:
-                vendor = connections[model.objects.db].vendor
-                if vendor == 'postgresql':
-                    concatenated = Cast('labels__id', output_field=CharField())
-                    expressions = {'label_ids': StringAgg(concatenated, ',', distinct=True)}
-                else:
+                connection = connections[model.objects.db]
+                if (
+                    DJANGO_VERSION < (6, 0) and connection.vendor != 'postgresql'
+                    or not connection.features.supports_aggregate_distinct_multiple_argument
+                ):
+                    # Function STRING_AGG should be preferred over GROUP_CONCAT, but isn't always available or doesn't
+                    # support the DISTINCT keyword in SQLite, so we have to use GROUP_CONCAT in that case.
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
+                else:
+                    concatenated = Cast('labels__id', output_field=CharField())
+                    expressions = {'label_ids': StringAgg(concatenated, Value(','), distinct=True)}
             if user:
                 assert isinstance(user, get_user_model()), "`user` must be an instance of AUTH_USER_MODEL."
                 if user.is_superuser:
@@ -169,7 +184,15 @@ class InodeManagerMixin:
                 if name in annotations:
                     concrete_fields.remove(name)
                 elif name not in model_field_names:
-                    value = None if field.default is models.NOT_PROVIDED else field.default
+                    if field.default is models.NOT_PROVIDED:
+                        if field.get_internal_type() in NUMERIC_FIELD_TYPES:
+                            value = 0
+                        elif field.empty_strings_allowed:
+                            value = ''
+                        else:
+                            value = None
+                    else:
+                        value = field.default
                     expressions[name] = Value(value, output_field=field)
             query = self.get_query(model, **lookup)
             return model.objects.values(*concrete_fields, **expressions).annotate(**annotations).filter(query)

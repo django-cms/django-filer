@@ -324,14 +324,7 @@ class InodeAdmin(admin.ModelAdmin):
     def annotate_unified_queryset(self, ambit, queryset):
         annotate_unified_queryset(ambit, queryset)
         for entry in queryset:
-            entry.update(
-                change_url=self.get_inode_url(ambit.slug, str(entry['id'])),
-                # change_url=reverse(
-                #     'admin:finder_inodemodel_change',
-                #     args=(entry['id'],),
-                #     current_app=self.admin_site.name,
-                # )
-            )
+            entry['change_url'] = self.get_inode_url(ambit.slug, str(entry['id']))
 
     def response_post_save_change(self, request, obj):
         ambit = obj.folder.get_ambit()

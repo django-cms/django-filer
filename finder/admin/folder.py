@@ -308,7 +308,10 @@ class FolderAdmin(InodeAdmin):
             if body['target_id'] == 'parent':
                 target_folder = current_folder.parent
             else:
-                target_folder = self.get_object(request, body['target_id'])
+                try:
+                    target_folder = self.get_object(request, body['target_id'])
+                except FolderModel.DoesNotExist:
+                    target_folder = None
             if not target_folder:
                 msg = gettext("Folder named “{folder}” not found.")
                 return HttpResponseNotFound(msg.format(folder=body['target_id']))
