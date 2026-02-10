@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.models.expressions import F, OuterRef, Q
+from django.db.models.expressions import Exists, F, OuterRef, Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -11,14 +11,6 @@ class Privilege(models.IntegerChoices):
     READ_WRITE = 3, _("Read & Write")
     ADMIN = 4, _("Administrator")
     FULL = 7, _("Full Control")
-
-
-def has_privilege_subquery(user, privilege):
-    group_ids = user.groups.values_list('id', flat=True)
-    return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
-        Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
-        inode=OuterRef('id'),
-    )
 
 
 class AccessControlBase(models.Model):
@@ -79,6 +71,22 @@ class AccessControlBase(models.Model):
             }
 
 
+class AccessControlManager(models.Manager):
+    def get_privilege_queryset(self, user, privilege):
+        group_ids = user.groups.values_list('id', flat=True)
+        return self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
+            Q(privilege_mask__gt=0)
+            & (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
+        )
+
+    def has_privilege_subquery(self, user, privilege):
+        group_ids = user.groups.values_list('id', flat=True)
+        return Exists(self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
+            Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
+            inode=OuterRef('id'),
+        ))
+
+
 class AccessControlEntry(AccessControlBase):
     inode = models.UUIDField(db_index=True)
 
@@ -114,6 +122,8 @@ class AccessControlEntry(AccessControlBase):
                 name='acl_valid_privilege',
             ),
         ]
+
+    objects = AccessControlManager()
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(user={self.user}, inode={self.inode})>'

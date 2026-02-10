@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
-from django.db.models.expressions import Exists, F, Value
+from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.http.response import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseForbidden,
@@ -21,7 +21,7 @@ from django.utils.translation import gettext
 
 from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder
-from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege, has_privilege_subquery
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 
 
 class InodeAdmin(admin.ModelAdmin):
@@ -240,8 +240,8 @@ class InodeAdmin(admin.ModelAdmin):
             can_change = Value(True, output_field=BooleanField())
             can_view = Value(True, output_field=BooleanField())
         else:
-            can_change = Exists(has_privilege_subquery(request.user, Privilege.WRITE))
-            can_view = Exists(has_privilege_subquery(request.user, Privilege.READ))
+            can_change = AccessControlEntry.objects.has_privilege_subquery(request.user, Privilege.WRITE)
+            can_view = AccessControlEntry.objects.has_privilege_subquery(request.user, Privilege.READ)
         folders = PinnedFolder.objects.values(
             'folder__id',
             'folder__name',
