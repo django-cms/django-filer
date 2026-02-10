@@ -44,6 +44,16 @@ class AccessControlBase(models.Model):
             other = other.as_dict()
         return entry['type'] == other['type'] and entry['principal'] == other['principal']
 
+    @property
+    def principal(self):
+        if self.user:
+            return {'user': self.user}
+        if self.group:
+            return {'group': self.group}
+        if self.everyone:
+            return {'everyone': True}
+        raise RuntimeError("AccessControlEntry has no principal")
+
     def as_dict(self):
         if self.user:
             return {
@@ -126,7 +136,9 @@ class AccessControlEntry(AccessControlBase):
     objects = AccessControlManager()
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}(user={self.user}, inode={self.inode})>'
+        principal = '{0}={1}'.format(*next(iter(self.principal.items())))
+        privilege = f'privilege={self.get_privilege_display().replace(" & ", "&")}'
+        return f'<{self.__class__.__name__}(inode={self.inode}, {principal}, {privilege})>'
 
 
 class DefaultAccessControlEntry(AccessControlBase):
@@ -153,3 +165,8 @@ class DefaultAccessControlEntry(AccessControlBase):
                 name='dacl_valid_privilege',
             ),
         ]
+
+    def __repr__(self):
+        principal = '{0}={1}'.format(*next(iter(self.principal.items())))
+        privilege = f'privilege={self.get_privilege_display().replace(" & ", "&")}'
+        return f'<{self.__class__.__name__}(folder={self.folder}, {principal}, {privilege})>'
