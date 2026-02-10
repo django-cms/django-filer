@@ -335,11 +335,19 @@ class FolderAdmin(InodeAdmin):
         insert_after = request.COOKIES.get('django-finder-layout') in ['tiles', 'mosaic']
         body = json.loads(request.body)
         target_inode = FolderModel.objects.get_inode(id=body.get('target_id'))
+        if not target_inode.parent.has_permission(request.user, Privilege.WRITE):
+            msg = gettext("You do not have permission to reorder items in folder “{folder}”.")
+            return HttpResponseForbidden(msg.format(folder=self.name))
+
         inode_ids = body.get('inode_ids', [])
-        try:
-            target_inode.parent.reorder(request.user, target_inode.id, inode_ids, insert_after)
-        except PermissionDenied as exc:
-            return HttpResponseForbidden(str(exc))
+        if not request.user.is_superuser:
+            reorderable_inode_ids = set(
+                map(str, AccessControlEntry.objects.get_privilege_queryset(request.user, Privilege.WRITE).filter(
+                    inode__in=inode_ids
+                ).values_list('inode', flat=True).distinct())
+            )
+            inode_ids = [id for id in inode_ids if id in reorderable_inode_ids]  # preserve the order of inode_ids
+        target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_inode.parent)),
         })

@@ -246,7 +246,7 @@ class FolderModel(InodeModel):
                     obj.update_access_control_list(default_access_control_list)
 
         for folder in FolderModel.objects.filter(id__in=parent_ids):
-            folder.reorder(user)
+            folder.reorder()
 
     def copy_to(self, user, folder, **kwargs):
         """
@@ -285,7 +285,7 @@ class FolderModel(InodeModel):
             msg = gettext("Folder name “{name}” is reserved.")
             raise ValidationError(msg.format(name=self.name))
 
-    def reorder(self, user, target_id=None, inode_ids=[], insert_after=True):
+    def reorder(self, target_id=None, inode_ids=[], insert_after=True):
         """
         Set `ordering` index based on their natural ordering index.
         Returns the number of reorderings performed.
@@ -295,9 +295,6 @@ class FolderModel(InodeModel):
             inodes_order.update({id: nord for nord, id in enumerate(inode_ids, new_order)})
             return new_order + len(inode_ids)
 
-        if not self.has_permission(user, Privilege.WRITE):
-            msg = gettext("You do not have permission to reorder items in folder “{folder}”.")
-            raise PermissionDenied(msg.format(folder=self.name))
         inodes_order, new_order = {}, 1
         target_id = str(target_id) if target_id else None
         for inode in self.listdir().order_by('ordering'):
@@ -326,9 +323,8 @@ class FolderModel(InodeModel):
                         update_inodes.append(inode)
                         num_reorders += 1
                 inode_model.objects.bulk_update(update_inodes, ['parent', 'ordering'])
-
-        for folder in former_parents:
-            folder.reorder(user)
+            for folder in former_parents:
+                folder.reorder()
 
         return num_reorders
 
