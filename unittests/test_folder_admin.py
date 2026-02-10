@@ -11,9 +11,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
-# from filer import settings as filer_settings
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, ROOT_FOLDER_NAME
+from finder.models.permission import AccessControlEntry, Privilege
 
 
 def test_root_folder_exists(admin_client, ambit):
@@ -342,52 +342,84 @@ def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_
     assert uploaded_file.parent == ambit.root_folder
 
 
-def test_reorder_inodes_insert_before(admin_client, uploaded_file, sub_folder):
-    created_files = FileModel.objects.bulk_create([
-        FileModel(
-            parent=sub_folder,
-            name=f"File #{ordering}",
+@pytest.mark.parametrize('denied', [False, True])
+@pytest.mark.parametrize('same_folder', [True, False])
+@pytest.mark.parametrize('finder_layout', ['tiles', 'list'])
+@pytest.mark.parametrize('principal', ['superuser', 'user', 'group', 'everyone'])
+def test_reorder_inodes_insert(
+    admin_client, admin_user, uploaded_file, sub_folder, principal, finder_layout, same_folder, denied
+):
+    if principal != 'superuser':
+        admin_user.is_superuser = False
+        admin_user.save(update_fields=['is_superuser'])
+        if principal == 'user':
+            principal_kwargs = {'user': admin_user}
+        elif principal == 'group':
+            group = admin_user.groups.create(name='Test Group')
+            admin_user.groups.add(group)
+            principal_kwargs = {'group': group}
+        else:
+            principal_kwargs = {'everyone': True}
+    admin_client.cookies['django-finder-layout'] = finder_layout
+    created_inodes = FileModel.objects.bulk_create([
+        *(FileModel(
+            parent=sub_folder.parent,
+            name=f"File #R{ordering}",
             file_size=uploaded_file.file_size,
             sha1=uploaded_file.sha1,
             owner=uploaded_file.owner,
             ordering=ordering,
-        ) for ordering in range(1, 10)
+        ) for ordering in range(1, 10)),
+        *(FileModel(
+            parent=sub_folder,
+            name=f"File #S{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 10)),
     ])
+    AccessControlEntry.objects.all().delete()
+    if admin_user.is_superuser is False:
+        acl = [
+            AccessControlEntry(inode=inode.id, **principal_kwargs, privilege=Privilege.READ_WRITE)
+            for inode in created_inodes
+        ]
+        if not denied:
+            acl.extend([
+                AccessControlEntry(inode=sub_folder.parent.id, **principal_kwargs, privilege=Privilege.READ_WRITE),
+                AccessControlEntry(inode=sub_folder.id, **principal_kwargs, privilege=Privilege.READ_WRITE),
+            ])
+        AccessControlEntry.objects.bulk_create(acl)
+
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    if same_folder:
+        target_id = created_inodes[12].id
+        expected_root = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
+        if finder_layout == 'tiles':
+            expected_sub = ['S1', 'S2', 'S3', 'S4', 'S7', 'S8', 'S9', 'S5', 'S6']
+        else:
+            expected_sub = ['S1', 'S2', 'S3', 'S7', 'S8', 'S9', 'S4', 'S5', 'S6']
+    else:
+        target_id = created_inodes[3].id  # target is in parent folder, so files are moved there
+        if finder_layout == 'tiles':
+            expected_root = ['R1', 'R2', 'R3', 'R4', 'S7', 'S8', 'S9', 'R5', 'R6', 'R7', 'R8', 'R9']
+        else:
+            expected_root = ['R1', 'R2', 'R3', 'S7', 'S8', 'S9', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
+        expected_sub = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
     response = admin_client.post(
         f'{admin_url}/reorder',
         json.dumps({
-            'target_id': str(created_files[3].id),
-            'inode_ids': [str(created_file.id) for created_file in created_files[6:]]
+            'target_id': str(target_id),
+            'inode_ids': [str(created_file.id) for created_file in created_inodes[15:]]
         }),
         content_type='application/json',
     )
+    if denied and admin_user.is_superuser is False:
+        assert response.status_code == 403
+        return
     assert response.status_code == 200
-    for file, expected in zip(sub_folder.listdir().order_by('ordering'), [1, 2, 3, 7, 8, 9, 4, 5, 6]):
+    for file, expected in zip(sub_folder.parent.listdir(name__startswith='File').order_by('ordering'), expected_root):
         assert file['name'] == f"File #{expected}"
-
-
-def test_reorder_inodes_insert_after(admin_client, uploaded_file, sub_folder):
-    created_files = FileModel.objects.bulk_create([
-        FileModel(
-            parent=sub_folder,
-            name=f"File #{ordering}",
-            file_size=uploaded_file.file_size,
-            sha1=uploaded_file.sha1,
-            owner=uploaded_file.owner,
-            ordering=ordering,
-        ) for ordering in range(1, 10)
-    ])
-    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
-    admin_client.cookies['django-finder-layout'] = 'tiles'  # inserts after target
-    response = admin_client.post(
-        f'{admin_url}/reorder',
-        json.dumps({
-            'target_id': str(created_files[3].id),
-            'inode_ids': [str(created_file.id) for created_file in created_files[6:]]
-        }),
-        content_type='application/json',
-    )
-    assert response.status_code == 200
-    for file, expected in zip(sub_folder.listdir().order_by('ordering'), [1, 2, 3, 4, 7, 8, 9, 5, 6]):
+    for file, expected in zip(sub_folder.listdir(name__startswith='File').order_by('ordering'), expected_sub):
         assert file['name'] == f"File #{expected}"

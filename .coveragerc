@@ -3,7 +3,11 @@ branch = True
 source =
     finder
 omit =
-    migrations/*
+    demoapp/*
+    docs/*
+    filer/*
+    finder/migrations/*
+    tests/*
 
 [report]
 exclude_lines =

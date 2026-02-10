@@ -337,7 +337,7 @@ class FolderAdmin(InodeAdmin):
         target_inode = FolderModel.objects.get_inode(id=body.get('target_id'))
         if not target_inode.parent.has_permission(request.user, Privilege.WRITE):
             msg = gettext("You do not have permission to reorder items in folder “{folder}”.")
-            return HttpResponseForbidden(msg.format(folder=self.name))
+            return HttpResponseForbidden(msg.format(folder=target_inode.parent.name))
 
         inode_ids = body.get('inode_ids', [])
         if not request.user.is_superuser:
