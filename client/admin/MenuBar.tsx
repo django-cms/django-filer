@@ -342,6 +342,8 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 			const body = await response.json();
 			folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 			current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+			alert(await response.text());
 		} else {
 			console.error(response);
 		}

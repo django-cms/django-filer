@@ -355,14 +355,18 @@ class FolderAdmin(InodeAdmin):
     def delete_inodes(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
+        user = request.user
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
             return HttpResponse("Cannot move inodes from trash folder into itself.", status=409)
+        if not current_folder.has_permission(user, Privilege.WRITE):
+            msg = gettext("You do not have permission to delete items from folder “{folder}”.")
+            return HttpResponseForbidden(msg.format(folder=current_folder.name))
         trash_ordering = trash_folder.get_max_ordering()
         inode_ids = body.get('inode_ids', [])
-        for entry in FolderModel.objects.filter_unified(id__in=inode_ids):
+        for entry in FolderModel.objects.filter_unified(user=user, has_write_permission=True, id__in=inode_ids):
             inode = FolderModel.objects.get_inode(id=entry['id'])
             update_fields = ['parent', 'ordering']
             if entry['is_folder']:
