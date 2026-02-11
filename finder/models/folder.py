@@ -225,7 +225,7 @@ class FolderModel(InodeModel):
         update_inodes = {}
         target_ambit, cache_ambits = self.get_ambit(), {}
         entries = FolderModel.objects.filter_unified(id__in=inode_ids, user=user, has_write_permission=True)
-        default_access_control_list = [ace.as_dict() for ace in self.default_access_control_list.all()]
+        default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
             parent_ids.add(entry['parent'])
             try:

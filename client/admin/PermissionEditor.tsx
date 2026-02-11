@@ -24,7 +24,6 @@ enum Privilege {
 
 
 type AccessControlEntry = {
-	id: string,
 	type: 'user'|'group'|'everyone',
 	principal: number|null,
 	name: string,

@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models.expressions import Exists, F, OuterRef, Q
-from django.utils.translation import gettext_lazy as _
+from django.utils.functional import cached_property
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 class Privilege(models.IntegerChoices):
@@ -39,12 +40,20 @@ class AccessControlBase(models.Model):
         abstract = True
 
     def __eq__(self, other):
-        entry = self.as_dict()
+        entry = self.as_dict
         if isinstance(other, AccessControlBase):
-            other = other.as_dict()
-        return entry['type'] == other['type'] and entry['principal'] == other['principal']
+            other = other.as_dict
+        return (
+            entry['type'] == other['type']
+            and entry['principal'] == other['principal']
+            and entry['privilege'] == other['privilege']
+        )
 
-    @property
+    def __hash__(self):
+        entry = self.as_dict
+        return hash((entry['type'], entry['principal'], entry['privilege']))
+
+    @cached_property
     def principal(self):
         if self.user:
             return {'user': self.user}
@@ -54,10 +63,10 @@ class AccessControlBase(models.Model):
             return {'everyone': True}
         raise RuntimeError("AccessControlEntry has no principal")
 
+    @cached_property
     def as_dict(self):
         if self.user:
             return {
-                'id': self.id,
                 'type': 'user',
                 'principal': self.user.id,
                 'name': str(self.user),
@@ -65,7 +74,6 @@ class AccessControlBase(models.Model):
             }
         if self.group:
             return {
-                'id': self.id,
                 'type': 'group',
                 'principal': self.group.id,
                 'name': str(self.group),
@@ -73,10 +81,9 @@ class AccessControlBase(models.Model):
             }
         if self.everyone:
             return {
-                'id': self.id,
                 'type': 'everyone',
                 'principal': None,
-                'name': _("Everyone"),
+                'name': gettext("Everyone"),
                 'privilege': self.privilege,
             }
 

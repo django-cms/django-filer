@@ -159,8 +159,8 @@ class InodeAdmin(admin.ModelAdmin):
         else:
             acl_qs = AccessControlEntry.objects.filter(inode=current_inode.id)
         for ace in acl_qs:
-            entry = ace.as_dict()
-            entry['is_current_user'] = entry['type'] == 'user' and entry['id'] == current_user.id
+            entry = ace.as_dict
+            entry['is_current_user'] = entry['type'] == 'user' and entry['principal'] == current_user.id
             access_control_list.append(entry)
         return JsonResponse({
             'access_control_list': access_control_list,
