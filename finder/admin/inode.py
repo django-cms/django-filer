@@ -240,8 +240,8 @@ class InodeAdmin(admin.ModelAdmin):
             can_change = Value(True, output_field=BooleanField())
             can_view = Value(True, output_field=BooleanField())
         else:
-            can_change = AccessControlEntry.objects.has_privilege_subquery(request.user, Privilege.WRITE)
-            can_view = AccessControlEntry.objects.has_privilege_subquery(request.user, Privilege.READ)
+            can_change = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.WRITE)
+            can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
         folders = PinnedFolder.objects.values(
             'folder__id',
             'folder__name',

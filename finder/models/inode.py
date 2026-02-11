@@ -177,8 +177,8 @@ class InodeManagerMixin:
                     )
                 else:
                     annotations.update(
-                        can_view=AccessControlEntry.objects.has_privilege_subquery(user, Privilege.READ),
-                        can_change=AccessControlEntry.objects.has_privilege_subquery(user, Privilege.WRITE),
+                        can_view=AccessControlEntry.objects.privilege_subquery_exists(user, Privilege.READ),
+                        can_change=AccessControlEntry.objects.privilege_subquery_exists(user, Privilege.WRITE),
                     )
             for name, field in unified_fields.items():
                 if name in annotations:

@@ -144,8 +144,8 @@ class FolderAdmin(InodeAdmin):
                 can_change = Value(True, output_field=BooleanField())
                 can_view = Value(True, output_field=BooleanField())
             else:
-                can_change = AccessControlEntry.objects.has_privilege_subquery(request.user, Privilege.WRITE)
-                can_view = AccessControlEntry.objects.has_privilege_subquery(request.user, Privilege.READ)
+                can_change = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.WRITE)
+                can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
             values = 'id', 'can_change', 'can_view'
             ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
         else:

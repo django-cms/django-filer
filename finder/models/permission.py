@@ -89,7 +89,7 @@ class AccessControlManager(models.Manager):
             & (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
         )
 
-    def has_privilege_subquery(self, user, privilege):
+    def privilege_subquery_exists(self, user, privilege):
         group_ids = user.groups.values_list('id', flat=True)
         return Exists(self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
             Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
