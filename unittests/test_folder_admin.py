@@ -426,8 +426,8 @@ def test_reorder_inodes(
         content_type='application/json',
     )
     if (admin_user.is_superuser is False and (
-        not same_folder and access_control == AccessControl.TARGET_DENIED or
-        same_folder and access_control == AccessControl.SOURCE_DENIED
+        not same_folder and access_control == AccessControl.TARGET_DENIED
+        or same_folder and access_control == AccessControl.SOURCE_DENIED
     )):
         assert response.status_code == 403
         return
