@@ -342,24 +342,28 @@ def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_
     assert uploaded_file.parent == ambit.root_folder
 
 
+@pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
+def principal_kwargs(admin_user, request):
+    if request.param == 'superuser':
+        return
+    admin_user.is_superuser = False
+    admin_user.save(update_fields=['is_superuser'])
+    if request.param == 'user':
+        return {'user': admin_user, 'privilege': Privilege.READ_WRITE}
+    if request.param == 'group':
+        group = admin_user.groups.create(name='Test Group')
+        admin_user.groups.add(group)
+        return {'group': group, 'privilege': Privilege.READ_WRITE}
+    if request.param == 'everyone':
+        return {'everyone': True, 'privilege': Privilege.READ_WRITE}
+
+
 @pytest.mark.parametrize('denied', [False, True])
 @pytest.mark.parametrize('same_folder', [True, False])
 @pytest.mark.parametrize('finder_layout', ['tiles', 'list'])
-@pytest.mark.parametrize('principal', ['superuser', 'user', 'group', 'everyone'])
 def test_reorder_inodes_insert(
-    admin_client, admin_user, uploaded_file, sub_folder, principal, finder_layout, same_folder, denied
+    admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, finder_layout, same_folder, denied
 ):
-    if principal != 'superuser':
-        admin_user.is_superuser = False
-        admin_user.save(update_fields=['is_superuser'])
-        if principal == 'user':
-            principal_kwargs = {'user': admin_user}
-        elif principal == 'group':
-            group = admin_user.groups.create(name='Test Group')
-            admin_user.groups.add(group)
-            principal_kwargs = {'group': group}
-        else:
-            principal_kwargs = {'everyone': True}
     admin_client.cookies['django-finder-layout'] = finder_layout
     created_inodes = FileModel.objects.bulk_create([
         *(FileModel(
@@ -382,13 +386,13 @@ def test_reorder_inodes_insert(
     AccessControlEntry.objects.all().delete()
     if admin_user.is_superuser is False:
         acl = [
-            AccessControlEntry(inode=inode.id, **principal_kwargs, privilege=Privilege.READ_WRITE)
+            AccessControlEntry(inode=inode.id, **principal_kwargs)
             for inode in created_inodes
         ]
         if not denied:
             acl.extend([
-                AccessControlEntry(inode=sub_folder.parent.id, **principal_kwargs, privilege=Privilege.READ_WRITE),
-                AccessControlEntry(inode=sub_folder.id, **principal_kwargs, privilege=Privilege.READ_WRITE),
+                AccessControlEntry(inode=sub_folder.parent.id, **principal_kwargs),
+                AccessControlEntry(inode=sub_folder.id, **principal_kwargs),
             ])
         AccessControlEntry.objects.bulk_create(acl)
 
@@ -419,7 +423,14 @@ def test_reorder_inodes_insert(
         assert response.status_code == 403
         return
     assert response.status_code == 200
+    default_access_control_list = set(ace for ace in sub_folder.parent.default_access_control_list.all())
     for file, expected in zip(sub_folder.parent.listdir(name__startswith='File').order_by('ordering'), expected_root):
         assert file['name'] == f"File #{expected}"
+        for file in sub_folder.parent.listdir(name__startswith='File #S'):
+            # check that default ACL is assigned to inodes moved through reordering
+            acl = set(ace for ace in AccessControlEntry.objects.filter(inode=file['id']))
+            assert acl == default_access_control_list
     for file, expected in zip(sub_folder.listdir(name__startswith='File').order_by('ordering'), expected_sub):
         assert file['name'] == f"File #{expected}"
+
+

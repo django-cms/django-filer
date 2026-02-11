@@ -309,6 +309,7 @@ class FolderModel(InodeModel):
 
         former_parents = set()
         num_reorders = 0
+        default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
         with transaction.atomic():
             for inode_model in InodeModel.get_models(include_folder=True):
                 update_inodes = []
@@ -317,6 +318,7 @@ class FolderModel(InodeModel):
                     if inode.parent != self:
                         former_parents.add(inode.parent)
                         inode.parent = self
+                        inode.update_access_control_list(default_access_control_list)
                         update_inodes.append(inode)
                     if inode.ordering != ordering:
                         inode.ordering = ordering
