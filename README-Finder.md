@@ -1,17 +1,12 @@
 # Django-Filer ("Finder" branch)
 
 The "Finder" branch of django-filer is a complete rewrite of the original **django-filer** project.
-It is 'work in progress' and not yet ready for production use. However, the code is in a state
-where it can be used for testing and development purposes.
 
 A rewrite was necessary because the original codebase was not maintainable anymore. Please read this
-[discussion](https://github.com/django-cms/django-filer/discussions/1348) for details on why rewriting
-this library was necessary.
-
-Apart from the maintainability issues, using the File and Folder models was not possible in a
-multi-tenant environment. Extending the file model with a more specialized implementation was
-possible in theory, but so complicated that apart from the `ImageModel` no other implementations
-ever have been created.
+[discussion](https://github.com/django-cms/django-filer/discussions/1348) for details. Apart from the maintainability issues, using the File and Folder
+models was not possible in a multi-tenant environment. Extending the file model with a more
+specialized implementation was possible in theory, but so complicated that apart from the
+`ImageModel` no other implementations ever have been created.
 
 
 ## Less third-party dependencies
@@ -39,6 +34,14 @@ The "Finder" branch of django-filer is designed to be extensible for every MIME-
 Therefore, those extensions might need their own dependencies in order to extract or visualize a
 certain type of file. A minimal installation can be configured to only distinguish between files
 and folders.
+
+
+## Multiple Folder Roots
+The "Finder" branch of **django-filer** allows to have multiple folder roots (ambits). Such a folder
+root must be created using the management command `manage.py finder add-root …`. All folder roots
+are then displayed in the left sidebar of the Django admin. For each folder root, a different Django
+storage can be configured.
+
 
 
 ## New Model Features
@@ -77,6 +80,64 @@ clipboard and pasted into another folder.
 Each user now has its *own private trash* folder. Whenever he deletes a file or folder, it is moved
 to that trash folder. From there, he can restore the file or folder, or delete it permanently. The
 trash folder can be emptied automatically after a given time period.
+
+
+## Permission System
+
+The permission system of **django-filer** is based on the idea of Access Control Lists (ACLs) similar
+to Posix or NTFS ACSs. This allows to grant fine-grained permissions to everybody, individual users
+and/or groups for each file and folder.
+
+Permissions are controlled through the model named `AccessControlEntry`. This model has a foreign
+key onto `InodeModel` and a so-called "principal". A principal is either a user, a group or a flag
+for everyone. They are mutually exclusive and implemented as a nullable foreign key onto `User`, a
+foreign key onto `Group` and a Boolean field named `everyone`. Either of them can be set, but not
+both. If both are unset, the chosen permissions are applied to every staff user.
+
+By using a separate model `AccessControlEntry`, **django-filer** can now compute the permissions
+using just one database query per inode. Until version 3, the permissions had to be computed
+traversing all ancestors starting from the current folder up to the root of the folder tree. This
+was a time-consuming opertaion and made **django-filer** slow for large datasets.
+
+Each `AccessControlEntry` has a bitmap field used to represent:
+* `write` set for a folder: Allows the user to upload a file, to change the name of that folder,
+  to reorder files in that folder, to move files out of that filer.
+* `write` set for a file: Allows the user to replace a file, to edit the file's meta-data, and to
+  move the file to another folder, if the source and target folders have write permissions.
+* `read` set for a folder: Allows the user to open that folder.
+* `read` set for a file: Allows the user to view a thumbnail of that file inside its containing
+  folder and use that file, including copying.
+* `admin`: Allows the user to change the permissions of that folder or file.
+* A generic foreign key pointing onto the `InodeModel`. This creates a one-to-many relation between
+  different file types and folders on one side and the access control list on the other.
+
+In addition to `AccessControlEntry` the permission system also provides a model named
+`DefaultAccessControlEntry`. This acts as a template for newly  which is used to set default permissions for files and folders created as children of a specific folder. This allows to set a permission template for each folder, which is inherited by all files and folders created as children of that folder. This is implemented as a separate model with a foreign key onto the `FolderModel`, because it is not possible to use the same model for both purposes, since the default permissions must be inherited by all children of a folder, while the regular permissions only apply to the file or folder they are attached to.
+
+*
+* A foreign key onto the folder model to set a permission template. Read below for details.
+* The `execute` flag as seen in Unix file systems and other ACL implementations does not make sense
+  in this context and is not implemented.
+
+If a folder has `write` but no `read` permission, the user can upload files into that folder, but
+doesn't see files from other users. This is named "Dropbox" functionality.
+
+Each file and folder has a foreign key named `owner`, pointing onto the `User` model. The owner of a
+file or folder can change its permissions if he has the global permission to do so. When creating a
+new file or folder, the currently loggedin user is set as the owner of that file or folder.
+
+Only a superuser and the owner of a file or folder can change its permissions. The superuser can
+change the permissions of any file or folder. Staff users can change the permissions only of files
+they own themselves.
+
+Only a superuser can change the owner of a file or folder.
+
+In addition to the file and folder permissions, each folder requires a template of permissions on how to
+inherit them to files and folders created as children of that specific folder. This can be achieved with
+a separate foreign key in model `AccessControlEntry` pointing onto the `FolderModel`.
+
+Microsoft gives a good explanation on the implementation of
+[ACLs in their Data-Lake implementation](https://learn.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-access-control).
 
 
 ### Alternative Views
@@ -178,8 +239,9 @@ STORAGES = {
 }
 ```
 
-If instead of using the local file system you want to use another storage backend, such as Amazon S3
-or Google Cloud Storage, configure the corresponding storage backend in the `STORAGES` setting as:
+If instead of using the local file system you want to use another storage backend, such as MinIO,
+Amazon S3 or Google Cloud Storage, configure the corresponding storage backend in the `STORAGES`
+setting as:
 
 ```python
 STORAGES = {
@@ -318,54 +380,6 @@ By extending the focal point to three degrees of freedom, it is possible to crea
 taking the resolution into account. This allows us to create thumbnails taking art direction into
 consideration. For instance, if a user uploads a portrait image, the focal point can be set to the
 head of the person in that image.
-
-
-## Permission System (Proposal)
-
-The permission system of **django-filer** is based on the idea of Access Control Lists (ACLs) similar
-to Posix or NTFS ACSs. This allows to grant fine-grained permissions to everybody, individual users
-and/or groups for each file and folder.
-
-Permissions are controlled through the model named `AccessControlEntry`. This model has a foreign
-key onto `InodeModel` and a nullable foreign key onto `User` and `Group`. Either of them can be
-set, but not both. If both are unset, the chosen permissions are applied to everybody including the
-anonymous user.
-
-By using a separate model `AccessControlEntry`, **django-filer** can now compute the permissions
-using just one database query per inode. Until version 3, the permissions had to be computed traversing
-all ancestors starting from the current folder up to the root of the folder tree. This is a
-time-consuming opertaion and made **django-filer** slow for large datasets.
-
-Each `AccessControlEntry` has a these fields:
-* `write`: If set for a folder, it allows the currently loggedin user to upload a file. If set for a
-  file, it allows the currently loggedin user to edit that file.
-* `read`: If set for a folder, it allows the currently loggedin user to open that folder. If set for
-  a file, it allows the currently loggedin user to view and use that file.
-* A generic foreign key pointing onto the `InodeModel`. This creates a one-to-many relation between
-  different file types and folders on one side and the access control list on the other.
-* A foreign key onto the folder model to set a permission template. Read below for details.
-* The `execute` flag as seen in Unix file systems and other ACL implementations does not make sense
-  in this context and is not implemented.
-
-If a folder has `write` but no `read` permission, the user can upload files into that folder, but
-doesn't see files from other users. This is named "Dropbox" functionality.
-
-Each file and folder has a foreign key named `owner`, pointing onto the `User` model. The owner of a
-file or folder can change its permissions if he has the global permission to do so. When creating a
-new file or folder, the currently loggedin user is set as the owner of that file or folder.
-
-Only a superuser and the owner of a file or folder can change its permissions. The superuser can
-change the permissions of any file or folder. Staff users can change the permissions only of files
-they own themselves.
-
-Only a superuser can change the owner of a file or folder.
-
-In addition to the file and folder permissions, each folder requires a template of permissions on how to
-inherit them to files and folders created as children of that specific folder. This can be achieved with
-a separate foreign key in model `AccessControlEntry` pointing onto the `FolderModel`.
-
-Microsoft gives a good explanation on the implementation of
-[ACLs in their Data-Lake implementation](https://learn.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-access-control).
 
 
 ## Further Steps
