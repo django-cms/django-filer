@@ -80,7 +80,7 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.update_labels),
             ),
             path(
-                'undo_discard',
+                '<uuid:trash_folder_id>/undo_discard',
                 self.admin_site.admin_view(self.undo_discarded_inodes),
             ),
             path(
@@ -120,7 +120,7 @@ class FolderAdmin(InodeAdmin):
         trash_folder = self.get_trash_folder(request)
         ambit = request._ambit
         if inode.id != trash_folder.id:
-            folder_url = self.get_inode_url(request._ambit.slug, str(inode.folder.id))
+            folder_url = self.get_inode_url(ambit.slug, str(inode.folder.id))
             settings.update(
                 is_root=inode.is_root,
                 is_trash=False,
@@ -364,25 +364,35 @@ class FolderAdmin(InodeAdmin):
         if not current_folder.has_permission(user, Privilege.WRITE):
             msg = gettext("You do not have permission to delete items from folder “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
+
+        deleted_inodes = []
         trash_ordering = trash_folder.get_max_ordering()
         inode_ids = body.get('inode_ids', [])
-        for entry in FolderModel.objects.filter_unified(user=user, has_write_permission=True, id__in=inode_ids):
-            inode = FolderModel.objects.get_inode(id=entry['id'])
-            update_fields = ['parent', 'ordering']
-            if entry['is_folder']:
-                PinnedFolder.objects.filter(folder=inode).delete()
-                while trash_folder.listdir(name=inode.name, is_folder=True).exists():
-                    inode.name = f"{inode.name}.renamed"
-                update_fields.append('name')
-            DiscardedInode.objects.create(
-                inode=inode.id,
-                previous_parent=inode.parent,
+        with transaction.atomic():
+            for entry in FolderModel.objects.filter_unified(user=user, has_write_permission=True, id__in=inode_ids):
+                inode = FolderModel.objects.get_inode(id=entry['id'])
+                if entry['is_folder']:
+                    PinnedFolder.objects.filter(folder=inode).delete()
+                    while trash_folder.listdir(name=inode.name, is_folder=True).exists():
+                        inode.name = f"{inode.name}.renamed"
+                DiscardedInode.objects.create(
+                    inode=inode.id,
+                    previous_parent=inode.parent,
+                )
+                trash_ordering += 1
+                inode.ordering = trash_ordering
+                inode.parent = trash_folder
+                deleted_inodes.append(inode)
+            FolderModel.objects.bulk_update(
+                filter(lambda inode: isinstance(inode, FolderModel), deleted_inodes),
+                ['name', 'parent', 'ordering'],
             )
-            trash_ordering += 1
-            inode.ordering = trash_ordering
-            inode.parent = trash_folder
-            inode.save(update_fields=update_fields)
-        current_folder.reorder()
+            for model in InodeModel.get_models():
+                model.objects.bulk_update(
+                    filter(lambda inode: isinstance(inode, model), deleted_inodes),
+                    ['parent', 'ordering'],
+                )
+            current_folder.reorder()
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
@@ -421,19 +431,36 @@ class FolderAdmin(InodeAdmin):
             ],
         })
 
-    def undo_discarded_inodes(self, request):
-        if request.method != 'POST':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
+    def undo_discarded_inodes(self, request, trash_folder_id):
+        if response := self.check_for_valid_post_request(request, trash_folder_id):
+            return response
         body = json.loads(request.body)
         trash_folder = self.get_trash_folder(request)
+        assert trash_folder.id == trash_folder_id, "Trash folder ID mismatch."
         discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
-        for entry in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):
-            inode = FolderModel.objects.get_inode(id=entry['id'])
-            inode.parent = discarded_inodes.get(inode=inode.id).previous_parent
-            inode.save(update_fields=['parent'])
-            inode.parent.reorder()  # TODO: optimize by grouping
-        discarded_inodes.delete()
-        return HttpResponse()
+        restored_inodes, restored_folders = [], {}
+        with transaction.atomic():
+            for entry in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):
+                inode = FolderModel.objects.get_inode(id=entry['id'])
+                previous_parent = discarded_inodes.get(inode=inode.id).previous_parent
+                if not previous_parent.has_permission(request.user, Privilege.WRITE):
+                    msg = gettext("You do not have permission to restore item “{item}” to folder “{folder}”.")
+                    raise PermissionDenied(msg.format(item=inode.name, folder=previous_parent.name))
+                if previous_parent.id in restored_folders:
+                    restored_folders[previous_parent.id] += 1
+                else:
+                    restored_folders[previous_parent.id] = previous_parent.get_max_ordering() + 1
+                inode.ordering = restored_folders[previous_parent.id]
+                inode.parent = previous_parent
+                restored_inodes.append(inode)
+            for model in InodeModel.get_models(include_folder=True):
+                model.objects.bulk_update(
+                    filter(lambda inode: isinstance(inode, model), restored_inodes),
+                    ['ordering', 'parent'],
+                )
+            discarded_inodes.delete()
+            trash_folder.reorder()
+        return HttpResponse(status=204)  # No content
 
     def erase_trash_folder(self, request, trash_folder_id):
         if request.method != 'DELETE':

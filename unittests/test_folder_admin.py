@@ -1,9 +1,9 @@
 import json
-
 import hashlib
 import pytest
 
 from bs4 import BeautifulSoup
+from enum import Enum, auto
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -342,6 +342,13 @@ def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_
     assert uploaded_file.parent == ambit.root_folder
 
 
+class AccessControl(Enum):
+    ALLOW = auto()
+    SOURCE_DENIED = auto()
+    TARGET_DENIED = auto()
+    # PARTIAL_DENIED = auto()
+
+
 @pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
 def principal_kwargs(admin_user, request):
     if request.param == 'superuser':
@@ -358,11 +365,11 @@ def principal_kwargs(admin_user, request):
         return {'everyone': True, 'privilege': Privilege.READ_WRITE}
 
 
-@pytest.mark.parametrize('denied', [False, True])
+@pytest.mark.parametrize('access_control', AccessControl)
 @pytest.mark.parametrize('same_folder', [True, False])
 @pytest.mark.parametrize('finder_layout', ['tiles', 'list'])
-def test_reorder_inodes_insert(
-    admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, finder_layout, same_folder, denied
+def test_reorder_inodes(
+    admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, finder_layout, same_folder, access_control
 ):
     admin_client.cookies['django-finder-layout'] = finder_layout
     created_inodes = FileModel.objects.bulk_create([
@@ -389,11 +396,10 @@ def test_reorder_inodes_insert(
             AccessControlEntry(inode=inode.id, **principal_kwargs)
             for inode in created_inodes
         ]
-        if not denied:
-            acl.extend([
-                AccessControlEntry(inode=sub_folder.parent.id, **principal_kwargs),
-                AccessControlEntry(inode=sub_folder.id, **principal_kwargs),
-            ])
+        if access_control != AccessControl.SOURCE_DENIED:
+            acl.append(AccessControlEntry(inode=sub_folder.id, **principal_kwargs))
+        if access_control != AccessControl.TARGET_DENIED:
+            acl.append(AccessControlEntry(inode=sub_folder.parent.id, **principal_kwargs))
         AccessControlEntry.objects.bulk_create(acl)
 
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
@@ -419,7 +425,10 @@ def test_reorder_inodes_insert(
         }),
         content_type='application/json',
     )
-    if denied and admin_user.is_superuser is False:
+    if (admin_user.is_superuser is False and (
+        not same_folder and access_control == AccessControl.TARGET_DENIED or
+        same_folder and access_control == AccessControl.SOURCE_DENIED
+    )):
         assert response.status_code == 403
         return
     assert response.status_code == 200
@@ -434,3 +443,44 @@ def test_reorder_inodes_insert(
         assert file['name'] == f"File #{expected}"
 
 
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.SOURCE_DENIED])
+def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, access_control):
+    created_inodes = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"File #S{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 10)
+    ])
+    AccessControlEntry.objects.all().delete()
+    if admin_user.is_superuser is False:
+        acl = [
+            AccessControlEntry(inode=inode.id, **principal_kwargs)
+            for inode in created_inodes
+        ]
+        if access_control != AccessControl.SOURCE_DENIED:
+            acl.append(AccessControlEntry(inode=sub_folder.id, **principal_kwargs))
+        AccessControlEntry.objects.bulk_create(acl)
+
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/delete',
+        json.dumps({
+            'inode_ids': [str(created_file.id) for created_file in created_inodes[2:6]]
+        }),
+        content_type='application/json',
+    )
+    if admin_user.is_superuser is False and access_control != AccessControl.ALLOW:
+        assert response.status_code == 403
+        return
+
+    assert response.status_code == 200
+    inode_list = sub_folder.listdir(name__startswith='File').order_by('ordering')
+    expected_sub = ['S1', 'S2', 'S7', 'S8', 'S9']
+    assert len(inode_list) == len(expected_sub)
+    for file, ordering, expected in zip(inode_list, range(1, 6), expected_sub):
+        assert file['name'] == f"File #{expected}"
+        assert file['ordering'] == ordering

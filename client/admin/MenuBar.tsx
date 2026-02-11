@@ -355,7 +355,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		if (inodeIds.length === 0)
 			return;
 
-		const fetchUrl = `${settings.base_url}undo_discard`;
+		const fetchUrl = `${settings.base_url}${settings.folder_id}/undo_discard`;
 		const response = await fetch(fetchUrl, {
 			method: 'POST',
 			headers: {
