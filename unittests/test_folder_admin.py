@@ -13,6 +13,7 @@ from django.urls import reverse
 
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, ROOT_FOLDER_NAME
+from finder.models.inode import DiscardedInode
 from finder.models.permission import AccessControlEntry, Privilege
 
 
@@ -461,6 +462,7 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
             AccessControlEntry(inode=inode.id, **principal_kwargs)
             for inode in created_inodes
         ]
+        acl[4].privilege = Privilege.READ  # one file is read-only, so it should not be deleted
         if access_control != AccessControl.SOURCE_DENIED:
             acl.append(AccessControlEntry(inode=sub_folder.id, **principal_kwargs))
         AccessControlEntry.objects.bulk_create(acl)
@@ -479,8 +481,24 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
 
     assert response.status_code == 200
     inode_list = sub_folder.listdir(name__startswith='File').order_by('ordering')
-    expected_sub = ['S1', 'S2', 'S7', 'S8', 'S9']
+    if admin_user.is_superuser:
+        expected_sub = ['S1', 'S2', 'S7', 'S8', 'S9']
+        expected_trash = ['S3', 'S4', 'S5', 'S6']
+    else:
+        expected_sub = ['S1', 'S2', 'S5', 'S7', 'S8', 'S9']
+        expected_trash = ['S3', 'S4', 'S6']
     assert len(inode_list) == len(expected_sub)
     for file, ordering, expected in zip(inode_list, range(1, 6), expected_sub):
         assert file['name'] == f"File #{expected}"
         assert file['ordering'] == ordering
+        if admin_user.is_superuser is False:
+            assert AccessControlEntry.objects.filter(inode=file['id']).exists()
+
+    ambit = sub_folder.get_ambit()
+    trash_folder = ambit.trash_folders.get(owner=admin_user)
+    deleted_inodes = trash_folder.listdir(name__startswith='File').order_by('ordering')
+    assert len(deleted_inodes) == len(expected_trash)
+    for file, ordering, expected in zip(deleted_inodes, range(1, 5), expected_trash):
+        assert file['ordering'] == ordering
+        assert not AccessControlEntry.objects.filter(inode=file['id']).exists()
+        assert DiscardedInode.objects.get(inode=file['id']).previous_parent == sub_folder
