@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import lru_cache, partial
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -199,17 +199,14 @@ class FolderModel(InodeModel):
         """
         Move all Inodes with the given IDs to the end of the current folder.
         """
-        def storage_transfer(entry):
+        def storage_transfer(entry, source_ambit):
             if entry['is_folder']:
                 for child_entry in FolderModel.objects.get(id=entry['id']).listdir():
-                    storage_transfer(child_entry)
-            else:
-                if not (source_ambit := cache_ambits.get(entry['parent'])):
-                    source_ambit = FolderModel.objects.get(id=entry['parent']).get_ambit()
-                    cache_ambits[entry['parent']] = source_ambit
-                if target_ambit.original_storage.deconstruct() != source_ambit.original_storage.deconstruct():
-                    # move payload from source_ambit to target_ambit and delete from source_ambit
-                    file_path = '{id}/{file_name}'.format(**entry)
+                    storage_transfer(child_entry, source_ambit)
+            elif target_ambit.original_storage.deconstruct() != source_ambit.original_storage.deconstruct():
+                # move payload from source_ambit to target_ambit and delete from source_ambit
+                file_path = '{id}/{file_name}'.format(**entry)
+                if source_ambit.original_storage.exists(file_path):
                     with source_ambit.original_storage.open(file_path, 'rb') as readhandle:
                         target_ambit.original_storage.save(file_path, readhandle)
                     source_ambit.original_storage.delete(file_path)
@@ -217,9 +214,9 @@ class FolderModel(InodeModel):
         if not self.has_permission(user, Privilege.WRITE):
             msg = gettext("You do not have permission to move these items to folder “{folder}”.")
             raise PermissionDenied(msg.format(folder=self.name))
-        parent_ids = set()
-        update_inodes = {}
-        target_ambit, cache_ambits = self.get_ambit(), {}
+
+        update_inodes, parent_ids = [], set()
+        target_ambit = self.get_ambit()
         entries = FolderModel.objects.filter_unified(id__in=inode_ids, user=user, has_write_permission=True)
         default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
@@ -232,17 +229,24 @@ class FolderModel(InodeModel):
             proxy_obj.parent = self
             proxy_obj.ordering = ordering
             proxy_obj.validate_constraints()
-            update_inodes.setdefault(proxy_obj._meta.concrete_model, []).append(proxy_obj)
-            storage_transfer(entry)
+            update_inodes.append(proxy_obj)
+
+        parent_folder_qs = FolderModel.objects.filter(id__in=parent_ids)
+        parent_ambits = {folder.id: folder.get_ambit() for folder in parent_folder_qs}
 
         with transaction.atomic():
-            for concrete_model, proxy_objects in update_inodes.items():
-                concrete_model.objects.bulk_update(proxy_objects, ['parent', 'ordering'])
-                for obj in proxy_objects:
-                    obj.update_access_control_list(default_access_control_list)
+            for model in InodeModel.get_models(include_folder=True):
+                model.objects.bulk_update(
+                    filter(lambda inode: isinstance(inode, model), update_inodes),
+                    ['parent', 'ordering'],
+                )
+            for inode in update_inodes:
+                inode.update_access_control_list(default_access_control_list)
+                entry = next(filter(lambda e: e['id'] == inode.id, entries))
+                transaction.on_commit(partial(storage_transfer, entry, parent_ambits[entry['parent']]))
 
-        for folder in FolderModel.objects.filter(id__in=parent_ids):
-            folder.reorder()
+            for folder in parent_folder_qs:
+                folder.reorder()
 
     def copy_to(self, user, folder, **kwargs):
         """
