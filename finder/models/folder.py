@@ -168,15 +168,11 @@ class FolderModel(InodeModel):
         ))
 
     @lru_cache
-    def as_dict(self, ambit=None):
+    def as_dict(self, ambit):
         return {
-            'id': self.id,
-            'name': self.name,
+            **super().as_dict(ambit),
+            'is_folder': True,
             'has_subfolders': self.subfolders.exists(),
-            'created_at': self.created_at.replace(microsecond=0, tzinfo=None),
-            'last_modified_at': self.last_modified_at.replace(microsecond=0, tzinfo=None),
-            'summary': self.summary,
-            'meta_data': self.get_meta_data(),
         }
 
     def has_permission(self, user, privilege):

@@ -335,6 +335,16 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         names.append(self.name)
         return " / ".join(names)
 
+    def as_dict(self, ambit):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.replace(microsecond=0, tzinfo=None),
+            'last_modified_at': self.last_modified_at.replace(microsecond=0, tzinfo=None),
+            'summary': self.summary,
+            'meta_data': self.get_meta_data(),
+        }
+
     def serializable_value(self, field_name):
         data = super().serializable_value(field_name)
         if field_name in ['id', 'parent']:

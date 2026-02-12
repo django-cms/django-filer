@@ -168,17 +168,12 @@ class AbstractFileModel(InodeModel):
     @lru_cache
     def as_dict(self, ambit):
         return {
-            'id': self.id,
+            **super().as_dict(ambit),
             'parent': self.folder.id,
-            'name': self.name,
             'file_name': self.file_name,
             'file_size': self.file_size,
             'sha1': self.sha1,
             'mime_type': self.mime_type,
-            'created_at': self.created_at.replace(microsecond=0, tzinfo=None),
-            'last_modified_at': self.last_modified_at.replace(microsecond=0, tzinfo=None),
-            'summary': self.summary,
-            'meta_data': self.get_meta_data(),
             'folderitem_component': self.folderitem_component,
             'browser_component': self.browser_component,
             'download_url': self.get_download_url(ambit),
