@@ -376,7 +376,10 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         current_acl_qs = AccessControlEntry.objects.filter(inode=self.id)
         entry_ids, update_entries, create_entries = [], [], []
         for ace in next_acl:
-            if entry := next(filter(lambda entry: entry == ace, current_acl_qs), None):
+            if entry := next(filter(
+                lambda ca: ca.as_dict['type'] == ace['type'] and ca.as_dict['principal'] == ace['principal'],
+                current_acl_qs
+            ), None):
                 if entry.privilege != ace['privilege']:
                     entry.privilege = ace['privilege']
                     update_entries.append(entry)
