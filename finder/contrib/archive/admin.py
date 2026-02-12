@@ -165,9 +165,10 @@ class ArchiveAdmin(FileAdmin):
         return HttpResponse(msg.format(name=zip_file_obj.name, folder=archive_name))
 
     def get_editor_settings(self, request, inode):
-        settings = super().get_editor_settings(request, inode)
-        settings.update(download_file=True)
-        return settings
+        return {
+            **super().get_editor_settings(request, inode),
+            'download_file': True,
+        }
 
     def get_menu_extension_settings(self, request):
         return {'component': 'Archive'}

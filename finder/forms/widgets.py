@@ -39,12 +39,12 @@ class FinderFileSelect(FinderInodeSelect):
         if isinstance(value, AbstractFileModel):
             ambit = AmbitModel.objects.get(slug=self.ambit)
             attrs['data-selected_file'] = json.dumps(value.as_dict(ambit), cls=DjangoJSONEncoder)
-        context = super().get_context(name, value, attrs)
-        context.update(
-            base_url=reverse('finder-api:base-url'),
-            ambit=self.ambit,
-            style_url=staticfiles_storage.url('finder/css/finder-browser.css'),
-        )
+        context = {
+            **super().get_context(name, value, attrs),
+            'base_url': reverse('finder-api:base-url'),
+            'ambit': self.ambit,
+            'style_url': staticfiles_storage.url('finder/css/finder-browser.css'),
+        }
         if isinstance(self.accept_mime_types, (list, tuple)) and self.accept_mime_types:
             context['mime_types'] = ','.join(self.accept_mime_types)
         return context
@@ -74,14 +74,13 @@ class FinderFolderSelect(FinderInodeSelect):
         if isinstance(value, FolderModel):
             ambit = AmbitModel.objects.get(slug=self.ambit)
             attrs['data-selected_folder'] = json.dumps(value.as_dict(ambit), cls=DjangoJSONEncoder)
-        context = super().get_context(name, value, attrs)
-        context.update(
-            base_url=reverse('finder-api:base-url'),
-            ambit=self.ambit,
-            style_url=staticfiles_storage.url('finder/css/finder-browser.css'),
-            folder_icon_url=staticfiles_storage.url('finder/icons/folder.svg'),
-        )
-        return context
+        return {
+            **super().get_context(name, value, attrs),
+            'base_url': reverse('finder-api:base-url'),
+            'ambit': self.ambit,
+            'style_url': staticfiles_storage.url('finder/css/finder-browser.css'),
+            'folder_icon_url': staticfiles_storage.url('finder/icons/folder.svg'),
+        }
 
     def format_value(self, value):
         if value == '' or value is None:

@@ -37,10 +37,9 @@ class ImageAdmin(FileAdmin):
         return type(ImageFileForm.__name__, ImageFileForm.__mro__, attrs)
 
     def get_editor_settings(self, request, inode):
-        settings = super().get_editor_settings(request, inode)
-        settings.update(
-            replace_file= True,
-            download_file=True,
-            view_original=True,
-        )
-        return settings
+        return {
+            **super().get_editor_settings(request, inode),
+            'replace_file': True,
+            'download_file': True,
+            'view_original': True,
+        }

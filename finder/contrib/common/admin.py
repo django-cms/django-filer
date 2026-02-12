@@ -11,19 +11,19 @@ class CommonAdmin(FileAdmin):
     """
 
     def get_editor_settings(self, request, inode):
-        settings = super().get_editor_settings(request, inode)
-        settings.update(
-            replace_file=True,
-            download_file=True,
-        )
-        return settings
+        return {
+            **super().get_editor_settings(request, inode),
+            'replace_file': True,
+            'download_file': True,
+        }
 
 
 class PDFFileAdmin(CommonAdmin):
     def get_editor_settings(self, request, inode):
-        settings = super().get_editor_settings(request, inode)
-        settings.update(view_original=True)
-        return settings
+        return {
+            **super().get_editor_settings(request, inode),
+            'view_original': True,
+        }
 
 
 admin.site.register(SpreadsheetModel, CommonAdmin)

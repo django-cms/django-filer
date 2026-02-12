@@ -191,8 +191,8 @@ class InodeAdmin(admin.ModelAdmin):
         })
 
     def serialize_inode(self, ambit, inode):
-        data = {field: inode.serializable_value(field) for field in inode.data_fields}
         change_url = self.get_inode_url(ambit.slug, str(inode.id))
+        data = {field: inode.serializable_value(field) for field in inode.data_fields}
         data.update(
             owner_name=inode.owner.username if inode.owner else None,
             is_folder=inode.is_folder,
@@ -296,7 +296,7 @@ class InodeAdmin(admin.ModelAdmin):
     def get_editor_settings(self, request, inode):
         favorite_folders = self.get_favorite_folders(request, inode.folder)
         parent_url = self.get_inode_url(request._ambit.slug, str(inode.parent_id)) if inode.parent_id else None
-        settings = {
+        return {
             'name': inode.name,
             'is_folder': inode.is_folder,
             'folder_id': inode.folder.id,
@@ -307,7 +307,6 @@ class InodeAdmin(admin.ModelAdmin):
             'is_admin': inode.has_permission(request.user, Privilege.ADMIN),
             'can_change': inode.has_permission(request.user, Privilege.WRITE),
         }
-        return settings
 
     def get_folderitem_settings(self, request, inode):
         """

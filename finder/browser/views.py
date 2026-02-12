@@ -54,13 +54,6 @@ class BrowserView(View):
             children.append(child)
         return children
 
-    # def _get_realm(self, request, slug):
-    #     site = get_current_site(request)
-    #     try:
-    #         return RealmModel.objects.get(site=site, slug=slug)
-    #     except RealmModel.DoesNotExist:
-    #         raise ObjectDoesNotExist(f"Realm named {slug} not found for {site.domain}.")
-
     @method_decorator(require_GET)
     def structure(self, request, slug=None):
         ambit = AmbitModel.objects.get(slug=slug)

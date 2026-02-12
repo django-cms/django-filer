@@ -114,17 +114,17 @@ class FileAdmin(InodeAdmin):
         return super().render_change_form(request, context, add, change, form_url, obj)
 
     def get_editor_settings(self, request, inode):
-        settings = super().get_editor_settings(request, inode)
         ambit = inode.folder.get_ambit()
-        settings.update(
-            base_url=reverse('admin:finder_filemodel_changelist', current_app=self.admin_site.name),
-            download_url=inode.get_download_url(ambit),
-            thumbnail_url=inode.get_thumbnail_url(ambit),
-            file_id=inode.id,
-            filename=inode.file_name,
-            file_mime_type=inode.mime_type,
-            editor_component=inode.editor_component,
-        )
+        settings = {
+            **super().get_editor_settings(request, inode),
+            'base_url': reverse('admin:finder_filemodel_changelist', current_app=self.admin_site.name),
+            'download_url': inode.get_download_url(ambit),
+            'thumbnail_url': inode.get_thumbnail_url(ambit),
+            'file_id': inode.id,
+            'filename': inode.file_name,
+            'file_mime_type': inode.mime_type,
+            'editor_component': inode.editor_component,
+        }
         if inode.labels.model.objects.exists():
             settings['labels'] = [
                 {'value': id, 'label': name, 'color': color}
