@@ -235,11 +235,9 @@ class FolderModel(InodeModel):
         parent_ambits = {folder.id: folder.get_ambit() for folder in parent_folder_qs}
 
         with transaction.atomic():
+            update_fields = ['parent', 'ordering']
             for model in InodeModel.get_models(include_folder=True):
-                model.objects.bulk_update(
-                    filter(lambda inode: isinstance(inode, model), update_inodes),
-                    ['parent', 'ordering'],
-                )
+                model.objects.bulk_update(filter(lambda obj: isinstance(obj, model), update_inodes), update_fields)
             for inode in update_inodes:
                 inode.update_access_control_list(default_access_control_list)
                 entry = next(filter(lambda e: e['id'] == inode.id, entries))
@@ -288,7 +286,6 @@ class FolderModel(InodeModel):
     def reorder(self, target_id=None, inode_ids=[], insert_after=True):
         """
         Set `ordering` index based on their natural ordering index.
-        Returns the number of reorderings performed.
         """
 
         def insert(new_order):
@@ -307,28 +304,24 @@ class FolderModel(InodeModel):
             if insert_after and inode_id == target_id:
                 new_order = insert(new_order)
 
-        former_parents = set()
-        num_reorders = 0
         default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
-        with transaction.atomic():
-            for inode_model in InodeModel.get_models(include_folder=True):
-                update_inodes = []
-                for inode in inode_model.objects.filter(pk__in=inodes_order.keys()):
-                    ordering = inodes_order[str(inode.id)]
-                    if inode.parent != self:
-                        former_parents.add(inode.parent)
-                        inode.parent = self
-                        inode.update_access_control_list(default_access_control_list)
-                        update_inodes.append(inode)
-                    if inode.ordering != ordering:
-                        inode.ordering = ordering
-                        update_inodes.append(inode)
-                        num_reorders += 1
-                inode_model.objects.bulk_update(update_inodes, ['parent', 'ordering'])
-            for folder in former_parents:
-                folder.reorder()
+        update_inodes, former_parents = [], set()
+        update_fields = ['parent', 'ordering']
+        for model in InodeModel.get_models(include_folder=True):
+            for inode in model.objects.filter(pk__in=inodes_order.keys()):
+                ordering = inodes_order[str(inode.id)]
+                if inode.parent != self:
+                    former_parents.add(inode.parent)
+                    inode.parent = self
+                    inode.update_access_control_list(default_access_control_list)
+                    update_inodes.append(inode)
+                if inode.ordering != ordering:
+                    inode.ordering = ordering
+                    update_inodes.append(inode)
+            model.objects.bulk_update(filter(lambda obj: isinstance(obj, model), update_inodes), update_fields)
 
-        return num_reorders
+        for folder in former_parents:
+            folder.reorder()
 
     def get_max_ordering(self):
         """

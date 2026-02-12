@@ -347,7 +347,8 @@ class FolderAdmin(InodeAdmin):
                 ).values_list('inode', flat=True).distinct())
             )
             inode_ids = [id for id in inode_ids if id in reorderable_inode_ids]  # preserve the order of inode_ids
-        target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
+        with transaction.atomic():
+            target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=target_inode.parent)),
         })
@@ -383,14 +384,10 @@ class FolderAdmin(InodeAdmin):
                 inode.ordering = trash_ordering
                 inode.parent = trash_folder
                 deleted_inodes.append(inode)
-            FolderModel.objects.bulk_update(
-                filter(lambda inode: isinstance(inode, FolderModel), deleted_inodes),
-                ['name', 'parent', 'ordering'],
-            )
-            for model in InodeModel.get_models():
+            for model in InodeModel.get_models(include_folder=True):
                 model.objects.bulk_update(
-                    filter(lambda inode: isinstance(inode, model), deleted_inodes),
-                    ['parent', 'ordering'],
+                    filter(lambda obj: isinstance(obj, model), deleted_inodes),
+                    ['name', 'ordering', 'parent'] if model.is_folder else ['ordering', 'parent'],
                 )
             AccessControlEntry.objects.filter(inode__in=[d.id for d in deleted_inodes]).delete()
             current_folder.reorder()
@@ -448,6 +445,8 @@ class FolderAdmin(InodeAdmin):
                 if not previous_parent.has_permission(request.user, Privilege.WRITE):
                     msg = gettext("You do not have permission to restore item “{item}” to folder “{folder}”.")
                     raise PermissionDenied(msg.format(item=inode.name, folder=previous_parent.name))
+                while previous_parent.listdir(name=inode.name, is_folder=True).exists():
+                    inode.name = f"{inode.name}.renamed"
                 if previous_parent.id in restored_folders:
                     restored_folders[previous_parent.id] += 1
                 else:
@@ -457,8 +456,8 @@ class FolderAdmin(InodeAdmin):
                 restored_inodes.append(inode)
             for model in InodeModel.get_models(include_folder=True):
                 model.objects.bulk_update(
-                    filter(lambda inode: isinstance(inode, model), restored_inodes),
-                    ['ordering', 'parent'],
+                    filter(lambda obj: isinstance(obj, model), restored_inodes),
+                    ['name', 'ordering', 'parent'] if model.is_folder else ['ordering', 'parent'],
                 )
             discarded_inodes.delete()
             trash_folder.reorder()
