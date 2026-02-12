@@ -541,8 +541,9 @@ ul.messagelist {
 						display: flex;
 						justify-content: center;
 
-						img, div:has(>video) {
+						img, video {
 							width: 60px;
+							max-height: 60px;
 							align-self: center;
 							border-radius: 3px;
 						}
