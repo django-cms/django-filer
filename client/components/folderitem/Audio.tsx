@@ -8,6 +8,7 @@ export default function Audio(props) {
 		if (!props.sample_url || !props.webAudio)
 			return;
 		const audioElement = new window.Audio(props.sample_url);
+		audioElement.setAttribute('crossorigin', 'anonymous');  // required, if media is served by S3
 		const track = props.webAudio.context.createMediaElementSource(audioElement);
 		track.connect(props.webAudio.gainNode).connect(props.webAudio.context.destination);
 		setAudioElement(audioElement);

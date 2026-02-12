@@ -51,6 +51,7 @@ export default function Video(props) {
 				poster={props.thumbnail_url}
 				controls={false}
 				preload="auto"
+				crossOrigin="anonymous"
 				style={{width: '100%', height: '100%'}}
 			></video>
 		) : (
