@@ -392,7 +392,9 @@ class FolderAdmin(InodeAdmin):
                     filter(lambda inode: isinstance(inode, model), deleted_inodes),
                     ['parent', 'ordering'],
                 )
+            AccessControlEntry.objects.filter(inode__in=[d.id for d in deleted_inodes]).delete()
             current_folder.reorder()
+
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
