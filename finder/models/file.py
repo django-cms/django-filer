@@ -215,11 +215,12 @@ class AbstractFileModel(InodeModel):
         self.sha1 = digest_sha1(uploaded_file)
         self._for_write = True
 
-    def copy_to(self, user, folder, **kwargs):
+    def copy_to(self, source_ambit, user, folder, skip_permission_check=False, **kwargs):
         """
         Copy the file to a destination folder and returns it.
         """
-        if not folder.has_permission(user, Privilege.WRITE):
+
+        if not skip_permission_check and not folder.has_permission(user, Privilege.WRITE):
             msg = gettext("You do not have permission to copy file “{source}” to folder “{target}”.")
             raise PermissionDenied(msg.format(source=self.name, target=folder.name))
 
@@ -234,11 +235,11 @@ class AbstractFileModel(InodeModel):
             meta_data=self.meta_data,
             owner=user,
         )
-        source_ambit = self.folder.get_ambit()
         target_ambit = folder.get_ambit()
         obj = model(**kwargs)
-        with source_ambit.original_storage.open(self.file_path, 'rb') as readhandle:
-            target_ambit.original_storage.save(obj.file_path, readhandle)
+        if source_ambit.original_storage.exists(self.file_path):
+            with source_ambit.original_storage.open(self.file_path, 'rb') as readhandle:
+                target_ambit.original_storage.save(obj.file_path, readhandle)
         obj._for_write = True
         obj.store_and_save(target_ambit, force_insert=True)
         obj.transfer_access_control_list(folder)

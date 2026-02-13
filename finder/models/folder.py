@@ -217,7 +217,12 @@ class FolderModel(InodeModel):
 
         update_inodes, parent_ids = [], set()
         target_ambit = self.get_ambit()
-        entries = FolderModel.objects.filter_unified(id__in=inode_ids, user=user, has_write_permission=True)
+        entries = FolderModel.objects.filter_unified(
+            id__in=inode_ids,
+            user=user,
+            has_read_permission=True,
+            has_write_permission=True,
+        )
         default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
             parent_ids.add(entry['parent'])
@@ -246,11 +251,11 @@ class FolderModel(InodeModel):
             for folder in parent_folder_qs:
                 folder.reorder()
 
-    def copy_to(self, user, folder, **kwargs):
+    def copy_to(self, source_ambit, user, folder, skip_permission_check=False, **kwargs):
         """
         Copies the folder to a destination folder and returns it.
         """
-        if not folder.has_permission(user, Privilege.WRITE):
+        if not skip_permission_check and not folder.has_permission(user, Privilege.WRITE):
             msg = gettext("You do not have permission to copy folder “{source}” to folder “{target}”.")
             raise PermissionDenied(msg.format(source=self.name, target=folder.name))
 
@@ -265,7 +270,7 @@ class FolderModel(InodeModel):
         kwargs.update(parent=folder, owner=user)
         obj = self._meta.model.objects.create(**kwargs)
         for inode in self.listdir():
-            inode.copy_to(user, obj, owner=obj.owner)
+            inode.copy_to(source_ambit, user, obj, skip_permission_check=True, owner=obj.owner)
         return obj
 
     def validate_constraints(self):
