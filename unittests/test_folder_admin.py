@@ -12,7 +12,7 @@ from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
 from finder.models.file import FileModel
-from finder.models.folder import FolderModel, ROOT_FOLDER_NAME
+from finder.models.folder import FolderModel, PinnedFolder, ROOT_FOLDER_NAME
 from finder.models.inode import DiscardedInode
 from finder.models.permission import AccessControlEntry, Privilege
 
@@ -397,6 +397,7 @@ def test_reorder_inodes(
             AccessControlEntry(inode=inode.id, **principal_kwargs)
             for inode in created_inodes
         ]
+        acl.pop(14)  # one file is not readable, so it should not be reordered
         if access_control != AccessControl.SOURCE_DENIED:
             acl.append(AccessControlEntry(inode=sub_folder.id, **principal_kwargs))
         if access_control != AccessControl.TARGET_DENIED:
@@ -405,24 +406,37 @@ def test_reorder_inodes(
 
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
     if same_folder:
-        target_id = created_inodes[12].id
+        target_id = created_inodes[11].id
         expected_root = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
-        if finder_layout == 'tiles':
-            expected_sub = ['S1', 'S2', 'S3', 'S4', 'S7', 'S8', 'S9', 'S5', 'S6']
+        if admin_user.is_superuser:
+            if finder_layout == 'tiles':
+                expected_sub = ['S1', 'S2', 'S3', 'S5', 'S6', 'S7', 'S4', 'S8', 'S9']
+            else:
+                expected_sub = ['S1', 'S2', 'S5', 'S6', 'S7', 'S3', 'S4', 'S8', 'S9']
         else:
-            expected_sub = ['S1', 'S2', 'S3', 'S7', 'S8', 'S9', 'S4', 'S5', 'S6']
+            if finder_layout == 'tiles':
+                expected_sub = ['S1', 'S2', 'S3', 'S5', 'S7', 'S4', 'S6', 'S8', 'S9']
+            else:
+                expected_sub = ['S1', 'S2', 'S5', 'S7', 'S3', 'S4', 'S6', 'S8', 'S9']
     else:
         target_id = created_inodes[3].id  # target is in parent folder, so files are moved there
-        if finder_layout == 'tiles':
-            expected_root = ['R1', 'R2', 'R3', 'R4', 'S7', 'S8', 'S9', 'R5', 'R6', 'R7', 'R8', 'R9']
+        if admin_user.is_superuser:
+            if finder_layout == 'tiles':
+                expected_root = ['R1', 'R2', 'R3', 'R4', 'S5', 'S6', 'S7', 'R5', 'R6', 'R7', 'R8', 'R9']
+            else:
+                expected_root = ['R1', 'R2', 'R3', 'S5', 'S6', 'S7', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
+            expected_sub = ['S1', 'S2', 'S3', 'S4', 'S8', 'S9']
         else:
-            expected_root = ['R1', 'R2', 'R3', 'S7', 'S8', 'S9', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
-        expected_sub = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
+            if finder_layout == 'tiles':
+                expected_root = ['R1', 'R2', 'R3', 'R4', 'S5', 'S7', 'R5', 'R6', 'R7', 'R8', 'R9']
+            else:
+                expected_root = ['R1', 'R2', 'R3', 'S5', 'S7', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
+            expected_sub = ['S1', 'S2', 'S3', 'S4', 'S6', 'S8', 'S9']
     response = admin_client.post(
         f'{admin_url}/reorder',
         json.dumps({
             'target_id': str(target_id),
-            'inode_ids': [str(created_file.id) for created_file in created_inodes[15:]]
+            'inode_ids': [str(created_file.id) for created_file in created_inodes[13:16]]
         }),
         content_type='application/json',
     )
@@ -446,16 +460,25 @@ def test_reorder_inodes(
 
 @pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.SOURCE_DENIED])
 def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, access_control):
+    ambit = sub_folder.get_ambit()
+    PinnedFolder.objects.all().delete()
     created_inodes = FileModel.objects.bulk_create([
         FileModel(
             parent=sub_folder,
-            name=f"File #S{ordering}",
+            name=f"Inode #F{ordering}",
             file_size=uploaded_file.file_size,
             sha1=uploaded_file.sha1,
             owner=uploaded_file.owner,
             ordering=ordering,
-        ) for ordering in range(1, 10)
+        ) for ordering in range(1, 10) if ordering != 5
     ])
+    favorite_folder = FolderModel.objects.create(
+        parent=sub_folder,
+        name="Inode #D5",
+        owner=uploaded_file.owner,
+        ordering=5,
+    )
+    created_inodes.insert(4, favorite_folder)
     AccessControlEntry.objects.all().delete()
     if admin_user.is_superuser is False:
         acl = [
@@ -469,6 +492,30 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
 
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
     response = admin_client.post(
+        f'{admin_url}/toggle_pin',
+        json.dumps({'pinned_id': str(favorite_folder.id)}),
+        content_type='application/json',
+    )
+    favorite_folders = response.json()['favorite_folders']
+    assert len(favorite_folders) == 2
+    assert favorite_folders[0] == {
+        'id': str(favorite_folder.id),
+        'name': "Inode #D5",
+        'is_pinned': True,
+        'can_change': admin_user.is_superuser,
+        'change_url': f'/admin/finder/{ambit.slug}/{favorite_folder.id}',
+    }
+    for key in ['created_at', 'last_modified_at', 'owner_name', 'download_url', 'thumbnail_url', 'summary']:
+        favorite_folders[1].pop(key)
+    assert favorite_folders[1] == {
+        'id': str(sub_folder.id),
+        'name': "Sub Folder",
+        'parent': str(ambit.root_folder.id),
+        'is_folder': True,
+        'is_root': False,
+        'change_url': f'/admin/finder/{ambit.slug}/{sub_folder.id}',
+    }
+    response = admin_client.post(
         f'{admin_url}/delete',
         json.dumps({
             'inode_ids': [str(created_file.id) for created_file in created_inodes[2:6]]
@@ -480,25 +527,100 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
         return
 
     assert response.status_code == 200
-    inode_list = sub_folder.listdir(name__startswith='File').order_by('ordering')
+    favorite_folders = response.json()['favorite_folders']
     if admin_user.is_superuser:
-        expected_sub = ['S1', 'S2', 'S7', 'S8', 'S9']
-        expected_trash = ['S3', 'S4', 'S5', 'S6']
+        assert len(favorite_folders) == 2
+        assert favorite_folders[1]['is_trash']
     else:
-        expected_sub = ['S1', 'S2', 'S5', 'S7', 'S8', 'S9']
-        expected_trash = ['S3', 'S4', 'S6']
+        if access_control == AccessControl.ALLOW:
+            assert len(favorite_folders) == 3
+            assert favorite_folders[0]['id'] == str(favorite_folder.id)
+            assert favorite_folders[2]['is_trash']
+    inode_list = sub_folder.listdir(name__startswith="Inode").order_by('ordering')
+    if admin_user.is_superuser:
+        expected_sub = ['F1', 'F2', 'F7', 'F8', 'F9']
+        expected_trash = ['F3', 'F4', 'D5', 'F6']
+    else:
+        expected_sub = ['F1', 'F2', 'D5', 'F7', 'F8', 'F9']
+        expected_trash = ['F3', 'F4', 'F6']
     assert len(inode_list) == len(expected_sub)
     for file, ordering, expected in zip(inode_list, range(1, 6), expected_sub):
-        assert file['name'] == f"File #{expected}"
+        assert file['name'] == f"Inode #{expected}"
         assert file['ordering'] == ordering
         if admin_user.is_superuser is False:
             assert AccessControlEntry.objects.filter(inode=file['id']).exists()
 
     ambit = sub_folder.get_ambit()
     trash_folder = ambit.trash_folders.get(owner=admin_user)
-    deleted_inodes = trash_folder.listdir(name__startswith='File').order_by('ordering')
+    deleted_inodes = trash_folder.listdir(name__startswith="Inode").order_by('ordering')
     assert len(deleted_inodes) == len(expected_trash)
     for file, ordering, expected in zip(deleted_inodes, range(1, 5), expected_trash):
         assert file['ordering'] == ordering
         assert not AccessControlEntry.objects.filter(inode=file['id']).exists()
         assert DiscardedInode.objects.get(inode=file['id']).previous_parent == sub_folder
+
+
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
+def test_copy_inodes(admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, access_control):
+    created_inodes = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"File #S{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 10)
+    ])
+    AccessControlEntry.objects.all().delete()
+    if admin_user.is_superuser is False:
+        principal_kwargs.pop('privilege')
+        acl = [
+            AccessControlEntry(inode=inode.id, privilege=Privilege.READ, **principal_kwargs)
+            for inode in created_inodes
+        ]
+        acl.pop(4)  # one file is not readable, so it should not be copied
+        if access_control != AccessControl.TARGET_DENIED:
+            acl.append(AccessControlEntry(
+                inode=sub_folder.parent.id,
+                privilege=Privilege.READ_WRITE,
+                **principal_kwargs
+            ))
+        AccessControlEntry.objects.bulk_create(acl)
+
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.parent.id})
+    response = admin_client.post(
+        f'{admin_url}/copy',
+        json.dumps({
+            'inode_ids': [str(created_file.id) for created_file in created_inodes[2:7]]
+        }),
+        content_type='application/json',
+    )
+    if admin_user.is_superuser is False and access_control == AccessControl.TARGET_DENIED:
+        assert response.status_code == 403
+        return
+
+    assert response.status_code == 200
+    body = response.json()
+    inode_list = sub_folder.listdir(name__startswith='File').order_by('ordering')
+
+    # check that original files are not modified
+    assert len(created_inodes) == len(inode_list)
+    for created_inode, expected_inode in zip(created_inodes, inode_list):
+        assert created_inode.id == expected_inode['id']
+        assert created_inode.ordering == expected_inode['ordering']
+
+    if admin_user.is_superuser:
+        expected_copied = ['S3', 'S4', 'S5', 'S6', 'S7']
+    else:
+        expected_copied = ['S3', 'S4', 'S6', 'S7']
+
+    target_inodes = list(sub_folder.parent.listdir(name__startswith='File'))
+    resp_inodes = [inode for inode in body['inodes'] if inode['name'].startswith("File")]
+    assert len(target_inodes) == len(expected_copied) == len(resp_inodes)
+
+    target_names = sorted(inode['name'] for inode in target_inodes)
+    resp_names = sorted(inode['name'] for inode in resp_inodes)
+    expected_names = sorted(f"File #{s}" for s in expected_copied)
+    assert target_names == expected_names
+    assert resp_names == expected_names
