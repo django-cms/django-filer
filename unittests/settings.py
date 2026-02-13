@@ -51,9 +51,9 @@ if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'finder',
-            'USER': 'finder',
-            'PASSWORD': '',
+            'NAME': os.getenv('POSTGRES_NAME'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
             'HOST': 'localhost',
             'PORT': 5432,
         },
