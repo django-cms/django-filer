@@ -286,11 +286,15 @@ class FolderAdmin(InodeAdmin):
         current_folder = self.get_object(request, folder_id)
         ordering = current_folder.get_max_ordering()
         inode_ids = body.get('inode_ids', [])
-        for values in FolderModel.objects.filter_unified(id__in=inode_ids):
-            inode = FolderModel.objects.get_inode(id=values['id'])
+        for entry in FolderModel.objects.filter_unified(
+            id__in=inode_ids,
+            user=request.user,
+            has_read_permission=True,
+        ):
+            proxy_obj = InodeManager.get_proxy_object(entry)
             try:
                 ordering += 1
-                inode.copy_to(request.user, current_folder, ordering=ordering)
+                proxy_obj.copy_to(request._ambit, request.user, current_folder, ordering=ordering)
             except RecursionError as exc:
                 return HttpResponse(str(exc), status=409)
             except PermissionDenied as exc:
