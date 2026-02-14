@@ -260,13 +260,10 @@ class InodeAdmin(admin.ModelAdmin):
             **values,
             change_url=self.get_inode_url(ambit.slug, str(values['id'])),
         ) for values in folders]
-        fallback_folder = self.get_fallback_folder(request)
         root_folder = ambit.root_folder
         trash_folder = self.get_trash_folder(request)
         for folder in folders:
             if folder['id'] == current_folder.id:
-                if len(folders) == 0:  # TODO: is this ever possible?
-                    folders.append(self.serialize_inode(ambit, fallback_folder))
                 break
         else:
             if current_folder.id == root_folder.id:

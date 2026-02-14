@@ -7,11 +7,6 @@ from django.db import models, transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
-try:
-    from django_cte import CTEManager as ModelManager
-except ImportError:
-    ModelManager = models.Manager
-
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
 from finder.models.permission import DefaultAccessControlEntry as DefaultACE, Privilege
@@ -20,7 +15,7 @@ ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
 
 
-class FolderModelManager(InodeManagerMixin, ModelManager):
+class FolderModelManager(InodeManagerMixin, models.Manager):
     def get_trash_folder(self, ambit, owner):
         try:
             trash_folder = ambit.trash_folders.get(owner=owner)
@@ -97,7 +92,7 @@ class FolderModel(InodeModel):
             )
 
         try:
-            from django_cte import With
+            from django_cte import CTE, with_cte
         except ImportError:
             # traversing the tree folder by folder (slow)
             folder, ancestors = self, []
@@ -107,11 +102,11 @@ class FolderModel(InodeModel):
             return ancestors
         else:
             # traversing the tree using a recursive CTE (fast)
-            ascendant_cte = With.recursive(make_ascendant_cte)
-            ancestor_qs = ascendant_cte.join(
-                self.__class__, id=ascendant_cte.col.id
-            ).with_cte(ascendant_cte)
-            return ancestor_qs
+            ascendant_cte = CTE.recursive(make_ascendant_cte)
+            return with_cte(
+                ascendant_cte,
+                select=ascendant_cte.join(self.__class__, id=ascendant_cte.col.id),
+            )
 
     @cached_property
     def descendants(self):
@@ -138,16 +133,17 @@ class FolderModel(InodeModel):
             )
 
         try:
-            from django_cte import With
+            from django_cte import CTE, with_cte
         except ImportError:
             # traversing the tree folder by folder (slow)
             return traverse(self)
         else:
             # traversing the tree using a recursive CTE (fast)
-            descendant_cte = With.recursive(make_descendant_cte)
-            return descendant_cte.join(
-                self.__class__, id=descendant_cte.col.id
-            ).with_cte(descendant_cte)
+            descendant_cte = CTE.recursive(make_descendant_cte)
+            return with_cte(
+                descendant_cte,
+                select=descendant_cte.join(self.__class__, id=descendant_cte.col.id)
+            )
 
     @property
     def is_root(self):
@@ -203,6 +199,9 @@ class FolderModel(InodeModel):
             if entry['is_folder']:
                 for child_entry in FolderModel.objects.get(id=entry['id']).listdir():
                     storage_transfer(child_entry, source_ambit)
+                if target_ambit.id != source_ambit.id:
+                    # delete pinned folder entry for the moved folder if it is moved to a different ambit
+                    PinnedFolder.objects.exclude(ambit=target_ambit).filter(folder_id=entry['id']).delete()
             elif target_ambit.original_storage.deconstruct() != source_ambit.original_storage.deconstruct():
                 # move payload from source_ambit to target_ambit and delete from source_ambit
                 file_path = '{id}/{file_name}'.format(**entry)
@@ -416,3 +415,6 @@ class PinnedFolder(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['owner', 'folder'], name='unique_pinned_folder')
         ]
+
+    def __repr__(self):
+        return f'<PinnedFolder(owner={self.owner}, folder="{self.folder}")>'
