@@ -112,3 +112,5 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = Path(os.getenv('DJANGO_MEDIA_ROOT', BASE_DIR / 'workdir/media'))
 
 MEDIA_URL = '/media/'
+
+assert isinstance(DATABASES['default']['NAME'], str)

@@ -62,9 +62,7 @@ jobs:
         for i in $(seq 1 30); do
           docker exec test-postgres pg_isready -U finder && break || sleep 1
         done
-    - name: Export USE_POSTGRES env when requested
-      if: ${{ matrix.use_postgres == '1' }}
-      run: echo "USE_POSTGRES=1" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
+        export USE_POSTGRES="${{ matrix.use_postgres }}"
         python -m pytest -v unittests
