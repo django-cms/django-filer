@@ -63,9 +63,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'workdir/testdb.sqlite3',
+            'NAME': str(BASE_DIR / 'workdir/testdb.sqlite3'),
             'TEST': {
-                'NAME': BASE_DIR / 'workdir/testdb.sqlite3',
+                'NAME': str(BASE_DIR / 'workdir/testdb.sqlite3'),
                 # live_server requires a file rather than :memory:
                 'OPTIONS': {
                     'timeout': 20,
