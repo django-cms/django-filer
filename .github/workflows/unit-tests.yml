@@ -21,26 +21,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        python-version: ["3.11", "3.12"]
+        django-version: ["5.2.*", "6.0.*"]
         node-version: ["22.x"]
-        include:
+        with_cte: ["0", "1"]
+        use_postgres: ["0", "1"]
+        exclude:
           - python-version: "3.11"
-            django-version: "5.2.*"
-            name: "py3.11 django-5.2 (sqlite)"
-          - python-version: "3.12"
             django-version: "6.0.*"
-            with_cte: "1"
-            name: "py3.12 django-6.0 (cte)"
-          - python-version: "3.11"
-            django-version: "5.2.*"
-            use_postgres: "1"
-            name: "py3.11 django-5.2 (postgres)"
           - python-version: "3.12"
-            django-version: "6.0.*"
+            django-version: "5.2.*"
+          - django-version: "5.2.*"
+            with_cte: "0"
             use_postgres: "1"
-            with_cte: "1"
-            name: "py3.12 django-6.0 (postgres+cte)"
+          - django-version: "6.0.*"
+            with_cte: "0"
+            use_postgres: "0"
+    name: "py${{ matrix.python-version }} django-${{ matrix.django-version }} with ${{ matrix.use_postgres == '1' && 'PostgreSQL' || 'SQLite' }}${{ matrix.with_cte == '1' && ' CTE' || '' }}"
     steps:
     - uses: actions/checkout@v3
+    - name: Debug matrix
+      run: |
+        echo "JOB NAME: ${{ matrix.name || 'no-name' }}"
+        echo "MATRIX: python=${{ matrix.python-version || '' }} django=${{ matrix.django-version || '' }} use_postgres=${{ matrix.use_postgres || '' }} with_cte=${{ matrix.with_cte || '' }} node=${{ matrix.node-version || '' }}"
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
     - name: Set up Python ${{ matrix.python-version }}
