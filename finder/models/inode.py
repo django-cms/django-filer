@@ -158,8 +158,8 @@ class InodeManagerMixin:
             else:
                 connection = connections[model.objects.db]
                 if (
-                    connection.vendor == 'postgresql' or
                     getattr(connection.features, 'supports_aggregate_distinct_multiple_argument', False)
+                    or connection.vendor == 'postgresql'
                 ):
                     concatenated = Cast('labels__id', output_field=CharField())
                     expressions = {'label_ids': StringAgg(concatenated, Value(','), distinct=True)}
