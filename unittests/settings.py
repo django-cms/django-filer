@@ -51,7 +51,7 @@ if os.getenv('USE_POSTGRES', False) in ['1', 'True', 'true']:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'finder',
+            'NAME': 'test_finder',
             'USER': 'finder',
             'PASSWORD': 'finder',
             'HOST': 'localhost',
@@ -63,13 +63,10 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': str(BASE_DIR / 'workdir/testdb.sqlite3'),
-            'TEST': {
-                'NAME': str(BASE_DIR / 'workdir/testdb.sqlite3'),
-                # live_server requires a file rather than :memory:
-                'OPTIONS': {
-                    'timeout': 20,
-                },
+            'NAME': BASE_DIR / 'workdir/testdb.sqlite3',
+            # live_server requires a file rather than :memory:
+            'OPTIONS': {
+                'timeout': 20,
             },
         },
     }
@@ -112,5 +109,3 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = Path(os.getenv('DJANGO_MEDIA_ROOT', BASE_DIR / 'workdir/media'))
 
 MEDIA_URL = '/media/'
-
-assert isinstance(DATABASES['default']['NAME'], str)

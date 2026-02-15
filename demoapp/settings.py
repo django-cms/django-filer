@@ -81,10 +81,9 @@ if os.getenv('USE_POSTGRES', False) in ['1', 'TRUE', 'True', 'true']:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'finder',
             'USER': 'finder',
-            'PASSWORD': '',
+            'PASSWORD': 'finder',
             'HOST': 'localhost',
             'PORT': 5432,
-            # 'CONN_MAX_AGE': 900,
         },
     }
 else:

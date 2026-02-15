@@ -5,6 +5,7 @@ from uuid import uuid5, NAMESPACE_DNS
 
 from django.conf import settings
 from django.core.management import call_command
+from django.db import connection
 from django.urls import reverse
 
 from finder.models.ambit import AmbitModel
@@ -23,16 +24,28 @@ def create_assets():
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_blocker):
-    database_file = settings.BASE_DIR / 'workdir/test_db.sqlite3'
-    try:
-        os.remove(database_file)
-    except FileNotFoundError:
-        pass
-    settings.DATABASES['default']['NAME'] = database_file
+    """Prepare the test database for the session."""
+
     with django_db_blocker.unblock():
+        db_settings = settings.DATABASES.get('default', {})
+        engine = db_settings.get('ENGINE', '')
+
+        # If using SQLite ensure the test DB file is removed so migrations start
+        # from a clean slate.
+        if 'sqlite3' in engine:
+            db_name = db_settings.get('NAME')
+            try:
+                os.remove(db_name)
+            except FileNotFoundError:
+                pass
+        else:
+            with connection.cursor() as cursor:
+                table_names = connection.introspection.table_names()
+                for table_name in table_names:
+                    cursor.execute(f'DROP TABLE IF EXISTS "{table_name}" CASCADE;')
+
         call_command('migrate', verbosity=0)
     yield
-    os.remove(database_file)
 
 
 @pytest.fixture(autouse=True, scope='session')

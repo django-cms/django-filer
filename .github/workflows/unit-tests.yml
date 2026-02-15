@@ -57,7 +57,7 @@ jobs:
     - name: Start Postgres container (only when requested)
       if: ${{ matrix.use_postgres == '1' }}
       run: |
-        docker run --name test-postgres -e POSTGRES_DB=finder -e POSTGRES_USER=finder -e POSTGRES_PASSWORD=finder -p 5432:5432 -d postgres:16
+        docker run --name test-postgres -e POSTGRES_DB=test_finder -e POSTGRES_USER=finder -e POSTGRES_PASSWORD=finder -p 5432:5432 -d postgres:16
         # wait until pg_isready succeeds (up to ~30s)
         for i in $(seq 1 30); do
           docker exec test-postgres pg_isready -U finder && break || sleep 1
