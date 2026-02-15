@@ -28,8 +28,7 @@ else:
 
 class GroupConcat(Aggregate):
     """
-    To be used on SQLite, MySQL and MariaDB databases. For Postgres, use `StringAgg`.
-    In Django-6.0 and later, use StringAgg if it supports the DISTINCT keyword with multiple arguments.
+    To be used on SQLite, MySQL and MariaDB databases with Django < 6.
     """
     function = 'GROUP_CONCAT'
     template = '%(function)s(%(distinct)s %(expressions)s)'
@@ -159,15 +158,15 @@ class InodeManagerMixin:
             else:
                 connection = connections[model.objects.db]
                 if (
-                    DJANGO_VERSION < (6, 0) and connection.vendor != 'postgresql'
-                    or not getattr(connection.features, 'supports_aggregate_distinct_multiple_argument', False)
+                    connection.vendor == 'postgresql' or
+                    getattr(connection.features, 'supports_aggregate_distinct_multiple_argument', False)
                 ):
+                    concatenated = Cast('labels__id', output_field=CharField())
+                    expressions = {'label_ids': StringAgg(concatenated, Value(','), distinct=True)}
+                else:
                     # Function STRING_AGG should be preferred over GROUP_CONCAT, but isn't always available or doesn't
                     # support the DISTINCT keyword in SQLite, so we have to use GROUP_CONCAT in that case.
                     expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
-                else:
-                    concatenated = Cast('labels__id', output_field=CharField())
-                    expressions = {'label_ids': StringAgg(concatenated, Value(','), distinct=True)}
             if user:
                 assert isinstance(user, get_user_model()), "`user` must be an instance of AUTH_USER_MODEL."
                 if user.is_superuser:
