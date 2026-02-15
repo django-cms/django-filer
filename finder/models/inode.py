@@ -160,7 +160,7 @@ class InodeManagerMixin:
                 connection = connections[model.objects.db]
                 if (
                     DJANGO_VERSION < (6, 0) and connection.vendor != 'postgresql'
-                    or not connection.features.supports_aggregate_distinct_multiple_argument
+                    or not getattr(connection.features, 'supports_aggregate_distinct_multiple_argument', False)
                 ):
                     # Function STRING_AGG should be preferred over GROUP_CONCAT, but isn't always available or doesn't
                     # support the DISTINCT keyword in SQLite, so we have to use GROUP_CONCAT in that case.
