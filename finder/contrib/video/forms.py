@@ -18,4 +18,4 @@ class VideoFileForm(EntangledModelFormMixin, FileForm):
     class Meta:
         model = VideoFileModel
         entangled_fields = {'meta_data': ['sample_start']}
-        untangled_fields = ['name', 'labels']
+        untangled_fields = ['name', 'tags']

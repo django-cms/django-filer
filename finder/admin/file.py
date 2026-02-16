@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from finder.forms.file import FileForm
 from finder.models.file import FileModel
 from finder.models.inode import InodeModel
-from finder.models.label import Label
+from finder.models.filetag import FileTag
 from finder.admin.inode import InodeAdmin
 
 
@@ -89,8 +89,8 @@ class FileAdmin(InodeAdmin):
 
     def get_fields(self, request, obj=None):
         fields = list(super().get_fields(request, obj))
-        if 'labels' in fields and not Label.objects.exists():
-            fields.remove('labels')
+        if 'tags' in fields and not FileTag.objects.exists():
+            fields.remove('tags')
         return fields
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
@@ -125,9 +125,9 @@ class FileAdmin(InodeAdmin):
             'file_mime_type': inode.mime_type,
             'editor_component': inode.editor_component,
         }
-        if inode.labels.model.objects.exists():
-            settings['labels'] = [
-                {'value': id, 'label': name, 'color': color}
-                for id, name, color in inode.labels.model.objects.values_list('id', 'name', 'color')
+        if inode.tags.model.objects.exists():
+            settings['tags'] = [
+                {'value': id, 'label': label, 'color': color}
+                for id, label, color in inode.tags.model.objects.values_list('id', 'label', 'color')
             ]
         return settings

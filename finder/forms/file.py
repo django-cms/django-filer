@@ -2,17 +2,17 @@ from django.forms.fields import CharField
 from django.forms.models import ModelForm
 from django.forms.widgets import TextInput
 
-from finder.forms.fields import LabelsChoiceField
+from finder.forms.fields import TagChoiceField
 from finder.models.file import FileModel
-from finder.models.label import Label
+from finder.models.filetag import FileTag
 
 
 class FileForm(ModelForm):
     name = CharField(
         widget=TextInput(attrs={'size': 100}),
     )
-    labels = LabelsChoiceField(
-        queryset=Label.objects.all(),
+    tags = TagChoiceField(
+        queryset=FileTag.objects.all(),
         required=False,
     )
 

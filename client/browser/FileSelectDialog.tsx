@@ -11,7 +11,7 @@ import React, {
 	useState,
 } from 'react';
 import {useInView} from 'react-intersection-observer';
-import FigureLabels from '../common/FigureLabels';
+import FileTags from '../common/FileTags';
 import FileUploader from '../common/FileUploader';
 import {useAudioSettings, useSearchZone} from '../common/Storage';
 import BrowserEditor from './BrowserEditor';
@@ -42,9 +42,9 @@ function Figure(props) {
 	return (
 		<figure className="figure">
 			<FigBody {...props}>
-				<FigureLabels labels={props.labels}>
+				<FileTags tags={props.tags}>
 					<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} aria-selected={props.isSelected} />
-				</FigureLabels>
+				</FileTags>
 			</FigBody>
 			<figcaption>
 				{props.name}

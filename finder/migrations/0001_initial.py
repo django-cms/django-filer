@@ -209,27 +209,27 @@ class Migration(migrations.Migration):
             bases=('finder.imagefilemodel',),
         ),
         migrations.CreateModel(
-            name='Label',
+            name='FileTag',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
+                ('label', models.CharField(max_length=255, verbose_name='Label')),
                 ('color', models.CharField(default='#000000', max_length=7, verbose_name='Color')),
-                ('ambit', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='labels', to='finder.ambitmodel')),
+                ('ambit', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='tags', to='finder.ambitmodel')),
             ],
             options={
-                'verbose_name': 'Label',
-                'verbose_name_plural': 'Labels',
+                'verbose_name': 'Tag',
+                'verbose_name_plural': 'Tags',
             },
         ),
         migrations.AddField(
             model_name='imagefilemodel',
-            name='labels',
-            field=models.ManyToManyField(blank=True, related_name='+', to='finder.label', verbose_name='Labels'),
+            name='tags',
+            field=models.ManyToManyField(blank=True, related_name='+', to='finder.filetag', verbose_name='Tags'),
         ),
         migrations.AddField(
             model_name='filemodel',
-            name='labels',
-            field=models.ManyToManyField(blank=True, related_name='+', to='finder.label', verbose_name='Labels'),
+            name='tags',
+            field=models.ManyToManyField(blank=True, related_name='+', to='finder.filetag', verbose_name='Tags'),
         ),
         migrations.CreateModel(
             name='PinnedFolder',

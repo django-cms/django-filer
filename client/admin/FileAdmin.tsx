@@ -5,7 +5,7 @@ import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
 import FileDetails from './FileDetails';
 import PermissionEditor from './PermissionEditor';
-import SelectLabels from '../common/SelectLabels';
+import SelectTags from '../common/SelectTags';
 import ShieldFileIcon from '../icons/shield-file.svg';
 
 
@@ -39,13 +39,13 @@ export default function FileAdmin() {
 	const editorRef = useRef(null);
 
 	useEffect(() => {
-		if (settings.labels) {
-			const labelsElement = document.getElementById('id_labels');
-			if (labelsElement instanceof HTMLSelectElement) {
-				// extract selected values from the original <select multiple name="labels"> element
+		if (settings.tags) {
+			const tagsElement = document.getElementById('id_tags');
+			if (tagsElement instanceof HTMLSelectElement) {
+				// extract selected values from the original <select multiple name="tags"> element
 				const initial = [];
-				for (const option of labelsElement.selectedOptions) {
-					const found = settings.labels.find(label => label.value == option.value);
+				for (const option of tagsElement.selectedOptions) {
+					const found = settings.tags.find(label => label.value == option.value);
 					if (found) {
 						initial.push(found);
 					}
@@ -54,10 +54,10 @@ export default function FileAdmin() {
 				// replace the original <select multiple name="labels"> element with the "downshift" component
 				const divElement = document.createElement('div');
 				divElement.classList.add('select-container');
-				labelsElement.insertAdjacentElement('afterend', divElement);
-				labelsElement.style.display = 'none';
+				tagsElement.insertAdjacentElement('afterend', divElement);
+				tagsElement.style.display = 'none';
 				const root = createRoot(divElement);
-				root.render(<SelectLabels labels={settings.labels} initial={initial} original={labelsElement} />);
+				root.render(<SelectTags tags={settings.tags} initial={initial} original={tagsElement} />);
 			}
 		}
 	}, []);

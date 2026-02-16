@@ -8,11 +8,11 @@ from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from finder.lookups import annotate_unified_queryset, lookup_by_label, sort_by_attribute
+from finder.lookups import annotate_unified_queryset, lookup_by_tag, sort_by_attribute
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
-from finder.models.label import Label
+from finder.models.filetag import FileTag
 
 
 class FormRenderer(DjangoTemplates):
@@ -83,9 +83,9 @@ class BrowserView(View):
                 'is_open': is_open,
                 'children': children,
             },
-            'labels': [
-                {'value': id, 'name': name, 'color': color}
-                for id, name, color in Label.objects.values_list('id', 'name', 'color')
+            'tags': [
+                {'value': id, 'label': label, 'color': color}
+                for id, label, color in FileTag.objects.values_list('id', 'name', 'color')
             ],
             'last_folder': request.session['finder.last_folder'],
             **self.list(request, request.session['finder.last_folder']),
@@ -148,7 +148,7 @@ class BrowserView(View):
         request.session['finder.last_folder'] = str(folder_id)
         offset = int(request.GET.get('offset', 0))
         recursive = 'recursive' in request.GET
-        lookup = lookup_by_label(request)
+        lookup = lookup_by_tag(request)
         lookup['mime_types'] = request.GET.getlist('mimetypes')
         current_folder = FolderModel.objects.get(id=folder_id)
         if recursive:

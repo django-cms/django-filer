@@ -1,6 +1,6 @@
 import React, {lazy, Suspense, useEffect, useMemo, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import SelectLabels from '../common/SelectLabels';
+import SelectTags from '../common/SelectTags';
 
 
 function EditorForm(props) {
@@ -11,31 +11,31 @@ function EditorForm(props) {
 		const shadowRoot = mainContent.getRootNode();
 		if (!(shadowRoot instanceof ShadowRoot))
 			return;
-		const labelsElement = shadowRoot.getElementById('id_labels');
-		if (!(labelsElement instanceof HTMLSelectElement))
+		const tagsElement = shadowRoot.getElementById('id_tags');
+		if (!(tagsElement instanceof HTMLSelectElement))
 			return;
-		if (settings.labels) {
+		if (settings.tags) {
 			// extract selected values from the original <select multiple name="labels"> element
 			// this only happens if a user sets a label but the form is rejected by the server
 			const initial = [];
-			for (const option of labelsElement.selectedOptions) {
-				const found = settings.labels.find(label => label.value == option.value);
+			for (const option of tagsElement.selectedOptions) {
+				const found = settings.tags.find(tag => tag.value == option.value);
 				if (found) {
 					initial.push(found);
 				}
 			}
 
 			// replace the original <select multiple name="labels"> element with the "downshift" component
-			if (labelsElement.nextElementSibling?.classList.contains('select-container')) {
-				labelsElement.nextElementSibling.remove();
+			if (tagsElement.nextElementSibling?.classList.contains('select-container')) {
+				tagsElement.nextElementSibling.remove();
 			}
 			const divElement = document.createElement('div');
 			divElement.classList.add('select-container');
-			labelsElement.insertAdjacentElement('afterend', divElement);
+			tagsElement.insertAdjacentElement('afterend', divElement);
 			const root = createRoot(divElement);
-			root.render(<SelectLabels labels={settings.labels} initial={initial} original={labelsElement}/>);
+			root.render(<SelectTags tags={settings.tags} initial={initial} original={tagsElement}/>);
 		}
-		labelsElement.style.display = 'none';
+		tagsElement.style.display = 'none';
 	}, [formHtml]);
 
 	function handleSave() {

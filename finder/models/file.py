@@ -12,7 +12,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext, gettext_lazy as _
 
-from finder.models.label import Label
+from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
 
@@ -70,12 +70,12 @@ class FileModelManager(InodeManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.prefetch_related('labels')
+        queryset = queryset.prefetch_related('tags')
         return queryset
 
 
 class AbstractFileModel(InodeModel):
-    data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type', 'labels']
+    data_fields = InodeModel.data_fields + ['file_size', 'file_name', 'sha1', 'mime_type', 'tags']
     fallback_thumbnail_url = staticfiles_storage.url('finder/icons/file-unknown.svg')
     browser_component = editor_component = folderitem_component = None
 
@@ -104,11 +104,11 @@ class AbstractFileModel(InodeModel):
         editable=False,
         db_index=True,
     )
-    labels = models.ManyToManyField(
-        Label,
+    tags = models.ManyToManyField(
+        FileTag,
         related_name='+',
         blank=True,
-        verbose_name=_("Labels"),
+        verbose_name=_("Tags"),
     )
 
     class Meta:
@@ -179,7 +179,7 @@ class AbstractFileModel(InodeModel):
             'download_url': self.get_download_url(ambit),
             'thumbnail_url': self.get_thumbnail_url(ambit),
             'sample_url': self.get_sample_url(ambit),
-            'labels': self.serializable_value('labels'),
+            'tags': self.serializable_value('tags'),
         }
 
     def get_download_url(self, ambit):

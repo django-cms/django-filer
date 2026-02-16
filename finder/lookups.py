@@ -1,5 +1,5 @@
 from finder.models.inode import InodeManager
-from finder.models.label import Label
+from finder.models.filetag import FileTag
 
 
 def annotate_unified_queryset(ambit, queryset):
@@ -7,7 +7,7 @@ def annotate_unified_queryset(ambit, queryset):
     Annotates the given queryset with additional fields for the frontend.
     This step must be applied after filtering and sorting.
     """
-    labels = Label.objects.values_list('id', 'name', 'color')
+    tags = FileTag.objects.values_list('id', 'label', 'color')
     for entry in queryset:
         proxy_obj = InodeManager.get_proxy_object(entry)
         entry.update(
@@ -17,22 +17,22 @@ def annotate_unified_queryset(ambit, queryset):
             summary=proxy_obj.summary,
             folderitem_component=proxy_obj.folderitem_component,
         )
-        if label_ids := entry.pop('label_ids', None):
-            label_ids = list(map(int, label_ids.split(',')))
-            entry['labels'] = [
-                {'id': id, 'name': name, 'color': color}
-                for id, name, color in labels if id in label_ids
+        if tag_ids := entry.pop('tag_ids', None):
+            tag_ids = list(map(int, tag_ids.split(',')))
+            entry['tags'] = [
+                {'id': id, 'label': label, 'color': color}
+                for id, label, color in tags if id in tag_ids
             ]
         entry.pop('name_lower', None)  # only used for searching
 
 
-def lookup_by_label(request):
+def lookup_by_tag(request):
     lookup = {}
     if filter := request.COOKIES.get('django-finder-filter'):
-        allowed_labels = Label.objects.values_list('id', flat=True)
+        allowed_tags = FileTag.objects.values_list('id', flat=True)
         try:
-            if label_ids := [int(v) for v in filter.split(',') if int(v) in allowed_labels]:
-                lookup['labels__in'] = label_ids
+            if tag_ids := [int(v) for v in filter.split(',') if int(v) in allowed_tags]:
+                lookup['tags__in'] = tag_ids
         except ValueError:
             pass
     return lookup

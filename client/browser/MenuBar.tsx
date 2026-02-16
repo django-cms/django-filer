@@ -1,7 +1,7 @@
 import React, {forwardRef, useImperativeHandle, useMemo, useRef} from 'react';
 import DropDownMenu from '../common/DropDownMenu';
 import SortingOptions from '../common/SortingOptions';
-import FilterByLabel from '../common/FilterByLabel';
+import FilterByTag from '../common/FilterByTag';
 import VolumeControl from '../common/VolumeControl';
 import SearchIcon from '../icons/search.svg';
 import UploadIcon from '../icons/upload.svg';
@@ -82,7 +82,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 			</li>
 			<VolumeControl webAudio={webAudio} />
 			<SortingOptions refreshFilesList={refreshFilesList} root={rootNode} />
-			{labels && <FilterByLabel refreshFilesList={refreshFilesList} labels={labels} root={rootNode} />}
+			{labels && <FilterByTag refreshFilesList={refreshFilesList} labels={labels} root={rootNode} />}
 			<Tooltip>
 				<TooltipTrigger>
 					<li role="menuitem" onClick={openUploader}>

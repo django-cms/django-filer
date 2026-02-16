@@ -4,15 +4,15 @@ from django.utils.translation import gettext_lazy as _
 from finder.models.ambit import AmbitModel
 
 
-class Label(models.Model):
+class FileTag(models.Model):
     ambit = models.ForeignKey(
         AmbitModel,
         on_delete=models.CASCADE,
-        related_name='labels',
+        related_name='tags',
         editable=False,
     )
-    name = models.CharField(
-        _("Name"),
+    label = models.CharField(
+        _("Label"),
         max_length=255,
     )
     color = models.CharField(
@@ -22,8 +22,8 @@ class Label(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Label")
-        verbose_name_plural = _("Labels")
+        verbose_name = _("Tag")
+        verbose_name_plural = _("Tags")
 
     def __str__(self):
-        return self.name
+        return self.label

@@ -4,17 +4,18 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
+import {VERBOSE_HTTP_ERROR_CODES} from './constants';
 import Dialog from './Dialog';
 import AddEntryIcon from '../icons/add-entry.svg';
 import TrashIcon from '../icons/trash.svg';
 
 
-const LabelEditor = forwardRef((props: any, forwardedRef) => {
+const TagEditor = forwardRef((props: any, forwardedRef) => {
 	const {settings} = props;
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
-	const newLabelInputRef = useRef<HTMLInputElement>(null);
-	const [labels, setLabels] = useState(settings.labels ?? []);
-	const [newLabel, setNewLabel] = useState({name: '', color: '#f0f0f0'});
+	const newTagInputRef = useRef<HTMLInputElement>(null);
+	const [tags, setTags] = useState(settings.tags ?? []);
+	const [newTag, setNewTag] = useState({label: '', color: '#f0f0f0'});
 	const [isOpen, setIsOpen] = useState(false);
 	const [offset, setOffset] = useState({x: 0, y: 0});
 
@@ -22,28 +23,28 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 		show: () => setIsOpen(true),
 		close: () => setIsOpen(false),
 		handleDragStart: (event) => {},
-		handleDragEnd: (event) => event.active.id === 'labels-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
+		handleDragEnd: (event) => event.active.id === 'tags-dialog' && setOffset({x: event.delta.x + offset.x, y: event.delta.y + offset.y}),
 	}));
 
-	function addLabel() {
-		if (newLabel.name) {
-			setLabels([...labels, newLabel]);
-			newLabelInputRef.current.value = '';
-			setNewLabel({...newLabel, name: ''});
+	function addTag() {
+		if (newTag.label) {
+			setTags([...tags, newTag]);
+			newTagInputRef.current.value = '';
+			setNewTag({...newTag, label: ''});
 			tbodyRef.current.scrollBy({top: 50, behavior: 'smooth'});
 		}
 	}
 
 	function dismissDialog() {
-		newLabelInputRef.current.value = '';
-		setNewLabel({...newLabel, name: ''});
+		newTagInputRef.current.value = '';
+		setNewTag({...newTag, label: ''});
 		setIsOpen(false);
 		setOffset({x: 0, y: 0});
 	}
 
-	async function applyLabels() {
-		const labelsList = newLabel.name ? [...labels, {name: newLabel.name, color: newLabel.color}] : labels;
-		const url = `${settings.base_url}${settings.folder_id}/labels`;
+	async function applyTags() {
+		const tagsList = newTag.label ? [...tags, {label: newTag.label, color: newTag.color}] : tags;
+		const url = `${settings.base_url}${settings.folder_id}/update_tags`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
@@ -51,13 +52,15 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 				'X-CSRFToken': settings.csrf_token,
 			},
 			body: JSON.stringify({
-				labels: labelsList,
+				tags: tagsList,
 			}),
 		});
 		if (response.ok) {
 			const body = await response.json();
-			setLabels(body['labels']);
+			setTags(body['tags']);
 			dismissDialog();
+		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+			alert(await response.text());
 		} else {
 			console.error(response);
 		}
@@ -66,29 +69,29 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 	function updateLabel(index?: number) : Function {
 		if (index === undefined) {
 			return (event: Event) => {
-				setNewLabel({...newLabel, name: (event.target as HTMLInputElement).value});
+				setNewTag({...newTag, label: (event.target as HTMLInputElement).value});
 			};
 		}
 		return (event: Event) => {
-			const label = {...labels[index], name: (event.target as HTMLInputElement).value};
-			setLabels(labels.toSpliced(index, 1, label));
+			const tag = {...tags[index], label: (event.target as HTMLInputElement).value};
+			setTags(tags.toSpliced(index, 1, tag));
 		};
 	}
 
 	function updateColor(index?: number) : Function {
 		if (index === undefined) {
 			return (event: Event) => {
-				setNewLabel({...newLabel, color: (event.target as HTMLInputElement).value});
+				setNewTag({...newTag, color: (event.target as HTMLInputElement).value});
 			};
 		}
 		return (event: Event) => {
-			const label = {...labels[index], color: (event.target as HTMLInputElement).value};
-			setLabels(labels.toSpliced(index, 1, label));
+			const tag = {...tags[index], color: (event.target as HTMLInputElement).value};
+			setTags(tags.toSpliced(index, 1, tag));
 		};
 	}
 
 	return (
-		<Dialog id="labels-dialog" label={gettext("Edit Labels")} isOpen={isOpen} offset={offset}>
+		<Dialog id="tags-dialog" label={gettext("Edit Tags")} isOpen={isOpen} offset={offset}>
 			<table>
 				<thead>
 					<tr>
@@ -98,22 +101,22 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 					</tr>
 				</thead>
 				<tbody ref={tbodyRef}>
-				{labels.map((entry, index) => (
-					<tr key={`label-${index}`}>
+				{tags.map((entry, index) => (
+					<tr key={`tag-${index}`}>
 						<td>
-							<input type="text" name="label" value={entry.name} onChange={event => updateLabel(index)(event)} />
+							<input type="text" name="label" value={entry.label} onChange={event => updateLabel(index)(event)} />
 						</td>
 						<td>
 							<input type="color" name="color" value={entry.color} onChange={event => updateColor(index)(event)} />
 						</td>
 						<td>
-							<span onClick={() => setLabels(labels.toSpliced(index, 1))}>
+							<span onClick={() => setTags(tags.toSpliced(index, 1))}>
 								<TrashIcon />
 							</span>
 						</td>
 					</tr>
 				))}
-				{labels.length === 0 && (
+				{tags.length === 0 && (
 					<tr>
 						<td colSpan={3}><em>{gettext("Labels haven't been set.")}</em></td>
 					</tr>
@@ -122,13 +125,13 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 				<tfoot>
 					<tr>
 						<td>
-							<input ref={newLabelInputRef} type="text" name="label" onChange={event => updateLabel()(event)} />
+							<input ref={newTagInputRef} type="text" name="label" onChange={event => updateLabel()(event)} />
 						</td>
 						<td>
-							<input type="color" name="color" defaultValue={newLabel.color} onChange={event => updateColor()(event)} />
+							<input type="color" name="color" defaultValue={newTag.color} onChange={event => updateColor()(event)} />
 						</td>
 						<td>
-							<span onClick={() => addLabel()} aria-disabled={!newLabel.name} >
+							<span onClick={() => addTag()} aria-disabled={!newTag.label} >
 								<AddEntryIcon />
 							</span>
 						</td>
@@ -137,10 +140,10 @@ const LabelEditor = forwardRef((props: any, forwardedRef) => {
 			</table>
 			<div className="button-group">
 				<button onClick={() => dismissDialog()}>{gettext("Dismiss")}</button>
-				<button onClick={() => applyLabels()}>{gettext("Apply")}</button>
+				<button onClick={() => applyTags()}>{gettext("Apply")}</button>
 			</div>
 		</Dialog>
 	);
 });
 
-export default LabelEditor;
+export default TagEditor;

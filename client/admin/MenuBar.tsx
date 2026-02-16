@@ -13,10 +13,10 @@ import {DndContext} from '@dnd-kit/core';
 import SearchField from './SearchField';
 import {VERBOSE_HTTP_ERROR_CODES} from './constants';
 import PermissionEditor from './PermissionEditor';
-import LabelEditor from './LabelEditor';
+import TagEditor from './TagEditor';
 import DropDownMenu from '../common/DropDownMenu';
 import VolumeControl from '../common/VolumeControl';
-import FilterByLabel from '../common/FilterByLabel';
+import FilterByTag from '../common/FilterByTag';
 import SortingOptions from '../common/SortingOptions';
 import {Tooltip, TooltipContent, TooltipTrigger} from '../common/Tooltip';
 import MoreVerticalIcon from '../icons/more-vertical.svg';
@@ -71,7 +71,7 @@ function ExtraMenu(props) {
 		clearClipboard,
 		deselectAll,
 		permissionDialogRef,
-		labelDialogRef,
+		tagDialogRef,
 	} = props;
 
 	async function addFolder() {
@@ -107,13 +107,13 @@ function ExtraMenu(props) {
 	}
 
 	function openPermissionEditorDialog(asDefault: boolean) {
-		labelDialogRef.current?.close();
+		tagDialogRef.current?.close();
 		permissionDialogRef.current.show(asDefault);
 	}
 
-	function openLabelEditorDialog() {
+	function openTagEditorDialog() {
 		permissionDialogRef.current?.close();
-		labelDialogRef.current.show();
+		tagDialogRef.current.show();
 	}
 
 	return (
@@ -150,8 +150,8 @@ function ExtraMenu(props) {
 				<FolderShieldIcon/><span>{gettext("Edit default permissions")}</span>
 			</li>
 				{settings.is_root &&
-			<li role="option" onClick={() => openLabelEditorDialog()}>
-				<LabelIcon/><span>{gettext("Edit labels")}</span>
+			<li role="option" onClick={() => openTagEditorDialog()}>
+				<LabelIcon/><span>{gettext("Edit tags")}</span>
 			</li>
 				}
 			</>}
@@ -199,7 +199,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
 	const permissionDialogRef = useRef(null);
-	const labelDialogRef = useRef(null);
+	const tagDialogRef = useRef(null);
 
 	useImperativeHandle(forwardedRef, () => ({
 		setSelected: (selectedInodes) => {
@@ -364,6 +364,8 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 		});
 		if (response.ok) {
 			current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+			alert(await response.text());
 		} else {
 			console.error(response);
 		}
@@ -389,13 +391,13 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 			onDragStart={
 				event => {
 					permissionDialogRef.current?.handleDragStart(event);
-					labelDialogRef.current?.handleDragStart(event);
+					tagDialogRef.current?.handleDragStart(event);
 				}
 			}
 			onDragEnd={
 				event => {
 					permissionDialogRef.current?.handleDragEnd(event);
-					labelDialogRef.current?.handleDragEnd(event);
+					tagDialogRef.current?.handleDragEnd(event);
 				}
 			}
 			autoScroll={false}
@@ -419,7 +421,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 						<ColumnsIcon/>
 					</MenuItem>
 					<SortingOptions refreshFilesList={refreshColumns} />
-					{settings.labels && <FilterByLabel refreshFilesList={refreshColumns} labels={settings.labels} />}
+					{settings.tags && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags} />}
 					<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
 						<CutIcon/>
 					</MenuItem>
@@ -445,7 +447,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 							clearClipboard={clearClipboard}
 							deselectAll={deselectAll}
 							permissionDialogRef={permissionDialogRef}
-							labelDialogRef={labelDialogRef}
+							tagDialogRef={tagDialogRef}
 							{...props}
 						/>
 					</>)}
@@ -453,7 +455,7 @@ const MenuBar = forwardRef((props: any, forwardedRef) => {
 			</nav>
 			{settings.is_admin && <>
 			<PermissionEditor ref={permissionDialogRef} settings={settings} />
-				{settings.is_root && <LabelEditor ref={labelDialogRef} settings={settings} />}
+				{settings.is_root && <TagEditor ref={tagDialogRef} settings={settings} />}
 			</>}
 		</DndContext>
 	);

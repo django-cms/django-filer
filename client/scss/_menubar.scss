@@ -116,19 +116,19 @@
 
 			&.sorting-options {
 				margin-left: auto;
-				&:not(:has(+.filter-by-label)) {
+				&:not(:has(+.filter-by-tag)) {
 					margin-right: auto;
 				}
 			}
 
-			&.filter-by-label {
+			&.filter-by-tag {
 				margin-right: auto;
 
 				ul > li {
 					input[type="checkbox"] {
 						vertical-align: initial;
 					}
-					span.label-dot {
+					span.tag-dot {
 						width: 12px;
 						height: 12px;
 						display: inline-block;

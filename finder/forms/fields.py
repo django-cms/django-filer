@@ -30,7 +30,7 @@ class FinderFolderField(UUIDField):
         return super().widget_attrs(widget)
 
 
-class LabelsChoiceField(ModelMultipleChoiceField):
+class TagChoiceField(ModelMultipleChoiceField):
     def prepare_value(self, values):
         values = super().prepare_value(values)
         return [v for v in values if v] if hasattr(values, '__iter__') else values

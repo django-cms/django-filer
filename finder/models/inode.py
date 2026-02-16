@@ -105,7 +105,7 @@ class InodeManagerMixin:
     def get_query(self, model, **lookup):
         model_field_names = [field.name for field in model._meta.get_fields()]
         mime_types = lookup.pop('mime_types', None)
-        labels = lookup.pop('labels__in', None)
+        tags = lookup.pop('tags__in', None)
         can_view = lookup.pop('has_read_permission', None)
         can_change = lookup.pop('has_write_permission', None)
         query = reduce(and_, (Q(**{key: value}) for key, value in lookup.items()), Q())
@@ -131,9 +131,9 @@ class InodeManagerMixin:
                     queries.append(Q(mime_type=mime_type))
             query &= reduce(or_, queries, Q())
 
-        # query to filter by labels
-        if labels and 'labels' in model_field_names:
-            query &= Q(labels__in=labels)
+        # query to filter by tags
+        if tags and 'tags' in model_field_names:
+            query &= Q(tags__in=tags)
 
         return query
 
@@ -154,19 +154,19 @@ class InodeManagerMixin:
                 **unified_annotations,
             )
             if model.is_folder:
-                expressions = {'label_ids': Value('', output_field=CharField())}
+                expressions = {'tag_ids': Value('', output_field=CharField())}
             else:
                 connection = connections[model.objects.db]
                 if (
                     getattr(connection.features, 'supports_aggregate_distinct_multiple_argument', False)
                     or connection.vendor == 'postgresql'
                 ):
-                    concatenated = Cast('labels__id', output_field=CharField())
-                    expressions = {'label_ids': StringAgg(concatenated, Value(','), distinct=True)}
+                    concatenated = Cast('tags__id', output_field=CharField())
+                    expressions = {'tag_ids': StringAgg(concatenated, Value(','), distinct=True)}
                 else:
                     # Function STRING_AGG should be preferred over GROUP_CONCAT, but isn't always available or doesn't
                     # support the DISTINCT keyword in SQLite, so we have to use GROUP_CONCAT in that case.
-                    expressions = {'label_ids': GroupConcat('labels__id', distinct=True)}
+                    expressions = {'tag_ids': GroupConcat('tags__id', distinct=True)}
             if user:
                 assert isinstance(user, get_user_model()), "`user` must be an instance of AUTH_USER_MODEL."
                 if user.is_superuser:
@@ -350,8 +350,8 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             return str(data)
         if field_name in ['created_at', 'last_modified_at']:
             return data.isoformat()
-        if field_name == 'labels':
-            return list(self.labels.values('id', 'name', 'color'))
+        if field_name == 'tags':
+            return list(self.tags.values('id', 'label', 'color'))
         return data
 
     def get_meta_data(self):

@@ -20,4 +20,4 @@ class AudioFileForm(EntangledModelFormMixin, FileForm):
     class Meta:
         model = AudioFileModel
         entangled_fields = {'meta_data': ['sample_start', 'sample_duration']}
-        untangled_fields = ['name', 'labels']
+        untangled_fields = ['name', 'tags']

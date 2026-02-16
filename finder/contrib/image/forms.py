@@ -37,4 +37,4 @@ class ImageFileForm(EntangledModelFormMixin, FileForm):
     class Meta:
         model = ImageFileModel
         entangled_fields = {'meta_data': ['alt_text', 'credit']}
-        untangled_fields = ['name', 'labels', 'width', 'height', 'crop_x', 'crop_y', 'crop_size', 'gravity']
+        untangled_fields = ['name', 'tags', 'width', 'height', 'crop_x', 'crop_y', 'crop_size', 'gravity']

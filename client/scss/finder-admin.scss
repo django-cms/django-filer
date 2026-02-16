@@ -361,11 +361,11 @@ ul.messagelist {
 			.inode {
 				box-sizing: border-box;
 
-				div:has(> .figure-labels) {
+				div:has(> .file-tags) {
 					position: relative;
 				}
 
-				.figure-labels {
+				.file-tags {
 					position: absolute;
 					line-height: 0;
 					text-align: right;
@@ -442,7 +442,7 @@ ul.messagelist {
 					padding: 15px; // reduce the size of SVG images
 				}
 
-				.figure-labels {
+				.file-tags {
 					inset: 5px;
 
 					span {
@@ -482,7 +482,7 @@ ul.messagelist {
 				}
 			}
 
-			.inode .figure-labels {
+			.inode .file-tags {
 				inset: 2px;
 
 				span {
@@ -555,7 +555,7 @@ ul.messagelist {
 					}
 				}
 
-				.figure-labels {
+				.file-tags {
 					display: inline-flex;
 					width: 15px;
 					height: 60px;
@@ -739,7 +739,7 @@ ul.messagelist {
 			}
 		}
 
-		.form-row.field-labels {
+		.form-row.field-tags {
 			overflow: visible;  // allow the dropdown to overflow the container
 		}
 	}

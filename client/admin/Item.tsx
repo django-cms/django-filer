@@ -4,8 +4,8 @@ import FinderSettings from './FinderSettings';
 import DroppableArea from './DroppableArea';
 import {useSearchParam} from './SearchField';
 import {useSorting} from '../common/SortingOptions';
-import {useFilter} from '../common/FilterByLabel';
-import FigureLabels from '../common/FigureLabels';
+import {useFilter} from '../common/FilterByTag';
+import FileTags from '../common/FileTags';
 import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
@@ -195,9 +195,9 @@ export function ListItem(props) {
 			return (
 				<figure className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
-						<FigureLabels labels={props.labels}>
+						<FileTags tags={props.tags}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-						</FigureLabels>
+						</FileTags>
 					</FigBody>
 					<figcaption>
 						<div className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
@@ -212,9 +212,9 @@ export function ListItem(props) {
 					<TooltipTrigger>
 						<div className={`figure${readonly ? ' readonly' : ''}`}>
 							<FigBody {...props}>
-								<FigureLabels labels={props.labels}>
+								<FileTags tags={props.tags}>
 									<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-								</FigureLabels>
+								</FileTags>
 							</FigBody>
 						</div>
 					</TooltipTrigger>
@@ -225,9 +225,9 @@ export function ListItem(props) {
 			return (<>
 				<div className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
-						<FigureLabels labels={props.labels}>
+						<FileTags tags={props.tags}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-						</FigureLabels>
+						</FileTags>
 					</FigBody>
 				</div>
 				<div>
@@ -249,9 +249,9 @@ export function ListItem(props) {
 			return (<>
 				<div className={`figure${readonly ? ' readonly' : ''}`}>
 					<FigBody {...props}>
-						<FigureLabels labels={props.labels}>
+						<FileTags tags={props.tags}>
 							<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
-						</FigureLabels>
+						</FileTags>
 					</FigBody>
 				</div>
 				<div>

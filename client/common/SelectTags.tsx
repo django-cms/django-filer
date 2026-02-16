@@ -2,15 +2,15 @@ import React from 'react';
 import {useMultipleSelection, useSelect} from 'downshift';
 
 
-type Label = {
+type Tag = {
 	value: string,
 	label: string,
 	color: string,
 };
 
 
-export default function SelectLabels(props) {
-	const {labels, initial, original} = props as { labels: Label[]; initial: Label[]; original: HTMLSelectElement };
+export default function SelectTags(props) {
+	const {tags, initial, original} = props as {tags: Tag[]; initial: Tag[]; original: HTMLSelectElement};
 	const {
 		getSelectedItemProps,
 		getDropdownProps,
@@ -18,7 +18,7 @@ export default function SelectLabels(props) {
 		removeSelectedItem,
 		selectedItems,
 	} = useMultipleSelection({initialSelectedItems: initial});
-	const items = labels.filter(label => !selectedItems.find((selectedItem: any) => selectedItem.value === label.value));
+	const items = tags.filter(label => !selectedItems.find((selectedItem: any) => selectedItem.value === label.value));
 	const {
 		isOpen,
 		getToggleButtonProps,
@@ -61,13 +61,13 @@ export default function SelectLabels(props) {
 		},
 	});
 
-	function removeLabel(event: React.MouseEvent, label: Label) {
+	function removeLabel(event: React.MouseEvent, tag: Tag) {
 		event.stopPropagation();
-		const option = Array.from(original.options).find(o => o.value == label.value);
+		const option = Array.from(original.options).find(o => o.value == tag.value);
 		if (option) {
 			option.selected = false;
 		}
-		removeSelectedItem(label);
+		removeSelectedItem(tag);
 	}
 
 	return (

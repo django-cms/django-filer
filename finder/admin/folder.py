@@ -19,7 +19,7 @@ from finder.admin.inode import InodeAdmin
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
-from finder.models.label import Label
+from finder.models.filetag import FileTag
 from finder.models.permission import Privilege, AccessControlEntry
 
 
@@ -76,8 +76,8 @@ class FolderAdmin(InodeAdmin):
                 self.admin_site.admin_view(self.delete_inodes),
             ),
             path(
-                '<uuid:folder_id>/labels',
-                self.admin_site.admin_view(self.update_labels),
+                '<uuid:folder_id>/update_tags',
+                self.admin_site.admin_view(self.update_tags),
             ),
             path(
                 '<uuid:trash_folder_id>/undo_discard',
@@ -126,10 +126,10 @@ class FolderAdmin(InodeAdmin):
                 is_trash=False,
                 folder_url=folder_url,
             )
-            if Label.objects.exists():
-                settings['labels'] = [
-                    {'value': id, 'name': name, 'color': color}
-                    for id, name, color in Label.objects.filter(ambit=ambit).values_list('id', 'name', 'color')
+            if FileTag.objects.exists():
+                settings['tags'] = [
+                    {'value': id, 'label': label, 'color': color}
+                    for id, label, color in FileTag.objects.filter(ambit=ambit).values_list('id', 'label', 'color')
                 ]
             request.session['finder_last_folder_id'] = str(inode.id)
         else:
@@ -400,37 +400,41 @@ class FolderAdmin(InodeAdmin):
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })
 
-    def update_labels(self, request, folder_id):
+    def update_tags(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         ambit = request._ambit
-        CREATE_LABEL = object()
+        if not ambit.root_folder.has_permission(request.user, Privilege.ADMIN):
+            msg = gettext("You do not have permission to edit tags.")
+            return HttpResponseForbidden(msg)
+
+        CREATE_TAG = object()
         body = json.loads(request.body)
-        preserved_label_ids = []
+        preserved_tag_ids = []
         with transaction.atomic():
-            for label in body['labels']:
-                id = label.get('value', CREATE_LABEL)
-                if id is CREATE_LABEL:
-                    create_kwargs = {'ambit': ambit, 'name': label['name'], 'color': label['color']}
-                    created_entry = Label.objects.create(**create_kwargs)
-                    preserved_label_ids.append(created_entry.id)
+            for tag in body['tags']:
+                id = tag.get('value', CREATE_TAG)
+                if id is CREATE_TAG:
+                    create_kwargs = {'ambit': ambit, 'label': tag['label'], 'color': tag['color']}
+                    created_entry = FileTag.objects.create(**create_kwargs)
+                    preserved_tag_ids.append(created_entry.id)
                 else:
-                    update_entry = Label.objects.get(id=id, ambit=ambit)
+                    update_entry = FileTag.objects.get(id=id, ambit=ambit)
                     update_fields = []
-                    if update_entry.name != label['name']:
-                        update_entry.name = label['name']
-                        update_fields.append('name')
-                    if update_entry.color != label['color']:
-                        update_entry.color = label['color']
+                    if update_entry.label != tag['label']:
+                        update_entry.label = tag['label']
+                        update_fields.append('label')
+                    if update_entry.color != tag['color']:
+                        update_entry.color = tag['color']
                         update_fields.append('color')
                     if update_fields:
                         update_entry.save(update_fields=update_fields)
-                    preserved_label_ids.append(update_entry.id)
-            Label.objects.filter(ambit=ambit).exclude(id__in=preserved_label_ids).delete()
+                    preserved_tag_ids.append(update_entry.id)
+            FileTag.objects.filter(ambit=ambit).exclude(id__in=preserved_tag_ids).delete()
         return JsonResponse({
-            'labels': [
-                {'value': id, 'name': name, 'color': color}
-                for id, name, color in Label.objects.filter(ambit=ambit).values_list('id', 'name', 'color')
+            'tags': [
+                {'value': id, 'label': label, 'color': color}
+                for id, label, color in FileTag.objects.filter(ambit=ambit).values_list('id', 'label', 'color')
             ],
         })
 
