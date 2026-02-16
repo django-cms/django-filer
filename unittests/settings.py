@@ -96,6 +96,26 @@ STORAGES = {
     },
 }
 
+if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
+    STORAGES['finder_bucket'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'access_key': 'finder',
+            'secret_key': 'finderadmin',
+            'bucket_name': 'finder-public',
+            'endpoint_url': 'http://localhost:9000',
+        },
+    }
+    STORAGES['finder_bucket_samples'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'access_key': 'finder',
+            'secret_key': 'finderadmin',
+            'bucket_name': 'finder-public-samples',
+            'endpoint_url': 'http://localhost:9000',
+        },
+    }
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 USE_TZ = True
