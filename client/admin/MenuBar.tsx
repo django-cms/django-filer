@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import {DndContext} from '@dnd-kit/core';
 import SearchField from './SearchField';
+import {VERBOSE_HTTP_ERROR_CODES} from './constants';
 import PermissionEditor from './PermissionEditor';
 import LabelEditor from './LabelEditor';
 import DropDownMenu from '../common/DropDownMenu';
@@ -37,9 +38,6 @@ import DownloadIcon from '../icons/download.svg';
 import UndoIcon from '../icons/undo.svg';
 import UploadIcon from '../icons/upload.svg';
 import FolderUploadIcon from '../icons/folder-upload.svg';
-
-
-export const VERBOSE_HTTP_ERROR_CODES = new Set([403, 409]);
 
 
 function MenuExtension(props) {

@@ -18,7 +18,8 @@ import {useAudioSettings, useCookie, useSessionStorage} from '../common/Storage'
 import FileUploader from '../common/FileUploader';
 import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
-import MenuBar, {VERBOSE_HTTP_ERROR_CODES} from './MenuBar';
+import {VERBOSE_HTTP_ERROR_CODES} from './constants';
+import MenuBar from './MenuBar';
 import SelectableArea from './SelectableArea';
 import InodeList from './InodeList';
 import DraggedInodes from './DraggedInodes';
