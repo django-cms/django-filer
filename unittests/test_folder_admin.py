@@ -14,6 +14,7 @@ from django.urls import reverse
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, PinnedFolder, ROOT_FOLDER_NAME
 from finder.models.inode import DiscardedInode
+from finder.models.filetag import FileTag
 from finder.models.permission import AccessControlEntry, Privilege
 
 
@@ -624,3 +625,37 @@ def test_copy_inodes(admin_client, admin_user, uploaded_file, sub_folder, princi
     expected_names = sorted(f"File #{s}" for s in expected_copied)
     assert target_names == expected_names
     assert resp_names == expected_names
+
+
+def test_update_file_tags(admin_client, ambit, principal_kwargs):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    existing_tag = FileTag.objects.create(ambit=ambit, label="Alpha", color='#111111')
+    stale_tag = FileTag.objects.create(ambit=ambit, label="Stale", color='#222222')
+    AccessControlEntry.objects.all().delete()
+    if principal_kwargs:
+        if 'user' in principal_kwargs:
+            principal_kwargs['privilege'] = Privilege.FULL
+        AccessControlEntry.objects.create(inode=ambit.root_folder_id, **principal_kwargs)
+
+    payload = {
+        'tags': [
+            {'value': existing_tag.id, 'label': "Alpha Renamed", 'color': '#333333'},
+            {'label': "New Tag", 'color': '#444444'},
+        ],
+    }
+    response = admin_client.post(f'{admin_url}/update_tags', json.dumps(payload), content_type='application/json')
+    if principal_kwargs and not principal_kwargs['privilege'] & Privilege.ADMIN:
+        assert response.status_code == 403
+        return
+    assert response.status_code == 200
+    response_tags = response.json()['tags']
+    existing_tag.refresh_from_db()
+    assert existing_tag.label == "Alpha Renamed"
+    assert existing_tag.color == '#333333'
+    assert FileTag.objects.filter(id=stale_tag.id).exists() is False
+    expected = {
+        (existing_tag.id, "Alpha Renamed", '#333333'),
+        (FileTag.objects.get(label="New Tag", ambit=ambit).id, "New Tag", '#444444'),
+    }
+    actual = {(entry['value'], entry['label'], entry['color']) for entry in response_tags}
+    assert actual == expected
