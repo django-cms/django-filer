@@ -659,3 +659,100 @@ def test_update_file_tags(admin_client, ambit, principal_kwargs):
     }
     actual = {(entry['value'], entry['label'], entry['color']) for entry in response_tags}
     assert actual == expected
+
+
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.SOURCE_DENIED])
+def test_undo_discarded_inodes(admin_client, admin_user, ambit, uploaded_file, sub_folder, principal_kwargs, access_control):
+    """Test restoring deleted inodes from trash folder."""
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    discarded_inodes = FileModel.objects.bulk_create([
+        FileModel(
+            parent=trash_folder,
+            name=f"Discarded #{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 9)
+    ])
+    DiscardedInode.objects.bulk_create([
+        DiscardedInode(inode=inode.id, previous_parent=sub_folder) for inode in discarded_inodes
+    ])
+    AccessControlEntry.objects.all().delete()
+    if admin_user.is_superuser is False and access_control == AccessControl.ALLOW:
+         AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+
+    # verify inodes are not in sub_folder
+    assert list(sub_folder.listdir(name__startswith='Discarded')) == []
+
+    # undo deletion
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/undo_discard',
+        json.dumps({'inode_ids': [str(inode.id) for inode in discarded_inodes[3:6]]}),
+        content_type='application/json',
+    )
+    if not (admin_user.is_superuser or access_control == AccessControl.ALLOW):
+        assert response.status_code == 403
+        return
+
+    assert response.status_code == 204
+
+    # Verify inodes are restored to original folder
+    restored_inodes = list(sub_folder.listdir(name__startswith="Discarded").order_by('ordering'))
+    assert len(restored_inodes) == 3
+    restored_ids = {inode['id'] for inode in restored_inodes}
+    expected_ids = {inode.id for inode in discarded_inodes[3:6]}
+    assert restored_ids == expected_ids
+
+    # Verify inodes are no longer in trash
+    remaining_trash = list(trash_folder.listdir(name__startswith="Discarded"))
+    assert len(remaining_trash) == 5
+    DiscardedInode.objects.filter(inode__in=[inode.id for inode in discarded_inodes[3:6]]).exists() is False
+
+
+# def test_undo_discarded_inodes_with_filename_conflict(admin_client, admin_user, ambit, uploaded_file, sub_folder):
+#     """Test restoring inodes when a file with the same name exists in the original folder."""
+#     ambit = sub_folder.get_ambit()
+#
+#     # Create and delete an inode
+#     deletable_file = FileModel.objects.create(
+#         parent=sub_folder,
+#         name="conflicting_file.txt",
+#         file_size=uploaded_file.file_size,
+#         sha1=uploaded_file.sha1,
+#         owner=admin_user,
+#     )
+#
+#     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+#     response = admin_client.post(
+#         f'{admin_url}/delete',
+#         json.dumps({'inode_ids': [str(deletable_file.id)]}),
+#         content_type='application/json',
+#     )
+#     assert response.status_code == 200
+#
+#     # Create a file with the same name in the original folder
+#     FileModel.objects.create(
+#         parent=sub_folder,
+#         name="conflicting_file.txt",
+#         file_size=uploaded_file.file_size,
+#         sha1=uploaded_file.sha1,
+#         owner=admin_user,
+#     )
+#
+#     # Restore the deleted file
+#     trash_folder = ambit.trash_folders.get(owner=admin_user)
+#     trash_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+#     restore_response = admin_client.post(
+#         f'{trash_url}/undo_discard',
+#         json.dumps({'inode_ids': [str(deletable_file.id)]}),
+#         content_type='application/json',
+#     )
+#     assert restore_response.status_code == 204
+#
+#     # Verify the restored file has a renamed name to avoid conflict
+#     restored_inode = sub_folder.listdir(id=str(deletable_file.id)).first()
+#     assert restored_inode is not None
+#     assert restored_inode['name'] == "conflicting_file.txt.renamed"
+#     assert restored_inode['parent'] == str(sub_folder.id)
