@@ -18,15 +18,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         subparsers = parser.add_subparsers(dest='subcommand', required=True)
-        subparsers.add_parser('reorganize', help="Iterates over all files and assign them to the model specfic to their mime-type.")
-        subparsers.add_parser('reorder', help="Set order value for each file in all folders.")
-        add_ambit_parser = subparsers.add_parser('add-root', help="Add named tree root.")
+        reorganize_parser = subparsers.add_parser('reorganize', help="Iterates over all files and assign them to the model specfic to their mime-type.")
+        reorganize_parser.add_argument('slug', action='store', type=str)
+        reorder_parser = subparsers.add_parser('reorder', help="Set order values for each file in all folders.")
+        reorder_parser.add_argument('slug', action='store', type=str)
+        subparsers.add_parser('list-ambits', help="List all configured ambits.")
+        add_ambit_parser = subparsers.add_parser('add-ambit', help="Add a named ambit to hold tree roots.")
         add_ambit_parser.add_argument('slug', action='store', type=str)
         add_ambit_parser.add_argument('--values', action='store', nargs='*', type=str)
-        edit_ambit_parser = subparsers.add_parser('edit-root', help="Edit named tree root.")
+        edit_ambit_parser = subparsers.add_parser('edit-ambit', help="Edit a named ambit.")
         edit_ambit_parser.add_argument('slug', action='store', type=str)
         edit_ambit_parser.add_argument('--values', action='store', nargs='*', type=str)
-        delete_ambit_parser = subparsers.add_parser('delete-root', help="Delete named tree root.")
+        delete_ambit_parser = subparsers.add_parser('delete-ambit', help="Delete a named ambit.")
         delete_ambit_parser.add_argument('slug', action='store', type=str)
         delete_ambit_parser.add_argument('--erase-files', action='store_true', help="Erase files from storage.")
 
@@ -35,24 +38,26 @@ class Command(BaseCommand):
 
         subcommand = options.pop('subcommand', '')
         if subcommand == 'reorganize':
-            self.reorganize()
+            self.reorganize(**options)
         elif subcommand == 'reorder':
-            self.reorder()
-        elif subcommand == 'add-root':
+            self.reorder(**options)
+        elif subcommand == 'list-ambits':
+            self.list_ambits()
+        elif subcommand == 'add-ambit':
             try:
                 self.add_ambit(**options)
             except Exception as exc:
-                self.stderr.write(f"Error while adding tree root: ‘{exc}’")
-        elif subcommand == 'edit-root':
+                self.stderr.write(f"Error while adding ambit: ‘{exc}’")
+        elif subcommand == 'edit-ambit':
             try:
                 self.edit_ambit(**options)
             except Exception as exc:
-                self.stderr.write(f"Error while change tree root: ‘{exc}’")
-        elif subcommand == 'delete-root':
+                self.stderr.write(f"Error while changing ambit: ‘{exc}’")
+        elif subcommand == 'delete-ambit':
             try:
                 self.delete_ambit(**options)
             except Exception as exc:
-                self.stderr.write(f"Error while deleting tree root: ‘{exc}’")
+                self.stderr.write(f"Error while deleting ambit: ‘{exc}’")
         else:
             self.stderr.write(f"Unknown subcommand ‘{subcommand}’")
 
@@ -73,16 +78,20 @@ class Command(BaseCommand):
                         file_model.objects.create(**kwargs)
                     file.delete()
 
-    def reorder(self):
+    def reorder(self, **options):
         self.stdout.write("Reorder files in django-filer (finder branch)")
         sum_reorders = 0
         for folder in FinderFolderModel.objects.all():
             num_reorders = folder.reorder()
-            if num_reorders > 0:
+            if self.verbosity > 1 and num_reorders > 0:
                 sum_reorders += num_reorders
                 self.stdout.write(f"Reordered {num_reorders} items in folder ‘{folder}’.")
         if sum_reorders == 0:
             self.stdout.write("No folder required any reordering.")
+
+    def list_ambits(self):
+        for ambit in AmbitModel.objects.all():
+            self.stdout.write(f"Slug: {ambit.slug}, Name: {ambit.verbose_name}, Site: {ambit.site}, Admin: {ambit.admin_name}, Storage: {ambit.original_storage}, Sample Storage: {ambit.sample_storage}")
 
     def add_ambit(self, **options):
         slug = options.pop('slug')

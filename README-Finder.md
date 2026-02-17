@@ -36,12 +36,13 @@ certain type of file. A minimal installation can be configured to only distingui
 and folders.
 
 
-## Multiple Folder Roots
-The "Finder" branch of **django-filer** allows to have multiple folder roots (ambits). Such a folder
-root must be created using the management command `manage.py finder add-root …`. All folder roots
-are then displayed in the left sidebar of the Django admin. For each folder root, a different Django
-storage can be configured.
+## Multiple Ambits to hold Folder Roots
 
+The "Finder" branch of **django-filer** allows multiple ambits, each able to hold multiple root
+folders. Such an ambit must be created using the management command `manage.py finder add-ambit …`.
+Each ambit has a slug and a name. The slug is used in the URL to access that ambit, while the name
+is used for display purposes. All ambits are displayed in the left sidebar of the Django admin. For
+each ambit, a different Django storage can be configured.
 
 
 ## New Model Features
