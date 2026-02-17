@@ -2,7 +2,7 @@ import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import {ProgressOverlay, ProgressBar} from './UploadProgress';
 
 
-const FileUploader = forwardRef((props: any, forwardedRef) => {
+const FileUploader = forwardRef(function FileUploader(props: any, forwardedRef) {
 	const {folderId, disabled, handleUpload} = props;
 	const multiple = 'multiple' in props;
 	const fileUploadRef = useRef(null);

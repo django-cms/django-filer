@@ -181,7 +181,7 @@ function MenuItem(props) {
 }
 
 
-const MenuBar = forwardRef((props: any, forwardedRef) => {
+const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	const {
 		currentFolderId,
 		columnRefs,

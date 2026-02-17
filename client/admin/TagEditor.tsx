@@ -10,7 +10,7 @@ import AddEntryIcon from '../icons/add-entry.svg';
 import TrashIcon from '../icons/trash.svg';
 
 
-const TagEditor = forwardRef((props: any, forwardedRef) => {
+const TagEditor = forwardRef(function TagEditor(props: any, forwardedRef){
 	const {settings} = props;
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const newTagInputRef = useRef<HTMLInputElement>(null);

@@ -32,7 +32,7 @@ type AccessControlEntry = {
 };
 
 
-const SelectPrincipal = forwardRef((props: any, forwardedRef) => {
+const SelectPrincipal = forwardRef(function SelectPrincipal(props: any, forwardedRef) {
 	const {acl, selectedItem, setSelectedItem, settings} = props;
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [inputValue, setInputValue] = useState<string>('');
@@ -144,7 +144,7 @@ function PrivilegeTypeIcon(props) {
 }
 
 
-const PermissionEditor = forwardRef((props: any, forwardedRef) => {
+const PermissionEditor = forwardRef(function PermissionEditor(props: any, forwardedRef) {
 	const {settings} = props;
 	const tbodyRef = useRef<HTMLTableSectionElement>(null);
 	const selectPrincipalRef = useRef(null);

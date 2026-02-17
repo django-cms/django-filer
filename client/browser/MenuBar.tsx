@@ -8,8 +8,8 @@ import UploadIcon from '../icons/upload.svg';
 import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
-const MenuBar = forwardRef((props: any, forwardedRef) => {
 	const {openUploader, labels, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone, webAudio} = props;
+const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	const ref = useRef(null);
 	const searchRef = useRef(null);
 

@@ -104,7 +104,7 @@ export function Tooltip({children, ...options}: { children: ReactNode } & Toolti
 export const TooltipTrigger = forwardRef<
 	HTMLElement,
 	HTMLProps<HTMLElement>
->(({children, ...props}, forwardedRef) => {
+>(function TooltipTrigger({children, ...props}, forwardedRef) {
 	const context = useTooltipContext();
 	const ref = useMergeRefs([context.refs.setReference, forwardedRef]);
 
@@ -124,7 +124,7 @@ export const TooltipTrigger = forwardRef<
 export const TooltipContent = forwardRef<
 	HTMLDivElement,
 	HTMLProps<HTMLDivElement> & {root?: HTMLElement}
->(({style, ...props}, forwardedRef) => {
+>(function TooltipContent({style, ...props}, forwardedRef) {
 	const context = useTooltipContext();
 	const refs = useMergeRefs([context.refs.setFloating, forwardedRef]);
 

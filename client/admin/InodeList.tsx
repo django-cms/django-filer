@@ -25,7 +25,7 @@ function InodeListHeader() {
 }
 
 
-const InodeList = forwardRef((props: any, forwardedRef) => {
+const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 	const {
 		folderId,
 		ancestorFolderId,

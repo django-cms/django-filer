@@ -105,7 +105,7 @@ function FolderTab(props) {
 	);
 }
 
-const FolderTabs = forwardRef((props: any, forwardedRef) => {
+const FolderTabs = forwardRef(function FolderTabs(props: any, forwardedRef) {
 	const {isSearchResult, settings} = props;
 	const [favoriteFolders, setFavoriteFolders] = useState(settings.favorite_folders);
 

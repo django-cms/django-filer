@@ -89,7 +89,7 @@ const FilesList = memo((props: any) => {
 });
 
 
-const FileSelectDialog = forwardRef((props: any, forwardedRef) => {
+const FileSelectDialog = forwardRef(function (props: any, forwardedRef) {
 	const {ambit, baseUrl, selectedFolderId, mimeTypes, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
