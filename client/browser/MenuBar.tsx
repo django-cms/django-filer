@@ -8,8 +8,8 @@ import UploadIcon from '../icons/upload.svg';
 import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
-	const {openUploader, labels, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone, webAudio} = props;
 const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
+	const {openUploader, tags, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone, webAudio} = props;
 	const ref = useRef(null);
 	const searchRef = useRef(null);
 
@@ -82,7 +82,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			</li>
 			<VolumeControl webAudio={webAudio} />
 			<SortingOptions refreshFilesList={refreshFilesList} root={rootNode} />
-			{labels && <FilterByTag refreshFilesList={refreshFilesList} labels={labels} root={rootNode} />}
+			{tags && <FilterByTag refreshFilesList={refreshFilesList} tags={tags} root={rootNode} />}
 			<Tooltip>
 				<TooltipTrigger>
 					<li role="menuitem" onClick={openUploader}>

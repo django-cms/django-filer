@@ -15,8 +15,8 @@ function EditorForm(props) {
 		if (!(tagsElement instanceof HTMLSelectElement))
 			return;
 		if (settings.tags) {
-			// extract selected values from the original <select multiple name="labels"> element
-			// this only happens if a user sets a label but the form is rejected by the server
+			// extract selected values from the original <select multiple name="tags"> element
+			// this only happens if a user sets a tag but the form is rejected by the server
 			const initial = [];
 			for (const option of tagsElement.selectedOptions) {
 				const found = settings.tags.find(tag => tag.value == option.value);

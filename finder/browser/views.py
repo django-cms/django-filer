@@ -85,7 +85,7 @@ class BrowserView(View):
             },
             'tags': [
                 {'value': id, 'label': label, 'color': color}
-                for id, label, color in FileTag.objects.values_list('id', 'name', 'color')
+                for id, label, color in FileTag.objects.values_list('id', 'label', 'color')
             ],
             'last_folder': request.session['finder.last_folder'],
             **self.list(request, request.session['finder.last_folder']),

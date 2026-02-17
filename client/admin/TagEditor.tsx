@@ -118,7 +118,7 @@ const TagEditor = forwardRef(function TagEditor(props: any, forwardedRef){
 				))}
 				{tags.length === 0 && (
 					<tr>
-						<td colSpan={3}><em>{gettext("Labels haven't been set.")}</em></td>
+						<td colSpan={3}><em>{gettext("Tags haven't been set.")}</em></td>
 					</tr>
 				)}
 				</tbody>

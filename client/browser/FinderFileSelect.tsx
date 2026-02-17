@@ -15,7 +15,7 @@ interface SelectedFile {
 	meta_data: object;
 	download_url: string;
 	thumbnail_url: string;
-	labels: string[];
+	tags: string[];
 }
 
 function parseDataset(dataset: string|object) : SelectedFile|null {
@@ -34,7 +34,7 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 			meta_data,
 			download_url,
 			thumbnail_url,
-			labels
+			tags
 		} = data;
 		return {
 			id,
@@ -49,7 +49,7 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 			meta_data,
 			download_url,
 			thumbnail_url,
-			labels
+			tags
 		} as SelectedFile;
 	}
 	return null;

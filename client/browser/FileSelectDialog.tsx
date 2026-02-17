@@ -98,7 +98,7 @@ const FileSelectDialog = forwardRef(function (props: any, forwardedRef) {
 		offset: null,
 		recursive: false,
 		search_query: '',
-		labels: [],
+		tags: [],
 	});
 	const [isDirty, setDirty] = useState(false);
 	const ref = useRef(null);
@@ -299,12 +299,12 @@ const FileSelectDialog = forwardRef(function (props: any, forwardedRef) {
 			<BrowserEditor
 				uploadedFile={uploadedFile}
 				mainContent={ref.current}
-				settings={{csrfToken, baseUrl, selectFile, dismissAndClose, labels: structure.labels}}
+				settings={{csrfToken, baseUrl, selectFile, dismissAndClose, tags: structure.tags}}
 			/> : <>
 				<MenuBar
 					ref={menuBarRef}
 					openUploader={() => uploaderRef.current.openUploader()}
-					labels={structure.labels}
+					tags={structure.tags}
 					refreshFilesList={refreshFilesList}
 					setDirty={setDirty}
 					setSearchQuery={setSearchQuery}
