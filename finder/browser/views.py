@@ -1,7 +1,7 @@
-from django.core.exceptions import BadRequest, ValidationError
+from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist
 from django.db.models import QuerySet, Subquery
 from django.forms.renderers import DjangoTemplates
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
@@ -38,17 +38,21 @@ class BrowserView(View):
             return HttpResponseBadRequest(f"Action {self.action} not allowed.")
         try:
             return JsonResponse(action(request, *args, **kwargs))
+        except ObjectDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
+        except PermissionError as e:
+            return HttpResponseForbidden(str(e))
         except ValidationError as e:
             return JsonResponse({'error': e.messages}, status=422)
         except Exception as e:
             return HttpResponseBadRequest(str(e))
 
-    def _get_children(cls, open_folders, parent):
+    def _get_children(cls, ambit, open_folders, parent):
         children = []
         for subfolder in parent.subfolders:
-            child = subfolder.as_dict()
+            child = subfolder.as_dict(ambit)
             if str(subfolder.id) in open_folders:
-                child.update(children=cls._get_children(open_folders, subfolder), is_open=True)
+                child.update(children=cls._get_children(ambit, open_folders, subfolder), is_open=True)
             else:
                 child.update(children=None, is_open=False)
             children.append(child)
@@ -72,12 +76,12 @@ class BrowserView(View):
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
             else:  # django-cte not installed
                 open_folders.update(str(ancestor.id) for ancestor in ancestors)
-            children = self._get_children(open_folders, ambit.root_folder)
+            children = self._get_children(ambit, open_folders, ambit.root_folder)
         else:
             children = None
         return {
             'root_folder': {
-                **ambit.root_folder.as_dict(),
+                **ambit.root_folder.as_dict(ambit),
                 'name': None,  # the root folder has no readable name
                 'is_root': True,
                 'is_open': is_open,
@@ -97,6 +101,7 @@ class BrowserView(View):
         Open the given folder and fetch children data for the folder.
         """
         inode = FileModel.objects.get_inode(id=inode_id)
+        ambit = inode.folder.get_ambit()
         inode_id = str(inode_id)
         if inode.is_folder:
             request.session.setdefault('finder.open_folders', [])
@@ -106,12 +111,11 @@ class BrowserView(View):
             return {
                 'id': inode_id,
                 'name': inode.name,
-                'children': self._get_children(request.session['finder.open_folders'], inode),
+                'children': self._get_children(ambit, request.session['finder.open_folders'], inode),
                 'is_open': True,
                 'has_subfolders': inode.subfolders.exists(),
             }
         else:
-            ambit = inode.folder.get_ambit()
             return inode.as_dict(ambit)
 
     @method_decorator(require_GET)

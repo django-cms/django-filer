@@ -512,7 +512,7 @@ class FolderAdmin(InodeAdmin):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         if not (parent_folder := self.get_object(request, folder_id)):
-            return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
+            return HttpResponseNotFound(f"Folder with id={folder_id} not found.")
         ambit = parent_folder.get_ambit()
         ordering = parent_folder.get_max_ordering() + 1
         body = json.loads(request.body)
