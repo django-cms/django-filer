@@ -25,7 +25,6 @@ env/
 /node_modules
 .sass-cache
 *.css.map
-package-lock.json
 
 local.sqlite
 

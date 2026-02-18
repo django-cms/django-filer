@@ -21,7 +21,7 @@ form .form-row {
     .filer-dropzone {
         @include clearfix;
         position: relative;
-        min-width: 215px;
+        min-width: 320px;
         border: solid 1px $gray-lighter;
         border-radius: $border-radius-normal;
         background-color: $gray-lightest;
