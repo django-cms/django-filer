@@ -89,8 +89,8 @@ const FilesList = memo((props: any) => {
 });
 
 
-const FileSelectDialog = forwardRef(function (props: any, forwardedRef) {
-	const {ambit, baseUrl, selectedFolderId, mimeTypes, csrfToken} = props;
+const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwardedRef) {
+	const {ambit, baseUrl, selectedFolderId, selectedFileId, mimeTypes, csrfToken} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
 		last_folder: null,
@@ -194,6 +194,9 @@ const FileSelectDialog = forwardRef(function (props: any, forwardedRef) {
 		const params = new URLSearchParams();
 		if (selectedFolderId) {
 			params.append('folder', selectedFolderId);
+		}
+		if (selectedFileId) {
+			params.append('file', selectedFileId);
 		}
 		mimeTypes?.forEach(type => params.append('mimetypes', type));
 		setDirty(false);
@@ -340,7 +343,7 @@ const FileSelectDialog = forwardRef(function (props: any, forwardedRef) {
 							setDirty={setDirty}
 							isDirty={isDirty}
 							selectFile={selectFile}
-							selectedFileId={props.selectedFileId}
+							selectedFileId={selectedFileId}
 							webAudio={webAudio}
 						/>
 						:

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useCallback} from 'react';
 import FileSelectDialog from './FileSelectDialog';
 
 
@@ -55,6 +55,17 @@ function parseDataset(dataset: string|object) : SelectedFile|null {
 	return null;
 }
 
+function getCSRFToken(shadowRoot) {
+	const csrfToken = shadowRoot.host.closest('form')?.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+	if (csrfToken)
+		return csrfToken;
+	const parts = `; ${document.cookie}`.split('; csrftoken=');
+	if (parts.length === 2)
+		return parts.pop().split(';').shift();
+}
+
+
+const uuid5Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
@@ -65,7 +76,7 @@ export default function FinderFileSelect(props) {
 	const slotRef = useRef(null);
 	const dialogRef = useRef(null);
 	const [selectedFile, setSelectedFile] = useState<SelectedFile>(null);
-	const csrfToken = getCSRFToken();
+	const csrfToken = getCSRFToken(shadowRoot);
 	const uuid5Regex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 	useEffect(() => {
@@ -126,15 +137,6 @@ export default function FinderFileSelect(props) {
 		}
 	}
 
-	function getCSRFToken() {
-		const csrfToken = shadowRoot.host.closest('form')?.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
-		if (csrfToken)
-			return csrfToken;
-		const parts = `; ${document.cookie}`.split('; csrftoken=');
-		if (parts.length === 2)
-			return parts.pop().split(';').shift();
-	}
-
 	function openDialog() {
 		dialogRef.current.showModal();
 		selectRef.current.scrollToCurrentFolder();
@@ -172,7 +174,7 @@ export default function FinderFileSelect(props) {
 		<div className="finder-file-select">
 			<figure>{selectedFile ? <>
 				<div>
-					<img src={selectedFile.thumbnail_url} onClick={openDialog} onDragEnter={openDialog} />
+					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} />
 				</div>
 				<figcaption>
 					<dl>

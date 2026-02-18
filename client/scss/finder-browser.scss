@@ -11,7 +11,8 @@
 		display: inline-flex;
 		margin: 0.25rem 0;
 		padding: 0;
-		outline: gray thin dotted;
+		outline: gray 2px dashed;
+		border-radius: 4px;
 
 		>div {
 			width: 180px;
