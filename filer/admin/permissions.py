@@ -6,7 +6,7 @@ from django.urls import reverse
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
     def get_autocomplete_fields(self, request):
-        """Remove "owner" from autocomplete_fields is User model has no search_fields"""
+        """Remove "owner" from autocomplete_fields if User model has no search_fields"""
 
         autocomplete_fields = super().get_autocomplete_fields(request)
         if django_version >= (5, 0):
