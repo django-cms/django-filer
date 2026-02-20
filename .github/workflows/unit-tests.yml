@@ -22,23 +22,23 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
-        django-version: ["5.2.*", "6.0.*"]
+        django-version: ["5.2", "6.0"]
         node-version: ["22.x"]
         with_cte: ["0", "1"]
         use_postgres: ["0", "1"]
         use_s3: ["0", "1"]
         exclude:
           - python-version: "3.11"
-            django-version: "6.0.*"
+            django-version: "6.0"
             use_s3: "1"
           - python-version: "3.12"
-            django-version: "5.2.*"
+            django-version: "5.2"
             use_s3: "1"
-          - django-version: "5.2.*"
+          - django-version: "5.2"
             with_cte: "0"
             use_postgres: "1"
             use_s3: "1"
-          - django-version: "6.0.*"
+          - django-version: "6.0"
             with_cte: "0"
             use_postgres: "0"
     name: "py${{ matrix.python-version }} django-${{ matrix.django-version }} with ${{ matrix.use_postgres == '1' && 'PostgreSQL' || 'SQLite' }}${{ matrix.with_cte == '1' && ' and CTE' || '' }}"
@@ -57,7 +57,7 @@ jobs:
         npm install --include=dev
         python -m pip install --upgrade pip
         python -m pip install --upgrade setuptools wheel
-        python -m pip install "Django==${{ matrix.django-version }}"
+        python -m pip install "Django~=${{ matrix.django-version }}"
         python -m pip install django-entangled ffmpeg-python pillow reportlab svglib pycairo
         python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov
     - name: Install Django-CTE
