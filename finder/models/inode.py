@@ -364,7 +364,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         group_ids = user.groups.values_list('id', flat=True)
         return AccessControlEntry.objects.annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
             Q(privilege_mask__gt=0, inode=self.id)
-            & (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
+            & (Q(user__isnull=True, group__isnull=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
         ).exists()
 
     def delete(self, *args):
@@ -387,7 +387,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
             else:
                 create_kwargs = {'inode': self.id, 'privilege': ace['privilege']}
                 if ace['type'] == 'everyone':
-                    create_kwargs['everyone'] = True
+                    pass  # user and group are already None
                 elif ace['type'] == 'group':
                     create_kwargs['group_id'] = ace['principal']
                 elif ace['type'] == 'user':
@@ -405,7 +405,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         Transfer the default access control list from the given folder to this inode.
         """
         AccessControlEntry.objects.bulk_create([
-            AccessControlEntry(inode=self.id, user=a.user, group=a.group, everyone=a.everyone, privilege=a.privilege)
+            AccessControlEntry(inode=self.id, user=a.user, group=a.group, privilege=a.privilege)
             for a in parent_folder.default_access_control_list.all()
         ])
 

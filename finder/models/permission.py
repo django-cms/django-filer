@@ -31,13 +31,13 @@ class AccessControlBase(models.Model):
         null=True,
         on_delete=models.CASCADE,
     )
-    everyone = models.BooleanField(
-        _("Everyone"),
-        default=False,
-    )
 
     class Meta:
         abstract = True
+
+    @cached_property
+    def everyone(self):
+        return self.user_id is None and self.group_id is None
 
     def __eq__(self, other):
         entry = self.as_dict
@@ -86,20 +86,23 @@ class AccessControlBase(models.Model):
                 'name': gettext("Everyone"),
                 'privilege': self.privilege,
             }
+        raise RuntimeError("AccessControlEntry has no principal")
 
 
 class AccessControlManager(models.Manager):
+    _everyone = Q(user__isnull=True, group__isnull=True)
+
     def get_privilege_queryset(self, user, privilege):
         group_ids = user.groups.values_list('id', flat=True)
         return self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
             Q(privilege_mask__gt=0)
-            & (Q(everyone=True) | Q(user_id=user.id) | Q(group_id__in=group_ids))
+            & (self._everyone | Q(user_id=user.id) | Q(group_id__in=group_ids))
         )
 
     def privilege_subquery_exists(self, user, privilege):
         group_ids = user.groups.values_list('id', flat=True)
         return Exists(self.get_queryset().annotate(privilege_mask=F('privilege').bitand(privilege)).filter(
-            Q(privilege_mask__gt=0) & (Q(everyone=True) | Q(group_id__in=group_ids) | Q(user_id=user.id)),
+            Q(privilege_mask__gt=0) & (self._everyone | Q(group_id__in=group_ids) | Q(user_id=user.id)),
             inode=OuterRef('id'),
         ))
 
@@ -112,11 +115,7 @@ class AccessControlEntry(AccessControlBase):
         verbose_name_plural = _("Access Control Entries")
         constraints = [
             models.CheckConstraint(
-                condition=(
-                    Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)
-                    | Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)
-                    | Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True)
-                ),
+                condition=~Q(user__isnull=False, group__isnull=False),
                 name='acl_single_principal',
             ),
             models.UniqueConstraint(
@@ -131,7 +130,7 @@ class AccessControlEntry(AccessControlBase):
             ),
             models.UniqueConstraint(
                 fields=['inode'],
-                condition=Q(everyone=True),
+                condition=Q(user__isnull=True, group__isnull=True),
                 name='acl_inode_everyone_unique',
             ),
             models.CheckConstraint(
@@ -160,11 +159,7 @@ class DefaultAccessControlEntry(AccessControlBase):
         verbose_name_plural = _("Default Access Control Entries")
         constraints = [
             models.CheckConstraint(
-                condition=(
-                    Q(user__isnull=False) & Q(group__isnull=True) & Q(everyone=False)
-                    | Q(user__isnull=True) & Q(group__isnull=False) & Q(everyone=False)
-                    | Q(user__isnull=True) & Q(group__isnull=True) & Q(everyone=True)
-                ),
+                condition=~Q(user__isnull=False, group__isnull=False),
                 name='dacl_single_principal',
             ),
             models.CheckConstraint(

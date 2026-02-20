@@ -364,7 +364,7 @@ def principal_kwargs(admin_user, request):
         admin_user.groups.add(group)
         return {'group': group, 'privilege': Privilege.READ_WRITE}
     if request.param == 'everyone':
-        return {'everyone': True, 'privilege': Privilege.READ_WRITE}
+        return {'privilege': Privilege.READ_WRITE}
 
 
 @pytest.mark.parametrize('access_control', AccessControl)

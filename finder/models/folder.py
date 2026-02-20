@@ -363,7 +363,7 @@ class FolderModel(InodeModel):
             else:
                 create_kwargs = {'folder': self, 'privilege': ace['privilege']}
                 if ace['type'] == 'everyone':
-                    create_kwargs['everyone'] = True
+                    pass  # user and group are already None
                 elif ace['type'] == 'group':
                     create_kwargs['group_id'] = ace['principal']
                 elif ace['type'] == 'user':
@@ -379,7 +379,7 @@ class FolderModel(InodeModel):
     def transfer_access_control_list(self, parent_folder):
         super().transfer_access_control_list(parent_folder)
         DefaultACE.objects.bulk_create([
-            DefaultACE(folder=self, user=a.user, group=a.group, everyone=a.everyone, privilege=a.privilege)
+            DefaultACE(folder=self, user=a.user, group=a.group, privilege=a.privilege)
             for a in parent_folder.default_access_control_list.all()
         ])
 

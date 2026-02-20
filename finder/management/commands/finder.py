@@ -115,15 +115,16 @@ class Command(BaseCommand):
             raise CommandError(f"Storage backend ‘{storage_name}’ is not configured.")
         values['_sample_storage'] = storage_name
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
-        # create default ACLs for root folder
+        # create ACLs with RW-permission for everyone and administrative permission for superusers
         AccessControlEntry.objects.bulk_create([
-            AccessControlEntry(inode=root_folder.id, everyone=True, privilege=Privilege.READ_WRITE), *[
+            AccessControlEntry(inode=root_folder.id, privilege=Privilege.READ_WRITE), *[
                 AccessControlEntry(inode=root_folder.id, user=user, privilege=Privilege.FULL)
                 for user in get_user_model().objects.filter(is_superuser=True)
             ],
         ])
+        # create default ACLs, those used as a template for new folders and files
         DefaultAccessControlEntry.objects.bulk_create([
-            DefaultAccessControlEntry(folder=root_folder, everyone=True, privilege=Privilege.READ_WRITE), *[
+            DefaultAccessControlEntry(folder=root_folder, privilege=Privilege.READ_WRITE), *[
                 DefaultAccessControlEntry(folder=root_folder, user=user, privilege=Privilege.FULL)
                 for user in get_user_model().objects.filter(is_superuser=True)
             ],
