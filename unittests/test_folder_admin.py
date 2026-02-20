@@ -680,7 +680,7 @@ def test_undo_discarded_inodes(admin_client, admin_user, ambit, uploaded_file, s
     ])
     AccessControlEntry.objects.all().delete()
     if admin_user.is_superuser is False and access_control == AccessControl.ALLOW:
-         AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+        AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
 
     # verify inodes are not in sub_folder
     assert list(sub_folder.listdir(name__startswith='Discarded')) == []
@@ -711,8 +711,64 @@ def test_undo_discarded_inodes(admin_client, admin_user, ambit, uploaded_file, s
     DiscardedInode.objects.filter(inode__in=[inode.id for inode in discarded_inodes[3:6]]).exists() is False
 
 
-# def test_undo_discarded_inodes_with_filename_conflict(admin_client, admin_user, ambit, uploaded_file, sub_folder):
-#     """Test restoring inodes when a file with the same name exists in the original folder."""
+def test_undo_discarded_folder_with_name_conflict(admin_client, admin_user, ambit, uploaded_file, sub_folder):
+    """Test restoring inodes when a file with the same name exists in the original folder."""
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    FolderModel.objects.create(
+        parent=sub_folder,
+        name="Conflicting name",
+        owner=admin_user,
+    )
+    discarded_folder = FolderModel.objects.create(
+        parent=trash_folder,
+        name="Conflicting name",
+        owner=uploaded_file.owner,
+    )
+    DiscardedInode.objects.create(inode=discarded_folder.id, previous_parent=sub_folder)
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/undo_discard',
+        json.dumps({'inode_ids': [str(discarded_folder.id)]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 204
+    restored_inodes = list(sub_folder.listdir(name__startswith="Conflicting").order_by('ordering'))
+    assert len(restored_inodes) == 2
+    assert restored_inodes[0]['name'] == "Conflicting name"
+    assert restored_inodes[1]['name'] == "Conflicting name.renamed"
+
+
+def test_erase_trash_folder(admin_client, admin_user, ambit, sub_folder):
+    """Test erasing a trash folder containing a file."""
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    file_name = 'small_file.bin'
+    with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
+        discarded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
+    discarded_inode = FileModel.objects.create_from_upload(
+        ambit,
+        discarded_file,
+        folder=trash_folder,
+        name="Discarded",
+        owner=admin_user,
+        ordering=1,
+    )
+    DiscardedInode.objects.create(inode=discarded_inode.id, previous_parent=sub_folder)
+    assert ambit.original_storage.exists(discarded_inode.file_path)
+
+    # Erase the trash folder
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+    erase_response = admin_client.delete(f'{admin_url}/erase_trash_folder')
+    assert erase_response.status_code == 200
+    response_data = erase_response.json()
+    assert 'success_url' in response_data
+
+    # Verify file is deleted physically from disk
+    remaining_files = list(trash_folder.listdir(name__startswith="Discarded"))
+    assert len(remaining_files) == 0
+    assert DiscardedInode.objects.filter(inode=discarded_inode.id).exists() is False
+    assert FileModel.objects.filter(id=discarded_inode.id).exists() is False
+    assert not ambit.original_storage.exists(discarded_inode.file_path)
+
 #     ambit = sub_folder.get_ambit()
 #
 #     # Create and delete an inode

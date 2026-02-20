@@ -241,7 +241,7 @@ class BrowserView(View):
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         current_folder = FolderModel.objects.get(id=folder_id)
         if not current_folder.has_permission(request.user, Privilege.WRITE):
-            raise PermissionDenied(f"Permission denied to upload file.")
+            raise PermissionDenied("Permission denied to upload file.")
         ambit = current_folder.get_ambit()
         file = model.objects.create_from_upload(
             ambit,
