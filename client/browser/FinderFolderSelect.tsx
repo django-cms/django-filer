@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, memo} from 'react';
 import FileSelectDialog from './FileSelectDialog';
 
 
@@ -33,6 +33,52 @@ function parseDataset(dataset: string|object) : SelectedFolder|null {
 	}
 	return null;
 }
+
+
+function renderTimestamp(timestamp) {
+	const date = new Date(timestamp);
+	return date.toLocaleString();
+}
+
+const FolderPreview = memo(({selectedFolder, folderIconUrl, openDialog, removeFolder}: {
+	selectedFolder: SelectedFolder | null;
+	folderIconUrl: string;
+	openDialog: () => void;
+	removeFolder: () => void;
+}) => {
+	return (
+		<div className="finder-file-select">
+			<figure>{selectedFolder ? <>
+				<div>
+					<img src={folderIconUrl} alt={selectedFolder.name} onClick={openDialog} onDragEnter={openDialog} />
+				</div>
+				<figcaption>
+					<dl>
+						<dt>{gettext("Name")}:</dt>
+						<dd>{selectedFolder.name}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Details")}:</dt>
+						<dd>{selectedFolder.summary}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Created at")}:</dt>
+						<dd>{renderTimestamp(selectedFolder.created_at)}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Modified at")}:</dt>
+						<dd>{renderTimestamp(selectedFolder.last_modified_at)}</dd>
+					</dl>
+					<button className="remove-file-button" type="button" onClick={removeFolder}>{gettext("Remove")}</button>
+				</figcaption>
+			</> :
+				<div onClick={openDialog} onDragEnter={openDialog}>
+					<p>{gettext("Select Folder")}</p>
+				</div>
+			}</figure>
+		</div>
+	);
+});
 
 
 export default function FinderFolderSelect(props) {
@@ -141,43 +187,9 @@ export default function FinderFolderSelect(props) {
 		}
 	}
 
-	function renderTimestamp(timestamp) {
-		const date = new Date(timestamp);
-		return date.toLocaleString();
-	}
-
 	return (<>
 		<slot ref={slotRef} />
-		<div className="finder-file-select">
-			<figure>{selectedFolder ? <>
-				<div>
-					<img src={folderIconUrl} onClick={openDialog} onDragEnter={openDialog} />
-				</div>
-				<figcaption>
-					<dl>
-						<dt>{gettext("Name")}:</dt>
-						<dd>{selectedFolder.name}</dd>
-					</dl>
-					<dl>
-						<dt>{gettext("Details")}:</dt>
-						<dd>{selectedFolder.summary}</dd>
-					</dl>
-					<dl>
-						<dt>{gettext("Created at")}:</dt>
-						<dd>{renderTimestamp(selectedFolder.created_at)}</dd>
-					</dl>
-					<dl>
-						<dt>{gettext("Modified at")}:</dt>
-						<dd>{renderTimestamp(selectedFolder.last_modified_at)}</dd>
-					</dl>
-					<button className="remove-file-button" type="button" onClick={removeFolder}>{gettext("Remove")}</button>
-				</figcaption>
-			</> :
-				<div onClick={openDialog} onDragEnter={openDialog}>
-					<p>{gettext("Select Folder")}</p>
-				</div>
-			}</figure>
-		</div>
+		<FolderPreview selectedFolder={selectedFolder} folderIconUrl={folderIconUrl} openDialog={openDialog} removeFolder={removeFolder} />
 		<dialog ref={dialogRef}>
 			<FileSelectDialog
 				ref={selectRef}

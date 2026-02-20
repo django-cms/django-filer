@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback} from 'react';
+import React, {useEffect, useRef, useState, useCallback, memo} from 'react';
 import FileSelectDialog from './FileSelectDialog';
 
 
@@ -17,6 +17,8 @@ interface SelectedFile {
 	thumbnail_url: string;
 	tags: string[];
 }
+
+const uuid5Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function parseDataset(dataset: string|object) : SelectedFile|null {
 	const data = typeof dataset === 'string' ? JSON.parse(dataset) : dataset;
@@ -64,8 +66,49 @@ function getCSRFToken(shadowRoot) {
 		return parts.pop().split(';').shift();
 }
 
+function renderTimestamp(timestamp) {
+	const date = new Date(timestamp);
+	return date.toLocaleString();
+}
 
-const uuid5Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const FilePreview = memo(({selectedFile, openDialog, removeFile}: {
+	selectedFile: SelectedFile | null;
+	openDialog: () => void;
+	removeFile: () => void;
+}) => {
+	return (
+		<div className="finder-file-select">
+			<figure>{selectedFile ? <>
+				<div>
+					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} />
+				</div>
+				<figcaption>
+					<dl>
+						<dt>{gettext("Name")}:</dt>
+						<dd>{selectedFile.name}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Details")}:</dt>
+						<dd>{selectedFile.summary}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Modified at")}:</dt>
+						<dd>{renderTimestamp(selectedFile.last_modified_at)}</dd>
+					</dl>
+					<dl>
+						<dt>{gettext("Content-Type")}:</dt>
+						<dd>{selectedFile.mime_type}</dd>
+					</dl>
+					<button className="remove-file-button" type="button" onClick={removeFile}>{gettext("Remove")}</button>
+				</figcaption>
+			</> :
+				<div onClick={openDialog} onDragEnter={openDialog}>
+					<p>{gettext("Select File")}</p>
+				</div>
+			}</figure>
+		</div>
+	);
+});
 
 export default function FinderFileSelect(props) {
 	const shadowRoot = props.container;
@@ -77,7 +120,6 @@ export default function FinderFileSelect(props) {
 	const dialogRef = useRef(null);
 	const [selectedFile, setSelectedFile] = useState<SelectedFile>(null);
 	const csrfToken = getCSRFToken(shadowRoot);
-	const uuid5Regex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 	useEffect(() => {
 		// Create a styles element for the shadow DOM
@@ -164,43 +206,9 @@ export default function FinderFileSelect(props) {
 		}
 	}
 
-	function renderTimestamp(timestamp) {
-		const date = new Date(timestamp);
-		return date.toLocaleString();
-	}
-
 	return (<>
 		<slot ref={slotRef} />
-		<div className="finder-file-select">
-			<figure>{selectedFile ? <>
-				<div>
-					<img src={selectedFile.thumbnail_url} alt={selectedFile.name} onClick={openDialog} onDragEnter={openDialog} />
-				</div>
-				<figcaption>
-					<dl>
-						<dt>{gettext("Name")}:</dt>
-						<dd>{selectedFile.name}</dd>
-					</dl>
-					<dl>
-						<dt>{gettext("Details")}:</dt>
-						<dd>{selectedFile.summary}</dd>
-					</dl>
-					<dl>
-						<dt>{gettext("Modified at")}:</dt>
-						<dd>{renderTimestamp(selectedFile.last_modified_at)}</dd>
-					</dl>
-					<dl>
-						<dt>{gettext("Content-Type")}:</dt>
-						<dd>{selectedFile.mime_type}</dd>
-					</dl>
-					<button className="remove-file-button" type="button" onClick={removeFile}>{gettext("Remove")}</button>
-				</figcaption>
-			</> :
-				<div onClick={openDialog} onDragEnter={openDialog}>
-					<p>{gettext("Select File")}</p>
-				</div>
-			}</figure>
-		</div>
+		<FilePreview selectedFile={selectedFile} openDialog={openDialog} removeFile={removeFile} />
 		<dialog ref={dialogRef}>
 			<FileSelectDialog
 				ref={selectRef}
