@@ -4,6 +4,7 @@ import {ProgressOverlay, ProgressBar} from './UploadProgress';
 
 const FileUploader = forwardRef(function FileUploader(props: any, forwardedRef) {
 	const {folderId, disabled, handleUpload} = props;
+	const mimeTypes = props.mimeTypes ?? [];
 	const multiple = 'multiple' in props;
 	const fileUploadRef = useRef(null);
 	const folderUploadRef = useRef(null);
@@ -49,15 +50,23 @@ const FileUploader = forwardRef(function FileUploader(props: any, forwardedRef) 
 	function uploadFiles(files: FileList) {
 		if (disabled)
 			return;
+		const matchesMimeType = (fileType: string) => mimeTypes.some(
+			allowed => allowed === fileType || (allowed.endsWith('/*') && fileType.startsWith(allowed.slice(0, -1)))
+		);
+		const filteredFiles = Array.from(files).filter(
+			file => mimeTypes.length === 0 || matchesMimeType(file.type)
+		);
+		if (filteredFiles.length === 0)
+			return;
 		const uploadFile = file => new Promise<Response>((resolve, reject) => {
 			file.resolve = resolve;
 			file.reject = reject;
 		});
 		const promises: Array<Promise<Response>> = [];
-		for (let k = 0; k < files.length; k++) {
-			promises.push(uploadFile(files.item(k)));
+		for (const file of filteredFiles) {
+			promises.push(uploadFile(file));
 		}
-		setUploading([...uploading, ...files]);
+		setUploading([...uploading, ...filteredFiles]);
 		Promise.all(promises).then(responses => {
 			handleUpload(folderId, responses);
 		}).catch((error) => {
@@ -69,6 +78,7 @@ const FileUploader = forwardRef(function FileUploader(props: any, forwardedRef) 
 	}
 
 	const directory = {directory: '', webkitdirectory: '', mozdirectory: ''};
+	const accept = mimeTypes.length > 0 ? mimeTypes.join(',') : undefined;
 
 	return (
 		<div
@@ -79,8 +89,8 @@ const FileUploader = forwardRef(function FileUploader(props: any, forwardedRef) 
 			onDrop={handleDrop}
 		>
 			{props.children}
-			<input type="file" name={`file:${folderId}`} multiple={multiple} ref={fileUploadRef} onChange={handleFileSelect} />
-			{multiple && <input type="file" name={`folder:${folderId}`} {...directory} ref={folderUploadRef} onChange={handleFileSelect}/>}
+			<input type="file" name={`file:${folderId}`} multiple={multiple} accept={accept} ref={fileUploadRef} onChange={handleFileSelect} />
+			{multiple && <input type="file" name={`folder:${folderId}`} accept={accept} {...directory} ref={folderUploadRef} onChange={handleFileSelect}/>}
 			{(dragging || uploading.length > 0) && (
 			disabled ?
 			<div className="progress-overlay">

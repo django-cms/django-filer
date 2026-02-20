@@ -238,7 +238,8 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 		}
 		mimeTypes?.forEach(type => params.append('mimetypes', type));
 		setDirty(false);
-		const response = await fetch(`${baseUrl}structure/${ambit}${params.size === 0 ? '' : `?${params.toString()}`}`);
+		const fetchUrl = `${baseUrl}structure/${ambit}${params.size === 0 ? '' : `?${params.toString()}`}`;
+		const response = await fetch(fetchUrl);
 		if (response.ok) {
 			const body = await response.json();
 			setStructure(body);
@@ -355,7 +356,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 					setSearchQuery={setSearchQuery}
 					searchZone={searchZone}
 					setSearchZone={changeSearchZone}
-					hasUploadPermission={structure.has_upload_permission}
+					hasUploadPermission={structure.has_upload_permission && props.selectFile}
 					webAudio={webAudio}
 				/>
 				<div className="browser-body">
@@ -377,8 +378,9 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 					</nav>
 					<FileUploader
 						folderId={structure.last_folder}
-						disabled={!structure.has_upload_permission}
+						disabled={!(structure.has_upload_permission && props.selectFile)}
 						handleUpload={handleUpload}
+						mimeTypes={mimeTypes}
 						ref={uploaderRef}
 						settings={{csrf_token: csrfToken, base_url: baseUrl}}
 					>
