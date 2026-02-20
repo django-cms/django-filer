@@ -1,5 +1,5 @@
-from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist
-from django.db.models import QuerySet, Subquery
+from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist, PermissionDenied
+from django.db.models import BooleanField, QuerySet, Subquery, Value
 from django.forms.renderers import DjangoTemplates
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden
 from django.utils.decorators import method_decorator
@@ -13,6 +13,7 @@ from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel
 from finder.models.filetag import FileTag
+from finder.models.permission import AccessControlEntry, Privilege
 
 
 class FormRenderer(DjangoTemplates):
@@ -47,36 +48,48 @@ class BrowserView(View):
         except Exception as e:
             return HttpResponseBadRequest(str(e))
 
-    def _get_children(cls, ambit, open_folders, parent):
+    @classmethod
+    def _get_children(cls, ambit, can_view_subquery, open_folders, parent):
         children = []
-        for subfolder in parent.subfolders:
+        for subfolder in parent.subfolders.annotate(can_view=can_view_subquery).filter(can_view=True):
             child = subfolder.as_dict(ambit)
             if str(subfolder.id) in open_folders:
-                child.update(children=cls._get_children(ambit, open_folders, subfolder), is_open=True)
+                child.update(
+                    children=cls._get_children(ambit, can_view_subquery, open_folders, subfolder),
+                    is_open=True,
+                )
             else:
                 child.update(children=None, is_open=False)
             children.append(child)
         return children
+
+    @classmethod
+    def _get_can_view_subquery(cls, user):
+        if user.is_superuser:
+            return Value(True, output_field=BooleanField())
+        else:
+            return AccessControlEntry.objects.privilege_subquery_exists(user, Privilege.READ)
 
     @method_decorator(require_GET)
     def structure(self, request, slug=None):
         ambit = AmbitModel.objects.get(slug=slug)
         request.session.setdefault('finder.open_folders', [])
         request.session.setdefault('finder.last_folder', str(ambit.root_folder.id))
-        last_folder_id = request.session['finder.last_folder']
+        last_folder_id = request.GET.get('folder', request.session['finder.last_folder'])
         if is_open := ambit.root_folder.subfolders.exists():
             # direct children of the root folder are open regardless of the session variable `open_folders`.
             # in addition to that, also open all ancestors of the last opened folder
-            open_folders = set(request.session['finder.open_folders'])
+            open_folders = {last_folder_id, *request.session['finder.open_folders']}
             try:
                 ancestors = FolderModel.objects.get(id=last_folder_id).ancestors
             except FolderModel.DoesNotExist:
                 ancestors = []
+            can_view_subquery = self._get_can_view_subquery(request.user)
             if isinstance(ancestors, QuerySet):
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
             else:  # django-cte not installed
                 open_folders.update(str(ancestor.id) for ancestor in ancestors)
-            children = self._get_children(ambit, open_folders, ambit.root_folder)
+            children = self._get_children(ambit, can_view_subquery, open_folders, ambit.root_folder)
         else:
             children = None
         return {
@@ -91,8 +104,8 @@ class BrowserView(View):
                 {'value': id, 'label': label, 'color': color}
                 for id, label, color in FileTag.objects.values_list('id', 'label', 'color')
             ],
-            'last_folder': request.session['finder.last_folder'],
-            **self.list(request, request.session['finder.last_folder']),
+            'last_folder': last_folder_id,
+            **self.list(request, last_folder_id),
         }
 
     @method_decorator(require_GET)
@@ -104,14 +117,16 @@ class BrowserView(View):
         ambit = inode.folder.get_ambit()
         inode_id = str(inode_id)
         if inode.is_folder:
+            can_view_subquery = self._get_can_view_subquery(request.user)
             request.session.setdefault('finder.open_folders', [])
             if inode_id not in request.session['finder.open_folders']:
                 request.session['finder.open_folders'].append(inode_id)
                 request.session.modified = True
+            open_folders = request.session['finder.open_folders']
             return {
                 'id': inode_id,
                 'name': inode.name,
-                'children': self._get_children(ambit, request.session['finder.open_folders'], inode),
+                'children': self._get_children(ambit, can_view_subquery, open_folders, inode),
                 'is_open': True,
                 'has_subfolders': inode.subfolders.exists(),
             }
@@ -152,8 +167,12 @@ class BrowserView(View):
         request.session['finder.last_folder'] = str(folder_id)
         offset = int(request.GET.get('offset', 0))
         recursive = 'recursive' in request.GET
-        lookup = lookup_by_tag(request)
-        lookup['mime_types'] = request.GET.getlist('mimetypes')
+        lookup = {
+            **lookup_by_tag(request),
+            'user': request.user,
+            'can_view': True,
+            'mime_types': request.GET.getlist('mimetypes'),
+        }
         current_folder = FolderModel.objects.get(id=folder_id)
         if recursive:
             if isinstance(current_folder.descendants, QuerySet):
@@ -172,6 +191,7 @@ class BrowserView(View):
         annotate_unified_queryset(ambit, unified_queryset)
         return {
             'files': list(unified_queryset[offset:offset + self.limit]),
+            'has_upload_permission': current_folder.has_permission(request.user, Privilege.WRITE),
             'offset': next_offset,
             'recursive': recursive,
             'search_query': '',
@@ -220,6 +240,8 @@ class BrowserView(View):
             raise BadRequest("Bad form encoding or missing payload.")
         model = FileModel.objects.get_model_for(request.FILES['upload_file'].content_type)
         current_folder = FolderModel.objects.get(id=folder_id)
+        if not current_folder.has_permission(request.user, Privilege.WRITE):
+            raise PermissionDenied(f"Permission denied to upload file.")
         ambit = current_folder.get_ambit()
         file = model.objects.create_from_upload(
             ambit,

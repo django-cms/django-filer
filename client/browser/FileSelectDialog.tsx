@@ -70,7 +70,7 @@ function ScrollSpy(props) {
 }
 
 
-const FilesList = memo((props: any) => {
+const FilesList = memo(function FilesList(props: any) {
 	const {structure, setDirty, isDirty, selectFile, selectedFileId, webAudio} = props;
 
 	return (
@@ -89,17 +89,44 @@ const FilesList = memo((props: any) => {
 });
 
 
+interface FileStructure {
+	root_folder: object | null;
+	last_folder: string | null;
+	files: any[] | null;
+	has_upload_permission: boolean;
+	offset: number | null;
+	recursive: boolean;
+	search_query: string;
+	tags: any[];
+}
+
+
 const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwardedRef) {
-	const {ambit, baseUrl, mimeTypes, csrfToken, selectedFileId, selectedFolderId, dialogRef} = props;
-	const [structure, setStructure] = useState({
-		root_folder: null,
-		last_folder: null,
-		files: null,
-		offset: null,
-		recursive: false,
-		search_query: '',
-		tags: [],
+	const {ambit, baseUrl, mimeTypes, csrfToken, selectedFileId, dialogRef} = props;
+	const selectedFolderIdRef = useRef(props.selectedFolderId);
+	selectedFolderIdRef.current = props.selectedFolderId;
+	const structureRef = useRef<FileStructure>(null);
+	const [structure, setStructureState] = useState<FileStructure>(() => {
+		const initial: FileStructure = {
+			root_folder: null,
+			last_folder: null,
+			files: null,
+			has_upload_permission: false,
+			offset: null,
+			recursive: false,
+			search_query: '',
+			tags: [],
+		};
+		structureRef.current = initial;
+		return initial;
 	});
+	const setStructure = useCallback((update: FileStructure | ((prev: FileStructure) => FileStructure)) => {
+		setStructureState(prev => {
+			const next = typeof update === 'function' ? update(prev) : update;
+			structureRef.current = next;
+			return next;
+		});
+	}, []);
 	const [isDirty, setDirty] = useState(false);
 	const ref = useRef(null);
 	const uploaderRef = useRef(null);
@@ -149,74 +176,72 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 	}, [isDirty]);
 
 	function setCurrentFolderId(folderId){
-		setStructure({
-			...structure,
+		setStructure(prev => ({
+			...prev,
 			last_folder: folderId,
 			files: [],
 			offset: null,
 			recursive: false,
 			search_query: '',
-		});
+		}));
 		setDirty(true);
 		menuBarRef.current.clearSearch();
 	}
 
 	function refreshFilesList() {
-		setStructure({
-			...structure,
+		setStructure(prev => ({
+			...prev,
 			files: [],
 			offset: null,
-		});
+		}));
 		setDirty(true);
 	}
 
 	function changeSearchZone(value) {
 		if (value !== searchZone) {
 			setSearchZone(value);
-			setStructure({
-				...structure,
+			setStructure(prev => ({
+				...prev,
 				files: [],
 				offset: null,
-			});
+			}));
 			setDirty(true);
 		}
 	}
 
 	 function toggleRecursive(folderId: string) {
-		setStructure({
-			...structure,
+		setStructure(prev => ({
+			...prev,
 			last_folder: folderId,
 			files: [],
 			offset: null,
-			recursive: structure.recursive ? false : true,
-		});
+			recursive: !prev.recursive,
+		}));
 		setDirty(true);
 	}
 
 	function setSearchQuery(query) {
-		setStructure({
-			...structure,
+		setStructure(prev => ({
+			...prev,
 			files: [],
 			offset: null,
 			recursive: false,
 			search_query: query,
-		});
+		}));
 		setDirty(true);
 	}
 
 	async function initializeStructure() {
 		const params = new URLSearchParams();
-		if (selectedFolderId) {
-			params.append('folder', selectedFolderId);
-		}
-		if (selectedFileId) {
-			params.append('file', selectedFileId);
+		if (selectedFolderIdRef.current) {
+			params.append('folder', selectedFolderIdRef.current);
 		}
 		mimeTypes?.forEach(type => params.append('mimetypes', type));
 		setDirty(false);
 		const response = await fetch(`${baseUrl}structure/${ambit}${params.size === 0 ? '' : `?${params.toString()}`}`);
 		if (response.ok) {
-			setStructure(await response.json());
+			const body = await response.json();
+			setStructure(body);
 			window.setTimeout(() => {
 				// first show the structure from the root for orientation, then scroll to the current folder
 				const currentListItem = ref.current.querySelector('ul[role="navigation"] li:has(>[aria-current="true"])');
@@ -230,29 +255,32 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 	}
 
 	async function fetchFiles() {
+		const currentStructure = structureRef.current;
+
 		const fetchUrl = (() => {
 			const params = new URLSearchParams();
 			mimeTypes?.forEach(type => params.append('mimetypes', type));
-			if (structure.recursive) {
+			if (currentStructure.recursive) {
 				params.set('recursive', '');
 			}
-			if (structure.offset !== null) {
-				params.set('offset', String(structure.offset));
+			if (currentStructure.offset !== null) {
+				params.set('offset', String(currentStructure.offset));
 			}
-			if (structure.search_query) {
-				params.set('q', structure.search_query);
-				return `${baseUrl}${structure.last_folder}/search?${params.toString()}`;
+			if (currentStructure.search_query) {
+				params.set('q', currentStructure.search_query);
+				return `${baseUrl}${currentStructure.last_folder}/search?${params.toString()}`;
 			}
-			return `${baseUrl}${structure.last_folder}/list${params.size === 0 ? '' : `?${params.toString()}`}`;
+			return `${baseUrl}${currentStructure.last_folder}/list${params.size === 0 ? '' : `?${params.toString()}`}`;
 		})();
 		const response = await fetch(fetchUrl);
 		if (response.ok) {
 			const body = await response.json();
-			setStructure({
-				...structure,
-				files: structure.files.concat(body.files),
+			setStructure(prev => ({
+				...prev,
+				files: prev.files.concat(body.files),
+				has_upload_permission: body.has_upload_permission,
 				offset: body.offset,
-			});
+			}));
 			setDirty(false);
 		} else {
 			console.error(response);
@@ -260,7 +288,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 	}
 
 	function handleUpload(folderId, uploadedFiles) {
-		if (structure.last_folder !== folderId)
+		if (structureRef.current.last_folder !== folderId)
 			throw new Error('Folder mismatch');
 		setUploadedFile(uploadedFiles[0]);
 	}
@@ -278,10 +306,10 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 		if (props.selectFolder) {
 			props.selectFolder(folder);
 			dialogRef.current.close();
-		} else if (structure.last_folder !== folder.id) {
+		} else if (structureRef.current.last_folder !== folder.id) {
 			setCurrentFolderId(folder.id);
 		}
-	}, [structure.last_folder]);
+	}, []);
 
 	function scrollToCurrentFolder() {
 		if (currentFolderElement) {
@@ -327,6 +355,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 					setSearchQuery={setSearchQuery}
 					searchZone={searchZone}
 					setSearchZone={changeSearchZone}
+					hasUploadPermission={structure.has_upload_permission}
 					webAudio={webAudio}
 				/>
 				<div className="browser-body">
@@ -339,7 +368,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 								selectFolder={selectFolder}
 								selectedFolderId={props.selectedFolderId}
 								toggleRecursive={toggleRecursive}
-								refreshStructure={() => setStructure({...structure})}
+								refreshStructure={() => setStructure(prev => ({...prev}))}
 								isListed={structure.recursive ? false : null}
 								setCurrentFolderId={setCurrentFolderId}
 								setCurrentFolderElement={setCurrentFolderElement}
@@ -348,10 +377,12 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 					</nav>
 					<FileUploader
 						folderId={structure.last_folder}
+						disabled={!structure.has_upload_permission}
 						handleUpload={handleUpload}
 						ref={uploaderRef}
 						settings={{csrf_token: csrfToken, base_url: baseUrl}}
-					>{Array.isArray(structure.files) ?
+					>
+					{Array.isArray(structure.files) ?
 						<FilesList
 							structure={structure}
 							setDirty={setDirty}
