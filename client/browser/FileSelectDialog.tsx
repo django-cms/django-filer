@@ -40,10 +40,10 @@ function Figure(props) {
 	}, []);
 
 	return (
-		<figure className="figure">
+		<figure className="figure" aria-selected={props.isSelected}>
 			<FigBody {...props}>
 				<FileTags tags={props.tags}>
-					<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} aria-selected={props.isSelected} />
+					<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
 				</FileTags>
 			</FigBody>
 			<figcaption>

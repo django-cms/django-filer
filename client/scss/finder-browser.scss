@@ -215,13 +215,21 @@ dialog {
 						border-radius: 0.25rem;
 					}
 
-					img[aria-selected="true"] {
-						box-shadow: 0 0 0.5rem colors.$active-rectangle;
-						border: 1px solid colors.$active-rectangle;
+					&[aria-selected="false"] {
+						img:not([src$=".svg"]), video {
+							box-shadow: 0 0 0.5rem #808080;
+						}
 					}
 
-					img[aria-selected="false"]:not([src$=".svg"]), video {
-						box-shadow: 0 0 0.5rem #808080;
+					&[aria-selected="true"] {
+						img {
+							box-shadow: 0 0 1.5rem colors.$active-rectangle;
+							outline: 2px solid colors.$active-rectangle;
+						}
+
+						figcaption {
+							font-weight: bold;
+						}
 					}
 
 					figcaption {
