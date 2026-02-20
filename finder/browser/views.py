@@ -65,13 +65,13 @@ class BrowserView(View):
         request.session.setdefault('finder.last_folder', str(ambit.root_folder.id))
         last_folder_id = request.session['finder.last_folder']
         if is_open := ambit.root_folder.subfolders.exists():
-            # direct children of the root folder are open regardless of the `open_folders` session
+            # direct children of the root folder are open regardless of the session variable `open_folders`.
             # in addition to that, also open all ancestors of the last opened folder
             open_folders = set(request.session['finder.open_folders'])
             try:
                 ancestors = FolderModel.objects.get(id=last_folder_id).ancestors
             except FolderModel.DoesNotExist:
-                pass
+                ancestors = []
             if isinstance(ancestors, QuerySet):
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
             else:  # django-cte not installed
@@ -98,7 +98,7 @@ class BrowserView(View):
     @method_decorator(require_GET)
     def fetch(self, request, inode_id):
         """
-        Open the given folder and fetch children data for the folder.
+        Open the given folder and fetch children data for the given folder.
         """
         inode = FileModel.objects.get_inode(id=inode_id)
         ambit = inode.folder.get_ambit()
