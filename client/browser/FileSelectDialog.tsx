@@ -90,7 +90,7 @@ const FilesList = memo((props: any) => {
 
 
 const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwardedRef) {
-	const {ambit, baseUrl, selectedFolderId, selectedFileId, mimeTypes, csrfToken} = props;
+	const {ambit, baseUrl, mimeTypes, csrfToken, selectedFileId, selectedFolderId, dialogRef} = props;
 	const [structure, setStructure] = useState({
 		root_folder: null,
 		last_folder: null,
@@ -127,9 +127,23 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 	}, []);
 
 	useEffect(() => {
-		if (structure.root_folder === null) {
-			initializeStructure();
-		} else if (isDirty) {
+		if (!dialogRef.current)
+			return;
+
+		const observer = new MutationObserver((mutations) => {
+			for (const mutation of mutations) {
+				if (mutation.attributeName === 'open' && dialogRef.current.open && structure.root_folder === null) {
+					initializeStructure();
+				}
+			}
+		});
+		observer.observe(dialogRef.current, {attributes: true});
+
+		return () => observer.disconnect();
+	}, []);
+
+	useEffect(() => {
+		if (isDirty) {
 			fetchFiles();
 		}
 	}, [isDirty]);
@@ -256,14 +270,14 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 			props.selectFile(fileInfo);
 			setUploadedFile(null);
 			refreshFilesList();
-			props.dialogRef.current.close();
+			dialogRef.current.close();
 		}
 	}, []);
 
 	const selectFolder = useCallback(folder => {
 		if (props.selectFolder) {
 			props.selectFolder(folder);
-			props.dialogRef.current.close();
+			dialogRef.current.close();
 		} else if (structure.last_folder !== folder.id) {
 			setCurrentFolderId(folder.id);
 		}
@@ -293,7 +307,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 		}
 		setUploadedFile(null);
 		refreshFilesList();
-		props.dialogRef.current.close();
+		dialogRef.current.close();
 	}
 
 	return (<>
