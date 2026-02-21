@@ -9,7 +9,8 @@ from django.db.models.expressions import Value
 from django.db.models.fields import BooleanField
 from django.forms.widgets import Media
 from django.http.response import (
-    HttpResponse, HttpResponseNotAllowed, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotFound,
+    JsonResponse,
 )
 from django.urls import path, reverse
 from django.utils.translation import gettext
@@ -443,7 +444,8 @@ class FolderAdmin(InodeAdmin):
             return response
         body = json.loads(request.body)
         trash_folder = self.get_trash_folder(request)
-        assert trash_folder.id == trash_folder_id, "Trash folder ID mismatch."
+        if trash_folder.id != trash_folder_id:
+            return HttpResponseBadRequest(f"Trash folder with ID=“{trash_folder.id}” expected.")
         discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
         restored_inodes, restored_folders = [], {}
         with transaction.atomic():
@@ -494,7 +496,8 @@ class FolderAdmin(InodeAdmin):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         parent_folder = self.get_object(request, folder_id)
-        assert parent_folder.is_folder
+        if not parent_folder.has_permission(request.user, Privilege.WRITE):
+            return HttpResponseForbidden("Permission denied to create a new folder.")
         body = json.loads(request.body)
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
@@ -511,8 +514,9 @@ class FolderAdmin(InodeAdmin):
     def get_or_create_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        if not (parent_folder := self.get_object(request, folder_id)):
-            return HttpResponseNotFound(f"Folder with id={folder_id} not found.")
+        parent_folder = self.get_object(request, folder_id)
+        if not parent_folder.has_permission(request.user, Privilege.WRITE):
+            return HttpResponseForbidden("Permission denied to create a folder through recursive upload.")
         ambit = parent_folder.get_ambit()
         ordering = parent_folder.get_max_ordering() + 1
         body = json.loads(request.body)
