@@ -356,7 +356,7 @@ const FileSelectDialog = forwardRef(function FileSelectDialog(props: any, forwar
 					setSearchQuery={setSearchQuery}
 					searchZone={searchZone}
 					setSearchZone={changeSearchZone}
-					hasUploadPermission={structure.has_upload_permission && props.selectFile}
+					fileUploadDisabled={!(structure.has_upload_permission && props.selectFile)}
 					webAudio={webAudio}
 				/>
 				<div className="browser-body">

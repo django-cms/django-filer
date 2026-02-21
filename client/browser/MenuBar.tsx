@@ -9,7 +9,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "../common/Tooltip";
 
 
 const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
-	const {openUploader, tags, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone, hasUploadPermission, webAudio} = props;
+	const {openUploader, tags, refreshFilesList, setDirty, setSearchQuery, searchZone, setSearchZone, fileUploadDisabled, webAudio} = props;
 	const ref = useRef(null);
 	const searchRef = useRef(null);
 
@@ -83,7 +83,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			<VolumeControl webAudio={webAudio} />
 			<SortingOptions refreshFilesList={refreshFilesList} root={rootNode} />
 			{tags && <FilterByTag refreshFilesList={refreshFilesList} tags={tags} root={rootNode} />}
-			{hasUploadPermission && <Tooltip>
+			{!fileUploadDisabled && <Tooltip>
 				<TooltipTrigger>
 					<li role="menuitem" onClick={openUploader}>
 						<UploadIcon/>
