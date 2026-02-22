@@ -240,10 +240,45 @@ def test_update_inode_update_with_missing_file(update_inode_url, admin_client, m
     assert response.status_code == 404
 
 
-def test_create_sub_folder(admin_client, ambit):
+class AccessControl(Enum):
+    ALLOW = auto()
+    SOURCE_DENIED = auto()
+    TARGET_DENIED = auto()
+
+
+@pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
+def principal_kwargs(admin_user, request):
+    if request.param == 'superuser':
+        return
+    admin_user.is_superuser = False
+    admin_user.save(update_fields=['is_superuser'])
+    if request.param == 'user':
+        return {'user': admin_user, 'privilege': Privilege.READ_WRITE}
+    if request.param == 'group':
+        group = admin_user.groups.create(name='Test Group')
+        admin_user.groups.add(group)
+        return {'group': group, 'privilege': Privilege.READ_WRITE}
+    if request.param == 'everyone':
+        return {'privilege': Privilege.READ_WRITE}
+
+
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
+def test_create_sub_folder(admin_client, admin_user, ambit, access_control, principal_kwargs):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    if admin_user.is_superuser is False:
+        AccessControlEntry.objects.all().delete()
+        if access_control == AccessControl.ALLOW:
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+        else:
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+
     response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
-    assert response.status_code == 200
+    if admin_user.is_superuser or access_control == AccessControl.ALLOW:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+        return
     new_folder = response.json()['new_folder']
     assert new_folder['name'] == "Sub Folder"
     sub_folder = FolderModel.objects.get(id=new_folder['id'])
@@ -342,29 +377,6 @@ def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_
     assert response.status_code == 404
     uploaded_file.refresh_from_db()
     assert uploaded_file.parent == ambit.root_folder
-
-
-class AccessControl(Enum):
-    ALLOW = auto()
-    SOURCE_DENIED = auto()
-    TARGET_DENIED = auto()
-    # PARTIAL_DENIED = auto()
-
-
-@pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
-def principal_kwargs(admin_user, request):
-    if request.param == 'superuser':
-        return
-    admin_user.is_superuser = False
-    admin_user.save(update_fields=['is_superuser'])
-    if request.param == 'user':
-        return {'user': admin_user, 'privilege': Privilege.READ_WRITE}
-    if request.param == 'group':
-        group = admin_user.groups.create(name='Test Group')
-        admin_user.groups.add(group)
-        return {'group': group, 'privilege': Privilege.READ_WRITE}
-    if request.param == 'everyone':
-        return {'privilege': Privilege.READ_WRITE}
 
 
 @pytest.mark.parametrize('access_control', AccessControl)
@@ -768,47 +780,3 @@ def test_erase_trash_folder(admin_client, admin_user, ambit, sub_folder):
     assert DiscardedInode.objects.filter(inode=discarded_inode.id).exists() is False
     assert FileModel.objects.filter(id=discarded_inode.id).exists() is False
     assert not ambit.original_storage.exists(discarded_inode.file_path)
-
-#     ambit = sub_folder.get_ambit()
-#
-#     # Create and delete an inode
-#     deletable_file = FileModel.objects.create(
-#         parent=sub_folder,
-#         name="conflicting_file.txt",
-#         file_size=uploaded_file.file_size,
-#         sha1=uploaded_file.sha1,
-#         owner=admin_user,
-#     )
-#
-#     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
-#     response = admin_client.post(
-#         f'{admin_url}/delete',
-#         json.dumps({'inode_ids': [str(deletable_file.id)]}),
-#         content_type='application/json',
-#     )
-#     assert response.status_code == 200
-#
-#     # Create a file with the same name in the original folder
-#     FileModel.objects.create(
-#         parent=sub_folder,
-#         name="conflicting_file.txt",
-#         file_size=uploaded_file.file_size,
-#         sha1=uploaded_file.sha1,
-#         owner=admin_user,
-#     )
-#
-#     # Restore the deleted file
-#     trash_folder = ambit.trash_folders.get(owner=admin_user)
-#     trash_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
-#     restore_response = admin_client.post(
-#         f'{trash_url}/undo_discard',
-#         json.dumps({'inode_ids': [str(deletable_file.id)]}),
-#         content_type='application/json',
-#     )
-#     assert restore_response.status_code == 204
-#
-#     # Verify the restored file has a renamed name to avoid conflict
-#     restored_inode = sub_folder.listdir(id=str(deletable_file.id)).first()
-#     assert restored_inode is not None
-#     assert restored_inode['name'] == "conflicting_file.txt.renamed"
-#     assert restored_inode['parent'] == str(sub_folder.id)

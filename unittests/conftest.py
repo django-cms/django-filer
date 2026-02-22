@@ -53,7 +53,7 @@ def ambit(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command(
             'finder',
-            'add-root',
+            'add-ambit',
             'test-ambit',
             '--values',
             'name=Root Folder',
