@@ -1,4 +1,4 @@
-import React, {lazy, Suspense, useContext, useEffect, useMemo, useState} from 'react';
+import React, {lazy, memo, Suspense, useContext, useEffect, useMemo, useState} from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import FinderSettings from './FinderSettings';
 import DroppableArea from './DroppableArea';
@@ -264,7 +264,7 @@ export function ListItem(props) {
 }
 
 
-export function File(props) {
+export const File = memo(function File(props: any) {
 	return (
 		<DraggableItem {...props}>
 			<div className="inode">
@@ -272,10 +272,10 @@ export function File(props) {
 			</div>
 		</DraggableItem>
 	);
-}
+});
 
 
-export function Folder(props) {
+export const Folder = memo(function Folder(props: any) {
 	const {
 		isOver,
 		active,
@@ -306,4 +306,4 @@ export function Folder(props) {
 			</div>
 		</DraggableItem>
 	);
-}
+});

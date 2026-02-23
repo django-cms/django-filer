@@ -1,6 +1,7 @@
 import React, {
 	createRef,
 	forwardRef,
+	useCallback,
 	useEffect,
 	useImperativeHandle,
 	useState,
@@ -79,7 +80,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		}
 	}
 
-	function selectInode(event: PointerEvent, inode) {
+	const selectInode = useCallback(function selectInode(event: PointerEvent, inode) {
 		if (inode.disabled)
 			return;
 		let modifier, selectedIndex = -1;
@@ -131,9 +132,9 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		setCurrentFolder(folderId);
 		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
 		setSelectedIndex(selectedIndex);
-	}
+	}, [inodes]);
 
-	function selectMultipleInodes(selectedInodeIds: Array<string>, extend: boolean = false) {
+	const selectMultipleInodes = useCallback(function selectMultipleInodes(selectedInodeIds: Array<string>, extend: boolean = false) {
 		if (selectedInodeIds.length) {
 			clearClipboard();
 			const modifiedInodes = inodes.map(inode => ({
@@ -144,13 +145,16 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 			setInodes(modifiedInodes);
 			menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
 		}
-	}
+	}, [inodes]);
 
-	function deselectInodes() {
-		if (inodes.find(inode => inode.selected || inode.dragged)) {
-			setInodes(inodes.map(inode => ({...inode, selected: false, dragged: false})));
-		}
-	}
+	const deselectInodes = useCallback(function deselectInodes() {
+		setInodes(prevInodes => {
+			if (prevInodes.find(inode => inode.selected || inode.dragged)) {
+				return prevInodes.map(inode => ({...inode, selected: false, dragged: false}));
+			}
+			return prevInodes;
+		});
+	}, []);
 
 	function cssClasses() {
 		const classes = ['inode-list'];
