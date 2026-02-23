@@ -463,6 +463,7 @@ class FolderAdmin(InodeAdmin):
                     restored_folders[previous_parent.id] = previous_parent.get_max_ordering() + 1
                 inode.ordering = restored_folders[previous_parent.id]
                 inode.parent = previous_parent
+                inode.transfer_access_control_list(previous_parent)
                 restored_inodes.append(inode)
             for model in InodeModel.get_models(include_folder=True):
                 model.objects.bulk_update(
