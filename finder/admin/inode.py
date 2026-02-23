@@ -19,7 +19,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse_lazy
 from django.utils.translation import gettext
 
-from finder.lookups import annotate_unified_queryset, lookup_by_tag, sort_by_attribute
+from finder.lookups import annotate_unified_queryset, sort_by_attribute
 from finder.models.folder import FolderModel, PinnedFolder
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry, Privilege
 
@@ -221,7 +221,6 @@ class InodeAdmin(admin.ModelAdmin):
         """
         Return a serialized list of files and folder for the given folder.
         """
-        lookup = dict(lookup_by_tag(request), user=request.user, has_read_permission=True, **lookup)
         unified_queryset = FolderModel.objects.filter_unified(**lookup)
         unified_queryset = sort_by_attribute(request, unified_queryset)
         self.annotate_unified_queryset(request._ambit, unified_queryset)

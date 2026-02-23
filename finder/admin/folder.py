@@ -17,6 +17,7 @@ from django.utils.translation import gettext
 from django.utils.html import format_html
 
 from finder.admin.inode import InodeAdmin
+from finder.lookups import lookup_by_read_permission, lookup_by_tag
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel, PinnedFolder
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
@@ -202,10 +203,13 @@ class FolderAdmin(InodeAdmin):
             request._ambit = current_folder.get_ambit()
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
+        lookup = {}
+        if not current_folder.is_trash:
+            lookup.update(**lookup_by_tag(request), **lookup_by_read_permission(request))
         if search_query := request.GET.get('q'):
-            inode_qs = self.search_for_inodes(request, current_folder, search_query)
+            inode_qs = self.search_for_inodes(request, current_folder, search_query, **lookup)
         else:
-            inode_qs = self.get_inodes(request, parent=current_folder)
+            inode_qs = self.get_inodes(request, parent=current_folder, **lookup)
         return JsonResponse({
             'inodes': list(inode_qs),
         })
@@ -300,8 +304,9 @@ class FolderAdmin(InodeAdmin):
                 return HttpResponse(str(exc), status=409)
             except PermissionDenied as exc:
                 return HttpResponseForbidden(str(exc))
+        lookup = lookup_by_read_permission(request)
         return JsonResponse({
-            'inodes': list(self.get_inodes(request, parent=current_folder)),
+            'inodes': list(self.get_inodes(request, parent=current_folder, **lookup)),
         })
 
     def move_inodes(self, request, folder_id):
@@ -330,8 +335,9 @@ class FolderAdmin(InodeAdmin):
         except PermissionDenied as exc:
             return HttpResponseForbidden(str(exc))
         else:
+            lookup = lookup_by_read_permission(request)
             return JsonResponse({
-                'inodes': list(self.get_inodes(request, parent=target_folder)),
+                'inodes': list(self.get_inodes(request, parent=target_folder, **lookup)),
             })
 
     def reorder_inodes(self, request, folder_id):
@@ -354,8 +360,9 @@ class FolderAdmin(InodeAdmin):
             inode_ids = [id for id in inode_ids if id in reorderable_inode_ids]  # preserve the order of inode_ids
         with transaction.atomic():
             target_inode.parent.reorder(target_inode.id, inode_ids, insert_after)
+        lookup = {**lookup_by_tag(request), **lookup_by_read_permission(request)}
         return JsonResponse({
-            'inodes': list(self.get_inodes(request, parent=target_inode.parent)),
+            'inodes': list(self.get_inodes(request, parent=target_inode.parent, **lookup)),
         })
 
     def delete_inodes(self, request, folder_id):

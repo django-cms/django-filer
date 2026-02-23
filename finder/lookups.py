@@ -38,6 +38,10 @@ def lookup_by_tag(request):
     return lookup
 
 
+def lookup_by_read_permission(request):
+    return {'user': request.user, 'has_read_permission': True}
+
+
 def sort_by_attribute(request, unified_queryset):
     sorting_map = {
         'name_asc': 'name_lower',
