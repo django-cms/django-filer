@@ -384,6 +384,7 @@ class FolderAdmin(InodeAdmin):
 
         deleted_inodes = []
         trash_ordering = trash_folder.get_max_ordering()
+        default_access_control_list = [ace.as_dict for ace in trash_folder.default_access_control_list.all()]
         inode_ids = body.get('inode_ids', [])
         with transaction.atomic():
             for entry in FolderModel.objects.filter_unified(user=user, has_write_permission=True, id__in=inode_ids):
@@ -405,9 +406,9 @@ class FolderAdmin(InodeAdmin):
                     filter(lambda obj: isinstance(obj, model), deleted_inodes),
                     ['name', 'ordering', 'parent'] if model.is_folder else ['ordering', 'parent'],
                 )
-            AccessControlEntry.objects.filter(inode__in=[d.id for d in deleted_inodes]).delete()
+            for inode in deleted_inodes:
+                inode.update_access_control_list(default_access_control_list)
             current_folder.reorder()
-
         return JsonResponse({
             'favorite_folders': self.get_favorite_folders(request, current_folder),
         })

@@ -22,6 +22,7 @@ class FolderModelManager(InodeManagerMixin, models.Manager):
         except FolderModel.DoesNotExist:
             trash_folder = self.create(parent=None, owner=owner, name=TRASH_FOLDER_NAME)
             ambit.trash_folders.add(trash_folder)
+            DefaultACE.objects.create(folder=trash_folder, user=owner, privilege=Privilege.READ_WRITE)
         return trash_folder
 
 
