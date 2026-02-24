@@ -397,15 +397,6 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
         current_acl_qs.exclude(id__in=entry_ids).delete()
 
-    def transfer_access_control_list(self, parent_folder):
-        """
-        Transfer the default access control list from the given folder to this inode.
-        """
-        AccessControlEntry.objects.bulk_create([
-            AccessControlEntry(inode=self.id, user=ace.user, group=ace.group, privilege=ace.privilege)
-            for ace in parent_folder.default_access_control_list.all()
-        ])
-
 
 class DiscardedInode(models.Model):
     """

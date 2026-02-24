@@ -357,6 +357,9 @@ class FolderModel(InodeModel):
         else:
             return self
 
+    def get_default_access_control_list(self):
+        return [ace.as_dict for ace in self.default_access_control_list.all()]
+
     def update_default_access_control_list(self, next_acl):
         default_acl_qs = self.default_access_control_list.all()
         entry_ids, update_entries, create_entries = [], [], []
@@ -383,12 +386,17 @@ class FolderModel(InodeModel):
         entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
         default_acl_qs.exclude(id__in=entry_ids).delete()
 
-    def transfer_access_control_list(self, parent_folder):
-        super().transfer_access_control_list(parent_folder)
-        DefaultACE.objects.bulk_create([
-            DefaultACE(folder=self, user=a.user, group=a.group, privilege=a.privilege)
-            for a in parent_folder.default_access_control_list.all()
-        ])
+    def update_access_control_list(self, next_acl):
+        """
+        Update the access control list of the current folder and all its descendant folders to the given ACL.
+        Also update the default access control list of the current folder to the given ACL.
+        """
+
+        super().update_access_control_list(next_acl)
+        self.update_default_access_control_list(next_acl)
+        for entry in self.listdir():
+             proxy_obj = InodeManager.get_proxy_object(entry)
+             proxy_obj.update_access_control_list(next_acl)
 
 
 class PinnedFolder(models.Model):

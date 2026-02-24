@@ -481,7 +481,7 @@ class FolderAdmin(InodeAdmin):
                     restored_folders[previous_parent.id] = previous_parent.get_max_ordering() + 1
                 inode.ordering = restored_folders[previous_parent.id]
                 inode.parent = previous_parent
-                inode.transfer_access_control_list(previous_parent)
+                inode.update_access_control_list(previous_parent.get_default_access_control_list())
                 restored_inodes.append(inode)
             for model in InodeModel.get_models(include_folder=True):
                 model.objects.bulk_update(
@@ -527,7 +527,7 @@ class FolderAdmin(InodeAdmin):
             owner=request.user,
             ordering=parent_folder.get_max_ordering() + 1,
         )
-        new_folder.transfer_access_control_list(parent_folder)
+        new_folder.update_access_control_list(parent_folder.get_default_access_control_list())
         return JsonResponse({'new_folder': self.serialize_inode(request._ambit, new_folder)})
 
     def get_or_create_folder(self, request, folder_id):
@@ -536,8 +536,10 @@ class FolderAdmin(InodeAdmin):
         parent_folder = self.get_object(request, folder_id)
         if not parent_folder.has_permission(request.user, Privilege.WRITE):
             return HttpResponseForbidden("Permission denied to create a folder through recursive upload.")
+
         ambit = parent_folder.get_ambit()
         ordering = parent_folder.get_max_ordering() + 1
+        default_acl = parent_folder.get_default_access_control_list()
         body = json.loads(request.body)
         for folder_name in body['relative_path'].split('/'):
             folder, created = FolderModel.objects.get_or_create(
@@ -547,5 +549,6 @@ class FolderAdmin(InodeAdmin):
             )
             if created:
                 ordering += 1
-                folder.transfer_access_control_list(parent_folder)
+                folder.update_access_control_list(default_acl)
+            parent_folder = folder
         return JsonResponse({'folder': self.serialize_inode(ambit, folder)})

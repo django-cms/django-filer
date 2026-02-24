@@ -7,6 +7,7 @@ from pathlib import Path
 
 from django.contrib import admin
 from django.core.files.temp import NamedTemporaryFile
+from django.db import transaction
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.urls import path
 from django.utils.translation import gettext
@@ -113,54 +114,55 @@ class ArchiveAdmin(FileAdmin):
             archive_name = archive_name.stem
         else:
             archive_name = str(archive_name)
-        if FolderModel.objects.filter(
-            name=archive_name,
-            parent=zip_file_obj.folder,
-        ).exists():
-            msg = gettext("Can not extract archive. A folder named “{name}” already exists.")
+        parent_folder = zip_file_obj.folder
+        if FolderModel.objects.filter(name=archive_name, parent=parent_folder).exists():
+            msg = gettext("Cannot extract archive. A folder named “{name}” already exists.")
             return HttpResponseBadRequest(msg.format(name=archive_name), status=409)
 
-        ambit = zip_file_obj.folder.get_ambit()
-        try:
-            folder_obj = FolderModel.objects.create(
-                name=archive_name,
-                parent=zip_file_obj.folder,
-                owner=request.user,
-            )
-            with zipfile.ZipFile(ambit.original_storage.open(zip_file_obj.file_path)) as zip_ref:
-                for ordering, zip_info in enumerate(zip_ref.infolist(), 1):
-                    parts = zip_info.filename.split('/')
-                    if zip_info.is_dir():
-                        assert parts.pop() == ''
-                        FolderModel.objects.create(
-                            name=parts[-1],
+        ambit = parent_folder.get_ambit()
+        default_acl = parent_folder.get_default_access_control_list()
+        with transaction.atomic():
+            try:
+                folder_obj = FolderModel.objects.create(
+                    name=archive_name,
+                    parent=parent_folder,
+                    owner=request.user,
+                )
+                folder_obj.update_access_control_list(default_acl)
+                with zipfile.ZipFile(ambit.original_storage.open(zip_file_obj.file_path)) as zip_ref:
+                    for ordering, zip_info in enumerate(zip_ref.infolist(), 1):
+                        parts = zip_info.filename.split('/')
+                        if zip_info.is_dir():
+                            assert parts.pop() == ''
+                            FolderModel.objects.create(
+                                name=parts[-1],
+                                parent=folder_obj.retrieve(parts[:-1]),
+                                owner=request.user,
+                                ordering=ordering,
+                            )
+                            continue
+                        filename = parts[-1]
+                        mime_type, _ = mimetypes.guess_type(filename)
+                        mime_type = mime_type or 'application/octet-stream'
+                        proxy_model = FileModel.objects.get_model_for(mime_type)
+                        extracted_file_obj = proxy_model.objects.create(
+                            name=filename,
                             parent=folder_obj.retrieve(parts[:-1]),
-                            owner=request.user,
+                            file_name=ambit.original_storage.generate_filename(filename),
+                            mime_type=mime_type,
+                            file_size=zip_info.file_size,
                             ordering=ordering,
                         )
-                        continue
-                    filename = parts[-1]
-                    mime_type, _ = mimetypes.guess_type(filename)
-                    mime_type = mime_type or 'application/octet-stream'
-                    proxy_model = FileModel.objects.get_model_for(mime_type)
-                    extracted_file_obj = proxy_model.objects.create(
-                        name=filename,
-                        parent=folder_obj.retrieve(parts[:-1]),
-                        file_name=ambit.original_storage.generate_filename(filename),
-                        mime_type=mime_type,
-                        file_size=zip_info.file_size,
-                        ordering=ordering,
-                    )
-                    sha1 = hashlib.sha1()
-                    with zip_ref.open(zip_info.filename) as zip_entry:
-                        ambit.original_storage.save(extracted_file_obj.file_path, zip_entry)
-                        zip_entry.seek(0)
-                        sha1.update(zip_entry.read())
-                    extracted_file_obj.sha1 = sha1.hexdigest()
-                    extracted_file_obj.save(update_fields=['sha1'])
-        except Exception as exc:
-            msg = gettext("Failed to extract archive “{name}”. Reason: {error}.")
-            return HttpResponseBadRequest(msg.format(name={zip_file_obj.name}, error=str(exc)), status=415)
+                        sha1 = hashlib.sha1()
+                        with zip_ref.open(zip_info.filename) as zip_entry:
+                            ambit.original_storage.save(extracted_file_obj.file_path, zip_entry)
+                            zip_entry.seek(0)
+                            sha1.update(zip_entry.read())
+                        extracted_file_obj.sha1 = sha1.hexdigest()
+                        extracted_file_obj.save(update_fields=['sha1'])
+            except Exception as exc:
+                msg = gettext("Failed to extract archive “{name}”. Reason: {error}.")
+                return HttpResponseBadRequest(msg.format(name={zip_file_obj.name}, error=str(exc)), status=415)
         msg = gettext("Successfully extracted ZIP archive “{name}” to folder “{folder}”.")
         return HttpResponse(msg.format(name=zip_file_obj.name, folder=archive_name))
 
