@@ -97,9 +97,9 @@ class InodeMetaModel(models.base.ModelBase):
                 yield model
 
 
-class InodeManagerMixin:
+class InodeManager(models.Manager):
     """
-    Mixin class to be added to managers for models ineriting from `Inode`.
+    Model manager for models ineriting from `Inode`.
     """
 
     def get_query(self, model, **lookup):
@@ -136,6 +136,9 @@ class InodeManagerMixin:
             query &= Q(tags__in=tags)
 
         return query
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('parent')
 
     def filter_unified(self, **lookup):
         """
@@ -243,12 +246,6 @@ class InodeManagerMixin:
         model = FolderModel if entry['is_folder'] else FileModel.objects.get_model_for(entry['mime_type'])
         field_names = [field.name for field in model._meta.get_fields() if not field.is_relation]
         return model(**{field: entry[field] for field in field_names})
-
-
-class InodeManager(InodeManagerMixin, models.Manager):
-    def get_queryset(self):
-        queryset = super().get_queryset().select_related('parent')
-        return queryset.filter(self.model.mime_types_query())
 
 
 def filename_validator(value):
@@ -405,8 +402,8 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         Transfer the default access control list from the given folder to this inode.
         """
         AccessControlEntry.objects.bulk_create([
-            AccessControlEntry(inode=self.id, user=a.user, group=a.group, privilege=a.privilege)
-            for a in parent_folder.default_access_control_list.all()
+            AccessControlEntry(inode=self.id, user=ace.user, group=ace.group, privilege=ace.privilege)
+            for ace in parent_folder.default_access_control_list.all()
         ])
 
 

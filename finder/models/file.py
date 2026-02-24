@@ -70,7 +70,7 @@ class FileModelManager(InodeManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.prefetch_related('tags')
+        queryset = queryset.filter(self.model.mime_types_query()).prefetch_related('tags')
         return queryset
 
 

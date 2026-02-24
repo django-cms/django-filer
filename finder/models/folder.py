@@ -8,14 +8,15 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
 from finder.models.ambit import AmbitModel
-from finder.models.inode import DiscardedInode, InodeManager, InodeManagerMixin, InodeModel
+from finder.models.inode import DiscardedInode, InodeManager, InodeModel
 from finder.models.permission import DefaultAccessControlEntry as DefaultACE, Privilege
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
 
 
-class FolderModelManager(InodeManagerMixin, models.Manager):
+class FolderModelManager(InodeManager):
+
     def get_trash_folder(self, ambit, owner):
         try:
             trash_folder = ambit.trash_folders.get(owner=owner)
@@ -350,7 +351,7 @@ class FolderModel(InodeModel):
             path = path.split('/')
         for part in path:
             if entry := self.listdir(name=part).first():
-                proxy_obj = InodeManagerMixin.get_proxy_object(entry)
+                proxy_obj = InodeManager.get_proxy_object(entry)
                 return proxy_obj.retrieve(path[1:])
             return None
         else:
