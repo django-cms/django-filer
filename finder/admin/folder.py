@@ -207,9 +207,9 @@ class FolderAdmin(InodeAdmin):
             request._ambit = current_folder.get_ambit()
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
-        lookup = {}
+        lookup = lookup_by_read_permission(request)
         if not current_folder.is_trash:
-            lookup.update(**lookup_by_tag(request), **lookup_by_read_permission(request))
+            lookup.update(lookup_by_tag(request))
         if search_query := request.GET.get('q'):
             inode_qs = self.search_for_inodes(request, current_folder, search_query, **lookup)
         else:
