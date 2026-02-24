@@ -302,8 +302,6 @@ class InodeAdmin(admin.ModelAdmin):
             'csrf_token': get_token(request),
             'parent_id': inode.parent_id,
             'parent_url': parent_url,
-            'is_admin': inode.has_permission(request.user, Privilege.ADMIN),
-            'can_change': inode.has_permission(request.user, Privilege.WRITE),
         }
 
     def get_folderitem_settings(self, request, inode):

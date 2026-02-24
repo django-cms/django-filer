@@ -6,11 +6,12 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from finder.admin.inode import InodeAdmin
 from finder.forms.file import FileForm
 from finder.models.file import FileModel
 from finder.models.inode import InodeModel
 from finder.models.filetag import FileTag
-from finder.admin.inode import InodeAdmin
+from finder.models.permission import Privilege
 
 
 @admin.register(FileModel)
@@ -120,6 +121,8 @@ class FileAdmin(InodeAdmin):
             'base_url': reverse('admin:finder_filemodel_changelist', current_app=self.admin_site.name),
             'download_url': inode.get_download_url(ambit),
             'thumbnail_url': inode.get_thumbnail_url(ambit),
+            'is_admin': inode.has_permission(request.user, Privilege.ADMIN),
+            'can_change': inode.has_permission(request.user, Privilege.WRITE),
             'file_id': inode.id,
             'filename': inode.file_name,
             'file_mime_type': inode.mime_type,

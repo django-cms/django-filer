@@ -123,10 +123,28 @@ class FolderAdmin(InodeAdmin):
         ambit = request._ambit
         if inode.id != trash_folder.id:
             folder_url = self.get_inode_url(ambit.slug, str(inode.folder.id))
+            if isinstance(inode.ancestors, QuerySet):
+                if request.user.is_superuser:
+                    can_change = Value(True, output_field=BooleanField())
+                    can_view = Value(True, output_field=BooleanField())
+                else:
+                    can_change = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.WRITE)
+                    can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
+                values = 'id', 'can_change', 'can_view'
+                ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
+            else:
+                ancestors = [
+                    {
+                        'id': ancestor.id,
+                        'can_change': ancestor.has_permission(request.user, Privilege.WRITE),
+                        'can_view': ancestor.has_permission(request.user, Privilege.READ),
+                    } for ancestor in inode.ancestors
+                ]
             settings.update(
                 is_root=inode.is_root,
                 is_trash=False,
-                folder_url=folder_url,
+                is_admin=inode.has_permission(request.user, Privilege.ADMIN),
+                can_change=inode.has_permission(request.user, Privilege.WRITE),
             )
             if FileTag.objects.exists():
                 settings['tags'] = [
@@ -134,34 +152,20 @@ class FolderAdmin(InodeAdmin):
                     for id, label, color in FileTag.objects.filter(ambit=ambit).values_list('id', 'label', 'color')
                 ]
             request.session['finder_last_folder_id'] = str(inode.id)
-        else:
+        else:  # editor settings for the trash folder
             folder_url = self.get_inode_url(ambit.slug, str(self.get_fallback_folder(request).id))
+            ancestors = [{'id': trash_folder.id, 'can_change': True, 'can_view': True}]
             settings.update(
                 is_root=False,
                 is_trash=True,
-                folder_url=folder_url,
+                is_admin=False,
+                can_change=True,
             )
-        if isinstance(inode.ancestors, QuerySet):
-            if request.user.is_superuser:
-                can_change = Value(True, output_field=BooleanField())
-                can_view = Value(True, output_field=BooleanField())
-            else:
-                can_change = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.WRITE)
-                can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
-            values = 'id', 'can_change', 'can_view'
-            ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
-        else:
-            ancestors = [
-                {
-                    'id': ancestor.id,
-                    'can_change': ancestor.has_permission(request.user, Privilege.WRITE),
-                    'can_view': ancestor.has_permission(request.user, Privilege.READ),
-                } for ancestor in inode.ancestors
-            ]
         settings.update(
             base_url=reverse('admin:finder_foldermodel_changelist', current_app=self.admin_site.name),
-            ancestors=ancestors,
             menu_extensions=self.get_menu_extension_settings(request),
+            folder_url=folder_url,
+            ancestors=ancestors,
             open_folder_icon_url=staticfiles_storage.url('finder/icons/folder-open.svg'),
         )
         return settings
