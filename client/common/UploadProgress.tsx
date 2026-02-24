@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
+// Module-level cache: ensures getOrCreateFolder runs only once per distinct slicedPath
+const folderPromises = new Map<string, Promise<any>>();
 
 export function ProgressOverlay(props) {
 	return (
@@ -20,19 +22,21 @@ export function ProgressOverlay(props) {
 export function ProgressBar(props) {
 	const {file, settings, targetId} = props;
 	const [complete, setComplete] = useState(0);
+	const relativePath = file.webkitRelativePath ?? file.mozRelativePath ?? file.relativePath;
+	const slicedPath = typeof relativePath === 'string' ? relativePath.slice(0, relativePath.lastIndexOf('/')) : '';
 
 	useEffect(() => {
+		const request = new XMLHttpRequest();
+
 		(async () => {
 			let uploadFilesURL = `${settings.base_url}${targetId}/upload`;
-			let relativePath = file.webkitRelativePath ?? file.mozRelativePath ?? file.relativePath;
-			if (typeof relativePath === 'string') {
-				relativePath = relativePath.slice(0, relativePath.lastIndexOf('/'));
-				if (relativePath.length > 0) {
-					const folder = await getOrCreateFolder(relativePath);
-					uploadFilesURL = `${settings.base_url}${folder.id}/upload`;
+			if (slicedPath.length > 0) {
+				if (!folderPromises.has(slicedPath)) {
+					folderPromises.set(slicedPath, getOrCreateFolder(slicedPath));
 				}
+				const folder = await folderPromises.get(slicedPath);
+				uploadFilesURL = `${settings.base_url}${folder.id}/upload`;
 			}
-			const request = new XMLHttpRequest();
 			request.addEventListener('loadstart', transferStart);
 			request.upload.addEventListener('progress', transferProgress, false);
 			request.addEventListener('loadend', transferComplete);
@@ -42,13 +46,13 @@ export function ProgressBar(props) {
 			const body = new FormData();
 			body.append('upload_file', file);
 			request.send(body);
-
-			return () => {
-				request.removeEventListener('loadstart', transferStart);
-				request.removeEventListener('progress', transferProgress);
-				request.removeEventListener('loadend', transferComplete);
-			};
 		})();
+
+		return () => {
+			request.removeEventListener('loadstart', transferStart);
+			request.upload.removeEventListener('progress', transferProgress);
+			request.removeEventListener('loadend', transferComplete);
+		};
 	}, [file]);
 
 	async function getOrCreateFolder(relativePath: string) {
