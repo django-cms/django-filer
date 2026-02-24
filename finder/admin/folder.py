@@ -322,8 +322,12 @@ class FolderAdmin(InodeAdmin):
             if body['target_id'] == 'parent':
                 target_folder = current_folder.parent
             else:
+                if body['target_id'] == 'return':
+                    target_id = request.session.get('finder_last_folder_id')
+                else:
+                    target_id = body['target_id']
                 try:
-                    target_folder = self.get_object(request, body['target_id'])
+                    target_folder = self.get_object(request, target_id)
                 except FolderModel.DoesNotExist:
                     target_folder = None
             if not target_folder:
@@ -377,9 +381,9 @@ class FolderAdmin(InodeAdmin):
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
-            return HttpResponse("Cannot move inodes from trash folder into itself.", status=409)
+            return HttpResponse("Cannot move inodes from the trash folder into itself.", status=409)
         if not current_folder.has_permission(user, Privilege.WRITE):
-            msg = gettext("You do not have permission to delete items from folder “{folder}”.")
+            msg = gettext("You do not have permission to delete items from a folder named “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
 
         deleted_inodes = []
