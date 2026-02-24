@@ -400,6 +400,7 @@ class FolderAdmin(InodeAdmin):
                 DiscardedInode.objects.create(
                     inode=inode.id,
                     previous_parent=inode.parent,
+                    trash_folder=trash_folder,
                 )
                 trash_ordering += 1
                 inode.ordering = trash_ordering
@@ -462,7 +463,8 @@ class FolderAdmin(InodeAdmin):
         trash_folder = self.get_trash_folder(request)
         if trash_folder.id != trash_folder_id:
             return HttpResponseBadRequest(f"Trash folder with ID=“{trash_folder.id}” expected.")
-        discarded_inodes = DiscardedInode.objects.filter(inode__in=body.get('inode_ids', []))
+        inode_ids = body.get('inode_ids', [])
+        discarded_inodes = DiscardedInode.objects.filter(trash_folder=trash_folder, inode__in=inode_ids)
         restored_inodes, restored_folders = [], {}
         with transaction.atomic():
             for entry in trash_folder.listdir(id__in=Subquery(discarded_inodes.values('inode'))):

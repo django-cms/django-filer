@@ -8,14 +8,25 @@ from enum import Enum, auto
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models import F
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
 from finder.models.file import FileModel
-from finder.models.folder import FolderModel, PinnedFolder, ROOT_FOLDER_NAME
+from finder.models.folder import FolderModel, PinnedFolder, ROOT_FOLDER_NAME, TRASH_FOLDER_NAME
 from finder.models.inode import DiscardedInode
 from finder.models.filetag import FileTag
 from finder.models.permission import AccessControlEntry, Privilege
+
+
+@pytest.fixture(scope='module', autouse=True)
+def file_tags(django_db_blocker, ambit):
+    with django_db_blocker.unblock():
+        FileTag.objects.bulk_create([
+            FileTag(ambit=ambit, label="Red", color='#ff0000'),
+            FileTag(ambit=ambit, label="Green", color='#00ff00'),
+            FileTag(ambit=ambit, label="Blue", color='#0000ff'),
+        ])
 
 
 def test_root_folder_exists(admin_client, ambit):
@@ -32,7 +43,7 @@ def test_root_folder_exists(admin_client, ambit):
     assert ambit.trash_folders.count() == 0
 
 
-def test_access_root_folder(admin_client, root_folder_url, ambit):
+def test_access_root_folder(admin_client, admin_user, root_folder_url, ambit, principal_kwargs):
     response = admin_client.get(root_folder_url)
     assert response.status_code == 200
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -52,7 +63,8 @@ def test_access_root_folder(admin_client, root_folder_url, ambit):
         'is_root': True,
         'is_trash': False,
         'folder_url': root_folder_url,
-        'is_admin': True,
+        'tags': list(FileTag.objects.filter(ambit=ambit).values('label', 'color').annotate(value=F('id'))),
+        'is_admin': admin_user.is_superuser,
         'can_change': True,
         'base_url': reverse('admin:finder_foldermodel_changelist'),
         'ancestors': [{'id': str(ambit.root_folder.id), 'can_change': True, 'can_view': True}],
@@ -64,6 +76,38 @@ def test_access_folder_not_found(admin_client, ambit, missing_inode_id):
     base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})
     response = admin_client.get(f'{base_url}{ambit.slug}/{missing_inode_id}')
     assert response.status_code == 404
+
+
+def test_access_trash_folder(admin_client, admin_user, root_folder_url, ambit, principal_kwargs):
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})
+    trash_folder_url = f'{base_url}{ambit.slug}/{trash_folder.id}'
+    response = admin_client.get(trash_folder_url)
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.content, 'html.parser')
+    assert soup.title.string == "Trash | Change Folder | Django site admin"
+    script_element = soup.find(id='finder-settings')
+    assert script_element.name == 'script'
+    finder_settings = json.loads(script_element.string)
+    finder_settings.pop('csrf_token')
+    finder_settings.pop('favorite_folders')
+    finder_settings.pop('menu_extensions')
+    expected = {
+        'name': TRASH_FOLDER_NAME,
+        'is_folder': True,
+        'folder_id': str(trash_folder.id),
+        'parent_id': None,
+        'parent_url': None,
+        'is_root': False,
+        'is_trash': True,
+        'is_admin': False,
+        'folder_url': root_folder_url,
+        'can_change': True,
+        'base_url': reverse('admin:finder_foldermodel_changelist'),
+        'ancestors': [{'id': str(trash_folder.id), 'can_change': True, 'can_view': True}],
+        'open_folder_icon_url': staticfiles_storage.url('finder/icons/folder-open.svg'),
+    }
+    assert finder_settings == expected
 
 
 @pytest.mark.parametrize('binary_file', ['small_file.bin', 'huge_file.bin'])
@@ -131,7 +175,6 @@ def sub_folder(ambit, admin_user):
     )
 
 
-@pytest.mark.django_db
 def test_folder_fetch(ambit, uploaded_file, admin_client, missing_inode_id):
     base_url = reverse('admin:finder_inodemodel_change', args=(ambit.root_folder_id,))
     response = admin_client.get(f'{base_url}/fetch')
@@ -569,7 +612,9 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
     assert len(deleted_inodes) == len(expected_trash)
     for file, ordering, expected in zip(deleted_inodes, range(1, 5), expected_trash):
         assert file['ordering'] == ordering
-        assert not AccessControlEntry.objects.filter(inode=file['id']).exists()
+        ace = AccessControlEntry.objects.get(inode=file['id'])
+        assert ace.user == admin_user
+        assert ace.privilege == Privilege.READ_WRITE
         assert DiscardedInode.objects.get(inode=file['id']).previous_parent == sub_folder
 
 
@@ -688,7 +733,8 @@ def test_undo_discarded_inodes(admin_client, admin_user, ambit, uploaded_file, s
         ) for ordering in range(1, 9)
     ])
     DiscardedInode.objects.bulk_create([
-        DiscardedInode(inode=inode.id, previous_parent=sub_folder) for inode in discarded_inodes
+        DiscardedInode(inode=inode.id, previous_parent=sub_folder, trash_folder=trash_folder)
+        for inode in discarded_inodes
     ])
     AccessControlEntry.objects.all().delete()
     if admin_user.is_superuser is False and access_control == AccessControl.ALLOW:
@@ -736,7 +782,7 @@ def test_undo_discarded_folder_with_name_conflict(admin_client, admin_user, ambi
         name="Conflicting name",
         owner=uploaded_file.owner,
     )
-    DiscardedInode.objects.create(inode=discarded_folder.id, previous_parent=sub_folder)
+    DiscardedInode.objects.create(inode=discarded_folder.id, previous_parent=sub_folder, trash_folder=trash_folder)
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
     response = admin_client.post(
         f'{admin_url}/undo_discard',
@@ -764,7 +810,7 @@ def test_erase_trash_folder(admin_client, admin_user, ambit, sub_folder):
         owner=admin_user,
         ordering=1,
     )
-    DiscardedInode.objects.create(inode=discarded_inode.id, previous_parent=sub_folder)
+    DiscardedInode.objects.create(inode=discarded_inode.id, previous_parent=sub_folder, trash_folder=trash_folder)
     assert ambit.original_storage.exists(discarded_inode.file_path)
 
     # Erase the trash folder

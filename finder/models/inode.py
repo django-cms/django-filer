@@ -422,6 +422,11 @@ class DiscardedInode(models.Model):
         related_name='+',
         on_delete=models.CASCADE,
     )
+    trash_folder = models.ForeignKey(
+        'finder.FolderModel',
+        related_name='+',
+        on_delete=models.CASCADE,
+    )
     deleted_at = models.DateTimeField(
         _("Deleted at"),
         auto_now_add=True,

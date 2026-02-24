@@ -155,6 +155,7 @@ class Migration(migrations.Migration):
                 ('inode', models.UUIDField(primary_key=True, serialize=False)),
                 ('deleted_at', models.DateTimeField(auto_now_add=True, verbose_name='Deleted at')),
                 ('previous_parent', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='finder.foldermodel')),
+                ('trash_folder', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='finder.foldermodel')),
             ],
         ),
         migrations.CreateModel(

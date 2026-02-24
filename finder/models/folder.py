@@ -226,10 +226,6 @@ class FolderModel(InodeModel):
         default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
             parent_ids.add(entry['parent'])
-            try:
-                DiscardedInode.objects.get(inode=entry['id']).delete()
-            except DiscardedInode.DoesNotExist:
-                pass
             proxy_obj = InodeManager.get_proxy_object(entry)
             proxy_obj.parent = self
             proxy_obj.ordering = ordering
@@ -247,9 +243,18 @@ class FolderModel(InodeModel):
                 inode.update_access_control_list(default_access_control_list)
                 entry = next(filter(lambda e: e['id'] == inode.id, entries))
                 transaction.on_commit(partial(storage_transfer, entry, parent_ambits[entry['parent']]))
-
             for folder in parent_folder_qs:
                 folder.reorder()
+            if self.is_trash:
+                DiscardedInode.objects.bulk_create([
+                    DiscardedInode(inode=entry['id'], previous_parent_id=entry['parent'], trash_folder=self)
+                    for entry in entries
+                ])
+            else:
+                DiscardedInode.objects.filter(
+                    trash_folder__in=parent_folder_qs,
+                    inode__in=[entry['id'] for entry in entries]
+                ).delete()
 
     def copy_to(self, source_ambit, user, folder, skip_permission_check=False, **kwargs):
         """
