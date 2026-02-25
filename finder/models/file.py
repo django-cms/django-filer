@@ -39,7 +39,6 @@ class FileModelManager(InodeManager):
         if not folder.has_permission(kwargs['owner'], Privilege.WRITE):
             msg = gettext("You don't have permission to upload a file to folder “{folder}”.")
             raise PermissionDenied(msg.format(folder=folder.name))
-        default_acl = folder.get_default_access_control_list()
         kwargs.update(
             parent=folder,
             name=uploaded_file.name,
@@ -51,7 +50,7 @@ class FileModelManager(InodeManager):
         obj.receive_file(ambit, uploaded_file)
         obj.ordering = folder.get_max_ordering() + 1
         obj.store_and_save(ambit, force_insert=True)
-        obj.update_access_control_list(default_acl)
+        obj.apply_access_control_lists(folder.default_access_control_list.all())
         folder.refresh_from_db()
         return obj
 
@@ -236,7 +235,6 @@ class AbstractFileModel(InodeModel):
             meta_data=self.meta_data,
             owner=user,
         )
-        default_acl = folder.get_default_access_control_list()
         target_ambit = folder.get_ambit()
         obj = model(**kwargs)
         if source_ambit.original_storage.exists(self.file_path):
@@ -244,7 +242,6 @@ class AbstractFileModel(InodeModel):
                 target_ambit.original_storage.save(obj.file_path, readhandle)
         obj._for_write = True
         obj.store_and_save(target_ambit, force_insert=True)
-        obj.update_access_control_list(default_acl)
         folder.refresh_from_db()
         return obj
 

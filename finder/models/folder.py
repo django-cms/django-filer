@@ -4,12 +4,13 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
+from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeModel
-from finder.models.permission import DefaultAccessControlEntry as DefaultACE, Privilege
+from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry as DefaultACE, Privilege
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
@@ -18,12 +19,14 @@ TRASH_FOLDER_NAME = '__trash__'
 class FolderModelManager(InodeManager):
 
     def get_trash_folder(self, ambit, owner):
-        try:
-            trash_folder = ambit.trash_folders.get(owner=owner)
-        except FolderModel.DoesNotExist:
-            trash_folder = self.create(parent=None, owner=owner, name=TRASH_FOLDER_NAME)
-            ambit.trash_folders.add(trash_folder)
-            DefaultACE.objects.create(folder=trash_folder, user=owner, privilege=Privilege.READ_WRITE)
+        with transaction.atomic():
+            try:
+                trash_folder = ambit.trash_folders.get(owner=owner)
+            except FolderModel.DoesNotExist:
+                trash_folder = self.create(parent=None, owner=owner, name=TRASH_FOLDER_NAME)
+                ambit.trash_folders.add(trash_folder)
+                AccessControlEntry.objects.create(inode=trash_folder.id, user=owner, privilege=Privilege.READ_WRITE)
+                DefaultACE.objects.create(folder=trash_folder, user=owner, privilege=Privilege.READ_WRITE)
         return trash_folder
 
 
@@ -56,7 +59,7 @@ class FolderModel(InodeModel):
     def get_root_folder(self):
         if self.is_root:
             return self
-        if isinstance(self.ancestors, models.QuerySet):
+        if isinstance(self.ancestors, QuerySet):
             count = self.ancestors.count()
             return self.ancestors[count - 1]
         return list(self.ancestors)[-1]
@@ -224,24 +227,28 @@ class FolderModel(InodeModel):
             has_read_permission=True,
             has_write_permission=True,
         )
-        default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
         for ordering, entry in enumerate(entries, self.get_max_ordering() + 1):
             parent_ids.add(entry['parent'])
             proxy_obj = InodeManager.get_proxy_object(entry)
             proxy_obj.parent = self
             proxy_obj.ordering = ordering
+            if self.is_trash and proxy_obj.is_folder:
+                while self.subfolders.filter(name=proxy_obj.name).exists():
+                    proxy_obj.name = f"{proxy_obj.name}.renamed"
             proxy_obj.validate_constraints()
             update_inodes.append(proxy_obj)
 
         parent_folder_qs = FolderModel.objects.filter(id__in=parent_ids)
         parent_ambits = {folder.id: folder.get_ambit() for folder in parent_folder_qs}
-
+        default_access_control_list = self.default_access_control_list.all()
         with transaction.atomic():
-            update_fields = ['parent', 'ordering']
             for model in InodeModel.get_models(include_folder=True):
-                model.objects.bulk_update(filter(lambda obj: isinstance(obj, model), update_inodes), update_fields)
+                model.objects.bulk_update(
+                    filter(lambda obj: isinstance(obj, model), update_inodes),
+                    ['name', 'parent', 'ordering'] if model.is_folder else ['parent', 'ordering']
+                )
             for inode in update_inodes:
-                inode.update_access_control_list(default_access_control_list)
+                inode.apply_access_control_lists(default_access_control_list, recursive=True, default_acl=True)
                 entry = next(filter(lambda e: e['id'] == inode.id, entries))
                 transaction.on_commit(partial(storage_transfer, entry, parent_ambits[entry['parent']]))
             for folder in parent_folder_qs:
@@ -251,48 +258,57 @@ class FolderModel(InodeModel):
                     DiscardedInode(inode=entry['id'], previous_parent_id=entry['parent'], trash_folder=self)
                     for entry in entries
                 ])
+                PinnedFolder.objects.filter(
+                    folder__in=[entry['id'] for entry in entries if entry['is_folder']]
+                ).delete()
             else:
                 DiscardedInode.objects.filter(
                     trash_folder__in=parent_folder_qs,
                     inode__in=[entry['id'] for entry in entries]
                 ).delete()
 
-    def copy_to(self, source_ambit, user, folder, skip_permission_check=False, **kwargs):
+    def copy_to(self, source_ambit, user, destination_folder, skip_permission_check=False, **kwargs):
         """
         Copies the folder to a destination folder and returns it.
         """
-        if not skip_permission_check and not folder.has_permission(user, Privilege.WRITE):
+        if not skip_permission_check and not destination_folder.has_permission(user, Privilege.WRITE):
             msg = gettext("You do not have permission to copy folder “{source}” to folder “{target}”.")
-            raise PermissionDenied(msg.format(source=self.name, target=folder.name))
+            raise PermissionDenied(msg.format(source=self.name, target=destination_folder.name))
 
-        for ancestor in folder.ancestors:
+        for ancestor in destination_folder.ancestors:
             if ancestor.id == self.id:
                 msg = gettext(
                     "Folder named “{source}” can not become the descendant of destination folder “{target}”."
                 )
-                raise RecursionError(msg.format(source=self.name, target=folder.name))
+                raise RecursionError(msg.format(source=self.name, target=destination_folder.name))
 
         kwargs.setdefault('name', self.name)
-        kwargs.update(parent=folder, owner=user)
+        kwargs.update(parent=destination_folder, owner=user)
         obj = self._meta.model.objects.create(**kwargs)
         for inode in self.listdir():
-            inode.copy_to(source_ambit, user, obj, skip_permission_check=True, owner=obj.owner)
+            proxy_obj = InodeManager.get_proxy_object(inode)
+            proxy_obj.copy_to(source_ambit, user, obj, skip_permission_check=True)
         return obj
 
     def validate_constraints(self):
-        super().validate_constraints()
-        parent = self.parent
-        while parent is not None:
-            if parent.id == self.id:
+        if isinstance(self.ancestors, QuerySet):
+            if self.parent.ancestors.filter(id=self.id).exists():
                 msg = gettext("A parent folder can not become the descendant of a destination folder.")
                 raise ValidationError(msg)
-            parent = parent.parent
+        else:  # django-cte is not installed, traversing the tree folder by folder
+            parent = self.parent
+            while parent is not None:
+                if parent.id == self.id:
+                    msg = gettext("A parent folder can not become the descendant of a destination folder.")
+                    raise ValidationError(msg)
+                parent = parent.parent
         if self.parent.listdir(name=self.name).exists():
             msg = gettext("Folder named “{name}” already exists in destination folder.")
             raise ValidationError(msg.format(name=self.name))
         if self.name in [ROOT_FOLDER_NAME, TRASH_FOLDER_NAME]:
             msg = gettext("Folder name “{name}” is reserved.")
             raise ValidationError(msg.format(name=self.name))
+        super().validate_constraints()
 
     def reorder(self, target_id=None, inode_ids=[], insert_after=True):
         """
@@ -315,7 +331,7 @@ class FolderModel(InodeModel):
             if insert_after and inode_id == target_id:
                 new_order = insert(new_order)
 
-        default_access_control_list = [ace.as_dict for ace in self.default_access_control_list.all()]
+        default_access_control_list = self.default_access_control_list.all()
         update_inodes, former_parents = [], set()
         update_fields = ['parent', 'ordering']
         for model in InodeModel.get_models(include_folder=True):
@@ -324,7 +340,7 @@ class FolderModel(InodeModel):
                 if inode.parent != self:
                     former_parents.add(inode.parent)
                     inode.parent = self
-                    inode.update_access_control_list(default_access_control_list)
+                    inode.apply_access_control_lists(default_access_control_list, recursive=True, default_acl=True)
                     update_inodes.append(inode)
                 if inode.ordering != ordering:
                     inode.ordering = ordering
@@ -357,46 +373,64 @@ class FolderModel(InodeModel):
         else:
             return self
 
-    def get_default_access_control_list(self):
-        return [ace.as_dict for ace in self.default_access_control_list.all()]
+    def apply_default_access_control_list(self, next_acl, user=None, recursive=False):
+        if user and not self.has_permission(user, Privilege.ADMIN):
+            return
 
-    def update_default_access_control_list(self, next_acl):
         default_acl_qs = self.default_access_control_list.all()
         entry_ids, update_entries, create_entries = [], [], []
-        for ace in next_acl:
-            if entry := next(filter(lambda entry: entry == ace, default_acl_qs), None):
-                if entry.privilege != ace['privilege']:
-                    entry.privilege = ace['privilege']
-                    update_entries.append(entry)
+        if isinstance(next_acl, QuerySet):
+            for ace in next_acl:
+                try:
+                    entry = default_acl_qs.get(user=ace.user, group=ace.group)
+                except DefaultACE.DoesNotExist:
+                    entry = DefaultACE(folder=self, user=ace.user, group=ace.group, privilege=ace.privilege)
+                    create_entries.append(entry)
                 else:
-                    entry_ids.append(entry.id)
-            else:
-                create_kwargs = {'folder': self, 'privilege': ace['privilege']}
-                if ace['type'] == 'everyone':
-                    pass  # user and group are already None
-                elif ace['type'] == 'group':
-                    create_kwargs['group_id'] = ace['principal']
-                elif ace['type'] == 'user':
-                    create_kwargs['user_id'] = ace['principal']
+                    if entry.privilege != ace.privilege:
+                        entry.privilege = ace.privilege
+                        update_entries.append(entry)
+                    else:
+                        entry_ids.append(entry.id)
+        else:
+            for ace in next_acl:
+                if entry := next(filter(lambda entry: entry == ace, default_acl_qs), None):
+                    if entry.privilege != ace['privilege']:
+                        entry.privilege = ace['privilege']
+                        update_entries.append(entry)
+                    else:
+                        entry_ids.append(entry.id)
                 else:
-                    raise ValueError(f"Unknown access control type {ace['type']}")
-                create_entries.append(default_acl_qs.model(**create_kwargs))
+                    create_kwargs = {'folder': self, 'privilege': ace['privilege']}
+                    if ace['type'] == 'everyone':
+                        pass  # user and group are already None
+                    elif ace['type'] == 'group':
+                        create_kwargs['group_id'] = ace['principal']
+                    elif ace['type'] == 'user':
+                        create_kwargs['user_id'] = ace['principal']
+                    else:
+                        raise ValueError(f"Unknown access control type {ace['type']}")
+                    create_entries.append(default_acl_qs.model(**create_kwargs))
+
         DefaultACE.objects.bulk_update(update_entries, ['privilege'])
         DefaultACE.objects.bulk_create(create_entries)
         entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
         default_acl_qs.exclude(id__in=entry_ids).delete()
+        if recursive:
+            for subfolder in self.subfolders:
+                subfolder.apply_default_access_control_list(next_acl, user, recursive=True)
 
-    def update_access_control_list(self, next_acl):
+    def apply_access_control_lists(self, next_acl, user=None, recursive=False, default_acl=False):
         """
         Update the access control list of the current folder and all its descendant folders to the given ACL.
-        Also update the default access control list of the current folder to the given ACL.
         """
-
-        super().update_access_control_list(next_acl)
-        self.update_default_access_control_list(next_acl)
-        for entry in self.listdir():
-             proxy_obj = InodeManager.get_proxy_object(entry)
-             proxy_obj.update_access_control_list(next_acl)
+        super().apply_access_control_lists(next_acl, user)
+        if recursive:
+            for entry in self.listdir():
+                proxy_obj = InodeManager.get_proxy_object(entry)
+                proxy_obj.apply_access_control_lists(next_acl, user=user, recursive=True)
+        if default_acl:
+            self.apply_default_access_control_list(next_acl, user=user, recursive=recursive)
 
 
 class PinnedFolder(models.Model):

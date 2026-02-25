@@ -144,7 +144,7 @@ class AccessControlEntry(AccessControlBase):
     def __repr__(self):
         principal = '{0}={1}'.format(*next(iter(self.principal.items())))
         privilege = f'privilege={self.get_privilege_display().replace(" & ", "&")}'
-        return f'<{self.__class__.__name__}(inode={self.inode}, {principal}, {privilege})>'
+        return f'<{self.__class__.__name__}({str(self.inode)[:8]}…) {principal}, {privilege}>'
 
 
 class DefaultAccessControlEntry(AccessControlBase):
@@ -170,5 +170,12 @@ class DefaultAccessControlEntry(AccessControlBase):
 
     def __repr__(self):
         principal = '{0}={1}'.format(*next(iter(self.principal.items())))
-        privilege = f'privilege={self.get_privilege_display().replace(" & ", "&")}'
-        return f'<{self.__class__.__name__}(folder={self.folder}, {principal}, {privilege})>'
+        if self.privilege == Privilege.READ:
+            privilege = 'privilege=RO'
+        elif self.privilege == Privilege.WRITE:
+            privilege = 'privilege=WO'
+        elif self.privilege == Privilege.READ_WRITE:
+            privilege = 'privilege=RW'
+        elif self.privilege == Privilege.FULL:
+            privilege = 'privilege=FULL'
+        return f'<{self.__class__.__name__}({str(self.folder_id)[:8]}…) {principal}, {privilege}>'

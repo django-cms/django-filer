@@ -294,21 +294,23 @@ class FolderAdmin(InodeAdmin):
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
         ordering = current_folder.get_max_ordering()
+        default_access_control_list = current_folder.default_access_control_list.all()
         inode_ids = body.get('inode_ids', [])
-        for entry in FolderModel.objects.filter_unified(
-            id__in=inode_ids,
-            user=request.user,
-            has_read_permission=True,
-        ):
+        # intentionally non-atomic to allow partial copying in case of problems
+        lookup = lookup_by_read_permission(request)
+        for entry in FolderModel.objects.filter_unified(id__in=inode_ids, **lookup):
             proxy_obj = InodeManager.get_proxy_object(entry)
+            if proxy_obj.is_folder:
+                while current_folder.subfolders.filter(name=proxy_obj.name).exists():
+                    proxy_obj.name = f"{proxy_obj.name}.renamed"
             try:
                 ordering += 1
-                proxy_obj.copy_to(request._ambit, request.user, current_folder, ordering=ordering)
+                copied_obj = proxy_obj.copy_to(request._ambit, request.user, current_folder, ordering=ordering)
+                copied_obj.apply_access_control_lists(default_access_control_list, recursive=True, default_acl=True)
             except RecursionError as exc:
                 return HttpResponse(str(exc), status=409)
             except PermissionDenied as exc:
                 return HttpResponseForbidden(str(exc))
-        lookup = lookup_by_read_permission(request)
         return JsonResponse({
             'inodes': list(self.get_inodes(request, parent=current_folder, **lookup)),
         })
@@ -318,6 +320,10 @@ class FolderAdmin(InodeAdmin):
             return response
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)
+        if not current_folder.has_permission(request.user, Privilege.WRITE):
+            msg = gettext("You do not have permission to move items out of the folder named “{folder}”.")
+            return HttpResponseForbidden(msg.format(folder=current_folder.name))
+
         if 'target_id' in body:
             if body['target_id'] == 'parent':
                 target_folder = current_folder.parent
@@ -346,6 +352,7 @@ class FolderAdmin(InodeAdmin):
             lookup = lookup_by_read_permission(request)
             return JsonResponse({
                 'inodes': list(self.get_inodes(request, parent=target_folder, **lookup)),
+                'favorite_folders': self.get_favorite_folders(request, target_folder),
             })
 
     def reorder_inodes(self, request, folder_id):
@@ -376,47 +383,27 @@ class FolderAdmin(InodeAdmin):
     def delete_inodes(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        user = request.user
         body = json.loads(request.body)
+        inode_ids = body.get('inode_ids', [])
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
             return HttpResponse("Cannot move inodes from the trash folder into itself.", status=409)
-        if not current_folder.has_permission(user, Privilege.WRITE):
-            msg = gettext("You do not have permission to delete items from a folder named “{folder}”.")
+        if not current_folder.has_permission(request.user, Privilege.WRITE):
+            msg = gettext("You do not have permission to delete items from the folder named “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
 
-        deleted_inodes = []
-        trash_ordering = trash_folder.get_max_ordering()
-        default_access_control_list = [ace.as_dict for ace in trash_folder.default_access_control_list.all()]
-        inode_ids = body.get('inode_ids', [])
-        with transaction.atomic():
-            for entry in FolderModel.objects.filter_unified(user=user, has_write_permission=True, id__in=inode_ids):
-                inode = FolderModel.objects.get_inode(id=entry['id'])
-                if entry['is_folder']:
-                    PinnedFolder.objects.filter(folder=inode).delete()
-                    while trash_folder.listdir(name=inode.name, is_folder=True).exists():
-                        inode.name = f"{inode.name}.renamed"
-                DiscardedInode.objects.create(
-                    inode=inode.id,
-                    previous_parent=inode.parent,
-                    trash_folder=trash_folder,
-                )
-                trash_ordering += 1
-                inode.ordering = trash_ordering
-                inode.parent = trash_folder
-                deleted_inodes.append(inode)
-            for model in InodeModel.get_models(include_folder=True):
-                model.objects.bulk_update(
-                    filter(lambda obj: isinstance(obj, model), deleted_inodes),
-                    ['name', 'ordering', 'parent'] if model.is_folder else ['ordering', 'parent'],
-                )
-            for inode in deleted_inodes:
-                inode.update_access_control_list(default_access_control_list)
-            current_folder.reorder()
-        return JsonResponse({
-            'favorite_folders': self.get_favorite_folders(request, current_folder),
-        })
+        try:
+            trash_folder.move_inodes(request.user, inode_ids)
+        except ValidationError as exc:
+            return HttpResponse(exc.messages[0], status=409)
+        except PermissionDenied as exc:
+            return HttpResponseForbidden(str(exc))
+        else:
+            return JsonResponse({
+                'inodes': list(self.get_inodes(request, parent=trash_folder)),
+                'favorite_folders': self.get_favorite_folders(request, current_folder),
+            })
 
     def update_tags(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -479,9 +466,10 @@ class FolderAdmin(InodeAdmin):
                     restored_folders[previous_parent.id] += 1
                 else:
                     restored_folders[previous_parent.id] = previous_parent.get_max_ordering() + 1
+                default_access_control_list = previous_parent.default_access_control_list.all()
                 inode.ordering = restored_folders[previous_parent.id]
                 inode.parent = previous_parent
-                inode.update_access_control_list(previous_parent.get_default_access_control_list())
+                inode.apply_access_control_lists(default_access_control_list, recursive=True, default_acl=True)
                 restored_inodes.append(inode)
             for model in InodeModel.get_models(include_folder=True):
                 model.objects.bulk_update(
@@ -521,14 +509,20 @@ class FolderAdmin(InodeAdmin):
         if parent_folder.listdir(name=body['name'], is_folder=True).exists():
             msg = gettext("A folder named “{name}” already exists.")
             return HttpResponse(msg.format(name=body['name']), status=409)
-        new_folder = FolderModel.objects.create(
-            name=body['name'],
-            parent=parent_folder,
-            owner=request.user,
-            ordering=parent_folder.get_max_ordering() + 1,
-        )
-        new_folder.update_access_control_list(parent_folder.get_default_access_control_list())
-        return JsonResponse({'new_folder': self.serialize_inode(request._ambit, new_folder)})
+        with transaction.atomic():
+            new_folder = FolderModel.objects.create(
+                name=body['name'],
+                parent=parent_folder,
+                owner=request.user,
+                ordering=parent_folder.get_max_ordering() + 1,
+            )
+            new_folder.apply_access_control_lists(parent_folder.default_access_control_list.all(), default_acl=True)
+        return JsonResponse({
+            'new_folder': {
+                **self.serialize_inode(request._ambit, new_folder),
+                'can_change': new_folder.has_permission(request.user, Privilege.WRITE),
+            },
+        })
 
     def get_or_create_folder(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
@@ -538,10 +532,10 @@ class FolderAdmin(InodeAdmin):
             return HttpResponseForbidden("Permission denied to create a folder through recursive upload.")
 
         ambit = parent_folder.get_ambit()
-        ordering = parent_folder.get_max_ordering() + 1
-        default_acl = parent_folder.get_default_access_control_list()
+        default_access_control_list = parent_folder.default_access_control_list.all()
         body = json.loads(request.body)
         for folder_name in body['relative_path'].split('/'):
+            ordering = parent_folder.get_max_ordering() + 1
             folder, created = FolderModel.objects.get_or_create(
                 name=folder_name,
                 parent=parent_folder,
@@ -549,6 +543,11 @@ class FolderAdmin(InodeAdmin):
             )
             if created:
                 ordering += 1
-                folder.update_access_control_list(default_acl)
+                folder.apply_access_control_lists(default_access_control_list, default_acl=True)
             parent_folder = folder
-        return JsonResponse({'folder': self.serialize_inode(ambit, folder)})
+        return JsonResponse({
+            'folder': {
+                **self.serialize_inode(ambit, folder),
+                'can_change': folder.has_permission(request.user, Privilege.WRITE),
+            },
+        })

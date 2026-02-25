@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models.expressions import F, Value
 from django.db.models.fields import BooleanField
 from django.http.response import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseForbidden,
+    HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound,
     HttpResponseRedirect, JsonResponse,
 )
 from django.middleware.csrf import get_token
@@ -109,24 +109,17 @@ class InodeAdmin(admin.ModelAdmin):
         return JsonResponse({'access_control_results': results})
 
     def dispatch_permissions(self, request, inode_id):
-        def set_permissions_recursive(folder, access_control_list):
-            for entry in folder.listdir():
-                inode = FolderModel.objects.get_inode(id=entry['id'])
-                if inode.has_permission(request.user, Privilege.ADMIN):
-                    inode.update_access_control_list(access_control_list)
-                if inode.is_folder:
-                    set_permissions_recursive(inode, access_control_list)
-
+        user = request.user
         try:
             current_inode = self.get_object(request, inode_id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"InodeModel<{inode_id}> not found.")
         if request.method == 'GET':
             to_default = 'default' in request.GET
-            return self.get_permissions(current_inode, request.user, to_default)
+            return self.get_permissions(current_inode, user, to_default)
         if request.method == 'POST':
             try:
-                if not current_inode.has_permission(request.user, Privilege.ADMIN):
+                if not current_inode.has_permission(user, Privilege.ADMIN):
                     raise PermissionDenied("Missing permissions to change access control list.")
                 body = json.loads(request.body)
                 access_control_list = body['access_control_list']
@@ -135,23 +128,13 @@ class InodeAdmin(admin.ModelAdmin):
                 with transaction.atomic():
                     if to_default:
                         assert current_inode.is_folder, "Default permission setting is only allowed on folders."
-                        if recursive:
-                            for subfolder in current_inode.descendants:
-                                if subfolder.has_permission(request.user, Privilege.ADMIN):
-                                    subfolder.update_default_access_control_list(access_control_list)
-                        else:
-                            current_inode.update_default_access_control_list(access_control_list)
+                        current_inode.apply_default_access_control_list(access_control_list, user, recursive)
                     else:
-                        if recursive:
-                            assert current_inode.is_folder, "Recursive permission setting is only allowed on folders."
-                            set_permissions_recursive(current_inode, access_control_list)
-                        current_inode.update_access_control_list(access_control_list)
-            except PermissionError as exc:
-                return HttpResponseForbidden(str(exc))
+                        current_inode.apply_access_control_lists(access_control_list, user, recursive)
             except (KeyError, json.JSONDecodeError):
                 return HttpResponse("Invalid JSON payload.", status=400)
             else:
-                return self.get_permissions(current_inode, request.user, to_default)
+                return self.get_permissions(current_inode, user, to_default)
         return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET and POST requests are allowed.")
 
     def get_permissions(self, current_inode, current_user, to_default):

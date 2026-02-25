@@ -3,6 +3,7 @@ import json
 import mimetypes
 import zipfile
 
+from functools import partial
 from pathlib import Path
 
 from django.contrib import admin
@@ -105,6 +106,12 @@ class ArchiveAdmin(FileAdmin):
         })
 
     def unarchive_file(self, request, file_id):
+        def store_zip_reference(zip_info, extracted_file_obj):
+            with zip_ref.open(zip_info.filename) as zip_entry:
+                ambit.original_storage.save(extracted_file_obj.file_path, zip_entry)
+                zip_entry.seek(0)
+                sha1.update(zip_entry.read())
+
         if request.method != 'POST':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
         if not (zip_file_obj := self.get_object(request, file_id)):
@@ -120,16 +127,15 @@ class ArchiveAdmin(FileAdmin):
             return HttpResponseBadRequest(msg.format(name=archive_name), status=409)
 
         ambit = parent_folder.get_ambit()
-        default_acl = parent_folder.get_default_access_control_list()
-        with transaction.atomic():
-            try:
-                folder_obj = FolderModel.objects.create(
-                    name=archive_name,
-                    parent=parent_folder,
-                    owner=request.user,
-                )
-                folder_obj.update_access_control_list(default_acl)
-                with zipfile.ZipFile(ambit.original_storage.open(zip_file_obj.file_path)) as zip_ref:
+        default_access_control_list = parent_folder.default_access_control_list.all()
+        with zipfile.ZipFile(ambit.original_storage.open(zip_file_obj.file_path)) as zip_ref:
+            with transaction.atomic():
+                try:
+                    folder_obj = FolderModel.objects.create(
+                        name=archive_name,
+                        parent=parent_folder,
+                        owner=request.user,
+                    )
                     for ordering, zip_info in enumerate(zip_ref.infolist(), 1):
                         parts = zip_info.filename.split('/')
                         if zip_info.is_dir():
@@ -154,15 +160,14 @@ class ArchiveAdmin(FileAdmin):
                             ordering=ordering,
                         )
                         sha1 = hashlib.sha1()
-                        with zip_ref.open(zip_info.filename) as zip_entry:
-                            ambit.original_storage.save(extracted_file_obj.file_path, zip_entry)
-                            zip_entry.seek(0)
-                            sha1.update(zip_entry.read())
                         extracted_file_obj.sha1 = sha1.hexdigest()
                         extracted_file_obj.save(update_fields=['sha1'])
-            except Exception as exc:
-                msg = gettext("Failed to extract archive “{name}”. Reason: {error}.")
-                return HttpResponseBadRequest(msg.format(name={zip_file_obj.name}, error=str(exc)), status=415)
+                        transaction.on_commit(partial(store_zip_reference, zip_info, extracted_file_obj))
+                except Exception as exc:
+                    msg = gettext("Failed to extract archive “{name}”. Reason: {error}.")
+                    return HttpResponseBadRequest(msg.format(name={zip_file_obj.name}, error=str(exc)), status=415)
+                folder_obj.apply_access_control_lists(default_access_control_list, recursive=True, default_acl=True)
+
         msg = gettext("Successfully extracted ZIP archive “{name}” to folder “{folder}”.")
         return HttpResponse(msg.format(name=zip_file_obj.name, folder=archive_name))
 

@@ -6,14 +6,15 @@ from operator import and_, or_
 from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError, PermissionDenied, ObjectDoesNotExist
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import F, Q, Value
 from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
+from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from finder.models.permission import AccessControlEntry, Privilege
 
@@ -316,6 +317,9 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__}({str(self.id)[:8]}…): name="{self.name}">'
+
     @property
     def ancestors(self):
         """
@@ -368,30 +372,48 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
         AccessControlEntry.objects.filter(inode=self.id).delete()
         super().delete(*args)
 
-    def update_access_control_list(self, next_acl):
+    def apply_access_control_lists(self, next_acl, user=None, **kwargs):
+        if user and not self.has_permission(user, Privilege.ADMIN):
+            return
+
         current_acl_qs = AccessControlEntry.objects.filter(inode=self.id)
         entry_ids, update_entries, create_entries = [], [], []
-        for ace in next_acl:
-            if entry := next(filter(
-                lambda ca: ca.as_dict['type'] == ace['type'] and ca.as_dict['principal'] == ace['principal'],
-                current_acl_qs
-            ), None):
-                if entry.privilege != ace['privilege']:
-                    entry.privilege = ace['privilege']
-                    update_entries.append(entry)
+        if isinstance(next_acl, QuerySet):
+            for ace in next_acl:
+                try:
+                    entry = current_acl_qs.get(user=ace.user, group=ace.group)
+                except AccessControlEntry.DoesNotExist:
+                    entry = AccessControlEntry(inode=self.id, user=ace.user, group=ace.group, privilege=ace.privilege)
+                    create_entries.append(entry)
                 else:
-                    entry_ids.append(entry.id)
-            else:
-                create_kwargs = {'inode': self.id, 'privilege': ace['privilege']}
-                if ace['type'] == 'everyone':
-                    pass  # user and group are already None
-                elif ace['type'] == 'group':
-                    create_kwargs['group_id'] = ace['principal']
-                elif ace['type'] == 'user':
-                    create_kwargs['user_id'] = ace['principal']
+                    if entry.privilege != ace.privilege:
+                        entry.privilege = ace.privilege
+                        update_entries.append(entry)
+                    else:
+                        entry_ids.append(entry.id)
+        else:
+            for ace in next_acl:
+                if entry := next(filter(
+                    lambda ca: ca.as_dict['type'] == ace['type'] and ca.as_dict['principal'] == ace['principal'],
+                    current_acl_qs
+                ), None):
+                    if entry.privilege != ace['privilege']:
+                        entry.privilege = ace['privilege']
+                        update_entries.append(entry)
+                    else:
+                        entry_ids.append(entry.id)
                 else:
-                    raise ValueError(f"Unknown access control type {ace['type']}")
-                create_entries.append(AccessControlEntry(**create_kwargs))
+                    create_kwargs = {'inode': self.id, 'privilege': ace['privilege']}
+                    if ace['type'] == 'everyone':
+                        pass  # user and group are already None
+                    elif ace['type'] == 'group':
+                        create_kwargs['group_id'] = ace['principal']
+                    elif ace['type'] == 'user':
+                        create_kwargs['user_id'] = ace['principal']
+                    else:
+                        raise ValueError(f"Unknown access control type {ace['type']}")
+                    create_entries.append(AccessControlEntry(**create_kwargs))
+
         AccessControlEntry.objects.bulk_update(update_entries, ['privilege'])
         AccessControlEntry.objects.bulk_create(create_entries)
         entry_ids.extend([*(entry.id for entry in update_entries), *(entry.id for entry in create_entries)])
