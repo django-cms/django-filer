@@ -4,6 +4,7 @@ from django.contrib.admin.sites import all_sites
 from django.contrib.sites.models import Site
 from django.core.files.storage import storages
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from finder.models.ambit import AmbitModel
@@ -44,20 +45,23 @@ class Command(BaseCommand):
         elif subcommand == 'list-ambits':
             self.list_ambits()
         elif subcommand == 'add-ambit':
-            try:
-                self.add_ambit(**options)
-            except Exception as exc:
-                self.stderr.write(f"Error while adding ambit: ‘{exc}’")
+            with transaction.atomic():
+                try:
+                    self.add_ambit(**options)
+                except Exception as exc:
+                    self.stderr.write(f"Error while adding ambit: ‘{exc}’")
         elif subcommand == 'edit-ambit':
-            try:
-                self.edit_ambit(**options)
-            except Exception as exc:
-                self.stderr.write(f"Error while changing ambit: ‘{exc}’")
+            with transaction.atomic():
+                try:
+                    self.edit_ambit(**options)
+                except Exception as exc:
+                    self.stderr.write(f"Error while changing ambit: ‘{exc}’")
         elif subcommand == 'delete-ambit':
-            try:
-                self.delete_ambit(**options)
-            except Exception as exc:
-                self.stderr.write(f"Error while deleting ambit: ‘{exc}’")
+            with transaction.atomic():
+                try:
+                    self.delete_ambit(**options)
+                except Exception as exc:
+                    self.stderr.write(f"Error while deleting ambit: ‘{exc}’")
         else:
             self.stderr.write(f"Unknown subcommand ‘{subcommand}’")
 
@@ -115,10 +119,10 @@ class Command(BaseCommand):
             raise CommandError(f"Storage backend ‘{storage_name}’ is not configured.")
         values['_sample_storage'] = storage_name
         root_folder = FinderFolderModel.objects.create(name=ROOT_FOLDER_NAME)
+        AmbitModel.objects.create(root_folder=root_folder, slug=slug, **values)
         # create ACL and default ACL with RW-permission for everyone
         AccessControlEntry.objects.create(inode=root_folder.id, privilege=Privilege.READ_WRITE)
         DefaultAccessControlEntry.objects.create(folder=root_folder, privilege=Privilege.READ_WRITE)
-        AmbitModel.objects.create(root_folder=root_folder, slug=slug, **values)
         self.stdout.write(f"Successfully created tree root with slug ‘{slug}’.")
 
     def edit_ambit(self, **options):
