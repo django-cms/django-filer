@@ -299,13 +299,14 @@ class FolderAdmin(InodeAdmin):
         # intentionally non-atomic to allow partial copying in case of problems
         lookup = lookup_by_read_permission(request)
         for entry in FolderModel.objects.filter_unified(id__in=inode_ids, **lookup):
-            proxy_obj = InodeManager.get_proxy_object(entry)
-            if proxy_obj.is_folder:
-                while current_folder.subfolders.filter(name=proxy_obj.name).exists():
-                    proxy_obj.name = f"{proxy_obj.name}.renamed"
+            source_obj = FileModel.objects.get_inode(id=entry['id'])
+            if source_obj.is_folder:
+                while current_folder.subfolders.filter(name=source_obj.name).exists():
+                    source_obj.name = f"{source_obj.name}.renamed"
+            source_ambit = source_obj.folder.get_ambit()
             try:
                 ordering += 1
-                copied_obj = proxy_obj.copy_to(request._ambit, request.user, current_folder, ordering=ordering)
+                copied_obj = source_obj.copy_to(source_ambit, request.user, current_folder, ordering=ordering)
                 copied_obj.apply_access_control_lists(default_access_control_list, recursive=True, default_acl=True)
             except RecursionError as exc:
                 return HttpResponse(str(exc), status=409)
