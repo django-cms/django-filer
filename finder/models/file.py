@@ -15,6 +15,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
+from finder.storage import delete_directory
 
 
 def mimetype_validator(value):
@@ -250,16 +251,9 @@ class AbstractFileModel(InodeModel):
 
     def erase_and_delete(self, ambit, using=None, keep_parents=False):
         if not self._meta.abstract:
-            if ambit.original_storage.exists(self.file_path):
-                ambit.original_storage.delete(self.file_path)
-            # delete samples and thumbnails if any
             dir_path = str(self.id)
-            try:
-                dir, files = ambit.sample_storage.listdir(dir_path)
-            except FileNotFoundError:
-                files = []
-            for file_name in files:
-                ambit.sample_storage.delete(f'{dir_path}/{file_name}')
+            delete_directory(ambit.original_storage, dir_path)
+            delete_directory(ambit.sample_storage, dir_path)
         self.delete(using, keep_parents)
 
 

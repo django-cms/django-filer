@@ -11,6 +11,7 @@ from django.utils.translation import gettext, gettext_lazy as _, ngettext
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry as DefaultACE, Privilege
+from finder.storage import delete_directory
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
@@ -213,7 +214,9 @@ class FolderModel(InodeModel):
                 if source_ambit.original_storage.exists(file_path):
                     with source_ambit.original_storage.open(file_path, 'rb') as readhandle:
                         target_ambit.original_storage.save(file_path, readhandle)
-                    source_ambit.original_storage.delete(file_path)
+                    dir_path = str(entry['id'])
+                    delete_directory(source_ambit.original_storage, dir_path)
+                    delete_directory(source_ambit.sample_storage, dir_path)
 
         if not self.has_permission(user, Privilege.WRITE):
             msg = gettext("You do not have permission to move these items to folder “{folder}”.")

@@ -20,3 +20,13 @@ class FinderSystemStorage(FileSystemStorage):
         id, filename = name.split('/', 1)
         name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
         return super().url(name)
+
+
+def delete_directory(storage, dir_path):
+    if storage.exists(dir_path):
+        child_folders, child_files = storage.listdir(dir_path)
+        for entry in child_files:
+            storage.delete(f'{dir_path}/{entry}')
+        for entry in child_folders:
+            delete_directory(storage, f'{dir_path}/{entry}')
+        storage.delete(dir_path)
