@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFou
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext
 from django.views import View
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -280,24 +281,27 @@ class BrowserView(View):
 
     @method_decorator(require_POST)
     def crop(self, request, image_id):
-        raise NotImplementedError
-        # image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
-        # width, height = request.POST.get('width'), request.POST.get('height')
-        # width = int(width) if str(width).isdigit() else None
-        # height = int(height) if str(height).isdigit() else None
-        # if width is None and height is None:
-        #     raise ValidationError(_("At least one of width or height must be given."))
-        # if width is None:
-        #     width = round(height * image.width / image.height)
-        # if height is None:
-        #     height = round(width / image.width * image.height)
-        # cropped_image_path = image.get_cropped_path(width, height)
-        # if not default_storage.exists(cropped_image_path):
-        #     image.crop(cropped_image_path, width, height)
-        # return {
-        #     'image_id': image_id,
-        #     'cropped_image_url': default_storage.url(cropped_image_path),
-        #     'width': width,
-        #     'height': height,
-        #     'meta_data': image.get_meta_data(),
-        # }
+        """
+        Widgets using the <finder-file-select> use this endpoint to fetch a cropped version of the image.
+        """
+        image = FileModel.objects.get_inode(id=image_id, mime_types=['image/*'], is_folder=False)
+        ambit = image.folder.get_ambit()
+        width, height = request.POST.get('width'), request.POST.get('height')
+        width = int(width) if str(width).isdigit() else None
+        height = int(height) if str(height).isdigit() else None
+        if width is None and height is None:
+            raise ValidationError(gettext("At least one of width or height must be given."))
+        if width is None:
+            width = round(height * image.width / image.height)
+        if height is None:
+            height = round(width / image.width * image.height)
+        cropped_image_path = f'{image.id}/{image.get_cropped_filename(width, height)}'
+        if not ambit.sample_storage.exists(cropped_image_path):
+            image.crop(ambit, cropped_image_path, width, height)
+        return {
+            'image_id': image_id,
+            'cropped_image_url': ambit.sample_storage.url(cropped_image_path),
+            'width': width,
+            'height': height,
+            'meta_data': image.get_meta_data(),
+        }

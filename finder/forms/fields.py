@@ -1,6 +1,7 @@
 from django.forms.fields import UUIDField
 from django.forms.models import ModelMultipleChoiceField
 
+from finder import settings
 from finder.forms.widgets import FinderFileSelect, FinderFolderSelect
 
 
@@ -9,7 +10,7 @@ class FinderFileField(UUIDField):
 
     def __init__(self, *args, **kwargs):
         self.accept_mime_types = kwargs.pop('accept_mime_types', None)
-        self.ambit = kwargs.pop('ambit', None)
+        self.ambit = kwargs.pop('ambit', settings.FINDER_DEFAULT_AMBIT)
         super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
@@ -22,7 +23,7 @@ class FinderFolderField(UUIDField):
     widget = FinderFolderSelect
 
     def __init__(self, *args, **kwargs):
-        self.ambit = kwargs.pop('ambit', None)
+        self.ambit = kwargs.pop('ambit', settings.FINDER_DEFAULT_AMBIT)
         super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
