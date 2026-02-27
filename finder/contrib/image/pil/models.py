@@ -85,11 +85,11 @@ class PILImageModel(ImageFileModel):
                 changed = True
         return image, changed
 
-    def crop(self, ambit, thumbnail_path, width, height):
+    def crop(self, ambit, cropped_image_path, width, height):
         image = Image.open(ambit.original_storage.open(self.file_path))
         crop_box = self.compute_crop_box(image.width, image.height, width, height)
         image = image.crop(crop_box)
         image.thumbnail((width, height))
         with NamedTemporaryFile(suffix=Path(self.file_path).suffix) as tempfile:
             image.save(tempfile, image.format)
-            ambit.sample_storage.save(thumbnail_path, tempfile)
+            ambit.sample_storage.save(cropped_image_path, tempfile)
