@@ -85,27 +85,27 @@ trash folder can be emptied automatically after a given time period.
 
 ## Permission System
 
-The permission system of **django-filer** is based on the idea of Access Control Lists (ACLs) similar
-to Posix or NTFS ACSs. This allows to grant fine-grained permissions to everybody, individual users
-and/or groups for each file and folder.
+The permission system of **django-filer** is using the concept of Access Control Lists (ACLs)
+similar to Posix or NTFS ACLs. This allows granting fine-grained permissions to everybody,
+individual users and/or groups for each file and folder.
 
 Permissions are controlled through the model named `AccessControlEntry`. This model has a foreign
-key onto `InodeModel` and a so-called "principal". A principal is either a user, a group or a flag
-for everyone. They are mutually exclusive and implemented as a nullable foreign key onto `User`, a
-foreign key onto `Group` and a Boolean field named `everyone`. Either of them can be set, but not
-both. If both are unset, the chosen permissions are applied to every staff user.
+key onto `InodeModel` and a so-called "principal". A principal is either a user, a group or for
+everyone. They are mutually exclusive and implemented as a nullable foreign key onto `User`, or a
+foreign key onto `Group`. Either of them can be set, but not both. If neither is set, the permission
+is considered for everyone.
 
 By using a separate model `AccessControlEntry`, **django-filer** can now compute the permissions
-using just one database query per inode. Until version 3, the permissions had to be computed
-traversing all ancestors starting from the current folder up to the root of the folder tree. This
-was a time-consuming opertaion and made **django-filer** slow for large datasets.
+using just one database (sub-)query while filtering all inodes. Until version 3, the permissions had
+to be computed traversing all ancestors starting from the current folder up to the root of the
+folder tree. This was a time-consuming operation and made **django-filer** slow for large datasets.
 
 Each `AccessControlEntry` has a bitmap field used to represent:
 * `write` set for a folder: Allows the user to upload a file, to change the name of that folder,
   to reorder files in that folder, to move files out of that filer.
 * `write` set for a file: Allows the user to replace a file, to edit the file's meta-data, and to
   move the file to another folder, if the source and target folders have write permissions.
-* `read` set for a folder: Allows the user to open that folder.
+* `read` set for a folder: Allows the user to open that folder and view its content.
 * `read` set for a file: Allows the user to view a thumbnail of that file inside its containing
   folder and use that file, including copying.
 * `admin`: Allows the user to change the permissions of that folder or file.
