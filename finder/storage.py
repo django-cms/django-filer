@@ -23,10 +23,21 @@ class FinderSystemStorage(FileSystemStorage):
 
 
 def delete_directory(storage, dir_path):
-    if storage.exists(dir_path):
+    # Ensure the directory path does not end with a slash for consistency
+    dir_path = dir_path.rstrip('/')
+    try:
         child_folders, child_files = storage.listdir(dir_path)
-        for entry in child_files:
+    except (FileNotFoundError, OSError):
+        # storage.exists() is not supported by all storages for directories
+        return
+    for entry in child_files:
+        try:
             storage.delete(f'{dir_path}/{entry}')
-        for entry in child_folders:
-            delete_directory(storage, f'{dir_path}/{entry}')
+        except (FileNotFoundError, OSError):
+            pass
+    for entry in child_folders:
+        delete_directory(storage, f'{dir_path}/{entry}')
+    try:
         storage.delete(dir_path)
+    except (FileNotFoundError, OSError):
+        pass
