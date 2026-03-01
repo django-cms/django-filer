@@ -1,4 +1,6 @@
+from os import unlink
 from pathlib import Path
+from tempfile import mkstemp
 
 from django.core.files.temp import NamedTemporaryFile
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -24,6 +26,20 @@ class VideoFileModel(FileModel):
         proxy = True
         app_label = 'finder'
 
+    def _copy_to_local(self, ambit):
+        """
+        Copy the video file from storage to a local temporary file.
+        This is needed because ffmpeg cannot seek in pipe input, and MP4 files
+        with the moov atom at the end require seeking to be read properly.
+        """
+        source_suffix = Path(self.file_name).suffix
+        local_file = NamedTemporaryFile(suffix=source_suffix)
+        with ambit.original_storage.open(self.file_path, 'rb') as handle:
+            for chunk in handle.chunks():
+                local_file.write(chunk)
+        local_file.flush()
+        return local_file
+
     def get_sample_url(self, ambit):
         sample_start = self.meta_data.get('sample_start')
         if sample_start is None:
@@ -33,32 +49,24 @@ class VideoFileModel(FileModel):
         if not ambit.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
             try:
-                with NamedTemporaryFile(suffix=suffix) as tempfile:
-                    in_stream = ffmpeg.input('pipe:0')
-                    video_stream = (
-                        in_stream.video
-                        .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
-                        .filter('scale', self.thumbnail_size, -1)
-                    )
-                    process = (
-                        ffmpeg.concat(video_stream, in_stream.audio, v=1, a=1)
-                        .output(
-                            tempfile.name,
-                            ss=sample_start,
-                            t=sample_duration,
+                fd, outpath = mkstemp(suffix=suffix)
+                try:
+                    with self._copy_to_local(ambit) as source_file:
+                        in_stream = ffmpeg.input(source_file.name, ss=sample_start)
+                        video_stream = (
+                            in_stream.video
+                            .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
+                            .filter('scale', self.thumbnail_size, -1)
                         )
-                        .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
-                    )
-                    with ambit.original_storage.open(self.file_path) as handle:
-                        for chunk in handle.chunks():
-                            try:
-                                process.stdin.write(chunk)
-                            except BrokenPipeError:
-                                break  # sample frame found
-                        process.stdin.close()
-                    process.wait()
-                    tempfile.flush()
-                    ambit.sample_storage.save(sample_path, tempfile)
+                        (
+                            ffmpeg.concat(video_stream, in_stream.audio, v=1, a=1)
+                            .output(outpath, t=sample_duration)
+                            .run(overwrite_output=True, quiet=True)
+                        )
+                    with open(outpath, 'rb') as outfile:
+                        ambit.sample_storage.save(sample_path, outfile)
+                finally:
+                    unlink(outpath)
             except Exception:
                 return
         return ambit.sample_storage.url(sample_path)
@@ -71,24 +79,20 @@ class VideoFileModel(FileModel):
         poster_path = f'{self.id}/{self.get_sample_path(sample_start, suffix=suffix)}'
         if not ambit.sample_storage.exists(poster_path):
             try:
-                with NamedTemporaryFile(suffix=suffix) as tempfile:
-                    process = (
-                        ffmpeg.input('pipe:0').video
-                        .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
-                        .filter('scale', self.thumbnail_size, -1)
-                        .output(tempfile.name, ss=sample_start, vframes=1)
-                        .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
-                    )
-                    with ambit.original_storage.open(self.file_path) as handle:
-                        for chunk in handle.chunks():
-                            try:
-                                process.stdin.write(chunk)
-                            except BrokenPipeError:
-                                break  # sample frame found
-                        process.stdin.close()
-                    process.wait()
-                    tempfile.flush()
-                    ambit.sample_storage.save(poster_path, tempfile)
+                fd, outpath = mkstemp(suffix=suffix)
+                try:
+                    with self._copy_to_local(ambit) as source_file:
+                        (
+                            ffmpeg.input(source_file.name, ss=sample_start).video
+                            .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
+                            .filter('scale', self.thumbnail_size, -1)
+                            .output(outpath, vframes=1)
+                            .run(overwrite_output=True, quiet=True)
+                        )
+                    with open(outpath, 'rb') as outfile:
+                        ambit.sample_storage.save(poster_path, outfile)
+                finally:
+                    unlink(outpath)
             except Exception:
                 return self.fallback_thumbnail_url
         return ambit.sample_storage.url(poster_path)
