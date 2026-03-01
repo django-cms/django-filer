@@ -19,6 +19,13 @@ from finder.models.filetag import FileTag
 from finder.models.permission import AccessControlEntry, Privilege
 
 
+class AccessControl(Enum):
+    ALLOW = auto()
+    SOURCE_DENIED = auto()
+    TARGET_DENIED = auto()
+    READ_ONLY = auto()
+
+
 @pytest.fixture(scope='module', autouse=True)
 def file_tags(django_db_blocker, ambit):
     with django_db_blocker.unblock():
@@ -27,6 +34,28 @@ def file_tags(django_db_blocker, ambit):
             FileTag(ambit=ambit, label="Green", color='#00ff00'),
             FileTag(ambit=ambit, label="Blue", color='#0000ff'),
         ])
+
+
+@pytest.fixture
+def uploaded_file(ambit, admin_user):
+    file_name = 'small_file.bin'
+    with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
+        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
+    return FileModel.objects.create_from_upload(
+        ambit,
+        uploaded_file,
+        folder=ambit.root_folder,
+        owner=admin_user,
+    )
+
+
+@pytest.fixture
+def sub_folder(ambit, admin_user):
+    return FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name='Sub Folder',
+        owner=admin_user,
+    )
 
 
 def test_root_folder_exists(admin_client, ambit):
@@ -110,6 +139,44 @@ def test_access_trash_folder(admin_client, admin_user, root_folder_url, ambit, p
     assert finder_settings == expected
 
 
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.READ_ONLY, None])
+def test_file_change_view(admin_client, admin_user, ambit, sub_folder, uploaded_file, access_control, principal_kwargs):
+    uploaded_file.parent = sub_folder
+    uploaded_file.save()
+    base_url = reverse('admin:finder_foldermodel_changelist')
+    parts = base_url.split('/')
+    parts = [ambit.slug if part == 'foldermodel' else part for part in parts]
+    if parts[-1] == '':
+        parts[-1] = str(uploaded_file.id)
+    else:
+        parts.append(str(uploaded_file.id))
+    admin_url = '/'.join(parts)
+    if admin_user.is_superuser:
+        if access_control is not None:
+            return  # skip redundant test cases where superuser has access regardless of ACL
+    else:
+        AccessControlEntry.objects.all().delete()
+        if access_control == AccessControl.ALLOW:
+            AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
+        elif access_control == AccessControl.READ_ONLY:
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
+
+    response = admin_client.get(admin_url)
+    if admin_user.is_superuser or access_control in [AccessControl.ALLOW, AccessControl.READ_ONLY]:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+        return
+    soup = BeautifulSoup(response.content, 'html.parser')
+    if admin_user.is_superuser or access_control == AccessControl.ALLOW:
+        assert soup.title.string == f"{uploaded_file.name} | Change File | Django site admin"
+    else:
+        assert soup.title.string == f"{uploaded_file.name} | View File | Django site admin"
+    links = soup.find(class_='breadcrumbs').find_all('a')
+    assert links[1]['href'] == '/'.join(parts[:3]) + '/'
+
+
 @pytest.mark.parametrize('binary_file', ['small_file.bin', 'huge_file.bin'])
 def test_folder_upload_file(admin_client, ambit, binary_file, missing_inode_id):
     sha1 = hashlib.sha1()
@@ -151,28 +218,6 @@ def test_folder_upload_file(admin_client, ambit, binary_file, missing_inode_id):
         )
         file_handle.seek(0)
     assert response.status_code == 404
-
-
-@pytest.fixture
-def uploaded_file(ambit, admin_user):
-    file_name = 'small_file.bin'
-    with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
-        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
-    return FileModel.objects.create_from_upload(
-        ambit,
-        uploaded_file,
-        folder=ambit.root_folder,
-        owner=admin_user,
-    )
-
-
-@pytest.fixture
-def sub_folder(ambit, admin_user):
-    return FolderModel.objects.create(
-        parent=ambit.root_folder,
-        name='Sub Folder',
-        owner=admin_user,
-    )
 
 
 def test_folder_fetch(ambit, uploaded_file, admin_client, missing_inode_id):
@@ -283,12 +328,6 @@ def test_update_inode_update_with_missing_file(update_inode_url, admin_client, m
     assert response.status_code == 404
 
 
-class AccessControl(Enum):
-    ALLOW = auto()
-    SOURCE_DENIED = auto()
-    TARGET_DENIED = auto()
-
-
 @pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
 def principal_kwargs(admin_user, request):
     if request.param == 'superuser':
@@ -341,7 +380,63 @@ def test_create_sub_folder(admin_client, admin_user, ambit, access_control, prin
     # add a second folder with the same name
     response = admin_client.post(f'{admin_url}/add_folder', {'name': "Sub Folder"}, content_type='application/json')
     assert response.status_code == 409
-    assert response.content.decode() == "A folder named “Sub Folder” already exists."
+    assert response.content.decode() == "A folder named \u201cSub Folder\u201d already exists."
+
+
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
+def test_get_or_create_folder(admin_client, admin_user, ambit, access_control, principal_kwargs):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    if admin_user.is_superuser is False:
+        AccessControlEntry.objects.all().delete()
+        if access_control == AccessControl.ALLOW:
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+        else:
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+
+    # create a single nested folder
+    response = admin_client.post(
+        f'{admin_url}/get_or_create_folder',
+        {'relative_path': 'Uploaded'},
+        content_type='application/json',
+    )
+    if admin_user.is_superuser or access_control == AccessControl.ALLOW:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+        return
+    folder = response.json()['folder']
+    assert folder['name'] == "Uploaded"
+    assert folder['is_folder'] is True
+    assert folder['parent'] == str(ambit.root_folder.id)
+    created_folder = FolderModel.objects.get(id=folder['id'])
+    assert created_folder.parent == ambit.root_folder
+
+    # create deeply nested folders in one request
+    response = admin_client.post(
+        f'{admin_url}/get_or_create_folder',
+        {'relative_path': 'Photos/2026/February'},
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    folder = response.json()['folder']
+    assert folder['name'] == "February"
+    february_folder = FolderModel.objects.get(id=folder['id'])
+    year_folder = FolderModel.objects.get(name='2026', parent=FolderModel.objects.get(name='Photos', parent=ambit.root_folder))
+    assert february_folder.parent == year_folder
+
+    # calling again with the same path should return the existing folder (idempotent)
+    response = admin_client.post(
+        f'{admin_url}/get_or_create_folder',
+        {'relative_path': 'Photos/2026/February'},
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    assert response.json()['folder']['id'] == str(february_folder.id)
+
+    # with missing Content-Type
+    response = admin_client.post(f'{admin_url}/get_or_create_folder')
+    assert response.status_code == 415
 
 
 def test_move_file_into_subfolder(admin_client, ambit, uploaded_file, sub_folder):
@@ -422,7 +517,7 @@ def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_
     assert uploaded_file.parent == ambit.root_folder
 
 
-@pytest.mark.parametrize('access_control', AccessControl)
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.SOURCE_DENIED, AccessControl.TARGET_DENIED])
 @pytest.mark.parametrize('same_folder', [True, False])
 @pytest.mark.parametrize('finder_layout', ['tiles', 'list'])
 def test_reorder_inodes(
