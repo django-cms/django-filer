@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from django.core.files.storage import FileSystemStorage
+from django.core.files.temp import NamedTemporaryFile
 
 
 class FinderSystemStorage(FileSystemStorage):
@@ -41,3 +44,18 @@ def delete_directory(storage, dir_path):
         storage.delete(dir_path)
     except (FileNotFoundError, OSError):
         pass
+
+
+def copy_to_local(storage, file_path):
+    """
+    Copy a file from storage to a local temporary file.
+    This is needed because ffmpeg cannot seek in pipe input, and MP4 files
+    with the moov atom at the end require seeking to be read properly.
+    """
+    source_suffix = Path(file_path).suffix
+    local_file = NamedTemporaryFile(suffix=source_suffix)
+    with storage.open(file_path, 'rb') as handle:
+        for chunk in handle.chunks():
+            local_file.write(chunk)
+    local_file.flush()
+    return local_file

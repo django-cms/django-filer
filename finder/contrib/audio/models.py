@@ -1,9 +1,11 @@
+from os import unlink
 from pathlib import Path
+from tempfile import mkstemp
 
-from django.core.files.temp import NamedTemporaryFile
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from finder.models.file import FileModel
+from finder.storage import copy_to_local
 
 import ffmpeg
 
@@ -29,23 +31,19 @@ class AudioFileModel(FileModel):
         if not ambit.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
             try:
-                with NamedTemporaryFile(suffix=suffix) as tempfile:
-                    process = (
-                        ffmpeg.input('pipe:0').audio
-                        .filter('atrim', start=sample_start, duration=sample_duration)
-                        .output(tempfile.name)
-                        .run_async(pipe_stdin=True, overwrite_output=True, quiet=True)
-                    )
-                    with ambit.original_storage.open(self.file_path) as handle:
-                        for chunk in handle.chunks():
-                            try:
-                                process.stdin.write(chunk)
-                            except BrokenPipeError:
-                                break  # end of sample reached
-                        process.stdin.close()
-                    process.wait()
-                    tempfile.flush()
-                    ambit.sample_storage.save(sample_path, tempfile)
+                fd, outpath = mkstemp(suffix=suffix)
+                try:
+                    with copy_to_local(ambit.original_storage, self.file_path) as source_file:
+                        (
+                            ffmpeg.input(source_file.name, ss=sample_start).audio
+                            .filter('atrim', duration=sample_duration)
+                            .output(outpath)
+                            .run(overwrite_output=True, quiet=True)
+                        )
+                    with open(outpath, 'rb') as outfile:
+                        ambit.sample_storage.save(sample_path, outfile)
+                finally:
+                    unlink(outpath)
             except Exception:
                 return
         return ambit.sample_storage.url(sample_path)

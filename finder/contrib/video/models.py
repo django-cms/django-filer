@@ -2,13 +2,13 @@ from os import unlink
 from pathlib import Path
 from tempfile import mkstemp
 
-from django.core.files.temp import NamedTemporaryFile
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 import ffmpeg
 
 from filer import settings as filer_settings
 from finder.models.file import FileModel
+from finder.storage import copy_to_local
 
 SAMPLE_DURATION = 5
 
@@ -26,20 +26,6 @@ class VideoFileModel(FileModel):
         proxy = True
         app_label = 'finder'
 
-    def _copy_to_local(self, ambit):
-        """
-        Copy the video file from storage to a local temporary file.
-        This is needed because ffmpeg cannot seek in pipe input, and MP4 files
-        with the moov atom at the end require seeking to be read properly.
-        """
-        source_suffix = Path(self.file_name).suffix
-        local_file = NamedTemporaryFile(suffix=source_suffix)
-        with ambit.original_storage.open(self.file_path, 'rb') as handle:
-            for chunk in handle.chunks():
-                local_file.write(chunk)
-        local_file.flush()
-        return local_file
-
     def get_sample_url(self, ambit):
         sample_start = self.meta_data.get('sample_start')
         if sample_start is None:
@@ -51,7 +37,7 @@ class VideoFileModel(FileModel):
             try:
                 fd, outpath = mkstemp(suffix=suffix)
                 try:
-                    with self._copy_to_local(ambit) as source_file:
+                    with copy_to_local(ambit.original_storage, self.file_path) as source_file:
                         in_stream = ffmpeg.input(source_file.name, ss=sample_start)
                         video_stream = (
                             in_stream.video
@@ -81,7 +67,7 @@ class VideoFileModel(FileModel):
             try:
                 fd, outpath = mkstemp(suffix=suffix)
                 try:
-                    with self._copy_to_local(ambit) as source_file:
+                    with copy_to_local(ambit.original_storage, self.file_path) as source_file:
                         (
                             ffmpeg.input(source_file.name, ss=sample_start).video
                             .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
