@@ -1,6 +1,7 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useMemo, useState} from 'react';
 import WavesurferPlayer from '@wavesurfer/react';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js';
+import Timeline from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 import FileDetails from '../../admin/FileDetails';
 import {useAudioSettings} from '../../common/Storage';
 import DropDownMenu from '../../common/DropDownMenu';
@@ -18,6 +19,7 @@ export default function Audio(props) {
 	const [wavesurfer, setWavesurfer] = useState(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [audioSettings, setAudioSettings] = useAudioSettings();
+	const plugins = useMemo(() => [Timeline.create()], []);
 
 	const onReady = (ws) => {
 		document.getElementById('wavesurfer-initializing')?.remove();
@@ -99,6 +101,7 @@ export default function Audio(props) {
 				cursorWidth={2}
 				waveColor='rgb(121, 174, 200)'
 				progressColor='rgb(65, 118, 144)'
+				plugins={plugins}
 			/>
 		</FileDetails>
 	</>);
