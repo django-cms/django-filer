@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 
 from django.core.files.storage import FileSystemStorage
@@ -14,9 +15,9 @@ class FinderSystemStorage(FileSystemStorage):
 
     def path(self, name):
         parts = name.split('/', 1)
-        if len(parts) == 1:
-            parts.append('')
-        name = self.template.format(id=parts[0], id02=parts[0][0:2], id24=parts[0][2:4], filename=parts[1])
+        id = str(uuid.UUID(parts[0]))  # enforce valid UUID
+        filename = '' if len(parts) == 1 else parts[1]
+        name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
         return super().path(name)
 
     def url(self, name):
@@ -30,19 +31,19 @@ def delete_directory(storage, dir_path):
     dir_path = dir_path.rstrip('/')
     try:
         child_folders, child_files = storage.listdir(dir_path)
-    except (FileNotFoundError, OSError):
+    except FileNotFoundError:
         # storage.exists() is not supported by all storages for directories
         return
     for entry in child_files:
         try:
             storage.delete(f'{dir_path}/{entry}')
-        except (FileNotFoundError, OSError):
+        except FileNotFoundError:
             pass
     for entry in child_folders:
         delete_directory(storage, f'{dir_path}/{entry}')
     try:
         storage.delete(dir_path)
-    except (FileNotFoundError, OSError):
+    except FileNotFoundError:
         pass
 
 

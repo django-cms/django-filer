@@ -482,10 +482,18 @@ class FolderAdmin(InodeAdmin):
         return HttpResponse(status=204)  # No content
 
     def erase_trash_folder(self, request, trash_folder_id):
+        def delete_recursive(folder):
+            for subfolder in folder.subfolders.all():
+                delete_recursive(subfolder)
+            for file in folder.listdir(is_folder=False):
+                proxy_obj = InodeManager.get_proxy_object(file)
+                proxy_obj.erase_and_delete(ambit)
+            folder.delete()
+
         if request.method != 'DELETE':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
         trash_folder = FolderModel.objects.get(id=trash_folder_id, owner=request.user)
-        request._ambit = trash_folder.get_ambit()
+        ambit = trash_folder.get_ambit()
         trash_folder_entries = trash_folder.listdir()
         with transaction.atomic():
             DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()
@@ -493,11 +501,11 @@ class FolderAdmin(InodeAdmin):
                 # bulk delete does not work here because each file must be erased from disk
                 proxy_obj = InodeManager.get_proxy_object(entry)
                 if proxy_obj.is_folder:
-                    proxy_obj.delete()
+                    delete_recursive(proxy_obj)
                 else:
-                    proxy_obj.erase_and_delete(request._ambit)
+                    proxy_obj.erase_and_delete(ambit)
         fallback_folder = self.get_fallback_folder(request)
-        success_url = self.get_inode_url(request._ambit.slug, str(fallback_folder.id))
+        success_url = self.get_inode_url(ambit.slug, str(fallback_folder.id))
         return JsonResponse({'success_url': success_url})
 
     def add_folder(self, request, folder_id):
