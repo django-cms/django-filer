@@ -1,8 +1,5 @@
 from pathlib import Path
 
-from django.conf import settings
-from django.contrib.admin import site as admin_site
-from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
 from filer.models.filemodels import Folder as FilerFolder
@@ -17,19 +14,19 @@ from finder.models.folder import FolderModel as FinderFolder, ROOT_FOLDER_NAME
 class Command(BaseCommand):
     help = "Migrate files from django-filer to finder branch."
 
+    def add_arguments(self, parser):
+        parser.add_argument('slug', action='store', type=str)
+
     def handle(self, verbosity, *args, **options):
         self.verbosity = verbosity
         self.stdout.write("Migrate django-filer to version 4 (Finder)")
-        self.forward()
+        self.forward(slug=options['slug'])
 
-    def forward(self):
-        site = Site.objects.get(id=settings.SITE_ID)
-        owner = FilerFolder.objects.filter(parent__isnull=True).first().owner
+    def forward(self, slug):
         try:
-            ambit = AmbitModel.objects.get(site=site, slug=admin_site.name)
+            ambit = AmbitModel.objects.get(slug=slug)
         except AmbitModel.DoesNotExist:
-            root_folder = FinderFolder.objects.create(name=ROOT_FOLDER_NAME, owner=owner)
-            ambit = AmbitModel.objects.create(site=site, slug=admin_site.name, root_folder=root_folder)
+            self.stderr.write(f"Ambit with slug {slug} does not exist.")
 
         for filer_folder in FilerFolder.objects.filter(parent__isnull=True):
             self.migrate_folder(filer_folder, ambit.root_folder)

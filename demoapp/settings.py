@@ -101,7 +101,7 @@ STORAGES = {
     'staticfiles': {
         'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
     },
-    'finder_public': {
+    'filer_public': {
         'BACKEND': 'finder.storage.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/filer_public',
@@ -109,7 +109,7 @@ STORAGES = {
             'allow_overwrite': True,
         },
     },
-    'finder_public_samples': {
+    'filer_public_samples': {
         'BACKEND': 'finder.storage.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/filer_public_thumbnails',

@@ -1,5 +1,3 @@
-from django.contrib.auth import get_user_model
-
 from django.contrib.admin.sites import all_sites
 from django.contrib.sites.models import Site
 from django.core.files.storage import storages
