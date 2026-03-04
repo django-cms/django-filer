@@ -57,7 +57,7 @@ jobs:
         npm install --include=dev
         python -m pip install --upgrade pip
         python -m pip install --upgrade setuptools wheel
-        python -m pip install "Django~=${{ matrix.django-version }}"
+        python -m pip install "Django==${{ matrix.django-version }}.*"
         python -m pip install django-entangled ffmpeg-python pillow reportlab svglib pycairo
         python -m pip install beautifulsoup4 coverage Faker lxml pytest pytest-django pytest-cov
     - name: Install Django-CTE
