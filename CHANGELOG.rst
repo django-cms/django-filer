@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+4.0
+===
+
+Complete rewrite of the project. See README-Finder.md for details.
+
+
 3.3.3 / 2025-11-07
 ==================
 
