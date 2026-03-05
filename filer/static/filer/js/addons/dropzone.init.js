@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageSelector = '.js-filer-dropzone-message';
     const lookupButtonSelector = '.js-related-lookup';
     const editButtonSelector = '.js-related-edit';
+    const dropzoneTemplate = '.js-filer-dropzone-template';
     const progressSelector = '.js-filer-dropzone-progress';
     const previewImageWrapperSelector = '.js-img-wrapper';
     const filerClearerSelector = '.filerClearer';
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             paramName: 'file',
             maxFiles: 1,
             maxFilesize: dropzone.dataset.maxFilesize,
-            // previewTemplate: document.querySelector(dropzoneTemplateSelector)?.innerHTML || '',
+            previewTemplate: document.querySelector(dropzoneTemplate).innerHTML || '',
             clickable: false,
             addRemoveLinks: false,
             init: function () {
@@ -108,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             drop: function () {
                 this.removeAllFiles(true);
+                clearButton?.click();
                 const progressEl = dropzone.querySelector(progressSelector);
                 if (progressEl) {
                     progressEl.classList.remove(hiddenClass);

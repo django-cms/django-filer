@@ -52,6 +52,8 @@ class AdminFileWidget(ForeignKeyRawIdWidget):
             lookup_url = "?" + urlencode(sorted(params.items()))
         else:
             lookup_url = ""
+        # Filer image is never autocomplete widget; Django's popup js fails if it finds "data-context="available-source"
+        self.attrs.pop("data-context", None)
         if "class" not in attrs:
             # The JavaScript looks for this hook.
             attrs["class"] = "vForeignKeyRawIdAdminField"
