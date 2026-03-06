@@ -30,7 +30,7 @@ click==8.2.1
     #   uvicorn
 colorama==0.4.6
     # via sphinx-autobuild
-django==4.2.23
+django==4.2.29
     # via -r requirements.in
 docutils==0.21.2
     # via
