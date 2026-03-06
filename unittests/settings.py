@@ -104,6 +104,9 @@ if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
             'secret_key': 'finderadmin',
             'bucket_name': 'finder-public',
             'endpoint_url': 'http://localhost:9000',
+            'querystring_auth': False,  # Generate permanent URLs without expiring signatures
+            'default_acl': 'public-read',  # Make objects publicly readable
+            'signature_version': 's3v4',  # Use AWS Signature Version 4
         },
     }
     STORAGES['finder_bucket_samples'] = {
@@ -113,6 +116,9 @@ if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
             'secret_key': 'finderadmin',
             'bucket_name': 'finder-public-samples',
             'endpoint_url': 'http://localhost:9000',
+            'querystring_auth': False,  # Generate permanent URLs without expiring signatures
+            'default_acl': 'public-read',  # Make objects publicly readable
+            'signature_version': 's3v4',  # Use AWS Signature Version 4
         },
     }
 
