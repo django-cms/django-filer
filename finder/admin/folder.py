@@ -493,7 +493,7 @@ class FolderAdmin(InodeAdmin):
         if request.method != 'DELETE':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
         trash_folder = FolderModel.objects.get(id=trash_folder_id, owner=request.user)
-        ambit = trash_folder.get_ambit()
+        ambit = request._ambit = trash_folder.get_ambit()
         trash_folder_entries = trash_folder.listdir()
         with transaction.atomic():
             DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()

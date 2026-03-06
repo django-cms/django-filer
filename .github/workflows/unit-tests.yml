@@ -30,7 +30,6 @@ jobs:
         exclude:
           - python-version: "3.11"
             django-version: "6.0"
-            use_s3: "1"
           - python-version: "3.12"
             django-version: "5.2"
             use_s3: "1"
