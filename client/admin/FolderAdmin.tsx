@@ -76,6 +76,14 @@ export default function FolderAdmin() {
 
 		document.documentElement.style.setProperty('--open-folder-url', `url("${settings.open_folder_icon_url}")`);
 
+		// compute the top offset in order to restrict the height of the `.work-area`
+		const headerElement = document.getElementById('header');
+		let offsetTop = headerElement?.getBoundingClientRect().height ?? 0;
+		if (headerElement?.nextElementSibling?.nodeName === 'NAV') {
+			offsetTop += headerElement.nextElementSibling.getBoundingClientRect().height;
+			document.documentElement.style.setProperty('--offset-top', `${offsetTop}px`);
+		}
+
 		const context = new window.AudioContext();
 		const gainNode = context.createGain();
 		gainNode.connect(context.destination);
