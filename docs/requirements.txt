@@ -136,7 +136,7 @@ typing-extensions==4.15.0
     #   exceptiongroup
     #   starlette
     #   uvicorn
-urllib3==2.5.0
+urllib3==2.6.3
     # via requests
 uvicorn==0.35.0
     # via sphinx-autobuild
