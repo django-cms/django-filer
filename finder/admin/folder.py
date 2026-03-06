@@ -132,7 +132,7 @@ class FolderAdmin(InodeAdmin):
                     can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
                 values = 'id', 'can_change', 'can_view'
                 ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
-            else:
+            else:  # django-cte not installed
                 ancestors = [
                     {
                         'id': ancestor.id,
@@ -183,14 +183,14 @@ class FolderAdmin(InodeAdmin):
         if model_admin := self._model_admin_cache.get(mime_type):
             return model_admin
         for model, model_admin in self.admin_site._registry.items():
-            if model._meta.app_label == 'finder':
+            if model._meta.app_label == self.model._meta.app_label:
                 if mime_type in getattr(model, 'accept_mime_types', ()):
                     self._model_admin_cache[mime_type] = model_admin
                     break
         else:
             main_mime_type = '/'.join((mime_type.split('/')[0], '*'))
             for model, model_admin in self.admin_site._registry.items():
-                if model._meta.app_label == 'finder':
+                if model._meta.app_label == self.model._meta.app_label:
                     if main_mime_type in getattr(model, 'accept_mime_types', ()):
                         self._model_admin_cache[mime_type] = model_admin
                         break
