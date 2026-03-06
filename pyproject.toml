@@ -14,43 +14,23 @@ maintainers = [
 description = "A file management application for django that makes handling of files and images a breeze."
 readme = "README.rst"
 license = {text = "BSD-3-Clause"}
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 dependencies = [
-    "django>=3.2",
-    "django-polymorphic",
-    "easy-thumbnails[svg]",
-    
-    # Pin svglib to a version below 1.6.0.
-    # The latest version (1.6.0) adds pycairo as a dependency,
-    # which requires system-level libraries and fails to install in the container.
-    # This can be removed once the issue is resolved.
-    # See: https://github.com/deeplook/svglib/issues/421
-    "svglib~=1.5.1"
+    "django>=5.2",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Framework :: Django",
-    "Framework :: Django :: 3.2",
-    "Framework :: Django :: 4.2",
-    "Framework :: Django :: 5.0",
-    "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
-    "Framework :: Django CMS",
-    "Framework :: Django CMS :: 3.11",
-    "Framework :: Django CMS :: 4.0",
-    "Framework :: Django CMS :: 4.1",
-    "Framework :: Django CMS :: 5.0",
+    "Framework :: Django :: 6.0",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Software Development",
@@ -58,7 +38,13 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+cte = ["django-cte"]
 heif = ["pillow-heif"]
+audio = ["ffmpeg-python", "django-entangled"]
+image = ["Pillow", "django-entangled"]
+svg = ["reportlab", "svglib", "django-entangled"]
+video = ["ffmpeg-python", "django-entangled"]
+s3 = ["django-storages[s3]"]
 
 [project.urls]
 Homepage = "https://github.com/django-cms/django-filer"
@@ -69,7 +55,7 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["filer*", "LICENSE"]
+include = ["filer*", "finder*", "LICENSE"]
 
 [tool.setuptools.package-data]
 "*" = [
@@ -81,7 +67,7 @@ include = ["filer*", "LICENSE"]
 ]
 
 [tool.setuptools.dynamic]
-version = {attr = "filer.__version__"}
+version = {attr = "finder.__version__"}
 
 [tool.flake8]
 max-line-length = 119
@@ -132,5 +118,5 @@ known_cms = ["cms", "menus"]
 known_django = ["django"]
 
 [tool.ruff]
-src = ["filer"]
+src = ["finder", "filer"]
 exclude = ["*/migrations/*"]
