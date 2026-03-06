@@ -194,6 +194,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 		setClipboard,
 		clearClipboard,
 		setSearchResult,
+		setBusy,
 		settings
 	} = props;
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
@@ -294,30 +295,35 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 		}
 		clearClipboard();
 
-		const fetchUrl = `${settings.base_url}${settings.folder_id}/${moveInodes ? 'move' : 'copy'}`;
-		const response = await fetch(fetchUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': settings.csrf_token,
-			},
-			body: JSON.stringify({inode_ids: inodeIds}),
-		});
-		if (response.ok) {
-			const body = await response.json();
-			if (moveInodes) {
-				const current = columnRefs[clipboard[0].parent]?.current;
-				if (current) {
-					current.setInodes(current.inodes.filter(inode => inodeIds.find(id => id !== inode.id)));
+		setBusy(true);
+		try {
+			const fetchUrl = `${settings.base_url}${settings.folder_id}/${moveInodes ? 'move' : 'copy'}`;
+			const response = await fetch(fetchUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': settings.csrf_token,
+				},
+				body: JSON.stringify({inode_ids: inodeIds}),
+			});
+			if (response.ok) {
+				const body = await response.json();
+				if (moveInodes) {
+					const current = columnRefs[clipboard[0].parent]?.current;
+					if (current) {
+						current.setInodes(current.inodes.filter(inode => inodeIds.find(id => id !== inode.id)));
+					}
 				}
+				columnRefs[settings.folder_id].current.setInodes(
+					body.inodes.map(inode => ({...inode, elementRef: createRef()}))
+				);
+			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+				alert(await response.text());
+			} else {
+				console.error(response);
 			}
-			columnRefs[settings.folder_id].current.setInodes(
-				body.inodes.map(inode => ({...inode, elementRef: createRef()}))
-			);
-		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-			alert(await response.text());
-		} else {
-			console.error(response);
+		} finally {
+			setBusy(false);
 		}
 	}
 
@@ -327,23 +333,28 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 		if (inodeIds.length === 0)
 			return;
 
-		let fetchUrl = `${settings.base_url}${settings.folder_id}/delete`;
-		const response = await fetch(fetchUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': settings.csrf_token,
-			},
-			body: JSON.stringify({inode_ids: inodeIds}),
-		});
-		if (response.ok) {
-			const body = await response.json();
-			folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
-			current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
-		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-			alert(await response.text());
-		} else {
-			console.error(response);
+		setBusy(true);
+		try {
+			let fetchUrl = `${settings.base_url}${settings.folder_id}/delete`;
+			const response = await fetch(fetchUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': settings.csrf_token,
+				},
+				body: JSON.stringify({inode_ids: inodeIds}),
+			});
+			if (response.ok) {
+				const body = await response.json();
+				folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
+				current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+				alert(await response.text());
+			} else {
+				console.error(response);
+			}
+		} finally {
+			setBusy(false);
 		}
 	}
 
@@ -353,36 +364,46 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 		if (inodeIds.length === 0)
 			return;
 
-		const fetchUrl = `${settings.base_url}${settings.folder_id}/undo_discard`;
-		const response = await fetch(fetchUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': settings.csrf_token,
-			},
-			body: JSON.stringify({inode_ids: inodeIds}),
-		});
-		if (response.ok) {
-			current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
-		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-			alert(await response.text());
-		} else {
-			console.error(response);
+		setBusy(true);
+		try {
+			const fetchUrl = `${settings.base_url}${settings.folder_id}/undo_discard`;
+			const response = await fetch(fetchUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': settings.csrf_token,
+				},
+				body: JSON.stringify({inode_ids: inodeIds}),
+			});
+			if (response.ok) {
+				current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+				alert(await response.text());
+			} else {
+				console.error(response);
+			}
+		} finally {
+			setBusy(false);
 		}
 	}
 
 	async function eraseTrashFolder() {
-		const fetchUrl = `${settings.base_url}${settings.folder_id}/erase_trash_folder`;
-		const response = await fetch(fetchUrl, {
-			method: 'DELETE',
-			headers: {
-				'X-CSRFToken': settings.csrf_token,
-			},
-		});
-		if (response.ok) {
-			clearClipboard();
-			const data = await response.json();
-			window.location.assign(data.success_url);
+		setBusy(true);
+		try {
+			const fetchUrl = `${settings.base_url}${settings.folder_id}/erase_trash_folder`;
+			const response = await fetch(fetchUrl, {
+				method: 'DELETE',
+				headers: {
+					'X-CSRFToken': settings.csrf_token,
+				},
+			});
+			if (response.ok) {
+				clearClipboard();
+				const data = await response.json();
+				window.location.assign(data.success_url);
+			}
+		} finally {
+			setBusy(false);
 		}
 	}
 

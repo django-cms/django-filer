@@ -52,6 +52,12 @@ ul.messagelist {
 	user-select: none;
 	background: var(--darkened-bg);
 
+	&.busy {
+		pointer-events: none;
+		opacity: 0.5;
+		cursor: wait;
+	}
+
 	&:has(.work-area) {
 		overflow: hidden;
 	}

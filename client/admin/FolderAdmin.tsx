@@ -42,6 +42,8 @@ export default function FolderAdmin() {
 	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)]));
 	const overlayRef = useRef(null);
 	const downloadLinkRef = useRef(null);
+	const containerRef = useRef<HTMLElement>(null);
+	const [busy, setBusy] = useState(false);
 	const [currentFolderId, setCurrentFolderId] = useState(settings.folder_id);
 	const [layout, setLayout] = useLayout('tiles');
 	const [clipboard, setClipboard] = useClipboard();
@@ -66,6 +68,8 @@ export default function FolderAdmin() {
 	};
 
 	useEffect(() => {
+		containerRef.current = document.getElementById('content-react');
+
 		const messagelist = document.querySelector('ul.messagelist') as HTMLUListElement;
 		if (messagelist) {
 			messagelist.classList.add('fade-out');
@@ -96,6 +100,10 @@ export default function FolderAdmin() {
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+		containerRef.current?.classList.toggle('busy', busy);
+	}, [busy]);
 
 	function modifyMovement(args) {
 		const {transform} = args;
@@ -253,39 +261,44 @@ export default function FolderAdmin() {
 						console.error(`Unknown drop target: ${what}`);
 						return;
 				}
-				let fetchUrl = `${settings.base_url}${settings.folder_id}/${action}`;
-				const response = await fetch(fetchUrl, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': settings.csrf_token,
-					},
-					body: JSON.stringify({
-						inode_ids: draggedInodes.map(inode => inode.id),
-						target_id: targetInodeId,
-					}),
-				});
-				if (response.ok) {
-					const body = await response.json();
-					if (body.inodes && columnRefs[targetFolderId]?.current) {
-						const targetInodes = body.inodes.map(inode => ({...inode, elementRef: createRef()}));
-						columnRefs[targetFolderId].current.setInodes(targetInodes);
-						if (sourceFolderId === targetFolderId) {
-							inodes = targetInodes;
+				setBusy(true);
+				try {
+					let fetchUrl = `${settings.base_url}${settings.folder_id}/${action}`;
+					const response = await fetch(fetchUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': settings.csrf_token,
+						},
+						body: JSON.stringify({
+							inode_ids: draggedInodes.map(inode => inode.id),
+							target_id: targetInodeId,
+						}),
+					});
+					if (response.ok) {
+						const body = await response.json();
+						if (body.inodes && columnRefs[targetFolderId]?.current) {
+							const targetInodes = body.inodes.map(inode => ({...inode, elementRef: createRef()}));
+							columnRefs[targetFolderId].current.setInodes(targetInodes);
+							if (sourceFolderId === targetFolderId) {
+								inodes = targetInodes;
+							}
 						}
+						if (body.favorite_folders) {
+							folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
+						}
+						if (sourceFolderId !== targetFolderId) {
+							inodes = inodes.filter(inode => !(inode.can_change && inode.dragged));
+						}
+					} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
+						alert(await response.text());
+					} else {
+						console.error(response);
 					}
-					if (body.favorite_folders) {
-						folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
-					}
-					if (sourceFolderId !== targetFolderId) {
-						inodes = inodes.filter(inode => !(inode.can_change && inode.dragged));
-					}
-				} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-					alert(await response.text());
-				} else {
-					console.error(response);
+				} finally {
+					setBusy(false);
+					overlayRef.current.hidden = false;
 				}
-				overlayRef.current.hidden = false;
 			}
 		}
 		columnRefs[sourceFolderId].current.setInodes(inodes.map(inode => ({...inode, dragged: false})));
@@ -433,6 +446,7 @@ export default function FolderAdmin() {
 			setClipboard={setClipboard}
 			clearClipboard={clearClipboard}
 			setSearchResult={setSearchResult}
+			setBusy={setBusy}
 			settings={settings}
 		/>
 		<DndContext
