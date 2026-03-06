@@ -19,7 +19,7 @@ from django.utils.html import format_html
 from finder.admin.inode import InodeAdmin
 from finder.lookups import lookup_by_read_permission, lookup_by_tag
 from finder.models.file import InodeModel, FileModel
-from finder.models.folder import FolderModel, PinnedFolder
+from finder.models.folder import FolderModel
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.filetag import FileTag
 from finder.models.permission import Privilege, AccessControlEntry
