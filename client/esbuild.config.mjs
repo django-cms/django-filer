@@ -1,5 +1,6 @@
 import {build} from 'esbuild';
 import svgr from 'esbuild-plugin-svgr';
+import license from 'esbuild-plugin-license';
 import parser from 'yargs-parser';
 
 const buildOptions = parser(process.argv.slice(2), {
@@ -25,6 +26,18 @@ await build({
   jsx: 'automatic',
   plugins: [
     svgr(),
+    license({
+      thirdParty: {
+        output: {
+          file: 'LICENSES.txt',
+          template(dependencies) {
+            return dependencies.map(dep =>
+              `${dep.packageJson.name}@${dep.packageJson.version}\nLicense: ${dep.packageJson.license}\n${dep.licenseText || 'No license text available.'}`
+            ).join('\n\n---\n\n');
+          },
+        },
+      },
+    }),
   ],
   loader: {'.svg': 'text', '.jsx': 'jsx' },
   target: ['es2020', 'chrome84', 'firefox84', 'safari14', 'edge84']
