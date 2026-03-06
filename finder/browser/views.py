@@ -85,6 +85,7 @@ class BrowserView(View):
                 ancestors = FolderModel.objects.get(id=last_folder_id).ancestors
             except FolderModel.DoesNotExist:
                 ancestors = []
+                last_folder_id = str(ambit.root_folder.id)
             can_view_subquery = self._get_can_view_subquery(request.user)
             if isinstance(ancestors, QuerySet):
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
