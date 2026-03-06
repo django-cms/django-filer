@@ -28,6 +28,10 @@ ul.messagelist {
 	position: relative;
 }
 
+#main:has(#content-react) {
+	max-height: calc(100vh - var(--offset-top, 85px));  // prevent double scrollbars when content-react is present
+}
+
 #content:has(#content-react) {
 	padding: 0;
 	h1 {
