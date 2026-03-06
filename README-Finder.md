@@ -343,6 +343,7 @@ class MyModel(models.Model):
     my_file = FinderFileField(
         null=True,
         blank=True,
+        ambit='my-ambit',  # this must be the slug of an existing ambit
     )
 ```
 
@@ -385,9 +386,7 @@ head of the person in that image.
 
 ## Further Steps
 
-* A permission system based on the idea of Access Control Lists, see above.
 * A quota system, which allows to limit the amount of disk space a user can use.
-* Thumbnailing, see above.
 
 
 ## Further Readings
