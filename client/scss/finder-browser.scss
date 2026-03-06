@@ -83,10 +83,10 @@ dialog {
 	border: 1px solid #a0a0a0;
 	border-radius: 0.5rem;
 	box-shadow: 0 0 0.5rem #c8c8c8;
-	width: 80%;
+	width: calc(100% - 2rem);
 	height: 80%;
 	max-width: 1200px;
-	padding: 2rem;
+	padding: 1rem;
 
 	.wrapper {
 		display: flex;
