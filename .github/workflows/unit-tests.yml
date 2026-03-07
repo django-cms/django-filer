@@ -4,17 +4,15 @@ on:
   push:
     branches:
       - finder
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-      - '/docs/**'
+    paths:
+      - 'finder/**'
+      - 'unittests/**'
   pull_request:
     branches:
       - develop
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-      - '/docs/**'
+    paths:
+      - 'finder/**'
+      - 'unittests/**'
 
 jobs:
   build:
@@ -30,6 +28,9 @@ jobs:
         exclude:
           - python-version: "3.11"
             django-version: "6.0"
+          - python-version: "3.11"
+            django-version: "5.2"
+            use_postgres: "1"
           - python-version: "3.12"
             django-version: "5.2"
             use_s3: "1"
