@@ -16,13 +16,14 @@ def principals_url():
 
 @pytest.fixture
 def permissions_url(ambit):
-    base_url = reverse('admin:finder_foldermodel_changelist')
     def _url(inode_id, **params):
         url = f'{base_url}{inode_id}/permissions'
         if params:
             query = '&'.join(f'{k}' for k in params)
             url = f'{url}?{query}'
         return url
+
+    base_url = reverse('admin:finder_foldermodel_changelist')
     return _url
 
 
@@ -473,4 +474,3 @@ def test_toggle_pin_missing_folder(admin_client, missing_inode_id):
         content_type='application/json',
     )
     assert response.status_code == 404
-
