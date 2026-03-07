@@ -95,4 +95,3 @@ def test_replace_file_without_write_permission(admin_client, admin_user, ambit, 
     uploaded_file.refresh_from_db()
     assert uploaded_file.file_size == original_file_size
     assert uploaded_file.sha1 == original_sha1
-

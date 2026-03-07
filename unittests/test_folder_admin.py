@@ -347,9 +347,6 @@ def test_folder_fetch_permission(ambit, admin_client, admin_user, uploaded_file,
     for ordering in range(3, 5):
         assert inodes_by_name[f"RO File #{ordering}"]['can_change'] is False
 
-
-@pytest.fixture
-def update_inode_url(ambit):
     return reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id}) + '/update'
 
 
@@ -1064,4 +1061,3 @@ def test_erase_trash_folder_recursive(admin_client, admin_user, ambit, sub_folde
     assert not ambit.original_storage.exists(inner_file.file_path)
     remaining_entries = list(trash_folder.listdir())
     assert len(remaining_entries) == 0
-

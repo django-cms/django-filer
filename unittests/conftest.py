@@ -113,4 +113,3 @@ def uploaded_image(ambit, admin_user):
         folder=ambit.root_folder,
         owner=admin_user,
     )
-
