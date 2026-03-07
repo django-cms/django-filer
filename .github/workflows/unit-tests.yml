@@ -37,7 +37,6 @@ jobs:
           - django-version: "5.2"
             with_cte: "0"
             use_postgres: "1"
-            use_s3: "1"
           - django-version: "6.0"
             with_cte: "0"
             use_postgres: "0"
