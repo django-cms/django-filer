@@ -24,8 +24,14 @@ SOFTWARE.
 
 ––––
 
-SVG icons supplied by courtesy of https://paomedia.github.io/small-n-flat/ and
-are subject to the Creative Commons Zero v1.0 Universal.
+Statically served SVG icons in `finder/static/finder/icons/` are supplied by
+courtesy of https://paomedia.github.io/small-n-flat/ and are subject to the
+Creative Commons Zero v1.0 Universal.
+
+––––
+
+Embedded SVG icons in `client/icons/` are supplied by courtesy of
+https://remixicon.com/ and are subject to the Remix Icon License v1.0.
 
 ––––
 
