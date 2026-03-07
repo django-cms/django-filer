@@ -335,7 +335,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 
 		setBusy(true);
 		try {
-			let fetchUrl = `${settings.base_url}${settings.folder_id}/delete`;
+			const fetchUrl = `${settings.base_url}${settings.folder_id}/delete`;
 			const response = await fetch(fetchUrl, {
 				method: 'POST',
 				headers: {
