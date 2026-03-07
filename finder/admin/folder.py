@@ -389,7 +389,8 @@ class FolderAdmin(InodeAdmin):
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
-            return HttpResponse("Cannot move inodes from the trash folder into itself.", status=409)
+            msg = gettext("Cannot move inodes from the trash folder into itself.")
+            return HttpResponse(msg, status=409)
         if not current_folder.has_permission(request.user, Privilege.WRITE):
             msg = gettext("You do not have permission to delete items from the folder named “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
@@ -484,7 +485,7 @@ class FolderAdmin(InodeAdmin):
     def erase_trash_folder(self, request, trash_folder_id):
         def delete_recursive(folder):
             for subfolder in folder.subfolders.all():
-                delete_recursive(subfolder)
+                delete_recursive(subfolder)  # presumably never reached
             for file in folder.listdir(is_folder=False):
                 proxy_obj = InodeManager.get_proxy_object(file)
                 proxy_obj.erase_and_delete(ambit)
