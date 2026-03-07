@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.forms.widgets import Media
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from finder.admin.inode import InodeAdmin
 from finder.forms.file import FileForm
 from finder.models.file import FileModel
+from finder.models.folder import FolderModel
 from finder.models.inode import InodeModel
 from finder.models.filetag import FileTag
 from finder.models.permission import Privilege
@@ -73,8 +74,12 @@ class FileAdmin(InodeAdmin):
     def replace_file(self, request, file_id):
         if request.method != 'POST':
             return HttpResponseBadRequest(f"Method {request.method} not allowed. Only POST requests are allowed.")
-        if not (file_obj := self.get_object(request, file_id)):
+        try:
+            file_obj = self.get_object(request, file_id)
+        except FolderModel.DoesNotExist:
             return HttpResponseNotFound(f"File {file_id} not found.")
+        if not self.has_change_permission(request, file_obj):
+            return HttpResponseForbidden(f"You do not have permission to replace file {file_id}.")
         if request.content_type != 'multipart/form-data' or 'upload_file' not in request.FILES:
             return HttpResponseBadRequest(f"Content-Type {request.content_type} invalid for file upload.")
         ambit = file_obj.folder.get_ambit()
@@ -82,7 +87,7 @@ class FileAdmin(InodeAdmin):
         if uploaded_file.content_type != file_obj.mime_type:
             return HttpResponseBadRequest(f"Can not replace file {file_obj.name} with different mime type.")
         # the payload of the file_obj is not replaced and remains orphaned, it may be deleted
-        file_obj.file_name = file_obj.generate_filename(uploaded_file.name)
+        file_obj.file_name = ambit.original_storage.generate_filename(uploaded_file.name)
         file_obj.file_size = uploaded_file.size
         file_obj.receive_file(ambit, uploaded_file)
         file_obj.save()
