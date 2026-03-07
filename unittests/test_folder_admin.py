@@ -347,6 +347,9 @@ def test_folder_fetch_permission(ambit, admin_client, admin_user, uploaded_file,
     for ordering in range(3, 5):
         assert inodes_by_name[f"RO File #{ordering}"]['can_change'] is False
 
+
+@pytest.fixture
+def update_inode_url(ambit):
     return reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id}) + '/update'
 
 

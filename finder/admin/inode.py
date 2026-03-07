@@ -128,9 +128,9 @@ class InodeAdmin(admin.ModelAdmin):
                 with transaction.atomic():
                     if to_default:
                         assert current_inode.is_folder, "Default permission setting is only allowed on folders."
-                        current_inode.apply_default_access_control_list(access_control_list, user, recursive)
+                        current_inode.apply_default_access_control_list(access_control_list, user=user, recursive=recursive)
                     else:
-                        current_inode.apply_access_control_lists(access_control_list, user, recursive)
+                        current_inode.apply_access_control_lists(access_control_list, user=user, recursive=recursive)
             except (KeyError, json.JSONDecodeError):
                 return HttpResponse("Invalid JSON payload.", status=400)
             else:
