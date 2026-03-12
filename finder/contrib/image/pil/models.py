@@ -13,7 +13,7 @@ class PILImageModel(ImageFileModel):
     """
     Model for image files which can be transformed by the PIL package.
     """
-    accept_mime_types = ['image/jpeg', 'image/webp', 'image/png', 'image/gif']
+    accept_mime_types = ['image/jpeg', 'image/webp', 'image/png', 'image/gif', 'image/avif']
     exif_values = set(ExifTags.Base.__members__.values())  # TODO: some EXIF values can be removed
     MAX_STORED_IMAGE_WIDTH = 3840
 
