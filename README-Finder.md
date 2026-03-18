@@ -54,15 +54,16 @@ while preserving the possibility to perform queries across all tables. This allo
 models inheriting from the `AbstractFileModel` without the need of **django-polymorphic**, and thus
 a join between two or more tables for each query.
 
-Multiple root folder are allowed. They can be used side by side in the Django admin and are listed
-in the sidebar. For each root folder, a different Django storage can be configured. It also is
-possible to restrict a root folder to a Site and/or to an AdminSite.
+Multiple ambits are allowed, each containg one root folder, one trash folder per user and a list of
+allowed tags. Each ambit must explictly be created using a management command. All ambits are
+displayed in the left sidebar of the Django admin. For each ambit, a different Django storage can be
+configured. It also is possible to restrict an ambit to a Site and/or to an AdminSite.
 
 The Admin interface has also been completely rewritten. For instance, there is no more list view for
 the `FolderModel` and the `FileModel` (or any specialized implementation). Instead, there are only
 details views for each of those models. This is much nearer to what a user would expect from a file
 system. Therefore, if a user wants to access the list view of a folder, he is redirected immediately
-to the detail view of the root folder of the given tenant. From there, he can traverse the folder
+to the detail view of the root folder of the given ambit. From there, he can traverse the folder
 tree in the same manner he's used to from his operating system.
 
 
@@ -113,15 +114,17 @@ Each `AccessControlEntry` has a bitmap field used to represent:
   different file types and folders on one side and the access control list on the other.
 
 In addition to `AccessControlEntry` the permission system also provides a model named
-`DefaultAccessControlEntry`. This acts as a template for newly  which is used to set default permissions for files and folders created as children of a specific folder. This allows to set a permission template for each folder, which is inherited by all files and folders created as children of that folder. This is implemented as a separate model with a foreign key onto the `FolderModel`, because it is not possible to use the same model for both purposes, since the default permissions must be inherited by all children of a folder, while the regular permissions only apply to the file or folder they are attached to.
+`DefaultAccessControlEntry`. This acts as a template for newely files or folders created inside, or
+move to another folder.
+The `DefaultAccessControlEntry` is implemented as a separate model with a foreign key onto the
+`FolderModel`, because it is not possible to use the `AccessControlEntry` for both purposes, since
+the default permissions must be inherited by all children of a folder, while the regular
+permissions only apply to the file or folder they are attached to.
 
-*
-* A foreign key onto the folder model to set a permission template. Read below for details.
-* The `execute` flag as seen in Unix file systems and other ACL implementations does not make sense
-  in this context and is not implemented.
+A foreign key onto the folder model to set a permission template. Read below for details.
 
 If a folder has `write` but no `read` permission, the user can upload files into that folder, but
-doesn't see files from other users. This is named "Dropbox" functionality.
+doesn't see files from other users. This is named the "Dropbox" functionality.
 
 Each file and folder has a foreign key named `owner`, pointing onto the `User` model. The owner of a
 file or folder can change its permissions if he has the global permission to do so. When creating a
@@ -266,10 +269,10 @@ Run the migrations for app `finder`:
 python manage.py migrate finder
 ```
 
-Create a root folder using the above configuration:
+Create an ambit using the above configuration:
 
 ```shell
-python manage.py finder add-root public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
+python manage.py finder add-ambit public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
 ```
 
 You can create multiple root folders, each with their own unique slug and name. You may configure a
