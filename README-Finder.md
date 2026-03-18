@@ -269,7 +269,7 @@ python manage.py migrate finder
 Create a root folder using the above configuration:
 
 ```shell
-python manage.py finder add-root public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
+python manage.py finder add-ambit public --values name="Public Folder" storage=finder_public sample_storage=finder_public_samples
 ```
 
 You can create multiple root folders, each with their own unique slug and name. You may configure a
