@@ -84,8 +84,9 @@ dialog {
 	border-radius: 0.5rem;
 	box-shadow: 0 0 0.5rem #c8c8c8;
 	width: calc(100% - 2rem);
-	height: 80%;
-	max-width: 1200px;
+	height: calc(100% - 2rem);
+	max-width: 90%;
+	max-height: 90%;
 	padding: 1rem;
 
 	.wrapper {
