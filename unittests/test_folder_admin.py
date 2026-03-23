@@ -37,19 +37,6 @@ def file_tags(django_db_blocker, ambit):
 
 
 @pytest.fixture
-def uploaded_file(ambit, admin_user):
-    file_name = 'small_file.bin'
-    with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
-        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
-    return FileModel.objects.create_from_upload(
-        ambit,
-        uploaded_file,
-        folder=ambit.root_folder,
-        owner=admin_user,
-    )
-
-
-@pytest.fixture
 def sub_folder(ambit, admin_user):
     return FolderModel.objects.create(
         parent=ambit.root_folder,
@@ -247,6 +234,118 @@ def test_folder_fetch(ambit, uploaded_file, admin_client, missing_inode_id):
     # with wrong method
     response = admin_client.head(f'{base_url}/fetch')
     assert response.status_code == 405
+
+
+def test_folder_fetch_permission(ambit, admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs):
+    """Test that the fetch endpoint only returns inodes the user has read permission for."""
+    # Create a second folder with read-only permission
+    read_only_folder = FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name='Read Only Folder',
+        owner=admin_user,
+    )
+
+    # Create files in sub_folder (read&write folder)
+    rw_files = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"RW File #{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=admin_user,
+            ordering=ordering,
+        ) for ordering in range(1, 7)
+    ])
+
+    # Create files in read_only_folder
+    ro_files = FileModel.objects.bulk_create([
+        FileModel(
+            parent=read_only_folder,
+            name=f"RO File #{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=admin_user,
+            ordering=ordering,
+        ) for ordering in range(1, 7)
+    ])
+
+    AccessControlEntry.objects.all().delete()
+
+    if admin_user.is_superuser:
+        # Superuser sees all files regardless of ACL
+        rw_fetch_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+        response = admin_client.get(f'{rw_fetch_url}/fetch')
+        assert response.status_code == 200
+        inodes = response.json()['inodes']
+        fetched_names = sorted(inode['name'] for inode in inodes)
+        expected_names = sorted(f"RW File #{o}" for o in range(1, 7))
+        assert fetched_names == expected_names
+        for inode in inodes:
+            assert inode['can_view'] is True
+            assert inode['can_change'] is True
+
+        ro_fetch_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': read_only_folder.id})
+        response = admin_client.get(f'{ro_fetch_url}/fetch')
+        assert response.status_code == 200
+        inodes = response.json()['inodes']
+        fetched_names = sorted(inode['name'] for inode in inodes)
+        expected_names = sorted(f"RO File #{o}" for o in range(1, 7))
+        assert fetched_names == expected_names
+        return
+
+    # For non-superuser: assign mixed permissions
+    # sub_folder: read&write access on the folder itself
+    AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+
+    # read_only_folder: read-only access on the folder itself
+    ro_kwargs = {**principal_kwargs, 'privilege': Privilege.READ}
+    AccessControlEntry.objects.create(inode=read_only_folder.id, **ro_kwargs)
+
+    # rw_files: files 1-2 have read&write, files 3-4 have read-only, files 5-6 have no permission
+    for file in rw_files[:2]:
+        AccessControlEntry.objects.create(inode=file.id, **principal_kwargs)
+    for file in rw_files[2:4]:
+        AccessControlEntry.objects.create(inode=file.id, **{**principal_kwargs, 'privilege': Privilege.READ})
+    # rw_files[4:6] get no ACL entries at all
+
+    # ro_files: files 1-2 have read&write, files 3-4 have read-only, files 5-6 have no permission
+    for file in ro_files[:2]:
+        AccessControlEntry.objects.create(inode=file.id, **principal_kwargs)
+    for file in ro_files[2:4]:
+        AccessControlEntry.objects.create(inode=file.id, **{**principal_kwargs, 'privilege': Privilege.READ})
+    # ro_files[4:6] get no ACL entries at all
+
+    # Fetch sub_folder: should only return files with read permission (files 1-4)
+    rw_fetch_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.get(f'{rw_fetch_url}/fetch')
+    assert response.status_code == 200
+    inodes = response.json()['inodes']
+    fetched_names = sorted(inode['name'] for inode in inodes)
+    expected_names = sorted(f"RW File #{o}" for o in range(1, 5))
+    assert fetched_names == expected_names
+
+    # Verify can_change annotation: files 1-2 are writable, files 3-4 are read-only
+    inodes_by_name = {inode['name']: inode for inode in inodes}
+    for ordering in range(1, 3):
+        assert inodes_by_name[f"RW File #{ordering}"]['can_change'] is True
+    for ordering in range(3, 5):
+        assert inodes_by_name[f"RW File #{ordering}"]['can_change'] is False
+
+    # Fetch read_only_folder: should only return files with read permission (files 1-4)
+    ro_fetch_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': read_only_folder.id})
+    response = admin_client.get(f'{ro_fetch_url}/fetch')
+    assert response.status_code == 200
+    inodes = response.json()['inodes']
+    fetched_names = sorted(inode['name'] for inode in inodes)
+    expected_names = sorted(f"RO File #{o}" for o in range(1, 5))
+    assert fetched_names == expected_names
+
+    # Verify can_change annotation: files 1-2 are writable, files 3-4 are read-only
+    inodes_by_name = {inode['name']: inode for inode in inodes}
+    for ordering in range(1, 3):
+        assert inodes_by_name[f"RO File #{ordering}"]['can_change'] is True
+    for ordering in range(3, 5):
+        assert inodes_by_name[f"RO File #{ordering}"]['can_change'] is False
 
 
 @pytest.fixture
@@ -921,3 +1020,47 @@ def test_erase_trash_folder(admin_client, admin_user, ambit, sub_folder):
     assert DiscardedInode.objects.filter(inode=discarded_inode.id).exists() is False
     assert FileModel.objects.filter(id=discarded_inode.id).exists() is False
     assert not ambit.original_storage.exists(discarded_inode.file_path)
+
+
+def test_erase_trash_folder_recursive(admin_client, admin_user, ambit, sub_folder):
+    """Test erasing a trash folder containing a sub_folder with a file inside, verifying delete_recursive."""
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+
+    # Create a file inside sub_folder
+    file_name = 'small_file.bin'
+    with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
+        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
+    inner_file = FileModel.objects.create_from_upload(
+        ambit,
+        uploaded_file,
+        folder=sub_folder,
+        owner=admin_user,
+    )
+    assert ambit.original_storage.exists(inner_file.file_path)
+
+    # Move sub_folder to trash
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/delete',
+        json.dumps({'inode_ids': [str(sub_folder.id)]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    sub_folder.refresh_from_db()
+    assert sub_folder.parent_id == trash_folder.id
+    assert DiscardedInode.objects.filter(inode=sub_folder.id).exists()
+
+    # Erase the trash folder
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+    erase_response = admin_client.delete(f'{admin_url}/erase_trash_folder')
+    assert erase_response.status_code == 200
+    response_data = erase_response.json()
+    assert 'success_url' in response_data
+
+    # Verify sub_folder and its contents are fully deleted
+    assert FolderModel.objects.filter(id=sub_folder.id).exists() is False
+    assert FileModel.objects.filter(id=inner_file.id).exists() is False
+    assert DiscardedInode.objects.filter(inode=sub_folder.id).exists() is False
+    assert not ambit.original_storage.exists(inner_file.file_path)
+    remaining_entries = list(trash_folder.listdir())
+    assert len(remaining_entries) == 0

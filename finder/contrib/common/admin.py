@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from finder.admin.file import FileAdmin
-from finder.contrib.common.models import PDFFileModel, SpreadsheetModel
+from finder.contrib.common.models import CodeFileModel, PDFFileModel, SpreadsheetModel, TextFileModel, WordFileModel
 
 
 class CommonAdmin(FileAdmin):
@@ -27,4 +27,7 @@ class PDFFileAdmin(CommonAdmin):
 
 
 admin.site.register(SpreadsheetModel, CommonAdmin)
+admin.site.register(TextFileModel, CommonAdmin)
+admin.site.register(CodeFileModel, CommonAdmin)
+admin.site.register(WordFileModel, CommonAdmin)
 admin.site.register(PDFFileModel, PDFFileAdmin)

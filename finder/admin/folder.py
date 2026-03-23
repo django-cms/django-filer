@@ -19,7 +19,7 @@ from django.utils.html import format_html
 from finder.admin.inode import InodeAdmin
 from finder.lookups import lookup_by_read_permission, lookup_by_tag
 from finder.models.file import InodeModel, FileModel
-from finder.models.folder import FolderModel, PinnedFolder
+from finder.models.folder import FolderModel
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.filetag import FileTag
 from finder.models.permission import Privilege, AccessControlEntry
@@ -132,7 +132,7 @@ class FolderAdmin(InodeAdmin):
                     can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
                 values = 'id', 'can_change', 'can_view'
                 ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
-            else:
+            else:  # django-cte not installed
                 ancestors = [
                     {
                         'id': ancestor.id,
@@ -183,14 +183,14 @@ class FolderAdmin(InodeAdmin):
         if model_admin := self._model_admin_cache.get(mime_type):
             return model_admin
         for model, model_admin in self.admin_site._registry.items():
-            if model._meta.app_label == 'finder':
+            if model._meta.app_label == self.model._meta.app_label:
                 if mime_type in getattr(model, 'accept_mime_types', ()):
                     self._model_admin_cache[mime_type] = model_admin
                     break
         else:
             main_mime_type = '/'.join((mime_type.split('/')[0], '*'))
             for model, model_admin in self.admin_site._registry.items():
-                if model._meta.app_label == 'finder':
+                if model._meta.app_label == self.model._meta.app_label:
                     if main_mime_type in getattr(model, 'accept_mime_types', ()):
                         self._model_admin_cache[mime_type] = model_admin
                         break
@@ -389,7 +389,8 @@ class FolderAdmin(InodeAdmin):
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
-            return HttpResponse("Cannot move inodes from the trash folder into itself.", status=409)
+            msg = gettext("Cannot move inodes from the trash folder into itself.")
+            return HttpResponse(msg, status=409)
         if not current_folder.has_permission(request.user, Privilege.WRITE):
             msg = gettext("You do not have permission to delete items from the folder named “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
@@ -484,7 +485,7 @@ class FolderAdmin(InodeAdmin):
     def erase_trash_folder(self, request, trash_folder_id):
         def delete_recursive(folder):
             for subfolder in folder.subfolders.all():
-                delete_recursive(subfolder)
+                delete_recursive(subfolder)  # presumably never reached
             for file in folder.listdir(is_folder=False):
                 proxy_obj = InodeManager.get_proxy_object(file)
                 proxy_obj.erase_and_delete(ambit)
@@ -493,7 +494,7 @@ class FolderAdmin(InodeAdmin):
         if request.method != 'DELETE':
             return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
         trash_folder = FolderModel.objects.get(id=trash_folder_id, owner=request.user)
-        ambit = trash_folder.get_ambit()
+        ambit = request._ambit = trash_folder.get_ambit()
         trash_folder_entries = trash_folder.listdir()
         with transaction.atomic():
             DiscardedInode.objects.filter(inode__in=list(trash_folder_entries.values_list('id', flat=True))).delete()

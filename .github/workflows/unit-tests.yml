@@ -4,17 +4,15 @@ on:
   push:
     branches:
       - finder
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-      - '/docs/**'
+    paths:
+      - 'finder/**'
+      - 'unittests/**'
   pull_request:
     branches:
       - develop
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-      - '/docs/**'
+    paths:
+      - 'finder/**'
+      - 'unittests/**'
 
 jobs:
   build:
@@ -30,18 +28,19 @@ jobs:
         exclude:
           - python-version: "3.11"
             django-version: "6.0"
-            use_s3: "1"
+          - python-version: "3.11"
+            django-version: "5.2"
+            use_postgres: "1"
           - python-version: "3.12"
             django-version: "5.2"
             use_s3: "1"
           - django-version: "5.2"
             with_cte: "0"
             use_postgres: "1"
-            use_s3: "1"
           - django-version: "6.0"
             with_cte: "0"
             use_postgres: "0"
-    name: "py${{ matrix.python-version }} django-${{ matrix.django-version }} with ${{ matrix.use_postgres == '1' && 'PostgreSQL' || 'SQLite' }}${{ matrix.with_cte == '1' && ' and CTE' || '' }}"
+    name: "py${{ matrix.python-version }} django-${{ matrix.django-version }} with ${{ matrix.use_postgres == '1' && 'PostgreSQL' || 'SQLite' }}${{ matrix.with_cte == '1' && ' and CTE' || '' }}${{ matrix.use_s3 == '1' && ' and S3 storage' || '' }}"
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}

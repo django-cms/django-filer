@@ -58,7 +58,11 @@ export default function SearchField(props) {
 			resetSearch();
 		} else if (event.type === 'keydown' && event.key === 'Enter') {
 			// pressed Enter
-			searchRef.current.value.length === 0 ? resetSearch() : performSearch();
+			if (searchRef.current.value.length === 0) {
+				resetSearch();
+			} else {
+				performSearch();
+			}
 		} else if (event.type === 'click' && searchRef.current.value.length > 2) {
 			// clicked on the search button
 			performSearch();

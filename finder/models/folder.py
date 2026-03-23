@@ -421,13 +421,13 @@ class FolderModel(InodeModel):
         default_acl_qs.exclude(id__in=entry_ids).delete()
         if recursive:
             for subfolder in self.subfolders:
-                subfolder.apply_default_access_control_list(next_acl, user, recursive=True)
+                subfolder.apply_default_access_control_list(next_acl, user=user, recursive=True)
 
     def apply_access_control_lists(self, next_acl, user=None, recursive=False, default_acl=False):
         """
         Update the access control list of the current folder and all its descendant folders to the given ACL.
         """
-        super().apply_access_control_lists(next_acl, user)
+        super().apply_access_control_lists(next_acl, user=user)
         if recursive:
             for entry in self.listdir():
                 proxy_obj = InodeManager.get_proxy_object(entry)

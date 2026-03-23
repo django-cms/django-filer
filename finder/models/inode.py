@@ -6,7 +6,7 @@ from operator import and_, or_
 from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured, ValidationError, PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import connections, models
 from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import F, Q, Value
@@ -14,7 +14,7 @@ from django.db.models.fields import BooleanField, CharField
 from django.db.models.functions import Cast, Lower
 from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from finder.models.permission import AccessControlEntry, Privilege
 

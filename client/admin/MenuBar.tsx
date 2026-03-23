@@ -335,7 +335,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 
 		setBusy(true);
 		try {
-			let fetchUrl = `${settings.base_url}${settings.folder_id}/delete`;
+			const fetchUrl = `${settings.base_url}${settings.folder_id}/delete`;
 			const response = await fetch(fetchUrl, {
 				method: 'POST',
 				headers: {
@@ -442,7 +442,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 						<ColumnsIcon/>
 					</MenuItem>
 					<SortingOptions refreshFilesList={refreshColumns} />
-					{settings.tags && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags} />}
+					{settings.tags?.length > 0 && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags} />}
 					<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={cutInodes} tooltip={gettext("Cut selected to clipboard")}>
 						<CutIcon/>
 					</MenuItem>

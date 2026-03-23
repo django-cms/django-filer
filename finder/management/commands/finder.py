@@ -121,7 +121,7 @@ class Command(BaseCommand):
         # create ACL and default ACL with RW-permission for everyone
         AccessControlEntry.objects.create(inode=root_folder.id, privilege=Privilege.READ_WRITE)
         DefaultAccessControlEntry.objects.create(folder=root_folder, privilege=Privilege.READ_WRITE)
-        self.stdout.write(f"Successfully created tree root with slug ‘{slug}’.")
+        self.stdout.write(f"Successfully created ambit with slug ‘{slug}’.")
 
     def edit_ambit(self, **options):
         slug = options.pop('slug')
@@ -144,7 +144,7 @@ class Command(BaseCommand):
             if storage_name in storages.backends:
                 values['_sample_storage'] = storage_name
         if AmbitModel.objects.filter(slug=slug).update(**values) == 1:
-            self.stdout.write(f"Successfully updated tree root with slug ‘{slug}’.")
+            self.stdout.write(f"Successfully updated ambit with slug ‘{slug}’.")
 
     def delete_ambit(self, **options):
         def delete_recursive(folder):
@@ -163,4 +163,4 @@ class Command(BaseCommand):
         erase_files = options.get('erase_files', False)
         delete_recursive(ambit.root_folder)
         ambit.delete()
-        self.stdout.write(f"Successfully deleted tree root with slug ‘{slug}’.")
+        self.stdout.write(f"Successfully deleted ambit with slug ‘{slug}’.")

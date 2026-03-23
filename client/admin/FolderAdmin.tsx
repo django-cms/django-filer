@@ -28,25 +28,25 @@ import DownloadIcon from '../icons/download.svg';
 import TrashIcon from '../icons/trash.svg';
 import MoreVerticalIcon from '../icons/more-vertical.svg';
 
-const useLayout = (initial: string) => useCookie('django-finder-layout', initial);
+// eslint-disable-next-line react-hooks/rules-of-hooks
 const useClipboard = useSessionStorage('filer-clipboard', []);
 
 
 export default function FolderAdmin() {
 	const settings = useContext(FinderSettings);
 	const [audioSettings] = useAudioSettings();
+	const [layout, setLayout] = useCookie('django-finder-layout', 'tiles');
+	const [clipboard, setClipboard] = useClipboard();
 	const [webAudio, setWebAudio] = useState(null);
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
 	const uploaderRef = useRef(null);
-	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)]));
+	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, createRef()]));
 	const overlayRef = useRef(null);
 	const downloadLinkRef = useRef(null);
 	const containerRef = useRef<HTMLElement>(null);
 	const [busy, setBusy] = useState(false);
 	const [currentFolderId, setCurrentFolderId] = useState(settings.folder_id);
-	const [layout, setLayout] = useLayout('tiles');
-	const [clipboard, setClipboard] = useClipboard();
 	const [activeInode, setActiveInode] = useState(null);
 	const [draggedInodes, setDraggedInodes] = useState([]);
 	const [isSearchResult, setSearchResult] = useState<boolean>(() => {
@@ -87,7 +87,9 @@ export default function FolderAdmin() {
 			offsetTop += headerElement.nextElementSibling.getBoundingClientRect().height;
 			document.documentElement.style.setProperty('--offset-top', `${offsetTop}px`);
 		}
+	}, []);
 
+	useEffect(() => {
 		const context = new window.AudioContext();
 		const gainNode = context.createGain();
 		gainNode.connect(context.destination);

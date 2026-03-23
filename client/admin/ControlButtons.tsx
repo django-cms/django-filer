@@ -46,7 +46,7 @@ function ReplaceFileButton(props) {
 			file.reject = reject;
 		});
 		props.setUploadFile(file);
-		promise.then((response) => {
+		promise.then(() => {
 			window.location.reload();
 		}).catch((error) => {
 			alert(error);
