@@ -3,6 +3,7 @@ import os
 
 import django
 import django.core.files
+from django import VERSION as DJANGO_VERSION
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -1995,4 +1996,10 @@ class AdditionalAdminFormsTests(TestCase):
     def test_resize_form(self):
         response = self.client.post(self.url, {"action": ["resize_images"], **self.payload})
         self.assertContains(response, 'Warning: Images will be resized in-place and originals will be lost.')
-        self.assertContains(response, '<div class="form-row field-crop field-upscale">')
+        if DJANGO_VERSION < (6, 1):
+            self.assertContains(response, '<div class="form-row field-crop field-upscale">')
+        else:
+            self.assertContains(
+                response,
+                '<div class="form-row flex-container form-multiline field-crop field-upscale">',
+            )
