@@ -8,6 +8,8 @@
 @use "tooltip";
 @use "volume-control";
 
+@include progress.keyframes;
+
 // messagelist appears after saving a file
 ul.messagelist {
 	position: relative;

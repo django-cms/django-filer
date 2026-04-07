@@ -1,5 +1,16 @@
 @use "colors";
 
+@mixin keyframes {
+	@keyframes progress-animation {
+		from {
+			background-position: 0 0;
+		}
+		to {
+			background-position: 50px 50px;
+		}
+	}
+}
+
 @mixin progress-overlay {
 	position: absolute;
 	inset: 0;
@@ -35,8 +46,38 @@
 				}
 				progress {
 					width: 50%;
-					height: 20px;
+					height: 1rem;
 					margin-inline-start: 0.5rem;
+					accent-color: var(--button-bg);
+					-webkit-appearance: none;
+
+					&::-webkit-progress-bar {
+						background-color: var(--body-quiet-color);
+						border-radius: 0.5rem;
+					}
+
+					&::-moz-progress-bar {
+						background-color: var(--body-quiet-color);
+						border-radius: 0.5rem;
+					}
+
+					&::-webkit-progress-value {
+						border-radius: 0.5rem;
+						background-color: var(--primary);
+						transition: width 0.3s ease;
+					}
+
+					&.processing::-webkit-progress-value {
+						background-color: var(--secondary);
+						background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+						background-size: 50px 50px;
+						background-repeat: repeat;
+						animation: progress-animation 2s linear infinite;
+					}
+
+					&.complete::-webkit-progress-value {
+						background-color: var(--secondary);
+					}
 				}
 			}
 		}
