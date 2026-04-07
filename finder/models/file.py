@@ -15,7 +15,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
-from finder.storage import delete_directory
+from finder.storages import delete_directory
 
 
 def mimetype_validator(value):

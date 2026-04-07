@@ -9,7 +9,7 @@ import ffmpeg
 
 from filer import settings as filer_settings
 from finder.models.file import FileModel
-from finder.storage import copy_to_local
+from finder.storages import copy_to_local
 
 SAMPLE_DURATION = 5
 
