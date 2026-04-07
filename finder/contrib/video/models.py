@@ -1,3 +1,4 @@
+from logging import getLogger
 from os import unlink
 from pathlib import Path
 from tempfile import mkstemp
@@ -11,6 +12,8 @@ from finder.models.file import FileModel
 from finder.storage import copy_to_local
 
 SAMPLE_DURATION = 5
+
+logger = getLogger(__name__)
 
 
 class VideoFileModel(FileModel):
@@ -34,27 +37,27 @@ class VideoFileModel(FileModel):
         sample_path = f'{self.id}/{self.get_sample_path(sample_start)}'
         if not ambit.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
+            fd, outpath = mkstemp(suffix=suffix)
             try:
-                fd, outpath = mkstemp(suffix=suffix)
-                try:
-                    with copy_to_local(ambit.original_storage, self.file_path) as source_file:
-                        in_stream = ffmpeg.input(source_file.name, ss=sample_start)
-                        video_stream = (
-                            in_stream.video
-                            .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
-                            .filter('scale', self.thumbnail_size, -1)
-                        )
-                        (
-                            ffmpeg.concat(video_stream, in_stream.audio, v=1, a=1)
-                            .output(outpath, t=sample_duration)
-                            .run(overwrite_output=True, quiet=True)
-                        )
-                    with open(outpath, 'rb') as outfile:
-                        ambit.sample_storage.save(sample_path, outfile)
-                finally:
-                    unlink(outpath)
-            except Exception:
+                with copy_to_local(ambit.original_storage, self.file_path) as source_file:
+                    in_stream = ffmpeg.input(source_file.name, ss=sample_start)
+                    video_stream = (
+                        in_stream.video
+                        .filter('crop', 'min(iw,ih)', 'min(iw,ih)')
+                        .filter('scale', self.thumbnail_size, -1)
+                    )
+                    (
+                        ffmpeg.concat(video_stream, in_stream.audio, v=1, a=1)
+                        .output(outpath, t=sample_duration)
+                        .run(overwrite_output=True, quiet=True)
+                    )
+                with open(outpath, 'rb') as outfile:
+                    ambit.sample_storage.save(sample_path, outfile)
+            except Exception as exc:
+                logger.warning(f"Sample generation failed for video file {self.pk}: {exc}")
                 return
+            finally:
+                unlink(outpath)
         return ambit.sample_storage.url(sample_path)
 
     def get_thumbnail_url(self, ambit):

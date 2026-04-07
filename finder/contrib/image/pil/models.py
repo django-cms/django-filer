@@ -1,3 +1,4 @@
+from logging import getLogger
 from pathlib import Path
 from PIL import ExifTags, Image
 
@@ -7,6 +8,9 @@ from django.utils.translation import gettext_lazy as _
 
 from finder.contrib.image.models import ImageFileModel
 from finder.models.file import digest_sha1
+
+
+logger = getLogger(__name__)
 
 
 class PILImageModel(ImageFileModel):
@@ -51,8 +55,8 @@ class PILImageModel(ImageFileModel):
             for key, value in exif.items():
                 if key in self.exif_values and isinstance(value, (str, int, float, datetime)):
                     self.meta_data['exif'].setdefault(ExifTags.Base(key).name, value)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(f"Sample generation failed for image file {self.pk}: {exc}")
         else:
             if 'update_fields' in kwargs:
                 kwargs['update_fields'].append('meta_data')
