@@ -1,6 +1,7 @@
 import uuid
 from pathlib import Path
 
+from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.files.temp import NamedTemporaryFile
 
@@ -24,6 +25,28 @@ class FinderSystemStorage(FileSystemStorage):
         id, filename = name.split('/', 1)
         name = self.template.format(id=id, id02=id[0:2], id24=id[2:4], filename=filename)
         return super().url(name)
+
+
+try:
+    from storages.backends.s3 import S3Storage
+except ImportError:
+    pass
+else:
+    class FinderS3Storage(S3Storage):
+        """
+        Custom S3 storage that caches the result of the exists()-method to prevent multiple HEAD requests to S3 for
+        the same file.
+        """
+        FILE_EXISTS_CACHE_TIMEOUT = 86400  # 1 day
+
+        def exists(self, name):
+            key = f'{self.__class__.__name__}:{name}'
+            result = cache.get(key)
+            if result is None:
+                result = super().exists(name)
+                if result is True:
+                    cache.set(key, True, timeout=self.FILE_EXISTS_CACHE_TIMEOUT)
+            return result
 
 
 def delete_directory(storage, dir_path):

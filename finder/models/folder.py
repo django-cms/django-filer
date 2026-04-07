@@ -11,7 +11,7 @@ from django.utils.translation import gettext, gettext_lazy as _, ngettext
 from finder.models.ambit import AmbitModel
 from finder.models.inode import DiscardedInode, InodeManager, InodeModel
 from finder.models.permission import AccessControlEntry, DefaultAccessControlEntry as DefaultACE, Privilege
-from finder.storage import delete_directory
+from finder.storages import delete_directory
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'

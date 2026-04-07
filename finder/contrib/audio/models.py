@@ -1,3 +1,4 @@
+from logging import getLogger
 from os import unlink
 from pathlib import Path
 from tempfile import mkstemp
@@ -5,12 +6,14 @@ from tempfile import mkstemp
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from finder.models.file import FileModel
-from finder.storage import copy_to_local
+from finder.storages import copy_to_local
 
 import ffmpeg
 
 
 SAMPLE_DURATION = 5
+
+logger = getLogger(__name__)
 
 
 class AudioFileModel(FileModel):
@@ -30,22 +33,22 @@ class AudioFileModel(FileModel):
         sample_path = f'{self.id}/{self.get_sample_path(sample_start, sample_duration)}'
         if not ambit.sample_storage.exists(sample_path):
             suffix = Path(sample_path).suffix
+            fd, outpath = mkstemp(suffix=suffix)
             try:
-                fd, outpath = mkstemp(suffix=suffix)
-                try:
-                    with copy_to_local(ambit.original_storage, self.file_path) as source_file:
-                        (
-                            ffmpeg.input(source_file.name, ss=sample_start).audio
-                            .filter('atrim', duration=sample_duration)
-                            .output(outpath)
-                            .run(overwrite_output=True, quiet=True)
-                        )
-                    with open(outpath, 'rb') as outfile:
-                        ambit.sample_storage.save(sample_path, outfile)
-                finally:
-                    unlink(outpath)
-            except Exception:
+                with copy_to_local(ambit.original_storage, self.file_path) as source_file:
+                    (
+                        ffmpeg.input(source_file.name, ss=sample_start).audio
+                        .filter('atrim', duration=sample_duration)
+                        .output(outpath)
+                        .run(overwrite_output=True, quiet=True)
+                    )
+                with open(outpath, 'rb') as outfile:
+                    ambit.sample_storage.save(sample_path, outfile)
+            except Exception as exc:
+                logger.warning(f"Sample generation failed for audio file {self.pk}: {exc}")
                 return
+            finally:
+                unlink(outpath)
         return ambit.sample_storage.url(sample_path)
 
     def get_sample_path(self, sample_start, sample_duration):
