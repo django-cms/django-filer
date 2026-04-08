@@ -21,7 +21,9 @@ export function ProgressOverlay(props) {
 
 export function ProgressBar(props) {
 	const {file, settings, targetId} = props;
-	const [complete, setComplete] = useState(0);
+	const [complete, setComplete] = useState(false);
+	const [processing, setProcessing] = useState(false);
+	const [percentage, setPercentage] = useState(0);
 	const relativePath = file.webkitRelativePath ?? file.mozRelativePath ?? file.relativePath;
 	const slicedPath = typeof relativePath === 'string' ? relativePath.slice(0, relativePath.lastIndexOf('/')) : '';
 
@@ -76,18 +78,25 @@ export function ProgressBar(props) {
 	}
 
 	function transferStart() {
-		setComplete(0);
+		setComplete(false);
+		setProcessing(false);
+		setPercentage(0);
 	}
 
 	function transferProgress(event: ProgressEvent) {
 		if (event.lengthComputable) {
-			setComplete(event.loaded / event.total * 0.98);
+			setPercentage(event.loaded / event.total);
+			if (event.loaded >= event.total) {
+				setProcessing(true);
+			}
 		}
 	}
 
 	function transferComplete(event: ProgressEvent) {
 		if (event.lengthComputable) {
-			setComplete(1);
+			setComplete(true);
+			setProcessing(false);
+			setPercentage(1);
 		}
 		const request = event.target as XMLHttpRequest;
 		if (request.status === 200) {
@@ -100,7 +109,7 @@ export function ProgressBar(props) {
 	return (
 		<li>
 			<span>{file.name}:</span>
-			<progress value={complete} max="1"></progress>
+			<progress value={percentage} max="1" className={complete ? "complete" : processing ? "processing" : null}></progress>
 		</li>
 	);
 }
