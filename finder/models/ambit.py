@@ -47,6 +47,9 @@ class AmbitModel(models.Model):
         default='finder_public_samples',
     )
 
+    class Meta:
+        db_table = 'finder_ambit'
+
     def __str__(self):
         return self.slug
 
