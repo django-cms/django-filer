@@ -49,14 +49,9 @@
 					height: 1rem;
 					margin-inline-start: 0.5rem;
 					accent-color: var(--button-bg);
-					-webkit-appearance: none;
+					appearance: none;
 
-					&::-webkit-progress-bar {
-						background-color: var(--body-quiet-color);
-						border-radius: 0.5rem;
-					}
-
-					&::-moz-progress-bar {
+					&::-webkit-progress-bar, &::-moz-progress-bar {
 						background-color: var(--body-quiet-color);
 						border-radius: 0.5rem;
 					}
