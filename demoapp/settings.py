@@ -102,7 +102,7 @@ STORAGES = {
         'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
     },
     'filer_public': {
-        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'BACKEND': 'finder.storages.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/filer_public',
             'base_url': '/media/filer_public/',
@@ -110,7 +110,7 @@ STORAGES = {
         },
     },
     'filer_public_samples': {
-        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'BACKEND': 'finder.storages.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/filer_public_thumbnails',
             'base_url': '/media/filer_public_thumbnails/',
@@ -118,7 +118,7 @@ STORAGES = {
         },
     },
     'finder_demo': {
-        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'BACKEND': 'finder.storages.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/finder_demo',
             'base_url': '/media/finder_demo/',
@@ -126,7 +126,7 @@ STORAGES = {
         },
     },
     'finder_demo_samples': {
-        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'BACKEND': 'finder.storages.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/finder_demo_samples',
             'base_url': '/media/finder_demo_samples/',
