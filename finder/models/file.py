@@ -114,6 +114,7 @@ class AbstractFileModel(InodeModel):
 
     class Meta:
         abstract = True
+        db_table = 'finder_file'
         verbose_name = _("File")
         verbose_name_plural = _("Files")
         default_permissions = []

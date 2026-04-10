@@ -41,7 +41,7 @@ export default function FolderAdmin() {
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
 	const uploaderRef = useRef(null);
-	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, createRef()]));
+	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)]));
 	const overlayRef = useRef(null);
 	const downloadLinkRef = useRef(null);
 	const containerRef = useRef<HTMLElement>(null);

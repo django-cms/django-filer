@@ -36,6 +36,7 @@ class FolderModel(InodeModel):
     folderitem_component = None
 
     class Meta:
+        db_table = 'finder_folder'
         verbose_name = _("Folder")
         verbose_name_plural = _("Folders")
         default_permissions = []
