@@ -128,9 +128,6 @@ stroke="#004400"/>
         )
 
     def test_svg_sanitizer(self):
-        config = apps.get_app_config("filer")
-        svg_validation = config.FILE_VALIDATORS["image/svg+xml"]
-        config.FILE_VALIDATORS["image/svg+xml"] = [sanitize_svg]
         for attack, disallowed in [
             ("""<a href="javascript: alert('ing');">test</a>""", "javascript:"),
             ('<script>alert(document.domain);</script>', "alert"),
@@ -155,12 +152,11 @@ stroke="#004400"/>
                     'jsessionid': self.client.session.session_key
                 }
                 response = self.client.post(url, post_data)
-            file_id = json.loads(response.content.decode("utf-8"))["file_id"]
+            result = json.loads(response.content.decode("utf-8"))
+            file_id = result["file_id"]
             img = File.objects.get(pk=file_id)
             content = img.file.file.read().decode("utf-8")
             self.assertNotIn(disallowed, content)
-
-        config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
 
 
 class TestWhitelist(TestCase):
