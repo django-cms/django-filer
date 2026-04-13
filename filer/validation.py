@@ -91,6 +91,47 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     file.write(xml)  # write to binary file with utf-8 encoding
 
 
+def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
+    """Remove EXIF and other metadata from an uploaded image by re-encoding it
+    with Pillow. Pillow only writes EXIF when explicitly passed via ``exif=``,
+    so a plain re-save drops it."""
+    from PIL import Image, UnidentifiedImageError
+
+    file.seek(0)
+    try:
+        image = Image.open(file)
+    except (UnidentifiedImageError, OSError):
+        raise FileValidationError(
+            _('File "{file_name}": Rejected due to incompatible format')
+            .format(file_name=file_name)
+        )
+
+    if not (image.info.get("exif") or image.getexif()):
+        file.seek(0)
+        return
+
+    image_format = image.format
+    save_kwargs = {"format": image_format}
+    if image_format == "JPEG":
+        save_kwargs["quality"] = "keep"
+    elif image_format == "WEBP":
+        save_kwargs["lossless"] = bool(image.info.get("lossless"))
+        save_kwargs["quality"] = image.info.get("quality", 80)
+
+    try:
+        image.load()
+    except OSError:
+        raise FileValidationError(
+            _('File "{file_name}": Rejected due to incompatible format')
+            .format(file_name=file_name)
+        )
+
+    file.seek(0)
+    file.truncate()
+    image.save(file, **save_kwargs)
+    file.seek(0)
+
+
 def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     """Actual validation: Call all validators for the given mime type. The app config reads
     the validators from the settings and replaces dotted paths by callables."""
