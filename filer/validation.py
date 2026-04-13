@@ -93,7 +93,7 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     content = file.read()
     try:
         sanitized = filter_svg(content)
-    except Exception:
+    except ValueError:
         sanitized = None
 
     if sanitized is None:
