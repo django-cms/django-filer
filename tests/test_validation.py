@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
-from filer.validation import FileValidationError, validate_upload, sanitize_svg
+from filer.validation import FileValidationError, sanitize_svg, strip_exif, validate_upload
 from tests.helpers import create_superuser
 
 
@@ -154,6 +154,64 @@ stroke="#004400"/>
             self.assertNotIn(disallowed, content)
 
         config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
+
+    def _jpeg_with_exif(self):
+        import io
+
+        from PIL import Image
+
+        image = Image.new("RGB", (8, 8), color=(255, 0, 0))
+        exif = image.getexif()
+        exif[0x010F] = "DjangoFiler"  # Make
+        exif[0x0110] = "TestCamera"  # Model
+        exif[0x8298] = "Copyright (c) nobody"  # Copyright
+
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", exif=exif.tobytes(), quality=88)
+        buffer.seek(0)
+        return buffer
+
+    def test_strip_exif_removes_metadata(self):
+        import io
+
+        from PIL import Image
+
+        source = self._jpeg_with_exif()
+        self.assertTrue(Image.open(source).getexif(), "fixture must contain EXIF")
+        source.seek(0)
+
+        strip_exif("photo.jpg", source, self.superuser, "image/jpeg")
+
+        stripped = Image.open(source)
+        self.assertEqual(stripped.format, "JPEG")
+        self.assertEqual(stripped.size, (8, 8))
+        self.assertFalse(stripped.getexif())
+        self.assertNotIn("exif", stripped.info)
+
+    def test_strip_exif_noop_without_metadata(self):
+        import io
+
+        from PIL import Image
+
+        image = Image.new("RGB", (4, 4), color=(0, 128, 0))
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        original = buffer.getvalue()
+        buffer.seek(0)
+
+        strip_exif("plain.png", buffer, self.superuser, "image/png")
+
+        self.assertEqual(buffer.getvalue(), original)
+
+    def test_strip_exif_rejects_non_image(self):
+        import io
+
+        garbage = io.BytesIO(b"this is definitely not an image")
+        with self.assertRaisesRegex(
+            FileValidationError,
+            "Rejected due to incompatible format",
+        ):
+            strip_exif("notes.txt", garbage, self.superuser, "image/jpeg")
 
 
 class TestWhitelist(TestCase):
