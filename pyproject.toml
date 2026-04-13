@@ -25,7 +25,8 @@ dependencies = [
     # which requires system-level libraries and fails to install in the container.
     # This can be removed once the issue is resolved.
     # See: https://github.com/deeplook/svglib/issues/421
-    "svglib~=1.5.1"
+    "svglib~=1.5.1",
+    "py-svg-hush",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -52,6 +53,7 @@ classifiers = [
     "Framework :: Django CMS :: 4.0",
     "Framework :: Django CMS :: 4.1",
     "Framework :: Django CMS :: 5.0",
+    "Framework :: Django CMS :: 5.1",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Software Development",

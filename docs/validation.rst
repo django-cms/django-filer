@@ -11,8 +11,9 @@ corrupted file which could cause harm to other staff users or
 even visitors of the website.
 
 To this end django-filer implements a basic file validation
-framework. By default, it will reject any HTML files for upload and certain
-SVG files that might include JavaScript code.
+framework. By default, it will reject any HTML files for upload and
+sanitize uploaded SVG files, stripping any scripts, event handlers or
+other non-graphic content.
 
 .. warning::
 
@@ -49,9 +50,9 @@ Validation hooks
 ----------------
 
 Uploaded files are validated by their mime-type. The two bundled validators
-reject and ``text/html`` file and will check for signs of JavaScript code in
-files with the mime type ``image/svg+xml``. Those files are dangerous since
-they are executed by a browser without any warnings.
+reject any ``text/html`` file and sanitize files with the mime type
+``image/svg+xml``. Both HTML and SVG files are dangerous since they are
+executed by a browser without any warnings.
 
 Validation hooks do not restrict the upload of other executable files
 (like ``*.exe`` or shell scripts). **Those are not automatically executed
@@ -97,32 +98,23 @@ The two built-in validators are extremely simple.
 This just rejects any file for upload. By default this happens for HTML files
 (mime type `text/html``).
 
-.. code-block:: python
-
-    def validate_svg(file_name, file, owner, mime_type):
-        """SVG files must not contain script tags or javascript hrefs.
-        This might be too strict but avoids parsing the xml"""
-        content = file.read().lower()
-        if b"<script" in content or b"javascript:" in content:
-            raise FileValidationError(
-                _('File "{}": Rejected due to potential cross site scripting vulnerability').format(file_name)
-            )
-
-
-This validator rejects any SVG file that contains the bytes ``<script`` or
-``javascript:``. This probably is a too strict criteria, since those bytes
-might be part of a legitimate string. The above code is a simplification
-the actual code also checks for occurrences of event attribute like
-``onclick="..."``.
+The second built-in validator, ``filer.validation.sanitize_svg``, parses
+uploaded SVG files and rewrites them with any scripts, event handlers and
+other non-graphic content removed. It is powered by
+`py-svg-hush <https://pypi.org/project/py-svg-hush/>`_, a Python binding
+for the Rust `svg-hush <https://github.com/kornelski/svg-hush>`_ library.
+Because the sanitizer runs in native code it is fast enough to apply to
+every upload by default.
 
 .. note::
 
-    If you have legitimate SVG files that contain either ``<script`` or
-    ``javascript:`` as byte sequences try escaping the ``<`` and ``:``.
+    The sanitized SVG is not byte-identical to the uploaded file: comments,
+    scripts, event handlers, external references and other potentially
+    dangerous constructs are stripped. The visual appearance of the
+    graphic is preserved.
 
-Clearly, the validator can be improved by parsing the SVG's xml code, but
-this could be error-prone and we decided to go with the potentially too strict
-but simpler method.
+If ``py-svg-hush`` cannot parse the file (for example because it is not a
+valid SVG), the upload is rejected with a ``FileValidationError``.
 
 Common validator settings
 -------------------------
@@ -147,18 +139,18 @@ a malicious file unknowingly.
         "application/octet-stream",
     ]
 
-No HTML upload and restricted SVG upload, no binary or unknown file upload
-...........................................................................
+No HTML upload, sanitized SVG upload, no binary or unknown file upload
+......................................................................
 
-This is the default setting. It will deny any SVG file that might contain
-Javascript. It is prone to false positives (i.e. files being rejected that
-actually are secure).
+This is the default setting. HTML uploads are rejected, SVG uploads are
+sanitized by ``filer.validation.sanitize_svg`` (see above), and binary or
+unknown files are rejected.
 
 .. note::
 
-    If you identify false negatives (i.e. files being
-    accepted despite containing Javascript) please contact the maintainer only
-    through `security@django-cms.org <mailto:security@django-cms.org>`_.
+    If you identify an attack vector that survives ``sanitize_svg`` please
+    contact the maintainer only through
+    `security@django-cms.org <mailto:security@django-cms.org>`_.
 
 
 
@@ -179,33 +171,25 @@ in the user's browser.
 
 (Still not binary or unknown file upload)
 
-Experimental SVG sanitization
-.............................
+Strict SVG rejection (legacy behaviour)
+.......................................
 
-This experimental feature passes an uploaded SVG image through easy-thumbnail
-and is rewritten without non-graphic tags or attributes. Any javascript
-within the SVG file will be lost.
-
-The resulting file is not identical to the uploaded file.
+Previous versions of django-filer shipped with a ``validate_svg`` validator
+that rejected any SVG file containing ``<script``, ``javascript:`` or an
+event handler attribute. It is still available if you prefer rejecting
+suspicious SVGs over rewriting them:
 
 .. code-block:: python
 
     FILER_REMOVE_FILE_VALIDATORS = ["image/svg+xml"]
 
     FILER_ADD_FILE_VALIDATORS = {
-        "image/svg+xml": ["filer.validation.sanitize_svg"],
+        "image/svg+xml": ["filer.validation.validate_svg"],
     }
 
-.. warning::
-
-    This feature is experimental. It is not clear how effective the
-    sanitization is in practice. Use it at own risk.
-
-.. note::
-
-    If you identify an attack vector when using ``sanitize_svg`` please
-    contact us only through
-    `security@django-cms.org <mailto:security@django-cms.org>`_.
+This approach is prone to false positives, since those byte sequences can
+legitimately appear inside SVG text content. ``sanitize_svg`` (the
+default) is usually the better choice.
 
 Block other mime-types
 ----------------------
