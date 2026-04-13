@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
-from filer.validation import FileValidationError, validate_upload, validate_svg
+from filer.validation import FileValidationError, sanitize_svg, validate_svg, validate_upload
 from tests.helpers import create_superuser
 
 
@@ -126,6 +126,18 @@ stroke="#004400"/>
             None,
             "text/html",
         )
+
+    def test_svg_validator_rejects_non_svg_file(self):
+        import io
+
+        non_svg_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01'
+        file_obj = io.BytesIO(non_svg_content)
+
+        with self.assertRaisesRegex(
+            FileValidationError,
+            "Rejected due to incompatible format",
+        ):
+            sanitize_svg("test_file.svg", file_obj, self.superuser, "image/svg+xml")
 
     def test_svg_sanitizer(self):
         for attack, disallowed in [
