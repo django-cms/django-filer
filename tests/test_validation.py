@@ -172,7 +172,6 @@ stroke="#004400"/>
         return buffer
 
     def test_strip_exif_removes_metadata(self):
-        import io
 
         from PIL import Image
 
