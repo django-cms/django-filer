@@ -75,7 +75,7 @@ def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
         warnings.warn(
             "SVG validation via string matching is deprecated and will be removed. "
             "SVGs will be sanitized instead. Remove this message by removing "
-            "{\"image/svg+xml\": [\"filer.validation.sanitize_svg\"]} from your " \
+            "{\"image/svg+xml\": [\"filer.validation.sanitize_svg\"]} from your "
             "FILER_ADD_FILE_VALIDATORS settings",
             DeprecationWarning,
             stacklevel=2,
@@ -95,7 +95,7 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
         sanitized = filter_svg(content)
     except Exception:
         sanitized = None
-    
+
     if sanitized is None:
         raise FileValidationError(
             _('File "{file_name}": Rejected due to incompatible format')
@@ -105,17 +105,17 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     file.seek(0)  # Rewind file
     file.truncate()  # Delete old content
     file.write(sanitized)  # write to binary file with utf-8 encoding
-    
+
 
 def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-    """Actual validation: Call all validators for the given mime type. The app config reads
+    """Actual validation: Call all validators for the given MIME type. The app config reads
     the validators from the settings and replaces dotted paths by callables."""
 
     config = apps.get_app_config("filer")
 
     # First, check white list if provided
     if config.MIME_TYPE_WHITELIST:
-        # FILER_MIME_TYPE_WHITELIST restricts the allowed mime types to, e.g., "image/*" or "text/plain"
+        # FILER_MIME_TYPE_WHITELIST restricts the allowed MIME types to, e.g., "image/*" or "text/plain"
         for allowed_mime_type in config.MIME_TYPE_WHITELIST:
             if mime_type == allowed_mime_type:
                 break

@@ -24,24 +24,24 @@ Mime type white list
 --------------------
 
 The first thing you can do to set up a security policy is to only allow
-white-listed mime types for upload.
+white-listed MIME types for upload.
 
 The setting ``FILER_MIME_TYPE_WHITELIST`` (default: ``[]``)  is a list of
 strings django-filer will consider for upload, e.g.::
 
     FILER_MIME_TYPE_WHITELIST = [
-        "text/plain",  # Exact mime type match
+        "text/plain",  # Exact MIME type match
         "image/*",  # All types of "image"
     ]
 
-If ``FILER_MIME_TYPE_WHITELIST`` is empty, all mime types will be accepted
+If ``FILER_MIME_TYPE_WHITELIST`` is empty, all MIME types will be accepted
 (default behaviour).
 
 .. note::
 
-    django-filer determines the mime-type of a file by its extension.
+    django-filer determines the MIME type of a file by its extension.
     It does **not** check if the file format is aligned with its extension.
-    Restricting mime types therefore effectively blocks certain extensions.
+    Restricting MIME types therefore effectively blocks certain extensions.
     It does not prevent a user from uploading an .exe file disguised as
     an image file, say .jpeg.
 
@@ -49,8 +49,8 @@ If ``FILER_MIME_TYPE_WHITELIST`` is empty, all mime types will be accepted
 Validation hooks
 ----------------
 
-Uploaded files are validated by their mime-type. The two bundled validators
-reject any ``text/html`` file and sanitize files with the mime type
+Uploaded files are validated by their MIME type. The two bundled validators
+reject any ``text/html`` file and sanitize files with the MIME type
 ``image/svg+xml``. Both HTML and SVG files are dangerous since they are
 executed by a browser without any warnings.
 
@@ -60,7 +60,7 @@ by the browser but still present a point of attack, if a user saves them
 to disk and executes them locally.**
 
 You can release validation restrictions by setting
-``FILER_REMOVE_FILE_VALIDATORS`` to a list of mime types to be removed from
+``FILER_REMOVE_FILE_VALIDATORS`` to a list of MIME types to be removed from
 validation. This is applicable to the two current validators for ``text/html``
 and ``image/svg+xml``, but also to any validators that might be added by
 default in future versions.
@@ -96,7 +96,7 @@ The two built-in validators are extremely simple.
         )
 
 This just rejects any file for upload. By default this happens for HTML files
-(mime type `text/html``).
+(MIME type `text/html``).
 
 The second built-in validator, ``filer.validation.sanitize_svg``, parses
 uploaded SVG files and rewrites them with any scripts, event handlers and
@@ -191,10 +191,10 @@ This approach is prone to false positives, since those byte sequences can
 legitimately appear inside SVG text content. ``sanitize_svg`` (the
 default) is usually the better choice.
 
-Block other mime-types
+Block other MIME types
 ----------------------
 
-To block other mime types add an entry for that mime type to
+To block other MIME types add an entry for that MIME type to
 ``FILER_ADD_FILE_VALIDATORS`` with ``filer.validation.deny``::
 
     FILER_ADD_FILE_VALIDATORS[mime_type] = ["filer.validation.deny"]
@@ -244,8 +244,8 @@ time.
 The ``owner`` argument is the ``User`` object of the user uploading the file.
 You can use it to distinguish validation for certain user groups if needed.
 
-If you distinguish validation by the mime type, remember to register the
-validator function for all relevant mime types.
+If you distinguish validation by the MIME type, remember to register the
+validator function for all relevant MIME types.
 
 
 .. _check_virus:
@@ -267,7 +267,7 @@ you can add a validator that checks for viruses in uploaded files.
 .. code-block:: python
 
     def validate_octet_stream(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-        """Octet streams are binary files without a specific mime type. They are run through
+        """Octet streams are binary files without a specific MIME type. They are run through
         a virus check."""
         try:
             from django_clamd.validators import validate_file_infection
