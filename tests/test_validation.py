@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
-from filer.validation import FileValidationError, validate_upload, sanitize_svg
+from filer.validation import FileValidationError, sanitize_svg, validate_svg, validate_upload
 from tests.helpers import create_superuser
 
 
@@ -57,9 +57,14 @@ stroke="#004400"/>
         self.assertEqual(File.objects.count(), 0)
 
     def test_svg_upload_fails(self):
+        config = apps.get_app_config("filer")
+        svg_validation = config.FILE_VALIDATORS["image/svg+xml"]
+        config.FILE_VALIDATORS["image/svg+xml"] = [validate_svg]
+
         for attack, expected_files in [
             ("""<a href="javascript: alert('ing');">test</a>""", 0),
             ('<script>alert(document.domain);</script>', 0),
+            ('&#x3c;script>alert(document.domain);</script>', 0),
             ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 0),
             ("", 1)
         ]:
@@ -86,6 +91,8 @@ stroke="#004400"/>
             if expected_files == 0:
                 self.assertContains(response, "Rejected due to potential cross site scripting vulnerability")
             self.assertEqual(File.objects.count(), n + expected_files)
+
+        config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
 
     def test_deny_validator(self):
         from filer.validation import deny
@@ -120,10 +127,19 @@ stroke="#004400"/>
             "text/html",
         )
 
+    def test_svg_validator_rejects_non_svg_file(self):
+        import io
+
+        non_svg_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01'
+        file_obj = io.BytesIO(non_svg_content)
+
+        with self.assertRaisesRegex(
+            FileValidationError,
+            "Rejected due to incompatible format",
+        ):
+            sanitize_svg("test_file.svg", file_obj, self.superuser, "image/svg+xml")
+
     def test_svg_sanitizer(self):
-        config = apps.get_app_config("filer")
-        svg_validation = config.FILE_VALIDATORS["image/svg+xml"]
-        config.FILE_VALIDATORS["image/svg+xml"] = [sanitize_svg]
         for attack, disallowed in [
             ("""<a href="javascript: alert('ing');">test</a>""", "javascript:"),
             ('<script>alert(document.domain);</script>', "alert"),
@@ -148,12 +164,11 @@ stroke="#004400"/>
                     'jsessionid': self.client.session.session_key
                 }
                 response = self.client.post(url, post_data)
-            file_id = json.loads(response.content.decode("utf-8"))["file_id"]
+            result = json.loads(response.content.decode("utf-8"))
+            file_id = result["file_id"]
             img = File.objects.get(pk=file_id)
             content = img.file.file.read().decode("utf-8")
             self.assertNotIn(disallowed, content)
-
-        config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
 
 
 class TestWhitelist(TestCase):

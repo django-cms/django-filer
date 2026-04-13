@@ -156,7 +156,7 @@ CHANGELOG
 * feat: Canonical URL action button now copies canonical URL to the user's
   clipboard
 * fix: Run validators on updated files in file change view
-* fix: Update mime type if uploading file in file change view
+* fix: Update MIME type if uploading file in file change view
 * fix: Do not allow to remove the file field from an uplaoded file in
   the admin interface
 * fix: refactor upload checks into running validators in the admin
@@ -344,7 +344,7 @@ CHANGELOG
 ==================
 
 * Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
-* Fix #1211: On upload MIME-type is not set correctly.
+* Fix #1211: On upload MIME type is not set correctly.
 
 
 2.0.1 (2020-09-04)

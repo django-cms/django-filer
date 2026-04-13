@@ -343,7 +343,7 @@ class FilerImageAdminUrlsTests(TestCase):
 
     def test_image_expand_link_in_change_view(self):
         files = [
-            # Files can use the same contents for this test - it's the mime type that counts
+            # Files can use the same contents for this test - it's the MIME type that counts
             File.objects.create(owner=self.superuser, original_filename='some-file.txt', file=self.file_object.file),
             Image.objects.create(owner=self.superuser, original_filename='some-image.jpg'),  # missing file
             Image.objects.create(owner=self.superuser, original_filename='some-image.jpg', file=self.file_object.file),
