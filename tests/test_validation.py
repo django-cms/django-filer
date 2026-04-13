@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 
 from filer.models import File, Folder
-from filer.validation import FileValidationError, validate_upload, sanitize_svg, validate_svg
+from filer.validation import FileValidationError, validate_upload, validate_svg
 from tests.helpers import create_superuser
 
 
