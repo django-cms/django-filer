@@ -95,7 +95,10 @@ def get_app_list(self, request, app_label=None):
     for model, model_admin in self._registry.items():
         if model._meta.proxy_for_model is not AmbitModel:
             continue
-        root_folder = AmbitModel.objects.get(slug=model._meta.model_name).root_folder
+        try:
+            root_folder = AmbitModel.objects.get(slug=model._meta.model_name).root_folder
+        except AmbitModel.DoesNotExist:
+            continue
         if not root_folder.has_permission(request.user, Privilege.READ):
             continue
         parts = [model._meta.model_name if part == 'foldermodel' else part for part in url_parts]

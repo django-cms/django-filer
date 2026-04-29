@@ -34,8 +34,8 @@ except ImportError:
 else:
     class FinderS3Storage(S3Storage):
         """
-        Custom S3 storage that caches the result of the exists()-method to prevent multiple HEAD requests to S3 for
-        the same file.
+        Custom S3 storage that caches the result of the exists()-method to prevent multiple HEAD requests
+        to the S3 server for lookups of the same file.
         """
         FILE_EXISTS_CACHE_TIMEOUT = 86400  # 1 day
 
