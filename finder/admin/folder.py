@@ -18,6 +18,7 @@ from django.utils.html import format_html
 
 from finder.admin.inode import InodeAdmin
 from finder.lookups import lookup_by_read_permission, lookup_by_tag
+from finder.models.fields import FinderBaseModelField
 from finder.models.file import InodeModel, FileModel
 from finder.models.folder import FolderModel
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
@@ -394,6 +395,16 @@ class FolderAdmin(InodeAdmin):
         if not current_folder.has_permission(request.user, Privilege.WRITE):
             msg = gettext("You do not have permission to delete items from the folder named “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
+
+        referenced_inodes = FinderBaseModelField.get_referenced_inodes(inode_ids)
+        if referenced_inodes.exists():
+            if not body.get('force'):
+                referenced_inode_ids = [ref['inode_id'] for ref in referenced_inodes]
+                return JsonResponse({'referenced_inodes': referenced_inode_ids}, status=412)
+            if any(filter(lambda ref: ref['on_delete'] in ('PROTECT', 'RESTRICT'), referenced_inodes)):
+                msg = gettext("Cannot delete items because they are protected and referenced by third party models.")
+                return HttpResponse(msg, status=409)
+            FinderBaseModelField.update_or_delete_referring_models(inode_ids)
 
         try:
             trash_folder.move_inodes(request.user, inode_ids)

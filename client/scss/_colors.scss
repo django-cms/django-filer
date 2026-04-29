@@ -1,6 +1,7 @@
 $trash-background: repeating-linear-gradient(45deg, var(--body-bg), var(--body-bg) 10px, var(--darkened-bg) 10px, var(--darkened-bg) 20px);
 $follow-folder-border: 2px dashed var(--border-color);
-$copied-inode-border: 2px dashed rgb(48, 164, 0);
+$copied-inode-border: 2px dotted rgb(48, 164, 0);
+$referenced-inode-border: 2px dashed rgb(192, 16, 16);
 $focus-visible-box-shadow: rgb(50, 150, 250) 0 0 5px;
 $active-rectangle: var(--accent, rgb(210, 210, 112));
 $body-fg-color: var(--body-fg, #000);

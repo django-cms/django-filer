@@ -359,7 +359,8 @@ class FolderModel(InodeModel):
         Get the maximum ordering index of all inodes in this folder.
         """
         queryset = self.subfolders.values_list('ordering', flat=True).union(*[
-            model.objects.filter(parent=self).values_list('ordering', flat=True) for model in InodeModel.get_models()
+            model.objects.filter(parent=self).values_list('ordering', flat=True)
+            for model in InodeModel.get_models()
         ])
         return max(queryset) if queryset.exists() else 0
 

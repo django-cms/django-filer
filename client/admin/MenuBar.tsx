@@ -94,7 +94,7 @@ function ExtraMenu(props) {
 			const body = await response.json();
 			current.setInodes([...current.inodes, {...body.new_folder, elementRef: createRef()}]);  // adds new folder to the end of the list
 		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-			alert(await response.text());
+			window.alert(await response.text());
 		} else {
 			console.error(response);
 		}
@@ -199,6 +199,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	} = props;
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
+	const [confirmDeletion, setConfirmDeletion] = useState(false);
 	const permissionDialogRef = useRef(null);
 	const tagDialogRef = useRef(null);
 
@@ -231,8 +232,20 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 		return () => window.removeEventListener('keydown', handleKeyboardEvents);
 	}, [currentFolderId]);
 
+	useEffect(() => {
+		if (confirmDeletion) {
+			if (window.confirm(gettext("Some items are referenced by third party models.\nDelete them anyway?"))) {
+				deleteInodes(true);
+			// } else {
+			// 	const current = columnRefs[currentFolderId].current;
+			// 	current.setInodes(current.inodes.map(inode => ({...inode, selected: inode.selected && !inode.referenced})));
+			}
+			setConfirmDeletion(false);
+		}
+	}, [confirmDeletion]);
+
 	function confirmEraseTrashFolder() {
-		if (window.confirm("Erase all files in the trash folder?")) {
+		if (window.confirm(gettext("Erase all files in the trash folder?"))) {
 			eraseTrashFolder();
 		}
 	}
@@ -318,7 +331,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 					body.inodes.map(inode => ({...inode, elementRef: createRef()}))
 				);
 			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-				alert(await response.text());
+				window.alert(await response.text());
 			} else {
 				console.error(response);
 			}
@@ -327,7 +340,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 		}
 	}
 
-	async function deleteInodes() {
+	async function deleteInodes(force?: boolean) {
 		const current = columnRefs[currentFolderId].current;
 		const inodeIds = current.inodes.filter(inode => inode.selected).map(inode => inode.id);
 		if (inodeIds.length === 0)
@@ -342,14 +355,19 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 					'Content-Type': 'application/json',
 					'X-CSRFToken': settings.csrf_token,
 				},
-				body: JSON.stringify({inode_ids: inodeIds}),
+				body: JSON.stringify({inode_ids: inodeIds, force}),
 			});
 			if (response.ok) {
 				const body = await response.json();
 				folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 				current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+			} else if (response.status === 412 && response.headers.get('Content-Type') === 'application/json') {
+				// the server wants to warn the user that some inodes are referenced by third party models
+				const body = await response.json();
+				current.setInodes(current.inodes.map(inode => ({...inode, referenced: body.referenced_inodes.includes(inode.id)})));
+				setConfirmDeletion(true);
 			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-				alert(await response.text());
+				window.alert(await response.text());
 			} else {
 				console.error(response);
 			}
@@ -378,7 +396,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			if (response.ok) {
 				current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
 			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
-				alert(await response.text());
+				window.alert(await response.text());
 			} else {
 				console.error(response);
 			}
@@ -457,7 +475,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 						<MenuItem aria-disabled={clipboard.length === 0 || !settings.can_change} onClick={pasteInodes} tooltip={gettext("Paste from clipboard")}>
 							<PasteIcon/>
 						</MenuItem>
-						<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={deleteInodes} tooltip={gettext("Move selected to trash folder")}>
+						<MenuItem aria-disabled={numSelectedInodes === 0 || !settings.can_change} onClick={() => deleteInodes()} tooltip={gettext("Move selected to trash folder")}>
 							<TrashIcon/>
 						</MenuItem>
 						<ExtraMenu
@@ -475,7 +493,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 				</ul>
 			</nav>
 			{settings.is_admin && <>
-			<PermissionEditor ref={permissionDialogRef} settings={settings} />
+				<PermissionEditor ref={permissionDialogRef} settings={settings} />
 				{settings.is_root && <TagEditor ref={tagDialogRef} settings={settings} />}
 			</>}
 		</DndContext>

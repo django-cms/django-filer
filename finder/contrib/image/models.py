@@ -55,7 +55,7 @@ class ImageFileModel(AbstractFileModel):
 
     class Meta:
         app_label = 'finder'
-        db_table = 'finder_image'
+        db_table = 'finder_imagefile'
         default_permissions = []
 
     @cached_property

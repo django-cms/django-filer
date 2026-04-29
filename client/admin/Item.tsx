@@ -74,6 +74,9 @@ export function DraggableItem(props) {
 		} else if (props.cutted) {
 			classes.push('cutted');
 		}
+		if (props.referenced) {
+			classes.push('referenced');
+		}
 		if (props.dragged) {
 			classes.push('dragging');
 		}

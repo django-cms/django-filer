@@ -244,7 +244,7 @@ class Migration(migrations.Migration):
                 ('tags', models.ManyToManyField(blank=True, related_name='+', to='finder.filetag', verbose_name='Tags')),
             ],
             options={
-                'db_table': 'finder_image',
+                'db_table': 'finder_imagefile',
                 'default_permissions': [],
             },
         ),

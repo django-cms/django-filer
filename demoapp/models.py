@@ -5,6 +5,7 @@ from finder.models.fields import FinderFileField, FinderFolderField
 
 class DemoAppModel(models.Model):
     file = FinderFileField(
+        models.SET_DEFAULT,
         verbose_name="Demo File",
         null=True,
         blank=True,
@@ -12,6 +13,7 @@ class DemoAppModel(models.Model):
         ambit='public',
     )
     folder = FinderFolderField(
+        on_delete=models.SET_DEFAULT,
         verbose_name="Demo Folder",
         null=True,
         blank=True,

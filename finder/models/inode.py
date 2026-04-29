@@ -153,10 +153,10 @@ class InodeManager(models.Manager):
         def get_queryset(model):
             concrete_fields = list(unified_fields.keys())
             model_field_names = [field.name for field in model._meta.get_fields()]
-            annotations = dict(
-                is_folder=Value(model.is_folder, output_field=BooleanField()),
+            annotations = {
                 **unified_annotations,
-            )
+                'is_folder': Value(model.is_folder, output_field=BooleanField()),
+            }
             if model.is_folder:
                 expressions = {'tag_ids': Value('', output_field=CharField())}
             else:
