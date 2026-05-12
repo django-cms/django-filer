@@ -200,6 +200,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	const [numSelectedInodes, setNumSelectedInodes] = useState(0);
 	const [numSelectedFiles, setNumSelectedFiles] = useState(0);
 	const [confirmDeletion, setConfirmDeletion] = useState(false);
+	const [protectedAlert, setProtectedAlert] = useState(false);
 	const permissionDialogRef = useRef(null);
 	const tagDialogRef = useRef(null);
 
@@ -233,13 +234,21 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	}, [currentFolderId]);
 
 	useEffect(() => {
+		if (protectedAlert) {
+			window.setTimeout(() => {
+				window.alert(gettext("Cannot delete items because they are protected and referenced by third party models."));
+			}, 0);
+			setProtectedAlert(false);
+		}
+	}, [protectedAlert]);
+
+	useEffect(() => {
 		if (confirmDeletion) {
-			if (window.confirm(gettext("Some items are referenced by third party models.\nDelete them anyway?"))) {
-				deleteInodes(true);
-			// } else {
-			// 	const current = columnRefs[currentFolderId].current;
-			// 	current.setInodes(current.inodes.map(inode => ({...inode, selected: inode.selected && !inode.referenced})));
-			}
+			window.setTimeout(() => {
+				if (window.confirm(gettext("Some items are referenced by third party models.\nDelete them anyway?"))) {
+					deleteInodes(true);
+				}
+			}, 0);
 			setConfirmDeletion(false);
 		}
 	}, [confirmDeletion]);
@@ -360,12 +369,20 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			if (response.ok) {
 				const body = await response.json();
 				folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
-				current.setInodes(current.inodes.filter(inode => !inodeIds.includes(inode.id)));
+				current.setInodes(current.inodes.filter(inode => body.inodes.includes(inode.id)));
 			} else if (response.status === 412 && response.headers.get('Content-Type') === 'application/json') {
 				// the server wants to warn the user that some inodes are referenced by third party models
 				const body = await response.json();
-				current.setInodes(current.inodes.map(inode => ({...inode, referenced: body.referenced_inodes.includes(inode.id)})));
-				setConfirmDeletion(true);
+				current.setInodes(
+					current.inodes.filter(inode => body.inodes.includes(inode.id)).map(
+						inode => ({...inode, referenced: body.referenced_inodes.includes(inode.id)})
+					)
+				);
+				if (body.protected) {
+					setProtectedAlert(true);
+				} else {
+					setConfirmDeletion(true);
+				}
 			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
 				window.alert(await response.text());
 			} else {

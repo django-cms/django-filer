@@ -386,7 +386,7 @@ class FolderAdmin(InodeAdmin):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
         body = json.loads(request.body)
-        inode_ids = body.get('inode_ids', [])
+        inode_ids = set(body.get('inode_ids', []))
         current_folder = self.get_object(request, folder_id)
         trash_folder = self.get_trash_folder(request)
         if current_folder.id == trash_folder.id:
@@ -396,16 +396,15 @@ class FolderAdmin(InodeAdmin):
             msg = gettext("You do not have permission to delete items from the folder named “{folder}”.")
             return HttpResponseForbidden(msg.format(folder=current_folder.name))
 
+        force = body.get('force', False)
         referenced_inodes = FinderBaseModelField.get_referenced_inodes(inode_ids)
-        if referenced_inodes.exists():
-            if not body.get('force'):
-                referenced_inode_ids = [ref['inode_id'] for ref in referenced_inodes]
-                return JsonResponse({'referenced_inodes': referenced_inode_ids}, status=412)
+        referenced_inode_ids = [ref['inode_id'] for ref in referenced_inodes]
+        if force:
             if any(filter(lambda ref: ref['on_delete'] in ('PROTECT', 'RESTRICT'), referenced_inodes)):
-                msg = gettext("Cannot delete items because they are protected and referenced by third party models.")
-                return HttpResponse(msg, status=409)
-            FinderBaseModelField.update_or_delete_referring_models(inode_ids)
-
+                # can only happen, if user bypasses client code
+                return HttpResponseBadRequest("Invalid request data.")
+        else:
+            inode_ids.difference_update(map(lambda inode: str(inode), referenced_inode_ids))
         try:
             trash_folder.move_inodes(request.user, inode_ids)
         except ValidationError as exc:
@@ -413,10 +412,17 @@ class FolderAdmin(InodeAdmin):
         except PermissionDenied as exc:
             return HttpResponseForbidden(str(exc))
         else:
-            return JsonResponse({
-                'inodes': list(self.get_inodes(request, parent=trash_folder)),
+            response_data = {
+                'inodes': [inode['id'] for inode in self.get_inodes(request, parent=current_folder)],
+                'referenced_inodes': referenced_inode_ids,
                 'favorite_folders': self.get_favorite_folders(request, current_folder),
-            })
+            }
+            if any(filter(lambda ref: ref['on_delete'] in ('PROTECT', 'RESTRICT'), referenced_inodes)):
+                return JsonResponse({**response_data, 'protected': True}, status=412)
+            elif not force and referenced_inode_ids:
+                return JsonResponse(response_data, status=412)
+            FinderBaseModelField.update_or_delete_referring_models(inode_ids)
+            return JsonResponse(response_data)
 
     def update_tags(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
