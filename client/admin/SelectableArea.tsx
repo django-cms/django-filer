@@ -1,4 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {useSessionStorage} from '../common/Storage';
+
+export const useScrollCache = useSessionStorage('filer-scroll', {});
 
 
 function SelectionRectangle(props) {
@@ -19,11 +22,28 @@ function SelectionRectangle(props) {
 const SelectableArea = (props: any)=> {
 	const edgeSize = 16;  // the size of the area near the upper and lower edge where scrolling starts
 	const acceleration = 40;  // accelerate scrolling the nearer the cursor reaches one of the edges
-	const {deselectAll, columnRef, dragging} = props;
+	const {folderId, deselectAll, columnRef, dragging} = props;
 	const areaRef = useRef(null);
+	const [scrollCache, setScrollCache] = useScrollCache();
 	const scrollableRef = useRef(null);
 	const [activeRectangle, setActiveRectangle] = useState(null);
 	const [timeoutHandler, setTimeoutHandler] = useState(null);
+
+	useEffect(() => {
+		if (scrollCache[folderId] === undefined)
+			return;
+
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+				if (mutation.type === 'childList' && mutation.target instanceof HTMLElement && mutation.target.querySelector('ul')) {
+					scrollableRef.current.scrollTo({top: scrollCache[folderId], left: 0, behavior: 'instant'});
+					observer.disconnect();
+				}
+			});
+		});
+		observer.observe(areaRef.current, {childList: true, subtree: true});
+		return () => observer.disconnect();
+	}, []);
 
 	useEffect(() => {
 		setActiveRectangle(null);
@@ -151,6 +171,7 @@ const SelectableArea = (props: any)=> {
 	};
 
 	const handleScroll = () => {
+		setScrollCache({...scrollCache, [folderId]: scrollableRef.current.scrollTop});
 		if (!activeRectangle)
 			return;
 		const scrollTop = scrollableRef.current.scrollTop - activeRectangle.scrollTop;
@@ -197,7 +218,7 @@ const SelectableArea = (props: any)=> {
 	};
 
 	return (
-		<div className="scrollable-area" onScroll={handleScroll} ref={scrollableRef}>
+		<div ref={scrollableRef} className="scrollable-area" onScroll={handleScroll}>
 			<div ref={areaRef} className="selectable-area">
 				{props.children}
 				{activeRectangle && <SelectionRectangle rect={activeRectangle} />}
