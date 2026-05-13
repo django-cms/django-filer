@@ -87,9 +87,9 @@ class BrowserView(View):
                 ancestors = []
                 last_folder_id = str(ambit.root_folder.id)
             can_view_subquery = self._get_can_view_subquery(request.user)
-            if isinstance(ancestors, QuerySet):
+            if isinstance(ancestors, QuerySet):  # pragma: with django-cte
                 open_folders.update(map(str, ancestors.values_list('id', flat=True)))
-            else:  # django-cte not installed
+            else:  # pragma: without django-cte
                 open_folders.update(str(ancestor.id) for ancestor in ancestors)
             children = self._get_children(ambit, can_view_subquery, open_folders, ambit.root_folder)
         else:
@@ -212,9 +212,9 @@ class BrowserView(View):
         search_zone = request.COOKIES.get('django-finder-search-zone')
         if search_zone == 'everywhere':
             starting_folder = list(starting_folder.ancestors)[-1]
-        if isinstance(starting_folder.descendants, QuerySet):
+        if isinstance(starting_folder.descendants, QuerySet):  # pragma: with django-cte
             parent_ids = Subquery(starting_folder.descendants.values('id'))
-        else:  # django-cte not installed (slow)
+        else:  # pragma: without django-cte
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
 
         ambit = starting_folder.get_ambit()

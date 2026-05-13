@@ -291,7 +291,7 @@ class InodeAdmin(admin.ModelAdmin):
         """
         Hook to return the context for the folder item.
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Must be implemented.")
 
     def get_menu_extension_settings(self, request):
         """

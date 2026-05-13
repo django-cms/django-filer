@@ -3,17 +3,17 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "django-filer"
+name = "django-finder"
 dynamic = ["version"]
 authors = [
-    {name = "Divio AG", email = "info@divio.ch"},
+    {name = "Jacob Rief", email = "jacob.rief@gmail.com"},
 ]
 maintainers = [
     {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
 ]
-description = "A file management application for django that makes handling of files and images a breeze."
-readme = "README.rst"
-license = {text = "BSD-3-Clause"}
+description = "A media asset management application for Django."
+readme = "README-finder.rst"
+license = {text = "MIT"}
 requires-python = ">=3.11"
 dependencies = [
     "django>=5.2",
@@ -29,7 +29,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Framework :: Django",
-    "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -69,6 +68,29 @@ include = ["filer*", "finder*", "LICENSE"]
 [tool.setuptools.dynamic]
 version = {attr = "finder.__version__"}
 
+[tool.coverage.run]
+branch = true
+source = [
+    "finder",
+    "unittests",
+]
+omit = [
+    "demoapp/*",
+    "docs/*",
+    "filer/*",
+    "finder/migrations/*",
+    "tests/*",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "pragma: without django-cte",
+]
+ignore_errors = true
+
 [tool.flake8]
 max-line-length = 119
 exclude = [
@@ -94,9 +116,6 @@ line_length = 119
 skip = [
     "manage.py",
     "*migrations*",
-    ".tox",
-    ".eggs",
-    "data",
     ".env",
     ".venv",
 ]

@@ -26,12 +26,12 @@ def create_assets():
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_blocker):
-    database_file = settings.BASE_DIR / 'workdir/test_db.sqlite3'
-    settings.DATABASES['default']['NAME'] = database_file
+    # database_file = settings.BASE_DIR / 'workdir/test_db.sqlite3'
+    # settings.DATABASES['default']['NAME'] = database_file
     with django_db_blocker.unblock():
         call_command('migrate', verbosity=0)
     yield
-    os.remove(database_file)
+    # os.remove(database_file)
 
 
 @pytest.fixture

@@ -124,7 +124,7 @@ class FolderAdmin(InodeAdmin):
         ambit = request._ambit
         if inode.id != trash_folder.id:
             folder_url = self.get_inode_url(ambit.slug, str(inode.folder.id))
-            if isinstance(inode.ancestors, QuerySet):
+            if isinstance(inode.ancestors, QuerySet):  # pragma: with django-cte
                 if request.user.is_superuser:
                     can_change = Value(True, output_field=BooleanField())
                     can_view = Value(True, output_field=BooleanField())
@@ -133,7 +133,7 @@ class FolderAdmin(InodeAdmin):
                     can_view = AccessControlEntry.objects.privilege_subquery_exists(request.user, Privilege.READ)
                 values = 'id', 'can_change', 'can_view'
                 ancestors = list(inode.ancestors.annotate(can_change=can_change, can_view=can_view).values(*values))
-            else:  # django-cte not installed
+            else:  # pragma: without django-cte
                 ancestors = [
                     {
                         'id': ancestor.id,
@@ -290,7 +290,7 @@ class FolderAdmin(InodeAdmin):
         })
 
     def copy_inodes(self, request, folder_id):
-        if response := self.check_for_valid_post_request(request, folder_id):
+        if response := self.check_for_valid_post_request(request, folder_id):  # pragma: no cover
             return response
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)

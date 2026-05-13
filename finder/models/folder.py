@@ -295,11 +295,11 @@ class FolderModel(InodeModel):
         return obj
 
     def validate_constraints(self):
-        if isinstance(self.ancestors, QuerySet):
+        if isinstance(self.ancestors, QuerySet):  # pragma: with django-cte
             if self.parent.ancestors.filter(id=self.id).exists():
                 msg = gettext("A parent folder can not become the descendant of a destination folder.")
                 raise ValidationError(msg)
-        else:  # django-cte is not installed, traversing the tree folder by folder
+        else:  # pragma: without django-cte
             parent = self.parent
             while parent is not None:
                 if parent.id == self.id:
