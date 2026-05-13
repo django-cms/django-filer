@@ -164,10 +164,23 @@ def test_file_change_view(admin_client, admin_user, ambit, sub_folder, uploaded_
     assert links[1]['href'] == '/'.join(parts[:3]) + '/'
 
 
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.READ_ONLY, None])
 @pytest.mark.parametrize('binary_file', ['small_file.bin', 'huge_file.bin'])
-def test_folder_upload_file(admin_client, ambit, binary_file, missing_inode_id):
+def test_folder_upload_file(admin_client, admin_user, ambit, binary_file, missing_inode_id, access_control, principal_kwargs):
     sha1 = hashlib.sha1()
     base_url = reverse('admin:finder_inodemodel_change', args=(ambit.root_folder.id,))
+
+    if admin_user.is_superuser:
+        if access_control == AccessControl.READ_ONLY:
+            return  # skip redundant test cases where superuser has access regardless of ACL
+    else:
+        AccessControlEntry.objects.all().delete()
+        if access_control == AccessControl.ALLOW:
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+        else:
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+
     with open(settings.BASE_DIR / 'workdir/assets' / binary_file, 'rb') as file_handle:
         response = admin_client.post(
             f'{base_url}/upload',
@@ -177,7 +190,11 @@ def test_folder_upload_file(admin_client, ambit, binary_file, missing_inode_id):
         file_handle.seek(0)
         while chunk := file_handle.read(4096):
             sha1.update(chunk)
-    assert response.status_code == 200
+    if admin_user.is_superuser or access_control == AccessControl.ALLOW:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+        return
     file_info = response.json()['file_info']
     assert file_info['name'] == binary_file
     assert FileModel.objects.filter(id=file_info['id']).exists()
