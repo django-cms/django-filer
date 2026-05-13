@@ -79,7 +79,7 @@ STORAGES = {
         'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
     },
     'finder_test': {
-        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'BACKEND': 'finder.storages.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/filer_test',
             'base_url': '/media/filer/',
@@ -87,7 +87,7 @@ STORAGES = {
         },
     },
     'finder_test_samples': {
-        'BACKEND': 'finder.storage.FinderSystemStorage',
+        'BACKEND': 'finder.storages.FinderSystemStorage',
         'OPTIONS': {
             'location': BASE_DIR / 'workdir/media/filer_test_samples',
             'base_url': '/media/filer_samples/',
