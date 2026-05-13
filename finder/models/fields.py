@@ -50,7 +50,7 @@ class FinderBaseModelField(UUIDField):
                     inode_id=Cast(F(field_name), output_field=UUIDField())
                 ).values('model_name', 'field_name', 'on_delete', 'inode_id')
             )
-        return querysets[0].union(*querysets[1:])
+        return next(iter(querysets), FileModel.objects.none()).union(*querysets[1:])
 
     @classmethod
     def update_or_delete_referring_models(cls, inode_ids):
