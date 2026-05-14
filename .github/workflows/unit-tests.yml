@@ -40,6 +40,8 @@ jobs:
           - django-version: "6.0"
             with_cte: "0"
             use_postgres: "0"
+          - python-version: "3.11"
+            use_s3: "1"
     name: "py${{ matrix.python-version }} django-${{ matrix.django-version }} with ${{ matrix.use_postgres == '1' && 'PostgreSQL' || 'SQLite' }}${{ matrix.with_cte == '1' && ' and CTE' || '' }}${{ matrix.use_s3 == '1' && ' and S3 storage' || '' }}"
     steps:
     - uses: actions/checkout@v3
