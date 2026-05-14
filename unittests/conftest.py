@@ -14,6 +14,7 @@ from django.urls import reverse
 from finder.contrib.image.pil.models import PILImageModel
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
+from finder.models.permission import Privilege
 
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
@@ -99,10 +100,10 @@ def uploaded_image(ambit, admin_user):
     image = Image.new('RGB', (640, 480))
     draw = ImageDraw.Draw(image)
     for _ in range(20):
-        x1, y1 = random.randint(0, 640), random.randint(0, 480)
-        x2, y2 = random.randint(0, 640), random.randint(0, 480)
+        x0, y0 = random.randint(0, 630), random.randint(0, 470)
+        x1, y1 = random.randint(x0 + 1, 640), random.randint(y0 + 1, 480)
         color = tuple(random.randint(0, 255) for _ in range(3))
-        draw.rectangle([x1, y1, x2, y2], fill=color)
+        draw.rectangle([x0, y0, x1, y1], fill=color)
     buffer = BytesIO()
     image.save(buffer, format='PNG')
     buffer.seek(0)
@@ -113,3 +114,19 @@ def uploaded_image(ambit, admin_user):
         folder=ambit.root_folder,
         owner=admin_user,
     )
+
+
+@pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
+def principal_kwargs(admin_user, request):
+    if request.param == 'superuser':
+        return
+    admin_user.is_superuser = False
+    admin_user.save(update_fields=['is_superuser'])
+    if request.param == 'user':
+        return {'user': admin_user, 'privilege': Privilege.READ_WRITE}
+    if request.param == 'group':
+        group = admin_user.groups.create(name='Test Group')
+        admin_user.groups.add(group)
+        return {'group': group, 'privilege': Privilege.READ_WRITE}
+    if request.param == 'everyone':
+        return {'privilege': Privilege.READ_WRITE}

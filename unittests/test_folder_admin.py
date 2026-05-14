@@ -444,22 +444,6 @@ def test_update_inode_update_with_missing_file(update_inode_url, admin_client, m
     assert response.status_code == 404
 
 
-@pytest.fixture(params=['superuser', 'user', 'group', 'everyone'])
-def principal_kwargs(admin_user, request):
-    if request.param == 'superuser':
-        return
-    admin_user.is_superuser = False
-    admin_user.save(update_fields=['is_superuser'])
-    if request.param == 'user':
-        return {'user': admin_user, 'privilege': Privilege.READ_WRITE}
-    if request.param == 'group':
-        group = admin_user.groups.create(name='Test Group')
-        admin_user.groups.add(group)
-        return {'group': group, 'privilege': Privilege.READ_WRITE}
-    if request.param == 'everyone':
-        return {'privilege': Privilege.READ_WRITE}
-
-
 @pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
 def test_create_sub_folder(admin_client, admin_user, ambit, access_control, principal_kwargs):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
