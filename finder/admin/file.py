@@ -90,7 +90,7 @@ class FileAdmin(InodeAdmin):
         file_obj.file_name = ambit.original_storage.generate_filename(uploaded_file.name)
         file_obj.file_size = uploaded_file.size
         file_obj.receive_file(ambit, uploaded_file)
-        file_obj.save()
+        file_obj.store_and_save(ambit, force_update=True)
         return HttpResponse(f"Replaced content of {file_obj.name} successfully.")
 
     def get_fields(self, request, obj=None):
