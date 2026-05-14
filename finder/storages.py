@@ -10,7 +10,7 @@ class FinderSystemStorage(FileSystemStorage):
     template = '{id02}/{id24}/{id}/{filename}'
 
     def __init__(self, template=None, **kwargs):
-        if template:
+        if template:  # pragma: no cover
             self.template = template
         super().__init__(**kwargs)
 
@@ -29,7 +29,7 @@ class FinderSystemStorage(FileSystemStorage):
 
 try:
     from storages.backends.s3 import S3Storage
-except ImportError:
+except ImportError:  # pragma: without django-storages
     pass
 else:
     class FinderS3Storage(S3Storage):

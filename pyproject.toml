@@ -29,6 +29,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Framework :: Django",
+    "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -88,6 +89,7 @@ exclude_also = [
     "def __repr__",
     "raise NotImplementedError",
     "pragma: without django-cte",
+    "pragma: without django-storages",
 ]
 ignore_errors = true
 
