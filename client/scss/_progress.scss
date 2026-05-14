@@ -46,18 +46,23 @@
 				}
 				progress {
 					width: 50%;
-					height: 1rem;
+					height: 0.75rem;
 					margin-inline-start: 0.5rem;
 					accent-color: var(--button-bg);
 					appearance: none;
 
-					&::-webkit-progress-bar, &::-moz-progress-bar {
+					&::-webkit-progress-bar {
 						background-color: var(--body-quiet-color);
-						border-radius: 0.5rem;
+						border-radius: 0.375rem;
+					}
+
+					&::-moz-progress-bar {
+						background-color: var(--body-quiet-color);
+						border-radius: 0.375rem;
 					}
 
 					&::-webkit-progress-value {
-						border-radius: 0.5rem;
+						border-radius: 0.375rem;
 						background-color: var(--primary);
 						transition: width 0.3s ease;
 					}
