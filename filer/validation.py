@@ -38,35 +38,48 @@ def deny_html(file_name: str, file: typing.IO, owner: User, mime_type: str) -> N
 TRIGGER_XSS_THREAD = (
     # Part 1: Event attributes that take js code as values
     # See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/Events
-    b"onbegin=", b"onend=", b"onrepeat=",
-    b"onabort=", b"onerror=", b"onresize=", b"onscroll=", b"onunload=",
-    b"oncopy=", b"oncut=", b"onpaste=",
-    b"oncancel=", b"oncanplay=", b"oncanplaythrough=", b"onchange=", b"onclick=", b"onclose=", b"oncuechange=", b"ondblclick=",
-    b"ondrag=", b"ondragend=", b"ondragenter=", b"ondragleave=", b"ondragover=", b"ondragstart=", b"ondrop=",
-    b"ondurationchange=", b"onemptied=", b"onended=", b"onerror=", b"onfocus=", b"oninput=", b"oninvalid=",
-    b"onkeydown=", b"onkeypress=", b"onkeyup=", b"onload=", b"onloadeddata=", b"onloadedmetadata=", b"onloadstart=",
-    b"onmousedown=", b"onmouseenter=", b"onmouseleave=", b"onmousemove=", b"onmouseout=", b"onmouseover=", b"onmouseup=",
-    b"onmousewheel=", b"onpause=", b"onplay=", b"onplaying=", b"onprogress=", b"onratechange=", b"onreset=", b"onresize=",
-    b"onscroll=", b"onseeked=", b"onseeking=", b"onselect=", b"onshow=", b"onstalled=", b"onsubmit=", b"onsuspend=",
-    b"ontimeupdate=", b"ontoggle==", b"onvolumechange==", b"onwaiting=",
-    b"onactivate=", b"onfocusin=", b"onfocusout=",
+    "onbegin=", "onend=", "onrepeat=",
+    "onabort=", "onerror=", "onresize=", "onscroll=", "onunload=",
+    "oncopy=", "oncut=", "onpaste=",
+    "oncancel=", "oncanplay=", "oncanplaythrough=", "onchange=", "onclick=", "onclose=", "oncuechange=", "ondblclick=",
+    "ondrag=", "ondragend=", "ondragenter=", "ondragleave=", "ondragover=", "ondragstart=", "ondrop=",
+    "ondurationchange=", "onemptied=", "onended=", "onerror=", "onfocus=", "oninput=", "oninvalid=",
+    "onkeydown=", "onkeypress=", "onkeyup=", "onload=", "onloadeddata=", "onloadedmetadata=", "onloadstart=",
+    "onmousedown=", "onmouseenter=", "onmouseleave=", "onmousemove=", "onmouseout=", "onmouseover=", "onmouseup=",
+    "onmousewheel=", "onpause=", "onplay=", "onplaying=", "onprogress=", "onratechange=", "onreset=", "onresize=",
+    "onscroll=", "onseeked=", "onseeking=", "onselect=", "onshow=", "onstalled=", "onsubmit=", "onsuspend=",
+    "ontimeupdate=", "ontoggle=", "onvolumechange=", "onwaiting=",
+    "onactivate=", "onfocusin=", "onfocusout=",
 ) + (
     # Part 2:
     # Reject base64 obfuscated content
-    b";base64,",
+    ";base64,",
 ) + (
     # Part 3: Obvious scripts
     # Reject direct <scrpit> tags or javascript: uri
-    b"<script",
-    b"javascript:",
+    "<script",
+    "javascript:",
 )
 
 
 def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     """SVG files must not contain script tags or javascript hrefs.
     This might be too strict but avoids parsing the xml"""
-    content = file.read().lower()
+
+    from html import unescape
+
+    content = unescape(file.read().decode('utf-8').lower())
     if any(map(lambda x: x in content, TRIGGER_XSS_THREAD)):
+        import warnings
+
+        warnings.warn(
+            "SVG validation via string matching is deprecated and will be removed. "
+            "SVGs will be sanitized instead. Remove this message by removing "
+            "{\"image/svg+xml\": [\"filer.validation.sanitize_svg\"]} from your "
+            "FILER_ADD_FILE_VALIDATORS settings",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         # If any element of TRIGGER_XSS_THREAD is found in file, raise FileValidationError
         raise FileValidationError(
             _('File "{file_name}": Rejected due to potential cross site scripting vulnerability')
@@ -75,31 +88,34 @@ def validate_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
 
 
 def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-    from easy_thumbnails.VIL.Image import Image
-    from reportlab.graphics import renderSVG
-    from svglib.svglib import svg2rlg
-    drawing = svg2rlg(file)
-    if not drawing:
+    from py_svg_hush import filter_svg
+
+    content = file.read()
+    try:
+        sanitized = filter_svg(content)
+    except ValueError:
+        sanitized = None
+
+    if sanitized is None:
         raise FileValidationError(
-            _('File "{file_name}": SVG file format not recognized')
+            _('File "{file_name}": Rejected due to incompatible format')
             .format(file_name=file_name)
         )
-    image = Image(size=(drawing.width, drawing.height))
-    renderSVG.draw(drawing, image.canvas)
-    xml = image.canvas.svg.toxml(encoding="UTF-8")  # Removes non-graphic nodes ->  sanitation
+
     file.seek(0)  # Rewind file
-    file.write(xml)  # write to binary file with utf-8 encoding
+    file.truncate()  # Delete old content
+    file.write(sanitized)  # write to binary file with utf-8 encoding
 
 
 def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
-    """Actual validation: Call all validators for the given mime type. The app config reads
+    """Actual validation: Call all validators for the given MIME type. The app config reads
     the validators from the settings and replaces dotted paths by callables."""
 
     config = apps.get_app_config("filer")
 
     # First, check white list if provided
     if config.MIME_TYPE_WHITELIST:
-        # FILER_MIME_TYPE_WHITELIST restricts the allowed mime types to, e.g., "image/*" or "text/plain"
+        # FILER_MIME_TYPE_WHITELIST restricts the allowed MIME types to, e.g., "image/*" or "text/plain"
         for allowed_mime_type in config.MIME_TYPE_WHITELIST:
             if mime_type == allowed_mime_type:
                 break

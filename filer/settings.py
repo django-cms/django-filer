@@ -291,7 +291,7 @@ IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
-    "image/svg+xml": ["filer.validation.validate_svg"],
+    "image/svg+xml": ["filer.validation.sanitize_svg"],
     "application/octet-stream": ["filer.validation.deny"],
 }
 
