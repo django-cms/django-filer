@@ -272,9 +272,9 @@ class AbstractFileModel(InodeModel):
     def validate_payload(self, ambit):
         for mime_type, validator in settings.FINDER_PAYLOAD_VALIDATORS:
             if (
-                self.mime_type == mime_type or
-                '{0}/*'.format(self.mime_type.split('/')) == mime_type or
-                mime_type == '*/*'
+                self.mime_type == mime_type
+                or '{0}/*'.format(self.mime_type.split('/')) == mime_type
+                or mime_type == '*/*'
             ):
                 with ambit.original_storage.open(self.file_path, 'rb') as readhandle:
                     payload_validator(validator)(readhandle)
