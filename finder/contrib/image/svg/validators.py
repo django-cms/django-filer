@@ -1,0 +1,28 @@
+def svg_validator(file_handle):
+    """
+    check for malicious tags not part of the SVG standard
+    """
+    try:
+        from py_svg_hush import filter_svg
+    except ImportError:
+        return
+
+    try:
+        filter_svg(file_handle.read())
+    except ValueError as exc:
+        raise ValueError(f"Invalid or malicious SVG: {exc}")
+
+
+def xml_validator(file_handle):
+    """
+    check against XXE, billion laughs, etc.
+    """
+    try:
+        import defusedxml.ElementTree as ET
+    except ImportError:
+        return
+
+    try:
+        ET.fromstring(file_handle.read())
+    except ET.ParseError as exc:
+        raise ValueError(f"Invalid or malicious SVG: {exc}")

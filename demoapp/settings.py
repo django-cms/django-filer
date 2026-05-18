@@ -212,3 +212,9 @@ LOGGING = {
         },
     },
 }
+
+
+FINDER_PAYLOAD_VALIDATORS = [
+    ('image/svg+xml', 'finder.contrib.image.svg.validators.svg_validator'),
+    ('image/svg+xml', 'finder.contrib.image.svg.validators.xml_validator'),
+]

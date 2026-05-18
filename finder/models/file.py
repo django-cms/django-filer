@@ -1,9 +1,9 @@
 import hashlib
 import mimetypes
 from functools import lru_cache, reduce
+from inspect import isclass
 from operator import or_
 
-from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext, gettext_lazy as _
 
+from finder import settings
 from finder.models.filetag import FileTag
 from finder.models.inode import InodeManager, InodeModel
 from finder.models.permission import Privilege
@@ -22,6 +23,16 @@ def mimetype_validator(value):
     if not mimetypes.guess_extension(value):
         msg = gettext("'{mimetype}' is not a recognized MIME-Type.")
         raise ValidationError(msg.format(mimetype=value))
+
+
+@lru_cache
+def payload_validator(validator):
+    if isinstance(validator, str):
+        return payload_validator(import_string(validator))
+    if isclass(validator):
+        return payload_validator(validator())
+    if callable(validator):
+        return validator
 
 
 def digest_sha1(readhandle):
@@ -248,6 +259,7 @@ class AbstractFileModel(InodeModel):
         return obj
 
     def store_and_save(self, ambit, **kwargs):
+        self.validate_payload(ambit)
         return self.save(**kwargs)
 
     def erase_and_delete(self, ambit, using=None, keep_parents=False):
@@ -256,6 +268,16 @@ class AbstractFileModel(InodeModel):
             delete_directory(ambit.original_storage, dir_path)
             delete_directory(ambit.sample_storage, dir_path)
         self.delete(using, keep_parents)
+
+    def validate_payload(self, ambit):
+        for mime_type, validator in settings.FINDER_PAYLOAD_VALIDATORS:
+            if (
+                self.mime_type == mime_type or
+                '{0}/*'.format(self.mime_type.split('/')) == mime_type or
+                mime_type == '*/*'
+            ):
+                with ambit.original_storage.open(self.file_path, 'rb') as readhandle:
+                    payload_validator(validator)(readhandle)
 
 
 class FileModel(AbstractFileModel):
