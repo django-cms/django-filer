@@ -256,6 +256,8 @@ class FolderAdmin(InodeAdmin):
             )
         except PermissionDenied as exc:
             return HttpResponseForbidden(str(exc))
+        except Exception as exc:
+            return HttpResponseBadRequest(str(exc))
         else:
             return JsonResponse({'file_info': new_file.as_dict(ambit)})
 

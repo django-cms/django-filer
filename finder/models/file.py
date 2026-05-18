@@ -1,6 +1,7 @@
 import hashlib
 import mimetypes
 from functools import lru_cache, reduce
+from inspect import isclass
 from operator import or_
 
 from django.conf import settings
@@ -248,6 +249,7 @@ class AbstractFileModel(InodeModel):
         return obj
 
     def store_and_save(self, ambit, **kwargs):
+        self.validate_payload(ambit)
         return self.save(**kwargs)
 
     def erase_and_delete(self, ambit, using=None, keep_parents=False):
@@ -256,6 +258,24 @@ class AbstractFileModel(InodeModel):
             delete_directory(ambit.original_storage, dir_path)
             delete_directory(ambit.sample_storage, dir_path)
         self.delete(using, keep_parents)
+
+    def validate_payload(self, ambit):
+        def payload_validator(validator):
+            if isinstance(validator, str):
+                return payload_validator(import_string(validator))
+            if isclass(validator):
+                return payload_validator(validator())
+            if callable(validator):
+                return validator
+
+        for mime_type, validator in settings.FINDER_PAYLOAD_VALIDATORS:
+            if (
+                self.mime_type == mime_type or
+                '{0}/*'.format(self.mime_type.split('/')) == mime_type or
+                mime_type == '*/*'
+            ):
+                with ambit.original_storage.open(self.file_path, 'rb') as readhandle:
+                    payload_validator(validator)(readhandle)
 
 
 class FileModel(AbstractFileModel):

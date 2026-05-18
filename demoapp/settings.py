@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
+from finder.settings import FINDER_PAYLOAD_VALIDATORS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -212,3 +213,9 @@ LOGGING = {
         },
     },
 }
+
+
+FINDER_PAYLOAD_VALIDATORS = [
+    ('image/svg+xml', 'finder.contrib.image.svg.validators.svg_validator'),
+    ('image/svg+xml', 'finder.contrib.image.svg.validators.xml_validator'),
+]
