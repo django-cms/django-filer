@@ -56,7 +56,7 @@ TRIGGER_XSS_THREAD = (
     b";base64,",
 ) + (
     # Part 3: Obvious scripts
-    # Reject direct <scrpit> tags or javascript: uri
+    # Reject direct <script> tags or javascript: uri
     b"<script",
     b"javascript:",
 )
