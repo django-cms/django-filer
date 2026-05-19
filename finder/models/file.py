@@ -277,7 +277,7 @@ class AbstractFileModel(InodeModel):
                 or mime_type == '*/*'
             ):
                 with ambit.original_storage.open(self.file_path, 'rb') as readhandle:
-                    payload_validator(validator)(readhandle)
+                    payload_validator(validator)(self.name, readhandle, self.owner, self.mime_type)
 
 
 class FileModel(AbstractFileModel):
