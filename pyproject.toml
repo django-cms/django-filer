@@ -85,7 +85,6 @@ omit = [
 
 [tool.coverage.report]
 exclude_also = [
-    "pragma: no cover",
     "def __repr__",
     "raise NotImplementedError",
     "pragma: without django-cte",
