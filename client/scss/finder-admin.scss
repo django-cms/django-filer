@@ -440,48 +440,52 @@ ul.messagelist {
 		}
 	}
 
-	.tiles ul.inode-list li {
-		margin-bottom: 5px;
+	.tiles ul.inode-list {
+		gap: 0 5px;
 
-		&:not(.status) {
-			min-height: 248px;
-			width: 192px;
-			box-sizing: border-box;
-			font-size: 15px;
-			line-height: 18px;
+		> li {
+			margin-bottom: 5px;
 
-			> .reordering {
-				position: absolute;
-				top: 0;
-				right: -5px;
-				bottom: 0;
+			&:not(.status) {
+				min-height: 248px;
+				width: 192px;
+				box-sizing: border-box;
+				font-size: 15px;
+				line-height: 18px;
 
-				> div {
-					height: 188px;
-					width: 4px;
-					margin: 2px;
-					border-radius: 2px;
+				> .reordering {
+					position: absolute;
+					top: 0;
+					right: -5px;
+					bottom: 0;
+
+					> div {
+						height: 188px;
+						width: 4px;
+						margin: 2px;
+						border-radius: 2px;
+					}
+
+					&.drag-over > div {
+						background-color: var(--primary);
+					}
 				}
 
-				&.drag-over > div {
-					background-color: var(--primary);
-				}
-			}
+				.inode figure {
+					> div:has(img[src$=".svg"]) {
+						padding: 15px; // reduce the size of SVG images
+					}
 
-			.inode figure {
-				> div:has(img[src$=".svg"]) {
-					padding: 15px; // reduce the size of SVG images
-				}
+					.file-tags {
+						inset: 5px;
 
-				.file-tags {
-					inset: 5px;
-
-					span {
-						width: 12px;
-						height: 12px;
-						display: inline-block;
-						border-radius: 50%;
-						margin-left: -4px;
+						span {
+							width: 12px;
+							height: 12px;
+							display: inline-block;
+							border-radius: 50%;
+							margin-left: -4px;
+						}
 					}
 				}
 			}
@@ -489,8 +493,8 @@ ul.messagelist {
 	}
 
 	.mosaic ul.inode-list li {
-		margin-bottom: 8px;
 		line-height: 10px;
+		gap: 2px;
 
 		&:not(.status) {
 			width: 70px;
