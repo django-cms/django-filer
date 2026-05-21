@@ -1,9 +1,11 @@
 import json
 import hashlib
 import pytest
+import uuid
 
 from bs4 import BeautifulSoup
 from enum import Enum, auto
+from time import sleep
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -11,6 +13,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import F
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
+from django.utils.timezone import datetime
 
 from finder.models.file import FileModel
 from finder.models.folder import FolderModel, PinnedFolder, ROOT_FOLDER_NAME, TRASH_FOLDER_NAME
@@ -539,14 +542,31 @@ def test_get_or_create_folder(admin_client, admin_user, ambit, access_control, p
     assert response.status_code == 415
 
 
-def test_move_file_into_subfolder(admin_client, ambit, uploaded_file, sub_folder):
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
+def test_move_file_into_subfolder(admin_client, admin_user, ambit, uploaded_file, sub_folder, principal_kwargs, access_control):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    if admin_user.is_superuser is False:
+        AccessControlEntry.objects.all().delete()
+        if access_control == AccessControl.ALLOW:
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+            AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+            AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
+        else:
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+            AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+            AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
+
     response = admin_client.post(
         f'{admin_url}/move',
         json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': str(sub_folder.id)}),
         content_type='application/json',
     )
-    assert response.status_code == 200
+    if admin_user.is_superuser or access_control == AccessControl.ALLOW:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+        return
     uploaded_file.refresh_from_db()
     assert uploaded_file.parent == sub_folder
 
@@ -879,6 +899,111 @@ def test_copy_inodes(admin_client, admin_user, uploaded_file, sub_folder, princi
     assert resp_names == expected_names
 
 
+def test_copy_folder(admin_client, ambit, uploaded_file, sub_folder):
+    created_inodes = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"File #S{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 3)
+    ])
+    created_inodes.append(FolderModel.objects.create(
+        parent=sub_folder,
+        name=f"Folder A",
+        owner=uploaded_file.owner,
+        ordering=3,
+    ))
+    target_folder = FolderModel.objects.create(
+        parent=sub_folder.parent,
+        name="Target Folder",
+        owner=sub_folder.owner,
+    )
+    assert target_folder.listdir().exists() is False
+    sleep(0.1)
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': target_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/copy',
+        json.dumps({'inode_ids': [str(created_inode.id) for created_inode in created_inodes]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    copied_inodes = target_folder.listdir().order_by('name')
+    assert len(copied_inodes) == len(created_inodes)
+    for orig, copy in zip(sub_folder.listdir().order_by('name'), copied_inodes):
+        assert orig.pop('id') != copy.pop('id')
+        assert orig.pop('parent') == sub_folder.id
+        assert copy.pop('parent') == target_folder.id
+        assert orig.pop('created_at') < copy.pop('created_at')
+        assert orig.pop('last_modified_at') < copy.pop('last_modified_at')
+        orig.pop('ordering')
+        copy.pop('ordering')
+        assert orig == copy
+
+    # copy the same folder again
+    sleep(0.1)
+    response = admin_client.post(
+        f'{admin_url}/copy',
+        json.dumps({'inode_ids': [str(created_inode.id) for created_inode in created_inodes]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    copied_inodes = target_folder.listdir().order_by('name')
+    assert len(copied_inodes) == 2 * len(created_inodes)
+    copied_inode_iterator = copied_inodes.iterator()
+    for orig in sub_folder.listdir().order_by('name'):
+        assert isinstance(orig.pop('id'), uuid.UUID)
+        assert orig.pop('parent') == sub_folder.id
+        orig.pop('ordering')
+        copy = next(copied_inode_iterator)
+        assert isinstance(copy.pop('id'), uuid.UUID)
+        assert copy.pop('parent') == target_folder.id
+        assert orig.pop('created_at') < copy.pop('created_at')
+        assert orig.pop('last_modified_at') < copy.pop('last_modified_at')
+        copy.pop('ordering')
+        assert orig == copy
+        copy = next(copied_inode_iterator)
+        assert isinstance(copy.pop('id'), uuid.UUID)
+        assert copy.pop('parent') == target_folder.id
+        copy.pop('ordering')
+        assert isinstance(copy.pop('created_at'), datetime)
+        assert isinstance(copy.pop('last_modified_at'), datetime)
+        if orig['is_folder']:
+            # folders with the same name
+            assert orig.pop('name') + '.renamed' == copy.pop('name')
+            assert orig.pop('name_lower') + '.renamed' == copy.pop('name_lower')
+        assert orig == copy
+
+
+def test_copy_folder_into_self(admin_client, ambit, uploaded_file, sub_folder):
+    created_inodes = FileModel.objects.bulk_create([
+        FileModel(
+            parent=sub_folder,
+            name=f"File #S{ordering}",
+            file_size=uploaded_file.file_size,
+            sha1=uploaded_file.sha1,
+            owner=uploaded_file.owner,
+            ordering=ordering,
+        ) for ordering in range(1, 3)
+    ])
+    created_inodes.append(FolderModel.objects.create(
+        parent=sub_folder,
+        name=f"Folder A",
+        owner=uploaded_file.owner,
+        ordering=3,
+    ))
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': created_inodes[-1].id})
+    response = admin_client.post(
+        f'{admin_url}/copy',
+        json.dumps({'inode_ids': [str(created_inode.id) for created_inode in created_inodes]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 409
+    assert response.text == 'Folder named “Folder A” cannot become the descendant of destination folder “Folder A”.'
+
+
 def test_update_file_tags(admin_client, ambit, principal_kwargs):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
     existing_tag = FileTag.objects.create(ambit=ambit, label="Alpha", color='#111111')
@@ -1027,6 +1152,17 @@ def test_erase_trash_folder_recursive(admin_client, admin_user, ambit, sub_folde
     """Test erasing a trash folder containing a sub_folder with a file inside, verifying delete_recursive."""
     trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
 
+    subsub_folder = FolderModel.objects.create(
+        parent=sub_folder,
+        name="Discarded SubSubfolder",
+        owner=admin_user,
+    )
+    subsubsub_folder = FolderModel.objects.create(
+        parent=subsub_folder,
+        name="Discarded SubSubSubfolder",
+        owner=admin_user,
+    )
+
     # Create a file inside sub_folder
     file_name = 'small_file.bin'
     with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
@@ -1034,7 +1170,7 @@ def test_erase_trash_folder_recursive(admin_client, admin_user, ambit, sub_folde
     inner_file = FileModel.objects.create_from_upload(
         ambit,
         uploaded_file,
-        folder=sub_folder,
+        folder=subsubsub_folder,
         owner=admin_user,
     )
     assert ambit.original_storage.exists(inner_file.file_path)
@@ -1063,5 +1199,31 @@ def test_erase_trash_folder_recursive(admin_client, admin_user, ambit, sub_folde
     assert FileModel.objects.filter(id=inner_file.id).exists() is False
     assert DiscardedInode.objects.filter(inode=sub_folder.id).exists() is False
     assert not ambit.original_storage.exists(inner_file.file_path)
-    remaining_entries = list(trash_folder.listdir())
-    assert len(remaining_entries) == 0
+    assert trash_folder.listdir().exists() is False
+
+
+def test_erase_trash_folder_wrong_method(admin_client, admin_user, ambit):
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+    erase_response = admin_client.post(f'{admin_url}/erase_trash_folder')
+    assert erase_response.status_code == 405
+
+
+def test_invalid_post_request(admin_client, admin_user, ambit, sub_folder):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
+    response = admin_client.get(f'{admin_url}/move')
+    assert response.status_code == 405
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
+    response = admin_client.get(f'{admin_url}/delete')
+    assert response.status_code == 405
+    response = admin_client.post(f'{admin_url}/delete', '{"inode_ids": []}', content_type='application/json')
+    assert response.status_code == 409
+    response = admin_client.get(f'{admin_url}/undo_discard')
+    assert response.status_code == 405
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(f'{admin_url}/undo_discard', '{"inode_ids": []}', content_type='application/json')
+    assert response.status_code == 400
+    assert response.text == f"Trash folder with ID=“{trash_folder.id}” expected."
+    response = admin_client.get(f'{admin_url}/update_tags')
+    assert response.status_code == 405
