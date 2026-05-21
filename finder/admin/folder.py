@@ -13,8 +13,8 @@ from django.http.response import (
     JsonResponse,
 )
 from django.urls import path, reverse
-from django.utils.translation import gettext
 from django.utils.html import format_html
+from django.utils.translation import gettext
 
 from finder.admin.inode import InodeAdmin
 from finder.lookups import lookup_by_read_permission, lookup_by_tag
@@ -24,6 +24,9 @@ from finder.models.folder import FolderModel
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.filetag import FileTag
 from finder.models.permission import Privilege, AccessControlEntry
+
+
+RENAMED_SUFFIX = "renamed"
 
 
 @admin.register(FolderModel)
@@ -202,7 +205,7 @@ class FolderAdmin(InodeAdmin):
 
     def fetch_inodes(self, request, folder_id):
         if request.method != 'GET':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
+            return HttpResponseNotAllowed(['GET'])
         try:
             current_folder = self.get_object(request, folder_id)
             request._ambit = current_folder.get_ambit()
@@ -238,7 +241,7 @@ class FolderAdmin(InodeAdmin):
 
     def upload_file(self, request, folder_id):
         if request.method != 'POST':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
+            return HttpResponseNotAllowed(['POST'])
         try:
             folder = self.get_object(request, folder_id)
         except ObjectDoesNotExist:
@@ -256,7 +259,7 @@ class FolderAdmin(InodeAdmin):
             )
         except PermissionDenied as exc:
             return HttpResponseForbidden(str(exc))
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             return HttpResponseBadRequest(str(exc))
         else:
             return JsonResponse({'file_info': new_file.as_dict(ambit)})
@@ -305,7 +308,7 @@ class FolderAdmin(InodeAdmin):
             source_obj = FileModel.objects.get_inode(id=entry['id'])
             if source_obj.is_folder:
                 while current_folder.subfolders.filter(name=source_obj.name).exists():
-                    source_obj.name = f"{source_obj.name}.renamed"
+                    source_obj.name = f"{source_obj.name}.{gettext(RENAMED_SUFFIX)}"
             source_ambit = source_obj.folder.get_ambit()
             try:
                 ordering += 1
@@ -482,7 +485,7 @@ class FolderAdmin(InodeAdmin):
                     msg = gettext("You do not have permission to restore item “{item}” to folder “{folder}”.")
                     raise PermissionDenied(msg.format(item=inode.name, folder=previous_parent.name))
                 while previous_parent.listdir(name=inode.name, is_folder=True).exists():
-                    inode.name = f"{inode.name}.renamed"
+                    inode.name = f"{inode.name}.{gettext(RENAMED_SUFFIX)}"
                 if previous_parent.id in restored_folders:
                     restored_folders[previous_parent.id] += 1
                 else:
@@ -504,14 +507,14 @@ class FolderAdmin(InodeAdmin):
     def erase_trash_folder(self, request, trash_folder_id):
         def delete_recursive(folder):
             for subfolder in folder.subfolders.all():
-                delete_recursive(subfolder)  # presumably never reached
+                delete_recursive(subfolder)
             for file in folder.listdir(is_folder=False):
                 proxy_obj = InodeManager.get_proxy_object(file)
                 proxy_obj.erase_and_delete(ambit)
             folder.delete()
 
         if request.method != 'DELETE':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only DELETE requests are allowed.")
+            return HttpResponseNotAllowed(['DELETE'])
         trash_folder = FolderModel.objects.get(id=trash_folder_id, owner=request.user)
         ambit = request._ambit = trash_folder.get_ambit()
         trash_folder_entries = trash_folder.listdir()

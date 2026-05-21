@@ -73,7 +73,7 @@ class InodeAdmin(admin.ModelAdmin):
 
     def check_for_valid_post_request(self, request, folder_id):
         if request.method != 'POST':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only POST requests are allowed.")
+            return HttpResponseNotAllowed(['POST'])
         if request.content_type != 'application/json':
             return HttpResponse(
                 f"Invalid content-type {request.content_type}. Only application/json is allowed.",
@@ -89,7 +89,7 @@ class InodeAdmin(admin.ModelAdmin):
 
     def lookup_principals(self, request):
         if request.method != 'GET':
-            return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET requests are allowed.")
+            return HttpResponseNotAllowed(['GET'])
         lookup = request.GET.get('q', '')
         results = [{'type': 'everyone', 'principal': None, 'name': gettext("Everyone"), 'is_current_user': False}]
         for obj in get_user_model().objects.filter(username__icontains=lookup)[:10]:
@@ -135,7 +135,7 @@ class InodeAdmin(admin.ModelAdmin):
                 return HttpResponse("Invalid JSON payload.", status=400)
             else:
                 return self.get_permissions(current_inode, user, to_default)
-        return HttpResponseNotAllowed(f"Method {request.method} not allowed. Only GET and POST requests are allowed.")
+        return HttpResponseNotAllowed(['GET', 'POST'])
 
     def get_permissions(self, current_inode, current_user, to_default):
         access_control_list = []
