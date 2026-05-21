@@ -282,7 +282,7 @@ class FolderModel(InodeModel):
         for ancestor in destination_folder.ancestors:
             if ancestor.id == self.id:
                 msg = gettext(
-                    "Folder named “{source}” can not become the descendant of destination folder “{target}”."
+                    "Folder named “{source}” cannot become the descendant of destination folder “{target}”."
                 )
                 raise RecursionError(msg.format(source=self.name, target=destination_folder.name))
 
@@ -297,13 +297,13 @@ class FolderModel(InodeModel):
     def validate_constraints(self):
         if isinstance(self.ancestors, QuerySet):  # pragma: with django-cte
             if self.parent.ancestors.filter(id=self.id).exists():
-                msg = gettext("A parent folder can not become the descendant of a destination folder.")
+                msg = gettext("A parent folder cannot become the descendant of a destination folder.")
                 raise ValidationError(msg)
         else:  # pragma: without django-cte
             parent = self.parent
             while parent is not None:
                 if parent.id == self.id:
-                    msg = gettext("A parent folder can not become the descendant of a destination folder.")
+                    msg = gettext("A parent folder cannot become the descendant of a destination folder.")
                     raise ValidationError(msg)
                 parent = parent.parent
         if self.parent.listdir(name=self.name).exists():
