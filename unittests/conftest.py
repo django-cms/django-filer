@@ -19,7 +19,7 @@ from finder.models.permission import Privilege
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def create_assets():
     os.makedirs(settings.BASE_DIR / 'workdir/assets', exist_ok=True)
     with open(settings.BASE_DIR / 'workdir/assets/small_file.bin', 'wb') as handle:
@@ -54,24 +54,33 @@ def django_db_setup(django_db_blocker):
     yield
 
 
-@pytest.fixture(autouse=True, scope='session')
-def ambit(django_db_setup, django_db_blocker):
+def _ensure_ambit(django_db_blocker, slug, storage, sample_storage):
+    """Re-create an ambit if it was flushed by a previous transaction=True test."""
     with django_db_blocker.unblock():
-        call_command(
-            'finder',
-            'add-ambit',
-            'test-ambit',
-            '--values',
-            'name=Root Folder',
-            'storage=finder_test',
-            'sample_storage=finder_test_samples'
-        )
-        ambit = AmbitModel.objects.first()
-        assert ambit is not None
-        return ambit
+        if not AmbitModel.objects.filter(slug=slug).exists():
+            call_command(
+                'finder',
+                'add-ambit',
+                slug,
+                '--values',
+                'name=Root Folder',
+                f'storage={storage}',
+                f'sample_storage={sample_storage}',
+            )
+        return AmbitModel.objects.get(slug=slug)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
+def ambit(django_db_blocker):
+    return _ensure_ambit(django_db_blocker, 'test-ambit', 'finder_test', 'finder_test_samples')
+
+
+@pytest.fixture
+def alternative_ambit(django_db_blocker):
+    return _ensure_ambit(django_db_blocker, 'alternative-ambit', 'finder_alternative', 'finder_alternative_samples')
+
+
+@pytest.fixture
 def root_folder_url(ambit):
     base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})
     return f'{base_url}{ambit.slug}/{ambit.root_folder_id}'

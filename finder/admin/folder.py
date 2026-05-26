@@ -20,13 +20,10 @@ from finder.admin.inode import InodeAdmin
 from finder.lookups import lookup_by_read_permission, lookup_by_tag
 from finder.models.fields import FinderBaseModelField
 from finder.models.file import InodeModel, FileModel
-from finder.models.folder import FolderModel
+from finder.models.folder import FolderModel, RENAMED_SUFFIX
 from finder.models.inode import DiscardedInode, InodeManager, filename_validator
 from finder.models.filetag import FileTag
 from finder.models.permission import Privilege, AccessControlEntry
-
-
-RENAMED_SUFFIX = "renamed"
 
 
 @admin.register(FolderModel)
@@ -295,7 +292,7 @@ class FolderAdmin(InodeAdmin):
         })
 
     def copy_inodes(self, request, folder_id):
-        if response := self.check_for_valid_post_request(request, folder_id):  # pragma: no cover
+        if response := self.check_for_valid_post_request(request, folder_id):
             return response
         body = json.loads(request.body)
         current_folder = self.get_object(request, folder_id)

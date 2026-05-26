@@ -15,6 +15,7 @@ from finder.storages import delete_directory
 
 ROOT_FOLDER_NAME = '__root__'
 TRASH_FOLDER_NAME = '__trash__'
+RENAMED_SUFFIX = "renamed"
 
 
 class FolderModelManager(InodeManager):
@@ -61,10 +62,11 @@ class FolderModel(InodeModel):
     def get_root_folder(self):
         if self.is_root:
             return self
-        if isinstance(self.ancestors, QuerySet):
+        if isinstance(self.ancestors, QuerySet):  # pragma: with django-cte
             count = self.ancestors.count()
             return self.ancestors[count - 1]
-        return list(self.ancestors)[-1]
+        else:  # pragma: without django-cte
+            return list(self.ancestors)[-1]
 
     @property
     def folder(self):
@@ -87,7 +89,7 @@ class FolderModel(InodeModel):
         """
         Returns a queryset of all ancestor folders including the current folder.
         """
-        def make_ascendant_cte(cte):
+        def make_ascendant_cte(cte):  # pragma: with django-cte
             return self.__class__.objects.filter(
                 id=self.id,
             ).values('id', 'parent_id').union(
@@ -100,14 +102,14 @@ class FolderModel(InodeModel):
 
         try:
             from django_cte import CTE, with_cte
-        except ImportError:
+        except ImportError:  # pragma: without django-cte
             # traversing the tree folder by folder (slow)
             folder, ancestors = self, []
             while folder:
                 ancestors.append(folder)
                 folder = folder.parent
             return ancestors
-        else:
+        else:  # pragma: with django-cte
             # traversing the tree using a recursive CTE (fast)
             ascendant_cte = CTE.recursive(make_ascendant_cte)
             return with_cte(
@@ -122,13 +124,13 @@ class FolderModel(InodeModel):
         If django-cte is installed return a CTE queryset. Otherwise, return a generator containing the descendant
         folders of the current folder.
         """
-        def traverse(parent):
+        def traverse(parent):  # pragma: without django-cte
             yield parent
             for inode in parent.subfolders:
                 if inode.is_folder:
                     yield from traverse(inode)
 
-        def make_descendant_cte(cte):
+        def make_descendant_cte(cte):  # pragma: with django-cte
             return self.__class__.objects.filter(
                 id=self.id,
             ).values('id').union(
@@ -141,10 +143,10 @@ class FolderModel(InodeModel):
 
         try:
             from django_cte import CTE, with_cte
-        except ImportError:
+        except ImportError:  # pragma: without django-cte
             # traversing the tree folder by folder (slow)
             return traverse(self)
-        else:
+        else:  # pragma: with django-cte
             # traversing the tree using a recursive CTE (fast)
             descendant_cte = CTE.recursive(make_descendant_cte)
             return with_cte(
@@ -238,7 +240,7 @@ class FolderModel(InodeModel):
             proxy_obj.ordering = ordering
             if self.is_trash and proxy_obj.is_folder:
                 while self.subfolders.filter(name=proxy_obj.name).exists():
-                    proxy_obj.name = f"{proxy_obj.name}.renamed"
+                    proxy_obj.name = f"{proxy_obj.name}.{RENAMED_SUFFIX}"
             proxy_obj.validate_constraints()
             update_inodes.append(proxy_obj)
 

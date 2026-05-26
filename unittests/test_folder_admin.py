@@ -29,14 +29,15 @@ class AccessControl(Enum):
     READ_ONLY = auto()
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(autouse=True)
 def file_tags(django_db_blocker, ambit):
     with django_db_blocker.unblock():
-        FileTag.objects.bulk_create([
-            FileTag(ambit=ambit, label="Red", color='#ff0000'),
-            FileTag(ambit=ambit, label="Green", color='#00ff00'),
-            FileTag(ambit=ambit, label="Blue", color='#0000ff'),
-        ])
+        if not FileTag.objects.filter(ambit=ambit).exists():
+            FileTag.objects.bulk_create([
+                FileTag(ambit=ambit, label="Red", color='#ff0000'),
+                FileTag(ambit=ambit, label="Green", color='#00ff00'),
+                FileTag(ambit=ambit, label="Blue", color='#0000ff'),
+            ])
 
 
 @pytest.fixture
@@ -49,6 +50,8 @@ def sub_folder(ambit, admin_user):
 
 
 def test_root_folder_exists(admin_client, ambit):
+    now = datetime.now()
+    sleep(0.1)
     base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})
     response = admin_client.get(f'{base_url}{ambit.slug}/')
     assert response.status_code == 301
@@ -60,6 +63,17 @@ def test_root_folder_exists(admin_client, ambit):
     assert ambit.root_folder.parent is None
     assert ambit.root_folder.is_root is True
     assert ambit.trash_folders.count() == 0
+    data = ambit.root_folder.as_dict(ambit)
+    assert data.pop('id') == ambit.root_folder.id
+    data.pop('created_at') > now
+    data.pop('last_modified_at') > now
+    assert data == {
+        'name': '__root__',
+        'summary': '0 Folders, 0 Files',
+        'meta_data': {},
+        'is_folder': True,
+        'has_subfolders': False,
+    }
 
 
 def test_access_root_folder(admin_client, admin_user, root_folder_url, ambit, principal_kwargs):
@@ -373,6 +387,7 @@ def update_inode_url(ambit):
     return reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id}) + '/update'
 
 
+@pytest.mark.django_db
 def test_update_inode_change_nothing(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
@@ -382,6 +397,7 @@ def test_update_inode_change_nothing(update_inode_url, uploaded_file, admin_clie
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
 def test_update_inode_rename_file(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
@@ -393,6 +409,7 @@ def test_update_inode_rename_file(update_inode_url, uploaded_file, admin_client)
     assert uploaded_file.name == "renamed_file.bin"
 
 
+@pytest.mark.django_db
 def test_update_inode_update_using_invalid_filename(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
@@ -402,6 +419,7 @@ def test_update_inode_update_using_invalid_filename(update_inode_url, uploaded_f
     assert response.status_code == 409
 
 
+@pytest.mark.django_db
 def test_update_inode_using_existing_folder_name(update_inode_url, uploaded_file, sub_folder, admin_client):
     response = admin_client.post(
         update_inode_url,
@@ -411,6 +429,7 @@ def test_update_inode_using_existing_folder_name(update_inode_url, uploaded_file
     assert response.status_code == 409
 
 
+@pytest.mark.django_db
 def test_update_inode_rename_folder(update_inode_url, sub_folder, admin_client):
     response = admin_client.post(
         update_inode_url,
@@ -422,6 +441,7 @@ def test_update_inode_rename_folder(update_inode_url, sub_folder, admin_client):
     assert sub_folder.name == "Renamed Folder"
 
 
+@pytest.mark.django_db
 def test_update_inode_update_with_missing_content_type(update_inode_url, uploaded_file, admin_client):
     response = admin_client.post(
         update_inode_url,
@@ -438,6 +458,7 @@ def test_update_inode_update_with_missing_folder(admin_client, missing_inode_id)
     assert response.status_code == 404
 
 
+@pytest.mark.django_db
 def test_update_inode_update_with_missing_file(update_inode_url, admin_client, missing_inode_id):
     response = admin_client.post(
         update_inode_url,
@@ -542,7 +563,7 @@ def test_get_or_create_folder(admin_client, admin_user, ambit, access_control, p
     assert response.status_code == 415
 
 
-@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED, AccessControl.SOURCE_DENIED, AccessControl.READ_ONLY])
 def test_move_file_into_subfolder(admin_client, admin_user, ambit, uploaded_file, sub_folder, principal_kwargs, access_control):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
     if admin_user.is_superuser is False:
@@ -551,21 +572,45 @@ def test_move_file_into_subfolder(admin_client, admin_user, ambit, uploaded_file
             AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
             AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
             AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
-        else:
-            principal_kwargs['privilege'] = Privilege.READ
+        elif access_control == AccessControl.TARGET_DENIED:
             AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+            AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+        elif access_control == AccessControl.SOURCE_DENIED:
             AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
             AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+        elif access_control == AccessControl.READ_ONLY:
+            AccessControlEntry.objects.create(inode=ambit.root_folder.id, **principal_kwargs)
+            AccessControlEntry.objects.create(inode=sub_folder.id, **principal_kwargs)
+            principal_kwargs['privilege'] = Privilege.READ
+            AccessControlEntry.objects.create(inode=uploaded_file.id, **principal_kwargs)
 
+    if admin_user.is_superuser and access_control == AccessControl.ALLOW:
+        session = admin_client.session
+        session['finder_last_folder_id'] = str(sub_folder.id)
+        session.save()
+        target_id = 'return'
+    else:
+        target_id = str(sub_folder.id)
     response = admin_client.post(
         f'{admin_url}/move',
-        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': str(sub_folder.id)}),
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': target_id}),
         content_type='application/json',
     )
     if admin_user.is_superuser or access_control == AccessControl.ALLOW:
+        body = response.json()
         assert response.status_code == 200
-    else:
+    elif access_control != AccessControl.READ_ONLY:
         assert response.status_code == 403
+        return
+    else:
+        body = response.json()
+        assert response.status_code == 200
+        assert body['inodes'] == []
+        assert uploaded_file.parent == ambit.root_folder
         return
     uploaded_file.refresh_from_db()
     assert uploaded_file.parent == sub_folder
@@ -635,6 +680,118 @@ def test_move_file_to_missing_inode(admin_client, ambit, uploaded_file, missing_
     assert response.status_code == 404
     uploaded_file.refresh_from_db()
     assert uploaded_file.parent == ambit.root_folder
+
+
+@pytest.mark.django_db(transaction=True)
+def test_move_file_to_alternative_ambit(admin_client, ambit, alternative_ambit, uploaded_file):
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    assert ambit.original_storage.exists(uploaded_file.file_path) is True
+    assert alternative_ambit.original_storage.exists(uploaded_file.file_path) is False
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(uploaded_file.id)], 'target_id': str(alternative_ambit.root_folder.id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    uploaded_file.refresh_from_db()
+    assert uploaded_file.parent == alternative_ambit.root_folder
+    assert ambit.original_storage.exists(uploaded_file.file_path) is False
+    assert alternative_ambit.original_storage.exists(uploaded_file.file_path) is True
+
+
+
+@pytest.mark.django_db
+def test_move_folder(admin_client, admin_user, ambit, sub_folder):
+    other_folder = FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name="Other Folder",
+        owner=admin_user,
+    )
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(other_folder.id)], 'target_id': str(sub_folder.id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    other_folder.refresh_from_db()
+    assert other_folder.parent == sub_folder
+    other_folder = FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name="Other Folder",
+        owner=admin_user,
+    )
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(other_folder.id)], 'target_id': str(sub_folder.id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 409
+
+
+@pytest.mark.django_db
+def test_move_folder_to_trash(admin_client, admin_user, ambit):
+    trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
+    other_folder = FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name="Other Folder",
+        owner=admin_user,
+    )
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    response = admin_client.post(
+        f'{admin_url}/delete',
+        json.dumps({'inode_ids': [str(other_folder.id)]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    other_folder.refresh_from_db()
+    assert other_folder.parent == trash_folder
+    other_folder = FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name="Other Folder",
+        owner=admin_user,
+    )
+    response = admin_client.post(
+        f'{admin_url}/delete',
+        json.dumps({'inode_ids': [str(other_folder.id)]}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    other_folder.refresh_from_db()
+    assert other_folder.parent == trash_folder
+    assert other_folder.name == "Other Folder.renamed"
+    assert len(trash_folder.listdir()) == 2
+
+
+@pytest.mark.django_db(transaction=True)
+def test_move_folder_to_alternative_ambit(admin_client, admin_user, ambit, alternative_ambit):
+    other_folder = FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name="Other Folder",
+        owner=admin_user,
+    )
+    file_name = 'small_file.bin'
+    with open(settings.BASE_DIR / 'workdir/assets' / file_name, 'rb') as file_handle:
+        uploaded_file = SimpleUploadedFile(file_name, file_handle.read(), content_type='application/octet-stream')
+    uploaded_file = FileModel.objects.create_from_upload(
+        ambit,
+        uploaded_file,
+        folder=other_folder,
+        owner=admin_user,
+    )
+    admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': ambit.root_folder.id})
+    assert ambit.original_storage.exists(uploaded_file.file_path) is True
+    assert alternative_ambit.original_storage.exists(uploaded_file.file_path) is False
+    response = admin_client.post(
+        f'{admin_url}/move',
+        json.dumps({'inode_ids': [str(other_folder.id)], 'target_id': str(alternative_ambit.root_folder.id)}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    other_folder.refresh_from_db()
+    assert other_folder.parent == alternative_ambit.root_folder
+    assert ambit.original_storage.exists(uploaded_file.file_path) is False
+    assert alternative_ambit.original_storage.exists(uploaded_file.file_path) is True
 
 
 @pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.SOURCE_DENIED, AccessControl.TARGET_DENIED])
@@ -1213,9 +1370,13 @@ def test_invalid_post_request(admin_client, admin_user, ambit, sub_folder):
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
     response = admin_client.get(f'{admin_url}/move')
     assert response.status_code == 405
+    response = admin_client.get(f'{admin_url}/copy')
+    assert response.status_code == 405
     trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': trash_folder.id})
     response = admin_client.get(f'{admin_url}/delete')
+    assert response.status_code == 405
+    response = admin_client.get(f'{admin_url}/reorder')
     assert response.status_code == 405
     response = admin_client.post(f'{admin_url}/delete', '{"inode_ids": []}', content_type='application/json')
     assert response.status_code == 409

@@ -104,6 +104,22 @@ STORAGES = {
             'allow_overwrite': True,
         },
     },
+    'finder_alternative': {
+        'BACKEND': 'finder.storages.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/filer_alternative',
+            'base_url': '/media/alt/',
+            'allow_overwrite': True,
+        },
+    },
+    'finder_alternative_samples': {
+        'BACKEND': 'finder.storages.FinderSystemStorage',
+        'OPTIONS': {
+            'location': BASE_DIR / 'workdir/media/filer_alternative_samples',
+            'base_url': '/media/alt_samples/',
+            'allow_overwrite': True,
+        },
+    },
 }
 
 if os.getenv('USE_S3', False) in ['1', 'TRUE', 'True', 'true']:
