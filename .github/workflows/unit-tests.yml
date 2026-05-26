@@ -19,21 +19,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
         django-version: ["5.2", "6.0"]
         node-version: ["22.x"]
         with_cte: ["0", "1"]
         use_postgres: ["0", "1"]
         use_s3: ["0", "1"]
         exclude:
+          - python-version: "3.13"
+            django-version: "5.2"
+          - python-version: "3.12"
+            django-version: "5.2"
           - python-version: "3.11"
             django-version: "6.0"
           - python-version: "3.11"
             django-version: "5.2"
             use_postgres: "1"
-          - python-version: "3.12"
-            django-version: "5.2"
-            use_s3: "1"
           - django-version: "5.2"
             with_cte: "0"
             use_postgres: "1"
