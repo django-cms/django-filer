@@ -21,7 +21,7 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
         django-version: ["5.2", "6.0"]
-        node-version: ["22.x"]
+        node-version: ["24.x"]
         with_cte: ["0", "1"]
         use_postgres: ["0", "1"]
         use_s3: ["0", "1"]
@@ -48,6 +48,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
