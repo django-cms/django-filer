@@ -401,7 +401,10 @@ class FolderModel(InodeModel):
                         entry_ids.append(entry.id)
         else:
             for ace in next_acl:
-                if entry := next(filter(lambda entry: entry == ace, default_acl_qs), None):
+                if entry := next(filter(
+                    lambda e: e.as_dict['type'] == ace['type'] and e.as_dict['principal'] == ace['principal'],
+                    default_acl_qs
+                ), None):
                     if entry.privilege != ace['privilege']:
                         entry.privilege = ace['privilege']
                         update_entries.append(entry)

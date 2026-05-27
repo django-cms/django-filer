@@ -690,7 +690,6 @@ def test_move_file_to_alternative_ambit(admin_client, ambit, alternative_ambit, 
     assert alternative_ambit.original_storage.exists(uploaded_file.file_path) is True
 
 
-
 @pytest.mark.django_db
 def test_move_folder(admin_client, admin_user, ambit, sub_folder):
     other_folder = FolderModel.objects.create(
@@ -1060,7 +1059,7 @@ def test_copy_folder(admin_client, ambit, uploaded_file, sub_folder):
     ])
     created_inodes.append(FolderModel.objects.create(
         parent=sub_folder,
-        name=f"Folder A",
+        name="Folder A",
         owner=uploaded_file.owner,
         ordering=3,
     ))
@@ -1138,7 +1137,7 @@ def test_copy_folder_into_self(admin_client, ambit, uploaded_file, sub_folder):
     ])
     created_inodes.append(FolderModel.objects.create(
         parent=sub_folder,
-        name=f"Folder A",
+        name="Folder A",
         owner=uploaded_file.owner,
         ordering=3,
     ))
