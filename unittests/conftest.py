@@ -14,6 +14,7 @@ from django.urls import reverse
 from finder.contrib.image.pil.models import PILImageModel
 from finder.models.ambit import AmbitModel
 from finder.models.file import FileModel
+from finder.models.folder import FolderModel
 from finder.models.permission import Privilege
 
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
@@ -38,13 +39,13 @@ def django_db_setup(django_db_blocker):
 
         # If using SQLite ensure the test DB file is removed so migrations start
         # from a clean slate.
-        if 'sqlite3' in engine:
+        if 'sqlite3' in engine:  # pragma: with postgres
             db_name = db_settings.get('NAME')
             try:
                 os.remove(db_name)
-            except FileNotFoundError:
+            except FileNotFoundError:  # pragma: no cover
                 pass
-        else:
+        else:  # pragma: without postgres
             with connection.cursor() as cursor:
                 table_names = connection.introspection.table_names()
                 for table_name in table_names:
@@ -121,6 +122,15 @@ def uploaded_image(ambit, admin_user):
         ambit,
         uploaded_file,
         folder=ambit.root_folder,
+        owner=admin_user,
+    )
+
+
+@pytest.fixture
+def sub_folder(ambit, admin_user):
+    return FolderModel.objects.create(
+        parent=ambit.root_folder,
+        name='Sub Folder',
         owner=admin_user,
     )
 

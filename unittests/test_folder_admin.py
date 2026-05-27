@@ -40,15 +40,6 @@ def file_tags(django_db_blocker, ambit):
             ])
 
 
-@pytest.fixture
-def sub_folder(ambit, admin_user):
-    return FolderModel.objects.create(
-        parent=ambit.root_folder,
-        name='Sub Folder',
-        owner=admin_user,
-    )
-
-
 def test_root_folder_exists(admin_client, ambit):
     now = datetime.now()
     sleep(0.1)

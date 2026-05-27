@@ -89,6 +89,7 @@ exclude_also = [
     "raise NotImplementedError",
     "pragma: without django-cte",
     "pragma: without django-storages",
+    "pragma: with postgres",
 ]
 ignore_errors = true
 

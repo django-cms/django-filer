@@ -265,14 +265,10 @@ def test_remove_permissions(admin_client, admin_user, ambit, uploaded_file, perm
     assert AccessControlEntry.objects.filter(inode=uploaded_file.id, user__isnull=True, group__isnull=True).exists() is False
 
 
-def test_set_default_permissions(admin_client, admin_user, ambit, permissions_url, groups):
+def test_set_default_permissions(admin_client, admin_user, ambit, sub_folder, permissions_url, staff_users, groups):
     """Test POST with to_default=True sets default ACL on a folder."""
-    sub_folder = FolderModel.objects.create(
-        parent=ambit.root_folder,
-        name='Default ACL Folder',
-        owner=admin_user,
-    )
     AccessControlEntry.objects.create(inode=sub_folder.id, user=admin_user, privilege=Privilege.FULL)
+    alice = staff_users[0]
     editors = groups[0]
 
     new_default_acl = [
@@ -286,10 +282,36 @@ def test_set_default_permissions(admin_client, admin_user, ambit, permissions_ur
     )
     assert response.status_code == 200
     acl = response.json()['access_control_list']
-    assert len(acl) == 2
-
+    acl.sort(key=lambda x: (x['type'], x['principal'] or -1))
+    assert acl == [
+        {'type': 'everyone', 'principal': None, 'name': 'Everyone', 'privilege': 1, 'is_current_user': False},
+        {'type': 'group', 'principal': editors.id, 'name': 'Editors', 'privilege': 3, 'is_current_user': False},
+    ]
     assert DefaultAccessControlEntry.objects.filter(folder=sub_folder).count() == 2
     assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, group=editors, privilege=Privilege.READ_WRITE).exists()
+
+    update_default_acl = [
+        {'type': 'user', 'principal': alice.id, 'privilege': Privilege.READ_WRITE},
+        {'type': 'group', 'principal': editors.id, 'privilege': Privilege.READ},
+        {'type': 'everyone', 'principal': None, 'privilege': Privilege.READ},
+    ]
+    response = admin_client.post(
+        permissions_url(sub_folder.id),
+        json.dumps({'access_control_list': update_default_acl, 'to_default': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    acl = response.json()['access_control_list']
+    acl.sort(key=lambda x: (x['type'], x['principal'] or -1))
+    assert acl == [
+        {'type': 'everyone', 'principal': None, 'name': 'Everyone', 'privilege': 1, 'is_current_user': False},
+        {'type': 'group', 'principal': editors.id, 'name': 'Editors', 'privilege': 1, 'is_current_user': False},
+        {'type': 'user', 'principal': alice.id, 'name': 'alice', 'privilege': 3, 'is_current_user': False},
+    ]
+    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder).count() == 3
+    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, user=alice, privilege=Privilege.READ_WRITE).exists()
+    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, group=editors, privilege=Privilege.READ).exists()
+    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, everyone=True, privilege=Privilege.READ).exists()
 
 
 def test_set_permissions_denied(admin_client, admin_user, ambit, uploaded_file, permissions_url, staff_users):

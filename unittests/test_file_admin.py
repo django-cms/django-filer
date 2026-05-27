@@ -3,12 +3,20 @@ import pytest
 
 from bs4 import BeautifulSoup
 from django.contrib import admin
+from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import MULTIPART_CONTENT
 from django.urls import reverse
 
 from finder.models.file import FileModel
 from finder.models.permission import AccessControlEntry, Privilege
+
+
+def test_changelist_view(admin_client, ambit):
+    base_url = reverse('admin:finder_filemodel_changelist')
+    response = admin_client.get(base_url)
+    assert response.status_code == 400
+    assert response.text == f"{base_url} must be converted to ambit."
 
 
 def test_replace_file(admin_client, ambit, uploaded_file, missing_inode_id):
@@ -74,7 +82,7 @@ def read_only_principal(admin_user, request):
         return {'privilege': Privilege.READ}
 
 
-def test_replace_file_without_write_permission(admin_client, admin_user, ambit, uploaded_file, read_only_principal):
+def test_replace_file_without_write_permission(admin_client, ambit, uploaded_file, read_only_principal):
     """Test that replacing a file fails when the user only has read permission."""
     base_url = reverse('admin:finder_filemodel_changelist')
     upload_url = f'{base_url}{uploaded_file.id}/upload'
@@ -101,7 +109,7 @@ def test_replace_file_without_write_permission(admin_client, admin_user, ambit, 
     assert uploaded_file.sha1 == original_sha1
 
 
-def test_file_detail_view(admin_client, admin_user, ambit, uploaded_file):
+def test_file_detail_view(admin_client, ambit, uploaded_file):
     """Test the change view of an uploaded file renders expected HTML elements."""
     model_admin = admin.site._registry[FileModel]
     admin_url = model_admin.get_inode_url(ambit.slug, str(uploaded_file.id))
@@ -150,3 +158,30 @@ def test_file_detail_view(admin_client, admin_user, ambit, uploaded_file):
     assert 'csrf_token' in finder_settings
     assert finder_settings['can_change'] is True
     assert finder_settings['folder_id'] == str(uploaded_file.parent_id)
+
+
+def test_delete_file_confirmed(admin_client, ambit, uploaded_file):
+    delete_url = reverse('admin:finder_filemodel_delete', kwargs={'object_id': uploaded_file.id})
+    model_admin = admin.site._registry[FileModel]
+    redirect_url = model_admin.get_inode_url(ambit.slug, str(uploaded_file.parent.id))
+    response = admin_client.post(delete_url, {'post': ['yes']})
+    assert response.status_code == 302
+    assert FileModel.objects.filter(id=uploaded_file.id).exists() is False
+    assert response.url == redirect_url
+    messages = list(get_messages(response.wsgi_request))
+    assert len(messages) == 1
+    assert messages[0].message == f"The File “{uploaded_file.name}” was deleted successfully."
+
+
+def test_file_post_save_changed(admin_client, ambit, uploaded_file):
+    model_admin = admin.site._registry[FileModel]
+    save_url = model_admin.get_inode_url(ambit.slug, str(uploaded_file.id))
+    redirect_url = model_admin.get_inode_url(ambit.slug, str(uploaded_file.parent.id))
+    response = admin_client.post(save_url, {'name': ["alternative-file-name"], '_save': ['Save']})
+    assert response.status_code == 302
+    assert response.url == redirect_url
+    file_obj = FileModel.objects.get(id=uploaded_file.id)
+    assert file_obj.name == "alternative-file-name"
+    messages = list(get_messages(response.wsgi_request))
+    assert len(messages) == 1
+    assert messages[0].message == f'The File “<a href="{save_url}">{file_obj.name}</a>” was changed successfully.'
