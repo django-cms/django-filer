@@ -7,7 +7,10 @@ export default function loadFinderAdmin(children: React.ReactNode) {
 	window.addEventListener('DOMContentLoaded', () => {
 		const reactContent = document.getElementById('content-react');
 		const mainContent = document.getElementById('content-main');
-		const settings = JSON.parse(document.getElementById('finder-settings').textContent);
+		const settings = JSON.parse(document.getElementById('finder-settings')?.textContent ?? 'null');
+		if (settings === null)
+			return;
+
 		settings.workAreaRect = reactContent.getBoundingClientRect();
 		if (mainContent) {
 			settings.mainContent = mainContent;
