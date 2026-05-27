@@ -89,7 +89,16 @@ class AccessControlBase(models.Model):
         raise RuntimeError("AccessControlEntry has no principal")
 
 
+class AccessControlQuerySet(models.QuerySet):
+    def _filter_or_exclude(self, negate, args, kwargs):
+        if kwargs.pop('everyone', None) is True:
+            kwargs['user__isnull'] = True
+            kwargs['group__isnull'] = True
+        return super()._filter_or_exclude(negate, args, kwargs)
+
+
 class AccessControlManager(models.Manager):
+    _queryset_class = AccessControlQuerySet
     _everyone = Q(user__isnull=True, group__isnull=True)
 
     def get_privilege_queryset(self, user, privilege):
@@ -167,6 +176,8 @@ class DefaultAccessControlEntry(AccessControlBase):
                 name='dacl_valid_privilege',
             ),
         ]
+
+    objects = AccessControlManager()
 
     def __repr__(self):
         principal = '{0}={1}'.format(*next(iter(self.principal.items())))

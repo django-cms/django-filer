@@ -309,9 +309,12 @@ def test_set_default_permissions(admin_client, admin_user, ambit, sub_folder, pe
         {'type': 'user', 'principal': alice.id, 'name': 'alice', 'privilege': 3, 'is_current_user': False},
     ]
     assert DefaultAccessControlEntry.objects.filter(folder=sub_folder).count() == 3
-    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, user=alice, privilege=Privilege.READ_WRITE).exists()
-    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, group=editors, privilege=Privilege.READ).exists()
-    assert DefaultAccessControlEntry.objects.filter(folder=sub_folder, everyone=True, privilege=Privilege.READ).exists()
+    ace_alice = DefaultAccessControlEntry.objects.get(folder=sub_folder, user=alice, privilege=Privilege.READ_WRITE)
+    assert ace_alice.principal == {'user': alice}
+    ace_editors = DefaultAccessControlEntry.objects.get(folder=sub_folder, group=editors, privilege=Privilege.READ)
+    assert ace_editors.principal == {'group': editors}
+    ace_everyone = DefaultAccessControlEntry.objects.get(folder=sub_folder, everyone=True, privilege=Privilege.READ)
+    assert ace_everyone.principal == {'everyone': True}
 
 
 def test_set_permissions_denied(admin_client, admin_user, ambit, uploaded_file, permissions_url, staff_users):
