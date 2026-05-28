@@ -120,12 +120,13 @@ class InodeManager(models.Manager):
             query &= Q(can_change=True)
 
         # query to filter by mime types
-        if mime_types and 'mime_type' in model_field_names:
+        if mime_types:
             queries = []
             for mime_type in mime_types:
                 main_type, sub_type = mime_type.split('/', 1)
                 if main_type == '*':
-                    return Q()
+                    queries.clear()
+                    break
                 if sub_type == '*':
                     queries.append(Q(mime_type__startswith=f'{main_type}/'))
                 else:
