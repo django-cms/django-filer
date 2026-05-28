@@ -53,7 +53,7 @@ class FileModelManager(InodeManager):
             raise PermissionDenied(msg.format(folder=folder.name))
         kwargs.update(
             parent=folder,
-            name=uploaded_file.name,
+            name=kwargs.pop('name', uploaded_file.name),
             file_name=ambit.original_storage.generate_filename(uploaded_file.name).lower(),
             mime_type=kwargs.pop('mime_type', uploaded_file.content_type),
             file_size=uploaded_file.size,
