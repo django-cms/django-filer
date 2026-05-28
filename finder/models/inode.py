@@ -330,11 +330,8 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
 
     @cached_property
     def pretty_path(self):
-        names = []
-        if self.parent:
-            names.extend(a.name for a in self.parent.ancestors)
-        names.append(self.name)
-        return " / ".join(names)
+        names = [str(self), *(str(a) for a in self.ancestors)]
+        return " / ".join(reversed(names))
 
     def as_dict(self, ambit):
         return {
