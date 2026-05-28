@@ -87,9 +87,11 @@ omit = [
 exclude_also = [
     "def __repr__",
     "raise NotImplementedError",
+    "raise RuntimeError",
+    "DJANGO_VERSION < (6, 0)",
     "pragma: without django-cte",
     "pragma: without django-storages",
-    "pragma: with postgres",
+    "pragma: with aggregate_distinct_multiple_argument",
 ]
 ignore_errors = true
 

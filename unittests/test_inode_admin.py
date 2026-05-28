@@ -1,8 +1,6 @@
 import json
 import pytest
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.urls import reverse
 
 from finder.models.folder import FolderModel
@@ -25,26 +23,6 @@ def permissions_url(ambit):
 
     base_url = reverse('admin:finder_foldermodel_changelist')
     return _url
-
-
-@pytest.fixture
-def staff_users():
-    User = get_user_model()
-    users = User.objects.bulk_create([
-        User(username='alice', is_staff=True),
-        User(username='bob', is_staff=True),
-        User(username='charlie', is_staff=True),
-    ])
-    return users
-
-
-@pytest.fixture
-def groups():
-    return Group.objects.bulk_create([
-        Group(name='Editors'),
-        Group(name='Reviewers'),
-        Group(name='Designers'),
-    ])
 
 
 def test_lookup_principals_without_query(admin_client, admin_user, principals_url, staff_users, groups):

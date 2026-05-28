@@ -621,9 +621,14 @@ def test_keep_file_in_subfolder(admin_client, ambit, uploaded_file, sub_folder):
     assert uploaded_file.parent == sub_folder
 
 
-def test_move_file_to_parent(admin_client, ambit, uploaded_file, sub_folder):
+@pytest.mark.parametrize('with_modify_ace', [False, True])
+def test_move_file_to_parent(admin_client, ambit, uploaded_file, sub_folder, with_modify_ace):
     uploaded_file.parent = sub_folder
     uploaded_file.save()
+    if with_modify_ace:
+        ace = AccessControlEntry.objects.get(inode=uploaded_file.id)
+        ace.privilege = Privilege.READ
+        ace.save()
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': sub_folder.id})
     response = admin_client.post(
         f'{admin_url}/move',
@@ -633,6 +638,7 @@ def test_move_file_to_parent(admin_client, ambit, uploaded_file, sub_folder):
     assert response.status_code == 200
     uploaded_file.refresh_from_db()
     assert uploaded_file.parent == ambit.root_folder
+    assert AccessControlEntry.objects.get(inode=uploaded_file.id).privilege == Privilege.READ_WRITE
 
 
 def test_move_file_to_self(admin_client, ambit, uploaded_file, sub_folder):
@@ -1046,7 +1052,8 @@ def test_copy_inodes(admin_client, admin_user, uploaded_file, sub_folder, princi
     assert resp_names == expected_names
 
 
-def test_copy_folder(admin_client, ambit, uploaded_file, sub_folder):
+@pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
+def test_copy_folder(admin_client, admin_user, ambit, uploaded_file, sub_folder, principal_kwargs, access_control):
     created_inodes = FileModel.objects.bulk_create([
         FileModel(
             parent=sub_folder,
@@ -1070,12 +1077,32 @@ def test_copy_folder(admin_client, ambit, uploaded_file, sub_folder):
     )
     assert target_folder.listdir().exists() is False
     sleep(0.1)
+
+    AccessControlEntry.objects.all().delete()
+    if admin_user.is_superuser is False:
+        principal_kwargs.pop('privilege')
+        acl = [
+            AccessControlEntry(inode=inode.id, privilege=Privilege.READ, **principal_kwargs)
+            for inode in created_inodes
+        ]
+        if access_control != AccessControl.TARGET_DENIED:
+            acl.append(AccessControlEntry(
+                inode=target_folder.id,
+                privilege=Privilege.READ_WRITE,
+                **principal_kwargs
+            ))
+        AccessControlEntry.objects.bulk_create(acl)
+
     admin_url = reverse('admin:finder_inodemodel_change', kwargs={'inode_id': target_folder.id})
     response = admin_client.post(
         f'{admin_url}/copy',
         json.dumps({'inode_ids': [str(created_inode.id) for created_inode in created_inodes]}),
         content_type='application/json',
     )
+    if admin_user.is_superuser is False and access_control == AccessControl.TARGET_DENIED:
+        assert response.status_code == 403
+        return
+
     assert response.status_code == 200
     copied_inodes = target_folder.listdir().order_by('name')
     assert len(copied_inodes) == len(created_inodes)

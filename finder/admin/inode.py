@@ -84,7 +84,7 @@ class InodeAdmin(admin.ModelAdmin):
             request._ambit = folder.get_ambit()
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"Folder with id “{folder_id}” not found.")
-        if not folder.is_folder:
+        if not folder.is_folder:  # pragma: no cover
             return HttpResponseBadRequest(f"Inode with id “{folder_id}” is not a folder.")
 
     def lookup_principals(self, request):

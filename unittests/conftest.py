@@ -6,6 +6,8 @@ from uuid import uuid5, NAMESPACE_DNS
 
 from PIL import Image, ImageDraw
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.db import connection
@@ -27,6 +29,26 @@ def create_assets():
         handle.write(random.randbytes(1000))
     with open(settings.BASE_DIR / 'workdir/assets/huge_file.bin', 'wb') as handle:
         handle.write(random.randbytes(100000))
+
+
+@pytest.fixture
+def staff_users():
+    User = get_user_model()
+    users = User.objects.bulk_create([
+        User(username='alice', is_staff=True),
+        User(username='bob', is_staff=True),
+        User(username='charlie', is_staff=True),
+    ])
+    return users
+
+
+@pytest.fixture
+def groups():
+    return Group.objects.bulk_create([
+        Group(name='Editors'),
+        Group(name='Reviewers'),
+        Group(name='Designers'),
+    ])
 
 
 @pytest.fixture(scope='session')

@@ -72,19 +72,19 @@ class InodeMetaModel(models.base.ModelBase):
         return new_class
 
     def _validate_accept_mime_types(new_class):
-        if not hasattr(new_class, 'accept_mime_types'):
-            msg = "Attribute accept_mime_types not defined for {}"
+        if not hasattr(new_class, 'accept_mime_types'):  # pragma: no coverage
+            msg = "Attribute ‘accept_mime_types’ not defined for {}"
             raise ImproperlyConfigured(msg.format(new_class))
-        if not isinstance(new_class.accept_mime_types, (list, tuple)):
-            msg = "Attribute accept_mime_types must be a list or tuple for {}"
+        if not isinstance(new_class.accept_mime_types, (list, tuple)):  # pragma: no coverage
+            msg = "Attribute ‘accept_mime_types’ must be a list or tuple for {}"
             raise ImproperlyConfigured(msg.format(new_class))
-        if not all(isinstance(mime_type, str) for mime_type in new_class.accept_mime_types):
-            msg = "Attribute accept_mime_types must be a list of strings for {}"
+        if not all(isinstance(mime_type, str) for mime_type in new_class.accept_mime_types):  # pragma: no coverage
+            msg = "Attribute ‘accept_mime_types’ must be a list of strings for {}"
             raise ImproperlyConfigured(msg.format(new_class))
         for accept_mime_type in new_class.accept_mime_types:
             for other in new_class._inode_models.values():
-                if not other.is_folder and accept_mime_type in other.accept_mime_types:
-                    msg = "Attribute accept_mime_types {} already defined in {}"
+                if not other.is_folder and accept_mime_type in other.accept_mime_types:  # pragma: no coverage
+                    msg = "Attribute ‘accept_mime_types’ {} already defined in {}"
                     raise ImproperlyConfigured(msg.format(accept_mime_type, other))
             new_class._mime_types_mapping[accept_mime_type] = new_class
 
@@ -166,10 +166,10 @@ class InodeManager(models.Manager):
                 if (
                     getattr(connection.features, 'supports_aggregate_distinct_multiple_argument', False)
                     or connection.vendor == 'postgresql'
-                ):
+                ):  # pragma: with aggregate_distinct_multiple_argument
                     concatenated = Cast('tags__id', output_field=CharField())
                     expressions = {'tag_ids': StringAgg(concatenated, Value(','), distinct=True)}
-                else:
+                else:  # pragma: without aggregate_distinct_multiple_argument
                     # Function STRING_AGG should be preferred over GROUP_CONCAT, but isn't always available or doesn't
                     # support the DISTINCT keyword in SQLite, so we have to use GROUP_CONCAT in that case.
                     expressions = {'tag_ids': GroupConcat('tags__id', distinct=True)}
@@ -196,7 +196,7 @@ class InodeManager(models.Manager):
                             value = 0
                         elif field.empty_strings_allowed:
                             value = ''
-                        else:
+                        else:  # pragma: no cover
                             value = None
                     else:
                         value = field.default
@@ -411,7 +411,7 @@ class InodeModel(models.Model, metaclass=InodeMetaModel):
                         create_kwargs['group_id'] = ace['principal']
                     elif ace['type'] == 'user':
                         create_kwargs['user_id'] = ace['principal']
-                    else:
+                    else:  # pragma: no cover
                         raise ValueError(f"Unknown access control type {ace['type']}")
                     create_entries.append(AccessControlEntry(**create_kwargs))
 
