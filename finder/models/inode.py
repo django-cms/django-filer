@@ -49,6 +49,7 @@ NUMERIC_FIELD_TYPES = [
     'IntegerField', 'FloatField', 'DecimalField', 'BigIntegerField', 'SmallIntegerField',
     'PositiveIntegerField', 'PositiveSmallIntegerField', 'PositiveBigIntegerField'
 ]
+FOLDER_MIME_TYPE = 'inode/directory'
 
 
 class InodeMetaModel(models.base.ModelBase):
@@ -187,6 +188,8 @@ class InodeManager(models.Manager):
             for name, field in unified_fields.items():
                 if name in annotations:
                     concrete_fields.remove(name)
+                elif name == 'mime_type' and model.is_folder:
+                    expressions[name] = Value(FOLDER_MIME_TYPE, output_field=field)
                 elif name not in model_field_names:
                     if field.default is models.NOT_PROVIDED:
                         if field.get_internal_type() in NUMERIC_FIELD_TYPES:
