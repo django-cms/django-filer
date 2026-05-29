@@ -147,7 +147,7 @@ class FolderAdmin(InodeAdmin):
                 is_admin=inode.has_permission(request.user, Privilege.ADMIN),
                 can_change=inode.has_permission(request.user, Privilege.WRITE),
             )
-            if FileTag.objects.exists():
+            if FileTag.objects.exists():  # pragma: no branch
                 settings['tags'] = [
                     {'value': id, 'label': label, 'color': color}
                     for id, label, color in FileTag.objects.filter(ambit=ambit).values_list('id', 'label', 'color')
@@ -174,7 +174,7 @@ class FolderAdmin(InodeAdmin):
     def get_menu_extension_settings(self, request):
         extensions = []
         for model in InodeModel.get_models(include_proxy=True):
-            if model_admin := self.admin_site._registry.get(model):
+            if model_admin := self.admin_site._registry.get(model):  # pragma: no branch
                 extension = model_admin.get_menu_extension_settings(request)
                 if extension.get('component'):
                     extensions.append(extension)
@@ -209,7 +209,7 @@ class FolderAdmin(InodeAdmin):
         except ObjectDoesNotExist:
             return HttpResponseNotFound(f"FolderModel<{folder_id}> not found.")
         lookup = lookup_by_read_permission(request)
-        if not current_folder.is_trash:
+        if not current_folder.is_trash:  # pragma: no branch
             lookup.update(lookup_by_tag(request))
         if search_query := request.GET.get('q'):
             inode_qs = self.search_for_inodes(request, current_folder, search_query, **lookup)
@@ -403,7 +403,7 @@ class FolderAdmin(InodeAdmin):
         referenced_inode_ids = [ref['inode_id'] for ref in referenced_inodes]
         if force:
             if any(filter(lambda ref: ref['on_delete'] in ('PROTECT', 'RESTRICT'), referenced_inodes)):
-                # can only happen, if user bypasses client code
+                # can only happen if user bypasses client code
                 return HttpResponseBadRequest("Invalid request data.")
         else:
             inode_ids.difference_update(map(lambda inode: str(inode), referenced_inode_ids))

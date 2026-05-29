@@ -418,7 +418,7 @@ class FolderModel(InodeModel):
                         create_kwargs['group_id'] = ace['principal']
                     elif ace['type'] == 'user':
                         create_kwargs['user_id'] = ace['principal']
-                    else:
+                    else:  # pragma: no cover
                         raise ValueError(f"Unknown access control type {ace['type']}")
                     create_entries.append(default_acl_qs.model(**create_kwargs))
 

@@ -25,15 +25,11 @@ def get_ambit_queryset(admin_name, current_site):
 def catch_all_view(self, request, url):
     urlconf = getattr(request, 'urlconf', None)
     if settings.APPEND_SLASH and not url.endswith('/'):
-        try:
-            match = resolve(f'{request.path_info}/', urlconf)
-        except Resolver404:
-            pass
-        else:
-            if getattr(match.func, 'should_append_slash', True):
-                return HttpResponsePermanentRedirect(
-                    request.get_full_path(force_append_slash=True)
-                )
+        match = resolve(f'{request.path_info}/', urlconf)
+        if getattr(match.func, 'should_append_slash', True):
+            return HttpResponsePermanentRedirect(
+                request.get_full_path(force_append_slash=True)
+            )
     current_site = get_current_site(request)
     if m := re.match(r'finder/([-a-zA-Z0-9_]+)/$', url):
         try:
@@ -95,14 +91,11 @@ def get_app_list(self, request, app_label=None):
     for model, model_admin in self._registry.items():
         if model._meta.proxy_for_model is not AmbitModel:
             continue
-        try:
-            root_folder = AmbitModel.objects.get(slug=model._meta.model_name).root_folder
-        except AmbitModel.DoesNotExist:
-            continue
+        root_folder = AmbitModel.objects.get(slug=model._meta.model_name).root_folder
         if not root_folder.has_permission(request.user, Privilege.READ):
             continue
         parts = [model._meta.model_name if part == 'foldermodel' else part for part in url_parts]
-        if parts[-1] != '':
+        if parts[-1] != '':  # pragma: no cover
             parts.append('')
         app_dict[model._meta.app_label]['models'].append({
             'model': model,

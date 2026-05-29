@@ -102,6 +102,28 @@ def test_access_folder_not_found(admin_client, ambit, missing_inode_id):
     assert response.status_code == 404
 
 
+def test_catch_all(admin_client):
+    response = admin_client.get('/admin/some-random-path')
+    assert response.status_code == 404
+
+
+def test_missing_ambit(admin_client, missing_inode_id):
+    base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})
+    response = admin_client.get(f'{base_url}non-existant/')
+    assert response.status_code == 404
+    response = admin_client.get(f'{base_url}non-existant/{missing_inode_id}')
+    assert response.status_code == 404
+    response = admin_client.get(f'{base_url}non-existant/non-existant')
+    assert response.status_code == 404
+
+
+def test_finder_redirect(admin_client):
+    site_url = reverse('admin:sites_site_changelist')
+    response = admin_client.get(site_url[:-1] if site_url[-1] == '/' else site_url)
+    assert response.status_code == 301
+    assert response.url == site_url
+
+
 def test_access_trash_folder(admin_client, admin_user, root_folder_url, ambit, principal_kwargs):
     trash_folder = FolderModel.objects.get_trash_folder(ambit, admin_user)
     base_url = reverse('admin:app_list', kwargs={'app_label': 'finder'})

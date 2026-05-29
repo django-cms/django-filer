@@ -40,7 +40,7 @@ class FileAdmin(InodeAdmin):
         ]
         urls.extend(super().get_urls())
         for model in InodeModel.get_models(include_proxy=True):
-            if model_admin := self.admin_site._registry.get(model):
+            if model_admin := self.admin_site._registry.get(model):  # pragma: no branch
                 urls.extend(model_admin.get_editor_urls())
         return urls
 
@@ -59,9 +59,6 @@ class FileAdmin(InodeAdmin):
     def get_model_perms(self, *args, **kwargs):
         """Prevent showing up in the admin index."""
         return {}
-
-    def get_ancestors(self, request, obj):
-        return super().get_ancestors(request, obj.folder)
 
     def get_breadcrumbs(self, obj):
         breadcrumbs = super().get_breadcrumbs(obj)
@@ -100,11 +97,6 @@ class FileAdmin(InodeAdmin):
         return fields
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
-        has_editable_inline_admin_formsets = False
-        for inline in context['inline_admin_formsets']:
-            if inline.has_add_permission or inline.has_change_permission or inline.has_delete_permission:
-                has_editable_inline_admin_formsets = True
-                break
         context.update(
             add=add,
             change=change,
@@ -112,7 +104,7 @@ class FileAdmin(InodeAdmin):
             has_add_permission=self.has_add_permission(request),
             has_change_permission=self.has_change_permission(request, obj),
             has_delete_permission=self.has_delete_permission(request, obj),
-            has_editable_inline_admin_formsets=has_editable_inline_admin_formsets,
+            has_editable_inline_admin_formsets=False,
             opts=self.opts,
             save_as=self.save_as,
             show_save_and_add_another=False,

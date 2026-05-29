@@ -21,7 +21,7 @@ from finder.storages import delete_directory
 
 def mimetype_validator(value):
     if not mimetypes.guess_extension(value):
-        msg = gettext("'{mimetype}' is not a recognized MIME-Type.")
+        msg = gettext("‘{mimetype}’ is not a recognized MIME-Type.")
         raise ValidationError(msg.format(mimetype=value))
 
 
@@ -49,7 +49,7 @@ class FileModelManager(InodeManager):
     def create_from_upload(self, ambit, uploaded_file, **kwargs):
         folder = kwargs.pop('folder')
         if not folder.has_permission(kwargs['owner'], Privilege.WRITE):
-            msg = gettext("You don't have permission to upload a file to folder “{folder}”.")
+            msg = gettext("You don't have permission to upload a file to the folder “{folder}”.")
             raise PermissionDenied(msg.format(folder=folder.name))
         kwargs.update(
             parent=folder,
@@ -135,11 +135,6 @@ class AbstractFileModel(InodeModel):
     @property
     def folder(self):
         return self.parent
-
-    @classmethod
-    @lru_cache
-    def accept_mime_main_types(cls):
-        return [mime_type.split('/')[0] for mime_type in cls.accept_mime_types]
 
     @classmethod
     @lru_cache
