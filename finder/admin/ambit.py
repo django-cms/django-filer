@@ -7,7 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
 from django.http import Http404
 from django.http.response import HttpResponsePermanentRedirect
-from django.urls import Resolver404, resolve, reverse
+from django.urls import resolve, reverse
 from django.views.decorators.common import no_append_slash
 
 from finder.models.ambit import AmbitModel
