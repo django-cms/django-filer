@@ -251,6 +251,8 @@ ul.messagelist {
 			position: relative;
 			width: 100%;
 			height: 100%;
+		}
+		&:not(.gallery) .scrollable-area {
 			overflow-x: hidden;
 			overflow-y: scroll;
 			overflow-anchor: none;
@@ -298,6 +300,28 @@ ul.messagelist {
 		position: absolute;
 		bottom: 0;
 		padding: 0;
+	}
+
+	figcaption > .inode-name {
+		padding: 5px;
+		border-radius: 3px;
+
+		&[contenteditable="true"]:focus-visible {
+			background-color: colors.$body-bg-color;
+			outline: 1px solid var(--link-selected-fg);
+			outline-offset: -1px;
+			box-shadow: inset var(--link-selected-fg) 0 0 10px;
+			cursor: text;
+		}
+
+		&[contenteditable="false"] {
+			font-style: italic;
+		}
+
+		&[contenteditable="false"] {
+			font-style: italic;
+			cursor: default;
+		}
 	}
 
 	.progress-overlay {
@@ -353,6 +377,7 @@ ul.messagelist {
 					}
 				}
 
+/*
 				.inode-name {
 					padding: 5px;
 					border-radius: 3px;
@@ -374,11 +399,12 @@ ul.messagelist {
 						cursor: default;
 					}
 				}
+ */
 			}
 		}
 	}
 
-	.tiles ul.inode-list, .mosaic ul.inode-list {
+	.tiles ul.inode-list, .mosaic ul.inode-list, .gallery ul.inode-list {
 		display: flex;
 		padding: 15px;
 		flex-wrap: wrap;
@@ -421,6 +447,7 @@ ul.messagelist {
 					}
 
 					video {
+						width: 100%;
 						border-radius: 5px;
 						box-shadow: colors.$border-color 0 0 5px;
 					}
@@ -441,7 +468,7 @@ ul.messagelist {
 	}
 
 	.tiles ul.inode-list {
-		gap: 0 5px;
+		gap: 0 6px;
 
 		> li {
 			margin-bottom: 5px;
@@ -492,40 +519,43 @@ ul.messagelist {
 		}
 	}
 
-	.mosaic ul.inode-list li {
-		line-height: 10px;
+	.mosaic ul.inode-list {
 		gap: 2px;
 
-		&:not(.status) {
-			width: 70px;
+		> li {
+			line-height: 10px;
 
-			> .reordering {
-				position: absolute;
-				top: 0;
-				right: -5px;
-				bottom: 0;
+			&:not(.status) {
+				width: 70px;
 
-				> div {
-					height: 100%;
-					width: 4px;
-					margin: 2px;
-					border-radius: 2px;
+				> .reordering {
+					position: absolute;
+					top: 0;
+					right: -5px;
+					bottom: 0;
+
+					> div {
+						height: 100%;
+						width: 4px;
+						margin: 2px;
+						border-radius: 2px;
+					}
+
+					&.drag-over > div {
+						background-color: var(--primary);
+					}
 				}
 
-				&.drag-over > div {
-					background-color: var(--primary);
-				}
-			}
+				.inode .file-tags {
+					inset: 2px;
 
-			.inode .file-tags {
-				inset: 2px;
-
-				span {
-					width: 8px;
-					height: 8px;
-					display: inline-block;
-					border-radius: 50%;
-					margin-left: -3px;
+					span {
+						width: 8px;
+						height: 8px;
+						display: inline-block;
+						border-radius: 50%;
+						margin-left: -3px;
+					}
 				}
 			}
 		}
@@ -672,6 +702,107 @@ ul.messagelist {
 				height: 32px;
 				background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(192, 192, 192)"><path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z"></path></svg>');
 				background-repeat: no-repeat;
+			}
+		}
+	}
+
+	.gallery {
+		.preview {
+			position: absolute;
+			inset: 0 0 140px 0;
+			display: flex;
+			justify-content: center;
+
+			> div {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.figure {
+				width: auto;
+				max-height: 100%;
+				margin: 0;
+
+				> div {
+					display: contents;
+				}
+
+				img, video {
+					max-height: calc(100% - 2em);
+					max-width: 100%;
+					margin: 5px;
+				}
+
+				img[src$=".svg"] {
+					min-height: 400px;
+				}
+
+				figcaption {
+					margin: 0 5px;
+				}
+			}
+		}
+
+		.thumbnails {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			overflow: scroll hidden;
+		}
+
+		ul.inode-list {
+			padding: 10px;
+			flex-wrap: nowrap;
+			width: fit-content;
+			height: 100px;
+			box-sizing: content-box;
+			gap: 4px;
+
+			> li {
+				&:not(.status) {
+					aspect-ratio: 1;
+					box-sizing: border-box;
+
+					> .reordering {
+						position: absolute;
+						top: 0;
+						right: -7.5px;
+						bottom: 0;
+
+						> div {
+							height: 188px;
+							width: 4px;
+							margin: 2px;
+							border-radius: 2px;
+						}
+
+						&.drag-over > div {
+							background-color: var(--primary);
+						}
+					}
+
+					.inode figure {
+						> div:has(img[src$=".svg"]) {
+							padding: 15px; // reduce the size of SVG images
+						}
+
+						.file-tags {
+							inset: 5px;
+
+							span {
+								width: 8px;
+								height: 8px;
+								display: inline-block;
+								border-radius: 50%;
+								margin-left: -3px;
+							}
+						}
+					}
+				}
 			}
 		}
 	}

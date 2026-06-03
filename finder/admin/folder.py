@@ -362,7 +362,7 @@ class FolderAdmin(InodeAdmin):
     def reorder_inodes(self, request, folder_id):
         if response := self.check_for_valid_post_request(request, folder_id):
             return response
-        insert_after = request.COOKIES.get('django-finder-layout') in ['tiles', 'mosaic']
+        insert_after = request.COOKIES.get('django-finder-layout') in ['tiles', 'mosaic', 'gallery']
         body = json.loads(request.body)
         target_inode = FolderModel.objects.get_inode(id=body.get('target_id'))
         if not target_inode.parent.has_permission(request.user, Privilege.WRITE):

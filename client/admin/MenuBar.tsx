@@ -25,6 +25,7 @@ import TilesIcon from '../icons/tiles.svg';
 import MosaicIcon from '../icons/mosaic.svg';
 import ListIcon from '../icons/list.svg';
 import ColumnsIcon from '../icons/columns.svg';
+import GalleryIcon from '../icons/gallery.svg';
 import CutIcon from '../icons/cut.svg';
 import PasteIcon from '../icons/paste.svg';
 import ClipboardIcon from '../icons/clipboard.svg';
@@ -225,7 +226,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			} else if (event.key === 'v' && (event.ctrlKey || event.metaKey || event.altKey)) {
 				event.preventDefault();
 				pasteInodes();
-			} else if (['Backspace', 'Delete'].includes(event.key)) {
+			} else if (['Backspace', 'Delete'].includes(event.key) && event.target.closest('ul.inode-list')) {
 				deleteInodes();
 			}
 		};
@@ -475,6 +476,9 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 					</MenuItem>
 					<MenuItem aria-selected={layout === 'columns'} onClick={() => setLayout('columns')} tooltip={gettext("Columns view")}>
 						<ColumnsIcon/>
+					</MenuItem>
+					<MenuItem aria-selected={layout === 'gallery'} onClick={() => setLayout('gallery')} tooltip={gettext("Gallery view")}>
+						<GalleryIcon/>
 					</MenuItem>
 					<SortingOptions refreshFilesList={refreshColumns} />
 					{settings.tags?.length > 0 && <FilterByTag refreshFilesList={refreshColumns} tags={settings.tags} />}

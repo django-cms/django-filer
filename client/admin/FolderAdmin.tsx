@@ -129,6 +129,8 @@ export default function FolderAdmin() {
 					}
 				} else if (layout === 'mosaic') {
 					offsetX = offsetY = -23;
+				} else if (layout === 'gallery') {
+					offsetX = offsetY = -15;
 				}
 			}
 		}
@@ -179,7 +181,7 @@ export default function FolderAdmin() {
 	}
 
 	function computeBoundingBox(inodes) {
-		let zoom = 1;
+		let zoom = 1, gap = 1;
 		if (inodes.length === 0) {
 			setDraggedInodesStyle({width: 0, height: 0});
 		} else {
@@ -191,16 +193,22 @@ export default function FolderAdmin() {
 				} else if (inodes.length > 1) {
 					zoom = 0.5;
 				}
+				gap = 10;
 			} else if (layout === 'mosaic') {
 				if (inodes.length > 64) {
 					zoom = 0.1;
 				} else if (inodes.length > 4) {
 					zoom = 0.5;
 				}
+				gap = 5;
+			} else if (layout === 'gallery') {
+				if (inodes.length > 16) {
+					zoom = 0.5;
+				}
+				gap = 2;
 			}
-			if (['tiles', 'mosaic'].includes(layout)) {
+			if (['tiles', 'mosaic', 'gallery'].includes(layout)) {
 				const squareRoot = Math.sqrt(inodes.length);
-				const gap = (layout === 'tiles' ? 10 : 5);
 				const width = Math.min(Math.ceil(squareRoot) * (inodeBox.width * zoom + gap) - gap, workAreaRect.width - 10);
 				const height = Math.min(Math.floor(squareRoot + 0.5) * inodeBox.height * zoom, workAreaRect.height - 10);
 				setDraggedInodesStyle({width: width, height: height});

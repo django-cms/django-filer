@@ -7,6 +7,7 @@ import React, {
 	useState,
 } from 'react';
 import {Folder, File} from './Item';
+import GalleryPreview from './GalleryPreview';
 
 
 function InodeListHeader() {
@@ -32,6 +33,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		ancestorFolderId,
 		setCurrentFolder,
 		menuBarRef,
+		folderTabsRef,
 		layout,
 		clipboard,
 		clearClipboard,
@@ -177,11 +179,20 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		);
 	}
 
-	return inodes === null ? (
-		<div className="status">
-			{gettext("Loading...")}
-		</div>
-	) : (
+	if (inodes === null) {
+		return <div className="status">{gettext("Loading...")}</div>;
+	}
+
+	if (layout === 'gallery') {
+		return (<>
+			<GalleryPreview inodes={inodes} setInodes={setInodes} {...props} />
+			<div className="thumbnails">
+				<ul className={cssClasses()}>{renderInodes()}</ul>
+			</div>
+		</>);
+	}
+
+	return (
 		<ul className={cssClasses()}>
 			{layout === 'list' && <InodeListHeader/>}
 			{renderInodes()}

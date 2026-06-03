@@ -13,6 +13,7 @@ def annotate_unified_queryset(ambit, queryset):
         entry.update(
             download_url=proxy_obj.get_download_url(ambit),
             thumbnail_url=proxy_obj.get_thumbnail_url(ambit),
+            preview_url=proxy_obj.get_preview_url(ambit),
             sample_url=proxy_obj.get_sample_url(ambit),
             summary=proxy_obj.summary,
             folderitem_component=proxy_obj.folderitem_component,

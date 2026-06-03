@@ -52,7 +52,6 @@ export default function Video(props) {
 				controls={false}
 				preload="auto"
 				crossOrigin="anonymous"
-				style={{width: '100%', height: '100%'}}
 			></video>
 		) : (
 			<img src={props.thumbnail_url} />

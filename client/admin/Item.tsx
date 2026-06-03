@@ -263,6 +263,21 @@ export function ListItem(props) {
 					</div>
 				</div>
 			</>);
+		case 'gallery':
+			return (
+				<Tooltip>
+					<TooltipTrigger>
+						<div className={`figure${readonly ? ' readonly' : ''}`}>
+							<FigBody {...props}>
+								<FileTags tags={props.tags}>
+									<img src={props.thumbnail_url} {...props.listeners} {...props.attributes} />
+								</FileTags>
+							</FigBody>
+						</div>
+					</TooltipTrigger>
+					<TooltipContent>{props.name}</TooltipContent>
+				</Tooltip>
+			);
 	}
 }
 

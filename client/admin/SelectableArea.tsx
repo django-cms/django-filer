@@ -102,6 +102,9 @@ const SelectableArea = (props: any)=> {
 		if (event.button !== 0) {
 			return;
 		}
+		// clicks outside <ul class="inode-list"> are ignored
+		if (!(event.target.closest('ul.inode-list')))
+			return;
 
 		// check if the click was on the image representation of an inode …
 		for (let element = event.target; element; element = element.parentElement) {

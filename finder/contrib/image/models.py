@@ -73,6 +73,9 @@ class ImageFileModel(AbstractFileModel):
                 return self.fallback_thumbnail_url
         return ambit.sample_storage.url(thumbnail_path)
 
+    def get_preview_url(self, ambit):
+        return ambit.original_storage.url(self.file_path)
+
     def get_cropped_filename(self, width, height):
         file_name = Path(self.file_name)
         crop_x, crop_y, crop_size, gravity = self.crop_x, self.crop_y, self.crop_size, self.gravity

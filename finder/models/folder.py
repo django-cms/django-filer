@@ -191,6 +191,9 @@ class FolderModel(InodeModel):
     def get_thumbnail_url(self, ambit):
         return staticfiles_storage.url('finder/icons/folder.svg')
 
+    def get_preview_url(self, ambit):
+        return staticfiles_storage.url('finder/icons/folder.svg')
+
     def get_sample_url(self, ambit):
         return None
 

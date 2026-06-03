@@ -118,6 +118,7 @@ class FileAdmin(InodeAdmin):
             'base_url': reverse('admin:finder_filemodel_changelist', current_app=self.admin_site.name),
             'download_url': inode.get_download_url(ambit),
             'thumbnail_url': inode.get_thumbnail_url(ambit),
+            'preview_url': inode.get_preview_url(ambit),
             'is_admin': inode.has_permission(request.user, Privilege.ADMIN),
             'can_change': inode.has_permission(request.user, Privilege.WRITE),
             'file_id': inode.id,

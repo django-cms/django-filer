@@ -202,6 +202,12 @@ class AbstractFileModel(InodeModel):
         """
         return self.fallback_thumbnail_url
 
+    def get_preview_url(self, ambit):
+        """
+        Hook to return a preview image for a given file.
+        """
+        return self.fallback_thumbnail_url
+
     def get_sample_url(self, ambit):
         """
         Hook to return a sample for a given file.
