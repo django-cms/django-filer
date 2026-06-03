@@ -254,7 +254,7 @@ class InodeManager(models.Manager):
 
 
 def filename_validator(value):
-    pattern = re.compile(r"^[\w\d\s\.&%!_#~+-]+$")
+    pattern = re.compile(r"^[\w\d\s\.&%!_#~+-]+$", re.UNICODE)
     if not pattern.match(value):
         msg = "'{filename}' is not a valid filename."
         raise ValidationError(msg.format(filename=value))
