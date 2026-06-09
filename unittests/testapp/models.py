@@ -3,7 +3,7 @@ from django.db import models
 from finder.models.fields import FinderFileField, FinderFolderField
 
 
-class TestAppModel1(models.Model):
+class SampleAppModel1(models.Model):
     file = FinderFileField(
         models.PROTECT,
         null=True,
@@ -12,7 +12,7 @@ class TestAppModel1(models.Model):
     )
 
 
-class TestAppModel2(models.Model):
+class SampleAppModel2(models.Model):
     file = FinderFileField(
         models.SET_DEFAULT,
         null=True,
@@ -21,7 +21,7 @@ class TestAppModel2(models.Model):
     )
 
 
-class TestAppModel3(models.Model):
+class SampleAppModel3(models.Model):
     file = FinderFileField(
         models.CASCADE,
         null=True,
@@ -31,7 +31,7 @@ class TestAppModel3(models.Model):
     )
 
 
-class TestAppModel4(models.Model):
+class SampleAppModel4(models.Model):
     folder = FinderFolderField(
         on_delete=models.PROTECT,
         null=True,
@@ -40,7 +40,7 @@ class TestAppModel4(models.Model):
     )
 
 
-class TestAppModel5(models.Model):
+class SampleAppModel5(models.Model):
     folder = FinderFolderField(
         on_delete=models.SET_DEFAULT,
         null=True,
@@ -49,7 +49,7 @@ class TestAppModel5(models.Model):
     )
 
 
-class TestAppModel6(models.Model):
+class SampleAppModel6(models.Model):
     folder = FinderFolderField(
         on_delete=models.CASCADE,
         null=True,

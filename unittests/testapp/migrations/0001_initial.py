@@ -14,42 +14,42 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='TestAppModel1',
+            name='SampleAppModel1',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', finder.models.fields.FinderFileField(ambit='public', blank=True, db_index=True, null=True, on_delete=django.db.models.deletion.PROTECT)),
             ],
         ),
         migrations.CreateModel(
-            name='TestAppModel2',
+            name='SampleAppModel2',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', finder.models.fields.FinderFileField(ambit='public', blank=True, db_index=True, null=True, on_delete=django.db.models.deletion.SET_DEFAULT)),
             ],
         ),
         migrations.CreateModel(
-            name='TestAppModel3',
+            name='SampleAppModel3',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', finder.models.fields.FinderFileField(accept_mime_types=['image/*'], ambit='public', blank=True, db_index=True, null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
         ),
         migrations.CreateModel(
-            name='TestAppModel4',
+            name='SampleAppModel4',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('folder', finder.models.fields.FinderFolderField(ambit='public', blank=True, db_index=True, null=True, on_delete=django.db.models.deletion.PROTECT)),
             ],
         ),
         migrations.CreateModel(
-            name='TestAppModel5',
+            name='SampleAppModel5',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('folder', finder.models.fields.FinderFolderField(ambit='public', blank=True, db_index=True, null=True, on_delete=django.db.models.deletion.SET_DEFAULT)),
             ],
         ),
         migrations.CreateModel(
-            name='TestAppModel6',
+            name='SampleAppModel6',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('folder', finder.models.fields.FinderFolderField(ambit='public', blank=True, db_index=True, null=True, on_delete=django.db.models.deletion.CASCADE)),

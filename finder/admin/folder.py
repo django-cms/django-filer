@@ -225,9 +225,9 @@ class FolderAdmin(InodeAdmin):
             starting_folder = current_folder.get_root_folder()
         else:
             starting_folder = current_folder
-        if isinstance(starting_folder.descendants, QuerySet):
+        if isinstance(starting_folder.descendants, QuerySet):  # pragma: with django-cte
             parent_ids = Subquery(starting_folder.descendants.values('id'))
-        else:
+        else:  # pragma: without django-cte
             parent_ids = [descendant.id for descendant in starting_folder.descendants]
         return self.get_inodes(
             request,

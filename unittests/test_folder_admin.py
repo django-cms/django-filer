@@ -21,6 +21,8 @@ from finder.models.inode import DiscardedInode
 from finder.models.filetag import FileTag
 from finder.models.permission import AccessControlEntry, Privilege
 
+from .testapp.models import SampleAppModel1, SampleAppModel2, SampleAppModel3, SampleAppModel4, SampleAppModel5, SampleAppModel6
+
 
 class AccessControl(Enum):
     ALLOW = auto()
@@ -904,8 +906,15 @@ def test_reorder_inodes(
         assert file['name'] == f"File #{expected}"
 
 
+@pytest.mark.parametrize('SampleAppFileModel, SampleAppFolderModel, force', [
+    (None, None, False),
+    (SampleAppModel1, SampleAppModel4, True),
+    (SampleAppModel2, SampleAppModel5, True),
+    (SampleAppModel2, SampleAppModel5, False),
+    (SampleAppModel3, SampleAppModel6, False)
+])
 @pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.SOURCE_DENIED])
-def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, access_control):
+def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, principal_kwargs, access_control, SampleAppFileModel, SampleAppFolderModel, force):
     ambit = sub_folder.get_ambit()
     PinnedFolder.objects.all().delete()
     created_inodes = FileModel.objects.bulk_create([
@@ -961,10 +970,17 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
         'is_root': False,
         'change_url': f'/admin/finder/{ambit.slug}/{sub_folder.id}',
     }
+    if SampleAppFileModel and SampleAppFolderModel:
+        sampleapp_fileobj = SampleAppFileModel.objects.create(file=created_inodes[3].id)
+        sampleapp_folderobj = SampleAppFolderModel.objects.create(folder=created_inodes[4].id)
+    else:
+        sampleapp_fileobj = None
+        sampleapp_folderobj = None
     response = admin_client.post(
         f'{admin_url}/delete',
         json.dumps({
-            'inode_ids': [str(created_file.id) for created_file in created_inodes[2:6]]
+            'inode_ids': [str(inode.id) for inode in created_inodes[2:6]],
+            'force': force,
         }),
         content_type='application/json',
     )
@@ -972,23 +988,37 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
         assert response.status_code == 403
         return
 
-    assert response.status_code == 200
-    favorite_folders = response.json()['favorite_folders']
-    if admin_user.is_superuser:
-        assert len(favorite_folders) == 2
-        assert favorite_folders[1]['is_trash']
+    protected = isinstance(sampleapp_fileobj, SampleAppModel1) or isinstance(sampleapp_folderobj, SampleAppModel4)
+    if force and protected:
+        assert response.status_code == 400
+        return
+    body = response.json()
+    if force is False and (sampleapp_fileobj or sampleapp_folderobj):
+        assert response.status_code == 412
+        assert len(body['favorite_folders']) == 3
+        assert body['favorite_folders'][2]['is_trash']
+        expected_sub = ['F1', 'F2', 'F4', 'D5', 'F7', 'F8', 'F9']
+        expected_trash = ['F3', 'F6']
+        expected_referenced = ['F4', 'D5']
     else:
-        if access_control == AccessControl.ALLOW:
-            assert len(favorite_folders) == 3
-            assert favorite_folders[0]['id'] == str(favorite_folder.id)
-            assert favorite_folders[2]['is_trash']
+        assert response.status_code == 200
+        if admin_user.is_superuser:
+            assert len(body['favorite_folders']) == 2
+            assert body['favorite_folders'][1]['is_trash']
+        else:
+            if access_control == AccessControl.ALLOW:
+                assert len(body['favorite_folders']) == 3
+                assert body['favorite_folders'][0]['id'] == str(favorite_folder.id)
+                assert body['favorite_folders'][2]['is_trash']
+        if admin_user.is_superuser:
+            expected_sub = ['F1', 'F2', 'F7', 'F8', 'F9']
+            expected_trash = ['F3', 'F4', 'D5', 'F6']
+        else:
+            expected_sub = ['F1', 'F2', 'D5', 'F7', 'F8', 'F9']
+            expected_trash = ['F3', 'F4', 'F6']
+        expected_referenced = []
+
     inode_list = sub_folder.listdir(name__startswith="Inode").order_by('ordering')
-    if admin_user.is_superuser:
-        expected_sub = ['F1', 'F2', 'F7', 'F8', 'F9']
-        expected_trash = ['F3', 'F4', 'D5', 'F6']
-    else:
-        expected_sub = ['F1', 'F2', 'D5', 'F7', 'F8', 'F9']
-        expected_trash = ['F3', 'F4', 'F6']
     assert len(inode_list) == len(expected_sub)
     for file, ordering, expected in zip(inode_list, range(1, 6), expected_sub):
         assert file['name'] == f"Inode #{expected}"
@@ -996,7 +1026,6 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
         if admin_user.is_superuser is False:
             assert AccessControlEntry.objects.filter(inode=file['id']).exists()
 
-    ambit = sub_folder.get_ambit()
     trash_folder = ambit.trash_folders.get(owner=admin_user)
     deleted_inodes = trash_folder.listdir(name__startswith="Inode").order_by('ordering')
     assert len(deleted_inodes) == len(expected_trash)
@@ -1006,6 +1035,10 @@ def test_delete_inodes(admin_client, admin_user, uploaded_file, sub_folder, prin
         assert ace.user == admin_user
         assert ace.privilege == Privilege.READ_WRITE
         assert DiscardedInode.objects.get(inode=file['id']).previous_parent == sub_folder
+
+    referenced_inodes = sub_folder.listdir(id__in=body['referenced_inodes']).order_by('ordering')
+    for referenced, expected in zip(referenced_inodes, expected_referenced):
+        assert referenced['name'] == f"Inode #{expected}"
 
 
 @pytest.mark.parametrize('access_control', [AccessControl.ALLOW, AccessControl.TARGET_DENIED])
