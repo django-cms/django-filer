@@ -221,7 +221,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             # Touch thumbnail to allow it to be prefetched for directory listing
             EasyThumbnail.objects.filter(name=thumbnail.name).update(modified=now())
             return HttpResponseRedirect(thumbnail.url)
-        except (InvalidImageFormatError, NoSourceGenerator):
+        except (InvalidImageFormatError, NoSourceGenerator, OSError):
             return HttpResponseRedirect(staticfiles_storage.url('filer/icons/file-missing.svg'))
 
 
