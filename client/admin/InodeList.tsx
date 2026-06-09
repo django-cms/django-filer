@@ -4,6 +4,7 @@ import React, {
 	useCallback,
 	useEffect,
 	useImperativeHandle,
+	useRef,
 	useState,
 } from 'react';
 import {Folder, File} from './Item';
@@ -33,14 +34,16 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		ancestorFolderId,
 		setCurrentFolder,
 		menuBarRef,
-		folderTabsRef,
 		layout,
 		clipboard,
 		clearClipboard,
+		preselectedInode,
+		setPreselectedInode,
 		settings
 	} = props;
+	const inodesPerRow = useRef(0);
+	const lastSelectedIndex = useRef(-1);
 	const [inodes, setInodes] = useState(null);
-	const [lastSelectedIndex, setSelectedIndex] = useState(-1);
 	const [searchQuery, setSearchQuery] = useState(() => {
 		const params = new URLSearchParams(window.location.search);
 		return params.get('q');
@@ -49,6 +52,25 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 	useEffect(() => {
 		fetchInodes();
 	}, [searchQuery]);
+
+	const setListRef = useCallback((listElement: HTMLUListElement) => {
+		const inodeElement = listElement?.querySelector(':scope > li');
+		if (!inodeElement)
+			return;
+		switch (layout) {
+			case 'tiles':
+				// (width - padding-left - padding-right + gap) / (width + gap)
+				inodesPerRow.current = Math.floor((listElement.getBoundingClientRect().width - 24) / (inodeElement.getBoundingClientRect().width + 6));
+				break;
+			case 'mosaic':
+				// (width - padding-left - padding-right + gap) / (width + gap)
+				inodesPerRow.current = Math.floor((listElement.getBoundingClientRect().width - 28) / (inodeElement.getBoundingClientRect().width + 2));
+				break;
+			default:
+				inodesPerRow.current = 1;
+				break;
+		}
+	}, [layout]);
 
 	useImperativeHandle(forwardedRef, () => ({
 		inodes,
@@ -60,6 +82,7 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		async fetchInodes() {
 			await fetchInodes();
 		},
+		navigatePreselection,
 	}));
 
 	async function fetchInodes() {
@@ -77,64 +100,167 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 				}
 				return {...inode, elementRef};
 			}));
+			if (preselectedInode === null && ancestorFolderId === null && body.inodes.length > 0) {
+				setPreselectedInode(body.inodes.at(0));
+			}
 		} else {
 			console.error(response);
 		}
 	}
 
+	function openDetailView(inode) {
+		if (!settings.is_trash) {
+			// prevent editing files in trash folder
+			window.location.assign(inode.change_url);
+		}
+	}
+
+	function modifySelectedInodes(inode, modifier: Function) {
+		const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
+		setInodes(modifiedInodes);
+		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
+	}
+
+	function extendSelection(inode) {
+		const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
+		let modifier: Function;
+		if (selectedInodeIndex < lastSelectedIndex.current) {
+			modifier = (f, k) => ({...f, selected: k >= selectedInodeIndex && k <= lastSelectedIndex.current || f.selected});
+		} else if (lastSelectedIndex.current !== -1 && selectedInodeIndex > lastSelectedIndex.current) {
+			modifier = (f, k) => ({...f, selected: k >= lastSelectedIndex.current && k <= selectedInodeIndex || f.selected});
+		} else {
+			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
+		}
+		modifySelectedInodes(inode, modifier);
+	}
+
+	function addToSelection(inode) {
+		let modifier: Function;
+		if (inode.selected) {
+			modifier = f => ({...f, selected: f.selected && f.id !== inode.id});
+		} else {
+			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
+			lastSelectedIndex.current = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
+			clearClipboard();
+		}
+		modifySelectedInodes(inode, modifier);
+	}
+
+	function toggleSelection(inode) {
+		let modifier: Function;
+		if (inode.selected) {
+			modifier = f => ({...f, selected: false});
+		} else {
+			modifier = f => ({...f, selected: f.id === inode.id});
+			lastSelectedIndex.current = inodes.findIndex(f => f.id === inode.id);
+		}
+		modifySelectedInodes(inode, modifier);
+	}
+
 	const selectInode = useCallback(function selectInode(event: PointerEvent, inode) {
 		if (inode.disabled)
 			return;
-		let modifier, selectedIndex = -1;
 		if (event.detail === 2) {
 			// double click
-			if (!settings.is_trash) {
-				// prevent editing files in trash folder
-				window.location.assign(inode.change_url);
-			}
-			return;
-		}
-		if (event.shiftKey) {
+			openDetailView(inode);
+		} else if (event.shiftKey) {
 			// shift click
-			const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
-			if (selectedInodeIndex < lastSelectedIndex) {
-				modifier = (f, k) => ({...f, selected: k >= selectedInodeIndex && k <= lastSelectedIndex || f.selected});
-			} else if (lastSelectedIndex !== -1 && selectedInodeIndex > lastSelectedIndex) {
-				modifier = (f, k) => ({...f, selected: k >= lastSelectedIndex && k <= selectedInodeIndex || f.selected});
-			} else {
-				modifier = f => ({...f, selected: f.selected || f.id === inode.id});
-			}
+			extendSelection(inode);
+			setCurrentFolder(folderId);
 		} else if (event.altKey || event.ctrlKey || event.metaKey) {
 			// alt/ctrl/meta click
-			if (inode.selected) {
-				modifier = f => ({...f, selected: f.selected && f.id !== inode.id});
-			} else {
-				modifier = f => ({...f, selected: f.selected || f.id === inode.id});
-				selectedIndex = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
-			}
-		} else {
+			addToSelection(inode);
+			setCurrentFolder(folderId);
+		} else if (!(event.target as HTMLElement)?.classList.contains('inode-name')) {
 			// simple click
-			if (inode.selected) {
-				modifier = f => ({...f, selected: false});
+			// prevent selecting the inode when clicking on the name field to edit it
+			toggleSelection(inode);
+			setPreselectedInode(inode);
+			setCurrentFolder(folderId);
+		}
+	}, [inodes]);
+
+	function navigatePreselection(event: KeyboardEvent) {
+		const index = inodes.findIndex((inode) => inode.id === preselectedInode.id);
+		let nextPreselectedInode;
+		if (event.key === 'ArrowLeft') {
+			nextPreselectedInode = layout === 'columns' ? inodes.at(0) : inodes.at(index - 1);
+		} else if (event.key === 'ArrowRight') {
+			nextPreselectedInode = layout === 'columns' ? inodes.at(0) : inodes.at(index + 1);
+		} else if (event.key === 'ArrowUp') {
+			nextPreselectedInode = inodes.at(index - inodesPerRow.current);
+		} else if (event.key === 'ArrowDown') {
+			nextPreselectedInode = inodes.at(index + inodesPerRow.current);
+		} else if (event.key === ' ') {
+			if (event.shiftKey) {
+				// shift click
+				extendSelection(preselectedInode);
+			} else if (event.altKey || event.ctrlKey || event.metaKey) {
+				// alt/ctrl/meta click
+				addToSelection(preselectedInode);
 			} else {
-				if (!(event.target as HTMLElement)?.classList.contains('inode-name')) {
-					// prevent selecting the inode when clicking on the name field to edit it
-					modifier = f => ({...f, selected: f.id === inode.id});
-					selectedIndex = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
-				} else {
-					modifier = f => f;
-				}
+				toggleSelection(preselectedInode);
 			}
 		}
-		if (selectedIndex !== -1) {
-			clearClipboard();
+		if (nextPreselectedInode) {
+			nextPreselectedInode.elementRef.current.scrollIntoView({behaviour: 'smooth', block: 'center', container: 'nearest', inline: 'center'});
+			setPreselectedInode(nextPreselectedInode);
 		}
-		const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
-		setInodes(modifiedInodes);
-		setCurrentFolder(folderId);
-		menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
-		setSelectedIndex(selectedIndex);
-	}, [inodes]);
+	}
+
+	// const selectInode = useCallback(function selectInode(event: PointerEvent|KeyboardEvent, inode) {
+	// 	if (inode.disabled)
+	// 		return;
+	// 	let modifier, selectedIndex = -1;
+	// 	if (event.detail === 2) {
+	// 		// double click
+	// 		if (!settings.is_trash) {
+	// 			// prevent editing files in trash folder
+	// 			window.location.assign(inode.change_url);
+	// 		}
+	// 		return;
+	// 	}
+	// 	if (event.shiftKey) {
+	// 		// shift click
+	// 		const selectedInodeIndex = inodes.findIndex(f => f.id === inode.id);
+	// 		if (selectedInodeIndex < lastSelectedIndex) {
+	// 			modifier = (f, k) => ({...f, selected: k >= selectedInodeIndex && k <= lastSelectedIndex || f.selected});
+	// 		} else if (lastSelectedIndex !== -1 && selectedInodeIndex > lastSelectedIndex) {
+	// 			modifier = (f, k) => ({...f, selected: k >= lastSelectedIndex && k <= selectedInodeIndex || f.selected});
+	// 		} else {
+	// 			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
+	// 		}
+	// 	} else if (event.altKey || event.ctrlKey || event.metaKey) {
+	// 		// alt/ctrl/meta click
+	// 		if (inode.selected) {
+	// 			modifier = f => ({...f, selected: f.selected && f.id !== inode.id});
+	// 		} else {
+	// 			modifier = f => ({...f, selected: f.selected || f.id === inode.id});
+	// 			selectedIndex = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
+	// 		}
+	// 	} else {
+	// 		// simple click
+	// 		if (inode.selected) {
+	// 			modifier = f => ({...f, selected: false});
+	// 		} else {
+	// 			if (!(event.target as HTMLElement)?.classList.contains('inode-name')) {
+	// 				// prevent selecting the inode when clicking on the name field to edit it
+	// 				modifier = f => ({...f, selected: f.id === inode.id});
+	// 				selectedIndex = inodes.findIndex(f => f.id === inode.id);  // remember for an upcoming shift-click
+	// 			} else {
+	// 				modifier = f => f;
+	// 			}
+	// 		}
+	// 	}
+	// 	if (selectedIndex !== -1) {
+	// 		clearClipboard();
+	// 	}
+	// 	const modifiedInodes = inodes.map((f, k) => ({...modifier(f, k), cutted: false, copied: false}));
+	// 	setInodes(modifiedInodes);
+	// 	setCurrentFolder(folderId);
+	// 	menuBarRef.current.setSelected(modifiedInodes.filter(inode => inode.selected));
+	// 	setSelectedIndex(selectedIndex);
+	// }, [inodes]);
 
 	const selectMultipleInodes = useCallback(function selectMultipleInodes(selectedInodeIds: Array<string>, extend: boolean = false) {
 		if (selectedInodeIds.length) {
@@ -172,10 +298,11 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 				return (<li className="status">{`No match while searching for “${searchQuery}”`}</li>);
 			return (<li className="status">{gettext("This folder is empty")}</li>);
 		}
+		const isPreselected = inode => preselectedInode?.id === inode.id;
 
 		return inodes.map(inode => inode.is_folder
-			? <Folder key={inode.id} {...inode} {...props} isParent={ancestorFolderId === inode.id} />
-			: <File key={inode.id} {...inode} {...props} />
+			? <Folder key={inode.id} {...inode} {...props} isParent={ancestorFolderId === inode.id} preselected={isPreselected(inode)} />
+			: <File key={inode.id} {...inode} {...props} preselected={isPreselected(inode)} />
 		);
 	}
 
@@ -185,15 +312,15 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 
 	if (layout === 'gallery') {
 		return (<>
-			<GalleryPreview inodes={inodes} setInodes={setInodes} {...props} />
+			<GalleryPreview inodes={inodes} setInodes={setInodes} preselectedInode={preselectedInode} {...props} />
 			<div className="thumbnails">
-				<ul className={cssClasses()}>{renderInodes()}</ul>
+				<ul ref={setListRef} className={cssClasses()}>{renderInodes()}</ul>
 			</div>
 		</>);
 	}
 
 	return (
-		<ul className={cssClasses()}>
+		<ul ref={setListRef} className={cssClasses()}>
 			{layout === 'list' && <InodeListHeader/>}
 			{renderInodes()}
 		</ul>

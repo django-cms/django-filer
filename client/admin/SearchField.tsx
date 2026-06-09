@@ -33,7 +33,7 @@ export function useSearchParam(key) : [string, (value: string) => any] {
 
 
 export default function SearchField(props) {
-	const {columnRefs, setSearchResult, settings} = props;
+	const {currentColumns, setSearchResult, settings} = props;
 	const searchRef = useRef(null);
 	const [searchQuery, setSearchQuery] = useSearchParam('q');
 	const [searchZone, setSearchZone] = useSearchZone('current');
@@ -41,13 +41,13 @@ export default function SearchField(props) {
 	function handleSearch(event) {
 		const performSearch = () => {
 			setSearchQuery(searchRef.current.value);
-			const current = columnRefs[settings.folder_id].current;
+			const current = currentColumns[settings.folder_id].current;
 			current.setSearchQuery(searchRef.current.value);
 			setSearchResult(true);
 		};
 		const resetSearch = () => {
 			setSearchQuery('');
-			Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
+			Object.entries(currentColumns as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
 				columnRef.current?.setSearchQuery();
 			});
 			setSearchResult(false);

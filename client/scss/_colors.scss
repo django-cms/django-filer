@@ -12,6 +12,7 @@ $darkened-bg: var(--darkened-bg, #f0f0f0);
 $border-color: var(--border-color, #808080);
 $selected-bg-color: var(--selected-bg, #f0f0f0);
 $selected-row-color: var(--selected-row, #ffffcc);
+$preselected-inode-border: 4px solid $border-color;
 
 $progress-bg-color: var(--body-fg, #fff);
 $progress-indicator-color: var(--breadcrumbs-fg, #c8c8c8);

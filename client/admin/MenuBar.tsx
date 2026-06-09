@@ -61,7 +61,7 @@ function MenuExtension(props) {
 function ExtraMenu(props) {
 	const {
 		settings,
-		columnRefs,
+		currentColumns,
 		openUploader,
 		downloadFiles,
 		numSelectedFiles,
@@ -91,7 +91,7 @@ function ExtraMenu(props) {
 			}),
 		});
 		if (response.ok) {
-			const current = columnRefs[settings.folder_id].current;
+			const current = currentColumns[settings.folder_id].current;
 			const body = await response.json();
 			current.setInodes([...current.inodes, {...body.new_folder, elementRef: createRef()}]);  // adds new folder to the end of the list
 		} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
@@ -102,7 +102,7 @@ function ExtraMenu(props) {
 	}
 
 	function downloadSelectedFiles() {
-		const current = columnRefs[currentFolderId].current;
+		const current = currentColumns[currentFolderId].current;
 		downloadFiles(current.inodes.filter(inode => !inode.is_folder && inode.selected));
 		deselectAll();
 	}
@@ -185,11 +185,12 @@ function MenuItem(props) {
 const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	const {
 		currentFolderId,
-		columnRefs,
+		currentColumns,
 		folderTabsRef,
 		layout,
 		setLayout,
 		deselectAll,
+		navigatePreselection,
 		refreshColumns,
 		clipboard,
 		setClipboard,
@@ -213,7 +214,11 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	}));
 
 	useEffect(() => {
-		const handleKeyboardEvents = (event) => {
+		let isPressed = false;
+		const handleKeyDownEvents = (event: KeyboardEvent) => {
+			if (isPressed || event.type !== 'keydown' || ['Alt', 'Cotrol', 'Meta', 'Shift'].includes(event.key))
+				return;
+			isPressed = true;
 			if (event.key === 'a' && (event.ctrlKey || event.metaKey || event.altKey)) {
 				event.preventDefault();
 				selectAllInodes();
@@ -226,12 +231,20 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			} else if (event.key === 'v' && (event.ctrlKey || event.metaKey || event.altKey)) {
 				event.preventDefault();
 				pasteInodes();
-			} else if (['Backspace', 'Delete'].includes(event.key) && event.target.closest('ul.inode-list')) {
+			} else if (['Backspace', 'Delete'].includes(event.key) && event.target instanceof HTMLElement && event.target.closest('ul.inode-list')) {
 				deleteInodes();
+			} else if (['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', ' '].includes(event.key)) {
+				event.preventDefault();
+				navigatePreselection(event);
 			}
 		};
-		window.addEventListener('keydown', handleKeyboardEvents);
-		return () => window.removeEventListener('keydown', handleKeyboardEvents);
+		const handleKeyUpEvents = (event: KeyboardEvent) => isPressed = false;
+		window.addEventListener('keydown', handleKeyDownEvents);
+		window.addEventListener('keyup', handleKeyUpEvents);
+		return () => {
+			window.removeEventListener('keyup', handleKeyDownEvents);
+			window.removeEventListener('keydown', handleKeyDownEvents);
+		};
 	}, [currentFolderId]);
 
 	useEffect(() => {
@@ -263,14 +276,14 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	function selectAllInodes() {
 		clearClipboard();
 		deselectAll();
-		const current = columnRefs[currentFolderId].current;
+		const current = currentColumns[currentFolderId].current;
 		current.setInodes(current.inodes.map(inode => ({...inode, selected: true, copied: false})));
 		setNumSelectedInodes(current.inodes.length);
 		setNumSelectedFiles(current.inodes.filter(inode => !inode.is_folder).length);
 	}
 
 	function copyInodes() {
-		const current = columnRefs[currentFolderId].current;
+		const current = currentColumns[currentFolderId].current;
 		if (current.inodes.find(inode => inode.selected)) {
 			const clipboard = current.inodes.filter(inode => inode.selected).map(inode => ({
 				id: inode.id,
@@ -286,7 +299,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	}
 
 	function cutInodes() {
-		const current = columnRefs[currentFolderId].current;
+		const current = currentColumns[currentFolderId].current;
 		if (current.inodes.find(inode => inode.selected && inode.can_change)) {
 			const clipboard = current.inodes.filter(inode => inode.selected && inode.can_change).map(inode => ({
 				id: inode.id,
@@ -332,12 +345,12 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			if (response.ok) {
 				const body = await response.json();
 				if (moveInodes) {
-					const current = columnRefs[clipboard[0].parent]?.current;
+					const current = currentColumns[clipboard[0].parent]?.current;
 					if (current) {
 						current.setInodes(current.inodes.filter(inode => inodeIds.find(id => id !== inode.id)));
 					}
 				}
-				columnRefs[settings.folder_id].current.setInodes(
+				currentColumns[settings.folder_id].current.setInodes(
 					body.inodes.map(inode => ({...inode, elementRef: createRef()}))
 				);
 			} else if (VERBOSE_HTTP_ERROR_CODES.has(response.status)) {
@@ -351,7 +364,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	}
 
 	async function deleteInodes(force?: boolean) {
-		const current = columnRefs[currentFolderId].current;
+		const current = currentColumns[currentFolderId].current;
 		const inodeIds = current.inodes.filter(inode => inode.selected).map(inode => inode.id);
 		if (inodeIds.length === 0)
 			return;
@@ -395,7 +408,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 	}
 
 	async function undoDiscardInodes() {
-		const current = columnRefs[currentFolderId].current;
+		const current = currentColumns[currentFolderId].current;
 		const inodeIds = current.inodes.filter(inode => inode.selected).map(inode => inode.id);
 		if (inodeIds.length === 0)
 			return;
@@ -462,7 +475,7 @@ const MenuBar = forwardRef(function MenuBar(props: any, forwardedRef) {
 			<nav aria-label={gettext("Finder List View")}>
 				<ul role="menubar">
 					<li className="search-field" role="menuitem">
-						<SearchField columnRefs={columnRefs} setSearchResult={setSearchResult} settings={settings}/>
+						<SearchField currentColumns={currentColumns} setSearchResult={setSearchResult} settings={settings}/>
 					</li>
 					<VolumeControl {...props} />
 					<MenuItem aria-selected={layout === 'tiles'} onClick={() => setLayout('tiles')} tooltip={gettext("Tiles view")}>

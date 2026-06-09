@@ -1,4 +1,4 @@
-import React, {lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {lazy, Suspense, useContext, useMemo, useRef} from 'react';
 import FinderSettings from './FinderSettings';
 import FileTags from '../common/FileTags';
 
@@ -27,26 +27,26 @@ function computeHash(selectedInodes): number {
 
 export default function GalleryPreview(props) {
 	const settings = useContext(FinderSettings);
-	const {inodes, setInodes, folderTabsRef} = props;
+	const {inodes, setInodes, folderTabsRef, preselectedInode} = props;
 	const inodeNameRef = useRef(null);
-	const isFirstRender = useRef(true);
-	const [previewInode, setPreviewInode] = useState(null);
+	//const isFirstRender = useRef(true);
+	// const [previewInode, setPreviewInode] = useState(null);
 	const selectedInodes = inodes.filter(inode => inode.selected);
 	const selectedHash = computeHash(selectedInodes);
-	const readonly = !previewInode?.can_change;
+	const readonly = !preselectedInode?.can_change;
 
-	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			setPreviewInode(inodes.at(0));
-		} else if (selectedInodes.length > 0) {
-			setPreviewInode(selectedInodes.at(-1));
-		}
-	}, [selectedHash]);
+	// useEffect(() => {
+	// 	if (isFirstRender.current) {
+	// 		isFirstRender.current = false;
+	// 		setPreviewInode(inodes.at(0));
+	// 	} else if (selectedInodes.length > 0) {
+	// 		setPreviewInode(selectedInodes.at(-1));
+	// 	}
+	// }, [selectedHash]);
 
 	const FigBody = useMemo(() => {
-		if (previewInode?.folderitem_component) {
-			const component = `./components/folderitem/${previewInode.folderitem_component}.js`;
+		if (preselectedInode?.folderitem_component) {
+			const component = `./components/folderitem/${preselectedInode.folderitem_component}.js`;
 			const LazyItem = lazy(() => import(component));
 			return (props) => (
 				<Suspense>
@@ -55,7 +55,7 @@ export default function GalleryPreview(props) {
 			);
 		}
 		return StaticFigure;
-	}, [previewInode]);
+	}, [preselectedInode]);
 
 	function handleFocus(event) {
 		if (!(event.target.contentEditable))
@@ -86,7 +86,7 @@ export default function GalleryPreview(props) {
 				'Content-Type': 'application/json',
 				'X-CSRFToken': settings.csrf_token,
 			},
-			body: JSON.stringify({id: previewInode.id, ...changedFields}),
+			body: JSON.stringify({id: preselectedInode.id, ...changedFields}),
 		});
 		if (response.ok) {
 			const body = await response.json();
@@ -99,28 +99,28 @@ export default function GalleryPreview(props) {
 			folderTabsRef.current.setFavoriteFolders(body.favorite_folders);
 		} else if (response.status === 409) {
 			alert(await response.text());
-			inodeNameRef.current.innerText = previewInode.name;
+			inodeNameRef.current.innerText = preselectedInode.name;
 		} else {
 			console.error(response);
 		}
 	}
 
 	function selectInode(event) {
-		if (previewInode.disabled || settings.is_trash)
+		if (preselectedInode.disabled || settings.is_trash)
 			return;
-		window.location.assign(previewInode.change_url);
+		window.location.assign(preselectedInode.change_url);
 	}
 
-	return previewInode && (
+	return preselectedInode && (
 		<div className="preview" onDoubleClick={selectInode}>
 			<div>
 				<figure className={`figure${readonly ? ' readonly' : ''}`}>
-					<FigBody sample_url={previewInode.download_url} {...props}>
-						<img src={previewInode.preview_url} {...previewInode.listeners} {...previewInode.attributes} />
+					<FigBody sample_url={preselectedInode.download_url} {...props}>
+						<img src={preselectedInode.preview_url} {...preselectedInode.listeners} {...preselectedInode.attributes} />
 					</FigBody>
 					<figcaption>
 						<div ref={inodeNameRef} className="inode-name" contentEditable={!readonly} suppressContentEditableWarning={true} onFocus={handleFocus} onBlur={updateName} onKeyDown={updateName}>
-							{previewInode.name}
+							{preselectedInode.name}
 						</div>
 					</figcaption>
 				</figure>

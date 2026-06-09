@@ -65,6 +65,9 @@ export function DraggableItem(props) {
 
 	function cssClasses() {
 		const classes = [];
+		if (props.preselected) {
+			classes.push('preselected');
+		}
 		if (props.disabled) {
 			classes.push('disabled');
 		} else if (props.selected) {

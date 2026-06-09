@@ -1,5 +1,6 @@
 import React, {
 	createRef,
+	useCallback,
 	useContext,
 	useEffect,
 	useRef,
@@ -41,12 +42,13 @@ export default function FolderAdmin() {
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
 	const uploaderRef = useRef(null);
-	const columnRefs = Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)]));
+	const columnRefs = useRef(Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)])));
 	const overlayRef = useRef(null);
 	const downloadLinkRef = useRef(null);
 	const containerRef = useRef<HTMLElement>(null);
 	const [busy, setBusy] = useState(false);
 	const [currentFolderId, setCurrentFolderId] = useState(settings.folder_id);
+	const [preselectedInode, setPreselectedInode] = useState(null);
 	const [activeInode, setActiveInode] = useState(null);
 	const [draggedInodes, setDraggedInodes] = useState([]);
 	const [isSearchResult, setSearchResult] = useState<boolean>(() => {
@@ -117,8 +119,10 @@ export default function FolderAdmin() {
 			if (draggedInodes.length > 1) {
 				const firstDraggedElement = overlayRef.current.querySelector(`.inode-list [data-id="${draggedInodes[0].id}"]`);
 				if (firstDraggedElement && activeDraggedElement) {
-					offsetX = (firstDraggedElement.getBoundingClientRect().left - activeDraggedElement.getBoundingClientRect().left) * zoomWhenDragging;
-					offsetY = (firstDraggedElement.getBoundingClientRect().top - activeDraggedElement.getBoundingClientRect().top) * zoomWhenDragging;
+					const firstClientRect = firstDraggedElement.getBoundingClientRect();
+					const activeClientRect = activeDraggedElement.getBoundingClientRect();
+					offsetX = (firstClientRect.left - activeClientRect.left) * zoomWhenDragging;
+					offsetY = (firstClientRect.top - activeClientRect.top) * zoomWhenDragging;
 				}
 			} else if (activeDraggedElement) {
 				if (layout === 'tiles') {
@@ -142,28 +146,42 @@ export default function FolderAdmin() {
 		};
 	}
 
-	const setCurrentFolder = (folderId: string) => {
+	const setCurrentFolder = useCallback((folderId: string) => {
 		if (folderId !== currentFolderId) {
 			deselectAll();
 			setCurrentFolderId(folderId);
 		}
-	};
+	}, [currentFolderId]);
 
-	const deselectAll = (event?) => {
-		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
+	const deselectAll = useCallback((event?) => {
+		Object.entries(columnRefs.current).forEach(([folderId, columnRef]) => {
 			columnRef.current?.deselectInodes();
 		});
 		menuBarRef.current.setSelected([]);
-	};
+	}, [columnRefs]);
 
-	const clearClipboard = () => {
+	const navigatePreselection = useCallback((event: KeyboardEvent) => {
+		if (layout === 'columns' && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+			const currentColumnIndex = settings.ancestors.findIndex(ancestor => ancestor.id === currentFolderId);
+			const nextColumnIndex = event.key === 'ArrowRight' ? currentColumnIndex - 1 : currentColumnIndex + 1;
+			if (nextColumnIndex >= 0 && nextColumnIndex < settings.ancestors.length) {
+				const nextFolderId = settings.ancestors[nextColumnIndex].id;
+				setCurrentFolder(nextFolderId);
+				columnRefs.current[nextFolderId].current?.navigatePreselection(event);
+			}
+		} else {
+			columnRefs.current[currentFolderId].current?.navigatePreselection(event);
+		}
+	}, [currentFolderId, layout]);
+
+	const clearClipboard = useCallback(() => {
 		setClipboard([]);
-		Object.entries(columnRefs).forEach(([folderId, columnRef]) => {
+		Object.entries(columnRefs.current).forEach(([folderId, columnRef]) => {
 			columnRef.current?.setInodes(columnRef.current?.inodes.map(inode =>
 				({...inode, cutted: false, copied: false})
 			));
 		});
-	};
+	}, [columnRefs]);
 
 	function downloadFiles(inodes) {
 		inodes.forEach(inode => {
@@ -175,7 +193,7 @@ export default function FolderAdmin() {
 	}
 
 	function refreshColumns() {
-		Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
+		Object.entries(columnRefs.current as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
 			columnRef.current?.fetchInodes();
 		});
 	}
@@ -225,14 +243,14 @@ export default function FolderAdmin() {
 	function handleDragStart(event) {
 		const {active} = event;
 		const folderId = active.data.current.folderId;
-		let inodes = columnRefs[folderId].current?.inodes ?? [];
+		let inodes = columnRefs.current[folderId].current?.inodes ?? [];
 		const multipleSelected = inodes.some(inode => inode.selected && inode.id === active.id);
 		overlayRef.current.hidden = false;
 		inodes = multipleSelected
 			? inodes.map(inode => ({...inode, dragged: inode.selected}))
 			: inodes.map(inode => ({...inode, dragged: inode.id === active.id, selected: false}));
 		computeBoundingBox(inodes.filter(inode => inode.dragged));
-		columnRefs[folderId].current.setInodes(inodes);
+		columnRefs.current[folderId].current.setInodes(inodes);
 		setDraggedInodes(inodes.filter(inode => inode.dragged));
 		setActiveInode(active);
 		setCurrentFolder(folderId);
@@ -241,7 +259,7 @@ export default function FolderAdmin() {
 	async function handleDragEnd(event) {
 		const {active, over} = event;
 		const sourceFolderId = active.data.current.folderId;
-		let inodes = columnRefs[sourceFolderId].current?.inodes ?? [];
+		let inodes = columnRefs.current[sourceFolderId].current?.inodes ?? [];
 		if (over) {
 			let [what, targetInodeId, targetFolderId] = over.id.split(':');
 			if (targetFolderId === undefined) {
@@ -287,9 +305,9 @@ export default function FolderAdmin() {
 					});
 					if (response.ok) {
 						const body = await response.json();
-						if (body.inodes && columnRefs[targetFolderId]?.current) {
+						if (body.inodes && columnRefs.current[targetFolderId]?.current) {
 							const targetInodes = body.inodes.map(inode => ({...inode, elementRef: createRef()}));
-							columnRefs[targetFolderId].current.setInodes(targetInodes);
+							columnRefs.current[targetFolderId].current.setInodes(targetInodes);
 							if (sourceFolderId === targetFolderId) {
 								inodes = targetInodes;
 							}
@@ -311,20 +329,20 @@ export default function FolderAdmin() {
 				}
 			}
 		}
-		columnRefs[sourceFolderId].current.setInodes(inodes.map(inode => ({...inode, dragged: false})));
+		columnRefs.current[sourceFolderId].current.setInodes(inodes.map(inode => ({...inode, dragged: false})));
 		setActiveInode(null);
 		setDraggedInodes([]);
 	}
 
 	const handleUpload = (folderId, uploadedFiles) => {
-		columnRefs[folderId].current.fetchInodes();
+		columnRefs.current[folderId].current.fetchInodes();
 	};
 
 	function handleDragCancel(event) {
 		const {active} = event;
 		const activeFolderId = active.data.current.folderId;
-		const inodes = columnRefs[activeFolderId].current.inodes;
-		columnRefs[activeFolderId].current.setInodes(inodes.map(inode => ({...inode, dragged: false})));
+		const inodes = columnRefs.current[activeFolderId].current.inodes;
+		columnRefs.current[activeFolderId].current.setInodes(inodes.map(inode => ({...inode, dragged: false})));
 		setActiveInode(null);
 		setDraggedInodes([]);
 	}
@@ -334,20 +352,22 @@ export default function FolderAdmin() {
 			<div className={`work-area ${layout}`}>
 				<SelectableArea
 					deselectAll={deselectAll}
-					columnRef={columnRefs[settings.folder_id]}
+					columnRef={columnRefs.current[settings.folder_id]}
 					dragging={dragging}
 				>
 					<InodeList
-						ref={columnRefs[settings.folder_id]}
+						ref={columnRefs.current[settings.folder_id]}
 						folderId={settings.folder_id}
 						sortingDisabled={true}
 						setCurrentFolder={setCurrentFolder}
-						listRef={columnRefs[settings.folder_id]}
+						listRef={columnRefs.current[settings.folder_id]}
 						menuBarRef={menuBarRef}
 						layout={layout}
 						clipboard={clipboard}
 						setClipboard={setClipboard}
 						clearClipboard={clearClipboard}
+						preselectedInode={preselectedInode}
+						setPreselectedInode={setPreselectedInode}
 						settings={settings}
 					/>
 				</SelectableArea>
@@ -384,7 +404,7 @@ export default function FolderAdmin() {
 						<SelectableArea
 							folderId={ancestor.id}
 							deselectAll={deselectAll}
-							columnRef={columnRefs[ancestor.id]}
+							columnRef={columnRefs.current[ancestor.id]}
 							dragging={dragging}
 						>
 							<DroppableArea
@@ -394,12 +414,12 @@ export default function FolderAdmin() {
 								dragging={dragging}
 							>
 								<InodeList
-									ref={columnRefs[ancestor.id]}
+									ref={columnRefs.current[ancestor.id]}
 									folderId={ancestor.id}
 									ancestorFolderId={previousAncestorId}
 									sortingDisabled={!ancestor.can_change}
 									setCurrentFolder={setCurrentFolder}
-									listRef={columnRefs[ancestor.id]}
+									listRef={columnRefs.current[ancestor.id]}
 									menuBarRef={menuBarRef}
 									folderTabsRef={folderTabsRef}
 									layout={layout}
@@ -407,6 +427,8 @@ export default function FolderAdmin() {
 									clipboard={clipboard}
 									setClipboard={setClipboard}
 									clearClipboard={clearClipboard}
+									preselectedInode={preselectedInode}
+									setPreselectedInode={setPreselectedInode}
 									settings={settings}
 								/>
 							</DroppableArea>
@@ -443,7 +465,7 @@ export default function FolderAdmin() {
 		<MenuBar
 			ref={menuBarRef}
 			currentFolderId={currentFolderId}
-			columnRefs={columnRefs}
+			currentColumns={columnRefs.current}
 			folderTabsRef={folderTabsRef}
 			openUploader={(isFolder: boolean) => uploaderRef.current.openUploader(isFolder)}
 			downloadFiles={downloadFiles}
@@ -451,6 +473,7 @@ export default function FolderAdmin() {
 			setLayout={setLayout}
 			webAudio={webAudio}
 			deselectAll={deselectAll}
+			navigatePreselection={navigatePreselection}
 			refreshColumns={refreshColumns}
 			clipboard={clipboard}
 			setClipboard={setClipboard}
