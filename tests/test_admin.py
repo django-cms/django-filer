@@ -305,6 +305,65 @@ class FilerImageAdminUrlsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("icons/file-missing.svg", response["Location"])
 
+    def test_icon_view_palette_gif(self):
+        """A palette-mode GIF generates a JPEG thumbnail with ``colorspace`` (#1601)
+
+        The ``colorspace`` processor converts the palette ("P") image to RGB, so
+        the JPEG thumbnail can be written and a real thumbnail is returned.
+        """
+        gif_name = 'palette.gif'
+        gif_path = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, gif_name)
+        create_image(mode='P', size=(200, 150)).save(gif_path, 'GIF')
+        try:
+            with open(gif_path, 'rb') as upload:
+                image = Image.objects.create(
+                    file=django.core.files.File(upload, name=gif_name),
+                )
+            url = reverse('admin:filer_file_fileicon', kwargs={
+                'file_id': image.pk,
+                'size': 80,
+            })
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 302)
+            # A real (media) thumbnail is generated, not the missing-file icon.
+            self.assertIn("/media/", response["Location"])
+            self.assertNotIn("icons/file-missing.svg", response["Location"])
+        finally:
+            os.remove(gif_path)
+
+    def test_icon_view_unencodable_image(self):
+        """Icon generation degrades gracefully when a thumbnail can't be encoded (#1601)
+
+        If ``colorspace`` is not part of ``THUMBNAIL_PROCESSORS``, a palette-mode
+        ("P") GIF reaches the JPEG encoder unchanged and raises
+        ``OSError: cannot write mode P as JPEG``. The icon view must fall back to
+        the missing-file icon instead of returning a 500.
+        """
+        gif_name = 'palette.gif'
+        gif_path = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, gif_name)
+        create_image(mode='P', size=(200, 150)).save(gif_path, 'GIF')
+        try:
+            with open(gif_path, 'rb') as upload:
+                image = Image.objects.create(
+                    file=django.core.files.File(upload, name=gif_name),
+                )
+            url = reverse('admin:filer_file_fileicon', kwargs={
+                'file_id': image.pk,
+                'size': 80,
+            })
+            with SettingsOverride(settings, THUMBNAIL_PROCESSORS=(
+                'easy_thumbnails.processors.autocrop',
+                'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+                'easy_thumbnails.processors.filters',
+            )):
+                response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 302)
+            self.assertIn("icons/file-missing.svg", response["Location"])
+        finally:
+            os.remove(gif_path)
+
     def test_icon_view_non_image(self):
         """Getting an icon for a non-image results in a 404"""
         file = File.objects.create(
