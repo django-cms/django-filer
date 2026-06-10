@@ -3,12 +3,12 @@ import {DraggableItem, ListItem} from './Item';
 
 
 export default function DraggedInodes(props) {
-	const {inodes, layout, style, zoom} = props;
+	const {inodes, layout} = props;
 
 	return (
-		<ul className="inode-list" style={style}>{
+		<ul className="inode-list">{
 			inodes.map(inode =>
-			<DraggableItem key={inode.id} {...inode} isDragged={true} zoom={zoom}>
+			<DraggableItem key={inode.id} {...inode} isDragged={true}>
 				<div className="inode">
 					<ListItem {...inode} layout={layout} />
 				</div>

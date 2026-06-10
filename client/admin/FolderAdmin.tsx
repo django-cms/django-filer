@@ -55,8 +55,7 @@ export default function FolderAdmin() {
 		const params = new URLSearchParams(window.location.search);
 		return params.get('q') !== null;
 	});
-	const [draggedInodesStyle, setDraggedInodesStyle] = useState({});
-	const [zoomWhenDragging, setZoomWhenDragging] = useState(1);
+	const [overlayStyle, setOverlayStyle] = useState({});
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
 			activationConstraint: {distance: 4},
@@ -64,10 +63,6 @@ export default function FolderAdmin() {
 	);
 	const dragModifiers = [modifyMovement, restrictToWindowEdges];
 	const dragging = draggedInodes.length !== 0;
-	const overlayStyle = {
-		height: 'fit-content',
-		width: 'fit-content',
-	};
 
 	useEffect(() => {
 		containerRef.current = document.getElementById('content-react');
@@ -121,8 +116,9 @@ export default function FolderAdmin() {
 				if (firstDraggedElement && activeDraggedElement) {
 					const firstClientRect = firstDraggedElement.getBoundingClientRect();
 					const activeClientRect = activeDraggedElement.getBoundingClientRect();
-					offsetX = (firstClientRect.left - activeClientRect.left) * zoomWhenDragging;
-					offsetY = (firstClientRect.top - activeClientRect.top) * zoomWhenDragging;
+					const itemScaleWhenDragging = overlayStyle['--item-scale-when-dragging'] ?? 1;
+					offsetX = (firstClientRect.left - activeClientRect.left) * itemScaleWhenDragging;
+					offsetY = (firstClientRect.top - activeClientRect.top) * itemScaleWhenDragging;
 				}
 			} else if (activeDraggedElement) {
 				if (layout === 'tiles') {
@@ -199,45 +195,63 @@ export default function FolderAdmin() {
 	}
 
 	function computeBoundingBox(inodes) {
-		let zoom = 1, gap = 1;
-		if (inodes.length === 0) {
-			setDraggedInodesStyle({width: 0, height: 0});
-		} else {
+		let scale = 1, gap = 1, width = 0, height = 0;
+		if (inodes.length > 0) {
+			const [numColumns, numRows] = (() => {
+				if (['tiles', 'mosaic', 'gallery'].includes(layout)) {
+					const squareRoot = Math.sqrt(inodes.length);
+					return [Math.ceil(squareRoot), Math.floor(squareRoot + 0.5)];
+				} else {
+					return [1, inodes.length];
+				}
+			})();
 			const workAreaRect = settings.workAreaRect;
 			const inodeBox = inodes[0].elementRef.current.getBoundingClientRect();
 			if (layout === 'tiles') {
 				if (inodes.length > 16) {
-					zoom = 0.1;
+					scale = 0.1;
 				} else if (inodes.length > 1) {
-					zoom = 0.5;
+					scale = 0.5;
 				}
 				gap = 10;
+				width = Math.min(numColumns * (inodeBox.width * scale + gap) - gap, workAreaRect.width - 10);
+				height = Math.min(numRows * (inodeBox.height * scale + gap) - gap, workAreaRect.height - 10);
 			} else if (layout === 'mosaic') {
 				if (inodes.length > 64) {
-					zoom = 0.1;
+					scale = 0.1;
+					gap = 2;
 				} else if (inodes.length > 4) {
-					zoom = 0.5;
+					scale = 0.5;
+					gap = 4;
+				} else {
+					gap = 6;
 				}
-				gap = 5;
+				width = Math.min(numColumns * (inodeBox.width * scale + gap) - gap, workAreaRect.width - 10);
+				height = Math.min(numRows * (inodeBox.height * scale + gap) - gap, workAreaRect.height - 10);
 			} else if (layout === 'gallery') {
-				if (inodes.length > 16) {
-					zoom = 0.5;
+				let mult;
+				if (inodes.length > 9) {
+					mult = 0.5;
+					scale = 0.25;
+					gap = 4;
+				} else {
+					mult = 1;
+					scale = 0.5;
+					gap = 6;
 				}
-				gap = 2;
-			}
-			if (['tiles', 'mosaic', 'gallery'].includes(layout)) {
-				const squareRoot = Math.sqrt(inodes.length);
-				const width = Math.min(Math.ceil(squareRoot) * (inodeBox.width * zoom + gap) - gap, workAreaRect.width - 10);
-				const height = Math.min(Math.floor(squareRoot + 0.5) * inodeBox.height * zoom, workAreaRect.height - 10);
-				setDraggedInodesStyle({width: width, height: height});
+				width = Math.min(numColumns * (inodeBox.width * mult + gap) - gap / mult, workAreaRect.width - 10);
+				height = Math.min(numRows * (inodeBox.height * mult + gap) - gap / mult, workAreaRect.height - 10);
 			} else {
-				setDraggedInodesStyle({
-					width: inodeBox.width,
-					height: Math.min(inodes.length * inodeBox.height, workAreaRect.height - 15),
-				});
+				width = inodeBox.width;
+				height = Math.min(numRows * inodeBox.height, workAreaRect.height - 15);
 			}
 		}
-		setZoomWhenDragging(zoom);
+		setOverlayStyle({
+			'--list-width-when-dragging': `${width}px`,
+			'--list-height-when-dragging': `${height}px`,
+			'--list-gap-when-dragging': `${gap}px`,
+			'--item-scale-when-dragging': scale,
+		});
 	}
 
 	function handleDragStart(event) {
@@ -492,14 +506,9 @@ export default function FolderAdmin() {
 		>
 			<FolderTabs ref={folderTabsRef} isSearchResult={isSearchResult} settings={settings} />
 			{settings.is_trash ? renderTrashArea() : renderWorkArea()}
-			<div ref={overlayRef} className="drag-overlay">
-				<DragOverlay className={layout} style={overlayStyle} modifiers={dragModifiers}>
-					<DraggedInodes
-						inodes={draggedInodes}
-						layout={layout}
-						style={draggedInodesStyle}
-						zoom={zoomWhenDragging}
-					/>
+			<div ref={overlayRef} className="drag-overlay" style={overlayStyle}>
+				<DragOverlay className={layout} modifiers={dragModifiers}>
+					<DraggedInodes inodes={draggedInodes} layout={layout} />
 				</DragOverlay>
 			</div>
 		</DndContext>

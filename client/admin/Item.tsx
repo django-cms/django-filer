@@ -94,7 +94,7 @@ export function DraggableItem(props) {
 
 	if (props.isDragged)
 		return (
-			<li data-id={props.id} style={{zoom: props.zoom}}>
+			<li data-id={props.id}>
 				{props.children}
 			</li>
 		);

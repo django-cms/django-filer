@@ -878,13 +878,24 @@ ul.messagelist {
 	}
 
 	.drag-overlay {
+		--list-width-when-dragging: 0;
+		--list-height-when-dragging: 0;
+		--list-gap-when-dragging: 2px;
+		--item-scale-when-dragging: 1;
+
 		ul.inode-list {
+			width: var(--list-width-when-dragging);
+			height: var(--list-height-when-dragging);
+			gap: var(--list-gap-when-dragging);
+			padding: 3px 0 0 3px;
 			opacity: 0.7;
 			border: 1px dashed var(--body-quiet-color);
 			overflow: hidden;
+			flex-wrap: wrap;
 
 			> li {
 				cursor: grabbing;
+				zoom: var(--item-scale-when-dragging);
 			}
 		}
 	}
