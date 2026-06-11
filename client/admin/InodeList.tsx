@@ -184,13 +184,13 @@ const InodeList = forwardRef(function InodeList(props: any, forwardedRef) {
 		const index = inodes.findIndex((inode) => inode.id === preselectedInode.id);
 		let nextPreselectedInode;
 		if (event.key === 'ArrowLeft') {
-			nextPreselectedInode = layout === 'columns' ? inodes.at(0) : inodes.at(index - 1);
+			nextPreselectedInode = layout === 'columns' ? inodes[0] : inodes[index - 1];
 		} else if (event.key === 'ArrowRight') {
-			nextPreselectedInode = layout === 'columns' ? inodes.at(0) : inodes.at(index + 1);
+			nextPreselectedInode = layout === 'columns' ? inodes[0] : inodes[index + 1];
 		} else if (event.key === 'ArrowUp') {
-			nextPreselectedInode = inodes.at(index - inodesPerRow.current);
+			nextPreselectedInode = inodes[index - inodesPerRow.current];
 		} else if (event.key === 'ArrowDown') {
-			nextPreselectedInode = inodes.at(index + inodesPerRow.current);
+			nextPreselectedInode = inodes[index + inodesPerRow.current];
 		} else if (event.key === ' ') {
 			if (event.shiftKey) {
 				// shift click
