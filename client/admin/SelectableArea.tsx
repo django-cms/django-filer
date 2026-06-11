@@ -20,14 +20,15 @@ function SelectionRectangle(props) {
 
 
 const SelectableArea = (props: any)=> {
-	const edgeSize = 16;  // the size of the area near the upper and lower edge where scrolling starts
+	const edgeSize = 20;  // the size of the area near the upper and lower edge where scrolling starts
 	const acceleration = 40;  // accelerate scrolling the nearer the cursor reaches one of the edges
-	const {folderId, deselectAll, columnRef, dragging} = props;
+	const scrollDelta = 2.5;  // pixels by which to autoScroll per timeout
+	const {folderId, deselectAll, columnRef, dragging, layout} = props;
 	const areaRef = useRef(null);
-	const [scrollCache, setScrollCache] = useScrollCache();
 	const scrollableRef = useRef(null);
+	const autoscrollTimeoutRef = useRef(null);
+	const [scrollCache, setScrollCache] = useScrollCache();
 	const [activeRectangle, setActiveRectangle] = useState(null);
-	const [timeoutHandler, setTimeoutHandler] = useState(null);
 
 	useEffect(() => {
 		if (scrollCache[folderId] === undefined)
@@ -134,28 +135,57 @@ const SelectableArea = (props: any)=> {
 		}
 	}
 
-	function handleAutoScroll(event) {
+	function handleAutoScrollX(event) {
 		// scroll the area if the mouse is near the edge
 		const scrollableRect = scrollableRef.current.getBoundingClientRect();
-		let timeout = edgeSize;
-		if (event.clientY < scrollableRect.top + edgeSize && scrollableRef.current.scrollTop > 0) {
-			timeout = event.clientY - scrollableRect.top;
-			scrollableRef.current.scrollTop--;
-		} else if (event.clientY > scrollableRect.bottom - edgeSize && scrollableRef.current.scrollTop < areaRef.current.clientHeight - scrollableRect.height) {
-			timeout = scrollableRect.bottom - event.clientY;
-			scrollableRef.current.scrollTop++;
+		const thumbnailsElement = scrollableRef.current.querySelector('.thumbnails');
+		if (!(thumbnailsElement instanceof HTMLElement))
+			return;
+		let delta;
+		if (event.clientX < scrollableRect.left + edgeSize) {
+			delta = event.clientX - scrollableRect.left;
+			thumbnailsElement.scrollLeft -= scrollDelta;
+		} else if (event.clientX > scrollableRect.right - edgeSize) {
+			delta = scrollableRect.right - event.clientX;
+			thumbnailsElement.scrollLeft += scrollDelta;
+		} else {
+			return;
 		}
-		if (timeout < edgeSize) {
-			setTimeoutHandler(setTimeout(() => handleAutoScroll(event), 100 * timeout / acceleration));
+		if (delta < edgeSize) {
+			const timeout = Math.max(Math.ceil(50 * delta / acceleration), 1);
+			autoscrollTimeoutRef.current = setTimeout(() => handleAutoScrollX(event), timeout);
+		}
+	}
+
+	function handleAutoScrollY(event) {
+		// scroll the area if the mouse is near the edge
+		const scrollableRect = scrollableRef.current.getBoundingClientRect();
+		let delta;
+		if (event.clientY < scrollableRect.top + edgeSize && scrollableRef.current.scrollTop > 0) {
+			delta = event.clientY - scrollableRect.top;
+			scrollableRef.current.scrollTop -= scrollDelta;
+		} else if (event.clientY > scrollableRect.bottom - edgeSize && scrollableRef.current.scrollTop < areaRef.current.clientHeight - scrollableRect.height) {
+			delta = scrollableRect.bottom - event.clientY;
+			scrollableRef.current.scrollTop += scrollDelta;
+		} else {
+			return;
+		}
+		if (delta < edgeSize) {
+			const timeout = Math.max(Math.ceil(50 * delta / acceleration), 1);
+			autoscrollTimeoutRef.current = setTimeout(() => handleAutoScrollY(event), timeout);
 		}
 	}
 
 	const selectionExtend = (event) => {
-		if (timeoutHandler) {
-			clearTimeout(timeoutHandler);
-			setTimeoutHandler(null);
+		if (autoscrollTimeoutRef.current) {
+			clearTimeout(autoscrollTimeoutRef.current);
+			autoscrollTimeoutRef.current = null;
 		}
-		handleAutoScroll(event);
+		if (layout === 'gallery') {
+			handleAutoScrollX(event);
+		} else {
+			handleAutoScrollY(event);
+		}
 
 		const scrollTop = scrollableRef.current.scrollTop - activeRectangle.scrollTop;
 		const areaRect = areaRef.current.getBoundingClientRect();
@@ -218,6 +248,10 @@ const SelectableArea = (props: any)=> {
 		const extend = event.shiftKey || event.ctrlKey || event.metaKey;
 		columnRef.current.selectMultipleInodes(overlappingInodeIds, extend);
 		setActiveRectangle(null);
+		if (autoscrollTimeoutRef.current) {
+			clearTimeout(autoscrollTimeoutRef.current);
+			autoscrollTimeoutRef.current = null;
+		}
 	};
 
 	return (

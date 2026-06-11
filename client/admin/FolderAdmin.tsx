@@ -209,38 +209,38 @@ export default function FolderAdmin() {
 			const inodeBox = inodes[0].elementRef.current.getBoundingClientRect();
 			if (layout === 'tiles') {
 				if (inodes.length > 16) {
-					scale = 0.1;
+					scale = 0.25;
+					gap = 2;
 				} else if (inodes.length > 1) {
 					scale = 0.5;
+					gap = 4;
+				} else {
+					gap = 6;
 				}
-				gap = 10;
 				width = Math.min(numColumns * (inodeBox.width * scale + gap) - gap, workAreaRect.width - 10);
 				height = Math.min(numRows * (inodeBox.height * scale + gap) - gap, workAreaRect.height - 10);
 			} else if (layout === 'mosaic') {
 				if (inodes.length > 64) {
-					scale = 0.1;
-					gap = 2;
-				} else if (inodes.length > 4) {
-					scale = 0.5;
-					gap = 4;
+					scale = 0.25;
+					gap = 0;
+				} else if (inodes.length > 9) {
+					scale = 0.667;
+					gap = 1;
 				} else {
-					gap = 6;
+					gap = 2;
 				}
 				width = Math.min(numColumns * (inodeBox.width * scale + gap) - gap, workAreaRect.width - 10);
 				height = Math.min(numRows * (inodeBox.height * scale + gap) - gap, workAreaRect.height - 10);
 			} else if (layout === 'gallery') {
-				let mult;
 				if (inodes.length > 9) {
-					mult = 0.5;
-					scale = 0.25;
-					gap = 4;
-				} else {
-					mult = 1;
 					scale = 0.5;
-					gap = 6;
+					gap = 2;
+				} else {
+					scale = 1;
+					gap = 4;
 				}
-				width = Math.min(numColumns * (inodeBox.width * mult + gap) - gap / mult, workAreaRect.width - 10);
-				height = Math.min(numRows * (inodeBox.height * mult + gap) - gap / mult, workAreaRect.height - 10);
+				width = Math.min(numColumns * (inodeBox.width * scale + gap) - gap, workAreaRect.width - 10);
+				height = Math.min(numRows * (inodeBox.height * scale + gap), workAreaRect.height - 10);
 			} else {
 				width = inodeBox.width;
 				height = Math.min(numRows * inodeBox.height, workAreaRect.height - 15);
@@ -420,6 +420,7 @@ export default function FolderAdmin() {
 							deselectAll={deselectAll}
 							columnRef={columnRefs.current[ancestor.id]}
 							dragging={dragging}
+							layout={layout}
 						>
 							<DroppableArea
 								id={`column:${ancestor.id}`}

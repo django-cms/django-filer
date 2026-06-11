@@ -419,10 +419,9 @@ ul.messagelist {
 
 		> li {
 			padding: 5px;
+			box-sizing: border-box;
 
 			.inode {
-				box-sizing: border-box;
-
 				div:has(> .file-tags) {
 					position: relative;
 				}
@@ -532,6 +531,7 @@ ul.messagelist {
 
 			&:not(.status) {
 				width: 70px;
+				padding: 2px;
 
 				> .reordering {
 					position: absolute;
@@ -768,6 +768,8 @@ ul.messagelist {
 			gap: 4px;
 
 			> li {
+				width: 100px;
+
 				&:not(.status) {
 					aspect-ratio: 1;
 					box-sizing: border-box;
@@ -887,7 +889,7 @@ ul.messagelist {
 			width: var(--list-width-when-dragging);
 			height: var(--list-height-when-dragging);
 			gap: var(--list-gap-when-dragging);
-			padding: 3px 0 0 3px;
+			padding: 3px;
 			opacity: 0.7;
 			border: 1px dashed var(--body-quiet-color);
 			overflow: hidden;
