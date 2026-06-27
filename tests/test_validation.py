@@ -127,6 +127,18 @@ stroke="#004400"/>
             "text/html",
         )
 
+    def test_browser_rendered_xml_formats_denied(self):
+        # Formats that a browser may render and execute JavaScript from must be
+        # rejected by default, just like text/html.
+        for mime_type in (
+            "application/xhtml+xml",
+            "application/xml",
+            "text/xml",
+            "application/xslt+xml",
+        ):
+            with self.assertRaises(FileValidationError):
+                validate_upload("test-file", None, self.superuser, mime_type)
+
     def test_svg_validator_rejects_non_svg_file(self):
         import io
 

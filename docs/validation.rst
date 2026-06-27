@@ -11,7 +11,8 @@ corrupted file which could cause harm to other staff users or
 even visitors of the website.
 
 To this end django-filer implements a basic file validation
-framework. By default, it will reject any HTML files for upload and
+framework. By default, it will reject HTML and other browser-rendered
+document formats that can execute JavaScript (XHTML, XML and XSLT), and
 sanitize uploaded SVG files, stripping any scripts, event handlers or
 other non-graphic content.
 
@@ -19,6 +20,8 @@ other non-graphic content.
 
     File validation is done at upload time. It does not affect already
     uploaded files.
+
+.. _mime_type_whitelist:
 
 Mime type white list
 --------------------
@@ -49,15 +52,27 @@ If ``FILER_MIME_TYPE_WHITELIST`` is empty, all MIME types will be accepted
 Validation hooks
 ----------------
 
-Uploaded files are validated by their MIME type. The two bundled validators
-reject any ``text/html`` file and sanitize files with the MIME type
-``image/svg+xml``. Both HTML and SVG files are dangerous since they are
-executed by a browser without any warnings.
+Uploaded files are validated by their MIME type. The bundled validators
+reject any ``text/html``, ``application/xhtml+xml``, ``application/xml``,
+``text/xml`` and ``application/xslt+xml`` file and sanitize files with the
+MIME type ``image/svg+xml``. All of these formats are dangerous since a
+browser may render them and execute embedded JavaScript without any
+warnings.
 
 Validation hooks do not restrict the upload of other executable files
 (like ``*.exe`` or shell scripts). **Those are not automatically executed
 by the browser but still present a point of attack, if a user saves them
 to disk and executes them locally.**
+
+.. note::
+
+    The bundled validators form a *block list* of known-dangerous MIME types.
+    Because django-filer determines the MIME type from the file extension (and
+    the AJAX upload path also trusts the browser-supplied content type), a
+    block list can never cover every script-capable format. If your site only
+    needs a known set of file types, prefer the stronger
+    :ref:`MIME type white list <mime_type_whitelist>` (``FILER_MIME_TYPE_WHITELIST``),
+    which rejects everything that is not explicitly allowed.
 
 You can release validation restrictions by setting
 ``FILER_REMOVE_FILE_VALIDATORS`` to a list of MIME types to be removed from
@@ -135,14 +150,19 @@ a malicious file unknowingly.
 
     FILER_REMOVE_FILE_VALIDATORS = [
         "text/html",
+        "application/xhtml+xml",
+        "application/xml",
+        "text/xml",
+        "application/xslt+xml",
         "image/svg+xml",
         "application/octet-stream",
     ]
 
-No HTML upload, sanitized SVG upload, no binary or unknown file upload
-......................................................................
+No HTML/XML upload, sanitized SVG upload, no binary or unknown file upload
+..........................................................................
 
-This is the default setting. HTML uploads are rejected, SVG uploads are
+This is the default setting. HTML, XHTML, XML and XSLT uploads are rejected
+(all can execute JavaScript when rendered by a browser), SVG uploads are
 sanitized by ``filer.validation.sanitize_svg`` (see above), and binary or
 unknown files are rejected.
 
