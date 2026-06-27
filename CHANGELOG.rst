@@ -2,6 +2,18 @@
 CHANGELOG
 =========
 
+3.5.0 (2026-06-27)
+==================
+
+## What's Changed
+* feat: By-default fast svg sanitation (deprecating svg validation) by @fsbraun in https://github.com/django-cms/django-filer/pull/1594
+* fix: extended list of denied mime types by @fsbraun
+* fix: Filer property popup did note close  by @fsbraun in https://github.com/django-cms/django-filer/pull/1578
+* fix: filer_admin_tags now falls back on any thumbnail render exception by @SAY-5 in https://github.com/django-cms/django-filer/pull/1598
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1600
+* fix: Treat misconfigs more gracefully by @fsbraun in https://github.com/django-cms/django-filer/pull/1602
+
+
 3.4.4 (2026-02-06)
 ==================
 
