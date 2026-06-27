@@ -2,6 +2,18 @@
 CHANGELOG
 =========
 
+3.5.0 (2026-06-27)
+==================
+
+## What's Changed
+* feat: By-default fast svg sanitation (deprecating svg validation) by @fsbraun in https://github.com/django-cms/django-filer/pull/1594
+* fix: extended list of denied mime types (XHTML/XML stored XSS, reported by SeongHyeon Lee) by @fsbraun in https://github.com/django-cms/django-filer/pull/1604
+* fix: Filer property popup did note close  by @fsbraun in https://github.com/django-cms/django-filer/pull/1578
+* fix: filer_admin_tags now falls back on any thumbnail render exception by @SAY-5 in https://github.com/django-cms/django-filer/pull/1598
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1600
+* fix: Treat misconfigs more gracefully by @fsbraun in https://github.com/django-cms/django-filer/pull/1602
+
+
 3.4.4 (2026-02-06)
 ==================
 
@@ -156,7 +168,7 @@ CHANGELOG
 * feat: Canonical URL action button now copies canonical URL to the user's
   clipboard
 * fix: Run validators on updated files in file change view
-* fix: Update mime type if uploading file in file change view
+* fix: Update MIME type if uploading file in file change view
 * fix: Do not allow to remove the file field from an uplaoded file in
   the admin interface
 * fix: refactor upload checks into running validators in the admin
@@ -344,7 +356,7 @@ CHANGELOG
 ==================
 
 * Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
-* Fix #1211: On upload MIME-type is not set correctly.
+* Fix #1211: On upload MIME type is not set correctly.
 
 
 2.0.1 (2020-09-04)

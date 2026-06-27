@@ -291,7 +291,13 @@ IMAGE_MIME_TYPES = ['gif', 'jpeg', 'png', 'x-png', 'svg+xml', 'webp']
 
 FILE_VALIDATORS = {
     "text/html": ["filer.validation.deny_html"],
-    "image/svg+xml": ["filer.validation.validate_svg"],
+    # Other browser-rendered document formats that can execute JavaScript in the
+    # media origin (stored XSS). See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/Events
+    "application/xhtml+xml": ["filer.validation.deny"],
+    "application/xml": ["filer.validation.deny"],
+    "text/xml": ["filer.validation.deny"],
+    "application/xslt+xml": ["filer.validation.deny"],
+    "image/svg+xml": ["filer.validation.sanitize_svg"],
     "application/octet-stream": ["filer.validation.deny"],
 }
 

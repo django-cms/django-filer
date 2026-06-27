@@ -1,3 +1,4 @@
+import logging
 from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -20,6 +21,9 @@ from filer.models.imagemodels import BaseImage
 from filer.settings import (
     DEFERRED_THUMBNAIL_SIZES, FILER_MAX_SVG_THUMBNAIL_SIZE, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 register = Library()
@@ -163,6 +167,12 @@ def file_icon_context(file, detail, width, height):
                     # This is caught by file.exists() for file storage systems
                     # For remote storage systems we catch the error to avoid second trip
                     # to the storage system
+                    return not_available_context
+                except Exception:
+                    # PIL/easy-thumbnails can raise broader errors (e.g. broken MPO,
+                    # truncated images). Fall back to the placeholder so a single bad
+                    # file can't 500 the entire admin (#1597).
+                    logger.warning("Could not render filer thumbnail for %s", file, exc_info=True)
                     return not_available_context
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_maintype}.svg')

@@ -60,7 +60,7 @@ class FilerConfig(AppConfig):
             self.FILE_VALIDATORS[mime_type] = functions
 
     def ready(self):
-        # Make webp mime type known to python (needed for python < 3.11)
+        # Make webp MIME type known to python (needed for python < 3.11)
         mimetypes.add_type("image/webp", ".webp")
         #
         self.resolve_validators()
