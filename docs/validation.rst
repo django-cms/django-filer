@@ -159,7 +159,7 @@ a malicious file unknowingly.
     ]
 
 No HTML/XML upload, sanitized SVG upload, no binary or unknown file upload
-.........................................................................
+..........................................................................
 
 This is the default setting. HTML, XHTML, XML and XSLT uploads are rejected
 (all can execute JavaScript when rendered by a browser), SVG uploads are
