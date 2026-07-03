@@ -1,21 +1,12 @@
 import os
-import re
 
 from easy_thumbnails.files import Thumbnailer
 
 
-# match the source filename using `__` as the seperator. ``opts_and_ext`` is non
-# greedy so it should match the last occurence of `__`.
-# in ``ThumbnailerNameMixin.get_thumbnail_name`` we ensure that there is no `__`
-# in the opts part.
-RE_ORIGINAL_FILENAME = re.compile(r"^(?P<source_filename>.*)__(?P<opts_and_ext>.*?)$")
-
-
 def thumbnail_to_original_filename(thumbnail_name):
-    m = RE_ORIGINAL_FILENAME.match(thumbnail_name)
-    if m:
-        return m.group(1)
-    return None
+    if '__' not in thumbnail_name:
+        return None
+    return thumbnail_name.rsplit('__', 1)[0]
 
 
 class ThumbnailerNameMixin:

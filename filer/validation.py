@@ -107,6 +107,76 @@ def sanitize_svg(file_name: str, file: typing.IO, owner: User, mime_type: str) -
     file.write(sanitized)  # write to binary file with utf-8 encoding
 
 
+# ``Image.info`` keys that carry potentially sensitive metadata. Pillow only
+# writes these back when they are explicitly passed to ``save()``, so a plain
+# re-save drops them. We re-encode whenever any of them (or EXIF, or PNG text
+# chunks) is present. The ICC color profile is intentionally *not* listed here:
+# it is not sensitive and is preserved on re-save to keep colors intact.
+STRIPPABLE_METADATA_KEYS = (
+    "exif",
+    "xmp",
+    "XML:com.adobe.xmp",
+    "iptc",
+    "photoshop",
+    "comment",
+)
+
+
+def strip_exif(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
+    """Remove EXIF and other metadata (XMP, IPTC, PNG text chunks, ...) from an
+    uploaded image by re-encoding it with Pillow. Pillow only writes such
+    metadata when explicitly passed to ``save()``, so a plain re-save drops it.
+    The ICC color profile is preserved so colors are not altered."""
+    from PIL import Image, UnidentifiedImageError
+
+    file.seek(0)
+    try:
+        image = Image.open(file)
+    except (UnidentifiedImageError, OSError):
+        raise FileValidationError(
+            _('File "{file_name}": Rejected due to incompatible format')
+            .format(file_name=file_name)
+        )
+
+    has_metadata = (
+        bool(image.getexif())
+        or any(image.info.get(key) for key in STRIPPABLE_METADATA_KEYS)
+        or bool(getattr(image, "text", None))  # PNG tEXt/iTXt/zTXt chunks
+    )
+    if not has_metadata:
+        file.seek(0)
+        return
+
+    image_format = image.format
+    save_kwargs = {"format": image_format}
+    icc_profile = image.info.get("icc_profile")
+    if icc_profile:
+        save_kwargs["icc_profile"] = icc_profile
+    if image_format == "JPEG":
+        save_kwargs["quality"] = "keep"
+        if image.info.get("progression"):
+            save_kwargs["progressive"] = True
+        save_kwargs["optimize"] = True
+    elif image_format == "WEBP":
+        save_kwargs["lossless"] = bool(image.info.get("lossless"))
+        save_kwargs["quality"] = image.info.get("quality", 80)
+        if image.info.get("method") is not None:
+            save_kwargs["method"] = image.info["method"]
+
+    try:
+        image.load()
+    except OSError:
+        raise FileValidationError(
+            _('File "{file_name}": Rejected due to incompatible format')
+            .format(file_name=file_name)
+        )
+
+    file.seek(0)
+    file.truncate()
+    image.save(file, **save_kwargs)
+    file.seek(0)
+
+
 def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str) -> None:
     """Actual validation: Call all validators for the given MIME type. The app config reads
     the validators from the settings and replaces dotted paths by callables."""
