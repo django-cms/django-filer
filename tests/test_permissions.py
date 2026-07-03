@@ -418,11 +418,12 @@ class FolderPermissionsTestCase(TestCase):
             # A folder (owned by someone else) containing a file. test_user1 can
             # read it but must not be able to delete it.
             target = Folder.objects.create(name="readonly_target", owner=self.superuser)
-            target_file = DjangoFile(open(self.filename, "rb"), name="inside.jpg")
-            inside = Image.objects.create(
-                owner=self.superuser, original_filename="inside.jpg",
-                file=target_file, folder=target,
-            )
+            with open(self.filename, "rb") as opened_file:
+                target_file = DjangoFile(opened_file, name="inside.jpg")
+                inside = Image.objects.create(
+                    owner=self.superuser, original_filename="inside.jpg",
+                    file=target_file, folder=target,
+                )
 
             self.assertTrue(
                 self.client.login(username=self.test_user1.username, password="secret")
