@@ -2,16 +2,23 @@
 CHANGELOG
 =========
 
-3.5.0 (2026-06-27)
+3.5.0 (2026-07-06)
 ==================
 
-## What's Changed
 * feat: By-default fast svg sanitation (deprecating svg validation) by @fsbraun in https://github.com/django-cms/django-filer/pull/1594
+* feat: Add strip_exif "validator" to remove potentially sensitive data from uploads by @fsbraun in https://github.com/django-cms/django-filer/pull/1595
 * fix: extended list of denied mime types (XHTML/XML stored XSS, reported by SeongHyeon Lee) by @fsbraun in https://github.com/django-cms/django-filer/pull/1604
-* fix: Filer property popup did note close  by @fsbraun in https://github.com/django-cms/django-filer/pull/1578
+* fix: Delete folder action failed to check all permissions (reported by Ta Duc Thien) by @fsbraun in https://github.com/django-cms/django-filer/pull/1605
+* fix: Filer property popup did not close  by @fsbraun in https://github.com/django-cms/django-filer/pull/1578
 * fix: filer_admin_tags now falls back on any thumbnail render exception by @SAY-5 in https://github.com/django-cms/django-filer/pull/1598
 * ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1600
 * fix: Treat misconfigs more gracefully by @fsbraun in https://github.com/django-cms/django-filer/pull/1602
+
+**New Contributors**
+* @dependabot[bot] made their first contribution in https://github.com/django-cms/django-filer/pull/1582
+* @felixxm made their first contribution in https://github.com/django-cms/django-filer/pull/1592
+* @SAY-5 made their first contribution in https://github.com/django-cms/django-filer/pull/1598
+* @onurguzel made their first contribution in https://github.com/django-cms/django-filer/pull/1603
 
 
 3.4.4 (2026-02-06)
