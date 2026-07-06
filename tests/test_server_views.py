@@ -52,6 +52,13 @@ class ServeProtectedFileTests(TestCase):
         response = self.client.get('/filer_private/nonexistent_file.txt')
         self.assertEqual(response.status_code, 404)
 
+    def test_serve_protected_file_url_matches_but_not_in_db(self):
+        """URL matches the routing pattern but File lookup in DB fails."""
+        # Construct a URL that Django will route to the view
+        base = filer_settings.FILER_PRIVATEMEDIA_STORAGE.base_url
+        response = self.client.get(f'/{base.lstrip("/")}2025/07/06/no_such_file.txt')
+        self.assertEqual(response.status_code, 404)
+
 
 class ServeProtectedFileDebugTests(TestCase):
     """Debug-mode behavior for serve_protected_file."""
