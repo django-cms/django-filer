@@ -112,3 +112,13 @@ class FileSizeTests(TestCase):
 
     def test_filesize_10_bytes(self):
         self.assertEqual(filesize(10, format='auto1024'), '10 B')
+
+    def test_filesize_three_char_non_i_format_returns_original(self):
+        # A 3-char format like 'k B' where second char is not 'i' should return original
+        # But 'k B' has first char 'k' in filesize_formats, second char ' ' != 'i'
+        # Actually 'kBB' would work: len 3, first='k' in formats, second='B' != 'i'
+        self.assertEqual(filesize(100, format='kBB'), 100)
+
+    def test_filesize_two_char_B_but_bad_first_char(self):
+        # 'XB': len 2, last='B', but 'X' not in filesize_formats
+        self.assertEqual(filesize(100, format='XB'), 100)
