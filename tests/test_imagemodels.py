@@ -1,6 +1,7 @@
 """Tests for filer.models.imagemodels — Image.save date_taken logic."""
 
 import os
+from unittest import skipIf
 
 from django.core.files import File as DjangoFile
 from django.test import TestCase
@@ -12,6 +13,7 @@ from tests.helpers import create_image, create_superuser
 Image = load_model(FILER_IMAGE_MODEL)
 
 
+@skipIf(FILER_IMAGE_MODEL != "filer.Image", "Tests specific for the filer Image model")
 class ImageSaveTests(TestCase):
     """Tests for Image.save date_taken handling."""
 
