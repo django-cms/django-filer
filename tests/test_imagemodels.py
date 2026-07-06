@@ -28,21 +28,23 @@ class ImageSaveTests(TestCase):
             img.delete()
 
     def test_save_sets_date_taken_to_now_when_no_exif(self):
-        file_obj = DjangoFile(open(self.filename, 'rb'), name='test.jpg')
-        image = Image.objects.create(
-            owner=self.superuser,
-            original_filename='test.jpg',
-            file=file_obj,
-        )
+        with open(self.filename, 'rb') as f:
+            file_obj = DjangoFile(f, name='test.jpg')
+            image = Image.objects.create(
+                owner=self.superuser,
+                original_filename='test.jpg',
+                file=file_obj,
+            )
         self.assertIsNotNone(image.date_taken)
 
     def test_author_and_copyright_defaults(self):
-        file_obj = DjangoFile(open(self.filename, 'rb'), name='test.jpg')
-        image = Image.objects.create(
-            owner=self.superuser,
-            original_filename='test.jpg',
-            file=file_obj,
-        )
+        with open(self.filename, 'rb') as f:
+            file_obj = DjangoFile(f, name='test.jpg')
+            image = Image.objects.create(
+                owner=self.superuser,
+                original_filename='test.jpg',
+                file=file_obj,
+            )
         self.assertIsNone(image.author)
         self.assertFalse(image.must_always_publish_author_credit)
         self.assertFalse(image.must_always_publish_copyright)
