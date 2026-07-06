@@ -1,11 +1,16 @@
 """Tests for filer.server.views."""
 
+from io import BytesIO
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 
 from filer import settings as filer_settings
 from filer.models.filemodels import File
+from filer.utils.loader import load_model
 from tests.helpers import create_image, create_superuser
+
+Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
 
 class ServeProtectedFileTests(TestCase):
@@ -83,22 +88,26 @@ class ServeProtectedThumbnailTests(TestCase):
         self.superuser = create_superuser()
         self.client.login(username='admin', password='secret')
 
-        image = create_image(mode='RGB', size=(200, 100))
+        pil_image = create_image(mode='RGB', size=(200, 100))
+        buffer = BytesIO()
+        pil_image.save(buffer, format='JPEG')
+        buffer.seek(0)
+
         file_obj = SimpleUploadedFile(
             name='test_thumb.jpg',
-            content=image.tobytes(),
+            content=buffer.read(),
             content_type='image/jpeg')
-        self.filer_file = File.objects.create(
+        self.filer_image = Image.objects.create(
             owner=self.superuser,
             is_public=False,
             file=file_obj,
             original_filename='test_thumb.jpg',
             mime_type='image/jpeg',
         )
-        self.file_url = self.filer_file.file.url
+        self.file_url = self.filer_image.file.url
 
     def tearDown(self):
-        self.filer_file.delete()
+        self.filer_image.delete()
 
     def test_serve_thumbnail_invalid_path_returns_404(self):
         """Requesting a thumbnail with no __ delimiter returns 404."""
@@ -113,9 +122,24 @@ class ServeProtectedThumbnailTests(TestCase):
     def test_serve_thumbnail_unauthenticated_returns_404(self):
         """Unauthenticated user cannot access thumbnail."""
         self.client.logout()
-        thumb_url = self.filer_file.file.url.replace(
+        thumb_url = self.filer_image.file.url.replace(
             filer_settings.FILER_PRIVATEMEDIA_STORAGE.base_url,
             filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE.base_url)
         thumb_url = thumb_url.rsplit('.', 1)[0] + '__100x100_q85.jpg'
         response = self.client.get(thumb_url)
         self.assertEqual(response.status_code, 404)
+
+    def test_serve_thumbnail_authenticated(self):
+        """Authenticated superuser can access a generated protected thumbnail."""
+        # Generate a real thumbnail via easy_thumbnails
+        thumbnailer = self.filer_image.easy_thumbnails_thumbnailer
+        thumbnail = thumbnailer.get_thumbnail({'size': (100, 100)})
+        # The thumbnail name is relative to the storage; prepend the base URL
+        thumb_url = '/' + filer_settings.FILER_PRIVATEMEDIA_THUMBNAIL_STORAGE.base_url.lstrip('/') + thumbnail.name
+
+        response = self.client.get(thumb_url)
+        self.assertEqual(
+            response.status_code, 200,
+            f"Expected 200, got {response.status_code} for {thumb_url}"
+        )
+        self.assertIn(response['Content-Type'], ['image/jpeg', 'image/webp'])

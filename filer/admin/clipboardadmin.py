@@ -154,7 +154,7 @@ def ajax_upload(request, folder_id=None):
     else:
         for key, error_list in uploadform.errors.items():
             for error in error_list:
-                messages.error(request, error)
+                messages.error(request, str(error))
 
         form_errors = '; '.join(['{}'.format(
             ', '.join(errors)) for errors in list(uploadform.errors.values())

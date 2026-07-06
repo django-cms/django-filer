@@ -30,6 +30,14 @@ class PercentageTests(TestCase):
     def test_percentage_float(self):
         self.assertAlmostEqual(percentage(1, 3), 100.0 / 3.0)
 
+    def test_percentage_zero_total(self):
+        with self.assertRaises(ZeroDivisionError):
+            percentage(10, 0)
+
+    def test_percentage_zero_total_zero_part(self):
+        with self.assertRaises(ZeroDivisionError):
+            percentage(0, 0)
+
 
 class RecalculateSizeTests(TestCase):
     """Tests for _recalculate_size."""

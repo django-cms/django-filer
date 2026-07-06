@@ -28,8 +28,13 @@ class NormalizeSubjectLocationTests(TestCase):
         self.assertEqual(result, (400, 300))
 
     def test_valid_string_with_spaces(self):
+        # Whitespace should be stripped, making '400, 300' valid
         result = normalize_subject_location('400, 300')
-        self.assertFalse(result)
+        self.assertEqual(result, (400, 300))
+
+    def test_valid_string_with_leading_trailing_spaces(self):
+        result = normalize_subject_location('  400,300  ')
+        self.assertEqual(result, (400, 300))
 
     def test_valid_tuple(self):
         result = normalize_subject_location((400, 300))
