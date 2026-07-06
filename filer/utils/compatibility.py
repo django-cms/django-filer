@@ -1,3 +1,4 @@
+import django
 from django.utils.functional import keep_lazy
 from django.utils.text import Truncator, format_lazy
 
@@ -12,7 +13,10 @@ def truncate_words(s, num, end_text='...'):
     return Truncator(s).words(num, truncate=truncate)
 
 
-truncate_words = keep_lazy(truncate_words, str)
+if django.VERSION >= (5, 0):
+    truncate_words = keep_lazy(str)(truncate_words)
+else:
+    truncate_words = keep_lazy(truncate_words, str)
 
 
 def get_delete_permission(opts):
