@@ -389,6 +389,62 @@ class FolderPermissionsTestCase(TestCase):
         perm = FolderPermission.objects.create()
         self.assertEqual(perm.who, "–")
 
+    def test_delete_action_requires_edit_permission(self):
+        # A staff user with only read access to a folder (can_read=ALLOW,
+        # can_edit=DENY) plus the model-level delete permissions must NOT be
+        # able to delete files/folders through the bulk delete action.
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        target_file = None
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+
+            # Grant the model-level delete permissions to test_user1.
+            delete_perms = Permission.objects.filter(
+                codename__in=("delete_folder", "delete_file", "delete_image")
+            )
+            self.test_user1.user_permissions.add(*delete_perms)
+
+            # Read allowed / edit denied on *all* folders. Using an "everybody"
+            # permission means no FolderPermission row is attached to the target
+            # folder itself, so the only thing that can block the deletion is
+            # the missing edit permission (which is what we are testing).
+            FolderPermission.objects.create(
+                type=FolderPermission.ALL, everybody=True,
+                can_edit=FolderPermission.DENY,
+                can_read=FolderPermission.ALLOW,
+                can_add_children=FolderPermission.DENY,
+            )
+
+            # A folder (owned by someone else) containing a file. test_user1 can
+            # read it but must not be able to delete it.
+            target = Folder.objects.create(name="readonly_target", owner=self.superuser)
+            with open(self.filename, "rb") as opened_file:
+                target_file = DjangoFile(opened_file, name="inside.jpg")
+                inside = Image.objects.create(
+                    owner=self.superuser, original_filename="inside.jpg",
+                    file=target_file, folder=target,
+                )
+
+            self.assertTrue(
+                self.client.login(username=self.test_user1.username, password="secret")
+            )
+
+            url = reverse('admin:filer-directory_listing-root')
+            response = self.client.post(url, {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % target.id],
+            })
+            self.assertEqual(response.status_code, 403)
+            # Neither the folder nor the file it contains may be deleted.
+            self.assertTrue(Folder.objects.filter(pk=target.pk).exists())
+            self.assertTrue(Image.objects.filter(pk=inside.pk).exists())
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            if target_file is not None:
+                target_file.close()
+            cache.clear()
+
     def test_folderpermission_is_copied(self):
         source_folder = Folder.objects.create(name="source")
         destination_folder = Folder.objects.create(name="destination")

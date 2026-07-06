@@ -756,6 +756,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if not self.has_delete_permission(request):
             raise PermissionDenied
 
+        # Check that the user has per-folder edit permission on every selected
+        # file and folder (and their descendants). Without this, a user with
+        # only read access to a folder could delete its contents when the
+        # optional per-folder permission system is enabled.
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
+
         current_folder = self._get_current_action_folder(
             request, files_queryset, folders_queryset)
 
