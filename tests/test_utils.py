@@ -157,6 +157,7 @@ class HandleRequestFilesUploadTests(TestCase):
 
     def test_single_file(self):
         upload = SimpleUploadedFile('test.txt', b'hello', content_type='text/plain')
+
         # Simulate request.FILES as a dict-like with a single entry
         class FakeFiles(dict):
             pass

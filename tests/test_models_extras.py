@@ -23,8 +23,10 @@ class ClipboardModelTests(TestCase):
 
     def test_clipboarditem_str(self):
         from django.core.files.uploadedfile import SimpleUploadedFile
-        file_obj = SimpleUploadedFile(name='test.txt', content=b'test',
-                                       content_type='text/plain')
+        file_obj = SimpleUploadedFile(
+            name='test.txt', content=b'test',
+            content_type='text/plain',
+        )
         f = File.objects.create(
             owner=self.user, file=file_obj,
             original_filename='test.txt', is_public=True,

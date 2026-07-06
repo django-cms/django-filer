@@ -24,8 +24,10 @@ class ClipboardToolsTests(TestCase):
         self.clipboard = Clipboard.objects.create(user=self.user)
 
         from django.core.files.uploadedfile import SimpleUploadedFile
-        obj = SimpleUploadedFile(name='test.txt', content=b'test',
-                                  content_type='text/plain')
+        obj = SimpleUploadedFile(
+            name='test.txt', content=b'test',
+            content_type='text/plain',
+        )
         self.file1 = File.objects.create(
             owner=self.user, file=obj,
             original_filename='test.txt', is_public=True,
