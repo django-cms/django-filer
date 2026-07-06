@@ -103,3 +103,36 @@ class WhitespaceProcessorTests(TestCase):
         result = whitespace(img, size=(200, 200), whitespace=True,
                            whitespace_color='#00FF00')
         self.assertEqual(result.size, (200, 200))
+
+
+class ScaleAndCropWithSubjectLocationTests(TestCase):
+    """Tests for scale_and_crop_with_subject_location."""
+
+    def test_scale_and_crop_no_subject_location(self):
+        """Without subject_location, falls through to normal scale_and_crop."""
+        from filer.thumbnail_processors import scale_and_crop_with_subject_location
+        img = create_image(mode='RGB', size=(400, 300))
+        result = scale_and_crop_with_subject_location(
+            img, size=(100, 100), crop=True, subject_location=False,
+        )
+        self.assertEqual(result.size, (100, 100))
+
+    def test_scale_and_crop_with_subject_location(self):
+        """With a valid subject_location and crop=True, centers on subject."""
+        from filer.thumbnail_processors import scale_and_crop_with_subject_location
+        img = create_image(mode='RGB', size=(400, 300))
+        # Subject location at (200, 150) — center of the image
+        result = scale_and_crop_with_subject_location(
+            img, size=(100, 100), crop=True, subject_location='200,150',
+        )
+        # Result should be cropped to the requested size
+        self.assertEqual(result.size, (100, 100))
+
+    def test_scale_and_crop_no_crop(self):
+        """Without crop=True, falls through to normal behavior."""
+        from filer.thumbnail_processors import scale_and_crop_with_subject_location
+        img = create_image(mode='RGB', size=(200, 100))
+        result = scale_and_crop_with_subject_location(
+            img, size=(100, 50), crop=False, subject_location='100,50',
+        )
+        self.assertEqual(result.size, (100, 50))
