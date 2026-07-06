@@ -1,5 +1,5 @@
 """Tests for filer.utils.compatibility."""
-
+import django
 from django.test import TestCase
 
 from filer.utils.compatibility import (
@@ -34,7 +34,7 @@ class TruncateWordsTests(TestCase):
 
     def test_truncate_zero_words(self):
         result = truncate_words('hello world', 0)
-        self.assertEqual(result, '')
+        self.assertEqual(result, '' if django.VERSION > (5, 0) else ' ...')
 
     def test_truncate_empty_string(self):
         result = truncate_words('', 5)
