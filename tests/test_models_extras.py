@@ -1,11 +1,11 @@
 """Tests for filer.models.clipboardmodels, thumbnailoptionmodels, and mixins."""
 
 from django.test import TestCase
-
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 from filer.models.filemodels import File
 from filer.models.mixins import IconsMixin
 from filer.models.thumbnailoptionmodels import ThumbnailOption
+
 from tests.helpers import create_superuser
 
 

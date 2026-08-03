@@ -1,5 +1,4 @@
 from django.db import models
-
 from filer.models.abstract import BaseImage
 
 

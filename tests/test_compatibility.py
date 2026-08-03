@@ -1,7 +1,6 @@
 """Tests for filer.utils.compatibility."""
 import django
 from django.test import TestCase
-
 from filer.utils.compatibility import (
     get_delete_permission,
     string_concat,

@@ -2,7 +2,6 @@
 
 
 from django.test import TestCase
-
 from filer.utils.generate_filename import by_date, prefixed_factory, randomized
 
 

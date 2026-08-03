@@ -11,7 +11,4 @@ def get_model_label(model):
     if isinstance(model, str):
         return model
     else:
-        return "{}.{}".format(
-            model._meta.app_label,
-            model.__name__
-        )
+        return f"{model._meta.app_label}.{model.__name__}"

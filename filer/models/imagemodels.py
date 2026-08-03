@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 
 from .abstract import BaseImage
 
-
 logger = logging.getLogger("filer")
 
 

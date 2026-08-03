@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-
 from filer.settings import IMAGE_EXTENSIONS
 from filer.utils.filer_easy_thumbnails import thumbnail_to_original_filename
 from filer.utils.files import (
@@ -18,6 +17,7 @@ from filer.utils.files import (
 )
 from filer.utils.loader import load_object
 from filer.utils.zip import unzip
+
 from tests.helpers import create_image
 
 

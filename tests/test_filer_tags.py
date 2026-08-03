@@ -1,7 +1,6 @@
 """Tests for filer.templatetags.filer_tags."""
 
 from django.test import TestCase
-
 from filer.templatetags.filer_tags import filesize
 
 

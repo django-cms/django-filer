@@ -2,7 +2,6 @@ import math
 
 from django.template import Library
 
-
 register = Library()
 
 # The templatetag below is copied from sorl.thumbnail

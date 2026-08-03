@@ -4,14 +4,14 @@ import os
 
 import django.core
 from django.apps import apps
-from PIL import Image
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-
 from filer.models import File, Folder
 from filer.validation import FileValidationError, sanitize_svg, strip_exif, validate_svg, validate_upload
+from PIL import Image
+
 from tests.helpers import create_superuser
 
 

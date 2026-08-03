@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-
 from filer.fields.file import AdminFileWidget
 from filer.models import File
+
 from tests.helpers import create_image
 
 

@@ -3,8 +3,8 @@
 from io import BytesIO
 
 from django.test import TestCase
-
 from filer.utils.pil_exif import get_exif, get_exif_for_file, get_subject_location
+
 from tests.helpers import create_image
 
 

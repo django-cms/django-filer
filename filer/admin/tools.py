@@ -4,7 +4,6 @@ from django.utils.http import urlencode
 
 from .. import settings
 
-
 ALLOWED_PICK_TYPES = ('folder', 'file')
 
 

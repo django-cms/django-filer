@@ -1,7 +1,6 @@
 """Tests for filer.admin.forms."""
 
 from django.test import TestCase
-
 from filer.admin.forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 
 

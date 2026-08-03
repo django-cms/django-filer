@@ -1,7 +1,6 @@
 """Tests for filer.utils.filer_easy_thumbnails."""
 
 from django.test import TestCase
-
 from filer.utils.filer_easy_thumbnails import (
     ThumbnailerNameMixin,
     thumbnail_to_original_filename,

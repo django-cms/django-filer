@@ -10,7 +10,6 @@ from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-
 from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
 from polymorphic.query import PolymorphicQuerySet
@@ -336,9 +335,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
         user = request.user
         if not user.is_authenticated:
             return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
+        elif user.is_superuser or user == self.owner:
             return True
         elif self.folder:
             return self.folder.has_generic_permission(request, permission_type)
@@ -347,11 +344,7 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     def get_admin_url(self, action):
         return reverse(
-            'admin:{}_{}_{}'.format(
-                self._meta.app_label,
-                self._meta.model_name,
-                action
-            ),
+            f'admin:{self._meta.app_label}_{self._meta.model_name}_{action}',
             args=(self.pk,)
         )
 

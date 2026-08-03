@@ -1,7 +1,6 @@
 """Tests for filer.utils.recursive_dictionary."""
 
 from django.test import TestCase
-
 from filer.utils.recursive_dictionary import RecursiveDictionary, RecursiveDictionaryWithExcludes
 
 

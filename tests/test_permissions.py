@@ -7,19 +7,18 @@ from django.core.cache import cache
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 from django.urls import reverse
-
 from filer import settings as filer_settings
 from filer.models.clipboardmodels import Clipboard
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
-from tests.helpers import create_image, create_superuser
 
+from tests.helpers import create_image, create_superuser
 
 Image = load_model(FILER_IMAGE_MODEL)
 
 
-class Mock():
+class Mock:
     pass
 
 
@@ -78,7 +77,7 @@ class FolderPermissionsTestCase(TestCase):
 
     def test_superuser_has_rights(self):
         request = Mock()
-        setattr(request, 'user', self.superuser)
+        request.user = self.superuser
 
         result = self.folder.has_read_permission(request)
         self.assertEqual(result, True)
@@ -88,7 +87,7 @@ class FolderPermissionsTestCase(TestCase):
         try:
             filer_settings.FILER_ENABLE_PERMISSIONS = True
             request = Mock()
-            setattr(request, 'user', self.unauth_user)
+            request.user = self.unauth_user
 
             result = self.folder.has_read_permission(request)
             self.assertEqual(result, False)
@@ -113,7 +112,7 @@ class FolderPermissionsTestCase(TestCase):
 
     def test_unlogged_user_has_rights_when_permissions_disabled(self):
         request = Mock()
-        setattr(request, 'user', self.unauth_user)
+        request.user = self.unauth_user
 
         result = self.folder.has_read_permission(request)
         self.assertEqual(result, True)
@@ -122,16 +121,16 @@ class FolderPermissionsTestCase(TestCase):
         # Set owner as the owner of the folder.
         self.folder.owner = self.owner
         request = Mock()
-        setattr(request, 'user', self.owner)
+        request.user = self.owner
 
         result = self.folder.has_read_permission(request)
         self.assertEqual(result, True)
 
     def test_combined_groups(self):
         request1 = Mock()
-        setattr(request1, 'user', self.test_user1)
+        request1.user = self.test_user1
         request2 = Mock()
-        setattr(request2, 'user', self.test_user2)
+        request2.user = self.test_user2
 
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
@@ -180,7 +179,7 @@ class FolderPermissionsTestCase(TestCase):
         # Tests overlapped groups with explicit deny
 
         request1 = Mock()
-        setattr(request1, 'user', self.test_user1)
+        request1.user = self.test_user1
 
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
@@ -226,7 +225,7 @@ class FolderPermissionsTestCase(TestCase):
         # Similar test to test_overlapped_groups_deny1, only order of groups is different
 
         request2 = Mock()
-        setattr(request2, 'user', self.test_user2)
+        request2.user = self.test_user2
 
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
@@ -271,7 +270,7 @@ class FolderPermissionsTestCase(TestCase):
         # Tests overlapped groups without explicit deny
 
         request1 = Mock()
-        setattr(request1, 'user', self.test_user1)
+        request1.user = self.test_user1
 
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:
@@ -317,7 +316,7 @@ class FolderPermissionsTestCase(TestCase):
         # Similar test to test_overlapped_groups1, only order of groups is different
 
         request2 = Mock()
-        setattr(request2, 'user', self.test_user2)
+        request2.user = self.test_user2
 
         old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
         try:

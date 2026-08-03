@@ -1,7 +1,6 @@
 """Tests for filer.thumbnail_processors."""
 
 from django.test import TestCase, override_settings
-
 from filer.thumbnail_processors import (
     normalize_subject_location,
     whitespace,

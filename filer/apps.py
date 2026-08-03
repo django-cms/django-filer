@@ -37,7 +37,7 @@ class FilerConfig(AppConfig):
         from filer.settings import FILE_VALIDATORS, FILER_MIME_TYPE_WHITELIST
 
         if (
-            not isinstance(FILER_MIME_TYPE_WHITELIST, (list, tuple)) or  # noqa W504
+            not isinstance(FILER_MIME_TYPE_WHITELIST, (list, tuple)) or
             any(map(lambda x: not isinstance(x, str), FILER_MIME_TYPE_WHITELIST))
         ):  # pragma: no cover
             raise ImproperlyConfigured(
@@ -62,6 +62,5 @@ class FilerConfig(AppConfig):
     def ready(self):
         # Make webp MIME type known to python (needed for python < 3.11)
         mimetypes.add_type("image/webp", ".webp")
-        #
         self.resolve_validators()
         self.register_optional_heif_supprt()

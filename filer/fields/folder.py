@@ -116,12 +116,10 @@ class FilerFolderField(models.ForeignKey):
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
         dfl = get_model_label(self.default_model_class)
-        if "to" in kwargs.keys():  # pragma: no cover
+        if "to" in kwargs:  # pragma: no cover
             old_to = get_model_label(kwargs.pop("to"))
             if old_to.lower() != dfl.lower():
-                msg = "{} can only be a ForeignKey to {}; {} passed".format(
-                    self.__class__.__name__, dfl, old_to
-                )
+                msg = f"{self.__class__.__name__} can only be a ForeignKey to {dfl}; {old_to} passed"
                 warnings.warn(msg, SyntaxWarning)
         kwargs["to"] = dfl
         super().__init__(**kwargs)

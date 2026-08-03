@@ -14,7 +14,6 @@ from ..utils.loader import load_model
 from ..validation import validate_upload
 from . import views
 
-
 NO_PERMISSIONS = _("You do not have permission to upload files.")
 NO_FOLDER_ERROR = _("Can't find folder to upload. Please refresh and try again")
 NO_PERMISSIONS_FOR_FOLDER = _(

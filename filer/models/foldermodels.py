@@ -209,9 +209,7 @@ class Folder(models.Model, mixins.IconsMixin):
         user = request.user
         if not user.is_authenticated:
             return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
+        elif user.is_superuser or user == self.owner:
             return True
         else:
             if not hasattr(self, "permission_cache") or\

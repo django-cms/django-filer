@@ -38,7 +38,6 @@ def handle_upload(request):
                                      content_length,
                                      None,
                                      None)
-            pass
 
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
@@ -159,9 +158,9 @@ def get_valid_filename(s):
     filename = slugify(filename)
     ext = slugify(ext)
     if ext:
-        valid_filename = "{}.{}".format(filename, ext)
+        valid_filename = f"{filename}.{ext}"
     else:
-        valid_filename = "{}".format(filename)
+        valid_filename = f"{filename}"
 
     # Ensure the filename meets the maximum length requirements.
     return _ensure_safe_length(valid_filename)

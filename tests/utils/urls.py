@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.static import serve
 
-
 admin.autodiscover()
 admin_urls = admin.site.urls
 

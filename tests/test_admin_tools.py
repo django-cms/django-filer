@@ -1,7 +1,6 @@
 """Tests for filer.admin.tools."""
 
-from django.test import TestCase, RequestFactory
-
+from django.test import RequestFactory, TestCase
 from filer.admin.tools import (
     AdminContext,
     admin_url_params,

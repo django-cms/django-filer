@@ -25,14 +25,17 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
-
 from easy_thumbnails.models import Thumbnail
 
 from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
 from ..settings import (
-    FILER_IMAGE_MODEL, FILER_PAGINATE_BY, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE, TABLE_LIST_TYPE,
+    FILER_IMAGE_MODEL,
+    FILER_PAGINATE_BY,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
+    TABLE_LIST_TYPE,
 )
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
@@ -43,11 +46,16 @@ from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext, admin_url_params_encoded, check_files_edit_permissions, check_files_read_permissions,
-    check_folder_edit_permissions, check_folder_read_permissions, get_directory_listing_type, popup_status,
+    AdminContext,
+    admin_url_params_encoded,
+    check_files_edit_permissions,
+    check_files_read_permissions,
+    check_folder_edit_permissions,
+    check_folder_read_permissions,
+    get_directory_listing_type,
+    popup_status,
     userperms_for_request,
 )
-
 
 Image = load_model(FILER_IMAGE_MODEL)
 
@@ -144,10 +152,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': obj.parent.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "{}{}".format(
-                url,
-                admin_url_params_encoded(request),
-            )
+            url = f"{url}{admin_url_params_encoded(request)}"
             return HttpResponseRedirect(url)
         return super().response_change(request, obj)
 
@@ -197,10 +202,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-root')
-            url = "{}{}".format(
-                url,
-                admin_url_params_encoded(request),
-            )
+            url = f"{url}{admin_url_params_encoded(request)}"
             return HttpResponseRedirect(url)
 
         return self.delete_files_or_folders(
@@ -650,7 +652,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             raise PermissionDenied
 
         if request.method != 'POST':
-            return None
+            return
 
         clipboard = tools.get_user_clipboard(request.user)
 
@@ -678,7 +680,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         self.message_user(request, _("Successfully moved %(count)d files to "
                                      "clipboard.") % {"count": files_count[0]})
 
-        return None
+        return
 
     move_to_clipboard.short_description = _("Move selected files to clipboard")
 
@@ -695,7 +697,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         permissions_enabled = settings.FILER_ENABLE_PERMISSIONS
 
         if request.method != 'POST' or not permissions_enabled:
-            return None
+            return
 
         check_files_edit_permissions(request, files_queryset)
         check_folder_edit_permissions(request, folders_queryset)
@@ -724,7 +726,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         else:
             self.message_user(request, _("Successfully enabled permissions for %(count)d files.") % {"count": files_count[0], })
 
-        return None
+        return
 
     def files_set_private(self, request, files_queryset, folders_queryset):
         return self.files_set_public_or_private(request, False, files_queryset,

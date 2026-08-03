@@ -18,8 +18,7 @@ class IconsMixin:
         if getattr(self, '_icon', False):
             for size in FILER_ADMIN_ICON_SIZES:
                 try:
-                    r[size] = static("filer/icons/{}_{}x{}.png".format(
-                        self._icon, size, size))
+                    r[size] = static(f"filer/icons/{self._icon}_{size}x{size}.png")
                 except ValueError:
                     # Do not raise an exception while trying to call static()
                     # on non-existent icon file. This avoids the issue with

@@ -1,5 +1,6 @@
 import logging
 
+import easy_thumbnails.utils
 from django.conf import settings
 from django.core.checks import Warning
 from django.core.checks import register as register_check
@@ -7,8 +8,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-
-import easy_thumbnails.utils
 from easy_thumbnails.VIL import Image as VILImage
 from PIL.Image import MAX_IMAGE_PIXELS
 
@@ -17,7 +16,6 @@ from ..utils.compatibility import PILImage
 from ..utils.filer_easy_thumbnails import FilerThumbnailer
 from ..utils.pil_exif import get_exif_for_file
 from .filemodels import File
-
 
 logger = logging.getLogger(__name__)
 
@@ -215,9 +213,7 @@ class BaseImage(File):
         user = request.user
         if not user.is_authenticated:
             return False
-        elif user.is_superuser:
-            return True
-        elif user == self.owner:
+        elif user.is_superuser or user == self.owner:
             return True
         elif self.folder:
             return self.folder.has_generic_permission(request, permission_type)

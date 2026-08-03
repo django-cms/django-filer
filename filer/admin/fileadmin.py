@@ -10,7 +10,6 @@ from django.urls import path, reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
-
 from easy_thumbnails.engine import NoSourceGenerator
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
@@ -23,7 +22,6 @@ from ..settings import DEFERRED_THUMBNAIL_SIZES
 from ..utils.loader import load_model
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import AdminContext, admin_url_params_encoded, popup_status
-
 
 Image = load_model(settings.FILER_IMAGE_MODEL)
 
@@ -114,10 +112,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             else:
                 url = reverse(
                     'admin:filer-directory_listing-unfiled_images')
-            url = "{}{}".format(
-                url,
-                admin_url_params_encoded(request),
-            )
+            url = f"{url}{admin_url_params_encoded(request)}"
             return HttpResponseRedirect(url)
 
         # Add media to context to allow default django js inclusions in django/filer/base_site.html ({{ media.js }})
@@ -170,10 +165,7 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
                               kwargs={'folder_id': parent_folder.id})
             else:
                 url = reverse('admin:filer-directory_listing-unfiled_images')
-            url = "{}{}".format(
-                url,
-                admin_url_params_encoded(request)
-            )
+            url = f"{url}{admin_url_params_encoded(request)}"
             return HttpResponseRedirect(url)
 
         return super().delete_view(

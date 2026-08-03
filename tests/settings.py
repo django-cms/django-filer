@@ -1,7 +1,6 @@
 import os
 from tempfile import mkdtemp
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 HELPER_SETTINGS = {

@@ -1,5 +1,4 @@
 from django.db import models
-
 from filer.fields.file import FilerFileField
 from filer.fields.folder import FilerFolderField
 from filer.fields.image import FilerImageField

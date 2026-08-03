@@ -1,7 +1,6 @@
 """Tests for filer.models.tools."""
 
 from django.test import TestCase
-
 from filer.models.clipboardmodels import Clipboard, ClipboardItem
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder
@@ -13,6 +12,7 @@ from filer.models.tools import (
     move_files_from_clipboard_to_folder,
     move_files_to_folder,
 )
+
 from tests.helpers import create_superuser
 
 

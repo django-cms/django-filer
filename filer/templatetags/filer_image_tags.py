@@ -2,7 +2,6 @@ import re
 
 from django.template import Library
 
-
 register = Library()
 
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')
@@ -129,10 +128,7 @@ def get_css_position(image):
     width = image.width
     height = image.height
 
-    coords = '{}% {}%'.format(
-        percentage(x, width),
-        percentage(y, height)
-    )
+    coords = f'{percentage(x, width)}% {percentage(y, height)}%'
     return coords
 
 

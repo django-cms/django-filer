@@ -16,10 +16,8 @@ from django.forms.models import model_to_dict as model_to_dict_django
 from django.http import HttpRequest, HttpResponseForbidden
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
-
 from easy_thumbnails.files import get_thumbnailer
 from easy_thumbnails.options import ThumbnailOptions
-
 from filer import settings as filer_settings
 from filer.admin import tools
 from filer.admin.folderadmin import FolderAdmin
@@ -31,9 +29,9 @@ from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
 from filer.templatetags.filer_admin_tags import file_icon_url, get_aspect_ratio_and_download_url
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
+
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 from tests.utils.extended_app.models import ExtImage, Video
-
 
 Image = load_model(FILER_IMAGE_MODEL)
 User = get_user_model()
@@ -81,7 +79,7 @@ class FilerFolderAdminUrlsTests(TestCase):
     def test_filer_remember_last_opened_directory(self):
         folder = Folder.objects.create(name='remember me please')
 
-        get_last_folder = lambda: self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)  # noqa
+        get_last_folder = lambda: self.client.get(reverse('admin:filer-directory_listing-last'), follow=True)
 
         self.client.get(reverse('admin:filer-directory_listing', kwargs={'folder_id': folder.id}))
         self.assertEqual(int(self.client.session['filer_last_folder_id']), folder.id)
@@ -595,7 +593,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         self.assertEqual(Image.objects.count(), 1)
         stored_image = Image.objects.first()
@@ -617,7 +615,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         self.assertEqual(Image.objects.count(), 0)
         self.assertIn("error", json.loads(response.content.decode("utf-8")))
@@ -637,7 +635,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
@@ -665,7 +663,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         self.assertEqual(Image.objects.count(), 1)  # Success
         check_result = abstract.max_pixel_setting_check(None)
@@ -687,7 +685,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='application/pdf',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         self.assertEqual(Image.objects.count(), 0)
         self.assertEqual(File.objects.count(), 1)
@@ -706,7 +704,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         self.assertEqual(Image.objects.count(), 1)
         stored_image = Image.objects.first()
@@ -744,7 +742,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='application/octet-stream',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
         self.assertContains(response, NO_FOLDER_ERROR)
@@ -808,7 +806,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 url,
                 data=file_obj.read(),
                 content_type='application/octet-stream',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS
@@ -837,7 +835,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )
         file.save()
         request = HttpRequest()
-        setattr(request, "user", staff_user)
+        request.user = staff_user
 
         self.assertEqual(folder.has_add_children_permission(request), False)
         self.assertEqual(file.has_add_children_permission(request), False)
@@ -874,7 +872,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                     url,
                     data=file_obj.read(),
                     content_type='application/octet-stream',
-                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                    HTTP_X_REQUESTED_WITH='XMLHttpRequest'
                 )
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER

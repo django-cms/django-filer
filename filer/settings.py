@@ -8,14 +8,13 @@ from django.utils.translation import gettext_lazy as _
 from .utils.loader import load_object
 from .utils.recursive_dictionary import RecursiveDictionaryWithExcludes
 
-
 logger = logging.getLogger(__name__)
 
 # FILER_IMAGE_MODEL setting is used to swap Image model.
 # If such global setting does not exist, it will be created at this point (with default model name).
 # This is needed especially when using this setting in migrations.
 if not hasattr(settings, 'FILER_IMAGE_MODEL'):
-    setattr(settings, 'FILER_IMAGE_MODEL', 'filer.Image')
+    settings.FILER_IMAGE_MODEL = 'filer.Image'
 FILER_IMAGE_MODEL = settings.FILER_IMAGE_MODEL
 
 FILER_DEBUG = getattr(settings, 'FILER_DEBUG', False)  # When True makes
@@ -27,7 +26,7 @@ FILER_0_8_COMPATIBILITY_MODE = getattr(settings, 'FILER_0_8_COMPATIBILITY_MODE',
 FILER_ENABLE_LOGGING = getattr(settings, 'FILER_ENABLE_LOGGING', False)
 if FILER_ENABLE_LOGGING:
     FILER_ENABLE_LOGGING = (
-        FILER_ENABLE_LOGGING and (getattr(settings, 'LOGGING')
+        FILER_ENABLE_LOGGING and (settings.LOGGING
                              and ('' in settings.LOGGING['loggers']
                              or 'filer' in settings.LOGGING['loggers'])))
 
@@ -303,8 +302,7 @@ FILE_VALIDATORS = {
 
 remove_mime_types = getattr(settings, "FILER_REMOVE_FILE_VALIDATORS", [])
 for mime_type in remove_mime_types:  # pragma: no cover
-    if mime_type in FILE_VALIDATORS:
-        del FILE_VALIDATORS[mime_type]
+    FILE_VALIDATORS.pop(mime_type, None)
 
 for mime_type, validators in getattr(settings, "FILER_ADD_FILE_VALIDATORS", {}).items():  # pragma: no cover
     if mime_type in FILE_VALIDATORS:

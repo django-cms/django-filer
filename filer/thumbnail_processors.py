@@ -4,7 +4,6 @@ from easy_thumbnails import processors
 
 from .settings import FILER_SUBJECT_LOCATION_IMAGE_DEBUG, FILER_WHITESPACE_COLOR
 
-
 try:
     from PIL import Image, ImageDraw
 except ImportError:

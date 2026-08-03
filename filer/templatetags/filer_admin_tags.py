@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils.html import escapejs, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-
 from easy_thumbnails.engine import NoSourceGenerator
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
@@ -19,9 +18,11 @@ from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 from filer.settings import (
-    DEFERRED_THUMBNAIL_SIZES, FILER_MAX_SVG_THUMBNAIL_SIZE, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE,
+    DEFERRED_THUMBNAIL_SIZES,
+    FILER_MAX_SVG_THUMBNAIL_SIZE,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
 )
-
 
 logger = logging.getLogger(__name__)
 

@@ -24,7 +24,7 @@ class Form(forms.BaseForm):
         settings.setdefault('MEDIA_HEADERS', []).insert(0, (
             r'filer_public(?:_thumbnails)?/.*',
             {
-                'Cache-Control': 'public, max-age={}'.format(86400 * 365),
+                'Cache-Control': f'public, max-age={86400 * 365}',
             },
         ))
 

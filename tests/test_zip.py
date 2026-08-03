@@ -4,7 +4,6 @@ import io
 import zipfile
 
 from django.test import TestCase
-
 from filer.utils.zip import unzip
 
 

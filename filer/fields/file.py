@@ -17,7 +17,6 @@ from ..settings import ICON_CSS_LIB
 from ..utils.compatibility import truncate_words
 from ..utils.model_label import get_model_label
 
-
 logger = logging.getLogger(__name__)
 
 

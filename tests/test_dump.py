@@ -7,14 +7,13 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.management import call_command
 from django.test import TestCase
-
 from filer import settings as filer_settings
 from filer.models import Folder
 from filer.models.filemodels import File
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
-from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 
+from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
 
 Image = load_model(FILER_IMAGE_MODEL)
 
@@ -32,7 +31,6 @@ class DumpDataTests(TestCase):
         os.remove(self.filename)
         for f in File.objects.all():
             f.delete()
-        pass
 
     def create_filer_image(self, folder=None):
         with open(self.filename, 'rb') as file:

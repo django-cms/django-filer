@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
-
 User = get_user_model()  # Needed for typing
 
 
@@ -187,9 +186,7 @@ def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str
     if config.MIME_TYPE_WHITELIST:
         # FILER_MIME_TYPE_WHITELIST restricts the allowed MIME types to, e.g., "image/*" or "text/plain"
         for allowed_mime_type in config.MIME_TYPE_WHITELIST:
-            if mime_type == allowed_mime_type:
-                break
-            elif "/" in allowed_mime_type and [mime_type.split("/")[0], "*"] == allowed_mime_type.split("/", 1):
+            if mime_type == allowed_mime_type or "/" in allowed_mime_type and [mime_type.split("/")[0], "*"] == allowed_mime_type.split("/", 1):
                 break
         else:
             # No match found <=> no break in for loop? Deny file
