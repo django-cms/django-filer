@@ -4,12 +4,11 @@ from django.forms.models import modelform_factory
 from django.http import JsonResponse
 from django.urls import path, reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_exempt
 
 from .. import settings as filer_settings
 from ..models import Clipboard, ClipboardItem, Folder
 from ..settings import FILER_THUMBNAIL_ICON_SIZE
-from ..utils.files import handle_request_files_upload, handle_upload
+from ..utils.files import UploadException, handle_request_files_upload, handle_upload
 from ..utils.loader import load_model
 from ..validation import validate_upload
 from . import views
@@ -49,10 +48,10 @@ class ClipboardAdmin(admin.ModelAdmin):
                  self.admin_site.admin_view(views.delete_clipboard),
                  name='filer-delete_clipboard'),
             path('operations/upload/<int:folder_id>/',
-                 ajax_upload,
+                 self.admin_site.admin_view(ajax_upload),
                  name='filer-ajax_upload'),
             path('operations/upload/no_folder/',
-                 ajax_upload,
+                 self.admin_site.admin_view(ajax_upload),
                  name='filer-ajax_upload'),
         ] + super().get_urls()
 
@@ -67,7 +66,6 @@ class ClipboardAdmin(admin.ModelAdmin):
         }
 
 
-@csrf_exempt
 def ajax_upload(request, folder_id=None):
     """
     Receives an upload from the uploader. Receives only one file at a time.
@@ -92,12 +90,16 @@ def ajax_upload(request, folder_id=None):
         messages.error(request, NO_PERMISSIONS_FOR_FOLDER)
         return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
 
-    if len(request.FILES) == 1:
-        # don't check if request is ajax or not, just grab the file
-        upload, filename, is_raw, mime_type = handle_request_files_upload(request)
-    else:
-        # else process the request as usual
-        upload, filename, is_raw, mime_type = handle_upload(request)
+    try:
+        if len(request.FILES) == 1:
+            # don't check if request is ajax or not, just grab the file
+            upload, filename, is_raw, mime_type = handle_request_files_upload(request)
+        else:
+            # else process the request as usual
+            upload, filename, is_raw, mime_type = handle_upload(request)
+    except UploadException as error:
+        messages.error(request, str(error))
+        return JsonResponse({'error': str(error)})
     # TODO: Deprecated/refactor
     # Get clipboad
     # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]

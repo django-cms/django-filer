@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { getCsrfToken } from './csrf.js';
+
 
 /* globals Cl */
 document.addEventListener('DOMContentLoaded', () => {
@@ -82,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dropzoneUrl = dropzoneElement.dataset.url;
             const dropzoneInstance = new Dropzone(dropzoneElement, {
                 url: dropzoneUrl,
+                headers: { 'X-CSRFToken': getCsrfToken() },
                 paramName: 'file',
                 maxFiles: parseInt(dropzoneElement.dataset.maxFiles) || 100,
                 maxFilesize: parseInt(dropzoneElement.dataset.maxFilesize),  // no default

@@ -4,6 +4,8 @@
 
 import Dropzone from 'dropzone';
 
+import { getCsrfToken } from './csrf.js';
+
 if (Dropzone) {
     Dropzone.autoDiscover = false;
 }
@@ -71,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         new Dropzone(dropzone, {
             url: dropzoneUrl,
+            headers: { 'X-CSRFToken': getCsrfToken() },
             paramName: 'file',
             maxFiles: 1,
             maxFilesize: dropzone.dataset.maxFilesize,

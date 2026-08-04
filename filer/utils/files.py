@@ -109,12 +109,15 @@ def handle_request_files_upload(request):
     is_raw = False
     upload = list(request.FILES.values())[0]
     filename = upload.name
-    _, iext = os.path.splitext(filename)
-    mime_type = upload.content_type.lower()
-    extensions = mimetypes.guess_all_extensions(mime_type)
-    if mime_type != 'application/octet-stream' and extensions and iext.lower() not in extensions:
-        msg = "MIME-Type '{mimetype}' does not correspond to file extension of {filename}."
-        raise UploadException(msg.format(mimetype=mime_type, filename=filename))
+    # The MIME type is derived from the file name and never taken from the
+    # client-supplied Content-Type of the multipart part: the type stored on the
+    # File object (and used by web servers when serving it) is derived from the
+    # file name, too. Trusting the client here would allow an upload to be
+    # validated as one type and then stored and served as another, bypassing
+    # FILER_MIME_TYPE_WHITELIST and the FILE_VALIDATORS (e.g. deny_html or
+    # sanitize_svg). File names with an unknown extension fall back to
+    # "application/octet-stream", which is denied by default.
+    mime_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
     return upload, filename, is_raw, mime_type
 
 

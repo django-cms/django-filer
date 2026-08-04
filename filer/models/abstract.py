@@ -113,7 +113,9 @@ class BaseImage(File):
     def matches_file_type(cls, iname, ifile, mime_type):
         # source: https://www.freeformatter.com/mime-types-list.html
         from ..settings import IMAGE_MIME_TYPES
-        maintype, subtype = mime_type.split('/')
+        # partition() instead of split(): a malformed MIME type without a slash
+        # must not raise
+        maintype, _, subtype = mime_type.partition('/')
         return maintype == 'image' and subtype in IMAGE_MIME_TYPES
 
     def file_data_changed(self, post_init=False):
