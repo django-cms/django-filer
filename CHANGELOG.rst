@@ -2,6 +2,30 @@
 CHANGELOG
 =========
 
+3.5.1 (unreleased)
+==================
+
+* fix: Upload validators could be bypassed by declaring an unknown Content-Type,
+  allowing stored XSS (reported by Miguel Rafael Martín de Nicolás Acedo). The MIME
+  type of an upload is now always derived from the file name, never from the
+  client-supplied ``Content-Type``.
+* fix: The AJAX upload endpoint no longer is ``@csrf_exempt`` and now requires a
+  staff user. The bundled uploaders send the ``X-CSRFToken`` header.
+* fix: A malformed MIME type without a slash no longer raises an error, and upload
+  errors return a JSON error response instead of an HTTP 500.
+* chore: Add tests for filer tags, views and fix whitespace/truncate by @fsbraun in https://github.com/django-cms/django-filer/pull/1607
+* chore: Let ruff sort imports, matching the isort configuration by @fsbraun
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1608
+
+.. warning::
+
+   Uploads whose file extension is unknown to Python's ``mimetypes`` module are now
+   treated as ``application/octet-stream`` and are rejected by the default validators.
+   Register additional extensions with ``mimetypes.add_type()`` if you need them.
+
+   Custom uploaders posting to ``filer-ajax_upload`` must now send a CSRF token and
+   authenticate as a staff user.
+
 3.5.0 (2026-07-06)
 ==================
 
