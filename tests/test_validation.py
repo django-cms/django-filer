@@ -4,13 +4,14 @@ import os
 
 import django.core
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth.models import Permission, User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from PIL import Image
-from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+
+from PIL import Image
 
 from filer.models import File, Folder
 from filer.settings import FILER_IMAGE_MODEL
