@@ -265,7 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     hasErrors = true;
                     if (window.filerShowError) {
-                        window.filerShowError(`${file.name}: ${error.message}`);
+                        // Dropzone passes the parsed JSON body when the server
+                        // rejects an upload; filer reports the reason in "error".
+                        const message = (error && (error.error || error.message)) || error;
+
+                        window.filerShowError(`${file.name}: ${message}`);
                     }
                 }
             });

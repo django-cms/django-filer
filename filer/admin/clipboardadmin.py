@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
@@ -14,14 +16,28 @@ from ..validation import validate_upload
 from . import views
 
 
+logger = logging.getLogger(__name__)
+
 NO_PERMISSIONS = _("You do not have permission to upload files.")
 NO_FOLDER_ERROR = _("Can't find folder to upload. Please refresh and try again")
 NO_PERMISSIONS_FOR_FOLDER = _(
     "Can't use this folder, Permission Denied. Please select another folder."
 )
+UPLOAD_ERROR = _("Upload failed. Please refresh and try again.")
 
 
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
+
+
+def _upload_error(request, message, status):
+    """
+    Report a failed upload both as a Django message (shown on the next full page
+    load) and as a JSON body with a matching HTTP status code, so that the
+    uploader - and any proxy in between - can tell a rejected upload from an
+    accepted one.
+    """
+    messages.error(request, message)
+    return JsonResponse({'error': str(message)}, status=status)
 
 
 # ModelAdmins
@@ -72,23 +88,20 @@ def ajax_upload(request, folder_id=None):
     """
 
     if not request.user.has_perm("filer.add_file"):
-        messages.error(request, NO_PERMISSIONS)
-        return JsonResponse({'error': NO_PERMISSIONS})
+        return _upload_error(request, NO_PERMISSIONS, status=403)
 
     if folder_id:
         try:
             # Get folder
             folder = Folder.objects.get(pk=folder_id)
         except Folder.DoesNotExist:
-            messages.error(request, NO_FOLDER_ERROR)
-            return JsonResponse({'error': NO_FOLDER_ERROR})
+            return _upload_error(request, NO_FOLDER_ERROR, status=400)
     else:
         folder = Folder.objects.filter(pk=request.session.get('filer_last_folder_id', 0)).first()
 
     # check permissions
     if folder and not folder.has_add_children_permission(request):
-        messages.error(request, NO_PERMISSIONS_FOR_FOLDER)
-        return JsonResponse({'error': NO_PERMISSIONS_FOR_FOLDER})
+        return _upload_error(request, NO_PERMISSIONS_FOR_FOLDER, status=403)
 
     try:
         if len(request.FILES) == 1:
@@ -97,9 +110,12 @@ def ajax_upload(request, folder_id=None):
         else:
             # else process the request as usual
             upload, filename, is_raw, mime_type = handle_upload(request)
-    except UploadException as error:
-        messages.error(request, str(error))
-        return JsonResponse({'error': str(error)})
+    except UploadException:
+        # UploadException describes a malformed request rather than something the
+        # uploading user can act on. Log the details instead of echoing them back:
+        # exception text may carry internals that should not reach the client.
+        logger.warning("Rejected file upload", exc_info=True)
+        return _upload_error(request, UPLOAD_ERROR, status=400)
     # TODO: Deprecated/refactor
     # Get clipboad
     # clipboard = Clipboard.objects.get_or_create(user=request.user)[0]
@@ -125,8 +141,10 @@ def ajax_upload(request, folder_id=None):
             # Enforce the FILER_IS_PUBLIC_DEFAULT
             file_obj.is_public = filer_settings.FILER_IS_PUBLIC_DEFAULT
         except ValidationError as error:
-            messages.error(request, str(error))
-            return JsonResponse({'error': str(error)})
+            # ValidationError carries a message written for the uploading user
+            # (e.g. "HTML upload denied by site security policy"), so it is safe
+            # - and useful - to pass on.
+            return _upload_error(request, '; '.join(error.messages), status=400)
         file_obj.folder = folder
         file_obj.save()
         # TODO: Deprecated/refactor
@@ -150,15 +168,13 @@ def ajax_upload(request, folder_id=None):
                 )
                 data['original_image'] = file_obj.url
             return JsonResponse(data)
-        except Exception as error:
-            messages.error(request, str(error))
-            return JsonResponse({"error": str(error)})
+        except Exception:
+            # Unexpected server-side failure: log it rather than exposing the
+            # exception text, which may reveal internals.
+            logger.exception("Failed to build the upload response for file %s", file_obj.pk)
+            return _upload_error(request, UPLOAD_ERROR, status=500)
     else:
-        for key, error_list in uploadform.errors.items():
-            for error in error_list:
-                messages.error(request, str(error))
-
         form_errors = '; '.join(['{}'.format(
             ', '.join(errors)) for errors in list(uploadform.errors.values())
         ])
-        return JsonResponse({'error': str(form_errors)}, status=200)
+        return _upload_error(request, form_errors, status=400)

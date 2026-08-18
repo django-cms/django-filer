@@ -63,7 +63,7 @@ stroke="#004400"/>
             }
             response = self.client.post(url, post_data)
 
-        self.assertContains(response, "HTML upload denied by site security policy")
+        self.assertContains(response, "HTML upload denied by site security policy", status_code=400)
         self.assertEqual(File.objects.count(), 0)
 
     def test_svg_upload_fails(self):
@@ -71,38 +71,45 @@ stroke="#004400"/>
         svg_validation = config.FILE_VALIDATORS["image/svg+xml"]
         config.FILE_VALIDATORS["image/svg+xml"] = [validate_svg]
 
-        for attack, expected_files in [
-            ("""<a href="javascript: alert('ing');">test</a>""", 0),
-            ('<script>alert(document.domain);</script>', 0),
-            ('&#x3c;script>alert(document.domain);</script>', 0),
-            ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 0),
-            ("", 1)
-        ]:
-            svg_file = 'test_file.svg'
-            filename = os.path.join(
-                settings.FILE_UPLOAD_TEMP_DIR,
-                svg_file
-            )
+        try:
+            for attack, expected_files in [
+                ("""<a href="javascript: alert('ing');">test</a>""", 0),
+                ('<script>alert(document.domain);</script>', 0),
+                ('&#x3c;script>alert(document.domain);</script>', 0),
+                ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 0),
+                ("", 1)
+            ]:
+                svg_file = 'test_file.svg'
+                filename = os.path.join(
+                    settings.FILE_UPLOAD_TEMP_DIR,
+                    svg_file
+                )
 
-            # create svg file with attack vector
-            with open(filename, 'w') as fh:
-                fh.write(self.svg_file.format(attack))
-            n = File.objects.count()
+                # create svg file with attack vector
+                with open(filename, 'w') as fh:
+                    fh.write(self.svg_file.format(attack))
+                n = File.objects.count()
 
-            with open(filename, 'rb') as fh:
-                file_obj = django.core.files.File(fh)
-                url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
-                post_data = {
-                    'Filename': svg_file,
-                    'Filedata': file_obj,
-                    'jsessionid': self.client.session.session_key
-                }
-                response = self.client.post(url, post_data)
-            if expected_files == 0:
-                self.assertContains(response, "Rejected due to potential cross site scripting vulnerability")
-            self.assertEqual(File.objects.count(), n + expected_files)
-
-        config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
+                with open(filename, 'rb') as fh:
+                    file_obj = django.core.files.File(fh)
+                    url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
+                    post_data = {
+                        'Filename': svg_file,
+                        'Filedata': file_obj,
+                        'jsessionid': self.client.session.session_key
+                    }
+                    response = self.client.post(url, post_data)
+                if expected_files == 0:
+                    self.assertContains(
+                        response,
+                        "Rejected due to potential cross site scripting vulnerability",
+                        status_code=400,
+                    )
+                self.assertEqual(File.objects.count(), n + expected_files)
+        finally:
+            # Restore in a finally: the validators live on the app config, so a
+            # failing assertion would otherwise leak them into every later test.
+            config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
 
     def test_deny_validator(self):
         from filer.validation import deny
@@ -391,7 +398,7 @@ class TestDeclaredMimeTypeIsNotTrusted(TestCase):
             with self.subTest(content_type=content_type):
                 response = self.upload("evil.html", self.html_payload, content_type)
 
-                self.assertContains(response, "HTML upload denied by site security policy")
+                self.assertContains(response, "HTML upload denied by site security policy", status_code=400)
                 self.assertEqual(File.objects.count(), 0)
 
     def test_svg_upload_with_unknown_content_type_is_sanitized(self):
@@ -415,7 +422,7 @@ class TestDeclaredMimeTypeIsNotTrusted(TestCase):
         finally:
             self.config.MIME_TYPE_WHITELIST = whitelist
 
-        self.assertContains(response, "denied by site security policy")
+        self.assertContains(response, "denied by site security policy", status_code=400)
         self.assertEqual(File.objects.count(), 0)
 
     def test_stored_mime_type_matches_validated_mime_type(self):
@@ -428,14 +435,14 @@ class TestDeclaredMimeTypeIsNotTrusted(TestCase):
         # raise ValueError -> HTTP 500
         response = self.upload("evil.html", self.html_payload, "bogus")
 
-        self.assertContains(response, "HTML upload denied by site security policy")
+        self.assertContains(response, "HTML upload denied by site security policy", status_code=400)
         self.assertEqual(File.objects.count(), 0)
 
     def test_unknown_extension_is_denied_by_default(self):
         # Falls back to application/octet-stream, which the default validators deny
         response = self.upload("payload.unknown-ext", b"data", "image/x-not-a-real-type")
 
-        self.assertContains(response, "denied by site security policy")
+        self.assertContains(response, "denied by site security policy", status_code=400)
         self.assertEqual(File.objects.count(), 0)
 
     def test_upload_requires_csrf_token(self):

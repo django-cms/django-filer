@@ -162,11 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
             },
-            error: function (file, msg, response) {
-                if (response && response.error) {
-                    msg += ` ; ${response.error}`;
-                }
-                showError(`${file.name}: ${msg}`);
+            error: function (file, msg) {
+                // Dropzone hands over the parsed JSON body when the server rejects
+                // an upload; filer reports the reason in "error".
+                const message = (msg && (msg.error || msg.message)) || msg;
+
+                showError(`${file.name}: ${message}`);
                 this.removeAllFiles(true);
             },
             reset: function () {
