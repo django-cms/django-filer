@@ -79,71 +79,25 @@ include = ["filer*", "LICENSE"]
 [tool.setuptools.dynamic]
 version = {attr = "filer.__version__"}
 
-[tool.flake8]
-max-line-length = 119
-exclude = [
-    "*.egg-info",
-    ".eggs",
-    ".env",
-    ".git",
-    ".settings",
-    ".tox",
-    ".venv",
-    "build",
-    "data",
-    "dist",
-    "docs",
-    "*migrations*",
-    "tmp",
-    "node_modules",
-]
-ignore = ["E251", "E128", "E501", "W503"]
-
-[tool.isort]
-line_length = 119
-skip = [
-    "manage.py",
-    "*migrations*",
-    ".tox",
-    ".eggs",
-    "data",
-    ".env",
-    ".venv",
-]
-include_trailing_comma = true
-# 3 = vertical hanging indent, the only wrapping style ruff's isort (I) emits.
-# Keep in sync with [tool.ruff.lint.isort] so the two tools do not fight.
-multi_line_output = 3
-lines_after_imports = 2
-default_section = "THIRDPARTY"
-sections = [
-    "FUTURE",
-    "STDLIB",
-    "DJANGO",
-    "CMS",
-    "THIRDPARTY",
-    "FIRSTPARTY",
-    "LOCALFOLDER",
-]
-known_first_party = ["filer"]
-known_cms = ["cms", "menus"]
-known_django = ["django"]
-
+# ruff replaces flake8 (linting) and isort (import sorting); it is the only linter
+# CI runs. See .github/workflows/lint.yml and the ruff hook in .pre-commit-config.yaml.
 [tool.ruff]
 src = ["filer"]
-exclude = ["*/migrations/*"]
+# extend-exclude rather than exclude, so ruff's own defaults (build, dist, .venv,
+# node_modules, ...) stay in place
+extend-exclude = ["*/migrations/*", "data", "tmp"]
 line-length = 119
 
 [tool.ruff.lint]
 # Pin the rule set explicitly: these were ruff's implicit defaults up to 0.15, and
 # 0.16 widened them. Selecting them here keeps a ruff upgrade from turning CI red
 # with hundreds of unrelated findings. Widen deliberately, in its own change.
+# E501 (line too long) stays off, as it was under flake8.
 select = ["E4", "E7", "E9", "F"]
 extend-select = ["I"]
 
 [tool.ruff.lint.isort]
-# Same grouping as [tool.isort]: standard library, django, other third party,
-# then our own code
+# Standard library, django, other third party, then our own code
 section-order = [
     "future",
     "standard-library",

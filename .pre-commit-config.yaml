@@ -31,8 +31,3 @@ repos:
     hooks:
       - id: check-merge-conflict
       - id: mixed-line-ending
-
-#  - repo: https://github.com/pycqa/isort
-#    rev: 5.12.0
-#    hooks:
-#      - id: isort

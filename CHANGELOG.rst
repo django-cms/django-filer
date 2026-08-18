@@ -20,6 +20,8 @@ CHANGELOG
   client; unexpected failures are logged instead.
 * chore: Add tests for filer tags, views and fix whitespace/truncate by @fsbraun in https://github.com/django-cms/django-filer/pull/1607
 * chore: Let ruff sort imports, matching the isort configuration by @fsbraun
+* ci: Replace flake8 and isort with ruff, which already runs as a pre-commit hook.
+  ``tox -e flake8`` and ``tox -e isort`` become ``tox -e ruff``.
 * ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1608
 
 .. warning::
