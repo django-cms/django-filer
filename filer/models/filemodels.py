@@ -175,11 +175,13 @@ class File(PolymorphicModel, mixins.IconsMixin):
 
     @cached_property
     def mime_maintype(self):
-        return self.mime_type.split('/')[0]
+        # partition() instead of split(): a malformed MIME type without a slash
+        # must not raise. "or ''" guards against legacy rows holding NULL.
+        return (self.mime_type or '').partition('/')[0]
 
     @cached_property
     def mime_subtype(self):
-        return self.mime_type.split('/')[1]
+        return (self.mime_type or '').partition('/')[2]
 
     def file_data_changed(self, post_init=False):
         """

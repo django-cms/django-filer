@@ -183,6 +183,10 @@ def validate_upload(file_name: str, file: typing.IO, owner: User, mime_type: str
 
     config = apps.get_app_config("filer")
 
+    # A missing MIME type is treated like an unknown one: denied by the default
+    # validators instead of raising an AttributeError below.
+    mime_type = mime_type or "application/octet-stream"
+
     # First, check white list if provided
     if config.MIME_TYPE_WHITELIST:
         # FILER_MIME_TYPE_WHITELIST restricts the allowed MIME types to, e.g., "image/*" or "text/plain"

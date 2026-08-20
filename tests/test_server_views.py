@@ -10,6 +10,7 @@ from filer.models.filemodels import File
 from filer.utils.loader import load_model
 from tests.helpers import create_image, create_superuser
 
+
 Image = load_model(filer_settings.FILER_IMAGE_MODEL)
 
 

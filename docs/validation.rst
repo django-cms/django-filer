@@ -42,11 +42,15 @@ If ``FILER_MIME_TYPE_WHITELIST`` is empty, all MIME types will be accepted
 
 .. note::
 
-    django-filer determines the MIME type of a file by its extension.
-    It does **not** check if the file format is aligned with its extension.
-    Restricting MIME types therefore effectively blocks certain extensions.
-    It does not prevent a user from uploading an .exe file disguised as
-    an image file, say .jpeg.
+    django-filer determines the MIME type of a file by its extension, never
+    from the ``Content-Type`` the uploading client declares. It does **not**
+    check if the file format is aligned with its extension. Restricting MIME
+    types therefore effectively blocks certain extensions. It does not prevent
+    a user from uploading an .exe file disguised as an image file, say .jpeg.
+
+    Files whose extension is unknown to Python's :mod:`mimetypes` module are
+    treated as ``application/octet-stream``, which the bundled validators
+    reject by default.
 
 
 Validation hooks
@@ -67,8 +71,7 @@ to disk and executes them locally.**
 .. note::
 
     The bundled validators form a *block list* of known-dangerous MIME types.
-    Because django-filer determines the MIME type from the file extension (and
-    the AJAX upload path also trusts the browser-supplied content type), a
+    Because django-filer determines the MIME type from the file extension, a
     block list can never cover every script-capable format. If your site only
     needs a known set of file types, prefer the stronger
     :ref:`MIME type white list <mime_type_whitelist>` (``FILER_MIME_TYPE_WHITELIST``),

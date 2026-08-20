@@ -5,6 +5,5 @@ django-app-helper>=3.3.1
 
 # other requirements
 coverage
-isort
-flake8
+ruff
 packaging

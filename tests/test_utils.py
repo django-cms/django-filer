@@ -171,8 +171,8 @@ class HandleRequestFilesUploadTests(TestCase):
         self.assertEqual(result[3], 'text/plain')
         self.assertFalse(result[2])  # is_raw is False
 
-    def test_mime_type_mismatch_raises(self):
-        """Uploading a file with mismatched MIME type and extension raises."""
+    def test_declared_content_type_is_ignored(self):
+        """The MIME type is derived from the file name, not from the client."""
         upload = SimpleUploadedFile('test.txt', b'<html>content</html>', content_type='text/html')
 
         class FakeFiles(dict):
@@ -181,8 +181,21 @@ class HandleRequestFilesUploadTests(TestCase):
         request = MagicMock()
         request.FILES = FakeFiles({'file': upload})
 
-        with self.assertRaises(UploadException):
-            handle_request_files_upload(request)
+        result = handle_request_files_upload(request)
+        self.assertEqual(result[3], 'text/plain')
+
+    def test_unknown_extension_falls_back_to_octet_stream(self):
+        """An unguessable file name must not inherit the client's MIME type."""
+        upload = SimpleUploadedFile('test.unknown-ext', b'data', content_type='image/x-made-up')
+
+        class FakeFiles(dict):
+            pass
+
+        request = MagicMock()
+        request.FILES = FakeFiles({'file': upload})
+
+        result = handle_request_files_upload(request)
+        self.assertEqual(result[3], 'application/octet-stream')
 
 
 class UploadExceptionTests(TestCase):
