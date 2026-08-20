@@ -19,7 +19,10 @@ from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 from filer.settings import (
-    DEFERRED_THUMBNAIL_SIZES, FILER_MAX_SVG_THUMBNAIL_SIZE, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE,
+    DEFERRED_THUMBNAIL_SIZES,
+    FILER_MAX_SVG_THUMBNAIL_SIZE,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
 )
 
 

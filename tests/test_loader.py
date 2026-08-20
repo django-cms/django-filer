@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 
-from filer.utils.loader import load_object, load_model, storage_factory
+from filer.utils.loader import load_model, load_object, storage_factory
 
 
 class LoadObjectTests(TestCase):

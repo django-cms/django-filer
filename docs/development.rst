@@ -60,11 +60,15 @@ Code Guidelines
 
 The code should be `PEP8`_ compliant. With the exception that the line width is not limited to 80, but to 120 characters.
 
-The `flake8`_ command can be very helpful (we run it as a separate env through `Tox` on `Travis`). If you want to check your changes for code style::
+`ruff`_ checks code style and import sorting; it is what CI runs. If you want to check your changes yourself::
 
-    $ flake8
+    $ ruff check
 
-This runs the checks without line widths and other minor checks, it also ignores source files in the `migrations` and `tests` and some other folders.
+This runs the checks without line widths and other minor checks, it also ignores source files in the `migrations` and some other folders. ``ruff check --fix`` applies the fixes it can make itself.
+
+Installing the `pre-commit`_ hooks runs the same check on every commit::
+
+    $ pre-commit install
 
 This is the last command to run before submitting a PR (that will run tests in all tox environments)::
 
@@ -99,7 +103,8 @@ once it is merged back into master.
 
 
 .. _`PEP8`: http://www.python.org/dev/peps/pep-0008
-.. _`flake8`: http://pypi.python.org/pypi/flake8
+.. _`ruff`: https://docs.astral.sh/ruff/
+.. _`pre-commit`: https://pre-commit.com/
 .. _`reindent`: http://pypi.python.org/pypi/Reindent
 .. _`nvie`: http://nvie.com
 .. _`django-filer`: http://github.com/divio/django-filer

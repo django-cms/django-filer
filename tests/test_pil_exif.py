@@ -45,6 +45,7 @@ class GetExifForFileTests(TestCase):
         buffer.seek(0)
 
         from django.core.files import File as DjangoFile
+
         from filer.models import File
 
         # Need to save as a filer File for the storage path

@@ -4,15 +4,23 @@ import os
 
 import django.core
 from django.apps import apps
-from PIL import Image
 from django.conf import settings
+from django.contrib.auth.models import Permission, User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 
+from PIL import Image
+
 from filer.models import File, Folder
+from filer.settings import FILER_IMAGE_MODEL
+from filer.utils.loader import load_model
 from filer.validation import FileValidationError, sanitize_svg, strip_exif, validate_svg, validate_upload
 from tests.helpers import create_superuser
+
+
+FilerImage = load_model(FILER_IMAGE_MODEL)
 
 
 class TestValidators(TestCase):
@@ -55,7 +63,7 @@ stroke="#004400"/>
             }
             response = self.client.post(url, post_data)
 
-        self.assertContains(response, "HTML upload denied by site security policy")
+        self.assertContains(response, "HTML upload denied by site security policy", status_code=400)
         self.assertEqual(File.objects.count(), 0)
 
     def test_svg_upload_fails(self):
@@ -63,38 +71,45 @@ stroke="#004400"/>
         svg_validation = config.FILE_VALIDATORS["image/svg+xml"]
         config.FILE_VALIDATORS["image/svg+xml"] = [validate_svg]
 
-        for attack, expected_files in [
-            ("""<a href="javascript: alert('ing');">test</a>""", 0),
-            ('<script>alert(document.domain);</script>', 0),
-            ('&#x3c;script>alert(document.domain);</script>', 0),
-            ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 0),
-            ("", 1)
-        ]:
-            svg_file = 'test_file.svg'
-            filename = os.path.join(
-                settings.FILE_UPLOAD_TEMP_DIR,
-                svg_file
-            )
+        try:
+            for attack, expected_files in [
+                ("""<a href="javascript: alert('ing');">test</a>""", 0),
+                ('<script>alert(document.domain);</script>', 0),
+                ('&#x3c;script>alert(document.domain);</script>', 0),
+                ("""<circle onclick="console.log('test')" cx="300" cy="225" r="100" fill="red"/>""", 0),
+                ("", 1)
+            ]:
+                svg_file = 'test_file.svg'
+                filename = os.path.join(
+                    settings.FILE_UPLOAD_TEMP_DIR,
+                    svg_file
+                )
 
-            # create svg file with attack vector
-            with open(filename, 'w') as fh:
-                fh.write(self.svg_file.format(attack))
-            n = File.objects.count()
+                # create svg file with attack vector
+                with open(filename, 'w') as fh:
+                    fh.write(self.svg_file.format(attack))
+                n = File.objects.count()
 
-            with open(filename, 'rb') as fh:
-                file_obj = django.core.files.File(fh)
-                url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
-                post_data = {
-                    'Filename': svg_file,
-                    'Filedata': file_obj,
-                    'jsessionid': self.client.session.session_key
-                }
-                response = self.client.post(url, post_data)
-            if expected_files == 0:
-                self.assertContains(response, "Rejected due to potential cross site scripting vulnerability")
-            self.assertEqual(File.objects.count(), n + expected_files)
-
-        config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
+                with open(filename, 'rb') as fh:
+                    file_obj = django.core.files.File(fh)
+                    url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
+                    post_data = {
+                        'Filename': svg_file,
+                        'Filedata': file_obj,
+                        'jsessionid': self.client.session.session_key
+                    }
+                    response = self.client.post(url, post_data)
+                if expected_files == 0:
+                    self.assertContains(
+                        response,
+                        "Rejected due to potential cross site scripting vulnerability",
+                        status_code=400,
+                    )
+                self.assertEqual(File.objects.count(), n + expected_files)
+        finally:
+            # Restore in a finally: the validators live on the app config, so a
+            # failing assertion would otherwise leak them into every later test.
+            config.FILE_VALIDATORS["image/svg+xml"] = svg_validation
 
     def test_deny_validator(self):
         from filer.validation import deny
@@ -349,3 +364,115 @@ class TestWhitelist(TestCase):
             else:
                 with self.assertRaises(FileValidationError):
                     validate_upload("test-file", None, None, mime_type)
+
+
+class TestDeclaredMimeTypeIsNotTrusted(TestCase):
+    """The MIME type of an upload is derived from its file name, never taken from
+    the client-supplied Content-Type of the multipart part. Otherwise a made-up
+    Content-Type would match neither FILE_VALIDATORS nor the extension
+    consistency check, and the file would be stored (and served) under the type
+    derived from its name -- bypassing deny_html/sanitize_svg."""
+
+    html_payload = b"<html><script>alert(document.domain);</script></html>"
+
+    def setUp(self) -> None:
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.folder = Folder.objects.create(name='foo')
+        self.config = apps.get_app_config("filer")
+
+    def tearDown(self) -> None:
+        self.folder.delete()
+
+    def upload(self, name, payload, content_type, client=None):
+        upload = SimpleUploadedFile(name, payload, content_type=content_type)
+        url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': self.folder.pk})
+        return (client or self.client).post(url, {'Filename': name, 'Filedata': upload})
+
+    def test_html_upload_with_unknown_content_type_denied(self):
+        for content_type in (
+            "image/x-not-a-real-type",
+            "application/x-does-not-exist",
+            "image/png",  # known type, but inconsistent with the file name
+        ):
+            with self.subTest(content_type=content_type):
+                response = self.upload("evil.html", self.html_payload, content_type)
+
+                self.assertContains(response, "HTML upload denied by site security policy", status_code=400)
+                self.assertEqual(File.objects.count(), 0)
+
+    def test_svg_upload_with_unknown_content_type_is_sanitized(self):
+        svg = TestValidators.svg_file.format(
+            '<script>alert(document.domain);</script>'
+        ).encode("utf-8")
+
+        self.upload("evil.svg", svg, "image/x-not-a-real-type")
+
+        self.assertEqual(File.objects.count(), 1)
+        file_obj = File.objects.get()
+        self.assertEqual(file_obj.mime_type, "image/svg+xml")
+        with file_obj.file.open("rb") as fh:
+            self.assertNotIn(b"<script>", fh.read())
+
+    def test_unknown_content_type_does_not_bypass_whitelist(self):
+        whitelist = self.config.MIME_TYPE_WHITELIST
+        self.config.MIME_TYPE_WHITELIST = ["image/*"]
+        try:
+            response = self.upload("evil.html", self.html_payload, "image/x-not-a-real-type")
+        finally:
+            self.config.MIME_TYPE_WHITELIST = whitelist
+
+        self.assertContains(response, "denied by site security policy", status_code=400)
+        self.assertEqual(File.objects.count(), 0)
+
+    def test_stored_mime_type_matches_validated_mime_type(self):
+        self.upload("hello.txt", b"hello", "image/x-not-a-real-type")
+
+        self.assertEqual(File.objects.get().mime_type, "text/plain")
+
+    def test_malformed_content_type_does_not_raise(self):
+        # A Content-Type without a slash used to reach mime_type.split('/') and
+        # raise ValueError -> HTTP 500
+        response = self.upload("evil.html", self.html_payload, "bogus")
+
+        self.assertContains(response, "HTML upload denied by site security policy", status_code=400)
+        self.assertEqual(File.objects.count(), 0)
+
+    def test_unknown_extension_is_denied_by_default(self):
+        # Falls back to application/octet-stream, which the default validators deny
+        response = self.upload("payload.unknown-ext", b"data", "image/x-not-a-real-type")
+
+        self.assertContains(response, "denied by site security policy", status_code=400)
+        self.assertEqual(File.objects.count(), 0)
+
+    def test_upload_requires_csrf_token(self):
+        client = self.client_class(enforce_csrf_checks=True)
+        client.login(username='admin', password='secret')
+
+        response = self.upload("hello.txt", b"hello", "text/plain", client=client)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(File.objects.count(), 0)
+
+    def test_upload_requires_staff_user(self):
+        user = User.objects.create_user(username="joe", password="secret", is_staff=False)
+        user.user_permissions.add(Permission.objects.get(codename="add_file"))
+        client = self.client_class()
+        client.login(username="joe", password="secret")
+
+        response = client.post(
+            reverse('admin:filer-ajax_upload'),
+            {'Filename': 'hello.txt', 'Filedata': SimpleUploadedFile("hello.txt", b"hello")},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(File.objects.count(), 0)
+
+
+class TestMimeTypeParsing(TestCase):
+    def test_malformed_mime_type_does_not_raise(self):
+        file_obj = File(mime_type="bogus")
+
+        self.assertEqual(file_obj.mime_maintype, "bogus")
+        self.assertEqual(file_obj.mime_subtype, "")
+        self.assertFalse(FilerImage.matches_file_type("bogus", None, "bogus"))

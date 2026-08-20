@@ -467,6 +467,28 @@ class FilerClipboardAdminUrlsTests(TestCase):
         os.remove(self.video_filename)
         super().tearDown()
 
+    def test_filer_ajax_upload_malformed_request(self):
+        """
+        A request the upload handlers cannot parse is answered with 400 and a
+        generic message: the exception text describes an internal protocol
+        violation and must not be echoed back to the client.
+        """
+        from filer.admin.clipboardadmin import UPLOAD_ERROR
+
+        url = reverse('admin:filer-ajax_upload')
+        with self.assertLogs('filer.admin.clipboardadmin', level='WARNING') as logs:
+            response = self.client.post(url, data={})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {'error': str(UPLOAD_ERROR)},
+        )
+        # The internal reason is logged, not returned
+        self.assertNotIn('Bad Upload', response.content.decode('utf-8'))
+        self.assertIn('Bad Upload', '\n'.join(logs.output))
+        self.assertEqual(File.objects.count(), 0)
+
     def test_filer_upload_file(self, extra_headers={}):
         self.assertEqual(Image.objects.count(), 0)
         folder = Folder.objects.create(name='foo')
@@ -604,48 +626,52 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
     def test_filer_ajax_decompression_bomb(self):
         DEFAULT_MAX_IMAGE_PIXELS = abstract.FILER_MAX_IMAGE_PIXELS
-        abstract.FILER_MAX_IMAGE_PIXELS = 800 * 200  # Triggers error
-        self.assertEqual(Image.objects.count(), 0)
-        folder = Folder.objects.create(name='foo')
-        with open(self.filename, 'rb') as fh:
-            file_obj = django.core.files.File(fh)
-            url = reverse(
-                'admin:filer-ajax_upload',
-                kwargs={'folder_id': folder.pk}
-            ) + '?filename=%s' % self.image_name
-            response = self.client.post(
-                url,
-                data=file_obj.read(),
-                content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-            )
-        self.assertEqual(Image.objects.count(), 0)
-        self.assertIn("error", json.loads(response.content.decode("utf-8")))
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level, ERROR)
+        try:
+            abstract.FILER_MAX_IMAGE_PIXELS = 800 * 200  # Triggers error
+            self.assertEqual(Image.objects.count(), 0)
+            folder = Folder.objects.create(name='foo')
+            with open(self.filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % self.image_name
+                response = self.client.post(
+                    url,
+                    data=file_obj.read(),
+                    content_type='image/jpeg',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Image.objects.count(), 0)
+            self.assertIn("error", json.loads(response.content.decode("utf-8")))
+            messages = list(get_messages(response.wsgi_request))
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].level, ERROR)
 
-        abstract.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
-        folder = Folder.objects.create(name='foo')
-        with open(self.filename, 'rb') as fh:
-            file_obj = django.core.files.File(fh)
-            url = reverse(
-                'admin:filer-ajax_upload',
-                kwargs={'folder_id': folder.pk}
-            ) + '?filename=%s' % self.image_name
-            response = self.client.post(
-                url,
-                data=file_obj.read(),
-                content_type='image/jpeg',
-                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-            )
-        self.assertEqual(response.status_code, 200)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)  # One more message
-        self.assertEqual(messages[1].level, ERROR)
-        self.assertEqual(Image.objects.count(), 0)
-
-        abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
+            abstract.FILER_MAX_IMAGE_PIXELS = 800 * 300  # Triggers warning
+            folder = Folder.objects.create(name='foo')
+            with open(self.filename, 'rb') as fh:
+                file_obj = django.core.files.File(fh)
+                url = reverse(
+                    'admin:filer-ajax_upload',
+                    kwargs={'folder_id': folder.pk}
+                ) + '?filename=%s' % self.image_name
+                response = self.client.post(
+                    url,
+                    data=file_obj.read(),
+                    content_type='image/jpeg',
+                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+                )
+            self.assertEqual(response.status_code, 400)
+            messages = list(get_messages(response.wsgi_request))
+            self.assertEqual(len(messages), 2)  # One more message
+            self.assertEqual(messages[1].level, ERROR)
+            self.assertEqual(Image.objects.count(), 0)
+        finally:
+            # Restore in a finally: FILER_MAX_IMAGE_PIXELS is a module global, so a
+            # failing assertion would otherwise leak it into every later test.
+            abstract.FILER_MAX_IMAGE_PIXELS = DEFAULT_MAX_IMAGE_PIXELS
 
     def test_filer_max_pixel_deactivation(self):
         from django.core.checks import Warning
@@ -727,7 +753,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
             }
             response = self.client.post(url, post_data, **extra_headers)
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
-        self.assertContains(response, NO_FOLDER_ERROR)
+        self.assertContains(response, NO_FOLDER_ERROR, status_code=400)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_ajax_upload_file_error(self):
@@ -747,7 +773,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
             )
         from filer.admin.clipboardadmin import NO_FOLDER_ERROR
-        self.assertContains(response, NO_FOLDER_ERROR)
+        self.assertContains(response, NO_FOLDER_ERROR, status_code=400)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_upload_permissions_error(self, extra_headers={}):
@@ -783,7 +809,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 response = self.client.post(url, post_data, **extra_headers)
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
-        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
+        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER, status_code=403)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_ajax_upload_without_permissions_error(self, extra_headers={}):
@@ -813,7 +839,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS
 
-        self.assertContains(response, NO_PERMISSIONS)
+        self.assertContains(response, NO_PERMISSIONS, status_code=403)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_filer_add_file_permissions(self, extra_headers={}):
@@ -837,7 +863,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
         )
         file.save()
         request = HttpRequest()
-        setattr(request, "user", staff_user)
+        request.user = staff_user
 
         self.assertEqual(folder.has_add_children_permission(request), False)
         self.assertEqual(file.has_add_children_permission(request), False)
@@ -878,7 +904,7 @@ class FilerClipboardAdminUrlsTests(TestCase):
                 )
 
         from filer.admin.clipboardadmin import NO_PERMISSIONS_FOR_FOLDER
-        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER)
+        self.assertContains(response, NO_PERMISSIONS_FOR_FOLDER, status_code=403)
         self.assertEqual(Image.objects.count(), 0)
 
     def test_templatetag_file_icon_url(self):

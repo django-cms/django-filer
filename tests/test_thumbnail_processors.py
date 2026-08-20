@@ -6,7 +6,6 @@ from filer.thumbnail_processors import (
     normalize_subject_location,
     whitespace,
 )
-
 from tests.helpers import create_image
 
 
