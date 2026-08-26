@@ -5,6 +5,12 @@ CHANGELOG
 3.5.1 (unreleased)
 ==================
 
+* fix: ``FileAdmin.icon_view()`` did not check read permissions. Any staff user could
+  enumerate file ids to obtain the name and private storage path of images in folders
+  they have no read permission on (reported by Denny).
+* fix: The file and folder admin change views only consulted the global Django model
+  permissions, which are not folder aware. Any staff user holding ``filer.change_file``
+  could open the change view of a file in a folder they have no read permission on.
 * fix: Upload validators could be bypassed by declaring an unknown Content-Type,
   allowing stored XSS (reported by Miguel Rafael Martín de Nicolás Acedo). The MIME
   type of an upload is now always derived from the file name, never from the

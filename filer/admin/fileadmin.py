@@ -22,7 +22,7 @@ from ..models import BaseImage, File
 from ..settings import DEFERRED_THUMBNAIL_SIZES
 from ..utils.loader import load_model
 from .permissions import PrimitivePermissionAwareModelAdmin
-from .tools import AdminContext, admin_url_params_encoded, popup_status
+from .tools import AdminContext, admin_url_params_encoded, has_admin_read_permission, popup_status
 
 
 Image = load_model(settings.FILER_IMAGE_MODEL)
@@ -212,6 +212,11 @@ class FileAdmin(PrimitivePermissionAwareModelAdmin):
             raise Http404
         file = get_object_or_404(File, pk=file_id)
         if not isinstance(file, BaseImage):
+            raise Http404()
+        if not has_admin_read_permission(request, file):
+            # Do not disclose the existence, name or storage path of files the
+            # user may not read. Http404 mirrors the other file serving views,
+            # see filer.server.views.serve_protected_thumbnail().
             raise Http404()
 
         try:
