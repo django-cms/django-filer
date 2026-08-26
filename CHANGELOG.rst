@@ -2,7 +2,7 @@
 CHANGELOG
 =========
 
-3.5.1 (unreleased)
+3.5.1 (2026-08-26)
 ==================
 
 * fix: ``FileAdmin.icon_view()`` did not check read permissions. Any staff user could
