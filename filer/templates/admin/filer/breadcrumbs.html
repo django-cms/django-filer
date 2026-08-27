@@ -1,5 +1,24 @@
 {% load i18n filer_admin_tags %}
+{% django_version_gte 6 1 as new_breadcrumbs %}
 
+{% if new_breadcrumbs %}
+<ol class="breadcrumbs">
+    <li><a href="{% url 'admin:index' %}" title="{% translate 'Go back to admin homepage' %}">{% translate "Home" %}</a></li>
+    <li><a href="{% url 'admin:app_list' app_label='filer' %}" title="{% translate 'Go back to Filer app' %}">{% translate "Filer" %}</a></li>
+    <li><a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% translate 'Go back to root folder' %}">{% translate "Folder" %}</a></li>
+    {% for ancestor_folder in instance.logical_path %}
+        <li><a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}" title="{% blocktranslate with folder_name=ancestor_folder.name %}Go back to '{{ folder_name }}' folder{% endblocktranslate %}">{% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}</a></li>
+    {% endfor %}
+    {% if breadcrumbs_action %}
+        {% if instance.label or instance.name %}
+            <li><a href="{{ instance.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}" title="{% blocktranslate with folder_name=instance.name %}Go back to '{{ folder_name }}' folder{% endblocktranslate %}">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</a></li>
+        {% endif %}
+        <li aria-current="page">{{ breadcrumbs_action }}</li>
+    {% else %}
+        <li aria-current="page">{% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}</li>
+    {% endif %}
+</ol>
+{% else %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}" title="{% translate 'Go back to admin homepage' %}">{% translate "Home" %}</a>
     &rsaquo; <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% translate 'Go back to Filer app' %}"> {% translate "Filer" %}</a>
@@ -22,3 +41,4 @@
         &rsaquo; {% if instance.label %}{{ instance.label }}{% else %}{{ instance.name }}{% endif %}
     {% endif %}
 </div>
+{% endif %}

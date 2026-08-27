@@ -1,6 +1,7 @@
 import logging
 from math import ceil
 
+from django import VERSION as DJANGO_VERSION
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.template import Library
@@ -75,6 +76,18 @@ def filer_folder_list_type_switcher(context):
 def filer_admin_context_url_params(context, first_separator='?'):
     return admin_url_params_encoded(
         context['request'], first_separator=first_separator)
+
+
+@register.simple_tag
+def django_version_gte(major, minor=0):
+    """Return ``True`` if the running Django version is at least ``(major, minor)``.
+
+    Used in the admin templates to switch between the legacy
+    ``<div class="breadcrumbs">`` markup (Django < 6.1) and the
+    ``<ol class="breadcrumbs">`` markup introduced in Django 6.1, whose CSS is
+    element-qualified (``ol.breadcrumbs``) and no longer styles a ``<div>``.
+    """
+    return DJANGO_VERSION[:2] >= (major, minor)
 
 
 @register.simple_tag(takes_context=True)

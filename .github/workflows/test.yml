@@ -14,6 +14,7 @@ jobs:
           django-5.1.txt,
           django-5.2.txt,
           django-6.0.txt,
+          django-6.1.txt,
           django-main.txt,
         ]
         custom-image-model: [false, true]
@@ -28,6 +29,10 @@ jobs:
           - requirements-file: django-6.0.txt
             python-version: 3.10
           - requirements-file: django-6.0.txt
+            python-version: 3.11
+          - requirements-file: django-6.1.txt
+            python-version: 3.10
+          - requirements-file: django-6.1.txt
             python-version: 3.11
           - requirements-file: django-4.2.txt
             python-version: 3.14
