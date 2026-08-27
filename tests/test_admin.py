@@ -28,7 +28,11 @@ from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
 from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
-from filer.templatetags.filer_admin_tags import file_icon_url, get_aspect_ratio_and_download_url
+from filer.templatetags.filer_admin_tags import (
+    django_version_gte,
+    file_icon_url,
+    get_aspect_ratio_and_download_url,
+)
 from filer.thumbnail_processors import normalize_subject_location
 from filer.utils.loader import load_model
 from tests.helpers import SettingsOverride, create_folder_structure, create_image, create_superuser
@@ -2088,3 +2092,60 @@ class AdditionalAdminFormsTests(TestCase):
                 response,
                 '<div class="form-row flex-container form-multiline field-crop field-upscale">',
             )
+
+
+class BreadcrumbsTests(TestCase):
+    """Filer's admin templates must emit the breadcrumb markup the running Django styles.
+
+    Django 6.1 replaced ``<div class="breadcrumbs">`` with ``<ol class="breadcrumbs">``
+    and its CSS selectors are element-qualified, so a ``<div>`` renders unstyled (#1615).
+    """
+
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.login(username='admin', password='secret')
+        self.folder = Folder.objects.create(name="Breadcrumb Folder")
+
+    def tearDown(self):
+        self.client.logout()
+
+    def assertBreadcrumbs(self, response):
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        if DJANGO_VERSION < (6, 1):
+            self.assertIn('<div class="breadcrumbs">', content)
+            self.assertNotIn('<ol class="breadcrumbs">', content)
+        else:
+            self.assertIn('<ol class="breadcrumbs">', content)
+            self.assertNotIn('<div class="breadcrumbs">', content)
+            # Django 6.1 generates the separators from ``li::after``; emitting
+            # them as well would show doubled chevrons.
+            breadcrumbs = content.split('<ol class="breadcrumbs">')[1].split('</ol>')[0]
+            self.assertNotIn('&rsaquo;', breadcrumbs)
+            self.assertIn('aria-current="page"', breadcrumbs)
+
+    def test_directory_listing_breadcrumbs(self):
+        response = self.client.get(reverse("admin:filer-directory_listing", args=[self.folder.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_folder_change_form_breadcrumbs(self):
+        response = self.client.get(reverse("admin:filer_folder_change", args=[self.folder.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_file_change_form_breadcrumbs(self):
+        file_object = File.objects.create(
+            original_filename="breadcrumb.txt",
+            file=django.core.files.base.ContentFile(b"content", name="breadcrumb.txt"),
+            folder=self.folder,
+        )
+        response = self.client.get(reverse("admin:filer_file_change", args=[file_object.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_delete_confirmation_breadcrumbs(self):
+        response = self.client.get(reverse("admin:filer_folder_delete", args=[self.folder.pk]))
+        self.assertBreadcrumbs(response)
+
+    def test_django_version_gte(self):
+        self.assertTrue(django_version_gte(*DJANGO_VERSION[:2]))
+        self.assertTrue(django_version_gte(DJANGO_VERSION[0] - 1))
+        self.assertFalse(django_version_gte(DJANGO_VERSION[0] + 1))

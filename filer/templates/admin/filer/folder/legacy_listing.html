@@ -27,46 +27,7 @@
 
 {% block breadcrumbs %}
    {% if not is_popup %}
-        <div class="breadcrumbs">
-            <a href="{% url 'admin:index' %}" title="{% trans 'Go back to admin homepage' %}">
-                {% trans "Home" %}
-            </a>
-            &rsaquo;
-            <a href="{% url 'admin:app_list' app_label='filer' %}" title="{% trans 'Go back to Filer app' %}">
-                {% trans "Filer" %}
-            </a>
-            &rsaquo; <a href="{% url 'admin:filer-directory_listing-root' %}{% filer_admin_context_url_params %}" title="{% translate 'Go back to root folder' %}">{% translate "Folder" %}</a>
-            {% for ancestor_folder in folder.logical_path %}
-                &rsaquo;
-                <a href="{{ ancestor_folder.get_admin_directory_listing_url_path }}{% filer_admin_context_url_params %}"
-                    title="{% blocktrans with ancestor_folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
-                    {% if ancestor_folder.label %}{{ ancestor_folder.label }}{% else %}{{ ancestor_folder.name }}{% endif %}
-                </a>
-            {% endfor %}
-            &rsaquo; {% if folder.label %}{{ folder.label }}{% else %}{{ folder.name }}{% endif %}
-            {% if breadcrumbs_action %}
-                &rsaquo;
-                <a href="{{ folder.get_admin_directory_listing_url_path }}"
-                    title="{% blocktrans with folder.name as folder_name %}Go back to '{{ folder_name }}' folder{% endblocktrans %}">
-                    {% if folder.label %}
-                        {{ folder.label }}
-                    {% else %}
-                        {{ folder.name }}
-                    {% endif %}
-                </a>
-                &rsaquo;
-                {{ breadcrumbs_action }}
-            {% else %}
-                {% if not instance.is_root and instance.is_smart_folder %}
-                    &rsaquo;
-                {% endif %}
-                {% if instance.label %}
-                    {{ instance.label }}
-                {% else %}
-                    {{ instance.name }}
-                {% endif %}
-            {% endif %}
-        </div>
+        {% include "admin/filer/folder/listing_breadcrumbs.html" %}
     {% endif %}
 {% endblock %}
 

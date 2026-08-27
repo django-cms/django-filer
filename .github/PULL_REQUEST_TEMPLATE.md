@@ -26,5 +26,5 @@ Use 'x' to check each item: [x] I have ...
 * [ ] I have opened this pull request against ``master``
 * [ ] I have added or modified the tests when changing logic
 * [ ] I have followed [the conventional commits guidelines](https://www.conventionalcommits.org/) to add meaningful information into the changelog
-* [ ] I have read the [contribution guidelines ](https://github.com/django-cms/django-filer/blob/master/docs/development.rst#contributing) and I have joined #workgroup-pr-review on 
-[Slack](https://www.django-cms.org/slack) to find a “pr review buddy” who is going to review my pull request.
+* [ ] I have read the [contribution guidelines ](https://github.com/django-cms/django-filer/blob/master/docs/development.rst#contributing) and I have joined #pr-reviews on
+[Discord](https://www.django-cms.org/dicord) to find a “pr review buddy” who is going to review my pull request.
