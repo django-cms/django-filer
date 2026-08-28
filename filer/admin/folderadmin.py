@@ -1,7 +1,7 @@
 import itertools
 import os
 import re
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from urllib.parse import quote as urlquote
 from urllib.parse import unquote as urlunquote
 
@@ -14,7 +14,7 @@ from django.contrib.admin.utils import capfirst, quote, unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import models, router
-from django.db.models import Case, F, OuterRef, Subquery, When
+from django.db.models import Case, F, When
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -259,6 +259,31 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         ] + super().get_urls()
 
     # custom views
+    @staticmethod
+    def _attach_thumbnail_names(items):
+        """
+        Attach the names of the up-to-date thumbnails of each file of a directory
+        listing page to the file object, so that ``filer_admin_tags.file_icon``
+        can tell whether a thumbnail already exists without asking the storage
+        backend.
+
+        Names are matched in full by the template tag instead of being matched
+        against the pattern of easy-thumbnails' default namer, which keeps this
+        working with a custom ``THUMBNAIL_NAMER``.
+        """
+        files = [item for item in items if isinstance(item, File) and item.file]
+        if not files:
+            return
+        existing = defaultdict(set)
+        thumbnails = Thumbnail.objects.filter(
+            source__name__in={file.file.name for file in files},
+            modified__gte=F("source__modified"),
+        ).values_list("source__name", "name")
+        for source_name, thumbnail_name in thumbnails:
+            existing[source_name].add(thumbnail_name)
+        for file in files:
+            file.existing_thumbnail_names = existing[file.file.name]
+
     def directory_listing(self, request, folder_id=None, viewtype=None):
         if not request.user.has_perm("filer.can_use_directory_listing"):
             raise PermissionDenied()
@@ -287,14 +312,6 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         request.session['filer_last_folder_id'] = folder_id
 
         list_type = get_directory_listing_type(request) or settings.FILER_FOLDER_ADMIN_DEFAULT_LIST_TYPE
-        if list_type == TABLE_LIST_TYPE:
-            # Prefetch thumbnails for table view
-            size = f"{FILER_TABLE_ICON_SIZE}x{FILER_TABLE_ICON_SIZE}"
-            size_x2 = f"{2 * FILER_TABLE_ICON_SIZE}x{2 * FILER_TABLE_ICON_SIZE}"
-        else:
-            # Prefetch thumbnails for thumbnail view
-            size = f"{FILER_THUMBNAIL_ICON_SIZE}x{FILER_THUMBNAIL_ICON_SIZE}"
-            size_x2 = f"{2 * FILER_THUMBNAIL_ICON_SIZE}x{2 * FILER_THUMBNAIL_ICON_SIZE}"
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -379,20 +396,7 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         if folder.is_root:
             folder_qs = folder_qs.exclude(**root_exclude_kwargs)
 
-        # Annotate thumbnail status
-        thumbnail_qs = (
-            Thumbnail.objects
-            .filter(
-                source__name=OuterRef("file"),
-                modified__gte=F("source__modified"),
-            )
-            .exclude(name__contains="upscale")  # TODO: Check WHY not used by directory listing
-            .order_by("-modified")
-        )
-        file_qs = file_qs.annotate(
-            thumbnail_name=Subquery(thumbnail_qs.filter(name__contains=f".{size}_").values_list("name")[:1]),
-            thumbnailx2_name=Subquery(thumbnail_qs.filter(name__contains=f".{size_x2}_").values_list("name")[:1])
-        ).select_related("owner")
+        file_qs = file_qs.select_related("owner")
 
         try:
             permissions = {
@@ -464,6 +468,8 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
             paginated_items = paginator.page(1)
         except EmptyPage:
             paginated_items = paginator.page(paginator.num_pages)
+
+        self._attach_thumbnail_names(paginated_items.object_list)
 
         context = self.admin_site.each_context(request)
         context.update({

@@ -137,14 +137,19 @@ def file_icon_context(file, detail, width, height):
                 opts = {'size': (width, height), 'crop': True}
             thumbnail_options = ThumbnailOptions(opts)
             # Optimize directory listing:
-            if width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "thumbnail_name"):
+            if width == height and width in DEFERRED_THUMBNAIL_SIZES and hasattr(file, "existing_thumbnail_names"):
                 # Get name of thumbnail from easy-thumbnail
                 configured_name = thumbnailer.get_thumbnail_name(thumbnail_options, transparent=file._transparent)
-                # If the name was annotated: Thumbnail exists and we can use it
-                if configured_name == file.thumbnail_name:
+                # If the name was prefetched: Thumbnail exists and we can use it
+                if configured_name in file.existing_thumbnail_names:
                     icon_url = file.file.thumbnail_storage.url(configured_name)
-                    if mime_subtype != 'svg+xml' and file.thumbnailx2_name:
-                        context['highres_url'] = file.file.thumbnail_storage.url(file.thumbnailx2_name)
+                    if mime_subtype != 'svg+xml':
+                        highres_options = ThumbnailOptions({**opts, 'size': (2 * width, 2 * height)})
+                        highres_name = thumbnailer.get_thumbnail_name(
+                            highres_options, transparent=file._transparent
+                        )
+                        if highres_name in file.existing_thumbnail_names:
+                            context['highres_url'] = file.file.thumbnail_storage.url(highres_name)
                 elif mime_subtype == 'svg+xml':
                     if file.size < FILER_MAX_SVG_THUMBNAIL_SIZE:
                         icon_url = file.url
