@@ -2,143 +2,241 @@
 // This script implements the upload button logic
 'use strict';
 
-// as of Django 2.x we need to check where jQuery is
-var djQuery = window.$;
+import Dropzone from 'dropzone';
 
-if (django.jQuery) {
-    djQuery = django.jQuery;
-}
+/* globals Cl */
 
-/* globals qq, Cl, django */
-(function ($) {
-    $(function () {
-        var submitNum = 0;
-        var maxSubmitNum = 1;
-        var uploadButton = $('.js-upload-button');
-        var uploadButtonDisabled = $('.js-upload-button-disabled');
-        var uploadUrl = uploadButton.data('url');
-        var uploadWelcome = $('.js-filer-dropzone-upload-welcome');
-        var uploadInfoContainer = $('.js-filer-dropzone-upload-info-container');
-        var uploadInfo = $('.js-filer-dropzone-upload-info');
-        var uploadNumber = $('.js-filer-dropzone-upload-number');
-        var uploadFileNameSelector = '.js-filer-dropzone-file-name';
-        var uploadProgressSelector = '.js-filer-dropzone-progress';
-        var uploadSuccess = $('.js-filer-dropzone-upload-success');
-        var uploadCanceled = $('.js-filer-dropzone-upload-canceled');
-        var uploadCancel = $('.js-filer-dropzone-cancel');
-        var infoMessage = $('.js-filer-dropzone-info-message');
-        var hiddenClass = 'hidden';
-        var maxUploaderConnections = uploadButton.data('max-uploader-connections') || 3;
-        var maxFilesize = parseInt(uploadButton.data('max-filesize') || 0, 10) * 1048576;
-        var hasErrors = false;
-        var updateUploadNumber = function () {
-            uploadNumber.text(maxSubmitNum - submitNum + '/' + maxSubmitNum);
-        };
-        var removeButton = function () {
+document.addEventListener('DOMContentLoaded', () => {
+    let submitNum = 0;
+    let maxSubmitNum = 1;
+    const uploadButton = document.querySelector('.js-upload-button');
+    if (!uploadButton) {
+        return;
+    }
+
+    const uploadButtonDisabled = document.querySelector('.js-upload-button-disabled');
+    const uploadUrl = uploadButton.dataset.url;
+    const uploadWelcome = document.querySelector('.js-filer-dropzone-upload-welcome');
+    const uploadInfoContainer = document.querySelector('.js-filer-dropzone-upload-info-container');
+    const uploadInfo = document.querySelector('.js-filer-dropzone-upload-info');
+    const uploadNumber = document.querySelector('.js-filer-dropzone-upload-number');
+    const uploadFileNameSelector = '.js-filer-dropzone-file-name';
+    const uploadProgressSelector = '.js-filer-dropzone-progress';
+    const uploadSuccess = document.querySelector('.js-filer-dropzone-upload-success');
+    const uploadCanceled = document.querySelector('.js-filer-dropzone-upload-canceled');
+    const uploadCancel = document.querySelector('.js-filer-dropzone-cancel');
+    const infoMessage = document.querySelector('.js-filer-dropzone-info-message');
+    const hiddenClass = 'hidden';
+    const maxUploaderConnections = parseInt(uploadButton.dataset.maxUploaderConnections || 3, 10);
+    const maxFilesize = parseInt(uploadButton.dataset.maxFilesize || 0, 10);
+    let hasErrors = false;
+
+    const updateUploadNumber = () => {
+        if (uploadNumber) {
+            uploadNumber.textContent = `${maxSubmitNum - submitNum}/${maxSubmitNum}`;
+        }
+    };
+
+    const removeButton = () => {
+        if (uploadButton) {
             uploadButton.remove();
-        };
-        // utility
-        var updateQuery = function (uri, key, value) {
-            var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
-            var separator = uri.indexOf('?') !== -1 ? '&' : '?';
-            var hash = window.location.hash;
-            uri = uri.replace(/#.*$/, '');
-            if (uri.match(re)) {
-                return uri.replace(re, '$1' + key + '=' + value + '$2') + hash;
+        }
+    };
+
+    // utility
+    const updateQuery = (uri, key, value) => {
+        const re = new RegExp(`([?&])${key}=.*?(&|$)`, 'i');
+        const separator = uri.indexOf('?') !== -1 ? '&' : '?';
+        const hash = window.location.hash;
+        uri = uri.replace(/#.*$/, '');
+        if (uri.match(re)) {
+            return uri.replace(re, `$1${key}=${value}$2`) + hash;
+        } else {
+            return uri + separator + key + '=' + value + hash;
+        }
+    };
+
+    const reloadOrdered = () => {
+        const uri = window.location.toString();
+        window.location.replace(updateQuery(uri, 'order_by', '-modified_at'));
+    };
+
+    Cl.mediator.subscribe('filer-upload-in-progress', removeButton);
+
+    // Initialize Dropzone on the upload button
+    Dropzone.autoDiscover = false;
+    const dropzone = new Dropzone(uploadButton, {
+        url: uploadUrl,
+        paramName: 'file',
+        maxFilesize: maxFilesize,  // already in MB
+        parallelUploads: maxUploaderConnections,
+        clickable: uploadButton,
+        previewTemplate: '<div></div>',
+        addRemoveLinks: false,
+        autoProcessQueue: true
+    });
+
+    dropzone.on('addedfile', () => {
+        Cl.mediator.remove('filer-upload-in-progress', removeButton);
+        Cl.mediator.publish('filer-upload-in-progress');
+        submitNum++;
+
+        maxSubmitNum = dropzone.files.length;
+
+        if (infoMessage) {
+            infoMessage.classList.remove(hiddenClass);
+        }
+        if (uploadWelcome) {
+            uploadWelcome.classList.add(hiddenClass);
+        }
+        if (uploadSuccess) {
+            uploadSuccess.classList.add(hiddenClass);
+        }
+        if (uploadInfoContainer) {
+            uploadInfoContainer.classList.remove(hiddenClass);
+        }
+        if (uploadCancel) {
+            uploadCancel.classList.remove(hiddenClass);
+        }
+        if (uploadCanceled) {
+            uploadCanceled.classList.add(hiddenClass);
+        }
+
+        updateUploadNumber();
+    });
+
+    dropzone.on('uploadprogress', (file, progress) => {
+        const percent = Math.round(progress);
+        const fileId = `file-${encodeURIComponent(file.name)}${file.size}${file.lastModified}`;
+        const fileItem = document.getElementById(fileId);
+        let uploadInfoClone;
+
+        if (fileItem) {
+            const progressBar = fileItem.querySelector(uploadProgressSelector);
+            if (progressBar) {
+                progressBar.style.width = `${percent}%`;
+            }
+        } else if (uploadInfo) {
+            uploadInfoClone = uploadInfo.cloneNode(true);
+
+            const fileNameEl = uploadInfoClone.querySelector(uploadFileNameSelector);
+            if (fileNameEl) {
+                fileNameEl.textContent = file.name;
+            }
+            const progressEl = uploadInfoClone.querySelector(uploadProgressSelector);
+            if (progressEl) {
+                progressEl.style.width = `${percent}%`;
+            }
+            uploadInfoClone.classList.remove(hiddenClass);
+            uploadInfoClone.setAttribute('id', fileId);
+            if (uploadInfoContainer) {
+                uploadInfoContainer.appendChild(uploadInfoClone);
+            }
+        }
+    });
+
+    dropzone.on('success', (file, response) => {
+        const fileId = `file-${encodeURIComponent(file.name)}${file.size}${file.lastModified}`;
+        const fileEl = document.getElementById(fileId);
+        if (fileEl) {
+            fileEl.remove();
+        }
+
+        if (response.error) {
+            hasErrors = true;
+            window.filerShowError(`${file.name}: ${response.error}`);
+        }
+
+        submitNum--;
+        updateUploadNumber();
+
+        if (submitNum === 0) {
+            maxSubmitNum = 1;
+
+            if (uploadWelcome) {
+                uploadWelcome.classList.add(hiddenClass);
+            }
+            if (uploadNumber) {
+                uploadNumber.classList.add(hiddenClass);
+            }
+            if (uploadCanceled) {
+                uploadCanceled.classList.add(hiddenClass);
+            }
+            if (uploadCancel) {
+                uploadCancel.classList.add(hiddenClass);
+            }
+            if (uploadSuccess) {
+                uploadSuccess.classList.remove(hiddenClass);
+            }
+
+            if (hasErrors) {
+                setTimeout(reloadOrdered, 1000);
             } else {
-                return uri + separator + key + '=' + value + hash;
+                reloadOrdered();
             }
-        };
-        var reloadOrdered = function () {
-            var uri = window.location.toString();
-            window.location.replace(updateQuery(uri, 'order_by', '-modified_at'));
-        };
+        }
+    });
 
-        Cl.mediator.subscribe('filer-upload-in-progress', removeButton);
+    dropzone.on('error', (file, errorMessage) => {
+        const fileId = `file-${encodeURIComponent(file.name)}${file.size}${file.lastModified}`;
+        const fileEl = document.getElementById(fileId);
+        if (fileEl) {
+            fileEl.remove();
+        }
 
-        new qq.FileUploaderBasic({
-            action: uploadUrl,
-            button: uploadButton[0],
-            maxConnections: maxUploaderConnections,
-            sizeLimit: maxFilesize,
-            onSubmit: function (id) {
-                Cl.mediator.remove('filer-upload-in-progress', removeButton);
-                Cl.mediator.publish('filer-upload-in-progress');
-                submitNum++;
+        hasErrors = true;
+        window.filerShowError(`${file.name}: ${errorMessage}`);
 
-                maxSubmitNum = id + 1;
+        submitNum--;
+        updateUploadNumber();
 
-                infoMessage.removeClass(hiddenClass);
-                uploadWelcome.addClass(hiddenClass);
-                uploadSuccess.addClass(hiddenClass);
-                uploadInfoContainer.removeClass(hiddenClass);
-                uploadCancel.removeClass(hiddenClass);
-                uploadCanceled.addClass(hiddenClass);
+        if (submitNum === 0) {
+            maxSubmitNum = 1;
 
-                updateUploadNumber();
-            },
-            onProgress: function (id, fileName, loaded, total) {
-                var percent = Math.round(loaded / total * 100);
-                var fileItem = $('#file-' + id);
-                var uploadInfoClone;
-
-                if (fileItem.length) {
-                    fileItem.find(uploadProgressSelector).width(percent + '%');
-                } else {
-                    uploadInfoClone = uploadInfo.clone();
-
-                    uploadInfoClone.find(uploadFileNameSelector).text(fileName);
-                    uploadInfoClone.find(uploadProgressSelector).width(percent);
-                    uploadInfoClone.removeClass(hiddenClass)
-                        .attr('id', 'file-' + id)
-                        .appendTo(uploadInfoContainer);
-                }
-            },
-            onComplete: function (id, fileName, responseJSON) {
-                var file = responseJSON;
-
-                $('#file-' + id).remove();
-
-                if (file.error) {
-                    hasErrors = true;
-                    window.filerShowError(fileName + ': ' + file.error);
-                }
-
-                submitNum--;
-                updateUploadNumber();
-
-                if (submitNum === 0) {
-                    maxSubmitNum = 1;
-
-                    uploadWelcome.addClass(hiddenClass);
-                    uploadNumber.addClass(hiddenClass);
-                    uploadCanceled.addClass(hiddenClass);
-                    uploadCancel.addClass(hiddenClass);
-                    uploadSuccess.removeClass(hiddenClass);
-
-                    if (hasErrors) {
-                        setTimeout(reloadOrdered, 1000);
-                    } else {
-                        reloadOrdered();
-                    }
-                }
+            if (uploadWelcome) {
+                uploadWelcome.classList.add(hiddenClass);
             }
-        });
+            if (uploadNumber) {
+                uploadNumber.classList.add(hiddenClass);
+            }
+            if (uploadCanceled) {
+                uploadCanceled.classList.add(hiddenClass);
+            }
+            if (uploadCancel) {
+                uploadCancel.classList.add(hiddenClass);
+            }
+            if (uploadSuccess) {
+                uploadSuccess.classList.remove(hiddenClass);
+            }
 
-        uploadCancel.on('click', function (clickEvent) {
+            setTimeout(reloadOrdered, 1000);
+        }
+    });
+
+    if (uploadCancel) {
+        uploadCancel.addEventListener('click', (clickEvent) => {
             clickEvent.preventDefault();
-            uploadCancel.addClass(hiddenClass);
-            uploadNumber.addClass(hiddenClass);
-            uploadInfoContainer.addClass(hiddenClass);
-            uploadCanceled.removeClass(hiddenClass);
+            uploadCancel.classList.add(hiddenClass);
+            if (uploadNumber) {
+                uploadNumber.classList.add(hiddenClass);
+            }
+            if (uploadInfoContainer) {
+                uploadInfoContainer.classList.add(hiddenClass);
+            }
+            if (uploadCanceled) {
+                uploadCanceled.classList.remove(hiddenClass);
+            }
 
-            setTimeout(function () {
+            setTimeout(() => {
                 window.location.reload();
             }, 1000);
         });
+    }
 
-        if (uploadButtonDisabled.length) {
-            Cl.filerTooltip($);
-        }
-    });
-})(djQuery);
+    if (uploadButtonDisabled && Cl.filerTooltip) {
+        Cl.filerTooltip();
+    }
+
+    // Fire custom event after scripts have been executed
+    document.dispatchEvent(new Event('filer-upload-scripts-executed'));
+});

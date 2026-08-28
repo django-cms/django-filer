@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from easy_thumbnails.files import Thumbnailer
 from easy_thumbnails.namers import default
 
+
 # easy-thumbnails default pattern
 # e.g: source.jpg.100x100_q80_crop_upscale.jpg
 RE_ORIGINAL_FILENAME = re.compile(

@@ -82,6 +82,18 @@ To enable automatic subject location aware cropping of images replace
         'easy_thumbnails.processors.filters',
     )
 
+.. IMPORTANT::
+
+    Keep ``easy_thumbnails.processors.colorspace`` as the first entry of
+    ``THUMBNAIL_PROCESSORS`` (it is part of easy-thumbnails' default chain).
+    This processor converts indexed/palette images – most notably GIFs, which
+    use Pillow's ``P`` mode – into ``RGB`` (or ``RGBA`` for transparent images).
+    Thumbnails are saved as JPEG by default, and the JPEG encoder cannot write
+    palette images: without ``colorspace`` running first, generating a thumbnail
+    for such a file fails with ``OSError: cannot write mode P as JPEG`` (see
+    issue #1601). Because it has to run before the image is resized, it must
+    come before the scaling/cropping processors.
+
 To crop an image and respect the subject location::
 
     {% load thumbnail %}

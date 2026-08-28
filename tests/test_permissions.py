@@ -2,7 +2,9 @@ import os
 
 from django.conf import settings
 from django.contrib.admin import helpers
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.core.cache import cache
 from django.core.files import File as DjangoFile
 from django.test.testcases import TestCase
 from django.urls import reverse
@@ -12,7 +14,7 @@ from filer.models.clipboardmodels import Clipboard
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils.loader import load_model
-from tests.helpers import create_image, create_superuser
+from tests.helpers import SettingsOverride, create_image, create_superuser
 
 
 Image = load_model(FILER_IMAGE_MODEL)
@@ -163,6 +165,7 @@ class FolderPermissionsTestCase(TestCase):
             # We have to invalidate cache
             delattr(self.folder, 'permission_cache')
             delattr(self.folder_perm, 'permission_cache')
+            cache.clear()
 
             self.assertEqual(self.folder.has_read_permission(request1), True)
             self.assertEqual(self.folder.has_read_permission(request2), True)
@@ -172,6 +175,7 @@ class FolderPermissionsTestCase(TestCase):
             self.assertEqual(self.folder_perm.pretty_logical_path, "/test_folder2")
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups_deny1(self):
         # Tests overlapped groups with explicit deny
@@ -216,6 +220,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups_deny2(self):
         # Tests overlapped groups with explicit deny
@@ -261,6 +266,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups1(self):
         # Tests overlapped groups without explicit deny
@@ -305,6 +311,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_overlapped_groups2(self):
         # Tests overlapped groups without explicit deny
@@ -350,6 +357,7 @@ class FolderPermissionsTestCase(TestCase):
 
         finally:
             filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            cache.clear()
 
     def test_folder_who_owner(self):
         perm = FolderPermission.objects.create(
@@ -382,6 +390,62 @@ class FolderPermissionsTestCase(TestCase):
         perm = FolderPermission.objects.create()
         self.assertEqual(perm.who, "–")
 
+    def test_delete_action_requires_edit_permission(self):
+        # A staff user with only read access to a folder (can_read=ALLOW,
+        # can_edit=DENY) plus the model-level delete permissions must NOT be
+        # able to delete files/folders through the bulk delete action.
+        old_setting = filer_settings.FILER_ENABLE_PERMISSIONS
+        target_file = None
+        try:
+            filer_settings.FILER_ENABLE_PERMISSIONS = True
+
+            # Grant the model-level delete permissions to test_user1.
+            delete_perms = Permission.objects.filter(
+                codename__in=("delete_folder", "delete_file", "delete_image")
+            )
+            self.test_user1.user_permissions.add(*delete_perms)
+
+            # Read allowed / edit denied on *all* folders. Using an "everybody"
+            # permission means no FolderPermission row is attached to the target
+            # folder itself, so the only thing that can block the deletion is
+            # the missing edit permission (which is what we are testing).
+            FolderPermission.objects.create(
+                type=FolderPermission.ALL, everybody=True,
+                can_edit=FolderPermission.DENY,
+                can_read=FolderPermission.ALLOW,
+                can_add_children=FolderPermission.DENY,
+            )
+
+            # A folder (owned by someone else) containing a file. test_user1 can
+            # read it but must not be able to delete it.
+            target = Folder.objects.create(name="readonly_target", owner=self.superuser)
+            with open(self.filename, "rb") as opened_file:
+                target_file = DjangoFile(opened_file, name="inside.jpg")
+                inside = Image.objects.create(
+                    owner=self.superuser, original_filename="inside.jpg",
+                    file=target_file, folder=target,
+                )
+
+            self.assertTrue(
+                self.client.login(username=self.test_user1.username, password="secret")
+            )
+
+            url = reverse('admin:filer-directory_listing-root')
+            response = self.client.post(url, {
+                'action': 'delete_files_or_folders',
+                'post': 'yes',
+                helpers.ACTION_CHECKBOX_NAME: ['folder-%d' % target.id],
+            })
+            self.assertEqual(response.status_code, 403)
+            # Neither the folder nor the file it contains may be deleted.
+            self.assertTrue(Folder.objects.filter(pk=target.pk).exists())
+            self.assertTrue(Image.objects.filter(pk=inside.pk).exists())
+        finally:
+            filer_settings.FILER_ENABLE_PERMISSIONS = old_setting
+            if target_file is not None:
+                target_file.close()
+            cache.clear()
+
     def test_folderpermission_is_copied(self):
         source_folder = Folder.objects.create(name="source")
         destination_folder = Folder.objects.create(name="destination")
@@ -411,3 +475,166 @@ class FolderPermissionsTestCase(TestCase):
         self.assertEqual(perm.can_edit, new_perm.can_edit)
         self.assertEqual(perm.can_read, new_perm.can_read)
         self.assertEqual(perm.can_add_children, new_perm.can_add_children)
+
+
+class AdminReadPermissionsTestCase(TestCase):
+    """
+    Regression tests for read permission checks on the admin views that serve
+    or display a single file: FileAdmin.icon_view() and the change view.
+    """
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        cache.clear()
+        self.owner = create_superuser()
+
+        # A staff user with all the global filer permissions, but without any
+        # FolderPermission granting access to self.secret_folder.
+        self.staff = User.objects.create_user(
+            username='staff', password='secret', is_staff=True, is_active=True)
+        perms = Permission.objects.filter(codename__in=(
+            'change_folder', 'can_use_directory_listing', 'add_file',
+            'change_file', 'view_file', 'add_image', 'change_image', 'view_image',
+        ))
+        self.staff.user_permissions.add(*perms)
+        self.staff = User.objects.get(pk=self.staff.pk)
+
+        self.secret_folder = Folder.objects.create(name='secret', owner=self.owner)
+        self.readable_folder = Folder.objects.create(name='readable', owner=self.owner)
+        FolderPermission.objects.create(
+            folder=self.readable_folder, user=self.staff,
+            type=FolderPermission.CHILDREN, can_read=FolderPermission.ALLOW)
+
+        self.filename = os.path.join(os.path.dirname(__file__), 'admin_perm_test.jpg')
+        create_image().save(self.filename, 'JPEG')
+        self.secret_file = self._create_image(self.secret_folder)
+        self.readable_file = self._create_image(self.readable_folder)
+        self.unfiled_file = self._create_image(None)
+
+    def tearDown(self):
+        cache.clear()
+        for image in Image.objects.all():
+            image.delete()
+        Folder.objects.all().delete()
+        os.remove(self.filename)
+
+    def _create_image(self, folder):
+        with open(self.filename, 'rb') as fh:
+            return Image.objects.create(
+                owner=self.owner, folder=folder, is_public=False,
+                original_filename='admin_perm_test.jpg',
+                file=DjangoFile(fh, name='admin_perm_test.jpg'))
+
+    def _icon_url(self, image):
+        return reverse('admin:filer_image_fileicon',
+                       kwargs={'file_id': image.pk, 'size': 80})
+
+    def _change_url(self, image):
+        opts = Image._meta
+        return reverse(
+            f'admin:{opts.app_label}_{opts.model_name}_change', args=[image.pk])
+
+    # -- icon_view ---------------------------------------------------------
+
+    def test_icon_view_denied_for_unreadable_folder(self):
+        """A staff user without read permission must not get the thumbnail
+        redirect, which leaks the file name and its private storage path."""
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            response = self.client.get(self._icon_url(self.secret_file))
+            self.assertEqual(response.status_code, 404)
+            self.assertNotIn('Location', response)
+
+    def test_icon_view_allowed_for_readable_folder(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            response = self.client.get(self._icon_url(self.readable_file))
+            self.assertEqual(response.status_code, 302)
+
+    def test_icon_view_allowed_for_unfiled_file(self):
+        """Unfiled files are listed for everyone by the directory listing, so
+        their icons must keep working."""
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            response = self.client.get(self._icon_url(self.unfiled_file))
+            self.assertEqual(response.status_code, 302)
+
+    def test_icon_view_allowed_when_permissions_disabled(self):
+        """No behaviour change for the default configuration."""
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            for image in (self.secret_file, self.readable_file, self.unfiled_file):
+                response = self.client.get(self._icon_url(image))
+                self.assertEqual(response.status_code, 302)
+
+    def test_icon_view_allowed_for_superuser(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='admin', password='secret')
+            response = self.client.get(self._icon_url(self.secret_file))
+            self.assertEqual(response.status_code, 302)
+
+    # -- change view / has_view_permission ---------------------------------
+
+    def test_change_view_denied_for_unreadable_folder(self):
+        """Global filer.change_image must not grant read access to a file in a
+        folder the user has no read permission on."""
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            response = self.client.get(self._change_url(self.secret_file))
+            self.assertEqual(response.status_code, 403)
+
+    def test_change_view_allowed_for_readable_folder(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            response = self.client.get(self._change_url(self.readable_file))
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_view_allowed_for_unfiled_file(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            response = self.client.get(self._change_url(self.unfiled_file))
+            self.assertEqual(response.status_code, 200)
+
+    def test_change_view_allowed_when_permissions_disabled(self):
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=False):
+            cache.clear()
+            self.client.login(username='staff', password='secret')
+            for image in (self.secret_file, self.readable_file, self.unfiled_file):
+                response = self.client.get(self._change_url(image))
+                self.assertEqual(response.status_code, 200)
+
+    def test_has_view_permission(self):
+        from django.contrib import admin as django_admin
+
+        model_admin = django_admin.site._registry[Image]
+        request = Mock()
+        request.user = self.staff
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.assertFalse(model_admin.has_view_permission(request, self.secret_file))
+            self.assertTrue(model_admin.has_view_permission(request, self.readable_file))
+            self.assertTrue(model_admin.has_view_permission(request, self.unfiled_file))
+            # The changelist must stay reachable
+            self.assertTrue(model_admin.has_view_permission(request))
+
+    def test_has_view_permission_requires_global_permission(self):
+        """Folder read permission alone must not grant admin access."""
+        from django.contrib import admin as django_admin
+
+        model_admin = django_admin.site._registry[Image]
+        self.staff.user_permissions.clear()
+        request = Mock()
+        request.user = get_user_model().objects.get(pk=self.staff.pk)
+        with SettingsOverride(filer_settings, FILER_ENABLE_PERMISSIONS=True):
+            cache.clear()
+            self.assertFalse(model_admin.has_view_permission(request, self.readable_file))

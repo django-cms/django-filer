@@ -1,285 +1,417 @@
 // #####################################################################################################################
 // #BASE#
 // Basic logic django filer
-/*jshint esversion: 6 */
 'use strict';
 
-var Cl = window.Cl || {};
+import Mediator from 'mediator-js/lib/mediator';
+import FocalPoint from './addons/focal-point';
+import Toggler from './addons/toggler';
 
-/* globals Mediator, django */
+window.Cl = window.Cl || {};
+Cl.mediator = new Mediator();  // mediator init
+Cl.FocalPoint = FocalPoint;
+Cl.Toggler = Toggler;
 
-// as of Django 2.x we need to check where jQuery is
-var djQuery = window.$;
 
-if (django.jQuery) {
-    djQuery = django.jQuery;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    let showErrorTimeout;
 
-// mediator init
-Cl.mediator = new Mediator();
+    window.filerShowError = (message) => {
+        const messages = document.querySelector('.messagelist');
+        const header = document.querySelector('#header');
+        const filerErrorClass = 'js-filer-error';
+        const tpl = `<ul class="messagelist"><li class="error ${filerErrorClass}">{msg}</li></ul>`;
+        const msg = tpl.replace('{msg}', message);
 
-(function ($) {
-    $(function () {
-        var showErrorTimeout;
+        if (messages) {
+            messages.outerHTML = msg;
+        } else if (header) {
+            header.insertAdjacentHTML('afterend', msg);
+        }
 
-        window.filerShowError = function (message) {
-            var messages = $('.messagelist');
-            var header = $('#header');
-            var filerErrorClass = 'js-filer-error';
-            var tpl = '<ul class="messagelist"><li class="error ' + filerErrorClass + '">{msg}</li></ul>';
-            var msg = tpl.replace('{msg}', message);
+        if (showErrorTimeout) {
+            clearTimeout(showErrorTimeout);
+        }
 
-            messages.length ? messages.replaceWith(msg) : header.after(msg);
-
-            if (showErrorTimeout) {
-                clearTimeout(showErrorTimeout);
+        showErrorTimeout = setTimeout(() => {
+            const errorEl = document.querySelector(`.${filerErrorClass}`);
+            if (errorEl) {
+                errorEl.remove();
             }
+        }, 5000);
+    };
 
-            showErrorTimeout = setTimeout(function () {
-                $('.' + filerErrorClass).remove();
-            }, 5000);
-        };
-
-        // Focal point logic init
-        if (Cl.FocalPoint) {
-            new Cl.FocalPoint();
-        }
-
-        // Toggler init
-        if (Cl.Toggler) {
-            new Cl.Toggler();
-        }
-
-        $('.js-filter-files').on('focus blur', function (event) {
-            var container = $(this).closest('.navigator-top-nav');
-            var dropdownTrigger = container.find('.dropdown-container a');
-
-            if (event.type === 'focus') {
-                container.addClass('search-is-focused');
-            } else {
-                if (!dropdownTrigger.is(event.relatedTarget)) {
-                    container.removeClass('search-is-focused');
-                }
+    const filterFiles = document.querySelector('.js-filter-files');
+    if (filterFiles) {
+        filterFiles.addEventListener('focus', (event) => {
+            const container = event.target.closest('.navigator-top-nav');
+            if (container) {
+                container.classList.add('search-is-focused');
             }
         });
 
-        // Focus on the search field on page load
-        (function () {
-            var filter = $('.js-filter-files');
-            var containerSelector = '.navigator-top-nav';
-            var searchDropdown = $(containerSelector).find('.filter-search-wrapper').find('.filer-dropdown-container');
-
-            if (filter.length) {
-                filter.on('keydown', function () {
-                    $(this).closest(containerSelector).addClass('search-is-focused');
-                });
-
-                searchDropdown.on('show.bs.filer-dropdown', function () {
-                    $(containerSelector).addClass('search-is-focused');
-                }).on('hide.bs.filer-dropdown', function () {
-                    $(containerSelector).removeClass('search-is-focused');
-                });
+        filterFiles.addEventListener('blur', (event) => {
+            const container = event.target.closest('.navigator-top-nav');
+            if (container) {
+                const dropdownTrigger = container.querySelector('.dropdown-container a');
+                if (!dropdownTrigger || event.relatedTarget !== dropdownTrigger) {
+                    container.classList.remove('search-is-focused');
+                }
             }
-        }());
+        });
+    }
 
-        // show counter if file is selected
-        (function () {
-            var navigatorTable = $('.navigator-table tr, .navigator-list .list-item');
-            var actionList = $('.actions-wrapper');
-            var actionSelect = $(
-                '.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a'
-            );
+    // Focus on the search field on page load
+    (() => {
+        const filter = document.querySelector('.js-filter-files');
+        const containerSelector = '.navigator-top-nav';
+        const container = document.querySelector(containerSelector);
+        const searchDropdown = container?.querySelector('.filter-search-wrapper .filer-dropdown-container');
 
-            // timeout is needed to wait until table row has class selected.
-            setTimeout(function () {
-                // Set classes for checked items
-                actionSelect.each(function (no, el) {
-                    if (el.checked) {
-                        el.closest('.list-item').classList.add('selected');
+        if (filter) {
+            filter.addEventListener('keydown', function () {
+                const navContainer = this.closest(containerSelector);
+                if (navContainer) {
+                    navContainer.classList.add('search-is-focused');
+                }
+            });
+
+            if (searchDropdown) {
+                searchDropdown.addEventListener('show.bs.filer-dropdown', () => {
+                    if (container) {
+                        container.classList.add('search-is-focused');
                     }
                 });
-                if (navigatorTable.hasClass('selected')) {
-                    actionList.addClass('action-selected');
-                }
-            }, 100);
+                searchDropdown.addEventListener('hide.bs.filer-dropdown', () => {
+                    if (container) {
+                        container.classList.remove('search-is-focused');
+                    }
+                });
+            }
+        }
+    })();
 
-            actionSelect.on('change', function () {
+    // show counter if file is selected
+    (() => {
+        const navigatorTable = document.querySelectorAll('.navigator-table tr, .navigator-list .list-item');
+        const actionList = document.querySelector('.actions-wrapper');
+        const actionSelect = document.querySelectorAll(
+            '.action-select, #action-toggle, #files-action-toggle, #folders-action-toggle, .actions .clear a'
+        );
+
+        // timeout is needed to wait until table row has class selected.
+        setTimeout(() => {
+            // Set classes for checked items
+            actionSelect.forEach((el) => {
+                if (el.checked) {
+                    const listItem = el.closest('.list-item');
+                    if (listItem) {
+                        listItem.classList.add('selected');
+                    }
+                }
+            });
+            const hasSelected = Array.from(navigatorTable).some((el) =>
+                el.classList.contains('selected')
+            );
+            if (hasSelected && actionList) {
+                actionList.classList.add('action-selected');
+            }
+        }, 100);
+
+        actionSelect.forEach((el) => {
+            el.addEventListener('change', function () {
                 // Mark element selected (for table view this is done by Django admin js - we do it ourselves
-                if ($(this).prop('checked')) {
-                    $(this).closest('.list-item').addClass('selected');
-                } else {
-                    $(this).closest('.list-item').removeClass('selected');
+                const listItem = this.closest('.list-item');
+                if (listItem) {
+                    if (this.checked) {
+                        listItem.classList.add('selected');
+                    } else {
+                        listItem.classList.remove('selected');
+                    }
                 }
                 // setTimeout makes sure that change event fires before click event which is reliable to admin
-                setTimeout(function () {
-                    if (navigatorTable.hasClass('selected')) {
-                        actionList.addClass('action-selected');
-                    } else {
-                        actionList.removeClass('action-selected');
+                setTimeout(() => {
+                    const hasSelected = Array.from(navigatorTable).some((el) =>
+                        el.classList.contains('selected')
+                    );
+                    if (actionList) {
+                        if (hasSelected) {
+                            actionList.classList.add('action-selected');
+                        } else {
+                            actionList.classList.remove('action-selected');
+                        }
                     }
                 }, 0);
-
             });
-        }());
+        });
+    })();
 
-        (function () {
-            var actionsMenu = $('.js-actions-menu');
-            var dropdown = actionsMenu.find('.filer-dropdown-menu');
-            var actionsSelect = $('.actions select[name="action"]');
-            var actionsSelectOptions = actionsSelect.find('option');
-            var actionsGo = $('.actions button[type="submit"]');
-            var html = '';
-            var actionDelete = $('.js-action-delete');
-            var actionCopy = $('.js-action-copy');
-            var actionMove = $('.js-action-move');
-            var valueDelete = 'delete_files_or_folders';
-            var valueCopy = 'copy_files_and_folders';
-            var valueMove = 'move_files_and_folders';
-            var navigatorTable =  $('.navigator-table tr, .navigator-list .list-item');
+    (() => {
+        const actionsMenu = document.querySelector('.js-actions-menu');
+        if (!actionsMenu) {
+            return;
+        }
 
-            // triggers delete copy and move actions on separate buttons
-            function actionsButton(optionValue, actionButton) {
-                actionsSelectOptions.each(function () {
-                    if (this.value === optionValue) {
-                        actionButton.show();
-                        actionButton.on('click', function (e) {
-                            e.preventDefault();
-                            if (navigatorTable.hasClass('selected')) {
-                                actionsSelect.val(optionValue).prop('selected', true);
-                                actionsGo.trigger('click');
-                            }
-                        });
-                    }
-                });
+        const dropdown = actionsMenu.querySelector('.filer-dropdown-menu');
+        const actionsSelect = document.querySelector('.actions select[name="action"]');
+        const actionsSelectOptions = actionsSelect?.querySelectorAll('option') || [];
+        const actionsGo = document.querySelector('.actions button[type="submit"]');
+        const actionDelete = document.querySelector('.js-action-delete');
+        const actionCopy = document.querySelector('.js-action-copy');
+        const actionMove = document.querySelector('.js-action-move');
+        const valueDelete = 'delete_files_or_folders';
+        const valueCopy = 'copy_files_and_folders';
+        const valueMove = 'move_files_and_folders';
+        const navigatorTable = document.querySelectorAll('.navigator-table tr, .navigator-list .list-item');
+
+        // triggers delete copy and move actions on separate buttons
+        const actionsButton = (optionValue, actionButton) => {
+            if (!actionButton) {
+                return;
             }
-            actionsButton(valueDelete, actionDelete);
-            actionsButton(valueCopy, actionCopy);
-            actionsButton(valueMove, actionMove);
+            actionsSelectOptions.forEach((option) => {
+                if (option.value === optionValue) {
+                    actionButton.style.display = '';
+                    actionButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const hasSelected = Array.from(navigatorTable).some((el) =>
+                            el.classList.contains('selected')
+                        );
+                        if (hasSelected && actionsSelect && actionsGo) {
+                            actionsSelect.value = optionValue;
+                            const targetOption = actionsSelect.querySelector(`option[value="${optionValue}"]`);
+                            if (targetOption) {
+                                targetOption.selected = true;
+                            }
+                            actionsGo.click();
+                        }
+                    });
+                }
+            });
+        };
+        actionsButton(valueDelete, actionDelete);
+        actionsButton(valueCopy, actionCopy);
+        actionsButton(valueMove, actionMove);
 
-            // mocking the action buttons to work in frontend UI
-            actionsSelectOptions.each(function (index) {
-                var className = '';
-                if (index !== 0) {
-                    if (this.value === valueDelete || this.value === valueCopy || this.value === valueMove) {
-                        className = 'class="hidden"';
+        // mocking the action buttons to work in frontend UI
+        actionsSelectOptions.forEach((option, index) => {
+            if (index !== 0) {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = option.textContent;
+
+                if (option.value === valueDelete || option.value === valueCopy || option.value === valueMove) {
+                    a.classList.add('hidden');
+                }
+
+                li.appendChild(a);
+                if (dropdown) {
+                    dropdown.appendChild(li);
+                }
+            }
+        });
+        if (dropdown) {
+
+            dropdown.addEventListener('click', (clickEvent) => {
+                if (clickEvent.target.tagName === 'A') {
+                    const li = clickEvent.target.closest('li');
+                    const targetIndex = Array.from(dropdown.querySelectorAll('li')).indexOf(li) + 1;
+
+                    clickEvent.preventDefault();
+
+                    if (actionsSelect && actionsGo) {
+                        const options = actionsSelect.querySelectorAll('option');
+                        if (options[targetIndex]) {
+                            options[targetIndex].selected = true;
+                        }
+                        actionsGo.click();
                     }
-                    html += '<li><a href="#"' + className + '>' + $(this).text() + '</a></li>';
-
                 }
             });
-            dropdown.append(html);
+        }
 
-            dropdown.on('click', 'a', function (clickEvent) {
-                var targetIndex = $(this).closest('li').index() + 1;
+        actionsMenu.addEventListener('click', (e) => {
+            const hasSelected = Array.from(navigatorTable).some((el) =>
+                el.classList.contains('selected')
+            );
+            if (!hasSelected) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    })();
 
-                clickEvent.preventDefault();
+    // breaks header if breadcrumbs name reaches a width of 80px
+    (() => {
+        const minBreadcrumbWidth = 80;
+        const header = document.querySelector('.navigator-top-nav');
 
-                actionsSelect.find('option').eq(targetIndex).prop('selected', true);
-                actionsGo.trigger('click');
-            });
+        if (!header) {
+            return;
+        }
 
-            actionsMenu.on('click', function (e) {
-                if (!navigatorTable.hasClass('selected')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
-        }());
+        const breadcrumbContainer = document.querySelector('.breadcrumbs-container');
+        if (!breadcrumbContainer) {
+            return;
+        }
 
-        // breaks header if breadcrumbs name reaches a width of 80px
-        (function () {
-            var minBreadcrumbWidth = 80;
-            var header = $('.navigator-top-nav');
+        const breadcrumbFolder = breadcrumbContainer.querySelector('.navigator-breadcrumbs');
+        const breadcrumbDropdown = breadcrumbContainer.querySelector('.filer-dropdown-container');
+        const filterFilesContainer = document.querySelector('.filter-files-container');
+        const actionsWrapper = document.querySelector('.actions-wrapper');
+        const navigatorButtonWrapper = document.querySelector('.navigator-button-wrapper');
 
-            var breadcrumbContainer = $('.breadcrumbs-container');
-            var breadcrumbFolderWidth = breadcrumbContainer.find('.navigator-breadcrumbs').outerWidth();
-            var breadcrumbDropdownWidth = breadcrumbContainer.find('.filer-dropdown-container').outerWidth();
-            var searchWidth = $('.filter-files-container').outerWidth();
-            var actionsWidth = $('.actions-wrapper').outerWidth();
-            var buttonsWidth = $('.navigator-button-wrapper').outerWidth();
-            var headerPadding = parseInt(header.css('padding-left'), 10) + parseInt(header.css('padding-right'), 10);
+        const breadcrumbFolderWidth = breadcrumbFolder?.offsetWidth || 0;
+        const breadcrumbDropdownWidth = breadcrumbDropdown?.offsetWidth || 0;
+        const searchWidth = filterFilesContainer?.offsetWidth || 0;
+        const actionsWidth = actionsWrapper?.offsetWidth || 0;
+        const buttonsWidth = navigatorButtonWrapper?.offsetWidth || 0;
 
-            var headerWidth = header.outerWidth();
-            var fullHeaderWidth = minBreadcrumbWidth + breadcrumbFolderWidth +
-                breadcrumbDropdownWidth + searchWidth + actionsWidth + buttonsWidth + headerPadding;
+        const headerStyles = window.getComputedStyle(header);
+        const headerPadding = parseInt(headerStyles.paddingLeft, 10) + parseInt(headerStyles.paddingRight, 10);
 
-            var breadcrumbSizeHandlerClassName = 'breadcrumb-min-width';
+        let headerWidth = header.offsetWidth;
+        const fullHeaderWidth = minBreadcrumbWidth + breadcrumbFolderWidth +
+            breadcrumbDropdownWidth + searchWidth + actionsWidth + buttonsWidth + headerPadding;
 
-            var breadcrumbSizeHandler = function () {
-                if (headerWidth < fullHeaderWidth) {
-                    header.addClass(breadcrumbSizeHandlerClassName);
-                } else {
-                    header.removeClass(breadcrumbSizeHandlerClassName);
-                }
-            };
+        const breadcrumbSizeHandlerClassName = 'breadcrumb-min-width';
 
+        const breadcrumbSizeHandler = () => {
+            if (headerWidth < fullHeaderWidth) {
+                header.classList.add(breadcrumbSizeHandlerClassName);
+            } else {
+                header.classList.remove(breadcrumbSizeHandlerClassName);
+            }
+        };
+
+        breadcrumbSizeHandler();
+
+        window.addEventListener('resize', () => {
+            headerWidth = header.offsetWidth;
             breadcrumbSizeHandler();
+        });
+    })();
+    // thumbnail folder admin view
+    (() => {
+        const actionEls = document.querySelectorAll('.navigator-list .list-item input.action-select');
+        const foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select';
+        const filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select';
+        const allFilesToggle = document.querySelector('#files-action-toggle');
+        const allFoldersToggle = document.querySelector('#folders-action-toggle');
 
-            $(window).on('resize', function () {
-                headerWidth = header.outerWidth();
-                breadcrumbSizeHandler();
-            });
-
-        }());
-        // thumbnail folder admin view
-        (function () {
-            var $actionEls = $('.navigator-list .list-item input.action-select'),
-                foldersActionCheckboxes = '.navigator-list .navigator-folders-body .list-item input.action-select',
-                filesActionCheckboxes = '.navigator-list .navigator-files-body .list-item input.action-select',
-                $allFilesToggle = $('#files-action-toggle'),
-                $allFoldersToggle = $('#folders-action-toggle');
-
-            $allFoldersToggle.on('click', function () {
-                if (!!$(this).prop('checked')) {
-                    $(foldersActionCheckboxes).filter(':not(:checked)').trigger('click');
+        if (allFoldersToggle) {
+            allFoldersToggle.addEventListener('click', function () {
+                const checkboxes = document.querySelectorAll(foldersActionCheckboxes);
+                if (this.checked) {
+                    checkboxes.forEach((cb) => {
+                        if (!cb.checked) {
+                            cb.click();
+                        }
+                    });
                 } else {
-                    $(foldersActionCheckboxes).filter(':checked').trigger('click');
+                    checkboxes.forEach((cb) => {
+                        if (cb.checked) {
+                            cb.click();
+                        }
+                    });
                 }
             });
-            $allFilesToggle.on('click', function () {
-                if (!!$(this).prop('checked')) {
-                    $(filesActionCheckboxes).filter(':not(:checked)').trigger('click');
+        }
+
+        if (allFilesToggle) {
+            allFilesToggle.addEventListener('click', function () {
+                const checkboxes = document.querySelectorAll(filesActionCheckboxes);
+                if (this.checked) {
+                    checkboxes.forEach((cb) => {
+                        if (!cb.checked) {
+                            cb.click();
+                        }
+                    });
                 } else {
-                    $(filesActionCheckboxes).filter(':checked').trigger('click');
+                    checkboxes.forEach((cb) => {
+                        if (cb.checked) {
+                            cb.click();
+                        }
+                    });
                 }
             });
-            $actionEls.on('click', function () {
-                if (!$(this).prop('checked')) {
-                    if (!!$(filesActionCheckboxes).filter(':not(:checked)').length) {
-                        $allFilesToggle.prop('checked', false);
+        }
+
+        actionEls.forEach((el) => {
+            el.addEventListener('click', function () {
+                const filesCheckboxes = document.querySelectorAll(filesActionCheckboxes);
+                const foldersCheckboxes = document.querySelectorAll(foldersActionCheckboxes);
+
+                if (!this.checked) {
+                    const hasUncheckedFiles = Array.from(filesCheckboxes).some((cb) => !cb.checked);
+                    const hasUncheckedFolders = Array.from(foldersCheckboxes).some((cb) => !cb.checked);
+
+                    if (hasUncheckedFiles && allFilesToggle) {
+                        allFilesToggle.checked = false;
                     }
-                    if (!!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
-                        $allFoldersToggle.prop('checked', false);
+                    if (hasUncheckedFolders && allFoldersToggle) {
+                        allFoldersToggle.checked = false;
                     }
                 } else {
-                    if (!$(filesActionCheckboxes).filter(':not(:checked)').length) {
-                        $allFilesToggle.prop('checked', true);
+                    const allFilesChecked = Array.from(filesCheckboxes).every((cb) => cb.checked);
+                    const allFoldersChecked = Array.from(foldersCheckboxes).every((cb) => cb.checked);
+
+                    if (allFilesChecked && allFilesToggle) {
+                        allFilesToggle.checked = true;
                     }
-                    if (!$(foldersActionCheckboxes).filter(':not(:checked)').length) {
-                        $allFoldersToggle.prop('checked', true);
+                    if (allFoldersChecked && allFoldersToggle) {
+                        allFoldersToggle.checked = true;
                     }
                 }
             });
-            $('.navigator .actions .clear a').on('click', function () {
-                $allFoldersToggle.prop('checked', false);
-                $allFilesToggle.prop('checked', false);
+        });
+
+        const clearLink = document.querySelector('.navigator .actions .clear a');
+        if (clearLink) {
+            clearLink.addEventListener('click', () => {
+                if (allFoldersToggle) {
+                    allFoldersToggle.checked = false;
+                }
+                if (allFilesToggle) {
+                    allFilesToggle.checked = false;
+                }
             });
-        })();
-        $('.js-copy-url').on('click', function (e) {
+        }
+    })();
+
+    const copyUrlButtons = document.querySelectorAll('.js-copy-url');
+    copyUrlButtons.forEach((button) => {
+        button.addEventListener('click', function (e) {
             const url = new URL(this.dataset.url, document.location.href);
             const msg = this.dataset.msg || 'URL copied to clipboard';
-            let infobox = document.createElement('template');
+            const infobox = document.createElement('template');
             e.preventDefault();
-            for (let el of document.getElementsByClassName('info filer-tooltip')) {
+
+            const existingTooltips = document.querySelectorAll('.info.filer-tooltip');
+            existingTooltips.forEach((el) => {
                 el.remove();
-            }
+            });
+
             navigator.clipboard.writeText(url.href);
-            infobox.innerHTML = '<div class="info filer-tooltip">' + msg + '</div>';
+            infobox.innerHTML = `<div class="info filer-tooltip">${msg}</div>`;
             this.classList.add('filer-tooltip-wrapper');
             this.appendChild(infobox.content.firstChild);
+
+            const self = this;
             setTimeout(() => {
-                this.getElementsByClassName('info')[0].remove();
+                const tooltip = self.querySelector('.info');
+                if (tooltip) {
+                    tooltip.remove();
+                }
             }, 1200);
         });
     });
-})(djQuery);
+
+    // Initialize FocalPoint
+    const focalPoint = new FocalPoint();
+    focalPoint.initialize();
+
+    // Initialize Toggler (auto-initializes in constructor)
+    new Toggler();
+});

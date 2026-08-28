@@ -1,7 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase
-from filer.cache import get_folder_perm_cache_key, get_folder_permission_cache, clear_folder_permission_cache, update_folder_permission_cache
+
+from filer.cache import (
+    clear_folder_permission_cache,
+    get_folder_perm_cache_key,
+    get_folder_permission_cache,
+    update_folder_permission_cache,
+)
 
 
 User = get_user_model()
@@ -11,7 +17,7 @@ class PermissionCacheTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='12345')
         self.permission = 'can_read'
-        self.id_list = [1, 5, 8]
+        self.id_list = {1, 5, 8}
 
     def tearDown(self):
         clear_folder_permission_cache(self.user)
@@ -42,6 +48,12 @@ class PermissionCacheTests(TestCase):
         self.assertIsNone(cache.get(get_folder_perm_cache_key(self.user, self.permission)))
 
     def test_update_folder_permission_cache_updates_permissions_for_user_and_permission(self):
+        update_folder_permission_cache(self.user, self.permission, self.id_list)
+        permissions = get_folder_permission_cache(self.user, self.permission)
+        self.assertEqual(permissions, self.id_list)
+
+    def test_update_folder_permission_cache_overwrites_existing_cache_value(self):
+        update_folder_permission_cache(self.user, self.permission, {2})
         update_folder_permission_cache(self.user, self.permission, self.id_list)
         permissions = get_folder_permission_cache(self.user, self.permission)
         self.assertEqual(permissions, self.id_list)

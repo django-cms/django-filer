@@ -2,6 +2,123 @@
 CHANGELOG
 =========
 
+3.5.1 (2026-08-26)
+==================
+
+* fix: ``FileAdmin.icon_view()`` did not check read permissions. Any staff user could
+  enumerate file ids to obtain the name and private storage path of images in folders
+  they have no read permission on (reported by Denny).
+* fix: The file and folder admin change views only consulted the global Django model
+  permissions, which are not folder aware. Any staff user holding ``filer.change_file``
+  could open the change view of a file in a folder they have no read permission on.
+* fix: Upload validators could be bypassed by declaring an unknown Content-Type,
+  allowing stored XSS (reported by Miguel Rafael Martín de Nicolás Acedo). The MIME
+  type of an upload is now always derived from the file name, never from the
+  client-supplied ``Content-Type``.
+* fix: The AJAX upload endpoint no longer is ``@csrf_exempt`` and now requires a
+  staff user. The bundled uploaders send the ``X-CSRFToken`` header.
+* fix: A malformed MIME type without a slash no longer raises an error, and upload
+  errors return a JSON error response instead of an HTTP 500.
+* fix: A failed upload now answers with a 4xx/5xx status code instead of HTTP 200,
+  so that uploaders and proxies can tell a rejected upload from an accepted one.
+  The bundled uploaders report the server's error message accordingly.
+* fix: The AJAX upload endpoint no longer echoes internal exception text back to the
+  client; unexpected failures are logged instead.
+* chore: Add tests for filer tags, views and fix whitespace/truncate by @fsbraun in https://github.com/django-cms/django-filer/pull/1607
+* chore: Let ruff sort imports, matching the isort configuration by @fsbraun
+* ci: Replace flake8 and isort with ruff, which already runs as a pre-commit hook.
+  ``tox -e flake8`` and ``tox -e isort`` become ``tox -e ruff``.
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1608
+
+.. warning::
+
+   Uploads whose file extension is unknown to Python's ``mimetypes`` module are now
+   treated as ``application/octet-stream`` and are rejected by the default validators.
+   Register additional extensions with ``mimetypes.add_type()`` if you need them.
+
+   Custom uploaders posting to ``filer-ajax_upload`` must now send a CSRF token and
+   authenticate as a staff user. They also need to handle non-2xx responses: a
+   rejected upload is answered with HTTP 400 (or 403 for a permission problem)
+   carrying the ``{"error": ...}`` body that was previously returned with HTTP 200.
+
+3.5.0 (2026-07-06)
+==================
+
+* feat: By-default fast svg sanitation (deprecating svg validation) by @fsbraun in https://github.com/django-cms/django-filer/pull/1594
+* feat: Add strip_exif "validator" to remove potentially sensitive data from uploads by @fsbraun in https://github.com/django-cms/django-filer/pull/1595
+* fix: extended list of denied mime types (XHTML/XML stored XSS, reported by SeongHyeon Lee) by @fsbraun in https://github.com/django-cms/django-filer/pull/1604
+* fix: Delete folder action failed to check all permissions (reported by Ta Duc Thien) by @fsbraun in https://github.com/django-cms/django-filer/pull/1605
+* fix: Filer property popup did not close  by @fsbraun in https://github.com/django-cms/django-filer/pull/1578
+* fix: filer_admin_tags now falls back on any thumbnail render exception by @SAY-5 in https://github.com/django-cms/django-filer/pull/1598
+* ci: pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/django-cms/django-filer/pull/1600
+* fix: Treat misconfigs more gracefully by @fsbraun in https://github.com/django-cms/django-filer/pull/1602
+
+**New Contributors**
+* @dependabot[bot] made their first contribution in https://github.com/django-cms/django-filer/pull/1582
+* @felixxm made their first contribution in https://github.com/django-cms/django-filer/pull/1592
+* @SAY-5 made their first contribution in https://github.com/django-cms/django-filer/pull/1598
+* @onurguzel made their first contribution in https://github.com/django-cms/django-filer/pull/1603
+
+
+3.4.4 (2026-02-06)
+==================
+
+* fix: Popup window failed with django CMS' GrouperAdmin forms by @fsbraun in https://github.com/django-cms/django-filer/pull/1575
+
+3.4.3 (2026-01-17)
+==================
+
+* fix: django-app-helper link in the docs by @bckohan in https://github.com/django-cms/django-filer/pull/1570
+* fix: infinite recursion bug on django-polymorphic >=4.9 by @bckohan in https://github.com/django-cms/django-filer/pull/1571
+
+@bckohan made their first contribution in https://github.com/django-cms/django-filer/pull/1570
+
+3.4.2 (2026-01-13)
+==================
+
+* fix: invalid JS in `dropzone.init.js` by @PeterW-LWL in https://github.com/django-cms/django-filer/pull/1565
+* fix: Subject location only worked on Safari, incorrect subject location upscaling by @fsbraun in https://github.com/django-cms/django-filer/pull/1566
+
+
+3.4.1 (2025-11-24)
+==================
+
+* fix: Add missing JS bundles and LICENSE file
+
+3.4.0 (2025-11-21)
+==================
+
+* feat: Add Django 6.0 support
+* feat: Add CSP support by collecting all JS code in bundles
+* fix: preserve "limit search to folder" state in pagination links #1553 by @benzkji in https://github.com/django-cms/django-filer/pull/1555
+
+
+3.3.3 (2025-11-07)
+==================
+
+* Pin svglib to a version below 1.6.0 by @payamnj (#1550) in https://github.com/django-cms/django-filer/pull/1551
+
+3.3.2 (2025-09-01)
+==================
+
+* fix: add filename length safety check with random suffix by @Baraff24 in https://github.com/django-cms/django-filer/pull/1515
+* fix: Remove user from autocomplete fields if (swapped) user model does not have search fields by @fsbraun in https://github.com/django-cms/django-filer/pull/1517
+* Fix: Include Private Storage in Orphan File Scanning for filer_check Command by @Baraff24 in https://github.com/django-cms/django-filer/pull/1518
+* fix: Relect template block structure of Django 5.2+ by @fsbraun in https://github.com/django-cms/django-filer/pull/1523
+* chore: Added Full Persian (Farsi) Translate by @dimacodev in https://github.com/django-cms/django-filer/pull/1524
+* fix: Update directory_table_list.html by @AliAkbarSobhanpoor in https://github.com/django-cms/django-filer/pull/1528
+* fix: Avoid locale-dependent ratio by @albanbochsler in https://github.com/django-cms/django-filer/pull/1536
+* fix: docs GitHub action built by @fsbraun in https://github.com/django-cms/django-filer/pull/1540
+* fix: Folder permission cache update sometimes raised TypeError by @fsbraun in https://github.com/django-cms/django-filer/pull/1539
+* fix: Failed to install submodules of filer by @fsbraun in https://github.com/django-cms/django-filer/pull/1544
+
+**New Contributors**
+
+* @Baraff24 made their first contribution in https://github.com/django-cms/django-filer/pull/1515
+* @dimacodev made their first contribution in https://github.com/django-cms/django-filer/pull/1524
+* @AliAkbarSobhanpoor made their first contribution in https://github.com/django-cms/django-filer/pull/1528
+* @albanbochsler made their first contribution in https://github.com/django-cms/django-filer/pull/1536
+
 3.3.1 (2024-12-07)
 ==================
 
@@ -97,7 +214,7 @@ CHANGELOG
 * feat: Canonical URL action button now copies canonical URL to the user's
   clipboard
 * fix: Run validators on updated files in file change view
-* fix: Update mime type if uploading file in file change view
+* fix: Update MIME type if uploading file in file change view
 * fix: Do not allow to remove the file field from an uplaoded file in
   the admin interface
 * fix: refactor upload checks into running validators in the admin
@@ -285,7 +402,7 @@ CHANGELOG
 ==================
 
 * Fix #1214: `serve()` missing 1 required positional argument: `filer_file`.
-* Fix #1211: On upload MIME-type is not set correctly.
+* Fix #1211: On upload MIME type is not set correctly.
 
 
 2.0.1 (2020-09-04)

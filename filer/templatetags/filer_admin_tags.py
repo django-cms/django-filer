@@ -1,3 +1,4 @@
+import logging
 from math import ceil
 
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -18,8 +19,14 @@ from filer import settings
 from filer.admin.tools import admin_url_params, admin_url_params_encoded
 from filer.models.imagemodels import BaseImage
 from filer.settings import (
-    DEFERRED_THUMBNAIL_SIZES, FILER_MAX_SVG_THUMBNAIL_SIZE, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE,
+    DEFERRED_THUMBNAIL_SIZES,
+    FILER_MAX_SVG_THUMBNAIL_SIZE,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 register = Library()
@@ -164,6 +171,12 @@ def file_icon_context(file, detail, width, height):
                     # For remote storage systems we catch the error to avoid second trip
                     # to the storage system
                     return not_available_context
+                except Exception:
+                    # PIL/easy-thumbnails can raise broader errors (e.g. broken MPO,
+                    # truncated images). Fall back to the placeholder so a single bad
+                    # file can't 500 the entire admin (#1597).
+                    logger.warning("Could not render filer thumbnail for %s", file, exc_info=True)
+                    return not_available_context
     elif mime_maintype in ['audio', 'font', 'video']:
         icon_url = staticfiles_storage.url(f'filer/icons/file-{mime_maintype}.svg')
         height = width  # icon is a square
@@ -190,7 +203,7 @@ def get_aspect_ratio_and_download_url(context, detail, file, height, width):
             # because they don't really have width or height
             if file.width:
                 width, height = 210, ceil(210 / file.width * file.height)
-                context['sidebar_image_ratio'] = file.width / 210
+                context['sidebar_image_ratio'] = '%.6f' % (file.width / 210)
     return height, width, context
 
 

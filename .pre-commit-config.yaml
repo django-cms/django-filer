@@ -20,23 +20,14 @@ repos:
 #      - id: django-upgrade
 #        args: [--target-version, "2.2"]
 
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.2
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.3
     hooks:
-      - id: flake8
-
-  - repo: https://github.com/asottile/yesqa
-    rev: v1.5.0
-    hooks:
-      - id: yesqa
+      - id: ruff-check
+        args: [--fix]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-merge-conflict
       - id: mixed-line-ending
-
-#  - repo: https://github.com/pycqa/isort
-#    rev: 5.12.0
-#    hooks:
-#      - id: isort

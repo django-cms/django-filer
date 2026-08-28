@@ -6,7 +6,7 @@
 // rake spec:javascript loads specs relative to the tmp/jasmine/runner.html, need to override:
 module.exports = function (config) {
     var browsers = {
-        'PhantomJS': 'used for local testing'
+        'ChromeHeadless': 'used for local testing'
     };
 
     var settings = {
@@ -22,16 +22,17 @@ module.exports = function (config) {
         files: [
             // the current order meets the dependency requirements
             // dependency loading is not handled yet
-            '../filer/static/filer/js/libs/jquery.min.js',
-            '../filer/static/filer/js/libs/!(jquery.min)*.js',
+            '../node_modules/jquery/dist/jquery.min.js',
 
             'frontend/unit/mocks.js',
             'frontend/unit/mock-ajax.min.js',
+            'frontend/unit/jasmine-jquery.min.js',
+            'frontend/unit/jquery.simulate.min.js',
 
-            '../filer/static/filer/js/addons/*.js',
+            '../filer/static/filer/js/dist/filer-base.bundle.js',
 
             // tests themselves
-            'frontend/unit/*.js',
+            'frontend/unit/test.*.js',
 
             // fixture patterns
             {
@@ -81,7 +82,13 @@ module.exports = function (config) {
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: Object.keys(browsers),
 
-        // Continuous Integration mode
+        // Custom Chrome configuration
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox', '--disable-web-security']
+            }
+        },        // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false
     };

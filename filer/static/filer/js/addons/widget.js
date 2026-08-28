@@ -1,38 +1,56 @@
 'use strict';
-/* global django */
 
-// as of Django 2.x we need to check where jQuery is
-var djQuery = window.$;
-
-if (django.jQuery) {
-    djQuery = django.jQuery;
-}
-
-djQuery(function ($) {
-    var filer_clear = function (ev) {
-        var clearer = $(this);
-        var container = clearer.closest('.filerFile');
-        var input = container.find(':input');
-        var thumbnail = container.find('.thumbnail_img');
-        var description = container.find('.description_text');
-        var addImageButton = container.find('.lookup');
-        var editImageButton = container.find('.edit');
-        var dropzoneMessage = container.siblings('.dz-message');
-        var hiddenClass = 'hidden';
-
+document.addEventListener('DOMContentLoaded', () => {
+    const filer_clear = (ev) => {
         ev.preventDefault();
-        clearer.addClass(hiddenClass);
-        input.val('');
-        thumbnail.addClass(hiddenClass);
-        thumbnail.parent('a').removeAttr('href');
-        addImageButton.removeClass('related-lookup-change');
-        editImageButton.removeClass('related-lookup-change');
-        dropzoneMessage.removeClass(hiddenClass);
-        description.empty();
+
+        const clearer = ev.currentTarget;
+        const container = clearer.closest('.filerFile');
+        if (!container) {
+            return;
+        }
+
+        const input = container.querySelector('input');
+        const thumbnail = container.querySelector('.thumbnail_img');
+        const description = container.querySelector('.description_text');
+        const addImageButton = container.querySelector('.lookup');
+        const editImageButton = container.querySelector('.edit');
+        const dropzoneMessage = container.parentElement.querySelector('.dz-message');
+        const hiddenClass = 'hidden';
+
+        clearer.classList.add(hiddenClass);
+        if (input) {
+            input.value = '';
+        }
+        if (thumbnail) {
+            thumbnail.classList.add(hiddenClass);
+            var thumbnailLink = thumbnail.parentElement;
+            if (thumbnailLink.tagName === 'A') {
+                thumbnailLink.removeAttribute('href');
+            }
+        }
+        if (addImageButton) {
+            addImageButton.classList.remove('related-lookup-change');
+        }
+        if (editImageButton) {
+            editImageButton.classList.remove('related-lookup-change');
+        }
+        if (dropzoneMessage) {
+            dropzoneMessage.classList.remove(hiddenClass);
+        }
+        if (description) {
+            description.textContent = '';
+        }
     };
 
-    $('.filerFile .vForeignKeyRawIdAdminField').attr('type', 'hidden');
-    //if this file is included multiple time, we ensure that filer_clear is attached only once.
-    $(document).off('click.filer', '.filerFile .filerClearer', filer_clear)
-               .on('click.filer', '.filerFile .filerClearer', filer_clear);
+    const foreignKeyFields = document.querySelectorAll('.filerFile .vForeignKeyRawIdAdminField');
+    foreignKeyFields.forEach((field) => {
+        field.setAttribute('type', 'hidden');
+    });
+
+    // Remove any existing handlers and add new ones
+    const clearers = document.querySelectorAll('.filerFile .filerClearer');
+    clearers.forEach((clearer) => {
+        clearer.addEventListener('click', filer_clear);
+    });
 });

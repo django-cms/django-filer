@@ -1,0 +1,115 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-filer"
+dynamic = ["version"]
+authors = [
+    {name = "Divio AG", email = "info@divio.ch"},
+]
+maintainers = [
+    {name = "Django CMS Association and contributors", email = "info@django-cms.org"},
+]
+description = "A file management application for django that makes handling of files and images a breeze."
+readme = "README.rst"
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.8"
+dependencies = [
+    "django>=3.2",
+    "django-polymorphic<5.0",
+    "easy-thumbnails[svg]",
+    "py-svg-hush",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Framework :: Django CMS",
+    "Framework :: Django CMS :: 3.11",
+    "Framework :: Django CMS :: 4.0",
+    "Framework :: Django CMS :: 4.1",
+    "Framework :: Django CMS :: 5.0",
+    "Framework :: Django CMS :: 5.1",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.optional-dependencies]
+heif = ["pillow-heif"]
+
+[project.urls]
+Homepage = "https://github.com/django-cms/django-filer"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["filer*", "LICENSE"]
+
+[tool.setuptools.package-data]
+"*" = [
+    "templates/**/*.html",
+    "static/**/*",
+    "locale/**/*",
+    "*.po",
+    "*.mo",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "filer.__version__"}
+
+# ruff replaces flake8 (linting) and isort (import sorting); it is the only linter
+# CI runs. See .github/workflows/lint.yml and the ruff hook in .pre-commit-config.yaml.
+[tool.ruff]
+src = ["filer"]
+# extend-exclude rather than exclude, so ruff's own defaults (build, dist, .venv,
+# node_modules, ...) stay in place
+extend-exclude = ["*/migrations/*", "data", "tmp"]
+line-length = 119
+
+[tool.ruff.lint]
+# Pin the rule set explicitly: these were ruff's implicit defaults up to 0.15, and
+# 0.16 widened them. Selecting them here keeps a ruff upgrade from turning CI red
+# with hundreds of unrelated findings. Widen deliberately, in its own change.
+# E501 (line too long) stays off, as it was under flake8.
+select = ["E4", "E7", "E9", "F"]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+# Standard library, django, other third party, then our own code
+section-order = [
+    "future",
+    "standard-library",
+    "django",
+    "cms",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+known-first-party = ["filer"]
+lines-after-imports = 2
+
+[tool.ruff.lint.isort.sections]
+django = ["django"]
+cms = ["cms", "menus"]

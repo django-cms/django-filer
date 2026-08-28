@@ -1,0 +1,11 @@
+django>=4.2,<5
+furo
+restructuredtext-lint
+sphinx<8
+sphinx-autobuild
+sphinx-copybutton
+sphinxcontrib-images
+sphinxcontrib-spelling
+sphinxcontrib-inlinesyntaxhighlight
+sphinxext-opengraph
+pip-tools

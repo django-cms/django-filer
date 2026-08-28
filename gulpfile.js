@@ -1,15 +1,13 @@
 'use strict';
 
 var gulp = require('gulp');
-var gutil = require('gulp-util');
+var log = require('fancy-log');
 var sass = require('gulp-sass')(require('sass'));
 var iconfont = require('gulp-iconfont');
 var iconfontCss = require('gulp-iconfont-css');
-var autoprefixer = require('gulp-autoprefixer');
+var autoprefixer = require('gulp-autoprefixer').default;
 var sourcemaps = require('gulp-sourcemaps');
-var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs');
-var stylish = require('jshint-stylish');
+var eslint = require('gulp-eslint-new');
 var Server = require('karma').Server;
 
 var PROJECT_ROOT = __dirname;
@@ -38,16 +36,57 @@ var PROJECT_PATTERNS = {
 // #############################################################################
 // sass
 gulp.task('sass', function () {
-    return gulp.src(PROJECT_PATTERNS.sass)
-        .pipe(sourcemaps.init())
+    var isDebug = process.argv.includes('--debug');
+    var stream = gulp.src(PROJECT_PATTERNS.sass);
+
+    if (isDebug) {
+        stream = stream.pipe(sourcemaps.init());
+    }
+
+    stream = stream
         .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-        .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
-        .pipe(sourcemaps.write('/maps'))
-        .pipe(gulp.dest(PROJECT_PATH.css));
+        .pipe(autoprefixer());
+
+    if (isDebug) {
+        stream = stream.pipe(sourcemaps.write('/maps'));
+    }
+
+    return stream.pipe(gulp.dest(PROJECT_PATH.css));
 });
 
 gulp.task('sass:watch', function () {
     gulp.watch(PROJECT_PATTERNS.sass, gulp.series('sass'));
+});
+
+
+// #############################################################################
+// WEBPACK
+gulp.task('bundle', function (done) {
+    var webpack = require('webpack');
+    var webpackConfigFactory = require('./webpack.config.js');
+    var isDebug = process.argv.includes('--debug');
+    var webpackConfig = webpackConfigFactory({}, { debug: isDebug });
+
+    webpack(webpackConfig, function(err, stats) {
+        if (err) {
+            log.error(err);
+            done(err);
+            return;
+        }
+
+        log.info(stats.toString({
+            colors: true,
+            chunks: false
+        }));
+
+        if (isDebug) {
+            log.info('Built in DEBUG mode (unminified with source maps)');
+        } else {
+            log.info('Built in PRODUCTION mode (minified)');
+        }
+
+        done();
+    });
 });
 
 // #############################################################################
@@ -66,32 +105,33 @@ gulp.task('icons', function () {
             normalize: true,
             formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
         }))
-        .on('glyphs', function (glyphs, options) {
-            gutil.log.bind(glyphs, options);
+        .on('glyphs', function (glyphs) {
+            log.info('Generated', glyphs.length, 'glyphs');
         })
         .pipe(gulp.dest(PROJECT_PATH.icons));
 });
 
 // #############################################################################
 // LINTING
-gulp.task('jscs', function () {
-    return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(jscs())
-        .pipe(jscs.reporter())
-        .pipe(jscs.reporter('fail'));
-});
+gulp.task('lint', function () {
+    var fix = process.argv.includes('--fix');
+    var stream = gulp.src(PROJECT_PATTERNS.lint, { allowEmpty: true });
 
-gulp.task('jscs:fix', function () {
-    return gulp.src([PROJECT_PATH.js + '**/*.js', '!' + PROJECT_PATH.js + '**/*.min.js'])
-        .pipe(jscs({fix: true}))
-        .pipe(gulp.dest(PROJECT_PATH.js));
-});
+    if (fix) {
+        stream = stream
+            .pipe(eslint({fix: true}))
+            .pipe(eslint.format())
+            .pipe(gulp.dest(function(file) {
+                return file.base;
+            }));
+    } else {
+        stream = stream
+            .pipe(eslint())
+            .pipe(eslint.format())
+            .pipe(eslint.failAfterError());
+    }
 
-gulp.task('jshint', function () {
-    return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(jshint('.jshintrc'))
-        .pipe(jshint.reporter(stylish))
-        .pipe(jshint.reporter('fail'));
+    return stream;
 });
 
 // #############################################################################
@@ -108,14 +148,14 @@ gulp.task('tests:watch', function () {
 
 // #############################################################################
 // TASKS
-gulp.task('js', gulp.series('jshint', 'jscs' /* ,'tests:unit'*/));
+gulp.task('build', gulp.series('sass', 'bundle'));
+gulp.task('js', gulp.series('lint' /* ,'tests:unit'*/));
 gulp.task('js:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, gulp.series('js'));
 });
 gulp.task('watch', gulp.parallel('sass:watch', 'js:watch'));
-gulp.task('lint', gulp.series('jscs', 'jshint'));
 gulp.task('lint:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, gulp.series('lint'));
 });
-gulp.task('ci', gulp.series('sass', 'jscs', 'lint', 'tests:unit'));
+gulp.task('ci', gulp.series('sass', 'bundle', 'lint', 'tests:unit'));
 gulp.task('default', gulp.parallel('sass:watch', 'js:watch', 'lint:watch'));

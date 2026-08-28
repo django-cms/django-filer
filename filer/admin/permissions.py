@@ -3,10 +3,12 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from .tools import has_admin_read_permission
+
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
     def get_autocomplete_fields(self, request):
-        """Remove "owner" from autocomplete_fields is User model has no search_fields"""
+        """Remove "owner" from autocomplete_fields if User model has no search_fields"""
 
         autocomplete_fields = super().get_autocomplete_fields(request)
         if django_version >= (5, 0):
@@ -31,6 +33,17 @@ class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
                 return False
         else:
             return True
+
+    def has_view_permission(self, request, obj=None):
+        # Django's implementation only consults the global "view"/"change"
+        # model permissions, which are not folder aware. Without this override
+        # any staff user holding filer.change_file could open the change view
+        # of a file in a folder they have no read permission on.
+        if not super().has_view_permission(request, obj):
+            return False
+        if obj is None or not hasattr(obj, 'has_read_permission'):
+            return True
+        return has_admin_read_permission(request, obj)
 
     def has_delete_permission(self, request, obj=None):
         # we don't have a specific delete permission... so we use change

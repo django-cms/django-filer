@@ -12,7 +12,7 @@ def truncate_words(s, num, end_text='...'):
     return Truncator(s).words(num, truncate=truncate)
 
 
-truncate_words = keep_lazy(truncate_words, str)
+truncate_words = keep_lazy(str)(truncate_words)
 
 
 def get_delete_permission(opts):
@@ -24,7 +24,7 @@ try:
     from PIL import ExifTags as PILExifTags
     from PIL import Image as PILImage
     from PIL import ImageDraw as PILImageDraw
-except ImportError:
+except ImportError:  # pragma: no cover
     try:
         import ExifTags as PILExifTags  # noqa
         import Image as PILImage  # noqa

@@ -37,8 +37,8 @@ $icon-size: 16px;
 
 $line-height-normal: 20px;
 
-$border-radius-base: 3px;
-$border-radius-normal: 5px;
+$border-radius-base: var(--dca-btn-radius, 3px);
+$border-radius-normal: var(--dca-border-radius, 5px);
 
 $padding-base: 3px;
 $padding-normal: 10px;
@@ -53,16 +53,16 @@ $screen-tablet-filer: 810px;
 //##############################################################################
 // BUTTONS
 
-$btn-border-radius-base: $border-radius-base;
+$btn-border-radius-base: var(--button-radius, 3px);
 $btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
 
 $btn-default-color: var(--dca-gray-light, var(--button-fg, #999));
 $btn-default-bgcolor: var(--dca-white, var(--button-bg, #fff));
 $btn-default-border: var(--dca-gray-lighter, transparent);
 
-$btn-action-color: var(--dca-white, var(--button-fg, #fff));
-$btn-action-bgcolor: $color-primary;
-$btn-action-border: $color-primary;
+$btn-action-color: var(--default-button-fg, var(--button-fg, #fff));
+$btn-action-bgcolor: var(--default-button-bg);
+$btn-action-border: $black;
 
 //##############################################################################
 // #SHADOW

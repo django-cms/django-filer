@@ -32,7 +32,11 @@ from .. import settings
 from ..cache import clear_folder_permission_cache
 from ..models import File, Folder, FolderPermission, FolderRoot, ImagesWithMissingData, UnsortedImages, tools
 from ..settings import (
-    FILER_IMAGE_MODEL, FILER_PAGINATE_BY, FILER_TABLE_ICON_SIZE, FILER_THUMBNAIL_ICON_SIZE, TABLE_LIST_TYPE,
+    FILER_IMAGE_MODEL,
+    FILER_PAGINATE_BY,
+    FILER_TABLE_ICON_SIZE,
+    FILER_THUMBNAIL_ICON_SIZE,
+    TABLE_LIST_TYPE,
 )
 from ..thumbnail_processors import normalize_subject_location
 from ..utils.compatibility import get_delete_permission
@@ -43,8 +47,14 @@ from .forms import CopyFilesAndFoldersForm, RenameFilesForm, ResizeImagesForm
 from .patched.admin_utils import get_deleted_objects
 from .permissions import PrimitivePermissionAwareModelAdmin
 from .tools import (
-    AdminContext, admin_url_params_encoded, check_files_edit_permissions, check_files_read_permissions,
-    check_folder_edit_permissions, check_folder_read_permissions, get_directory_listing_type, popup_status,
+    AdminContext,
+    admin_url_params_encoded,
+    check_files_edit_permissions,
+    check_files_read_permissions,
+    check_folder_edit_permissions,
+    check_folder_read_permissions,
+    get_directory_listing_type,
+    popup_status,
     userperms_for_request,
 )
 
@@ -71,7 +81,11 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
     actions = ['delete_files_or_folders', 'move_files_and_folders',
                'copy_files_and_folders', 'resize_images', 'rename_files']
 
-    directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    if DJANGO_VERSION >= (5, 2):
+        directory_listing_template = 'admin/filer/folder/directory_listing.html'
+    else:  # Remove this when Django 5.2 is the minimum version
+        directory_listing_template = 'admin/filer/folder/legacy_listing.html'
+
     order_by_file_fields = ['_file_size', 'original_filename', 'name', 'owner',
                             'uploaded_at', 'modified_at']
 
@@ -751,6 +765,13 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         # Check that the user has delete permission for the actual model
         if not self.has_delete_permission(request):
             raise PermissionDenied
+
+        # Check that the user has per-folder edit permission on every selected
+        # file and folder (and their descendants). Without this, a user with
+        # only read access to a folder could delete its contents when the
+        # optional per-folder permission system is enabled.
+        check_files_edit_permissions(request, files_queryset)
+        check_folder_edit_permissions(request, folders_queryset)
 
         current_folder = self._get_current_action_folder(
             request, files_queryset, folders_queryset)
