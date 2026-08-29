@@ -2,8 +2,7 @@
 CHANGELOG
 =========
 
-unreleased
-==========
+3.6.0 (unreleased)
 
 * feat: Thumbnails of public files now honour easy-thumbnails' ``THUMBNAIL_NAMER``
   setting instead of filer's own naming scheme. Thumbnails of private files keep
@@ -19,6 +18,21 @@ unreleased
    behind in your thumbnail storage and can be removed once all pages have been
    re-rendered. URLs of private thumbnails handed out by earlier versions keep
    working: both naming schemes are recognised when serving them.
+
+* feat: Add support for Django 6.1. The admin breadcrumbs now render as
+  ``<ol class="breadcrumbs">`` on Django 6.1 and later, matching the markup its
+  element-qualified CSS selectors expect, and keep the legacy
+  ``<div class="breadcrumbs">`` markup on older versions.
+* ci: Test against Django 6.0 and 6.1.
+
+.. note::
+
+   Projects that override one of filer's breadcrumb templates
+   (``admin/filer/breadcrumbs.html``, ``admin/filer/folder/change_form.html``, or the
+   new ``admin/filer/folder/listing_breadcrumbs.html``, which replaces the duplicated
+   breadcrumb blocks of ``directory_listing.html`` and ``legacy_listing.html``) need to
+   emit the Django 6.1 markup themselves to stay styled. Use the
+   ``{% django_version_gte 6 1 %}`` tag from ``filer_admin_tags`` to support both.
 
 3.5.1 (2026-08-26)
 ==================
