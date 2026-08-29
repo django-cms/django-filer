@@ -1,5 +1,6 @@
 """Tests for filer.utils.filer_easy_thumbnails."""
 
+from django.core.files.storage import FileSystemStorage
 from django.test import TestCase, override_settings
 
 from filer.storage import PrivateFileSystemStorage, PublicFileSystemStorage
@@ -39,6 +40,22 @@ class ThumbnailToOriginalFilenameTests(TestCase):
         """A ``__`` in the source file name is not mistaken for the delimiter."""
         result = thumbnail_to_original_filename('a__b.jpg.100x100_q85_crop.jpg')
         self.assertEqual(result, 'a__b.jpg')
+
+    def test_legacy_name_with_dotted_option_value(self):
+        """The old namer emitted option values verbatim, dots included."""
+        result = thumbnail_to_original_filename(
+            'foo.jpg__200x200_q85_subject_location-0.5,0.5.jpg')
+        self.assertEqual(result, 'foo.jpg')
+
+    def test_name_with_dotted_option_value(self):
+        result = thumbnail_to_original_filename(
+            'foo.jpg.200x200_q85_subject_location-0.5,0.5.jpg')
+        self.assertEqual(result, 'foo.jpg')
+
+    def test_size_like_double_underscore_in_source_filename(self):
+        """The current scheme wins over a legacy read of the source filename."""
+        result = thumbnail_to_original_filename('a__100x100_x.jpg.50x50_q85.jpg')
+        self.assertEqual(result, 'a__100x100_x.jpg')
 
     def test_candidates_cover_both_schemes(self):
         self.assertEqual(
@@ -86,6 +103,14 @@ class ThumbnailerNameMixinTests(TestCase):
         thumbnailer.get_thumbnail_name({'size': (50, 50)})
         self.assertIs(thumbnailer.thumbnail_namer, namer)
         self.assertEqual(thumbnailer.thumbnail_preserve_extensions, preserve)
+
+    def test_naming_options_are_restored_on_error(self):
+        """A file without a name must not leave the default namer behind."""
+        thumbnailer = self.make_thumbnailer(name=None, is_public=False)
+        namer = thumbnailer.thumbnail_namer
+        with self.assertRaises(Exception):
+            thumbnailer.get_thumbnail_name({'size': (50, 50)})
+        self.assertIs(thumbnailer.thumbnail_namer, namer)
 
     def test_transparent_preserves_png(self):
         name = self.make_thumbnailer().get_thumbnail_name({'size': (100, 100)}, transparent=True)
@@ -137,4 +162,13 @@ class ThumbnailNamerSelectionTests(TestCase):
         self.assertEqual(
             public.get_thumbnail_name({'size': (100, 100)}),
             'uploads/custom_prefix_photo.jpg.jpg',
+        )
+
+    def test_unknown_storage_is_treated_as_private(self):
+        """Fail safe: an unnamable thumbnail is worse than an unstyled name."""
+        thumbnailer = self.make_thumbnailer(thumbnail_storage=FileSystemStorage())
+        self.assertFalse(thumbnailer.is_public_thumbnail())
+        self.assertEqual(
+            thumbnailer.get_thumbnail_name({'size': (100, 100)}),
+            'uploads/photo.jpg.100x100_q85.jpg',
         )

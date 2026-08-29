@@ -271,18 +271,23 @@ class FolderAdmin(PrimitivePermissionAwareModelAdmin):
         against the pattern of easy-thumbnails' default namer, which keeps this
         working with a custom ``THUMBNAIL_NAMER``.
         """
-        files = [item for item in items if isinstance(item, File) and item.file]
+        files = [item for item in items if isinstance(item, File)]
         if not files:
             return
         existing = defaultdict(set)
-        thumbnails = Thumbnail.objects.filter(
-            source__name__in={file.file.name for file in files},
-            modified__gte=F("source__modified"),
-        ).values_list("source__name", "name")
-        for source_name, thumbnail_name in thumbnails:
-            existing[source_name].add(thumbnail_name)
+        source_names = {file.file.name for file in files if file.file}
+        if source_names:
+            thumbnails = Thumbnail.objects.filter(
+                source__name__in=source_names,
+                modified__gte=F("source__modified"),
+            ).values_list("source__name", "name")
+            for source_name, thumbnail_name in thumbnails:
+                existing[source_name].add(thumbnail_name)
         for file in files:
-            file.existing_thumbnail_names = existing[file.file.name]
+            # Files without a stored file get an empty set rather than no
+            # attribute at all, so that they too stay on the deferred path
+            # instead of asking the storage backend for a thumbnail.
+            file.existing_thumbnail_names = existing[file.file.name if file.file else None]
 
     def directory_listing(self, request, folder_id=None, viewtype=None):
         if not request.user.has_perm("filer.can_use_directory_listing"):
