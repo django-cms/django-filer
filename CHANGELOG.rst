@@ -3,6 +3,7 @@ CHANGELOG
 =========
 
 3.6.0 (unreleased)
+==================
 
 * feat: Thumbnails of public files now honour easy-thumbnails' ``THUMBNAIL_NAMER``
   setting instead of filer's own naming scheme. Thumbnails of private files keep
