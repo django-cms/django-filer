@@ -4,7 +4,7 @@ from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.forms.models import modelform_factory
 from django.http import JsonResponse
-from django.urls import path, reverse
+from django.urls import NoReverseMatch, path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
@@ -160,6 +160,12 @@ def ajax_upload(request, folder_id=None):
                 'label': str(file_obj),
                 'file_id': file_obj.pk,
             }
+            try:
+                # Lets the file widget link its edit button to the new file
+                data['change_url'] = file_obj.get_admin_change_url()
+            except NoReverseMatch:
+                # Custom file models are not necessarily registered in the admin
+                data['change_url'] = ''
             # prepare preview thumbnail
             if isinstance(file_obj, Image):
                 data['thumbnail_180'] = reverse(

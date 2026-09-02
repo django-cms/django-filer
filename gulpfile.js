@@ -136,12 +136,19 @@ gulp.task('lint', function () {
 
 // #############################################################################
 // JS UNIT-TESTS
-gulp.task('tests:unit', function (done) {
+gulp.task('tests:unit:base', function (done) {
     new Server({
         configFile: PROJECT_PATH.tests + '/karma.conf.js',
         singleRun: true
     }, done).start();
 });
+gulp.task('tests:unit:widget', function (done) {
+    new Server({
+        configFile: PROJECT_PATH.tests + '/karma.widget.conf.js',
+        singleRun: true
+    }, done).start();
+});
+gulp.task('tests:unit', gulp.series('tests:unit:base', 'tests:unit:widget'));
 gulp.task('tests:watch', function () {
     gulp.watch(PROJECT_PATTERNS.lint, ['tests:unit']);
 });
