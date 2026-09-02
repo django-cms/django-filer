@@ -6,7 +6,7 @@ from zipfile import ZipFile
 from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
 from filer.settings import IMAGE_EXTENSIONS
 from filer.utils.filer_easy_thumbnails import thumbnail_to_original_filename
@@ -14,6 +14,7 @@ from filer.utils.files import (
     UploadException,
     get_valid_filename,
     handle_request_files_upload,
+    handle_upload,
     slugify,
 )
 from filer.utils.loader import load_object
@@ -196,6 +197,56 @@ class HandleRequestFilesUploadTests(TestCase):
 
         result = handle_request_files_upload(request)
         self.assertEqual(result[3], 'application/octet-stream')
+
+
+class HandleUploadTests(TestCase):
+    """Malformed raw (XMLHttpRequest) uploads raise UploadException, not a 500."""
+
+    def _request(self, **headers):
+        request = RequestFactory().post('/upload/', data=b'', content_type='application/octet-stream')
+        request.META.pop('CONTENT_LENGTH', None)
+        request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+        request.META.update(headers)
+        return request
+
+    def test_missing_content_length(self):
+        with self.assertRaises(UploadException):
+            handle_upload(self._request())
+
+    def test_malformed_content_length(self):
+        with self.assertRaises(UploadException):
+            handle_upload(self._request(CONTENT_LENGTH='not a number'))
+
+    def test_negative_content_length(self):
+        with self.assertRaises(UploadException):
+            handle_upload(self._request(CONTENT_LENGTH='-1'))
+
+    def test_no_handler_accepts_the_upload(self):
+        """No upload handler returning a file used to raise UnboundLocalError."""
+
+        class NoFileUploadHandler:
+            chunk_size = 64 * 1024
+
+            def handle_raw_input(self, *args, **kwargs):
+                pass
+
+            def new_file(self, *args, **kwargs):
+                pass
+
+            def receive_data_chunk(self, raw_data, start):
+                return raw_data
+
+            def file_complete(self, file_size):
+                return None
+
+            def upload_complete(self):
+                pass
+
+        request = self._request(CONTENT_LENGTH='0')
+        request.upload_handlers = [NoFileUploadHandler()]
+
+        with self.assertRaises(UploadException):
+            handle_upload(request)
 
 
 class UploadExceptionTests(TestCase):
