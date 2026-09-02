@@ -27,7 +27,7 @@ from filer.models import abstract
 from filer.models.filemodels import File
 from filer.models.foldermodels import Folder, FolderPermission
 from filer.models.virtualitems import FolderRoot
-from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL
+from filer.settings import DEFERRED_THUMBNAIL_SIZES, FILER_IMAGE_MODEL, FILER_THUMBNAIL_ICON_SIZE
 from filer.templatetags.filer_admin_tags import (
     django_version_gte,
     file_icon_url,
@@ -509,6 +509,33 @@ class FilerClipboardAdminUrlsTests(TestCase):
         self.assertEqual(Image.objects.count(), 1)
         self.assertEqual(Image.objects.all()[0].original_filename,
                          self.image_name)
+
+    def test_filer_upload_response(self):
+        """The upload response carries what the file widget needs to show the new file"""
+        folder = Folder.objects.create(name='foo')
+        with open(self.filename, 'rb') as fh:
+            file_obj = django.core.files.File(fh)
+            url = reverse('admin:filer-ajax_upload', kwargs={'folder_id': folder.pk})
+            response = self.client.post(url, {
+                'Filename': self.image_name,
+                'Filedata': file_obj,
+                'jsessionid': self.client.session.session_key,
+            })
+
+        image = Image.objects.get()
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {
+                'thumbnail': None,
+                'alt_text': '',
+                'label': str(image),
+                'file_id': image.pk,
+                'change_url': image.get_admin_change_url(),
+                'thumbnail_180': reverse('admin:filer_image_fileicon',
+                                         args=(image.pk, FILER_THUMBNAIL_ICON_SIZE)),
+                'original_image': image.url,
+            },
+        )
 
     def test_filer_upload_video(self, extra_headers={}):
         with SettingsOverride(filer_settings, FILER_FILE_MODELS=(

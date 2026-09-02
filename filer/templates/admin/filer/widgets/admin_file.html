@@ -8,8 +8,10 @@
         <span class="filerFile">
             <div class="dz-thumbnail"><img class="quiet" data-dz-thumbnail></div>
             <span data-dz-name class="dz-name"></span>
-            <span class="filerClearer fa fa-close filer-icon filer-icon-remove-selection" title="{% translate 'Clear' %}"
-                 data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}"></span>
+            <a class="filerClearer" title="{% translate 'Clear' %}" href="#"
+                 data-dz-remove data-no-icon-file="{% static 'filer/icons/file-unknown.svg' %}">
+                <span class="fa fa-close filer-icon filer-icon-remove-selection"></span>
+            </a>
             <div class="dz-progress js-filer-dropzone-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
         </span>
     </template>

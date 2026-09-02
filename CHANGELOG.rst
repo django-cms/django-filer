@@ -10,6 +10,18 @@ CHANGELOG
   element-qualified CSS selectors expect, and keep the legacy
   ``<div class="breadcrumbs">`` markup on older versions.
 * ci: Test against Django 6.0 and 6.1.
+* fix: Dropping a file on the admin file widget no longer stacks the upload preview
+  on top of the widget's own markup, which left two files visible and covered the
+  widget's buttons (#1573). The widget now shows the uploaded file itself - thumbnail,
+  label, and working lookup, edit and clear buttons - as it does after a reload, and a
+  failed upload leaves the previous selection untouched. The upload response gained a
+  ``change_url`` key for this.
+* fix: The file widget's clear button works again in widgets that are added to the page
+  after it loaded, e.g. in Django admin inline formsets.
+* fix: A file dragged over the file widget now only recolors the widget's background in
+  the admin's primary color. The widget used to hide its content and grow its border,
+  which moved what was under the cursor and made the widget flicker between its drop
+  state and the file it holds.
 
 .. note::
 
