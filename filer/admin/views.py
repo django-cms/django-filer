@@ -3,14 +3,13 @@ from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBadRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
 from .. import settings as filer_settings
-from ..models import Clipboard, Folder, FolderRoot, tools
-from .tools import AdminContext, admin_url_params_encoded, popup_status
+from ..models import Folder, FolderRoot
+from .tools import AdminContext, popup_status
 
 
 class NewFolderForm(forms.ModelForm):
@@ -72,60 +71,19 @@ def make_folder(request, folder_id=None):
     return TemplateResponse(request, 'admin/filer/folder/new_folder_form.html', context)
 
 
+# The clipboard operations are no longer part of the file browser. The views are
+# kept - and answer 400 - so that projects still linking to them do not run into
+# a NoReverseMatch.
 @login_required
 def paste_clipboard_to_folder(request):
-    if True:
-        # TODO: cleanly remove Clipboard code if it is no longer needed
-        return HttpResponseBadRequest('not implemented anymore')
-
-    if request.method == 'POST':
-        folder = Folder.objects.get(id=request.POST.get('folder_id'))
-        clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
-        if folder.has_add_children_permission(request):
-            tools.move_files_from_clipboard_to_folder(clipboard, folder)
-            tools.discard_clipboard(clipboard)
-        else:
-            raise PermissionDenied
-    redirect = request.GET.get('redirect_to', '')
-    if not redirect:
-        redirect = request.POST.get('redirect_to', '')
-    return HttpResponseRedirect(
-        '{}?order_by=-modified_at{}'.format(
-            redirect,
-            admin_url_params_encoded(request, first_separator='&'),
-        )
-    )
+    return HttpResponseBadRequest('not implemented anymore')
 
 
 @login_required
 def discard_clipboard(request):
-    if True:
-        # TODO: cleanly remove Clipboard code if it is no longer needed
-        return HttpResponseBadRequest('not implemented anymore')
-
-    if request.method == 'POST':
-        clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
-        tools.discard_clipboard(clipboard)
-    return HttpResponseRedirect(
-        '{}{}'.format(
-            request.POST.get('redirect_to', ''),
-            admin_url_params_encoded(request, first_separator='&'),
-        )
-    )
+    return HttpResponseBadRequest('not implemented anymore')
 
 
 @login_required
 def delete_clipboard(request):
-    if True:
-        # TODO: cleanly remove Clipboard code if it is no longer needed
-        return HttpResponseBadRequest('not implemented anymore')
-
-    if request.method == 'POST':
-        clipboard = Clipboard.objects.get(id=request.POST.get('clipboard_id'))
-        tools.delete_clipboard(clipboard)
-    return HttpResponseRedirect(
-        '{}{}'.format(
-            request.POST.get('redirect_to', ''),
-            admin_url_params_encoded(request, first_separator='&'),
-        )
-    )
+    return HttpResponseBadRequest('not implemented anymore')
