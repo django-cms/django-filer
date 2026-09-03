@@ -1,70 +1,81 @@
-=========================
-Django Filer Documentation
-=========================
+============================
+django-finder documentation
+============================
 
-Run the documentation locally
------------------------------
+The documentation follows the `Diátaxis <https://diataxis.fr/>`_ framework. Before adding a
+page, decide which of the four kinds it is, and put it in the matching directory:
 
-Install the Enchant library
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``tutorials/``
+    Learning-oriented. A lesson the reader follows from start to finish. It must work if
+    typed verbatim.
 
-You will need to install the
-`enchant <https://www.abisource.com/projects/enchant/>`__ library that
-is used by ``pyenchant`` for spelling.
+``how-to/``
+    Task-oriented. A recipe for one goal, for someone who already has a working setup.
 
-macOS:
-^^^^^^
+``reference/``
+    Information-oriented. What something *is*. No tutorials, no opinions.
 
-.. code:: bash
+``explanation/``
+    Understanding-oriented. Why the software is the way it is. No instructions.
 
-    brew install enchant
+A page that wants to be two of these is two pages.
 
-After that:
 
-Fork & Clone the repository:
-^^^^^^^^^^^^^^^^^^^^^
+Build the documentation locally
+===============================
 
-.. code:: bash
+Install the dependencies into a virtual environment:
 
-    git@github.com:your-github-username/django-filer.git
+.. code-block:: shell
 
-Switch to the django-filer/docs directory:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: bash
-
-    cd django-filer/docs
-
-Install the dependencies:
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: bash
-
+    cd docs
     make install
 
-This command creates a virtual environment and installs the required
-dependencies there.
+Start the development server, which rebuilds and reloads on every change:
 
-Start the development server:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code:: bash
+.. code-block:: shell
 
     make run
 
-Open the local docs instance in your browser:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Then open http://0.0.0.0:8001/.
 
-.. code:: bash
+To reproduce what CI does — a full build with warnings treated as errors:
 
-    open http://0.0.0.0:8001/
+.. code-block:: shell
 
-The documentation uses livereload. This means, that every time something
-is changed, the documentation will automatically reload in your
-browser.
+    make strict
+
+Every build target uses the virtualenv created by ``make install`` when it exists, and falls
+back to whatever ``sphinx-build`` is on your ``PATH`` otherwise. Override it explicitly with
+``make html SPHINXBUILD=/path/to/sphinx-build``.
+
+
+Unwritten sections
+==================
+
+Gaps are marked with ``.. todo::`` directives and are rendered in the built output, because
+``todo_include_todos`` is on. Search for them before starting work:
+
+.. code-block:: shell
+
+    grep -rn "todo::" .
+
+
+Spelling
+========
+
+``sphinxcontrib.spelling`` is configured but only runs under the ``spelling`` builder, not
+during the HTML build. It needs the `enchant <https://www.abisource.com/projects/enchant/>`_
+library:
+
+.. code-block:: shell
+
+    brew install enchant  # macOS
+    make spelling
+
 
 Contribute
-----------
+==========
 
-If you find anything that could be improved or changed in your opinion,
-feel free to create a pull request.
+If you find anything that could be improved, please open a pull request against the
+``finder`` branch.

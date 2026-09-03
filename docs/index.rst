@@ -1,76 +1,60 @@
-.. django-filer documentation master file
+===========================
+django-finder documentation
+===========================
 
-Welcome to django-filer's documentation!
-========================================
+**django-finder** is a media asset management application for Django. It is the complete
+rewrite of `django-filer <https://github.com/django-cms/django-filer>`_ that lives on the
+``finder`` branch: a file browser in the Django admin that behaves like the file manager of
+your operating system, a permission system built on access control lists, and an extension
+mechanism that lets you teach it about any MIME type.
 
-.. only:: develop
+.. toctree::
+   :maxdepth: 2
+   :hidden:
 
-   .. warning::
-      This documentation refers to the development version of ``django-filer``.
-
-      As this version has not been released yet, any part of the API maybe subject
-      to modifications without notice, and this documentation may be outdated and
-      not in sync with the code.
+   tutorials/index
+   how-to/index
+   reference/index
+   explanation/index
 
 
-``django-filer`` is a file management application for django. It handles uploading
-and organizing files and images in contrib.admin.
+How this documentation is organised
+===================================
 
-+------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/filer_1.png | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/filer_2.png |
-+------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------+
+These pages follow the `Diátaxis <https://diataxis.fr/>`_ framework. Each section answers a
+different kind of question, and knowing which one you are asking is the fastest way to the
+page you need.
 
-Filer detail view:
+:doc:`Tutorials <tutorials/index>`
+    Lessons that take you by the hand through getting django-finder running. Start here if
+    you have never used it. They are learning-oriented: follow them in order, and do not
+    worry about why each step works yet.
 
-+-----------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/detail_image.png | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/detail_file.png |
-+-----------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------+
+:doc:`How-to guides <how-to/index>`
+    Recipes for a specific goal — configuring a storage backend, adding support for a file
+    type, migrating from django-filer. They assume you already have a working installation
+    and know roughly what you want.
 
-Filer picker widget:
+:doc:`Reference <reference/index>`
+    The settings, models, management commands and APIs, described exactly. Consult these
+    when you need to know what something does, not how to use it.
 
-+------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_1.png | .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_2.png |
-+------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
-| .. image:: https://raw.githubusercontent.com/django-cms/django-filer/master/docs/_static/file_picker_3.png |                                                                                                            |
-+------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+:doc:`Explanation <explanation/index>`
+    The reasoning behind the design: why the rewrite happened, why permissions are access
+    control lists, why every ambit needs two storage backends. Read these to understand the
+    shape of the project.
 
-Custom model fields are provided for use in 3rd party apps as a replacement for
-the default ``FileField`` from django. Behind the scenes a ``ForeignKey`` to the
-File model is used.
 
 Getting help
-------------
+============
 
-* google group: http://groups.google.com/group/django-filer
-* IRC: #django-filer on freenode.net
+* Issues and discussions: https://github.com/django-cms/django-filer
+* Discord: https://www.django-cms.org/discord
 
 
 Contributing
-------------
+============
 
-The code is hosted on github at http://github.com/divio/django-filer/
-and is fully open source. We hope you choose to help us on the project! More
-information on how to contribute can be found in `contributing`_.
-
-
-Contents
-========
-
-.. toctree::
-   :maxdepth: 1
-
-   installation
-   upgrading
-   usage
-   permissions
-   secure_downloads
-   validation
-   settings
-   development
-   extending_filer
-   running_tests
-   dump_payload
-   management_commands
-
-
-.. _`contributing`: development/#contributing
+The code is hosted on GitHub at https://github.com/django-cms/django-filer and is fully open
+source. See :doc:`explanation/why-a-rewrite` for the background, and the repository's
+contribution guidelines for how to submit changes.
