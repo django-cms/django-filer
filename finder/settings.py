@@ -6,12 +6,39 @@ from django.conf import settings as django_settings
 FINDER_DEFAULT_AMBIT = getattr(django_settings, 'FINDER_DEFAULT_AMBIT', 'default')
 
 
-# A list of 2-tuples, where the first entry is the MIME-type of a file to be validated
-# and the second entry is a dotted path to a callable that takes a file-like object and raises a ValueError if the
-# file is invalid. This can be used to add custom validation for files uploaded to django-finder.
-# It is possible to register multiple validators for the same MIME-type, in which case all validators will be run for
-# files of that type.
-FINDER_PAYLOAD_VALIDATORS = getattr(django_settings, 'FINDER_PAYLOAD_VALIDATORS', [])
+# The validators run against every uploaded payload unless a project opts out of them.
+# They cover the formats a browser executes in the media origin, which is where an uploaded
+# file turns into stored XSS against the site's own staff and visitors.
+# Note that, unlike django-filer, finder does not deny 'application/octet-stream': its
+# FileModel is the documented fallback for everything that matches no other model, and
+# browsers report that MIME-type for plenty of harmless files. Projects wanting filer's
+# behaviour can add {'application/octet-stream': ['finder.validators.deny']}.
+FINDER_DEFAULT_PAYLOAD_VALIDATORS = {
+    'text/html': ['finder.validators.deny_html'],
+    'application/xhtml+xml': ['finder.validators.deny'],
+    'application/xml': ['finder.validators.deny'],
+    'text/xml': ['finder.validators.deny'],
+    'application/xslt+xml': ['finder.validators.deny'],
+    'image/svg+xml': ['finder.contrib.image.svg.validators.sanitize_svg'],
+}
+
+
+# Validators to run in addition to FINDER_DEFAULT_PAYLOAD_VALIDATORS, as a dict mapping a
+# MIME-type to a list of validators. A validator is a dotted path to, or a reference to, a
+# callable taking (file_name, file, owner, mime_type) that raises
+# finder.exceptions.FileValidationError to reject the upload; it may also rewrite the file
+# in place. This is the contract django-filer's FILER_ADD_FILE_VALIDATORS uses, so
+# validators written for filer work here unchanged.
+# The MIME-type may be exact ('image/png'), a subtype wildcard ('image/*') or '*/*'.
+# For backwards compatibility a flat list of (mime_type, validator) 2-tuples is accepted too.
+#
+#     FINDER_PAYLOAD_VALIDATORS = {'image/*': ['myapp.validators.strip_exif']}
+#
+# MIME-types listed in FINDER_REMOVE_PAYLOAD_VALIDATORS are dropped from the defaults:
+#
+#     FINDER_REMOVE_PAYLOAD_VALIDATORS = ['image/svg+xml']
+#
+# See finder.validators for the details.
 
 
 def __getattr__(name):

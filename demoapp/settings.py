@@ -214,7 +214,7 @@ LOGGING = {
 }
 
 
-FINDER_PAYLOAD_VALIDATORS = [
-    ('image/svg+xml', 'finder.contrib.image.svg.validators.svg_validator'),
-    ('image/svg+xml', 'finder.contrib.image.svg.validators.xml_validator'),
-]
+# Runs on top of FINDER_DEFAULT_PAYLOAD_VALIDATORS, which already sanitizes SVG uploads.
+FINDER_PAYLOAD_VALIDATORS = {
+    'image/svg+xml': ['finder.contrib.image.svg.validators.xml_validator'],
+}
