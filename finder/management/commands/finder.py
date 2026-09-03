@@ -108,11 +108,11 @@ class Command(BaseCommand):
                     break
             else:
                 raise CommandError(f"No such admin site ‘{admin_name}’.")
-        storage_name = values.pop('storage', None)
+        storage_name = values.pop('storage', "default")
         if storage_name not in storages.backends:
             raise CommandError(f"Storage backend ‘{storage_name}’ is not configured.")
         values['_original_storage'] = storage_name
-        storage_name = values.pop('sample_storage', None)
+        storage_name = values.pop('sample_storage', "default")
         if storage_name not in storages.backends:
             raise CommandError(f"Storage backend ‘{storage_name}’ is not configured.")
         values['_sample_storage'] = storage_name
