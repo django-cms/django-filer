@@ -1,0 +1,59 @@
+name: End-to-end tests (finder branch)
+
+on:
+  push:
+    branches:
+      - finder
+    paths:
+      - 'client/**'
+      - 'demoapp/**'
+      - 'finder/**'
+      - 'package.json'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'client/**'
+      - 'demoapp/**'
+      - 'finder/**'
+      - 'package.json'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    name: "Playwright end-to-end tests"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24.x'
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    - name: Install dependencies from PyPI and npm
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2-dev pkg-config
+        npm install --include=dev
+        python -m pip install --upgrade pip
+        python -m pip install "Django==6.0.*"
+        python -m pip install django-entangled ffmpeg-python pillow reportlab svglib pycairo
+        python -m pip install defusedxml py_svg_hush
+        python -m pip install pytest pytest-django playwright
+    - name: Install the Chromium browser used by Playwright
+      run: python -m playwright install --with-deps chromium
+    - name: Build the client assets
+      # The tests drive the compiled React application, so finder/static must be
+      # populated before the live server starts.
+      run: npm run buildall
+    - name: Run the end-to-end tests
+      run: python -m pytest -v demoapp/e2etests --ds=demoapp.e2etests.settings
+    - name: Upload traces of failed tests
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-traces
+        path: workdir/e2e/traces
+        if-no-files-found: ignore

@@ -45,6 +45,7 @@ image = ["Pillow", "django-entangled"]
 svg = ["reportlab", "svglib", "django-entangled"]
 video = ["ffmpeg-python", "django-entangled"]
 s3 = ["django-storages[s3]"]
+e2e = ["playwright", "pytest", "pytest-django", "Pillow"]
 
 [project.urls]
 Homepage = "https://github.com/django-cms/django-filer"
