@@ -1,8 +1,16 @@
 import {useEffect, useMemo, useState} from 'react';
 
 
-export function useSessionStorage(storageKey: string, initial) {
-	return () => {
+/**
+ * Build a hook which keeps a value in the session storage under `storageKey`.
+ *
+ * This is a factory rather than a hook itself: it is called once at module level and
+ * the hook it returns is used by the components. Hence the name must not start with
+ * `use`, while the returned function must, so that both sides of the React hook rules
+ * can be checked.
+ */
+export function createSessionStorage(storageKey: string, initial) {
+	return function useStoredValue() {
 		const [value, setValue] = useState(
 			JSON.parse(sessionStorage.getItem(storageKey)) ?? initial
 		);
@@ -61,4 +69,4 @@ export function useCookie(key, initial) : [any, (value: any) => any] {
 
 
 export const useSearchZone = initial => useCookie('django-finder-search-zone', initial);
-export const useAudioSettings = useSessionStorage('filer-audio-settings', {volume: 0.5});
+export const useAudioSettings = createSessionStorage('filer-audio-settings', {volume: 0.5});

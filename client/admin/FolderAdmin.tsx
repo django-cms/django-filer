@@ -15,7 +15,7 @@ import {
 	useSensors
 } from '@dnd-kit/core';
 import {restrictToWindowEdges} from '@dnd-kit/modifiers';
-import {useAudioSettings, useCookie, useSessionStorage} from '../common/Storage';
+import {createSessionStorage, useAudioSettings, useCookie} from '../common/Storage';
 import FileUploader from '../common/FileUploader';
 import FinderSettings from './FinderSettings';
 import FolderTabs from './FolderTabs';
@@ -29,8 +29,7 @@ import DownloadIcon from '../icons/download.svg';
 import TrashIcon from '../icons/trash.svg';
 import MoreVerticalIcon from '../icons/more-vertical.svg';
 
-// eslint-disable-next-line react-hooks/rules-of-hooks
-const useClipboard = useSessionStorage('filer-clipboard', []);
+const useClipboard = createSessionStorage('filer-clipboard', []);
 
 
 export default function FolderAdmin() {
@@ -42,7 +41,9 @@ export default function FolderAdmin() {
 	const menuBarRef = useRef(null);
 	const folderTabsRef = useRef(null);
 	const uploaderRef = useRef(null);
-	const columnRefs = useRef(Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, useRef(null)])));
+	// `createRef` rather than `useRef`, because the number of ancestors is not known
+	// up front and a hook must not be called from within a callback.
+	const columnRefs = useRef(Object.fromEntries(settings.ancestors.map(ancestor => [ancestor.id, createRef()])));
 	const overlayRef = useRef(null);
 	const downloadLinkRef = useRef(null);
 	const containerRef = useRef<HTMLElement>(null);

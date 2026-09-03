@@ -49,6 +49,18 @@ def uploaded_svg(ambit, admin_user):
     )
 
 
+@pytest.fixture
+def without_svg_sanitizer(settings):
+    """
+    Drop `sanitize_svg`, the validator registered for `image/svg+xml` by default.
+
+    It rejects a malformed document while it is being uploaded, which is what it is there
+    for, but it also makes it impossible to put one into storage — which the tests for the
+    error handling further down the line have to do.
+    """
+    settings.FINDER_REMOVE_PAYLOAD_VALIDATORS = ['image/svg+xml']
+
+
 class TestParseLength:
     @pytest.mark.parametrize('value, expected', [
         ('12', 12.0),

@@ -47,7 +47,7 @@ export default function SearchField(props) {
 		};
 		const resetSearch = () => {
 			setSearchQuery('');
-			Object.entries(currentColumns as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
+			Object.values(currentColumns).forEach((columnRef: React.RefObject<any>) => {
 				columnRef.current?.setSearchQuery();
 			});
 			setSearchResult(false);
@@ -72,8 +72,8 @@ export default function SearchField(props) {
 	function changeSearchZone(value) {
 		if (value !== searchZone) {
 			setSearchZone(value);
-			 Object.entries(columnRefs as React.MutableRefObject<any>).forEach(([folderId, columnRef]) => {
-			 	columnRef.current?.fetchInodes();
+			Object.values(currentColumns).forEach((columnRef: React.RefObject<any>) => {
+				columnRef.current?.fetchInodes();
 			});
 		}
 	}
