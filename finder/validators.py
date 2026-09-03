@@ -60,7 +60,7 @@ def payload_validator(validator):
         try:
             return payload_validator(import_string(validator))
         except ImportError as exc:
-            raise ImproperlyConfigured(f"Could not import payload validator “{validator}”: {exc}")
+            raise ImproperlyConfigured(f"Could not import payload validator “{validator}”: {exc}") from exc
     if isclass(validator):
         return payload_validator(validator())
     if callable(validator):
