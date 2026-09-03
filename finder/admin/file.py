@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.exceptions import ValidationError
 from django.forms.widgets import Media
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.urls import path, reverse
@@ -86,7 +87,11 @@ class FileAdmin(InodeAdmin):
         # the payload of the file_obj is not replaced and remains orphaned, it may be deleted
         file_obj.file_name = ambit.original_storage.generate_filename(uploaded_file.name)
         file_obj.file_size = uploaded_file.size
-        file_obj.receive_file(ambit, uploaded_file)
+        try:
+            file_obj.receive_file(ambit, uploaded_file)
+        except ValidationError as exc:
+            # The messages of a rejected payload are written for the uploading user.
+            return HttpResponseBadRequest('; '.join(exc.messages))
         file_obj.store_and_save(ambit, force_update=True)
         return HttpResponse(f"Replaced content of {file_obj.name} successfully.")
 
