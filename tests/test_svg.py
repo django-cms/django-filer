@@ -6,15 +6,17 @@ import unittest
 import xml.etree.ElementTree as ET
 from io import BytesIO, StringIO
 
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from easy_thumbnails import VIL
-from easy_thumbnails.exceptions import EasyThumbnailsError
+from easy_thumbnails.exceptions import EasyThumbnailsError, InvalidImageFormatError
 from easy_thumbnails.files import get_thumbnailer
 
 from filer.settings import FILER_IMAGE_MODEL
 from filer.utils import svg
+from filer.utils.filer_easy_thumbnails import svg_source_generator
 from filer.utils.loader import load_model
 
 
@@ -238,6 +240,18 @@ class ResizeAndCropTests(TestCase):
         root = self.serialize(image.crop((0, 0, 10, 5)))
         self.assertEqual(root.get('viewBox'), '-10 -5 10 5')
 
+    def test_crop_with_a_degenerate_box_copies(self):
+        """A box with no area leaves the image at its current geometry."""
+        image = svg.load(BytesIO(make_svg(width='40', height='20')))
+        for box in ((10, 10, 10, 10), (30, 0, 10, 20)):
+            cropped = image.crop(box)
+            self.assertEqual(cropped.size, (40.0, 20.0), box)
+
+    def test_filter_is_a_no_op(self):
+        """The ``detail`` and ``sharpen`` processors do not apply to vectors."""
+        image = svg.load(BytesIO(make_svg(width='40', height='20')))
+        self.assertIs(image.filter('anything'), image)
+
     def test_crop_without_a_box_copies(self):
         image = svg.load(BytesIO(make_svg(width='40', height='20')))
         self.assertEqual(image.crop().size, (40.0, 20.0))
@@ -341,6 +355,26 @@ class SvgThumbnailTests(TestCase):
         self.assertEqual(ET.fromstring(self.read(thumbnail)).tag,
                          '{http://www.w3.org/2000/svg}svg')
 
+    def test_source_generator_without_a_source(self):
+        """easy-thumbnails passes ``None`` when it cannot open the file."""
+        self.assertIsNone(svg_source_generator(None))
+
+    def test_unopenable_svg_reports_an_invalid_image_format(self):
+        """
+        The ``{% thumbnail %}`` tag asks the source generators for silence, so a
+        file named ``.svg`` that is not SVG surfaces here rather than earlier.
+        """
+        image = self.create_image(content=b'this is not markup', name='notreally.svg')
+        with self.assertRaises(InvalidImageFormatError):
+            get_thumbnailer(image).get_thumbnail(
+                {'size': (100, 100)}, silent_template_exception=True)
+
+    def test_unparseable_thumbnail_size_is_rejected(self):
+        """A size with no numbers in it leaves nothing to scale to."""
+        thumbnailer = get_thumbnailer(self.create_image())
+        with self.assertRaises(EasyThumbnailsError):
+            thumbnailer.get_thumbnail({'size': ('wide', None)})
+
     def test_unreadable_svg_leaves_dimensions_unset(self):
         image = self.create_image(content=b'<svg><rect></svg>', name='broken.svg')
         self.assertEqual((image.width, image.height), (0.0, 0.0))
@@ -380,3 +414,30 @@ class OptionalDependencyTests(TestCase):
                 if module.split('.')[0] in ('svglib', 'reportlab') or module.startswith('easy_thumbnails.VIL'):
                     offenders.append(f'{source.relative_to(root.parent)}: {module}')
         self.assertEqual(offenders, [])
+
+
+class ImageSizeGuardTests(TestCase):
+    """
+    ``BaseImage.clean()`` refuses images whose dimensions cannot be read: for a
+    raster image that is the signature of a decompression bomb, since Pillow
+    reports no size for one. A vector image has no pixel count at all, so the
+    guard must not catch it.
+    """
+
+    def unmeasurable_image(self, name, mime_type):
+        image = Image(
+            file=SimpleUploadedFile(name=name, content=b'...', content_type=mime_type),
+            original_filename=name,
+            mime_type=mime_type,
+        )
+        image._width, image._height = None, None
+        return image
+
+    def test_vector_image_without_dimensions_is_allowed(self):
+        self.unmeasurable_image('vector.svg', 'image/svg+xml').clean()
+
+    def test_raster_image_without_dimensions_is_rejected(self):
+        image = self.unmeasurable_image('photo.jpg', 'image/jpeg')
+        with self.assertRaises(ValidationError) as caught:
+            image.clean()
+        self.assertEqual(caught.exception.code, 'image_size')
