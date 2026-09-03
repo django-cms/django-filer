@@ -94,4 +94,14 @@ jobs:
       run: |
         export USE_POSTGRES="${{ matrix.use_postgres }}"
         export USE_S3="${{ matrix.use_s3 }}"
-        python -m pytest -v unittests
+        python -m pytest -v --cov --cov-report=xml unittests
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v6
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: py${{ matrix.python-version }}-django${{ matrix.django-version }}${{ matrix.with_cte == '1' && '-cte' || '' }}${{ matrix.use_postgres == '1' && '-postgres' || '-sqlite' }}${{ matrix.use_s3 == '1' && '-s3' || '' }}
+        token: ${{ secrets.CODECOV_TOKEN }}
+        # every matrix leg uploads its own report; Codecov merges them, which is what the
+        # `pragma: with[out] django-cte` exclusions in pyproject.toml rely on
+        fail_ci_if_error: false
