@@ -94,17 +94,20 @@ def _ensure_ambit(django_db_blocker, slug, storage, sample_storage):
 
 
 @pytest.fixture
-def ambit(django_db_blocker):
+def ambit(db, django_db_blocker):
+    # `db` opens the test transaction before the ambit is written. Without it a test
+    # whose other fixtures need no database (`client` rather than `admin_client`) writes
+    # the ambit in autocommit mode, where it survives every following test.
     return _ensure_ambit(django_db_blocker, 'test-ambit', 'finder_test', 'finder_test_samples')
 
 
 @pytest.fixture
-def alternative_ambit(django_db_blocker):
+def alternative_ambit(db, django_db_blocker):
     return _ensure_ambit(django_db_blocker, 'alternative-ambit', 'finder_alternative', 'finder_alternative_samples')
 
 
 @pytest.fixture
-def public_ambit(django_db_blocker):
+def public_ambit(db, django_db_blocker):
     """The ambit referred to by the `FinderFileField`s of the test application."""
     return _ensure_ambit(django_db_blocker, 'public', 'finder_test', 'finder_test_samples')
 
